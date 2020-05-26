@@ -54,7 +54,7 @@ from program_management.models.enums.node_type import NodeType
 
 
 class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageMixin, FormView):
-    template_name = "tree/attach_inner.html"
+    template_name = "tree/paste_inner.html"
     permission_required = "base.attach_educationgroup"
 
     def has_permission(self):
@@ -146,7 +146,7 @@ class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageM
 
 
 class CheckPasteView(LoginRequiredMixin, AjaxTemplateMixin, SuccessMessageMixin, TemplateView):
-    template_name = "tree/check_attach_inner.html"
+    template_name = "tree/check_paste_inner.html"
 
     def get(self, request, *args, **kwargs):
         nodes_to_paste = element_selected_service.retrieve_element_selected(

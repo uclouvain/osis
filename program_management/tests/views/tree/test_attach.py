@@ -114,7 +114,7 @@ class TestAttachNodeView(TestCase):
         path = "|".join([str(self.tree.root_node.pk), str(self.tree.root_node.children[0].child.pk)])
         response = self.client.get(self.url, data={"path": path})
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, 'tree/attach_inner.html')
+        self.assertTemplateUsed(response, 'tree/paste_inner.html')
 
         msgs = [m.message for m in messages.get_messages(response.wsgi_request)]
         self.assertEqual(msgs, [_("Please cut or copy an item before paste")])
@@ -129,7 +129,7 @@ class TestAttachNodeView(TestCase):
         path = "|".join([str(self.tree.root_node.pk), str(self.tree.root_node.children[0].child.pk)])
         response = self.client.get(self.url, data={"path": path})
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, 'tree/attach_inner.html')
+        self.assertTemplateUsed(response, 'tree/paste_inner.html')
 
         self.assertIn('formset', response.context, msg="Probably there are no item selected on cache")
         self.assertIsInstance(response.context['formset'], PasteNodesFormset)
@@ -149,7 +149,7 @@ class TestAttachNodeView(TestCase):
         path = "|".join([str(self.tree.root_node.pk), str(self.tree.root_node.children[1].child.pk)])
         response = self.client.get(self.url, data={"path": path})
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, 'tree/attach_inner.html')
+        self.assertTemplateUsed(response, 'tree/paste_inner.html')
 
         self.assertIn('formset', response.context, msg="Probably there are no item selected on cache")
         self.assertIsInstance(response.context['formset'], PasteNodesFormset)
@@ -166,7 +166,7 @@ class TestAttachNodeView(TestCase):
         path = "|".join([str(self.tree.root_node.pk), str(self.tree.root_node.children[1].child.pk)])
         response = self.client.post(self.url + "?path=" + path)
 
-        self.assertTemplateUsed(response, 'tree/attach_inner.html')
+        self.assertTemplateUsed(response, 'tree/paste_inner.html')
         self.assertIn('formset', response.context, msg="Probably there are no item selected on cache")
         self.assertIsInstance(response.context['formset'], PasteNodesFormset)
 
@@ -222,7 +222,7 @@ class TestAttachCheckView(TestCase):
             "content_type": EDUCATION_GROUP_YEAR,
             "path": self.path
         })
-        self.assertTemplateUsed(response, "tree/check_attach_inner.html")
+        self.assertTemplateUsed(response, "tree/check_paste_inner.html")
 
         msgs = [m.message for m in get_messages(response.wsgi_request)]
         self.assertIn("Not valid", msgs)
