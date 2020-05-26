@@ -30,7 +30,8 @@ from django.utils.translation import gettext_lazy as _
 import program_management.ddd.command
 from program_management.ddd.business_types import *
 from program_management.ddd.repositories import load_tree, load_node
-from program_management.ddd.service.write.paste_element_service import _validate_end_date_and_option_finality
+from program_management.ddd.validators._validate_end_date_and_option_finality import \
+    _validate_end_date_and_option_finality
 from program_management.ddd.validators import link as link_validator, _minimum_editable_year, _infinite_recursivity
 
 

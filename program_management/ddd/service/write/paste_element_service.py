@@ -23,14 +23,14 @@
 # ############################################################################
 from typing import List
 
-from base.models.enums.link_type import LinkTypes
 from program_management.ddd.business_types import *
 from program_management.ddd import command
 from program_management.ddd.repositories import load_tree, load_node, persist_tree
 from program_management.ddd.service import detach_node_service
-from program_management.ddd.validators._attach_finality_end_date import AttachFinalityEndDateValidator
-from program_management.ddd.validators._attach_option import AttachOptionsValidator
-from program_management.ddd.validators._authorized_relationship import PasteAuthorizedRelationshipValidator
+from program_management.ddd.validators._authorized_relationship_for_all_trees import \
+    __validate_trees_using_node_as_reference_link
+from program_management.ddd.validators._validate_end_date_and_option_finality import \
+    _validate_end_date_and_option_finality
 from program_management.models.enums.node_type import NodeType
 
 
@@ -60,39 +60,3 @@ def paste_element_service(paste_command: command.PasteElementCommand) -> List['B
     if commit:
         persist_tree.persist(tree)
     return action_messages
-
-
-def __validate_trees_using_node_as_reference_link(
-        tree: 'ProgramTree',
-        node_to_attach: 'Node',
-        path: 'Path'
-) -> List['BusinessValidationMessage']:
-
-    error_messages = []
-    child_node = tree.get_node(path)
-    trees = load_tree.load_trees_from_children([child_node.node_id], link_type=LinkTypes.REFERENCE)
-    for tree in trees:
-        for parent_from_reference_link in tree.get_parents_using_node_as_reference(child_node):
-            validator = PasteAuthorizedRelationshipValidator(tree, node_to_attach, parent_from_reference_link)
-            if not validator.is_valid():
-                error_messages += validator.error_messages
-    return error_messages
-
-
-def _validate_end_date_and_option_finality(node_to_attach: 'Node') -> List['BusinessValidationMessage']:
-    error_messages = []
-    tree_from_node_to_attach = load_tree.load(node_to_attach.node_id)
-    finality_ids = [n.node_id for n in tree_from_node_to_attach.get_all_finalities()]
-    if node_to_attach.is_finality() or finality_ids:
-        trees_2m = [
-            tree for tree in load_tree.load_trees_from_children(child_branch_ids=finality_ids)
-            if tree.is_master_2m()
-        ]
-        for tree_2m in trees_2m:
-            validator = AttachFinalityEndDateValidator(tree_2m, tree_from_node_to_attach)
-            if not validator.is_valid():
-                error_messages += validator.error_messages
-            validator = AttachOptionsValidator(tree_2m, tree_from_node_to_attach)
-            if not validator.is_valid():
-                error_messages += validator.error_messages
-    return error_messages

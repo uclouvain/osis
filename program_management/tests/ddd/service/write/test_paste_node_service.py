@@ -39,8 +39,6 @@ from base.models.enums.link_type import LinkTypes
 from program_management.ddd.domain import program_tree
 from program_management.ddd.service import attach_node_service
 from program_management.ddd.service.write import paste_element_service
-from program_management.ddd.validators._attach_finality_end_date import AttachFinalityEndDateValidator
-from program_management.ddd.validators._attach_option import AttachOptionsValidator
 from program_management.ddd.validators._authorized_relationship import PasteAuthorizedRelationshipValidator
 from program_management.ddd.validators._infinite_recursivity import InfiniteRecursivityTreeValidator
 from program_management.ddd.validators._minimum_editable_year import MinimumEditableYearValidator
@@ -48,7 +46,7 @@ from program_management.ddd.validators.link import CreateLinkValidatorList
 from program_management.ddd.validators.validators_by_business_action import PasteNodeValidatorList
 from program_management.models.enums.node_type import NodeType
 from program_management.tests.ddd.factories.link import LinkFactory
-from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory, NodeGroupYearFactory
+from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 from program_management.tests.ddd.service.mixins import ValidatorPatcherMixin
 
@@ -203,76 +201,6 @@ class TestPasteNode(SimpleTestCase, ValidatorPatcherMixin):
         self.mock_validator(PasteNodeValidatorList, [_('Success message')], level=MessageLevel.SUCCESS)
         program_management.ddd.service.write.paste_element_service.paste_element_service(self.paste_command)
         self.assertFalse(self.mock_persist.called)
-
-
-class TestValidateEndDateAndOptionFinality(SimpleTestCase, ValidatorPatcherMixin):
-
-    def setUp(self):
-        self.root_node = NodeGroupYearFactory(node_type=TrainingType.PGRM_MASTER_120)
-        self.tree_2m = ProgramTreeFactory(root_node=self.root_node)
-        self.root_path = str(self.root_node.node_id)
-        self.node_to_attach_not_finality = NodeGroupYearFactory(node_type=TrainingType.BACHELOR)
-
-        self._patch_load_tree()
-
-    def _patch_load_tree(self):
-        patcher_load = patch("program_management.ddd.repositories.load_tree.load")
-        self.addCleanup(patcher_load.stop)
-        self.mock_load_tree_to_attach = patcher_load.start()
-        self.mock_load_tree_to_attach.return_value = ProgramTreeFactory(root_node=self.node_to_attach_not_finality)
-
-    @patch('program_management.ddd.repositories.load_tree.load_trees_from_children')
-    def test_when_node_to_attach_is_not_finality(self, mock_load_2m_trees):
-        """Unit test only for performance"""
-        self.mock_validator(AttachFinalityEndDateValidator, [_('Success message')], level=MessageLevel.SUCCESS)
-
-        program_management.ddd.service.write.paste_element_service._validate_end_date_and_option_finality(self.node_to_attach_not_finality)
-        self.assertFalse(mock_load_2m_trees.called)
-
-    @patch('program_management.ddd.repositories.load_tree.load_trees_from_children')
-    def test_when_end_date_of_finality_node_to_attach_is_not_valid(self, mock_load_2m_trees):
-        mock_load_2m_trees.return_value = [self.tree_2m]
-        node_to_attach = NodeGroupYearFactory(node_type=TrainingType.MASTER_MA_120)
-        self.mock_load_tree_to_attach.return_value = ProgramTreeFactory(root_node=node_to_attach)
-        self.mock_validator(AttachFinalityEndDateValidator, [_('Error end date finality message')])
-
-        result = program_management.ddd.service.write.paste_element_service._validate_end_date_and_option_finality(node_to_attach)
-        validator_msg = "Error end date finality message"
-        self.assertEqual(result[0].message, validator_msg)
-
-    @patch('program_management.ddd.repositories.load_tree.load_trees_from_children')
-    def test_when_end_date_of_finality_children_of_node_to_attach_is_not_valid(self, mock_load_2m_trees):
-        mock_load_2m_trees.return_value = [self.tree_2m]
-        not_finality = NodeGroupYearFactory(node_type=TrainingType.AGGREGATION)
-        finality = NodeGroupYearFactory(node_type=TrainingType.MASTER_MA_120)
-        not_finality.add_child(finality)
-        self.mock_load_tree_to_attach.return_value = ProgramTreeFactory(root_node=not_finality)
-        self.mock_validator(AttachFinalityEndDateValidator, [_('Error end date finality message')])
-
-        result = program_management.ddd.service.write.paste_element_service._validate_end_date_and_option_finality(not_finality)
-        validator_msg = "Error end date finality message"
-        self.assertEqual(result[0].message, validator_msg)
-
-    @patch('program_management.ddd.repositories.load_tree.load_trees_from_children')
-    def test_when_end_date_of_finality_node_to_attach_is_valid(self, mock_load_2m_trees):
-        mock_load_2m_trees.return_value = [self.tree_2m]
-        finality = NodeGroupYearFactory(node_type=TrainingType.MASTER_MA_120)
-        self.mock_load_tree_to_attach.return_value = ProgramTreeFactory(root_node=finality)
-        self.mock_validator(AttachFinalityEndDateValidator, [_('Success')], level=MessageLevel.SUCCESS)
-
-        result = program_management.ddd.service.write.paste_element_service._validate_end_date_and_option_finality(finality)
-        self.assertEqual([], result)
-
-    @patch('program_management.ddd.repositories.load_tree.load_trees_from_children')
-    def test_when_option_validator_not_valid(self, mock_load_2m_trees):
-        mock_load_2m_trees.return_value = [self.tree_2m]
-        node_to_attach = NodeGroupYearFactory(node_type=TrainingType.MASTER_MA_120)
-        self.mock_load_tree_to_attach.return_value = ProgramTreeFactory(root_node=node_to_attach)
-        self.mock_validator(AttachOptionsValidator, [_('Error attach option message')])
-
-        result = program_management.ddd.service.write.paste_element_service._validate_end_date_and_option_finality(node_to_attach)
-        validator_msg = "Error attach option message"
-        self.assertIn(validator_msg, result)
 
 
 class TestCheckAttach(SimpleTestCase):
