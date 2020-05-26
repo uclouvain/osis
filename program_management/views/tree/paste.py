@@ -68,8 +68,8 @@ class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageM
         return self.request.user.has_perms(("base.detach_educationgroup",), obj_to_detach)
 
     def get_permission_object(self) -> EducationGroupYear:
-        node_to_attach_from_id = int(self.request.GET['path'].split("|")[-1])
-        return shortcuts.get_object_or_404(EducationGroupYear, pk=node_to_attach_from_id)
+        node_to_paste_to_id = int(self.request.GET['path'].split("|")[-1])
+        return shortcuts.get_object_or_404(EducationGroupYear, pk=node_to_paste_to_id)
 
     def get_path_to_detach(self) -> Optional[Path]:
         link_to_detach = fetch_source_link(self.request.GET, self.request.user)  # type: GroupElementYear
@@ -78,7 +78,7 @@ class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageM
         return "|".join([str(link_to_detach.parent.pk), str(link_to_detach.child.pk)])
 
     @cached_property
-    def nodes_to_attach(self) -> List[Tuple[int, NodeType]]:
+    def nodes_to_paste(self) -> List[Tuple[int, NodeType]]:
         return element_selected_service.retrieve_element_selected(
             self.request.user,
             self.request.GET.get("id", []),
@@ -86,10 +86,10 @@ class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageM
         )
 
     def get_form_class(self):
-        return formset_factory(form=paste_form_factory, formset=PasteNodesFormset, extra=len(self.nodes_to_attach))
+        return formset_factory(form=paste_form_factory, formset=PasteNodesFormset, extra=len(self.nodes_to_paste))
 
     def get_form_kwargs(self) -> List[dict]:
-        return [self._get_form_kwargs(node_id, node_type) for node_id, node_type in self.nodes_to_attach]
+        return [self._get_form_kwargs(node_id, node_type) for node_id, node_type in self.nodes_to_paste]
 
     def _get_form_kwargs(
             self,
@@ -97,9 +97,9 @@ class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageM
             node_type: NodeType
     ) -> dict:
         return {
-            'node_to_attach_type': node_type,
-            'node_to_attach_id': node_id,
-            'path_of_node_to_attach_from': self.request.GET['path'],
+            'node_to_paste_type': node_type,
+            'node_to_paste_id': node_id,
+            'path_of_node_to_paste_into': self.request.GET['path'],
             'path_to_detach': self.get_path_to_detach(),
         }
 
@@ -115,11 +115,11 @@ class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageM
             context_data["formset"]
         )
         context_data["nodes_by_id"] = {node_id: load_node.load_by_type(node_type, node_id)
-                                       for node_id, node_type in self.nodes_to_attach}
+                                       for node_id, node_type in self.nodes_to_paste}
         if self.get_path_to_detach():
             self.check_detach_errors()
-        if not self.nodes_to_attach:
-            display_warning_messages(self.request, _("Please cut or copy an item before attach it"))
+        if not self.nodes_to_paste:
+            display_warning_messages(self.request, _("Please cut or copy an item before paste"))
         return context_data
 
     def check_detach_errors(self):
@@ -149,7 +149,7 @@ class CheckPasteView(LoginRequiredMixin, AjaxTemplateMixin, SuccessMessageMixin,
     template_name = "tree/check_attach_inner.html"
 
     def get(self, request, *args, **kwargs):
-        nodes_to_attach = element_selected_service.retrieve_element_selected(
+        nodes_to_paste = element_selected_service.retrieve_element_selected(
             self.request.user,
             self.request.GET.get("id", []),
             self.request.GET.get("content_type")
@@ -157,7 +157,7 @@ class CheckPasteView(LoginRequiredMixin, AjaxTemplateMixin, SuccessMessageMixin,
         check_command = program_management.ddd.command.CheckAttachNodeCommand(
             root_id=self.kwargs["root_id"],
             path_where_to_attach=self.request.GET["path"],
-            nodes_to_attach=nodes_to_attach
+            nodes_to_attach=nodes_to_paste
         )
         error_messages = attach_node_service.check_attach(check_command)
 

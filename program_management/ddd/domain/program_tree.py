@@ -37,7 +37,7 @@ from program_management.ddd.business_types import *
 from program_management.ddd.domain import prerequisite
 from program_management.ddd.validators._detach_root import DetachRootValidator
 from program_management.ddd.validators._path_validator import PathValidator
-from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList, \
+from program_management.ddd.validators.validators_by_business_action import PasteNodeValidatorList, \
     UpdatePrerequisiteValidatorList
 from program_management.ddd.validators.validators_by_business_action import DetachNodeValidatorList
 from program_management.models.enums import node_type
@@ -239,44 +239,44 @@ class ProgramTree(interface.RootEntity):
         copied_root_node = _copy(self.root_node, ignore_children_from=ignore_children_from)
         return ProgramTree(root_node=copied_root_node, authorized_relationships=self.authorized_relationships)
 
-    def attach_node(
+    def paste_node(
             self,
-            node_to_attach: 'Node',
+            node_to_paste: 'Node',
             path: Optional[Path],
-            attach_command: program_management.ddd.command.PasteElementCommand
+            paste_command: program_management.ddd.command.PasteElementCommand
     ) -> List['BusinessValidationMessage']:
         """
         Add a node to the tree
-        :param node_to_attach: Node to add on the tree
+        :param node_to_paste: Node to paste into the tree
         :param path: [Optional]The position where the node must be added
-        :param attach_command: an attach node command
+        :param paste_command: a paste node command
         """
         parent = self.get_node(path) if path else self.root_node
         path = path or str(self.root_node.node_id)
-        link_type = attach_command.link_type
-        block = attach_command.block
-        is_valid, messages = self.clean_attach_node(node_to_attach, path, link_type, block)
+        link_type = paste_command.link_type
+        block = paste_command.block
+        is_valid, messages = self.clean_paste_node(node_to_paste, path, link_type, block)
         if is_valid:
             parent.add_child(
-                node_to_attach,
-                access_condition=attach_command.access_condition,
-                is_mandatory=attach_command.is_mandatory,
-                block=attach_command.block,
-                link_type=attach_command.link_type,
-                comment=attach_command.comment,
-                comment_english=attach_command.comment_english,
-                relative_credits=attach_command.relative_credits
+                node_to_paste,
+                access_condition=paste_command.access_condition,
+                is_mandatory=paste_command.is_mandatory,
+                block=paste_command.block,
+                link_type=paste_command.link_type,
+                comment=paste_command.comment,
+                comment_english=paste_command.comment_english,
+                relative_credits=paste_command.relative_credits
             )
         return messages
 
-    def clean_attach_node(
+    def clean_paste_node(
             self,
-            node_to_attach: 'Node',
+            node_to_paste: 'Node',
             path: Path,
             link_type: Optional[LinkTypes],
             block: Optional[int]
     ) -> Tuple[bool, List['BusinessValidationMessage']]:
-        validator = AttachNodeValidatorList(self, node_to_attach, path, link_type, block)
+        validator = PasteNodeValidatorList(self, node_to_paste, path, link_type, block)
         return validator.is_valid(), validator.messages
 
     def set_prerequisite(

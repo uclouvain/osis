@@ -32,7 +32,7 @@ from base.models.enums.link_type import LinkTypes
 from program_management.ddd.business_types import *
 from program_management.ddd.validators._authorized_link_type import AuthorizedLinkTypeValidator
 from program_management.ddd.validators._authorized_relationship import \
-    AuthorizedRelationshipLearningUnitValidator, AttachAuthorizedRelationshipValidator, \
+    AuthorizedRelationshipLearningUnitValidator, PasteAuthorizedRelationshipValidator, \
     DetachAuthorizedRelationshipValidator
 from program_management.ddd.validators._block_validator import BlockValidator
 from program_management.ddd.validators._detach_option_2M import DetachOptionValidator
@@ -46,32 +46,32 @@ from program_management.ddd.validators._prerequisites_items import PrerequisiteI
 from program_management.ddd.validators.link import CreateLinkValidatorList
 
 
-class AttachNodeValidatorList(BusinessListValidator):
+class PasteNodeValidatorList(BusinessListValidator):
     def __init__(
             self,
             tree: 'ProgramTree',
-            node_to_add: 'Node',
+            node_to_paste: 'Node',
             path: 'Path',
             link_type: Optional[LinkTypes],
             block: Optional[int]
     ):
-        if node_to_add.is_group():
+        if node_to_paste.is_group():
             self.validators = [
-                CreateLinkValidatorList(tree.get_node(path), node_to_add),
-                AttachAuthorizedRelationshipValidator(tree, node_to_add, tree.get_node(path)),
+                CreateLinkValidatorList(tree.get_node(path), node_to_paste),
+                PasteAuthorizedRelationshipValidator(tree, node_to_paste, tree.get_node(path)),
                 MinimumEditableYearValidator(tree),
-                InfiniteRecursivityTreeValidator(tree, node_to_add, path),
-                AuthorizedLinkTypeValidator(tree.root_node, node_to_add, link_type),
+                InfiniteRecursivityTreeValidator(tree, node_to_paste, path),
+                AuthorizedLinkTypeValidator(tree.root_node, node_to_paste, link_type),
                 BlockValidator(block),
             ]
 
-        elif node_to_add.is_learning_unit():
+        elif node_to_paste.is_learning_unit():
             self.validators = [
-                CreateLinkValidatorList(tree.get_node(path), node_to_add),
-                AuthorizedRelationshipLearningUnitValidator(tree, node_to_add, tree.get_node(path)),
+                CreateLinkValidatorList(tree.get_node(path), node_to_paste),
+                AuthorizedRelationshipLearningUnitValidator(tree, node_to_paste, tree.get_node(path)),
                 MinimumEditableYearValidator(tree),
-                InfiniteRecursivityTreeValidator(tree, node_to_add, path),
-                AuthorizedLinkTypeValidator(tree.root_node, node_to_add, link_type),
+                InfiniteRecursivityTreeValidator(tree, node_to_paste, path),
+                AuthorizedLinkTypeValidator(tree.root_node, node_to_paste, link_type),
                 BlockValidator(block),
             ]
 

@@ -31,31 +31,31 @@ from base.ddd.utils.business_validator import BusinessValidator
 from program_management.ddd.business_types import *
 
 
-class AttachAuthorizedRelationshipValidator(BusinessValidator):
-    def __init__(self, tree: 'ProgramTree', node_to_add: 'Node', position_to_add: 'Node'):
-        super(AttachAuthorizedRelationshipValidator, self).__init__()
+class PasteAuthorizedRelationshipValidator(BusinessValidator):
+    def __init__(self, tree: 'ProgramTree', node_to_paste: 'Node', node_to_paste_into: 'Node'):
+        super(PasteAuthorizedRelationshipValidator, self).__init__()
         self.tree = tree
-        self.node_to_add = node_to_add
-        self.parent = position_to_add
+        self.node_to_paste = node_to_paste
+        self.parent = node_to_paste_into
         self.auth_relations = tree.authorized_relationships
 
     def validate(self):
-        if not self.auth_relations.is_authorized(self.parent.node_type, self.node_to_add.node_type):
+        if not self.auth_relations.is_authorized(self.parent.node_type, self.node_to_paste.node_type):
             self.add_error_message(
                 _("You cannot add \"%(child)s\" of type \"%(child_types)s\" "
                   "to \"%(parent)s\" of type \"%(parent_type)s\"") % {
-                    'child': self.node_to_add,
-                    'child_types': self.node_to_add.node_type.value,
+                    'child': self.node_to_paste,
+                    'child_types': self.node_to_paste.node_type.value,
                     'parent': self.parent,
                     'parent_type': self.parent.node_type.value,
                 }
             )
-        if self.is_maximum_children_types_reached(self.parent, self.node_to_add):
+        if self.is_maximum_children_types_reached(self.parent, self.node_to_paste):
             self.add_error_message(
                 _("Cannot add \"%(child)s\" because the number of children of type(s) \"%(child_types)s\" "
                   "for \"%(parent)s\" has already reached the limit.") % {
-                    'child': self.node_to_add,
-                    'child_types': self.node_to_add.node_type.value,
+                    'child': self.node_to_paste,
+                    'child_types': self.node_to_paste.node_type.value,
                     'parent': self.parent
                 }
             )

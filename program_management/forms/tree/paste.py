@@ -55,32 +55,32 @@ class PasteNodesFormset(BaseFormSet):
 
 def paste_form_factory(
         self,
-        path_of_node_to_attach_from: str,
-        node_to_attach_id: int,
-        node_to_attach_type: NodeType,
+        path_of_node_to_paste_into: str,
+        node_to_paste_id: int,
+        node_to_paste_type: NodeType,
         **kwargs
 ) -> 'PasteNodeForm':
-    form_class = _get_form_class(path_of_node_to_attach_from, node_to_attach_id, node_to_attach_type)
-    return form_class(path_of_node_to_attach_from, node_to_attach_id, node_to_attach_type, **kwargs)
+    form_class = _get_form_class(path_of_node_to_paste_into, node_to_paste_id, node_to_paste_type)
+    return form_class(path_of_node_to_paste_into, node_to_paste_id, node_to_paste_type, **kwargs)
 
 
 def _get_form_class(
-        path_of_node_to_attach_from: str,
-        node_to_attach_id: int,
-        node_to_attach_type: NodeType
+        path_of_node_to_paste_into: str,
+        node_to_paste_id: int,
+        node_to_paste_type: NodeType
 ) -> Type['PasteNodeForm']:
-    node_to_attach_from_id = int(path_of_node_to_attach_from.split("|")[-1])
-    node_to_attach_from = load_node.load_by_type(NodeType.EDUCATION_GROUP, node_to_attach_from_id)
-    node_to_attach = load_node.load_by_type(node_to_attach_type, node_to_attach_id)
+    node_to_paste_into_id = int(path_of_node_to_paste_into.split("|")[-1])
+    node_to_paste_into = load_node.load_by_type(NodeType.EDUCATION_GROUP, node_to_paste_into_id)
+    node_to_paste = load_node.load_by_type(node_to_paste_type, node_to_paste_id)
     authorized_relationship = load_authorized_relationship.load()
 
-    if node_to_attach_from.is_minor_major_list_choice():
+    if node_to_paste_into.is_minor_major_list_choice():
         return PasteToMinorMajorListChoiceForm
-    elif node_to_attach.node_type == NodeType.LEARNING_UNIT:
+    elif node_to_paste.node_type == NodeType.LEARNING_UNIT:
         return PasteLearningUnitForm
-    elif node_to_attach_from.is_training() and node_to_attach.is_minor_major_list_choice():
+    elif node_to_paste_into.is_training() and node_to_paste.is_minor_major_list_choice():
         return PasteMinorMajorListChoiceToTrainingForm
-    elif not authorized_relationship.is_authorized(node_to_attach_from.node_type, node_to_attach.node_type):
+    elif not authorized_relationship.is_authorized(node_to_paste_into.node_type, node_to_paste.node_type):
         return PasteNotAuthorizedChildren
     return PasteNodeForm
 
@@ -97,14 +97,14 @@ class PasteNodeForm(forms.Form):
     def __init__(
             self,
             to_path: str,
-            node_to_attach_id: int,
-            node_to_attach_type: NodeType,
+            node_to_paste_id: int,
+            node_to_paste_type: NodeType,
             path_to_detach: str = None,
             **kwargs
     ):
         self.to_path = to_path
-        self.node_id = node_to_attach_id
-        self.node_type = node_to_attach_type
+        self.node_id = node_to_paste_id
+        self.node_type = node_to_paste_type
         self.path_to_detach = path_to_detach
         super().__init__(**kwargs)
 
@@ -127,9 +127,9 @@ class PasteNodeForm(forms.Form):
         root_id = int(self.to_path.split("|")[0])
         return command.PasteElementCommand(
             root_id=root_id,
-            node_id_to_attach=self.node_id,
-            type_of_node_to_attach=self.node_type,
-            path_where_to_attach=self.to_path,
+            node_to_paste_id=self.node_id,
+            node_to_paste_type=self.node_type,
+            path_where_to_paste=self.to_path,
             commit=True,
             access_condition=self.cleaned_data.get("access_condition", False),
             is_mandatory=self.cleaned_data.get("is_mandatory", True),
@@ -171,9 +171,9 @@ class PasteToMinorMajorListChoiceForm(PasteNodeForm):
         root_id = int(self.to_path.split("|")[0])
         return command.PasteElementCommand(
             root_id=root_id,
-            node_id_to_attach=self.node_id,
-            type_of_node_to_attach=self.node_type,
-            path_where_to_attach=self.to_path,
+            node_to_paste_id=self.node_id,
+            node_to_paste_type=self.node_type,
+            path_where_to_paste=self.to_path,
             commit=True,
             access_condition=self.cleaned_data.get("access_condition", False),
             is_mandatory=self.cleaned_data.get("is_mandatory", True),

@@ -69,9 +69,9 @@ class PasteElementCommand(interface.CommandRequest):
     def __init__(
             self,
             root_id: int,
-            node_id_to_attach: int,
-            type_of_node_to_attach: node_type.NodeType,
-            path_where_to_attach: 'Path',
+            node_to_paste_id: int,
+            node_to_paste_type: node_type.NodeType,
+            path_where_to_paste: 'Path',
             commit: bool,
             access_condition: Optional[bool],
             is_mandatory: Optional[bool],
@@ -83,9 +83,9 @@ class PasteElementCommand(interface.CommandRequest):
             path_where_to_detach: Optional['Path']
     ) -> None:
         self.root_id = root_id
-        self.node_id_to_attach = node_id_to_attach
-        self.type_of_node_to_attach = type_of_node_to_attach
-        self.path_where_to_attach = path_where_to_attach
+        self.node_to_paste_id = node_to_paste_id
+        self.node_to_paste_type = node_to_paste_type
+        self.path_where_to_paste = path_where_to_paste
         self.commit = commit
         self.access_condition = access_condition
         self.is_mandatory = is_mandatory

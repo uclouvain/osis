@@ -31,7 +31,7 @@ from base.models.authorized_relationship import AuthorizedRelationshipList
 from base.models.enums.education_group_types import TrainingType, GroupType
 from base.models.enums.link_type import LinkTypes
 from base.tests.factories.academic_year import AcademicYearFactory
-from program_management.ddd.validators._authorized_relationship import AttachAuthorizedRelationshipValidator, \
+from program_management.ddd.validators._authorized_relationship import PasteAuthorizedRelationshipValidator, \
     DetachAuthorizedRelationshipValidator, AuthorizedRelationshipLearningUnitValidator
 from program_management.models.enums.node_type import NodeType
 from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipObjectFactory
@@ -70,13 +70,13 @@ class TestAttachAuthorizedRelationshipValidator(SimpleTestCase):
             root_node=NodeGroupYearFactory(node_type=TrainingType.BACHELOR),
             authorized_relationships=self.authorized_relationships
         )
-        validator = AttachAuthorizedRelationshipValidator(tree, self.authorized_child, tree.root_node)
+        validator = PasteAuthorizedRelationshipValidator(tree, self.authorized_child, tree.root_node)
         result = validator.is_valid()
         self.assertTrue(result)
 
     def test_when_relation_is_not_authorized(self):
         unauthorized_child = NodeGroupYearFactory(node_type=GroupType.COMPLEMENTARY_MODULE)
-        validator = AttachAuthorizedRelationshipValidator(self.tree, unauthorized_child, self.authorized_parent)
+        validator = PasteAuthorizedRelationshipValidator(self.tree, unauthorized_child, self.authorized_parent)
         self.assertFalse(validator.is_valid())
         error_msg = _("You cannot add \"%(child)s\" of type \"%(child_types)s\" "
                       "to \"%(parent)s\" of type \"%(parent_type)s\"") % {
@@ -95,7 +95,7 @@ class TestAttachAuthorizedRelationshipValidator(SimpleTestCase):
             root_node=another_authorized_parent,
             authorized_relationships=self.authorized_relationships
         )
-        validator = AttachAuthorizedRelationshipValidator(tree, self.authorized_child, another_authorized_parent)
+        validator = PasteAuthorizedRelationshipValidator(tree, self.authorized_child, another_authorized_parent)
         self.assertTrue(validator.is_valid())
 
     def test_when_parent_has_children_but_maximum_is_not_reached(self):
@@ -106,13 +106,13 @@ class TestAttachAuthorizedRelationshipValidator(SimpleTestCase):
             root_node=another_authorized_parent,
             authorized_relationships=self.authorized_relationships
         )
-        validator = AttachAuthorizedRelationshipValidator(tree, self.authorized_child, another_authorized_parent)
+        validator = PasteAuthorizedRelationshipValidator(tree, self.authorized_child, another_authorized_parent)
         self.assertTrue(validator.is_valid())
 
     def test_when_maximum_is_reached(self):
         self.authorized_parent.add_child(self.authorized_child)
         another_authorized_child = NodeGroupYearFactory(node_type=GroupType.COMMON_CORE)
-        validator = AttachAuthorizedRelationshipValidator(self.tree, another_authorized_child, self.authorized_parent)
+        validator = PasteAuthorizedRelationshipValidator(self.tree, another_authorized_child, self.authorized_parent)
 
         self.assertFalse(validator.is_valid())
 

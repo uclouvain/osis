@@ -23,21 +23,22 @@
 # ############################################################################
 from typing import List
 
-import program_management.ddd.command
 from base.models.enums.link_type import LinkTypes
+from program_management.ddd.business_types import *
+from program_management.ddd import command
 from program_management.ddd.repositories import load_tree, load_node, persist_tree
 from program_management.ddd.service import detach_node_service
 from program_management.ddd.validators._attach_finality_end_date import AttachFinalityEndDateValidator
 from program_management.ddd.validators._attach_option import AttachOptionsValidator
-from program_management.ddd.validators._authorized_relationship import AttachAuthorizedRelationshipValidator
+from program_management.ddd.validators._authorized_relationship import PasteAuthorizedRelationshipValidator
 from program_management.models.enums.node_type import NodeType
 
 
-def paste_element_service(paste_command: program_management.ddd.command.PasteElementCommand) -> List['BusinessValidationMessage']:
+def paste_element_service(paste_command: command.PasteElementCommand) -> List['BusinessValidationMessage']:
     root_id = paste_command.root_id
-    type_node_to_attach = paste_command.type_of_node_to_attach
-    node_id_to_attach = paste_command.node_id_to_attach
-    path = paste_command.path_where_to_attach
+    type_node_to_attach = paste_command.node_to_paste_type
+    node_id_to_attach = paste_command.node_to_paste_id
+    path = paste_command.path_where_to_paste
     path_to_detach = paste_command.path_where_to_detach
     commit = paste_command.commit
 
@@ -55,7 +56,7 @@ def paste_element_service(paste_command: program_management.ddd.command.PasteEle
 
         action_messages.extend(detach_node_service.detach_node(path_to_detach, commit=commit).errors)
 
-    action_messages.extend(tree.attach_node(node_to_attach, path, paste_command))
+    action_messages.extend(tree.paste_node(node_to_attach, path, paste_command))
     if commit:
         persist_tree.persist(tree)
     return action_messages
@@ -72,7 +73,7 @@ def __validate_trees_using_node_as_reference_link(
     trees = load_tree.load_trees_from_children([child_node.node_id], link_type=LinkTypes.REFERENCE)
     for tree in trees:
         for parent_from_reference_link in tree.get_parents_using_node_as_reference(child_node):
-            validator = AttachAuthorizedRelationshipValidator(tree, node_to_attach, parent_from_reference_link)
+            validator = PasteAuthorizedRelationshipValidator(tree, node_to_attach, parent_from_reference_link)
             if not validator.is_valid():
                 error_messages += validator.error_messages
     return error_messages

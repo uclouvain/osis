@@ -117,7 +117,7 @@ class TestAttachNodeView(TestCase):
         self.assertTemplateUsed(response, 'tree/attach_inner.html')
 
         msgs = [m.message for m in messages.get_messages(response.wsgi_request)]
-        self.assertEqual(msgs, [_("Please cut or copy an item before attach it")])
+        self.assertEqual(msgs, [_("Please cut or copy an item before paste")])
         self.assertTrue(self.permission_mock.called)
 
     @mock.patch('program_management.ddd.service.read.element_selected_service.retrieve_element_selected')
