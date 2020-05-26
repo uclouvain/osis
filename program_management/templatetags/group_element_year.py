@@ -31,12 +31,9 @@ from osis_role.errors import get_permission_error
 register = template.Library()
 
 
-@register.inclusion_tag("blocks/button/action_template.html", takes_context=True)
-def action_with_permission(context, title, value, perm, url):
-    person = context.get('person')
-    group_element_year = context.get('group')
-
-    has_perm = person.user.has_perm(perm, group_element_year.parent)
+@register.inclusion_tag("blocks/button/action_template.html")
+def action_with_permission(person, group, title, value, perm, url):
+    has_perm = person.user.has_perm(perm, group.parent)
 
     return {
         'load_modal': has_perm,
