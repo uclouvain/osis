@@ -39,6 +39,7 @@ from base.models.enums.link_type import LinkTypes
 from program_management.ddd.domain import program_tree
 from program_management.ddd.service import attach_node_service
 from program_management.ddd.service.write import paste_element_service
+from program_management.ddd.validators import _validate_end_date_and_option_finality
 from program_management.ddd.validators._authorized_relationship import PasteAuthorizedRelationshipValidator
 from program_management.ddd.validators._infinite_recursivity import InfiniteRecursivityTreeValidator
 from program_management.ddd.validators._minimum_editable_year import MinimumEditableYearValidator
@@ -203,7 +204,7 @@ class TestPasteNode(SimpleTestCase, ValidatorPatcherMixin):
         self.assertFalse(self.mock_persist.called)
 
 
-class TestCheckAttach(SimpleTestCase):
+class TestCheckAttach(SimpleTestCase, ValidatorPatcherMixin):
     def setUp(self) -> None:
         self.tree = ProgramTreeFactory()
         self.node_to_attach_from = NodeEducationGroupYearFactory()
@@ -213,12 +214,14 @@ class TestCheckAttach(SimpleTestCase):
         self.node_to_attach_1 = NodeEducationGroupYearFactory()
         self.node_to_attach_2 = NodeEducationGroupYearFactory()
 
-        self._patch_validate_end_date_and_option_finality()
         self._patch_load_tree()
         self._patch_load_node()
         self.mock_create_link_validator = self._patch_validator_is_valid(CreateLinkValidatorList)
         self.mock_minimum_year_editable = self._patch_validator_is_valid(MinimumEditableYearValidator)
         self.mock_infinite_recursivity_tree = self._patch_validator_is_valid(InfiniteRecursivityTreeValidator)
+        self.mock_validate_end_date_and_option_finality = self._patch_validator_is_valid(
+            _validate_end_date_and_option_finality.ValidateEndDateAndOptionFinality
+        )
 
     def _patch_load_node(self):
         patcher_load_nodes = mock.patch(
@@ -235,14 +238,6 @@ class TestCheckAttach(SimpleTestCase):
         self.mock_load_tree = patcher_load_tree.start()
         self.mock_load_tree.return_value = self.tree
         self.addCleanup(patcher_load_tree.stop)
-
-    def _patch_validate_end_date_and_option_finality(self):
-        patcher_validate_end_date_and_option_finality = mock.patch(
-            "program_management.ddd.service.attach_node_service._validate_end_date_and_option_finality"
-        )
-        self.mock_validate_end_date_and_option_finality = patcher_validate_end_date_and_option_finality.start()
-        self.mock_validate_end_date_and_option_finality.return_value = []
-        self.addCleanup(patcher_validate_end_date_and_option_finality.stop)
 
     def _patch_validator_is_valid(self, validator_class: Type[business_validator.BusinessValidator]):
         patch_validator = mock.patch.object(
@@ -289,20 +284,3 @@ class TestCheckAttach(SimpleTestCase):
         self.assertEqual(self.mock_create_link_validator.call_count, 2)
         self.assertEqual(self.mock_minimum_year_editable.call_count, 2)
         self.assertEqual(self.mock_infinite_recursivity_tree.call_count, 2)
-
-    def test_should_return_validation_messages_if_any(self):
-        check_command = program_management.ddd.command.CheckAttachNodeCommand(
-            root_id=self.tree.root_node.node_id,
-            nodes_to_attach=[
-                (self.node_to_attach_1.node_id, self.node_to_attach_1.node_type),
-                (self.node_to_attach_2.node_id, self.node_to_attach_2.node_type)
-            ],
-            path_where_to_attach=self.path
-        )
-        self.mock_validate_end_date_and_option_finality.return_value = ["Validation error"]
-        result = attach_node_service.check_attach(check_command)
-
-        self.assertEqual(
-            result,
-            ["Validation error", "Validation error"]
-        )

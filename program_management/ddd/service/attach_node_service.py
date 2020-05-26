@@ -31,7 +31,7 @@ import program_management.ddd.command
 from program_management.ddd.business_types import *
 from program_management.ddd.repositories import load_tree, load_node
 from program_management.ddd.validators._validate_end_date_and_option_finality import \
-    _validate_end_date_and_option_finality
+    ValidateEndDateAndOptionFinality
 from program_management.ddd.validators import link as link_validator, _minimum_editable_year, _infinite_recursivity
 
 
@@ -55,7 +55,9 @@ def check_attach(check_command: program_management.ddd.command.CheckAttachNodeCo
 
     for node_to_attach in _nodes_to_attach:
         if not node_to_attach.is_learning_unit():
-            result.extend(_validate_end_date_and_option_finality(node_to_attach))
+            validator = ValidateEndDateAndOptionFinality(node_to_attach)
+            validator.is_valid()
+            result.extend(validator.error_messages)
 
         validator = link_validator.CreateLinkValidatorList(node_to_attach_from, node_to_attach)
         if not validator.is_valid():

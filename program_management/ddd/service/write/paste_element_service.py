@@ -28,9 +28,9 @@ from program_management.ddd import command
 from program_management.ddd.repositories import load_tree, load_node, persist_tree
 from program_management.ddd.service import detach_node_service
 from program_management.ddd.validators._authorized_relationship_for_all_trees import \
-    __validate_trees_using_node_as_reference_link
+    ValidateAuthorizedRelationshipForAllTrees
 from program_management.ddd.validators._validate_end_date_and_option_finality import \
-    _validate_end_date_and_option_finality
+    ValidateEndDateAndOptionFinality
 from program_management.models.enums.node_type import NodeType
 
 
@@ -45,9 +45,13 @@ def paste_element_service(paste_command: command.PasteElementCommand) -> List['B
     tree = load_tree.load(root_id)
     node_to_attach = load_node.load_by_type(type_node_to_attach, element_id=node_id_to_attach)
 
-    error_messages = __validate_trees_using_node_as_reference_link(tree, node_to_attach, path)
+    validator = ValidateAuthorizedRelationshipForAllTrees(tree, node_to_attach, path)
+    validator.is_valid()
+    error_messages = validator.error_messages
     if type_node_to_attach != NodeType.LEARNING_UNIT:
-        error_messages += _validate_end_date_and_option_finality(node_to_attach)
+        other_validator = ValidateEndDateAndOptionFinality(node_to_attach)
+        other_validator.is_valid()
+        error_messages += other_validator.error_messages
     if error_messages:
         return error_messages
 

@@ -23,24 +23,31 @@
 # ############################################################################
 from typing import List
 
+from base.ddd.utils.business_validator import BusinessValidator
 from base.models.enums.link_type import LinkTypes
 from program_management.ddd.repositories import load_tree
 from program_management.ddd.validators._authorized_relationship import PasteAuthorizedRelationshipValidator
 from program_management.ddd.business_types import *
 
 
-def __validate_trees_using_node_as_reference_link(
-        tree: 'ProgramTree',
-        node_to_attach: 'Node',
-        path: 'Path'
-) -> List['BusinessValidationMessage']:
+class ValidateAuthorizedRelationshipForAllTrees(BusinessValidator):
+    def __init__(
+            self,
+            tree: 'ProgramTree',
+            node_to_attach: 'Node',
+            path: 'Path'
+    ) -> None:
+        super().__init__()
+        self.tree = tree
+        self.node_to_attach = node_to_attach
+        self.path = path
 
-    error_messages = []
-    child_node = tree.get_node(path)
-    trees = load_tree.load_trees_from_children([child_node.node_id], link_type=LinkTypes.REFERENCE)
-    for tree in trees:
-        for parent_from_reference_link in tree.get_parents_using_node_as_reference(child_node):
-            validator = PasteAuthorizedRelationshipValidator(tree, node_to_attach, parent_from_reference_link)
-            if not validator.is_valid():
-                error_messages += validator.error_messages
-    return error_messages
+    def validate(self, *args, **kwargs):
+        child_node = self.tree.get_node(self.path)
+        trees = load_tree.load_trees_from_children([child_node.node_id], link_type=LinkTypes.REFERENCE)
+        for tree in trees:
+            for parent_from_reference_link in tree.get_parents_using_node_as_reference(child_node):
+                validator = PasteAuthorizedRelationshipValidator(tree, self.node_to_attach, parent_from_reference_link)
+                if not validator.is_valid():
+                    for msg in validator.error_messages:
+                        self.add_error_message(msg.message)
