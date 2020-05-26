@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,23 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.utils.translation import gettext_lazy as _
+from typing import TYPE_CHECKING
 
-from base.models.utils.utils import ChoiceEnum
+# FIXME :: Temporary solution ; waiting for update python to 3.8 for data structure
 
-NON_ACADEMIC = "NON_ACADEMIC"
-NON_ACADEMIC_CREF = "NON_ACADEMIC_CREF"
-ACADEMIC = "ACADEMIC"
-
-#  FIXME ::  DEPRECATED - use AcademicTypes enum instead
-ACADEMIC_TYPES = (
-    (NON_ACADEMIC, _("Non academic")),
-    (NON_ACADEMIC_CREF, _("Non academic CREF")),
-    (ACADEMIC, _("Academic"))
-)
-
-
-class AcademicTypes(ChoiceEnum):
-    NON_ACADEMIC = _("Non academic")
-    NON_ACADEMIC_CREF = _("Non academic CREF")
-    ACADEMIC = _("Academic")
+if TYPE_CHECKING:
+    from education_group.ddd.domain.training import Training, TrainingIdentity

@@ -39,9 +39,9 @@ class ProgramTreeVersionBuilder:
         assert isinstance(from_tree, ProgramTreeVersion)
         assert from_tree.is_standard, "Forbidden to copy from a non Standard version"
         if from_tree.is_transition:
-            self._tree_version = self._build_from_transition(from_tree.tree, **tree_version_attrs)
+            self._tree_version = self._build_from_transition(from_tree.get_tree(), **tree_version_attrs)
         else:
-            self._tree_version = self._build_from_standard(from_tree.tree, **tree_version_attrs)
+            self._tree_version = self._build_from_standard(from_tree.get_tree(), **tree_version_attrs)
         return self.program_tree_version
 
     @property
@@ -55,22 +55,30 @@ class ProgramTreeVersionBuilder:
         raise NotImplementedError()
 
 
+# FIXME :: should be in a separate DDD domain
 class ProgramTreeVersion(interface.RootEntity):
 
     def __init__(
             self,
             entity_identity: 'ProgramTreeVersionIdentity',
-            offer: int = None,
+            program_tree_identity: 'ProgramTreeIdentity',
+            program_tree_repository: 'ProgramTreeRepository',
             title_fr: str = None,
             title_en: str = None,
-            root_group = None
+            tree: 'ProgramTree' = None
     ):
         super(ProgramTreeVersion, self).__init__(entity_id=entity_identity)
         self.entity_id = entity_identity
-        self.offer = offer
+        self.program_tree_identity = program_tree_identity
+        self.program_tree_repository = program_tree_repository
         self.title_fr = title_fr
         self.title_en = title_en
-        self.root_group = root_group
+        self._tree = tree
+
+    def get_tree(self) -> 'ProgramTree':
+        if not self._tree:
+            self._tree = self.program_tree_repository.get(self.program_tree_identity)
+        return self._tree
 
     @property
     def is_standard(self):
@@ -85,7 +93,7 @@ class ProgramTreeVersion(interface.RootEntity):
         return self.entity_id.version_name
 
     @property
-    def version_label(self):
+    def version_label(self):  # TODO :: to remove
         if self.is_standard:
             return 'Transition' if self.is_transition else ''
         else:

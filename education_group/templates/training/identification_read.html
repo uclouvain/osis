@@ -25,10 +25,56 @@
 {% endcomment %}
 
 {% block details %}
-    <div class="row">
-        <div class="col-md-7">
-            TEST IDENTIFICATION
+    {% if not current_version.is_standard %}
+        {% include  "education_group/blocks/panel/panel_version_information.html" %}
+    {% endif %}
+    <div class="{% if not current_version.is_standard %} of_unversioned_field {% endif %}">
+        <div class="row">
+            <div class="col-md-7">
+                {% include  "training/identification/panel_informations.html" %}
+                {% include  "training/identification/panel_academic_informations.html" %}
+            </div>
+            <div class="col-md-5">
+                {% include  "training/identification/panel_entities.html" %}
+                {% include  "training/identification/panel_funding.html" %}
+                {% include  "training/identification/panel_history.html" %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                {% include  "training/identification/panel_remarks.html" %}
+                {% include  "training/identification/panel_hops.html" %}
+                {% include  "training/identification/panel_coorganizations.html" %}
+            </div>
         </div>
     </div>
+
     {% include "education_group/blocks/modal/custom_xls.html" %}
+
 {% endblock details %}
+
+{% block script %}
+    <script>
+        $(document).ready(function () {
+            $('#tbl_coorganization').DataTable({
+                columnDefs: [
+                    {targets: 3, type: 'diacritics-neutralise'},
+                    {targets: 1, orderable: false},
+                ],
+                "paging": false,
+                "ordering": true,
+                "info": false,
+                "searching": false,
+                "language": {
+                    "oAria": {
+                        "sSortAscending": "{% trans 'activate to sort column ascending'%}",
+                        "sSortDescending": "{% trans 'activate to sort column descending'%}"
+                    }
+                },
+                "order": [[2, "desc"], [0, "asc"]]
+            });
+
+        });
+        $('.of_unversioned_field div label').attr('title', "{% trans 'The value of this attribute is inherited from the standard OF' %}")
+    </script>
+{% endblock %}

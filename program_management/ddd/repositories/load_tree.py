@@ -31,6 +31,7 @@ from base.models.enums.link_type import LinkTypes
 from base.models.enums.quadrimesters import DerogationQuadrimester
 from osis_common.decorators.deprecated import deprecated
 from education_group.models.group_year import GroupYear
+from osis_common.decorators.deprecated import deprecated
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.education_group_version_academic_year import EducationGroupVersionAcademicYear
 from program_management.ddd.domain.link import factory as link_factory
@@ -41,6 +42,7 @@ from program_management.ddd.repositories import load_node, load_prerequisite, \
     load_authorized_relationship
 # Typing
 from program_management.ddd.repositories.load_prerequisite import TreeRootId, NodeId
+from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 from program_management.models.education_group_version import EducationGroupVersion
 
 GroupElementYearColumnName = str
@@ -63,16 +65,7 @@ def load_version(acronym: str, year: int, version_name: str, transition: bool) -
     except EducationGroupVersion.DoesNotExist:
         raise ProgramTreeVersionNotFoundException
 
-    tree = load(education_group_version.root_group.element.pk)
-    return ProgramTreeVersion(
-        tree,
-        education_group_version.version_name,
-        education_group_version.is_transition,
-        education_group_version.offer_id,
-        education_group_version.title_fr,
-        education_group_version.title_en,
-        tree.root_node
-    )
+    return __instanciate_from_education_group_version(education_group_version)
 
 
 @deprecated  # use ProgramTreeRepository.get() instead
@@ -236,23 +229,38 @@ def __build_children(
     return children
 
 
+@deprecated  # use ProgramTreeVersionRepository.search_all_versions_from_root_node instead
 def find_all_program_tree_versions(acronym: str, year: int, load_tree: bool = True) -> List['ProgramTreeVersion']:
     qs = EducationGroupVersion.objects.filter(offer__acronym=acronym, offer__academic_year__year=year)\
-        .select_related('offer').order_by('version_name')
+        .select_related('offer__academic_year', 'root_group').order_by('version_name')
 
     results = []
 
     for elt in qs:
-        elem = {
-            'is_transition': elt.is_transition,
-            'version_name': elt.version_name,
-            'offer': elt.offer,
-            'title_fr': elt.title_fr,
-            'title_en': elt.title_en,
-            'root_group': elt.root_group
-        }
-        results.append(ProgramTreeVersion(**elem, tree=load_tree))
+        results.append(
+            __instanciate_from_education_group_version(elt)
+        )
     return results
+
+
+def __instanciate_from_education_group_version(educ_group_version: EducationGroupVersion) -> 'ProgramTreeVersion':
+    identity = ProgramTreeVersionIdentity(
+        educ_group_version.offer.acronym,
+        educ_group_version.offer.academic_year.year,
+        educ_group_version.version_name,
+        educ_group_version.is_transition
+    )
+    tree_identity = ProgramTreeIdentity(
+        educ_group_version.root_group.partial_acronym,
+        educ_group_version.offer.academic_year.year
+    )
+    return ProgramTreeVersion(
+        identity,
+        tree_identity,
+        ProgramTreeRepository(),
+        title_en=elt.title_en,
+        title_fr=elt.title_fr,
+    )
 
 
 def find_all_versions_academic_year(acronym: str,

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,23 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.utils.translation import gettext_lazy as _
-
-from base.models.utils.utils import ChoiceEnum
-
-NON_ACADEMIC = "NON_ACADEMIC"
-NON_ACADEMIC_CREF = "NON_ACADEMIC_CREF"
-ACADEMIC = "ACADEMIC"
-
-#  FIXME ::  DEPRECATED - use AcademicTypes enum instead
-ACADEMIC_TYPES = (
-    (NON_ACADEMIC, _("Non academic")),
-    (NON_ACADEMIC_CREF, _("Non academic CREF")),
-    (ACADEMIC, _("Academic"))
-)
+from osis_common.ddd import interface
 
 
-class AcademicTypes(ChoiceEnum):
-    NON_ACADEMIC = _("Non academic")
-    NON_ACADEMIC_CREF = _("Non academic CREF")
-    ACADEMIC = _("Academic")
+class Campus(interface.ValueObject):
+    def __init__(self, name: str, university_name: str):
+        self.name = name
+        self.university_name = university_name
+
+    def __eq__(self, other):
+        return self.name == other.name and self.university_name == other.university_name
+
+    def __hash__(self):
+        return hash(self.name + self.university_name)

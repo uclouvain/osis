@@ -21,7 +21,7 @@ class TrainingReadGeneralInformation(TrainingRead):
             "publish_url": reverse('publish_general_information', args=[node.year, node.code]) +
             "?path={}".format(self.get_path()),
             "can_edit_information":
-                self.request.user.has_perm("base.change_pedagogyinformation", self.get_education_group_version().offer)
+                self.request.user.has_perm("base.change_pedagogyinformation", self.education_group_version.offer)
         }
 
     def get_translated_labels(self):

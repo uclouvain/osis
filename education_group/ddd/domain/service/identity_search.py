@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,23 +23,27 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.utils.translation import gettext_lazy as _
+from django.db.models import F
 
-from base.models.utils.utils import ChoiceEnum
+from education_group.models.group_year import GroupYear
+from osis_common.ddd.interface import BusinessException
+from program_management.ddd.business_types import *
+from education_group.ddd.business_types import *
 
-NON_ACADEMIC = "NON_ACADEMIC"
-NON_ACADEMIC_CREF = "NON_ACADEMIC_CREF"
-ACADEMIC = "ACADEMIC"
-
-#  FIXME ::  DEPRECATED - use AcademicTypes enum instead
-ACADEMIC_TYPES = (
-    (NON_ACADEMIC, _("Non academic")),
-    (NON_ACADEMIC_CREF, _("Non academic CREF")),
-    (ACADEMIC, _("Academic"))
-)
+DomainService = object  # TODO :: move into osis_commin/ddd/interfaces
 
 
-class AcademicTypes(ChoiceEnum):
-    NON_ACADEMIC = _("Non academic")
-    NON_ACADEMIC_CREF = _("Non academic CREF")
-    ACADEMIC = _("Academic")
+class TrainingIdentitySearch(DomainService):
+    def get_from_node_identity(self, node_identity: 'NodeIdentity') -> 'TrainingIdentity':
+        values = GroupYear.objects.filter(
+            partial_acronym=node_identity.code,
+            academic_year__year=node_identity.year
+        ).annotate(
+            offer_acronym=F('education_group_version__education_group_year__acronym'),
+            year=F('education_group_version__education_group_year__academic_year__year'),
+        ).values('offer_acronym', 'year')
+        if values:
+            return TrainingIdentity(acronym=values[0]['offer_acronym'], year=values[0]['year'])
+        raise BusinessException(
+            "TrainingIdentity not found from NodeIdentity = {n_id.code} - {n_id.year}".format(n_id=node_identity)
+        )
