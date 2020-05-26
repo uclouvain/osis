@@ -5,6 +5,7 @@ from enum import Enum
 
 from django.urls import reverse
 from django.utils.functional import cached_property
+from django.utils.text import capfirst
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 
@@ -115,7 +116,7 @@ class TrainingRead(PermissionRequiredMixin, TemplateView):
                 "?path={}".format(self.get_path()),
             },
             Tab.SKILLS_ACHIEVEMENTS: {
-                'text': _('skills and achievements'),
+                'text': capfirst(_('skills and achievements')),
                 'active': Tab.SKILLS_ACHIEVEMENTS == self.active_tab,
                 'display': True,
                 'url': reverse('training_skills_achievements', args=[node.year, node.code]) +

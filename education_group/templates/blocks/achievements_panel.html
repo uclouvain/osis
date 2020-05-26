@@ -50,13 +50,13 @@
             </div>
         </div>
     </div>
-    <div id="body-achievements" class="panel-body">
+    <div id="body-achievements" class="panel-body panel-collapse collapse in">
         {% for achievement in achievements %}
             <div class="row">
                 <div class="col-md-1">
                     <strong>{{ achievement.code_name }}</strong>
-                    <span data-toggle="collapse" data-target="#row_detail_achievement_{{ forloop.counter }}"
-                          class="glyphicon glyphicon-chevron-right collapse_span pull-right">
+                    <span class="glyphicon glyphicon-chevron-right collapse_span pull-right"
+                        data-toggle="collapse" data-target="#detail_achievements_{{ forloop.counter }}">
                     </span>
                 </div>
                 <div class="col-md-11">
@@ -118,6 +118,7 @@
                     </div>
                 </div>
             </div>
+            <hr>
         {% endfor %}
          {% if can_edit_information %}
              {# TODO: Fix URL for create education group achievement  #}
