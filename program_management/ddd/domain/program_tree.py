@@ -33,6 +33,7 @@ from base.models.enums.education_group_types import EducationGroupTypesEnum, Tra
 from base.models.enums.link_type import LinkTypes
 from osis_common.ddd import interface
 from osis_common.decorators.deprecated import deprecated
+from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import prerequisite
 from program_management.ddd.validators._detach_root import DetachRootValidator
@@ -242,22 +243,18 @@ class ProgramTree(interface.RootEntity):
     def paste_node(
             self,
             node_to_paste: 'Node',
-            path: Optional[Path],
-            paste_command: program_management.ddd.command.PasteElementCommand
+            paste_command: command.PasteElementCommand
     ) -> List['BusinessValidationMessage']:
         """
         Add a node to the tree
         :param node_to_paste: Node to paste into the tree
-        :param path: [Optional]The position where the node must be added
         :param paste_command: a paste node command
         """
-        parent = self.get_node(path) if path else self.root_node
-        path = path or str(self.root_node.node_id)
-        link_type = paste_command.link_type
-        block = paste_command.block
-        is_valid, messages = self.clean_paste_node(node_to_paste, path, link_type, block)
+        path_to_paste_to = paste_command.path_where_to_paste
+        node_to_paste_to = self.get_node(path_to_paste_to)
+        is_valid, messages = self.clean_paste_node(node_to_paste, paste_command)
         if is_valid:
-            parent.add_child(
+            node_to_paste_to.add_child(
                 node_to_paste,
                 access_condition=paste_command.access_condition,
                 is_mandatory=paste_command.is_mandatory,
@@ -272,11 +269,9 @@ class ProgramTree(interface.RootEntity):
     def clean_paste_node(
             self,
             node_to_paste: 'Node',
-            path: Path,
-            link_type: Optional[LinkTypes],
-            block: Optional[int]
+            paste_command: command.PasteElementCommand
     ) -> Tuple[bool, List['BusinessValidationMessage']]:
-        validator = PasteNodeValidatorList(self, node_to_paste, path, link_type, block)
+        validator = PasteNodeValidatorList(self, node_to_paste, paste_command)
         return validator.is_valid(), validator.messages
 
     def set_prerequisite(

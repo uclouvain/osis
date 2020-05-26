@@ -29,6 +29,7 @@ from django.utils.translation import gettext as _
 
 from base.ddd.utils.business_validator import BusinessListValidator
 from base.models.enums.link_type import LinkTypes
+from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.validators._authorized_link_type import AuthorizedLinkTypeValidator
 from program_management.ddd.validators._authorized_relationship import \
@@ -51,10 +52,12 @@ class PasteNodeValidatorList(BusinessListValidator):
             self,
             tree: 'ProgramTree',
             node_to_paste: 'Node',
-            path: 'Path',
-            link_type: Optional[LinkTypes],
-            block: Optional[int]
+            paste_command: command.PasteElementCommand,
     ):
+        path = paste_command.path_where_to_paste
+        link_type = paste_command.link_type
+        block = paste_command.block
+
         if node_to_paste.is_group():
             self.validators = [
                 CreateLinkValidatorList(tree.get_node(path), node_to_paste),

@@ -197,44 +197,37 @@ class TestPasteNodeProgramTree(SimpleTestCase, ValidatorPatcherMixin):
     def setUp(self):
         root_node = NodeGroupYearFactory(node_id=0)
         self.tree = ProgramTreeFactory(root_node=root_node)
+        self.child_to_paste = NodeGroupYearFactory()
         self.request = program_management.ddd.command.PasteElementCommand(
-            None, None, None, None, None, None, None, None, None, None, None, None, None
+            root_node.node_id,
+            self.child_to_paste.node_id,
+            self.child_to_paste.node_type,
+            str(self.tree.root_node.node_id),
+            False,
+            None,
+            None,
+            None,
+            None,
+            "",
+            "",
+            None,
+            None
         )
-
-    def test_attach_node_case_no_path_specified(self):
-        self.mock_validator(PasteNodeValidatorList, ['Success msg'], level=MessageLevel.SUCCESS)
-        subgroup_node = NodeGroupYearFactory()
-        self.tree.paste_node(subgroup_node, None, self.request)
-        self.assertIn(subgroup_node, self.tree.root_node.children_as_nodes)
-
-    def test_attach_node_case_path_specified_found(self):
-        self.mock_validator(PasteNodeValidatorList, ['Success msg'], level=MessageLevel.SUCCESS)
-        subgroup_node = NodeGroupYearFactory()
-        self.tree.paste_node(subgroup_node, None, self.request)
-
-        node_to_paste = NodeGroupYearFactory()
-        path = "|".join([str(self.tree.root_node.pk), str(subgroup_node.pk)])
-        self.tree.paste_node(node_to_paste, path, self.request)
-
-        self.assertIn(node_to_paste, self.tree.get_node(path).children_as_nodes)
 
     def test_when_validator_list_is_valid(self):
         self.mock_validator(PasteNodeValidatorList, ['Success message text'], level=MessageLevel.SUCCESS)
-        path = str(self.tree.root_node.node_id)
-        child_to_paste = NodeGroupYearFactory()
-        result = self.tree.paste_node(child_to_paste, path, self.request)
+
+        result = self.tree.paste_node(self.child_to_paste, self.request)
         self.assertEqual(result[0], 'Success message text')
         self.assertEqual(1, len(result))
-        self.assertIn(child_to_paste, self.tree.root_node.children_as_nodes)
+        self.assertIn(self.child_to_paste, self.tree.root_node.children_as_nodes)
 
     def test_when_validator_list_is_not_valid(self):
         self.mock_validator(PasteNodeValidatorList, ['error message text'], level=MessageLevel.ERROR)
-        path = str(self.tree.root_node.node_id)
-        child_to_paste = NodeGroupYearFactory()
-        result = self.tree.paste_node(child_to_paste, path, self.request)
+        result = self.tree.paste_node(self.child_to_paste, self.request)
         self.assertEqual(result[0], 'error message text')
         self.assertEqual(1, len(result))
-        self.assertNotIn(child_to_paste, self.tree.root_node.children_as_nodes)
+        self.assertNotIn(self.child_to_paste, self.tree.root_node.children_as_nodes)
 
 
 class TestDetachNodeProgramTree(SimpleTestCase):

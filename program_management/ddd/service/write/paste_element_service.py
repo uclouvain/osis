@@ -56,7 +56,7 @@ def paste_element_service(paste_command: command.PasteElementCommand) -> List['B
 
         action_messages.extend(detach_node_service.detach_node(path_to_detach, commit=commit).errors)
 
-    action_messages.extend(tree.paste_node(node_to_attach, path, paste_command))
+    action_messages.extend(tree.paste_node(node_to_attach, paste_command))
     if commit:
         persist_tree.persist(tree)
     return action_messages
