@@ -971,47 +971,6 @@ class TestSelectAttach(TestCase):
 
         self._assert_link_with_inital_parent_present()
 
-    def test_attach_child_education_group_year_to_one_of_its_descendants_creating_loop(self):
-        # We attempt to create a loop : child --> initial_parent --> new_parent --> child
-        GroupElementYearFactory(
-            parent=self.new_parent_education_group_year,
-            child_branch=self.initial_parent_education_group_year
-        )
-        AuthorizedRelationshipFactory(
-            parent_type=self.child_education_group_year.education_group_type,
-            child_type=self.new_parent_education_group_year.education_group_type,
-        )
-
-        # Select :
-        self.client.post(
-            self.url_copy_education_group,
-            data={
-                'element_id': self.new_parent_education_group_year.id,
-            }
-        )
-
-        # Create a link :
-        response = self.client.post(
-            reverse("group_element_year_create", args=[
-                self.new_parent_education_group_year.id, self.child_education_group_year.id
-            ]),
-            data={
-                'form-TOTAL_FORMS': '1',
-                'form-INITIAL_FORMS': '0',
-                'form-MAX_NUM_FORMS': '1',
-            }
-        )
-        self.assertFormsetError(
-            response, 'form', 0, '__all__',
-            _("It is forbidden to add an element to one of its included elements.")
-        )
-
-        expected_absent_group_element_year = GroupElementYear.objects.filter(
-            parent=self.child_education_group_year,
-            child_branch=self.new_parent_education_group_year
-        ).exists()
-        self.assertFalse(expected_absent_group_element_year)
-
     def test_attach_case_child_education_group_year_without_person_entity_link_fails(self):
         self.mocked_perm.return_value = False
         AuthorizedRelationshipFactory(
@@ -1092,20 +1051,6 @@ class TestSelectAttach(TestCase):
 
         self.assertEqual(len(messages), 1)
         self.assertEqual(str(messages[0]), _("Please cut or copy an item before attach it"))
-
-    @mock.patch.object(AttachEducationGroupYearStrategy, 'is_valid', side_effect=ValidationError('Dummy message'))
-    def test_attach_a_not_valid_case(self, mock_attach_strategy):
-        ElementCache(self.person.user).save_element_selected(self.child_education_group_year)
-        response = self.client.get(
-            reverse("group_element_year_create",
-                    args=[self.root.pk,
-                          self.new_parent_education_group_year.pk]),
-        )
-        self.assertEqual(response.status_code, 200)
-
-        messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 1)
-        self.assertIn(_("Dummy message"), str(messages[0]))
 
     def _assert_link_with_inital_parent_present(self):
         expected_initial_group_element_year = GroupElementYear.objects.get(

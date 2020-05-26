@@ -26,6 +26,7 @@
 import random
 
 from django.core.exceptions import ValidationError
+from django.db import IntegrityError
 from django.test import TestCase
 
 from base.models.enums.education_group_types import GroupType, MiniTrainingType
@@ -81,119 +82,15 @@ class TestSaveGroupElementYear(TestCase):
             child_branch=egy2,
         )
 
-    def test_loop_save_on_itself_ko(self):
-        egy = EducationGroupYearFactory()
-        with self.assertRaises(ValidationError):
-            GroupElementYearFactory(
-                parent=egy,
-                child_branch=egy,
-            )
-
-    def test_loop_save_ko(self):
-        egy1 = EducationGroupYearFactory(academic_year=self.academic_year)
-        egy2 = EducationGroupYearFactory(academic_year=self.academic_year)
-        egy3 = EducationGroupYearFactory(academic_year=self.academic_year)
-
-        GroupElementYearFactory(
-            parent=egy2,
-            child_branch=egy1,
-        )
-        GroupElementYearFactory(
-            parent=egy3,
-            child_branch=egy2,
-        )
-
-        with self.assertRaises(ValidationError):
-            GroupElementYearFactory(
-                parent=egy1,
-                child_branch=egy3,
-            )
-
     def test_save_with_child_branch_and_child_leaf_ko(self):
         egy = EducationGroupYearFactory(academic_year=self.academic_year)
         luy = LearningUnitYearFactory()
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(IntegrityError):
             GroupElementYearFactory(
                 parent=egy,
                 child_branch=egy,
                 child_leaf=luy,
             )
-
-
-class TestValidationOnEducationGroupYearBlockField(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.academic_year = AcademicYearFactory()
-
-    def setUp(self):
-        self.group_element_year = GroupElementYearFactory(parent__academic_year=self.academic_year,
-                                                          child_branch__academic_year=self.academic_year)
-
-    def test_when_value_is_higher_than_max_authorized(self):
-        self.group_element_year.block = 7
-        with self.assertRaises(ValidationError):
-            self.group_element_year.full_clean()
-
-    def test_when_more_than_6_digits_are_submitted(self):
-        self.group_element_year.block = 1234567
-        with self.assertRaises(ValidationError):
-            self.group_element_year.full_clean()
-
-    def test_when_values_are_duplicated(self):
-        self.group_element_year.block = 1446
-        with self.assertRaises(ValidationError):
-            self.group_element_year.full_clean()
-
-    def test_when_values_are_not_ordered(self):
-        self.group_element_year.block = 54
-        with self.assertRaises(ValidationError):
-            self.group_element_year.full_clean()
-
-    def test_when_0(self):
-        self.group_element_year.block = 0
-        with self.assertRaises(ValidationError):
-            self.group_element_year.full_clean()
-
-    def test_when_value_is_negative(self):
-        self.group_element_year.block = -124
-        with self.assertRaises(ValidationError):
-            self.group_element_year.full_clean()
-
-    def test_when_academic_year_diff_of_2_education_group(self):
-        egy1 = EducationGroupYearFactory(academic_year=self.academic_year)
-        egy2 = EducationGroupYearFactory(academic_year__year=self.academic_year.year + 1)
-        with self.assertRaises(ValidationError):
-            GroupElementYearFactory(
-                parent=egy1,
-                child_branch=egy2,
-                child_leaf=None,
-            )
-
-
-class TestLinkTypeGroupElementYear(TestCase):
-    def test_when_link_minor_to_minor_list_choice(self):
-        minor_list_choice = GroupFactory(education_group_type__name=GroupType.MINOR_LIST_CHOICE.name)
-        minor = MiniTrainingFactory(education_group_type__name=random.choice(MiniTrainingType.minors()))
-
-        link = GroupElementYear(parent=minor_list_choice, child_branch=minor, link_type=None)
-        link._clean_link_type()
-        self.assertEqual(link.link_type, LinkTypes.REFERENCE.name)
-
-    def test_when_link_deepening_to_minor_list_choice(self):
-        minor_list_choice = GroupFactory(education_group_type__name=GroupType.MINOR_LIST_CHOICE.name)
-        deepening = MiniTrainingFactory(education_group_type__name=MiniTrainingType.DEEPENING.name)
-
-        link = GroupElementYear(parent=minor_list_choice, child_branch=deepening, link_type=None)
-        link._clean_link_type()
-        self.assertEqual(link.link_type, LinkTypes.REFERENCE.name)
-
-    def test_when_link_major_to_major_list_choice(self):
-        major_list_choice = GroupFactory(education_group_type__name=GroupType.MAJOR_LIST_CHOICE.name)
-        major = MiniTrainingFactory(education_group_type__name=MiniTrainingType.FSA_SPECIALITY.name)
-
-        link = GroupElementYear(parent=major_list_choice, child_branch=major, link_type=None)
-        link._clean_link_type()
-        self.assertEqual(link.link_type, LinkTypes.REFERENCE.name)
 
 
 class TestManagerGetAdjacencyList(TestCase):
