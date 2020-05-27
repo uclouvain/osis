@@ -152,3 +152,21 @@ class Training(interface.RootEntity):
 
     def is_finality(self) -> bool:
         return self.type in set(TrainingType.finality_types_enum())
+
+    def is_bachelor(self) -> bool:
+        return self.type == TrainingType.BACHELOR
+
+    def is_master_specialized(self):
+        return self.type == TrainingType.MASTER_MC
+
+    def is_aggregation(self):
+        return self.type == TrainingType.AGGREGATION
+
+    def is_master_60_credits(self):
+        return self.type == TrainingType.MASTER_M1
+
+    def is_master_120_credits(self):
+        return self.type == TrainingType.PGRM_MASTER_120
+
+    def is_master_180_240_credits(self):
+        return self.type == TrainingType.PGRM_MASTER_180_240

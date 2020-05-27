@@ -13,12 +13,12 @@ class MiniTrainingReadAdmissionCondition(MiniTrainingRead):
             **super().get_context_data(**kwargs),
             "admission_requirements_label": self.get_admission_requirements_label(),
             "can_edit_information":
-                self.request.user.has_perm("base.change_admissioncondition", self.get_education_group_version().offer),
-            "mini_training": self.get_offer()
+                self.request.user.has_perm("base.change_admissioncondition", self.get_mini_training()),
+            "mini_training": self.get_mini_training()
         }
 
     @functools.lru_cache()
-    def get_offer(self):
+    def get_mini_training(self):
         return self.get_education_group_version().offer
 
     def get_admission_requirements_label(self):
@@ -26,5 +26,5 @@ class MiniTrainingReadAdmissionCondition(MiniTrainingRead):
 
     @functools.lru_cache()
     def __get_admission_condition(self):
-        offer = self.get_offer()
-        return admission_condition.get_admission_condition(offer.acronym, offer.academic_year.year)
+        mini_training = self.get_mini_training()
+        return admission_condition.get_admission_condition(mini_training.acronym, mini_training.academic_year.year)
