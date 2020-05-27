@@ -44,7 +44,6 @@ from base.utils.cache import ElementCache
 from base.views.common import display_warning_messages, display_error_messages
 from base.views.mixins import AjaxTemplateMixin
 from osis_role.contrib.views import PermissionRequiredMixin
-from program_management.business.group_element_years.management import fetch_source_link
 from program_management.ddd.domain.program_tree import Path
 from program_management.ddd.repositories import load_node
 from program_management.ddd.service import attach_node_service, detach_node_service
@@ -61,9 +60,9 @@ class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageM
         return self._has_permission_to_detach() & super().has_permission()
 
     def _has_permission_to_detach(self) -> bool:
-        if not self.get_path_to_detach():
+        if not self.get_path_to_detach:
             return True
-        obj_to_detach_id = int(self.get_path_to_detach().split("|")[-2])
+        obj_to_detach_id = int(self.get_path_to_detach.split("|")[-2])
         obj_to_detach = shortcuts.get_object_or_404(EducationGroupYear, pk=obj_to_detach_id)
         return self.request.user.has_perms(("base.detach_educationgroup",), obj_to_detach)
 
@@ -71,14 +70,15 @@ class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageM
         node_to_paste_to_id = int(self.request.GET['path'].split("|")[-1])
         return shortcuts.get_object_or_404(EducationGroupYear, pk=node_to_paste_to_id)
 
+    @cached_property
     def get_path_to_detach(self) -> Optional[Path]:
-        link_to_detach = fetch_source_link(self.request.GET, self.request.user)  # type: GroupElementYear
-        if not link_to_detach:
+        if not self.nodes_to_paste or not self.nodes_to_paste[0][2]:
             return None
-        return "|".join([str(link_to_detach.parent.pk), str(link_to_detach.child.pk)])
+        grp = GroupElementYear.objects.get(id=self.nodes_to_paste[0][2])
+        return "|".join([str(grp.parent.id), str(self.nodes_to_paste[0][0])])
 
     @cached_property
-    def nodes_to_paste(self) -> List[Tuple[int, NodeType]]:
+    def nodes_to_paste(self) -> List[Tuple[int, NodeType, int]]:
         return element_selected_service.retrieve_element_selected(
             self.request.user,
             self.request.GET.get("id", []),
@@ -89,7 +89,7 @@ class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageM
         return formset_factory(form=paste_form_factory, formset=PasteNodesFormset, extra=len(self.nodes_to_paste))
 
     def get_form_kwargs(self) -> List[dict]:
-        return [self._get_form_kwargs(node_id, node_type) for node_id, node_type in self.nodes_to_paste]
+        return [self._get_form_kwargs(node_id, node_type) for node_id, node_type, source_parent in self.nodes_to_paste]
 
     def _get_form_kwargs(
             self,
@@ -100,7 +100,7 @@ class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageM
             'node_to_paste_type': node_type,
             'node_to_paste_id': node_id,
             'path_of_node_to_paste_into': self.request.GET['path'],
-            'path_to_detach': self.get_path_to_detach(),
+            'path_to_detach': self.get_path_to_detach,
         }
 
     def get_form(self, form_class=None):
@@ -115,21 +115,21 @@ class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageM
             context_data["formset"]
         )
         context_data["nodes_by_id"] = {node_id: load_node.load_by_type(node_type, node_id)
-                                       for node_id, node_type in self.nodes_to_paste}
-        if self.get_path_to_detach():
+                                       for node_id, node_type, source_parent in self.nodes_to_paste}
+        if self.get_path_to_detach:
             self.check_detach_errors()
         if not self.nodes_to_paste:
             display_warning_messages(self.request, _("Please cut or copy an item before paste"))
         return context_data
 
     def check_detach_errors(self):
-        message_list = detach_node_service.detach_node(self.get_path_to_detach(), commit=False)
+        message_list = detach_node_service.detach_node(self.get_path_to_detach, commit=False)
         if message_list.contains_errors():
             display_error_messages(self.request, message_list)
 
     def form_valid(self, formset: PasteNodesFormset):
-        messages = formset.save()
-        if BusinessValidationMessage.contains_errors(messages):
+        node_entities_ids = formset.save()
+        if None in node_entities_ids:
             return self.form_invalid(formset)
         ElementCache(self.request.user).clear()
 

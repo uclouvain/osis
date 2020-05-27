@@ -67,7 +67,7 @@ class NodeIdentity(interface.EntityIdentity):
         return hash(self.code + str(self.year))
 
     def __eq__(self, other):
-        return self.code == other.code and self.year == other.year
+        return type(other) == type(self) and (self.code, self.year) == (other.code, other.year)
 
 
 class Node(interface.Entity):

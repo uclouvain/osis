@@ -240,17 +240,18 @@ class ProgramTree(interface.RootEntity):
             self,
             node_to_paste: 'Node',
             paste_command: command.PasteElementCommand
-    ) -> List['BusinessValidationMessage']:
+    ) -> None:
         """
         Add a node to the tree
         :param node_to_paste: Node to paste into the tree
         :param paste_command: a paste node command
         """
+        validator = validators_by_business_action.PasteNodeValidatorList(self, node_to_paste, paste_command)
+        validator.validate()
+
         path_to_paste_to = paste_command.path_where_to_paste
         node_to_paste_to = self.get_node(path_to_paste_to)
-        is_valid, messages = self.clean_paste_node(node_to_paste, paste_command)
-        if is_valid:
-            node_to_paste_to.add_child(
+        node_to_paste_to.add_child(
                 node_to_paste,
                 access_condition=paste_command.access_condition,
                 is_mandatory=paste_command.is_mandatory,
@@ -259,16 +260,7 @@ class ProgramTree(interface.RootEntity):
                 comment=paste_command.comment,
                 comment_english=paste_command.comment_english,
                 relative_credits=paste_command.relative_credits
-            )
-        return messages
-
-    def clean_paste_node(
-            self,
-            node_to_paste: 'Node',
-            paste_command: command.PasteElementCommand
-    ) -> Tuple[bool, List['BusinessValidationMessage']]:
-        validator = validators_by_business_action.PasteNodeValidatorList(self, node_to_paste, paste_command)
-        return validator.is_valid(), validator.messages
+        )
 
     def set_prerequisite(
             self,

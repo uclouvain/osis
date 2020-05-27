@@ -47,12 +47,12 @@ class TestRetrieveElementsSelected(SimpleTestCase):
         result = element_selected_service.retrieve_element_selected(self.user, [], None)
         self.assertEqual(
             result,
-            [(45, node_type.NodeType.LEARNING_UNIT)]
+            [(45, node_type.NodeType.LEARNING_UNIT, None)]
         )
 
     def test_when_ids_and_content_type_set_then_should_return_those_but_zipped(self):
         result = element_selected_service.retrieve_element_selected(self.user, [45, 18], node_type.NodeType.EDUCATION_GROUP.name)
         self.assertEqual(
             result,
-            [(45, node_type.NodeType.EDUCATION_GROUP), (18, node_type.NodeType.EDUCATION_GROUP)]
+            [(45, node_type.NodeType.EDUCATION_GROUP, None), (18, node_type.NodeType.EDUCATION_GROUP, None)]
         )

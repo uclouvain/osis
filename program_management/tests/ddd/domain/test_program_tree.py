@@ -30,6 +30,7 @@ from django.test import SimpleTestCase
 from django.utils.translation import gettext_lazy as _
 
 import program_management.ddd.command
+from base.ddd.utils import business_validator
 from base.ddd.utils.validation_message import MessageLevel, BusinessValidationMessage
 from base.models.enums import prerequisite_operator
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
@@ -46,6 +47,7 @@ from program_management.ddd.validators.validators_by_business_action import Past
 from program_management.ddd.validators.validators_by_business_action import DetachNodeValidatorList
 from program_management.models.enums import node_type
 from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipObjectFactory
+from program_management.tests.ddd.factories.commands.paste_element_command import PasteElementCommandFactory
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
@@ -193,40 +195,31 @@ class TestGetCodesPermittedAsPrerequisite(SimpleTestCase):
         )
 
 
-class TestPasteNodeProgramTree(SimpleTestCase, ValidatorPatcherMixin):
+class TestPasteNodeProgramTree(ValidatorPatcherMixin, SimpleTestCase):
     def setUp(self):
         root_node = NodeGroupYearFactory(node_id=0)
         self.tree = ProgramTreeFactory(root_node=root_node)
         self.child_to_paste = NodeGroupYearFactory()
-        self.request = program_management.ddd.command.PasteElementCommand(
-            root_node.node_id,
-            self.child_to_paste.node_id,
-            self.child_to_paste.node_type,
-            str(self.tree.root_node.node_id),
-            False,
-            None,
-            None,
-            None,
-            None,
-            "",
-            "",
-            None,
-            None
+        self.request = PasteElementCommandFactory(
+            root_id=root_node.node_id,
+            node_to_paste_id=self.child_to_paste.node_id,
+            node_to_paste_type=self.child_to_paste.node_type,
+            path_where_to_paste=str(self.tree.root_node.node_id)
         )
 
-    def test_when_validator_list_is_valid(self):
-        self.mock_validator(PasteNodeValidatorList, ['Success message text'], level=MessageLevel.SUCCESS)
+    def test_should_paste_node_to_position_indicated_by_path_when_validator_do_not_raise_exception(self):
+        self.mock_validator_validate_to_not_raise_exception(PasteNodeValidatorList)
 
-        result = self.tree.paste_node(self.child_to_paste, self.request)
-        self.assertEqual(result[0], 'Success message text')
-        self.assertEqual(1, len(result))
+        self.tree.paste_node(self.child_to_paste, self.request)
+
         self.assertIn(self.child_to_paste, self.tree.root_node.children_as_nodes)
 
-    def test_when_validator_list_is_not_valid(self):
-        self.mock_validator(PasteNodeValidatorList, ['error message text'], level=MessageLevel.ERROR)
-        result = self.tree.paste_node(self.child_to_paste, self.request)
-        self.assertEqual(result[0], 'error message text')
-        self.assertEqual(1, len(result))
+    def test_should_propagate_exception_and_not_paste_node_when_validator_raises_exception(self):
+        self.mock_validator_validate_to_raise_exception(PasteNodeValidatorList, ["error message text"])
+
+        with self.assertRaises(business_validator.BusinessExceptions):
+            self.tree.paste_node(self.child_to_paste, self.request)
+
         self.assertNotIn(self.child_to_paste, self.tree.root_node.children_as_nodes)
 
 

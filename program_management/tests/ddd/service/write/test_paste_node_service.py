@@ -35,7 +35,7 @@ import program_management.ddd.service.write.paste_element_service
 from base.ddd.utils import business_validator
 from base.ddd.utils.validation_message import MessageLevel, BusinessValidationMessage, BusinessValidationMessageList
 from base.models.enums.education_group_types import TrainingType
-from program_management.ddd.domain import program_tree
+from program_management.ddd.domain import program_tree, node
 from program_management.ddd.service import attach_node_service
 from program_management.ddd.service.write import paste_element_service
 from program_management.ddd.validators import _validate_end_date_and_option_finality
@@ -86,20 +86,17 @@ class TestPasteNode(SimpleTestCase, ValidatorPatcherMixin):
         self.mock_load.return_value = self.node_to_paste
 
     @patch.object(program_tree.ProgramTree, 'paste_node')
-    def test_when_attach_node_action_is_valid(self, mock_attach_node):
-        validator_message = BusinessValidationMessage('Success message', level=MessageLevel.SUCCESS)
-        mock_attach_node.return_value = [validator_message]
+    def test_should_return_node_identity_attached_when_paste_was_successful(self, mock_attach_node):
+        mock_attach_node.return_value = None
         result = program_management.ddd.service.write.paste_element_service.paste_element_service(self.paste_command)
-        self.assertEqual(result[0], validator_message)
-        self.assertEqual(len(result), 1)
+        self.assertIsInstance(result, node.NodeIdentity)
 
     @patch.object(program_tree.ProgramTree, 'paste_node')
-    def test_when_attach_node_action_is_not_valid(self, mock_attach_node):
-        validator_message = BusinessValidationMessage('error message text', level=MessageLevel.ERROR)
-        mock_attach_node.return_value = [validator_message]
-        result = program_management.ddd.service.write.paste_element_service.paste_element_service(self.paste_command)
-        self.assertEqual(result[0], validator_message)
-        self.assertEqual(len(result), 1)
+    def test_should_propagate_exception_when_paste_raises_one(self, mock_attach_node):
+        mock_attach_node.side_effect = business_validator.BusinessExceptions(["error_message_text"])
+
+        with self.assertRaises(business_validator.BusinessExceptions):
+            program_management.ddd.service.write.paste_element_service.paste_element_service(self.paste_command)
 
     def test_when_commit_is_true_then_persist_modification(self):
         self.mock_validator(PasteNodeValidatorList, [_('Success message')], level=MessageLevel.SUCCESS)

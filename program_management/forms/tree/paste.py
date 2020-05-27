@@ -22,7 +22,7 @@
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
 import itertools
-from typing import List, Type
+from typing import List, Type, Optional
 
 from django import forms
 from django.core.exceptions import ValidationError
@@ -37,6 +37,7 @@ from program_management.ddd.repositories import load_node, load_authorized_relat
 from program_management.ddd.service.write import paste_element_service
 from program_management.ddd.validators import _block_validator
 from program_management.models.enums.node_type import NodeType
+from program_management.ddd.business_types import *
 
 
 class PasteNodesFormset(BaseFormSet):
@@ -47,10 +48,8 @@ class PasteNodesFormset(BaseFormSet):
         return {}
 
     @transaction.atomic
-    def save(self) -> List[validation_message.BusinessValidationMessage]:
-        return list(itertools.chain.from_iterable(
-            [form.save() for form in self.forms]
-        ))
+    def save(self) -> List[Optional['NodeIdentity']]:
+        return [form.save() for form in self.forms]
 
 
 def paste_form_factory(
@@ -116,12 +115,13 @@ class PasteNodeForm(forms.Form):
             raise ValidationError(business_exception.messages)
         return cleaned_block_type
 
-    def save(self) -> List[validation_message.BusinessValidationMessage]:
-        result = []
+    def save(self) -> Optional['NodeIdentity']:
+        result = None
         if self.is_valid():
-            result = paste_element_service.paste_element_service(self._create_paste_command())
-            if result:
-                self.add_error(None, result)
+            try:
+                result = paste_element_service.paste_element_service(self._create_paste_command())
+            except business_validator.BusinessExceptions as business_exception:
+                self.add_error(None, business_exception.messages)
         return result
 
     def _create_paste_command(self) -> command.PasteElementCommand:

@@ -38,6 +38,7 @@ from base.tests.factories.education_group_year import GroupFactory, EducationGro
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.person import PersonFactory
 from base.utils.cache import ElementCache
+from program_management.models.enums import node_type
 
 
 @override_flag('education_group_update', active=True)
@@ -97,9 +98,11 @@ class TestMoveGroupElementYearView(TestCase):
             min_count_authorized=0,
             max_count_authorized=None
         )
-        ElementCache(self.person.user).save_element_selected(
-            self.group_element_year.child_branch,
-            source_link_id=self.group_element_year.id
+        ElementCache(self.person.user).save_element_selected_bis(
+            self.group_element_year.child_branch.pk,
+            node_type.NodeType.EDUCATION_GROUP,
+            source_link_id=self.group_element_year.id,
+            action=ElementCache.ElementCacheAction.CUT
         )
 
         self.client.post(self.url, data={
@@ -109,7 +112,10 @@ class TestMoveGroupElementYearView(TestCase):
             "link_type": LinkTypes.REFERENCE.name
         })
 
-        self.assertFalse(GroupElementYear.objects.filter(id=self.group_element_year.id))
+        self.assertFalse(GroupElementYear.objects.filter(id=self.group_element_year.id).exists())
         self.assertTrue(
-            GroupElementYear.objects.filter(parent=self.selected_egy, child_branch=self.group_element_year.child_branch)
+            GroupElementYear.objects.filter(
+                parent=self.selected_egy,
+                child_branch=self.group_element_year.child_branch
+            ).exists()
         )

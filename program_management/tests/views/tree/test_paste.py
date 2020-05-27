@@ -113,7 +113,7 @@ class TestPasteNodeView(TestCase):
     @mock.patch('program_management.ddd.service.read.element_selected_service.retrieve_element_selected')
     def test_get_method_when_education_group_year_element_is_selected(self, mock_cache_elems):
         subgroup_to_attach = NodeGroupYearFactory(node_type=GroupType.SUB_GROUP)
-        mock_cache_elems.return_value = [(subgroup_to_attach.node_id, subgroup_to_attach.node_type)]
+        mock_cache_elems.return_value = [(subgroup_to_attach.node_id, subgroup_to_attach.node_type, None)]
 
         # To path :  BIR1BA ---> COMMON_CORE
         path = "|".join([str(self.tree.root_node.pk), str(self.tree.root_node.children[0].child.pk)])
@@ -131,8 +131,8 @@ class TestPasteNodeView(TestCase):
         subgroup_to_attach = NodeGroupYearFactory(node_type=GroupType.SUB_GROUP)
         subgroup_to_attach_2 = NodeGroupYearFactory(node_type=GroupType.SUB_GROUP,)
         mock_cache_elems.return_value = [
-            (subgroup_to_attach.node_id, subgroup_to_attach.node_type),
-            (subgroup_to_attach_2.node_id, subgroup_to_attach_2.node_type)
+            (subgroup_to_attach.node_id, subgroup_to_attach.node_type, None),
+            (subgroup_to_attach_2.node_id, subgroup_to_attach_2.node_type, None)
         ]
 
         # To path :  BIR1BA ---> LBIR101G
@@ -149,7 +149,7 @@ class TestPasteNodeView(TestCase):
     @mock.patch('program_management.forms.tree.paste.PasteNodesFormset.is_valid')
     def test_post_method_case_formset_invalid(self, mock_formset_is_valid, mock_cache_elems):
         subgroup_to_attach = NodeGroupYearFactory(node_type=GroupType.SUB_GROUP)
-        mock_cache_elems.return_value = [(subgroup_to_attach.node_id, subgroup_to_attach.node_type)]
+        mock_cache_elems.return_value = [(subgroup_to_attach.node_id, subgroup_to_attach.node_type, None)]
         mock_formset_is_valid.return_value = False
 
         # To path :  BIR1BA ---> LBIR101G
@@ -168,7 +168,7 @@ class TestPasteNodeView(TestCase):
         mock_form_valid.return_value = True
         mock_service.return_value = [BusinessValidationMessage('Success', MessageLevel.SUCCESS)]
         subgroup_to_attach = NodeGroupYearFactory(node_type=GroupType.SUB_GROUP,)
-        mock_cache_elems.return_value = [(subgroup_to_attach.node_id, subgroup_to_attach.node_type)]
+        mock_cache_elems.return_value = [(subgroup_to_attach.node_id, subgroup_to_attach.node_type, None)]
 
         # To path :  BIR1BA ---> LBIR101G
         path = "|".join([str(self.tree.root_node.pk), str(self.tree.root_node.children[1].child.pk)])
