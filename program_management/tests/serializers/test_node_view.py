@@ -31,7 +31,6 @@ from django.utils.translation import gettext_lazy as _
 
 from base.models.enums import link_type
 from base.models.enums.proposal_type import ProposalType
-from program_management.ddd.domain.program_tree import build_path
 from program_management.models.enums.node_type import NodeType
 from program_management.serializers.node_view import _get_node_view_attribute_serializer, \
     _get_leaf_view_attribute_serializer, \

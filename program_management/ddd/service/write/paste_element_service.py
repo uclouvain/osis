@@ -29,6 +29,7 @@ from program_management.ddd.repositories import load_tree, load_node, persist_tr
 from program_management.ddd.service import detach_node_service
 
 
+# TODO should return an entity
 def paste_element_service(paste_command: command.PasteElementCommand) -> List['BusinessValidationMessage']:
     commit = paste_command.commit
     path_to_detach = paste_command.path_where_to_detach
