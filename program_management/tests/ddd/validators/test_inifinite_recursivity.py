@@ -27,6 +27,7 @@
 from django.test import SimpleTestCase
 from django.utils.translation import gettext as _
 
+from base.ddd.utils import business_validator
 from base.tests.factories.academic_year import AcademicYearFactory
 from program_management.ddd.domain.program_tree import build_path
 from program_management.ddd.validators._infinite_recursivity import InfiniteRecursivityTreeValidator, \
@@ -46,13 +47,12 @@ class TestInfiniteRecursivityTreeValidator(SimpleTestCase):
 
         self.common_core_node = NodeGroupYearFactory(year=self.academic_year.year)
 
-    def test_when_no_recursivity_found(self):
+    def test_should_not_raise_eception_when_no_recursivity_found(self):
         path = build_path(self.node_to_attach)
         node_to_attach = self.common_core_node
-        validator = InfiniteRecursivityTreeValidator(self.tree, node_to_attach, path)
-        self.assertTrue(validator.is_valid())
+        InfiniteRecursivityTreeValidator(self.tree, node_to_attach, path).validate()
 
-    def test_when_adding_node_as_parent_level_1(self):
+    def test_should_raise_exception_when_adding_node_as_parent_level_1(self):
         child = NodeGroupYearFactory(
             year=self.academic_year.year,
         )
@@ -61,14 +61,15 @@ class TestInfiniteRecursivityTreeValidator(SimpleTestCase):
         path = build_path(self.node_to_attach, child)
         validator = InfiniteRecursivityTreeValidator(self.tree, self.node_to_attach, path)
 
-        self.assertFalse(validator.is_valid())
+        with self.assertRaises(business_validator.BusinessExceptions) as context_exc:
+            validator.validate()
         expected_message = _(
             'The child %(child)s you want to attach '
             'is a parent of the node you want to attach.'
         ) % {'child': self.node_to_attach}
-        self.assertEqual(expected_message, validator.error_messages[0])
+        self.assertEqual(context_exc.exception.messages, [expected_message])
 
-    def test_when_adding_node_as_parent_level_2(self):
+    def test_should_raise_exception_when_adding_node_as_parent_level_2(self):
         child_lvl1 = NodeGroupYearFactory(
             year=self.academic_year.year,
         )
@@ -81,12 +82,14 @@ class TestInfiniteRecursivityTreeValidator(SimpleTestCase):
         path = build_path(self.node_to_attach, child_lvl1, child_lvl2)
         validator = InfiniteRecursivityTreeValidator(self.tree, self.node_to_attach, path)
 
-        self.assertFalse(validator.is_valid())
+        with self.assertRaises(business_validator.BusinessExceptions) as context_exc:
+            validator.validate()
+
         expected_message = _(
             'The child %(child)s you want to attach '
             'is a parent of the node you want to attach.'
         ) % {'child': self.node_to_attach}
-        self.assertEqual(expected_message, validator.error_messages[0])
+        self.assertEqual(context_exc.exception.messages, [expected_message])
 
 
 class TestInfiniteRecursivityLinkValidator(SimpleTestCase):
@@ -99,13 +102,13 @@ class TestInfiniteRecursivityLinkValidator(SimpleTestCase):
 
         self.common_core_node = NodeGroupYearFactory(year=self.academic_year.year)
 
-    def test_when_no_recursivity_found(self):
+    def test_should_not_raise_exception_when_no_recursivity_found(self):
         node_to_attach = self.common_core_node
-        validator = InfiniteRecursivityLinkValidator(self.node_to_attach, node_to_attach)
-        self.assertTrue(validator.is_valid())
+        InfiniteRecursivityLinkValidator(self.node_to_attach, node_to_attach).validate()
 
-    def test_when_adding_node_to_himself(self):
+    def test_should_raise_exception_when_adding_node_to_himself(self):
         validator = InfiniteRecursivityLinkValidator(self.node_to_attach, self.node_to_attach)
         error_msg = _('Cannot attach a node %(node)s to himself.') % {"node": self.node_to_attach}
-        self.assertFalse(validator.is_valid())
-        self.assertEqual(error_msg, validator.error_messages[0])
+        with self.assertRaises(business_validator.BusinessExceptions) as context_exc:
+            validator.validate()
+        self.assertEqual(context_exc.exception.messages, [error_msg])
