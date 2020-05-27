@@ -23,6 +23,7 @@
 # ############################################################################
 from typing import List
 
+from base.ddd.utils import business_validator
 from base.ddd.utils.business_validator import BusinessValidator
 from base.models.enums.link_type import LinkTypes
 from program_management.ddd.repositories import load_tree
@@ -45,9 +46,13 @@ class ValidateAuthorizedRelationshipForAllTrees(BusinessValidator):
     def validate(self, *args, **kwargs):
         child_node = self.tree.get_node(self.path)
         trees = load_tree.load_trees_from_children([child_node.node_id], link_type=LinkTypes.REFERENCE)
+        messages = []
         for tree in trees:
             for parent_from_reference_link in tree.get_parents_using_node_as_reference(child_node):
                 validator = PasteAuthorizedRelationshipValidator(tree, self.node_to_paste, parent_from_reference_link)
                 if not validator.is_valid():
                     for msg in validator.error_messages:
-                        self.add_error_message(msg.message)
+                        messages.append(msg.message)
+
+        if messages:
+            raise business_validator.BusinessExceptions(messages)
