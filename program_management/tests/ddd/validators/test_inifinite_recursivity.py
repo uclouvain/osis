@@ -90,23 +90,19 @@ class TestInfiniteRecursivityTreeValidator(TestValidatorValidateMixin, SimpleTes
         )
 
 
-class TestInfiniteRecursivityLinkValidator(SimpleTestCase):
+class TestInfiniteRecursivityLinkValidator(TestValidatorValidateMixin, SimpleTestCase):
     def setUp(self):
-        self.academic_year = AcademicYearFactory.build(current=True)
-
-        self.node_to_attach = NodeGroupYearFactory(year=self.academic_year.year)
-
-        self.tree = ProgramTreeFactory(root_node=self.node_to_attach)
-
-        self.common_core_node = NodeGroupYearFactory(year=self.academic_year.year)
+        self.tree = ProgramTreeFactory()
 
     def test_should_not_raise_exception_when_no_recursivity_found(self):
-        node_to_attach = self.common_core_node
-        InfiniteRecursivityLinkValidator(self.node_to_attach, node_to_attach).validate()
+        node_to_attach = NodeGroupYearFactory()
+
+        self.assertValidatorNotRaises(InfiniteRecursivityLinkValidator(self.tree.root_node, node_to_attach))
 
     def test_should_raise_exception_when_adding_node_to_himself(self):
-        validator = InfiniteRecursivityLinkValidator(self.node_to_attach, self.node_to_attach)
-        error_msg = _('Cannot attach a node %(node)s to himself.') % {"node": self.node_to_attach}
-        with self.assertRaises(business_validator.BusinessExceptions) as context_exc:
-            validator.validate()
-        self.assertEqual(context_exc.exception.messages, [error_msg])
+        error_msg = _('Cannot attach a node %(node)s to himself.') % {"node": self.tree.root_node}
+
+        self.assertValidatorRaises(
+            InfiniteRecursivityLinkValidator(self.tree.root_node, self.tree.root_node),
+            [error_msg]
+        )
