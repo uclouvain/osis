@@ -27,6 +27,7 @@
 from django.test import SimpleTestCase
 from django.utils.translation import gettext as _
 
+from base.ddd.utils import business_validator
 from base.models.authorized_relationship import AuthorizedRelationshipList
 from base.models.enums.education_group_types import TrainingType, GroupType
 from base.models.enums.link_type import LinkTypes
@@ -65,40 +66,30 @@ class TestAttachAuthorizedRelationshipValidator(SimpleTestCase):
             authorized_relationships=self.authorized_relationships
         )
 
-    def test_success(self):
+    def test_should_not_raise_an_exception_when_maximum_children_is_not_reached(self):
         tree = ProgramTreeFactory(
             root_node=NodeGroupYearFactory(node_type=TrainingType.BACHELOR),
             authorized_relationships=self.authorized_relationships
         )
         validator = PasteAuthorizedRelationshipValidator(tree, self.authorized_child, tree.root_node)
-        result = validator.is_valid()
-        self.assertTrue(result)
+        validator.validate()
 
-    def test_when_relation_is_not_authorized(self):
+    def test_should_raise_exception_when_relation_is_not_authorized(self):
         unauthorized_child = NodeGroupYearFactory(node_type=GroupType.COMPLEMENTARY_MODULE)
         validator = PasteAuthorizedRelationshipValidator(self.tree, unauthorized_child, self.authorized_parent)
-        self.assertFalse(validator.is_valid())
-        error_msg = _("You cannot add \"%(child)s\" of type \"%(child_types)s\" "
-                      "to \"%(parent)s\" of type \"%(parent_type)s\"") % {
-            'child': unauthorized_child,
-            'child_types': unauthorized_child.node_type.value,
-            'parent': self.authorized_parent,
-            'parent_type': self.authorized_parent.node_type.value
-        }
+        exception_message = _("You cannot add \"%(child)s\" of type \"%(child_types)s\" "
+                              "to \"%(parent)s\" of type \"%(parent_type)s\"") % {
+                                'child': unauthorized_child,
+                                'child_types': unauthorized_child.node_type.value,
+                                'parent': self.authorized_parent,
+                                'parent_type': self.authorized_parent.node_type.value
+                            }
+        with self.assertRaises(business_validator.BusinessExceptions) as context_exc:
+            validator.is_valid()
 
-        self.assertIn(error_msg, validator.error_messages)
+        self.assertEqual(context_exc.exception.messages, [exception_message])
 
-    def test_when_parent_has_no_children_yet(self):
-        another_authorized_parent = NodeGroupYearFactory(node_type=TrainingType.BACHELOR)
-        self.assertEqual([], another_authorized_parent.children)
-        tree = ProgramTreeFactory(
-            root_node=another_authorized_parent,
-            authorized_relationships=self.authorized_relationships
-        )
-        validator = PasteAuthorizedRelationshipValidator(tree, self.authorized_child, another_authorized_parent)
-        self.assertTrue(validator.is_valid())
-
-    def test_when_parent_has_children_but_maximum_is_not_reached(self):
+    def test_should_not_raise_exception_when_parent_has_children_but_maximum_is_not_reached(self):
         another_authorized_child = NodeGroupYearFactory(node_type=GroupType.SUB_GROUP)
         another_authorized_parent = NodeGroupYearFactory(node_type=TrainingType.BACHELOR)
         another_authorized_parent.add_child(another_authorized_child)  # add child manually, bypass validations
@@ -107,14 +98,12 @@ class TestAttachAuthorizedRelationshipValidator(SimpleTestCase):
             authorized_relationships=self.authorized_relationships
         )
         validator = PasteAuthorizedRelationshipValidator(tree, self.authorized_child, another_authorized_parent)
-        self.assertTrue(validator.is_valid())
+        validator.validate()
 
-    def test_when_maximum_is_reached(self):
+    def test_should_raise_exception_when_maximum_is_already_reached(self):
         self.authorized_parent.add_child(self.authorized_child)
         another_authorized_child = NodeGroupYearFactory(node_type=GroupType.COMMON_CORE)
         validator = PasteAuthorizedRelationshipValidator(self.tree, another_authorized_child, self.authorized_parent)
-
-        self.assertFalse(validator.is_valid())
 
         max_error_msg = _(
             "Cannot add \"%(child)s\" because the number of children of type(s) \"%(child_types)s\" "
@@ -123,9 +112,12 @@ class TestAttachAuthorizedRelationshipValidator(SimpleTestCase):
             'child_types': another_authorized_child.node_type.value,
             'parent': self.authorized_parent
         }
+        with self.assertRaises(business_validator.BusinessExceptions) as context_exc:
+            validator.validate()
 
-        self.assertIn(max_error_msg, validator.error_messages)
-        self.assertEqual(len(validator.error_messages), 1)
+        self.assertEqual(context_exc.exception.messages, [max_error_msg])
+
+
 
 
 class TestAuthorizedRelationshipLearningUnitValidator(SimpleTestCase):
@@ -214,8 +206,10 @@ class TestDetachAuthorizedRelationshipValidator(SimpleTestCase):
                |--ACCESS_MINOR (link_type=reference)
                   |--COMMON_CORE
             # FIXME :: What if we want to detach ACCESS_MINOR in the tree above?
-            # FIXME :: In this case, the relation between child of minor () COMMON_CORE and parent of minor (MINOR_LIST_CHOICE) is not authorized.
-            # FIXME :: While this test pass, it permit to ignore validation if the authorized_relationship does not exist.
+            # FIXME :: In this case, the relation between child of minor () COMMON_CORE
+            #          and parent of minor (MINOR_LIST_CHOICE) is not authorized.
+            # FIXME :: While this test pass, it permit to ignore validation if the authorized_relationship
+            #          does not exist.
         """
         unauthorized_child = NodeGroupYearFactory(node_type=GroupType.COMPLEMENTARY_MODULE)
         LinkFactory(parent=self.authorized_parent, child=unauthorized_child)
@@ -287,4 +281,3 @@ class TestDetachAuthorizedRelationshipValidator(SimpleTestCase):
             validator.error_messages,
             "Should validate types of the children of the child linked by reference"
         )
-

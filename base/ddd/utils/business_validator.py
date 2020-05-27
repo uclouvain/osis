@@ -24,9 +24,18 @@
 #
 ##############################################################################
 from abc import ABC
-from typing import List
+from typing import List, Union
 
 from base.ddd.utils.validation_message import BusinessValidationMessage, MessageLevel
+
+
+#  FIXME implement this in osis common
+from osis_common.ddd import interface
+
+
+class BusinessExceptions(interface.BusinessException):
+    def __init__(self, messages: List[str]):
+        self.messages = messages
 
 
 class BusinessValidator(ABC):

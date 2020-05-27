@@ -36,9 +36,7 @@ from program_management.ddd.business_types import *
 from program_management.ddd.domain import prerequisite
 from program_management.ddd.validators._detach_root import DetachRootValidator
 from program_management.ddd.validators._path_validator import PathValidator
-from program_management.ddd.validators.validators_by_business_action import DetachNodeValidatorList
-from program_management.ddd.validators.validators_by_business_action import PasteNodeValidatorList, \
-    UpdatePrerequisiteValidatorList
+from program_management.ddd.validators import validators_by_business_action
 from program_management.models.enums import node_type
 from program_management.models.enums.node_type import NodeType
 
@@ -269,7 +267,7 @@ class ProgramTree(interface.RootEntity):
             node_to_paste: 'Node',
             paste_command: command.PasteElementCommand
     ) -> Tuple[bool, List['BusinessValidationMessage']]:
-        validator = PasteNodeValidatorList(self, node_to_paste, paste_command)
+        validator = validators_by_business_action.PasteNodeValidatorList(self, node_to_paste, paste_command)
         return validator.is_valid(), validator.messages
 
     def set_prerequisite(
@@ -292,7 +290,7 @@ class ProgramTree(interface.RootEntity):
             prerequisite_expression: 'PrerequisiteExpression',
             node: 'NodeLearningUnitYear'
     ) -> (bool, List['BusinessValidationMessage']):
-        validator = UpdatePrerequisiteValidatorList(prerequisite_expression, node, self)
+        validator = validators_by_business_action.UpdatePrerequisiteValidatorList(prerequisite_expression, node, self)
         return validator.is_valid(), validator.messages
 
     def detach_node(self, path_to_node_to_detach: Path) -> Tuple[bool, List['BusinessValidationMessage']]:
@@ -331,7 +329,7 @@ class ProgramTree(interface.RootEntity):
             node_to_detach: 'Node',
             path_to_parent: Path
     ) -> Tuple[bool, List['BusinessValidationMessage']]:
-        validator = DetachNodeValidatorList(self, node_to_detach, path_to_parent)
+        validator = validators_by_business_action.DetachNodeValidatorList(self, node_to_detach, path_to_parent)
         return validator.is_valid(), validator.messages
 
 

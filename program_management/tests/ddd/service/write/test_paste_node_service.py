@@ -35,12 +35,10 @@ import program_management.ddd.service.write.paste_element_service
 from base.ddd.utils import business_validator
 from base.ddd.utils.validation_message import MessageLevel, BusinessValidationMessage, BusinessValidationMessageList
 from base.models.enums.education_group_types import TrainingType
-from base.models.enums.link_type import LinkTypes
 from program_management.ddd.domain import program_tree
 from program_management.ddd.service import attach_node_service
 from program_management.ddd.service.write import paste_element_service
 from program_management.ddd.validators import _validate_end_date_and_option_finality
-from program_management.ddd.validators._authorized_relationship import PasteAuthorizedRelationshipValidator
 from program_management.ddd.validators._infinite_recursivity import InfiniteRecursivityTreeValidator
 from program_management.ddd.validators._minimum_editable_year import MinimumEditableYearValidator
 from program_management.ddd.validators.link import CreateLinkValidatorList

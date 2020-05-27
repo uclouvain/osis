@@ -36,7 +36,6 @@ from program_management.ddd.business_types import *
 from program_management.ddd.domain.link import factory as link_factory
 from program_management.ddd.domain.prerequisite import NullPrerequisite
 from program_management.ddd.domain.prerequisite import Prerequisite
-from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.ddd.repositories import load_node, load_prerequisite, \
     load_authorized_relationship
 # Typing
