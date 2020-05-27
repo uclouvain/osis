@@ -32,30 +32,31 @@ from base.ddd.utils import business_validator
 from program_management.ddd.validators._minimum_editable_year import MinimumEditableYearValidator
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
+from program_management.tests.ddd.validators.mixins import TestValidatorValidateMixin
 
 
-class TestMinimumEditableYearValidator(SimpleTestCase):
+class TestMinimumEditableYearValidator(TestValidatorValidateMixin, SimpleTestCase):
 
     @override_settings(YEAR_LIMIT_EDG_MODIFICATION=2019)
     def test_shoudl_raise_exception_when_root_year_is_lower_than_settings(self):
         year = 2010
         tree = ProgramTreeFactory(root_node__year=year)
-        validator = MinimumEditableYearValidator(tree)
-        with self.assertRaises(business_validator.BusinessExceptions) as context_exc:
-            validator.validate()
         msg_expected = _("Cannot perform action on a education group before %(limit_year)s") % {
             "limit_year": 2019
         }
-        self.assertEqual(context_exc.exception.messages, [msg_expected])
+
+        self.assertValidatorRaises(MinimumEditableYearValidator(tree), [msg_expected])
 
     @override_settings(YEAR_LIMIT_EDG_MODIFICATION=2019)
     def test_should_not_raise_exception_when_root_year_is_equal_to_settings(self):
         year = 2019
         tree = ProgramTreeFactory(root_node__year=year)
-        MinimumEditableYearValidator(tree).validate()
+
+        self.assertValidatorNotRaises(MinimumEditableYearValidator(tree))
 
     @override_settings(YEAR_LIMIT_EDG_MODIFICATION=2019)
     def test_should_not_raise_exception_when_root_year_greater_than_settings(self):
         year = 2099
         tree = ProgramTreeFactory(root_node__year=year)
-        MinimumEditableYearValidator(tree).validate()
+
+        self.assertValidatorNotRaises(MinimumEditableYearValidator(tree))

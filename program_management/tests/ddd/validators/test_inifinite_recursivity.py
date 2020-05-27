@@ -34,9 +34,10 @@ from program_management.ddd.validators._infinite_recursivity import InfiniteRecu
     InfiniteRecursivityLinkValidator
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
+from program_management.tests.ddd.validators.mixins import TestValidatorValidateMixin
 
 
-class TestInfiniteRecursivityTreeValidator(SimpleTestCase):
+class TestInfiniteRecursivityTreeValidator(TestValidatorValidateMixin, SimpleTestCase):
 
     def setUp(self):
         self.academic_year = AcademicYearFactory.build(current=True)
@@ -50,24 +51,23 @@ class TestInfiniteRecursivityTreeValidator(SimpleTestCase):
     def test_should_not_raise_eception_when_no_recursivity_found(self):
         path = build_path(self.node_to_attach)
         node_to_attach = self.common_core_node
-        InfiniteRecursivityTreeValidator(self.tree, node_to_attach, path).validate()
+        self.assertValidatorNotRaises(InfiniteRecursivityTreeValidator(self.tree, node_to_attach, path))
 
     def test_should_raise_exception_when_adding_node_as_parent_level_1(self):
         child = NodeGroupYearFactory(
             year=self.academic_year.year,
         )
         self.node_to_attach.add_child(child)
-
         path = build_path(self.node_to_attach, child)
-        validator = InfiniteRecursivityTreeValidator(self.tree, self.node_to_attach, path)
-
-        with self.assertRaises(business_validator.BusinessExceptions) as context_exc:
-            validator.validate()
         expected_message = _(
             'The child %(child)s you want to attach '
             'is a parent of the node you want to attach.'
         ) % {'child': self.node_to_attach}
-        self.assertEqual(context_exc.exception.messages, [expected_message])
+
+        self.assertValidatorRaises(
+            InfiniteRecursivityTreeValidator(self.tree, self.node_to_attach, path),
+            [expected_message]
+        )
 
     def test_should_raise_exception_when_adding_node_as_parent_level_2(self):
         child_lvl1 = NodeGroupYearFactory(
@@ -80,16 +80,14 @@ class TestInfiniteRecursivityTreeValidator(SimpleTestCase):
         child_lvl1.add_child(child_lvl2)
 
         path = build_path(self.node_to_attach, child_lvl1, child_lvl2)
-        validator = InfiniteRecursivityTreeValidator(self.tree, self.node_to_attach, path)
-
-        with self.assertRaises(business_validator.BusinessExceptions) as context_exc:
-            validator.validate()
-
         expected_message = _(
             'The child %(child)s you want to attach '
             'is a parent of the node you want to attach.'
         ) % {'child': self.node_to_attach}
-        self.assertEqual(context_exc.exception.messages, [expected_message])
+        self.assertValidatorRaises(
+            InfiniteRecursivityTreeValidator(self.tree, self.node_to_attach, path),
+            [expected_message]
+        )
 
 
 class TestInfiniteRecursivityLinkValidator(SimpleTestCase):
