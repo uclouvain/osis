@@ -105,7 +105,8 @@ class TestDetachNode(SimpleTestCase, ValidatorPatcherMixin):
         detach_node_service.detach_node(self.path_to_detach, commit=True)
         self.assertTrue(self.mock_persist.called)
 
-    def test_when_commit_is_false(self):
+    @patch.object(ProgramTree, 'detach_node', return_value=(True, []))
+    def test_when_commit_is_false(self, mock_detach_node):
         detach_node_service.detach_node(self.path_to_detach, commit=False)
         assertion_message = "Should not persist any data into database. " \
                             "It only tests and applies detach action on the in-memory object."

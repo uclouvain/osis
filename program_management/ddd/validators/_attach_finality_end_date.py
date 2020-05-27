@@ -26,13 +26,13 @@
 
 from django.utils.translation import ngettext
 
-from base.ddd.utils.business_validator import BusinessValidator
+from base.ddd.utils import business_validator
 from base.models.enums.education_group_types import TrainingType
 from program_management.ddd.business_types import *
 
 
 # Implemented from _check_end_year_constraints_on_2m
-class AttachFinalityEndDateValidator(BusinessValidator):
+class AttachFinalityEndDateValidator(business_validator.BusinessValidator):
     """
     In context of 2M, when we add a finality [or group which contains finality], we must ensure that
     the end date of all 2M is greater or equals of all finalities.
@@ -51,15 +51,15 @@ class AttachFinalityEndDateValidator(BusinessValidator):
         if self.node_to_add.is_finality() or self.tree_from_node_to_add.get_all_finalities():
             inconsistent_nodes = self._get_codes_where_end_date_gte_root_end_date()
             if inconsistent_nodes:
-                self.add_error_message(
-                    ngettext(
+                raise business_validator.BusinessExceptions(
+                    [ngettext(
                         "Finality \"%(code)s\" has an end date greater than %(root_code)s program.",
                         "Finalities \"%(code)s\" have an end date greater than %(root_code)s program.",
                         len(inconsistent_nodes)
                     ) % {
                         "code": ', '.join(inconsistent_nodes),
                         "root_code": self.tree_2m.root_node.code
-                    }
+                    }]
                 )
 
     def _get_codes_where_end_date_gte_root_end_date(self):

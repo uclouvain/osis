@@ -29,7 +29,7 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.forms import BaseFormSet
 
-from base.ddd.utils import validation_message
+from base.ddd.utils import validation_message, business_validator
 from base.forms.utils import choice_field
 from base.models.enums.link_type import LinkTypes
 from program_management.ddd import command
@@ -110,9 +110,10 @@ class PasteNodeForm(forms.Form):
 
     def clean_block(self):
         cleaned_block_type = self.cleaned_data.get('block', None)
-        validator = _block_validator.BlockValidator(cleaned_block_type)
-        if not validator.is_valid():
-            raise ValidationError(validator.error_messages)
+        try:
+            _block_validator.BlockValidator(cleaned_block_type).validate()
+        except business_validator.BusinessExceptions as business_exception:
+            raise ValidationError(business_exception.messages)
         return cleaned_block_type
 
     def save(self) -> List[validation_message.BusinessValidationMessage]:

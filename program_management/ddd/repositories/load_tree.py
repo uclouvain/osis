@@ -33,6 +33,7 @@ from base.models.enums.link_type import LinkTypes
 from base.models.enums.quadrimesters import DerogationQuadrimester
 from osis_common.decorators.deprecated import deprecated
 from program_management.ddd.business_types import *
+from program_management.ddd.domain import program_tree
 from program_management.ddd.domain.link import factory as link_factory
 from program_management.ddd.domain.prerequisite import NullPrerequisite
 from program_management.ddd.domain.prerequisite import Prerequisite
@@ -184,7 +185,7 @@ def __build_tree(
             parent_path = '|'.join(s_dict['path'].split('|')[:-1])
             structure_by_parent.setdefault(parent_path, []).append(s_dict)
     root_node.children = __build_children(str(root_node.pk), structure_by_parent, nodes, links, prerequisites)
-    tree = ProgramTree(root_node, authorized_relationships=load_authorized_relationship.load())
+    tree = program_tree.ProgramTree(root_node, authorized_relationships=load_authorized_relationship.load())
     return tree
 
 
