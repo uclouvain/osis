@@ -27,6 +27,7 @@ from education_group.ddd.domain._address import Address
 from osis_common.ddd import interface
 
 
+# FIXME :: should be an Entity in another Domain, and Training should have just an EntityIdentity to get this object.
 class AcademicPartner(interface.ValueObject):
     def __init__(self, name: str, address: Address, logo_url: str = None):
         self.name = name

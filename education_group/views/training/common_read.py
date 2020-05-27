@@ -8,25 +8,31 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 
+from program_management.ddd.business_types import *
+from education_group.ddd.business_types import *
+
 from base import models as mdl
+from education_group.ddd.domain.service.identity_search import TrainingIdentitySearch
 from osis_role.contrib.views import PermissionRequiredMixin
+from program_management.ddd.domain.node import NodeIdentity
+from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories import load_tree
+from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.models.element import Element
 from program_management.serializers.program_tree_view import program_tree_view_serializer
 from program_management.forms.custom_xls import CustomXlsForm
 
-from program_management.ddd.business_types import *
-
 
 class Tab(Enum):
     IDENTIFICATION = 0
     DIPLOMAS_CERTIFICATES = 1
-    CONTENT = 2
-    UTILIZATION = 3
-    GENERAL_INFO = 4
-    SKILLS_ACHIEVEMENTS = 5
-    ADMISSION_CONDITION = 6
+    ADMINISTRATIVE_DATA = 2
+    CONTENT = 3
+    UTILIZATION = 4
+    GENERAL_INFO = 5
+    SKILLS_ACHIEVEMENTS = 6
+    ADMISSION_CONDITION = 7
 
 
 class TrainingRead(PermissionRequiredMixin, TemplateView):
@@ -45,6 +51,22 @@ class TrainingRead(PermissionRequiredMixin, TemplateView):
             )
             path = str(root_element.pk)
         return path
+
+    @cached_property
+    def node_identity(self) -> 'NodeIdentity':
+        return NodeIdentity(code=self.kwargs['code'], year=self.kwargs['year'])
+
+    @cached_property
+    def training_identity(self) -> 'TrainingIdentity':
+        return TrainingIdentitySearch().get_from_program_tree_version_identity(self.program_tree_version_identity)
+
+    @cached_property
+    def program_tree_version_identity(self) -> 'ProgramTreeVersionIdentity':
+        return ProgramTreeVersionIdentitySearch().get_from_node_identity(self.node_identity)
+
+    @cached_property
+    def current_version(self) -> 'ProgramTreeVersion':
+        return ProgramTreeVersionRepository.get(self.program_tree_version_identity)
 
     @cached_property
     def education_group_version(self):
@@ -78,6 +100,9 @@ class TrainingRead(PermissionRequiredMixin, TemplateView):
     def get_permission_object(self):
         return self.education_group_version.offer
 
+    def __display_administrative_data_tab(self):
+        return not self.get_object().is_master_2m() and self.current_version.is_standard
+
     def get_tab_urls(self):
         node = self.get_object()
         return OrderedDict({
@@ -93,6 +118,15 @@ class TrainingRead(PermissionRequiredMixin, TemplateView):
                 'active': Tab.DIPLOMAS_CERTIFICATES == self.active_tab,
                 'display': True,
                 'url': reverse('training_diplomas', args=[node.year, node.code]) + "?path={}".format(self.get_path())
+            },
+            Tab.ADMINISTRATIVE_DATA: {
+                'text': _('Administrative data'),
+                'active': Tab.ADMINISTRATIVE_DATA == self.active_tab,
+                'display': self.__display_administrative_data_tab(),
+                'url': reverse(
+                    'training_administrative_data',
+                    args=[node.year, node.code]
+                ) + "?path={}".format(self.get_path()),
             },
             Tab.CONTENT: {
                 'text': _('Content'),

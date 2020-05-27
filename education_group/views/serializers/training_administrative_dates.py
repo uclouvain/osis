@@ -27,7 +27,7 @@ from datetime import datetime
 from typing import Dict, List, Any
 
 from django.conf import settings
-from django.db.models import OuterRef, Subquery, fields, F, QuerySet, Prefetch
+from django.db.models import OuterRef, Subquery, fields, F, QuerySet, Prefetch, IntegerField, Value, Case, When
 
 from base.business.education_groups import general_information_sections
 from base.models.academic_calendar import AcademicCalendar
@@ -43,10 +43,10 @@ from program_management.ddd.domain.node import NodeGroupYear
 
 DomainTitle = str
 SessionNumber = str
-Dates = Dict['start/end_date', datetime]
+Dates = Dict[str, datetime]
 
 
-class AdministrativeDate:
+class AdministrativeDateBySession:
     def __init__(self, domain_title: str, session_number: int, start_date: datetime, end_date: datetime):
         self.domain_title = domain_title
         self.session_number = session_number
@@ -54,7 +54,7 @@ class AdministrativeDate:
         self.end_date = end_date
 
 
-def get_session_dates(offer_acronym: str, year: int) -> Dict[DomainTitle: Dict[SessionNumber, Dates]]:
+def get_session_dates(offer_acronym: str, year: int) -> Dict[DomainTitle, Dict[SessionNumber, Dates]]:
     dates = __get_queryset_values(offer_acronym, year)
     return {
         'exam_enrollments_dates': __get_dates_by_session(academic_calendar_type.EXAM_ENROLLMENTS, dates),
@@ -65,7 +65,7 @@ def get_session_dates(offer_acronym: str, year: int) -> Dict[DomainTitle: Dict[S
     }
 
 
-def __get_dates_by_session(domain_title: str, dates: List[AdministrativeDate]) -> Dict[SessionNumber, Dates]:
+def __get_dates_by_session(domain_title: str, dates: List[AdministrativeDateBySession]) -> Dict[SessionNumber, Dates]:
     dates = list(filter(lambda administrative_date: administrative_date.domain_title == domain_title, dates))
     return {
         'session1': __get_session_dates(1, dates),
@@ -74,15 +74,17 @@ def __get_dates_by_session(domain_title: str, dates: List[AdministrativeDate]) -
     }
 
 
-def __get_session_dates(session_number: int, dates: List[AdministrativeDate]) -> Dates:
+def __get_session_dates(session_number: int, dates: List[AdministrativeDateBySession]) -> Dates:
     administrative_date = next(date for date in dates if date.session_number == session_number)
+    start_date = administrative_date.start_date if administrative_date else None
+    end_date = administrative_date.end_date if administrative_date else None
     return {
-        'start_date': administrative_date.start_date if administrative_date else None,
-        'end_date': administrative_date.end_date if administrative_date else None,
+        'start_date': start_date,
+        'end_date': end_date,
     }
 
 
-def __get_queryset_values(offer_acronym: str, year: int) -> List[AdministrativeDate]:
+def __get_queryset_values(offer_acronym: str, year: int) -> List[AdministrativeDateBySession]:
     calendar_types_to_fetch = (
         academic_calendar_type.EXAM_ENROLLMENTS,
         academic_calendar_type.SCORES_EXAM_SUBMISSION,
@@ -93,19 +95,17 @@ def __get_queryset_values(offer_acronym: str, year: int) -> List[AdministrativeD
     qs = OfferYearCalendar.objects.filter(
         education_group_year__acronym=offer_acronym,
         education_group_year__academic_year__year=year,
-        reference__in=calendar_types_to_fetch,
+        academic_calendar__reference__in=calendar_types_to_fetch,
     ).annotate(
         session_number=F('academic_calendar__sessionexamcalendar__number_session'),
-        start_date=F('academic_calendar__start_date'),
-        end_date=F('academic_calendar__end_date'),
         domain_title=F('academic_calendar__reference'),
-    )
+    ).values('session_number', 'start_date', 'end_date', 'domain_title')
     return [
-        AdministrativeDate(
-            domain_title=obj.domain_title,
-            session_number=obj.session_number,
-            start_date=obj.start_date,
-            end_date=obj.end_date,
+        AdministrativeDateBySession(
+            domain_title=values['domain_title'],
+            session_number=values['session_number'],
+            start_date=values['start_date'],
+            end_date=values['end_date'],
         )
-        for obj in qs
+        for values in qs
     ]
