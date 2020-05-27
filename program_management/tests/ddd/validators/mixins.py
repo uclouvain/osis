@@ -21,17 +21,18 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from typing import List
+from typing import List, Optional
 
 from base.ddd.utils import business_validator
 
 
 class TestValidatorValidateMixin:
-    def assertValidatorRaises(self, validator: business_validator.BusinessValidator, messages: List[str]):
+    def assertValidatorRaises(self, validator: business_validator.BusinessValidator, messages: Optional[List[str]]):
         with self.assertRaises(business_validator.BusinessExceptions) as context_exc:
             validator.validate()
 
-        self.assertEqual(context_exc.exception.messages, messages)
+        if messages is not None:
+            self.assertEqual(context_exc.exception.messages, messages)
 
     def assertValidatorNotRaises(self, validator: business_validator.BusinessValidator):
         try:

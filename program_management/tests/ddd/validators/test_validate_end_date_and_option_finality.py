@@ -34,9 +34,10 @@ from program_management.ddd.validators._attach_option import AttachOptionsValida
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 from program_management.tests.ddd.service.mixins import ValidatorPatcherMixin
+from program_management.tests.ddd.validators.mixins import TestValidatorValidateMixin
 
 
-class TestValidateEndDateAndOptionFinality(SimpleTestCase, ValidatorPatcherMixin):
+class TestValidateEndDateAndOptionFinality(TestValidatorValidateMixin, ValidatorPatcherMixin, SimpleTestCase):
 
     def setUp(self):
         self.root_node = NodeGroupYearFactory(node_type=TrainingType.PGRM_MASTER_120)
@@ -53,30 +54,32 @@ class TestValidateEndDateAndOptionFinality(SimpleTestCase, ValidatorPatcherMixin
         self.mock_load_tree_to_attach.return_value = ProgramTreeFactory(root_node=self.node_to_attach_not_finality)
 
     @patch('program_management.ddd.repositories.load_tree.load_trees_from_children')
-    def test_when_node_to_attach_is_not_finality(self, mock_load_2m_trees):
+    def test_should_not_raise_exception_when_node_to_attach_is_not_finality(self, mock_load_2m_trees):
         """Unit test only for performance"""
         self.mock_validator(AttachFinalityEndDateValidator, [_('Success message')], level=MessageLevel.SUCCESS)
 
-        validator = _validate_end_date_and_option_finality.ValidateEndDateAndOptionFinality(self.node_to_attach_not_finality)
-        validator.is_valid()
-        result = validator.messages
+        self.assertValidatorNotRaises(
+            _validate_end_date_and_option_finality.ValidateEndDateAndOptionFinality(self.node_to_attach_not_finality)
+        )
         self.assertFalse(mock_load_2m_trees.called)
 
     @patch('program_management.ddd.repositories.load_tree.load_trees_from_children')
-    def test_when_end_date_of_finality_node_to_attach_is_not_valid(self, mock_load_2m_trees):
+    def test_shoudl_raise_exception_when_end_date_of_finality_node_to_attach_is_not_valid(self, mock_load_2m_trees):
         mock_load_2m_trees.return_value = [self.tree_2m]
         node_to_attach = NodeGroupYearFactory(node_type=TrainingType.MASTER_MA_120)
         self.mock_load_tree_to_attach.return_value = ProgramTreeFactory(root_node=node_to_attach)
         self.mock_validator(AttachFinalityEndDateValidator, [_('Error end date finality message')])
 
-        validator = _validate_end_date_and_option_finality.ValidateEndDateAndOptionFinality(node_to_attach)
-        validator.is_valid()
-        result = validator.messages
-        validator_msg = "Error end date finality message"
-        self.assertEqual(result[0].message, validator_msg)
+        self.assertValidatorRaises(
+            _validate_end_date_and_option_finality.ValidateEndDateAndOptionFinality(node_to_attach),
+            [_('Error end date finality message')]
+        )
 
     @patch('program_management.ddd.repositories.load_tree.load_trees_from_children')
-    def test_when_end_date_of_finality_children_of_node_to_attach_is_not_valid(self, mock_load_2m_trees):
+    def test_shoudl_raise_exception_when_end_date_of_finality_children_of_node_to_attach_is_not_valid(
+            self,
+            mock_load_2m_trees
+    ):
         mock_load_2m_trees.return_value = [self.tree_2m]
         not_finality = NodeGroupYearFactory(node_type=TrainingType.AGGREGATION)
         finality = NodeGroupYearFactory(node_type=TrainingType.MASTER_MA_120)
@@ -84,33 +87,28 @@ class TestValidateEndDateAndOptionFinality(SimpleTestCase, ValidatorPatcherMixin
         self.mock_load_tree_to_attach.return_value = ProgramTreeFactory(root_node=not_finality)
         self.mock_validator(AttachFinalityEndDateValidator, [_('Error end date finality message')])
 
-        validator = _validate_end_date_and_option_finality.ValidateEndDateAndOptionFinality(not_finality)
-        validator.is_valid()
-        result = validator.messages
-        validator_msg = "Error end date finality message"
-        self.assertEqual(result[0].message, validator_msg)
+        self.assertValidatorRaises(
+            _validate_end_date_and_option_finality.ValidateEndDateAndOptionFinality(not_finality),
+            [_('Error end date finality message')]
+        )
 
     @patch('program_management.ddd.repositories.load_tree.load_trees_from_children')
-    def test_when_end_date_of_finality_node_to_attach_is_valid(self, mock_load_2m_trees):
+    def test_should_not_raise_exception_when_end_date_of_finality_node_to_attach_is_valid(self, mock_load_2m_trees):
         mock_load_2m_trees.return_value = [self.tree_2m]
         finality = NodeGroupYearFactory(node_type=TrainingType.MASTER_MA_120)
         self.mock_load_tree_to_attach.return_value = ProgramTreeFactory(root_node=finality)
         self.mock_validator(AttachFinalityEndDateValidator, [_('Success')], level=MessageLevel.SUCCESS)
 
-        validator = _validate_end_date_and_option_finality.ValidateEndDateAndOptionFinality(finality)
-        validator.is_valid()
-        result = validator.messages
-        self.assertEqual([], result)
+        self.assertValidatorNotRaises(_validate_end_date_and_option_finality.ValidateEndDateAndOptionFinality(finality))
 
     @patch('program_management.ddd.repositories.load_tree.load_trees_from_children')
-    def test_when_option_validator_not_valid(self, mock_load_2m_trees):
+    def test_should_raise_exception_when_option_validator_not_valid(self, mock_load_2m_trees):
         mock_load_2m_trees.return_value = [self.tree_2m]
         node_to_attach = NodeGroupYearFactory(node_type=TrainingType.MASTER_MA_120)
         self.mock_load_tree_to_attach.return_value = ProgramTreeFactory(root_node=node_to_attach)
         self.mock_validator(AttachOptionsValidator, [_('Error attach option message')])
 
-        validator = _validate_end_date_and_option_finality.ValidateEndDateAndOptionFinality(node_to_attach)
-        validator.is_valid()
-        result = validator.messages
-        validator_msg = "Error attach option message"
-        self.assertIn(validator_msg, result)
+        self.assertValidatorRaises(
+            _validate_end_date_and_option_finality.ValidateEndDateAndOptionFinality(node_to_attach),
+            None
+        )

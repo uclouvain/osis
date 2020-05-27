@@ -21,16 +21,15 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from typing import List
 
-from base.ddd.utils.business_validator import BusinessValidator
-from program_management.ddd.repositories import load_tree
-from program_management.ddd.validators._attach_finality_end_date import AttachFinalityEndDateValidator
-from program_management.ddd.validators._attach_option import AttachOptionsValidator
+from base.ddd.utils import business_validator
 from program_management.ddd.business_types import *
+from program_management.ddd.repositories import load_tree
+from program_management.ddd.validators import _attach_finality_end_date
+from program_management.ddd.validators import _attach_option
 
 
-class ValidateEndDateAndOptionFinality(BusinessValidator):
+class ValidateEndDateAndOptionFinality(business_validator.BusinessValidator):
     def __init__(self, node_to_paste: 'Node'):
         super().__init__()
         self.node_to_paste = node_to_paste
@@ -38,17 +37,20 @@ class ValidateEndDateAndOptionFinality(BusinessValidator):
     def validate(self, *args, **kwargs):
         tree = load_tree.load(self.node_to_paste.node_id)
         finality_ids = [n.node_id for n in tree.get_all_finalities()]
+        messages = []
         if self.node_to_paste.is_finality() or finality_ids:
             trees_2m = [
                 tree for tree in load_tree.load_trees_from_children(child_branch_ids=finality_ids)
                 if tree.is_master_2m()
             ]
             for tree_2m in trees_2m:
-                validator = AttachFinalityEndDateValidator(tree_2m, tree)
+                validator = _attach_finality_end_date.AttachFinalityEndDateValidator(tree_2m, tree)
                 if not validator.is_valid():
                     for msg in validator.error_messages:
-                        self.add_error_message(msg.message)
-                validator = AttachOptionsValidator(tree_2m, tree)
+                        messages.append(msg.message)
+                validator = _attach_option.AttachOptionsValidator(tree_2m, tree)
                 if not validator.is_valid():
                     for msg in validator.error_messages:
-                        self.add_error_message(msg.message)
+                        messages.append(msg.message)
+        if messages:
+            raise business_validator.BusinessExceptions(messages)

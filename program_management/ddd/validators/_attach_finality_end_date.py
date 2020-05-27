@@ -29,7 +29,6 @@ from django.utils.translation import ngettext
 from base.ddd.utils.business_validator import BusinessValidator
 from base.models.enums.education_group_types import TrainingType
 from program_management.ddd.business_types import *
-from program_management.ddd.domain import program_tree
 
 
 # Implemented from _check_end_year_constraints_on_2m
@@ -41,8 +40,6 @@ class AttachFinalityEndDateValidator(BusinessValidator):
 
     def __init__(self, tree_2m: 'ProgramTree', tree_from_node_to_add: 'ProgramTree', *args):
         super(AttachFinalityEndDateValidator, self).__init__()
-        msg = "This validator need the children of the node to add. Please load the complete Tree from the Node to Add"
-        assert isinstance(tree_from_node_to_add, program_tree.ProgramTree), msg
         if tree_from_node_to_add.root_node.is_finality() or tree_from_node_to_add.get_all_finalities():
             assert_error_msg = "To use correctly this validator, make sure the ProgramTree root is of type 2M"
             assert tree_2m.root_node.node_type in TrainingType.root_master_2m_types_enum(), assert_error_msg
