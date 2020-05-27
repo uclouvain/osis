@@ -84,12 +84,12 @@ class AuthorizedRelationshipLearningUnitValidator(business_validator.BusinessVal
                 self.position_to_attach_from.node_type,
                 self.node_to_attach.node_type
         ):
-            self.add_error_message(
-                _("You can not attach a learning unit like %(node)s to element %(parent)s of type %(type)s.") % {
+            raise business_validator.BusinessExceptions(
+                [_("You can not attach a learning unit like %(node)s to element %(parent)s of type %(type)s.") % {
                     "node": self.node_to_attach,
                     "parent": self.position_to_attach_from,
                     "type": self.position_to_attach_from.node_type.value
-                }
+                }]
             )
 
 
