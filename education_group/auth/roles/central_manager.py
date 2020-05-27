@@ -32,20 +32,14 @@ class CentralManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
             'base.can_access_catalog': rules.always_allow,  # Perms Backward compibility
             'base.view_educationgroup': rules.always_allow,
             'base.add_training':
-                predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
-                predicates.is_program_edition_period_open &
-                predicates.is_maximum_child_not_reached_for_mini_training_category &
+                predicates.is_maximum_child_not_reached_for_training_category &
                 predicates.is_user_attached_to_management_entity,
             'base.add_minitraining':
-                predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
-                predicates.is_program_edition_period_open &
                 predicates.is_maximum_child_not_reached_for_mini_training_category &
                 predicates.is_user_attached_to_management_entity,
             'base.add_group':
                 predicates.is_not_orphan_group &
-                predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
-                predicates.is_program_edition_period_open &
-                predicates.is_maximum_child_not_reached_for_mini_training_category &
+                predicates.is_maximum_child_not_reached_for_group_category &
                 predicates.is_user_attached_to_management_entity,
             # TODO : split in training, minitraining, group
             'base.change_educationgroup':
@@ -118,8 +112,5 @@ class CentralManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_education_group_type_authorized_according_to_user_scope &
                 predicates.is_user_attached_to_management_entity,
-            'base.change_link_data':
-                predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
-                predicates.is_program_edition_period_open &
-                predicates.is_user_attached_to_management_entity
+            'base.change_link_data': predicates.is_user_attached_to_management_entity,
         })
