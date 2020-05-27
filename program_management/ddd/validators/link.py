@@ -1,6 +1,4 @@
-from django.utils.translation import gettext as _
-
-from base.ddd.utils.business_validator import BusinessListValidator
+from base.ddd.utils import business_validator
 from program_management.ddd.business_types import *
 from program_management.ddd.validators._infinite_recursivity import InfiniteRecursivityLinkValidator
 from program_management.ddd.validators._node_duplication import NodeDuplicationValidator
@@ -8,11 +6,7 @@ from program_management.ddd.validators._parent_as_leaf import ParentIsNotLeafVal
 from program_management.ddd.validators._parent_child_academic_year import ParentChildSameAcademicYearValidator
 
 
-class CreateLinkValidatorList(BusinessListValidator):
-    success_messages = [
-        _('Success message')
-    ]
-
+class CreateLinkValidatorList(business_validator.BusinessListValidator):
     def __init__(self, parent_node: 'Node', node_to_add: 'Node'):
         self.validators = [
             ParentIsNotLeafValidator(parent_node, node_to_add),
@@ -21,3 +15,14 @@ class CreateLinkValidatorList(BusinessListValidator):
             InfiniteRecursivityLinkValidator(parent_node, node_to_add),
         ]
         super().__init__()
+
+    def validate(self):
+        error_messages = []
+        for validator in self.validators:
+            try:
+                validator.validate()
+            except business_validator.BusinessExceptions as business_exception:
+                error_messages.extend(business_exception.messages)
+
+        if error_messages:
+            raise business_validator.BusinessExceptions(error_messages)

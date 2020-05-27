@@ -26,13 +26,15 @@
 
 from django.utils.translation import gettext as _
 
-from base.ddd.utils.business_validator import BusinessListValidator
+from base.ddd.utils import business_validator
 from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.validators._authorized_link_type import AuthorizedLinkTypeValidator
 from program_management.ddd.validators._authorized_relationship import \
     AuthorizedRelationshipLearningUnitValidator, PasteAuthorizedRelationshipValidator, \
     DetachAuthorizedRelationshipValidator
+from program_management.ddd.validators._authorized_relationship_for_all_trees import \
+    ValidateAuthorizedRelationshipForAllTrees
 from program_management.ddd.validators._authorized_root_type_for_prerequisite import AuthorizedRootTypeForPrerequisite
 from program_management.ddd.validators._block_validator import BlockValidator
 from program_management.ddd.validators._detach_option_2M import DetachOptionValidator
@@ -40,15 +42,13 @@ from program_management.ddd.validators._has_or_is_prerequisite import IsPrerequi
 from program_management.ddd.validators._infinite_recursivity import InfiniteRecursivityTreeValidator
 from program_management.ddd.validators._minimum_editable_year import \
     MinimumEditableYearValidator
-from program_management.ddd.validators._validate_end_date_and_option_finality import ValidateEndDateAndOptionFinality
-from program_management.ddd.validators._authorized_relationship_for_all_trees import \
-    ValidateAuthorizedRelationshipForAllTrees
 from program_management.ddd.validators._prerequisite_expression_syntax import PrerequisiteExpressionSyntaxValidator
 from program_management.ddd.validators._prerequisites_items import PrerequisiteItemsValidator
+from program_management.ddd.validators._validate_end_date_and_option_finality import ValidateEndDateAndOptionFinality
 from program_management.ddd.validators.link import CreateLinkValidatorList
 
 
-class PasteNodeValidatorList(BusinessListValidator):
+class PasteNodeValidatorList(business_validator.BusinessListValidator):
     def __init__(
             self,
             tree: 'ProgramTree',
@@ -86,8 +86,19 @@ class PasteNodeValidatorList(BusinessListValidator):
             raise AttributeError("Unknown instance of node")
         super().__init__()
 
+    def validate(self):
+        error_messages = []
+        for validator in self.validators:
+            try:
+                validator.validate()
+            except business_validator.BusinessExceptions as business_exception:
+                error_messages.extend(business_exception.messages)
 
-class DetachNodeValidatorList(BusinessListValidator):
+        if error_messages:
+            raise business_validator.BusinessExceptions(error_messages)
+
+
+class DetachNodeValidatorList(business_validator.BusinessListValidator):
 
     def __init__(self, tree: 'ProgramTree', node_to_detach: 'Node', path_to_parent: 'Path'):
         detach_from = tree.get_node(path_to_parent)
@@ -120,7 +131,7 @@ class DetachNodeValidatorList(BusinessListValidator):
         })  # TODO :: unit test
 
 
-class UpdatePrerequisiteValidatorList(BusinessListValidator):
+class UpdatePrerequisiteValidatorList(business_validator.BusinessListValidator):
 
     def __init__(
             self,
