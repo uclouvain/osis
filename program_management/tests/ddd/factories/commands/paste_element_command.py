@@ -21,26 +21,27 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from typing import List
+import factory.fuzzy
 
 from program_management.ddd import command
-from program_management.ddd.business_types import *
-from program_management.ddd.repositories import load_tree, load_node, persist_tree
-from program_management.ddd.service import detach_node_service
+from program_management.models.enums import node_type
 
 
-def paste_element_service(paste_command: command.PasteElementCommand) -> List['BusinessValidationMessage']:
-    commit = paste_command.commit
-    path_to_detach = paste_command.path_where_to_detach
-    tree = load_tree.load(paste_command.root_id)
-    node_to_attach = load_node.load_by_type(paste_command.node_to_paste_type, element_id=paste_command.node_to_paste_id)
+class PasteElementCommandFactory(factory.Factory):
+    class Meta:
+        model = command.PasteElementCommand
+        abstract = False
 
-    action_messages = []
-    if path_to_detach:
-        action_messages.extend(detach_node_service.detach_node(path_to_detach, commit=commit).errors)
-
-    action_messages.extend(tree.paste_node(node_to_attach, paste_command))
-
-    if commit:
-        persist_tree.persist(tree)
-    return action_messages
+    root_id = factory.Faker("random_int")
+    node_to_paste_id = factory.Faker("random_int")
+    node_to_paste_type = factory.fuzzy.FuzzyChoice(node_type.NodeType.get_names())
+    path_where_to_paste = factory.LazyAttribute(lambda o: str(o.root_id))
+    commit = False
+    access_condition = None
+    is_mandatory = None
+    block = None
+    link_type = None
+    comment = ""
+    comment_english = ""
+    relative_credits = None
+    path_where_to_detach = None

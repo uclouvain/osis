@@ -46,6 +46,7 @@ from program_management.ddd.validators._minimum_editable_year import MinimumEdit
 from program_management.ddd.validators.link import CreateLinkValidatorList
 from program_management.ddd.validators.validators_by_business_action import PasteNodeValidatorList
 from program_management.models.enums.node_type import NodeType
+from program_management.tests.ddd.factories.commands.paste_element_command import PasteElementCommandFactory
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
@@ -55,31 +56,18 @@ from program_management.tests.ddd.service.mixins import ValidatorPatcherMixin
 class TestPasteNode(SimpleTestCase, ValidatorPatcherMixin):
 
     def setUp(self):
-        self.root_node = NodeEducationGroupYearFactory(
-            node_type=TrainingType.BACHELOR
-        )
+        self.root_node = NodeEducationGroupYearFactory(node_type=TrainingType.BACHELOR)
         self.tree = ProgramTreeFactory(root_node=self.root_node)
-        self.root_path = str(self.root_node.node_id)
         self.node_to_paste = NodeEducationGroupYearFactory()
         self.node_to_paste_type = NodeType.EDUCATION_GROUP
 
         self._patch_persist_tree()
         self._patch_load_tree()
         self._patch_load_child_node_to_attach()
-        self.paste_command = program_management.ddd.command.PasteElementCommand(
+        self.paste_command = PasteElementCommandFactory(
             root_id=self.tree.root_node.node_id,
             node_to_paste_id=self.node_to_paste.node_id,
             node_to_paste_type=self.node_to_paste_type,
-            path_where_to_paste=self.root_path,
-            commit=False,
-            access_condition=None,
-            is_mandatory=None,
-            block=None,
-            link_type=None,
-            comment="",
-            comment_english="",
-            relative_credits=None,
-            path_where_to_detach=None
         )
 
     def _patch_persist_tree(self):
@@ -117,25 +105,16 @@ class TestPasteNode(SimpleTestCase, ValidatorPatcherMixin):
 
     def test_when_commit_is_true_then_persist_modification(self):
         self.mock_validator(PasteNodeValidatorList, [_('Success message')], level=MessageLevel.SUCCESS)
-        paste_command_with_commit_set_to_true = program_management.ddd.command.PasteElementCommand(
+        paste_command_with_commit_set_to_true = PasteElementCommandFactory(
             root_id=self.tree.root_node.node_id,
             node_to_paste_id=self.node_to_paste.node_id,
             node_to_paste_type=self.node_to_paste_type,
-            path_where_to_paste=self.root_path,
-            commit=True,
-            access_condition=None,
-            is_mandatory=None,
-            block=None,
-            link_type=None,
-            comment="",
-            comment_english="",
-            relative_credits=None,
-            path_where_to_detach=None
+            commit=True
         )
         paste_element_service.paste_element_service(paste_command_with_commit_set_to_true)
         self.assertTrue(self.mock_persist.called)
 
-    def test_when_commit_is_false_then_sould_not_persist_modification(self):
+    def test_when_commit_is_false_then_should_not_persist_modification(self):
         self.mock_validator(PasteNodeValidatorList, [_('Success message')], level=MessageLevel.SUCCESS)
         program_management.ddd.service.write.paste_element_service.paste_element_service(self.paste_command)
         self.assertFalse(self.mock_persist.called)
@@ -144,19 +123,10 @@ class TestPasteNode(SimpleTestCase, ValidatorPatcherMixin):
     def test_when_path_to_detach_is_set_then_should_call_detach_service(self, mock_detach):
         mock_detach.return_value = BusinessValidationMessageList([])
         self.mock_validator(PasteNodeValidatorList, [_('Success message')], level=MessageLevel.SUCCESS)
-        paste_command_with_path_to_detach_set = program_management.ddd.command.PasteElementCommand(
+        paste_command_with_path_to_detach_set = PasteElementCommandFactory(
             root_id=self.tree.root_node.node_id,
             node_to_paste_id=self.node_to_paste.node_id,
             node_to_paste_type=self.node_to_paste_type,
-            path_where_to_paste=self.root_path,
-            commit=False,
-            access_condition=None,
-            is_mandatory=None,
-            block=None,
-            link_type=None,
-            comment="",
-            comment_english="",
-            relative_credits=None,
             path_where_to_detach="a|b"
         )
         paste_element_service.paste_element_service(paste_command_with_path_to_detach_set)

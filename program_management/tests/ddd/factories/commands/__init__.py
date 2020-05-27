@@ -21,26 +21,3 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from typing import List
-
-from program_management.ddd import command
-from program_management.ddd.business_types import *
-from program_management.ddd.repositories import load_tree, load_node, persist_tree
-from program_management.ddd.service import detach_node_service
-
-
-def paste_element_service(paste_command: command.PasteElementCommand) -> List['BusinessValidationMessage']:
-    commit = paste_command.commit
-    path_to_detach = paste_command.path_where_to_detach
-    tree = load_tree.load(paste_command.root_id)
-    node_to_attach = load_node.load_by_type(paste_command.node_to_paste_type, element_id=paste_command.node_to_paste_id)
-
-    action_messages = []
-    if path_to_detach:
-        action_messages.extend(detach_node_service.detach_node(path_to_detach, commit=commit).errors)
-
-    action_messages.extend(tree.paste_node(node_to_attach, paste_command))
-
-    if commit:
-        persist_tree.persist(tree)
-    return action_messages
