@@ -19,4 +19,14 @@ class CentralManager(osis_role_models.EntityRoleModel):
     @classmethod
     def rule_set(cls):
         return rules.RuleSet({
+            'base.can_create_learningunit': rules.always_allow,
+            'base.can_access_learningunit': rules.always_allow,
+            'base.can_delete_learningunit': rules.always_allow,
+            'base.can_edit_learningunit': rules.always_allow,
+            'base.add_externallearningunityear': rules.always_allow,
+            'base.can_propose_learningunit': rules.always_allow,
+            'base.can_edit_learningunit_date': rules.always_allow,
+            'base.can_edit_learningunit_pedagogy': rules.always_allow,
+            'base.can_edit_learningunit_specification': rules.always_allow,
+            'base.can_consolidate_learningunit_proposal': rules.always_allow,
         })
