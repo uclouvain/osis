@@ -30,7 +30,6 @@ from unittest import mock
 
 from django.contrib.auth.models import Permission
 from django.contrib.messages import get_messages
-from django.core.exceptions import ValidationError
 from django.http import HttpResponseForbidden, HttpResponseRedirect, HttpResponse
 from django.test import TestCase
 from django.urls import reverse
@@ -68,7 +67,6 @@ from base.utils.cache import ElementCache
 from base.views.education_groups.update import _get_success_redirect_url, update_education_group
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from program_management.business.group_element_years import management
-from program_management.business.group_element_years.attach import AttachEducationGroupYearStrategy
 from program_management.models.enums import node_type
 from reference.tests.factories.country import CountryFactory
 from reference.tests.factories.domain import DomainFactory
@@ -763,7 +761,6 @@ class TestSelectAttach(TestCase):
             academic_year=cls.academic_year,
             education_group__end_year=cls.next_academic_year_1
         )
-        cls.person = CentralManagerFactory().person
         cls.learning_unit_year = LearningUnitYearFactory(academic_year=cls.academic_year)
         cls.initial_parent_education_group_year = EducationGroupYearFactory(academic_year=cls.academic_year)
         cls.new_parent_education_group_year = EducationGroupYearFactory(
@@ -822,6 +819,8 @@ class TestSelectAttach(TestCase):
             "group_element_year_id": group_above_new_parent.id,
             "action": "attach",
         }
+        cls.person = CentralManagerFactory(entity=cls.new_parent_education_group_year.management_entity).person
+
 
     def setUp(self):
         self.client.force_login(self.person.user)

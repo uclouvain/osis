@@ -54,17 +54,17 @@ class TestCanUpdateGroupElementYear(TestCase):
 
     def test_return_false_when_user_not_linked_to_entity(self):
         person = PersonFactory()
-        self.assertFalse(person.user.has_perm(self.permission_required, self.group_element_year))
+        self.assertFalse(person.user.has_perm(self.permission_required, self.group_element_year.parent))
 
     def test_return_true_if_is_central_manager(self):
         central_manager = CentralManagerFactory(entity=self.group_element_year.parent.management_entity).person
-        self.assertTrue(central_manager.user.has_perm(self.permission_required, self.group_element_year))
+        self.assertTrue(central_manager.user.has_perm(self.permission_required, self.group_element_year.parent))
 
     def test_return_true_if_child_is_learning_unit_and_user_is_central_manager(self):
         GroupElementYearChildLeafFactory(parent=self.group_element_year.parent)
         central_manager = CentralManagerFactory(entity=self.group_element_year.parent.management_entity)
 
-        self.assertTrue(central_manager.person.user.has_perm(self.permission_required, self.group_element_year))
+        self.assertTrue(central_manager.person.user.has_perm(self.permission_required, self.group_element_year.parent))
 
     def test_true_if_person_is_faculty_manager_and_period_open(self):
         OpenAcademicCalendarFactory(reference=EDUCATION_GROUP_EDITION, academic_year=self.current_acy,
@@ -82,7 +82,7 @@ class TestCanUpdateGroupElementYear(TestCase):
 
     def test_raise_permission_denied_if_person_is_program_manager(self):
         program_manager = PersonWithPermissionsFactory(groups=(PROGRAM_MANAGER_GROUP, ))
-        self.assertFalse(program_manager.user.has_perm(self.permission_required, self.group_element_year))
+        self.assertFalse(program_manager.user.has_perm(self.permission_required, self.group_element_year.parent))
 
     def test_true_if_person_has_both_roles(self):
         person_with_both_roles = PersonWithPermissionsFactory(
@@ -91,7 +91,7 @@ class TestCanUpdateGroupElementYear(TestCase):
         )
         CentralManagerFactory(person=person_with_both_roles, entity=self.group_element_year.parent.management_entity)
 
-        self.assertTrue(person_with_both_roles.user.has_perm(self.permission_required, self.group_element_year))
+        self.assertTrue(person_with_both_roles.user.has_perm(self.permission_required, self.group_element_year.parent))
 
     @patch('base.business.event_perms.EventPerm.is_open', return_value=True)
     def test_raise_permission_denied_when_minor_or_major_list_choice_and_person_is_faculty_manager(self, mock_period):
