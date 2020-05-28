@@ -23,30 +23,24 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.urls import reverse
+from typing import List
 
-from program_management.serializers.node_view import serialize_children
+from django.db.models import F
+
+from education_group.ddd.domain.training import TrainingIdentity
+from education_group.models.group_year import GroupYear
+from osis_common.ddd.interface import BusinessException
 from program_management.ddd.business_types import *
+from program_management.ddd.domain.service.identity_search import DomainService
 
 
-def program_tree_view_serializer(tree: 'ProgramTree') -> dict:
-    path = str(tree.root_node.pk)
-    return {
-        'text': '%(code)s - %(title)s' % {'code': tree.root_node.code, 'title': tree.root_node.title},
-        'id': path,
-        'icon': None,
-        'children': serialize_children(
-            children=tree.root_node.children,
-            path=path,
-            context={'root': tree.root_node}
-        ),
-        'a_attr': {
-            'href': reverse('element_identification', args=[tree.root_node.year, tree.root_node.code]),
-            'element_id': tree.root_node.pk,
-            'element_type': tree.root_node.type.name,
-            'attach_url': reverse(
-                'education_group_attach',
-                args=[tree.root_node.pk, tree.root_node.pk]
-            ) + "?path=%s" % str(tree.root_node.pk),
-        }
-    }
+class ExistingAcademicYearSearch(DomainService):
+    def search_from_node_identity(self, node_identity: 'NodeIdentity') -> List[int]:
+        return GroupYear.objects.filter(
+            partial_acronym=node_identity.code
+        ).annotate(
+            year=F('academic_year__year'),
+        ).values_list(
+            'year',
+            flat=True
+        )

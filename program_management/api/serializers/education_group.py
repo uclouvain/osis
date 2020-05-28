@@ -34,7 +34,10 @@ class EducationGroupHyperlinkedIdentityField(serializers.HyperlinkedIdentityFiel
         super().__init__(view_name='element_identification', **kwargs)
 
     def get_url(self, obj, view_name, request, format):
-        return reverse('element_identification', args=[obj.element.pk])
+        return reverse(
+            'element_identification',
+            args=[obj.academic_year.year, obj.partial_acronym]
+        )
 
 
 class EducationGroupSerializer(serializers.Serializer):

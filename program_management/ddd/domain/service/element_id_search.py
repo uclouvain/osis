@@ -23,28 +23,50 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import itertools
+from typing import List, Dict
 
 from django.db.models import F
 
 from education_group.models.group_year import GroupYear
-from osis_common.ddd.interface import BusinessException
-from program_management.ddd.business_types import *
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
+# from program_management.ddd.business_types import *
+from program_management.ddd.domain.service.identity_search import DomainService
 
-DomainService = object  # TODO :: move into osis_commin/ddd/interfaces
+PathElementId = int
+Year = int
 
 
-class ProgramTreeVersionIdentitySearch(DomainService):
-    def get_from_node_identity(self, node_identity: 'NodeIdentity') -> 'ProgramTreeVersionIdentity':
-        values = GroupYear.objects.filter(
-            partial_acronym=node_identity.code,
-            academic_year__year=node_identity.year
+class ElementIdByYearSearch(DomainService):
+
+    def search_from_element_ids_and_years(
+            self,
+            element_ids: List[PathElementId],
+            years: List[Year]
+    ) -> Dict[PathElementId, Dict[Year, PathElementId]]:
+
+        values_list = GroupYear.objects.filter(
+            group__groupyear__element__pk__in=element_ids,
+            academic_year__year__in=years,
         ).annotate(
-            offer_acronym=F('educationgroupversion__offer__acronym'),
+            element_id=F('element__pk'),
             year=F('academic_year__year'),
-            version_name=F('educationgroupversion__version_name'),
-            is_transition=F('educationgroupversion__is_transition'),
-        ).values('offer_acronym', 'year', 'version_name', 'is_transition')
-        if values:
-            return ProgramTreeVersionIdentity(**values[0])
-        raise BusinessException("Program tree version identity not found")
+        ).values(
+            'element_id',
+            'group_id',
+            'year',
+        )
+
+        grouped_by_group_id = itertools.groupby(values_list, lambda record: record['group_id'])
+        grouped_by_group_id = {}
+        for rec in values_list:
+            grouped_by_group_id.setdefault(rec['group_id'], []).append(rec)
+
+        result = {}
+        for group_id, records in grouped_by_group_id.items():
+            for record in records:
+                element_id = record['element_id']
+                result[element_id] = {
+                    rec['year']: rec['element_id'] for rec in records
+                }
+
+        return result

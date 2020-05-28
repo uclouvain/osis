@@ -1,5 +1,5 @@
 {% extends "education_group/layout.html" %}
-{% load education_group format i18n static version %}
+{% load format i18n static version bootstrap3 %}
 
 {% block title %}
     <title>OSIS - {{ education_group_year.acronym }} {{ learning_unit_year.acronym }}</title>
@@ -45,19 +45,25 @@
     <div class="panel panel-default" id="panel-data">
         <div class="panel-heading">
             <div class="row">
-                <a id="btn-toggle-tree" class="btn btn-default" style="margin-left: 15px;" onclick="toggleNav()">
-                    <span class="fa fa-bars" aria-hidden="true"></span>
-                </a>
-
-                {% if offer and education_group_year and offer == education_group_year %}
-                    {% dropdown_academic_years current_version academic_years request.GET.tab_to_show %}
-                    {% if all_versions_available %}
-                        {% dropdown_versions all_versions_available current_version request.GET.tab_to_show %}
-                    {% endif %}
-                {% endif %}
-                <div class="pull-right" style="margin-right: 15px;">
-                    {% block top_action_bar %}
-                    {% endblock %}
+                <div class="col-md-1">
+                    <a id="btn-toggle-tree" class="btn btn-default" style="margin-left: 15px;" onclick="toggleNav()">
+                        <span class="fa fa-bars" aria-hidden="true"></span>
+                    </a>
+                </div>
+                <div class="col-md-2">
+                    <select id="slt_academic_year" name="select_academic_year" class="form-control" onchange="location = this.value;">
+                        {% for choice in academic_year_choices %}
+                            <option value="{{ choice.node_href }}"
+                                    {% if node.year == choice.year %}
+                                    selected {% endif %}>{{ choice.year_display }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-9">
+                    <div class="pull-right" style="margin-right: 15px;">
+                        {% block top_action_bar %}
+                        {% endblock %}
+                    </div>
                 </div>
             </div>
         </div>

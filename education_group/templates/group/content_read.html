@@ -47,7 +47,7 @@
                         <tr>
                             <td style="width:8%">{{ link.child.title }}</td>
                              <td>
-                                <a href="{% url 'element_identification' link.child.pk %}"
+                                <a href="{% url 'element_identification' link.child.year link.child.code %}"
                                    id="lnk_education_group_{{ link.child.pk }}">{{ link.child.code }}</a>
                             </td>
                             <td style="width:25%">

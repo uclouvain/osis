@@ -9,6 +9,7 @@ from django.utils.text import capfirst
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 
+from education_group.forms.academic_year import get_academic_year_choices
 from program_management.ddd.business_types import *
 from education_group.ddd.business_types import *
 
@@ -23,6 +24,7 @@ from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories import load_tree
+from program_management.ddd.repositories.load_tree import find_all_versions_academic_year
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.models.element import Element
@@ -58,6 +60,10 @@ class TrainingRead(PermissionRequiredMixin, TemplateView):
             path = str(root_element.pk)
         return path
 
+    @property
+    def is_path_root(self) -> bool:
+        return len(self.get_path().split("|")) == 1
+
     @cached_property
     def node_identity(self) -> 'NodeIdentity':
         return NodeIdentity(code=self.kwargs['code'], year=self.kwargs['year'])
@@ -90,6 +96,7 @@ class TrainingRead(PermissionRequiredMixin, TemplateView):
         return self.get_tree().get_node(self.get_path())
 
     def get_context_data(self, **kwargs):
+        test = self.is_path_root
         return {
             **super().get_context_data(**kwargs),
             "person": self.request.user.person,
@@ -101,6 +108,13 @@ class TrainingRead(PermissionRequiredMixin, TemplateView):
             # TODO: Remove when finished reoganized tempalate
             "group_year": self.education_group_version.root_group,
             "form_xls_custom": CustomXlsForm(path=self.get_path()),
+            "is_path_root": test,
+            "academic_years":  find_all_versions_academic_year(
+                self.training_identity.acronym,
+                self.program_tree_version_identity.version_name,
+                self.program_tree_version_identity.is_transition
+            ),
+            "academic_year_choices": get_academic_year_choices(self.node_identity, self.get_path()),
         }
 
     def get_permission_object(self):
@@ -110,63 +124,55 @@ class TrainingRead(PermissionRequiredMixin, TemplateView):
         return not self.get_object().is_master_2m() and self.current_version.is_standard
 
     def get_tab_urls(self):
-        node = self.get_object()
+        node_identity = self.get_object().entity_id
         return OrderedDict({
             Tab.IDENTIFICATION: {
                 'text': _('Identification'),
                 'active': Tab.IDENTIFICATION == self.active_tab,
                 'display': True,
-                'url': reverse('training_identification', args=[node.year, node.code]) +
-                "?path={}".format(self.get_path())
+                'url': get_tab_urls(Tab.IDENTIFICATION, node_identity, self.get_path()),
             },
             Tab.DIPLOMAS_CERTIFICATES: {
                 'text': _('Diplomas /  Certificates'),
                 'active': Tab.DIPLOMAS_CERTIFICATES == self.active_tab,
                 'display': True,
-                'url': reverse('training_diplomas', args=[node.year, node.code]) + "?path={}".format(self.get_path())
+                'url': get_tab_urls(Tab.DIPLOMAS_CERTIFICATES, node_identity, self.get_path()),
             },
             Tab.ADMINISTRATIVE_DATA: {
                 'text': _('Administrative data'),
                 'active': Tab.ADMINISTRATIVE_DATA == self.active_tab,
                 'display': self.__display_administrative_data_tab(),
-                'url': reverse(
-                    'training_administrative_data',
-                    args=[node.year, node.code]
-                ) + "?path={}".format(self.get_path()),
+                'url': get_tab_urls(Tab.ADMINISTRATIVE_DATA, node_identity, self.get_path()),
             },
             Tab.CONTENT: {
                 'text': _('Content'),
                 'active': Tab.CONTENT == self.active_tab,
                 'display': True,
-                'url': reverse('training_content', args=[node.year, node.code]) + "?path={}".format(self.get_path())
+                'url': get_tab_urls(Tab.CONTENT, node_identity, self.get_path()),
             },
             Tab.UTILIZATION: {
                 'text': _('Utilizations'),
                 'active': Tab.UTILIZATION == self.active_tab,
                 'display': True,
-                'url': reverse('training_utilization', args=[node.year, node.code]) +
-                "?path={}".format(self.get_path()),
+                'url': get_tab_urls(Tab.UTILIZATION, node_identity, self.get_path()),
             },
             Tab.GENERAL_INFO: {
                 'text': _('General informations'),
                 'active': Tab.GENERAL_INFO == self.active_tab,
                 'display': self._have_general_information_tab(),
-                'url': reverse('training_general_information', args=[node.year, node.code]) +
-                "?path={}".format(self.get_path()),
+                'url': get_tab_urls(Tab.GENERAL_INFO, node_identity, self.get_path()),
             },
             Tab.SKILLS_ACHIEVEMENTS: {
                 'text': capfirst(_('skills and achievements')),
                 'active': Tab.SKILLS_ACHIEVEMENTS == self.active_tab,
                 'display': self._have_skills_and_achievements_tab(),
-                'url': reverse('training_skills_achievements', args=[node.year, node.code]) +
-                "?path={}".format(self.get_path()),
+                'url': get_tab_urls(Tab.SKILLS_ACHIEVEMENTS, node_identity, self.get_path()),
             },
             Tab.ADMISSION_CONDITION: {
                 'text': _('Conditions'),
                 'active': Tab.ADMISSION_CONDITION == self.active_tab,
                 'display': self._have_admission_condition_tab(),
-                'url': reverse('training_admission_condition', args=[node.year, node.code]) +
-                "?path={}".format(self.get_path()),
+                'url': get_tab_urls(Tab.ADMISSION_CONDITION, node_identity, self.get_path()),
             },
         })
 
@@ -192,3 +198,18 @@ class TrainingRead(PermissionRequiredMixin, TemplateView):
     def _is_general_info_and_condition_admission_in_display_range(self):
         return MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION <= self.get_object().year < \
                self.get_current_academic_year().year + 2
+
+
+def get_tab_urls(tab: Tab, node_identity: 'NodeIdentity', path: 'Path' = None) -> str:
+    path = path or ""
+    url_name = {
+        Tab.IDENTIFICATION: 'training_identification',
+        Tab.DIPLOMAS_CERTIFICATES: 'training_diplomas',
+        Tab.ADMINISTRATIVE_DATA: 'training_administrative_data',
+        Tab.CONTENT: 'training_content',
+        Tab.UTILIZATION: 'training_utilization',
+        Tab.GENERAL_INFO: 'training_general_information',
+        Tab.SKILLS_ACHIEVEMENTS: 'training_skills_achievements',
+        Tab.ADMISSION_CONDITION: 'training_admission_condition',
+    }[tab]
+    return reverse(url_name, args=[node_identity.year, node_identity.code]) + "?path={}".format(path)
