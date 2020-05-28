@@ -30,7 +30,6 @@ from program_management.ddd.repositories import load_tree, load_node, persist_tr
 from program_management.ddd.service import detach_node_service
 
 
-# TODO should return an entity
 def paste_element_service(paste_command: command.PasteElementCommand) -> 'NodeIdentity':
     commit = paste_command.commit
     path_to_detach = paste_command.path_where_to_detach
@@ -46,4 +45,4 @@ def paste_element_service(paste_command: command.PasteElementCommand) -> 'NodeId
 
     if commit:
         persist_tree.persist(tree)
-    return node.NodeIdentity("TEST", 2015)
+    return node.NodeIdentity(code=node_to_attach.code, year=node_to_attach.year)

@@ -89,7 +89,9 @@ class TestPasteNode(SimpleTestCase, ValidatorPatcherMixin):
     def test_should_return_node_identity_attached_when_paste_was_successful(self, mock_attach_node):
         mock_attach_node.return_value = None
         result = program_management.ddd.service.write.paste_element_service.paste_element_service(self.paste_command)
-        self.assertIsInstance(result, node.NodeIdentity)
+        expected_result = node.NodeIdentity(code=self.node_to_paste.code, year=self.node_to_paste.year)
+
+        self.assertEqual(result, expected_result)
 
     @patch.object(program_tree.ProgramTree, 'paste_node')
     def test_should_propagate_exception_when_paste_raises_one(self, mock_attach_node):

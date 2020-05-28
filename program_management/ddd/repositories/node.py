@@ -49,7 +49,7 @@ class NodeRepository(interface.AbstractRepository):
         raise NotImplementedError
 
     @classmethod
-    def get(cls, entity_id: 'NodeIdentity') -> 'Node':
+    def get(cls, entity_id: 'NodeIdentity') -> Optional['Node']:
         search_result = cls.search(entity_ids=[entity_id])
         if search_result:
             return search_result[0]
