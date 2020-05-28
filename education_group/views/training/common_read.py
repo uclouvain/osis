@@ -79,7 +79,7 @@ class TrainingRead(PermissionRequiredMixin, TemplateView):
 
     @cached_property
     def education_group_version(self):
-        root_element_id = self.get_path().split("|")[-1]
+        root_element_id = self.get_object().pk
         return EducationGroupVersion.objects.select_related(
             'offer__academic_year', 'root_group'
         ).get(root_group__element__pk=root_element_id)
@@ -89,21 +89,12 @@ class TrainingRead(PermissionRequiredMixin, TemplateView):
         root_element_id = self.get_path().split("|")[0]
         return load_tree.load(int(root_element_id))
 
+    @functools.lru_cache()
     def get_object(self) -> 'Node':
-        # TODO :: manage NodeNotFoundException
         try:
             return self.get_tree().get_node(self.get_path())
         except NodeNotFoundException:
-            # redirect to root
-            # return
             return self.get_tree().root_node
-
-    # def dispatch(self, request, *args, **kwargs):
-    #     try:
-    #         self.get_object()
-    #     except Exception:
-    #         root_node = self.get_tree().root_node
-    #         return HttpResponseRedirect(reverse('training_identification', args=(learning_unit_year_id,)))
 
     def get_context_data(self, **kwargs):
         return {
