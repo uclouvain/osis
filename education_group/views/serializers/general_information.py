@@ -66,9 +66,12 @@ def __get_specific_labels(node: NodeGroupYear) -> List[str]:
 
 def __get_common_translated_labels(node: NodeGroupYear, language_code: str):
     labels = __get_common_labels(node)
-    reference_pk = EducationGroupYear.objects.get_common(academic_year__year=node.year).pk
-
-    return __get_translated_labels(reference_pk, labels, language_code)
+    try:
+        reference_pk = EducationGroupYear.objects.get_common(academic_year__year=node.year).pk
+        translated_labels = __get_translated_labels(reference_pk, labels, language_code)
+    except EducationGroupYear.DoesNotExist:
+        translated_labels = {}
+    return translated_labels
 
 
 def __get_common_labels(node: NodeGroupYear) -> List[str]:

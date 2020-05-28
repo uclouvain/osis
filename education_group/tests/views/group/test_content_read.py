@@ -1,4 +1,5 @@
-from django.db.models import QuerySet
+from typing import List
+
 from django.http import HttpResponseForbidden, HttpResponse, HttpResponseNotFound
 from django.test import TestCase
 from django.urls import reverse
@@ -10,7 +11,7 @@ from program_management.ddd.domain.node import NodeGroupYear
 from program_management.tests.factories.element import ElementGroupYearFactory
 
 
-class TestGroupReadIdentification(TestCase):
+class TestGroupReadContent(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.person = PersonWithPermissionsFactory('view_educationgroup')
@@ -18,7 +19,7 @@ class TestGroupReadIdentification(TestCase):
             group_year__partial_acronym="LTRONC100B",
             group_year__academic_year__year=2018
         )
-        cls.url = reverse('group_identification', kwargs={'year': 2018, 'code': 'LTRONC100B'})
+        cls.url = reverse('group_content', kwargs={'year': 2018, 'code': 'LTRONC100B'})
 
     def setUp(self) -> None:
         self.client.force_login(self.person.user)
@@ -45,7 +46,7 @@ class TestGroupReadIdentification(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, "group/identification_read.html")
+        self.assertTemplateUsed(response, "group/content_read.html")
 
     def test_assert_context_data(self):
         response = self.client.get(self.url)
@@ -54,12 +55,12 @@ class TestGroupReadIdentification(TestCase):
         self.assertEqual(response.context['group_year'], self.element_group_year.group_year)
         self.assertIsInstance(response.context['tree'], str)
         self.assertIsInstance(response.context['node'], NodeGroupYear)
-        self.assertIsInstance(response.context['history'], QuerySet)
+        self.assertIsInstance(response.context['children'], List)
 
-    def test_assert_active_tabs_is_identification_and_others_are_not_active(self):
+    def test_assert_active_tabs_is_content_and_others_are_not_active(self):
         response = self.client.get(self.url)
 
-        self.assertTrue(response.context['tab_urls'][Tab.IDENTIFICATION]['active'])
-        self.assertFalse(response.context['tab_urls'][Tab.CONTENT]['active'])
+        self.assertTrue(response.context['tab_urls'][Tab.CONTENT]['active'])
+        self.assertFalse(response.context['tab_urls'][Tab.IDENTIFICATION]['active'])
         self.assertFalse(response.context['tab_urls'][Tab.UTILIZATION]['active'])
         self.assertFalse(response.context['tab_urls'][Tab.GENERAL_INFO]['active'])

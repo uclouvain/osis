@@ -1,12 +1,18 @@
+from django.contrib.auth.mixins import UserPassesTestMixin
 from django.urls import reverse
 
+from base.models.enums.education_group_types import GroupType
 from education_group.views import serializers
 from education_group.views.group.common_read import Tab, GroupRead
 
 
-class GroupReadGeneralInformation(GroupRead):
+class GroupReadGeneralInformation(GroupRead, UserPassesTestMixin):
     template_name = "group/general_informations_read.html"
     active_tab = Tab.GENERAL_INFO
+
+    def test_func(self):
+        # TODO: Fix ME: USE DDD object instead
+        return self.get_group_year().education_group_type.name == GroupType.COMMON_CORE.name
 
     def get_context_data(self, **kwargs):
         node = self.get_object()

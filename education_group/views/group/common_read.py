@@ -1,7 +1,9 @@
+import functools
 import json
 from collections import OrderedDict
 from enum import Enum
 
+from django.http import Http404
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
@@ -63,9 +65,13 @@ class GroupRead(PermissionRequiredMixin, TemplateView):
             "group_year": self.get_group_year()  # TODO: Should be remove and use DDD object
         }
 
+    @functools.lru_cache()
     def get_group_year(self):
-        return GroupYear.objects.select_related('education_group_type', 'academic_year', 'management_entity')\
+        try:
+            return GroupYear.objects.select_related('education_group_type', 'academic_year', 'management_entity')\
                                 .get(academic_year__year=self.kwargs['year'], partial_acronym=self.kwargs['code'])
+        except GroupYear.DoesNotExist:
+            raise Http404
 
     def get_permission_object(self):
         return self.get_group_year()
