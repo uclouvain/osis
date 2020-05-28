@@ -31,7 +31,6 @@ def cut_element_service(cut_command: command.CutElementCommand):
     ).save_element_selected_bis(
         element_code=cut_command.element_code,
         element_year=cut_command.element_year,
-        parent_code=cut_command.parent_code,
-        parent_year=cut_command.parent_year,
+        path_to_detach=cut_command.path_to_detach,
         action=cache.ElementCache.ElementCacheAction.CUT
     )

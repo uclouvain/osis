@@ -21,7 +21,6 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-import itertools
 from typing import List, Type, Optional
 
 from django import forms
@@ -29,15 +28,16 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.forms import BaseFormSet
 
-from base.ddd.utils import validation_message, business_validator
+from base.ddd.utils import business_validator
 from base.forms.utils import choice_field
 from base.models.enums.link_type import LinkTypes
 from program_management.ddd import command
-from program_management.ddd.repositories import load_node, load_authorized_relationship
+from program_management.ddd.business_types import *
+from program_management.ddd.domain import node
+from program_management.ddd.repositories import load_node, load_authorized_relationship, node as node_repository
 from program_management.ddd.service.write import paste_element_service
 from program_management.ddd.validators import _block_validator
 from program_management.models.enums.node_type import NodeType
-from program_management.ddd.business_types import *
 
 
 class PasteNodesFormset(BaseFormSet):
@@ -55,22 +55,25 @@ class PasteNodesFormset(BaseFormSet):
 def paste_form_factory(
         self,
         path_of_node_to_paste_into: str,
-        node_to_paste_id: int,
-        node_to_paste_type: NodeType,
+        node_to_paste_code: str,
+        node_to_paste_year: int,
         **kwargs
 ) -> 'PasteNodeForm':
-    form_class = _get_form_class(path_of_node_to_paste_into, node_to_paste_id, node_to_paste_type)
-    return form_class(path_of_node_to_paste_into, node_to_paste_id, node_to_paste_type, **kwargs)
+    form_class = _get_form_class(path_of_node_to_paste_into, node_to_paste_code, node_to_paste_year)
+    return form_class(path_of_node_to_paste_into, node_to_paste_code, node_to_paste_year, **kwargs)
 
 
 def _get_form_class(
         path_of_node_to_paste_into: str,
-        node_to_paste_id: int,
-        node_to_paste_type: NodeType
+        node_to_paste_code: str,
+        node_to_paste_year: int
 ) -> Type['PasteNodeForm']:
     node_to_paste_into_id = int(path_of_node_to_paste_into.split("|")[-1])
     node_to_paste_into = load_node.load_by_type(NodeType.EDUCATION_GROUP, node_to_paste_into_id)
-    node_to_paste = load_node.load_by_type(node_to_paste_type, node_to_paste_id)
+
+    node_identity = node.NodeIdentity(code=node_to_paste_code, year=node_to_paste_year)
+    node_to_paste = node_repository.NodeRepository.get(node_identity)
+
     authorized_relationship = load_authorized_relationship.load()
 
     if node_to_paste_into.is_minor_major_list_choice():
@@ -96,14 +99,14 @@ class PasteNodeForm(forms.Form):
     def __init__(
             self,
             to_path: str,
-            node_to_paste_id: int,
-            node_to_paste_type: NodeType,
+            node_to_paste_code: str,
+            node_to_paste_year: int,
             path_to_detach: str = None,
             **kwargs
     ):
         self.to_path = to_path
-        self.node_id = node_to_paste_id
-        self.node_type = node_to_paste_type
+        self.node_code = node_to_paste_code
+        self.node_year = node_to_paste_year
         self.path_to_detach = path_to_detach
         super().__init__(**kwargs)
 
@@ -128,8 +131,8 @@ class PasteNodeForm(forms.Form):
         root_id = int(self.to_path.split("|")[0])
         return command.PasteElementCommand(
             root_id=root_id,
-            node_to_paste_id=self.node_id,
-            node_to_paste_type=self.node_type,
+            node_to_paste_code=self.node_code,
+            node_to_paste_year=self.node_year,
             path_where_to_paste=self.to_path,
             commit=True,
             access_condition=self.cleaned_data.get("access_condition", False),

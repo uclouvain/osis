@@ -63,17 +63,16 @@ class CopyElementCommand(interface.CommandRequest):
 
 
 class CutElementCommand(interface.CommandRequest):
-    def __init__(self, user_id: int, element_code: str, element_year: int, parent_code: str, parent_year: int):
+    def __init__(self, user_id: int, element_code: str, element_year: int, path_to_detach: str):
         self.user_id = user_id
         self.element_code = element_code
         self.element_year = element_year
-        self.parent_code = parent_code
-        self.parent_year = parent_year
+        self.path_to_detach = path_to_detach
 
     def __eq__(self, other):
         if isinstance(other, CutElementCommand):
-            return (self.user_id, self.element_code, self.element_year, self.parent_code, self.parent_year) == \
-                   (other.user_id, other.element_code, other.element_year, other.parent_code, other.parent_year)
+            return (self.user_id, self.element_code, self.element_year, self.path_to_detach) == \
+                   (other.user_id, other.element_code, other.element_year, other.path_to_detach)
         return False
 
 

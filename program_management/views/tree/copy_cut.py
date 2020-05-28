@@ -52,11 +52,10 @@ def copy_to_cache(request):
 
 @require_http_methods(['POST'])
 def cut_to_cache(request):
-    parent_code = request.POST['parent_code']
-    parent_year = int(request.POST['parent_year'])
+    path_to_detach = request.POST['path_to_detach']
     element_code = request.POST['element_code']
     element_year = int(request.POST['element_year'])
-    cut_command = command.CutElementCommand(request.user.id, element_code, element_year, parent_code, parent_year)
+    cut_command = command.CutElementCommand(request.user.id, element_code, element_year, path_to_detach)
 
     cut_element_service.cut_element_service(cut_command)
 

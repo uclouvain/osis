@@ -37,8 +37,7 @@ class TestCutElementService(SimpleTestCase):
             user_id=user_id,
             element_code="LOSIS5878",
             element_year=2015,
-            parent_code="LDROI200M",
-            parent_year=2015
+            path_to_detach="MDRI2547Q|WDNH8957"
         )
         cut_element_service.cut_element_service(cut_command)
 

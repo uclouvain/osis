@@ -165,15 +165,13 @@ class ElementCache(OsisCache):
             self,
             element_code: str,
             element_year: int,
-            parent_code: str = None,
-            parent_year: int = None,
+            path_to_detach: str = None,
             action: ElementCacheAction = ElementCacheAction.COPY
     ):
         data_to_cache = {
             'element_code': element_code,
             'element_year': element_year,
-            'parent_code': parent_code,
-            'parent_year': parent_year,
+            'path_to_detach': path_to_detach,
             'action': action.value
         }
         self.set_cached_data(data_to_cache)

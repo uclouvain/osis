@@ -34,6 +34,7 @@ from program_management.tests.ddd.factories.authorized_relationship import Autho
     AuthorizedRelationshipObjectFactory
 from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory, NodeLearningUnitYearFactory, \
     NodeGroupYearFactory
+from program_management.ddd.repositories import node as node_repository
 
 
 class TestAttachNodeFormFactory(SimpleTestCase):
@@ -41,7 +42,13 @@ class TestAttachNodeFormFactory(SimpleTestCase):
         patcher_load = mock.patch("program_management.ddd.repositories.load_node.load_by_type")
         self.addCleanup(patcher_load.stop)
         self.mock_load = patcher_load.start()
-        self.mock_load.side_effect = return_values
+        self.mock_load.return_value = return_values
+
+    def _mock_node_repo_get(self, return_values):
+        patcher_load = mock.patch.object(node_repository.NodeRepository, "get")
+        self.addCleanup(patcher_load.stop)
+        self.mock_load = patcher_load.start()
+        self.mock_load.return_value = return_values
 
     def _mock_load_authorized_relationships(self, return_value):
         patcher_load = mock.patch("program_management.ddd.repositories.load_authorized_relationship.load")
@@ -53,26 +60,38 @@ class TestAttachNodeFormFactory(SimpleTestCase):
         path = "1|2"
         node_to_attach_from = NodeEducationGroupYearFactory(node_id=2)
         node_to_attach = NodeLearningUnitYearFactory()
-        self._mock_load_by_type([node_to_attach_from, node_to_attach])
+        self._mock_load_by_type(node_to_attach_from)
+        self._mock_node_repo_get(node_to_attach)
 
         relationships = AuthorizedRelationshipListFactory()
         self._mock_load_authorized_relationships(relationships)
 
-        form = program_management.forms.tree.paste.paste_form_factory(None, path, node_to_attach.node_id, node_to_attach.node_type)
+        form = program_management.forms.tree.paste.paste_form_factory(
+            None,
+            path,
+            node_to_attach.code,
+            node_to_attach.year
+        )
         self.assertIsInstance(form, program_management.forms.tree.paste.PasteLearningUnitForm)
 
     def test_form_returned_when_relationship_is_not_authorized(self):
         path = "9|4|5"
         node_to_attach_from = NodeEducationGroupYearFactory(node_id=5)
         node_to_attach = NodeEducationGroupYearFactory(node_type=MiniTrainingType.FSA_SPECIALITY)
-        self._mock_load_by_type([node_to_attach_from, node_to_attach])
+        self._mock_load_by_type(node_to_attach_from)
+        self._mock_node_repo_get(node_to_attach)
 
         relationships = AuthorizedRelationshipListFactory(
             authorized_relationships=[AuthorizedRelationshipObjectFactory(child_type=MiniTrainingType.SOCIETY_MINOR)]
         )
         self._mock_load_authorized_relationships(relationships)
 
-        form = program_management.forms.tree.paste.paste_form_factory(None, path, node_to_attach.node_id, node_to_attach.node_type)
+        form = program_management.forms.tree.paste.paste_form_factory(
+            None,
+            path,
+            node_to_attach.code,
+            node_to_attach.year
+        )
         self.assertIsInstance(form, program_management.forms.tree.paste.PasteNotAuthorizedChildren)
 
     def test_form_returned_when_parent_is_minor_major_list_choice(self):
@@ -82,7 +101,8 @@ class TestAttachNodeFormFactory(SimpleTestCase):
             node_id=6
         )
         node_to_attach = NodeEducationGroupYearFactory()
-        self._mock_load_by_type([node_to_attach_from, node_to_attach])
+        self._mock_load_by_type(node_to_attach_from)
+        self._mock_node_repo_get(node_to_attach)
 
         relationship_object = AuthorizedRelationshipObjectFactory(
             parent_type=node_to_attach_from.node_type,
@@ -93,7 +113,12 @@ class TestAttachNodeFormFactory(SimpleTestCase):
         )
         self._mock_load_authorized_relationships(relationships)
 
-        form = program_management.forms.tree.paste.paste_form_factory(None, path, node_to_attach.node_id, node_to_attach.node_type)
+        form = program_management.forms.tree.paste.paste_form_factory(
+            None,
+            path,
+            node_to_attach.code,
+            node_to_attach.year
+        )
         self.assertIsInstance(form, program_management.forms.tree.paste.PasteToMinorMajorListChoiceForm)
 
     def test_form_returned_when_parent_is_training_and_child_is_minor_major_list_choice(self):
@@ -102,7 +127,8 @@ class TestAttachNodeFormFactory(SimpleTestCase):
         node_to_attach = NodeEducationGroupYearFactory(
             node_type=factory.fuzzy.FuzzyChoice(GroupType.minor_major_list_choice_enums())
         )
-        self._mock_load_by_type([node_to_attach_from, node_to_attach])
+        self._mock_load_by_type(node_to_attach_from)
+        self._mock_node_repo_get(node_to_attach)
 
         relationship_object = AuthorizedRelationshipObjectFactory(
             parent_type=node_to_attach_from.node_type,
@@ -113,7 +139,12 @@ class TestAttachNodeFormFactory(SimpleTestCase):
         )
         self._mock_load_authorized_relationships(relationships)
 
-        form = program_management.forms.tree.paste.paste_form_factory(None, path, node_to_attach.node_id, node_to_attach.node_type)
+        form = program_management.forms.tree.paste.paste_form_factory(
+            None,
+            path,
+            node_to_attach.code,
+            node_to_attach.year
+        )
         self.assertIsInstance(form, program_management.forms.tree.paste.PasteMinorMajorListChoiceToTrainingForm)
 
     def test_return_base_form_when_no_special_condition_met(self):
@@ -124,14 +155,20 @@ class TestAttachNodeFormFactory(SimpleTestCase):
             parent_type=node_to_attach_from.node_type,
             child_type=node_to_attach.node_type
         )
-        self._mock_load_by_type([node_to_attach_from, node_to_attach])
+        self._mock_load_by_type(node_to_attach_from)
+        self._mock_node_repo_get(node_to_attach)
 
         relationships = AuthorizedRelationshipListFactory(
             authorized_relationships=[relationship_object]
         )
         self._mock_load_authorized_relationships(relationships)
 
-        form = program_management.forms.tree.paste.paste_form_factory(None, path, node_to_attach.node_id, node_to_attach.node_type)
+        form = program_management.forms.tree.paste.paste_form_factory(
+            None,
+            path,
+            node_to_attach.code,
+            node_to_attach.year
+        )
         self.assertEqual(type(form), program_management.forms.tree.paste.PasteNodeForm)
 
 

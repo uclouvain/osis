@@ -100,7 +100,7 @@ class TestPasteNodeView(TestCase):
         root_node.add_child(subgroup)
         return ProgramTreeFactory(root_node=root_node)
 
-    def test_get_method_when_no_data_selected_on_cache(self):
+    def test_should_return_error_message_when_no_nodes_selected_to_paste(self):
         path = "|".join([str(self.tree.root_node.pk), str(self.tree.root_node.children[0].child.pk)])
         response = self.client.get(self.url, data={"path": path})
         self.assertEqual(response.status_code, HttpResponse.status_code)
@@ -111,28 +111,12 @@ class TestPasteNodeView(TestCase):
         self.assertTrue(self.permission_mock.called)
 
     @mock.patch('program_management.ddd.service.read.element_selected_service.retrieve_element_selected')
-    def test_get_method_when_education_group_year_element_is_selected(self, mock_cache_elems):
-        subgroup_to_attach = NodeGroupYearFactory(node_type=GroupType.SUB_GROUP)
-        mock_cache_elems.return_value = [(subgroup_to_attach.node_id, subgroup_to_attach.node_type, None)]
-
-        # To path :  BIR1BA ---> COMMON_CORE
-        path = "|".join([str(self.tree.root_node.pk), str(self.tree.root_node.children[0].child.pk)])
-        response = self.client.get(self.url, data={"path": path})
-        self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, 'tree/paste_inner.html')
-
-        self.assertIn('formset', response.context, msg="Probably there are no item selected on cache")
-        self.assertIsInstance(response.context['formset'], PasteNodesFormset)
-        self.assertEqual(len(response.context['formset'].forms), 1)
-        self.assertIsInstance(response.context['formset'].forms[0], PasteNodeForm)
-
-    @mock.patch('program_management.ddd.service.read.element_selected_service.retrieve_element_selected')
-    def test_get_method_when_multiple_education_group_year_element_are_selected(self, mock_cache_elems):
+    def test_should_return_formset_when_elements_are_selected(self, mock_cache_elems):
         subgroup_to_attach = NodeGroupYearFactory(node_type=GroupType.SUB_GROUP)
         subgroup_to_attach_2 = NodeGroupYearFactory(node_type=GroupType.SUB_GROUP,)
         mock_cache_elems.return_value = [
-            (subgroup_to_attach.node_id, subgroup_to_attach.node_type, None),
-            (subgroup_to_attach_2.node_id, subgroup_to_attach_2.node_type, None)
+            (subgroup_to_attach.code, subgroup_to_attach.year, None, None),
+            (subgroup_to_attach_2.code, subgroup_to_attach_2.year, None, None)
         ]
 
         # To path :  BIR1BA ---> LBIR101G
@@ -141,13 +125,12 @@ class TestPasteNodeView(TestCase):
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, 'tree/paste_inner.html')
 
-        self.assertIn('formset', response.context, msg="Probably there are no item selected on cache")
         self.assertIsInstance(response.context['formset'], PasteNodesFormset)
         self.assertEqual(len(response.context['formset'].forms), 2)
 
     @mock.patch('program_management.ddd.service.read.element_selected_service.retrieve_element_selected')
     @mock.patch('program_management.forms.tree.paste.PasteNodesFormset.is_valid')
-    def test_post_method_case_formset_invalid(self, mock_formset_is_valid, mock_cache_elems):
+    def test_should_rereturn_fromset_when_post_data_are_not_valid(self, mock_formset_is_valid, mock_cache_elems):
         subgroup_to_attach = NodeGroupYearFactory(node_type=GroupType.SUB_GROUP)
         mock_cache_elems.return_value = [(subgroup_to_attach.node_id, subgroup_to_attach.node_type, None)]
         mock_formset_is_valid.return_value = False
@@ -157,14 +140,13 @@ class TestPasteNodeView(TestCase):
         response = self.client.post(self.url + "?path=" + path)
 
         self.assertTemplateUsed(response, 'tree/paste_inner.html')
-        self.assertIn('formset', response.context, msg="Probably there are no item selected on cache")
         self.assertIsInstance(response.context['formset'], PasteNodesFormset)
 
     @mock.patch('program_management.ddd.service.write.paste_element_service.paste_element_service')
     @mock.patch.object(PasteNodesFormset, 'is_valid', new=form_valid_effect)
     @mock.patch.object(PasteNodeForm, 'is_valid')
     @mock.patch('program_management.ddd.service.read.element_selected_service.retrieve_element_selected')
-    def test_post_method_case_formset_valid(self, mock_cache_elems, mock_form_valid, mock_service):
+    def test_should_call_attach_node_service_when_post_data_are_valid(self, mock_cache_elems, mock_form_valid, mock_service):
         mock_form_valid.return_value = True
         mock_service.return_value = [BusinessValidationMessage('Success', MessageLevel.SUCCESS)]
         subgroup_to_attach = NodeGroupYearFactory(node_type=GroupType.SUB_GROUP,)

@@ -79,10 +79,9 @@ class TestCutToCache(TestCase):
         response = self.client.post(self.url, data={
             "element_code": "WMD200M",
             "element_year": 2021,
-            "parent_code": "WMD199M",
-            "parent_year": 2021
+            "path_to_detach": "DROI2033M|WMD199M",
         })
-        copy_command = command.CutElementCommand(self.person.user.id, "WMD200M", 2021, "WMD199M", 2021)
+        copy_command = command.CutElementCommand(self.person.user.id, "WMD200M", 2021, "DROI2033M|WMD199M")
         mock_cut_service.assert_called_with(copy_command)
         self.assertEqual(
             response.json(),
