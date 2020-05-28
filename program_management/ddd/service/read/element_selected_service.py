@@ -29,15 +29,5 @@ from base.utils import cache
 from program_management.models.enums.node_type import NodeType
 
 
-def retrieve_element_selected(user: models.User, ids: List[int], content_type: Optional[str]) -> List:
-    def _convert_element_to_node_id_and_node_type(element) -> Tuple[int, NodeType, int]:
-        if element['modelname'] == NodeType.LEARNING_UNIT.name:
-            return element["id"], NodeType.LEARNING_UNIT, element.get("source_link_id")
-        return element["id"], NodeType.EDUCATION_GROUP, element.get("source_link_id")
-
-    if ids:
-        selected_elements = [{"id": object_id, "modelname": content_type} for object_id in ids]
-    else:
-        selected_element_in_cache = cache.ElementCache(user).cached_data
-        selected_elements = [selected_element_in_cache] if selected_element_in_cache else []
-    return [_convert_element_to_node_id_and_node_type(element) for element in selected_elements]
+def retrieve_element_selected(user_id: int) -> dict:
+    return cache.ElementCache(user_id).cached_data

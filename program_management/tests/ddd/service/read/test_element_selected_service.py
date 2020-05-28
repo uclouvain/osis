@@ -23,36 +23,21 @@
 # ############################################################################
 from django.test import SimpleTestCase
 
-from base.tests.factories.user import UserFactory
 from base.utils import cache
 from program_management.ddd.service.read import element_selected_service
-from program_management.models.enums import node_type
 
 
 class TestRetrieveElementsSelected(SimpleTestCase):
     def setUp(self):
-        self.user = UserFactory.build()
-        self.addCleanup(cache.ElementCache(self.user).clear)
+        self.user_id = 25
+        self.addCleanup(cache.ElementCache(self.user_id).clear)
 
-    def test_when_no_elements_selected_then_should_return_empty_list(self):
-        result = element_selected_service.retrieve_element_selected(self.user, [], None)
-        self.assertEqual(
-            result,
-            []
-        )
+    def test_should_return_none_if_no_cached_data(self):
+        result = element_selected_service.retrieve_element_selected(self.user_id)
+        self.assertIsNone(result)
 
-    def test_when_one_element_selected_stored_in_cache_then_should_return_a_list_of_dict(self):
-        cache.ElementCache(self.user).save_element_selected_bis(45, node_type.NodeType.LEARNING_UNIT.name)
+    def test_should_return_cached_data_if_present(self):
+        cache.ElementCache(self.user_id).save_element_selected_bis("element_code", 254)
 
-        result = element_selected_service.retrieve_element_selected(self.user, [], None)
-        self.assertEqual(
-            result,
-            [(45, node_type.NodeType.LEARNING_UNIT, None)]
-        )
-
-    def test_when_ids_and_content_type_set_then_should_return_those_but_zipped(self):
-        result = element_selected_service.retrieve_element_selected(self.user, [45, 18], node_type.NodeType.EDUCATION_GROUP.name)
-        self.assertEqual(
-            result,
-            [(45, node_type.NodeType.EDUCATION_GROUP, None), (18, node_type.NodeType.EDUCATION_GROUP, None)]
-        )
+        result = element_selected_service.retrieve_element_selected(self.user_id)
+        self.assertEqual(result, cache.ElementCache(self.user_id).cached_data)
