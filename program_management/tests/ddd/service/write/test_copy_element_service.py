@@ -34,7 +34,7 @@ class TestCopyElementService(SimpleTestCase):
     def test_should_save_element_copied_to_cache(self):
         user = UserFactory.build()
         copy_command = command.CopyElementCommand(
-            user=user,
+            user_id=user,
             element_id=45,
             element_type=node_type.NodeType.LEARNING_UNIT.name,
         )

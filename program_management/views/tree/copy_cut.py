@@ -21,69 +21,47 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-
+from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_http_methods
 
-from base.models.education_group_year import EducationGroupYear
-from base.models.learning_unit_year import LearningUnitYear
 from program_management.ddd import command
 from program_management.ddd.service.write import copy_element_service, cut_element_service
-from program_management.models.enums.node_type import NodeType
 
+MESSAGE_TEMPLATE = "<strong>{clipboard_title}</strong><br>{object_str}"
 
-#  FIXME Add tests for those views
 
 @require_http_methods(['POST'])
+@login_required
 def copy_to_cache(request):
-    element_id = request.POST['element_id']
-    element_type = request.POST['element_type']
-    copy_command = command.CopyElementCommand(request.user, element_id, element_type)
+    element_code = request.POST['element_code']
+    element_year = int(request.POST['element_year'])
+    copy_command = command.CopyElementCommand(request.user.id, element_code, element_year)
 
     copy_element_service.copy_element_service(copy_command)
 
-    element = _get_concerned_object(element_id, element_type)
-
-    msg_template = "<strong>{clipboard_title}</strong><br>{object_str}"
-    success_msg = msg_template.format(
+    success_msg = MESSAGE_TEMPLATE.format(
         clipboard_title=_("Copied element"),
-        object_str=str(element),
+        object_str="{} - {}".format(element_code, element_year),
     )
 
-    return build_success_json_response(success_msg)
+    return JsonResponse({'success_message': success_msg})
 
 
 @require_http_methods(['POST'])
 def cut_to_cache(request):
-    link_id = request.POST['group_element_year_id']
-    element_id = request.POST['element_id']
-    element_type = request.POST['element_type']
-    cut_command = command.CutElementCommand(request.user, element_id, element_type, link_id)
+    parent_code = request.POST['parent_code']
+    parent_year = int(request.POST['parent_year'])
+    element_code = request.POST['element_code']
+    element_year = int(request.POST['element_year'])
+    cut_command = command.CutElementCommand(request.user.id, element_code, element_year, parent_code, parent_year)
 
     cut_element_service.cut_element_service(cut_command)
 
-    element = _get_concerned_object(element_id, element_type)
-
-    msg_template = "<strong>{clipboard_title}</strong><br>{object_str}"
-    success_msg = msg_template.format(
+    success_msg = MESSAGE_TEMPLATE.format(
         clipboard_title=_("Cut element"),
-        object_str=str(element),
+        object_str="{} - {}".format(element_code, element_year),
     )
 
-    return build_success_json_response(success_msg)
-
-
-def _get_concerned_object(element_id: int, element_type: str):
-    if element_type == NodeType.LEARNING_UNIT.name:
-        object_class = LearningUnitYear
-    else:
-        object_class = EducationGroupYear
-
-    return get_object_or_404(object_class, pk=element_id)
-
-
-def build_success_json_response(success_message):
-    data = {'success_message': success_message}
-    return JsonResponse(data)
+    return JsonResponse({'success_message': success_msg})

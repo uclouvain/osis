@@ -50,18 +50,31 @@ class CreateProgramTreeVersionCommand(interface.CommandRequest):
 
 
 class CopyElementCommand(interface.CommandRequest):
-    def __init__(self, user: models.User, element_id: int, element_type: str):
-        self.user = user
-        self.element_id = element_id
-        self.element_type = element_type
+    def __init__(self, user_id: int, element_code: str, element_year: int):
+        self.user_id = user_id
+        self.element_code = element_code
+        self.element_year = element_year
+
+    def __eq__(self, other):
+        if isinstance(other, CopyElementCommand):
+            return (self.user_id, self.element_code, self.element_year) == \
+                   (other.user_id, other.element_code, other.element_year)
+        return False
 
 
 class CutElementCommand(interface.CommandRequest):
-    def __init__(self, user: models.User, element_id: int, element_type: str, link_id: int):
-        self.user = user
-        self.element_id = element_id
-        self.element_type = element_type
-        self.link_id = link_id
+    def __init__(self, user_id: int, element_code: str, element_year: int, parent_code: str, parent_year: int):
+        self.user_id = user_id
+        self.element_code = element_code
+        self.element_year = element_year
+        self.parent_code = parent_code
+        self.parent_year = parent_year
+
+    def __eq__(self, other):
+        if isinstance(other, CutElementCommand):
+            return (self.user_id, self.element_code, self.element_year, self.parent_code, self.parent_year) == \
+                   (other.user_id, other.element_code, other.element_year, other.parent_code, other.parent_year)
+        return False
 
 
 #  TODO extract link attributes into named tuple
