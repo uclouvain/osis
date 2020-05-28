@@ -25,10 +25,10 @@
 ##############################################################################
 from django.db.models import F
 
+from education_group.ddd.domain.training import TrainingIdentity
 from education_group.models.group_year import GroupYear
 from osis_common.ddd.interface import BusinessException
 from program_management.ddd.business_types import *
-from education_group.ddd.business_types import *
 
 DomainService = object  # TODO :: move into osis_commin/ddd/interfaces
 
@@ -46,4 +46,10 @@ class TrainingIdentitySearch(DomainService):
             return TrainingIdentity(acronym=values[0]['offer_acronym'], year=values[0]['year'])
         raise BusinessException(
             "TrainingIdentity not found from NodeIdentity = {n_id.code} - {n_id.year}".format(n_id=node_identity)
+        )
+
+    def get_from_program_tree_version_identity(self, tree_version_identity) -> 'TrainingIdentity':
+        return TrainingIdentity(
+            acronym=tree_version_identity.offer_acronym,
+            year=tree_version_identity.year,
         )

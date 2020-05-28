@@ -23,19 +23,27 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from education_group.ddd.domain._address import Address
-from osis_common.ddd import interface
+from django.db.models import F
+
+from education_group.models.group_year import GroupYear
+from osis_common.ddd.interface import BusinessException
+from program_management.ddd.business_types import *
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
+
+DomainService = object  # TODO :: move into osis_commin/ddd/interfaces
 
 
-# FIXME :: should be an Entity in another Domain, and Training should have just an EntityIdentity to get this object.
-class AcademicPartner(interface.ValueObject):
-    def __init__(self, name: str, address: Address, logo_url: str = None):
-        self.name = name
-        self.address = address
-        self.logo_url = logo_url
-
-    def __eq__(self, other):
-        return self.name == other.name and self.address == other.address and self.logo_url == other.logo_url
-
-    def __hash__(self):
-        return hash(self.name + str(self.address) + self.logo_url)
+class ProgramTreeVersionIdentitySearch(DomainService):
+    def get_from_node_identity(self, node_identity: 'NodeIdentity') -> 'ProgramTreeVersionIdentity':
+        values = GroupYear.objects.filter(
+            partial_acronym=node_identity.code,
+            academic_year__year=node_identity.year
+        ).annotate(
+            offer_acronym=F('educationgroupversion__offer__acronym'),
+            year=F('academic_year__year'),
+            version_name=F('educationgroupversion__version_name'),
+            is_transition=F('educationgroupversion__is_transition'),
+        ).values('offer_acronym', 'year', 'version_name', 'is_transition')
+        if values:
+            return ProgramTreeVersionIdentity(**values[0])
+        raise BusinessException("Program tree version identity not found")

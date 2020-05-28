@@ -5,3 +5,4 @@ from .general_information_read import TrainingReadGeneralInformation
 from .identification_read import TrainingReadIdentification
 from .skills_achievements_read import TrainingReadSkillsAchievements
 from .utilization_read import TrainingReadUtilization
+from .administrative_data import TrainingAdmnistrativeData

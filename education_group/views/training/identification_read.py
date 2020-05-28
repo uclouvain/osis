@@ -37,18 +37,6 @@ class TrainingReadIdentification(TrainingRead):
             NodeIdentity(self.get_tree().root_node.code, self.get_tree().root_node.year)
         )
 
-    @cached_property
-    def current_version(self) -> 'ProgramTreeVersion':
-        current_version_name = self.education_group_version.version_name
-        is_transition = self.education_group_version.is_transition
-        return next(
-            (
-                version for version in self.all_versions_available
-                if version.version_name == current_version_name and version.is_transition == is_transition
-            ),
-            None
-        )
-
     def get_related_history(self):
         education_group_year = self.education_group_version.offer
         versions = Version.objects.get_for_object(

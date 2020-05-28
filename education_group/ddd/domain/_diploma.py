@@ -44,6 +44,7 @@ class DiplomaAim(interface.ValueObject):
         return hash(str(self.section) + str(self.code) + self.description)
 
 
+# FIXME :: should be an Entity in another Domain, and Training should have just an EntityIdentity to get this object.
 class Diploma(interface.ValueObject):
     def __init__(self, leads_to_diploma: bool, printing_title: str, professional_title: str, aims: List['DiplomaAim']):
         self.leads_to_diploma = leads_to_diploma or False
