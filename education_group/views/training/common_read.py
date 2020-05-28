@@ -3,6 +3,7 @@ import json
 from collections import OrderedDict
 from enum import Enum
 
+from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.text import capfirst
@@ -21,7 +22,7 @@ from base.business.education_groups.general_information_sections import \
 from base.models import academic_year
 from base.models.enums.education_group_types import TrainingType
 from osis_role.contrib.views import PermissionRequiredMixin
-from program_management.ddd.domain.node import NodeIdentity
+from program_management.ddd.domain.node import NodeIdentity, NodeNotFoundException
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories import load_tree
 from program_management.ddd.repositories.load_tree import find_all_versions_academic_year
@@ -60,10 +61,6 @@ class TrainingRead(PermissionRequiredMixin, TemplateView):
             path = str(root_element.pk)
         return path
 
-    @property
-    def is_path_root(self) -> bool:
-        return len(self.get_path().split("|")) == 1
-
     @cached_property
     def node_identity(self) -> 'NodeIdentity':
         return NodeIdentity(code=self.kwargs['code'], year=self.kwargs['year'])
@@ -93,10 +90,22 @@ class TrainingRead(PermissionRequiredMixin, TemplateView):
         return load_tree.load(int(root_element_id))
 
     def get_object(self) -> 'Node':
-        return self.get_tree().get_node(self.get_path())
+        # TODO :: manage NodeNotFoundException
+        try:
+            return self.get_tree().get_node(self.get_path())
+        except NodeNotFoundException:
+            # redirect to root
+            # return
+            return self.get_tree().root_node
+
+    # def dispatch(self, request, *args, **kwargs):
+    #     try:
+    #         self.get_object()
+    #     except Exception:
+    #         root_node = self.get_tree().root_node
+    #         return HttpResponseRedirect(reverse('training_identification', args=(learning_unit_year_id,)))
 
     def get_context_data(self, **kwargs):
-        test = self.is_path_root
         return {
             **super().get_context_data(**kwargs),
             "person": self.request.user.person,
@@ -108,7 +117,6 @@ class TrainingRead(PermissionRequiredMixin, TemplateView):
             # TODO: Remove when finished reoganized tempalate
             "group_year": self.education_group_version.root_group,
             "form_xls_custom": CustomXlsForm(path=self.get_path()),
-            "is_path_root": test,
             "academic_years":  find_all_versions_academic_year(
                 self.training_identity.acronym,
                 self.program_tree_version_identity.version_name,

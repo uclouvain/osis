@@ -65,5 +65,5 @@ def get_academic_year_choices(node_identity: 'NodeIdentity', path: 'Path') -> Li
             node_identity=NodeIdentity(year=year_to_display, code=node_identity.code),
             path='|'.join(str(map_element_id_by_year[elem_id][year_to_display]) for elem_id in element_ids)
         )
-        for year_to_display in years
+        for year_to_display in sorted(years)
     ]

@@ -37,10 +37,11 @@ from program_management.ddd.domain.service.identity_search import DomainService
 class ExistingAcademicYearSearch(DomainService):
     def search_from_node_identity(self, node_identity: 'NodeIdentity') -> List[int]:
         return GroupYear.objects.filter(
-            partial_acronym=node_identity.code
+            group__groupyear__partial_acronym=node_identity.code,
+            group__groupyear__academic_year__year=node_identity.year,
         ).annotate(
             year=F('academic_year__year'),
         ).values_list(
             'year',
             flat=True
-        )
+        ).distinct()
