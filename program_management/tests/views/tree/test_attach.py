@@ -298,7 +298,7 @@ class TestCreateGroupElementYearView(TestCase):
 
         cls.url = reverse("group_element_year_create", args=[cls.egy.id, cls.egy.id])
 
-        cls.person = CentralManagerFactory().person
+        cls.person = CentralManagerFactory(entity=cls.egy.management_entity).person
 
         cls.perm_patcher = mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group",
                                       return_value=True)
@@ -410,7 +410,7 @@ class TestMoveGroupElementYearView(TestCase):
             args=[cls.root_egy.id, cls.selected_egy.id, cls.group_element_year.id]
         )
 
-        cls.person = CentralManagerFactory().person
+        cls.person = CentralManagerFactory(entity=cls.selected_egy.management_entity).person
 
     def setUp(self):
         self.client.force_login(self.person.user)
