@@ -202,7 +202,7 @@ class TrainingRepository(interface.AbstractRepository):
                 decree_name=obj.main_domain.decree.name,
                 code=obj.main_domain.code,
                 name=obj.main_domain.name,
-            ),
+            ) if obj.main_domain else None,
             secondary_domains=secondary_domains,
             isced_domain=IscedDomain(
                 code=obj.isced_domain.code,
@@ -228,9 +228,10 @@ class TrainingRepository(interface.AbstractRepository):
                 obj.other_campus_activities] if obj.other_campus_activities else None,
             funding=Funding(
                 can_be_funded=obj.funding,
-                funding_orientation=FundingCodes[obj.funding_direction],
+                funding_orientation=FundingCodes[obj.funding_direction] if obj.funding_direction else None,
                 can_be_international_funded=obj.funding_cud,
-                international_funding_orientation=FundingCodes[obj.funding_direction_cud],
+                international_funding_orientation=FundingCodes[obj.funding_direction_cud]
+                if obj.funding_direction_cud else None,
             ),
             hops=HOPS(
                 ares_code=obj.hops.ares_study,

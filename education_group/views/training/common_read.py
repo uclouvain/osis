@@ -5,6 +5,7 @@ from enum import Enum
 
 from django.urls import reverse
 from django.utils.functional import cached_property
+from django.utils.text import capfirst
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 
@@ -13,6 +14,11 @@ from education_group.ddd.business_types import *
 
 from base import models as mdl
 from education_group.ddd.domain.service.identity_search import TrainingIdentitySearch
+from base.business.education_groups import general_information_sections
+from base.business.education_groups.general_information_sections import \
+    MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION
+from base.models import academic_year
+from base.models.enums.education_group_types import TrainingType
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
@@ -144,22 +150,45 @@ class TrainingRead(PermissionRequiredMixin, TemplateView):
             Tab.GENERAL_INFO: {
                 'text': _('General informations'),
                 'active': Tab.GENERAL_INFO == self.active_tab,
-                'display': True,
+                'display': self._have_general_information_tab(),
                 'url': reverse('training_general_information', args=[node.year, node.code]) +
                 "?path={}".format(self.get_path()),
             },
             Tab.SKILLS_ACHIEVEMENTS: {
-                'text': _('skills and achievements'),
+                'text': capfirst(_('skills and achievements')),
                 'active': Tab.SKILLS_ACHIEVEMENTS == self.active_tab,
-                'display': True,
+                'display': self._have_skills_and_achievements_tab(),
                 'url': reverse('training_skills_achievements', args=[node.year, node.code]) +
                 "?path={}".format(self.get_path()),
             },
             Tab.ADMISSION_CONDITION: {
                 'text': _('Conditions'),
                 'active': Tab.ADMISSION_CONDITION == self.active_tab,
-                'display': True,
+                'display': self._have_admission_condition_tab(),
                 'url': reverse('training_admission_condition', args=[node.year, node.code]) +
                 "?path={}".format(self.get_path()),
             },
         })
+
+    @functools.lru_cache()
+    def get_current_academic_year(self):
+        return academic_year.starting_academic_year()
+
+    def _have_general_information_tab(self):
+        node_category = self.get_object().category
+        return node_category.name in general_information_sections.SECTIONS_PER_OFFER_TYPE and \
+            self._is_general_info_and_condition_admission_in_display_range
+
+    def _have_skills_and_achievements_tab(self):
+        node_category = self.get_object().category
+        return node_category.name in TrainingType.with_skills_achievements() and \
+            self._is_general_info_and_condition_admission_in_display_range
+
+    def _have_admission_condition_tab(self):
+        node_category = self.get_object().category
+        return node_category.name in TrainingType.with_admission_condition() and \
+            self._is_general_info_and_condition_admission_in_display_range
+
+    def _is_general_info_and_condition_admission_in_display_range(self):
+        return MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION <= self.get_object().year < \
+               self.get_current_academic_year().year + 2
