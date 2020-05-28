@@ -3,6 +3,7 @@ import json
 from collections import OrderedDict
 from enum import Enum
 
+from django.http import Http404
 from django.urls import reverse
 from django.utils.text import capfirst
 from django.utils.translation import gettext_lazy as _
@@ -52,10 +53,13 @@ class MiniTrainingRead(PermissionRequiredMixin, TemplateView):
         return academic_year.starting_academic_year()
 
     def get_education_group_version(self):
-        root_element_id = self.get_path().split("|")[0]
-        return EducationGroupVersion.objects.select_related(
-            'offer', 'root_group'
-        ).get(root_group__element__pk=root_element_id)
+        try:
+            root_element_id = self.get_path().split("|")[0]
+            return EducationGroupVersion.objects.select_related(
+                'offer', 'root_group'
+            ).get(root_group__element__pk=root_element_id)
+        except (EducationGroupVersion.DoesNotExist, Element.DoesNotExist):
+            raise Http404
 
     def get_tree(self):
         root_element_id = self.get_path().split("|")[0]
