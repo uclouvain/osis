@@ -24,7 +24,6 @@
 import factory.fuzzy
 
 from program_management.ddd import command
-from program_management.models.enums import node_type
 
 
 class PasteElementCommandFactory(factory.Factory):
@@ -33,8 +32,8 @@ class PasteElementCommandFactory(factory.Factory):
         abstract = False
 
     root_id = factory.Faker("random_int")
-    node_to_paste_id = factory.Faker("random_int")
-    node_to_paste_type = factory.fuzzy.FuzzyChoice(node_type.NodeType.get_names())
+    node_to_paste_code = "LSINF2547"
+    node_to_paste_year = factory.Faker("random_int")
     path_where_to_paste = factory.LazyAttribute(lambda o: str(o.root_id))
     commit = False
     access_condition = None

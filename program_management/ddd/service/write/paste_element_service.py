@@ -26,15 +26,16 @@ from base.ddd.utils import business_validator
 from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import node
-from program_management.ddd.repositories import load_tree, load_node, persist_tree
+from program_management.ddd.repositories import load_tree, persist_tree, node as node_repository
 from program_management.ddd.service import detach_node_service
 
 
 def paste_element_service(paste_command: command.PasteElementCommand) -> 'NodeIdentity':
+    node_identity = node.NodeIdentity(code=paste_command.node_to_paste_code, year=paste_command.node_to_paste_year)
     commit = paste_command.commit
     path_to_detach = paste_command.path_where_to_detach
     tree = load_tree.load(paste_command.root_id)
-    node_to_attach = load_node.load_by_type(paste_command.node_to_paste_type, element_id=paste_command.node_to_paste_id)
+    node_to_attach = node_repository.NodeRepository.get(node_identity)
 
     if path_to_detach:
         error_messages = detach_node_service.detach_node(path_to_detach, commit=commit).errors
@@ -45,4 +46,4 @@ def paste_element_service(paste_command: command.PasteElementCommand) -> 'NodeId
 
     if commit:
         persist_tree.persist(tree)
-    return node.NodeIdentity(code=node_to_attach.code, year=node_to_attach.year)
+    return node_identity
