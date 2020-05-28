@@ -66,7 +66,9 @@ def is_education_group_type_authorized_according_to_user_scope(self, user, egy=N
         return any(
             egy.education_group_type.name in role.get_allowed_education_group_types()
             for role in self.context['role_qs']
-            if egy.management_entity_id in self.context['role_qs'].filter(pk=role.pk).get_entities_ids()
+            if egy.management_entity_id in self.context['role_qs'].filter(pk=role.pk).get_entities_ids(
+                append_null_entity=True
+            )
         )
     return None
 
@@ -75,7 +77,7 @@ def is_education_group_type_authorized_according_to_user_scope(self, user, egy=N
 @predicate_failed_msg(message=_("The user is not attached to the management entity"))
 def is_user_attached_to_management_entity(self, user, education_group_year=None):
     if education_group_year:
-        user_entity_ids = self.context['role_qs'].get_entities_ids()
+        user_entity_ids = self.context['role_qs'].get_entities_ids(append_null_entity=True)
         return education_group_year.management_entity_id in user_entity_ids
     return education_group_year
 
@@ -142,7 +144,7 @@ def is_user_linked_to_all_scopes_of_management_entity(self, user, education_grou
         user_scopes = {
             entity_id: scope for role in self.context['role_qs']
             for scope in role.scopes if hasattr(role, 'scopes')
-            for entity_id in self.context['role_qs'].filter(pk=role.pk).get_entities_ids()
+            for entity_id in self.context['role_qs'].filter(pk=role.pk).get_entities_ids(append_null_entity=True)
         }
         return user_scopes.get(education_group_year.management_entity_id) == Scope.ALL.value
     return None
