@@ -26,14 +26,12 @@ from program_management.ddd import command
 
 
 def cut_element_service(cut_command: command.CutElementCommand):
-    user = cut_command.user
-    element_id = cut_command.element_id
-    element_type = cut_command.element_type
-    link_id = cut_command.link_id
-
-    cache.ElementCache(user).save_element_selected_bis(
-        element_id,
-        element_type,
-        source_link_id=link_id,
+    cache.ElementCache(
+        cut_command.user_id
+    ).save_element_selected_bis(
+        element_code=cut_command.element_code,
+        element_year=cut_command.element_year,
+        parent_code=cut_command.parent_code,
+        parent_year=cut_command.parent_year,
         action=cache.ElementCache.ElementCacheAction.CUT
     )

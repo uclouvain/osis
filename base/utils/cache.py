@@ -140,12 +140,12 @@ class ElementCache(OsisCache):
         COPY = "copy-action"
         CUT = "cut-action"
 
-    def __init__(self, user):
-        self.user = user
+    def __init__(self, user_id: int):
+        self.user_id = user_id
 
     @property
     def key(self):
-        return self.PREFIX_KEY.format(user=self.user.pk)
+        return self.PREFIX_KEY.format(user=self.user_id)
 
     @deprecated  # Use equals_element instead
     def equals(self, obj_to_compare):
@@ -163,14 +163,19 @@ class ElementCache(OsisCache):
 
     def save_element_selected_bis(
             self,
-            element_id,
-            element_type,
-            source_link_id=None,
+            element_code: str,
+            element_year: int,
+            parent_code: str = None,
+            parent_year: int = None,
             action: ElementCacheAction = ElementCacheAction.COPY
     ):
-        data_to_cache = {'id': element_id, 'modelname': element_type, 'action': action.value}
-        if source_link_id:
-            data_to_cache['source_link_id'] = source_link_id
+        data_to_cache = {
+            'element_code': element_code,
+            'element_year': element_year,
+            'parent_code': parent_code,
+            'parent_year': parent_year,
+            'action': action.value
+        }
         self.set_cached_data(data_to_cache)
 
     def save_element_selected(

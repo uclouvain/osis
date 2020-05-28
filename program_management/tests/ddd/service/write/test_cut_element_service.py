@@ -32,14 +32,18 @@ from program_management.models.enums import node_type
 
 class TestCutElementService(SimpleTestCase):
     def test_should_save_element_cut_to_cache(self):
-        user = UserFactory.build()
+        user_id = 25
         cut_command = command.CutElementCommand(
-            user=user,
-            element_id=45,
-            element_type=node_type.NodeType.LEARNING_UNIT.name,
-            link_id=23
+            user_id=user_id,
+            element_code="LOSIS5878",
+            element_year=2015,
+            parent_code="LDROI200M",
+            parent_year=2015
         )
         cut_element_service.cut_element_service(cut_command)
-        cached_data = cache.ElementCache(user).cached_data
+
+        cached_data = cache.ElementCache(user_id).cached_data
         self.assertTrue(cached_data)
+
+        cache.ElementCache(user_id).clear()
 

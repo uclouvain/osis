@@ -26,8 +26,9 @@ from program_management.ddd import command
 
 
 def copy_element_service(copy_command: command.CopyElementCommand):
-    user = copy_command.user
-    element_id = copy_command.element_id
-    element_type = copy_command.element_type
-
-    cache.ElementCache(user).save_element_selected_bis(element_id, element_type)
+    cache.ElementCache(
+        copy_command.user_id
+    ).save_element_selected_bis(
+        copy_command.element_code,
+        copy_command.element_year
+    )

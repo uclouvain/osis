@@ -32,13 +32,12 @@ from program_management.models.enums import node_type
 
 class TestCopyElementService(SimpleTestCase):
     def test_should_save_element_copied_to_cache(self):
-        user = UserFactory.build()
-        copy_command = command.CopyElementCommand(
-            user_id=user,
-            element_id=45,
-            element_type=node_type.NodeType.LEARNING_UNIT.name,
-        )
+        user_id = 19
+        copy_command = command.CopyElementCommand(user_id=user_id, element_code="LSINF1254", element_year=2015)
+
         copy_element_service.copy_element_service(copy_command)
-        cached_data = cache.ElementCache(user).cached_data
+
+        cached_data = cache.ElementCache(user_id).cached_data
         self.assertTrue(cached_data)
 
+        cache.ElementCache(user_id).clear()

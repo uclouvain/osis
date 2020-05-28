@@ -32,6 +32,7 @@ from program_management.ddd.service.write import copy_element_service, cut_eleme
 MESSAGE_TEMPLATE = "<strong>{clipboard_title}</strong><br>{object_str}"
 
 
+#  TODO fix view call
 @require_http_methods(['POST'])
 @login_required
 def copy_to_cache(request):
