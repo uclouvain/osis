@@ -34,6 +34,7 @@ from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 from program_management.ddd.repositories.program_tree import ProgramTreeRepository
+from program_management.models.education_group_version import EducationGroupVersion
 
 
 class ProgramTreeVersionRepository(interface.AbstractRepository):
@@ -48,7 +49,28 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
 
     @classmethod
     def get(cls, entity_id: ProgramTreeVersionIdentity) -> 'ProgramTreeVersion':
-        raise NotImplementedError
+        qs = EducationGroupVersion.objects.filter(
+            version_name=entity_id.version_name,
+            offer__acronym=entity_id.offer_acronym,
+            offer__academic_year__year=entity_id.year,
+            is_transition=entity_id.is_transition,
+        ).annotate(
+            code=F('root_group__partial_acronym'),
+            offer_acronym=F('offer__acronym'),
+            offer_year=F('offer__academic_year__year'),
+            version_title_fr=F('title_fr'),
+            version_title_en=F('title_en'),
+        ).values(
+            'code',
+            'offer_acronym',
+            'offer_year',
+            'version_name',
+            'version_title_fr',
+            'version_title_en',
+            'is_transition',
+        )
+        if qs:
+            return _instanciate_tree_version(qs[0])
 
     @classmethod
     def search(
@@ -70,6 +92,7 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
         ).order_by(
             'educationgroupversion__version_name'
         ).annotate(
+            code=F('partial_acronym'),
             offer_acronym=F('educationgroupversion__offer__acronym'),
             offer_year=F('educationgroupversion__offer__academic_year__year'),
             version_name=F('educationgroupversion__version_name'),
@@ -77,6 +100,7 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
             version_title_en=F('educationgroupversion__title_en'),
             is_transition=F('educationgroupversion__is_transition'),
         ).values(
+            'code',
             'offer_acronym',
             'offer_year',
             'version_name',
@@ -86,18 +110,20 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
         )
         results = []
         for record_dict in qs:
-            results.append(
-                ProgramTreeVersion(
-                    entity_identity=ProgramTreeVersionIdentity(
-                        record_dict['offer_acronym'],
-                        record_dict['offer_year'],
-                        record_dict['version_name'],
-                        record_dict['is_transition'],
-                    ),
-                    program_tree_identity=ProgramTreeIdentity(root_node_identity.code, root_node_identity.year),
-                    program_tree_repository=ProgramTreeRepository(),
-                    title_fr=record_dict['version_title_fr'],
-                    title_en=record_dict['version_title_en'],
-                )
-            )
+            results.append(_instanciate_tree_version(record_dict))
         return results
+
+
+def _instanciate_tree_version(record_dict: dict) -> 'ProgramTreeVersion':
+    return ProgramTreeVersion(
+        entity_identity=ProgramTreeVersionIdentity(
+            record_dict['offer_acronym'],
+            record_dict['offer_year'],
+            record_dict['version_name'],
+            record_dict['is_transition'],
+        ),
+        program_tree_identity=ProgramTreeIdentity(record_dict['code'], record_dict['offer_year']),
+        program_tree_repository=ProgramTreeRepository(),
+        title_fr=record_dict['version_title_fr'],
+        title_en=record_dict['version_title_en'],
+    )
