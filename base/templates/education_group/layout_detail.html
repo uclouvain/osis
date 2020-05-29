@@ -61,14 +61,15 @@
 
                 </div>
                 <div class="col-md-2">
-                    <select id="slt_version" name="select_program_tree_version" class="form-control" onchange="location = this.value;">
-                        {% for choice in versions_choices %}
-                            <option value="{{ choice.node_href }}"
-                                    {% if current_version.tree_version_identity == choice.tree_version_identity %}
-                                    selected {% endif %}>{{ choice.version_name_display }}</option>
-                        {% endfor %}
-                    </select>
-
+                    {% if current_version %}
+                        <select id="slt_version" name="select_program_tree_version" class="form-control" onchange="location = this.value;">
+                            {% for choice in versions_choices %}
+                                <option value="{{ choice.node_href }}"
+                                        {% if current_version.tree_version_identity == choice.tree_version_identity %}
+                                        selected {% endif %}>{{ choice.version_name_display }}</option>
+                            {% endfor %}
+                        </select>
+                    {% endif %}
                 </div>
                 <div class="col-md-7">
                     <div class="pull-right" style="margin-right: 15px;">
