@@ -11,6 +11,7 @@ from django.utils.text import capfirst
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 
+from base.views.common import display_warning_messages
 from education_group.forms import tree_version_choices
 from education_group.forms.academic_year import get_academic_year_choices
 from program_management.ddd.business_types import *
@@ -96,7 +97,14 @@ class TrainingRead(PermissionRequiredMixin, TemplateView):
         try:
             return self.get_tree().get_node(self.get_path())
         except NodeNotFoundException:
-            return self.get_tree().root_node
+            root_node = self.get_tree().root_node
+            message = _(
+                "The formation you work with doesn't exist (or is not at the same position) "
+                "in the tree {root.title} in {root.year}."
+                "You've been redirected to the root {root.code} ({root.year})"
+            ).format(root=root_node)
+            display_warning_messages(self.request, message)
+            return root_node
 
     def get_context_data(self, **kwargs):
         return {
@@ -122,7 +130,6 @@ class TrainingRead(PermissionRequiredMixin, TemplateView):
         }
 
     def get_versions_choices(self) -> List[tree_version_choices.ProgramTreeVersionChoiceOption]:
-        # TODO :: Add message when nodenotfoundexpcetion (redirection - avertir utilisateur)
         return tree_version_choices.get_tree_versions_choices(self.node_identity)
 
     @cached_property

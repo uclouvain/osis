@@ -22,3 +22,9 @@ msgstr ""
 
 msgid "End year must be greater than the start year"
 msgstr ""
+
+msgid ""
+"The formation you work with doesn't exist (or is not at the same position) "
+"in the tree {root.title} in {root.year}.You've been redirected to the root "
+"{root.code} ({root.year})"
+msgstr ""
