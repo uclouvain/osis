@@ -1,3 +1,5 @@
+from unittest import mock
+
 from django.db.models import QuerySet
 from django.http import HttpResponseForbidden, HttpResponse, HttpResponseNotFound
 from django.test import TestCase
@@ -74,3 +76,54 @@ class TestMiniTrainingReadIdentification(TestCase):
         self.assertFalse(response.context['tab_urls'][Tab.GENERAL_INFO]['active'])
         self.assertFalse(response.context['tab_urls'][Tab.SKILLS_ACHIEVEMENTS]['active'])
         self.assertFalse(response.context['tab_urls'][Tab.ADMISSION_CONDITION]['active'])
+
+    @mock.patch("education_group.views.mini_training.common_read."
+                "MiniTrainingRead._is_general_info_and_condition_admission_in_display_range", return_value=True)
+    def test_assert_displayed_general_information_tabs(self, mock_displayed_range):
+        with mock.patch.dict(
+                'base.business.education_groups.general_information_sections.SECTIONS_PER_OFFER_TYPE',
+                return_value={self.mini_training_version.root_group.education_group_type.name: {}}
+        ):
+            response = self.client.get(self.url)
+            self.assertTrue(response.context['tab_urls'][Tab.GENERAL_INFO]['display'])
+
+        with mock.patch.dict(
+                'base.business.education_groups.general_information_sections.SECTIONS_PER_OFFER_TYPE',
+                {}
+        ):
+            response = self.client.get(self.url)
+            self.assertTrue(response.context['tab_urls'][Tab.GENERAL_INFO]['display'])
+
+    @mock.patch("education_group.views.mini_training.common_read."
+                "MiniTrainingRead._is_general_info_and_condition_admission_in_display_range", return_value=True)
+    def test_assert_displayed_skill_and_achievements_tabs(self, mock_displayed_range):
+        with mock.patch(
+            'base.models.enums.education_group_types.MiniTrainingType.with_skills_achievements',
+            side_effect=(lambda: [self.mini_training_version.root_group.education_group_type.name])
+        ):
+            response = self.client.get(self.url)
+            self.assertTrue(response.context['tab_urls'][Tab.SKILLS_ACHIEVEMENTS]['display'])
+
+        with mock.patch(
+            'base.models.enums.education_group_types.MiniTrainingType.with_skills_achievements',
+            side_effect=(lambda: [])
+        ):
+            response = self.client.get(self.url)
+            self.assertFalse(response.context['tab_urls'][Tab.SKILLS_ACHIEVEMENTS]['display'])
+
+    @mock.patch("education_group.views.mini_training.common_read."
+                "MiniTrainingRead._is_general_info_and_condition_admission_in_display_range", return_value=True)
+    def test_assert_displayed_admission_condition_tabs(self, mock_displayed_range):
+        with mock.patch(
+                'base.models.enums.education_group_types.MiniTrainingType.with_admission_condition',
+                side_effect=(lambda: [self.mini_training_version.root_group.education_group_type.name])
+        ):
+            response = self.client.get(self.url)
+            self.assertTrue(response.context['tab_urls'][Tab.SKILLS_ACHIEVEMENTS]['display'])
+
+        with mock.patch(
+                'base.models.enums.education_group_types.MiniTrainingType.with_admission_condition',
+                side_effect=(lambda: [])
+        ):
+            response = self.client.get(self.url)
+            self.assertFalse(response.context['tab_urls'][Tab.SKILLS_ACHIEVEMENTS]['display'])
