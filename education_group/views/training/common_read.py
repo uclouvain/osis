@@ -2,6 +2,7 @@ import functools
 import json
 from collections import OrderedDict
 from enum import Enum
+from typing import List
 
 from django.http import HttpResponseRedirect
 from django.urls import reverse
@@ -10,6 +11,7 @@ from django.utils.text import capfirst
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 
+from education_group.forms import tree_version_choices
 from education_group.forms.academic_year import get_academic_year_choices
 from program_management.ddd.business_types import *
 from education_group.ddd.business_types import *
@@ -114,7 +116,20 @@ class TrainingRead(PermissionRequiredMixin, TemplateView):
                 self.program_tree_version_identity.is_transition
             ),
             "academic_year_choices": get_academic_year_choices(self.node_identity, self.get_path()),
+            "current_version": self.current_version,
+            "versions_choices": self.get_versions_choices(),
+            "": ""
         }
+
+    def get_versions_choices(self) -> List[tree_version_choices.ProgramTreeVersionChoiceOption]:
+        # TODO :: Add message when nodenotfoundexpcetion (redirection - avertir utilisateur)
+        return tree_version_choices.get_tree_versions_choices(self.node_identity)
+
+    @cached_property
+    def all_versions_available(self) -> List['ProgramTreeVersion']:
+        return ProgramTreeVersionRepository.search_all_versions_from_root_node(
+            NodeIdentity(self.get_tree().root_node.code, self.get_tree().root_node.year)
+        )
 
     def get_permission_object(self):
         return self.education_group_version.offer
