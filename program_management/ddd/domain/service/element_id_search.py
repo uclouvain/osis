@@ -28,13 +28,13 @@ from typing import List, Dict
 from django.db.models import F
 
 from education_group.models.group_year import GroupYear
-from program_management.ddd.domain.service.identity_search import DomainService
+from osis_common.ddd import interface
 
 PathElementId = int
 Year = int
 
 
-class ElementIdByYearSearch(DomainService):
+class ElementIdByYearSearch(interface.DomainService):
 
     def search_from_element_ids_and_years(
             self,
