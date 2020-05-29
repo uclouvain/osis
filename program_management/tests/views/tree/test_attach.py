@@ -38,7 +38,6 @@ from base.tests.factories.education_group_year import GroupFactory, EducationGro
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.person import PersonFactory
 from base.utils.cache import ElementCache
-from program_management.models.enums import node_type
 
 
 @override_flag('education_group_update', active=True)
@@ -47,11 +46,14 @@ class TestMoveGroupElementYearView(TestCase):
     def setUpTestData(cls):
         cls.next_academic_year = AcademicYearFactory(current=True)
         cls.root_egy = EducationGroupYearFactory(academic_year=cls.next_academic_year)
-        cls.group_element_year = GroupElementYearFactory(parent__academic_year=cls.next_academic_year)
+        cls.group_element_year = GroupElementYearFactory(
+            parent__academic_year=cls.next_academic_year,
+            generate_element=True
+        )
         cls.selected_egy = GroupFactory(
             academic_year=cls.next_academic_year
         )
-        GroupElementYearFactory(parent=cls.root_egy, child_branch=cls.selected_egy)
+        GroupElementYearFactory(parent=cls.root_egy, child_branch=cls.selected_egy, generate_element=True)
 
         path_to_attach = "|".join([str(cls.root_egy.pk), str(cls.selected_egy.pk)])
         cls.url = reverse("group_element_year_move", args=[cls.root_egy.id])
@@ -77,9 +79,11 @@ class TestMoveGroupElementYearView(TestCase):
             min_count_authorized=0,
             max_count_authorized=None
         )
-        ElementCache(self.person.user).save_element_selected(
-            self.group_element_year.child_branch,
-            source_link_id=self.group_element_year.id
+        ElementCache(self.person.user.id).save_element_selected_bis(
+            element_year=self.group_element_year.child_branch.academic_year.year,
+            element_code=self.group_element_year.child_branch.partial_acronym,
+            path_to_detach="|".join([str(self.group_element_year.parent.id), str(self.group_element_year.child_branch.id)]),
+            action=ElementCache.ElementCacheAction.CUT
         )
         self.client.get(self.url)
         self.permission_mock.assert_has_calls(
@@ -98,10 +102,10 @@ class TestMoveGroupElementYearView(TestCase):
             min_count_authorized=0,
             max_count_authorized=None
         )
-        ElementCache(self.person.user).save_element_selected_bis(
-            self.group_element_year.child_branch.pk,
-            node_type.NodeType.EDUCATION_GROUP,
-            source_link_id=self.group_element_year.id,
+        ElementCache(self.person.user.id).save_element_selected_bis(
+            element_year=self.group_element_year.child_branch.academic_year.year,
+            element_code=self.group_element_year.child_branch.partial_acronym,
+            path_to_detach="|".join([str(self.group_element_year.parent.id), str(self.group_element_year.child_branch.id)]),
             action=ElementCache.ElementCacheAction.CUT
         )
 

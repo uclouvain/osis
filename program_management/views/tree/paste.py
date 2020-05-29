@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List, Optional
+from typing import List
 
 from django import shortcuts
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -42,7 +42,8 @@ from base.utils.cache import ElementCache
 from base.views.common import display_warning_messages, display_error_messages
 from base.views.mixins import AjaxTemplateMixin
 from osis_role.contrib.views import PermissionRequiredMixin
-from program_management.ddd.repositories import load_node
+from program_management.ddd.domain import node
+from program_management.ddd.repositories import node as node_repository
 from program_management.ddd.service import attach_node_service
 from program_management.ddd.service.read import element_selected_service
 from program_management.forms.tree.paste import PasteNodesFormset, paste_form_factory, PasteToMinorMajorListChoiceForm
@@ -57,7 +58,7 @@ class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageM
 
     def _has_permission_to_detach(self) -> bool:
         nodes_to_detach_from = [
-            int(path_to_detach.split("|")[-2]) for code, year, path_to_detach in self.nodes_to_paste if path_to_detach
+            int(element_selected["path_to_detach"].split("|")[-2]) for element_selected in self.nodes_to_paste if element_selected["path_to_detach"]
         ]
         objs_to_detach_from = EducationGroupYear.objects.filter(id__in=nodes_to_detach_from)
         return all(self.request.user.has_perms(("base.detach_educationgroup",), obj_to_detach)
@@ -69,26 +70,25 @@ class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageM
 
     @cached_property
     def nodes_to_paste(self) -> List[dict]:
-        return [element_selected_service.retrieve_element_selected(self.request.user.id)]
+        node_to_paste = element_selected_service.retrieve_element_selected(self.request.user.id)
+        return [node_to_paste] if node_to_paste else []
 
     def get_form_class(self):
         return formset_factory(form=paste_form_factory, formset=PasteNodesFormset, extra=len(self.nodes_to_paste))
 
     def get_form_kwargs(self) -> List[dict]:
-        return [self._get_form_kwargs(node_code, node_year, path_to_detach)
-                for node_code, node_year, path_to_detach in self.nodes_to_paste]
+        return [self._get_form_kwargs(element_selected)
+                for element_selected in self.nodes_to_paste]
 
     def _get_form_kwargs(
             self,
-            node_code: str,
-            node_year: int,
-            path_to_detach: Optional[str]
+            element_selected: dict,
     ) -> dict:
         return {
-            'node_to_paste_code': node_code,
-            'node_to_paste_year': node_year,
+            'node_to_paste_code': element_selected["element_code"],
+            'node_to_paste_year': element_selected["element_year"],
             'path_of_node_to_paste_into': self.request.GET['path'],
-            'path_to_detach': path_to_detach,
+            'path_to_detach': element_selected["path_to_detach"],
         }
 
     def get_form(self, form_class=None):
@@ -102,8 +102,10 @@ class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageM
         context_data["is_parent_a_minor_major_list_choice"] = self._is_parent_a_minor_major_list_choice(
             context_data["formset"]
         )
-        context_data["nodes_by_id"] = {node_id: load_node.load_by_type(node_type, node_id)
-                                       for node_id, node_type, source_parent in self.nodes_to_paste}
+        context_data["nodes_by_id"] = {
+            ele["element_code"]: node_repository.NodeRepository.get(
+                node.NodeIdentity(ele["element_code"], ele["element_year"])
+            ) for ele in self.nodes_to_paste}
         if not self.nodes_to_paste:
             display_warning_messages(self.request, _("Please cut or copy an item before paste"))
         return context_data

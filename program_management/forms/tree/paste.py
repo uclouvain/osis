@@ -175,8 +175,8 @@ class PasteToMinorMajorListChoiceForm(PasteNodeForm):
         root_id = int(self.to_path.split("|")[0])
         return command.PasteElementCommand(
             root_id=root_id,
-            node_to_paste_id=self.node_id,
-            node_to_paste_type=self.node_type,
+            node_to_paste_code=self.node_code,
+            node_to_paste_year=self.node_year,
             path_where_to_paste=self.to_path,
             commit=True,
             access_condition=self.cleaned_data.get("access_condition", False),

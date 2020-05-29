@@ -51,11 +51,14 @@ def serialize_children(children: List['Link'], path: str, context=None) -> List[
 
 def _get_node_view_attribute_serializer(link: 'Link', path: 'Path', context=None) -> dict:
     return {
+        'path': path,
         'href': reverse('education_group_read', args=[context['root'].pk, link.child.pk]),
         'root': context['root'].pk,
         'group_element_year': link.pk,
         'element_id': link.child.pk,
         'element_type': link.child.type.name,
+        'element_code': link.child.code,
+        'element_year': link.child.year,
         'title': link.child.code,
         'attach_url': reverse('tree_paste_node', args=[context['root'].pk]) + "?path=%s" % path,
         'detach_url': reverse('tree_detach_node', args=[context['root'].pk]) + "?path=%s" % path,

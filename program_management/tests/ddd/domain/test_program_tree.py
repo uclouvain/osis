@@ -202,8 +202,8 @@ class TestPasteNodeProgramTree(ValidatorPatcherMixin, SimpleTestCase):
         self.child_to_paste = NodeGroupYearFactory()
         self.request = PasteElementCommandFactory(
             root_id=root_node.node_id,
-            node_to_paste_id=self.child_to_paste.node_id,
-            node_to_paste_type=self.child_to_paste.node_type,
+            node_to_paste_code=self.child_to_paste.code,
+            node_to_paste_year=self.child_to_paste.year,
             path_where_to_paste=str(self.tree.root_node.node_id)
         )
 

@@ -153,14 +153,14 @@ function adaptTreeOnFooter() {
     }
 }
 
-function handleCutAction(cut_url, element_id, element_type, link_id) {
+function handleCutAction(cut_url, element_code, element_year, path_to_detach) {
     $.ajax({
         url: cut_url,
         dataType: 'json',
         data: {
-            'element_id': element_id,
-            'element_type': element_type,
-            'group_element_year_id': link_id
+            'element_code': element_code,
+            'element_year': element_year,
+            'path_to_detach': path_to_detach
         },
         type: 'POST',
         success: function (jsonResponse) {
@@ -169,13 +169,13 @@ function handleCutAction(cut_url, element_id, element_type, link_id) {
     });
 }
 
-function handleCopyAction(copy_url, element_id, element_type) {
+function handleCopyAction(copy_url, element_code, element_year) {
     $.ajax({
         url: copy_url,
         dataType: 'json',
         data: {
-            'element_id': element_id,
-            'element_type': element_type
+            'element_code': element_code,
+            'element_year': element_year
         },
         type: 'POST',
         success: function (jsonResponse) {
@@ -246,8 +246,7 @@ function initializeJsTree($documentTree, cut_element_url, copy_element_url) {
                             },
                             "action": function (data) {
                                 const node_data = get_data_from_tree(data);
-                                handleCutAction(cut_element_url, node_data.element_id, node_data.element_type,
-                                    node_data.group_element_year_id)
+                                handleCutAction(cut_element_url, node_data.element_code, node_data.element_year, node_data.path)
                             }
                         },
 
@@ -255,7 +254,7 @@ function initializeJsTree($documentTree, cut_element_url, copy_element_url) {
                             "label": gettext("Copy"),
                             "action": function (data) {
                                 const node_data = get_data_from_tree(data);
-                                handleCopyAction(copy_element_url, node_data.element_id, node_data.element_type)
+                                handleCopyAction(copy_element_url, node_data.element_code, node_data.element_year)
                             }
                         },
 
@@ -392,6 +391,8 @@ function get_data_from_tree(data) {
         group_element_year_id: obj.a_attr.group_element_year,
         element_id: obj.a_attr.element_id,
         element_type: obj.a_attr.element_type,
+        element_code: obj.a_attr.element_code,
+        element_year: obj.a_attr.element_year,
         has_prerequisite: obj.a_attr.has_prerequisite,
         is_prerequisite: obj.a_attr.is_prerequisite,
         view_url: obj.a_attr.href,
