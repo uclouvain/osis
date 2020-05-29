@@ -31,6 +31,7 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from waffle.testutils import override_flag
 
+from base.ddd.utils import business_validator
 from base.ddd.utils.validation_message import BusinessValidationMessage, MessageLevel
 from base.models.enums.education_group_types import GroupType
 from base.tests.factories.person import PersonFactory
@@ -178,7 +179,7 @@ class TestPasteCheckView(TestCase):
     def setUpTestData(cls):
         cls.person = PersonFactory()
 
-        cls.url = reverse("check_education_group_paste", args=["12"])
+        cls.url = reverse("check_tree_paste_node", args=["12"])
         cls.path = "12|25|98"
 
     def setUp(self):
@@ -188,67 +189,33 @@ class TestPasteCheckView(TestCase):
             "program_management.ddd.service.read.element_selected_service.retrieve_element_selected"
         )
         mock_fetch_nodes_selected = patcher_fetch_nodes_selected.start()
-        mock_fetch_nodes_selected.return_value = [(36, NodeType.EDUCATION_GROUP), (89, NodeType.EDUCATION_GROUP)]
+        mock_fetch_nodes_selected.return_value = {
+            "element_code": "LSINF1254",
+            "element_year": 2020,
+            "path_to_detach": None
+        }
         self.addCleanup(patcher_fetch_nodes_selected.stop)
 
-        patcher_check_attach = mock.patch("program_management.ddd.service.attach_node_service.check_attach")
-        self.mock_check_attach = patcher_check_attach.start()
-        self.mock_check_attach.return_value = []
-        self.addCleanup(patcher_check_attach.stop)
+        patcher_check_paste = mock.patch("program_management.ddd.service.attach_node_service.check_attach")
+        self.mock_check_paste = patcher_check_paste.start()
+        self.mock_check_paste.return_value = []
+        self.addCleanup(patcher_check_paste.stop)
 
-    def test_when_check_errors_then_should_display_those_errors(self):
-        self.mock_check_attach.return_value = ["Not valid"]
-        response = self.client.get(self.url, data={
-            "id": [36, 89],
-            "content_type": EDUCATION_GROUP_YEAR,
-            "path": self.path
-        })
-        self.assertTemplateUsed(response, "tree/check_paste_inner.html")
-
-        msgs = [m.message for m in get_messages(response.wsgi_request)]
-        self.assertIn("Not valid", msgs)
-
-    def test_when_check_errors_and_accept_json_header_then_should_return_those_errors_as_json(self):
-        self.mock_check_attach.return_value = ["Not valid"]
-        response = self.client.get(self.url, data={
-            "id": [36, 89],
-            "content_type": EDUCATION_GROUP_YEAR,
-            "path": self.path
-        }, HTTP_ACCEPT="application/json")
+    def test_should_return_error_messages_when_check_paste_service_raises_exception(
+            self
+    ):
+        self.mock_check_paste.side_effect = business_validator.BusinessExceptions(["Not valid"])
+        response = self.client.get(self.url, data={"path": self.path}, HTTP_ACCEPT="application/json")
 
         self.assertEqual(
             response.json(),
             {"error_messages": ["Not valid"]}
         )
 
-    def test_when_no_check_errors_and_accept_json_header_then_should_json_response_with_empty_errors_messages(self):
-        response = self.client.get(self.url, data={
-            "id": [36, 89],
-            "content_type": EDUCATION_GROUP_YEAR,
-            "path": self.path
-        }, HTTP_ACCEPT="application/json")
+    def test_should_not_return_error_messages_when_check_paste_service_do_not_raises_excpetion(self):
+        response = self.client.get(self.url, data={"path": self.path}, HTTP_ACCEPT="application/json")
 
         self.assertEqual(
             response.json(),
             {"error_messages": []}
-        )
-
-    def test_when_no_check_errors_then_should_redirect_to_view_attach_nodes(self):
-        response = self.client.get(self.url, data={
-            "id": [36, 89],
-            "content_type": EDUCATION_GROUP_YEAR,
-            "path": self.path
-        })
-
-        qd = QueryDict(mutable=True)
-        qd.update({
-            "content_type": EDUCATION_GROUP_YEAR,
-            "path": self.path
-        })
-        qd.setlist("id", [36, 89])
-        expected_url = reverse("tree_paste_node", args=[12]) + "?{}".format(qd.urlencode())
-        self.assertRedirects(
-            response,
-            expected_url,
-            fetch_redirect_response=False
         )

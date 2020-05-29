@@ -89,7 +89,7 @@ urlpatterns = [
             path('down/', program_management.views.tree.move.down, name="group_element_year_down")
         ])),
         path('check_attach/', program_management.views.tree.paste.CheckPasteView.as_view(),
-             name="check_education_group_paste"),
+             name="check_tree_paste_node"),
         path('<str:node_path>/quick_search/', include([
             path('learning_unit/', QuickSearchLearningUnitYearView.as_view(), name="quick_search_learning_unit"),
             path('education_group/', QuickSearchEducationGroupYearView.as_view(), name="quick_search_education_group"),

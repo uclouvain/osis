@@ -98,6 +98,47 @@ class PasteNodeValidatorList(business_validator.BusinessListValidator):
             raise business_validator.BusinessExceptions(error_messages)
 
 
+class CheckPasteNodeValidatorList(business_validator.BusinessListValidator):
+    def __init__(
+            self,
+            tree: 'ProgramTree',
+            node_to_paste: 'Node',
+            check_paste_command: command.CheckPasteNodeCommand,
+    ):
+        path = check_paste_command.path_to_paste
+
+        if node_to_paste.is_group():
+            self.validators = [
+                CreateLinkValidatorList(tree.get_node(path), node_to_paste),
+                MinimumEditableYearValidator(tree),
+                InfiniteRecursivityTreeValidator(tree, node_to_paste, path),
+                ValidateEndDateAndOptionFinality(node_to_paste),
+            ]
+
+        elif node_to_paste.is_learning_unit():
+            self.validators = [
+                CreateLinkValidatorList(tree.get_node(path), node_to_paste),
+                AuthorizedRelationshipLearningUnitValidator(tree, node_to_paste, tree.get_node(path)),
+                MinimumEditableYearValidator(tree),
+                InfiniteRecursivityTreeValidator(tree, node_to_paste, path),
+            ]
+
+        else:
+            raise AttributeError("Unknown instance of node")
+        super().__init__()
+
+    def validate(self):
+        error_messages = []
+        for validator in self.validators:
+            try:
+                validator.validate()
+            except business_validator.BusinessExceptions as business_exception:
+                error_messages.extend(business_exception.messages)
+
+        if error_messages:
+            raise business_validator.BusinessExceptions(error_messages)
+
+
 class DetachNodeValidatorList(business_validator.BusinessListValidator):
 
     def __init__(self, tree: 'ProgramTree', node_to_detach: 'Node', path_to_parent: 'Path'):

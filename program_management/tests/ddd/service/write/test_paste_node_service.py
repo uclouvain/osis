@@ -43,7 +43,8 @@ from program_management.ddd.validators import _validate_end_date_and_option_fina
 from program_management.ddd.validators._infinite_recursivity import InfiniteRecursivityTreeValidator
 from program_management.ddd.validators._minimum_editable_year import MinimumEditableYearValidator
 from program_management.ddd.validators.link import CreateLinkValidatorList
-from program_management.ddd.validators.validators_by_business_action import PasteNodeValidatorList
+from program_management.ddd.validators.validators_by_business_action import PasteNodeValidatorList, \
+    CheckPasteNodeValidatorList
 from program_management.tests.ddd.factories.commands.paste_element_command import PasteElementCommandFactory
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory, NodeGroupYearFactory
@@ -129,31 +130,26 @@ class TestPasteNode(SimpleTestCase, ValidatorPatcherMixin):
         self.assertTrue(mock_detach.called)
 
 
-class TestCheckAttach(SimpleTestCase, ValidatorPatcherMixin):
+class TestCheckPaste(SimpleTestCase, ValidatorPatcherMixin):
     def setUp(self) -> None:
         self.tree = ProgramTreeFactory()
         self.node_to_attach_from = NodeEducationGroupYearFactory()
         LinkFactory(parent=self.tree.root_node, child=self.node_to_attach_from)
         self.path = "|".join([str(self.tree.root_node.node_id), str(self.node_to_attach_from.node_id)])
 
-        self.node_to_attach_1 = NodeEducationGroupYearFactory()
-        self.node_to_attach_2 = NodeEducationGroupYearFactory()
+        self.node_to_paste = NodeEducationGroupYearFactory()
 
         self._patch_load_tree()
         self._patch_load_node()
-        self.mock_create_link_validator = self._patch_validator_is_valid(CreateLinkValidatorList)
-        self.mock_minimum_year_editable = self._patch_validator_is_valid(MinimumEditableYearValidator)
-        self.mock_infinite_recursivity_tree = self._patch_validator_is_valid(InfiniteRecursivityTreeValidator)
-        self.mock_validate_end_date_and_option_finality = self._patch_validator_is_valid(
-            _validate_end_date_and_option_finality.ValidateEndDateAndOptionFinality
-        )
+        self.mock_check_paste_validator = self._path_validator()
 
     def _patch_load_node(self):
-        patcher_load_nodes = mock.patch(
-            "program_management.ddd.repositories.load_node.load_by_type"
+        patcher_load_nodes = mock.patch.object(
+            node_repositoriy.NodeRepository,
+            "get"
         )
         self.mock_load_node = patcher_load_nodes.start()
-        self.mock_load_node.side_effect = [self.node_to_attach_1, self.node_to_attach_2]
+        self.mock_load_node.return_value = self.node_to_paste
         self.addCleanup(patcher_load_nodes.stop)
 
     def _patch_load_tree(self):
@@ -164,48 +160,33 @@ class TestCheckAttach(SimpleTestCase, ValidatorPatcherMixin):
         self.mock_load_tree.return_value = self.tree
         self.addCleanup(patcher_load_tree.stop)
 
-    def _patch_validator_is_valid(self, validator_class: Type[business_validator.BusinessValidator]):
+    def _path_validator(self):
         patch_validator = mock.patch.object(
-            validator_class, "is_valid"
+            CheckPasteNodeValidatorList, "validate"
         )
         mock_validator = patch_validator.start()
         mock_validator.return_value = True
         self.addCleanup(patch_validator.stop)
         return mock_validator
 
-    def test_should_call_return_error_if_no_nodes_to_attach(self):
-        check_command = program_management.ddd.command.CheckAttachNodeCommand(
+    def test_should_propagate_error_when_validator_raises_exception(self):
+        self.mock_check_paste_validator.side_effect = business_validator.BusinessExceptions(["an error"])
+        check_command = program_management.ddd.command.CheckPasteNodeCommand(
             root_id=self.tree.root_node.node_id,
-            nodes_to_attach=[],
-            path_where_to_attach=self.path
+            node_to_past_code=self.node_to_paste.code,
+            node_to_paste_year=self.node_to_paste.year,
+            path_to_paste=self.path,
+            path_to_detach=None
         )
-        result = attach_node_service.check_attach(check_command)
-        self.assertIn(_("Please select an item before adding it"), result)
+        with self.assertRaises(business_validator.BusinessExceptions):
+            attach_node_service.check_paste(check_command)
 
-    def test_should_call_validate_end_date_and_option_finality(self):
-        check_command = program_management.ddd.command.CheckAttachNodeCommand(
+    def test_should_return_none_when_validator_do_not_raise_exception(self):
+        check_command = program_management.ddd.command.CheckPasteNodeCommand(
             root_id=self.tree.root_node.node_id,
-            nodes_to_attach=[
-                (self.node_to_attach_1.node_id, self.node_to_attach_1.node_type),
-                (self.node_to_attach_2.node_id, self.node_to_attach_2.node_type)
-            ],
-            path_where_to_attach=self.path
+            node_to_past_code=self.node_to_paste.code,
+            node_to_paste_year=self.node_to_paste.year,
+            path_to_paste=self.path,
+            path_to_detach=None
         )
-        attach_node_service.check_attach(check_command)
-
-        self.assertEqual(self.mock_validate_end_date_and_option_finality.call_count, 2)
-
-    def test_should_call_specific_validators(self):
-        check_command = program_management.ddd.command.CheckAttachNodeCommand(
-            root_id=self.tree.root_node.node_id,
-            nodes_to_attach=[
-                (self.node_to_attach_1.node_id, self.node_to_attach_1.node_type),
-                (self.node_to_attach_2.node_id, self.node_to_attach_2.node_type)
-            ],
-            path_where_to_attach=self.path
-        )
-        attach_node_service.check_attach(check_command)
-
-        self.assertEqual(self.mock_create_link_validator.call_count, 2)
-        self.assertEqual(self.mock_minimum_year_editable.call_count, 2)
-        self.assertEqual(self.mock_infinite_recursivity_tree.call_count, 2)
+        self.assertIsNone(attach_node_service.check_paste(check_command))

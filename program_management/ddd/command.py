@@ -108,7 +108,11 @@ class PasteElementCommand(interface.CommandRequest):
         self.path_where_to_detach = path_where_to_detach
 
 
-CheckAttachNodeCommand = collections.namedtuple(
-    "CheckAttachNodeCommand",
-    "root_id, nodes_to_attach, path_where_to_attach"
-)
+class CheckPasteNodeCommand(interface.CommandRequest):
+    def __init__(self, root_id, node_to_past_code, node_to_paste_year, path_to_paste, path_to_detach):
+        self.root_id = root_id
+        self.node_to_paste_code = node_to_past_code
+        self.node_to_paste_year = node_to_paste_year
+        self.path_to_detach = path_to_detach
+        self.path_to_paste = path_to_paste
+

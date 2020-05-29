@@ -23,58 +23,24 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
-
-from django.utils.translation import gettext_lazy as _
 
 import program_management.ddd.command
-from program_management.ddd.business_types import *
-from program_management.ddd.repositories import load_tree, load_node
-from program_management.ddd.validators._validate_end_date_and_option_finality import \
-    ValidateEndDateAndOptionFinality
-from program_management.ddd.validators import link as link_validator, _minimum_editable_year, _infinite_recursivity
+from program_management.ddd.domain import node
+from program_management.ddd.repositories import load_tree, node as node_repository
+from program_management.ddd.validators import validators_by_business_action
 
 
-# FIXME Pass repository to method attach_node and move validations inside AttachNodeValidatorList
+def check_paste(check_command: program_management.ddd.command.CheckPasteNodeCommand) -> None:
+    node_to_paste = node_repository.NodeRepository.get(
+        node.NodeIdentity(code=check_command.node_to_paste_code, year=check_command.node_to_paste_year)
+    )
+    tree = load_tree.load(check_command.root_id)
 
+    validators_by_business_action.CheckPasteNodeValidatorList(
+        tree,
+        node_to_paste,
+        check_command
+    ).validate()
 
-def check_attach(check_command: program_management.ddd.command.CheckAttachNodeCommand) -> List['BusinessValidationMessage']:
-    tree_root_id = check_command.root_id
-    path_of_node_to_attach_from = check_command.path_where_to_attach
-    nodes_to_attach = check_command.nodes_to_attach
-    result = []
-    tree = load_tree.load(tree_root_id)
-    node_to_attach_from = tree.get_node(path_of_node_to_attach_from)
-
-    _nodes_to_attach = [load_node.load_by_type(node_type, node_id) for node_id, node_type in nodes_to_attach]
-
-    if not _nodes_to_attach:
-        result.append(
-            _("Please select an item before adding it")
-        )
-
-    for node_to_attach in _nodes_to_attach:
-        if not node_to_attach.is_learning_unit():
-            validator = ValidateEndDateAndOptionFinality(node_to_attach)
-            validator.is_valid()
-            result.extend(validator.error_messages)
-
-        validator = link_validator.CreateLinkValidatorList(node_to_attach_from, node_to_attach)
-        if not validator.is_valid():
-            result.extend(validator.messages)
-
-        validator = _minimum_editable_year.MinimumEditableYearValidator(tree)
-        if not validator.is_valid():
-            result.extend(validator.messages)
-
-        validator = _infinite_recursivity.InfiniteRecursivityTreeValidator(
-            tree,
-            node_to_attach,
-            path_of_node_to_attach_from
-        )
-        if not validator.is_valid():
-            result.extend(validator.messages)
-
-    return result
 
 

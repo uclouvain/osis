@@ -30,16 +30,16 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.forms import formset_factory
 from django.http import JsonResponse
-from django.shortcuts import redirect
-from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import FormView, TemplateView
+from django.views.generic import FormView
+from django.views.generic.base import View
 
 import program_management.ddd.command
+from base.ddd.utils import business_validator
 from base.models.education_group_year import EducationGroupYear
 from base.utils.cache import ElementCache
-from base.views.common import display_warning_messages, display_error_messages
+from base.views.common import display_warning_messages
 from base.views.mixins import AjaxTemplateMixin
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd.domain import node
@@ -128,29 +128,25 @@ class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageM
         return
 
 
-class CheckPasteView(LoginRequiredMixin, AjaxTemplateMixin, SuccessMessageMixin, TemplateView):
-    template_name = "tree/check_paste_inner.html"
+class CheckPasteView(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
-        nodes_to_paste = element_selected_service.retrieve_element_selected(
-            self.request.user,
-            self.request.GET.get("id", []),
-            self.request.GET.get("content_type")
-        )
-        check_command = program_management.ddd.command.CheckAttachNodeCommand(
+        nodes_to_paste = element_selected_service.retrieve_element_selected(self.request.user.id)
+        if not nodes_to_paste:
+            return JsonResponse({"error_messages": [_("Please cut or copy an item before paste")]})
+
+        check_command = program_management.ddd.command.CheckPasteNodeCommand(
             root_id=self.kwargs["root_id"],
-            path_where_to_attach=self.request.GET["path"],
-            nodes_to_attach=nodes_to_paste
+            node_to_past_code=nodes_to_paste["element_code"],
+            node_to_paste_year=nodes_to_paste["element_year"],
+            path_to_detach=nodes_to_paste["path_to_detach"],
+            path_to_paste=self.request.GET["path"],
         )
-        error_messages = attach_node_service.check_attach(check_command)
 
-        if "application/json" in self.request.headers.get("Accept", ""):
-            return JsonResponse({"error_messages": [str(msg) for msg in error_messages]})
+        try:
+            attach_node_service.check_paste(check_command)
+        except business_validator.BusinessExceptions as business_exception:
+            return JsonResponse({"error_messages": business_exception.messages})
 
-        if not error_messages:
-            return redirect(
-                reverse("tree_paste_node", args=[self.kwargs["root_id"]]) + "?{}".format(self.request.GET.urlencode())
-            )
+        return JsonResponse({"error_messages": []})
 
-        display_error_messages(self.request, error_messages)
-        return super().get(request, *args, **kwargs)
