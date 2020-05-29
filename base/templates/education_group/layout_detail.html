@@ -57,7 +57,7 @@
                             <select id="slt_academic_year" name="select_academic_year" class="form-control" onchange="location = this.value;">
                                 {% for choice in academic_year_choices %}
                                     <option value="{{ choice.0 }}"
-                                            {% if request.get_full_path in choice.0 %}
+                                            {% if request.path in choice.0|urlencode %}
                                             selected {% endif %}>{{ choice.1 | display_as_academic_year }}</option>
                                 {% endfor %}
                             </select>
