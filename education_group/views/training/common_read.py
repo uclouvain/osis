@@ -114,9 +114,7 @@ class TrainingRead(PermissionRequiredMixin, TemplateView):
             "tab_urls": self.get_tab_urls(),
             "node": self.get_object(),
             "tree": json.dumps(program_tree_view_serializer(self.get_tree())),
-            "education_group_version": self.education_group_version,
-            # TODO: Remove when finished reoganized tempalate
-            "group_year": self.education_group_version.root_group,
+
             "form_xls_custom": CustomXlsForm(path=self.get_path()),
             "academic_years":  find_all_versions_academic_year(
                 self.training_identity.acronym,
@@ -126,7 +124,10 @@ class TrainingRead(PermissionRequiredMixin, TemplateView):
             "academic_year_choices": get_academic_year_choices(self.node_identity, self.get_path()),
             "current_version": self.current_version,
             "versions_choices": self.get_versions_choices(),
-            "": ""
+
+            # TODO: Two lines below to remove when finished reorganized templates
+            "education_group_version": self.education_group_version,
+            "group_year": self.education_group_version.root_group,
         }
 
     def get_versions_choices(self) -> List[tree_version_choices.ProgramTreeVersionChoiceOption]:
