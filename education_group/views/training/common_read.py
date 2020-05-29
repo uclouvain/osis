@@ -13,7 +13,7 @@ from django.views.generic import TemplateView
 
 from base.views.common import display_warning_messages
 from education_group.forms import tree_version_choices
-from education_group.forms.academic_year import get_academic_year_choices
+from education_group.forms.academic_year_choices import get_academic_year_choices
 from program_management.ddd.business_types import *
 from education_group.ddd.business_types import *
 
