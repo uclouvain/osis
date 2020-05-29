@@ -1,5 +1,5 @@
 {% extends "education_group/layout.html" %}
-{% load format i18n static version bootstrap3 academic_year_display %}
+{% load format i18n static version bootstrap3 academic_year_display version_name_display %}
 
 {% block title %}
     <title>OSIS - {{ education_group_year.acronym }} {{ learning_unit_year.acronym }}</title>
@@ -45,38 +45,47 @@
     <div class="panel panel-default" id="panel-data">
         <div class="panel-heading">
             <div class="row">
-                <div class="col-md-1">
-                    <a id="btn-toggle-tree" class="btn btn-default" style="margin-left: 15px;" onclick="toggleNav()">
-                        <span class="fa fa-bars" aria-hidden="true"></span>
-                    </a>
-                </div>
-                <div class="col-md-2">
-                    <select id="slt_academic_year" name="select_academic_year" class="form-control" onchange="location = this.value;">
-                        {% for choice in academic_year_choices %}
-                            <option value="{{ choice.0 }}"
-                                    {% if request.get_full_path in choice.0 %}
-                                    selected {% endif %}>{{ choice.1 | display_as_academic_year }}</option>
-                        {% endfor %}
-                    </select>
+                <div class="col-md-5">
+                    <div class="row">
+                        <div class="col-md-1">
+                            <a id="btn-toggle-tree" class="btn btn-default" onclick="toggleNav()">
+                                <span class="fa fa-bars" aria-hidden="true"></span>
+                            </a>
+                        </div>
+
+                        <div class="col-md-4">
+                            <select id="slt_academic_year" name="select_academic_year" class="form-control" onchange="location = this.value;">
+                                {% for choice in academic_year_choices %}
+                                    <option value="{{ choice.0 }}"
+                                            {% if request.get_full_path in choice.0 %}
+                                            selected {% endif %}>{{ choice.1 | display_as_academic_year }}</option>
+                                {% endfor %}
+                            </select>
+
+                        </div>
+
+                        <div class="col-md-6">
+                            {% if current_version %}
+                                <select id="slt_version" name="select_program_tree_version" class="form-control" onchange="location = this.value;">
+                                    {% for choice in versions_choices %}
+                                        <option value="{{ choice.node_href }}"
+                                                {% if current_version.entity_identity == choice.1 %}
+                                                selected {% endif %}>{{ choice.1 | display_version_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            {% endif %}
+                        </div>
+                    </div>
 
                 </div>
-                <div class="col-md-2">
-                    {% if current_version %}
-                        <select id="slt_version" name="select_program_tree_version" class="form-control" onchange="location = this.value;">
-                            {% for choice in versions_choices %}
-                                <option value="{{ choice.node_href }}"
-                                        {% if current_version.tree_version_identity == choice.tree_version_identity %}
-                                        selected {% endif %}>{{ choice.version_name_display }}</option>
-                            {% endfor %}
-                        </select>
-                    {% endif %}
-                </div>
+
                 <div class="col-md-7">
                     <div class="pull-right" style="margin-right: 15px;">
                         {% block top_action_bar %}
                         {% endblock %}
                     </div>
                 </div>
+
             </div>
         </div>
         <div class="panel-body" id="tabs">

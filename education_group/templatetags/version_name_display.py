@@ -23,32 +23,20 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List, Tuple
 
-from django.urls import reverse
+from django import template
+from django.utils.translation import gettext_lazy as _
 
 from program_management.ddd.business_types import *
-from program_management.ddd.domain.node import NodeIdentity
-from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
-from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
+
+register = template.Library()
 
 
-def get_tree_versions_choices(node_identity: 'NodeIdentity') -> List[Tuple[str, 'ProgramTreeVersionIdentity']]:
-
-    tree_versions = ProgramTreeVersionRepository.search_all_versions_from_root_node(node_identity)
-
-    choices = []
-    for tree_version in sorted(tree_versions):
-        node_identity = NodeIdentitySearch().get_from_program_tree_identity(tree_version.program_tree_identity)
-        choices.append(
-            (
-                _get_href(node_identity),
-                tree_version.entity_id,
-            )
-        )
-
-    return choices
-
-
-def _get_href(node_identity: 'NodeIdentity') -> str:
-    return reverse('element_identification', args=[node_identity.year, node_identity.code])
+@register.filter()
+def display_version_name(tree_version_identity: 'ProgramTreeVersionIdentity'):
+    version_name_display = ""
+    if tree_version_identity:
+        version_name_display = tree_version_identity.version_name or _('Standard')
+        if tree_version_identity.is_transition:
+            version_name_display += " [TRANSITION]"
+    return version_name_display

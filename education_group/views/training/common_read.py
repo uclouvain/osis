@@ -121,15 +121,12 @@ class TrainingRead(PermissionRequiredMixin, TemplateView):
                 _get_view_name_from_tab(self.active_tab),
             ),
             "current_version": self.current_version,
-            "versions_choices": self.get_versions_choices(),
+            "versions_choices": tree_version_choices.get_tree_versions_choices(self.node_identity),
 
             # TODO: Two lines below to remove when finished reorganized templates
             "education_group_version": self.education_group_version,
             "group_year": self.education_group_version.root_group,
         }
-
-    def get_versions_choices(self) -> List[tree_version_choices.ProgramTreeVersionChoiceOption]:
-        return tree_version_choices.get_tree_versions_choices(self.node_identity)
 
     @cached_property
     def all_versions_available(self) -> List['ProgramTreeVersion']:
