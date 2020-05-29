@@ -29,9 +29,10 @@ def are_all_groups_removable(self, user, education_group_year):
 
 
 def _are_all_removable(self, user, objects, perm):
+    # use shortcut break : at least one should not have perm to trigger error
     result = all(
         user.has_perm(perm, object)
-        for object in objects
+        for object in objects.order_by('academic_year__year')
     )
     # transfers last perm error message
     message = get_permission_error(user, perm)
@@ -50,7 +51,7 @@ def is_not_orphan_group(self, user, education_group_year=None):
 
 @predicate(bind=True)
 @predicate_failed_msg(
-    message=_("You cannot change a education group before %(limit_year)s") %
+    message=_("You cannot change/delete a education group existing before %(limit_year)s") %
     {"limit_year": settings.YEAR_LIMIT_EDG_MODIFICATION}
 )
 def is_education_group_year_older_or_equals_than_limit_settings_year(self, user, education_group_year=None):
