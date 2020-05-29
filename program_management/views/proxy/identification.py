@@ -12,7 +12,6 @@ class IdentificationRedirectView(RedirectView):
     def get_redirect_url(self, *args, **kwargs):
         year = self.kwargs['year']
         code = self.kwargs['code']
-        # tab = self.kwargs['tab']
         root_node = NodeRepository().get(NodeIdentity(code=code, year=year))
         if root_node.is_training():
             url_name = "training_identification"

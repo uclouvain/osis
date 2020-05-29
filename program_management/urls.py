@@ -110,5 +110,5 @@ urlpatterns = [
         ]))
     ])),
 
-    path('<int:year>/<str:code>/', IdentificationRedirectView.as_view(), name='element_identification'),  # TODO :: rename element_identification
+    path('<int:year>/<str:code>/', IdentificationRedirectView.as_view(), name='element_identification'),
 ]
