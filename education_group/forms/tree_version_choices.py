@@ -33,16 +33,19 @@ from program_management.ddd.domain.service.identity_search import NodeIdentitySe
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 
 
-def get_tree_versions_choices(node_identity: 'NodeIdentity') -> List[Tuple[str, 'ProgramTreeVersionIdentity']]:
+def get_tree_versions_choices(
+        node_identity: 'NodeIdentity',
+        active_view_name: str
+) -> List[Tuple[str, 'ProgramTreeVersionIdentity']]:
 
     tree_versions = ProgramTreeVersionRepository.search_all_versions_from_root_node(node_identity)
 
     choices = []
-    for tree_version in sorted(tree_versions):
+    for tree_version in tree_versions:
         node_identity = NodeIdentitySearch().get_from_program_tree_identity(tree_version.program_tree_identity)
         choices.append(
             (
-                _get_href(node_identity),
+                _get_href(node_identity, active_view_name),
                 tree_version.entity_id,
             )
         )
@@ -50,5 +53,5 @@ def get_tree_versions_choices(node_identity: 'NodeIdentity') -> List[Tuple[str, 
     return choices
 
 
-def _get_href(node_identity: 'NodeIdentity') -> str:
-    return reverse('element_identification', args=[node_identity.year, node_identity.code])
+def _get_href(node_identity: 'NodeIdentity', active_view_name: str) -> str:
+    return reverse(active_view_name, args=[node_identity.year, node_identity.code])

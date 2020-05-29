@@ -14,6 +14,7 @@ from django.views.generic import TemplateView
 from base.views.common import display_warning_messages
 from education_group.forms import tree_version_choices
 from education_group.forms.academic_year_choices import get_academic_year_choices
+from education_group.forms.tree_version_choices import get_tree_versions_choices
 from program_management.ddd.business_types import *
 from education_group.ddd.business_types import *
 
@@ -121,18 +122,12 @@ class TrainingRead(PermissionRequiredMixin, TemplateView):
                 _get_view_name_from_tab(self.active_tab),
             ),
             "current_version": self.current_version,
-            "versions_choices": tree_version_choices.get_tree_versions_choices(self.node_identity),
+            "versions_choices": get_tree_versions_choices(self.node_identity, _get_view_name_from_tab(self.active_tab)),
 
             # TODO: Two lines below to remove when finished reorganized templates
             "education_group_version": self.education_group_version,
             "group_year": self.education_group_version.root_group,
         }
-
-    @cached_property
-    def all_versions_available(self) -> List['ProgramTreeVersion']:
-        return ProgramTreeVersionRepository.search_all_versions_from_root_node(
-            NodeIdentity(self.get_tree().root_node.code, self.get_tree().root_node.year)
-        )
 
     def get_permission_object(self):
         return self.education_group_version.offer
