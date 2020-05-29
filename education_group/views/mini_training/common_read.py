@@ -59,6 +59,7 @@ class MiniTrainingRead(PermissionRequiredMixin, TemplateView):
     def get_current_academic_year(self):
         return academic_year.starting_academic_year()
 
+    @functools.lru_cache()
     def get_education_group_version(self):
         try:
             root_element_id = self.get_path().split("|")[0]
@@ -68,10 +69,12 @@ class MiniTrainingRead(PermissionRequiredMixin, TemplateView):
         except (EducationGroupVersion.DoesNotExist, Element.DoesNotExist):
             raise Http404
 
+    @functools.lru_cache()
     def get_tree(self):
         root_element_id = self.get_path().split("|")[0]
         return load_tree.load(int(root_element_id))
 
+    @functools.lru_cache()
     def get_object(self):
         return self.get_tree().get_node(self.get_path())
 
