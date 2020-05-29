@@ -46,8 +46,9 @@
                     input.type = 'checkbox';
                     input.name = 'selected-item';
                     input.value = data;
-                    // FIXME Use uuid in the future when implemented in place of data-url
                     input.setAttribute('data-url', row['osis_url']);
+                    input.setAttribute('data-code', row['acronym']);
+                    input.setAttribute('data-year', row['academic_year']);
                     input.setAttribute('data-name', `${row['academic_year']} - ${row['acronym']}`);
                     return input.outerHTML;
                 }

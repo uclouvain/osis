@@ -135,4 +135,3 @@ class CheckPasteNodeCommand(interface.CommandRequest):
         parameters = ", ".join([str(self.root_id), str(self.node_to_paste_code),
                                 str(self.node_to_paste_year), str(self.path_to_paste), str(self.path_to_detach)])
         return "CheckPasteNodeCommand({parameters})".format(parameters=parameters)
-

@@ -104,13 +104,13 @@
 
         function attachElementSelected(checkUrl, attachUrl){
             return function(){
-                const elementsUrl = $("input[name=selected-item]:checked").map(function(){return $(this).attr("data-url");}).get();
-                const parameters = extract_ids_and_content_type_parameters(elementsUrl);
+                const boxChecked = document.querySelectorAll("input[name=selected-item]:checked")
+                const parameters = extract_ids_and_content_type_parameters(boxChecked);
                 const paramString = new URLSearchParams();
-                paramString.append("content_type", parameters["content_type"]);
+                paramString.append("year", parameters["year"]);
                 paramString.append("path", "{{ node_path }}");
-                for (let index in parameters["id"]){
-                    paramString.append("id", parameters["id"][index]);
+                for (let index in parameters["codes"]){
+                    paramString.append("codes", parameters["codes"][index]);
                 }
 
                 $.ajax({
@@ -138,20 +138,14 @@
             };
         }
 
-        function extract_ids_and_content_type_parameters(urls){
-            let contentType = "";
-            if (urls.length === 0){
-                contentType = ""
-            }
-            else if (urls[0].includes("learning_units")){
-                contentType = "base_learningunityear";
-            }else if(urls[0].includes("educationgroups")){
-                contentType = "base_educationgroupyear";
-            }
-
-            let object_ids = urls.map((url) => getIdFromUrl(url).toString());
-
-            return {"id": object_ids, "content_type": contentType};
+        function extract_ids_and_content_type_parameters(elements){
+            codes = []
+            year = null;
+            elements.forEach((function(element){
+                codes.push(element.dataset.code);
+                year = element.dataset.year;
+            }));
+            return {"codes": codes, "year": year};
         }
 
         // FIXME This method is copy pasted. Should be extracted in a common file.
