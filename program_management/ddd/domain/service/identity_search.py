@@ -27,15 +27,13 @@
 from django.db.models import F
 
 from education_group.models.group_year import GroupYear
-from osis_common.ddd.interface import BusinessException
+from osis_common.ddd import interface
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 
-DomainService = object  # TODO :: move into osis_commin/ddd/interfaces
 
-
-class ProgramTreeVersionIdentitySearch(DomainService):
+class ProgramTreeVersionIdentitySearch(interface.DomainService):
     def get_from_node_identity(self, node_identity: 'NodeIdentity') -> 'ProgramTreeVersionIdentity':
         values = GroupYear.objects.filter(
             partial_acronym=node_identity.code,
@@ -48,9 +46,9 @@ class ProgramTreeVersionIdentitySearch(DomainService):
         ).values('offer_acronym', 'year', 'version_name', 'is_transition')
         if values:
             return ProgramTreeVersionIdentity(**values[0])
-        raise BusinessException("Program tree version identity not found")
+        raise interface.BusinessException("Program tree version identity not found")
 
 
-class NodeIdentitySearch(DomainService):
+class NodeIdentitySearch(interface.DomainService):
     def get_from_program_tree_identity(self, tree_identity: 'ProgramTreeIdentity') -> 'NodeIdentity':
         return NodeIdentity(year=tree_identity.year, code=tree_identity.code)

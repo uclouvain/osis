@@ -27,13 +27,12 @@ from django.db.models import F
 
 from education_group.ddd.domain.training import TrainingIdentity
 from education_group.models.group_year import GroupYear
+from osis_common.ddd import interface
 from osis_common.ddd.interface import BusinessException
 from program_management.ddd.business_types import *
 
-DomainService = object  # TODO :: move into osis_commin/ddd/interfaces
 
-
-class TrainingIdentitySearch(DomainService):
+class TrainingIdentitySearch(interface.DomainService):
     def get_from_node_identity(self, node_identity: 'NodeIdentity') -> 'TrainingIdentity':
         values = GroupYear.objects.filter(
             partial_acronym=node_identity.code,
