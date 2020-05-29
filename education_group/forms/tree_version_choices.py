@@ -23,17 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List, Dict
+from typing import List
 
-from django import forms
 from django.urls import reverse
-
-# from program_management.ddd.business_types import *
-from program_management.ddd.domain.node import NodeIdentity
-from program_management.ddd.domain.service.academic_year_search import ExistingAcademicYearSearch
-from program_management.ddd.domain.service.element_id_search import ElementIdByYearSearch, PathElementId, Year
 from django.utils.translation import gettext_lazy as _
 
+from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 
@@ -42,7 +37,6 @@ PresentationObject = object  # FIXME :: to move into osis-common/ddd
 
 class ProgramTreeVersionChoiceOption(PresentationObject):
     def __init__(self, tree_version: 'ProgramTreeVersion'):
-        # FIXME :: use dependency injection???
         node_identity = NodeIdentitySearch().get_from_program_tree_identity(tree_version.program_tree_identity)
         self.node_href = _get_href(node_identity)
         self.tree_version_identity = tree_version.entity_id

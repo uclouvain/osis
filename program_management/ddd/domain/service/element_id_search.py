@@ -23,13 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import itertools
 from typing import List, Dict
 
 from django.db.models import F
 
 from education_group.models.group_year import GroupYear
-# from program_management.ddd.business_types import *
 from program_management.ddd.domain.service.identity_search import DomainService
 
 PathElementId = int
@@ -56,7 +54,6 @@ class ElementIdByYearSearch(DomainService):
             'year',
         )
 
-        grouped_by_group_id = itertools.groupby(values_list, lambda record: record['group_id'])
         grouped_by_group_id = {}
         for rec in values_list:
             grouped_by_group_id.setdefault(rec['group_id'], []).append(rec)

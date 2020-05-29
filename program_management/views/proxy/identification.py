@@ -1,9 +1,7 @@
 from django.urls import reverse
 from django.views.generic import RedirectView
 
-from base.models.enums.education_group_types import GroupType, TrainingType, MiniTrainingType
 from program_management.ddd.domain.node import NodeIdentity
-from program_management.ddd.repositories import load_tree, load_node
 from program_management.ddd.repositories.node import NodeRepository
 
 

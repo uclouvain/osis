@@ -27,9 +27,7 @@ from typing import List
 
 from django.db.models import F
 
-from education_group.ddd.domain.training import TrainingIdentity
 from education_group.models.group_year import GroupYear
-from osis_common.ddd.interface import BusinessException
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.service.identity_search import DomainService
 
