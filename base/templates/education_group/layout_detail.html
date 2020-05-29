@@ -7,10 +7,10 @@
 {% block breadcrumb %}
     {{ block.super }}
     <li class="active">
-        {% if education_group_year.education_group_type.category == "TRAINING" %}
-            {{ education_group_year.acronym }}
+        {% if node.is_training %}
+            {{ node.title }}
         {% else %}
-            {{ education_group_year.partial_acronym }}
+            {{ node.code }}
         {% endif %}
     </li>
 {% endblock %}
