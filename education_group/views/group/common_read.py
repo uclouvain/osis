@@ -11,11 +11,12 @@ from django.views.generic import TemplateView
 
 from base import models as mdl
 from base.models.enums.education_group_types import GroupType
+from base.views.common import display_warning_messages
 from education_group.forms.academic_year_choices import get_academic_year_choices
 from education_group.models.group_year import GroupYear
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd.business_types import *
-from program_management.ddd.domain.node import NodeIdentity
+from program_management.ddd.domain.node import NodeIdentity, NodeNotFoundException
 from program_management.ddd.repositories import load_tree
 from program_management.forms.custom_xls import CustomXlsForm
 from program_management.models.element import Element
@@ -57,7 +58,17 @@ class GroupRead(PermissionRequiredMixin, TemplateView):
 
     @functools.lru_cache()
     def get_object(self):
-        return self.get_tree().get_node(self.path)
+        try:
+            return self.get_tree().get_node(self.path)
+        except NodeNotFoundException:
+            root_node = self.get_tree().root_node
+            message = _(
+                "The formation you work with doesn't exist (or is not at the same position) "
+                "in the tree {root.title} in {root.year}."
+                "You've been redirected to the root {root.code} ({root.year})"
+            ).format(root=root_node)
+            display_warning_messages(self.request, message)
+            return root_node
 
     def get_context_data(self, **kwargs):
         can_change_education_group = self.request.user.has_perm(

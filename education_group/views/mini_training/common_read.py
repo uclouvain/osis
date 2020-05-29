@@ -16,9 +16,10 @@ from base.business.education_groups.general_information_sections import \
     MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION
 from base.models import academic_year
 from base.models.enums.education_group_types import MiniTrainingType
+from base.views.common import display_warning_messages
 from education_group.forms.academic_year_choices import get_academic_year_choices
 from osis_role.contrib.views import PermissionRequiredMixin
-from program_management.ddd.domain.node import NodeIdentity
+from program_management.ddd.domain.node import NodeIdentity, NodeNotFoundException
 from program_management.ddd.repositories import load_tree
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.models.element import Element
@@ -76,7 +77,17 @@ class MiniTrainingRead(PermissionRequiredMixin, TemplateView):
 
     @functools.lru_cache()
     def get_object(self):
-        return self.get_tree().get_node(self.get_path())
+        try:
+            return self.get_tree().get_node(self.get_path())
+        except NodeNotFoundException:
+            root_node = self.get_tree().root_node
+            message = _(
+                "The formation you work with doesn't exist (or is not at the same position) "
+                "in the tree {root.title} in {root.year}."
+                "You've been redirected to the root {root.code} ({root.year})"
+            ).format(root=root_node)
+            display_warning_messages(self.request, message)
+            return root_node
 
     def get_context_data(self, **kwargs):
         return {
