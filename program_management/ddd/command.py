@@ -109,10 +109,30 @@ class PasteElementCommand(interface.CommandRequest):
 
 
 class CheckPasteNodeCommand(interface.CommandRequest):
-    def __init__(self, root_id, node_to_past_code, node_to_paste_year, path_to_paste, path_to_detach):
+    def __init__(
+            self,
+            root_id: int,
+            node_to_past_code: str,
+            node_to_paste_year: int,
+            path_to_paste: str,
+            path_to_detach: Optional[str]
+    ):
         self.root_id = root_id
         self.node_to_paste_code = node_to_past_code
         self.node_to_paste_year = node_to_paste_year
         self.path_to_detach = path_to_detach
         self.path_to_paste = path_to_paste
+
+    def __eq__(self, other):
+        if isinstance(other, CheckPasteNodeCommand):
+            return (self.root_id, self.node_to_paste_code, self.node_to_paste_year,
+                    self.path_to_detach, self.path_to_paste) == \
+                   (other.root_id, other.node_to_paste_code, other.node_to_paste_year,
+                    other.path_to_detach, other.path_to_paste)
+        return False
+
+    def __repr__(self) -> str:
+        parameters = ", ".join([str(self.root_id), str(self.node_to_paste_code),
+                                str(self.node_to_paste_year), str(self.path_to_paste), str(self.path_to_detach)])
+        return "CheckPasteNodeCommand({parameters})".format(parameters=parameters)
 

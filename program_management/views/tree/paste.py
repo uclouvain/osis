@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import itertools
 from typing import List
 
 from django import shortcuts
@@ -70,6 +71,10 @@ class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageM
 
     @cached_property
     def nodes_to_paste(self) -> List[dict]:
+        year = self.request.GET.get("year")
+        codes = self.request.GET.getlist("codes", [])
+        if codes and year:
+            return [{"element_code": code, "element_year": int(year), "path_to_detach": None} for code in codes]
         node_to_paste = element_selected_service.retrieve_element_selected(self.request.user.id)
         return [node_to_paste] if node_to_paste else []
 
@@ -129,24 +134,38 @@ class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageM
 
 
 class CheckPasteView(LoginRequiredMixin, View):
+    def _retrieve_elements_selected(self) -> List[dict]:
+        year = self.request.GET.get("year")
+        codes = self.request.GET.getlist("codes", [])
+        if codes and year:
+            return [{"element_code": code, "element_year": int(year), "path_to_detach": None} for code in codes]
+        return []
 
-    def get(self, request, *args, **kwargs):
-        nodes_to_paste = element_selected_service.retrieve_element_selected(self.request.user.id)
-        if not nodes_to_paste:
-            return JsonResponse({"error_messages": [_("Please cut or copy an item before paste")]})
-
+    def _check_paste(self, element_selected: dict) -> List[str]:
         check_command = program_management.ddd.command.CheckPasteNodeCommand(
             root_id=self.kwargs["root_id"],
-            node_to_past_code=nodes_to_paste["element_code"],
-            node_to_paste_year=nodes_to_paste["element_year"],
-            path_to_detach=nodes_to_paste["path_to_detach"],
+            node_to_past_code=element_selected["element_code"],
+            node_to_paste_year=element_selected["element_year"],
+            path_to_detach=element_selected["path_to_detach"],
             path_to_paste=self.request.GET["path"],
         )
 
         try:
             attach_node_service.check_paste(check_command)
         except business_validator.BusinessExceptions as business_exception:
-            return JsonResponse({"error_messages": business_exception.messages})
+            return business_exception.messages
+        return []
+
+    def get(self, request, *args, **kwargs):
+        elements_to_paste = self._retrieve_elements_selected()
+        if not elements_to_paste:
+            return JsonResponse({"error_messages": [_("Please cut or copy an item before paste")]})
+
+        error_messages = list(itertools.chain.from_iterable(
+            self._check_paste(element) for element in elements_to_paste
+        ))
+        if error_messages:
+            return JsonResponse({"error_messages": error_messages})
 
         return JsonResponse({"error_messages": []})
 

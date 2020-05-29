@@ -43,6 +43,7 @@ from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.person import PersonFactory
 from base.utils.cache import ElementCache
 from osis_role.contrib.views import PermissionRequiredMixin
+from program_management.ddd import command
 from program_management.forms.tree.paste import PasteNodesFormset, PasteNodeForm
 from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory, NodeLearningUnitYearFactory, \
     NodeGroupYearFactory
@@ -120,20 +121,22 @@ class TestPasteNodeView(TestCase):
     def test_should_return_formset_when_elements_are_selected(self, mock_cache_elems):
         subgroup_to_attach = NodeGroupYearFactory(node_type=GroupType.SUB_GROUP)
         subgroup_to_attach_2 = NodeGroupYearFactory(node_type=GroupType.SUB_GROUP,)
-        mock_cache_elems.return_value = {
-            "element_code": subgroup_to_attach.code,
-            "element_year": subgroup_to_attach.year,
-            "path_to_detach": None
-        }
 
         # To path :  BIR1BA ---> LBIR101G
         path = "|".join([str(self.tree.root_node.pk), str(self.tree.root_node.children[1].child.pk)])
-        response = self.client.get(self.url, data={"path": path})
+        response = self.client.get(
+            self.url,
+            data={
+                "path": path,
+                "codes": [subgroup_to_attach.code, subgroup_to_attach_2.code],
+                "year": subgroup_to_attach.year
+            }
+        )
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, 'tree/paste_inner.html')
 
         self.assertIsInstance(response.context['formset'], PasteNodesFormset)
-        self.assertEqual(len(response.context['formset'].forms), 1)
+        self.assertEqual(len(response.context['formset'].forms), 2)
 
     @mock.patch('program_management.ddd.service.read.element_selected_service.retrieve_element_selected')
     @mock.patch('program_management.forms.tree.paste.PasteNodesFormset.is_valid')
@@ -286,35 +289,69 @@ class TestCheckPasteView(TestCase):
     def setUp(self):
         self.client.force_login(self.person.user)
 
-        patcher_fetch_nodes_selected = mock.patch(
-            "program_management.ddd.service.read.element_selected_service.retrieve_element_selected"
-        )
-        mock_fetch_nodes_selected = patcher_fetch_nodes_selected.start()
-        mock_fetch_nodes_selected.return_value = {
-            "element_code": "LSINF1254",
-            "element_year": 2020,
-            "path_to_detach": None
-        }
-        self.addCleanup(patcher_fetch_nodes_selected.stop)
-
         patcher_check_paste = mock.patch("program_management.ddd.service.attach_node_service.check_paste")
         self.mock_check_paste = patcher_check_paste.start()
-        self.mock_check_paste.return_value = []
+        self.mock_check_paste.return_value = None
         self.addCleanup(patcher_check_paste.stop)
+
+    def test_should_call_check_paste_service_based_on_get_parameters_when_get_parameters_are_filled(self):
+        self.client.get(
+            self.url,
+            data={
+                "path": self.path,
+                "codes": ["LSINF1254", "LECGE2589"],
+                "year": 2021,
+            },
+            HTTP_ACCEPT="application/json"
+        )
+        self.mock_check_paste.assert_has_calls(
+            [
+                mock.call(command.CheckPasteNodeCommand(
+                    12,
+                    node_to_past_code="LSINF1254",
+                    node_to_paste_year=2021,
+                    path_to_paste=self.path,
+                    path_to_detach=None
+                )),
+                mock.call(command.CheckPasteNodeCommand(
+                    12,
+                    node_to_past_code="LECGE2589",
+                    node_to_paste_year=2021,
+                    path_to_paste=self.path,
+                    path_to_detach=None
+                ))
+            ]
+        )
 
     def test_should_return_error_messages_when_check_paste_service_raises_exception(
             self
     ):
         self.mock_check_paste.side_effect = business_validator.BusinessExceptions(["Not valid"])
-        response = self.client.get(self.url, data={"path": self.path}, HTTP_ACCEPT="application/json")
+        response = self.client.get(
+            self.url,
+            data={
+                "path": self.path,
+                "codes": ["LSINF1254", "LECGE2589"],
+                "year": 2021,
+            },
+            HTTP_ACCEPT="application/json"
+        )
 
         self.assertEqual(
             response.json(),
-            {"error_messages": ["Not valid"]}
+            {"error_messages": ["Not valid", "Not valid"]}
         )
 
     def test_should_not_return_error_messages_when_check_paste_service_do_not_raises_excpetion(self):
-        response = self.client.get(self.url, data={"path": self.path}, HTTP_ACCEPT="application/json")
+        response = self.client.get(
+            self.url,
+            data={
+                "path": self.path,
+                "codes": ["LSINF1254", "LECGE2589"],
+                "year": 2021,
+            },
+            HTTP_ACCEPT="application/json"
+        )
 
         self.assertEqual(
             response.json(),
