@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List, Dict
+from typing import List, Dict, Tuple
 
 from django import forms
 from django.urls import reverse
@@ -33,31 +33,12 @@ from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.service.academic_year_search import ExistingAcademicYearSearch
 from program_management.ddd.domain.service.element_id_search import ElementIdByYearSearch, PathElementId, Year
 
-PresentationObject = object  # FIXME :: to move into osis-common/ddd
-
-
-# TODO :: to remove (and use href + year instead) + use pipe academicyeardisplay
-class AcademicYearChoiceOption(PresentationObject):
-    def __init__(self, node_identity: 'NodeIdentity', path: 'Path', active_view_name: str):
-        self.node_href = _get_href(node_identity, path, active_view_name)
-        self.node_identity = node_identity
-        self.year = node_identity.year
-        self.year_display = _get_year_display(self.year)
-
-
-def _get_href(node_identity: 'NodeIdentity', path: 'Path', active_view_name: str):
-    return reverse(active_view_name, args=[node_identity.year, node_identity.code]) + "?path=%s" % path
-
-
-def _get_year_display(year: int):
-    return u"%s-%s" % (year, str(year + 1)[-2:])
-
 
 def get_academic_year_choices(
         node_identity: 'NodeIdentity',
         path: 'Path',
         active_view_name: str,
-) -> List[AcademicYearChoiceOption]:
+) -> List[Tuple[str, int]]:
     years = ExistingAcademicYearSearch().search_from_node_identity(node_identity)
     element_ids = [int(element_id) for element_id in path.split('|')]
     map_element_id_by_year = ElementIdByYearSearch().search_from_element_ids_and_years(
@@ -66,10 +47,17 @@ def get_academic_year_choices(
     )
 
     return [
-        AcademicYearChoiceOption(
-            node_identity=NodeIdentity(year=year_to_display, code=node_identity.code),
-            path='|'.join(str(map_element_id_by_year[elem_id][year_to_display]) for elem_id in element_ids),
-            active_view_name=active_view_name,
+        (
+            _get_href(
+                node_identity=NodeIdentity(year=year, code=node_identity.code),
+                path='|'.join(str(map_element_id_by_year[elem_id][year]) for elem_id in element_ids),
+                active_view_name=active_view_name,
+            ),
+            year
         )
-        for year_to_display in sorted(years)
+        for year in sorted(years)
     ]
+
+
+def _get_href(node_identity: 'NodeIdentity', path: 'Path', active_view_name: str) -> str:
+    return reverse(active_view_name, args=[node_identity.year, node_identity.code]) + "?path=%s" % path

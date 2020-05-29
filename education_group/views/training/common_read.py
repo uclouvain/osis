@@ -114,13 +114,7 @@ class TrainingRead(PermissionRequiredMixin, TemplateView):
             "tab_urls": self.get_tab_urls(),
             "node": self.get_object(),
             "tree": json.dumps(program_tree_view_serializer(self.get_tree())),
-
             "form_xls_custom": CustomXlsForm(path=self.get_path()),
-            "academic_years":  find_all_versions_academic_year(
-                self.training_identity.acronym,
-                self.program_tree_version_identity.version_name,
-                self.program_tree_version_identity.is_transition
-            ),
             "academic_year_choices": get_academic_year_choices(
                 self.node_identity,
                 self.get_path(),
