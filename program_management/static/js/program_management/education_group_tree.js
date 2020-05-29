@@ -263,20 +263,20 @@ function initializeJsTree($documentTree, cut_element_url, copy_element_url) {
                             "action": function (data) {
                                 let __ret = get_data_from_tree(data);
 
-                                $('#form-modal-ajax-content').load(__ret.attach_url, function (response, status, xhr) {
+                                $('#form-modal-ajax-content').load(__ret.paste_url, function (response, status, xhr) {
                                     if (status === "success") {
                                         $('#form-ajax-modal').modal('toggle');
                                         let form = $(this).find('form').first();
                                         formAjaxSubmit(form, '#form-ajax-modal');
                                     } else {
-                                        window.location.href = __ret.attach_url
+                                        window.location.href = __ret.paste_url
                                     }
                                 });
                             },
                             "title": $node.a_attr.attach_msg,
                             "_disabled": function (data) {
                                 let __ret = get_data_from_tree(data);
-                                return __ret.attach_url == null;
+                                return __ret.paste_url == null;
                             }
                         },
 
@@ -304,8 +304,7 @@ function initializeJsTree($documentTree, cut_element_url, copy_element_url) {
                             "title": $node.a_attr.detach_msg,
                             "_disabled": function (data) {
                                 let __ret = get_data_from_tree(data);
-                                // tree's root and learning_unit having/being prerequisite(s) cannot be detached
-                                return __ret.detach_disabled === true;
+                                return __ret.detach_url == null;
                             }
                         },
 
@@ -329,7 +328,7 @@ function initializeJsTree($documentTree, cut_element_url, copy_element_url) {
                             "_disabled": function (data) {
                                 let __ret = get_data_from_tree(data);
                                 // tree's root cannot be edit (no link with parent...)
-                                return __ret.modification_disabled === true;
+                                return __ret.modify_url == null;
                             }
                         },
 
@@ -396,12 +395,9 @@ function get_data_from_tree(data) {
         has_prerequisite: obj.a_attr.has_prerequisite,
         is_prerequisite: obj.a_attr.is_prerequisite,
         view_url: obj.a_attr.href,
-        attach_url: obj.a_attr.attach_url,
+        paste_url: obj.a_attr.paste_url,
         detach_url: obj.a_attr.detach_url,
         modify_url: obj.a_attr.modify_url,
-        attach_disabled: obj.a_attr.attach_disabled,
-        detach_disabled: obj.a_attr.detach_disabled,
-        modification_disabled: obj.a_attr.modification_disabled,
         search_url: obj.a_attr.search_url,
         path: obj.a_attr.path
     };
