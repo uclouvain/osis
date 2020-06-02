@@ -384,40 +384,6 @@ class EducationGroupViewTestCase(TestCase):
         self.assertEqual(response.context['education_group_year'], a_group_element_year.child_branch)
         self.assertEqual(response.context['parent'], a_group_element_year.parent)
 
-    def test_get_sessions_dates(self):
-        from base.views.education_groups.detail import get_sessions_dates
-        from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
-        from base.tests.factories.academic_calendar import AcademicCalendarFactory
-        from base.tests.factories.education_group_year import EducationGroupYearFactory
-        from base.tests.factories.offer_year_calendar import OfferYearCalendarFactory
-
-        sessions_quantity = 3
-        an_academic_year = AcademicYearFactory()
-        academic_calendars = [
-            AcademicCalendarFactory(academic_year=an_academic_year,
-                                    reference=academic_calendar_type.DELIBERATION)
-            for _ in range(sessions_quantity)
-        ]
-        education_group_year = EducationGroupYearFactory(academic_year=an_academic_year)
-
-        for session, academic_calendar in enumerate(academic_calendars):
-            SessionExamCalendarFactory(number_session=session + 1, academic_calendar=academic_calendar)
-
-        offer_year_calendars = [OfferYearCalendarFactory(
-            academic_calendar=academic_calendar,
-            education_group_year=education_group_year)
-            for academic_calendar in academic_calendars]
-
-        self.assertEqual(
-            get_sessions_dates(education_group_year),
-            {
-                academic_calendar_type.DELIBERATION.lower(): {
-                    'session{}'.format(s + 1): offer_year_calendar
-                    for s, offer_year_calendar in enumerate(offer_year_calendars)
-                }
-            }
-        )
-
     def test_education_content(self):
         an_education_group = EducationGroupYearFactory()
         url = reverse("education_group_diplomas", args=[an_education_group.id, an_education_group.id])
@@ -681,10 +647,6 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         )
 
         cls.person = PersonFactory()
-        cls.url = reverse(
-            "education_group_year_admission_condition_edit",
-            args=[cls.education_group_parent.pk, cls.education_group_child.pk]
-        )
         cls.template_name = "education_group/tab_admission_conditions.html"
 
     def setUp(self):
@@ -693,41 +655,6 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         self.addCleanup(self.perm_patcher.stop)
 
         self.client.force_login(self.person.user)
-
-    def test_when_not_logged(self):
-        self.client.logout()
-        response = self.client.get(self.url)
-
-        self.assertRedirects(response, LOGIN_NEXT.format(self.url))
-
-    @mock.patch("django.contrib.auth.models.User.has_perm", return_value=False)
-    def test_user_without_permission(self, mock_has_perm):
-        response = self.client.get(self.url)
-
-        self.assertTemplateUsed(response, ACCESS_DENIED)
-        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
-
-    def test_user_has_link_to_edit_conditions(self):
-        response = self.client.get(self.url)
-
-        self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, self.template_name)
-
-        soup = bs4.BeautifulSoup(response.content, 'html.parser')
-        self.assertGreater(len(soup.select('button.btn-publish')), 0)
-
-    def test_case_free_text_is_not_show_when_common(self):
-        common_bachelor = EducationGroupYearCommonBachelorFactory(academic_year=self.academic_year)
-        url_edit_common = reverse(
-            "education_group_year_admission_condition_edit",
-            args=[common_bachelor.pk, common_bachelor.pk]
-        )
-
-        response = self.client.get(url_edit_common)
-        self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, self.template_name)
-
-        self.assertFalse(response.context['info']['show_free_text'])
 
     def test_case_admission_condition_remove_line_not_found(self):
         delete_url = reverse(
