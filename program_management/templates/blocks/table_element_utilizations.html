@@ -20,7 +20,7 @@
         <tr>
             <td> {% if row.link.is_reference %}  <img src="{% static 'img/reference.jpg' %}" > {% endif %} </td>
             <td>
-                {% url 'element_identification' row.link.parent.pk as url_parent_identification  %}
+                {% url 'element_identification' row.link.parent.year row.link.parent.code as url_parent_identification %}
                 <a href="{{ url_parent_identification }}">{{ row.link.parent.code | default_if_none:'' }}</a>
             </td>
             <td>{{ row.link.parent.title | default_if_none:'' }}</td>
@@ -36,7 +36,7 @@
             <td>
                 {% for root_node in row.root_nodes %}
                     {# TODO: Compute URL #}
-                    {% url 'element_identification' root_node.pk as url_root_identification  %}
+                    {% url 'element_identification' root_node.year root_node.code as url_root_identification  %}
                     <a href="{{ url_root_identification }}">{{ root_node.title }}</a>
                     {% if not forloop.last %} - {% endif %}
                 {% empty %}

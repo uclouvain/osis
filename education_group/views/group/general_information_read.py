@@ -10,9 +10,10 @@ class GroupReadGeneralInformation(GroupRead):
     active_tab = Tab.GENERAL_INFO
 
     def get(self, request, *args, **kwargs):
+        result = super().get(request, *args, **kwargs)
         if not self.have_general_information_tab():
-            return redirect(reverse('group_identification', kwargs=self.kwargs))
-        return super().get(request, *args, **kwargs)
+            return redirect(reverse('group_identification', kwargs=self.kwargs)) + "?path={}".format(self.path)
+        return result
 
     def get_context_data(self, **kwargs):
         node = self.get_object()

@@ -50,7 +50,7 @@ def serialize_children(children: List['Link'], path: str, context=None) -> List[
 
 def _get_node_view_attribute_serializer(link: 'Link', path: 'Path', context=None) -> dict:
     return {
-        'href': reverse('element_identification', args=[link.child.pk]) + "?path=%s" % path,
+        'href': reverse('element_identification', args=[link.child.year, link.child.code]) + "?path=%s" % path,
         'root': context['root'].pk,
         'group_element_year': link.pk,
         'element_id': link.child.pk,

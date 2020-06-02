@@ -89,7 +89,6 @@ urlpatterns = [
         ])),
     ])),
     path('<int:root_element_id>/', include([
-        path('identification/', IdentificationRedirectView.as_view(), name='element_identification'),
         path('<int:child_element_id>/', include([
             path('quick_search/', include([
                 path('learning_unit/', QuickSearchLearningUnitYearView.as_view(),
@@ -110,4 +109,6 @@ urlpatterns = [
             ]))
         ]))
     ])),
+
+    path('<int:year>/<str:code>/', IdentificationRedirectView.as_view(), name='element_identification'),
 ]

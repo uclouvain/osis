@@ -23,32 +23,35 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db.models import F
+from typing import List, Tuple
 
-from education_group.ddd.domain.training import TrainingIdentity
-from education_group.models.group_year import GroupYear
-from osis_common.ddd import interface
-from osis_common.ddd.interface import BusinessException
+from django.urls import reverse
+
 from program_management.ddd.business_types import *
+from program_management.ddd.domain.node import NodeIdentity
+from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
+from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 
 
-class TrainingIdentitySearch(interface.DomainService):
-    def get_from_node_identity(self, node_identity: 'NodeIdentity') -> 'TrainingIdentity':
-        values = GroupYear.objects.filter(
-            partial_acronym=node_identity.code,
-            academic_year__year=node_identity.year
-        ).annotate(
-            offer_acronym=F('education_group_version__education_group_year__acronym'),
-            year=F('education_group_version__education_group_year__academic_year__year'),
-        ).values('offer_acronym', 'year')
-        if values:
-            return TrainingIdentity(acronym=values[0]['offer_acronym'], year=values[0]['year'])
-        raise BusinessException(
-            "TrainingIdentity not found from NodeIdentity = {n_id.code} - {n_id.year}".format(n_id=node_identity)
+def get_tree_versions_choices(
+        node_identity: 'NodeIdentity',
+        active_view_name: str
+) -> List[Tuple[str, 'ProgramTreeVersionIdentity']]:
+
+    tree_versions = ProgramTreeVersionRepository.search_all_versions_from_root_node(node_identity)
+
+    choices = []
+    for tree_version in tree_versions:
+        node_identity = NodeIdentitySearch().get_from_program_tree_identity(tree_version.program_tree_identity)
+        choices.append(
+            (
+                _get_href(node_identity, active_view_name),
+                tree_version.entity_id,
+            )
         )
 
-    def get_from_program_tree_version_identity(self, tree_version_identity) -> 'TrainingIdentity':
-        return TrainingIdentity(
-            acronym=tree_version_identity.offer_acronym,
-            year=tree_version_identity.year,
-        )
+    return choices
+
+
+def _get_href(node_identity: 'NodeIdentity', active_view_name: str) -> str:
+    return reverse(active_view_name, args=[node_identity.year, node_identity.code])

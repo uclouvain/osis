@@ -5,6 +5,7 @@ from enum import Enum
 
 from django.http import Http404
 from django.urls import reverse
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 
@@ -13,8 +14,12 @@ from base.business.education_groups import general_information_sections
 from base.business.education_groups.general_information_sections import \
     MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION
 from base.models.enums.education_group_types import GroupType
+from base.views.common import display_warning_messages
+from education_group.forms.academic_year_choices import get_academic_year_choices
 from education_group.models.group_year import GroupYear
 from osis_role.contrib.views import PermissionRequiredMixin
+from program_management.ddd.business_types import *
+from program_management.ddd.domain.node import NodeIdentity, NodeNotFoundException
 from program_management.ddd.repositories import load_tree
 from program_management.forms.custom_xls import CustomXlsForm
 from program_management.models.element import Element
@@ -44,12 +49,28 @@ class GroupRead(PermissionRequiredMixin, TemplateView):
             self.path = str(root_element.pk)
         return super().get(request, *args, **kwargs)
 
+    @functools.lru_cache()
     def get_tree(self):
         root_element_id = self.path.split("|")[0]
         return load_tree.load(int(root_element_id))
 
+    @cached_property
+    def node_identity(self) -> 'NodeIdentity':
+        return NodeIdentity(code=self.kwargs['code'], year=self.kwargs['year'])
+
+    @functools.lru_cache()
     def get_object(self):
-        return self.get_tree().get_node(self.path)
+        try:
+            return self.get_tree().get_node(self.path)
+        except NodeNotFoundException:
+            root_node = self.get_tree().root_node
+            message = _(
+                "The formation you work with doesn't exist (or is not at the same position) "
+                "in the tree {root.title} in {root.year}."
+                "You've been redirected to the root {root.code} ({root.year})"
+            ).format(root=root_node)
+            display_warning_messages(self.request, message)
+            return root_node
 
     def get_context_data(self, **kwargs):
         can_change_education_group = self.request.user.has_perm(
@@ -65,6 +86,11 @@ class GroupRead(PermissionRequiredMixin, TemplateView):
             "tree": json.dumps(program_tree_view_serializer(self.get_tree())),
             "node": self.get_object(),
             "tab_urls": self.get_tab_urls(),
+            "academic_year_choices": get_academic_year_choices(
+                self.node_identity,
+                self.path,
+                _get_view_name_from_tab(self.active_tab),
+            ),
             "group_year": self.get_group_year()  # TODO: Should be remove and use DDD object
         }
 
@@ -86,35 +112,50 @@ class GroupRead(PermissionRequiredMixin, TemplateView):
                 'text': _('Identification'),
                 'active': Tab.IDENTIFICATION == self.active_tab,
                 'display': True,
-                'url': reverse('group_identification', args=[node.year, node.code]) + "?path={}".format(self.path)
+                'url': _get_tab_urls(Tab.IDENTIFICATION, self.node_identity, self.path),
             },
             Tab.CONTENT: {
                 'text': _('Content'),
                 'active': Tab.CONTENT == self.active_tab,
                 'display': True,
-                'url': reverse('group_content', args=[node.year, node.code]) + "?path={}".format(self.path),
+                'url': _get_tab_urls(Tab.CONTENT, self.node_identity, self.path),
             },
             Tab.UTILIZATION: {
                 'text': _('Utilizations'),
                 'active': Tab.UTILIZATION == self.active_tab,
                 'display': True,
-                'url': reverse('group_utilization', args=[node.year, node.code]) +
-                "?path={}".format(self.path),
+                'url': _get_tab_urls(Tab.UTILIZATION, self.node_identity, self.path),
             },
             Tab.GENERAL_INFO: {
                 'text': _('General informations'),
                 'active': Tab.GENERAL_INFO == self.active_tab,
                 'display': self.have_general_information_tab(),
-                'url': reverse('group_general_information', args=[node.year, node.code]) +
-                "?path={}".format(self.path),
+                'url': _get_tab_urls(Tab.GENERAL_INFO, self.node_identity, self.path),
             }
         })
 
     def have_general_information_tab(self):
         node_category = self.get_object().category
         return node_category.name in general_information_sections.SECTIONS_PER_OFFER_TYPE and \
-            self._is_general_info_and_condition_admission_in_display_range
+               self._is_general_info_and_condition_admission_in_display_range
 
     def _is_general_info_and_condition_admission_in_display_range(self):
         return MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION <= self.get_object().year < \
                self.get_current_academic_year().year + 2
+
+
+def _get_view_name_from_tab(tab: Tab):
+    return {
+        Tab.IDENTIFICATION: 'group_identification',
+        Tab.CONTENT: 'group_content',
+        Tab.UTILIZATION: 'group_utilization',
+        Tab.GENERAL_INFO: 'group_general_information',
+    }[tab]
+
+
+def _get_tab_urls(tab: Tab, node_identity: 'NodeIdentity', path: 'Path' = None) -> str:
+    path = path or ""
+    return reverse(
+        _get_view_name_from_tab(tab),
+        args=[node_identity.year, node_identity.code]
+    ) + "?path={}".format(path)

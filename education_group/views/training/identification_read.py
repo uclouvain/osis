@@ -25,17 +25,9 @@ class TrainingReadIdentification(TrainingRead):
     def get_context_data(self, **kwargs):
         return {
             **super().get_context_data(**kwargs),
-            "all_versions_available": self.all_versions_available,
-            "current_version": self.current_version,
             "education_group_year": self.get_training(),
             "history": self.get_related_history(),
         }
-
-    @cached_property
-    def all_versions_available(self) -> List['ProgramTreeVersion']:
-        return ProgramTreeVersionRepository.search_all_versions_from_root_node(
-            NodeIdentity(self.get_tree().root_node.code, self.get_tree().root_node.year)
-        )
 
     def get_related_history(self):
         education_group_year = self.education_group_version.offer

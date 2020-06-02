@@ -181,7 +181,7 @@ class GroupFilter(FilterSet):
             OuterRef('academic_year__start_date')
         ).values('acronym')[:1]
 
-        return GroupYear.objects_version.all().select_related('element').annotate(
+        return GroupYear.objects_version.all().select_related('element', 'academic_year').annotate(
             type_ordering=Case(
                 *[When(education_group_type__name=key, then=Value(str(_(val))))
                   for i, (key, val) in enumerate(education_group_types.ALL_TYPES)],
