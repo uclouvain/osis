@@ -53,6 +53,20 @@ class TestNavigationMixin:
         cls.elements = cls.generate_elements()
         cls.user = UserFactory()
 
+    @classmethod
+    def generate_elements(cls):
+        raise NotImplementedError
+
+    @property
+    def url_name(self):
+        raise NotImplementedError()
+
+    def _get_element_url(self, query_parameters: QueryDict, index):
+        raise NotImplementedError()
+
+    def navigation_function(self, *args, **kwargs):
+        raise NotImplementedError
+
     @property
     def elements_sorted_by_acronym(self):
         return sorted(self.elements, key=lambda obj: obj.acronym)
@@ -64,11 +78,6 @@ class TestNavigationMixin:
                 academic_year=self.academic_year.id
             )
         )
-        QueryDict
-        parameters = {
-            "academic_year": self.academic_year.id,
-            "ordering": "acronym"
-        }
         parameters = QueryDict('academic_year={academic_year}&ordering=acronym'.format(
             academic_year=self.academic_year.id
         ))
@@ -109,6 +118,28 @@ class TestNavigationLearningUnitYear(TestNavigationMixin, TestCase):
         next_element = self.elements_sorted_by_acronym[index]
 
         return reverse(self.url_name, args=[next_element.acronym, next_element.academic_year.year])
+
+    def test_filter_called_depending_on_search_type(self):
+        parameters = {
+            "academic_year": "self.academic_year.id",
+            "ordering": "acronym",
+            "search_type": SearchTypes.EXTERNAL_SEARCH.value
+        }
+        self.cache.set_cached_data(parameters)
+
+        self.filter_form_patcher = mock.patch("base.templatetags.navigation._get_learning_unit_filter_class",
+                                              return_value=LearningUnitFilter)
+        self.mocked_filter_form = self.filter_form_patcher.start()
+
+        self.navigation_function(
+            self.user,
+            self.elements_sorted_by_acronym[0],
+            self.url_name
+        )
+
+        self.assertTrue(self.mocked_filter_form.called)
+
+        self.filter_form_patcher.stop()
 
     def test_navigation_when_no_search_query(self):
         self.cache.clear()
@@ -155,30 +186,8 @@ class TestNavigationLearningUnitYear(TestNavigationMixin, TestCase):
         }
         self.assertNavigationContextEquals(expected_context, inner_element_index)
 
-    def test_filter_called_depending_on_search_type(self):
-        parameters = {
-            "academic_year": "self.academic_year.id",
-            "ordering": "acronym",
-            "search_type": SearchTypes.EXTERNAL_SEARCH.value
-        }
-        self.cache.set_cached_data(parameters)
 
-        self.filter_form_patcher = mock.patch("base.templatetags.navigation._get_learning_unit_filter_class",
-                                              return_value=LearningUnitFilter)
-        self.mocked_filter_form = self.filter_form_patcher.start()
-
-        self.navigation_function(
-            self.user,
-            self.elements_sorted_by_acronym[0],
-            self.url_name
-        )
-
-        self.assertTrue(self.mocked_filter_form.called)
-
-        self.filter_form_patcher.stop()
-
-
-class TestNavigationEducationGroupYear(TestNavigationMixin, TestCase):
+class TestNavigationGroupYear(TestNavigationMixin, TestCase):
     search_type = GroupYear.__name__
 
     @classmethod

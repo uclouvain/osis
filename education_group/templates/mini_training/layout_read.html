@@ -35,7 +35,7 @@
 {% endblock %}
 
 {% block header_content %}
-    {% navigation_education_group request.user education_group_version.offer request.resolver_match.url_name %}
+    {% navigation_group request.user education_group_version.root_group request.resolver_match.url_name %}
 {% endblock %}
 
 {% block tabs %}
