@@ -63,10 +63,8 @@ from osis_common.decorators.ajax import ajax_required
 
 def education_group_year_pedagogy_edit_post(request, education_group_year_id, root_id):
     form = EducationGroupPedagogyEditForm(request.POST)
-    redirect_url = reverse('education_group_general_informations', kwargs={
-        'root_id': root_id,
-        'education_group_year_id': education_group_year_id
-    })
+    training_identity = TrainingIdentitySearch().get_from_education_group_year_id(education_group_year_id)
+    redirect_url = _get_admission_condition_success_url(training_identity.year, training_identity.acronym)
     if form.is_valid():
         label = form.cleaned_data['label']
 
