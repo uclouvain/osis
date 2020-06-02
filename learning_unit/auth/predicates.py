@@ -4,9 +4,15 @@ from rules import predicate
 
 from attribution.models.tutor_application import TutorApplication
 from base.business.event_perms import EventPermLearningUnitCentralManagerEdition
-from base.models.enums import learning_container_year_types as container_types
+from base.models.enums import learning_container_year_types as container_types, learning_container_year_types
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from osis_role.errors import predicate_failed_msg
+
+FACULTY_EDITABLE_CONTAINER_TYPES = (
+    learning_container_year_types.COURSE,
+    learning_container_year_types.DISSERTATION,
+    learning_container_year_types.INTERNSHIP
+)
 
 
 @predicate(bind=True)
@@ -59,6 +65,15 @@ def is_learning_unit_container_type_deletable(self, user, learning_unit_year):
 
 
 @predicate(bind=True)
+@predicate_failed_msg(message=_("This learning unit isn't eligible for modification because of it's type"))
+def is_learning_unit_container_type_editable(self, user, learning_unit_year):
+    if learning_unit_year:
+        container = learning_unit_year.learning_container_year
+        return container and container.container_type in FACULTY_EDITABLE_CONTAINER_TYPES
+    return None
+
+
+@predicate(bind=True)
 @predicate_failed_msg(message=EventPermLearningUnitCentralManagerEdition.error_msg)
 def is_edition_period_open(self, user, learning_unit_year):
     if learning_unit_year:
@@ -89,6 +104,14 @@ def is_external_learning_unit_cograduation(self, user, learning_unit_year):
 def is_learning_unit_year_not_in_past(self, user, learning_unit_year):
     if learning_unit_year:
         return learning_unit_year.is_past()
+    return None
+
+
+@predicate(bind=True)
+@predicate_failed_msg(message=_("The learning unit is a partim"))
+def is_learning_unit_year_not_a_partim(self, user, learning_unit_year):
+    if learning_unit_year:
+        return learning_unit_year.is_partim()
     return None
 
 
