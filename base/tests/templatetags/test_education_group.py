@@ -24,14 +24,12 @@
 #
 ##############################################################################
 
-from django.core.exceptions import FieldDoesNotExist
 from django.test import TestCase, RequestFactory
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from waffle.testutils import override_switch
 
-from base.templatetags.education_group import link_pdf_content_education_group, dl_with_parent, \
-    have_only_access_to_certificate_aims
+from base.templatetags.education_group import link_pdf_content_education_group, have_only_access_to_certificate_aims
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import TrainingFactory, EducationGroupYearFactory
 from base.tests.factories.person import PersonFactory
@@ -105,64 +103,6 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
                 'load_modal': False
             }
         )
-
-
-class TestEducationGroupDlWithParent(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.parent = EducationGroupYearFactory()
-
-    def setUp(self):
-        self.education_group_year = EducationGroupYearFactory()
-        self.context = {
-            'parent': self.parent,
-            'education_group_year': self.education_group_year,
-        }
-
-    def test_dl_value_in_education_group(self):
-        response = dl_with_parent(self.context, "acronym")
-        self.assertEqual(response["value"], self.education_group_year.acronym)
-        self.assertEqual(response["label"], _("Acronym/Short title"))
-        self.assertEqual(response["parent_value"], None)
-
-    def test_dl_value_in_parent(self):
-        self.education_group_year.acronym = ""
-        response = dl_with_parent(self.context, "acronym")
-        self.assertEqual(response["value"], "")
-        self.assertEqual(response["label"], _("Acronym/Short title"))
-        self.assertEqual(response["parent_value"], self.parent.acronym)
-
-    def test_dl_default_value(self):
-        self.education_group_year.acronym = ""
-        self.parent.acronym = ""
-        response = dl_with_parent(self.context, "acronym", default_value="avada kedavra")
-
-        self.assertEqual(response["value"], "")
-        self.assertEqual(response["label"], _("Acronym/Short title"))
-        self.assertEqual(response["parent_value"], "")
-        self.assertEqual(response["default_value"], "avada kedavra")
-
-    def test_dl_with_bool(self):
-        self.education_group_year.partial_deliberation = False
-        response = dl_with_parent(self.context, "partial_deliberation")
-        self.assertEqual(response["value"], "no")
-        self.assertEqual(response["parent_value"], None)
-
-        self.education_group_year.partial_deliberation = True
-        response = dl_with_parent(self.context, "partial_deliberation")
-        self.assertEqual(response["value"], "yes")
-        self.assertEqual(response["parent_value"], None)
-
-        self.education_group_year.partial_deliberation = None
-        self.parent.partial_deliberation = True
-        response = dl_with_parent(self.context, "partial_deliberation")
-        self.assertEqual(response["value"], None)
-        self.assertEqual(response["parent_value"], "yes")
-
-    def test_dl_invalid_key(self):
-        self.education_group_year.partial_deliberation = False
-        with self.assertRaises(FieldDoesNotExist):
-            dl_with_parent(self.context, "not_a_real_attr")
 
 
 # TODO: Remove when migration of program_manager done
