@@ -54,6 +54,7 @@
                         </div>
 
                         <div class="col-md-4">
+                        {% if not node.is_learning_unit %}
                             <select id="slt_academic_year" name="select_academic_year" class="form-control" onchange="location = this.value;">
                                 {% for choice in academic_year_choices %}
                                     <option value="{{ choice.0 }}"
@@ -61,7 +62,7 @@
                                             selected {% endif %}>{{ choice.1 | display_as_academic_year }}</option>
                                 {% endfor %}
                             </select>
-
+                        {% endif %}
                         </div>
 
                         <div class="col-md-6">
