@@ -85,7 +85,5 @@ urlpatterns = [
             name="common_master_specialized_admission_condition"
         ),
     ])),
-    path('<int:year>/<str:code>/publish',
-         group.GroupReadGeneralInformation.as_view(),
-         name='publish_general_information')
+    path('<int:year>/<str:code>/publish', general_information.publish, name='publish_general_information')
 ]

@@ -32,15 +32,12 @@ from unittest import mock
 
 import bs4
 from django.conf import settings
-from django.contrib import messages
 from django.contrib.auth.models import Permission, Group
-from django.contrib.messages import get_messages
 from django.http import HttpResponseForbidden, HttpResponseNotFound, HttpResponse, HttpResponseRedirect
 from django.test import TestCase, RequestFactory
 from django.urls import reverse
 from waffle.testutils import override_flag
 
-from base.business.education_groups.general_information import PublishException
 from base.forms.education_group_admission import UpdateTextForm
 from base.forms.education_group_pedagogy_edit import EducationGroupPedagogyEditForm
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine, CONDITION_ADMISSION_ACCESSES
@@ -300,52 +297,6 @@ class EducationGroupPedagogyUpdateViewTestCase(TestCase):
         self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
         anchor_expected = '#section_welcome_introduction'
         self.assertTrue(anchor_expected in response.url)
-
-
-class EducationGroupPublishViewTestCase(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.academic_year = create_current_academic_year()
-        cls.training = TrainingFactory(academic_year=cls.academic_year)
-        cls.url = reverse('education_group_publish', args=(cls.training.pk, cls.training.pk))
-        cls.person = PersonWithPermissionsFactory('view_educationgroup')
-
-    def setUp(self):
-        self.client.force_login(self.person.user)
-
-    def test_publish_case_user_not_logged(self):
-        self.client.logout()
-        response = self.client.post(self.url)
-        self.assertRedirects(response, LOGIN_NEXT.format(self.url))
-
-    def test_public_case_methods_not_allowed(self):
-        methods_not_allowed = ['get', 'delete', 'put']
-        for method in methods_not_allowed:
-            request_to_call = getattr(self.client, method)
-            response = request_to_call(self.url)
-            self.assertEqual(response.status_code, 405)
-
-    @mock.patch("base.business.education_groups.general_information.publish", side_effect=lambda e: "portal-url")
-    def test_publish_case_ok_redirection_with_success_message(self, mock_publish):
-        response = self.client.post(self.url)
-
-        msg = [m.message for m in get_messages(response.wsgi_request)]
-        msg_level = [m.level for m in get_messages(response.wsgi_request)]
-
-        self.assertEqual(len(msg), 1)
-        self.assertIn(messages.SUCCESS, msg_level)
-        self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
-
-    @mock.patch("base.business.education_groups.general_information.publish", side_effect=PublishException('error'))
-    def test_publish_case_ko_redirection_with_error_message(self, mock_publish):
-        response = self.client.post(self.url)
-
-        msg = [m.message for m in get_messages(response.wsgi_request)]
-        msg_level = [m.level for m in get_messages(response.wsgi_request)]
-
-        self.assertEqual(len(msg), 1)
-        self.assertIn(messages.ERROR, msg_level)
-        self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
 
 
 @override_flag('education_group_update', active=True)

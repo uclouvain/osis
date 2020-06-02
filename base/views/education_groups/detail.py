@@ -38,14 +38,11 @@ from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
-from django.views.decorators.http import require_http_methods
-from django.views.generic import DetailView, TemplateView
+from django.views.generic import TemplateView
 from reversion.models import Version
 
 from base import models as mdl
 from base.business import education_group as education_group_business
-from base.business.education_groups import general_information
-from base.business.education_groups.general_information import PublishException
 from base.business.education_groups.general_information_sections import SECTION_LIST, \
     MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION, SECTIONS_PER_OFFER_TYPE, CONTACTS
 from base.models.academic_calendar import AcademicCalendar
@@ -67,14 +64,12 @@ from base.models.offer_year_calendar import OfferYearCalendar
 from base.models.program_manager import ProgramManager
 from base.utils.cache import cache, ElementCache
 from base.utils.cache_keys import get_tab_lang_keys
-from base.views.common import display_error_messages, display_success_messages
 from base.views.education_groups.select import get_clipboard_content_display
 from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
 from education_group.models.group_year import GroupYear
 from program_management.ddd.repositories import load_tree, load_node
-from program_management.ddd.repositories.find_roots import find_roots
 from program_management.ddd.service import tree_service
 from program_management.forms.custom_xls import CustomXlsForm
 from program_management.models.enums import node_type
@@ -483,23 +478,6 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
         for publication_contact in self.object.educationgrouppublicationcontact_set.all():
             contacts_by_type.setdefault(publication_contact.type, []).append(publication_contact)
         return contacts_by_type
-
-
-@login_required
-@require_http_methods(['POST'])
-def publish(request, education_group_year_id, root_id):
-    education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
-
-    try:
-        general_information.publish(education_group_year)
-        message = _("The program %(acronym)s will be published soon") % {'acronym': education_group_year.acronym}
-        display_success_messages(request, message, extra_tags='safe')
-    except PublishException as e:
-        display_error_messages(request, str(e))
-
-    default_redirect_view = reverse('education_group_general_informations',
-                                    kwargs={'root_id': root_id, 'education_group_year_id': education_group_year_id})
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER', default_redirect_view))
 
 
 class EducationGroupAdministrativeData(EducationGroupGenericDetailView):
