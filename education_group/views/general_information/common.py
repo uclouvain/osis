@@ -1,5 +1,6 @@
 from enum import Enum
 
+from django.http import Http404
 from django.urls import reverse
 from django.views.generic import TemplateView
 from django.utils.translation import gettext_lazy as _
@@ -45,7 +46,10 @@ class CommonGeneralInformation(PermissionRequiredMixin, TemplateView):
         return general_information.get_sections_of_common(self.kwargs['year'], self.request.LANGUAGE_CODE)
 
     def get_object(self):
-        return EducationGroupYear.objects.get_common(academic_year__year=self.kwargs['year'])
+        try:
+            return EducationGroupYear.objects.get_common(academic_year__year=self.kwargs['year'])
+        except EducationGroupYear.DoesNotExist:
+            raise Http404
 
     def get_update_label_url(self):
         offer_id = self.get_object().pk

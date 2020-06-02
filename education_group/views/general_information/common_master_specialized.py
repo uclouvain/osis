@@ -22,14 +22,10 @@ class CommonMasterSpecializedAdmissionCondition(PermissionRequiredMixin, Templat
 
     def get_context_data(self, **kwargs):
         object = self.get_object()
-        admission_condition = getattr(object, 'admissioncondition', None)
-        if admission_condition is None:
-            raise Http404
-
         return {
             **super().get_context_data(**kwargs),
             "object": object,
-            "admission_condition": admission_condition,
+            "admission_condition": object.admissioncondition,
             "tab_urls": self.get_tab_urls(),
             "can_edit_information": self.request.user.has_perm(
                 "base.change_commonadmissioncondition", self.get_object()
@@ -47,7 +43,11 @@ class CommonMasterSpecializedAdmissionCondition(PermissionRequiredMixin, Templat
         }
 
     def get_object(self) -> EducationGroupYear:
-        return EducationGroupYear.objects.look_for_common(
-            academic_year__year=self.kwargs['year'],
-            education_group_type__name=TrainingType.MASTER_MC.name,
-        ).select_related('admissioncondition').get()
+        try:
+            return EducationGroupYear.objects.look_for_common(
+                academic_year__year=self.kwargs['year'],
+                education_group_type__name=TrainingType.MASTER_MC.name,
+                admissioncondition__isnull=False
+            ).select_related('admissioncondition').get()
+        except EducationGroupYear.DoesNotExist:
+            raise Http404
