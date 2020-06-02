@@ -33,7 +33,12 @@ class CentralManager(osis_role_models.EntityRoleModel):
                 predicates.is_user_attached_to_management_entity &
                 predicates.is_learning_unit_year_prerequisite &
                 predicates.has_learning_unit_applications,
-            'base.can_edit_learningunit': rules.always_allow,
+            'base.can_edit_learningunit':
+                predicates.is_user_attached_to_management_entity &
+                predicates.is_learning_unit_year_not_in_past &
+                predicates.is_edition_period_open &
+                predicates.is_external_learning_unit_cograduation &
+                predicates.is_not_proposal,
             'base.add_externallearningunityear': rules.always_allow,
             'base.can_propose_learningunit': rules.always_allow,
             'base.can_edit_learningunit_date': rules.always_allow,

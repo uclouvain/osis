@@ -5,6 +5,7 @@ from rules import predicate
 from attribution.models.tutor_application import TutorApplication
 from base.business.event_perms import EventPermLearningUnitCentralManagerEdition
 from base.models.enums import learning_container_year_types as container_types
+from base.models.proposal_learning_unit import ProposalLearningUnit
 from osis_role.errors import predicate_failed_msg
 
 
@@ -84,8 +85,19 @@ def is_external_learning_unit_cograduation(self, user, learning_unit_year):
 
 
 @predicate(bind=True)
-@predicate_failed_msg(message=_("You can't modify learning unit of a previous year"))
+@predicate_failed_msg(message=_("You cannot modify a learning unit of a previous year"))
 def is_learning_unit_year_not_in_past(self, user, learning_unit_year):
     if learning_unit_year:
         return learning_unit_year.is_past()
+    return None
+
+
+@predicate(bind=True)
+@predicate_failed_msg(message=_("You can't edit because the learning unit has proposal"))
+def is_not_proposal(self, user, learning_unit_year):
+    if learning_unit_year:
+        return not ProposalLearningUnit.objects.filter(
+            learning_unit_year__learning_unit=learning_unit_year.learning_unit,
+            learning_unit_year__academic_year__year__lte=learning_unit_year.academic_year.year
+        ).exists()
     return None
