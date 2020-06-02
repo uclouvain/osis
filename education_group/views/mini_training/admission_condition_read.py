@@ -1,5 +1,8 @@
 import functools
 
+from django.shortcuts import redirect
+from django.urls import reverse
+
 from education_group.views.mini_training.common_read import MiniTrainingRead, Tab
 from education_group.views.serializers import admission_condition
 
@@ -7,6 +10,11 @@ from education_group.views.serializers import admission_condition
 class MiniTrainingReadAdmissionCondition(MiniTrainingRead):
     template_name = "mini_training/admission_condition_read.html"
     active_tab = Tab.ADMISSION_CONDITION
+
+    def get(self, request, *args, **kwargs):
+        if not self.have_admission_condition_tab():
+            return redirect(reverse('mini_training_identification', kwargs=self.kwargs))
+        return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         return {

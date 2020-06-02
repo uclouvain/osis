@@ -80,19 +80,19 @@ class TestMiniTrainingReadIdentification(TestCase):
     @mock.patch("education_group.views.mini_training.common_read."
                 "MiniTrainingRead._is_general_info_and_condition_admission_in_display_range", return_value=True)
     def test_assert_displayed_general_information_tabs(self, mock_displayed_range):
-        with mock.patch.dict(
+        with mock.patch(
                 'base.business.education_groups.general_information_sections.SECTIONS_PER_OFFER_TYPE',
-                return_value={self.mini_training_version.root_group.education_group_type.name: {}}
+                {self.mini_training_version.root_group.education_group_type.name: {}}
         ):
             response = self.client.get(self.url)
             self.assertTrue(response.context['tab_urls'][Tab.GENERAL_INFO]['display'])
 
-        with mock.patch.dict(
-                'base.business.education_groups.general_information_sections.SECTIONS_PER_OFFER_TYPE',
-                {}
+        with mock.patch(
+            'base.business.education_groups.general_information_sections.SECTIONS_PER_OFFER_TYPE',
+            {}
         ):
             response = self.client.get(self.url)
-            self.assertTrue(response.context['tab_urls'][Tab.GENERAL_INFO]['display'])
+            self.assertFalse(response.context['tab_urls'][Tab.GENERAL_INFO]['display'])
 
     @mock.patch("education_group.views.mini_training.common_read."
                 "MiniTrainingRead._is_general_info_and_condition_admission_in_display_range", return_value=True)

@@ -1,18 +1,18 @@
-from django.contrib.auth.mixins import UserPassesTestMixin
+from django.shortcuts import redirect
 from django.urls import reverse
 
-from base.models.enums.education_group_types import GroupType
 from education_group.views import serializers
 from education_group.views.group.common_read import Tab, GroupRead
 
 
-class GroupReadGeneralInformation(GroupRead, UserPassesTestMixin):
+class GroupReadGeneralInformation(GroupRead):
     template_name = "group/general_informations_read.html"
     active_tab = Tab.GENERAL_INFO
 
-    def test_func(self):
-        # TODO: Fix ME: USE DDD object instead
-        return self.get_group_year().education_group_type.name == GroupType.COMMON_CORE.name
+    def get(self, request, *args, **kwargs):
+        if not self.have_general_information_tab():
+            return redirect(reverse('group_identification', kwargs=self.kwargs))
+        return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         node = self.get_object()

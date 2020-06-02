@@ -50,17 +50,28 @@ def get_skills_labels(node: NodeGroupYear, language_code: str):
         language=language_code
     ).values('label')[:1]
 
-    return TextLabel.objects.filter(
-        label__in=[
-            general_information_sections.CMS_LABEL_PROGRAM_AIM,
-            general_information_sections.CMS_LABEL_ADDITIONAL_INFORMATION
-        ]
+    label_ids = [
+        general_information_sections.CMS_LABEL_PROGRAM_AIM,
+        general_information_sections.CMS_LABEL_ADDITIONAL_INFORMATION
+    ]
+
+    qs = TextLabel.objects.filter(
+        label__in=label_ids
     ).annotate(
         label_id=F('label'),
         label_translated=Subquery(subqslabel, output_field=fields.CharField()),
         text_fr=Subquery(subqstranslated_fr, output_field=fields.CharField()),
         text_en=Subquery(subqstranslated_en, output_field=fields.CharField())
     ).values('label_id', 'label_translated', 'text_fr', 'text_en')
+
+    labels_translated = []
+    for label_id in label_ids:
+        try:
+            labels_translated.append(next(label for label in qs if label['label_id'] == label_id))
+        except StopIteration:
+            # Default value if not found on database
+            labels_translated.append({'label_id': label_id, 'label_translated': '', 'text_fr': '', 'text_en': ''})
+    return labels_translated
 
 
 def __get_reference_pk(node: NodeGroupYear):

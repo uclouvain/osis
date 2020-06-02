@@ -9,6 +9,9 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 
 from base import models as mdl
+from base.business.education_groups import general_information_sections
+from base.business.education_groups.general_information_sections import \
+    MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION
 from base.models.enums.education_group_types import GroupType
 from education_group.models.group_year import GroupYear
 from osis_role.contrib.views import PermissionRequiredMixin
@@ -101,8 +104,17 @@ class GroupRead(PermissionRequiredMixin, TemplateView):
             Tab.GENERAL_INFO: {
                 'text': _('General informations'),
                 'active': Tab.GENERAL_INFO == self.active_tab,
-                'display': node.node_type == GroupType.COMMON_CORE,
+                'display': self.have_general_information_tab(),
                 'url': reverse('group_general_information', args=[node.year, node.code]) +
                 "?path={}".format(self.path),
             }
         })
+
+    def have_general_information_tab(self):
+        node_category = self.get_object().category
+        return node_category.name in general_information_sections.SECTIONS_PER_OFFER_TYPE and \
+            self._is_general_info_and_condition_admission_in_display_range
+
+    def _is_general_info_and_condition_admission_in_display_range(self):
+        return MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION <= self.get_object().year < \
+               self.get_current_academic_year().year + 2

@@ -1,5 +1,6 @@
 import functools
 
+from django.shortcuts import redirect
 from django.urls import reverse
 
 from base.business.education_groups import general_information_sections
@@ -10,6 +11,11 @@ from education_group.views.serializers import achievement
 class MiniTrainingReadSkillsAchievements(MiniTrainingRead):
     template_name = "mini_training/skills_achievements_read.html"
     active_tab = Tab.SKILLS_ACHIEVEMENTS
+
+    def get(self, request, *args, **kwargs):
+        if not self.have_skills_and_achievements_tab():
+            return redirect(reverse('mini_training_identification', kwargs=self.kwargs))
+        return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         edition_perm_name = "base.change_admissioncondition"
