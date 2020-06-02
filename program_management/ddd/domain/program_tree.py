@@ -76,23 +76,6 @@ class ProgramTree(interface.RootEntity):
     def is_master_2m(self):
         return self.root_node.is_master_2m()
 
-    def is_empty(self, children=None):
-        children = children or self.root_node.children
-        for links in children:
-            if not self.is_empty([l.child for l in links]):
-                return False
-
-            authorized_rel = self.authorized_relationships.get_authorized_relationship(
-                self.root_node.node_type,
-                links.child.node_type
-            )
-            if not authorized_rel:  #  Si par quelconque magie le root a un enfant non authorisé on dit qu'il n'est pas vide
-                return False
-            elif authorized_rel.min_count_authorized == 0: # si le groupement est non obligatoire
-                return False
-
-        return True
-
     def is_root(self, node: 'Node'):
         return self.root_node == node
 
