@@ -27,7 +27,6 @@ from django.conf.urls import url
 from django.urls import include, path
 
 import program_management.views.tree.copy_cut
-import program_management.views.tree.move
 import program_management.views.tree.paste
 from program_management.views import groupelementyear_update, \
     groupelementyear_read, element_utilization, excel, search, tree

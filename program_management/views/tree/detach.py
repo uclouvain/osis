@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from django.db.models import Q
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 
@@ -42,8 +43,6 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
     form_class = DetachNodeForm
 
     permission_required = 'base.can_detach_node'
-
-    _object = None
 
     @property
     def parent_id(self):
@@ -96,27 +95,28 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
         ).get()
         return obj
 
-    @property
+    @cached_property
     def object(self):
-        if self._object is None:
-            self._object = self.get_object()
-        return self._object
+        return self.get_object()
 
     def form_valid(self, form):
+        self.object
         message_list = form.save()
         display_business_messages(self.request, message_list.messages)
         if message_list.contains_errors():
             return self.form_invalid(form)
-        self._remove_element_from_clipboard_if_stored(form.cleaned_data['path'])
+        self._remove_element_from_clipboard_if_stored()
         return super().form_valid(form)
 
     def form_invalid(self, form):
         return super(DetachNodeView, self).form_invalid(form)
 
-    def _remove_element_from_clipboard_if_stored(self, path: str):
+    def _remove_element_from_clipboard_if_stored(self):
         element_cache = ElementCache(self.request.user)
-        detached_element_id = int(path.split(PATH_SEPARATOR)[-1])
-        if element_cache and element_cache.equals_element(detached_element_id):
+        element_code = self.object.child_branch.partial_acronym \
+            if self.object.child_branch else self.object.child_leaf.acronym
+        element_year = self.object.child.academic_year.year
+        if element_cache.equals_element(element_code, element_year):
             element_cache.clear()
 
     def get_success_url(self):

@@ -147,10 +147,11 @@ class ElementCache(OsisCache):
     def key(self):
         return self.PREFIX_KEY.format(user=self.user_id)
 
-    def equals_element(self, element_id: int) -> bool:
+    def equals_element(self, element_code: str, element_year: int) -> bool:
         return (
             self.cached_data
-            and self.cached_data['id'] == element_id
+            and self.cached_data['element_code'] == element_code
+            and self.cached_data['element_year'] == element_year
         )
 
     def save_element_selected_bis(
