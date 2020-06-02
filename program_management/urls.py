@@ -27,15 +27,11 @@ from django.conf.urls import url
 from django.urls import include, path
 
 import program_management.views.tree.copy_cut
-import program_management.views.tree.paste
 from program_management.views import groupelementyear_update, \
-    groupelementyear_read, element_utilization, excel, search, tree
+    groupelementyear_read, element_utilization, excel, search, tree, quick_search
 from program_management.views.prerequisite import read, update
-from program_management.views.quick_search import QuickSearchLearningUnitYearView, QuickSearchEducationGroupYearView
 
 urlpatterns = [
-    url(r'^cut_element/$', program_management.views.tree.copy_cut.cut_to_cache, name='cut_element'),
-    url(r'^copy_element/$', program_management.views.tree.copy_cut.copy_to_cache, name='copy_element'),
     url(r'^(?P<root_id>[0-9]+)/(?P<education_group_year_id>[0-9]+)/', include([
         url(r'^content/', include([
             url(r'^(?P<group_element_year_id>[0-9]+)/', include([
@@ -81,15 +77,25 @@ urlpatterns = [
         path('attach/', tree.paste.PasteNodesView.as_view(), name='tree_paste_node'),
         path('detach/', tree.detach.DetachNodeView.as_view(), name='tree_detach_node'),
         path('move/', tree.paste.PasteNodesView.as_view(), name='group_element_year_move'),
+        path('cut_element/', tree.copy_cut.cut_to_cache, name='cut_element'),
+        path('copy_element/', tree.copy_cut.copy_to_cache, name='copy_element'),
         path('<int:link_id>/', include([
-            path('up/', program_management.views.tree.move.up, name="group_element_year_up"),
-            path('down/', program_management.views.tree.move.down, name="group_element_year_down")
+            path('up/', tree.move.up, name="group_element_year_up"),
+            path('down/', tree.move.down, name="group_element_year_down")
         ])),
-        path('check_attach/', program_management.views.tree.paste.CheckPasteView.as_view(),
+        path('check_attach/', tree.paste.CheckPasteView.as_view(),
              name="check_tree_paste_node"),
         path('<str:node_path>/quick_search/', include([
-            path('learning_unit/', QuickSearchLearningUnitYearView.as_view(), name="quick_search_learning_unit"),
-            path('education_group/', QuickSearchEducationGroupYearView.as_view(), name="quick_search_education_group"),
+            path(
+                'learning_unit/',
+                quick_search.QuickSearchLearningUnitYearView.as_view(),
+                name="quick_search_learning_unit"
+            ),
+            path(
+                'education_group/',
+                quick_search.QuickSearchEducationGroupYearView.as_view(),
+                name="quick_search_education_group"
+            ),
         ])),
 
     ])),
