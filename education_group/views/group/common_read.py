@@ -39,7 +39,6 @@ class GroupRead(PermissionRequiredMixin, TemplateView):
     raise_exception = True
     active_tab = None
 
-    @functools.lru_cache()
     def get(self, request, *args, **kwargs):
         self.path = self.request.GET.get('path')
         if self.path is None:
