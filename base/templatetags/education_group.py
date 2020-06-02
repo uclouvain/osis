@@ -87,24 +87,6 @@ def _get_permission(context, permission):
     return permission_denied_message, "" if result else "disabled", root
 
 
-@register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
-def button_edit_administrative_data(context):
-    education_group_year = context.get('education_group_year')
-
-    permission_denied_message, is_disabled, root = _get_permission(context, can_user_edit_administrative_data)
-    if not permission_denied_message and is_disabled:
-        permission_denied_message = _("Only program managers of the education group OR "
-                                      "central manager linked to entity can edit.")
-
-    return {
-        'class_li': is_disabled,
-        'title': permission_denied_message,
-        'text': _('Modify'),
-        'url': '#' if is_disabled else
-        reverse('education_group_edit_administrative', args=[root.pk, education_group_year.pk])
-    }
-
-
 @register.inclusion_tag("blocks/button/button_order.html", takes_context=True)
 def button_order_with_permission(context, title, id_button, value):
     permission_denied_message, disabled, root = _get_permission(

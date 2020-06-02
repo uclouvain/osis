@@ -37,7 +37,7 @@ from base.models.enums import education_group_categories
 from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
 from base.models.enums.education_group_types import GroupType
 from base.templatetags.education_group import button_order_with_permission, \
-    link_pdf_content_education_group, button_edit_administrative_data, dl_with_parent, \
+    link_pdf_content_education_group, dl_with_parent, \
     have_only_access_to_certificate_aims
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
@@ -125,23 +125,6 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
             }
         )
 
-    def test_button_edit_administrative_data_enabled(self):
-        result = button_edit_administrative_data(self.context)
-
-        self.assertEqual(
-            result["url"],
-            reverse('education_group_edit_administrative', args=[
-                self.education_group_year.pk,
-                self.education_group_year.pk
-            ])
-        )
-
-        self.assertEqual(result["title"], "")
-
-        self.assertEqual(result["class_li"], "")
-
-        self.assertEqual(result["text"], _("Modify"))
-
 
 class TestEducationGroupAsFacultyManagerTag(TestCase):
     """ This class will test the tag as faculty manager """
@@ -171,19 +154,6 @@ class TestEducationGroupAsFacultyManagerTag(TestCase):
             "education_group_year": self.education_group_year,
             "request": RequestFactory().get("")
         }
-
-    def test_button_edit_administrative_data_disabled(self):
-        result = button_edit_administrative_data(self.context)
-
-        self.assertEqual(result["url"], "#")
-
-        self.assertEqual(
-            result["title"],
-            _('Only program managers of the education group OR central manager linked to entity can edit.')
-        )
-
-        self.assertEqual(result["class_li"], "disabled")
-        self.assertEqual(result["text"], _("Modify"))
 
     @mock.patch('base.business.education_groups.perms.check_permission')
     @mock.patch('base.business.education_groups.perms.is_eligible_to_change_education_group')
