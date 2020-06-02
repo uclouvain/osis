@@ -12,7 +12,7 @@ class GroupReadGeneralInformation(GroupRead):
     def get(self, request, *args, **kwargs):
         result = super().get(request, *args, **kwargs)
         if not self.have_general_information_tab():
-            return redirect(reverse('group_identification', kwargs=self.kwargs)) + "?path={}".format(self.path)
+            return redirect(reverse('group_identification', kwargs=self.kwargs) + "?path={}".format(self.path))
         return result
 
     def get_context_data(self, **kwargs):
