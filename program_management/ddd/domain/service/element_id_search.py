@@ -30,21 +30,25 @@ from django.db.models import F
 from education_group.models.group_year import GroupYear
 from osis_common.ddd import interface
 
-PathElementId = int
+ElementId = int
 Year = int
 
 
 class ElementIdByYearSearch(interface.DomainService):
 
-    def search_from_element_ids_and_years(
+    def search_from_element_ids(
             self,
-            element_ids: List[PathElementId],
-            years: List[Year]
-    ) -> Dict[PathElementId, Dict[Year, PathElementId]]:
+            element_ids: List[ElementId]
+    ) -> Dict[ElementId, Dict[Year, ElementId]]:
+        """
+        :return: Map associating elements ids given in parameter with these elements ids mapped by year :
+        {
+            <element_id>: {year: <element_id_of_year>}
+        }
+        """
 
         values_list = GroupYear.objects.filter(
             group__groupyear__element__pk__in=element_ids,
-            academic_year__year__in=years,
         ).annotate(
             element_id=F('element__pk'),
             year=F('academic_year__year'),
@@ -65,5 +69,4 @@ class ElementIdByYearSearch(interface.DomainService):
                 result[element_id] = {
                     rec['year']: rec['element_id'] for rec in records
                 }
-
         return result

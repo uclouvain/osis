@@ -31,7 +31,7 @@ from django.urls import reverse
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.service.academic_year_search import ExistingAcademicYearSearch
-from program_management.ddd.domain.service.element_id_search import ElementIdByYearSearch, PathElementId, Year
+from program_management.ddd.domain.service.element_id_search import ElementIdByYearSearch, ElementId, Year
 
 
 def get_academic_year_choices(
@@ -39,12 +39,11 @@ def get_academic_year_choices(
         path: 'Path',
         active_view_name: str,
 ) -> List[Tuple[str, int]]:
-    years = ExistingAcademicYearSearch().search_from_node_identity(node_identity)
     element_ids = [int(element_id) for element_id in path.split('|')]
-    map_element_id_by_year = ElementIdByYearSearch().search_from_element_ids_and_years(
+    map_element_id_by_year = ElementIdByYearSearch().search_from_element_ids(
         element_ids=element_ids,
-        years=years,
     )
+    years = ExistingAcademicYearSearch().search_from_node_identity(node_identity)
 
     return [
         (
