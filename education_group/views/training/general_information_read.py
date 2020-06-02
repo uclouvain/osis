@@ -1,5 +1,6 @@
 import functools
 
+from django.shortcuts import redirect
 from django.urls import reverse
 
 from base.business.education_groups import general_information_sections
@@ -11,6 +12,11 @@ from education_group.views.training.common_read import TrainingRead, Tab
 class TrainingReadGeneralInformation(TrainingRead):
     template_name = "training/general_informations_read.html"
     active_tab = Tab.GENERAL_INFO
+
+    def get(self, request, *args, **kwargs):
+        if not self.have_general_information_tab():
+            return redirect(reverse('training_identification', kwargs=self.kwargs))
+        return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         node = self.get_object()

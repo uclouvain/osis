@@ -38,7 +38,11 @@ urlpatterns = [
     path('trainings/<int:year>/<str:code>/', include([
         path('identification/', training.TrainingReadIdentification.as_view(), name='training_identification'),
         path('diplomas/', training.TrainingReadDiplomaCertificate.as_view(), name='training_diplomas'),
-        path('administrative_data/', training.TrainingAdmnistrativeData.as_view(), name='training_administrative_data'),
+        path(
+            'administrative_data/',
+            training.TrainingReadAdministrativeData.as_view(),
+            name='training_administrative_data'
+        ),
         path('content/', training.TrainingReadContent.as_view(), name='training_content'),
         path('utilization/', training.TrainingReadUtilization.as_view(), name='training_utilization'),
         path(

@@ -1,24 +1,25 @@
-from typing import Dict
+from django.db.models import F
+from django.shortcuts import redirect
+from django.urls import reverse
 
-from django.db.models import Prefetch, F, Value
-
-from base.models.academic_calendar import AcademicCalendar
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import academic_calendar_type
-from base.models.enums.academic_calendar_type import EXAM_ENROLLMENTS, SCORES_EXAM_SUBMISSION, DISSERTATION_SUBMISSION, \
-    DELIBERATION
 from base.models.enums.mandate_type import MandateTypes
 from base.models.mandatary import Mandatary
 from base.models.offer_year_calendar import OfferYearCalendar
 from base.models.program_manager import ProgramManager
 from education_group.views.serializers import training_administrative_dates as serializer
-from education_group.views.serializers.training_administrative_dates import DomainTitle, Dates, SessionNumber
 from education_group.views.training.common_read import TrainingRead, Tab
 
 
-class TrainingAdmnistrativeData(TrainingRead):
+class TrainingReadAdministrativeData(TrainingRead):
     template_name = "training/administrative_data.html"
     active_tab = Tab.ADMINISTRATIVE_DATA
+
+    def get(self, request, *args, **kwargs):
+        if not self.have_administrative_data_tab():
+            return redirect(reverse('training_identification', kwargs=self.kwargs))
+        return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         offer_acronym = self.get_object().title

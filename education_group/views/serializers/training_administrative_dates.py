@@ -75,7 +75,7 @@ def __get_dates_by_session(domain_title: str, dates: List[AdministrativeDateBySe
 
 
 def __get_session_dates(session_number: int, dates: List[AdministrativeDateBySession]) -> Dates:
-    administrative_date = next(date for date in dates if date.session_number == session_number)
+    administrative_date = next((date for date in dates if date.session_number == session_number), None)
     start_date = administrative_date.start_date if administrative_date else None
     end_date = administrative_date.end_date if administrative_date else None
     return {

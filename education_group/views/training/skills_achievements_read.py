@@ -1,22 +1,23 @@
 import functools
 
-from django.contrib.auth.mixins import UserPassesTestMixin
+from django.shortcuts import redirect
 from django.urls import reverse
 
 from base.business.education_groups import general_information_sections
-from base.models.enums.education_group_types import TrainingType
 from education_group.ddd.domain.training import TrainingIdentity
 from education_group.ddd.repository.training import TrainingRepository
 from education_group.views.serializers import achievement
 from education_group.views.training.common_read import TrainingRead, Tab
 
 
-class TrainingReadSkillsAchievements(TrainingRead, UserPassesTestMixin):
+class TrainingReadSkillsAchievements(TrainingRead):
     template_name = "training/skills_achievements_read.html"
     active_tab = Tab.SKILLS_ACHIEVEMENTS
 
-    def test_func(self):
-        return self.get_training().type.name in TrainingType.with_skills_achievements()
+    def get(self, request, *args, **kwargs):
+        if not self.have_skills_and_achievements_tab():
+            return redirect(reverse('training_identification', kwargs=self.kwargs))
+        return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         edition_perm_name = "base.change_admissioncondition"
