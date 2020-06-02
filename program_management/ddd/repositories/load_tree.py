@@ -263,6 +263,7 @@ def __instanciate_from_education_group_version(educ_group_version: EducationGrou
     )
 
 
+#  TODO :: to remove
 def find_all_versions_academic_year(acronym: str,
                                     version_name: str,
                                     is_transition: bool) -> List['EducationGroupVersionAcademicYear']:
