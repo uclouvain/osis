@@ -87,37 +87,6 @@ def _get_permission(context, permission):
     return permission_denied_message, "" if result else "disabled", root
 
 
-@register.inclusion_tag("blocks/button/button_order.html", takes_context=True)
-def button_order_with_permission(context, title, id_button, value):
-    permission_denied_message, disabled, root = _get_permission(
-        context, is_eligible_to_change_education_group_content
-    )
-
-    if disabled:
-        title = permission_denied_message
-    else:
-        education_group_year = context.get('education_group_year')
-        person = context.get('person')
-
-        if person.is_faculty_manager and education_group_year.type in GroupType.minor_major_list_choice():
-            title = _('The user is not allowed to change education group content.')
-            disabled = "disabled"
-
-    if value == "up" and context["forloop"]["first"]:
-        disabled = "disabled"
-
-    if value == "down" and context["forloop"]["last"]:
-        disabled = "disabled"
-
-    return {
-        'title': title,
-        'id': id_button,
-        'value': value,
-        'disabled': disabled,
-        'icon': ICONS[value],
-    }
-
-
 @register.simple_tag(takes_context=True)
 def url_resolver_match(context):
     return context.request.resolver_match.url_name
