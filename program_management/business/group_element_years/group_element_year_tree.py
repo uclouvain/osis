@@ -190,9 +190,7 @@ class EducationGroupHierarchy:
                 'element_type': self.element_type,
                 'title': self.education_group_year.acronym,
                 'attach_url': reverse('tree_paste_node', args=[self.root.pk]),
-                'detach_url': reverse('group_element_year_delete', args=[
-                    self.root.pk, self.education_group_year.pk, self.group_element_year.pk
-                ]) if self.group_element_year else '#',
+                'detach_url': reverse('tree_detach_node', args=[self.root.pk]) + "?path=%s" % self.path,
                 'modify_url': reverse('group_element_year_update', args=[
                     self.root.pk, self.education_group_year.pk, self.group_element_year.pk
                 ]) if self.group_element_year else '#',
@@ -208,8 +206,8 @@ class EducationGroupHierarchy:
 
     def _get_search_url(self):
         if attach.can_attach_learning_units(self.education_group_year):
-            return reverse('quick_search_learning_unit', args=[self.root.pk, self.education_group_year.pk])
-        return reverse('quick_search_education_group', args=[self.root.pk, self.education_group_year.pk])
+            return reverse('quick_search_learning_unit', args=[self.root.pk, self.path])
+        return reverse('quick_search_education_group', args=[self.root.pk, self.path])
 
     def _get_acronym(self):
         acronym = ''
@@ -390,9 +388,7 @@ class NodeLeafJsTree(EducationGroupHierarchy):
                 'title': self._get_tooltip_text(),
                 'has_prerequisite': self.group_element_year.has_prerequisite,
                 'is_prerequisite': self.group_element_year.is_prerequisite,
-                'detach_url': reverse('group_element_year_delete', args=[
-                    self.root.pk, self.group_element_year.parent.pk, self.group_element_year.pk
-                ]) if self.group_element_year else '#',
+                'detach_url': reverse('tree_detach_node', args=[self.root.pk]) + "?path=%s" % self.path,
                 'modify_url': reverse('group_element_year_update', args=[
                     self.root.pk, self.learning_unit_year.pk, self.group_element_year.pk
                 ]) if self.group_element_year else '#',

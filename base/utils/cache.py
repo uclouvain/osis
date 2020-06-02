@@ -147,14 +147,6 @@ class ElementCache(OsisCache):
     def key(self):
         return self.PREFIX_KEY.format(user=self.user_id)
 
-    @deprecated  # Use equals_element instead
-    def equals(self, obj_to_compare):
-        return (
-            self.cached_data
-            and self.cached_data['id'] == obj_to_compare.id
-            and self.cached_data['modelname'] == obj_to_compare._meta.db_table
-        )
-
     def equals_element(self, element_id: int) -> bool:
         return (
             self.cached_data

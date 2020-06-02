@@ -80,9 +80,9 @@ class TestNodeViewAttributeSerializer(SimpleTestCase):
         expected_url = reverse('tree_detach_node', args=[self.root_node.pk]) + "?path=1|2|6"
         self.assertEqual(self.serialized_data['detach_url'], expected_url)
 
-    def test_serialize_node_attr_ensure_attach_url(self):
+    def test_serialize_node_attr_ensure_paste_url(self):
         expected_url = reverse('tree_paste_node', args=[self.root_node.pk]) + "?path=1|2|6"
-        self.assertEqual(self.serialized_data['attach_url'], expected_url)
+        self.assertEqual(self.serialized_data['paste_url'], expected_url)
 
     def test_serialize_node_attr_ensure_modify_url(self):
         expected_url = reverse('group_element_year_update', args=[

@@ -26,10 +26,10 @@
 from django.conf.urls import url
 from django.urls import include, path
 
-import program_management.views.tree.paste
 import program_management.views.tree.copy_cut
 import program_management.views.tree.move
-from program_management.views import groupelementyear_delete, groupelementyear_update, \
+import program_management.views.tree.paste
+from program_management.views import groupelementyear_update, \
     groupelementyear_read, element_utilization, excel, search, tree
 from program_management.views.prerequisite import read, update
 from program_management.views.quick_search import QuickSearchLearningUnitYearView, QuickSearchEducationGroupYearView
@@ -40,8 +40,6 @@ urlpatterns = [
     url(r'^(?P<root_id>[0-9]+)/(?P<education_group_year_id>[0-9]+)/', include([
         url(r'^content/', include([
             url(r'^(?P<group_element_year_id>[0-9]+)/', include([
-                url(r'^delete/$', groupelementyear_delete.DetachGroupElementYearView.as_view(),
-                    name='group_element_year_delete'),
                 url(r'^update/$', groupelementyear_update.UpdateGroupElementYearView.as_view(),
                     name="group_element_year_update"),
             ]))

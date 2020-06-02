@@ -105,7 +105,9 @@ class Node(interface.Entity):
         super(Node, self).__init__(entity_id=NodeIdentity(self.code, self.year))
 
     def __eq__(self, other):
-        return (self.node_id, self.__class__) == (other.node_id,  other.__class__)
+        if self.__class__ == other.__class__:
+            return self.node_id == other.node_id
+        return False
 
     def __hash__(self):
         return hash(self.node_id)
