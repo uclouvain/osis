@@ -30,33 +30,42 @@ from django.http import HttpResponseForbidden, HttpResponse, HttpResponseNotFoun
 from django.test import TestCase
 from django.urls import reverse
 
-from base.models.enums.education_group_types import MiniTrainingType
+from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.factories.user import UserFactory
-from education_group.views.mini_training.common_read import Tab
 from program_management.ddd.domain.node import NodeGroupYear
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory
 
 
-class TestMLiniTrainingReadUtilization(TestCase):
+class TestTrainingReadSkillAchievementsRead(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.person = PersonWithPermissionsFactory('view_educationgroup')
-        cls.mini_training_version = EducationGroupVersionFactory(
-            offer__acronym="APPBIOL",
+        cls.training_version = EducationGroupVersionFactory(
+            offer__acronym="DROI2M",
+            offer__partial_acronym="LDROI200M",
             offer__academic_year__year=2019,
-            offer__education_group_type__name=MiniTrainingType.DEEPENING.name,
-            root_group__partial_acronym="LBIOL100P",
+            offer__education_group_type__name=TrainingType.PGRM_MASTER_120.name,
+            root_group__acronym="DROI2M",
+            root_group__partial_acronym="LDROI200M",
             root_group__academic_year__year=2019,
-            root_group__education_group_type__name=MiniTrainingType.DEEPENING.name,
+            root_group__education_group_type__name=TrainingType.PGRM_MASTER_120.name,
         )
-        ElementGroupYearFactory(group_year=cls.mini_training_version.root_group)
+        ElementGroupYearFactory(group_year=cls.training_version.root_group)
 
-        cls.url = reverse('mini_training_utilization', kwargs={'year': 2019, 'code': 'LBIOL100P'})
+        cls.url = reverse('training_skills_achievements', kwargs={'year': 2019, 'code': 'LDROI200M'})
 
     def setUp(self) -> None:
         self.client.force_login(self.person.user)
+
+        self.perm_patcher = mock.patch(
+            "education_group.views.training.skills_achievements_read.TrainingReadSkillsAchievements."
+            "have_skills_and_achievements_tab",
+            return_value=True
+        )
+        self.mocked_perm = self.perm_patcher.start()
+        self.addCleanup(self.perm_patcher.stop)
 
     def test_case_user_not_logged(self):
         self.client.logout()
@@ -70,8 +79,18 @@ class TestMLiniTrainingReadUtilization(TestCase):
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
         self.assertTemplateUsed(response, "access_denied.html")
 
-    def test_case_mini_training_not_exists(self):
-        dummy_url = reverse('mini_training_utilization', kwargs={'year': 2018, 'code': 'DUMMY100B'})
+    def test_case_mini_training_unauthorized_skills_achievements_tab(self):
+        with mock.patch(
+            "education_group.views.training.skills_achievements_read.TrainingReadSkillsAchievements."
+            "have_skills_and_achievements_tab",
+            return_value=False
+        ):
+            response = self.client.get(self.url)
+            expected_redirect = reverse('training_identification', kwargs={'year': 2019, 'code': 'LDROI200M'})
+            self.assertRedirects(response, expected_redirect)
+
+    def test_case_training_not_exists(self):
+        dummy_url = reverse('training_skills_achievements', kwargs={'year': 2018, 'code': 'DUMMY100B'})
         response = self.client.get(dummy_url)
 
         self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
@@ -80,25 +99,41 @@ class TestMLiniTrainingReadUtilization(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, "mini_training/utilization_read.html")
+        self.assertTemplateUsed(response, "training/skills_achievements_read.html")
 
-    @mock.patch('program_management.ddd.service.tree_service.search_trees_using_node', return_value=[])
-    def test_assert_context_data(self, mock_tree_service):
+    def test_assert_context_data(self):
         response = self.client.get(self.url)
 
-        self.assertTrue(mock_tree_service.called)
         self.assertEqual(response.context['person'], self.person)
-        self.assertEqual(response.context['group_year'], self.mini_training_version.root_group)
+        self.assertEqual(response.context['group_year'], self.training_version.root_group)
+        self.assertEqual(response.context['education_group_version'], self.training_version)
         self.assertIsInstance(response.context['tree'], str)
         self.assertIsInstance(response.context['node'], NodeGroupYear)
-        self.assertIsInstance(response.context['utilization_rows'], List)
+        self.assertIsInstance(response.context['achievements'], List)
+        self.assertIn("can_edit_information", response.context)
 
-    def test_assert_active_tabs_is_utilization_and_others_are_not_active(self):
+    def test_assert_label_structure_on_context_data(self):
         response = self.client.get(self.url)
 
-        self.assertTrue(response.context['tab_urls'][Tab.UTILIZATION]['active'])
+        self.assertIsInstance(response.context['program_aims_label'], dict)
+        self.assertIn("label_id", response.context['program_aims_label'])
+        self.assertIn("text_fr", response.context['program_aims_label'])
+        self.assertIn("text_en", response.context['program_aims_label'])
+
+        self.assertIsInstance(response.context['additional_information_skills_label'], dict)
+        self.assertIn("label_id", response.context['additional_information_skills_label'])
+        self.assertIn("text_fr", response.context['additional_information_skills_label'])
+        self.assertIn("text_en", response.context['additional_information_skills_label'])
+
+    def test_assert_active_tabs_is_skills_achievements_and_others_are_not_active(self):
+        from education_group.views.training.common_read import Tab
+        response = self.client.get(self.url)
+
+        self.assertTrue(response.context['tab_urls'][Tab.SKILLS_ACHIEVEMENTS]['active'])
         self.assertFalse(response.context['tab_urls'][Tab.IDENTIFICATION]['active'])
+        self.assertFalse(response.context['tab_urls'][Tab.DIPLOMAS_CERTIFICATES]['active'])
+        self.assertFalse(response.context['tab_urls'][Tab.ADMINISTRATIVE_DATA]['active'])
         self.assertFalse(response.context['tab_urls'][Tab.CONTENT]['active'])
+        self.assertFalse(response.context['tab_urls'][Tab.UTILIZATION]['active'])
         self.assertFalse(response.context['tab_urls'][Tab.GENERAL_INFO]['active'])
-        self.assertFalse(response.context['tab_urls'][Tab.SKILLS_ACHIEVEMENTS]['active'])
         self.assertFalse(response.context['tab_urls'][Tab.ADMISSION_CONDITION]['active'])
