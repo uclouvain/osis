@@ -61,50 +61,6 @@ from education_group.views.proxy.read import Tab
 from osis_common.decorators.ajax import ajax_required
 
 
-@login_required
-@waffle_flag("education_group_update")
-@waffle_flag("education_group_administrative_data_update")
-def education_group_edit_administrative_data(request, root_id, education_group_year_id):
-    education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
-
-    assert_category_of_education_group_year(education_group_year, (education_group_categories.TRAINING,))
-
-    if not education_group_business.can_user_edit_administrative_data(request.user, education_group_year):
-        raise PermissionDenied(_("Only program managers of the education group OR central manager "
-                                 "linked to entity can edit."))
-
-    formset_session = AdministrativeDataFormset(
-        request.POST or None,
-        form_kwargs={'education_group_year': education_group_year}
-    )
-
-    offer_year_calendar = mdl.offer_year_calendar.search(
-        education_group_year_id=education_group_year_id,
-        academic_calendar_reference=academic_calendar_type.COURSE_ENROLLMENT
-    ).first()
-
-    course_enrollment = CourseEnrollmentForm(request.POST or None,
-                                             instance=offer_year_calendar,
-                                             education_group_yr=education_group_year)
-
-    course_enrollment_validity = course_enrollment.is_valid()
-    formset_session_validity = formset_session.is_valid()
-
-    group_to_parent = request.GET.get("group_to_parent")
-    additional_info_form = AdditionalInfoForm(
-        request.POST or None,
-        instance=education_group_year
-    )
-    if course_enrollment_validity and formset_session_validity:
-        formset_session.save()
-        course_enrollment.save()
-        additional_info_form.save()
-        messages.add_message(request, messages.SUCCESS, _('The administrative data has been successfully modified'))
-        return HttpResponseRedirect(reverse('education_group_administrative', args=[root_id, education_group_year_id]))
-
-    return render(request, "education_group/tab_edit_administrative_data.html", locals())
-
-
 def education_group_year_pedagogy_edit_post(request, education_group_year_id, root_id):
     form = EducationGroupPedagogyEditForm(request.POST)
     redirect_url = reverse('education_group_general_informations', kwargs={

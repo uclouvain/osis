@@ -93,10 +93,6 @@ urlpatterns = [
         url(r'^update/$', update.update_education_group, name="update_education_group"),
         url(r'^informations/edit/$', education_group.education_group_year_pedagogy_edit,
             name="education_group_pedagogy_edit"),
-        url(r'^administrative/', include([
-            url(u'^edit/$', education_group.education_group_edit_administrative_data,
-                name='education_group_edit_administrative')
-        ])),
         url(r'^select/$', copy_education_group_to_cache, name='copy_education_group_to_cache'),
         url(r'^skills_achievements/', include(urlpatterns_achievement)),
 
