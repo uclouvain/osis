@@ -133,34 +133,34 @@ class MiniTrainingRead(PermissionRequiredMixin, TemplateView):
             Tab.GENERAL_INFO: {
                 'text': _('General informations'),
                 'active': Tab.GENERAL_INFO == self.active_tab,
-                'display': self._have_general_information_tab(),
+                'display': self.have_general_information_tab(),
                 'url': _get_tab_urls(Tab.GENERAL_INFO, self.node_identity, self.get_path()),
             },
             Tab.SKILLS_ACHIEVEMENTS: {
                 'text': capfirst(_('skills and achievements')),
                 'active': Tab.SKILLS_ACHIEVEMENTS == self.active_tab,
-                'display': self._have_skills_and_achievements_tab(),
+                'display': self.have_skills_and_achievements_tab(),
                 'url': _get_tab_urls(Tab.SKILLS_ACHIEVEMENTS, self.node_identity, self.get_path()),
             },
             Tab.ADMISSION_CONDITION: {
                 'text': _('Conditions'),
                 'active': Tab.ADMISSION_CONDITION == self.active_tab,
-                'display': self._have_admission_condition_tab(),
+                'display': self.have_admission_condition_tab(),
                 'url': _get_tab_urls(Tab.ADMISSION_CONDITION, self.node_identity, self.get_path()),
             },
         })
 
-    def _have_general_information_tab(self):
+    def have_general_information_tab(self):
         node_category = self.get_object().category
         return node_category.name in general_information_sections.SECTIONS_PER_OFFER_TYPE and \
             self._is_general_info_and_condition_admission_in_display_range
 
-    def _have_skills_and_achievements_tab(self):
+    def have_skills_and_achievements_tab(self):
         node_category = self.get_object().category
         return node_category.name in MiniTrainingType.with_skills_achievements() and \
             self._is_general_info_and_condition_admission_in_display_range
 
-    def _have_admission_condition_tab(self):
+    def have_admission_condition_tab(self):
         node_category = self.get_object().category
         return node_category.name in MiniTrainingType.with_admission_condition() and \
             self._is_general_info_and_condition_admission_in_display_range

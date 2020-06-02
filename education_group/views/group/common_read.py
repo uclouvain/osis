@@ -10,6 +10,9 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 
 from base import models as mdl
+from base.business.education_groups import general_information_sections
+from base.business.education_groups.general_information_sections import \
+    MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION
 from base.models.enums.education_group_types import GroupType
 from base.views.common import display_warning_messages
 from education_group.forms.academic_year_choices import get_academic_year_choices
@@ -110,29 +113,36 @@ class GroupRead(PermissionRequiredMixin, TemplateView):
                 'text': _('Identification'),
                 'active': Tab.IDENTIFICATION == self.active_tab,
                 'display': True,
-                'url': reverse('group_identification', args=[node.year, node.code]) + "?path={}".format(self.path)
+                'url': _get_tab_urls(Tab.IDENTIFICATION, self.node_identity, self.path),
             },
             Tab.CONTENT: {
                 'text': _('Content'),
                 'active': Tab.CONTENT == self.active_tab,
                 'display': True,
-                'url': reverse('group_content', args=[node.year, node.code]) + "?path={}".format(self.path),
+                'url': _get_tab_urls(Tab.CONTENT, self.node_identity, self.path),
             },
             Tab.UTILIZATION: {
                 'text': _('Utilizations'),
                 'active': Tab.UTILIZATION == self.active_tab,
                 'display': True,
-                'url': reverse('group_utilization', args=[node.year, node.code]) +
-                "?path={}".format(self.path),
+                'url': _get_tab_urls(Tab.UTILIZATION, self.node_identity, self.path),
             },
             Tab.GENERAL_INFO: {
                 'text': _('General informations'),
                 'active': Tab.GENERAL_INFO == self.active_tab,
-                'display': node.node_type == GroupType.COMMON_CORE,
-                'url': reverse('group_general_information', args=[node.year, node.code]) +
-                "?path={}".format(self.path),
+                'display': self.have_general_information_tab(),
+                'url': _get_tab_urls(Tab.GENERAL_INFO, self.node_identity, self.path),
             }
         })
+
+    def have_general_information_tab(self):
+        node_category = self.get_object().category
+        return node_category.name in general_information_sections.SECTIONS_PER_OFFER_TYPE and \
+               self._is_general_info_and_condition_admission_in_display_range
+
+    def _is_general_info_and_condition_admission_in_display_range(self):
+        return MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION <= self.get_object().year < \
+               self.get_current_academic_year().year + 2
 
 
 def _get_view_name_from_tab(tab: Tab):
