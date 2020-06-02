@@ -26,6 +26,7 @@
 
 from django.db.models import F
 
+from education_group.ddd.domain.training import TrainingIdentity
 from education_group.models.group_year import GroupYear
 from osis_common.ddd import interface
 from program_management.ddd.domain.node import NodeIdentity
@@ -52,3 +53,13 @@ class ProgramTreeVersionIdentitySearch(interface.DomainService):
 class NodeIdentitySearch(interface.DomainService):
     def get_from_program_tree_identity(self, tree_identity: 'ProgramTreeIdentity') -> 'NodeIdentity':
         return NodeIdentity(year=tree_identity.year, code=tree_identity.code)
+
+    def get_from_training_identity(self, training_identity: 'TrainingIdentity') -> 'NodeIdentity':
+        values = GroupYear.objects.filter(
+            educationgroupversion__offer__acronym=training_identity.acronym,
+            educationgroupversion__offer__academic_year__year=training_identity.year,
+        ).values(
+            'partial_acronym'
+        )
+        if values:
+            return NodeIdentity(code=values[0]['partial_acronym'], year=training_identity.year)

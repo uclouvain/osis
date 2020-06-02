@@ -1,9 +1,14 @@
 from django.urls import include, path
 
 from education_group.views import group, training, mini_training, general_information
-
+from education_group.views.proxy.read import ReadEducationGroupRedirectView
 
 urlpatterns = [
+    path(
+        '<int:year>/<str:acronym>/',
+        ReadEducationGroupRedirectView.as_view(),
+        name='education_group_read_proxy'
+    ),
     path('groups/<int:year>/<str:code>/', include([
         path('identification/', group.GroupReadIdentification.as_view(), name='group_identification'),
         path('content/', group.GroupReadContent.as_view(), name='group_content'),

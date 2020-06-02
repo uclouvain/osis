@@ -15,6 +15,7 @@ from base.views.common import display_warning_messages
 from education_group.forms import tree_version_choices
 from education_group.forms.academic_year_choices import get_academic_year_choices
 from education_group.forms.tree_version_choices import get_tree_versions_choices
+from education_group.views.proxy import read
 from program_management.ddd.business_types import *
 from education_group.ddd.business_types import *
 
@@ -37,15 +38,7 @@ from program_management.serializers.program_tree_view import program_tree_view_s
 from program_management.forms.custom_xls import CustomXlsForm
 
 
-class Tab(Enum):
-    IDENTIFICATION = 0
-    DIPLOMAS_CERTIFICATES = 1
-    ADMINISTRATIVE_DATA = 2
-    CONTENT = 3
-    UTILIZATION = 4
-    GENERAL_INFO = 5
-    SKILLS_ACHIEVEMENTS = 6
-    ADMISSION_CONDITION = 7
+Tab = read.Tab  # FIXME :: fix imports (and remove this line)
 
 
 class TrainingRead(PermissionRequiredMixin, TemplateView):
@@ -142,49 +135,49 @@ class TrainingRead(PermissionRequiredMixin, TemplateView):
                 'text': _('Identification'),
                 'active': Tab.IDENTIFICATION == self.active_tab,
                 'display': True,
-                'url': _get_tab_urls(Tab.IDENTIFICATION, node_identity, self.get_path()),
+                'url': get_tab_urls(Tab.IDENTIFICATION, node_identity, self.get_path()),
             },
             Tab.DIPLOMAS_CERTIFICATES: {
                 'text': _('Diplomas /  Certificates'),
                 'active': Tab.DIPLOMAS_CERTIFICATES == self.active_tab,
                 'display': True,
-                'url': _get_tab_urls(Tab.DIPLOMAS_CERTIFICATES, node_identity, self.get_path()),
+                'url': get_tab_urls(Tab.DIPLOMAS_CERTIFICATES, node_identity, self.get_path()),
             },
             Tab.ADMINISTRATIVE_DATA: {
                 'text': _('Administrative data'),
                 'active': Tab.ADMINISTRATIVE_DATA == self.active_tab,
                 'display': self.__display_administrative_data_tab(),
-                'url': _get_tab_urls(Tab.ADMINISTRATIVE_DATA, node_identity, self.get_path()),
+                'url': get_tab_urls(Tab.ADMINISTRATIVE_DATA, node_identity, self.get_path()),
             },
             Tab.CONTENT: {
                 'text': _('Content'),
                 'active': Tab.CONTENT == self.active_tab,
                 'display': True,
-                'url': _get_tab_urls(Tab.CONTENT, node_identity, self.get_path()),
+                'url': get_tab_urls(Tab.CONTENT, node_identity, self.get_path()),
             },
             Tab.UTILIZATION: {
                 'text': _('Utilizations'),
                 'active': Tab.UTILIZATION == self.active_tab,
                 'display': True,
-                'url': _get_tab_urls(Tab.UTILIZATION, node_identity, self.get_path()),
+                'url': get_tab_urls(Tab.UTILIZATION, node_identity, self.get_path()),
             },
             Tab.GENERAL_INFO: {
                 'text': _('General informations'),
                 'active': Tab.GENERAL_INFO == self.active_tab,
                 'display': self._have_general_information_tab(),
-                'url': _get_tab_urls(Tab.GENERAL_INFO, node_identity, self.get_path()),
+                'url': get_tab_urls(Tab.GENERAL_INFO, node_identity, self.get_path()),
             },
             Tab.SKILLS_ACHIEVEMENTS: {
                 'text': capfirst(_('skills and achievements')),
                 'active': Tab.SKILLS_ACHIEVEMENTS == self.active_tab,
                 'display': self._have_skills_and_achievements_tab(),
-                'url': _get_tab_urls(Tab.SKILLS_ACHIEVEMENTS, node_identity, self.get_path()),
+                'url': get_tab_urls(Tab.SKILLS_ACHIEVEMENTS, node_identity, self.get_path()),
             },
             Tab.ADMISSION_CONDITION: {
                 'text': _('Conditions'),
                 'active': Tab.ADMISSION_CONDITION == self.active_tab,
                 'display': self._have_admission_condition_tab(),
-                'url': _get_tab_urls(Tab.ADMISSION_CONDITION, node_identity, self.get_path()),
+                'url': get_tab_urls(Tab.ADMISSION_CONDITION, node_identity, self.get_path()),
             },
         })
 
@@ -225,6 +218,6 @@ def _get_view_name_from_tab(tab: Tab):
     }[tab]
 
 
-def _get_tab_urls(tab: Tab, node_identity: 'NodeIdentity', path: 'Path' = None) -> str:
+def get_tab_urls(tab: Tab, node_identity: 'NodeIdentity', path: 'Path' = None) -> str:
     path = path or ""
     return reverse(_get_view_name_from_tab(tab), args=[node_identity.year, node_identity.code]) + "?path={}".format(path)
