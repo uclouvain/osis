@@ -44,7 +44,7 @@ from base.business.education_groups.general_information import PublishException
 from base.forms.education_group_admission import UpdateTextForm
 from base.forms.education_group_pedagogy_edit import EducationGroupPedagogyEditForm
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine, CONDITION_ADMISSION_ACCESSES
-from base.models.enums import education_group_categories, academic_calendar_type
+from base.models.enums import education_group_categories
 from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.admission_condition import AdmissionConditionFactory
@@ -57,8 +57,7 @@ from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.mandatary import MandataryFactory
 from base.tests.factories.person import PersonWithPermissionsFactory, PersonFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
-from base.tests.factories.user import UserFactory, SuperUserFactory
-from base.views.education_groups.detail import get_appropriate_common_admission_condition
+from base.tests.factories.user import SuperUserFactory
 from cms.enums import entity_name
 from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory, TranslatedTextRandomFactory
@@ -1018,57 +1017,3 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         url = reverse('tab_lang_edit', args=[self.education_group_parent.pk, self.education_group_child.pk, 'fr'])
         response = self.client.get(url)
         self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
-
-    def test_get_appropriate_common_offer_for_common(self):
-        edy = EducationGroupYearCommonFactory(
-            education_group_type__minitraining=True,
-            academic_year=self.academic_year
-        )
-        result = get_appropriate_common_admission_condition(edy)
-        self.assertEqual(result, None)
-
-    def test_get_appropriate_common_offer_for_bachelor(self):
-        edy = EducationGroupYearFactory(
-            education_group_type__name=TrainingType.BACHELOR.name,
-            academic_year=self.academic_year
-        )
-        result = get_appropriate_common_admission_condition(edy)
-        self.assertEqual(result, self.bachelor_adm_cond)
-
-    def test_get_appropriate_common_offer_for_agregation(self):
-        edy = EducationGroupYearFactory(
-            education_group_type__name=TrainingType.AGGREGATION.name,
-            academic_year=self.academic_year
-        )
-        result = get_appropriate_common_admission_condition(edy)
-        self.assertEqual(result, self.agregation_adm_cond)
-
-    def test_get_appropriate_common_offer_for_master(self):
-        edy = EducationGroupYearFactory(
-            education_group_type__name=TrainingType.PGRM_MASTER_120.name,
-            academic_year=self.academic_year
-        )
-        result = get_appropriate_common_admission_condition(edy)
-        self.assertEqual(result, self.master_adm_cond)
-
-        edy = EducationGroupYearFactory(
-            education_group_type__name=TrainingType.MASTER_M1.name,
-            academic_year=self.academic_year
-        )
-        result = get_appropriate_common_admission_condition(edy)
-        self.assertEqual(result, self.master_adm_cond)
-
-        edy = EducationGroupYearFactory(
-            education_group_type__name=TrainingType.PGRM_MASTER_180_240.name,
-            academic_year=self.academic_year
-        )
-        result = get_appropriate_common_admission_condition(edy)
-        self.assertEqual(result, self.master_adm_cond)
-
-    def test_get_appropriate_common_offer_for_special_master(self):
-        edy = EducationGroupYearFactory(
-            education_group_type__name=TrainingType.MASTER_MC.name,
-            academic_year=self.academic_year
-        )
-        result = get_appropriate_common_admission_condition(edy)
-        self.assertEqual(result, self.special_master_adm_cond)
