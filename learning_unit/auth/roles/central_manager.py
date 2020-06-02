@@ -22,7 +22,7 @@ class CentralManager(osis_role_models.EntityRoleModel):
         return rules.RuleSet({
             'base.can_create_learningunit': rules.always_allow,
             'base.can_create_partim':
-                predicates.is_user_attached_to_management_entity &
+                predicates.is_user_attached_to_current_management_entity &
                 predicates.is_learning_unit_year_not_in_past &
                 predicates.is_edition_period_open &
                 predicates.is_learning_unit_year_full &
@@ -30,12 +30,12 @@ class CentralManager(osis_role_models.EntityRoleModel):
             'base.can_access_learningunit': rules.always_allow,
             'base.can_delete_learningunit':
                 predicates.is_learning_unit_container_type_deletable &
-                predicates.is_user_attached_to_management_entity &
+                predicates.is_user_attached_to_current_management_entity &
                 predicates.is_learning_unit_year_prerequisite &
                 predicates.has_learning_unit_applications,
             'base.can_edit_learningunit':
-                predicates.is_user_attached_to_management_entity &
-                predicates.is_learning_unit_year_not_in_past &
+                predicates.is_user_attached_to_current_management_entity &
+                predicates.is_learning_unit_year_older_or_equals_than_limit_settings_year &
                 predicates.is_edition_period_open &
                 predicates.is_external_learning_unit_cograduation &
                 predicates.is_not_proposal,
@@ -45,9 +45,17 @@ class CentralManager(osis_role_models.EntityRoleModel):
                 predicates.is_learning_unit_year_not_a_partim &
                 predicates.is_learning_unit_container_type_editable &
                 predicates.is_not_proposal &
-                predicates.is_user_attached_to_management_entity &
+                predicates.is_user_attached_to_current_management_entity &
                 predicates.is_external_learning_unit_cograduation,
-            'base.can_edit_learningunit_date': rules.always_allow,
+            'base.can_cancel_proposal':
+                predicates.is_not_proposal_of_type_creation_with_applications &
+                predicates.is_user_attached_to_current_management_entity |
+                predicates.is_user_attached_to_initial_management_entity &
+                predicates.is_external_learning_unit_cograduation,
+            'base.can_edit_learningunit_date':
+                predicates.is_learning_unit_year_older_or_equals_than_limit_settings_year &
+                predicates.is_learning_unit_year_not_in_past
+            ,
             'base.can_edit_learningunit_pedagogy': rules.always_allow,
             'base.can_edit_learningunit_specification': rules.always_allow,
             'base.can_consolidate_learningunit_proposal': rules.always_allow,

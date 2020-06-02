@@ -5,7 +5,10 @@ from rules import predicate
 from attribution.models.tutor_application import TutorApplication
 from base.business.event_perms import EventPermLearningUnitCentralManagerEdition
 from base.models.enums import learning_container_year_types as container_types, learning_container_year_types
+from base.models.enums.proposal_state import ProposalState
+from base.models.enums.proposal_type import ProposalType
 from base.models.proposal_learning_unit import ProposalLearningUnit
+from osis_common.utils.models import get_object_or_none
 from osis_role.errors import predicate_failed_msg
 
 FACULTY_EDITABLE_CONTAINER_TYPES = (
@@ -17,11 +20,25 @@ FACULTY_EDITABLE_CONTAINER_TYPES = (
 
 @predicate(bind=True)
 @predicate_failed_msg(message=_("You can only modify a learning unit when your are linked to its requirement entity"))
-def is_user_attached_to_management_entity(self, user, learning_unit_year=None):
+def is_user_attached_to_initial_management_entity(self, user, learning_unit_year=None):
     if learning_unit_year:
-        user_entity_ids = self.context['role_qs'].get_entities_ids()
-        return learning_unit_year.management_entity_id in user_entity_ids
+        initial_container_year = learning_unit_year.initial_data.get("learning_container_year")
+        requirement_entity_id = initial_container_year.get('requirement_entity')
+        return _is_attached_to_entity(requirement_entity_id, self)
     return learning_unit_year
+
+
+@predicate(bind=True)
+@predicate_failed_msg(message=_("You can only modify a learning unit when your are linked to its requirement entity"))
+def is_user_attached_to_current_management_entity(self, user, learning_unit_year=None):
+    if learning_unit_year:
+        return _is_attached_to_entity(learning_unit_year.management_entity_id, self)
+    return learning_unit_year
+
+
+def _is_attached_to_entity(requirement_entity, self):
+    user_entity_ids = self.context['role_qs'].get_entities_ids()
+    return requirement_entity in user_entity_ids
 
 
 @predicate(bind=True)
@@ -124,3 +141,26 @@ def is_not_proposal(self, user, learning_unit_year):
             learning_unit_year__academic_year__year__lte=learning_unit_year.academic_year.year
         ).exists()
     return None
+
+
+@predicate(bind=True)
+@predicate_failed_msg(message=_("Person not in accordance with proposal state"))
+def has_faculty_proposal_state(self, user, learning_unit_year):
+    if learning_unit_year:
+        learning_unit_proposal = get_object_or_none(ProposalLearningUnit, learning_unit_year__id=learning_unit_year.pk)
+        if learning_unit_proposal:
+            return learning_unit_proposal.state == ProposalState.FACULTY.name
+    return None
+
+
+@predicate(bind=True)
+@predicate_failed_msg(message=_("This learning unit has application"))
+def is_not_proposal_of_type_creation_with_applications(self, user, learning_unit_year):
+    if learning_unit_year:
+        proposal = get_object_or_none(ProposalLearningUnit, learning_unit_year__id=learning_unit_year.pk)
+        if proposal:
+            return proposal.type != ProposalType.CREATION.name or not TutorApplication.objects.filter(
+                learning_container_year=proposal.learning_unit_year.learning_container_year
+            ).exists()
+    return None
+
