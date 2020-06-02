@@ -32,6 +32,9 @@ from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView, UpdateView
+
+from base.business.education_groups.general_information_sections import CMS_LABEL_PROGRAM_AIM, \
+    CMS_LABEL_ADDITIONAL_INFORMATION
 from osis_role.contrib.views import PermissionRequiredMixin
 
 from base.forms.education_group.achievement import ActionForm, EducationGroupAchievementForm, \
@@ -40,7 +43,6 @@ from base.models.education_group_year import EducationGroupYear
 from base.views.common import display_error_messages
 from base.views.education_groups.achievement.common import EducationGroupAchievementMixin, \
     EducationGroupDetailedAchievementMixin
-from base.views.education_groups.achievement.detail import CMS_LABEL_PROGRAM_AIM, CMS_LABEL_ADDITIONAL_INFORMATION
 from base.views.mixins import AjaxTemplateMixin
 from cms.enums import entity_name
 from cms.models import translated_text

@@ -38,19 +38,44 @@ from base.models.enums.education_group_types import TrainingType, MiniTrainingTy
 from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
+from base.utils.cache import ElementCache
 from base.views.education_groups import perms
-from base.views.education_groups.detail import CatalogGenericDetailView
 from base.views.mixins import RulesRequiredMixin, FlagMixin, AjaxTemplateMixin
 from education_group.models.group_year import GroupYear
 from osis_common.utils.models import get_object_or_none
 from program_management.ddd.repositories import load_tree
 from program_management.models.enums.node_type import NodeType
 from program_management.serializers import program_tree_view
+from base.views.education_groups.select import get_clipboard_content_display
 
 NO_PREREQUISITES = TrainingType.finality_types() + [
     MiniTrainingType.OPTION.name,
     MiniTrainingType.MOBILITY_PARTNERSHIP.name,
 ] + GroupType.get_names()
+
+
+LEARNING_UNIT_YEAR = LearningUnitYear._meta.db_table
+EDUCATION_GROUP_YEAR = EducationGroupYear._meta.db_table
+
+
+class CatalogGenericDetailView:
+    def get_selected_element_for_clipboard(self):
+        cached_data = ElementCache(self.request.user).cached_data
+        if cached_data:
+            obj = self._get_instance_object_from_cache(cached_data)
+            return get_clipboard_content_display(obj, cached_data['action'])
+        return None
+
+    @staticmethod
+    def _get_instance_object_from_cache(cached_data):
+        model_name = cached_data.get('modelname')
+        cached_obj_id = cached_data.get('id')
+        obj = None
+        if model_name == LEARNING_UNIT_YEAR:
+            obj = LearningUnitYear.objects.get(id=cached_obj_id)
+        elif model_name == EDUCATION_GROUP_YEAR:
+            obj = EducationGroupYear.objects.get(id=cached_obj_id)
+        return obj
 
 
 @method_decorator(login_required, name='dispatch')
