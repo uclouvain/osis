@@ -59,7 +59,8 @@ class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageM
 
     def _has_permission_to_detach(self) -> bool:
         nodes_to_detach_from = [
-            int(element_selected["path_to_detach"].split("|")[-2]) for element_selected in self.nodes_to_paste if element_selected["path_to_detach"]
+            int(element_selected["path_to_detach"].split("|")[-2])
+            for element_selected in self.nodes_to_paste if element_selected["path_to_detach"]
         ]
         objs_to_detach_from = EducationGroupYear.objects.filter(id__in=nodes_to_detach_from)
         return all(self.request.user.has_perms(("base.detach_educationgroup",), obj_to_detach)
@@ -168,4 +169,3 @@ class CheckPasteView(LoginRequiredMixin, View):
             return JsonResponse({"error_messages": error_messages})
 
         return JsonResponse({"error_messages": []})
-
