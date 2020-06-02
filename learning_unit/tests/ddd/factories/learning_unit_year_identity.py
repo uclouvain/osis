@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,25 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.core.exceptions import PermissionDenied
-from django.shortcuts import get_object_or_404
 
-from base.models import person
-from program_management.business.group_element_years import perms as business_perms
+import factory.fuzzy
 
-
-def can_update_group_element_year(user, group_element_year, raise_exception=False):
-    pers = get_object_or_404(person.Person, user=user)
-    is_eligible = business_perms.is_eligible_to_update_group_element_year_content(
-        pers, group_element_year, raise_exception=raise_exception
-    )
-    if not is_eligible:
-        raise PermissionDenied
-    return True
+from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYearIdentity
 
 
-def can_detach_group_element_year(user, group_element_year, raise_exception=False):
-    pers = get_object_or_404(person.Person, user=user)
-    if not business_perms.is_eligible_to_detach_group_element_year(pers, group_element_year, raise_exception):
-        raise PermissionDenied
-    return True
+def generate_end_year(node):
+    return node.year + 10
+
+
+def generate_start_year(node):
+    return node.year + 10
+
+
+class LearningUnitYearIdentityFactory(factory.Factory):
+
+    class Meta:
+        model = LearningUnitYearIdentity
+        abstract = False
+
+    code = factory.Sequence(lambda n: 'Code-%02d' % n)
+    year = factory.fuzzy.FuzzyInteger(low=1999, high=2099)

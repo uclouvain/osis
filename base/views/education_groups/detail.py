@@ -45,7 +45,7 @@ from reversion.models import Version
 
 from base import models as mdl
 from base.business import education_group as education_group_business
-from base.business.education_groups import perms, general_information
+from base.business.education_groups import general_information
 from base.business.education_groups.general_information import PublishException
 from base.business.education_groups.general_information_sections import SECTION_LIST, \
     MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION, SECTIONS_PER_OFFER_TYPE, CONTACTS
@@ -178,6 +178,7 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
                 self.object.id,
                 node_type.NodeType.EDUCATION_GROUP
             )
+            context["node_path"] = program_tree.get_node_smallest_ordered_path(context["current_node"])
         context['group_to_parent'] = self.request.GET.get("group_to_parent") or '0'
         context['can_change_education_group'] = self.request.user.has_perm(
             'base.change_educationgroup',
@@ -191,6 +192,7 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
         context['current_academic_year'] = self.starting_academic_year
         context['selected_element_clipboard'] = self.get_selected_element_for_clipboard()
         context['form_xls_custom'] = CustomXlsForm()
+        context['delete_perm'] = self.get_delete_permission()
         return context
 
     def get(self, request, *args, **kwargs):
@@ -243,6 +245,13 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
     def is_general_info_and_condition_admission_in_display_range(self):
         return MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION <= self.object.academic_year.year < \
                self.starting_academic_year.year + 2
+
+    def get_delete_permission(self):
+        return {
+            education_group_categories.TRAINING: 'base.delete_all_training',
+            education_group_categories.MINI_TRAINING: 'base.delete_all_minitraining',
+            education_group_categories.GROUP: 'base.delete_all_group',
+        }[self.object.education_group_type.category]
 
 
 class EducationGroupRead(EducationGroupGenericDetailView):

@@ -34,6 +34,7 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from base import utils
+from base.models.education_group_type import EducationGroupType
 from base.models.enums import education_group_categories
 from base.models.enums.education_group_categories import TRAINING, MINI_TRAINING, GROUP
 from base.tests.factories.academic_year import AcademicYearFactory
@@ -461,8 +462,8 @@ class TestEducationGroupTypeAutoComplete(TestCase):
         self.assertEqual(6, len(json_response["results"]))
 
     def test_with_category_set(self):
-        tuples_category_woth_expected_result = [(TRAINING, 2), (MINI_TRAINING, 3), (GROUP, 1)]
-        for category, expected_result in tuples_category_woth_expected_result:
+        tuples_category_with_expected_result = [(TRAINING, 2), (MINI_TRAINING, 3), (GROUP, 1)]
+        for category, expected_result in tuples_category_with_expected_result:
             with self.subTest(category=category):
                 response = self.client.get(self.url, data={"forward": json.dumps({"category": category})})
                 json_response = response.json()
