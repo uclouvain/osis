@@ -44,7 +44,7 @@ from base.models.enums.rate_code import RateCode
 from base.models.enums.schedule_type import ScheduleTypeEnum
 from base.models.organization_address import OrganizationAddress
 from education_group.ddd.business_types import *
-from education_group.ddd.domain import training
+from education_group.ddd.domain import training, exception
 from education_group.ddd.domain._academic_partner import AcademicPartner
 from education_group.ddd.domain._address import Address
 from education_group.ddd.domain._campus import Campus
@@ -125,7 +125,10 @@ class TrainingRepository(interface.AbstractRepository):
             ),
         )
 
-        obj = qs.get()
+        try:
+            obj = qs.get()
+        except EducationGroupYear.DoesNotExist:
+            raise exception.TrainingNotFoundException
 
         secondary_domains = []
         for domain in obj.secondary_domains.all():
