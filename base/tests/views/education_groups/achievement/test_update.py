@@ -35,7 +35,6 @@ from base.tests.factories.education_group_achievement import EducationGroupAchie
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.user import UserFactory
-from base.views.education_groups.achievement.detail import CMS_LABEL_PROGRAM_AIM, CMS_LABEL_ADDITIONAL_INFORMATION
 from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
 from cms.tests.factories.text_label import TextLabelFactory
