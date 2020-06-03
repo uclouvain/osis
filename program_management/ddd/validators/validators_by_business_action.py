@@ -38,6 +38,7 @@ from program_management.ddd.validators._authorized_relationship_for_all_trees im
 from program_management.ddd.validators._authorized_root_type_for_prerequisite import AuthorizedRootTypeForPrerequisite
 from program_management.ddd.validators._block_validator import BlockValidator
 from program_management.ddd.validators._detach_option_2M import DetachOptionValidator
+from program_management.ddd.validators._detach_root import DetachRootValidator
 from program_management.ddd.validators._has_or_is_prerequisite import IsPrerequisiteValidator, HasPrerequisiteValidator
 from program_management.ddd.validators._infinite_recursivity import InfiniteRecursivityTreeValidator
 from program_management.ddd.validators._minimum_editable_year import \
@@ -147,6 +148,7 @@ class DetachNodeValidatorList(business_validator.BusinessListValidator):
         if node_to_detach.is_group():
             path_to_node_to_detach = path_to_parent + '|' + str(node_to_detach.node_id)
             self.validators = [
+                DetachRootValidator(tree, path_to_parent),
                 MinimumEditableYearValidator(tree),
                 DetachAuthorizedRelationshipValidator(tree, node_to_detach, detach_from),
                 IsPrerequisiteValidator(tree, node_to_detach),

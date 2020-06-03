@@ -291,9 +291,7 @@ class ProgramTree(interface.RootEntity):
         :param path_to_node_to_detach: The path node to detach
         :return:
         """
-        validator = PathValidator(path_to_node_to_detach)
-        if not validator.is_valid():
-            return False, validator.messages
+        PathValidator(path_to_node_to_detach).validate()
 
         validator = DetachRootValidator(self, path_to_node_to_detach)
         if not validator.is_valid():

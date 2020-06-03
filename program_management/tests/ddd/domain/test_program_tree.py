@@ -223,38 +223,6 @@ class TestPasteNodeProgramTree(ValidatorPatcherMixin, SimpleTestCase):
         self.assertNotIn(self.child_to_paste, self.tree.root_node.children_as_nodes)
 
 
-class TestDetachNodeProgramTree(SimpleTestCase):
-    def setUp(self):
-        self.link1 = LinkFactory()
-        self.link2 = LinkFactory(parent=self.link1.child)
-        self.tree = ProgramTreeFactory(root_node=self.link1.parent)
-
-    def test_detach_node_case_invalid_path(self):
-        is_valid, messages = self.tree.detach_node("dummy_path")
-        self.assertFalse(is_valid)
-        self.assertListEqual(messages, [BusinessValidationMessage('Invalid tree path', level=MessageLevel.ERROR)])
-
-    @patch.object(DetachAuthorizedRelationshipValidator, 'validate')
-    def test_detach_node_case_valid_path(self, mock):
-        path_to_detach = "|".join([
-            str(self.link1.parent.pk),
-            str(self.link1.child.pk),
-            str(self.link2.child.pk),
-        ])
-
-        self.tree.detach_node(path_to_detach)
-        self.assertListEqual(
-            self.tree.root_node.children[0].child.children,  # root_node/common_core
-            []
-        )
-
-    def test_detach_node_case_try_to_detach_root_node(self):
-        is_valid, messages = self.tree.detach_node(str(self.link1.parent.pk))
-        self.assertFalse(is_valid)
-        expected_error = BusinessValidationMessage(_("Cannot perform detach action on root."), level=MessageLevel.ERROR)
-        self.assertListEqual(messages, [expected_error])
-
-
 class TestGetParentsUsingNodeAsReference(SimpleTestCase):
     def setUp(self):
         self.link_with_root = LinkFactory(parent__title='ROOT', child__title='child_ROOT')
@@ -712,23 +680,16 @@ class TestDetachNode(SimpleTestCase):
         tree = ProgramTreeFactory()
         LinkFactory(parent=tree.root_node)
         path_to_detach = "Invalid path"
-        result_is_valid, result_messages = tree.detach_node(path_to_detach)
-        self.assertFalse(result_is_valid)
-        expected_result = [
-            BusinessValidationMessage(_("Invalid tree path"), MessageLevel.ERROR)
-        ]
-        self.assertListEqual(result_messages, expected_result)
+        with self.assertRaises(business_validator.BusinessExceptions):
+            tree.detach_node(path_to_detach)
 
     def test_when_path_to_detach_is_root_node(self):
         tree = ProgramTreeFactory()
         LinkFactory(parent=tree.root_node)
         path_to_detach = str(tree.root_node.pk)
-        result_is_valid, result_messages = tree.detach_node(path_to_detach)
-        self.assertFalse(result_is_valid)
-        expected_result = [
-            BusinessValidationMessage(_("Cannot perform detach action on root."), MessageLevel.ERROR)
-        ]
-        self.assertListEqual(result_messages, expected_result)
+        with self.assertRaises(business_validator.BusinessExceptions):
+            tree.detach_node(path_to_detach)
+
 
     @patch.object(DetachNodeValidatorList, 'messages')
     @patch.object(DetachNodeValidatorList, 'is_valid')
