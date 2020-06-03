@@ -24,6 +24,7 @@ class Tab(Enum):
 
 
 class ReadEducationGroupRedirectView(RedirectView):
+    """Proxy used only for training and minitraining"""
     permanent = False
     query_string = False
 
@@ -46,21 +47,16 @@ class ReadEducationGroupRedirectView(RedirectView):
             return Tab.IDENTIFICATION
 
     def get_redirect_url(self, *args, **kwargs):
-        if self.node.is_learning_unit():
-            url_name = "learning_unit"
-            url_kwargs = {'year': self.node.year, 'acronym': self.node.code}
-            url = reverse(url_name, kwargs=url_kwargs)
-        else:
-            url = get_tab_urls(
-                tab=self._get_current_tab(),
-                node=self.node,
-            )
+        url = get_tab_urls(
+            tab=self._get_current_tab(),
+            node=self.node,
+        )
         self.url = url
         return super().get_redirect_url(*args, **kwargs)
 
 
 def _get_view_name_from_tab(node: 'Node', tab: Tab):
-    prefix = 'group'
+    prefix = None
     if node.is_training():
         prefix = 'training'
     elif node.is_mini_training():
