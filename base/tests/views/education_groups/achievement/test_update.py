@@ -30,6 +30,8 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from backoffice.settings.base import LANGUAGE_CODE_FR, LANGUAGE_CODE_EN
+from base.business.education_groups.general_information_sections import CMS_LABEL_PROGRAM_AIM, \
+    CMS_LABEL_ADDITIONAL_INFORMATION
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_achievement import EducationGroupAchievementFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
@@ -105,7 +107,6 @@ class TestEducationGroupAchievementActionUpdateDelete(TestCase):
         self.assertEqual(messages[0], _("Invalid action"))
 
     def test_update(self):
-        print('update')
         code = "The life is like a box of chocolates"
         response = self.client.post(
             reverse(
