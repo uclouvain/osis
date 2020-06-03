@@ -32,11 +32,8 @@ from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import EducationGroupTypesEnum
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
-from education_group.models.group_year import GroupYear
 from learning_unit.ddd.repository import load_learning_unit_year
 from program_management.ddd.domain import node
-from program_management.models.education_group_version import EducationGroupVersion
-from program_management.models.element import Element
 from program_management.models.enums.node_type import NodeType
 
 
@@ -125,10 +122,7 @@ def __convert_category_enum(category: str):
 
 
 def __load_multiple_node_education_group_year(node_group_year_ids: List[int]) -> QuerySet:
-    elements = Element.objects.filter(pk__in=node_group_year_ids)
-    root_groups = GroupYear.objects.filter(pk__in=elements.values_list('group_year_id', flat=True))
-    versions = EducationGroupVersion.objects.filter(root_group_id__in=root_groups.values_list('pk', flat=True))
-    return EducationGroupYear.objects.filter(pk__in=versions.values_list('offer_id', flat=True)).annotate(
+    return EducationGroupYear.objects.filter(pk__in=node_group_year_ids).annotate(
         # Fields from "Group"
         node_id=F('pk'),
         type=Value(NodeType.EDUCATION_GROUP.name, output_field=CharField()),

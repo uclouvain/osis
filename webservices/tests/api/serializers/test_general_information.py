@@ -38,11 +38,8 @@ from base.tests.factories.group_element_year import GroupElementYearFactory
 from cms.enums.entity_name import OFFER_YEAR
 from cms.tests.factories.translated_text import TranslatedTextFactory
 from cms.tests.factories.translated_text_label import TranslatedTextLabelFactory
-from education_group.tests.factories.group_year import GroupYearFactory
 from program_management.ddd.repositories import load_tree
 from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory
-from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
-from program_management.tests.factories.element import ElementFactory
 from webservices.api.serializers.general_information import GeneralInformationSerializer
 from webservices.business import EVALUATION_KEY, SKILLS_AND_ACHIEVEMENTS_INTRO, SKILLS_AND_ACHIEVEMENTS_EXTRA
 
@@ -55,17 +52,6 @@ class GeneralInformationSerializerTestCase(TestCase):
             node_id=cls.egy.id,
             node_type=cls.egy.education_group_type,
         )
-        group = GroupYearFactory(
-            academic_year=cls.egy.academic_year,
-            group__start_year=cls.egy.academic_year,
-            partial_acronym=cls.egy.partial_acronym,
-            education_group_type__name=cls.egy.education_group_type.name
-        )
-        StandardEducationGroupVersionFactory(
-            root_group=group,
-            offer=cls.egy
-        )
-        element = ElementFactory(group_year=group)
         cls.common_egy = EducationGroupYearCommonFactory(academic_year=cls.egy.academic_year)
         cls.language = settings.LANGUAGE_CODE_EN
         cls.pertinent_sections = {
@@ -101,7 +87,7 @@ class GeneralInformationSerializerTestCase(TestCase):
                 entity=OFFER_YEAR,
                 language=cls.language
             )
-        cls.tree = load_tree.load(element.id)
+        cls.tree = load_tree.load(cls.egy.id)
         cls.serializer = GeneralInformationSerializer(
             cls.tree.root_node, context={
                 'language': cls.language,
@@ -183,17 +169,6 @@ class IntroOffersSectionTestCase(TestCase):
         cls.egy = TrainingFactory(education_group_type__name=TrainingType.PGRM_MASTER_120.name)
         EducationGroupYearCommonFactory(academic_year=cls.egy.academic_year)
         cls.language = settings.LANGUAGE_CODE_EN
-        group = GroupYearFactory(
-            academic_year=cls.egy.academic_year,
-            group__start_year=cls.egy.academic_year,
-            partial_acronym=cls.egy.partial_acronym,
-            education_group_type__name=cls.egy.education_group_type.name
-        )
-        StandardEducationGroupVersionFactory(
-            root_group=group,
-            offer=cls.egy
-        )
-        cls.element = ElementFactory(group_year=group)
 
     def setUp(self):
         patcher_sections = mock.patch(
@@ -229,13 +204,13 @@ class IntroOffersSectionTestCase(TestCase):
 
     def test_get_intro_finality_offer(self):
         g = GroupElementYearFactory(
-            parent_element=self.element,
-            child_element__group_year__education_group_type__name=GroupType.FINALITY_120_LIST_CHOICE.name
+            parent=self.egy,
+            child_branch__education_group_type__name=GroupType.FINALITY_120_LIST_CHOICE.name
         )
         gey = GroupElementYearFactory(
-            parent_element=g.child_element,
-            child_element__group_year__education_group_type__name=TrainingType.MASTER_MD_120.name,
-            child_element__group_year__partial_acronym="TESTFINA",
+            parent=g.child_branch,
+            child_branch__education_group_type__name=TrainingType.MASTER_MD_120.name,
+            child_branch__partial_acronym="TESTFINA",
         )
         intro_offer_section = self._get_pertinent_intro_section(gey)
         self.assertIsNone(intro_offer_section['content'])
@@ -252,7 +227,7 @@ class IntroOffersSectionTestCase(TestCase):
             entity=OFFER_YEAR,
             reference=gey.child_branch.id
         )
-        tree = load_tree.load(self.element.id)
+        tree = load_tree.load(self.egy.id)
         node = tree.root_node
         return GeneralInformationSerializer(
             node, context={
