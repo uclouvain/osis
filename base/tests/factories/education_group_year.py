@@ -139,8 +139,8 @@ class EducationGroupYearCommonBachelorFactory(EducationGroupYearFactory):
 
 
 class EducationGroupYearBachelorFactory(EducationGroupYearCommonBachelorFactory):
-    acronym = 'actu1ba'
-    partial_acronym = 'actu1ba'
+    acronym = 'ACTU1BA'
+    partial_acronym = 'ACTU1BA'
 
 
 class EducationGroupYearCommonAgregationFactory(EducationGroupYearFactory):
@@ -174,8 +174,8 @@ class EducationGroupYearCommonMasterFactory(EducationGroupYearFactory):
 
 
 class EducationGroupYearMasterFactory(EducationGroupYearCommonMasterFactory):
-    acronym = 'actu2m'
-    partial_acronym = 'actu2m'
+    acronym = 'ACTU2M'
+    partial_acronym = 'ACTU2M'
 
 
 class EducationGroupYearCommonFactory(EducationGroupYearFactory):
