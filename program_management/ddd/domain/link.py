@@ -26,11 +26,27 @@
 
 from base.models.enums.link_type import LinkTypes
 from base.models.enums.quadrimesters import DerogationQuadrimester
+from osis_common.ddd import interface
 from program_management.ddd.business_types import *
 from program_management.models.enums.node_type import NodeType
 
 
-class Link:
+class LinkIdentity(interface.EntityIdentity):
+    def __init__(self, parent_code: str, child_code: str, year: int):
+        self.parent_code = parent_code
+        self.child_code = child_code
+        self.year = year
+
+    def __hash__(self):
+        return hash((self.parent_code, self.child_code, self.year))
+
+    def __eq__(self, other):
+        if isinstance(other, LinkIdentity):
+            return (self.parent_code, self.child_code, self.year) == (other.parent_code, other.child_code, other.year)
+        return False
+
+
+class Link(interface.Entity):
 
     def __init__(
         self,

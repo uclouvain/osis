@@ -25,7 +25,7 @@
 ##############################################################################
 from _decimal import Decimal
 from collections import OrderedDict
-from typing import List, Set, Dict
+from typing import List, Set, Dict, Optional
 
 from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, MiniTrainingType, GroupType
@@ -243,10 +243,11 @@ class Node(interface.Entity):
         self._children.append(child)
         child._has_changed = True
 
-    def detach_child(self, node_to_detach: 'Node'):
+    def detach_child(self, node_to_detach: 'Node') -> 'Link':
         link_to_detach = next(link for link in self.children if link.child == node_to_detach)
         self._deleted_children.add(link_to_detach)
         self.children.remove(link_to_detach)
+        return link_to_detach
 
     def get_link(self, link_id: int) -> 'Link':
         return next((link for link in self.children if link.pk == link_id), None)

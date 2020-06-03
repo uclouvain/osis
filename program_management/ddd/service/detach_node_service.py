@@ -23,18 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
 
-from base.ddd.utils import business_validator
-from base.ddd.utils.validation_message import BusinessValidationMessageList
 from program_management.ddd import command
+from program_management.ddd.domain import link
 from program_management.ddd.domain.program_tree import PATH_SEPARATOR
 from program_management.ddd.repositories import load_tree, persist_tree
 from program_management.ddd.service import tree_service
 from program_management.ddd.validators._detach_option_2M import DetachOptionValidator
 
 
-def detach_node(detach_command: command.DetachNodeCommand) -> None:
+def detach_node(detach_command: command.DetachNodeCommand) -> link.LinkIdentity:
     path_to_detach = detach_command.path
     commit = detach_command.commit
 
@@ -48,9 +46,9 @@ def detach_node(detach_command: command.DetachNodeCommand) -> None:
 
     DetachOptionValidator(working_tree, path_to_detach, other_trees_using_node).validate()
 
-    working_tree.detach_node(path_to_detach)
+    deleted_link = working_tree.detach_node(path_to_detach)
 
     if commit:
         persist_tree.persist(working_tree)
 
-    return
+    return deleted_link.entity_id

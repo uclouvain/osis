@@ -34,7 +34,7 @@ from base.models.enums.quadrimesters import DerogationQuadrimester
 from osis_common.decorators.deprecated import deprecated
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import program_tree
-from program_management.ddd.domain.link import factory as link_factory
+from program_management.ddd.domain.link import factory as link_factory, LinkIdentity
 from program_management.ddd.domain.prerequisite import NullPrerequisite
 from program_management.ddd.domain.prerequisite import Prerequisite
 from program_management.ddd.repositories import load_node, load_prerequisite, \
@@ -219,5 +219,10 @@ def __build_children(
         link_node = links['_'.join([str(parent_id), str(child_id)])]
         link_node.parent = nodes['{}_{}'.format(parent_id, NodeType.EDUCATION_GROUP)]
         link_node.child = child_node
+        link_node.entity_id = LinkIdentity(
+            parent_code=link_node.parent.code,
+            child_code=link_node.child.code,
+            year=link_node.parent.year
+        )
         children.append(link_node)
     return children

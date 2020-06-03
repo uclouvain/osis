@@ -285,7 +285,7 @@ class ProgramTree(interface.RootEntity):
         validator = validators_by_business_action.UpdatePrerequisiteValidatorList(prerequisite_expression, node, self)
         return validator.is_valid(), validator.messages
 
-    def detach_node(self, path_to_node_to_detach: Path) -> None:
+    def detach_node(self, path_to_node_to_detach: Path) -> 'Link':
         """
         Detach a node from tree
         :param path_to_node_to_detach: The path node to detach
@@ -299,8 +299,7 @@ class ProgramTree(interface.RootEntity):
 
         self.remove_prerequisites(node_to_detach, parent_path)
         parent = self.get_node(parent_path)
-        parent.detach_child(node_to_detach)
-        return None
+        return parent.detach_child(node_to_detach)
 
     def remove_prerequisites(self, detached_node: 'Node', parent_path):
         pruned_tree = ProgramTree(root_node=_copy(self.root_node))

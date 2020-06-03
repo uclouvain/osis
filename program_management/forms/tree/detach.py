@@ -26,12 +26,13 @@
 from django import forms
 
 from program_management.ddd import command
+from program_management.ddd.domain import link
 from program_management.ddd.service import detach_node_service
 
 
 class DetachNodeForm(forms.Form):
     path = forms.CharField(widget=forms.HiddenInput)
 
-    def save(self):
+    def save(self) -> link.LinkIdentity:
         detach_node_command = command.DetachNodeCommand(path_where_to_detach=self.cleaned_data["path"], commit=True)
         return detach_node_service.detach_node(detach_node_command)

@@ -30,7 +30,7 @@ from django.views.generic import FormView
 
 from base.ddd.utils import business_validator
 from base.utils.cache import ElementCache
-from base.views.common import display_business_messages
+from base.views.common import display_business_messages, display_success_messages
 from base.views.common import display_error_messages, display_warning_messages
 from base.views.mixins import AjaxTemplateMixin
 from program_management.ddd import command
@@ -106,10 +106,18 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
     def form_valid(self, form):
         self.object
         try:
-            form.save()
+            link_entity_id = form.save()
         except business_validator.BusinessExceptions as business_exception:
             display_error_messages(self.request, business_exception.messages)
             return self.form_invalid(form)
+
+        display_success_messages(
+            self.request,
+            [_("\"%(child)s\" has been detached from \"%(parent)s\"") % {
+                'child': link_entity_id.child_code,
+                'parent': link_entity_id.parent_code,
+            }]
+        )
 
         self._remove_element_from_clipboard_if_stored()
         return super().form_valid(form)
