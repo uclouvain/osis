@@ -31,6 +31,8 @@ from django.views.generic.detail import SingleObjectMixin
 from base.models.education_group_achievement import EducationGroupAchievement
 from base.models.education_group_detailed_achievement import EducationGroupDetailedAchievement
 from base.models.education_group_year import EducationGroupYear
+from education_group.ddd.domain.service.identity_search import TrainingIdentitySearch
+from education_group.views.proxy.read import Tab
 
 
 class EducationGroupAchievementMixin(SingleObjectMixin):
@@ -41,13 +43,18 @@ class EducationGroupAchievementMixin(SingleObjectMixin):
 
     def get_success_url(self):
         # Redirect to a page fragment
+        training_identity = TrainingIdentitySearch().get_from_education_group_year_id(self.kwargs['offer_id'])
         url = reverse(
-            "education_group_skills_achievements",
-            args=[
-                self.kwargs['offer_id'],
-                self.kwargs['education_group_year_id'],
-            ]
-        )
+            'education_group_read_proxy',
+            args=[training_identity.year, training_identity.acronym]
+        ) + '?tab={}'.format(Tab.SKILLS_ACHIEVEMENTS)
+        # url = reverse(
+        #     "education_group_skills_achievements",
+        #     args=[
+        #         self.kwargs['offer_id'],
+        #         self.kwargs['education_group_year_id'],
+        #     ]
+        # )
 
         obj = getattr(self, "object", None) or self.get_object()
         if obj:
