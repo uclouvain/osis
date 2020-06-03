@@ -110,7 +110,7 @@ def build_success_message(last_luy_reported, luy):
 
     if last_luy_reported and is_pedagogy_data_must_be_postponed(luy):
         msg = "{} {}.".format(
-            default_message,
+            _("The learning unit has been updated"),
             _("and postponed until %(year)s") % {
                 "year": last_luy_reported.academic_year
             }
