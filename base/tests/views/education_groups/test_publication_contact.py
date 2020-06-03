@@ -204,9 +204,8 @@ class TestPublicationContactDeleteView(PublicationContactViewSetupTest):
         )
 
     def test_delete_assert_redirection(self):
-        # TODO FIX: URL redirection
         redirect_expected = reverse(
-            'training_identification',
+            'training_general_information',
             kwargs={'year': self.training.academic_year.year, 'code': self.training.partial_acronym}
         )
         response = self.client.post(self.url_delete, follow=True)

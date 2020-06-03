@@ -61,7 +61,7 @@ class CommonEducationGroupPublicationContactView(PermissionRequiredMixin, AjaxTe
         return reverse(
             'education_group_read_proxy',
             args=[training_identity.year, training_identity.acronym]
-        ) + '?tab={}'.format(Tab.GENERAL_INFO) + '&anchor=True'
+        ) + '?tab={}'.format(Tab.GENERAL_INFO.value) + '&anchor=True'
 
     def get_permission_object(self):
         return self.education_group_year
