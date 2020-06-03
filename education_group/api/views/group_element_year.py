@@ -32,6 +32,7 @@ from base.models.enums.education_group_categories import Categories
 from education_group.api.serializers.group_element_year import EducationGroupRootNodeTreeSerializer
 from program_management.ddd.domain import link
 from program_management.ddd.repositories import load_tree
+from program_management.models.element import Element
 
 
 class EducationGroupTreeView(LanguageContextSerializerMixin, generics.RetrieveAPIView):
@@ -52,8 +53,13 @@ class EducationGroupTreeView(LanguageContextSerializerMixin, generics.RetrieveAP
 
         self.check_object_permissions(self.request, education_group_year)
 
-        tree = load_tree.load(education_group_year.id)
+        tree = load_tree.load(self.get_element_id(education_group_year))
         return link.factory.get_link(parent=None, child=tree.root_node)
+
+    def get_element_id(self, education_group_year):
+        return get_object_or_404(
+            Element.objects.filter(group_year__educationgroupversion__offer=education_group_year)
+        ).id
 
 
 class TrainingTreeView(EducationGroupTreeView):
