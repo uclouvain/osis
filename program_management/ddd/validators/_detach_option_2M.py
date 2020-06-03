@@ -32,7 +32,7 @@ from base.ddd.utils import business_validator
 from program_management.ddd.business_types import *
 
 
-class DetachOptionValidator(business_validator.BusinessValidator):  # TODO :: to unit test !!
+class DetachOptionValidator(business_validator.BusinessValidator):
     """
     In context of MA/MD/MS when we add an option [or group which contains options],
     this options must exist in parent context (2m)
