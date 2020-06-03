@@ -175,7 +175,7 @@ def _get_cms_label_translated(cms_label, user_language):
 
 
 def build_success_message(last_academic_year=None, learning_unit_year_id=None, with_postponement=False):
-    default_msg = _("The learning unit has been updated")
+    default_msg = _("The learning unit has been updated (without report).")
     luy = LearningUnitYear.objects.get(id=learning_unit_year_id)
     proposal = ProposalLearningUnit.objects.filter(
         learning_unit_year__learning_unit=luy.learning_unit

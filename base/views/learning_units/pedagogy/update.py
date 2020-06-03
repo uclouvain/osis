@@ -105,7 +105,7 @@ def _post_learning_unit_pedagogy_form(request):
 
 
 def build_success_message(last_luy_reported, luy):
-    default_message = _("The learning unit has been updated")
+    default_message = _("The learning unit has been updated (without report).")
     proposal = ProposalLearningUnit.objects.filter(learning_unit_year__learning_unit=luy.learning_unit).first()
 
     if last_luy_reported and is_pedagogy_data_must_be_postponed(luy):
