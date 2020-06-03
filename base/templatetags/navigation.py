@@ -28,7 +28,6 @@ from django.db.models.functions import Lag, Lead
 from django.template.defaulttags import register
 from django.urls import reverse
 
-from base.forms.education_groups import EducationGroupFilter
 from base.forms.learning_unit.search.borrowed import BorrowedLearningUnitSearch
 from base.forms.learning_unit.search.educational_information import LearningUnitDescriptionFicheFilter
 from base.forms.learning_unit.search.external import ExternalLearningUnitFilter
@@ -46,12 +45,6 @@ from program_management.forms.education_groups import GroupFilter
 @register.inclusion_tag('templatetags/navigation_learning_unit.html', takes_context=False)
 def navigation_learning_unit(user, obj: LearningUnitYear, url_name: str):
     return _navigation_base(_get_learning_unit_filter_class, _reverse_learning_unit_year_url, user, obj, url_name,
-                            "acronym")
-
-
-@register.inclusion_tag('templatetags/navigation_education_group.html', takes_context=False)
-def navigation_education_group(user, obj: GroupYear, url_name: str):
-    return _navigation_base(_get_education_group_filter_class, _reverse_education_group_year_url, user, obj, url_name,
                             "acronym")
 
 
@@ -112,19 +105,13 @@ def _navigation_base(filter_class_function, reverse_url_function, user, obj, url
     if current_row:
         context.update({
             "next_element_title": current_row.next_code,
-            "next_url": reverse_url_function(current_row.next_code, current_row.next_year, current_row.next_id,
-                                             url_name)
+            "next_url": reverse_url_function(current_row.next_code, current_row.next_year, url_name)
             if current_row.next_id else None,
             "previous_element_title": current_row.previous_code,
-            "previous_url": reverse_url_function(current_row.previous_code, current_row.previous_year,
-                                                 current_row.previous_id, url_name)
+            "previous_url": reverse_url_function(current_row.previous_code, current_row.previous_year, url_name)
             if current_row.previous_id else None
         })
     return context
-
-
-def _get_education_group_filter_class(search_type):
-    return EducationGroupFilter
 
 
 def _get_group_filter_class(search_type):
@@ -147,15 +134,11 @@ def _get_current_row(qs, obj):
     return next((row for row in qs if row.id == obj.id), None)
 
 
-def _reverse_education_group_year_url(partial_acronym, year, education_group_year_id, url_name):
-    return reverse(url_name, args=[education_group_year_id, education_group_year_id])
-
-
-def _reverse_group_year_url(partial_acronym, year, group_year_id, url_name):
+def _reverse_group_year_url(partial_acronym, year, url_name):
     return reverse(url_name, args=[year, partial_acronym])
 
 
-def _reverse_learning_unit_year_url(acronym, year, learning_unit_year_id, url_name):
+def _reverse_learning_unit_year_url(acronym, year, url_name):
     return reverse(url_name, args=[acronym, year])
 
 
