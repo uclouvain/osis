@@ -1,5 +1,4 @@
-{% extends "education_group/../../../education_group/templates/education_group_app/blocks/layout_detail.html" %}
-{% load bootstrap3 i18n %}
+{% extends "education_group_app/general_information/layout_read.html" %}
 {% comment "License" %}
     * OSIS stands for Open Student Information System. It's an application
     * designed to manage the core business of higher education institutions,
@@ -24,6 +23,18 @@
     * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-{% block content %}
-    {% include "group_element_year/pdf_content_inner.html" %}
-{% endblock %}
+{% block details %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                {% for section_name, labels in sections.items %}
+                    {% include "education_group_app/blocks/general_information_section_panel.html" %}
+                {% endfor %}
+
+                {% if show_contacts %}
+                    {% include "education_group_app/blocks/general_information_section_contact_panel.html" %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock details %}

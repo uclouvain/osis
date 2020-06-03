@@ -35,7 +35,7 @@ from education_group.views.mini_training.common_read import MiniTrainingRead, Ta
 
 
 class MiniTrainingReadGeneralInformation(MiniTrainingRead):
-    template_name = "mini_training/general_informations_read.html"
+    template_name = "education_group_app/mini_training/general_informations_read.html"
     active_tab = Tab.GENERAL_INFO
 
     def get(self, request, *args, **kwargs):
