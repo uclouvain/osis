@@ -25,7 +25,9 @@
 ##############################################################################
 from typing import List
 
+from base.ddd.utils import business_validator
 from base.ddd.utils.validation_message import BusinessValidationMessageList
+from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.program_tree import PATH_SEPARATOR
 from program_management.ddd.repositories import load_tree, persist_tree
@@ -34,10 +36,9 @@ from program_management.ddd.validators._detach_option_2M import DetachOptionVali
 from program_management.ddd.validators._path_validator import PathValidator
 
 
-def detach_node(path_to_detach: 'Path', commit=True) -> BusinessValidationMessageList:
-    validator = PathValidator(path_to_detach)
-    if not validator.is_valid():
-        return BusinessValidationMessageList(messages=validator.messages)
+def detach_node(detach_command: command.DetachNodeCommand) -> BusinessValidationMessageList:
+    path_to_detach = detach_command.path
+    commit = detach_command.commit
 
     root_id = int(path_to_detach.split(PATH_SEPARATOR)[0])
     working_tree = load_tree.load(root_id)
@@ -61,7 +62,9 @@ def detach_node(path_to_detach: 'Path', commit=True) -> BusinessValidationMessag
     return message_list
 
 
-def __check_detach_option(working_tree, path_to_detach, trees_using_node) -> List['BusinessValidationMessage']:
-    validator = DetachOptionValidator(working_tree, path_to_detach, trees_using_node)
-    validator.is_valid()
-    return validator.messages
+def __check_detach_option(working_tree, path_to_detach, trees_using_node) -> List[str]:
+    try:
+        DetachOptionValidator(working_tree, path_to_detach, trees_using_node).validate()
+    except business_validator.BusinessExceptions as business_exceptions:
+        return business_exceptions.messages
+    return []

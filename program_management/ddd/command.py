@@ -35,8 +35,14 @@ from program_management.models.enums import node_type
 
 
 class DetachNodeCommand(interface.CommandRequest):
-    # To implement
-    pass
+    def __init__(self, path_where_to_detach: str, commit: bool):
+        self.path = path_where_to_detach
+        self.commit = commit
+
+    def __eq__(self, other):
+        if isinstance(other, DetachNodeCommand):
+            return self.path == other.path and self.commit == other.commit
+        return False
 
 
 class OrderLinkCommand(interface.CommandRequest):

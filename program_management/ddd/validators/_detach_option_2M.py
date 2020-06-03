@@ -28,12 +28,11 @@ from typing import List
 
 from django.utils.translation import ngettext
 
-from base.ddd.utils.business_validator import BusinessValidator
+from base.ddd.utils import business_validator
 from program_management.ddd.business_types import *
 
 
-# Implmented from _check_detach_options_rules
-class DetachOptionValidator(BusinessValidator):  # TODO :: to unit test !!
+class DetachOptionValidator(business_validator.BusinessValidator):  # TODO :: to unit test !!
     """
     In context of MA/MD/MS when we add an option [or group which contains options],
     this options must exist in parent context (2m)
@@ -63,6 +62,7 @@ class DetachOptionValidator(BusinessValidator):  # TODO :: to unit test !!
         return result
 
     def validate(self):
+        error_messages = []
         options_to_detach = self.get_options_to_detach()
         if options_to_detach and not self._is_inside_finality():
             for tree_2m in self.trees_2m:
@@ -74,7 +74,7 @@ class DetachOptionValidator(BusinessValidator):  # TODO :: to unit test !!
                 for finality in tree_2m.get_all_finalities():
                     options_to_detach_used_in_finality = set(options_to_detach) & set(finality.get_option_list())
                     if options_to_detach_used_in_finality:
-                        self.add_error_message(
+                        error_messages.append(
                             ngettext(
                                 "Option \"%(acronym)s\" cannot be detach because it is contained in"
                                 " %(finality_acronym)s program.",
@@ -86,6 +86,8 @@ class DetachOptionValidator(BusinessValidator):  # TODO :: to unit test !!
                                 "finality_acronym": finality.title
                             }
                         )
+        if error_messages:
+            raise business_validator.BusinessExceptions(error_messages)
 
     def _is_inside_finality(self):
         parents = self.working_tree.get_parents(self.path_to_node_to_detach)
