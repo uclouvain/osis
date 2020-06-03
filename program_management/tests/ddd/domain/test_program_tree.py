@@ -676,43 +676,19 @@ class TestDetachNode(SimpleTestCase):
         self.success_message = BusinessValidationMessage("Success message", MessageLevel.SUCCESS)
         self.error_message = BusinessValidationMessage("Error message", MessageLevel.ERROR)
 
-    def test_when_path_is_not_valid(self):
+    def test_should_raise_exception_when_path_is_not_valid(self):
         tree = ProgramTreeFactory()
         LinkFactory(parent=tree.root_node)
         path_to_detach = "Invalid path"
         with self.assertRaises(business_validator.BusinessExceptions):
             tree.detach_node(path_to_detach)
 
-    def test_when_path_to_detach_is_root_node(self):
-        tree = ProgramTreeFactory()
-        LinkFactory(parent=tree.root_node)
-        path_to_detach = str(tree.root_node.pk)
-        with self.assertRaises(business_validator.BusinessExceptions):
-            tree.detach_node(path_to_detach)
-
-
-    @patch.object(DetachNodeValidatorList, 'messages')
-    @patch.object(DetachNodeValidatorList, 'is_valid')
-    def test_when_validator_list_is_valid(self, mock_is_valid, mock_messages):
-        mock_is_valid.return_value = True
-        mock_messages.return_value = [self.success_message]
-        tree = ProgramTreeFactory()
-        link = LinkFactory(parent=tree.root_node)
-        path_to_detach = build_path(link.parent, link.child)
-        result_is_valid, result_messages = tree.detach_node(path_to_detach)
-        self.assertTrue(result_is_valid)
-        self.assertListEqual(result_messages.return_value, [self.success_message])
-        self.assertNotIn(link, tree.root_node.children)
-
-    @patch.object(DetachNodeValidatorList, 'messages')
-    @patch.object(DetachNodeValidatorList, 'is_valid')
-    def test_when_validator_list_is_valid_and_node_contains_node_that_has_prerequisites(
+    @patch.object(DetachNodeValidatorList, 'validate')
+    def test_should_remove_prerequisites_and_delete_link_when_validator_do_not_raise_exception(
             self,
-            mock_is_valid,
-            mock_messages
+            mock_validate,
     ):
-        mock_is_valid.return_value = True
-        mock_messages.return_value = [self.success_message]
+        mock_validate.return_value = True
 
         node_that_has_prerequisite = NodeLearningUnitYearFactory()
         node_that_is_prerequisite = NodeLearningUnitYearFactory(is_prerequisite_of=[node_that_has_prerequisite])
@@ -727,24 +703,26 @@ class TestDetachNode(SimpleTestCase):
         LinkFactory(parent=tree.root_node, child=node_that_is_prerequisite)
         link = LinkFactory(parent=tree.root_node, child=node_that_has_prerequisite)
         path_to_detach = build_path(link.parent, link.child)
-        result_is_valid, result_messages = tree.detach_node(path_to_detach)
-        self.assertTrue(result_is_valid)
-        self.assertListEqual(result_messages.return_value, [self.success_message])
+        tree.detach_node(path_to_detach)
+
         self.assertNotIn(link, tree.root_node.children)
         self.assertListEqual(node_that_has_prerequisite.prerequisite.get_all_prerequisite_items(), [])
 
-    @patch.object(DetachNodeValidatorList, 'messages')
-    @patch.object(DetachNodeValidatorList, 'is_valid')
-    def test_when_validator_list_is_not_valid(self, mock_is_valid, mock_messages):
-        mock_is_valid.return_value = False
-        mock_messages.return_value = [self.error_message]
+    @patch.object(DetachNodeValidatorList, 'validate')
+    def test_should_propagate_exception_when_validator_raises_exception(self, mock_validate):
+        mock_validate.side_effect = business_validator.BusinessExceptions(["error occured", "an other error"])
+
         tree = ProgramTreeFactory()
         link = LinkFactory(parent=tree.root_node)
         path_to_detach = build_path(link.parent, link.child)
-        result_is_valid, result_messages = tree.detach_node(path_to_detach)
-        self.assertFalse(result_is_valid)
-        self.assertListEqual(result_messages.return_value, [self.error_message])
-        self.assertIn(link, tree.root_node.children)
+
+        with self.assertRaises(business_validator.BusinessExceptions) as exception_context:
+            tree.detach_node(path_to_detach)
+
+        self.assertListEqual(
+            exception_context.exception.messages,
+            ["error occured", "an other error"]
+        )
 
 
 class TestGet2mOptionList(SimpleTestCase):

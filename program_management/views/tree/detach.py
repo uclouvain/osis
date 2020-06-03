@@ -28,10 +28,12 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 
+from base.ddd.utils import business_validator
 from base.utils.cache import ElementCache
 from base.views.common import display_business_messages
 from base.views.common import display_error_messages, display_warning_messages
 from base.views.mixins import AjaxTemplateMixin
+from program_management.ddd import command
 from program_management.ddd.domain.program_tree import PATH_SEPARATOR
 from program_management.ddd.service import detach_node_service
 from program_management.forms.tree.detach import DetachNodeForm
@@ -74,10 +76,12 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
 
     def get_context_data(self, **kwargs):
         context = super(DetachNodeView, self).get_context_data(**kwargs)
-        message_list = detach_node_service.detach_node(self.request.GET.get('path'), commit=False)
-        display_warning_messages(self.request, message_list.warnings)
-        display_error_messages(self.request, message_list.errors)
-        if not message_list.contains_errors():
+        detach_node_command = command.DetachNodeCommand(path_where_to_detach=self.request.GET.get('path'), commit=False)
+        try:
+            detach_node_service.detach_node(detach_node_command)
+        except business_validator.BusinessExceptions as business_exception:
+            display_error_messages(self.request, business_exception.messages)
+        else:
             context['confirmation_message'] = self.confirmation_message
         return context
 
@@ -101,10 +105,12 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
 
     def form_valid(self, form):
         self.object
-        message_list = form.save()
-        display_business_messages(self.request, message_list.messages)
-        if message_list.contains_errors():
+        try:
+            form.save()
+        except business_validator.BusinessExceptions as business_exception:
+            display_error_messages(self.request, business_exception.messages)
             return self.form_invalid(form)
+
         self._remove_element_from_clipboard_if_stored()
         return super().form_valid(form)
 

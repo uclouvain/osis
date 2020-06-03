@@ -34,7 +34,7 @@ from program_management.ddd.service import tree_service
 from program_management.ddd.validators._detach_option_2M import DetachOptionValidator
 
 
-def detach_node(detach_command: command.DetachNodeCommand) -> BusinessValidationMessageList:
+def detach_node(detach_command: command.DetachNodeCommand) -> None:
     path_to_detach = detach_command.path
     commit = detach_command.commit
 
@@ -46,23 +46,11 @@ def detach_node(detach_command: command.DetachNodeCommand) -> BusinessValidation
         tree for tree in tree_service.search_trees_using_node(node_to_detach) if tree != working_tree
     ]
 
-    messages = []
-    messages += __check_detach_option(working_tree, path_to_detach, other_trees_using_node)
+    DetachOptionValidator(working_tree, path_to_detach, other_trees_using_node).validate()
 
-    is_valid, _messages = working_tree.detach_node(path_to_detach)
-    messages += _messages
+    working_tree.detach_node(path_to_detach)
 
-    message_list = BusinessValidationMessageList(messages=messages)
-
-    if not message_list.contains_errors() and commit:
+    if commit:
         persist_tree.persist(working_tree)
 
-    return message_list
-
-
-def __check_detach_option(working_tree, path_to_detach, trees_using_node) -> List[str]:
-    try:
-        DetachOptionValidator(working_tree, path_to_detach, trees_using_node).validate()
-    except business_validator.BusinessExceptions as business_exceptions:
-        return business_exceptions.messages
-    return []
+    return

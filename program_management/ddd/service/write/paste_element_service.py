@@ -38,9 +38,8 @@ def paste_element_service(paste_command: command.PasteElementCommand) -> 'NodeId
     node_to_attach = node_repository.NodeRepository.get(node_identity)
 
     if path_to_detach:
-        error_messages = detach_node_service.detach_node(path_to_detach, commit=commit).errors
-        if error_messages:
-            raise business_validator.BusinessExceptions([str(msg) for msg in error_messages])
+        detach_command = command.DetachNodeCommand(path_where_to_detach=path_to_detach, commit=commit)
+        detach_node_service.detach_node(detach_command)
 
     tree.paste_node(node_to_attach, paste_command)
 

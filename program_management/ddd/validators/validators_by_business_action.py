@@ -168,10 +168,16 @@ class DetachNodeValidatorList(business_validator.BusinessListValidator):
             raise AttributeError("Unknown instance of node")
         super().__init__()
 
-        self.add_success_message(_("\"%(child)s\" has been detached from \"%(parent)s\"") % {
-            'child': node_to_detach,
-            'parent': detach_from,
-        })  # TODO :: unit test
+    def validate(self):
+        error_messages = []
+        for validator in self.validators:
+            try:
+                validator.validate()
+            except business_validator.BusinessExceptions as business_exception:
+                error_messages.extend(business_exception.messages)
+
+        if error_messages:
+            raise business_validator.BusinessExceptions(error_messages)
 
 
 class UpdatePrerequisiteValidatorList(business_validator.BusinessListValidator):
