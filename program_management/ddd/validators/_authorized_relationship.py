@@ -103,11 +103,11 @@ class DetachAuthorizedRelationshipValidator(business_validator.BusinessValidator
     def validate(self):
         minimum_children_types_reached = self._get_minimum_children_types_reached(self.detach_from, self.node_to_detach)
         if minimum_children_types_reached:
-            self.add_error_message(
+            raise business_validator.BusinessExceptions([
                 _("The parent must have at least one child of type(s) \"%(types)s\".") % {
                     "types": ','.join(str(node_type.value) for node_type in minimum_children_types_reached)
                 }
-            )
+            ])
 
     def _get_minimum_children_types_reached(self, parent_node: 'Node', child_node: 'Node'):
         children_types_to_check = [child_node.node_type]

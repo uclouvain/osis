@@ -152,7 +152,7 @@ class TestAuthorizedRelationshipLearningUnitValidator(TestValidatorValidateMixin
         self.assertValidatorNotRaises(AuthorizedRelationshipLearningUnitValidator(tree, node_to_add, tree.root_node))
 
 
-class TestDetachAuthorizedRelationshipValidator(SimpleTestCase):
+class TestDetachAuthorizedRelationshipValidator(TestValidatorValidateMixin, SimpleTestCase):
 
     def setUp(self):
         self.academic_year = AcademicYearFactory.build(current=True)
@@ -179,7 +179,7 @@ class TestDetachAuthorizedRelationshipValidator(SimpleTestCase):
             AuthorizedRelationshipObjectFactory(
                 parent_type=self.authorized_child.node_type,
                 child_type=NodeType.LEARNING_UNIT,
-                min_constraint=1,
+                min_constraint=0,
             ),
         ])
         self.tree = ProgramTreeFactory(
@@ -187,13 +187,7 @@ class TestDetachAuthorizedRelationshipValidator(SimpleTestCase):
             authorized_relationships=self.authorized_relationships
         )
 
-    def test_success(self):
-        LinkFactory(parent=self.authorized_parent, child=self.authorized_child)
-        link = LinkFactory(parent=self.authorized_parent, child__node_type=GroupType.COMMON_CORE)
-        validator = DetachAuthorizedRelationshipValidator(self.tree, link.child, self.authorized_parent)
-        self.assertTrue(validator.is_valid())
-
-    def test_when_relation_is_not_authorized(self):
+    def test_should_not_raise_exception_when_relation_is_not_authorized(self):
         """
             Business case to fix :
             MINOR_LIST_CHOICE
@@ -208,9 +202,9 @@ class TestDetachAuthorizedRelationshipValidator(SimpleTestCase):
         unauthorized_child = NodeGroupYearFactory(node_type=GroupType.COMPLEMENTARY_MODULE)
         LinkFactory(parent=self.authorized_parent, child=unauthorized_child)
         validator = DetachAuthorizedRelationshipValidator(self.tree, unauthorized_child, self.authorized_parent)
-        self.assertTrue(validator.is_valid())
+        self.assertValidatorNotRaises(validator)
 
-    def test_when_parent_has_children_but_minimum_is_not_reached(self):
+    def test_should_not_raise_exception_when_minimum_is_not_reached_when_detaching(self):
         another_authorized_child = NodeGroupYearFactory(node_type=GroupType.COMMON_CORE)
         another_authorized_parent = NodeGroupYearFactory(node_type=TrainingType.BACHELOR)
         another_authorized_parent.add_child(another_authorized_child)
@@ -220,20 +214,19 @@ class TestDetachAuthorizedRelationshipValidator(SimpleTestCase):
             authorized_relationships=self.authorized_relationships
         )
         validator = DetachAuthorizedRelationshipValidator(tree, another_authorized_child, another_authorized_parent)
-        self.assertTrue(validator.is_valid())
+        self.assertValidatorNotRaises(validator)
 
-    def test_when_minimum_is_reached(self):
+    def test_should_raise_exception_when_minimum_is_reached_when_detaching(self):
         node_to_detach = self.authorized_child
         detach_from = self.authorized_parent
         LinkFactory(parent=detach_from, child=node_to_detach)
         validator = DetachAuthorizedRelationshipValidator(self.tree, node_to_detach, detach_from)
-        self.assertFalse(validator.is_valid())
         expected_error_msg = _("The parent must have at least one child of type(s) \"%(types)s\".") % {
             "types": str(node_to_detach.node_type.value)
         }
-        self.assertListEqual([expected_error_msg], validator.error_messages)
+        self.assertValidatorRaises(validator, [expected_error_msg])
 
-    def test_when_link_to_detach_is_reference(self):
+    def test_should_not_raise_exception_when_link_to_detach_is_learning_unit(self):
         """
         BACHELOR
            |--COMMON_CORE
@@ -246,13 +239,9 @@ class TestDetachAuthorizedRelationshipValidator(SimpleTestCase):
         detach_from = link.parent
         validator = DetachAuthorizedRelationshipValidator(self.tree, node_to_detach, detach_from)
 
-        self.assertFalse(validator.is_valid())
-        expected_error_msg = _("The parent must have at least one child of type(s) \"%(types)s\".") % {
-            "types": str(NodeType.LEARNING_UNIT.value)
-        }
-        self.assertListEqual([expected_error_msg], validator.error_messages)
+        self.assertValidatorNotRaises(validator)
 
-    def test_when_link_to_detach_is_learning_unit(self):
+    def test_should_raise_exception_when_node_to_detach_is_linked_by_reference_and_min_reached_for_its_children(self):
         LinkFactory(parent=self.authorized_parent, child=self.authorized_child)
         reference_link = LinkFactory(
             parent=self.authorized_child,
@@ -266,12 +255,7 @@ class TestDetachAuthorizedRelationshipValidator(SimpleTestCase):
         detach_from = reference_link.parent
         validator = DetachAuthorizedRelationshipValidator(self.tree, node_to_detach, detach_from)
 
-        self.assertFalse(validator.is_valid())
         expected_error_msg = _("The parent must have at least one child of type(s) \"%(types)s\".") % {
             "types": str(child_type_under_reference.value)
         }
-        self.assertListEqual(
-            [expected_error_msg],
-            validator.error_messages,
-            "Should validate types of the children of the child linked by reference"
-        )
+        self.assertValidatorRaises(validator, [expected_error_msg])
