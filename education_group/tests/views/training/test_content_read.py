@@ -80,7 +80,7 @@ class TestTrainingReadContent(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, "training/content_read.html")
+        self.assertTemplateUsed(response, "education_group_app/training/content_read.html")
 
     def test_assert_context_data(self):
         response = self.client.get(self.url)

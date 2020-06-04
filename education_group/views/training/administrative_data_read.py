@@ -38,7 +38,7 @@ from education_group.views.training.common_read import TrainingRead, Tab
 
 
 class TrainingReadAdministrativeData(TrainingRead):
-    template_name = "training/administrative_data.html"
+    template_name = "education_group_app/training/administrative_data.html"
     active_tab = Tab.ADMINISTRATIVE_DATA
 
     def get(self, request, *args, **kwargs):

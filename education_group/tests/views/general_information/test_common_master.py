@@ -75,7 +75,7 @@ class TestCommonMasterAdmissionCondition(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, "general_information/common_master.html")
+        self.assertTemplateUsed(response, "education_group_app/general_information/common_master.html")
 
     def test_assert_context_data(self):
         response = self.client.get(self.url)

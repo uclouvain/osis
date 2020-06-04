@@ -31,7 +31,7 @@ from education_group.views.group.common_read import Tab, GroupRead
 
 
 class GroupReadGeneralInformation(GroupRead):
-    template_name = "group/general_informations_read.html"
+    template_name = "education_group_app/group/general_informations_read.html"
     active_tab = Tab.GENERAL_INFO
 
     def get(self, request, *args, **kwargs):

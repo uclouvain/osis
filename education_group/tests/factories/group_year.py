@@ -55,8 +55,8 @@ class GroupYearFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = "education_group.GroupYear"
 
-    partial_acronym = factory.Sequence(lambda n: 'PGy %d' % n)
-    acronym = factory.Sequence(lambda n: 'Gy %d' % n)
+    partial_acronym = factory.Sequence(lambda n: 'PGy%d' % n)
+    acronym = factory.Sequence(lambda n: 'Gy%d' % n)
     education_group_type = factory.SubFactory(EducationGroupTypeFactory)
     credits = factory.fuzzy.FuzzyInteger(MINIMUM_CREDITS, MAXIMUM_CREDITS)
     constraint_type = CREDITS

@@ -78,7 +78,7 @@ class TestTrainingReadDiplomaCertificate(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, "training/diplomas_certificates_read.html")
+        self.assertTemplateUsed(response, "education_group_app/training/diplomas_certificates_read.html")
 
     def test_assert_context_data(self):
         response = self.client.get(self.url)

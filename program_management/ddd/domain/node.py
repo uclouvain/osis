@@ -140,7 +140,7 @@ class Node(interface.Entity):
     def is_learning_unit(self):
         return self.type == NodeType.LEARNING_UNIT
 
-    def is_group(self):
+    def is_group_or_mini_or_training(self):
         return self.type == NodeType.GROUP or self.type == NodeType.EDUCATION_GROUP
 
     def is_finality(self) -> bool:
@@ -157,6 +157,9 @@ class Node(interface.Entity):
 
     def is_mini_training(self) -> bool:
         return self.node_type in MiniTrainingType.all()
+
+    def is_group(self) -> bool:
+        return self.node_type in GroupType.all()
 
     def is_minor_major_list_choice(self) -> bool:
         return self.node_type in GroupType.minor_major_list_choice_enums()

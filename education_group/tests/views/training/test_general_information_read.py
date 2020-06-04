@@ -97,7 +97,7 @@ class TestTrainingReadGeneralInformation(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, "training/general_informations_read.html")
+        self.assertTemplateUsed(response, "education_group_app/training/general_informations_read.html")
 
     @mock.patch('education_group.views.serializers.general_information.get_sections', return_value={})
     def test_assert_context_data(self, mock_get_sections):

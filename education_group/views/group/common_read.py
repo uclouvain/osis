@@ -42,6 +42,7 @@ from base.models.enums.education_group_types import GroupType
 from base.views.common import display_warning_messages
 from education_group.forms.academic_year_choices import get_academic_year_choices
 from education_group.models.group_year import GroupYear
+from education_group.views.proxy import read
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.node import NodeIdentity, NodeNotFoundException
@@ -51,11 +52,7 @@ from program_management.models.element import Element
 from program_management.serializers.program_tree_view import program_tree_view_serializer
 
 
-class Tab(Enum):
-    IDENTIFICATION = 0
-    CONTENT = 1
-    UTILIZATION = 2
-    GENERAL_INFO = 3
+Tab = read.Tab  # FIXME :: fix imports (and remove this line)
 
 
 class GroupRead(PermissionRequiredMixin, TemplateView):
@@ -137,32 +134,32 @@ class GroupRead(PermissionRequiredMixin, TemplateView):
                 'text': _('Identification'),
                 'active': Tab.IDENTIFICATION == self.active_tab,
                 'display': True,
-                'url': _get_tab_urls(Tab.IDENTIFICATION, self.node_identity, self.path),
+                'url': get_tab_urls(Tab.IDENTIFICATION, self.node_identity, self.path),
             },
             Tab.CONTENT: {
                 'text': _('Content'),
                 'active': Tab.CONTENT == self.active_tab,
                 'display': True,
-                'url': _get_tab_urls(Tab.CONTENT, self.node_identity, self.path),
+                'url': get_tab_urls(Tab.CONTENT, self.node_identity, self.path),
             },
             Tab.UTILIZATION: {
                 'text': _('Utilizations'),
                 'active': Tab.UTILIZATION == self.active_tab,
                 'display': True,
-                'url': _get_tab_urls(Tab.UTILIZATION, self.node_identity, self.path),
+                'url': get_tab_urls(Tab.UTILIZATION, self.node_identity, self.path),
             },
             Tab.GENERAL_INFO: {
                 'text': _('General informations'),
                 'active': Tab.GENERAL_INFO == self.active_tab,
                 'display': self.have_general_information_tab(),
-                'url': _get_tab_urls(Tab.GENERAL_INFO, self.node_identity, self.path),
+                'url': get_tab_urls(Tab.GENERAL_INFO, self.node_identity, self.path),
             }
         })
 
     def have_general_information_tab(self):
         node_category = self.get_object().category
         return node_category.name in general_information_sections.SECTIONS_PER_OFFER_TYPE and \
-               self._is_general_info_and_condition_admission_in_display_range
+            self._is_general_info_and_condition_admission_in_display_range
 
     def _is_general_info_and_condition_admission_in_display_range(self):
         return MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION <= self.get_object().year < \
@@ -178,7 +175,7 @@ def _get_view_name_from_tab(tab: Tab):
     }[tab]
 
 
-def _get_tab_urls(tab: Tab, node_identity: 'NodeIdentity', path: 'Path' = None) -> str:
+def get_tab_urls(tab: Tab, node_identity: 'NodeIdentity', path: 'Path' = None) -> str:
     path = path or ""
     return reverse(
         _get_view_name_from_tab(tab),

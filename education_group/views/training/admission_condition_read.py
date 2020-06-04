@@ -39,7 +39,7 @@ from education_group.views.training.common_read import TrainingRead, Tab
 
 
 class TrainingReadAdmissionCondition(TrainingRead):
-    template_name = "training/admission_condition_read.html"
+    template_name = "education_group_app/training/admission_condition_read.html"
     active_tab = Tab.ADMISSION_CONDITION
 
     def get(self, request, *args, **kwargs):

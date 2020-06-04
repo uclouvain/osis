@@ -28,7 +28,7 @@ from program_management.ddd.service import tree_service
 
 
 class GroupReadUtilization(GroupRead):
-    template_name = "group/utilization_read.html"
+    template_name = "education_group_app/group/utilization_read.html"
     active_tab = Tab.UTILIZATION
 
     def get_context_data(self, **kwargs):
