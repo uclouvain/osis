@@ -26,7 +26,8 @@ from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import node
 from program_management.ddd.repositories import load_tree, persist_tree, node as node_repository
-from program_management.ddd.service import detach_node_service
+from program_management.ddd.service import tree_service
+from program_management.ddd.validators._detach_option_2M import DetachOptionValidator
 
 
 def paste_element_service(paste_command: command.PasteElementCommand) -> 'LinkIdentity':
@@ -36,12 +37,16 @@ def paste_element_service(paste_command: command.PasteElementCommand) -> 'LinkId
     tree = load_tree.load(paste_command.root_id)
     node_to_attach = node_repository.NodeRepository.get(node_identity)
 
-    if path_to_detach:
-        detach_command = command.DetachNodeCommand(path_where_to_detach=path_to_detach, commit=commit)
-        detach_node_service.detach_node(detach_command)
-
     link_created = tree.paste_node(node_to_attach, paste_command)
+
+    if path_to_detach:
+        other_trees_using_node = [
+            tree for tree in tree_service.search_trees_using_node(node_to_attach) if tree != tree
+        ]
+        DetachOptionValidator(tree, path_to_detach, other_trees_using_node).validate()
+        tree.detach_node(path_to_detach)
 
     if commit:
         persist_tree.persist(tree)
+
     return link_created.entity_id
