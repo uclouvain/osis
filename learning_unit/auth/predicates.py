@@ -3,7 +3,8 @@ from django.utils.translation import gettext_lazy as _
 from rules import predicate
 
 from attribution.models.tutor_application import TutorApplication
-from base.business.event_perms import EventPermLearningUnitCentralManagerEdition
+from base.business import event_perms
+from base.business.learning_units.perms import PROPOSAL_CONSOLIDATION_ELIGIBLE_STATES
 from base.models.enums import learning_container_year_types as container_types, learning_container_year_types
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
@@ -61,7 +62,7 @@ def is_learning_unit_year_prerequisite(self, user, learning_unit_year):
 
 
 @predicate(bind=True)
-@predicate_failed_msg(message=_("This learning unit has application."))
+@predicate_failed_msg(message=_("This learning unit has no application."))
 def has_learning_unit_applications(self, user, learning_unit_year):
     if learning_unit_year:
         return TutorApplication.objects.filter(
@@ -91,11 +92,22 @@ def is_learning_unit_container_type_editable(self, user, learning_unit_year):
 
 
 @predicate(bind=True)
-@predicate_failed_msg(message=EventPermLearningUnitCentralManagerEdition.error_msg)
-def is_edition_period_open(self, user, learning_unit_year):
+@predicate_failed_msg(message=_("This learning unit is not editable this period."))
+def is_learning_unit_edition_period_open(self, user, learning_unit_year):
     if learning_unit_year:
-        # TODO : make predicate independent from role
-        EventPermLearningUnitCentralManagerEdition(obj=learning_unit_year).is_open()
+        for role in self.context['role_qs']:
+            return event_perms.generate_event_perm_learning_unit_edition(role.person, learning_unit_year).is_open()
+    return None
+
+
+@predicate(bind=True)
+@predicate_failed_msg(message=_("Modification or transformation proposal not allowed during this period."))
+def is_proposal_edition_period_open(self, user, learning_unit_year):
+    if learning_unit_year:
+        for role in self.context['role_qs']:
+            event_perms.generate_event_perm_modification_transformation_proposal(
+                role.person, learning_unit_year
+            ).is_open()
     return None
 
 
@@ -128,7 +140,26 @@ def is_learning_unit_year_not_in_past(self, user, learning_unit_year):
 @predicate_failed_msg(message=_("The learning unit is a partim"))
 def is_learning_unit_year_not_a_partim(self, user, learning_unit_year):
     if learning_unit_year:
+        return not learning_unit_year.is_partim()
+    return None
+
+
+@predicate(bind=True)
+@predicate_failed_msg(message=_("The learning unit is not a partim"))
+def is_learning_unit_year_a_partim(self, user, learning_unit_year):
+    if learning_unit_year:
         return learning_unit_year.is_partim()
+    return None
+
+
+@predicate(bind=True)
+@predicate_failed_msg(message=_("Not a proposal"))
+def is_proposal(self, user, learning_unit_year):
+    if learning_unit_year:
+        return ProposalLearningUnit.objects.filter(
+            learning_unit_year__learning_unit=learning_unit_year.learning_unit,
+            learning_unit_year__academic_year__year__lte=learning_unit_year.academic_year.year
+        ).exists()
     return None
 
 
@@ -164,3 +195,50 @@ def is_not_proposal_of_type_creation_with_applications(self, user, learning_unit
             ).exists()
     return None
 
+
+@predicate(bind=True)
+@predicate_failed_msg(message=_("This learning unit has application"))
+def is_not_proposal_of_type_suppression_with_applications(self, user, learning_unit_year):
+    if learning_unit_year:
+        proposal = get_object_or_none(ProposalLearningUnit, learning_unit_year__id=learning_unit_year.pk)
+        if proposal:
+            return proposal.type != ProposalType.SUPPRESSION.name or not TutorApplication.objects.filter(
+                learning_container_year=proposal.learning_unit_year.learning_container_year
+            ).exists()
+    return None
+
+
+@predicate(bind=True)
+@predicate_failed_msg(message=_("This learning unit has application"))
+def has_learning_unit_no_application_this_year(self, user, learning_unit_year):
+    if learning_unit_year:
+        learning_container_year = learning_unit_year.learning_container_year
+        return not TutorApplication.objects.filter(learning_container_year=learning_container_year).exists()
+
+
+@predicate(bind=True)
+@predicate_failed_msg(message=_("This learning unit has application"))
+def has_learning_unit_no_application_this_year(self, user, learning_unit_year):
+    if learning_unit_year:
+        learning_container_year = learning_unit_year.learning_container_year
+        return not TutorApplication.objects.filter(learning_container_year=learning_container_year).exists()
+
+
+@predicate(bind=True)
+@predicate_failed_msg(message=_("Proposal not in eligible state for consolidation"))
+def is_proposal_in_state_to_be_consolidated(self, user, learning_unit_year):
+    if learning_unit_year:
+        learning_unit_proposal = get_object_or_none(ProposalLearningUnit, learning_unit_year__id=learning_unit_year.pk)
+        if learning_unit_proposal:
+            return learning_unit_proposal.state in PROPOSAL_CONSOLIDATION_ELIGIBLE_STATES
+    return None
+
+
+@predicate(bind=True)
+@predicate_failed_msg(message=_("Proposal is not of modification type"))
+def is_modification_proposal_type(self, user, learning_unit_year):
+    if learning_unit_year:
+        learning_unit_proposal = get_object_or_none(ProposalLearningUnit, learning_unit_year__id=learning_unit_year.pk)
+        if learning_unit_proposal:
+            return learning_unit_proposal.type == ProposalType.MODIFICATION.name
+    return None
