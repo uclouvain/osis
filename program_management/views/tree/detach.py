@@ -36,6 +36,7 @@ from base.views.mixins import AjaxTemplateMixin
 from program_management.ddd import command
 from program_management.ddd.domain.program_tree import PATH_SEPARATOR
 from program_management.ddd.service import detach_node_service
+from program_management.ddd.service.read import detach_warning_messages_service
 from program_management.forms.tree.detach import DetachNodeForm
 from program_management.views.generic import GenericGroupElementYearMixin
 
@@ -77,6 +78,9 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
     def get_context_data(self, **kwargs):
         context = super(DetachNodeView, self).get_context_data(**kwargs)
         detach_node_command = command.DetachNodeCommand(path_where_to_detach=self.request.GET.get('path'), commit=False)
+        warning_messages = detach_warning_messages_service.detach_warning_messages(detach_node_command)
+        if warning_messages:
+            display_warning_messages(self.request, warning_messages)
         try:
             detach_node_service.detach_node(detach_node_command)
         except business_validator.BusinessExceptions as business_exception:

@@ -163,9 +163,14 @@ class TestDetachNodeView(TestCase):
             element_code=element_cached.partial_acronym,
             element_year=element_cached.academic_year.year
         )
-        self.client.post(self.url, follow=True, HTTP_X_REQUESTED_WITH='XMLHttpRequest', data={'path': self.path_to_detach})
+        self.client.post(
+            self.url,
+            follow=True,
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+            data={'path': self.path_to_detach}
+        )
         error_msg = "The clipboard should not be cleared if element in clipboard is not the detached element"
-        self.assertTrue(ElementCache(self.person.user).cached_data)
+        self.assertTrue(ElementCache(self.person.user).cached_data, error_msg)
 
     @mock.patch('base.business.event_perms.EventPerm.is_open', return_value=False)
     def test_detach_not_permitted_for_faculty_manager_if_period_closed(self, mock_period_open):

@@ -37,20 +37,6 @@ from base.ddd.utils.business_validator import BusinessValidator
 from program_management.models.enums.node_type import NodeType
 
 
-class HasOrIsPrerequisiteValidator(BusinessValidator):
-
-    def __init__(self, tree: 'ProgramTree', node_to_detach: 'NodeLearningUnitYear', path: 'Path'):
-        super(HasOrIsPrerequisiteValidator, self).__init__()
-        self.node_to_detach = node_to_detach
-        self.tree = tree
-
-    def validate(self):
-        if self.node_to_detach.is_prerequisite or self.node_to_detach.has_prerequisite:
-            self.add_error_message(
-                _("Cannot detach due to prerequisites.")
-            )
-
-
 class IsPrerequisiteValidator(business_validator.BusinessValidator):
 
     def __init__(self, tree: 'ProgramTree', node_to_detach: 'Node'):
