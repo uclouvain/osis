@@ -28,8 +28,7 @@ import random
 from django.test import TestCase
 
 from base.tests.factories.education_group_year import EducationGroupYearFactory
-from education_group.templatetags.version import compute_url, IDENTIFICATION_URL_NAME, _ordered_version_list, \
-    _get_version_url_with_tab_to_show, CONTENT_URL_NAME, UTILIZATION_URL_NAME
+from education_group.templatetags.version import _ordered_version_list,  _get_version_url_with_tab_to_show
 from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
 
 AVAILABLE_TABS_TO_SHOW = [

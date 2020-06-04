@@ -38,6 +38,7 @@ from base import models as mdl
 from base.business.education_groups import general_information_sections
 from base.business.education_groups.general_information_sections import \
     MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION
+from base.models import academic_year
 from base.models.enums.education_group_types import GroupType
 from base.views.common import display_warning_messages
 from education_group.forms.academic_year_choices import get_academic_year_choices
@@ -123,6 +124,10 @@ class GroupRead(PermissionRequiredMixin, TemplateView):
                                 .get(academic_year__year=self.kwargs['year'], partial_acronym=self.kwargs['code'])
         except GroupYear.DoesNotExist:
             raise Http404
+
+    @functools.lru_cache()
+    def get_current_academic_year(self):
+        return academic_year.starting_academic_year()
 
     def get_permission_object(self):
         return self.get_group_year()
