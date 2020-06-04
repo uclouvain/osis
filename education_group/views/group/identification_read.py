@@ -30,7 +30,7 @@ from education_group.views.group.common_read import Tab, GroupRead
 
 
 class GroupReadIdentification(GroupRead):
-    template_name = "group/identification_read.html"
+    template_name = "education_group_app/group/identification_read.html"
     active_tab = Tab.IDENTIFICATION
 
     def get_context_data(self, **kwargs):

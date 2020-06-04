@@ -27,7 +27,7 @@ from education_group.views.mini_training.common_read import MiniTrainingRead, Ta
 
 
 class MiniTrainingReadContent(MiniTrainingRead):
-    template_name = "mini_training/content_read.html"
+    template_name = "education_group_app/mini_training/content_read.html"
     active_tab = Tab.CONTENT
 
     def get_context_data(self, **kwargs):

@@ -28,7 +28,7 @@ from program_management.ddd.service import tree_service
 
 
 class TrainingReadUtilization(TrainingRead):
-    template_name = "training/utilization_read.html"
+    template_name = "education_group_app/training/utilization_read.html"
     active_tab = Tab.UTILIZATION
 
     def get_context_data(self, **kwargs):

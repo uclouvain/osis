@@ -70,21 +70,21 @@
                 {% if other_academic_responsibles %}
                     <h5>{% trans 'Other academic responsibles' %} : </h5>
                     {% with contacts=other_academic_responsibles %}
-                         {% include "education_group_app/blocks/blocks/general_information_section_contact_ul.html" %}
+                         {% include "education_group_app/blocks/general_information_section_contact_ul.html" %}
                     {% endwith %}
                 {% endif %}
 
                 {% if jury_members %}
                     <h5>{% trans 'Jury members' %} :</h5>
                     {% with contacts=jury_members %}
-                         {% include "education_group_app/blocks/blocks/general_information_section_contact_ul.html" %}
+                         {% include "education_group_app/blocks/general_information_section_contact_ul.html" %}
                     {% endwith %}
                 {% endif %}
 
                 {% if other_contacts %}
                     <h5>{% trans 'Other contacts' %} :</h5>
                     {% with contacts=other_contacts %}
-                         {% include "education_group_app/blocks/blocks/general_information_section_contact_ul.html" %}
+                         {% include "education_group_app/blocks/general_information_section_contact_ul.html" %}
                     {% endwith %}
                 {% endif %}
             </div>

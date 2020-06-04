@@ -159,7 +159,7 @@ class GroupRead(PermissionRequiredMixin, TemplateView):
     def have_general_information_tab(self):
         node_category = self.get_object().category
         return node_category.name in general_information_sections.SECTIONS_PER_OFFER_TYPE and \
-               self._is_general_info_and_condition_admission_in_display_range
+            self._is_general_info_and_condition_admission_in_display_range
 
     def _is_general_info_and_condition_admission_in_display_range(self):
         return MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION <= self.get_object().year < \

@@ -36,7 +36,7 @@ from program_management.models.education_group_version import EducationGroupVers
 
 
 class MiniTrainingReadIdentification(MiniTrainingRead):
-    template_name = "mini_training/identification_read.html"
+    template_name = "education_group_app/mini_training/identification_read.html"
     active_tab = Tab.IDENTIFICATION
 
     def get_context_data(self, **kwargs):

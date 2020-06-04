@@ -34,7 +34,7 @@ from education_group.views.serializers import achievement
 
 
 class MiniTrainingReadSkillsAchievements(MiniTrainingRead):
-    template_name = "mini_training/skills_achievements_read.html"
+    template_name = "education_group_app/mini_training/skills_achievements_read.html"
     active_tab = Tab.SKILLS_ACHIEVEMENTS
 
     def get(self, request, *args, **kwargs):

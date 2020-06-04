@@ -72,7 +72,7 @@ class TestGroupReadUtilization(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, "group/utilization_read.html")
+        self.assertTemplateUsed(response, "education_group_app/group/utilization_read.html")
 
     @mock.patch('program_management.ddd.service.tree_service.search_trees_using_node', return_value=[])
     def test_assert_context_data(self, mock_tree_service):

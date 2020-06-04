@@ -43,7 +43,7 @@ class CommonGeneralInformation(PermissionRequiredMixin, TemplateView):
     # PermissionRequiredMixin
     permission_required = 'base.view_educationgroup'
     raise_exception = True
-    template_name = "general_information/common.html"
+    template_name = "education_group_app/general_information/common.html"
 
     def get_context_data(self, **kwargs):
         return {
