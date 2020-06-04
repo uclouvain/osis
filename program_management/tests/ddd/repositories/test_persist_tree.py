@@ -36,6 +36,7 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from program_management.ddd.domain.node import NodeEducationGroupYear, NodeLearningUnitYear
 from program_management.ddd.repositories import persist_tree, load_tree
 from program_management.ddd.validators._authorized_relationship import DetachAuthorizedRelationshipValidator
+from program_management.ddd.validators.validators_by_business_action import DetachNodeValidatorList
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
@@ -120,7 +121,7 @@ class TestPersistTree(TestCase):
         """
         self.assertTrue(mock.called, assertion_msg)
 
-    @patch.object(DetachAuthorizedRelationshipValidator, 'validate')
+    @patch.object(DetachNodeValidatorList, 'validate')
     def test_delete_when_1_link_has_been_deleted(self, mock):
         GroupElementYearFactory(parent=self.training, child_branch=self.common_core, child_leaf=None)
         node_to_detach = self.common_core_node

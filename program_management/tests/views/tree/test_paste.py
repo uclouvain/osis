@@ -44,7 +44,9 @@ from base.tests.factories.person import PersonFactory
 from base.utils.cache import ElementCache
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command
+from program_management.ddd.domain import link
 from program_management.forms.tree.paste import PasteNodesFormset, PasteNodeForm
+from program_management.tests.ddd.factories.commands.paste_element_command import PasteElementCommandFactory
 from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory, NodeLearningUnitYearFactory, \
     NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
@@ -160,20 +162,24 @@ class TestPasteNodeView(TestCase):
     @mock.patch.object(PasteNodesFormset, 'is_valid', new=form_valid_effect)
     @mock.patch.object(PasteNodeForm, 'is_valid')
     @mock.patch('program_management.ddd.service.read.element_selected_service.retrieve_element_selected')
-    def test_should_call_attach_node_service_when_post_data_are_valid(
+    def test_should_call_paste_node_service_when_post_data_are_valid(
             self,
             mock_cache_elems,
             mock_form_valid,
             mock_service
     ):
-        mock_form_valid.return_value = True
-        mock_service.return_value = [BusinessValidationMessage('Success', MessageLevel.SUCCESS)]
         subgroup_to_attach = NodeGroupYearFactory(node_type=GroupType.SUB_GROUP,)
         mock_cache_elems.return_value = {
             "element_code": subgroup_to_attach.code,
             "element_year": subgroup_to_attach.year,
             "path_to_detach": None
         }
+        mock_form_valid.return_value = True
+        mock_service.return_value = link.LinkIdentity(
+            parent_code=self.tree.root_node.children[1].child.code,
+            child_code=subgroup_to_attach.code,
+            year=self.tree.root_node.children[1].child.year
+        )
 
         # To path :  BIR1BA ---> LBIR101G
         path = "|".join([str(self.tree.root_node.pk), str(self.tree.root_node.children[1].child.pk)])
@@ -244,20 +250,24 @@ class TestPasteWithCutView(TestCase):
         )
         self.assertTrue(self.permission_mock.called)
 
-    def test_move(self):
+    @mock.patch("program_management.ddd.service.write.paste_element_service.paste_element_service")
+    def test_move(self, mock_paste_service):
         AuthorizedRelationshipFactory(
             parent_type=self.selected_egy.education_group_type,
             child_type=self.group_element_year.child_branch.education_group_type,
             min_count_authorized=0,
             max_count_authorized=None
         )
+        mock_paste_service.return_value = link.LinkIdentity(
+            parent_code=self.group_element_year.parent.partial_acronym,
+            child_code=self.group_element_year.child_branch.partial_acronym,
+            year=self.group_element_year.parent.academic_year.year
+        )
+        detach_path = "|".join([str(self.group_element_year.parent.id), str(self.group_element_year.child_branch.id)])
         ElementCache(self.person.user.id).save_element_selected(
             element_year=self.group_element_year.child_branch.academic_year.year,
             element_code=self.group_element_year.child_branch.partial_acronym,
-            path_to_detach="|".join([
-                str(self.group_element_year.parent.id),
-                str(self.group_element_year.child_branch.id)
-            ]),
+            path_to_detach=detach_path,
             action=ElementCache.ElementCacheAction.CUT
         )
 
@@ -268,12 +278,9 @@ class TestPasteWithCutView(TestCase):
             "link_type": LinkTypes.REFERENCE.name
         })
 
-        self.assertFalse(GroupElementYear.objects.filter(id=self.group_element_year.id).exists())
-        self.assertTrue(
-            GroupElementYear.objects.filter(
-                parent=self.selected_egy,
-                child_branch=self.group_element_year.child_branch
-            ).exists()
+        self.assertEqual(
+            mock_paste_service.call_args[0][0].path_where_to_detach,
+            detach_path
         )
 
 

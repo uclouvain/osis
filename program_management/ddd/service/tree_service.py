@@ -23,12 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
 
 from program_management.ddd.business_types import *
 from program_management.ddd.repositories import load_tree
 
 
-def search_trees_using_node(node_to_detach: 'Node'):
+def search_trees_using_node(node_to_detach: 'Node') -> List['ProgramTree']:
     node_id = node_to_detach.pk
     if node_to_detach.is_learning_unit():
         trees = load_tree.load_trees_from_children(child_branch_ids=None, child_leaf_ids=[node_id])

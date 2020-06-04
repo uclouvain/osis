@@ -76,8 +76,8 @@ class TestPasteNode(SimpleTestCase, ValidatorPatcherMixin):
     def _patch_load_tree(self):
         patcher_load = patch("program_management.ddd.repositories.load_tree.load")
         self.addCleanup(patcher_load.stop)
-        self.mock_load = patcher_load.start()
-        self.mock_load.return_value = self.tree
+        self.mock_load_tree = patcher_load.start()
+        self.mock_load_tree.return_value = self.tree
 
     def _patch_load_child_node_to_attach(self):
         patcher_load = patch.object(node_repositoriy.NodeRepository, "get")
@@ -116,15 +116,19 @@ class TestPasteNode(SimpleTestCase, ValidatorPatcherMixin):
         paste_element_service.paste_element_service(paste_command_with_commit_set_to_true)
         self.assertTrue(self.mock_persist.called)
 
-    @mock.patch("program_management.ddd.service.detach_node_service.detach_node")
-    def test_when_path_to_detach_is_set_then_should_call_detach_service(self, mock_detach):
-        mock_detach.return_value = BusinessValidationMessageList([])
+    @patch.object(program_tree.ProgramTree, 'detach_node')
+    @patch("program_management.ddd.service.tree_service.search_trees_using_node")
+    def test_when_path_to_detach_is_set_then_should_call_detach(self, mock_search_trees, mock_detach):
+        other_tree = ProgramTreeFactory()
+        LinkFactory(parent=other_tree.root_node, child=self.node_to_paste)
+        self.mock_load_tree.side_effect = [self.tree, other_tree]
+        mock_search_trees.return_value = []
         self.mock_validator(PasteNodeValidatorList, [_('Success message')], level=MessageLevel.SUCCESS)
         paste_command_with_path_to_detach_set = PasteElementCommandFactory(
             root_id=self.tree.root_node.node_id,
             node_to_paste_code=self.node_to_paste.code,
             node_to_paste_year=self.node_to_paste.year,
-            path_where_to_detach="a|b"
+            path_where_to_detach=program_tree.build_path(other_tree.root_node, self.node_to_paste)
         )
         paste_element_service.paste_element_service(paste_command_with_path_to_detach_set)
         self.assertTrue(mock_detach.called)
