@@ -131,6 +131,6 @@ def build_success_message(last_luy_reported, luy):
             }
         )
     else:
-        msg = "{}.".format(default_message)
+        msg = "{}".format(default_message)
 
     return msg
