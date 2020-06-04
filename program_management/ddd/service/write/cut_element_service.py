@@ -28,7 +28,7 @@ from program_management.ddd import command
 def cut_element_service(cut_command: command.CutElementCommand):
     cache.ElementCache(
         cut_command.user_id
-    ).save_element_selected_bis(
+    ).save_element_selected(
         element_code=cut_command.element_code,
         element_year=cut_command.element_year,
         path_to_detach=cut_command.path_to_detach,

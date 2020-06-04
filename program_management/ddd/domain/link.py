@@ -82,6 +82,8 @@ class Link(interface.Entity):
         self.link_type = link_type
         self.order = order
         self._has_changed = False
+        if parent and child:
+            super().__init__(entity_id=LinkIdentity(self.parent.code, self.child.code, self.parent.year))
 
     @property
     def has_changed(self):

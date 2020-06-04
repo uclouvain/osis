@@ -154,7 +154,7 @@ class ElementCache(OsisCache):
             and self.cached_data['element_year'] == element_year
         )
 
-    def save_element_selected_bis(
+    def save_element_selected(
             self,
             element_code: str,
             element_year: int,
@@ -167,15 +167,4 @@ class ElementCache(OsisCache):
             'path_to_detach': path_to_detach,
             'action': action.value
         }
-        self.set_cached_data(data_to_cache)
-
-    def save_element_selected(
-            self,
-            obj,
-            source_link_id=None,
-            action: ElementCacheAction = ElementCacheAction.COPY.value
-    ):
-        data_to_cache = {'id': obj.pk, 'modelname': obj._meta.db_table, 'action': action}
-        if source_link_id:
-            data_to_cache['source_link_id'] = source_link_id
         self.set_cached_data(data_to_cache)

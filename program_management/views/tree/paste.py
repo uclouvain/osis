@@ -40,7 +40,7 @@ import program_management.ddd.command
 from base.ddd.utils import business_validator
 from base.models.education_group_year import EducationGroupYear
 from base.utils.cache import ElementCache
-from base.views.common import display_warning_messages
+from base.views.common import display_warning_messages, display_success_messages
 from base.views.mixins import AjaxTemplateMixin
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd.domain import node
@@ -117,18 +117,26 @@ class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageM
         return context_data
 
     def form_valid(self, formset: PasteNodesFormset):
-        node_entities_ids = formset.save()
-        if None in node_entities_ids:
+        link_identities_ids = formset.save()
+        if None in link_identities_ids:
             return self.form_invalid(formset)
+
+        messages = []
+        for link_identity in link_identities_ids:
+            messages.append(
+                _("\"%(child)s\" has been pasted into \"%(parent)s\"") % {
+                    "child": link_identity.child_code,
+                    "parent": link_identity.parent_code
+                }
+            )
+
+        display_success_messages(self.request, messages)
         ElementCache(self.request.user).clear()
 
         return super().form_valid(formset)
 
     def _is_parent_a_minor_major_list_choice(self, formset):
         return any(isinstance(form, PasteToMinorMajorListChoiceForm) for form in formset)
-
-    def get_success_message(self, cleaned_data):
-        return _("The content has been updated.")
 
     def get_success_url(self):
         return

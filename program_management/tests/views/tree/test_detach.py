@@ -39,6 +39,7 @@ from base.tests.factories.person import PersonFactory
 from base.utils.cache import ElementCache
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from education_group.tests.factories.auth.faculty_manager import FacultyManagerFactory
+from program_management.ddd.domain import link
 from program_management.ddd.validators._authorized_relationship import DetachAuthorizedRelationshipValidator
 from program_management.forms.tree.detach import DetachNodeForm
 
@@ -89,10 +90,9 @@ class TestDetachNodeView(TestCase):
 
     def test_post_with_invalid_path(self):
         response = self.client.post(self.url, data={'path': 'dummy_path'})
+        form_errors = response.context["form"].errors
 
-        messages = [m.message for m in get_messages(response.wsgi_request)]
-
-        self.assertListEqual(messages, ['Invalid tree path'])
+        self.assertListEqual(form_errors["path"], ['Invalid tree path'])
         self.assertEqual(response.status_code, HttpResponse.status_code)
 
     @override_flag('education_group_update', active=False)
@@ -118,8 +118,10 @@ class TestDetachNodeView(TestCase):
     @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group")
     def test_detach_case_post_success(self, mock_permission, mock_service):
         mock_permission.return_value = True
-        mock_service.return_value = BusinessValidationMessageList(
-            messages=[BusinessValidationMessage('Success', MessageLevel.SUCCESS)]
+        mock_service.return_value = link.LinkIdentity(
+            parent_code=self.group_element_year.parent.partial_acronym,
+            child_code=self.group_element_year.child_branch.partial_acronym,
+            year=self.group_element_year.parent.academic_year.year
         )
 
         response = self.client.post(
@@ -134,12 +136,18 @@ class TestDetachNodeView(TestCase):
         self.assertEqual(list(get_messages(response.wsgi_request))[0].level, MSG.SUCCESS)
         self.assertTrue(mock_service.called)
 
-    @mock.patch("base.models.group_element_year.GroupElementYear.delete")
+    @mock.patch("program_management.ddd.service.detach_node_service.detach_node")
     @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group")
-    def test_detach_when_element_is_in_clipboard(self, mock_permission, mock_delete):
+    def test_detach_when_element_is_in_clipboard(self, mock_permission, mock_service):
+        mock_permission.return_value = True
+        mock_service.return_value = link.LinkIdentity(
+            parent_code=self.group_element_year.parent.partial_acronym,
+            child_code=self.group_element_year.child_branch.partial_acronym,
+            year=self.group_element_year.parent.academic_year.year
+        )
         ElementCache(self.person.user).save_element_selected(
-            self.group_element_year.child_branch,
-            source_link_id=self.group_element_year.id
+            element_code=self.group_element_year.child_branch.partial_acronym,
+            element_year=self.group_element_year.child_branch.academic_year.year
         )
         self.client.post(
             self.url, follow=True, HTTP_X_REQUESTED_WITH='XMLHttpRequest', data={'path': self.path_to_detach}
@@ -152,11 +160,12 @@ class TestDetachNodeView(TestCase):
     def test_detach_when_clipboard_filled_with_different_detached_element(self, mock_permission, mock_delete):
         element_cached = EducationGroupYearFactory()
         ElementCache(self.person.user).save_element_selected(
-            element_cached,
+            element_code=element_cached.partial_acronym,
+            element_year=element_cached.academic_year.year
         )
         self.client.post(self.url, follow=True, HTTP_X_REQUESTED_WITH='XMLHttpRequest', data={'path': self.path_to_detach})
         error_msg = "The clipboard should not be cleared if element in clipboard is not the detached element"
-        self.assertEqual(ElementCache(self.person.user).cached_data['id'], element_cached.id, error_msg)
+        self.assertTrue(ElementCache(self.person.user).cached_data)
 
     @mock.patch('base.business.event_perms.EventPerm.is_open', return_value=False)
     def test_detach_not_permitted_for_faculty_manager_if_period_closed(self, mock_period_open):

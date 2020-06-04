@@ -48,7 +48,7 @@ class PasteNodesFormset(BaseFormSet):
         return {}
 
     @transaction.atomic
-    def save(self) -> List[Optional['NodeIdentity']]:
+    def save(self) -> List[Optional['LinkIdentity']]:
         return [form.save() for form in self.forms]
 
 
@@ -118,7 +118,7 @@ class PasteNodeForm(forms.Form):
             raise ValidationError(business_exception.messages)
         return cleaned_block_type
 
-    def save(self) -> Optional['NodeIdentity']:
+    def save(self) -> Optional['LinkIdentity']:
         result = None
         if self.is_valid():
             try:

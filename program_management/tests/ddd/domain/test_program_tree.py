@@ -27,9 +27,7 @@ import inspect
 from unittest.mock import patch
 
 from django.test import SimpleTestCase
-from django.utils.translation import gettext_lazy as _
 
-import program_management.ddd.command
 from base.ddd.utils import business_validator
 from base.ddd.utils.validation_message import MessageLevel, BusinessValidationMessage
 from base.models.enums import prerequisite_operator
@@ -41,10 +39,9 @@ from program_management.ddd.domain import program_tree
 from program_management.ddd.domain.prerequisite import PrerequisiteItem
 from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.ddd.domain.program_tree import build_path
-from program_management.ddd.validators._authorized_relationship import DetachAuthorizedRelationshipValidator
+from program_management.ddd.validators.validators_by_business_action import DetachNodeValidatorList
 from program_management.ddd.validators.validators_by_business_action import PasteNodeValidatorList, \
     UpdatePrerequisiteValidatorList
-from program_management.ddd.validators.validators_by_business_action import DetachNodeValidatorList
 from program_management.models.enums import node_type
 from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipObjectFactory
 from program_management.tests.ddd.factories.commands.paste_element_command import PasteElementCommandFactory
@@ -210,9 +207,8 @@ class TestPasteNodeProgramTree(ValidatorPatcherMixin, SimpleTestCase):
     def test_should_paste_node_to_position_indicated_by_path_when_validator_do_not_raise_exception(self):
         self.mock_validator_validate_to_not_raise_exception(PasteNodeValidatorList)
 
-        self.tree.paste_node(self.child_to_paste, self.request)
-
-        self.assertIn(self.child_to_paste, self.tree.root_node.children_as_nodes)
+        link_created = self.tree.paste_node(self.child_to_paste, self.request)
+        self.assertIn(link_created, self.tree.root_node.children)
 
     def test_should_propagate_exception_and_not_paste_node_when_validator_raises_exception(self):
         self.mock_validator_validate_to_raise_exception(PasteNodeValidatorList, ["error message text"])
@@ -417,7 +413,7 @@ class TestCopyAndPrune(SimpleTestCase):
 
         copied_link.block = 123456
         self.assertEqual(copied_link.block, 123456)
-        self.assertNotEqual(original_link, 123456)
+        self.assertNotEqual(original_link.block, 123456)
 
     def test_when_change_tree_signature(self):
         original_signature = ['self', 'root_node', 'authorized_relationships']
@@ -703,9 +699,9 @@ class TestDetachNode(SimpleTestCase):
         LinkFactory(parent=tree.root_node, child=node_that_is_prerequisite)
         link = LinkFactory(parent=tree.root_node, child=node_that_has_prerequisite)
         path_to_detach = build_path(link.parent, link.child)
-        tree.detach_node(path_to_detach)
+        deleted_link = tree.detach_node(path_to_detach)
 
-        self.assertNotIn(link, tree.root_node.children)
+        self.assertNotIn(deleted_link, tree.root_node.children)
         self.assertListEqual(node_that_has_prerequisite.prerequisite.get_all_prerequisite_items(), [])
 
     @patch.object(DetachNodeValidatorList, 'validate')

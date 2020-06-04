@@ -240,7 +240,7 @@ class ProgramTree(interface.RootEntity):
             self,
             node_to_paste: 'Node',
             paste_command: command.PasteElementCommand
-    ) -> None:
+    ) -> 'Link':
         """
         Add a node to the tree
         :param node_to_paste: Node to paste into the tree
@@ -251,7 +251,7 @@ class ProgramTree(interface.RootEntity):
 
         path_to_paste_to = paste_command.path_where_to_paste
         node_to_paste_to = self.get_node(path_to_paste_to)
-        node_to_paste_to.add_child(
+        return node_to_paste_to.add_child(
                 node_to_paste,
                 access_condition=paste_command.access_condition,
                 is_mandatory=paste_command.is_mandatory,

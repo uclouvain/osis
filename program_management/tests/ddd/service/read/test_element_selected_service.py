@@ -37,7 +37,7 @@ class TestRetrieveElementsSelected(SimpleTestCase):
         self.assertIsNone(result)
 
     def test_should_return_cached_data_if_present(self):
-        cache.ElementCache(self.user_id).save_element_selected_bis("element_code", 254)
+        cache.ElementCache(self.user_id).save_element_selected("element_code", 254)
 
         result = element_selected_service.retrieve_element_selected(self.user_id)
         self.assertEqual(result, cache.ElementCache(self.user_id).cached_data)

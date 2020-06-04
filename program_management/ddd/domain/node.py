@@ -238,10 +238,11 @@ class Node(interface.Entity):
     def descendents(self) -> Dict['Path', 'Node']:   # TODO :: add unit tests
         return _get_descendents(self)
 
-    def add_child(self, node: 'Node', **link_attrs):
+    def add_child(self, node: 'Node', **link_attrs) -> 'Link':
         child = link_factory.get_link(parent=self, child=node, **link_attrs)
         self._children.append(child)
         child._has_changed = True
+        return child
 
     def detach_child(self, node_to_detach: 'Node') -> 'Link':
         link_to_detach = next(link for link in self.children if link.child == node_to_detach)

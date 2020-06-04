@@ -225,7 +225,7 @@ class TestPasteWithCutView(TestCase):
             min_count_authorized=0,
             max_count_authorized=None
         )
-        ElementCache(self.person.user.id).save_element_selected_bis(
+        ElementCache(self.person.user.id).save_element_selected(
             element_year=self.group_element_year.child_branch.academic_year.year,
             element_code=self.group_element_year.child_branch.partial_acronym,
             path_to_detach="|".join([
@@ -251,7 +251,7 @@ class TestPasteWithCutView(TestCase):
             min_count_authorized=0,
             max_count_authorized=None
         )
-        ElementCache(self.person.user.id).save_element_selected_bis(
+        ElementCache(self.person.user.id).save_element_selected(
             element_year=self.group_element_year.child_branch.academic_year.year,
             element_code=self.group_element_year.child_branch.partial_acronym,
             path_to_detach="|".join([

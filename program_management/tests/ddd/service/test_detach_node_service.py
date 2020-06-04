@@ -28,6 +28,7 @@ from unittest.mock import patch
 from django.test import SimpleTestCase
 from django.utils.translation import gettext as _
 
+from base.ddd.utils import business_validator
 from base.ddd.utils.validation_message import MessageLevel, BusinessValidationMessage, BusinessValidationMessageList
 from base.models.enums.education_group_types import TrainingType
 from program_management.ddd.domain import program_tree
@@ -58,7 +59,7 @@ class TestDetachNode(SimpleTestCase, ValidatorPatcherMixin):
         self.node_to_detach = self.link.child
         self.path_to_detach = build_path(self.link.parent, self.link.child)
 
-        self.detach_command = DetachNodeCommandFactory(path_where_to_detach=self.path_to_detach)
+        self.detach_command = DetachNodeCommandFactory(path_where_to_detach=self.path_to_detach, commit=True)
 
         self._patch_persist_tree()
         self._patch_load_tree()
@@ -82,30 +83,29 @@ class TestDetachNode(SimpleTestCase, ValidatorPatcherMixin):
         self.mock_load_tress_from_children.return_value = [self.tree]
 
     @patch.object(program_tree.ProgramTree, 'detach_node')
-    def test_when_tree_detach_node_is_valid(self, mock_detach_node):
-        validator_message = BusinessValidationMessage('Success message', level=MessageLevel.SUCCESS)
-        mock_detach_node.return_value = True, [validator_message]
-        result = detach_node_service.detach_node(self.detach_command)
-        expected_result = [validator_message]
-        self.assertListEqual(result.messages, expected_result)
+    def test_should_return_link_created_identity_and_persist_it_when_valid_and_commit_set_to_true(self, mock_detach_node):
+        mock_detach_node.return_value = self.link
+        link_identity = detach_node_service.detach_node(self.detach_command)
 
-    @patch.object(program_tree.ProgramTree, 'detach_node')
-    def test_when_tree_detach_node_is_not_valid(self, mock_detach_node):
-        validator_message = BusinessValidationMessage('error message text', level=MessageLevel.ERROR)
-        mock_detach_node.return_value = False, [validator_message]
-        result = detach_node_service.detach_node(self.detach_command)
-        expected_result = [validator_message]
-        self.assertListEqual(result.messages, expected_result)
-
-    @patch.object(ProgramTree, 'detach_node', return_value=(True, []))
-    def test_when_commit_is_true(self, mock):
-        detach_command = DetachNodeCommandFactory(path_where_to_detach=self.path_to_detach, commit=True)
-        detach_node_service.detach_node(detach_command)
+        self.assertEqual(link_identity, self.link.entity_id)
         self.assertTrue(self.mock_persist.called)
 
-    @patch.object(ProgramTree, 'detach_node', return_value=(True, []))
-    def test_when_commit_is_false(self, mock_detach_node):
-        detach_node_service.detach_node(self.detach_command)
+    @patch.object(ProgramTree, 'detach_node')
+    def test_should_return_link_identity_and_not_persist_when_valid_and_commit_set_to_false(self, mock_detach_node):
+        mock_detach_node.return_value = self.link
+        detach_node_command = DetachNodeCommandFactory(path_where_to_detach=self.path_to_detach, commit=False)
+        detach_node_service.detach_node(detach_node_command)
         assertion_message = "Should not persist any data into database. " \
                             "It only tests and applies detach action on the in-memory object."
         self.assertFalse(self.mock_persist.called, assertion_message)
+
+    @patch.object(program_tree.ProgramTree, 'detach_node')
+    def test_should_raise_exception_when_detach_node_raise_exception(self, mock_detach_node):
+        mock_detach_node.side_effect = business_validator.BusinessExceptions(["error message"])
+        with self.assertRaises(business_validator.BusinessExceptions) as exception_context:
+            detach_node_service.detach_node(self.detach_command)
+
+        self.assertListEqual(
+            exception_context.exception.messages,
+            ['error message']
+        )

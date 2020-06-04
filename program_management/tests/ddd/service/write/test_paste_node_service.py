@@ -36,7 +36,7 @@ from base.ddd.utils import business_validator
 from base.ddd.utils.validation_message import MessageLevel, BusinessValidationMessageList
 from base.models.enums.education_group_types import TrainingType
 from program_management.ddd.repositories import node as node_repositoriy
-from program_management.ddd.domain import program_tree, node
+from program_management.ddd.domain import program_tree, node, link
 from program_management.ddd.service import attach_node_service
 from program_management.ddd.service.write import paste_element_service
 from program_management.ddd.validators import _validate_end_date_and_option_finality
@@ -86,12 +86,17 @@ class TestPasteNode(SimpleTestCase, ValidatorPatcherMixin):
         self.mock_load.return_value = self.node_to_paste
 
     @patch.object(program_tree.ProgramTree, 'paste_node')
-    def test_should_return_node_identity_attached_when_paste_was_successful(self, mock_attach_node):
-        mock_attach_node.return_value = None
+    def test_should_return_link_identity_and_not_persist_when_paste_valid_and_commit_false(self, mock_attach_node):
+        mock_attach_node.return_value = LinkFactory(parent=self.root_node, child=self.node_to_paste)
         result = program_management.ddd.service.write.paste_element_service.paste_element_service(self.paste_command)
-        expected_result = node.NodeIdentity(code=self.node_to_paste.code, year=self.node_to_paste.year)
+        expected_result = link.LinkIdentity(
+            parent_code=self.root_node.code,
+            child_code=self.node_to_paste.code,
+            year=self.root_node.year
+        )
 
         self.assertEqual(result, expected_result)
+        self.assertFalse(self.mock_persist.called)
 
     @patch.object(program_tree.ProgramTree, 'paste_node')
     def test_should_propagate_exception_when_paste_raises_one(self, mock_attach_node):
@@ -110,11 +115,6 @@ class TestPasteNode(SimpleTestCase, ValidatorPatcherMixin):
         )
         paste_element_service.paste_element_service(paste_command_with_commit_set_to_true)
         self.assertTrue(self.mock_persist.called)
-
-    def test_when_commit_is_false_then_should_not_persist_modification(self):
-        self.mock_validator(PasteNodeValidatorList, [_('Success message')], level=MessageLevel.SUCCESS)
-        program_management.ddd.service.write.paste_element_service.paste_element_service(self.paste_command)
-        self.assertFalse(self.mock_persist.called)
 
     @mock.patch("program_management.ddd.service.detach_node_service.detach_node")
     def test_when_path_to_detach_is_set_then_should_call_detach_service(self, mock_detach):

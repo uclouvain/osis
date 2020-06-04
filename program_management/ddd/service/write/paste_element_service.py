@@ -22,7 +22,6 @@
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
 
-from base.ddd.utils import business_validator
 from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import node
@@ -30,7 +29,7 @@ from program_management.ddd.repositories import load_tree, persist_tree, node as
 from program_management.ddd.service import detach_node_service
 
 
-def paste_element_service(paste_command: command.PasteElementCommand) -> 'NodeIdentity':
+def paste_element_service(paste_command: command.PasteElementCommand) -> 'LinkIdentity':
     node_identity = node.NodeIdentity(code=paste_command.node_to_paste_code, year=paste_command.node_to_paste_year)
     commit = paste_command.commit
     path_to_detach = paste_command.path_where_to_detach
@@ -41,8 +40,8 @@ def paste_element_service(paste_command: command.PasteElementCommand) -> 'NodeId
         detach_command = command.DetachNodeCommand(path_where_to_detach=path_to_detach, commit=commit)
         detach_node_service.detach_node(detach_command)
 
-    tree.paste_node(node_to_attach, paste_command)
+    link_created = tree.paste_node(node_to_attach, paste_command)
 
     if commit:
         persist_tree.persist(tree)
-    return node_identity
+    return link_created.entity_id
