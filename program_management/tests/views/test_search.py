@@ -136,7 +136,6 @@ class TestEducationGroupDataSearchFilter(TestCase):
             education_group_type=cls.type_group,
             management_entity=envi_entity,
             title_fr=TITLE_EDPH2,
-            group__start_year=cls.current_academic_year,
         )
         cls.education_group_edph3 = EducationGroupYearFactory(
             acronym='EDPH3', academic_year=cls.current_academic_year,
@@ -154,34 +153,34 @@ class TestEducationGroupDataSearchFilter(TestCase):
             education_group_type=cls.type_training,
             management_entity=envi_entity,
             title_fr=TITLE_EDPH3,
-            group__start_year=cls.current_academic_year
         )
         cls.education_group_arke2a = EducationGroupYearFactory(
-            acronym='ARKE2A', academic_year=cls.current_academic_year,
-            education_group__start_year=cls.current_academic_year,
+            acronym='ARKE2A',
+            academic_year=cls.current_academic_year,
             education_group_type=cls.type_training,
             management_entity=oph_entity
         )
         cls.group_year_arke2a = create_with_version(
             cls.education_group_arke2a,
-            acronym='ARKE2A', academic_year=cls.current_academic_year,
+            acronym='ARKE2A',
+            academic_year=cls.current_academic_year,
             education_group_type=cls.type_training,
             management_entity=oph_entity,
-            group__start_year=cls.current_academic_year
         )
 
         cls.education_group_hist2a = EducationGroupYearFactory(
-            acronym='HIST2A', academic_year=cls.current_academic_year,
+            acronym='HIST2A',
+            academic_year=cls.current_academic_year,
             education_group__start_year=cls.previous_academic_year,
             education_group_type=cls.type_group,
             management_entity=oph_entity
         )
         cls.group_year_hist2a = create_with_version(
             cls.education_group_hist2a,
-            acronym='HIST2A', academic_year=cls.current_academic_year,
+            acronym='HIST2A',
+            academic_year=cls.current_academic_year,
             education_group_type=cls.type_group,
             management_entity=oph_entity,
-            group__start_year=cls.current_academic_year
         )
 
         cls.education_group_arke2a_previous_year = EducationGroupYearFactory(
@@ -196,7 +195,6 @@ class TestEducationGroupDataSearchFilter(TestCase):
             academic_year=cls.previous_academic_year,
             education_group_type=cls.type_training,
             management_entity=oph_entity,
-            group__start_year=cls.previous_academic_year
         )
         cls.oph_entity_v = EntityVersionFactory(entity=oph_entity, parent=envi_entity, end_date=None)
         cls.envi_entity_v = EntityVersionFactory(entity=envi_entity, end_date=None)
