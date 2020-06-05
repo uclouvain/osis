@@ -1,3 +1,28 @@
+##############################################################################
+#
+#    OSIS stands for Open Student Information System. It's an application
+#    designed to manage the core business of higher education institutions,
+#    such as universities, faculties, institutes and professional schools.
+#    The core business involves the administration of students, teachers,
+#    courses, programs and so on.
+#
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    A copy of this license - GNU General Public License - is available
+#    at the root of the source code of this program.  If not,
+#    see http://www.gnu.org/licenses/.
+#
+##############################################################################
 import functools
 import json
 from collections import OrderedDict
@@ -18,6 +43,7 @@ from base.models import academic_year
 from base.models.enums.education_group_types import MiniTrainingType
 from base.views.common import display_warning_messages
 from education_group.forms.academic_year_choices import get_academic_year_choices
+from education_group.views.proxy import read
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd.domain.node import NodeIdentity, NodeNotFoundException
 from program_management.ddd.repositories import load_tree
@@ -26,13 +52,7 @@ from program_management.models.element import Element
 from program_management.serializers.program_tree_view import program_tree_view_serializer
 
 
-class Tab(Enum):
-    IDENTIFICATION = 0
-    CONTENT = 1
-    UTILIZATION = 2
-    GENERAL_INFO = 3
-    SKILLS_ACHIEVEMENTS = 4
-    ADMISSION_CONDITION = 5
+Tab = read.Tab  # FIXME :: fix imports (and remove this line)
 
 
 class MiniTrainingRead(PermissionRequiredMixin, TemplateView):
@@ -116,37 +136,37 @@ class MiniTrainingRead(PermissionRequiredMixin, TemplateView):
                 'text': _('Identification'),
                 'active': Tab.IDENTIFICATION == self.active_tab,
                 'display': True,
-                'url': _get_tab_urls(Tab.IDENTIFICATION, self.node_identity, self.get_path()),
+                'url': get_tab_urls(Tab.IDENTIFICATION, self.node_identity, self.get_path()),
             },
             Tab.CONTENT: {
                 'text': _('Content'),
                 'active': Tab.CONTENT == self.active_tab,
                 'display': True,
-                'url': _get_tab_urls(Tab.CONTENT, self.node_identity, self.get_path()),
+                'url': get_tab_urls(Tab.CONTENT, self.node_identity, self.get_path()),
             },
             Tab.UTILIZATION: {
                 'text': _('Utilizations'),
                 'active': Tab.UTILIZATION == self.active_tab,
                 'display': True,
-                'url': _get_tab_urls(Tab.UTILIZATION, self.node_identity, self.get_path()),
+                'url': get_tab_urls(Tab.UTILIZATION, self.node_identity, self.get_path()),
             },
             Tab.GENERAL_INFO: {
                 'text': _('General informations'),
                 'active': Tab.GENERAL_INFO == self.active_tab,
                 'display': self.have_general_information_tab(),
-                'url': _get_tab_urls(Tab.GENERAL_INFO, self.node_identity, self.get_path()),
+                'url': get_tab_urls(Tab.GENERAL_INFO, self.node_identity, self.get_path()),
             },
             Tab.SKILLS_ACHIEVEMENTS: {
                 'text': capfirst(_('skills and achievements')),
                 'active': Tab.SKILLS_ACHIEVEMENTS == self.active_tab,
                 'display': self.have_skills_and_achievements_tab(),
-                'url': _get_tab_urls(Tab.SKILLS_ACHIEVEMENTS, self.node_identity, self.get_path()),
+                'url': get_tab_urls(Tab.SKILLS_ACHIEVEMENTS, self.node_identity, self.get_path()),
             },
             Tab.ADMISSION_CONDITION: {
                 'text': _('Conditions'),
                 'active': Tab.ADMISSION_CONDITION == self.active_tab,
                 'display': self.have_admission_condition_tab(),
-                'url': _get_tab_urls(Tab.ADMISSION_CONDITION, self.node_identity, self.get_path()),
+                'url': get_tab_urls(Tab.ADMISSION_CONDITION, self.node_identity, self.get_path()),
             },
         })
 
@@ -181,7 +201,7 @@ def _get_view_name_from_tab(tab: Tab):
     }[tab]
 
 
-def _get_tab_urls(tab: Tab, node_identity: 'NodeIdentity', path: 'Path' = None) -> str:
+def get_tab_urls(tab: Tab, node_identity: 'NodeIdentity', path: 'Path' = None) -> str:
     path = path or ""
     return reverse(
         _get_view_name_from_tab(tab),

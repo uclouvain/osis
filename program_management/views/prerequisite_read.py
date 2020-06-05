@@ -42,7 +42,7 @@ class LearningUnitPrerequisite(PermissionRequiredMixin, LearningUnitGeneric):
     raise_exception = True
 
     def dispatch(self, request, *args, **kwargs):
-        if self.program_tree.root_node.category.name in Categories.training_categories():
+        if self.program_tree.root_node.is_training():
             return LearningUnitPrerequisiteTraining.as_view()(request, *args, **kwargs)
         return LearningUnitPrerequisiteGroup.as_view()(request, *args, **kwargs)
 

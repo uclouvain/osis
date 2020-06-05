@@ -1,10 +1,34 @@
+##############################################################################
+#
+#    OSIS stands for Open Student Information System. It's an application
+#    designed to manage the core business of higher education institutions,
+#    such as universities, faculties, institutes and professional schools.
+#    The core business involves the administration of students, teachers,
+#    courses, programs and so on.
+#
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    A copy of this license - GNU General Public License - is available
+#    at the root of the source code of this program.  If not,
+#    see http://www.gnu.org/licenses/.
+#
+##############################################################################
 import functools
 import json
 from collections import OrderedDict
 from enum import Enum
-from typing import List
 
-from django.http import HttpResponseRedirect
+from django.http import Http404
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.text import capfirst
@@ -12,9 +36,9 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 
 from base.views.common import display_warning_messages
-from education_group.forms import tree_version_choices
 from education_group.forms.academic_year_choices import get_academic_year_choices
 from education_group.forms.tree_version_choices import get_tree_versions_choices
+from education_group.views.proxy import read
 from program_management.ddd.business_types import *
 from education_group.ddd.business_types import *
 
@@ -29,7 +53,6 @@ from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd.domain.node import NodeIdentity, NodeNotFoundException
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories import load_tree
-from program_management.ddd.repositories.load_tree import find_all_versions_academic_year
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.models.element import Element
@@ -37,15 +60,7 @@ from program_management.serializers.program_tree_view import program_tree_view_s
 from program_management.forms.custom_xls import CustomXlsForm
 
 
-class Tab(Enum):
-    IDENTIFICATION = 0
-    DIPLOMAS_CERTIFICATES = 1
-    ADMINISTRATIVE_DATA = 2
-    CONTENT = 3
-    UTILIZATION = 4
-    GENERAL_INFO = 5
-    SKILLS_ACHIEVEMENTS = 6
-    ADMISSION_CONDITION = 7
+Tab = read.Tab  # FIXME :: fix imports (and remove this line)
 
 
 class TrainingRead(PermissionRequiredMixin, TemplateView):
@@ -83,10 +98,13 @@ class TrainingRead(PermissionRequiredMixin, TemplateView):
 
     @cached_property
     def education_group_version(self):
-        root_element_id = self.get_object().pk
-        return EducationGroupVersion.objects.select_related(
-            'offer__academic_year', 'root_group'
-        ).get(root_group__element__pk=root_element_id)
+        try:
+            root_element_id = self.get_object().pk
+            return EducationGroupVersion.objects.select_related(
+                'offer__academic_year', 'root_group'
+            ).get(root_group__element__pk=root_element_id)
+        except (EducationGroupVersion.DoesNotExist, Element.DoesNotExist):
+            raise Http404
 
     @functools.lru_cache()
     def get_tree(self):
@@ -132,9 +150,6 @@ class TrainingRead(PermissionRequiredMixin, TemplateView):
     def get_permission_object(self):
         return self.education_group_version.offer
 
-    def __display_administrative_data_tab(self):
-        return not self.get_object().is_master_2m() and self.current_version.is_standard
-
     def get_tab_urls(self):
         node_identity = self.get_object().entity_id
         return OrderedDict({
@@ -142,49 +157,49 @@ class TrainingRead(PermissionRequiredMixin, TemplateView):
                 'text': _('Identification'),
                 'active': Tab.IDENTIFICATION == self.active_tab,
                 'display': True,
-                'url': _get_tab_urls(Tab.IDENTIFICATION, node_identity, self.get_path()),
+                'url': get_tab_urls(Tab.IDENTIFICATION, node_identity, self.get_path()),
             },
             Tab.DIPLOMAS_CERTIFICATES: {
                 'text': _('Diplomas /  Certificates'),
                 'active': Tab.DIPLOMAS_CERTIFICATES == self.active_tab,
                 'display': True,
-                'url': _get_tab_urls(Tab.DIPLOMAS_CERTIFICATES, node_identity, self.get_path()),
+                'url': get_tab_urls(Tab.DIPLOMAS_CERTIFICATES, node_identity, self.get_path()),
             },
             Tab.ADMINISTRATIVE_DATA: {
                 'text': _('Administrative data'),
                 'active': Tab.ADMINISTRATIVE_DATA == self.active_tab,
-                'display': self.__display_administrative_data_tab(),
-                'url': _get_tab_urls(Tab.ADMINISTRATIVE_DATA, node_identity, self.get_path()),
+                'display': self.have_administrative_data_tab(),
+                'url': get_tab_urls(Tab.ADMINISTRATIVE_DATA, node_identity, self.get_path()),
             },
             Tab.CONTENT: {
                 'text': _('Content'),
                 'active': Tab.CONTENT == self.active_tab,
                 'display': True,
-                'url': _get_tab_urls(Tab.CONTENT, node_identity, self.get_path()),
+                'url': get_tab_urls(Tab.CONTENT, node_identity, self.get_path()),
             },
             Tab.UTILIZATION: {
                 'text': _('Utilizations'),
                 'active': Tab.UTILIZATION == self.active_tab,
                 'display': True,
-                'url': _get_tab_urls(Tab.UTILIZATION, node_identity, self.get_path()),
+                'url': get_tab_urls(Tab.UTILIZATION, node_identity, self.get_path()),
             },
             Tab.GENERAL_INFO: {
                 'text': _('General informations'),
                 'active': Tab.GENERAL_INFO == self.active_tab,
-                'display': self._have_general_information_tab(),
-                'url': _get_tab_urls(Tab.GENERAL_INFO, node_identity, self.get_path()),
+                'display': self.have_general_information_tab(),
+                'url': get_tab_urls(Tab.GENERAL_INFO, node_identity, self.get_path()),
             },
             Tab.SKILLS_ACHIEVEMENTS: {
                 'text': capfirst(_('skills and achievements')),
                 'active': Tab.SKILLS_ACHIEVEMENTS == self.active_tab,
-                'display': self._have_skills_and_achievements_tab(),
-                'url': _get_tab_urls(Tab.SKILLS_ACHIEVEMENTS, node_identity, self.get_path()),
+                'display': self.have_skills_and_achievements_tab(),
+                'url': get_tab_urls(Tab.SKILLS_ACHIEVEMENTS, node_identity, self.get_path()),
             },
             Tab.ADMISSION_CONDITION: {
                 'text': _('Conditions'),
                 'active': Tab.ADMISSION_CONDITION == self.active_tab,
-                'display': self._have_admission_condition_tab(),
-                'url': _get_tab_urls(Tab.ADMISSION_CONDITION, node_identity, self.get_path()),
+                'display': self.have_admission_condition_tab(),
+                'url': get_tab_urls(Tab.ADMISSION_CONDITION, node_identity, self.get_path()),
             },
         })
 
@@ -192,17 +207,20 @@ class TrainingRead(PermissionRequiredMixin, TemplateView):
     def get_current_academic_year(self):
         return academic_year.starting_academic_year()
 
-    def _have_general_information_tab(self):
+    def have_administrative_data_tab(self):
+        return not self.get_object().is_master_2m() and self.current_version.is_standard
+
+    def have_general_information_tab(self):
         node_category = self.get_object().category
         return node_category.name in general_information_sections.SECTIONS_PER_OFFER_TYPE and \
             self._is_general_info_and_condition_admission_in_display_range
 
-    def _have_skills_and_achievements_tab(self):
+    def have_skills_and_achievements_tab(self):
         node_category = self.get_object().category
         return node_category.name in TrainingType.with_skills_achievements() and \
             self._is_general_info_and_condition_admission_in_display_range
 
-    def _have_admission_condition_tab(self):
+    def have_admission_condition_tab(self):
         node_category = self.get_object().category
         return node_category.name in TrainingType.with_admission_condition() and \
             self._is_general_info_and_condition_admission_in_display_range
@@ -225,6 +243,6 @@ def _get_view_name_from_tab(tab: Tab):
     }[tab]
 
 
-def _get_tab_urls(tab: Tab, node_identity: 'NodeIdentity', path: 'Path' = None) -> str:
+def get_tab_urls(tab: Tab, node_identity: 'NodeIdentity', path: 'Path' = None) -> str:
     path = path or ""
     return reverse(_get_view_name_from_tab(tab), args=[node_identity.year, node_identity.code]) + "?path={}".format(path)

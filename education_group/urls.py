@@ -1,9 +1,14 @@
 from django.urls import include, path
 
 from education_group.views import group, training, mini_training, general_information
-
+from education_group.views.proxy.read import ReadEducationGroupRedirectView
 
 urlpatterns = [
+    path(
+        '<int:year>/<str:acronym>/',
+        ReadEducationGroupRedirectView.as_view(),
+        name='education_group_read_proxy'
+    ),
     path('groups/<int:year>/<str:code>/', include([
         path('identification/', group.GroupReadIdentification.as_view(), name='group_identification'),
         path('content/', group.GroupReadContent.as_view(), name='group_content'),
@@ -38,7 +43,11 @@ urlpatterns = [
     path('trainings/<int:year>/<str:code>/', include([
         path('identification/', training.TrainingReadIdentification.as_view(), name='training_identification'),
         path('diplomas/', training.TrainingReadDiplomaCertificate.as_view(), name='training_diplomas'),
-        path('administrative_data/', training.TrainingAdmnistrativeData.as_view(), name='training_administrative_data'),
+        path(
+            'administrative_data/',
+            training.TrainingReadAdministrativeData.as_view(),
+            name='training_administrative_data'
+        ),
         path('content/', training.TrainingReadContent.as_view(), name='training_content'),
         path('utilization/', training.TrainingReadUtilization.as_view(), name='training_utilization'),
         path(
@@ -80,7 +89,5 @@ urlpatterns = [
             name="common_master_specialized_admission_condition"
         ),
     ])),
-    path('<int:year>/<str:code>/publish',
-         group.GroupReadGeneralInformation.as_view(),
-         name='publish_general_information')
+    path('<int:year>/<str:code>/publish', general_information.publish, name='publish_general_information')
 ]

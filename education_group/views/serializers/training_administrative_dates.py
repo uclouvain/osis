@@ -24,22 +24,12 @@
 #
 ##############################################################################
 from datetime import datetime
-from typing import Dict, List, Any
+from typing import Dict, List
 
-from django.conf import settings
-from django.db.models import OuterRef, Subquery, fields, F, QuerySet, Prefetch, IntegerField, Value, Case, When
+from django.db.models import F
 
-from base.business.education_groups import general_information_sections
-from base.models.academic_calendar import AcademicCalendar
 from base.models.enums import academic_calendar_type
 from base.models.offer_year_calendar import OfferYearCalendar
-from cms.models.text_label import TextLabel
-from cms.models.translated_text import TranslatedText
-from cms.models.translated_text_label import TranslatedTextLabel
-from education_group.ddd.domain.training import TrainingIdentity
-from education_group.ddd.repository.training import TrainingRepository
-from program_management.ddd.domain.node import NodeGroupYear
-
 
 DomainTitle = str
 SessionNumber = str
@@ -75,7 +65,7 @@ def __get_dates_by_session(domain_title: str, dates: List[AdministrativeDateBySe
 
 
 def __get_session_dates(session_number: int, dates: List[AdministrativeDateBySession]) -> Dates:
-    administrative_date = next(date for date in dates if date.session_number == session_number)
+    administrative_date = next((date for date in dates if date.session_number == session_number), None)
     start_date = administrative_date.start_date if administrative_date else None
     end_date = administrative_date.end_date if administrative_date else None
     return {

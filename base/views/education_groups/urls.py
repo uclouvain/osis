@@ -34,7 +34,7 @@ from base.views.education_groups.search import EducationGroupTypeAutoComplete
 from base.views.education_groups.select import copy_education_group_to_cache, copy_learning_unit_to_cache
 from base.views.education_groups.update import CertificateAimAutocomplete
 from education_group import urls as education_group_urls
-from . import search, create, detail, update, delete
+from . import search, create, update, delete
 from .achievement.urls import urlpatterns as urlpatterns_achievement
 
 urlpatterns = [
@@ -91,28 +91,11 @@ urlpatterns = [
     ),
     url(r'^(?P<offer_id>[0-9]+)/(?P<education_group_year_id>[0-9]+)/', include([
         url(r'^update/$', update.update_education_group, name="update_education_group"),
-        # TODO : URL TO REMOVE because splited by group/mini_training/training (rewriting path)
-        # url(r'^diplomas/$', detail.EducationGroupDiplomas.as_view(),
-        #     name='education_group_diplomas'),
-        # url(r'^informations/$', detail.EducationGroupGeneralInformation.as_view(),
-        #     name='education_group_general_informations'),
         url(r'^informations/edit/$', education_group.education_group_year_pedagogy_edit,
             name="education_group_pedagogy_edit"),
-        # TODO : URL TO REMOVE because splited by group/mini_training/training (rewriting path)
-        # url(r'^informations/publish/$', detail.publish,
-        #     name="education_group_publish"),
-        url(r'^administrative/', include([
-            # TODO : URL TO REMOVE because splited by group/mini_training/training (rewriting path)
-            # url(u'^$', detail.EducationGroupAdministrativeData.as_view(), name='education_group_administrative'),
-            url(u'^edit/$', education_group.education_group_edit_administrative_data,
-                name='education_group_edit_administrative')
-        ])),
         url(r'^select/$', copy_education_group_to_cache, name='copy_education_group_to_cache'),
         url(r'^skills_achievements/', include(urlpatterns_achievement)),
 
-        url(r'^admission_conditions/$',
-            detail.EducationGroupYearAdmissionCondition.as_view(),
-            name='education_group_year_admission_condition_edit'),
         url(r'^admission_conditions/remove_line$',
             education_group.education_group_year_admission_condition_remove_line,
             name='education_group_year_admission_condition_remove_line'),

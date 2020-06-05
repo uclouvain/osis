@@ -25,6 +25,7 @@
 ##############################################################################
 from django.db.models import F
 
+from base.models.education_group_year import EducationGroupYear
 from education_group.ddd.domain.training import TrainingIdentity
 from education_group.models.group_year import GroupYear
 from osis_common.ddd import interface
@@ -52,3 +53,17 @@ class TrainingIdentitySearch(interface.DomainService):
             acronym=tree_version_identity.offer_acronym,
             year=tree_version_identity.year,
         )
+
+    def get_from_education_group_year_id(self, education_group_year_id: int) -> 'TrainingIdentity':
+        values = EducationGroupYear.objects.filter(
+            pk=education_group_year_id
+        ).annotate(
+            year=F('academic_year__year'),
+        ).values(
+            'acronym',
+            'year',
+        )
+        if values:
+            return TrainingIdentity(
+                **values[0]
+            )

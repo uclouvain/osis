@@ -1,3 +1,28 @@
+##############################################################################
+#
+#    OSIS stands for Open Student Information System. It's an application
+#    designed to manage the core business of higher education institutions,
+#    such as universities, faculties, institutes and professional schools.
+#    The core business involves the administration of students, teachers,
+#    courses, programs and so on.
+#
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    A copy of this license - GNU General Public License - is available
+#    at the root of the source code of this program.  If not,
+#    see http://www.gnu.org/licenses/.
+#
+##############################################################################
 import functools
 import json
 from collections import OrderedDict
@@ -13,10 +38,12 @@ from base import models as mdl
 from base.business.education_groups import general_information_sections
 from base.business.education_groups.general_information_sections import \
     MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION
+from base.models import academic_year
 from base.models.enums.education_group_types import GroupType
 from base.views.common import display_warning_messages
 from education_group.forms.academic_year_choices import get_academic_year_choices
 from education_group.models.group_year import GroupYear
+from education_group.views.proxy import read
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.node import NodeIdentity, NodeNotFoundException
@@ -26,11 +53,7 @@ from program_management.models.element import Element
 from program_management.serializers.program_tree_view import program_tree_view_serializer
 
 
-class Tab(Enum):
-    IDENTIFICATION = 0
-    CONTENT = 1
-    UTILIZATION = 2
-    GENERAL_INFO = 3
+Tab = read.Tab  # FIXME :: fix imports (and remove this line)
 
 
 class GroupRead(PermissionRequiredMixin, TemplateView):
@@ -59,7 +82,7 @@ class GroupRead(PermissionRequiredMixin, TemplateView):
         return NodeIdentity(code=self.kwargs['code'], year=self.kwargs['year'])
 
     @functools.lru_cache()
-    def get_object(self):
+    def get_object(self) -> 'Node':
         try:
             return self.get_tree().get_node(self.path)
         except NodeNotFoundException:
@@ -102,42 +125,44 @@ class GroupRead(PermissionRequiredMixin, TemplateView):
         except GroupYear.DoesNotExist:
             raise Http404
 
+    @functools.lru_cache()
+    def get_current_academic_year(self):
+        return academic_year.starting_academic_year()
+
     def get_permission_object(self):
         return self.get_group_year()
 
     def get_tab_urls(self):
-        node = self.get_object()
         return OrderedDict({
             Tab.IDENTIFICATION: {
                 'text': _('Identification'),
                 'active': Tab.IDENTIFICATION == self.active_tab,
                 'display': True,
-                'url': _get_tab_urls(Tab.IDENTIFICATION, self.node_identity, self.path),
+                'url': get_tab_urls(Tab.IDENTIFICATION, self.node_identity, self.path),
             },
             Tab.CONTENT: {
                 'text': _('Content'),
                 'active': Tab.CONTENT == self.active_tab,
                 'display': True,
-                'url': _get_tab_urls(Tab.CONTENT, self.node_identity, self.path),
+                'url': get_tab_urls(Tab.CONTENT, self.node_identity, self.path),
             },
             Tab.UTILIZATION: {
                 'text': _('Utilizations'),
                 'active': Tab.UTILIZATION == self.active_tab,
                 'display': True,
-                'url': _get_tab_urls(Tab.UTILIZATION, self.node_identity, self.path),
+                'url': get_tab_urls(Tab.UTILIZATION, self.node_identity, self.path),
             },
             Tab.GENERAL_INFO: {
                 'text': _('General informations'),
                 'active': Tab.GENERAL_INFO == self.active_tab,
                 'display': self.have_general_information_tab(),
-                'url': _get_tab_urls(Tab.GENERAL_INFO, self.node_identity, self.path),
+                'url': get_tab_urls(Tab.GENERAL_INFO, self.node_identity, self.path),
             }
         })
 
     def have_general_information_tab(self):
-        node_category = self.get_object().category
-        return node_category.name in general_information_sections.SECTIONS_PER_OFFER_TYPE and \
-               self._is_general_info_and_condition_admission_in_display_range
+        return self.get_object().node_type.name in general_information_sections.SECTIONS_PER_OFFER_TYPE and \
+            self._is_general_info_and_condition_admission_in_display_range
 
     def _is_general_info_and_condition_admission_in_display_range(self):
         return MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION <= self.get_object().year < \
@@ -153,7 +178,7 @@ def _get_view_name_from_tab(tab: Tab):
     }[tab]
 
 
-def _get_tab_urls(tab: Tab, node_identity: 'NodeIdentity', path: 'Path' = None) -> str:
+def get_tab_urls(tab: Tab, node_identity: 'NodeIdentity', path: 'Path' = None) -> str:
     path = path or ""
     return reverse(
         _get_view_name_from_tab(tab),

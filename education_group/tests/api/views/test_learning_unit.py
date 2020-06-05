@@ -259,8 +259,8 @@ class LearningUnitPrerequisitesViewTestCase(APITestCase):
             many=True,
             context={
                 'request': RequestFactory().get(self.url),
-                'language': settings.LANGUAGE_CODE_EN
+                "test": 'test',
+                'language': settings.LANGUAGE_CODE_FR
             }
         )
         self.assertListEqual(response.data, serializer.data)
-
