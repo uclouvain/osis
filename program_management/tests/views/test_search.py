@@ -34,6 +34,7 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from base import utils
+from base.models.education_group_type import EducationGroupType
 from base.models.enums import education_group_categories
 from base.models.enums.education_group_categories import TRAINING, MINI_TRAINING, GROUP
 from base.tests.factories.academic_year import AcademicYearFactory
@@ -66,7 +67,7 @@ class TestEducationGroupSearchView(TestCase):
     def setUpTestData(cls):
         cls.user = UserFactory()
         cls.person = PersonFactory(user=cls.user)
-        cls.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
+        cls.user.user_permissions.add(Permission.objects.get(codename="view_educationgroup"))
         cls.url = reverse(URL_EDUCATION_GROUPS)
 
     def setUp(self):
@@ -195,7 +196,7 @@ class TestEducationGroupDataSearchFilter(TestCase):
         cls.envi_entity_v = EntityVersionFactory(entity=envi_entity, end_date=None)
 
         cls.user = PersonFactory().user
-        cls.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
+        cls.user.user_permissions.add(Permission.objects.get(codename="view_educationgroup"))
         cls.form_class = GroupFilter()._meta.form
         cls.url = reverse(URL_EDUCATION_GROUPS)
 
@@ -461,8 +462,8 @@ class TestEducationGroupTypeAutoComplete(TestCase):
         self.assertEqual(6, len(json_response["results"]))
 
     def test_with_category_set(self):
-        tuples_category_woth_expected_result = [(TRAINING, 2), (MINI_TRAINING, 3), (GROUP, 1)]
-        for category, expected_result in tuples_category_woth_expected_result:
+        tuples_category_with_expected_result = [(TRAINING, 2), (MINI_TRAINING, 3), (GROUP, 1)]
+        for category, expected_result in tuples_category_with_expected_result:
             with self.subTest(category=category):
                 response = self.client.get(self.url, data={"forward": json.dumps({"category": category})})
                 json_response = response.json()
@@ -529,7 +530,7 @@ class TestEducationGroupDataSearchFilterWithVersion(TestCase):
             offer=cls.egy)
         cls.user = UserFactory()
         cls.person = PersonFactory(user=cls.user)
-        cls.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
+        cls.user.user_permissions.add(Permission.objects.get(codename="view_educationgroup"))
         cls.url = reverse(URL_EDUCATION_GROUPS)
         cls.form_class = GroupFilter()._meta.form
 
