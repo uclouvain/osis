@@ -262,5 +262,5 @@ class LearningUnitPrerequisitesViewTestCase(APITestCase):
                 'language': settings.LANGUAGE_CODE_EN
             }
         )
-        self.assertEqual(response.data, serializer.data)
+        self.assertListEqual(response.data, serializer.data)
 
