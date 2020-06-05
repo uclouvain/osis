@@ -60,6 +60,14 @@ class TestTrainingReadIdentification(TestCase):
     def setUp(self) -> None:
         self.client.force_login(self.person.user)
 
+        self.perm_patcher = mock.patch(
+            "education_group.views.training.common_read."
+            "TrainingRead._is_general_info_and_condition_admission_in_display_range",
+            return_value=True
+        )
+        self.mocked_perm = self.perm_patcher.start()
+        self.addCleanup(self.perm_patcher.stop)
+
     def test_case_user_not_logged(self):
         self.client.logout()
         response = self.client.get(self.url)
@@ -123,9 +131,7 @@ class TestTrainingReadIdentification(TestCase):
         self.assertFalse(response.context['tab_urls'][Tab.SKILLS_ACHIEVEMENTS]['active'])
         self.assertFalse(response.context['tab_urls'][Tab.ADMISSION_CONDITION]['active'])
 
-    @mock.patch("education_group.views.training.common_read."
-                "TrainingRead._is_general_info_and_condition_admission_in_display_range", return_value=True)
-    def test_assert_displayed_general_information_tabs(self, mock_displayed_range):
+    def test_assert_displayed_general_information_tabs(self):
         from education_group.views.training.common_read import Tab
 
         with mock.patch(
@@ -142,9 +148,7 @@ class TestTrainingReadIdentification(TestCase):
             response = self.client.get(self.url)
             self.assertFalse(response.context['tab_urls'][Tab.GENERAL_INFO]['display'])
 
-    @mock.patch("education_group.views.training.common_read."
-                "TrainingRead._is_general_info_and_condition_admission_in_display_range", return_value=True)
-    def test_assert_displayed_skill_and_achievements_tabs(self, mock_displayed_range):
+    def test_assert_displayed_skill_and_achievements_tabs(self):
         from education_group.views.training.common_read import Tab
 
         with mock.patch(
@@ -161,9 +165,7 @@ class TestTrainingReadIdentification(TestCase):
             response = self.client.get(self.url)
             self.assertFalse(response.context['tab_urls'][Tab.SKILLS_ACHIEVEMENTS]['display'])
 
-    @mock.patch("education_group.views.training.common_read."
-                "TrainingRead._is_general_info_and_condition_admission_in_display_range", return_value=True)
-    def test_assert_displayed_admission_condition_tabs(self, mock_displayed_range):
+    def test_assert_displayed_admission_condition_tabs(self):
         from education_group.views.training.common_read import Tab
 
         with mock.patch(
