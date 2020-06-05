@@ -82,7 +82,7 @@ class GroupRead(PermissionRequiredMixin, TemplateView):
         return NodeIdentity(code=self.kwargs['code'], year=self.kwargs['year'])
 
     @functools.lru_cache()
-    def get_object(self) -> Node:
+    def get_object(self) -> 'Node':
         try:
             return self.get_tree().get_node(self.path)
         except NodeNotFoundException:
