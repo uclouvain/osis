@@ -117,7 +117,7 @@ def build_success_message(last_luy_reported, luy):
         )
     elif proposal and learning_unit.proposal_is_on_same_year(proposal=proposal, base_luy=luy):
         msg = "{}. {}.".format(
-            default_message,
+            _("The learning unit has been updated"),
             _("The learning unit is in proposal, the report from %(proposal_year)s will be done at "
               "consolidation") % {
                 'proposal_year': proposal.learning_unit_year.academic_year
@@ -125,7 +125,7 @@ def build_success_message(last_luy_reported, luy):
         )
     elif proposal and learning_unit.proposal_is_on_future_year(proposal=proposal, base_luy=luy):
         msg = "{} ({}).".format(
-            default_message,
+            _("The learning unit has been updated"),
             _("the report has not been done from %(proposal_year)s because the LU is in proposal") % {
                 'proposal_year': proposal.learning_unit_year.academic_year
             }
