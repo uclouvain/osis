@@ -28,13 +28,13 @@ class EntityManager(osis_role_models.EntityRoleModel):
     @classmethod
     def rule_set(cls):
         return rules.RuleSet({
-            "view_educationgroup": rules.always_allow,
-            "change_scoresresponsible": rules.always_allow,
-            "view_scoresresponsible": rules.always_allow,
-            "change_programmanager": rules.always_allow,
-            "view_programmanager": rules.always_allow,
-            "can_access_catalog": rules.always_allow,
-            "is_institution_administrator": rules.always_allow,
+            "base.view_educationgroup": rules.always_allow,
+            "assessments.change_scoresresponsible": rules.always_allow,
+            "assessments.view_scoresresponsible": rules.always_allow,
+            "base.change_programmanager": rules.always_allow,
+            "base.view_programmanager": rules.always_allow,
+            "base.can_access_catalog": rules.always_allow,
+            "base.is_institution_administrator": rules.always_allow,
         })
 
 
