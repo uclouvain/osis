@@ -26,7 +26,7 @@
 import json
 import random
 from http import HTTPStatus
-from unittest import mock
+from unittest import mock, skip
 
 from django.contrib.auth.models import Permission
 from django.contrib.messages import get_messages
@@ -759,6 +759,7 @@ class TestGetSuccessRedirectUrl(TestCase):
         self.assertEqual(result, expected_url)
 
 
+@skip("Will disappear in OSIS-4529")
 @override_flag('education_group_attach', active=True)
 @override_flag('copy_education_group_to_cache', active=True)
 @override_flag('education_group_update', active=True)
