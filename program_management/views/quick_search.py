@@ -34,12 +34,14 @@ from base.utils.cache import CacheFilterMixin
 from base.utils.search import SearchMixin
 from base.views.mixins import AjaxTemplateMixin
 from education_group.api.serializers.education_group import EducationGroupSerializer
+from education_group.models.group_year import GroupYear
 from learning_unit.api.serializers.learning_unit import LearningUnitSerializer
 from program_management.ddd.repositories import load_node
 
 CACHE_TIMEOUT = 60
 
 
+# FIXME Replace model by GroupYear
 class QuickSearchEducationGroupYearView(PermissionRequiredMixin, CacheFilterMixin, AjaxTemplateMixin, SearchMixin,
                                         FilterView):
     model = EducationGroupYear
@@ -68,8 +70,7 @@ class QuickSearchEducationGroupYearView(PermissionRequiredMixin, CacheFilterMixi
         context = super().get_context_data(**kwargs)
         context['form'] = context["filter"].form
         context['root_id'] = self.kwargs['root_id']
-        context['education_group_year_id'] = self.node_id
-        context['display_quick_search_luy_link'] = EducationGroupYear.objects.get(
+        context['display_quick_search_luy_link'] = GroupYear.objects.get(
             id=self.node_id
         ).education_group_type.learning_unit_child_allowed
         context['node_path'] = self.kwargs["node_path"]
