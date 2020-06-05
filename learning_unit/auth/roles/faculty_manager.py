@@ -23,7 +23,6 @@ class FacultyManager(osis_role_models.EntityRoleModel):
             'base.can_create_learningunit': rules.always_allow,
             'base.can_create_partim':
                 predicates.is_user_attached_to_current_management_entity &
-                predicates.is_learning_unit_year_not_in_past &
                 predicates.is_learning_unit_edition_period_open &
                 predicates.is_learning_unit_year_full &
                 predicates.is_external_learning_unit_cograduation,
@@ -64,7 +63,7 @@ class FacultyManager(osis_role_models.EntityRoleModel):
                 predicates.is_learning_unit_year_older_or_equals_than_limit_settings_year &
                 predicates.is_learning_unit_year_not_in_past &
                 predicates.has_learning_unit_no_application_this_year &
-                predicates.is_edition_period_open &
+                predicates.is_learning_unit_edition_period_open &
                 predicates.is_user_attached_to_current_management_entity &
                 predicates.is_learning_unit_year_a_partim |
                 predicates.is_learning_unit_container_type_editable &
