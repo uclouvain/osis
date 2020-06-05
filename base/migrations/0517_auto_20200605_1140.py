@@ -27,8 +27,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='entitymanager',
             name='entity',
-            field=models.ForeignKey(default=10000000, on_delete=django.db.models.deletion.CASCADE, to='base.Entity'),
-            preserve_default=False,
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.Entity'),
         ),
         migrations.AlterField(
             model_name='entitymanager',

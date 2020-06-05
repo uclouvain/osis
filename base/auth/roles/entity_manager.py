@@ -1,6 +1,5 @@
 import rules
 from django.db import models
-from django.db.models import Prefetch
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
@@ -36,28 +35,3 @@ class EntityManager(osis_role_models.EntityRoleModel):
             "base.can_access_catalog": rules.always_allow,
             "base.is_institution_administrator": rules.always_allow,
         })
-
-
-def get_perms(model):
-    return model._meta.permissions
-
-
-def find_by_user(a_user, with_entity_version=True):
-    qs = EntityManager.objects.filter(person__user=a_user) \
-        .select_related('person', 'structure', 'entity') \
-        .order_by('structure__acronym')
-    if with_entity_version:
-        qs = qs.prefetch_related(
-            Prefetch('entity__entityversion_set', to_attr='entity_versions')
-        )
-    return qs
-
-
-def find_entities_with_descendants_from_entity_managers(entities_manager, entities_by_id):
-    entities_with_descendants = []
-    for entity_manager in entities_manager:
-        entities_with_descendants.append(entity_manager.entity)
-        entities_with_descendants += [
-            ent_version.entity for ent_version in entities_by_id[entity_manager.entity_id].get('all_children')
-        ]
-    return entities_with_descendants

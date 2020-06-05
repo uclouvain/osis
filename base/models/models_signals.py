@@ -25,7 +25,6 @@
 ##############################################################################
 from django.conf import settings
 from django.contrib.auth.models import Group
-from django.contrib.auth.models import Permission
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver, Signal
 
@@ -112,16 +111,6 @@ def _update_person_if_necessary(person, user, global_id):
     return updated, person
 
 
-def get_or_create_group():
-    entity_managers_group, created = Group.objects.get_or_create(name='entity_managers')
-    if created:
-        for perm in entity_manager.get_perms(entity_manager.EntityManager):
-            permission_codename = perm[0]
-            permission = Permission.objects.get(codename=permission_codename)
-            entity_managers_group.permissions.add(permission)
-    return entity_managers_group
-
-
 @receiver(post_save, sender=mdl.tutor.Tutor)
 def add_to_tutors_group(sender, instance, **kwargs):
     if kwargs.get('created', True) and instance.person.user:
@@ -134,13 +123,6 @@ def add_to_pgm_managers_group(sender, instance, **kwargs):
     if kwargs.get('created', True) and instance.person.user:
         pgm_managers_group = Group.objects.get(name='program_managers')
         instance.person.user.groups.add(pgm_managers_group)
-
-
-@receiver(post_save, sender=entity_manager.EntityManager)
-def add_to_entity_manager_group(sender, instance, **kwargs):
-    if kwargs.get('created', True) and instance.person.user:
-        entity_managers_group = get_or_create_group()
-        instance.person.user.groups.add(entity_managers_group)
 
 
 @receiver(post_delete, sender=mdl.tutor.Tutor)

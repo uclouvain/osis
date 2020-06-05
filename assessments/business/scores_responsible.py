@@ -25,7 +25,6 @@
 ##############################################################################
 from django.db.models import QuerySet, Q
 
-from base.auth.roles import entity_manager
 from base.models import program_manager, entity_version
 from base.models.person import Person
 
@@ -42,7 +41,7 @@ def filter_learning_unit_year_according_person(queryset: QuerySet, person: Perso
     :return: queryset
     """
     structure = entity_version.build_current_entity_version_structure_in_memory()
-    entities_with_descendants = entity_manager.find_entities_with_descendants_from_entity_managers(
+    entities_with_descendants = _find_entities_with_descendants_from_entity_managers(
         person.entitymanager_set.all().select_related('entity'),
         structure
     )
@@ -58,3 +57,14 @@ def filter_learning_unit_year_according_person(queryset: QuerySet, person: Perso
         Q(id__in=learning_units_of_prgm_mngr)
     )
     return queryset
+
+
+def _find_entities_with_descendants_from_entity_managers(entities_manager, entities_by_id):
+    entities_with_descendants = []
+    for entity_manager in entities_manager:
+        entities_with_descendants.append(entity_manager.entity)
+        entities_with_descendants += [
+            ent_version.entity for ent_version in entities_by_id[entity_manager.entity_id].get('all_children')
+        ]
+    return entities_with_descendants
+
