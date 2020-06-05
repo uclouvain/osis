@@ -89,11 +89,10 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
         }
 
     def get_object(self):
-        obj = self.model.objects.filter(
-            parent_id=self.parent_id
-        ).filter(
-            Q(child_branch_id=self.child_id_to_detach) | Q(child_leaf_id=self.child_id_to_detach)
-        ).get()
+        obj = self.model.objects.get(
+            parent_element_id=self.parent_id,
+            child_element_id=self.child_id_to_detach
+        )
         return obj
 
     @property
