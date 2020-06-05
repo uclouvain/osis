@@ -175,9 +175,10 @@ def __load_multiple_node_group_year(node_group_year_ids: List[int]) -> QuerySet:
         schedule_type=F('educationgroupversion__offer__schedule_type'),
         keywords=F('educationgroupversion__offer__keywords'),
         group_title_fr=F('title_fr'),
-        group_title_en=F('title_en')
+        group_title_en=F('title_en'),
+        node_id=F('id')
     ).values(
-        'id',
+        'node_id',
         'type',
         'node_type',
         'code',
