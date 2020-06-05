@@ -432,7 +432,7 @@ class LearningUnitPedagogyEditTestCase(TestCase):
         )
         ProposalLearningUnitFactory(learning_unit_year=previous_luy)
         msg = self._post_learning_unit_pedagogy()
-        expected_message = "{}.".format(_("The learning unit has been updated"))
+        expected_message = "{}".format(_("The learning unit has been updated (without report)."))
         self.assertEqual(msg[0].get('message'), expected_message)
         self.assertEqual(msg[0].get('level'), messages.SUCCESS)
 
