@@ -221,10 +221,10 @@ class GroupElementYearManager(models.Manager):
                           END as is_root_row
                     FROM base_groupelementyear gey
                     INNER JOIN program_management_element parent_elem on parent_elem.id = gey.parent_element_id
-                    
+
                     INNER JOIN education_group_groupyear AS gpyp on parent_elem.group_year_id = gpyp.id
                     INNER JOIN base_educationgrouptype AS egt on gpyp.education_group_type_id = egt.id
-                    
+
                     INNER JOIN program_management_element child_element on child_element.id = gey.child_element_id
                     LEFT JOIN base_learningunityear bl on child_element.learning_unit_year_id = bl.id
                     LEFT JOIN education_group_groupyear AS gpyc on parent_elem.group_year_id = gpyc.id
@@ -245,7 +245,7 @@ class GroupElementYearManager(models.Manager):
                     FROM base_groupelementyear AS parent
                     INNER JOIN root_query AS child on parent.child_element_id = child.parent_element_id
                     and child.is_root_row = false
-                    
+
                     INNER JOIN program_management_element parent_elem on parent_elem.id = parent.parent_element_id
                     INNER JOIN education_group_groupyear gpyp on parent_elem.group_year_id = gpyp.id
                     INNER JOIN base_educationgrouptype AS egt on gpyp.education_group_type_id = egt.id

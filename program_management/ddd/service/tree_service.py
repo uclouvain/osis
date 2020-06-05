@@ -30,4 +30,3 @@ from program_management.ddd.repositories import load_tree
 
 def search_trees_using_node(node: 'Node'):
     return load_tree.load_trees_from_children(child_element_ids=[node.pk])
-

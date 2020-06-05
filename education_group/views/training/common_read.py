@@ -245,4 +245,7 @@ def _get_view_name_from_tab(tab: Tab):
 
 def get_tab_urls(tab: Tab, node_identity: 'NodeIdentity', path: 'Path' = None) -> str:
     path = path or ""
-    return reverse(_get_view_name_from_tab(tab), args=[node_identity.year, node_identity.code]) + "?path={}".format(path)
+    return reverse(
+        _get_view_name_from_tab(tab),
+        args=[node_identity.year, node_identity.code]
+    ) + "?path={}".format(path)

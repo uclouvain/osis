@@ -62,5 +62,3 @@ class CustomXlsForm(forms.Form):
     def get_current_node_id(self, path):
         nodes = path.split('|')
         return nodes[-1]
-
-

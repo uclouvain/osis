@@ -64,7 +64,7 @@ def __instanciate_volume_domain_object(learn_unit_data: dict) -> dict:
     return learn_unit_data
 
 
-@deprecated  # Please use :py:meth:`~learning_unit.ddd.repository.load_learning_unit_year.load_multiple_by_identity` instead !
+@deprecated  # Use :py:meth:`~learning_unit.ddd.repository.load_learning_unit_year.load_multiple_by_identity` instead !
 def load_multiple(learning_unit_year_ids: List[int]) -> List['LearningUnitYear']:
     subquery_component = LearningComponentYear.objects.filter(
         learning_unit_year_id=OuterRef('pk')
