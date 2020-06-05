@@ -30,6 +30,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from base.models.enums.education_group_types import GroupType
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.factories.user import UserFactory
 from education_group.views.group.common_read import Tab
@@ -40,6 +41,7 @@ from program_management.tests.factories.element import ElementGroupYearFactory
 class TestGroupReadGeneralInformation(TestCase):
     @classmethod
     def setUpTestData(cls):
+        AcademicYearFactory(current=True)
         cls.person = PersonWithPermissionsFactory('view_educationgroup')
         cls.element_group_year = ElementGroupYearFactory(
             group_year__partial_acronym="LTRONC100B",
