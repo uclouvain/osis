@@ -309,10 +309,10 @@ def generate_learning_unit_year_with_associated_education_group(academic_year, s
         education_group_year=TrainingFactory(academic_year=academic_year)
     )
 
-    # GroupElementYearFactory(child_branch=offer_year_entity.education_group_year, parent=None)
     GroupElementYearChildLeafFactory(
         parent=offer_year_entity.education_group_year,
         parent_element__group_year__academic_year=academic_year,
+        parent_element__group_year__management_entity=entity_version.entity,
         child_leaf=luy
     )
 
