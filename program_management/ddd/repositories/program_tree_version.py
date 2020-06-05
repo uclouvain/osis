@@ -86,9 +86,12 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
 
     @classmethod
     def search_all_versions_from_root_node(cls, root_node_identity: 'NodeIdentity') -> List['ProgramTreeVersion']:
+        version_ids = EducationGroupVersion.objects.filter(
+            root_group__partial_acronym=root_node_identity.code,
+            root_group__academic_year__year=root_node_identity.year
+        ).values_list('offer_id', flat=True)
         qs = GroupYear.objects.filter(
-            partial_acronym=root_node_identity.code,
-            academic_year__year=root_node_identity.year,
+            educationgroupversion__offer_id__in=version_ids,
         ).order_by(
             'educationgroupversion__version_name'
         ).annotate(

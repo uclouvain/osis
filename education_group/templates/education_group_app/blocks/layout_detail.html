@@ -69,8 +69,8 @@
                             {% if current_version %}
                                 <select id="slt_version" name="select_program_tree_version" class="form-control" onchange="location = this.value;">
                                     {% for choice in versions_choices %}
-                                        <option value="{{ choice.node_href }}"
-                                                {% if current_version.entity_identity == choice.1 %}
+                                        <option value="{{ choice.0 }}"
+                                                {% if current_version.entity_id == choice.1 %}
                                                 selected {% endif %}>{{ choice.1 | display_version_name }}</option>
                                     {% endfor %}
                                 </select>
