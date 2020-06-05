@@ -30,6 +30,7 @@ from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver, Signal
 
 from base import models as mdl
+from base.auth.roles import entity_manager
 from osis_common.models.serializable_model import SerializableModel
 from osis_common.models.signals.authentication import user_created_signal, user_updated_signal
 
@@ -114,7 +115,7 @@ def _update_person_if_necessary(person, user, global_id):
 def get_or_create_group():
     entity_managers_group, created = Group.objects.get_or_create(name='entity_managers')
     if created:
-        for perm in mdl.entity_manager.get_perms(mdl.entity_manager.EntityManager):
+        for perm in entity_manager.get_perms(entity_manager.EntityManager):
             permission_codename = perm[0]
             permission = Permission.objects.get(codename=permission_codename)
             entity_managers_group.permissions.add(permission)
@@ -124,8 +125,8 @@ def get_or_create_group():
 @receiver(post_save, sender=mdl.tutor.Tutor)
 def add_to_tutors_group(sender, instance, **kwargs):
     if kwargs.get('created', True) and instance.person.user:
-            tutors_group = Group.objects.get(name='tutors')
-            instance.person.user.groups.add(tutors_group)
+        tutors_group = Group.objects.get(name='tutors')
+        instance.person.user.groups.add(tutors_group)
 
 
 @receiver(post_save, sender=mdl.program_manager.ProgramManager)
@@ -135,7 +136,7 @@ def add_to_pgm_managers_group(sender, instance, **kwargs):
         instance.person.user.groups.add(pgm_managers_group)
 
 
-@receiver(post_save, sender=mdl.entity_manager.EntityManager)
+@receiver(post_save, sender=entity_manager.EntityManager)
 def add_to_entity_manager_group(sender, instance, **kwargs):
     if kwargs.get('created', True) and instance.person.user:
         entity_managers_group = get_or_create_group()
@@ -149,7 +150,7 @@ def remove_from_tutor_group(sender, instance, **kwargs):
         instance.person.user.groups.remove(tutors_group)
 
 
-@receiver(post_delete, sender=mdl.entity_manager.EntityManager)
+@receiver(post_delete, sender=entity_manager.EntityManager)
 def remove_from_entity_manager_group(sender, instance, **kwargs):
     if instance.person.user:
         entity_managers_group = get_or_create_group()

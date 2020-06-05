@@ -25,7 +25,8 @@
 ##############################################################################
 from django.db.models import QuerySet, Q
 
-from base.models import entity_manager, program_manager, entity_version
+from base.auth.roles import entity_manager
+from base.models import program_manager, entity_version
 from base.models.person import Person
 
 
