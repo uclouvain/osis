@@ -43,6 +43,7 @@ class AttachStrategy(metaclass=abc.ABCMeta):
         pass
 
 
+# FIXME :: DEPRECATED :: to remove - use ddd/service/attach_node instead (OSIS-4723)
 class AttachEducationGroupYearStrategy(AttachStrategy):
     def __init__(self, parent: EducationGroupYear, child: EducationGroupYear, instance=None):
         self.parent = parent

@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from django.conf import settings
-from django.test import RequestFactory
+from django.test import RequestFactory, override_settings
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -200,6 +200,7 @@ class EducationGroupRootsListTestCase(APITestCase):
         self.assertEqual(response.data, serializer.data)
 
 
+# @override_settings(LANGUAGES=[('fr-be', 'French'), ('en', 'English'), ], LANGUAGE_CODE='fr-be')
 class LearningUnitPrerequisitesViewTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):
@@ -259,8 +260,8 @@ class LearningUnitPrerequisitesViewTestCase(APITestCase):
             many=True,
             context={
                 'request': RequestFactory().get(self.url),
-                'language': settings.LANGUAGE_CODE_EN
+                "test": 'test',
+                'language': settings.LANGUAGE_CODE_FR
             }
         )
         self.assertEqual(response.data, serializer.data)
-
