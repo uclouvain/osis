@@ -82,7 +82,7 @@ class GroupRead(PermissionRequiredMixin, TemplateView):
         return NodeIdentity(code=self.kwargs['code'], year=self.kwargs['year'])
 
     @functools.lru_cache()
-    def get_object(self):
+    def get_object(self) -> Node:
         try:
             return self.get_tree().get_node(self.path)
         except NodeNotFoundException:
@@ -133,7 +133,6 @@ class GroupRead(PermissionRequiredMixin, TemplateView):
         return self.get_group_year()
 
     def get_tab_urls(self):
-        node = self.get_object()
         return OrderedDict({
             Tab.IDENTIFICATION: {
                 'text': _('Identification'),
@@ -162,8 +161,7 @@ class GroupRead(PermissionRequiredMixin, TemplateView):
         })
 
     def have_general_information_tab(self):
-        node_category = self.get_object().category
-        return node_category.name in general_information_sections.SECTIONS_PER_OFFER_TYPE and \
+        return self.get_object().node_type.name in general_information_sections.SECTIONS_PER_OFFER_TYPE and \
             self._is_general_info_and_condition_admission_in_display_range
 
     def _is_general_info_and_condition_admission_in_display_range(self):
