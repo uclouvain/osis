@@ -158,7 +158,7 @@ class AddToGroupsSignalsTest(TestCase):
         return EntityManager.objects.create(
             person=self.person_foo,
             structure=Structure.objects.create(acronym="TEST"),
-            entity=EntityVersionFactory()
+            entity=EntityVersionFactory().entity
         )
 
     def setUp(self):
