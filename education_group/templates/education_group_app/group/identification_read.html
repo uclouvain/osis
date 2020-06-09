@@ -60,7 +60,7 @@
                         </div>
                         <div class="col-md-6">
                             {% bootstrap_label _("Type of constraint") label_class='d-block'%}
-                            <p>{{ node.constraint_type|default_if_none:""  }}</p>
+                            <p>{{ node.constraint_type.value|capfirst|default_if_none:""  }}</p>
                         </div>
                     </div>
                     <br>
