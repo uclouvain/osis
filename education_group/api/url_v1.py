@@ -34,15 +34,15 @@ app_name = "education_group"
 
 urlpatterns = [
     url(r'^trainings$', TrainingList.as_view(), name=TrainingList.name),
-    url(
-        r'^trainings/(?P<year>[\d]{4})/(?P<acronym>[\w]+(?:[/| ]?[a-zA-Z]{1,2})?)$',
-        TrainingDetail.as_view(),
-        name=TrainingDetail.name
-    ),
-    url(r'^trainings/(?P<year>[\d]{4})/(?P<acronym>[\w]+(?:[/| ]?[a-zA-Z]{1,2})?)/', include([
+    url(r'^trainings/(?P<year>[\d]{4})/(?P<acronym>[\w]+(?:[/ ]?[a-zA-Z]{1,2}){0,2})/', include([
         url(r'^tree$', TrainingTreeView.as_view(), name=TrainingTreeView.name),
         url(r'^title$', TrainingTitle.as_view(), name=TrainingTitle.name),
     ])),
+    url(
+        r'^trainings/(?P<year>[\d]{4})/(?P<acronym>[\w]+(?:[/ ]?[a-zA-Z]{1,2}){0,2})$',
+        TrainingDetail.as_view(),
+        name=TrainingDetail.name
+    ),
     url(r'^mini_trainings$', MiniTrainingList.as_view(), name=MiniTrainingList.name),
     url(
         r'^mini_trainings/(?P<year>[\d]{4})/(?P<partial_acronym>[\w]+)$',
