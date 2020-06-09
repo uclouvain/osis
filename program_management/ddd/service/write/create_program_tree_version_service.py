@@ -36,7 +36,8 @@ def create_program_tree_version(command: CreateProgramTreeVersionCommand) -> Pro
         command.is_transition
     )
     program_tree_version_standard = ProgramTreeVersionRepository().get(entity_id=identity_standard)
-    ProgramTreeVersionBuilder().build_from(program_tree_version_standard, command)
+    new_program_tree_version = ProgramTreeVersionBuilder().build_from(program_tree_version_standard, command)
+
     identity = ProgramTreeVersionIdentity(
         command.offer_acronym,
         command.year,

@@ -26,9 +26,6 @@
 from collections import Counter
 from typing import List, Set, Tuple, Optional
 
-from program_management.ddd.domain.service.create_program_tree_structure_service import \
-    create_program_tree_structure_service
-
 from base.models.authorized_relationship import AuthorizedRelationshipList
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, GroupType
 from base.models.enums.link_type import LinkTypes
@@ -39,7 +36,7 @@ from program_management.ddd.domain import prerequisite, node
 from program_management.ddd.domain.link import LinkFactory
 from program_management.ddd.domain.node import NodeFactory
 from program_management.ddd.domain.service import generate_node_code_service
-from program_management.ddd.service import command
+from program_management.ddd.service import command, create_program_tree_structure_service
 from program_management.ddd.validators._detach_root import DetachRootValidator
 from program_management.ddd.validators._path_validator import PathValidator
 from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList, \
@@ -72,7 +69,7 @@ class ProgramTreeBuilder:
             from_tree.root_node.code,
             from_tree.root_node.year
         )
-        program_tree = create_program_tree_structure_service(from_tree.root_node)
+        program_tree = create_program_tree_structure_service.create_program_tree_structure(from_tree)
         return program_tree
 
 

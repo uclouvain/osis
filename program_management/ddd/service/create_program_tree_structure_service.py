@@ -25,43 +25,18 @@
 ##############################################################################
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.link import LinkFactory
+from program_management.ddd.domain.node import NodeFactory
 from program_management.ddd.domain.service import search_authorized_relationships_service
 
 
-def create_program_tree_structure_service(root_node: 'Node') -> 'ProgramTree':
-    authorized_relationships = search_authorized_relationships_service.search_authorized_relationships(
+def create_program_tree_structure(from_tree: 'ProgramTree') -> 'ProgramTree':
+    child_types = search_authorized_relationships_service.search_authorized_relationships(
         min_count_authorized=1,
-        parent_type=root_node.node_type
+        parent_type=from_tree.root_node.node_type
     )
-    for authorized_relationship in authorized_relationships:
-        new_node = Node(
-            node_type=authorized_relationship.child_type.value,
-            # end_date=authorized_relationship,
-            # children: List['Link'] = None,
-            # code: str = None,
-            # title: str = None,
-            # year: int = None,
-            # credits: Decimal = None
-            # constraint_type: ConstraintTypes = None,
-            # min_constraint: int = None,
-            # max_constraint: int = None,
-            # remark_fr: str = None,
-            # remark_en: str = None,Link
-            # start_year: int = None,
-            # end_year: int = None,
-            # offer_title_fr: str = None,
-            # offer_title_en: str = None,
-            # group_title_fr: str = None,
-            # group_title_en: str = None,
-            # offer_partial_title_fr: str = None,
-            # offer_partial_title_en: str = None,
-            # category: GroupType = None,
-            # management_entity_acronym: str = None,
-            # teaching_campus: str = None,
-            # schedule_type: ScheduleTypeEnum = None,
-            # offer_status: ActiveStatusEnum = None,
-            # keywords: str = None,
-        )
-        LinkFactory().get_link(parent=root_node, child=new_node)
-    program_tree = ProgramTree(root_node=root_node)
+    children_node_list = from_tree.root_node.get_all_children_as_nodes(take_only=child_types)
+    for child in children_node_list:
+        new_node = NodeFactory().deepcopy_node_without_copy_children_recursively(original_node=child)
+        LinkFactory().get_link(parent=from_tree.root_node, child=new_node)
+    program_tree = ProgramTree(root_node=from_tree.root_node)
     return program_tree

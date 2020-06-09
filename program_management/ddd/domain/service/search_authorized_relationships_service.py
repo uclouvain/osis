@@ -23,11 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+from typing import Set
 
 from base.models.authorized_relationship import AuthorizedRelationship
+from base.models.enums.education_group_types import EducationGroupTypesEnum
 
 
-def search_authorized_relationships(**kwargs) -> List[AuthorizedRelationship]:
-    authorized_relationships = AuthorizedRelationship.objects.filter(**kwargs)
-    return list(authorized_relationships)
+def search_authorized_relationships(**kwargs) -> Set[EducationGroupTypesEnum]:
+    child_types = AuthorizedRelationship.objects.filter(**kwargs).values_list("child_type__name", flat=True)
+    return set(child_types)
