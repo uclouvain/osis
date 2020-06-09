@@ -47,6 +47,7 @@ class EducationGroupTreeView(LanguageContextSerializerMixin, generics.RetrieveAP
             lookup_field: self.kwargs[lookup_url_kwarg]
             for lookup_field, lookup_url_kwarg in zip(self.lookup_fields, self.lookup_url_kwargs)
         }
+
         education_group_year = get_object_or_404(queryset, **filter_kwargs)
 
         self.check_object_permissions(self.request, education_group_year)
