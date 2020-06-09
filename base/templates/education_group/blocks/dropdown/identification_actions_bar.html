@@ -67,7 +67,8 @@
         {# Paste link #}
         <li>
             {% url 'education_group_attach' parent.id education_group_year.id as attach_url %}
-            {% a_tag_modal_has_perm attach_url|add:"?path="|add:node_path _('Paste') 'base.can_attach_node' user education_group_year %}
+            {#            FIXME :: fix attach #}
+{#            {% a_tag_modal_has_perm attach_url|add:"?path="|add:node_path _('Paste') 'base.can_attach_node' user education_group_year %}#}
         </li>
         <li class="divider"></li>
 
@@ -84,15 +85,20 @@
         {# Update link #}
         <li>
             {% url 'update_education_group' root.pk education_group_year.pk as update_url %}
-            {% have_only_access_to_certificate_aims user education_group_year as only_certificate_aims %}
-            {% if only_certificate_aims %}
-                {% a_tag_modal_has_perm update_url _('Modify') 'base.change_educationgroupcertificateaim' user education_group_year %}
-            {% else %}
-                {% if tab_to_show and education_group_year.groupelementyear_set.count > 0 %}
-                    {% a_tag_has_perm update_url|add:"?tab_to_show="|add:tab_to_show _('Modify') 'base.change_educationgroup' user education_group_year %}
+
+            {% if offer %}
+                {% have_only_access_to_certificate_aims user education_group_year as only_certificate_aims %}
+                {% if only_certificate_aims %}
+                    {% a_tag_modal_has_perm update_url _('Modify') 'base.change_educationgroupcertificateaim' user education_group_year %}
                 {% else %}
-                    {% a_tag_has_perm update_url _('Modify') 'base.change_educationgroup' user education_group_year %}
+                    {% if tab_to_show and education_group_year.groupelementyear_set.count > 0 %}
+                        {% a_tag_has_perm update_url|add:"?tab_to_show="|add:tab_to_show _('Modify') 'base.change_educationgroup' user education_group_year %}
+                    {% else %}
+                        {% a_tag_has_perm update_url _('Modify') 'base.change_educationgroup' user education_group_year %}
+                    {% endif %}
                 {% endif %}
+            {% else %}
+                {% a_tag_has_perm update_url _('Modify') 'base.change_educationgroup' user group_year %}
             {% endif %}
         </li>
 
@@ -110,18 +116,19 @@
         <li class="divider"></li>
 
         <li>
-            {% url 'quick_search_education_group' root_id=parent.id node_path=node_path as search_url %}
-            {% a_tag_modal_has_perm search_url _('Search') 'base.change_link_data' user education_group_year %}
+            {#            FIXME :: fix quick-search #}
+{#            {% url 'quick_search_education_group' root_id=parent.id node_path=node_path as search_url %}#}
+{#            {% a_tag_modal_has_perm search_url _('Search') 'base.change_link_data' user education_group_year %}#}
         </li>
         <li class="divider"></li>
         <li>
-            <a href="{% url "education_group_learning_units_prerequisites" education_group_year_pk=education_group_year.pk %}"
+            <a href="{% url "education_group_learning_units_prerequisites" group_year.pk %}"
                 class="download">
                 <span>{% trans 'Generate xls of learning units that have prerequisites' %}</span>
             </a>
         </li>
         <li>
-            <a href="{% url "education_group_learning_units_is_prerequisite_for" education_group_year_pk=education_group_year.pk %}"
+            <a href="{% url "education_group_learning_units_is_prerequisite_for" group_year.pk %}"
                 class="download">
                 <span>{% trans 'Generate xls of learning units that are prerequisites for' %}</span>
             </a>
