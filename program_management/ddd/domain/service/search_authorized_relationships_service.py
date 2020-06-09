@@ -23,37 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from osis_common.ddd import interface
+from typing import List
+
+from base.models.authorized_relationship import AuthorizedRelationship
 
 
-class AttachNodeCommand(interface.CommandRequest):
-    # To implement
-    pass
-
-
-class DetachNodeCommand(interface.CommandRequest):
-    # To implement
-    pass
-
-
-class OrderLinkCommand(interface.CommandRequest):
-    # To implement
-    pass
-
-
-class CreateProgramTreeVersionCommand(interface.CommandRequest):
-    def __init__(
-            self,
-            offer_acronym: str,
-            version_name: str,
-            year: int,
-            is_transition: bool,
-            title_en: str = "",
-            title_fr: str = ""
-    ):
-        self.offer_acronym = offer_acronym
-        self.version_name = version_name
-        self.year = year
-        self.is_transition = is_transition
-        self.title_en = title_en
-        self.title_fr = title_fr
+def search_authorized_relationships(**kwargs) -> List[AuthorizedRelationship]:
+    authorized_relationships = AuthorizedRelationship.objects.filter(**kwargs)
+    return list(authorized_relationships)

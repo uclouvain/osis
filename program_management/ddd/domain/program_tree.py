@@ -23,9 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import copy
 from collections import Counter
 from typing import List, Set, Tuple, Optional
+
+from program_management.ddd.domain.service.create_program_tree_structure_service import \
+    create_program_tree_structure_service
 
 from base.models.authorized_relationship import AuthorizedRelationshipList
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, GroupType
@@ -33,7 +35,10 @@ from base.models.enums.link_type import LinkTypes
 from osis_common.ddd import interface
 from osis_common.decorators.deprecated import deprecated
 from program_management.ddd.business_types import *
-from program_management.ddd.domain import prerequisite
+from program_management.ddd.domain import prerequisite, node
+from program_management.ddd.domain.link import LinkFactory
+from program_management.ddd.domain.node import NodeFactory
+from program_management.ddd.domain.service import generate_node_code_service
 from program_management.ddd.service import command
 from program_management.ddd.validators._detach_root import DetachRootValidator
 from program_management.ddd.validators._path_validator import PathValidator
@@ -57,6 +62,18 @@ class ProgramTreeIdentity(interface.EntityIdentity):
 
     def __eq__(self, other):
         return self.code == other.code and self.year == other.year
+
+
+class ProgramTreeBuilder:
+
+    def build_from(self, from_tree: 'ProgramTree') -> 'ProgramTree':
+        new_root_node = node.NodeFactory().deepcopy_node_without_copy_children_recursively(from_tree.root_node)
+        new_root_node.code = generate_node_code_service.generate_node_code(
+            from_tree.root_node.code,
+            from_tree.root_node.year
+        )
+        program_tree = create_program_tree_structure_service(from_tree.root_node)
+        return program_tree
 
 
 class ProgramTree(interface.RootEntity):
@@ -363,30 +380,14 @@ def build_path(*nodes):
 
 
 def _copy(root: 'Node', ignore_children_from: Set[EducationGroupTypesEnum] = None):
-    new_node = _deepcopy_node_without_copy_children_recursively(root)
+    new_node = NodeFactory().deepcopy_node_without_copy_children_recursively(root)
     new_children = []
     for link in root.children:
         if ignore_children_from and link.parent.node_type in ignore_children_from:
             continue
         new_child = _copy(link.child, ignore_children_from=ignore_children_from)
-        new_link = _deepcopy_link_without_copy_children_recursively(link)
+        new_link = LinkFactory().deepcopy_link_without_copy_children_recursively(link)
         new_link.child = new_child
         new_children.append(new_link)
     new_node.children = new_children
     return new_node
-
-
-def _deepcopy_node_without_copy_children_recursively(original_node: 'Node'):
-    original_children = original_node.children
-    original_node.children = []  # To avoid recursive deep copy of all children behind
-    copied_node = copy.deepcopy(original_node)
-    original_node.children = original_children
-    return copied_node
-
-
-def _deepcopy_link_without_copy_children_recursively(original_link: 'Link'):
-    original_child = original_link.child
-    original_link.child = None  # To avoid recursive deep copy of all children behind
-    new_link = copy.deepcopy(original_link)
-    original_link.child = original_child
-    return new_link

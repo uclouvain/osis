@@ -25,34 +25,58 @@
 ##############################################################################
 from osis_common.ddd import interface
 from program_management.ddd.business_types import *
-from base.models.education_group_year import EducationGroupYear
-from education_group.models.group_year import GroupYear
+from program_management.ddd.command import CreateProgramTreeVersionCommand
+from program_management.ddd.domain.program_tree import ProgramTreeBuilder
 
 STANDARD = ""
 
 
 class ProgramTreeVersionBuilder:
-
     _tree_version = None
 
-    def build_from(self, from_tree: 'ProgramTreeVersion', **tree_version_attrs) -> 'ProgramTreeVersion':
+    def build_from(
+            self,
+            from_tree: 'ProgramTreeVersion',
+            command: CreateProgramTreeVersionCommand
+    ) -> 'ProgramTreeVersion':
         assert isinstance(from_tree, ProgramTreeVersion)
         assert from_tree.is_standard, "Forbidden to copy from a non Standard version"
         if from_tree.is_transition:
-            self._tree_version = self._build_from_transition(from_tree.get_tree(), **tree_version_attrs)
+            self._tree_version = self._build_from_transition(from_tree, command)
         else:
-            self._tree_version = self._build_from_standard(from_tree.get_tree(), **tree_version_attrs)
+            self._tree_version = self._build_from_standard(from_tree, command)
         return self.program_tree_version
 
     @property
     def program_tree_version(self):
         return self._tree_version
 
-    def _build_from_transition(self, from_tree: 'ProgramTree', **tree_version_attrs) -> 'ProgramTreeVersion':
+    def _build_from_transition(
+            self,
+            from_tree_version: 'ProgramTreeVersion',
+            command: CreateProgramTreeVersionCommand
+    ) -> 'ProgramTreeVersion':
         raise NotImplementedError()
 
-    def _build_from_standard(self, from_tree: 'ProgramTree', **tree_version_attrs) -> 'ProgramTreeVersion':
-        raise NotImplementedError()
+    def _build_from_standard(
+            self,
+            from_tree_version: 'ProgramTreeVersion',
+            command: CreateProgramTreeVersionCommand
+    ) -> 'ProgramTreeVersion':
+        from_tree = from_tree_version.get_tree()
+        return ProgramTreeVersion(
+            program_tree_identity=from_tree_version.program_tree_identity,
+            program_tree_repository=from_tree_version.program_tree_repository,
+            entity_identity=ProgramTreeVersionIdentity(
+                offer_acronym=from_tree_version.entity_id.offer_acronym,
+                version_name=command.version_name,
+                year=from_tree_version.entity_id.year,
+                is_transition=command.is_transition
+            ),
+            title_en=command.title_en,
+            title_fr=command.title_fr,
+            tree=ProgramTreeBuilder().build_from(from_tree=from_tree)
+        )
 
 
 # FIXME :: should be in a separate DDD domain

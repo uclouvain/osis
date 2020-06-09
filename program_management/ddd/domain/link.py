@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import copy
 
 from base.models.enums.link_type import LinkTypes
 from base.models.enums.quadrimesters import DerogationQuadrimester
@@ -126,6 +127,13 @@ class LinkFactory:
             return LinkWithChildLeaf(parent, child, **kwargs)
         else:
             return LinkWithChildBranch(parent, child, **kwargs)
+
+    def deepcopy_link_without_copy_children_recursively(original_link: 'Link'):
+        original_child = original_link.child
+        original_link.child = None  # To avoid recursive deep copy of all children behind
+        new_link = copy.deepcopy(original_link)
+        original_link.child = original_child
+        return new_link
 
 
 factory = LinkFactory()

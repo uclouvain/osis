@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import copy
+
 from _decimal import Decimal
 from collections import OrderedDict
 from typing import List, Set, Dict
@@ -55,6 +57,13 @@ class NodeFactory:
             NodeType.LEARNING_CLASS: NodeLearningClassYear
         }[type]
         return node_cls(**node_attrs)
+
+    def deepcopy_node_without_copy_children_recursively(self, original_node: 'Node'):
+        original_children = original_node.children
+        original_node.children = []  # To avoid recursive deep copy of all children behind
+        copied_node = copy.deepcopy(original_node)
+        original_node.children = original_children
+        return copied_node
 
 
 factory = NodeFactory()

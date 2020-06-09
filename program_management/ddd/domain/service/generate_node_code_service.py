@@ -23,37 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from osis_common.ddd import interface
+from education_group.models.group_year import GroupYear
 
 
-class AttachNodeCommand(interface.CommandRequest):
-    # To implement
-    pass
+def generate_node_code(code_from_standard_root_node: str, year: int) -> str:
+    counter = 1
+    new_partial_acronym = code_from_standard_root_node
+    while _check_node_code_exists(code_from_standard_root_node, year):
+        incrementation = str(int(code_from_standard_root_node[-4:][:-1]) + counter)
+        new_partial_acronym = code_from_standard_root_node[:-4] + incrementation + code_from_standard_root_node[-1:]
+        counter += 1
+    return new_partial_acronym
 
 
-class DetachNodeCommand(interface.CommandRequest):
-    # To implement
-    pass
-
-
-class OrderLinkCommand(interface.CommandRequest):
-    # To implement
-    pass
-
-
-class CreateProgramTreeVersionCommand(interface.CommandRequest):
-    def __init__(
-            self,
-            offer_acronym: str,
-            version_name: str,
-            year: int,
-            is_transition: bool,
-            title_en: str = "",
-            title_fr: str = ""
-    ):
-        self.offer_acronym = offer_acronym
-        self.version_name = version_name
-        self.year = year
-        self.is_transition = is_transition
-        self.title_en = title_en
-        self.title_fr = title_fr
+def _check_node_code_exists(code: str, year: int) -> bool:
+    return GroupYear.objects.get(partial_acronym=code, academic_year__year=year).exist()
