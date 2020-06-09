@@ -63,7 +63,7 @@ class NodeRepository(interface.AbstractRepository):
 
 
 def _search_by_entity_ids(entity_ids: List['NodeIdentity']) -> List['Node']:
-    qs = group_element_year.GroupElementYear.objects.all()
+    qs = Element.objects.all()
     filter_search_from = _build_where_clause(entity_ids[0])
     for identity in entity_ids[1:]:
         filter_search_from |= _build_where_clause(identity)
@@ -74,13 +74,10 @@ def _search_by_entity_ids(entity_ids: List['NodeIdentity']) -> List['Node']:
 def _build_where_clause(node_identity: 'NodeIdentity') -> Q:
     return Q(
         Q(
-            parent_element__group_year__partial_acronym=node_identity.code,
-            parent_element__group_year__academic_year__year=node_identity.year
+            group_year__partial_acronym=node_identity.code,
+            group_year__academic_year__year=node_identity.year
         ) | Q(
-            child_element__group_year__partial_acronym=node_identity.code,
-            child_element__group_year__academic_year__year=node_identity.year
-        ) | Q(
-            child_element__learning_unit_year__acronym=node_identity.code,
-            child_element__learning_unit_year__academic_year__year=node_identity.year
+            learning_unit_year__acronym=node_identity.code,
+            learning_unit_year__academic_year__year=node_identity.year
         )
     )
