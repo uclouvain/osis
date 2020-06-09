@@ -120,11 +120,11 @@ $("a[id^='quick-search']").click(function (event) {
 
 
 $("#scrollableDiv").on("scroll", function() {
-    saveScrollPosition();
+    saveScrollPosition(tree);
 });
 
-function saveScrollPosition() {
-    const rootId = $('#panel_file_tree').attr("data-rootId");
+function saveScrollPosition(tree) {
+    const rootId = tree["id"];
     const scrollPosition = $("#scrollableDiv")[0].scrollTop
     const storageValue = {}
     storageValue[rootId] = scrollPosition
@@ -132,8 +132,8 @@ function saveScrollPosition() {
 }
 
 
-function scrollToPositionSaved() {
-    const rootId = $('#panel_file_tree').attr("data-rootId");
+function scrollToPositionSaved(tree) {
+    const rootId = tree["id"];
     const storageValue = JSON.parse(localStorage.getItem('scrollpos'));
     let scrollPosition = 0;
     if (storageValue !== null && rootId in storageValue) {
@@ -212,13 +212,19 @@ function initializeJsTree($documentTree, cut_element_url, copy_element_url) {
             document.location.href = data.node.a_attr.href;
         });
 
-        scrollToPositionSaved();
+        scrollToPositionSaved(tree);
 
         // if the tree has never been loaded, execute close_all by default.
         if ($.vakata.storage.get(data.instance.settings.state.key) === null) {
             $(this).jstree('close_all');
         }
     });
+
+    function generateTreeKey(tree){
+        const treeRootId = tree["id"];
+        return `progrem_tree_state_${treeRootId}`;
+
+    }
 
     $documentTree.jstree({
             "core": {
@@ -234,7 +240,7 @@ function initializeJsTree($documentTree, cut_element_url, copy_element_url) {
             "state": {
                 // the key is important if you have multiple trees in the same domain
                 // The key includes the root_id
-                "key": "program_tree_state/" + location.pathname.split('/', 3)[2],
+                "key": generateTreeKey(tree),
                 "opened": true,
                 "selected": false,
             },
