@@ -29,5 +29,5 @@ from base.utils import cache
 from program_management.models.enums.node_type import NodeType
 
 
-def retrieve_element_selected(user_id: int) -> dict:
+def retrieve_element_selected(user_id: int) -> Optional[dict]:
     return cache.ElementCache(user_id).cached_data
