@@ -43,6 +43,7 @@ from base.models.entity_version import find_pedagogical_entities_version, get_la
 from base.models.enums import education_group_categories, groups
 from base.models.enums.education_group_categories import Categories, TRAINING
 from base.models.enums.education_group_types import MiniTrainingType, GroupType
+from education_group.models.group_year import GroupYear
 from osis_role.contrib.forms.fields import EntityRoleChoiceField
 from program_management.business.group_element_years import management
 from reference.models.language import Language
@@ -145,7 +146,8 @@ class PermissionFieldEducationGroupYearMixin(PermissionFieldEducationGroupMixin)
 
     def is_edition_period_opened(self):
         education_group_year = self.instance if hasattr(self.instance, 'academic_year') else None
-        return EventPermEducationGroupEdition(obj=education_group_year, raise_exception=False).is_open()
+        dummy_group_year = GroupYear(academic_year=education_group_year.academic_year) if education_group_year else None
+        return EventPermEducationGroupEdition(obj=dummy_group_year, raise_exception=False).is_open()
 
 
 class PermissionFieldTrainingMixin(PermissionFieldEducationGroupYearMixin):
