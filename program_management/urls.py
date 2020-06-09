@@ -71,32 +71,25 @@ urlpatterns = [
             path('up/', tree.move.up, name="group_element_year_up"),
             path('down/', tree.move.down, name="group_element_year_down")
         ])),
-
-        path('<str:node_path>/quick_search/', include([
-            path(
-                'learning_unit/',
-                quick_search.QuickSearchLearningUnitYearView.as_view(),
-                name="quick_search_learning_unit"
-            ),
-            path(
-                'education_group/',
-                quick_search.QuickSearchEducationGroupYearView.as_view(),
-                name="quick_search_education_group"
-            ),
-        ])),
     ])),
     path('check_paste/', tree.paste.CheckPasteView.as_view(), name="check_tree_paste_node"),
     path('paste/', tree.paste.PasteNodesView.as_view(), name='tree_paste_node'),
     path('cut_element/', tree.copy_cut.cut_to_cache, name='cut_element'),
     path('copy_element/', tree.copy_cut.copy_to_cache, name='copy_element'),
+    path('<int:year>/quick_search/', include([
+        path(
+            'learning_unit/',
+            quick_search.QuickSearchLearningUnitYearView.as_view(),
+            name="quick_search_learning_unit"
+        ),
+        path(
+            'education_group/',
+            quick_search.QuickSearchEducationGroupYearView.as_view(),
+            name="quick_search_education_group"
+        ),
+    ])),
     path('<int:root_element_id>/', include([
         path('<int:child_element_id>/', include([
-            path('quick_search/', include([
-                path('learning_unit/', QuickSearchLearningUnitYearView.as_view(),
-                     name="quick_search_learning_unit"),
-                path('education_group/', QuickSearchEducationGroupYearView.as_view(),
-                     name="quick_search_education_group"),
-            ])),
             path('learning_unit/', include([
                 path('utilization/',
                      element_utilization.LearningUnitUtilization.as_view(),

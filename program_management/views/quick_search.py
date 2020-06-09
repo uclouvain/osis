@@ -23,6 +23,7 @@
 # ############################################################################
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.http import QueryDict
 from django.utils.translation import gettext_lazy as _
 from django_filters.views import FilterView
 
@@ -41,7 +42,6 @@ from program_management.ddd.repositories import load_node
 CACHE_TIMEOUT = 60
 
 
-# FIXME Replace model by GroupYear
 class QuickSearchEducationGroupYearView(PermissionRequiredMixin, CacheFilterMixin, AjaxTemplateMixin, SearchMixin,
                                         FilterView):
     model = EducationGroupYear
@@ -56,24 +56,20 @@ class QuickSearchEducationGroupYearView(PermissionRequiredMixin, CacheFilterMixi
 
     serializer_class = EducationGroupSerializer
 
-    @property
-    def node_id(self) -> int:
-        return int(self.kwargs["node_path"].split("|")[-1])
-
     def get_filterset_kwargs(self, filterset_class):
         kwargs = super().get_filterset_kwargs(filterset_class)
-        node = load_node.load_node_group_year(self.node_id)
-        kwargs["initial"] = {'academic_year': node.year}
+        kwargs["initial"] = {'academic_year': self.kwargs["year"]}
+        get_without_path = kwargs['data'].copy()  # type: QueryDict
+        del get_without_path["path"]
+        kwargs["data"] = get_without_path
         return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = context["filter"].form
-        context['root_id'] = self.kwargs['root_id']
-        context['display_quick_search_luy_link'] = GroupYear.objects.get(
-            id=self.node_id
-        ).education_group_type.learning_unit_child_allowed
-        context['node_path'] = self.kwargs["node_path"]
+        context['display_quick_search_luy_link'] = self.is_learning_unit_child_allowed()
+        context['node_path'] = self.request.GET["path"]
+        context['year'] = self.kwargs["year"]
         return context
 
     def render_to_response(self, context, **response_kwargs):
@@ -83,6 +79,10 @@ class QuickSearchEducationGroupYearView(PermissionRequiredMixin, CacheFilterMixi
 
     def get_paginate_by(self, queryset):
         return self.paginate_by
+
+    def is_learning_unit_child_allowed(self):
+        element_id = int(self.request.GET["path"].split("|")[-1])
+        return GroupYear.objects.get(element__id=element_id).education_group_type.learning_unit_child_allowed
 
 
 class QuickSearchLearningUnitYearView(PermissionRequiredMixin, CacheFilterMixin, AjaxTemplateMixin, SearchMixin,
@@ -99,22 +99,19 @@ class QuickSearchLearningUnitYearView(PermissionRequiredMixin, CacheFilterMixin,
 
     serializer_class = LearningUnitSerializer
 
-    @property
-    def node_id(self) -> int:
-        return int(self.kwargs["node_path"].split("|")[-1])
-
     def get_filterset_kwargs(self, filterset_class):
         kwargs = super().get_filterset_kwargs(filterset_class)
-        node = load_node.load_node_group_year(self.node_id)
-        kwargs["initial"] = {'academic_year': node.year}
+        kwargs["initial"] = {'academic_year': self.kwargs["year"]}
+        get_without_path = kwargs['data'].copy()  # type: QueryDict
+        del get_without_path["path"]
+        kwargs["data"] = get_without_path
         return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = context["filter"].form
-        context['root_id'] = self.kwargs['root_id']
-        context['group_year_id'] = self.node_id
-        context['node_path'] = self.kwargs["node_path"]
+        context['node_path'] = self.request.GET["path"]
+        context['year'] = self.kwargs["year"]
         return context
 
     def render_to_response(self, context, **response_kwargs):

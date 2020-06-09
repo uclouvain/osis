@@ -118,7 +118,7 @@
         <li class="divider"></li>
 
         <li>
-            {% url 'quick_search_education_group' root_id=parent.id node_path=node_path as search_url %}
+            {% url 'quick_search_education_group' year=group_year.academic_year.year as search_url %}
             {% a_tag_modal_has_perm search_url _('Search') 'base.change_link_data' user education_group_year %}
         </li>
         <li class="divider"></li>

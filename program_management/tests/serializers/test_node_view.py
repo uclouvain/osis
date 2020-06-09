@@ -31,6 +31,7 @@ from django.utils.translation import gettext_lazy as _
 
 from base.models.enums import link_type
 from base.models.enums.proposal_type import ProposalType
+from base.utils.urls import reverse_with_get
 from program_management.models.enums.node_type import NodeType
 from program_management.serializers.node_view import _get_node_view_attribute_serializer, \
     _get_leaf_view_attribute_serializer, \
@@ -91,7 +92,11 @@ class TestNodeViewAttributeSerializer(SimpleTestCase):
         self.assertEqual(self.serialized_data['modify_url'], expected_url)
 
     def test_serializer_node_attr_ensure_search_url(self):
-        expected_url = reverse('quick_search_education_group', args=[self.root_node.pk, '1|2|6'])
+        expected_url = reverse_with_get(
+            'quick_search_education_group',
+            args=[self.root_node.academic_year.year],
+            get={"path": '1|2|6'}
+        )
         self.assertEqual(self.serialized_data['search_url'], expected_url)
 
     def test_serializer_node_attr_ensure_get_title(self):
