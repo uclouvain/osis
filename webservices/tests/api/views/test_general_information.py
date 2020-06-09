@@ -53,13 +53,12 @@ class GeneralInformationTestCase(APITestCase):
         cls.egy = EducationGroupYearFactory()
         cls.group = GroupYearFactory(
             academic_year=cls.egy.academic_year,
-            group__start_year=cls.egy.academic_year,
-            partial_acronym='TEST',
+            partial_acronym=cls.egy.partial_acronym,
             education_group_type__name=cls.egy.education_group_type.name
         )
-        ElementFactory(group_year=cls.group)
+        element = ElementFactory(group_year=cls.group)
         EducationGroupVersionFactory(offer=cls.egy, root_group=cls.group)
-        cls.node = load_tree.load(cls.egy.id).root_node
+        cls.node = load_tree.load(element.id).root_node
         common_egy = EducationGroupYearCommonFactory(academic_year=cls.egy.academic_year)
         cls.pertinent_sections = {
             'specific': [EVALUATION_KEY, DETAILED_PROGRAM, SKILLS_AND_ACHIEVEMENTS],
@@ -133,7 +132,8 @@ class GeneralInformationTestCase(APITestCase):
         serializer = GeneralInformationSerializer(
             self.node, context={
                 'language': self.language,
-                'acronym': self.egy.acronym
+                'acronym': self.egy.acronym,
+                'offer': self.egy
             }
         )
         self.assertEqual(response.data, serializer.data)
@@ -151,7 +151,8 @@ class GeneralInformationTestCase(APITestCase):
         serializer = GeneralInformationSerializer(
             self.node, context={
                 'language': self.language,
-                'acronym': self.group.partial_acronym
+                'acronym': self.group.partial_acronym,
+                'offer': self.egy
             }
         )
         self.assertEqual(response.data, serializer.data)
