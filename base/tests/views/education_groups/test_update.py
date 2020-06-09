@@ -25,7 +25,6 @@
 ##############################################################################
 import json
 import random
-from http import HTTPStatus
 from unittest import mock
 
 from django.contrib.auth.models import Permission
@@ -44,7 +43,6 @@ from base.models.enums.diploma_coorganization import DiplomaCoorganizationTypes
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType
 from base.models.enums.link_type import LinkTypes
 from base.models.enums.schedule_type import DAILY
-from base.models.group_element_year import GroupElementYear
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear
@@ -57,17 +55,13 @@ from base.tests.factories.education_group_year_domain import EducationGroupYearD
 from base.tests.factories.entity_version import EntityVersionFactory, MainEntityVersionFactory
 from base.tests.factories.group import FacultyManagerGroupFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.organization_address import OrganizationAddressFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.user import SuperUserFactory
-from base.utils.cache import ElementCache
 from base.views.education_groups.update import _get_success_redirect_url, update_education_group
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
-from program_management.business.group_element_years import management
-from program_management.models.enums import node_type
 from reference.tests.factories.country import CountryFactory
 from reference.tests.factories.domain import DomainFactory
 from reference.tests.factories.domain_isced import DomainIscedFactory
@@ -108,8 +102,10 @@ class TestUpdate(TestCase):
             child_type=cls.education_group_year.education_group_type
         )
 
-        cls.url = reverse(update_education_group, kwargs={"root_id": cls.education_group_year.pk,
-                                                          "education_group_year_id": cls.education_group_year.pk})
+        cls.url = reverse(
+            update_education_group,
+            kwargs={"offer_id": cls.education_group_year.pk, "education_group_year_id": cls.education_group_year.pk}
+        )
         cls.person = PersonFactory()
         CentralManagerFactory(person=cls.person, entity=cls.education_group_year.management_entity)
 
@@ -732,8 +728,13 @@ class TestGetSuccessRedirectUrl(TestCase):
             ))
 
     def test_get_redirect_success_url_when_exist(self):
-        expected_url = reverse("education_group_read", args=[self.education_group_year.pk,
-                                                             self.education_group_year.id])
+        expected_url = reverse(
+            "element_identification",
+            kwargs={
+                "year": self.education_group_year.academic_year.year,
+                "code": self.education_group_year.partial_acronym
+            }
+        )
         result = _get_success_redirect_url(self.education_group_year, self.education_group_year)
         self.assertEqual(result, expected_url)
 
@@ -741,8 +742,13 @@ class TestGetSuccessRedirectUrl(TestCase):
         current_viewed = self.education_group_year_in_future[-1]
         current_viewed.delete()
         # Expected URL is the latest existing [-2]
-        expected_url = reverse("education_group_read", args=[self.education_group_year_in_future[-2].pk,
-                                                             self.education_group_year_in_future[-2].pk])
+        expected_url = reverse(
+            "element_identification",
+            kwargs={
+                "year": self.education_group_year_in_future[-2].academic_year.year,
+                "code": self.education_group_year_in_future[-2].partial_acronym
+            }
+        )
         result = _get_success_redirect_url(current_viewed, current_viewed)
         self.assertEqual(result, expected_url)
 
@@ -806,7 +812,7 @@ class TestCertificateAimView(TestCase):
     def setUp(self):
         super().setUp()
         self.url = reverse("update_education_group", kwargs={
-            "root_id": self.training.pk,
+            "offer_id": self.training.pk,
             "education_group_year_id": self.training.pk
         })
         self.client.force_login(user=self.program_manager.person.user)
@@ -820,7 +826,7 @@ class TestCertificateAimView(TestCase):
     def test_user_is_not_program_manager_of_training(self):
         training_without_pgrm_manager = TrainingFactory(academic_year=self.academic_year)
         url = reverse("update_education_group", kwargs={
-            "root_id": training_without_pgrm_manager.pk,
+            "offer_id": training_without_pgrm_manager.pk,
             "education_group_year_id": training_without_pgrm_manager.pk
         })
         response = self.client.get(url)
@@ -846,8 +852,13 @@ class TestCertificateAimView(TestCase):
         mock_form.return_value.save.return_value = self.training
 
         response = self.client.post(self.url, data={'dummy_key': 'dummy'})
-        excepted_url = reverse("education_group_read", args=[self.training.pk, self.training.pk])
-
+        excepted_url = reverse(
+            "element_identification",
+            kwargs={
+                "year": self.training.academic_year.year,
+                "code": self.training.partial_acronym
+            }
+        )
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertJSONEqual(
             str(response.content, encoding='utf8'),

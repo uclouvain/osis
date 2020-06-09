@@ -60,7 +60,7 @@ class PasteNodeValidatorList(business_validator.BusinessListValidator):
         link_type = paste_command.link_type
         block = paste_command.block
 
-        if node_to_paste.is_group():
+        if node_to_paste.is_group_or_mini_or_training():
             self.validators = [
                 CreateLinkValidatorList(tree.get_node(path), node_to_paste),
                 PasteAuthorizedRelationshipValidator(tree, node_to_paste, tree.get_node(path)),
@@ -145,7 +145,7 @@ class DetachNodeValidatorList(business_validator.BusinessListValidator):
     def __init__(self, tree: 'ProgramTree', node_to_detach: 'Node', path_to_parent: 'Path'):
         detach_from = tree.get_node(path_to_parent)
 
-        if node_to_detach.is_group():
+        if node_to_detach.is_group_or_mini_or_training():
             path_to_node_to_detach = path_to_parent + '|' + str(node_to_detach.node_id)
             self.validators = [
                 DetachRootValidator(tree, path_to_parent),
