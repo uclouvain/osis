@@ -23,9 +23,9 @@ $(document).ready(function () {
 function setListenerForCopyElements() {
     $(".copy-element").click(function (event) {
         const url = event.target.dataset.url;
-        const element_id = event.target.dataset.element_id;
-        const element_type = event.target.dataset.element_type;
-        handleCopyAction(url, element_id, element_type);
+        const element_code = event.target.dataset.element_code;
+        const element_year = event.target.dataset.element_year;
+        handleCopyAction(url, element_code, element_year);
         event.preventDefault();
     });
 }
@@ -33,10 +33,10 @@ function setListenerForCopyElements() {
 function setListenerForCutElements() {
     $(".cut-element").click(function (event) {
         const url = event.target.dataset.url;
-        const element_id = event.target.dataset.element_id;
-        const element_type = event.target.dataset.element_type;
-        const link_id = event.target.dataset.link_id;
-        handleCutAction(url, element_id, element_type, link_id);
+        const element_code = event.target.dataset.element_code;
+        const element_year = event.target.dataset.element_year;
+        const path_to_detach_from = event.target.dataset.path;
+        handleCutAction(url, element_code, element_year, path_to_detach_from);
         event.preventDefault();
     });
 }
