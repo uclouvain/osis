@@ -33,6 +33,7 @@ from program_management.views import groupelementyear_update, \
     groupelementyear_read, element_utilization, excel, search, tree, prerequisite_read, prerequisite_update
 from program_management.views.quick_search import QuickSearchLearningUnitYearView, QuickSearchEducationGroupYearView
 
+
 urlpatterns = [
     url(r'^(?P<root_id>[0-9]+)/(?P<education_group_year_id>[0-9]+)/', include([
         url(r'^content/', include([
@@ -60,20 +61,17 @@ urlpatterns = [
         name="education_group_learning_units_contains"
     ),
     url(r'^$', search.EducationGroupSearch.as_view(), name='version_program'),
-
     # NEW VERSION URL - Program management
     path('<int:root_id>/', include([
         path('create/', tree.create.CreateLinkView.as_view(), name='tree_create_link'),
         path('update/', tree.update.UpdateLinkView.as_view(), name='tree_update_link'),
-        path('attach/', tree.paste.PasteNodesView.as_view(), name='tree_paste_node'),
         path('detach/', tree.detach.DetachNodeView.as_view(), name='tree_detach_node'),
         path('move/', tree.paste.PasteNodesView.as_view(), name='group_element_year_move'),
         path('<int:link_id>/', include([
             path('up/', tree.move.up, name="group_element_year_up"),
             path('down/', tree.move.down, name="group_element_year_down")
         ])),
-        path('check_attach/', tree.paste.CheckPasteView.as_view(),
-             name="check_tree_paste_node"),
+
         path('<str:node_path>/quick_search/', include([
             path(
                 'learning_unit/',
@@ -87,6 +85,8 @@ urlpatterns = [
             ),
         ])),
     ])),
+    path('check_paste/', tree.paste.CheckPasteView.as_view(), name="check_tree_paste_node"),
+    path('paste/', tree.paste.PasteNodesView.as_view(), name='tree_paste_node'),
     path('cut_element/', tree.copy_cut.cut_to_cache, name='cut_element'),
     path('copy_element/', tree.copy_cut.copy_to_cache, name='copy_element'),
     path('<int:root_element_id>/', include([

@@ -42,6 +42,7 @@ from base.models.education_group_year import EducationGroupYear
 from base.utils.cache import ElementCache
 from base.views.common import display_warning_messages, display_success_messages
 from base.views.mixins import AjaxTemplateMixin
+from education_group.models.group_year import GroupYear
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd.domain import node
 from program_management.ddd.repositories import node as node_repository
@@ -52,7 +53,7 @@ from program_management.forms.tree.paste import PasteNodesFormset, paste_form_fa
 
 class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageMixin, FormView):
     template_name = "tree/paste_inner.html"
-    permission_required = "base.attach_educationgroup"
+    permission_required = "base.can_attach_node"
 
     def has_permission(self):
         return self._has_permission_to_detach() & super().has_permission()
@@ -62,13 +63,13 @@ class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageM
             int(element_selected["path_to_detach"].split("|")[-2])
             for element_selected in self.nodes_to_paste if element_selected["path_to_detach"]
         ]
-        objs_to_detach_from = EducationGroupYear.objects.filter(id__in=nodes_to_detach_from)
-        return all(self.request.user.has_perms(("base.detach_educationgroup",), obj_to_detach)
+        objs_to_detach_from = GroupYear.objects.filter(id__in=nodes_to_detach_from)
+        return all(self.request.user.has_perms(("base.can_detach_node",), obj_to_detach)
                    for obj_to_detach in objs_to_detach_from)
 
-    def get_permission_object(self) -> EducationGroupYear:
+    def get_permission_object(self) -> GroupYear:
         node_to_paste_to_id = int(self.request.GET['path'].split("|")[-1])
-        return shortcuts.get_object_or_404(EducationGroupYear, pk=node_to_paste_to_id)
+        return shortcuts.get_object_or_404(GroupYear, pk=node_to_paste_to_id)
 
     @cached_property
     def nodes_to_paste(self) -> List[dict]:
@@ -151,8 +152,9 @@ class CheckPasteView(LoginRequiredMixin, View):
         return []
 
     def _check_paste(self, element_selected: dict) -> List[str]:
+        root_id = int(self.request.GET["path"].split("|")[0])
         check_command = program_management.ddd.command.CheckPasteNodeCommand(
-            root_id=self.kwargs["root_id"],
+            root_id=root_id,
             node_to_past_code=element_selected["element_code"],
             node_to_paste_year=element_selected["element_year"],
             path_to_detach=element_selected["path_to_detach"],

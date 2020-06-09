@@ -59,7 +59,7 @@ def _get_node_view_attribute_serializer(link: 'Link', path: 'Path', context=None
         'element_code': link.child.code,
         'element_year': link.child.year,
         'title': link.child.code,
-        'paste_url': reverse('tree_paste_node', args=[context['root'].pk]) + "?path=%s" % path,
+        'paste_url': reverse('tree_paste_node') + "?path=%s" % path,
         'detach_url': reverse('tree_detach_node', args=[context['root'].pk]) + "?path=%s" % path,
         'modify_url': reverse('group_element_year_update', args=[context['root'].pk, link.child.pk, link.pk]),
         'search_url': reverse('quick_search_education_group', args=[context['root'].pk, path]),

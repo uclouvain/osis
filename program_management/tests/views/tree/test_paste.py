@@ -66,7 +66,7 @@ class TestPasteNodeView(TestCase):
 
     def setUp(self):
         self.tree = self.setUpTreeData()
-        self.url = reverse("tree_paste_node", kwargs={'root_id': self.tree.root_node.pk})
+        self.url = reverse("tree_paste_node")
         self.client.force_login(self.person.user)
 
         fetch_tree_patcher = mock.patch('program_management.ddd.repositories.load_tree.load', return_value=self.tree)
@@ -290,7 +290,7 @@ class TestCheckPasteView(TestCase):
     def setUpTestData(cls):
         cls.person = PersonFactory()
 
-        cls.url = reverse("check_tree_paste_node", args=["12"])
+        cls.url = reverse("check_tree_paste_node")
         cls.path = "12|25|98"
 
     def setUp(self):

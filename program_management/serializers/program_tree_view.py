@@ -46,10 +46,7 @@ def program_tree_view_serializer(tree: 'ProgramTree') -> dict:
             'element_type': tree.root_node.type.name,
             'element_code': tree.root_node.code,
             'element_year': tree.root_node.year,
-            'paste_url': reverse(
-                'tree_paste_node',
-                args=[tree.root_node.pk]
-            ) + "?path=%s" % str(tree.root_node.pk),
+            'paste_url': reverse('tree_paste_node') + "?path=%s" % str(tree.root_node.pk),
             'search_url': reverse('quick_search_education_group', args=[tree.root_node.pk, path]),
         }
     }

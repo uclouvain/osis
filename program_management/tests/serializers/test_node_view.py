@@ -81,7 +81,7 @@ class TestNodeViewAttributeSerializer(SimpleTestCase):
         self.assertEqual(self.serialized_data['detach_url'], expected_url)
 
     def test_serialize_node_attr_ensure_paste_url(self):
-        expected_url = reverse('tree_paste_node', args=[self.root_node.pk]) + "?path=1|2|6"
+        expected_url = reverse('tree_paste_node') + "?path=1|2|6"
         self.assertEqual(self.serialized_data['paste_url'], expected_url)
 
     def test_serialize_node_attr_ensure_modify_url(self):

@@ -86,8 +86,8 @@
        initializeDataTable("form-modal", "table-objects", "objectQuickSearchIds", {{ page_obj.number }},
             {{ paginator.per_page }}, "{{ request.path }}", columnDefs);
 
-        let checkUrl = "{% url 'check_tree_paste_node' root_id %}";
-        let attachUrl = "{% url 'tree_paste_node' root_id %}";
+        let checkUrl = "{% url 'check_tree_paste_node' %}";
+        let attachUrl = "{% url 'tree_paste_node' %}";
 
         $("#button-attach").click(attachElementSelected(checkUrl, attachUrl));
 
