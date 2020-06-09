@@ -337,7 +337,9 @@ div.dataTables_wrapper div.dataTables_processing {
 .d-block {
     display: block ! important;
 }
-
+.d-block::first-letter {
+    text-transform: uppercase;
+}
 .d-table {
     display: table ! important;
 }
