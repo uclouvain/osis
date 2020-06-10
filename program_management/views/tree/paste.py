@@ -38,7 +38,6 @@ from django.views.generic.base import View
 
 import program_management.ddd.command
 from base.ddd.utils import business_validator
-from base.models.education_group_year import EducationGroupYear
 from base.utils.cache import ElementCache
 from base.views.common import display_warning_messages, display_success_messages
 from base.views.mixins import AjaxTemplateMixin
@@ -46,8 +45,7 @@ from education_group.models.group_year import GroupYear
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd.domain import node
 from program_management.ddd.repositories import node as node_repository
-from program_management.ddd.service import attach_node_service
-from program_management.ddd.service.read import element_selected_service
+from program_management.ddd.service.read import element_selected_service, check_paste_node_service
 from program_management.forms.tree.paste import PasteNodesFormset, paste_form_factory, PasteToMinorMajorListChoiceForm
 
 
@@ -162,7 +160,7 @@ class CheckPasteView(LoginRequiredMixin, View):
         )
 
         try:
-            attach_node_service.check_paste(check_command)
+            check_paste_node_service.check_paste(check_command)
         except business_validator.BusinessExceptions as business_exception:
             return business_exception.messages
         return []

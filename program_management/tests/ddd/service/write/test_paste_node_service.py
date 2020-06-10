@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Type
 from unittest import mock
 from unittest.mock import patch
 
@@ -33,21 +32,17 @@ from django.utils.translation import gettext as _
 import program_management.ddd.command
 import program_management.ddd.service.write.paste_element_service
 from base.ddd.utils import business_validator
-from base.ddd.utils.validation_message import MessageLevel, BusinessValidationMessageList
+from base.ddd.utils.validation_message import MessageLevel
 from base.models.enums.education_group_types import TrainingType
 from program_management.ddd.repositories import node as node_repositoriy
-from program_management.ddd.domain import program_tree, node, link
-from program_management.ddd.service import attach_node_service
+from program_management.ddd.domain import program_tree, link
+from program_management.ddd.service.read import check_paste_node_service
 from program_management.ddd.service.write import paste_element_service
-from program_management.ddd.validators import _validate_end_date_and_option_finality
-from program_management.ddd.validators._infinite_recursivity import InfiniteRecursivityTreeValidator
-from program_management.ddd.validators._minimum_editable_year import MinimumEditableYearValidator
-from program_management.ddd.validators.link import CreateLinkValidatorList
 from program_management.ddd.validators.validators_by_business_action import PasteNodeValidatorList, \
     CheckPasteNodeValidatorList
 from program_management.tests.ddd.factories.commands.paste_element_command import PasteElementCommandFactory
 from program_management.tests.ddd.factories.link import LinkFactory
-from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory, NodeGroupYearFactory
+from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 from program_management.tests.ddd.service.mixins import ValidatorPatcherMixin
 
@@ -183,7 +178,7 @@ class TestCheckPaste(SimpleTestCase, ValidatorPatcherMixin):
             path_to_detach=None
         )
         with self.assertRaises(business_validator.BusinessExceptions):
-            attach_node_service.check_paste(check_command)
+            check_paste_node_service.check_paste(check_command)
 
     def test_should_return_none_when_validator_do_not_raise_exception(self):
         check_command = program_management.ddd.command.CheckPasteNodeCommand(
@@ -193,4 +188,4 @@ class TestCheckPaste(SimpleTestCase, ValidatorPatcherMixin):
             path_to_paste=self.path,
             path_to_detach=None
         )
-        self.assertIsNone(attach_node_service.check_paste(check_command))
+        self.assertIsNone(check_paste_node_service.check_paste(check_command))
