@@ -23,13 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Optional, List
 
 from base.models.authorized_relationship import AuthorizedRelationship as ModelRelationship, \
     AuthorizedRelationshipObject, AuthorizedRelationshipList
 from base.models.education_group_type import EducationGroupType
-from osis_common.ddd import interface
-from osis_common.ddd.interface import EntityIdentity, Entity
 from program_management.ddd.repositories.load_node import convert_node_type_enum
 from program_management.models.enums.node_type import NodeType
 
