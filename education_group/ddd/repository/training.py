@@ -54,7 +54,7 @@ from education_group.ddd.domain._diploma import Diploma, DiplomaAim, DiplomaAimI
 from education_group.ddd.domain._entity import Entity as EntityValueObject
 from education_group.ddd.domain._funding import Funding
 from education_group.ddd.domain._hops import HOPS
-from education_group.ddd.domain._isced_domain import IscedDomain
+from education_group.ddd.domain._isced_domain import IscedDomain, IscedDomainIdentity
 from education_group.ddd.domain._language import Language
 from education_group.ddd.domain._study_domain import StudyDomain, StudyDomainIdentity
 from education_group.ddd.domain._titles import Titles
@@ -216,7 +216,7 @@ class TrainingRepository(interface.AbstractRepository):
             ) if obj.main_domain else None,
             secondary_domains=secondary_domains,
             isced_domain=IscedDomain(
-                code=obj.isced_domain.code,
+                entity_id=IscedDomainIdentity(code=obj.isced_domain.code),
                 title_fr=obj.isced_domain.title_fr,
                 title_en=obj.isced_domain.title_en,
             ) if obj.isced_domain else None,
