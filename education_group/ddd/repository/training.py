@@ -50,7 +50,7 @@ from education_group.ddd.domain._address import Address
 from education_group.ddd.domain._campus import CampusIdentity
 from education_group.ddd.domain._co_graduation import CoGraduation
 from education_group.ddd.domain._co_organization import Coorganization, CoorganizationIdentity
-from education_group.ddd.domain._diploma import Diploma, DiplomaAim
+from education_group.ddd.domain._diploma import Diploma, DiplomaAim, DiplomaAimIdentity, DiplomaIdentity
 from education_group.ddd.domain._entity import Entity as EntityValueObject
 from education_group.ddd.domain._funding import Funding
 from education_group.ddd.domain._hops import HOPS
@@ -172,8 +172,7 @@ class TrainingRepository(interface.AbstractRepository):
         for aim in obj.educationgroupcertificateaim_set.all():
             certificate_aims.append(
                 DiplomaAim(
-                    section=aim.certificate_aim.section,
-                    code=aim.certificate_aim.code,
+                    entity_id=DiplomaAimIdentity(section=aim.certificate_aim.section, code=aim.certificate_aim.code),
                     description=aim.certificate_aim.description,
                 )
             )
