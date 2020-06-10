@@ -47,7 +47,7 @@ from education_group.ddd.business_types import *
 from education_group.ddd.domain import training, exception
 from education_group.ddd.domain._academic_partner import AcademicPartner, AcademicPartnerIdentity
 from education_group.ddd.domain._address import Address
-from education_group.ddd.domain._campus import Campus
+from education_group.ddd.domain._campus import CampusIdentity
 from education_group.ddd.domain._co_graduation import CoGraduation
 from education_group.ddd.domain._co_organization import Coorganization
 from education_group.ddd.domain._diploma import Diploma, DiplomaAim
@@ -223,11 +223,11 @@ class TrainingRepository(interface.AbstractRepository):
                 acronym=obj.administration_entity.most_recent_acronym,
             ),
             end_year=obj.education_group.end_year.year if obj.education_group.end_year else None,
-            teaching_campus=Campus(
+            teaching_campus=CampusIdentity(
                 name=obj.main_teaching_campus.name,
                 university_name=obj.main_teaching_campus.organization.name,
             ),
-            enrollment_campus=Campus(
+            enrollment_campus=CampusIdentity(
                 name=obj.enrollment_campus.name,
                 university_name=obj.enrollment_campus.organization.name,
             ),
