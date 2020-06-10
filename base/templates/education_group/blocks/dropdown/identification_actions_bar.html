@@ -108,6 +108,12 @@
             {% a_tag_has_perm delete_url _('Delete permanently') delete_perm user education_group_year %}
         </li>
 
+        {# Create ProgramTreeVersion #}
+        <li class="divider"></li>
+            {% url 'create_education_group_version' root.pk education_group_year.pk as create_version_url %}
+            {% li_with_create_perm_specific_version create_version_url _('Create specific version') %}
+        <li class="divider"></li>
+
         {# Generate PDF link #}
         <li class="divider"></li>
         {% url 'group_content' root_id=parent.id education_group_year_id=education_group_year.id as pdf_generate_url %}

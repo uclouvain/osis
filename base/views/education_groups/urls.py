@@ -90,6 +90,8 @@ urlpatterns = [
         name='select_education_group_type'
     ),
     url(r'^(?P<offer_id>[0-9]+)/(?P<education_group_year_id>[0-9]+)/', include([
+        url(r'^create_education_group_version/$',  create.CreateEducationGroupSpecificVersion.as_view(),
+            name="create_education_group_version"),
         url(r'^update/$', update.update_education_group, name="update_education_group"),
         url(r'^informations/edit/$', education_group.education_group_year_pedagogy_edit,
             name="education_group_pedagogy_edit"),
@@ -130,5 +132,7 @@ urlpatterns = [
                 EducationGroupPublicationContactDeleteView.as_view(),
                 name="publication_contact_delete"),
         ])),
-    ]))
+    ])),
+    url(r'^check_version_name/(?P<education_group_year_id>[0-9]+)$', create.check_version_name,
+        name="check_version_name"),
 ] + education_group_urls.urlpatterns

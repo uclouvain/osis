@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import re
+
 from django import forms
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -30,13 +32,17 @@ from django.core.exceptions import ValidationError, PermissionDenied
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
+from django.views.generic import CreateView
 from django.views.generic import FormView
 
+from base.business.education_groups import perms
 from base.forms.education_group.common import EducationGroupModelForm, EducationGroupTypeForm
 from base.forms.education_group.group import GroupForm
 from base.forms.education_group.mini_training import MiniTrainingForm
 from base.forms.education_group.training import TrainingForm
+from base.forms.education_group.version import SpecificVersionForm
 from base.models.academic_year import starting_academic_year, AcademicYear
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
@@ -49,6 +55,7 @@ from base.views.mixins import FlagMixin, AjaxTemplateMixin
 from osis_common.decorators.ajax import ajax_required
 from osis_common.utils.models import get_object_or_none
 from osis_role import errors
+from program_management.models.education_group_version import EducationGroupVersion
 
 FORMS_BY_CATEGORY = {
     education_group_categories.GROUP: GroupForm,
@@ -210,3 +217,84 @@ def validate_field(request, category, education_group_year_pk=None):
             response[field] = {'msg': e.message_dict[field][0], 'level': messages.DEFAULT_TAGS[messages.ERROR]}
 
     return JsonResponse(response)
+
+
+class CreateEducationGroupSpecificVersion(AjaxTemplateMixin, CreateView):
+    template_name = "education_group/create_specific_version_inner.html"
+    form_class = SpecificVersionForm
+    rules = [perms.is_eligible_to_add_education_group_year_version]
+
+    @cached_property
+    def person(self):
+        return self.request.user.person
+
+    @cached_property
+    def education_group_year(self):
+        return get_object_or_404(EducationGroupYear, pk=self.kwargs['education_group_year_id'])
+
+    def _call_rule(self, rule):
+        return rule(self.person, self.education_group_year)
+
+    def get_form_kwargs(self):
+        form_kwargs = super().get_form_kwargs()
+        form_kwargs["save_type"] = self.request.POST.get("save_type")
+        form_kwargs['education_group_year'] = self.education_group_year
+        form_kwargs['person'] = self.person
+        form_kwargs.pop('instance')
+        return form_kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super(CreateEducationGroupSpecificVersion, self).get_context_data(**kwargs)
+        context['education_group_year'] = self.education_group_year
+        context['root_id'] = self.kwargs['root_id']
+        context['form'] = self.get_form()
+        return context
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        for education_group_year in form.education_group_years_list:
+            message = \
+                _("Specific version for education group year %(acronym)s (%(academic_year)s) successfully created.") % \
+                {
+                    "acronym": form.clean_version_name(),
+                    "academic_year": education_group_year.academic_year,
+                }
+            display_success_messages(self.request, message)
+            return response
+
+    def get_success_url(self):
+        return reverse("education_group_read",
+                       args=[self.kwargs['root_id'], self.kwargs['education_group_year_id']])
+
+
+@login_required
+@ajax_required
+def check_version_name(request, education_group_year_id):
+    education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
+    version_name = education_group_year.acronym + request.GET['version_name']
+    existed_version_name = False
+    existing_version_name = check_existing_version(version_name, education_group_year_id)
+    last_using = None
+    old_specific_versions = find_last_existed_version(education_group_year, version_name)
+    if old_specific_versions:
+        last_using = str(old_specific_versions.offer.academic_year)
+        existed_version_name = True
+    valid = bool(re.match("^[A-Z]{0,15}$", request.GET['version_name'].upper()))
+    return JsonResponse({
+        "existed_version_name": existed_version_name,
+        "existing_version_name": existing_version_name,
+        "last_using": last_using,
+        "valid": valid,
+        "version_name": request.GET['version_name']}, safe=False)
+
+
+def check_existing_version(version_name: str, education_group_year_id: int) -> bool:
+    return EducationGroupVersion.objects.filter(version_name=version_name,
+                                                offer__id=education_group_year_id).exists()
+
+
+def find_last_existed_version(education_group_year, version_name):
+    return EducationGroupVersion.objects.filter(
+        version_name=version_name, offer__education_group=education_group_year.education_group,
+        offer__academic_year__year__lt=education_group_year.academic_year.year).order_by(
+        'offer__academic_year').last()

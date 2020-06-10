@@ -27,7 +27,9 @@ import waffle
 from django import template
 from django.utils.translation import gettext as _
 
+from base.business.education_groups.perms import is_eligible_to_add_education_group_year_version
 from base.models import program_manager
+from base.templatetags.learning_unit_li import li_with_permission
 
 register = template.Library()
 
@@ -43,6 +45,11 @@ def have_only_access_to_certificate_aims(user, education_group_year):
     """
     return program_manager.is_program_manager(user, education_group=education_group_year.education_group) \
         and not any((user.is_superuser, user.person.is_faculty_manager, user.person.is_central_manager))
+
+
+@register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
+def li_with_create_perm_specific_version(context, url, message, url_id="link_create_specific_version"):
+    return li_with_permission(context, is_eligible_to_add_education_group_year_version, url, message, url_id, True)
 
 
 @register.simple_tag(takes_context=True)
