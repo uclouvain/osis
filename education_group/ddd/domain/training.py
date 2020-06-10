@@ -34,7 +34,7 @@ from base.models.enums.education_group_types import TrainingType
 from base.models.enums.internship_presence import InternshipPresence
 from base.models.enums.rate_code import RateCode
 from base.models.enums.schedule_type import ScheduleTypeEnum
-from education_group.ddd.domain._campus import Campus
+from education_group.ddd.domain._campus import CampusIdentity
 from education_group.ddd.domain._co_graduation import CoGraduation
 from education_group.ddd.domain._co_organization import Coorganization
 from education_group.ddd.domain._diploma import Diploma
@@ -92,8 +92,8 @@ class Training(interface.RootEntity):
             management_entity: Entity = None,
             administration_entity: Entity = None,
             end_year: int = None,
-            teaching_campus: Campus = None,
-            enrollment_campus: Campus = None,
+            teaching_campus: CampusIdentity = None,
+            enrollment_campus: CampusIdentity = None,
             other_campus_activities: ActivityPresence = None,
             funding: Funding = None,
             hops: HOPS = None,

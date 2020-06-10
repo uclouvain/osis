@@ -26,7 +26,7 @@
 from osis_common.ddd import interface
 
 
-class Campus(interface.ValueObject):
+class CampusIdentity(interface.EntityIdentity):
     def __init__(self, name: str, university_name: str):
         self.name = name
         self.university_name = university_name
