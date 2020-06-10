@@ -45,7 +45,7 @@ from base.models.enums.schedule_type import ScheduleTypeEnum
 from base.models.organization_address import OrganizationAddress
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import training, exception
-from education_group.ddd.domain._academic_partner import AcademicPartner
+from education_group.ddd.domain._academic_partner import AcademicPartner, AcademicPartnerIdentity
 from education_group.ddd.domain._address import Address
 from education_group.ddd.domain._campus import Campus
 from education_group.ddd.domain._co_graduation import CoGraduation
@@ -148,7 +148,7 @@ class TrainingRepository(interface.AbstractRepository):
             coorganizations.append(
                 Coorganization(
                     partner=AcademicPartner(
-                        name=coorg.organization.name,
+                        entity_id=AcademicPartnerIdentity(name=coorg.organization.name),
                         address=Address(
                             country_name=first_address.country.name,
                             city=first_address.city,
