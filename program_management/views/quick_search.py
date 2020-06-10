@@ -27,9 +27,8 @@ from django.http import QueryDict
 from django.utils.translation import gettext_lazy as _
 from django_filters.views import FilterView
 
-from base.forms.education_group.search.quick_search import QuickEducationGroupYearFilter
+from base.forms.education_group.search.quick_search import QuickGroupYearFilter
 from base.forms.learning_unit.search.quick_search import QuickLearningUnitYearFilter
-from base.models.education_group_year import EducationGroupYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import CacheFilterMixin
 from base.utils.search import SearchMixin
@@ -37,19 +36,18 @@ from base.views.mixins import AjaxTemplateMixin
 from education_group.api.serializers.education_group import EducationGroupSerializer
 from education_group.models.group_year import GroupYear
 from learning_unit.api.serializers.learning_unit import LearningUnitSerializer
-from program_management.ddd.repositories import load_node
 
 CACHE_TIMEOUT = 60
 
 
-class QuickSearchEducationGroupYearView(PermissionRequiredMixin, CacheFilterMixin, AjaxTemplateMixin, SearchMixin,
-                                        FilterView):
-    model = EducationGroupYear
+class QuickSearchGroupYearView(PermissionRequiredMixin, CacheFilterMixin, AjaxTemplateMixin, SearchMixin,
+                               FilterView):
+    model = GroupYear
     template_name = 'quick_search_egy_inner.html'
     permission_required = ['base.view_educationgroup', 'base.can_access_learningunit']
     timeout = CACHE_TIMEOUT
 
-    filterset_class = QuickEducationGroupYearFilter
+    filterset_class = QuickGroupYearFilter
     cache_exclude_params = ['page']
     paginate_by = "12"
     ordering = ('academic_year', 'acronym', 'partial_acronym')

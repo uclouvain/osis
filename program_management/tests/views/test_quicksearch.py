@@ -34,7 +34,7 @@ from education_group.tests.factories.group_year import GroupYearFactory
 from program_management.tests.factories.element import ElementGroupYearFactory
 
 
-class TestQuickSearchLearningUnitView(TestCase):
+class TestQuickSearchLearningUnitYearView(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.root_element = ElementGroupYearFactory()
@@ -70,11 +70,11 @@ class TestQuickSearchLearningUnitView(TestCase):
         self.assertIsInstance(response, JsonResponse)
 
 
-class TestQuickSearchEducationGroupView(TestCase):
+class TestQuickSearchGroupYearView(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.root_element = ElementGroupYearFactory()
-        cls.egy_to_find = GroupFactory(acronym='RAV', title='The Ravenlord', partial_acronym="RV")
+        cls.group_to_find = GroupYearFactory(acronym='RAV', title_fr='The Ravenlord', partial_acronym="RV")
         cls.user = SuperUserFactory()
         cls.path = str(cls.root_element.id)
         cls.url = reverse_with_get(
@@ -95,10 +95,10 @@ class TestQuickSearchEducationGroupView(TestCase):
     def test_education_group_search_filter(self):
         response = self.client.get(self.url, data={'title': 'Rav', 'path': self.path})
         self.assertTemplateUsed(response, 'quick_search_egy_inner.html')
-        self.assertIn(self.egy_to_find, response.context['page_obj'])
+        self.assertIn(self.group_to_find, response.context['page_obj'])
 
         response = self.client.get(self.url, data={'title': 'Yggdrasil', 'path': self.path})
-        self.assertNotIn(self.egy_to_find, response.context['page_obj'])
+        self.assertNotIn(self.group_to_find, response.context['page_obj'])
 
     def test_return_json_when_accept_header_set_to_json(self):
         response = self.client.get(self.url, data={'title': 'dead', 'path': self.path}, HTTP_ACCEPT="application/json")

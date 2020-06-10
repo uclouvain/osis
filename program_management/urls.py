@@ -31,7 +31,7 @@ from program_management.views import quick_search
 from program_management.views.proxy.identification import IdentificationRedirectView
 from program_management.views import groupelementyear_update, \
     groupelementyear_read, element_utilization, excel, search, tree, prerequisite_read, prerequisite_update
-from program_management.views.quick_search import QuickSearchLearningUnitYearView, QuickSearchEducationGroupYearView
+from program_management.views.quick_search import QuickSearchLearningUnitYearView, QuickSearchGroupYearView
 
 
 urlpatterns = [
@@ -84,7 +84,7 @@ urlpatterns = [
         ),
         path(
             'education_group/',
-            quick_search.QuickSearchEducationGroupYearView.as_view(),
+            quick_search.QuickSearchGroupYearView.as_view(),
             name="quick_search_education_group"
         ),
     ])),
