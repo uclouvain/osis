@@ -33,7 +33,7 @@ from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import CacheFilterMixin
 from base.utils.search import SearchMixin
 from base.views.mixins import AjaxTemplateMixin
-from education_group.api.serializers.education_group import EducationGroupSerializer
+from education_group.api.serializers.group_year import GroupYearSerializer
 from education_group.models.group_year import GroupYear
 from learning_unit.api.serializers.learning_unit import LearningUnitSerializer
 
@@ -52,14 +52,14 @@ class QuickSearchGroupYearView(PermissionRequiredMixin, CacheFilterMixin, AjaxTe
     paginate_by = "12"
     ordering = ('academic_year', 'acronym', 'partial_acronym')
 
-    serializer_class = EducationGroupSerializer
+    serializer_class = GroupYearSerializer
 
     def get_filterset_kwargs(self, filterset_class):
         kwargs = super().get_filterset_kwargs(filterset_class)
         kwargs["initial"] = {'academic_year': self.kwargs["year"]}
         get_without_path = kwargs['data'].copy()  # type: QueryDict
         del get_without_path["path"]
-        kwargs["data"] = get_without_path
+        kwargs["data"] = get_without_path or None
         return kwargs
 
     def get_context_data(self, **kwargs):
@@ -102,7 +102,7 @@ class QuickSearchLearningUnitYearView(PermissionRequiredMixin, CacheFilterMixin,
         kwargs["initial"] = {'academic_year': self.kwargs["year"]}
         get_without_path = kwargs['data'].copy()  # type: QueryDict
         del get_without_path["path"]
-        kwargs["data"] = get_without_path
+        kwargs["data"] = get_without_path or None
         return kwargs
 
     def get_context_data(self, **kwargs):
