@@ -38,8 +38,8 @@ from program_management.ddd.repositories import node as node_repository
 
 
 class TestAttachNodeFormFactory(SimpleTestCase):
-    def _mock_load_by_type(self, return_values):
-        patcher_load = mock.patch("program_management.ddd.repositories.load_node.load_by_type")
+    def _mock_load_node(self, return_values):
+        patcher_load = mock.patch("program_management.ddd.repositories.load_node.load")
         self.addCleanup(patcher_load.stop)
         self.mock_load = patcher_load.start()
         self.mock_load.return_value = return_values
@@ -60,7 +60,7 @@ class TestAttachNodeFormFactory(SimpleTestCase):
         path = "1|2"
         node_to_attach_from = NodeEducationGroupYearFactory(node_id=2)
         node_to_attach = NodeLearningUnitYearFactory()
-        self._mock_load_by_type(node_to_attach_from)
+        self._mock_load_node(node_to_attach_from)
         self._mock_node_repo_get(node_to_attach)
 
         relationships = AuthorizedRelationshipListFactory()
@@ -78,7 +78,7 @@ class TestAttachNodeFormFactory(SimpleTestCase):
         path = "9|4|5"
         node_to_attach_from = NodeEducationGroupYearFactory(node_id=5)
         node_to_attach = NodeEducationGroupYearFactory(node_type=MiniTrainingType.FSA_SPECIALITY)
-        self._mock_load_by_type(node_to_attach_from)
+        self._mock_load_node(node_to_attach_from)
         self._mock_node_repo_get(node_to_attach)
 
         relationships = AuthorizedRelationshipListFactory(
@@ -101,7 +101,7 @@ class TestAttachNodeFormFactory(SimpleTestCase):
             node_id=6
         )
         node_to_attach = NodeEducationGroupYearFactory()
-        self._mock_load_by_type(node_to_attach_from)
+        self._mock_load_node(node_to_attach_from)
         self._mock_node_repo_get(node_to_attach)
 
         relationship_object = AuthorizedRelationshipObjectFactory(
@@ -127,7 +127,7 @@ class TestAttachNodeFormFactory(SimpleTestCase):
         node_to_attach = NodeEducationGroupYearFactory(
             node_type=factory.fuzzy.FuzzyChoice(GroupType.minor_major_list_choice_enums())
         )
-        self._mock_load_by_type(node_to_attach_from)
+        self._mock_load_node(node_to_attach_from)
         self._mock_node_repo_get(node_to_attach)
 
         relationship_object = AuthorizedRelationshipObjectFactory(
@@ -155,7 +155,7 @@ class TestAttachNodeFormFactory(SimpleTestCase):
             parent_type=node_to_attach_from.node_type,
             child_type=node_to_attach.node_type
         )
-        self._mock_load_by_type(node_to_attach_from)
+        self._mock_load_node(node_to_attach_from)
         self._mock_node_repo_get(node_to_attach)
 
         relationships = AuthorizedRelationshipListFactory(

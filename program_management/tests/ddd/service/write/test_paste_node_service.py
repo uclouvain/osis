@@ -137,11 +137,11 @@ class TestPasteNode(SimpleTestCase, ValidatorPatcherMixin):
 class TestCheckPaste(SimpleTestCase, ValidatorPatcherMixin):
     def setUp(self) -> None:
         self.tree = ProgramTreeFactory()
-        self.node_to_attach_from = NodeEducationGroupYearFactory()
+        self.node_to_attach_from = NodeGroupYearFactory()
         LinkFactory(parent=self.tree.root_node, child=self.node_to_attach_from)
         self.path = "|".join([str(self.tree.root_node.node_id), str(self.node_to_attach_from.node_id)])
 
-        self.node_to_paste = NodeEducationGroupYearFactory()
+        self.node_to_paste = NodeGroupYearFactory()
 
         self._patch_load_tree()
         self._patch_load_node()

@@ -42,6 +42,7 @@ from base.tests.factories.education_group_year import EducationGroupYearFactory,
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.person import PersonFactory
 from base.utils.cache import ElementCache
+from base.utils.urls import reverse_with_get
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command
 from program_management.ddd.domain import link
@@ -50,6 +51,7 @@ from program_management.tests.ddd.factories.commands.paste_element_command impor
 from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory, NodeLearningUnitYearFactory, \
     NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
+from program_management.tests.factories.element import ElementGroupYearFactory
 
 
 def form_valid_effect(formset: PasteNodesFormset):
@@ -196,23 +198,22 @@ class TestPasteNodeView(TestCase):
 class TestPasteWithCutView(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.next_academic_year = AcademicYearFactory(current=True)
-        cls.root_egy = EducationGroupYearFactory(academic_year=cls.next_academic_year)
+        cls.academic_year = AcademicYearFactory(current=True)
+        cls.root_element = ElementGroupYearFactory(group_year__academic_year=cls.academic_year)
         cls.group_element_year = GroupElementYearFactory(
-            parent__academic_year=cls.next_academic_year,
+            parent__academic_year=cls.academic_year,
             generate_element=True
         )
-        cls.selected_egy = GroupFactory(
-            academic_year=cls.next_academic_year
+        cls.selected_element = ElementGroupYearFactory(
+            group_year__academic_year=cls.academic_year
         )
-        GroupElementYearFactory(parent=cls.root_egy, child_branch=cls.selected_egy, generate_element=True)
-
-        path_to_attach = "|".join([str(cls.root_egy.pk), str(cls.selected_egy.pk)])
-        cls.url = reverse("group_element_year_move", args=[cls.root_egy.id])
-        cls.url = "{}?path={}".format(
-            cls.url, path_to_attach
+        GroupElementYearFactory(
+            parent_element=cls.root_element,
+            child_element=cls.selected_element
         )
 
+        path_to_attach = "|".join([str(cls.root_element.id), str(cls.selected_element.id)])
+        cls.url = reverse_with_get("tree_paste_node", get={"path": path_to_attach})
         cls.person = PersonFactory()
 
     def setUp(self):
@@ -226,25 +227,25 @@ class TestPasteWithCutView(TestCase):
 
     def test_should_check_attach_and_detach_permission(self):
         AuthorizedRelationshipFactory(
-            parent_type=self.selected_egy.education_group_type,
-            child_type=self.group_element_year.child_branch.education_group_type,
+            parent_type=self.selected_element.group_year.education_group_type,
+            child_type=self.group_element_year.child_element.group_year.education_group_type,
             min_count_authorized=0,
             max_count_authorized=None
         )
         ElementCache(self.person.user.id).save_element_selected(
-            element_year=self.group_element_year.child_branch.academic_year.year,
-            element_code=self.group_element_year.child_branch.partial_acronym,
+            element_year=self.academic_year.year,
+            element_code=self.group_element_year.child_element.group_year.partial_acronym,
             path_to_detach="|".join([
-                str(self.group_element_year.parent.id),
-                str(self.group_element_year.child_branch.id)
+                str(self.group_element_year.parent_element.id),
+                str(self.group_element_year.child_element.id)
             ]),
             action=ElementCache.ElementCacheAction.CUT
         )
         self.client.get(self.url)
         self.permission_mock.assert_has_calls(
             [
-                mock.call(("base.detach_educationgroup",), self.group_element_year.parent),
-                mock.call(("base.attach_educationgroup",), self.selected_egy)
+                mock.call(("base.can_detach_node",), self.group_element_year.parent_element.group_year),
+                mock.call(("base.can_attach_node",), self.selected_element.group_year)
             ]
 
         )
@@ -253,20 +254,22 @@ class TestPasteWithCutView(TestCase):
     @mock.patch("program_management.ddd.service.write.paste_element_service.paste_element_service")
     def test_move(self, mock_paste_service):
         AuthorizedRelationshipFactory(
-            parent_type=self.selected_egy.education_group_type,
-            child_type=self.group_element_year.child_branch.education_group_type,
+            parent_type=self.selected_element.group_year.education_group_type,
+            child_type=self.group_element_year.child_element.group_year.education_group_type,
             min_count_authorized=0,
             max_count_authorized=None
         )
         mock_paste_service.return_value = link.LinkIdentity(
-            parent_code=self.group_element_year.parent.partial_acronym,
-            child_code=self.group_element_year.child_branch.partial_acronym,
-            year=self.group_element_year.parent.academic_year.year
+            parent_code=self.group_element_year.parent_element.group_year.partial_acronym,
+            child_code=self.group_element_year.child_element.group_year.partial_acronym,
+            year=self.academic_year
         )
-        detach_path = "|".join([str(self.group_element_year.parent.id), str(self.group_element_year.child_branch.id)])
+        detach_path = "|".join(
+            [str(self.group_element_year.parent_element.id), str(self.group_element_year.child_element.id)]
+        )
         ElementCache(self.person.user.id).save_element_selected(
-            element_year=self.group_element_year.child_branch.academic_year.year,
-            element_code=self.group_element_year.child_branch.partial_acronym,
+            element_year=self.group_element_year.child_element.group_year.academic_year.year,
+            element_code=self.group_element_year.child_element.group_year.partial_acronym,
             path_to_detach=detach_path,
             action=ElementCache.ElementCacheAction.CUT
         )

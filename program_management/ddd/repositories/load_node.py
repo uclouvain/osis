@@ -25,12 +25,11 @@
 ##############################################################################
 from typing import List
 
-from django.db.models import F, Value, CharField, QuerySet, Q, Case, When, IntegerField, OuterRef, Subquery
+from django.db.models import F, Value, CharField, QuerySet, Case, When, IntegerField, OuterRef, Subquery
 from django.db.models.functions import Concat
 
 from base.models.entity_version import EntityVersion
 from base.models.enums.active_status import ActiveStatusEnum
-from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import EducationGroupTypesEnum, GroupType, TrainingType, MiniTrainingType
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from base.models.enums.schedule_type import ScheduleTypeEnum

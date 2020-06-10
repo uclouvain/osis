@@ -63,13 +63,13 @@ class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageM
             int(element_selected["path_to_detach"].split("|")[-2])
             for element_selected in self.nodes_to_paste if element_selected["path_to_detach"]
         ]
-        objs_to_detach_from = GroupYear.objects.filter(id__in=nodes_to_detach_from)
+        objs_to_detach_from = GroupYear.objects.filter(element__id__in=nodes_to_detach_from)
         return all(self.request.user.has_perms(("base.can_detach_node",), obj_to_detach)
                    for obj_to_detach in objs_to_detach_from)
 
     def get_permission_object(self) -> GroupYear:
         node_to_paste_to_id = int(self.request.GET['path'].split("|")[-1])
-        return shortcuts.get_object_or_404(GroupYear, pk=node_to_paste_to_id)
+        return shortcuts.get_object_or_404(GroupYear, element__pk=node_to_paste_to_id)
 
     @cached_property
     def nodes_to_paste(self) -> List[dict]:

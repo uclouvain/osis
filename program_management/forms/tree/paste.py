@@ -69,7 +69,7 @@ def _get_form_class(
         node_to_paste_year: int
 ) -> Type['PasteNodeForm']:
     node_to_paste_into_id = int(path_of_node_to_paste_into.split("|")[-1])
-    node_to_paste_into = load_node.load_by_type(NodeType.GROUP, node_to_paste_into_id)
+    node_to_paste_into = load_node.load(node_to_paste_into_id)
 
     node_identity = node.NodeIdentity(code=node_to_paste_code, year=node_to_paste_year)
     node_to_paste = node_repository.NodeRepository.get(node_identity)

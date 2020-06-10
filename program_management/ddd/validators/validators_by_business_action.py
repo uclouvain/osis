@@ -108,7 +108,7 @@ class CheckPasteNodeValidatorList(business_validator.BusinessListValidator):
     ):
         path = check_paste_command.path_to_paste
 
-        if node_to_paste.is_group():
+        if node_to_paste.is_group_or_mini_or_training():
             self.validators = [
                 CreateLinkValidatorList(tree.get_node(path), node_to_paste),
                 MinimumEditableYearValidator(tree),
