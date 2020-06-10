@@ -56,7 +56,7 @@ from education_group.ddd.domain._funding import Funding
 from education_group.ddd.domain._hops import HOPS
 from education_group.ddd.domain._isced_domain import IscedDomain
 from education_group.ddd.domain._language import Language
-from education_group.ddd.domain._study_domain import StudyDomain
+from education_group.ddd.domain._study_domain import StudyDomain, StudyDomainIdentity
 from education_group.ddd.domain._titles import Titles
 from osis_common.ddd import interface
 
@@ -134,9 +134,11 @@ class TrainingRepository(interface.AbstractRepository):
         for domain in obj.secondary_domains.all():
             secondary_domains.append(
                 StudyDomain(
-                    decree_name=domain.decree.name,
-                    code=domain.code,
-                    name=domain.name,
+                    entity_id=StudyDomainIdentity(
+                        decree_name=domain.decree.name,
+                        code=domain.code,
+                    ),
+                    domain_name=domain.name,
                 )
             )
 
@@ -202,9 +204,11 @@ class TrainingRepository(interface.AbstractRepository):
                 obj.other_language_activities] if obj.other_language_activities else None,
             internal_comment=obj.internal_comment,
             main_domain=StudyDomain(
-                decree_name=obj.main_domain.decree.name,
-                code=obj.main_domain.code,
-                name=obj.main_domain.name,
+                entity_id=StudyDomainIdentity(
+                    decree_name=obj.main_domain.decree.name,
+                    code=obj.main_domain.code,
+                ),
+                domain_name=obj.main_domain.name,
             ) if obj.main_domain else None,
             secondary_domains=secondary_domains,
             isced_domain=IscedDomain(
