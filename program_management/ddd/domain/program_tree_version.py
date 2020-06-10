@@ -25,7 +25,6 @@
 ##############################################################################
 from osis_common.ddd import interface
 from program_management.ddd.business_types import *
-from program_management.ddd.command import CreateProgramTreeVersionCommand
 from program_management.ddd.domain.program_tree import ProgramTreeBuilder
 
 STANDARD = ""
@@ -37,7 +36,7 @@ class ProgramTreeVersionBuilder:
     def build_from(
             self,
             from_tree: 'ProgramTreeVersion',
-            command: CreateProgramTreeVersionCommand
+            command: 'CreateProgramTreeVersionCommand'
     ) -> 'ProgramTreeVersion':
         assert isinstance(from_tree, ProgramTreeVersion)
         assert from_tree.is_standard, "Forbidden to copy from a non Standard version"
@@ -54,14 +53,14 @@ class ProgramTreeVersionBuilder:
     def _build_from_transition(
             self,
             from_tree_version: 'ProgramTreeVersion',
-            command: CreateProgramTreeVersionCommand
+            command: 'CreateProgramTreeVersionCommand'
     ) -> 'ProgramTreeVersion':
         raise NotImplementedError()
 
     def _build_from_standard(
             self,
             from_tree_version: 'ProgramTreeVersion',
-            command: CreateProgramTreeVersionCommand
+            command: 'CreateProgramTreeVersionCommand'
     ) -> 'ProgramTreeVersion':
         from_tree = from_tree_version.get_tree()
         return ProgramTreeVersion(

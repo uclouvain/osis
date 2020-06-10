@@ -111,3 +111,13 @@ class AuthorizedRelationshipList:
             auth_rel.child_type for auth_rel in self.authorized_relationships
             if auth_rel.parent_type == parent_type
         )
+
+    def get_default_authorized_children_types(
+            self,
+            parent_type: EducationGroupTypesEnum
+    ) -> Set[EducationGroupTypesEnum]:
+        return set(
+            auth_rel.child_type for auth_rel in self.authorized_relationships
+            if auth_rel.parent_type == parent_type
+            and auth_rel.min_count_authorized == 1
+        )

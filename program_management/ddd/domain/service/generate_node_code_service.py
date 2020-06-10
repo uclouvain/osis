@@ -27,14 +27,12 @@ from education_group.models.group_year import GroupYear
 
 
 def generate_node_code(code_from_standard_root_node: str, year: int) -> str:
-    counter = 1
-    new_partial_acronym = code_from_standard_root_node
-    while _check_node_code_exists(code_from_standard_root_node, year):
-        incrementation = str(int(code_from_standard_root_node[-4:][:-1]) + counter)
-        new_partial_acronym = code_from_standard_root_node[:-4] + incrementation + code_from_standard_root_node[-1:]
-        counter += 1
-    return new_partial_acronym
+    last_partial_acronym = _get_last_partial_acronym_using(code_from_standard_root_node, year)
+    return last_partial_acronym[:-4] + str(int(last_partial_acronym[-4:][:-1]) + 1) + last_partial_acronym[-1:]
 
 
-def _check_node_code_exists(code: str, year: int) -> bool:
-    return GroupYear.objects.get(partial_acronym=code, academic_year__year=year).exist()
+def _get_last_partial_acronym_using(code: str, year: int) -> bool:
+    return GroupYear.objects.get(
+        partial_acronym__startswith=code[-4:],
+        academic_year__year=year
+    ).order_by("partial_acronym").last()

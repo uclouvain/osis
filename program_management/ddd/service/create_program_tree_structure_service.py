@@ -26,14 +26,10 @@
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.link import LinkFactory
 from program_management.ddd.domain.node import NodeFactory
-from program_management.ddd.domain.service import search_authorized_relationships_service
 
 
 def create_program_tree_structure(from_tree: 'ProgramTree') -> 'ProgramTree':
-    child_types = search_authorized_relationships_service.search_authorized_relationships(
-        min_count_authorized=1,
-        parent_type=from_tree.root_node.node_type
-    )
+    child_types = from_tree.authorized_relationships.get_default_authorized_children_types(from_tree.root_node.node_type)
     children_node_list = from_tree.root_node.get_all_children_as_nodes(take_only=child_types)
     for child in children_node_list:
         new_node = NodeFactory().deepcopy_node_without_copy_children_recursively(original_node=child)

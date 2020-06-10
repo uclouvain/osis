@@ -66,25 +66,3 @@ def load() -> AuthorizedRelationshipList:  # TODO :: add unit tests
         )
     if authorized_relationships:
         return AuthorizedRelationshipList(authorized_relationships)
-
-
-class AuthorizedRelationshipRepository(interface.AbstractRepository):
-    @classmethod
-    def create(cls, entity: Entity) -> EntityIdentity:
-        pass
-
-    @classmethod
-    def update(cls, entity: Entity) -> EntityIdentity:
-        pass
-
-    @classmethod
-    def get(cls, entity_id: EntityIdentity) -> Entity:
-        pass
-
-    @classmethod
-    def search(cls, entity_ids: Optional[List[EntityIdentity]] = None, **kwargs) -> List[Entity]:
-        pass
-
-    @classmethod
-    def delete(cls, entity_id: EntityIdentity) -> None:
-        pass

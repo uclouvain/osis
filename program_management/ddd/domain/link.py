@@ -128,7 +128,7 @@ class LinkFactory:
         else:
             return LinkWithChildBranch(parent, child, **kwargs)
 
-    def deepcopy_link_without_copy_children_recursively(original_link: 'Link'):
+    def deepcopy_link_without_copy_children_recursively(self, original_link: 'Link'):
         original_child = original_link.child
         original_link.child = None  # To avoid recursive deep copy of all children behind
         new_link = copy.deepcopy(original_link)
