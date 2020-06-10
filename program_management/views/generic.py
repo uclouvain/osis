@@ -97,7 +97,7 @@ class CatalogGenericDetailView:
 
 
 @method_decorator(login_required, name='dispatch')
-class GenericGroupElementYearMixin(AjaxPermissionRequiredMixin, FlagMixin, SuccessMessageMixin, AjaxTemplateMixin):
+class GenericGroupElementYearMixin(FlagMixin, AjaxPermissionRequiredMixin, SuccessMessageMixin, AjaxTemplateMixin):
     model = GroupElementYear
     context_object_name = "group_element_year"
     pk_url_kwarg = "group_element_year_id"
@@ -114,8 +114,8 @@ class GenericGroupElementYearMixin(AjaxPermissionRequiredMixin, FlagMixin, Succe
     def get_root(self):
         return get_object_or_404(EducationGroupYear, pk=self.kwargs.get("root_id"))
 
-    def get_permission_object(self):
-        return self.get_object().parent
+    def get_permission_object(self) -> GroupYear:
+        return self.get_object().parent_element.group_year
 
 
 class LearningUnitGeneric(CatalogGenericDetailView, TemplateView):

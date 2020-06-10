@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from unittest import mock, skip
+from unittest import mock
 
 from django.contrib.messages import get_messages, constants as MSG
 from django.http import HttpResponseNotFound, HttpResponse
@@ -37,14 +37,12 @@ from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.person import PersonFactory
 from base.utils.cache import ElementCache
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
-from education_group.tests.factories.auth.faculty_manager import FacultyManagerFactory
 from program_management.ddd.domain import link
 from program_management.ddd.validators._authorized_relationship import DetachAuthorizedRelationshipValidator
 from program_management.forms.tree.detach import DetachNodeForm
 from program_management.tests.factories.element import ElementGroupYearFactory
 
 
-@skip("FIXME in OSIS-4723")
 @override_flag('education_group_update', active=True)
 class TestDetachNodeView(TestCase):
     @classmethod
@@ -53,7 +51,7 @@ class TestDetachNodeView(TestCase):
         element = ElementGroupYearFactory(group_year__academic_year=cls.academic_year)
         cls.group_element_year = GroupElementYearFactory(parent_element=element,
                                                          child_element__group_year__academic_year=cls.academic_year)
-        cls.person = CentralManagerFactory(entity=cls.education_group_year.management_entity).person
+        cls.person = CentralManagerFactory(entity=element.group_year.management_entity).person
         cls.path_to_detach = '|'.join([
             str(cls.group_element_year.parent_element_id),
             str(cls.group_element_year.child_element_id)
@@ -74,38 +72,21 @@ class TestDetachNodeView(TestCase):
         self.mocked_validator = self.validator_patcher.start()
         self.addCleanup(self.validator_patcher.stop)
 
-    def test_allowed_http_method_when_user_is_not_logged(self):
-        self.client.logout()
-
-        allowed_method = ['get', 'post']
-        for method in allowed_method:
-            response = getattr(self.client, method)(self.url)
-            self.assertIn("/login/?next=", response.url)
-
     @mock.patch("program_management.ddd.service.detach_node_service.detach_node")
-    def test_get_ensure_path_args_is_set_as_initial_on_form(self, mock):
-
+    def test_should_initialize_path_from_get_parameters_path_value_when_initializing_form(self, mock):
         response = self.client.get(self.url, data={'path': self.path_to_detach})
         self.assertTemplateUsed(response, 'tree/detach_confirmation_inner.html')
 
-        self.assertTrue('form' in response.context)
         self.assertIsInstance(response.context['form'], DetachNodeForm)
         self.assertDictEqual(response.context['form'].initial, {'path': self.path_to_detach})
 
-    def test_post_with_invalid_path(self):
-        response = self.client.post(self.url, data={'path': 'dummy_path'})
-        form_errors = response.context["form"].errors
-
-        self.assertListEqual(form_errors["path"], ['Invalid tree path'])
-        self.assertEqual(response.status_code, HttpResponse.status_code)
-
     @override_flag('education_group_update', active=False)
-    def test_detach_case_flag_disabled(self):
+    def test_should_return_page_not_found_when_flag_disabled(self):
         response = self.client.post(self.url)
         self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
         self.assertTemplateUsed(response, "page_not_found.html")
 
-    def test_detach_case_user_not_have_access(self):
+    def test_should_return_access_denied_when_user_has_not_sufficient_permissions(self):
         person = PersonFactory()
         self.client.force_login(person.user)
         response = self.client.post(self.url, follow=True, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
@@ -113,15 +94,13 @@ class TestDetachNodeView(TestCase):
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, "education_group/blocks/modal/modal_access_denied.html")
 
-    def test_detach_case_get_with_ajax_success(self):
+    def test_should_return_detach_confirmation_template_when_ajax_request_is_successful(self):
         response = self.client.get(self.url, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, "tree/detach_confirmation_inner.html")
 
     @mock.patch("program_management.ddd.service.detach_node_service.detach_node")
-    @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group")
-    def test_detach_case_post_success(self, mock_permission, mock_service):
-        mock_permission.return_value = True
+    def test_detach_case_post_success(self, mock_service):
         mock_service.return_value = link.LinkIdentity(
             parent_code=self.group_element_year.parent.partial_acronym,
             child_code=self.group_element_year.child_branch.partial_acronym,
@@ -141,9 +120,7 @@ class TestDetachNodeView(TestCase):
         self.assertTrue(mock_service.called)
 
     @mock.patch("program_management.ddd.service.detach_node_service.detach_node")
-    @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group")
-    def test_detach_when_element_is_in_clipboard(self, mock_permission, mock_service):
-        mock_permission.return_value = True
+    def test_detach_when_element_is_in_clipboard(self, mock_service):
         mock_service.return_value = link.LinkIdentity(
             parent_code=self.group_element_year.parent.partial_acronym,
             child_code=self.group_element_year.child_branch.partial_acronym,
@@ -160,8 +137,7 @@ class TestDetachNodeView(TestCase):
         self.assertFalse(ElementCache(self.person.user).cached_data, error_msg)
 
     @mock.patch("base.models.group_element_year.GroupElementYear.delete")
-    @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group")
-    def test_detach_when_clipboard_filled_with_different_detached_element(self, mock_permission, mock_delete):
+    def test_detach_when_clipboard_filled_with_different_detached_element(self, mock_delete):
         element_cached = EducationGroupYearFactory()
         ElementCache(self.person.user).save_element_selected(
             element_code=element_cached.partial_acronym,
@@ -175,11 +151,3 @@ class TestDetachNodeView(TestCase):
         )
         error_msg = "The clipboard should not be cleared if element in clipboard is not the detached element"
         self.assertTrue(ElementCache(self.person.user).cached_data, error_msg)
-
-    @mock.patch('base.business.event_perms.EventPerm.is_open', return_value=False)
-    def test_detach_not_permitted_for_faculty_manager_if_period_closed(self, mock_period_open):
-        faculty_manager = FacultyManagerFactory(entity=self.education_group_year.management_entity)
-        group_element_year = GroupElementYearFactory(parent=self.group_element_year.parent)
-        self.assertFalse(
-            faculty_manager.person.user.has_perm('base.can_detach_node', group_element_year.parent)
-        )
