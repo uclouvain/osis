@@ -46,32 +46,6 @@ LEARNING_UNIT_YEAR = LearningUnitYear._meta.db_table
 EDUCATION_GROUP_YEAR = EducationGroupYear._meta.db_table
 
 
-def fetch_source_link(request_parameters, user):
-    selected_data = _get_elements_selected(request_parameters, user)
-
-    source_link = None
-    for selected_element in selected_data:
-        if selected_element.get('source_link_id'):
-            source_link = GroupElementYear.objects.select_related('parent').get(pk=selected_element['source_link_id'])
-
-    return source_link
-
-
-# FIXME Migrate this method into ddd/service
-# FIXME :: DEPRECATED - Use AuthorizedRelationshipValidator from ddd instead
-def _get_elements_selected(request_parameters, user):
-    object_ids = request_parameters.getlist("id", [])
-    content_type = request_parameters.get("content_type")
-    if object_ids and content_type:
-        selected_data = [{"id": object_id, "modelname": content_type} for object_id in object_ids]
-    elif object_ids or content_type:
-        selected_data = []
-    else:
-        cached_data = ElementCache(user).cached_data
-        selected_data = [cached_data] if cached_data else []
-    return selected_data
-
-
 # FIXME :: DEPRECATED - Use AuthorizedRelationshipValidator from ddd instead
 def is_max_child_reached(parent, child_education_group_type):
     try:
