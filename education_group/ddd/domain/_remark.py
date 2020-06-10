@@ -23,11 +23,21 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import collections
-
 from osis_common.ddd import interface
 
 
-class GetGroupCommand(collections.namedtuple("GetGroupCommand", "code, year"),
-                      interface.CommandRequest):
-    pass
+class Remark(interface.ValueObject):
+    def __init__(
+            self,
+            text_fr: str,
+            text_en: str,
+    ):
+        self.text_fr = text_fr
+        self.text_en = text_en
+
+    def __eq__(self, other):
+        return self.text_fr == other.text_fr and \
+            self.text_en == other.text_en
+
+    def __hash__(self):
+        return hash(self.text_fr + self.text_en)

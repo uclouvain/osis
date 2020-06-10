@@ -23,11 +23,20 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import collections
-
+from base.models.enums.constraint_type import ConstraintTypeEnum
 from osis_common.ddd import interface
 
 
-class GetGroupCommand(collections.namedtuple("GetGroupCommand", "code, year"),
-                      interface.CommandRequest):
-    pass
+class ContentConstraint(interface.ValueObject):
+    def __init__(self, type: ConstraintTypeEnum, minimum: int, maximum: int):
+        self.type = type
+        self.minimum = minimum
+        self.maximum = maximum
+
+    def __eq__(self, other):
+        return self.type == other.type \
+               and self.minimum == other.minimum \
+               and self.maximum == other.maximum
+
+    def __hash__(self):
+        return hash(str(self.type) + str(self.minimum) + str(self.maximum))
