@@ -49,7 +49,7 @@ from education_group.ddd.domain._academic_partner import AcademicPartner, Academ
 from education_group.ddd.domain._address import Address
 from education_group.ddd.domain._campus import CampusIdentity
 from education_group.ddd.domain._co_graduation import CoGraduation
-from education_group.ddd.domain._co_organization import Coorganization
+from education_group.ddd.domain._co_organization import Coorganization, CoorganizationIdentity
 from education_group.ddd.domain._diploma import Diploma, DiplomaAim
 from education_group.ddd.domain._entity import Entity as EntityValueObject
 from education_group.ddd.domain._funding import Funding
@@ -147,6 +147,11 @@ class TrainingRepository(interface.AbstractRepository):
             first_address = coorg.organization.organizationaddress_set.all()[0]
             coorganizations.append(
                 Coorganization(
+                    entity_id=CoorganizationIdentity(
+                        partner_name=coorg.organization.name,
+                        training_acronym=entity_id.acronym,
+                        training_year=entity_id.year,
+                    ),
                     partner=AcademicPartner(
                         entity_id=AcademicPartnerIdentity(name=coorg.organization.name),
                         address=Address(
