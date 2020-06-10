@@ -37,7 +37,7 @@ class ParentChildSameAcademicYearValidator(business_validator.BusinessValidator)
         self.parent_node = parent_node
 
     def validate(self):
-        if self.parent_node.year != self.node_to_add.year:
+        if not self.node_to_add.is_learning_unit() and self.parent_node.year != self.node_to_add.year:
             raise business_validator.BusinessExceptions(
                 [_("It is prohibited to attach a %(child_node)s to an element of "
                    "another academic year %(parent_node)s.") % {

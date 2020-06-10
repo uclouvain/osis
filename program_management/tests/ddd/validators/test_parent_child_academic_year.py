@@ -27,9 +27,8 @@
 from django.test import SimpleTestCase
 from django.utils.translation import gettext as _
 
-from program_management.ddd.domain.program_tree import build_path
 from program_management.ddd.validators._parent_child_academic_year import ParentChildSameAcademicYearValidator
-from program_management.tests.ddd.factories.node import NodeGroupYearFactory
+from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 from program_management.tests.ddd.validators.mixins import TestValidatorValidateMixin
 
@@ -38,11 +37,7 @@ class TestParentChildSameAcademicYearValidator(TestValidatorValidateMixin, Simpl
     def setUp(self):
         self.tree = ProgramTreeFactory()
 
-    def test_should_not_raise_exception_when_year_of_parent_equals_year_of_node_to_add(self):
-        node_to_attach = NodeGroupYearFactory(year=self.tree.root_node.year)
-        self.assertValidatorNotRaises(ParentChildSameAcademicYearValidator(self.tree.root_node, node_to_attach))
-
-    def test_should_raise_exception_when_year_of_parent_differs_from_year_of_node_to_add(self):
+    def test_should_raise_exception_when_year_of_parent_differs_from_year_of_group_node_to_add(self):
         nodes_to_add = [
             NodeGroupYearFactory(year=self.tree.root_node.year - 1),
             NodeGroupYearFactory(year=self.tree.root_node.year + 1)
@@ -58,3 +53,11 @@ class TestParentChildSameAcademicYearValidator(TestValidatorValidateMixin, Simpl
                     ParentChildSameAcademicYearValidator(self.tree.root_node, node_to_add),
                     [expected_result]
                 )
+
+    def test_should_not_raise_exception_when_year_of_parent_differs_and_node_is_learning_unit(self):
+        node_to_paste = NodeLearningUnitYearFactory(year=self.tree.root_node.year - 1)
+        self.assertValidatorNotRaises(ParentChildSameAcademicYearValidator(self.tree.root_node, node_to_paste))
+
+    def test_should_not_raise_exception_when_year_of_parent_equals_year_of_node_to_add(self):
+        node_to_attach = NodeGroupYearFactory(year=self.tree.root_node.year)
+        self.assertValidatorNotRaises(ParentChildSameAcademicYearValidator(self.tree.root_node, node_to_attach))
