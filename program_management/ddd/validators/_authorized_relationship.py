@@ -27,6 +27,7 @@ from collections import Counter
 
 from django.utils.translation import gettext as _
 
+import osis_common.ddd.interface
 from base.ddd.utils import business_validator
 from program_management.ddd.business_types import *
 
@@ -61,7 +62,7 @@ class PasteAuthorizedRelationshipValidator(business_validator.BusinessValidator)
                 }
             )
         if exception_messages:
-            raise business_validator.BusinessExceptions(messages=exception_messages)
+            raise osis_common.ddd.interface.BusinessExceptions(messages=exception_messages)
 
     def is_maximum_children_types_reached(self, parent_node: 'Node', child_node: 'Node'):
         if not self.auth_relations.is_authorized(parent_node.node_type, child_node.node_type):
@@ -84,7 +85,7 @@ class AuthorizedRelationshipLearningUnitValidator(business_validator.BusinessVal
                 self.position_to_attach_from.node_type,
                 self.node_to_attach.node_type
         ):
-            raise business_validator.BusinessExceptions(
+            raise osis_common.ddd.interface.BusinessExceptions(
                 [_("You can not attach a learning unit like %(node)s to element %(parent)s of type %(type)s.") % {
                     "node": self.node_to_attach,
                     "parent": self.position_to_attach_from,
@@ -103,7 +104,7 @@ class DetachAuthorizedRelationshipValidator(business_validator.BusinessValidator
     def validate(self):
         minimum_children_types_reached = self._get_minimum_children_types_reached(self.detach_from, self.node_to_detach)
         if minimum_children_types_reached:
-            raise business_validator.BusinessExceptions([
+            raise osis_common.ddd.interface.BusinessExceptions([
                 _("The parent must have at least one child of type(s) \"%(types)s\".") % {
                     "types": ','.join(str(node_type.value) for node_type in minimum_children_types_reached)
                 }

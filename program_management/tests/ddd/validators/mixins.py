@@ -23,12 +23,13 @@
 # ############################################################################
 from typing import List, Optional
 
+import osis_common.ddd.interface
 from base.ddd.utils import business_validator
 
 
 class TestValidatorValidateMixin:
     def assertValidatorRaises(self, validator: business_validator.BusinessValidator, messages: Optional[List[str]]):
-        with self.assertRaises(business_validator.BusinessExceptions) as context_exc:
+        with self.assertRaises(osis_common.ddd.interface.BusinessExceptions) as context_exc:
             validator.validate()
 
         if messages is not None:
@@ -37,7 +38,7 @@ class TestValidatorValidateMixin:
     def assertValidatorNotRaises(self, validator: business_validator.BusinessValidator):
         try:
             validator.validate()
-        except business_validator.BusinessExceptions as exc:
+        except osis_common.ddd.interface.BusinessExceptions as exc:
             self.fail(
                 "Validator {validator_name} raised unexpected BusinessException: {exception_message}".format(
                     validator_name=validator.__class__.__name__,

@@ -26,6 +26,7 @@
 
 from django.utils.translation import gettext_lazy as _
 
+import osis_common.ddd.interface
 from base.ddd.utils import business_validator
 from program_management.ddd.business_types import *
 
@@ -39,4 +40,4 @@ class DetachRootValidator(business_validator.BusinessValidator):
 
     def validate(self):
         if self.tree.is_root(self.tree.get_node(self.path_to_detach)):
-            raise business_validator.BusinessExceptions([_("Cannot perform detach action on root.")])
+            raise osis_common.ddd.interface.BusinessExceptions([_("Cannot perform detach action on root.")])

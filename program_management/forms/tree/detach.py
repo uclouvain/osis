@@ -26,6 +26,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
 
+import osis_common.ddd.interface
 from base.ddd.utils import business_validator
 from program_management.ddd import command
 from program_management.ddd.domain import link
@@ -40,7 +41,7 @@ class DetachNodeForm(forms.Form):
         cleaned_path = self.cleaned_data.get("path")
         try:
             _path_validator.PathValidator(cleaned_path).validate()
-        except business_validator.BusinessExceptions as business_exception:
+        except osis_common.ddd.interface.BusinessExceptions as business_exception:
             raise ValidationError(business_exception.messages)
         return cleaned_path
 

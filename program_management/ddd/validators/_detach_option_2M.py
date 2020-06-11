@@ -28,6 +28,7 @@ from typing import List
 
 from django.utils.translation import ngettext
 
+import osis_common.ddd.interface
 from base.ddd.utils import business_validator
 from program_management.ddd.business_types import *
 
@@ -87,7 +88,7 @@ class DetachOptionValidator(business_validator.BusinessValidator):
                             }
                         )
         if error_messages:
-            raise business_validator.BusinessExceptions(error_messages)
+            raise osis_common.ddd.interface.BusinessExceptions(error_messages)
 
     def _is_inside_finality(self):
         parents = self.working_tree.get_parents(self.path_to_node_to_detach)

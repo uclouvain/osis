@@ -25,6 +25,7 @@
 ##############################################################################
 from django.utils.translation import gettext as _
 
+import osis_common.ddd.interface
 from base.ddd.utils import business_validator
 from base.ddd.utils.business_validator import BusinessValidator
 from program_management.ddd.business_types import *
@@ -38,9 +39,9 @@ class PathValidator(BusinessValidator):
 
     def validate(self):
         if not self.path:
-            raise business_validator.BusinessExceptions([_('Invalid tree path')])
+            raise osis_common.ddd.interface.BusinessExceptions([_('Invalid tree path')])
         else:
             try:
                 [int(node_id) for node_id in self.path.split('|')]
             except ValueError:
-                raise business_validator.BusinessExceptions([_('Invalid tree path')])
+                raise osis_common.ddd.interface.BusinessExceptions([_('Invalid tree path')])

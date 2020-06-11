@@ -26,6 +26,7 @@ from typing import Optional
 
 from django.utils.translation import gettext_lazy as _
 
+import osis_common.ddd.interface
 from base.ddd.utils import business_validator
 
 BLOCK_MAX_AUTHORIZED_VALUE = 6
@@ -48,4 +49,4 @@ class BlockValidator(business_validator.BusinessValidator):
                 "Please register a maximum of %(max_authorized_value)s digits in ascending order, "
                 "without any duplication. Authorized values are from 1 to 6. Examples: 12, 23, 46"
             ) % {'max_authorized_value': BLOCK_MAX_AUTHORIZED_VALUE}
-            raise business_validator.BusinessExceptions([error_msg])
+            raise osis_common.ddd.interface.BusinessExceptions([error_msg])

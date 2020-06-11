@@ -1,3 +1,4 @@
+import osis_common.ddd.interface
 from base.ddd.utils import business_validator
 from program_management.ddd.business_types import *
 from program_management.ddd.validators._infinite_recursivity import InfiniteRecursivityLinkValidator
@@ -21,8 +22,8 @@ class CreateLinkValidatorList(business_validator.BusinessListValidator):
         for validator in self.validators:
             try:
                 validator.validate()
-            except business_validator.BusinessExceptions as business_exception:
+            except osis_common.ddd.interface.BusinessExceptions as business_exception:
                 error_messages.extend(business_exception.messages)
 
         if error_messages:
-            raise business_validator.BusinessExceptions(error_messages)
+            raise osis_common.ddd.interface.BusinessExceptions(error_messages)

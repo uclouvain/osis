@@ -25,6 +25,7 @@
 ##############################################################################
 from django.utils.translation import gettext as _
 
+import osis_common.ddd.interface
 from base.ddd.utils import business_validator
 from base.ddd.utils.business_validator import BusinessValidator
 from program_management.ddd.business_types import *
@@ -43,7 +44,7 @@ class InfiniteRecursivityTreeValidator(business_validator.BusinessValidator):
             error_msg = _('The child %(child)s you want to attach is a parent of the node you want to attach.') % {
                 'child': self.node_to_add
             }
-            raise business_validator.BusinessExceptions([error_msg])
+            raise osis_common.ddd.interface.BusinessExceptions([error_msg])
 
 
 class InfiniteRecursivityLinkValidator(business_validator.BusinessValidator):
@@ -55,6 +56,6 @@ class InfiniteRecursivityLinkValidator(business_validator.BusinessValidator):
 
     def validate(self):
         if self.node_to_add == self.parent_node:
-            raise business_validator.BusinessExceptions(
+            raise osis_common.ddd.interface.BusinessExceptions(
                 [_('Cannot attach a node %(node)s to himself.') % {"node": self.node_to_add}]
             )

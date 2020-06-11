@@ -23,6 +23,7 @@
 # ############################################################################
 from typing import List
 
+import osis_common.ddd.interface
 from base.ddd.utils import business_validator
 from program_management.ddd import command
 from program_management.ddd.domain.program_tree import PATH_SEPARATOR
@@ -40,7 +41,7 @@ def detach_warning_messages(detach_command: command.DetachNodeCommand) -> List[s
     messages = []
     try:
         _has_or_is_prerequisite.HasPrerequisiteValidator(working_tree, node_to_detach).validate()
-    except business_validator.BusinessExceptions as e:
+    except osis_common.ddd.interface.BusinessExceptions as e:
         messages = e.messages
 
     return messages

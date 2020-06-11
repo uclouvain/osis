@@ -31,6 +31,7 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from waffle.testutils import override_flag
 
+import osis_common.ddd.interface
 from base.ddd.utils import business_validator
 from base.models.enums.education_group_types import GroupType
 from base.models.enums.link_type import LinkTypes
@@ -334,7 +335,7 @@ class TestCheckPasteView(TestCase):
     def test_should_return_error_messages_when_check_paste_service_raises_exception(
             self
     ):
-        self.mock_check_paste.side_effect = business_validator.BusinessExceptions(["Not valid"])
+        self.mock_check_paste.side_effect = osis_common.ddd.interface.BusinessExceptions(["Not valid"])
         response = self.client.get(
             self.url,
             data={

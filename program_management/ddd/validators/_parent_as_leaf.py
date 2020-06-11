@@ -25,6 +25,7 @@
 ##############################################################################
 from django.utils.translation import gettext_lazy as _
 
+import osis_common.ddd.interface
 from base.ddd.utils import business_validator
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import node
@@ -39,7 +40,7 @@ class ParentIsNotLeafValidator(business_validator.BusinessValidator):
 
     def validate(self):
         if isinstance(self.parent_node, node.NodeLearningUnitYear):
-            raise business_validator.BusinessExceptions(
+            raise osis_common.ddd.interface.BusinessExceptions(
                 [_("Cannot add any element to learning unit %(parent_node)s") % {
                     "parent_node": self.parent_node
                 }]

@@ -27,6 +27,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 
+import osis_common.ddd.interface
 from base.ddd.utils import business_validator
 from base.utils.cache import ElementCache
 from base.views.common import display_success_messages
@@ -81,7 +82,7 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
             display_warning_messages(self.request, warning_messages)
         try:
             detach_node_service.detach_node(detach_node_command)
-        except business_validator.BusinessExceptions as business_exception:
+        except osis_common.ddd.interface.BusinessExceptions as business_exception:
             display_error_messages(self.request, business_exception.messages)
         else:
             context['confirmation_message'] = self.confirmation_message
@@ -108,7 +109,7 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
         self.object
         try:
             link_entity_id = form.save()
-        except business_validator.BusinessExceptions as business_exception:
+        except osis_common.ddd.interface.BusinessExceptions as business_exception:
             display_error_messages(self.request, business_exception.messages)
             return self.form_invalid(form)
 

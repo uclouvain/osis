@@ -36,6 +36,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 from django.views.generic.base import View
 
+import osis_common.ddd.interface
 import program_management.ddd.command
 from base.ddd.utils import business_validator
 from base.utils.cache import ElementCache
@@ -161,7 +162,7 @@ class CheckPasteView(LoginRequiredMixin, View):
 
         try:
             check_paste_node_service.check_paste(check_command)
-        except business_validator.BusinessExceptions as business_exception:
+        except osis_common.ddd.interface.BusinessExceptions as business_exception:
             return business_exception.messages
         return []
 

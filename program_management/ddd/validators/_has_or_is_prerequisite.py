@@ -28,6 +28,7 @@ from typing import List
 
 from django.utils.translation import gettext_lazy as _
 
+import osis_common.ddd.interface
 from base.ddd.utils import business_validator
 from program_management.ddd.business_types import *
 from base.ddd.utils.business_validator import BusinessValidator
@@ -49,13 +50,13 @@ class IsPrerequisiteValidator(business_validator.BusinessValidator):
         if nodes_that_are_prerequisites:
             codes_that_are_prerequisite = [node.code for node in nodes_that_are_prerequisites]
             if self.node_to_detach.is_learning_unit():
-                raise business_validator.BusinessExceptions([
+                raise osis_common.ddd.interface.BusinessExceptions([
                     _("Cannot detach learning unit %(acronym)s as it has a prerequisite or it is a prerequisite.") % {
                         "acronym": self.node_to_detach.code
                     }
                 ])
             else:
-                raise business_validator.BusinessExceptions([
+                raise osis_common.ddd.interface.BusinessExceptions([
                     _("Cannot detach education group year %(acronym)s as the following learning units "
                       "are prerequisite in %(formation)s: %(learning_units)s") % {
                         "acronym": self.node_to_detach.title,
@@ -90,7 +91,7 @@ class HasPrerequisiteValidator(business_validator.BusinessValidator):
         nodes_that_has_prerequisites = self._get_nodes_that_has_prerequisite()
         if nodes_that_has_prerequisites:
             codes_that_have_prerequisites = [node.code for node in nodes_that_has_prerequisites]
-            raise business_validator.BusinessExceptions([
+            raise osis_common.ddd.interface.BusinessExceptions([
                 _("The prerequisites for the following learning units contained in education group year "
                   "%(acronym)s will we deleted: %(learning_units)s") % {
                     "acronym": self.tree.root_node.title,

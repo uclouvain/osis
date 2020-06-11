@@ -26,6 +26,7 @@
 from typing import List, Type
 from unittest.mock import PropertyMock, patch
 
+import osis_common.ddd.interface
 from base.ddd.utils import business_validator
 from base.ddd.utils.validation_message import MessageLevel, BusinessValidationMessage
 
@@ -65,7 +66,7 @@ class ValidatorPatcherMixin:
         patcher_validate = patch.object(
             validator_to_patch,
             'validate',
-            side_effect=business_validator.BusinessExceptions(messages)
+            side_effect=osis_common.ddd.interface.BusinessExceptions(messages)
         )
         self.addCleanup(patcher_validate.stop)
         patcher_validate.start()

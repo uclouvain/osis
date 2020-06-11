@@ -27,6 +27,7 @@ from unittest.mock import patch
 
 from django.test import SimpleTestCase
 
+import osis_common.ddd.interface
 from base.ddd.utils import business_validator
 from base.models.enums.education_group_types import TrainingType
 from program_management.ddd.domain import program_tree
@@ -98,8 +99,8 @@ class TestDetachNode(SimpleTestCase, ValidatorPatcherMixin):
 
     @patch.object(program_tree.ProgramTree, 'detach_node')
     def test_should_raise_exception_when_detach_node_raise_exception(self, mock_detach_node):
-        mock_detach_node.side_effect = business_validator.BusinessExceptions(["error message"])
-        with self.assertRaises(business_validator.BusinessExceptions) as exception_context:
+        mock_detach_node.side_effect = osis_common.ddd.interface.BusinessExceptions(["error message"])
+        with self.assertRaises(osis_common.ddd.interface.BusinessExceptions) as exception_context:
             detach_node_service.detach_node(self.detach_command)
 
         self.assertListEqual(

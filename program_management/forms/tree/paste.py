@@ -28,6 +28,7 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.forms import BaseFormSet
 
+import osis_common.ddd.interface
 from base.ddd.utils import business_validator
 from base.forms.utils import choice_field
 from base.models.enums.link_type import LinkTypes
@@ -114,7 +115,7 @@ class PasteNodeForm(forms.Form):
         cleaned_block_type = self.cleaned_data.get('block', None)
         try:
             _block_validator.BlockValidator(cleaned_block_type).validate()
-        except business_validator.BusinessExceptions as business_exception:
+        except osis_common.ddd.interface.BusinessExceptions as business_exception:
             raise ValidationError(business_exception.messages)
         return cleaned_block_type
 
@@ -123,7 +124,7 @@ class PasteNodeForm(forms.Form):
         if self.is_valid():
             try:
                 result = paste_element_service.paste_element(self._create_paste_command())
-            except business_validator.BusinessExceptions as business_exception:
+            except osis_common.ddd.interface.BusinessExceptions as business_exception:
                 self.add_error(None, business_exception.messages)
         return result
 

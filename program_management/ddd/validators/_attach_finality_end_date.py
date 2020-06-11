@@ -26,6 +26,7 @@
 
 from django.utils.translation import ngettext
 
+import osis_common.ddd.interface
 from base.ddd.utils import business_validator
 from base.models.enums.education_group_types import TrainingType
 from program_management.ddd.business_types import *
@@ -51,7 +52,7 @@ class AttachFinalityEndDateValidator(business_validator.BusinessValidator):
         if self.node_to_add.is_finality() or self.tree_from_node_to_add.get_all_finalities():
             inconsistent_nodes = self._get_codes_where_end_date_gte_root_end_date()
             if inconsistent_nodes:
-                raise business_validator.BusinessExceptions(
+                raise osis_common.ddd.interface.BusinessExceptions(
                     [ngettext(
                         "Finality \"%(code)s\" has an end date greater than %(root_code)s program.",
                         "Finalities \"%(code)s\" have an end date greater than %(root_code)s program.",

@@ -29,6 +29,7 @@ from unittest.mock import patch
 from django.test import SimpleTestCase
 from django.utils.translation import gettext as _
 
+import osis_common.ddd.interface
 import program_management.ddd.command
 import program_management.ddd.service.write.paste_element_service
 from base.ddd.utils import business_validator
@@ -96,9 +97,9 @@ class TestPasteNode(SimpleTestCase, ValidatorPatcherMixin):
 
     @patch.object(program_tree.ProgramTree, 'paste_node')
     def test_should_propagate_exception_when_paste_raises_one(self, mock_attach_node):
-        mock_attach_node.side_effect = business_validator.BusinessExceptions(["error_message_text"])
+        mock_attach_node.side_effect = osis_common.ddd.interface.BusinessExceptions(["error_message_text"])
 
-        with self.assertRaises(business_validator.BusinessExceptions):
+        with self.assertRaises(osis_common.ddd.interface.BusinessExceptions):
             program_management.ddd.service.write.paste_element_service.paste_element(self.paste_command)
 
     @patch.object(program_tree.ProgramTree, 'detach_node')
@@ -159,7 +160,7 @@ class TestCheckPaste(SimpleTestCase, ValidatorPatcherMixin):
         return mock_validator
 
     def test_should_propagate_error_when_validator_raises_exception(self):
-        self.mock_check_paste_validator.side_effect = business_validator.BusinessExceptions(["an error"])
+        self.mock_check_paste_validator.side_effect = osis_common.ddd.interface.BusinessExceptions(["an error"])
         check_command = program_management.ddd.command.CheckPasteNodeCommand(
             root_id=self.tree.root_node.node_id,
             node_to_past_code=self.node_to_paste.code,
@@ -167,7 +168,7 @@ class TestCheckPaste(SimpleTestCase, ValidatorPatcherMixin):
             path_to_paste=self.path,
             path_to_detach=None
         )
-        with self.assertRaises(business_validator.BusinessExceptions):
+        with self.assertRaises(osis_common.ddd.interface.BusinessExceptions):
             check_paste_node_service.check_paste(check_command)
 
     def test_should_return_none_when_validator_do_not_raise_exception(self):

@@ -28,6 +28,7 @@ from unittest.mock import patch
 
 from django.test import SimpleTestCase
 
+import osis_common.ddd.interface
 from base.ddd.utils import business_validator
 from base.ddd.utils.validation_message import MessageLevel, BusinessValidationMessage
 from base.models.enums import prerequisite_operator
@@ -212,7 +213,7 @@ class TestPasteNodeProgramTree(ValidatorPatcherMixin, SimpleTestCase):
     def test_should_propagate_exception_and_not_paste_node_when_validator_raises_exception(self):
         self.mock_validator_validate_to_raise_exception(PasteNodeValidatorList, ["error message text"])
 
-        with self.assertRaises(business_validator.BusinessExceptions):
+        with self.assertRaises(osis_common.ddd.interface.BusinessExceptions):
             self.tree.paste_node(self.child_to_paste, self.request)
 
         self.assertNotIn(self.child_to_paste, self.tree.root_node.children_as_nodes)
@@ -675,7 +676,7 @@ class TestDetachNode(SimpleTestCase):
         tree = ProgramTreeFactory()
         LinkFactory(parent=tree.root_node)
         path_to_detach = "Invalid path"
-        with self.assertRaises(business_validator.BusinessExceptions):
+        with self.assertRaises(osis_common.ddd.interface.BusinessExceptions):
             tree.detach_node(path_to_detach)
 
     @patch.object(DetachNodeValidatorList, 'validate')
@@ -705,13 +706,13 @@ class TestDetachNode(SimpleTestCase):
 
     @patch.object(DetachNodeValidatorList, 'validate')
     def test_should_propagate_exception_when_validator_raises_exception(self, mock_validate):
-        mock_validate.side_effect = business_validator.BusinessExceptions(["error occured", "an other error"])
+        mock_validate.side_effect = osis_common.ddd.interface.BusinessExceptions(["error occured", "an other error"])
 
         tree = ProgramTreeFactory()
         link = LinkFactory(parent=tree.root_node)
         path_to_detach = build_path(link.parent, link.child)
 
-        with self.assertRaises(business_validator.BusinessExceptions) as exception_context:
+        with self.assertRaises(osis_common.ddd.interface.BusinessExceptions) as exception_context:
             tree.detach_node(path_to_detach)
 
         self.assertListEqual(

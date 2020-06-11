@@ -23,6 +23,7 @@
 # ############################################################################
 from typing import List
 
+import osis_common.ddd.interface
 from base.ddd.utils import business_validator
 from base.ddd.utils.business_validator import BusinessValidator
 from base.models.enums.link_type import LinkTypes
@@ -55,4 +56,4 @@ class ValidateAuthorizedRelationshipForAllTrees(BusinessValidator):
                         messages.append(msg.message)
 
         if messages:
-            raise business_validator.BusinessExceptions(messages)
+            raise osis_common.ddd.interface.BusinessExceptions(messages)

@@ -21,7 +21,7 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-
+import osis_common.ddd.interface
 from base.ddd.utils import business_validator
 from program_management.ddd.business_types import *
 from program_management.ddd.repositories import load_tree
@@ -53,4 +53,4 @@ class ValidateEndDateAndOptionFinality(business_validator.BusinessValidator):
                     for msg in validator.error_messages:
                         messages.append(msg.message)
         if messages:
-            raise business_validator.BusinessExceptions(messages)
+            raise osis_common.ddd.interface.BusinessExceptions(messages)
