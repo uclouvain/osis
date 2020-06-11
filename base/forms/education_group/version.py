@@ -32,8 +32,6 @@ from base.business.education_groups.create import create_initial_group_element_y
 from base.forms.utils.choice_field import BLANK_CHOICE
 from base.models import academic_year
 from base.models.academic_year import compute_max_academic_year_adjournment
-from program_management.ddd.service.create_program_tree_version_service import report_specific_version_creation, \
-    create_specific_version
 
 
 class SpecificVersionForm(forms.Form):
@@ -62,17 +60,7 @@ class SpecificVersionForm(forms.Form):
             "title_en": self.cleaned_data.get("title_english")
         }
         if self.save_type == "new_version":
-            create_specific_version(data, self.education_group_year)
-            education_group_years_list = [self.education_group_year]
-            self.education_group_years_list = report_specific_version_creation(
-                data, self.education_group_year, end_postponement, education_group_years_list
-            )
+            pass
         if self.save_type == "attach":
-            education_group_years_list = []
-            last_old_version = base.views.education_groups.create.find_last_existed_version(
-                self.education_group_year, self.cleaned_data["version_name"]
-            )
-            self.education_group_years_list = report_specific_version_creation(
-                data, last_old_version.offer, end_postponement, education_group_years_list
-            )
+            pass
         create_initial_group_element_year_structure(self.education_group_years_list)

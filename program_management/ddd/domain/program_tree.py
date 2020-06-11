@@ -36,7 +36,7 @@ from program_management.ddd.domain import prerequisite, node
 from program_management.ddd.domain.link import LinkFactory
 from program_management.ddd.domain.node import NodeFactory
 from program_management.ddd.domain.service import generate_node_code_service
-from program_management.ddd.service import command, create_program_tree_structure_service
+from program_management.ddd.service import command
 from program_management.ddd.validators._detach_root import DetachRootValidator
 from program_management.ddd.validators._path_validator import PathValidator
 from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList, \
@@ -62,15 +62,29 @@ class ProgramTreeIdentity(interface.EntityIdentity):
 
 
 class ProgramTreeBuilder:
-
     def build_from(self, from_tree: 'ProgramTree') -> 'ProgramTree':
         new_root_node = node.NodeFactory().deepcopy_node_without_copy_children_recursively(from_tree.root_node)
         new_root_node.code = generate_node_code_service.generate_node_code(
             from_tree.root_node.code,
             from_tree.root_node.year
         )
-        program_tree = create_program_tree_structure_service.create_program_tree_structure(from_tree)
-        return program_tree
+        self._generate_mandatory_direct_children(
+            authorized_relationships=from_tree.authorized_relationships,
+            root_node=from_tree.root_node
+        )
+        return ProgramTree(root_node=from_tree.root_node)
+
+    def _generate_mandatory_direct_children(
+            self,
+            authorized_relationships: 'AuthorizedRelationshipList',
+            root_node: 'Node'
+    ):
+        child_types = authorized_relationships.get_default_authorized_children_types(root_node.node_type)
+        children_node_list = root_node.children_as_nodes
+        for child_node in children_node_list:
+            if child_node.node_type in child_types:
+                new_child_node = node.factory.deepcopy_node_without_copy_children_recursively(original_node=child_node)
+                root_node.add_child(new_child_node)
 
 
 class ProgramTree(interface.RootEntity):
