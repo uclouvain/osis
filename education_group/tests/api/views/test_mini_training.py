@@ -32,7 +32,6 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from base.models.enums import organization_type
-from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import MiniTrainingType
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import MiniTrainingFactory, TrainingFactory
@@ -105,18 +104,19 @@ class MiniTrainingListTestCase(APITestCase):
         cls.mini_trainings = []
         cls.versions = []
         for partial_acronym in ['LLOGO210O', 'NLOGO2101', 'WLOGO2102']:
-            mini_training = GroupYearFactory(
+            offer = MiniTrainingFactory(
                 partial_acronym=partial_acronym,
                 academic_year=cls.academic_year,
                 management_entity=cls.entity_version.entity,
-                education_group_type__category=Categories.MINI_TRAINING.name
             )
-            offer = MiniTrainingFactory(
-                acronym=mini_training.acronym,
+            mini_training = GroupYearFactory(
+                acronym=offer.acronym,
                 partial_acronym=partial_acronym,
                 academic_year=cls.academic_year,
-                management_entity=cls.entity_version.entity
+                management_entity=cls.entity_version.entity,
+                education_group_type=offer.education_group_type
             )
+
             cls.mini_trainings.append(mini_training)
             cls.versions.append(EducationGroupVersionFactory(
                 root_group=mini_training,
@@ -148,7 +148,7 @@ class MiniTrainingListTestCase(APITestCase):
         url = self.url + "?" + urllib.parse.urlencode({
             'education_group_type': [mini_training.education_group_type.name for mini_training in self.mini_trainings]
         }, doseq=True)
-
+        print(url, 'YOLO')
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['count'], 3)
