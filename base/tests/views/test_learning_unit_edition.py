@@ -316,7 +316,7 @@ class TestEditLearningUnit(TestCase):
         self.assertEqual(self.learning_unit_year.credits, credits)
         msg = [m.message for m in get_messages(response.wsgi_request)]
         msg_level = [m.level for m in get_messages(response.wsgi_request)]
-        self.assertEqual(msg[0], _('The learning unit has been updated (without report).'))
+        self.assertEqual(msg[0], _('The learning unit has been updated (with report).'))
         self.assertIn(messages.SUCCESS, msg_level)
 
     def test_valid_post_request_with_postponement(self):
