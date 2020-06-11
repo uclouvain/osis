@@ -85,7 +85,6 @@ class CutElementCommand(interface.CommandRequest):
 class PasteElementCommand(interface.CommandRequest):
     def __init__(
             self,
-            root_id: int,
             node_to_paste_code: str,
             node_to_paste_year: int,
             path_where_to_paste: 'Path',
@@ -99,7 +98,6 @@ class PasteElementCommand(interface.CommandRequest):
             relative_credits: Optional[int],
             path_where_to_detach: Optional['Path']
     ) -> None:
-        self.root_id = root_id
         self.node_to_paste_code = node_to_paste_code
         self.node_to_paste_year = node_to_paste_year
         self.path_where_to_paste = path_where_to_paste

@@ -128,9 +128,7 @@ class PasteNodeForm(forms.Form):
         return result
 
     def _create_paste_command(self) -> command.PasteElementCommand:
-        root_id = int(self.to_path.split("|")[0])
         return command.PasteElementCommand(
-            root_id=root_id,
             node_to_paste_code=self.node_code,
             node_to_paste_year=self.node_year,
             path_where_to_paste=self.to_path,
@@ -172,9 +170,7 @@ class PasteToMinorMajorListChoiceForm(PasteNodeForm):
     relative_credits = None
 
     def _create_paste_command(self) -> command.PasteElementCommand:
-        root_id = int(self.to_path.split("|")[0])
         return command.PasteElementCommand(
-            root_id=root_id,
             node_to_paste_code=self.node_code,
             node_to_paste_year=self.node_year,
             path_where_to_paste=self.to_path,

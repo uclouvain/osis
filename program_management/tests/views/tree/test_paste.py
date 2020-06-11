@@ -32,13 +32,10 @@ from django.utils.translation import gettext_lazy as _
 from waffle.testutils import override_flag
 
 from base.ddd.utils import business_validator
-from base.ddd.utils.validation_message import BusinessValidationMessage, MessageLevel
 from base.models.enums.education_group_types import GroupType
 from base.models.enums.link_type import LinkTypes
-from base.models.group_element_year import GroupElementYear
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory, GroupFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.person import PersonFactory
 from base.utils.cache import ElementCache
@@ -47,7 +44,6 @@ from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command
 from program_management.ddd.domain import link
 from program_management.forms.tree.paste import PasteNodesFormset, PasteNodeForm
-from program_management.tests.ddd.factories.commands.paste_element_command import PasteElementCommandFactory
 from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory, NodeLearningUnitYearFactory, \
     NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory

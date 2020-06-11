@@ -35,14 +35,15 @@ def paste_element_service(paste_command: command.PasteElementCommand) -> 'LinkId
     node_identity = node.NodeIdentity(code=paste_command.node_to_paste_code, year=paste_command.node_to_paste_year)
     commit = paste_command.commit
     path_to_detach = paste_command.path_where_to_detach
-    tree = load_tree.load(paste_command.root_id)
+    root_id = int(paste_command.path_where_to_paste.split("|")[0])
+    tree = load_tree.load(root_id)
     node_to_attach = node_repository.NodeRepository.get(node_identity)
 
     link_created = tree.paste_node(node_to_attach, paste_command)
 
     if path_to_detach:
         root_tree_to_detach = int(path_to_detach.split(PATH_SEPARATOR)[0])
-        tree_to_detach = tree if root_tree_to_detach == paste_command.root_id else load_tree.load(root_tree_to_detach)
+        tree_to_detach = tree if root_tree_to_detach == root_id else load_tree.load(root_tree_to_detach)
         other_trees_using_node = [
             tree for tree in tree_service.search_trees_using_node(node_to_attach) if tree != tree_to_detach
         ]

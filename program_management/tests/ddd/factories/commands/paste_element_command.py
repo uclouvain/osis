@@ -31,10 +31,9 @@ class PasteElementCommandFactory(factory.Factory):
         model = command.PasteElementCommand
         abstract = False
 
-    root_id = factory.Faker("random_int")
     node_to_paste_code = "LSINF2547"
     node_to_paste_year = factory.Faker("random_int")
-    path_where_to_paste = factory.LazyAttribute(lambda o: str(o.root_id))
+    path_where_to_paste = factory.LazyFunction(lambda: str(factory.Faker("random_int")))
     commit = False
     access_condition = None
     is_mandatory = None

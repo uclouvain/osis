@@ -58,9 +58,9 @@ class TestPasteNode(SimpleTestCase, ValidatorPatcherMixin):
         self._patch_load_tree()
         self._patch_load_child_node_to_attach()
         self.paste_command = PasteElementCommandFactory(
-            root_id=self.tree.root_node.node_id,
             node_to_paste_code=self.node_to_paste.code,
             node_to_paste_year=self.node_to_paste.year,
+            path_where_to_paste=str(self.tree.root_node.node_id)
         )
 
     def _patch_persist_tree(self):
@@ -103,9 +103,9 @@ class TestPasteNode(SimpleTestCase, ValidatorPatcherMixin):
     def test_when_commit_is_true_then_persist_modification(self):
         self.mock_validator(PasteNodeValidatorList, [_('Success message')], level=MessageLevel.SUCCESS)
         paste_command_with_commit_set_to_true = PasteElementCommandFactory(
-            root_id=self.tree.root_node.node_id,
             node_to_paste_code=self.node_to_paste.code,
             node_to_paste_year=self.node_to_paste.year,
+            path_where_to_paste=str(self.tree.root_node.node_id),
             commit=True
         )
         paste_element_service.paste_element_service(paste_command_with_commit_set_to_true)
@@ -120,9 +120,9 @@ class TestPasteNode(SimpleTestCase, ValidatorPatcherMixin):
         mock_search_trees.return_value = []
         self.mock_validator(PasteNodeValidatorList, [_('Success message')], level=MessageLevel.SUCCESS)
         paste_command_with_path_to_detach_set = PasteElementCommandFactory(
-            root_id=self.tree.root_node.node_id,
             node_to_paste_code=self.node_to_paste.code,
             node_to_paste_year=self.node_to_paste.year,
+            path_where_to_paste=str(self.tree.root_node.node_id),
             path_where_to_detach=program_tree.build_path(other_tree.root_node, self.node_to_paste)
         )
         paste_element_service.paste_element_service(paste_command_with_path_to_detach_set)
