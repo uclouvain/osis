@@ -50,9 +50,9 @@ class MiniTrainingFilter(filters.FilterSet):
         choices=MiniTrainingType.choices()
     )
     version_type = filters.CharFilter(method='filter_version_type')
-    acronym = filters.CharFilter(field_name="offer__acronym")
-    title = filters.CharFilter(field_name="root_group__title_fr")
-    title_english = filters.CharFilter(field_name="root_group__title_en")
+    acronym = filters.CharFilter(field_name="offer__acronym", lookup_expr='icontains')
+    title = filters.CharFilter(field_name="root_group__title_fr", lookup_expr='icontains')
+    title_english = filters.CharFilter(field_name="root_group__title_en", lookup_expr='icontains')
 
     order_by_field = 'ordering'
     ordering = OrderingFilterWithDefault(

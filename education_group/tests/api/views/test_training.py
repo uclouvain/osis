@@ -40,6 +40,7 @@ from base.tests.factories.person import PersonFactory
 from base.tests.factories.user import UserFactory
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
 from education_group.api.serializers.training import TrainingListSerializer, TrainingDetailSerializer
+from education_group.tests.factories.group_year import GroupYearFactory
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory, \
     StandardEducationGroupVersionFactory, StandardTransitionEducationGroupVersionFactory
@@ -182,9 +183,12 @@ class FilterTrainingTestCase(APITestCase):
             offer1 = TrainingFactory(acronym='BIR1BA', partial_acronym='LBIR1000I', academic_year=academic_year)
             offer2 = TrainingFactory(acronym='AGRO1BA', partial_acronym='LAGRO2111C', academic_year=academic_year)
             offer3 = TrainingFactory(acronym='MED12M', partial_acronym='LMED12MA', academic_year=academic_year)
-            StandardEducationGroupVersionFactory(offer=offer1)
-            StandardEducationGroupVersionFactory(offer=offer2)
-            StandardEducationGroupVersionFactory(offer=offer3)
+            group1 = GroupYearFactory(partial_acronym=offer1.partial_acronym, academic_year=offer1.academic_year)
+            group2 = GroupYearFactory(partial_acronym=offer2.partial_acronym, academic_year=offer2.academic_year)
+            group3 = GroupYearFactory(partial_acronym=offer3.partial_acronym, academic_year=offer3.academic_year)
+            StandardEducationGroupVersionFactory(offer=offer1, root_group=group1)
+            StandardEducationGroupVersionFactory(offer=offer2, root_group=group2)
+            StandardEducationGroupVersionFactory(offer=offer3, root_group=group3)
         StandardTransitionEducationGroupVersionFactory()
 
     def setUp(self):
