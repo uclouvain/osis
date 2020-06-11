@@ -59,7 +59,7 @@ class TestGroupRepositoryGetMethod(TestCase):
         with self.assertRaises(exception.GroupNotFoundException):
             GroupRepository.get(dummy_group_identity)
 
-    def test_assert_instance_returned(self):
+    def test_fields_mapping(self):
         group = GroupRepository.get(self.group_identity)
         self.assertIsInstance(group, Group)
 
