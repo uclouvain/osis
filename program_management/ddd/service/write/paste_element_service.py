@@ -31,7 +31,7 @@ from program_management.ddd.service import tree_service
 from program_management.ddd.validators._detach_option_2M import DetachOptionValidator
 
 
-def paste_element_service(paste_command: command.PasteElementCommand) -> 'LinkIdentity':
+def paste_element(paste_command: command.PasteElementCommand) -> 'LinkIdentity':
     node_identity = node.NodeIdentity(code=paste_command.node_to_paste_code, year=paste_command.node_to_paste_year)
     commit = paste_command.commit
     path_to_detach = paste_command.path_where_to_detach

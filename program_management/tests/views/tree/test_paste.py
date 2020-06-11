@@ -156,7 +156,7 @@ class TestPasteNodeView(TestCase):
         self.assertTemplateUsed(response, 'tree/paste_inner.html')
         self.assertIsInstance(response.context['formset'], PasteNodesFormset)
 
-    @mock.patch('program_management.ddd.service.write.paste_element_service.paste_element_service')
+    @mock.patch('program_management.ddd.service.write.paste_element_service.paste_element')
     @mock.patch.object(PasteNodesFormset, 'is_valid', new=form_valid_effect)
     @mock.patch.object(PasteNodeForm, 'is_valid')
     @mock.patch('program_management.ddd.service.read.element_selected_service.retrieve_element_selected')
@@ -248,7 +248,7 @@ class TestPasteWithCutView(TestCase):
         )
         self.assertTrue(self.permission_mock.called)
 
-    @mock.patch("program_management.ddd.service.write.paste_element_service.paste_element_service")
+    @mock.patch("program_management.ddd.service.write.paste_element_service.paste_element")
     def test_move(self, mock_paste_service):
         AuthorizedRelationshipFactory(
             parent_type=self.selected_element.group_year.education_group_type,

@@ -83,7 +83,7 @@ class TestPasteNode(SimpleTestCase, ValidatorPatcherMixin):
     @patch.object(program_tree.ProgramTree, 'paste_node')
     def test_should_return_link_identity_and_not_persist_when_paste_valid_and_commit_false(self, mock_attach_node):
         mock_attach_node.return_value = LinkFactory(parent=self.root_node, child=self.node_to_paste)
-        result = program_management.ddd.service.write.paste_element_service.paste_element_service(self.paste_command)
+        result = program_management.ddd.service.write.paste_element_service.paste_element(self.paste_command)
         expected_result = link.LinkIdentity(
             parent_code=self.root_node.code,
             child_code=self.node_to_paste.code,
@@ -99,7 +99,7 @@ class TestPasteNode(SimpleTestCase, ValidatorPatcherMixin):
         mock_attach_node.side_effect = business_validator.BusinessExceptions(["error_message_text"])
 
         with self.assertRaises(business_validator.BusinessExceptions):
-            program_management.ddd.service.write.paste_element_service.paste_element_service(self.paste_command)
+            program_management.ddd.service.write.paste_element_service.paste_element(self.paste_command)
 
     def test_when_commit_is_true_then_persist_modification(self):
         self.mock_validator(PasteNodeValidatorList, [_('Success message')], level=MessageLevel.SUCCESS)
@@ -109,7 +109,7 @@ class TestPasteNode(SimpleTestCase, ValidatorPatcherMixin):
             path_where_to_paste=str(self.tree.root_node.node_id),
             commit=True
         )
-        paste_element_service.paste_element_service(paste_command_with_commit_set_to_true)
+        paste_element_service.paste_element(paste_command_with_commit_set_to_true)
         self.assertTrue(self.mock_persist.called)
 
     @patch.object(program_tree.ProgramTree, 'detach_node')
@@ -126,7 +126,7 @@ class TestPasteNode(SimpleTestCase, ValidatorPatcherMixin):
             path_where_to_paste=str(self.tree.root_node.node_id),
             path_where_to_detach=program_tree.build_path(other_tree.root_node, self.node_to_paste)
         )
-        paste_element_service.paste_element_service(paste_command_with_path_to_detach_set)
+        paste_element_service.paste_element(paste_command_with_path_to_detach_set)
         self.assertTrue(mock_detach.called)
 
 

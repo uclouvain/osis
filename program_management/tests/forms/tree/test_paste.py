@@ -202,7 +202,7 @@ class TestAttachNodeForm(SimpleTestCase):
         form_instance = self._get_attach_node_form_instance({'block': "125"})
         self.assertTrue(form_instance.is_valid())
 
-    @mock.patch("program_management.ddd.service.write.paste_element_service.paste_element_service")
+    @mock.patch("program_management.ddd.service.write.paste_element_service.paste_element")
     def test_save_should_call_attach_service(self, mock_service_attach_node):
         form_instance = self._get_attach_node_form_instance(link_attributes={})
         form_instance.is_valid()

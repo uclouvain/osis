@@ -122,7 +122,7 @@ class PasteNodeForm(forms.Form):
         result = None
         if self.is_valid():
             try:
-                result = paste_element_service.paste_element_service(self._create_paste_command())
+                result = paste_element_service.paste_element(self._create_paste_command())
             except business_validator.BusinessExceptions as business_exception:
                 self.add_error(None, business_exception.messages)
         return result
