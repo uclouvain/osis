@@ -299,7 +299,7 @@ class TestCheckPasteView(TestCase):
     def setUp(self):
         self.client.force_login(self.person.user)
 
-        patcher_check_paste = mock.patch("program_management.ddd.service.attach_node_service.check_paste")
+        patcher_check_paste = mock.patch("program_management.ddd.service.read.check_paste_node_service.check_paste")
         self.mock_check_paste = patcher_check_paste.start()
         self.mock_check_paste.return_value = None
         self.addCleanup(patcher_check_paste.stop)
