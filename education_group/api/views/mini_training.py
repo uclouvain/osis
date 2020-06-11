@@ -175,8 +175,6 @@ class OfferRoots(LanguageContextSerializerMixin, generics.ListAPIView):
             [element],
             as_instances=True
         ).get(element.id, [])
-        return EducationGroupYear.objects.filter(
-            pk__in=EducationGroupVersion.objects.filter(
-                root_group__element__in=root_elements
-            ).values('offer_id')
-        ).select_related('academic_year', 'education_group_type')
+        return EducationGroupVersion.objects.filter(
+            root_group__element__in=root_elements
+        ).select_related('root_group__academic_year', 'root_group__education_group_type')

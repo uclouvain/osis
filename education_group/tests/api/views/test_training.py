@@ -292,13 +292,13 @@ class FilterTrainingTestCase(APITestCase):
         response = self.client.get(self.url, data=query_string)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        trainings = EducationGroupYear.objects.filter(
-            education_group_type__category=education_group_categories.TRAINING,
-            acronym__icontains='agro1ba'
-        ).order_by('-academic_year__year', 'acronym')
+        versions = EducationGroupVersion.objects.filter(
+            offer__education_group_type__category=education_group_categories.TRAINING,
+            offer__acronym__icontains='agro1ba'
+        ).order_by('-offer__academic_year__year', 'offer__acronym')
 
         serializer = TrainingListSerializer(
-            trainings,
+            versions,
             many=True,
             context={
                 'request': RequestFactory().get(self.url, query_string),
@@ -315,12 +315,12 @@ class FilterTrainingTestCase(APITestCase):
         response = self.client.get(self.url, data=query_string)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        trainings = EducationGroupYear.objects.filter(
-            hops__ares_ability=hops.ares_ability
-        ).order_by('-academic_year__year', 'acronym')
+        versions = EducationGroupVersion.objects.filter(
+            offer__hops__ares_ability=hops.ares_ability
+        ).order_by('-offer__academic_year__year', 'offer__acronym')
 
         serializer = TrainingListSerializer(
-            trainings,
+            versions,
             many=True,
             context={
                 'request': RequestFactory().get(self.url, query_string),

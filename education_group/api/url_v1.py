@@ -44,6 +44,11 @@ urlpatterns = [
         url(r'^versions$', TrainingVersionList.as_view(), name=TrainingVersionList.name)
     ])),
     url(
+        r'^trainings/(?P<year>[\d]{4})/(?P<acronym>[\w]+(?:[/ ]?[a-zA-Z]{1,2}){0,2})/versions/(?P<version_name>[\w]*)$',
+        TrainingDetail.as_view(),
+        name=TrainingDetail.name
+    ),
+    url(
         r'^trainings/(?P<year>[\d]{4})/(?P<acronym>[\w]+(?:[/ ]?[\w]{1,2}){0,2})$',
         TrainingDetail.as_view(),
         name=TrainingDetail.name

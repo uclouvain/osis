@@ -44,7 +44,6 @@ class GroupDetailSerializerTestCase(TestCase):
         cls.group = GroupYearFactory(
             academic_year=cls.academic_year,
             management_entity=cls.entity_version.entity,
-            group__start_year=cls.academic_year
         )
         url = reverse('education_group_api_v1:group_read', kwargs={
             'partial_acronym': cls.group.partial_acronym,
