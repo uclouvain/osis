@@ -26,15 +26,12 @@
 from unittest.mock import patch
 
 from django.test import SimpleTestCase
-from django.utils.translation import gettext as _
 
 from base.ddd.utils import business_validator
-from base.ddd.utils.validation_message import MessageLevel, BusinessValidationMessage, BusinessValidationMessageList
 from base.models.enums.education_group_types import TrainingType
 from program_management.ddd.domain import program_tree
 from program_management.ddd.domain.program_tree import build_path, ProgramTree
-from program_management.ddd.service import detach_node_service
-from program_management.ddd.validators._has_or_is_prerequisite import IsPrerequisiteValidator
+from program_management.ddd.service.write import detach_node_service
 from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipListFactory
 from program_management.tests.ddd.factories.commands.detach_node_command import DetachNodeCommandFactory
 from program_management.tests.ddd.factories.link import LinkFactory

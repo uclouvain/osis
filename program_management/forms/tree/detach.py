@@ -29,7 +29,7 @@ from django.core.exceptions import ValidationError
 from base.ddd.utils import business_validator
 from program_management.ddd import command
 from program_management.ddd.domain import link
-from program_management.ddd.service import detach_node_service
+from program_management.ddd.service.write import detach_node_service
 from program_management.ddd.validators import _path_validator
 
 

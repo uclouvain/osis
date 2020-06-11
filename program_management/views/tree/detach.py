@@ -23,19 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db.models import Q
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 
 from base.ddd.utils import business_validator
 from base.utils.cache import ElementCache
-from base.views.common import display_business_messages, display_success_messages
+from base.views.common import display_success_messages
 from base.views.common import display_error_messages, display_warning_messages
 from base.views.mixins import AjaxTemplateMixin
 from program_management.ddd import command
-from program_management.ddd.domain.program_tree import PATH_SEPARATOR
-from program_management.ddd.service import detach_node_service
+from program_management.ddd.service.write import detach_node_service
 from program_management.ddd.service.read import detach_warning_messages_service
 from program_management.forms.tree.detach import DetachNodeForm
 from program_management.views.generic import GenericGroupElementYearMixin

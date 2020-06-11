@@ -72,7 +72,7 @@ class TestDetachNodeView(TestCase):
         self.mocked_validator = self.validator_patcher.start()
         self.addCleanup(self.validator_patcher.stop)
 
-    @mock.patch("program_management.ddd.service.detach_node_service.detach_node")
+    @mock.patch("program_management.ddd.service.write.detach_node_service.detach_node")
     def test_should_initialize_path_from_get_parameters_path_value_when_initializing_form(self, mock):
         response = self.client.get(self.url, data={'path': self.path_to_detach})
         self.assertTemplateUsed(response, 'tree/detach_confirmation_inner.html')
@@ -99,7 +99,7 @@ class TestDetachNodeView(TestCase):
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, "tree/detach_confirmation_inner.html")
 
-    @mock.patch("program_management.ddd.service.detach_node_service.detach_node")
+    @mock.patch("program_management.ddd.service.write.detach_node_service.detach_node")
     def test_detach_case_post_success(self, mock_service):
         mock_service.return_value = link.LinkIdentity(
             parent_code=self.group_element_year.parent.partial_acronym,
@@ -120,7 +120,7 @@ class TestDetachNodeView(TestCase):
         self.assertEqual(list(get_messages(response.wsgi_request))[0].level, MSG.SUCCESS)
         self.assertTrue(mock_service.called)
 
-    @mock.patch("program_management.ddd.service.detach_node_service.detach_node")
+    @mock.patch("program_management.ddd.service.write.detach_node_service.detach_node")
     def test_detach_when_element_is_in_clipboard(self, mock_service):
         mock_service.return_value = link.LinkIdentity(
             parent_code=self.group_element_year.parent.partial_acronym,
