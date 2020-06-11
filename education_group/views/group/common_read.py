@@ -44,6 +44,7 @@ from base.utils.cache import ElementCache
 from base.views.common import display_warning_messages
 from education_group.forms.academic_year_choices import get_academic_year_choices
 from education_group.models.group_year import GroupYear
+from education_group.views.mixin import ElementSelectedClipBoardMixin
 from education_group.views.proxy import read
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd.business_types import *
@@ -58,7 +59,7 @@ from program_management.serializers.program_tree_view import program_tree_view_s
 Tab = read.Tab  # FIXME :: fix imports (and remove this line)
 
 
-class GroupRead(PermissionRequiredMixin, TemplateView):
+class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, TemplateView):
     # PermissionRequiredMixin
     permission_required = 'base.view_educationgroup'
     raise_exception = True
@@ -96,16 +97,6 @@ class GroupRead(PermissionRequiredMixin, TemplateView):
             ).format(root=root_node)
             display_warning_messages(self.request, message)
             return root_node
-
-    def get_selected_element_clipboard_message(self) -> str:
-        element_selected = element_selected_service.retrieve_element_selected(self.request.user.id)
-        if not element_selected:
-            return ""
-        return "<strong>{clipboard_title}</strong><br>{object_str}".format(
-            clipboard_title=_("Cut element") if element_selected["action"] == ElementCache.ElementCacheAction.CUT
-            else _("Copied element"),
-            object_str="{} - {}".format(element_selected["element_code"], element_selected["element_year"])
-        )
 
     def get_context_data(self, **kwargs):
         can_change_education_group = self.request.user.has_perm(

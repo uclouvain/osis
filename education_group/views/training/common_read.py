@@ -26,7 +26,6 @@
 import functools
 import json
 from collections import OrderedDict
-from enum import Enum
 
 from django.http import Http404
 from django.urls import reverse
@@ -35,37 +34,34 @@ from django.utils.text import capfirst
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 
-from base.utils.cache import ElementCache
-from base.views.common import display_warning_messages
-from education_group.forms.academic_year_choices import get_academic_year_choices
-from education_group.forms.tree_version_choices import get_tree_versions_choices
-from education_group.views.proxy import read
-from program_management.ddd.business_types import *
-from education_group.ddd.business_types import *
-
 from base import models as mdl
-from education_group.ddd.domain.service.identity_search import TrainingIdentitySearch
 from base.business.education_groups import general_information_sections
 from base.business.education_groups.general_information_sections import \
     MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION
 from base.models import academic_year
 from base.models.enums.education_group_types import TrainingType
+from base.views.common import display_warning_messages
+from education_group.ddd.business_types import *
+from education_group.ddd.domain.service.identity_search import TrainingIdentitySearch
+from education_group.forms.academic_year_choices import get_academic_year_choices
+from education_group.forms.tree_version_choices import get_tree_versions_choices
+from education_group.views.mixin import ElementSelectedClipBoardMixin
+from education_group.views.proxy import read
 from osis_role.contrib.views import PermissionRequiredMixin
+from program_management.ddd.business_types import *
 from program_management.ddd.domain.node import NodeIdentity, NodeNotFoundException
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories import load_tree
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
+from program_management.forms.custom_xls import CustomXlsForm
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.models.element import Element
 from program_management.serializers.program_tree_view import program_tree_view_serializer
-from program_management.forms.custom_xls import CustomXlsForm
-from program_management.ddd.service.read import element_selected_service
-
 
 Tab = read.Tab  # FIXME :: fix imports (and remove this line)
 
 
-class TrainingRead(PermissionRequiredMixin, TemplateView):
+class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, TemplateView):
     # PermissionRequiredMixin
     permission_required = 'base.view_educationgroup'
     raise_exception = True
@@ -126,17 +122,6 @@ class TrainingRead(PermissionRequiredMixin, TemplateView):
             ).format(root=root_node)
             display_warning_messages(self.request, message)
             return root_node
-
-    #  FIXME duplicate code
-    def get_selected_element_clipboard_message(self) -> str:
-        element_selected = element_selected_service.retrieve_element_selected(self.request.user.id)
-        if not element_selected:
-            return ""
-        return "<strong>{clipboard_title}</strong><br>{object_str}".format(
-            clipboard_title=_("Cut element") if element_selected["action"] == ElementCache.ElementCacheAction.CUT
-            else _("Copied element"),
-            object_str="{} - {}".format(element_selected["element_code"], element_selected["element_year"])
-        )
 
     def get_context_data(self, **kwargs):
         return {
