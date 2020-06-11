@@ -88,7 +88,6 @@ class PasteElementCommand(interface.CommandRequest):
             node_to_paste_code: str,
             node_to_paste_year: int,
             path_where_to_paste: 'Path',
-            commit: bool,
             access_condition: Optional[bool],
             is_mandatory: Optional[bool],
             block: Optional[int],
@@ -101,7 +100,6 @@ class PasteElementCommand(interface.CommandRequest):
         self.node_to_paste_code = node_to_paste_code
         self.node_to_paste_year = node_to_paste_year
         self.path_where_to_paste = path_where_to_paste
-        self.commit = commit
         self.access_condition = access_condition
         self.is_mandatory = is_mandatory
         self.block = block

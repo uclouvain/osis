@@ -81,7 +81,7 @@ class TestPasteNode(SimpleTestCase, ValidatorPatcherMixin):
         self.mock_load.return_value = self.node_to_paste
 
     @patch.object(program_tree.ProgramTree, 'paste_node')
-    def test_should_return_link_identity_and_not_persist_when_paste_valid_and_commit_false(self, mock_attach_node):
+    def test_should_return_link_identity_and_persist_when_paste_valid(self, mock_attach_node):
         mock_attach_node.return_value = LinkFactory(parent=self.root_node, child=self.node_to_paste)
         result = program_management.ddd.service.write.paste_element_service.paste_element(self.paste_command)
         expected_result = link.LinkIdentity(
@@ -92,7 +92,7 @@ class TestPasteNode(SimpleTestCase, ValidatorPatcherMixin):
         )
 
         self.assertEqual(result, expected_result)
-        self.assertFalse(self.mock_persist.called)
+        self.assertTrue(self.mock_persist.called)
 
     @patch.object(program_tree.ProgramTree, 'paste_node')
     def test_should_propagate_exception_when_paste_raises_one(self, mock_attach_node):
@@ -100,17 +100,6 @@ class TestPasteNode(SimpleTestCase, ValidatorPatcherMixin):
 
         with self.assertRaises(business_validator.BusinessExceptions):
             program_management.ddd.service.write.paste_element_service.paste_element(self.paste_command)
-
-    def test_when_commit_is_true_then_persist_modification(self):
-        self.mock_validator(PasteNodeValidatorList, [_('Success message')], level=MessageLevel.SUCCESS)
-        paste_command_with_commit_set_to_true = PasteElementCommandFactory(
-            node_to_paste_code=self.node_to_paste.code,
-            node_to_paste_year=self.node_to_paste.year,
-            path_where_to_paste=str(self.tree.root_node.node_id),
-            commit=True
-        )
-        paste_element_service.paste_element(paste_command_with_commit_set_to_true)
-        self.assertTrue(self.mock_persist.called)
 
     @patch.object(program_tree.ProgramTree, 'detach_node')
     @patch("program_management.ddd.service.tree_service.search_trees_using_node")

@@ -33,7 +33,6 @@ from program_management.ddd.validators._detach_option_2M import DetachOptionVali
 
 def paste_element(paste_command: command.PasteElementCommand) -> 'LinkIdentity':
     node_identity = node.NodeIdentity(code=paste_command.node_to_paste_code, year=paste_command.node_to_paste_year)
-    commit = paste_command.commit
     path_to_detach = paste_command.path_where_to_detach
     root_id = int(paste_command.path_where_to_paste.split("|")[0])
     tree = load_tree.load(root_id)
@@ -50,7 +49,6 @@ def paste_element(paste_command: command.PasteElementCommand) -> 'LinkIdentity':
         DetachOptionValidator(tree_to_detach, path_to_detach, other_trees_using_node).validate()
         tree_to_detach.detach_node(path_to_detach)
 
-    if commit:
-        persist_tree.persist(tree)
+    persist_tree.persist(tree)
 
     return link_created.entity_id
