@@ -245,6 +245,7 @@ class ProgramTree(interface.RootEntity):
         Add a node to the tree
         :param node_to_paste: Node to paste into the tree
         :param paste_command: a paste node command
+        :return: the created link
         """
         validator = validators_by_business_action.PasteNodeValidatorList(self, node_to_paste, paste_command)
         validator.validate()
@@ -289,7 +290,7 @@ class ProgramTree(interface.RootEntity):
         """
         Detach a node from tree
         :param path_to_node_to_detach: The path node to detach
-        :return:
+        :return: the suppressed link
         """
         PathValidator(path_to_node_to_detach).validate()
 
