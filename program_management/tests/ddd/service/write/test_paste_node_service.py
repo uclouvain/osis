@@ -87,7 +87,8 @@ class TestPasteNode(SimpleTestCase, ValidatorPatcherMixin):
         expected_result = link.LinkIdentity(
             parent_code=self.root_node.code,
             child_code=self.node_to_paste.code,
-            year=self.root_node.year
+            parent_year=self.root_node.year,
+            child_year=self.node_to_paste.year
         )
 
         self.assertEqual(result, expected_result)

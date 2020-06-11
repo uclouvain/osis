@@ -32,17 +32,19 @@ from program_management.models.enums.node_type import NodeType
 
 
 class LinkIdentity(interface.EntityIdentity):
-    def __init__(self, parent_code: str, child_code: str, year: int):
+    def __init__(self, parent_code: str, child_code: str, parent_year: int, child_year: int):
         self.parent_code = parent_code
+        self.parent_year = parent_year
         self.child_code = child_code
-        self.year = year
+        self.child_year = child_year
 
     def __hash__(self):
-        return hash((self.parent_code, self.child_code, self.year))
+        return hash((self.parent_code, self.child_code, self.parent_year, self.child_year))
 
     def __eq__(self, other):
         if isinstance(other, LinkIdentity):
-            return (self.parent_code, self.child_code, self.year) == (other.parent_code, other.child_code, other.year)
+            return (self.parent_code, self.child_code, self.parent_year, self.child_year) == \
+                   (other.parent_code, other.child_code, other.parent_year, other.child_year)
         return False
 
 
@@ -83,7 +85,9 @@ class Link(interface.Entity):
         self.order = order
         self._has_changed = False
         if parent and child:
-            super().__init__(entity_id=LinkIdentity(self.parent.code, self.child.code, self.parent.year))
+            super().__init__(
+                entity_id=LinkIdentity(self.parent.code, self.child.code, self.parent.year, self.child.year)
+            )
 
     @property
     def has_changed(self):

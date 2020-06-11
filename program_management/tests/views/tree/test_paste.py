@@ -176,7 +176,8 @@ class TestPasteNodeView(TestCase):
         mock_service.return_value = link.LinkIdentity(
             parent_code=self.tree.root_node.children[1].child.code,
             child_code=subgroup_to_attach.code,
-            year=self.tree.root_node.children[1].child.year
+            parent_year=self.tree.root_node.children[1].child.year,
+            child_year=subgroup_to_attach.year
         )
 
         # To path :  BIR1BA ---> LBIR101G
@@ -258,7 +259,8 @@ class TestPasteWithCutView(TestCase):
         mock_paste_service.return_value = link.LinkIdentity(
             parent_code=self.group_element_year.parent_element.group_year.partial_acronym,
             child_code=self.group_element_year.child_element.group_year.partial_acronym,
-            year=self.academic_year
+            parent_year=self.academic_year.year,
+            child_year=self.academic_year.year
         )
         detach_path = "|".join(
             [str(self.group_element_year.parent_element.id), str(self.group_element_year.child_element.id)]

@@ -104,7 +104,8 @@ class TestDetachNodeView(TestCase):
         mock_service.return_value = link.LinkIdentity(
             parent_code=self.group_element_year.parent.partial_acronym,
             child_code=self.group_element_year.child_branch.partial_acronym,
-            year=self.group_element_year.parent.academic_year.year
+            parent_year=self.group_element_year.parent.academic_year.year,
+            child_year=self.group_element_year.child_branch.academic_year.year
         )
 
         response = self.client.post(
@@ -124,7 +125,8 @@ class TestDetachNodeView(TestCase):
         mock_service.return_value = link.LinkIdentity(
             parent_code=self.group_element_year.parent.partial_acronym,
             child_code=self.group_element_year.child_branch.partial_acronym,
-            year=self.group_element_year.parent.academic_year.year
+            parent_year=self.group_element_year.parent.academic_year.year,
+            child_year=self.group_element_year.child_branch.academic_year.year
         )
         ElementCache(self.person.user).save_element_selected(
             element_code=self.group_element_year.child_branch.partial_acronym,

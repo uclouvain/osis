@@ -226,7 +226,8 @@ def __build_children(
         link_node.entity_id = LinkIdentity(
             parent_code=link_node.parent.code,
             child_code=link_node.child.code,
-            year=link_node.parent.year
+            parent_year=link_node.parent.year,
+            child_year=link_node.child.year
         )
         children.append(link_node)
     return children
