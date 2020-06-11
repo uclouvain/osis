@@ -25,9 +25,36 @@
 ##############################################################################
 import collections
 
-from osis_common.ddd import interface
+from django.test import SimpleTestCase
+
+from education_group.ddd.domain.group import GroupIdentity
+from education_group.ddd.factories.group import GroupFactory
 
 
-class GetGroupCommand(collections.namedtuple("GetGroupCommand", "code, year"),
-                      interface.CommandRequest):
-    pass
+class TestGroupIdentity(SimpleTestCase):
+    def test_assert_equals(self):
+        group_identity_1 = GroupIdentity(code="LTONC1000", year=2010)
+        group_identity_2 = GroupIdentity(code="LTONC1000", year=2010)
+
+        self.assertEqual(group_identity_1, group_identity_2)
+
+    def test_assert_object_is_hashable(self):
+        group_identity_1 = GroupIdentity(code="LTONC1000", year=2010)
+        self.assertIsInstance(group_identity_1, collections.Hashable)
+
+
+class TestGroup(SimpleTestCase):
+    def setUp(self):
+        self.group = GroupFactory()
+
+    def test_assert_code_property(self):
+        self.assertEqual(
+            self.group.code,
+            self.group.entity_id.code
+        )
+
+    def test_assert_year_property(self):
+        self.assertEqual(
+            self.group.year,
+            self.group.entity_id.year
+        )
