@@ -35,7 +35,7 @@ class TestReverseUrlWithGet(SimpleTestCase):
         )
 
     def test_should_append_get_parameters_when_get_parameter_are_set(self):
-        self.assertEqual(
+        self.assertURLEqual(
             reverse("home") + "?name=value&other=slop",
             reverse_with_get("home", get={"name": "value", "other": "slop"})
         )
