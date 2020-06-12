@@ -63,6 +63,10 @@ class NodeGroupYearFactory(NodeFactory):
         abstract = False
 
     node_type = factory.fuzzy.FuzzyChoice(TrainingType)
+    group_title_fr = factory.fuzzy.FuzzyText(length=240)
+    group_title_en = factory.fuzzy.FuzzyText(length=240)
+    remark_fr = factory.fuzzy.FuzzyText(length=240)
+    remark_en = factory.fuzzy.FuzzyText(length=240)
     offer_title_fr = factory.fuzzy.FuzzyText(length=240)
     offer_title_en = factory.fuzzy.FuzzyText(length=240)
     offer_partial_title_fr = factory.fuzzy.FuzzyText(length=240)
