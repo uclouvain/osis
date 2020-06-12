@@ -25,7 +25,7 @@
 ##############################################################################
 import copy
 from collections import Counter
-from typing import List, Set, Tuple, Optional
+from typing import List, Set, Optional
 
 from base.models.authorized_relationship import AuthorizedRelationshipList
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, GroupType
@@ -34,9 +34,8 @@ from osis_common.decorators.deprecated import deprecated
 from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import prerequisite
-from program_management.ddd.validators._detach_root import DetachRootValidator
-from program_management.ddd.validators._path_validator import PathValidator
 from program_management.ddd.validators import validators_by_business_action
+from program_management.ddd.validators._path_validator import PathValidator
 from program_management.models.enums import node_type
 from program_management.models.enums.node_type import NodeType
 

@@ -21,7 +21,7 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from unittest.mock import patch
+from unittest.mock import Mock
 
 from django.test import SimpleTestCase
 from django.utils.translation import gettext as _
@@ -45,70 +45,87 @@ class TestValidateEndDateAndOptionFinality(TestValidatorValidateMixin, Validator
         self.root_path = str(self.root_node.node_id)
         self.node_to_attach_not_finality = NodeGroupYearFactory(node_type=TrainingType.BACHELOR)
 
-        self._patch_load_tree()
+        self.mock_repository = self._mock_repository()
 
-    def _patch_load_tree(self):
-        patcher_load = patch("program_management.ddd.repositories.load_tree.load")
-        self.addCleanup(patcher_load.stop)
-        self.mock_load_tree_to_attach = patcher_load.start()
-        self.mock_load_tree_to_attach.return_value = ProgramTreeFactory(root_node=self.node_to_attach_not_finality)
+    def _mock_repository(self):
+        mock = Mock()
+        attrs = {
+            "get.return_value": ProgramTreeFactory(root_node=self.node_to_attach_not_finality)
+        }
+        mock.configure_mock(**attrs)
+        return mock
 
-    @patch('program_management.ddd.repositories.load_tree.load_trees_from_children')
-    def test_should_not_raise_exception_when_node_to_attach_is_not_finality(self, mock_load_2m_trees):
+    def test_should_not_raise_exception_when_node_to_attach_is_not_finality(self):
         """Unit test only for performance"""
         self.mock_validator(AttachFinalityEndDateValidator, [_('Success message')], level=MessageLevel.SUCCESS)
 
         self.assertValidatorNotRaises(
-            _validate_end_date_and_option_finality.ValidateEndDateAndOptionFinality(self.node_to_attach_not_finality)
+            _validate_end_date_and_option_finality.ValidateEndDateAndOptionFinality(
+                self.node_to_attach_not_finality,
+                self.mock_repository
+            )
         )
-        self.assertFalse(mock_load_2m_trees.called)
+        self.assertFalse(self.mock_repository.search_from_children.called)
 
-    @patch('program_management.ddd.repositories.load_tree.load_trees_from_children')
-    def test_shoudl_raise_exception_when_end_date_of_finality_node_to_attach_is_not_valid(self, mock_load_2m_trees):
-        mock_load_2m_trees.return_value = [self.tree_2m]
+    def test_should_raise_exception_when_end_date_of_finality_node_to_attach_is_not_valid(self):
         node_to_attach = NodeGroupYearFactory(node_type=TrainingType.MASTER_MA_120)
-        self.mock_load_tree_to_attach.return_value = ProgramTreeFactory(root_node=node_to_attach)
+        attrs = {
+            "search_from_children.return_value": [self.tree_2m],
+            "get.return_value": ProgramTreeFactory(root_node=node_to_attach)
+        }
+        self.mock_repository.configure_mock(**attrs)
         self.mock_validator(AttachFinalityEndDateValidator, [_('Error end date finality message')])
 
         self.assertValidatorRaises(
-            _validate_end_date_and_option_finality.ValidateEndDateAndOptionFinality(node_to_attach),
+            _validate_end_date_and_option_finality.ValidateEndDateAndOptionFinality(
+                node_to_attach,
+                self.mock_repository
+            ),
             [_('Error end date finality message')]
         )
 
-    @patch('program_management.ddd.repositories.load_tree.load_trees_from_children')
-    def test_shoudl_raise_exception_when_end_date_of_finality_children_of_node_to_attach_is_not_valid(
-            self,
-            mock_load_2m_trees
-    ):
-        mock_load_2m_trees.return_value = [self.tree_2m]
+    def test_should_raise_exception_when_end_date_of_finality_children_of_node_to_attach_is_not_valid(self):
         not_finality = NodeGroupYearFactory(node_type=TrainingType.AGGREGATION)
         finality = NodeGroupYearFactory(node_type=TrainingType.MASTER_MA_120)
         not_finality.add_child(finality)
-        self.mock_load_tree_to_attach.return_value = ProgramTreeFactory(root_node=not_finality)
+        attrs = {
+            "search_from_children.return_value": [self.tree_2m],
+            "get.return_value": ProgramTreeFactory(root_node=not_finality)
+        }
+        self.mock_repository.configure_mock(**attrs)
         self.mock_validator(AttachFinalityEndDateValidator, [_('Error end date finality message')])
 
         self.assertValidatorRaises(
-            _validate_end_date_and_option_finality.ValidateEndDateAndOptionFinality(not_finality),
+            _validate_end_date_and_option_finality.ValidateEndDateAndOptionFinality(not_finality, self.mock_repository),
             [_('Error end date finality message')]
         )
 
-    @patch('program_management.ddd.repositories.load_tree.load_trees_from_children')
-    def test_should_not_raise_exception_when_end_date_of_finality_node_to_attach_is_valid(self, mock_load_2m_trees):
-        mock_load_2m_trees.return_value = [self.tree_2m]
+    def test_should_not_raise_exception_when_end_date_of_finality_node_to_attach_is_valid(self):
         finality = NodeGroupYearFactory(node_type=TrainingType.MASTER_MA_120)
-        self.mock_load_tree_to_attach.return_value = ProgramTreeFactory(root_node=finality)
+        attrs = {
+            "search_from_children.return_value": [self.tree_2m],
+            "get.return_value": ProgramTreeFactory(root_node=finality)
+        }
+        self.mock_repository.configure_mock(**attrs)
         self.mock_validator(AttachFinalityEndDateValidator, [_('Success')], level=MessageLevel.SUCCESS)
 
-        self.assertValidatorNotRaises(_validate_end_date_and_option_finality.ValidateEndDateAndOptionFinality(finality))
+        self.assertValidatorNotRaises(
+            _validate_end_date_and_option_finality.ValidateEndDateAndOptionFinality(finality, self.mock_repository)
+        )
 
-    @patch('program_management.ddd.repositories.load_tree.load_trees_from_children')
-    def test_should_raise_exception_when_option_validator_not_valid(self, mock_load_2m_trees):
-        mock_load_2m_trees.return_value = [self.tree_2m]
+    def test_should_raise_exception_when_option_validator_not_valid(self):
         node_to_attach = NodeGroupYearFactory(node_type=TrainingType.MASTER_MA_120)
-        self.mock_load_tree_to_attach.return_value = ProgramTreeFactory(root_node=node_to_attach)
+        attrs = {
+            "search_from_children.return_value": [self.tree_2m],
+            "get.return_value": ProgramTreeFactory(root_node=node_to_attach)
+        }
+        self.mock_repository.configure_mock(**attrs)
         self.mock_validator(AttachOptionsValidator, [_('Error attach option message')])
 
         self.assertValidatorRaises(
-            _validate_end_date_and_option_finality.ValidateEndDateAndOptionFinality(node_to_attach),
+            _validate_end_date_and_option_finality.ValidateEndDateAndOptionFinality(
+                node_to_attach,
+                self.mock_repository
+            ),
             None
         )

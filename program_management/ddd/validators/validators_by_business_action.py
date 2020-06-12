@@ -46,7 +46,7 @@ from program_management.ddd.validators._minimum_editable_year import \
     MinimumEditableYearValidator
 from program_management.ddd.validators._prerequisite_expression_syntax import PrerequisiteExpressionSyntaxValidator
 from program_management.ddd.validators._prerequisites_items import PrerequisiteItemsValidator
-from program_management.ddd.validators._validate_end_date_and_option_finality import ValidateEndDateAndOptionFinality
+from program_management.ddd.validators import _validate_end_date_and_option_finality
 from program_management.ddd.validators.link import CreateLinkValidatorList
 
 
@@ -69,7 +69,7 @@ class PasteNodeValidatorList(business_validator.BusinessListValidator):
                 InfiniteRecursivityTreeValidator(tree, node_to_paste, path),
                 AuthorizedLinkTypeValidator(tree.root_node, node_to_paste, link_type),
                 BlockValidator(block),
-                ValidateEndDateAndOptionFinality(node_to_paste),
+                _validate_end_date_and_option_finality.ValidateEndDateAndOptionFinality(node_to_paste),
                 ValidateAuthorizedRelationshipForAllTrees(tree, node_to_paste, path)
             ]
 

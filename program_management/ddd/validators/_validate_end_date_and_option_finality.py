@@ -24,23 +24,28 @@
 import osis_common.ddd.interface
 from base.ddd.utils import business_validator
 from program_management.ddd.business_types import *
-from program_management.ddd.repositories import load_tree
+from program_management.ddd.domain import program_tree as program_tree_domain
 from program_management.ddd.validators import _attach_finality_end_date
 from program_management.ddd.validators import _attach_option
 
 
 class ValidateEndDateAndOptionFinality(business_validator.BusinessValidator):
-    def __init__(self, node_to_paste: 'Node'):
+    def __init__(self, node_to_paste: 'Node', tree_repository: 'ProgramTreeRepository'):
         super().__init__()
         self.node_to_paste = node_to_paste
+        self.tree_repository = tree_repository
 
     def validate(self, *args, **kwargs):
-        tree = load_tree.load(self.node_to_paste.node_id)
-        finality_ids = [n.node_id for n in tree.get_all_finalities()]
+        tree_identity = program_tree_domain.ProgramTreeIdentity(
+            code=self.node_to_paste.code,
+            year=self.node_to_paste.academic_year.year
+        )
+        tree = self.tree_repository.get(tree_identity)
+        finality_ids = [n.entity_id for n in tree.get_all_finalities()]
         messages = []
         if self.node_to_paste.is_finality() or finality_ids:
             trees_2m = [
-                tree for tree in load_tree.load_trees_from_children(child_branch_ids=finality_ids)
+                tree for tree in self.tree_repository.search_from_children(finality_ids)
                 if tree.is_master_2m()
             ]
             for tree_2m in trees_2m:
