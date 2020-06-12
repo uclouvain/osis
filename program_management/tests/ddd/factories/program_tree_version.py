@@ -61,7 +61,7 @@ class ProgramTreeVersionFactory(factory.Factory):
     program_tree_repository = ProgramTreeRepository()
     title_fr = factory.fuzzy.FuzzyText(length=240)
     title_en = factory.fuzzy.FuzzyText(length=240)
-    tree = factory.SubFactory(ProgramTreeFactory)
+    tree = None
 
 
 
