@@ -28,6 +28,8 @@ from typing import List
 
 from django.utils.translation import gettext_lazy as _
 
+import osis_common.ddd.interface
+from base.ddd.utils import business_validator
 from program_management.ddd.business_types import *
 from base.ddd.utils.business_validator import BusinessValidator
 
@@ -36,21 +38,7 @@ from base.ddd.utils.business_validator import BusinessValidator
 from program_management.models.enums.node_type import NodeType
 
 
-class HasOrIsPrerequisiteValidator(BusinessValidator):
-
-    def __init__(self, tree: 'ProgramTree', node_to_detach: 'NodeLearningUnitYear', path: 'Path'):
-        super(HasOrIsPrerequisiteValidator, self).__init__()
-        self.node_to_detach = node_to_detach
-        self.tree = tree
-
-    def validate(self):
-        if self.node_to_detach.is_prerequisite or self.node_to_detach.has_prerequisite:
-            self.add_error_message(
-                _("Cannot detach due to prerequisites.")
-            )
-
-
-class IsPrerequisiteValidator(BusinessValidator):
+class IsPrerequisiteValidator(business_validator.BusinessValidator):
 
     def __init__(self, tree: 'ProgramTree', node_to_detach: 'Node'):
         super(IsPrerequisiteValidator, self).__init__()
@@ -62,20 +50,20 @@ class IsPrerequisiteValidator(BusinessValidator):
         if nodes_that_are_prerequisites:
             codes_that_are_prerequisite = [node.code for node in nodes_that_are_prerequisites]
             if self.node_to_detach.is_learning_unit():
-                self.add_error_message(
+                raise osis_common.ddd.interface.BusinessExceptions([
                     _("Cannot detach learning unit %(acronym)s as it has a prerequisite or it is a prerequisite.") % {
                         "acronym": self.node_to_detach.code
                     }
-                )
+                ])
             else:
-                self.add_error_message(
+                raise osis_common.ddd.interface.BusinessExceptions([
                     _("Cannot detach education group year %(acronym)s as the following learning units "
                       "are prerequisite in %(formation)s: %(learning_units)s") % {
                         "acronym": self.node_to_detach.title,
                         "formation": self.tree.root_node.title,
                         "learning_units": ", ".join(codes_that_are_prerequisite)
                     }
-                )
+                ])
 
     def _get_nodes_that_are_prerequisite(self, search_under_node: 'Node'):
         nodes_that_are_prerequisites = []
@@ -92,7 +80,7 @@ class IsPrerequisiteValidator(BusinessValidator):
         return self.tree.count_usage(node_to_detach) > 1
 
 
-class HasPrerequisiteValidator(BusinessValidator):
+class HasPrerequisiteValidator(business_validator.BusinessValidator):
 
     def __init__(self, tree: 'ProgramTree', node_to_detach: 'Node'):
         super(HasPrerequisiteValidator, self).__init__()
@@ -103,13 +91,13 @@ class HasPrerequisiteValidator(BusinessValidator):
         nodes_that_has_prerequisites = self._get_nodes_that_has_prerequisite()
         if nodes_that_has_prerequisites:
             codes_that_have_prerequisites = [node.code for node in nodes_that_has_prerequisites]
-            self.add_warning_message(
+            raise osis_common.ddd.interface.BusinessExceptions([
                 _("The prerequisites for the following learning units contained in education group year "
                   "%(acronym)s will we deleted: %(learning_units)s") % {
                     "acronym": self.tree.root_node.title,
                     "learning_units": ", ".join(codes_that_have_prerequisites)
                 }
-            )
+            ])
 
     def _get_nodes_that_has_prerequisite(self):
         search_under_node = self.node_to_detach

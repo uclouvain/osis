@@ -21,15 +21,16 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-import collections
+from base.utils import cache
+from program_management.ddd import command
 
-AttachNodeCommand = collections.namedtuple(
-    "AttachNodeCommand",
-    "root_id, node_id_to_attach, type_of_node_to_attach, path_where_to_attach, commit,"
-    " access_condition, is_mandatory, block, link_type, comment, comment_english, relative_credits"
-)
 
-CheckAttachNodeCommand = collections.namedtuple(
-    "CheckAttachNodeCommand",
-    "root_id, nodes_to_attach, path_where_to_attach"
-)
+def cut_element_service(cut_command: command.CutElementCommand):
+    cache.ElementCache(
+        cut_command.user_id
+    ).save_element_selected(
+        element_code=cut_command.element_code,
+        element_year=cut_command.element_year,
+        path_to_detach=cut_command.path_to_detach,
+        action=cache.ElementCache.ElementCacheAction.CUT
+    )
