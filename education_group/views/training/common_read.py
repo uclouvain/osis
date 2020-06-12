@@ -26,7 +26,6 @@
 import functools
 import json
 from collections import OrderedDict
-from enum import Enum
 
 from django.http import Http404
 from django.urls import reverse

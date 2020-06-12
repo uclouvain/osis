@@ -584,7 +584,12 @@ table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:after, 
 .of_unversioned_field #hops_ares_authorization,
 .of_unversioned_field #co_graduation_inter_cfb,
 .of_unversioned_field #co_graduation_coefficient,
-.of_unversioned_field #keywords
+.of_unversioned_field #keywords,
+.of_unversioned_field #category,
+.of_unversioned_field #type_of_training,
+.of_unversioned_field #schedule_type,
+.of_unversioned_field #group_title_fr,
+.of_unversioned_field #group_title_en
 {
     color: grey;
 }
