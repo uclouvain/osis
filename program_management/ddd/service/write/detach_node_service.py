@@ -27,7 +27,7 @@
 from program_management.ddd import command
 from program_management.ddd.domain import link
 from program_management.ddd.domain.program_tree import PATH_SEPARATOR
-from program_management.ddd.repositories import load_tree, persist_tree
+from program_management.ddd.repositories import load_tree, persist_tree, program_tree
 from program_management.ddd.service import tree_service
 from program_management.ddd.validators._detach_option_2M import DetachOptionValidator
 
@@ -38,15 +38,8 @@ def detach_node(detach_command: command.DetachNodeCommand) -> link.LinkIdentity:
 
     root_id = int(path_to_detach.split(PATH_SEPARATOR)[0])
     working_tree = load_tree.load(root_id)
-    node_to_detach = working_tree.get_node(path_to_detach)
 
-    other_trees_using_node = [
-        tree for tree in tree_service.search_trees_using_node(node_to_detach) if tree != working_tree
-    ]
-
-    DetachOptionValidator(working_tree, path_to_detach, other_trees_using_node).validate()
-
-    deleted_link = working_tree.detach_node(path_to_detach)
+    deleted_link = working_tree.detach_node(path_to_detach, program_tree.ProgramTreeRepository())
 
     if commit:
         persist_tree.persist(working_tree)

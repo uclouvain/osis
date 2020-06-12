@@ -43,11 +43,7 @@ def paste_element(paste_command: command.PasteElementCommand) -> 'LinkIdentity':
     if path_to_detach:
         root_tree_to_detach = int(path_to_detach.split(PATH_SEPARATOR)[0])
         tree_to_detach = tree if root_tree_to_detach == root_id else load_tree.load(root_tree_to_detach)
-        other_trees_using_node = [
-            tree for tree in tree_service.search_trees_using_node(node_to_attach) if tree != tree_to_detach
-        ]
-        DetachOptionValidator(tree_to_detach, path_to_detach, other_trees_using_node).validate()
-        tree_to_detach.detach_node(path_to_detach)
+        tree_to_detach.detach_node(path_to_detach, program_tree.ProgramTreeRepository())
 
     persist_tree.persist(tree)
 

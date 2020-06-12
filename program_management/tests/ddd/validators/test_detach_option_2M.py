@@ -21,7 +21,10 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+from unittest import mock
+
 from django.test import SimpleTestCase
+from django.utils.translation import ngettext
 
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType
 from program_management.ddd.domain import program_tree
@@ -29,16 +32,21 @@ from program_management.ddd.validators._detach_option_2M import DetachOptionVali
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 from program_management.tests.ddd.validators.mixins import TestValidatorValidateMixin
-from django.utils.translation import ngettext
 
 
 class TestDetachOptionValidator(TestValidatorValidateMixin, SimpleTestCase):
+    def setUp(self) -> None:
+        self.mock_repository = mock.Mock()
+
     def test_should_not_raise_exception_when_node_to_detach_is_not_an_option_and_does_not_contain_options(self):
         working_tree = ProgramTreeFactory(root_node__node_type=TrainingType.PGRM_MASTER_120)
         link = LinkFactory(parent=working_tree.root_node, child__node_type=TrainingType.MASTER_MA_120)
         path_to_detach = program_tree.build_path(working_tree.root_node, link.child)
+        self.mock_repository.configure_mock(
+            **{"search_from_children.return_value": [working_tree]}
+        )
 
-        validator = DetachOptionValidator(working_tree, path_to_detach, [working_tree])
+        validator = DetachOptionValidator(working_tree, path_to_detach, self.mock_repository)
         self.assertValidatorNotRaises(validator)
 
     def test_should_raise_exception_when_node_to_detach_is_an_option_also_present_inside_finality(self):
@@ -49,7 +57,11 @@ class TestDetachOptionValidator(TestValidatorValidateMixin, SimpleTestCase):
 
         path_to_detach = program_tree.build_path(working_tree.root_node, link_root_option.child)
 
-        validator = DetachOptionValidator(working_tree, path_to_detach, [working_tree])
+        self.mock_repository.configure_mock(
+            **{"search_from_children.return_value": [working_tree]}
+        )
+
+        validator = DetachOptionValidator(working_tree, path_to_detach, self.mock_repository)
         expected_message = ngettext(
             "Option \"%(acronym)s\" cannot be detach because it is contained in"
             " %(finality_acronym)s program.",

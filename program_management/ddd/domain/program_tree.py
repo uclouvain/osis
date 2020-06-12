@@ -292,17 +292,23 @@ class ProgramTree(interface.RootEntity):
         validator = validators_by_business_action.UpdatePrerequisiteValidatorList(prerequisite_expression, node, self)
         return validator.is_valid(), validator.messages
 
-    def detach_node(self, path_to_node_to_detach: Path) -> 'Link':
+    def detach_node(self, path_to_node_to_detach: Path, tree_repository: 'ProgramTreeRepository') -> 'Link':
         """
         Detach a node from tree
         :param path_to_node_to_detach: The path node to detach
+        :param tree_repository: a tree repository
         :return: the suppressed link
         """
         PathValidator(path_to_node_to_detach).validate()
 
         node_to_detach = self.get_node(path_to_node_to_detach)
         parent_path, *__ = path_to_node_to_detach.rsplit(PATH_SEPARATOR, 1)
-        validators_by_business_action.DetachNodeValidatorList(self, node_to_detach, parent_path).validate()
+        validators_by_business_action.DetachNodeValidatorList(
+            self,
+            node_to_detach,
+            parent_path,
+            tree_repository
+        ).validate()
 
         self.remove_prerequisites(node_to_detach, parent_path)
         parent = self.get_node(parent_path)

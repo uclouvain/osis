@@ -24,7 +24,6 @@
 #
 ##############################################################################
 from collections import Counter
-from typing import List
 
 from django.utils.translation import ngettext
 
@@ -43,17 +42,13 @@ class DetachOptionValidator(business_validator.BusinessValidator):
             self,
             working_tree: 'ProgramTree',
             path_to_node_to_detach: 'Path',
-            trees_using_node: List['ProgramTree']
+            tree_repository: 'ProgramTreeRepository'
     ):
         super(DetachOptionValidator, self).__init__()
         self.working_tree = working_tree
         self.path_to_node_to_detach = path_to_node_to_detach
         self.node_to_detach = working_tree.get_node(path_to_node_to_detach)
-        self.trees_2m = [
-            tree for tree in trees_using_node if tree.is_master_2m()
-        ]
-        for tree in self.trees_2m:
-            assert tree.get_node_by_id_and_type(self.node_to_detach.node_id, self.node_to_detach.type)
+        self.tree_repository = tree_repository
 
     def get_options_to_detach(self):
         result = []
@@ -63,10 +58,15 @@ class DetachOptionValidator(business_validator.BusinessValidator):
         return result
 
     def validate(self):
+        trees_2m = [
+            tree for tree in self.tree_repository.search_from_children(node_ids=[self.node_to_detach.entity_id])
+            if tree.is_master_2m()
+        ]
+
         error_messages = []
         options_to_detach = self.get_options_to_detach()
         if options_to_detach and not self._is_inside_finality():
-            for tree_2m in self.trees_2m:
+            for tree_2m in trees_2m:
                 counter_options = Counter(tree_2m.get_2m_option_list())
                 counter_options.subtract(options_to_detach)
                 options_to_check = [opt for opt, count in counter_options.items() if count == 0]

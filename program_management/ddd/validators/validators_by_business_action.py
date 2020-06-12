@@ -143,7 +143,12 @@ class CheckPasteNodeValidatorList(business_validator.BusinessListValidator):
 
 class DetachNodeValidatorList(business_validator.BusinessListValidator):
 
-    def __init__(self, tree: 'ProgramTree', node_to_detach: 'Node', path_to_parent: 'Path'):
+    def __init__(
+            self,
+            tree: 'ProgramTree',
+            node_to_detach: 'Node',
+            path_to_parent: 'Path',
+            tree_repository: 'ProgramTreeRepository') -> None:
         detach_from = tree.get_node(path_to_parent)
 
         if node_to_detach.is_group_or_mini_or_training():
@@ -153,7 +158,7 @@ class DetachNodeValidatorList(business_validator.BusinessListValidator):
                 MinimumEditableYearValidator(tree),
                 DetachAuthorizedRelationshipValidator(tree, node_to_detach, detach_from),
                 IsPrerequisiteValidator(tree, node_to_detach),
-                DetachOptionValidator(tree, path_to_node_to_detach, [tree]),
+                DetachOptionValidator(tree, path_to_node_to_detach, tree_repository),
             ]
 
         elif node_to_detach.is_learning_unit():

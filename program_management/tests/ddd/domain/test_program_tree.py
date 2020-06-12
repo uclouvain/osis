@@ -678,7 +678,7 @@ class TestDetachNode(SimpleTestCase):
         LinkFactory(parent=tree.root_node)
         path_to_detach = "Invalid path"
         with self.assertRaises(osis_common.ddd.interface.BusinessExceptions):
-            tree.detach_node(path_to_detach)
+            tree.detach_node(path_to_detach, mock.Mock())
 
     @patch.object(DetachNodeValidatorList, 'validate')
     def test_should_remove_prerequisites_and_delete_link_when_validator_do_not_raise_exception(
@@ -700,7 +700,7 @@ class TestDetachNode(SimpleTestCase):
         LinkFactory(parent=tree.root_node, child=node_that_is_prerequisite)
         link = LinkFactory(parent=tree.root_node, child=node_that_has_prerequisite)
         path_to_detach = build_path(link.parent, link.child)
-        deleted_link = tree.detach_node(path_to_detach)
+        deleted_link = tree.detach_node(path_to_detach, mock.Mock())
 
         self.assertNotIn(deleted_link, tree.root_node.children)
         self.assertListEqual(node_that_has_prerequisite.prerequisite.get_all_prerequisite_items(), [])
@@ -714,7 +714,7 @@ class TestDetachNode(SimpleTestCase):
         path_to_detach = build_path(link.parent, link.child)
 
         with self.assertRaises(osis_common.ddd.interface.BusinessExceptions) as exception_context:
-            tree.detach_node(path_to_detach)
+            tree.detach_node(path_to_detach, mock.Mock())
 
         self.assertListEqual(
             exception_context.exception.messages,

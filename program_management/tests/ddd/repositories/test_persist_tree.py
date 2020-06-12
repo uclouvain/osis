@@ -113,7 +113,8 @@ class TestPersistTree(TestCase):
         self.assertTrue(mock.called, assertion_msg)
 
     @patch.object(DetachNodeValidatorList, 'validate')
-    def test_delete_when_1_link_has_been_deleted(self, mock):
+    def test_delete_when_1_link_has_been_deleted(self, mock_detach):
+        mock_detach.return_value = None
         GroupElementYearFactory(parent_element=self.root_group, child_element=self.common_core_element)
         node_to_detach = self.common_core_node
         qs_link_will_be_detached = GroupElementYear.objects.filter(child_element_id=node_to_detach.pk)
@@ -122,7 +123,7 @@ class TestPersistTree(TestCase):
         tree = load_tree.load(self.root_node.node_id)
 
         path_to_detach = "|".join([str(self.root_node.pk), str(node_to_detach.pk)])
-        tree.detach_node(path_to_detach)
+        tree.detach_node(path_to_detach, mock.Mock())
         persist_tree.persist(tree)
         self.assertEqual(qs_link_will_be_detached.count(), 0)
 
