@@ -57,7 +57,7 @@ class TestValidateEndDateAndOptionFinality(TestValidatorValidateMixin, Validator
 
     def test_should_not_raise_exception_when_node_to_attach_is_not_finality(self):
         """Unit test only for performance"""
-        self.mock_validator(AttachFinalityEndDateValidator, [_('Success message')], level=MessageLevel.SUCCESS)
+        self.mock_validator(AttachFinalityEndDateValidator, ['Success message'], level=MessageLevel.SUCCESS)
 
         self.assertValidatorNotRaises(
             _validate_end_date_and_option_finality.ValidateEndDateAndOptionFinality(
@@ -74,14 +74,14 @@ class TestValidateEndDateAndOptionFinality(TestValidatorValidateMixin, Validator
             "get.return_value": ProgramTreeFactory(root_node=node_to_attach)
         }
         self.mock_repository.configure_mock(**attrs)
-        self.mock_validator(AttachFinalityEndDateValidator, [_('Error end date finality message')])
+        self.mock_validator(AttachFinalityEndDateValidator, ['Error end date finality message'])
 
         self.assertValidatorRaises(
             _validate_end_date_and_option_finality.ValidateEndDateAndOptionFinality(
                 node_to_attach,
                 self.mock_repository
             ),
-            [_('Error end date finality message')]
+            ['Error end date finality message']
         )
 
     def test_should_raise_exception_when_end_date_of_finality_children_of_node_to_attach_is_not_valid(self):
@@ -93,11 +93,11 @@ class TestValidateEndDateAndOptionFinality(TestValidatorValidateMixin, Validator
             "get.return_value": ProgramTreeFactory(root_node=not_finality)
         }
         self.mock_repository.configure_mock(**attrs)
-        self.mock_validator(AttachFinalityEndDateValidator, [_('Error end date finality message')])
+        self.mock_validator(AttachFinalityEndDateValidator, ['Error end date finality message'])
 
         self.assertValidatorRaises(
             _validate_end_date_and_option_finality.ValidateEndDateAndOptionFinality(not_finality, self.mock_repository),
-            [_('Error end date finality message')]
+            ['Error end date finality message']
         )
 
     def test_should_not_raise_exception_when_end_date_of_finality_node_to_attach_is_valid(self):
@@ -120,7 +120,7 @@ class TestValidateEndDateAndOptionFinality(TestValidatorValidateMixin, Validator
             "get.return_value": ProgramTreeFactory(root_node=node_to_attach)
         }
         self.mock_repository.configure_mock(**attrs)
-        self.mock_validator(AttachOptionsValidator, [_('Error attach option message')])
+        self.mock_validator(AttachOptionsValidator, ['Error attach option message'])
 
         self.assertValidatorRaises(
             _validate_end_date_and_option_finality.ValidateEndDateAndOptionFinality(
