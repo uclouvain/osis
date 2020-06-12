@@ -50,7 +50,7 @@
                                 </thead>
                                 <tbody>
                                 {% for group_element_year in group_elements_years %}
-                                    {% url 'education_group_read' group_element_year.parent_id group_element_year.parent_id as url_education_group_year %}
+                                    {% url 'group_identification' group_element_year.parent.academic_year.year group_element_year.parent.partial_acronym as url_education_group_year %}
                                     <tr>
                                         <td>
                                             <a href="{{ url_education_group_year }}">
@@ -63,7 +63,7 @@
                                         <td>
                                             <ul>
                                                 {% for training in formations_by_educ_group_year|get_item:group_element_year.parent_id %}
-                                                    {% url 'education_group_read' training.id training.id as url_education_group_yr %}
+                                                    {% url 'training_identification' training.academic_year.year training.partial_acronym as url_education_group_yr %}
                                                     <li>
                                                         <a href="{{ url_education_group_yr }}">{{ training.acronym }}
                                                             - {{ training.title }}</a>
@@ -72,7 +72,7 @@
                                                                 <li>
                                                                     {% trans 'Included in' %} :
                                                                     {% for parent_training in formations_by_educ_group_year|get_item:training.id %}
-                                                                        {% url 'education_group_read' parent_training.id parent_training.id as url_parent_training %}
+                                                                        {% url 'training_identification' parent_training.academic_year.year parent_training.partial_acronym as url_parent_training %}
                                                                         <a href="{{ url_parent_training }}">{{ parent_training.acronym }}</a>
                                                                         {% if not forloop.last %} - {% endif %}
                                                                     {% endfor %}
@@ -119,7 +119,7 @@
                                 </thead>
                                 <tbody>
                                 {% for education_group_year in root_formations %}
-                                    {% url 'education_group_read' education_group_year.id education_group_year.id as url_education_group_year %}
+                                    {% url 'training_identification' education_group_year.academic_year.year education_group_year.partial_acronym as url_education_group_year %}
                                     <tr>
                                         <td>
                                             <a href="{{ url_education_group_year }}">
