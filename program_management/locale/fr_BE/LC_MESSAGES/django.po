@@ -340,7 +340,7 @@ msgid "Mobility"
 msgstr "Mobilité"
 
 msgid "Modification"
-msgstr "Modificcation"
+msgstr "Modification"
 
 msgid "Modify prerequisites"
 msgstr "Modifier les prérequis"
@@ -759,4 +759,4 @@ msgid "yes"
 msgstr "Oui"
 
 msgid "yes,no"
-msgstr ""
+msgstr "oui,non"
