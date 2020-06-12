@@ -24,12 +24,11 @@
 #
 ##############################################################################
 
-from django.utils.translation import gettext as _
-
 import osis_common.ddd.interface
 from base.ddd.utils import business_validator
 from program_management.ddd import command
 from program_management.ddd.business_types import *
+from program_management.ddd.validators import _validate_end_date_and_option_finality
 from program_management.ddd.validators._authorized_link_type import AuthorizedLinkTypeValidator
 from program_management.ddd.validators._authorized_relationship import \
     AuthorizedRelationshipLearningUnitValidator, PasteAuthorizedRelationshipValidator, \
@@ -40,13 +39,12 @@ from program_management.ddd.validators._authorized_root_type_for_prerequisite im
 from program_management.ddd.validators._block_validator import BlockValidator
 from program_management.ddd.validators._detach_option_2M import DetachOptionValidator
 from program_management.ddd.validators._detach_root import DetachRootValidator
-from program_management.ddd.validators._has_or_is_prerequisite import IsPrerequisiteValidator, HasPrerequisiteValidator
+from program_management.ddd.validators._has_or_is_prerequisite import IsPrerequisiteValidator
 from program_management.ddd.validators._infinite_recursivity import InfiniteRecursivityTreeValidator
 from program_management.ddd.validators._minimum_editable_year import \
     MinimumEditableYearValidator
 from program_management.ddd.validators._prerequisite_expression_syntax import PrerequisiteExpressionSyntaxValidator
 from program_management.ddd.validators._prerequisites_items import PrerequisiteItemsValidator
-from program_management.ddd.validators import _validate_end_date_and_option_finality
 from program_management.ddd.validators.link import CreateLinkValidatorList
 
 
@@ -56,6 +54,7 @@ class PasteNodeValidatorList(business_validator.BusinessListValidator):
             tree: 'ProgramTree',
             node_to_paste: 'Node',
             paste_command: command.PasteElementCommand,
+            tree_repository: 'ProgramTreeRepository'
     ):
         path = paste_command.path_where_to_paste
         link_type = paste_command.link_type
@@ -69,8 +68,8 @@ class PasteNodeValidatorList(business_validator.BusinessListValidator):
                 InfiniteRecursivityTreeValidator(tree, node_to_paste, path),
                 AuthorizedLinkTypeValidator(tree.root_node, node_to_paste, link_type),
                 BlockValidator(block),
-                _validate_end_date_and_option_finality.ValidateEndDateAndOptionFinality(node_to_paste),
-                ValidateAuthorizedRelationshipForAllTrees(tree, node_to_paste, path)
+                _validate_end_date_and_option_finality.ValidateEndDateAndOptionFinality(node_to_paste, tree_repository),
+                ValidateAuthorizedRelationshipForAllTrees(tree, node_to_paste, path, tree_repository)
             ]
 
         elif node_to_paste.is_learning_unit():
@@ -81,7 +80,7 @@ class PasteNodeValidatorList(business_validator.BusinessListValidator):
                 InfiniteRecursivityTreeValidator(tree, node_to_paste, path),
                 AuthorizedLinkTypeValidator(tree.root_node, node_to_paste, link_type),
                 BlockValidator(block),
-                ValidateAuthorizedRelationshipForAllTrees(tree, node_to_paste, path)
+                ValidateAuthorizedRelationshipForAllTrees(tree, node_to_paste, path, tree_repository)
             ]
 
         else:
@@ -106,6 +105,7 @@ class CheckPasteNodeValidatorList(business_validator.BusinessListValidator):
             tree: 'ProgramTree',
             node_to_paste: 'Node',
             check_paste_command: command.CheckPasteNodeCommand,
+            tree_repository: 'ProgramTreeRepository'
     ):
         path = check_paste_command.path_to_paste
 
@@ -114,7 +114,7 @@ class CheckPasteNodeValidatorList(business_validator.BusinessListValidator):
                 CreateLinkValidatorList(tree.get_node(path), node_to_paste),
                 MinimumEditableYearValidator(tree),
                 InfiniteRecursivityTreeValidator(tree, node_to_paste, path),
-                ValidateEndDateAndOptionFinality(node_to_paste),
+                _validate_end_date_and_option_finality.ValidateEndDateAndOptionFinality(node_to_paste, tree_repository),
             ]
 
         elif node_to_paste.is_learning_unit():

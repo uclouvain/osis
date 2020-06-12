@@ -238,15 +238,22 @@ class ProgramTree(interface.RootEntity):
     def paste_node(
             self,
             node_to_paste: 'Node',
-            paste_command: command.PasteElementCommand
+            paste_command: command.PasteElementCommand,
+            tree_repository: 'ProgramTreeRepository'
     ) -> 'Link':
         """
         Add a node to the tree
         :param node_to_paste: Node to paste into the tree
         :param paste_command: a paste node command
+        :param tree_repository: a tree repository
         :return: the created link
         """
-        validator = validators_by_business_action.PasteNodeValidatorList(self, node_to_paste, paste_command)
+        validator = validators_by_business_action.PasteNodeValidatorList(
+            self,
+            node_to_paste,
+            paste_command,
+            tree_repository
+        )
         validator.validate()
 
         path_to_paste_to = paste_command.path_where_to_paste

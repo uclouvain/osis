@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import inspect
+from unittest import mock
 from unittest.mock import patch
 
 from django.test import SimpleTestCase
@@ -207,14 +208,14 @@ class TestPasteNodeProgramTree(ValidatorPatcherMixin, SimpleTestCase):
     def test_should_paste_node_to_position_indicated_by_path_when_validator_do_not_raise_exception(self):
         self.mock_validator_validate_to_not_raise_exception(PasteNodeValidatorList)
 
-        link_created = self.tree.paste_node(self.child_to_paste, self.request)
+        link_created = self.tree.paste_node(self.child_to_paste, self.request, mock.Mock())
         self.assertIn(link_created, self.tree.root_node.children)
 
     def test_should_propagate_exception_and_not_paste_node_when_validator_raises_exception(self):
         self.mock_validator_validate_to_raise_exception(PasteNodeValidatorList, ["error message text"])
 
         with self.assertRaises(osis_common.ddd.interface.BusinessExceptions):
-            self.tree.paste_node(self.child_to_paste, self.request)
+            self.tree.paste_node(self.child_to_paste, self.request, mock.Mock())
 
         self.assertNotIn(self.child_to_paste, self.tree.root_node.children_as_nodes)
 

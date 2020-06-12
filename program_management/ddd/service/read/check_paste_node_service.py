@@ -26,7 +26,7 @@
 
 import program_management.ddd.command
 from program_management.ddd.domain import node
-from program_management.ddd.repositories import load_tree, node as node_repository
+from program_management.ddd.repositories import load_tree, node as node_repository, program_tree
 from program_management.ddd.validators import validators_by_business_action
 
 
@@ -39,7 +39,8 @@ def check_paste(check_command: program_management.ddd.command.CheckPasteNodeComm
     validators_by_business_action.CheckPasteNodeValidatorList(
         tree,
         node_to_paste,
-        check_command
+        check_command,
+        program_tree.ProgramTreeRepository()
     ).validate()
 
 
