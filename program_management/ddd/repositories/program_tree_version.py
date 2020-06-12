@@ -47,14 +47,14 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
             version_name=program_tree_version.version_name,
             title_fr=program_tree_version.title_fr,
             title_en=program_tree_version.title_en,
-            offer=EducationGroupYear.objects.filter(
+            offer_id=EducationGroupYear.objects.filter(
                 acronym=program_tree_version.entity_id.offer_acronym,
                 academic_year__year=program_tree_version.entity_id.year
             ).values_list('pk', flat=True)[0],
             is_transition=False,
-            root_group=GroupYear.objects.filter(
+            root_group_id=GroupYear.objects.filter(
                 partial_acronym=program_tree_version.program_tree_identity.code,
-                academic_year=program_tree_version.program_tree_identity.year
+                academic_year__year=program_tree_version.program_tree_identity.year
             ).values_list('pk', flat=True)[0]
         ).save()
         return program_tree_version.entity_id

@@ -25,8 +25,18 @@
 ##############################################################################
 import factory.fuzzy
 
-from program_management.ddd.domain.program_tree import ProgramTree
+from program_management.ddd.domain.program_tree import ProgramTree, ProgramTreeIdentity
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory
+
+
+class ProgramTreeIdentityFactory(factory.Factory):
+
+    class Meta:
+        model = ProgramTreeIdentity
+        abstract = False
+
+    code = factory.Sequence(lambda n: 'Code%02d' % n)
+    year = factory.fuzzy.FuzzyInteger(low=1999, high=2099)
 
 
 class ProgramTreeFactory(factory.Factory):
