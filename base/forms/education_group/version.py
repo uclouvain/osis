@@ -32,6 +32,8 @@ from base.business.education_groups.create import create_initial_group_element_y
 from base.forms.utils.choice_field import BLANK_CHOICE
 from base.models import academic_year
 from base.models.academic_year import compute_max_academic_year_adjournment
+from program_management.ddd.command import CreateProgramTreeVersionCommand
+from program_management.ddd.service.write import create_program_tree_version_service
 
 
 class SpecificVersionForm(forms.Form):
@@ -54,13 +56,30 @@ class SpecificVersionForm(forms.Form):
 
     def save(self):
         end_postponement = self.max_year if not self.cleaned_data['end_year'] else self.cleaned_data['end_year']
-        data = {
-            "version_name": self.cleaned_data.get("version_name"),
-            "title_fr": self.cleaned_data.get("title"),
-            "title_en": self.cleaned_data.get("title_english")
-        }
         if self.save_type == "new_version":
-            pass
+            command = CreateProgramTreeVersionCommand(
+                offer_acronym=self.education_group_year.acronym,
+                version_name=self.cleaned_data.get("version_name"),
+                year=self.education_group_year.academic_year.year,
+                is_transition=False,
+                title_en=self.cleaned_data.get("title_english"),
+                title_fr=self.cleaned_data.get("title")
+            )
+            while command.year <= end_postponement:
+                create_program_tree_version_service.create_program_tree_version(command=command)
+                command.year = command.year+1
         if self.save_type == "attach":
-            pass
-        create_initial_group_element_year_structure(self.education_group_years_list)
+            last_education_group_version_existing = base.views.education_groups.create.find_last_existed_version(
+                self.education_group_year, self.cleaned_data["version_name"]
+            )
+            command = CreateProgramTreeVersionCommand(
+                offer_acronym=self.education_group_year.acronym,
+                version_name=self.cleaned_data.get("version_name"),
+                year=last_education_group_version_existing.education_group_year.academic_year.year,
+                is_transition=False,
+                title_en=self.cleaned_data.get("title_english"),
+                title_fr=self.cleaned_data.get("title")
+            )
+            while command.year <= end_postponement:
+                create_program_tree_version_service.create_program_tree_version(command=command)
+                command.year = command.year+1
