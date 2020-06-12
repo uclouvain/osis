@@ -39,6 +39,7 @@ from learning_unit.ddd.repository import load_learning_unit_year
 from program_management.ddd.domain import node
 from program_management.models import element
 from program_management.models.enums.node_type import NodeType
+from education_group.models.enums.constraint_type import ConstraintTypes
 
 
 # TODO: Depracated, must be deleted (use load method type are determined in element)
@@ -125,6 +126,8 @@ def __convert_string_to_enum(node_data: dict) -> dict:
         node_data['periodicity'] = PeriodicityEnum[node_data['periodicity']]
     if node_data.get('schedule_type'):
         node_data['schedule_type'] = ScheduleTypeEnum[node_data['schedule_type']]
+    if node_data.get('constraint_type'):
+        node_data['constraint_type'] = ConstraintTypes[node_data['constraint_type']]
     if node_data.get('offer_status'):
         node_data['offer_status'] = ActiveStatusEnum[node_data['offer_status']]
     node_data['type'] = NodeType[node_data['type']]
