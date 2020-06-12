@@ -28,7 +28,6 @@ from django.forms import TextInput
 from django.utils.translation import gettext_lazy as _
 
 import base.views.education_groups.create
-from base.business.education_groups.create import create_initial_group_element_year_structure
 from base.forms.utils.choice_field import BLANK_CHOICE
 from base.models import academic_year
 from base.models.academic_year import compute_max_academic_year_adjournment

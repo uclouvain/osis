@@ -23,21 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from program_management.ddd.business_types import *
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionBuilder
-from program_management.ddd.validators.program_tree_version import CreateProgramTreeVersionValidatorList
+from program_management.models.education_group_version import EducationGroupVersion
 
 
-def create_program_tree_version(command: 'CreateProgramTreeVersionCommand') -> 'ProgramTreeVersionIdentity':
-    validator = CreateProgramTreeVersionValidatorList(command.year, command.version_name, )
-    if not validator.is_valid():
-        identity_standard = ProgramTreeVersionIdentity(
-            command.offer_acronym,
-            command.year,
-            '',
-            command.is_transition
-        )
-        program_tree_version_standard = ProgramTreeVersionRepository().get(entity_id=identity_standard)
-        new_program_tree_version = ProgramTreeVersionBuilder().build_from(program_tree_version_standard, command)
-        ProgramTreeVersionRepository.create(entity=new_program_tree_version)
-        return new_program_tree_version.entity_id
+def check_version_name_exists(working_year: int, version_name: str) -> bool:
+    return EducationGroupVersion.objects.filter(
+        version_name=version_name,
+        offer__academic_year__year__gte=working_year,
+    ).exists()

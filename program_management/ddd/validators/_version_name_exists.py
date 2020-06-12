@@ -23,21 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from program_management.ddd.business_types import *
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionBuilder
-from program_management.ddd.validators.program_tree_version import CreateProgramTreeVersionValidatorList
+from base.ddd.utils.business_validator import BusinessValidator
+from program_management.ddd.repositories.check_version_name_exists import check_version_name_exists
 
 
-def create_program_tree_version(command: 'CreateProgramTreeVersionCommand') -> 'ProgramTreeVersionIdentity':
-    validator = CreateProgramTreeVersionValidatorList(command.year, command.version_name, )
-    if not validator.is_valid():
-        identity_standard = ProgramTreeVersionIdentity(
-            command.offer_acronym,
-            command.year,
-            '',
-            command.is_transition
-        )
-        program_tree_version_standard = ProgramTreeVersionRepository().get(entity_id=identity_standard)
-        new_program_tree_version = ProgramTreeVersionBuilder().build_from(program_tree_version_standard, command)
-        ProgramTreeVersionRepository.create(entity=new_program_tree_version)
-        return new_program_tree_version.entity_id
+class VersionNameExistsValidator(BusinessValidator):
+
+    def __init__(self, working_year: int, version_name: str):
+        super(VersionNameExistsValidator, self).__init__()
+        self.working_year = working_year
+        self.version_name = version_name
+
+    def validate(self, *args, **kwargs):
+        if check_version_name_exists(self.working_year, self.version_name):
+            self.add_error_message("Acronym {} already exists".format(self.version_name))
