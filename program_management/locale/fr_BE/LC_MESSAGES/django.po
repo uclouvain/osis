@@ -620,7 +620,7 @@ msgid "Transformation and modification"
 msgstr ""
 
 msgid "Transition"
-msgstr "Inclure transition"
+msgstr "Transition"
 
 msgid "Tutors"
 msgstr ""
