@@ -205,7 +205,7 @@ class TestAttachNodeProgramTree(SimpleTestCase, ValidatorPatcherMixin):
         self.mock_validator(AttachNodeValidatorList, ['Success msg'], level=MessageLevel.SUCCESS)
         subgroup_node = NodeGroupYearFactory()
         self.tree.attach_node(subgroup_node, None, self.request)
-        self.assertIn(subgroup_node, self.tree.root_node.children_as_nodes)
+        self.assertIn(subgroup_node, self.tree.root_node.get_direct_children_as_nodes())
 
     def test_attach_node_case_path_specified_found(self):
         self.mock_validator(AttachNodeValidatorList, ['Success msg'], level=MessageLevel.SUCCESS)
@@ -216,7 +216,7 @@ class TestAttachNodeProgramTree(SimpleTestCase, ValidatorPatcherMixin):
         path = "|".join([str(self.tree.root_node.pk), str(subgroup_node.pk)])
         self.tree.attach_node(node_to_attach, path, self.request)
 
-        self.assertIn(node_to_attach, self.tree.get_node(path).children_as_nodes)
+        self.assertIn(node_to_attach, self.tree.get_node(path).get_direct_children_as_nodes())
 
     def test_when_validator_list_is_valid(self):
         self.mock_validator(AttachNodeValidatorList, ['Success message text'], level=MessageLevel.SUCCESS)
@@ -225,7 +225,7 @@ class TestAttachNodeProgramTree(SimpleTestCase, ValidatorPatcherMixin):
         result = self.tree.attach_node(child_to_attach, path, self.request)
         self.assertEqual(result[0], 'Success message text')
         self.assertEqual(1, len(result))
-        self.assertIn(child_to_attach, self.tree.root_node.children_as_nodes)
+        self.assertIn(child_to_attach, self.tree.root_node.get_direct_children_as_nodes())
 
     def test_when_validator_list_is_not_valid(self):
         self.mock_validator(AttachNodeValidatorList, ['error message text'], level=MessageLevel.ERROR)
@@ -234,7 +234,7 @@ class TestAttachNodeProgramTree(SimpleTestCase, ValidatorPatcherMixin):
         result = self.tree.attach_node(child_to_attach, path, self.request)
         self.assertEqual(result[0], 'error message text')
         self.assertEqual(1, len(result))
-        self.assertNotIn(child_to_attach, self.tree.root_node.children_as_nodes)
+        self.assertNotIn(child_to_attach, self.tree.root_node.get_direct_children_as_nodes())
 
 
 class TestDetachNodeProgramTree(SimpleTestCase):

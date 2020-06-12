@@ -80,7 +80,7 @@ class ProgramTreeBuilder:
             root_node: 'Node'
     ):
         child_types = authorized_relationships.get_default_authorized_children_types(root_node.node_type)
-        children_node_list = root_node.children_as_nodes
+        children_node_list = root_node.get_direct_children_as_nodes()
         for child_node in children_node_list:
             if child_node.node_type in child_types:
                 new_child_node = node.factory.deepcopy_node_without_copy_children_recursively(original_node=child_node)

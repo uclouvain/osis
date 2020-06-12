@@ -212,8 +212,7 @@ class Node(interface.Entity):
         )
         return [link.child for link in sorted_links]
 
-    @property
-    def children_as_nodes(self) -> List['Node']:
+    def get_direct_children_as_nodes(self) -> List['Node']:
         return [link.child for link in self.children]
 
     def children_and_reference_children(

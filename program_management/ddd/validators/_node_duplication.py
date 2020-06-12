@@ -37,7 +37,7 @@ class NodeDuplicationValidator(BusinessValidator):
         self.parent_node = parent_node
 
     def validate(self):
-        if self.node_to_add in self.parent_node.children_as_nodes:
+        if self.node_to_add in self.parent_node.get_direct_children_as_nodes():
             self.add_error_message(
                 _("You can not add the same child %(child_node)s several times.") % {"child_node": self.node_to_add}
             )
