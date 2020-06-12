@@ -39,10 +39,10 @@ class ProgramTreeRepository(interface.AbstractRepository):
         raise NotImplementedError
 
     @classmethod
-    def search_from_children(cls, node_ids: List['NodeIdentity']) -> List['ProgramTree']:
+    def search_from_children(cls, node_ids: List['NodeIdentity'], **kwargs) -> List['ProgramTree']:
         nodes = node.NodeRepository.search(entity_ids=node_ids)
         node_db_ids = [n.node_id for n in nodes]
-        return load_tree.load_trees_from_children(node_db_ids)
+        return load_tree.load_trees_from_children(node_db_ids, **kwargs)
 
     @classmethod
     def delete(cls, entity_id: 'ProgramTreeIdentity') -> None:

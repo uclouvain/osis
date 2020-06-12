@@ -21,15 +21,12 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from typing import List
 
 import osis_common.ddd.interface
-from base.ddd.utils import business_validator
 from base.ddd.utils.business_validator import BusinessValidator
 from base.models.enums.link_type import LinkTypes
-from program_management.ddd.repositories import load_tree
-from program_management.ddd.validators._authorized_relationship import PasteAuthorizedRelationshipValidator
 from program_management.ddd.business_types import *
+from program_management.ddd.validators._authorized_relationship import PasteAuthorizedRelationshipValidator
 
 
 class ValidateAuthorizedRelationshipForAllTrees(BusinessValidator):
@@ -37,16 +34,18 @@ class ValidateAuthorizedRelationshipForAllTrees(BusinessValidator):
             self,
             tree: 'ProgramTree',
             node_to_paste: 'Node',
-            path: 'Path'
+            path: 'Path',
+            tree_repository: 'ProgramTreeRepository'
     ) -> None:
         super().__init__()
         self.tree = tree
         self.node_to_paste = node_to_paste
         self.path = path
+        self.tree_repository = tree_repository
 
     def validate(self, *args, **kwargs):
         child_node = self.tree.get_node(self.path)
-        trees = load_tree.load_trees_from_children([child_node.node_id], link_type=LinkTypes.REFERENCE)
+        trees = self.tree_repository.search_from_children([child_node.entity_id], link_type=LinkTypes.REFERENCE)
         messages = []
         for tree in trees:
             for parent_from_reference_link in tree.get_parents_using_node_as_reference(child_node):
