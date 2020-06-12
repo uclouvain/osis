@@ -25,16 +25,62 @@
 ##############################################################################
 from django.db import transaction
 
+from base.models import entity_version
+from base.models.academic_year import AcademicYear
+from base.models.campus import Campus
+from base.models.education_group_type import EducationGroupType
 from base.models.group_element_year import GroupElementYear
+from education_group.models.group import Group
+from education_group.models.group_year import GroupYear
 from osis_common.decorators.deprecated import deprecated
 from program_management.ddd.domain import program_tree
-from program_management.ddd.domain.node import Node
+from program_management.ddd.domain.node import Node, NodeGroupYear
 from program_management.ddd.repositories import _persist_prerequisite
+from program_management.models.element import Element
+
+
+# TODO :: to move into "Group" repository (another domain)
+def __create_nodes(tree: program_tree.ProgramTree):
+    for node in tree.get_all_nodes():
+        if node._has_changed and node.is_group_or_mini_or_training():
+            # TODO :: utiliser update_or_create et donc ajouter UnannualizedIdentity à Node !
+            group = Group(
+                start_year=AcademicYear.objects.get(year=node.start_year),
+                end_year=AcademicYear.objects.get(year=node.end_date) if node.end_date else None,
+            )
+            group.save()
+
+            entity = entity_version.find(
+                node.management_entity_acronym
+            ).entity_id if node.management_entity_acronym else None
+            group_year, created = GroupYear.objects.update_or_create(
+                partial_acronym=node.code,
+                academic_year=AcademicYear.objects.get(year=node.year),
+                defaults={
+                    'acronym': node.title,
+                    'education_group_type': EducationGroupType.objects.get(name=node.node_type.name) if node.node_type else None,
+                    'credits': node.credits,
+                    'constraint_type': node.constraint_type,
+                    'min_constraint': node.min_constraint,
+                    'max_constraint': node.max_constraint,
+                    'group': group,
+                    'title_fr': node.group_title_fr,
+                    'title_en': node.group_title_en,
+                    'remark_fr': node.remark_fr,
+                    'remark_en': node.remark_en,
+                    'management_entity': entity,
+                    'main_teaching_campus': Campus.objects.get(name=node.teaching_campus).pk if node.teaching_campus else None,
+                    # 'active': node.status,  # FIXME :: to implement in Repository.get() !
+                }
+            )
+
+            Element.objects.get_or_create(group_year=group_year)
 
 
 @deprecated  # use ProgramTreeRepository.create() or .update() instead
 @transaction.atomic
 def persist(tree: program_tree.ProgramTree) -> None:
+    __create_nodes(tree)
     __update_or_create_links(tree.root_node)
     __delete_links(tree, tree.root_node)
     _persist_prerequisite.persist(tree)
