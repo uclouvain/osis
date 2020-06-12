@@ -33,7 +33,7 @@ from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import CacheFilterMixin
 from base.utils.search import SearchMixin
 from base.views.mixins import AjaxTemplateMixin
-from education_group.api.serializers.group_year import GroupYearSerializer
+from education_group.views.serializers.group_year import GroupYearSerializer
 from education_group.models.group_year import GroupYear
 from learning_unit.api.serializers.learning_unit import LearningUnitSerializer
 
