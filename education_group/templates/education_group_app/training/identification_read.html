@@ -25,9 +25,6 @@
 {% endcomment %}
 
 {% block details %}
-    {% if not current_version.is_standard %}
-        {% include  "education_group/blocks/panel/panel_version_information.html" %}
-    {% endif %}
     <div class="{% if not current_version.is_standard %} of_unversioned_field {% endif %}">
         <div class="row">
             <div class="col-md-7">
