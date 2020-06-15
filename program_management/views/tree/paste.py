@@ -44,7 +44,7 @@ from base.views.common import display_warning_messages, display_success_messages
 from base.views.mixins import AjaxTemplateMixin
 from education_group.models.group_year import GroupYear
 from osis_role.contrib.views import PermissionRequiredMixin
-from program_management.ddd.domain import node
+from program_management.ddd.domain import node, link
 from program_management.ddd.repositories import node as node_repository
 from program_management.ddd.service.read import element_selected_service, check_paste_node_service
 from program_management.forms.tree.paste import PasteNodesFormset, paste_form_factory, PasteToMinorMajorListChoiceForm
@@ -131,8 +131,7 @@ class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageM
             )
 
         display_success_messages(self.request, messages)
-        ElementCache(self.request.user).clear()
-
+        ElementCache(self.request.user.id).clear()
         return super().form_valid(formset)
 
     def _is_parent_a_minor_major_list_choice(self, formset):
