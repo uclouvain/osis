@@ -86,6 +86,20 @@ class NodeIdentity(interface.EntityIdentity):
         return self.code == other.code and self.year == other.year
 
 
+class NodeNotAnnualizedIdentity(interface.ValueObject):
+    """
+    This ID is necessary to find a Node through years because code can be different through years.
+    """
+    def __init__(self, uuid: str):
+        self.uuid = uuid
+
+    def __hash__(self):
+        return hash(self.uuid)
+
+    def __eq__(self, other):
+        return self.uuid == other.uuid
+
+
 class Node(interface.Entity):
 
     _academic_year = None
@@ -96,6 +110,7 @@ class Node(interface.Entity):
     def __init__(
             self,
             node_id: int = None,
+            not_annualized_id: NodeNotAnnualizedIdentity = None,
             node_type: EducationGroupTypesEnum = None,
             end_date: int = None,
             children: List['Link'] = None,
@@ -105,6 +120,7 @@ class Node(interface.Entity):
             credits: Decimal = None
     ):
         self.node_id = node_id
+        self.not_annualized_id = not_annualized_id
         self.children = children
         self._children = children or []
         self.node_type = node_type

@@ -27,16 +27,26 @@ import factory.fuzzy
 
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType, GroupType
 from base.models.enums.learning_container_year_types import LearningContainerYearType
-from program_management.ddd.domain.node import NodeEducationGroupYear, NodeLearningUnitYear, NodeGroupYear, Node
+from program_management.ddd.domain.node import NodeEducationGroupYear, NodeLearningUnitYear, NodeGroupYear, Node, \
+    NodeNotAnnualizedIdentity
 
 
 def generate_end_date(node):
     return node.year + 10
 
 
+class NodeNotAnnualizedIdentityFactory(factory.Factory):
+    class Meta:
+        model = NodeNotAnnualizedIdentity
+        abstract = False
+
+    uuid = factory.Sequence(lambda n: n+1)
+
+
 class NodeFactory(factory.Factory):
 
     node_id = factory.Sequence(lambda n: n+1)
+    not_annualized_id = factory.SubFactory(NodeNotAnnualizedIdentityFactory)
     code = factory.Sequence(lambda n: 'Code%02d' % n)
     title = factory.Sequence(lambda n: 'Acronym%02d' % n)
     year = factory.fuzzy.FuzzyInteger(low=1999, high=2099)

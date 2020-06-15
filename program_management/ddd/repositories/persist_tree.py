@@ -43,10 +43,12 @@ from program_management.models.element import Element
 def __create_nodes(tree: program_tree.ProgramTree):
     for node in tree.get_all_nodes():
         if node._has_changed and node.is_group_or_mini_or_training():
-            # TODO :: utiliser update_or_create et donc ajouter UnannualizedIdentity à Node !
-            group = Group(
-                start_year=AcademicYear.objects.get(year=node.start_year),
-                end_year=AcademicYear.objects.get(year=node.end_date) if node.end_date else None,
+            group, created = Group.objects.update_or_create(
+                pk=node.not_annualized_id.uuid,
+                defaults={
+                    'start_year': AcademicYear.objects.get(year=node.start_year),
+                    'end_year': AcademicYear.objects.get(year=node.end_date) if node.end_date else None,
+                }
             )
             group.save()
 

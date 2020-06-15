@@ -23,42 +23,64 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from unittest.mock import patch
 
 from django.test import TestCase
 
+from base.models.education_group_type import EducationGroupType as EducationGroupTypeModelDb
+from base.models.enums.education_group_types import TrainingType
+from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.education_group_type import EducationGroupTypeFactory, TrainingEducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
+from education_group.models.group_year import GroupYear
 from education_group.tests.factories.group_year import GroupYearFactory
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
+from program_management.ddd.domain.node import Node
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.models.education_group_version import EducationGroupVersion
+from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
 
 
 class TestVersionRepositoryCreateMethod(TestCase):
-    def setUp(self):
-        self.offer = EducationGroupYearFactory()
-        self.root_group = GroupYearFactory(academic_year=self.offer.academic_year)
-        self.repository = ProgramTreeVersionRepository()
 
-    def test_simple_case_creation(self):
-        domain_object: ProgramTreeVersion = ProgramTreeVersionFactory(
-            entity_identity__offer_acronym=self.offer.acronym,
-            entity_identity__year=self.offer.academic_year.year,
-            program_tree_identity__code=self.root_group.partial_acronym,
-            program_tree_identity__year=self.root_group.academic_year.year,
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory(current=True)
+        cls.database_offer = EducationGroupYearFactory(academic_year=cls.academic_year)
+        cls.type = TrainingEducationGroupTypeFactory()
+        cls.repository = ProgramTreeVersionRepository()
+
+    @patch.object(Node, '_has_changed', return_value=True)
+    def test_simple_case_creation(self, *mocks):
+        new_program_tree = ProgramTreeFactory(
+            root_node__year=self.academic_year.year,
+            root_node__start_year=self.academic_year.year,
+            root_node__end_year=self.academic_year.year,
+            root_node__node_type=TrainingType[self.type.name],
+        )
+        domain_object = ProgramTreeVersionFactory(
+            entity_identity__offer_acronym=self.database_offer.acronym,
+            entity_identity__year=self.database_offer.academic_year.year,
+            program_tree_identity=new_program_tree.entity_id,
+            tree=new_program_tree,
         )
         self.repository.create(domain_object)
 
-        database_object = EducationGroupVersion.objects.get(
+        education_group_version_db_object = EducationGroupVersion.objects.get(
             offer__acronym=domain_object.entity_id.offer_acronym,
             offer__academic_year__year=domain_object.entity_id.year,
             version_name=domain_object.entity_id.version_name,
             is_transition=domain_object.entity_id.is_transition,
         )
 
-        self.assertEqual(database_object.offer_id, self.offer.id)
-        self.assertEqual(database_object.root_group_id, self.root_group.id)
-        self.assertEqual(database_object.is_transition, domain_object.is_transition)
-        self.assertEqual(database_object.version_name, domain_object.version_name)
-        self.assertEqual(database_object.title_fr, domain_object.title_fr)
-        self.assertEqual(database_object.title_en, domain_object.title_en)
+        group_year_db_object = GroupYear.objects.get(
+            partial_acronym=new_program_tree.root_node.code,
+            academic_year__year=new_program_tree.root_node.year,
+        )
+
+        self.assertEqual(education_group_version_db_object.offer_id, self.database_offer.id)
+        self.assertEqual(education_group_version_db_object.root_group, group_year_db_object)
+        self.assertEqual(education_group_version_db_object.is_transition, domain_object.is_transition)
+        self.assertEqual(education_group_version_db_object.version_name, domain_object.version_name)
+        self.assertEqual(education_group_version_db_object.title_fr, domain_object.title_fr)
+        self.assertEqual(education_group_version_db_object.title_en, domain_object.title_en)
