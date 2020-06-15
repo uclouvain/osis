@@ -70,8 +70,9 @@ def __update_or_create_group_model(node: 'NodeGroupYear') -> Group:
 
 
 def __update_or_create_group_year_model(node: 'NodeGroupYear', group: Group) -> GroupYear:
-    entity = entity_version.find(
-        node.management_entity_acronym
+    entity_id = entity_version.find_entity_version_by_acronym_and_year(
+        node.management_entity_acronym,
+        node.year,
     ).entity_id if node.management_entity_acronym else None
     group_year, created = GroupYear.objects.update_or_create(
         partial_acronym=node.code,
@@ -88,8 +89,8 @@ def __update_or_create_group_year_model(node: 'NodeGroupYear', group: Group) -> 
             'title_en': node.group_title_en,
             'remark_fr': node.remark_fr,
             'remark_en': node.remark_en,
-            'management_entity': entity,
-            'main_teaching_campus': Campus.objects.get(name=node.teaching_campus).pk if node.teaching_campus else None,
+            'management_entity_id': entity_id,
+            'main_teaching_campus_id': Campus.objects.get(name=node.teaching_campus).pk if node.teaching_campus else None,
             # 'active': node.status,  # FIXME :: to implement in Repository.get() !
         }
     )
