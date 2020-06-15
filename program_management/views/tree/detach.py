@@ -23,16 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db.models import Q
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 
+import osis_common.ddd.interface
+from base.ddd.utils import business_validator
 from base.utils.cache import ElementCache
-from base.views.common import display_business_messages
+from base.views.common import display_success_messages
 from base.views.common import display_error_messages, display_warning_messages
 from base.views.mixins import AjaxTemplateMixin
-from program_management.ddd.domain.program_tree import PATH_SEPARATOR
-from program_management.ddd.service import detach_node_service
+from program_management.ddd import command
+from program_management.ddd.service.write import detach_node_service
+from program_management.ddd.service.read import detach_warning_messages_service
 from program_management.forms.tree.detach import DetachNodeForm
 from program_management.views.generic import GenericGroupElementYearMixin
 
@@ -42,8 +45,6 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
     form_class = DetachNodeForm
 
     permission_required = 'base.can_detach_node'
-
-    _object = None
 
     @property
     def parent_id(self):
@@ -75,10 +76,15 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
 
     def get_context_data(self, **kwargs):
         context = super(DetachNodeView, self).get_context_data(**kwargs)
-        message_list = detach_node_service.detach_node(self.request.GET.get('path'), commit=False)
-        display_warning_messages(self.request, message_list.warnings)
-        display_error_messages(self.request, message_list.errors)
-        if not message_list.contains_errors():
+        detach_node_command = command.DetachNodeCommand(path_where_to_detach=self.request.GET.get('path'), commit=False)
+        warning_messages = detach_warning_messages_service.detach_warning_messages(detach_node_command)
+        if warning_messages:
+            display_warning_messages(self.request, warning_messages)
+        try:
+            detach_node_service.detach_node(detach_node_command)
+        except osis_common.ddd.interface.BusinessExceptions as business_exception:
+            display_error_messages(self.request, business_exception.messages)
+        else:
             context['confirmation_message'] = self.confirmation_message
         return context
 
@@ -95,27 +101,38 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
         )
         return obj
 
-    @property
+    @cached_property
     def object(self):
-        if self._object is None:
-            self._object = self.get_object()
-        return self._object
+        return self.get_object()
 
     def form_valid(self, form):
-        message_list = form.save()
-        display_business_messages(self.request, message_list.messages)
-        if message_list.contains_errors():
+        self.object
+        try:
+            link_entity_id = form.save()
+        except osis_common.ddd.interface.BusinessExceptions as business_exception:
+            display_error_messages(self.request, business_exception.messages)
             return self.form_invalid(form)
-        self._remove_element_from_clipboard_if_stored(form.cleaned_data['path'])
+
+        display_success_messages(
+            self.request,
+            [_("\"%(child)s\" has been detached from \"%(parent)s\"") % {
+                'child': link_entity_id.child_code,
+                'parent': link_entity_id.parent_code,
+            }]
+        )
+
+        self._remove_element_from_clipboard_if_stored()
         return super().form_valid(form)
 
     def form_invalid(self, form):
         return super(DetachNodeView, self).form_invalid(form)
 
-    def _remove_element_from_clipboard_if_stored(self, path: str):
+    def _remove_element_from_clipboard_if_stored(self):
         element_cache = ElementCache(self.request.user)
-        detached_element_id = int(path.split(PATH_SEPARATOR)[-1])
-        if element_cache and element_cache.equals_element(detached_element_id):
+        element_code = self.object.child_branch.partial_acronym \
+            if self.object.child_branch else self.object.child_leaf.acronym
+        element_year = self.object.child.academic_year.year
+        if element_cache.equals_element(element_code, element_year):
             element_cache.clear()
 
     def get_success_url(self):
