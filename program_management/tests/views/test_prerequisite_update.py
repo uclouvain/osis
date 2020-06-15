@@ -28,7 +28,7 @@ from django.http import HttpResponseForbidden, HttpResponseNotFound
 from django.test import TestCase
 from django.urls import reverse
 
-from base.models.enums.education_group_types import GroupType
+from base.models.enums.education_group_types import GroupType, TrainingType
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearBachelorFactory, \
     EducationGroupYearMasterFactory
