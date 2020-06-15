@@ -314,6 +314,9 @@ class ProgramTree(interface.RootEntity):
         parent = self.get_node(parent_path)
         return parent.detach_child(node_to_detach)
 
+    def __copy__(self) -> 'ProgramTree':
+        return ProgramTree(root_node=_copy(self.root_node))
+
     def remove_prerequisites(self, detached_node: 'Node', parent_path):
         pruned_tree = ProgramTree(root_node=_copy(self.root_node))
         pruned_tree.get_node(parent_path).detach_child(detached_node)
