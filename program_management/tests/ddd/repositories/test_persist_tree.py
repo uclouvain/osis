@@ -34,6 +34,7 @@ from base.tests.factories.group_element_year import GroupElementYearFactory
 from program_management.ddd.domain.node import NodeEducationGroupYear, NodeLearningUnitYear, NodeGroupYear
 from program_management.ddd.repositories import persist_tree, load_tree
 from program_management.ddd.validators._authorized_relationship import DetachAuthorizedRelationshipValidator
+from program_management.ddd.validators.validators_by_business_action import DetachNodeValidatorList
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
@@ -111,8 +112,9 @@ class TestPersistTree(TestCase):
         """
         self.assertTrue(mock.called, assertion_msg)
 
-    @patch.object(DetachAuthorizedRelationshipValidator, 'validate')
-    def test_delete_when_1_link_has_been_deleted(self, mock):
+    @patch.object(DetachNodeValidatorList, 'validate')
+    def test_delete_when_1_link_has_been_deleted(self, mock_detach):
+        mock_detach.return_value = None
         GroupElementYearFactory(parent_element=self.root_group, child_element=self.common_core_element)
         node_to_detach = self.common_core_node
         qs_link_will_be_detached = GroupElementYear.objects.filter(child_element_id=node_to_detach.pk)
@@ -121,7 +123,7 @@ class TestPersistTree(TestCase):
         tree = load_tree.load(self.root_node.node_id)
 
         path_to_detach = "|".join([str(self.root_node.pk), str(node_to_detach.pk)])
-        tree.detach_node(path_to_detach)
+        tree.detach_node(path_to_detach, mock.Mock())
         persist_tree.persist(tree)
         self.assertEqual(qs_link_will_be_detached.count(), 0)
 

@@ -51,7 +51,10 @@
         {# Cut link #} {# We cannot cut root element #}
         {% if group_to_parent and group_to_parent != "0" %}
             <li id='select_li'>
-                <a href="#" class="cut-element" data-url="{% url "cut_element" %}" data-element_id="{{ education_group_year.id }}" data-element_type="EDUCATION_GROUP" data-link_id="{{ group_to_parent }}">
+                <a href="#" class="cut-element" data-url="{% url "cut_element" %}"
+                   data-element_code="{{ education_group_year.partial_acronym }}"
+                   data-element_year="{{ education_group_year.academic_year.year }}"
+                   data-path_to_detach="{{ group_to_parent }}|{{ education_group_year.id }}">
                     {% trans 'Cut' %}
                 </a>
             </li>
@@ -59,28 +62,27 @@
 
         {# Copy link #}
         <li id='select_li'>
-            <a href="#" class="copy-element" data-url="{% url "copy_element" %}" data-element_id="{{ education_group_year.id }}" data-element_type="EDUCATION_GROUP" >
+            <a href="#" class="copy-element" data-url="{% url "copy_element" %}"
+               data-element_code="{{ education_group_year.partial_acronym }}"
+               data-element_year="{{ education_group_year.academic_year.year }}" >
                 {% trans 'Copy' %}
             </a>
         </li>
 
         {# Paste link #}
         <li>
-            {% url 'education_group_attach' parent.id education_group_year.id as attach_url %}
-            {#            FIXME :: fix attach #}
-{#            {% a_tag_modal_has_perm attach_url|add:"?path="|add:node_path _('Paste') 'base.can_attach_node' user education_group_year %}#}
+            {% url 'tree_paste_node' as attach_url %}
+            {% a_tag_modal_has_perm attach_url|add:"?path="|add:node_path _('Paste') 'base.attach_educationgroup' user education_group_year %}
         </li>
         <li class="divider"></li>
 
 
         {# Detach link #}
-        {% if group_to_parent and group_to_parent != "0" %}    {# We cannot detach root element #}
-            <li>
-                {% url 'group_element_year_delete' parent.id education_group_year.id group_to_parent as detach_url %}
-                {% a_tag_modal_has_perm detach_url _('Detach') 'base.can_detach_node' user education_group_year %}
-            </li>
-             <li class="divider"></li>
-        {% endif %}
+        <li>
+            {% url 'tree_detach_node' parent.id as detach_url %}
+            {% a_tag_modal_has_perm detach_url|add:"?path="|add:node_path _('Detach') 'base.can_detach_node' user education_group_year %}
+        </li>
+         <li class="divider"></li>
 
         {# Update link #}
         <li>
@@ -116,9 +118,8 @@
         <li class="divider"></li>
 
         <li>
-            {#            FIXME :: fix quick-search #}
-{#            {% url 'quick_search_education_group' root_id=parent.id node_path=node_path as search_url %}#}
-{#            {% a_tag_modal_has_perm search_url _('Search') 'base.change_link_data' user education_group_year %}#}
+            {% url 'quick_search_education_group' year=group_year.academic_year.year as search_url %}
+            {% a_tag_modal_has_perm search_url _('Search') 'base.change_link_data' user education_group_year %}
         </li>
         <li class="divider"></li>
         <li>

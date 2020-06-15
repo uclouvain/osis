@@ -47,10 +47,6 @@ def generate_title(group_year):
     return '{obj.group.start_year} {gen_str}'.format(obj=group_year, gen_str=string_generator()).lower()
 
 
-def generate_group(group_year):
-    return GroupFactory(start_year=group_year.academic_year)
-
-
 class GroupYearFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = "education_group.GroupYear"
@@ -62,7 +58,7 @@ class GroupYearFactory(factory.django.DjangoModelFactory):
     constraint_type = CREDITS
     min_constraint = factory.fuzzy.FuzzyInteger(1, MAXIMUM_CREDITS)
     max_constraint = factory.lazy_attribute(lambda a: a.min_constraint)
-    group = factory.LazyAttribute(generate_group)
+    group = factory.SubFactory(GroupFactory, start_year=factory.SelfAttribute("..academic_year"))
     title_fr = factory.LazyAttribute(generate_title)
     title_en = factory.LazyAttribute(generate_title)
     remark_fr = factory.fuzzy.FuzzyText(length=255)
