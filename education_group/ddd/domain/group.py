@@ -23,8 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from decimal import Decimal
-
 from base.models.enums.education_group_types import GroupType
 from education_group.ddd.domain._campus import Campus
 from education_group.ddd.domain._content_constraint import ContentConstraint
@@ -46,6 +44,20 @@ class GroupIdentity(interface.EntityIdentity):
         return self.code == other.code and self.year == other.year
 
 
+class GroupUnannualizedIdentity(interface.EntityIdentity):
+    """
+    This ID is necessary to find a GROUP through years because code can be different accros years
+    """
+    def __init__(self, uuid: str):
+        self.uuid = uuid
+
+    def __hash__(self):
+        return hash(self.uuid)
+
+    def __eq__(self, other):
+        return self.uuid == other.uuid
+
+
 class Group(interface.RootEntity):
     def __init__(
         self,
@@ -53,13 +65,14 @@ class Group(interface.RootEntity):
         type: GroupType,
         abbreviated_title: str,
         titles: Titles,
-        credits: Decimal,
+        credits: int,
         content_constraint: ContentConstraint,
         management_entity: Entity,
         teaching_campus: Campus,
         remark: Remark,
         start_year: int,
-        end_year: int = None
+        unannualized_identity: 'GroupUnannualizedIdentity' = None,
+        end_year: int = None,
     ):
         super(Group, self).__init__(entity_id=entity_identity)
         self.entity_id = entity_identity
@@ -72,6 +85,7 @@ class Group(interface.RootEntity):
         self.teaching_campus = teaching_campus
         self.remark = remark
         self.start_year = start_year
+        self.unannualized_identity = unannualized_identity
         self.end_year = end_year
 
     @property
