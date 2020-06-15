@@ -148,7 +148,6 @@ class MiniTrainingListTestCase(APITestCase):
         url = self.url + "?" + urllib.parse.urlencode({
             'education_group_type': [mini_training.education_group_type.name for mini_training in self.mini_trainings]
         }, doseq=True)
-        print(url, 'YOLO')
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['count'], 3)
