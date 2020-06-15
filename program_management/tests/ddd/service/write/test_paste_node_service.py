@@ -109,7 +109,7 @@ class TestPasteNode(SimpleTestCase, ValidatorPatcherMixin):
         LinkFactory(parent=other_tree.root_node, child=self.node_to_paste)
         self.mock_load_tree.side_effect = [self.tree, other_tree]
         mock_search_trees.return_value = []
-        self.mock_validator(PasteNodeValidatorList, [_('Success message')], level=MessageLevel.SUCCESS)
+        self.mock_validator(PasteNodeValidatorList, ['Success message'], level=MessageLevel.SUCCESS)
         paste_command_with_path_to_detach_set = PasteElementCommandFactory(
             node_to_paste_code=self.node_to_paste.code,
             node_to_paste_year=self.node_to_paste.year,
