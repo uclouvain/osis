@@ -49,8 +49,6 @@ class ChoiceEnum(Enum):
         return [x.value for x in cls]
 
     def __deepcopy__(self, memodict: Dict = None) -> 'ChoiceEnum':
-        if memodict is None:
-            memodict = {}
         return self
 
 
