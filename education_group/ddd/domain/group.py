@@ -23,13 +23,51 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from base.models.enums.constraint_type import ConstraintTypeEnum
 from base.models.enums.education_group_types import GroupType
+from education_group.ddd import command
 from education_group.ddd.domain._campus import Campus
 from education_group.ddd.domain._content_constraint import ContentConstraint
 from education_group.ddd.domain._entity import Entity
 from education_group.ddd.domain._remark import Remark
 from education_group.ddd.domain._titles import Titles
 from osis_common.ddd import interface
+
+
+class GroupBuilder:
+    @classmethod
+    def build_from_create_cmd(self, cmd: command.CreateGroupCommand):
+        group_id = GroupIdentity(code=cmd.code, year=cmd.year)
+        titles = Titles(title_fr=cmd.title_fr, title_en=cmd.title_en)
+        content_constraint = ContentConstraint(
+            type=ConstraintTypeEnum[cmd.constraint_type],
+            minimum=cmd.min_constraint,
+            maximum=cmd.max_constraint
+        )
+        management_entity = Entity(acronym=cmd.management_entity_acronym)
+        teaching_campus = Campus(
+            name=cmd.teaching_campus_name,
+            university_name=cmd.organization_name,
+        )
+        remark = Remark(text_fr=cmd.remark_fr, text_en=cmd.remark_en)
+
+        return Group(
+            entity_identity=group_id,
+            type=GroupType[cmd.type],
+            abbreviated_title=cmd.abbreviated_title,
+            titles=titles,
+            credits=cmd.credits,
+            content_constraint=content_constraint,
+            management_entity=management_entity,
+            teaching_campus=teaching_campus,
+            remark=remark,
+            start_year=cmd.start_year,
+            unannualized_identity=None,
+            end_year=cmd.end_year
+        )
+
+
+builder = GroupBuilder()
 
 
 class GroupIdentity(interface.EntityIdentity):
@@ -44,11 +82,11 @@ class GroupIdentity(interface.EntityIdentity):
         return self.code == other.code and self.year == other.year
 
 
-class GroupUnannualizedIdentity(interface.EntityIdentity):
+class GroupUnannualizedIdentity(interface.ValueObject):
     """
-    This ID is necessary to find a GROUP through years because code can be different accros years
+    This ID is necessary to find a GROUP through years because code can be different through years
     """
-    def __init__(self, uuid: str):
+    def __init__(self, uuid: int):
         self.uuid = uuid
 
     def __hash__(self):
