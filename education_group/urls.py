@@ -9,13 +9,15 @@ urlpatterns = [
         ReadEducationGroupRedirectView.as_view(),
         name='education_group_read_proxy'
     ),
-    path('groups/<int:year>/<str:code>/', include([
-        path('identification/', group.GroupReadIdentification.as_view(), name='group_identification'),
-        path('content/', group.GroupReadContent.as_view(), name='group_content'),
-        path('utilization/', group.GroupReadUtilization.as_view(), name='group_utilization'),
-        path('general_information/', group.GroupReadGeneralInformation.as_view(), name='group_general_information'),
+    path('groups/', include([
+        path('<str:type>/create', group.GroupCreateView.as_view(), name='group_create'),
+        path('<int:year>/<str:code>/', include([
+            path('identification/', group.GroupReadIdentification.as_view(), name='group_identification'),
+            path('content/', group.GroupReadContent.as_view(), name='group_content'),
+            path('utilization/', group.GroupReadUtilization.as_view(), name='group_utilization'),
+            path('general_information/', group.GroupReadGeneralInformation.as_view(), name='group_general_information'),
+        ]))
     ])),
-
     path('mini_trainings/<int:year>/<str:code>/', include([
         path(
             'identification/',
