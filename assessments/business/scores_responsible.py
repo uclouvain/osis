@@ -25,6 +25,7 @@
 ##############################################################################
 from django.db.models import QuerySet, Q
 
+from base.auth.roles.entity_manager import EntityManager
 from base.models import program_manager, entity_version
 from base.models.person import Person
 from osis_role.contrib.helper import EntityRoleHelper
@@ -42,7 +43,7 @@ def filter_learning_unit_year_according_person(queryset: QuerySet, person: Perso
     :return: queryset
     """
     structure = entity_version.build_current_entity_version_structure_in_memory()
-    entities_with_descendants = EntityRoleHelper.get_all_entities(person, ['entity_managers'])
+    entities_with_descendants = EntityRoleHelper.get_all_entities(person, [EntityManager.group_name])
 
     learning_units_of_prgm_mngr = program_manager.get_learning_unit_years_attached_to_program_managers(
         person.programmanager_set.all(),
