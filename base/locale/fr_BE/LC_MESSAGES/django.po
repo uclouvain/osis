@@ -909,7 +909,7 @@ msgid "Elaboration and management of the formation catalogue."
 msgstr "Elaboration et gestion du catalogue de formations."
 
 msgid "Email"
-msgstr "Email"
+msgstr "Courriel"
 
 msgid "End"
 msgstr "Fin"
