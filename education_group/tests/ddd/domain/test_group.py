@@ -27,7 +27,11 @@ import collections
 
 from django.test import SimpleTestCase
 
-from education_group.ddd.domain.group import GroupIdentity
+from base.models.enums.constraint_type import ConstraintTypeEnum
+from base.models.enums.education_group_types import GroupType
+from education_group.ddd.command import CreateGroupCommand
+from education_group.ddd.domain import group
+from education_group.ddd.domain.group import GroupIdentity, Group
 from education_group.ddd.factories.group import GroupFactory
 
 
@@ -57,4 +61,33 @@ class TestGroup(SimpleTestCase):
         self.assertEqual(
             self.group.year,
             self.group.entity_id.year
+        )
+
+
+class TestGroupBuilder(SimpleTestCase):
+    def setUp(self):
+        self.cmd = CreateGroupCommand(
+            code="LTRONC100T",
+            year=2018,
+            type=GroupType.COMMON_CORE.name,
+            abbreviated_title="Intitulé en francais",
+            title_fr="Titre en français",
+            title_en="Title in english",
+            credits=30,
+            constraint_type=ConstraintTypeEnum.CREDITS.name,
+            min_constraint=0,
+            max_constraint=20,
+            management_entity_acronym="AGRO",
+            teaching_campus_name="Mons Fucam",
+            organization_name="UCLouvain",
+            remark_fr="Remarque en francais",
+            remark_en="Remark in english",
+            start_year=2018,
+            end_year=None,
+        )
+
+    def test_assert_return_instance(self):
+        self.assertIsInstance(
+            group.builder.build_from_create_cmd(self.cmd),
+            Group
         )

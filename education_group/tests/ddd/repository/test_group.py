@@ -26,7 +26,10 @@
 from django.test import TestCase
 
 from base.models.enums.constraint_type import ConstraintTypeEnum
-from base.models.enums.education_group_types import GroupType
+from base.models.enums.education_group_types import GroupType, TrainingType
+from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.campus import CampusFactory
+from base.tests.factories.education_group_type import GroupEducationGroupTypeFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from education_group.ddd.domain import exception
 from education_group.ddd.domain._campus import Campus
@@ -34,9 +37,14 @@ from education_group.ddd.domain._content_constraint import ContentConstraint
 from education_group.ddd.domain._remark import Remark
 from education_group.ddd.domain._titles import Titles
 from education_group.ddd.domain._entity import Entity as EntityValueObject
-from education_group.ddd.domain.group import GroupIdentity, Group
+from education_group.ddd.domain.exception import AcademicYearNotFound, TypeNotFound, ManagementEntityNotFound, \
+    TeachingCampusNotFound
+from education_group.ddd.domain.group import GroupIdentity, Group, GroupUnannualizedIdentity
+from education_group.ddd.factories.group import GroupFactory
 from education_group.ddd.repository.group import GroupRepository
 from education_group.tests.factories.group_year import GroupYearFactory
+from education_group.tests.factories.group import GroupFactory as GroupModelDbFactory
+from education_group.models.group_year import GroupYear as GroupYearModelDb
 
 
 class TestGroupRepositoryGetMethod(TestCase):
@@ -111,3 +119,102 @@ class TestGroupRepositoryGetMethod(TestCase):
                 text_en=self.group_year_db.remark_en
             )
         )
+
+        self.assertIsInstance(group.unannualized_identity, GroupUnannualizedIdentity)
+        self.assertEqual(
+            group.unannualized_identity,
+            GroupUnannualizedIdentity(
+                uuid=self.group_year_db.group_id
+            )
+        )
+
+
+class TestGroupRepositoryCreateMethod(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        # Create database data
+        cls.management_entity_version = EntityVersionFactory(acronym='DRT')
+        cls.education_group_type = GroupEducationGroupTypeFactory()
+        cls.academic_year = AcademicYearFactory(year=2017)
+        cls.campus = CampusFactory()
+
+    def setUp(self):
+        # Construct DDD model based on database data
+        self.group_identity = GroupIdentity(code="LTRONC1200", year=2017)
+        self.group = GroupFactory(
+            entity_identity=self.group_identity,
+            type=self.education_group_type,
+            management_entity=EntityValueObject(acronym='DRT'),
+            teaching_campus=Campus(
+                name=self.campus.name,
+                university_name=self.campus.organization.name,
+            ),
+            start_year=2017,
+            end_year=None
+        )
+
+    def test_assert_raise_academic_year_not_found(self):
+        self.group.entity_id.year = 2000
+        with self.assertRaises(AcademicYearNotFound):
+            GroupRepository.create(self.group)
+
+    def test_assert_raise_group_type_not_found(self):
+        self.group.type = TrainingType.BACHELOR
+        with self.assertRaises(TypeNotFound):
+            GroupRepository.create(self.group)
+
+    def test_assert_raise_management_entity_not_found(self):
+        self.group.management_entity = EntityValueObject(acronym='AGRO')
+        with self.assertRaises(ManagementEntityNotFound):
+            GroupRepository.create(self.group)
+
+    def test_assert_raise_teaching_campus_not_found(self):
+        self.group.teaching_campus = Campus(
+            name="Fucam Mons",
+            university_name="UCLouvain",
+        )
+        with self.assertRaises(TeachingCampusNotFound):
+            GroupRepository.create(self.group)
+
+    def test_assert_group_created_map_fields(self):
+        group_identity = GroupRepository.create(self.group)
+
+        self.assertIsInstance(group_identity, GroupIdentity)
+        self.assertEqual(group_identity, self.group_identity)
+
+        group_inserted = GroupYearModelDb.objects.get(
+            partial_acronym=group_identity.code,
+            academic_year__year=group_identity.year
+        )
+        self.assertEqual(group_inserted.acronym, self.group.abbreviated_title)
+        self.assertEqual(group_inserted.title_fr, self.group.titles.title_fr)
+        self.assertEqual(group_inserted.title_en, self.group.titles.title_en)
+        self.assertEqual(group_inserted.constraint_type, self.group.content_constraint.type.name)
+        self.assertEqual(group_inserted.min_constraint, self.group.content_constraint.minimum)
+        self.assertEqual(group_inserted.max_constraint, self.group.content_constraint.maximum)
+
+        self.assertEqual(group_inserted.management_entity_id, self.management_entity_version.entity_id)
+        self.assertEqual(group_inserted.academic_year_id, self.academic_year.pk)
+        self.assertEqual(group_inserted.education_group_type_id, self.education_group_type.pk)
+        self.assertEqual(group_inserted.main_teaching_campus_id, self.campus.pk)
+
+    def test_assert_unannualized_identity_correctly_save(self):
+        group_identity = GroupRepository.create(self.group)
+
+        group_inserted = GroupYearModelDb.objects.get(
+            partial_acronym=group_identity.code,
+            academic_year__year=group_identity.year
+        )
+        self.assertEqual(group_inserted.group.start_year.year, 2017)
+        self.assertIsNone(group_inserted.group.end_year)
+
+    def test_assert_unannualized_identity_same_if_provided(self):
+        group_db = GroupModelDbFactory()
+        self.group.unannualized_identity = GroupUnannualizedIdentity(uuid=group_db.pk)
+        group_identity = GroupRepository.create(self.group)
+
+        group_inserted = GroupYearModelDb.objects.get(
+            partial_acronym=group_identity.code,
+            academic_year__year=group_identity.year
+        )
+        self.assertEqual(group_inserted.group.pk, group_db.pk)
