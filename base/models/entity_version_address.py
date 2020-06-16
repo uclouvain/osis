@@ -46,3 +46,11 @@ class EntityVersionAddress(models.Model):
     entity_version_id = models.ForeignKey('EntityVersion', on_delete=models.PROTECT)
     localisation = PointField(blank=True, null=True)
     is_main = models.BooleanField(default=False)
+
+    def save(self, *args, **kwargs):
+        if self.is_main and EntityVersionAddress.objects.filter(
+                is_main=True, entity_version_id=self.entity_version_id).exists():
+            raise AttributeError(
+                "There is already an EntityVersionAddress with this entity_version_id and is_main = True"
+            )
+        super(EntityVersionAddress, self).save()
