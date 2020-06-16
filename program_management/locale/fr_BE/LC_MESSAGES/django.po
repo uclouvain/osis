@@ -632,7 +632,7 @@ msgid "Utilizations"
 msgstr "Utilisations"
 
 msgid "Version"
-msgstr "Sigle de la version"
+msgstr "Version"
 
 msgid "Version name"
 msgstr "Sigle de la version"
