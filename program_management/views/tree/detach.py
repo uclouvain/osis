@@ -34,6 +34,7 @@ from base.views.common import display_success_messages
 from base.views.common import display_error_messages, display_warning_messages
 from base.views.mixins import AjaxTemplateMixin
 from program_management.ddd import command
+from program_management.ddd.domain import link
 from program_management.ddd.service.write import detach_node_service
 from program_management.ddd.service.read import detach_warning_messages_service
 from program_management.forms.tree.detach import DetachNodeForm
@@ -62,18 +63,6 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
     def root_id(self):
         return self.path_to_detach.split('|')[0]
 
-    @property
-    def confirmation_message(self):
-        msg = "%(acronym)s" % {"acronym": self.object.child.acronym}
-        if hasattr(self.object.child, 'partial_acronym'):
-            msg = "%(partial_acronym)s - %(acronym)s" % {
-                "acronym": msg,
-                "partial_acronym": self.object.child.partial_acronym
-            }
-        return _("Are you sure you want to detach %(acronym)s ?") % {
-            "acronym": msg
-        }
-
     def get_context_data(self, **kwargs):
         context = super(DetachNodeView, self).get_context_data(**kwargs)
         detach_node_command = command.DetachNodeCommand(path_where_to_detach=self.request.GET.get('path'), commit=False)
@@ -81,11 +70,13 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
         if warning_messages:
             display_warning_messages(self.request, warning_messages)
         try:
-            detach_node_service.detach_node(detach_node_command)
+            link_to_detach_id = detach_node_service.detach_node(detach_node_command)
         except osis_common.ddd.interface.BusinessExceptions as business_exception:
             display_error_messages(self.request, business_exception.messages)
         else:
-            context['confirmation_message'] = self.confirmation_message
+            context['confirmation_message'] = _("Are you sure you want to detach %(acronym)s ?") % {
+                "acronym": link_to_detach_id.child_code
+            }
         return context
 
     def get_initial(self):
@@ -101,12 +92,7 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
         )
         return obj
 
-    @cached_property
-    def object(self):
-        return self.get_object()
-
     def form_valid(self, form):
-        self.object
         try:
             link_entity_id = form.save()
         except osis_common.ddd.interface.BusinessExceptions as business_exception:
@@ -121,18 +107,15 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
             }]
         )
 
-        self._remove_element_from_clipboard_if_stored()
+        self._remove_element_from_clipboard_if_stored(link_entity_id)
         return super().form_valid(form)
 
     def form_invalid(self, form):
         return super(DetachNodeView, self).form_invalid(form)
 
-    def _remove_element_from_clipboard_if_stored(self):
+    def _remove_element_from_clipboard_if_stored(self, link_entity_id: link.LinkIdentity):
         element_cache = ElementCache(self.request.user)
-        element_code = self.object.child_branch.partial_acronym \
-            if self.object.child_branch else self.object.child_leaf.acronym
-        element_year = self.object.child.academic_year.year
-        if element_cache.equals_element(element_code, element_year):
+        if element_cache.equals_element(link_entity_id.child_code, link_entity_id.child_year):
             element_cache.clear()
 
     def get_success_url(self):
