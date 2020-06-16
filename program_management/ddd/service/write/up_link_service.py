@@ -24,13 +24,10 @@
 from typing import List
 
 from base.ddd.utils.validation_message import BusinessValidationMessage
-from program_management.ddd.repositories import persist_tree, load_tree, load_node
+from program_management.ddd.repositories import load_node, load_tree, persist_tree
 from program_management.models.enums import node_type
 
 
-#  FIXME Use path in place of parent and child id when group element year form is refactored to use ddd
-#  TODO split this service into two files one for up and the other for down
-#  TODO take a command that have path
 def up_link(
         root_id: int,
         parent_id: int,
@@ -49,30 +46,6 @@ def up_link(
     if not previous_order >= 0:
         return []
     link_to_down = parent_node.children[previous_order]
-    link_to_up.order_up()
-    link_to_down.order_down()
-
-    persist_tree.persist(tree)
-    return []
-
-
-def down_link(
-        root_id: int,
-        parent_id: int,
-        child_id: int,
-        child_type: node_type.NodeType
-) -> List[BusinessValidationMessage]:
-    parent_node = load_node.load_node_group_year(parent_id)
-    child_node = load_node.load_by_type(child_type, child_id)
-
-    tree = load_tree.load(root_id)
-    link_to_down = tree.get_link(parent_node, child_node)
-    parent_node = link_to_down.parent
-
-    next_order = link_to_down.order + 1
-    if not len(parent_node.children) > next_order:
-        return []
-    link_to_up = parent_node.children[next_order]
     link_to_up.order_up()
     link_to_down.order_down()
 

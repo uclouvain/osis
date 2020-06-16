@@ -30,12 +30,13 @@ from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
 from waffle.decorators import waffle_flag
 
+import program_management.ddd.service.write.up_link_service
 from base.models.education_group_year import EducationGroupYear
 from base.models.group_element_year import GroupElementYear
 from base.views.common import display_success_messages
 from base.views.education_groups import perms
 from osis_common.utils.models import get_object_or_none
-from program_management.ddd.service import order_link_service
+from program_management.ddd.service.write import down_link_service
 from program_management.models.enums import node_type
 
 
@@ -44,14 +45,14 @@ from program_management.models.enums import node_type
 @waffle_flag("education_group_update")
 @require_http_methods(['POST'])
 def up(request, root_id, link_id):
-    return _order_content(request, root_id, link_id, order_link_service.up_link)
+    return _order_content(request, root_id, link_id, program_management.ddd.service.write.up_link_service.up_link)
 
 
 @login_required
 @waffle_flag("education_group_update")
 @require_http_methods(['POST'])
 def down(request, root_id, link_id):
-    return _order_content(request, root_id, link_id, order_link_service.down_link)
+    return _order_content(request, root_id, link_id, down_link_service.down_link)
 
 
 def _order_content(

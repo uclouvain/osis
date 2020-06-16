@@ -25,7 +25,8 @@ from unittest import mock
 
 from django.test import SimpleTestCase
 
-from program_management.ddd.service import order_link_service
+import program_management.ddd.service.write.up_link_service
+from program_management.ddd.service.write import down_link_service
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
@@ -64,7 +65,7 @@ class TestUpDownChildren(SimpleTestCase):
     @mock.patch("program_management.ddd.repositories.load_node.load_by_type")
     def test_do_not_modify_order_when_applying_up_on_first_element(self, mock_load_child):
         mock_load_child.return_value = self.link0.child
-        order_link_service.up_link(
+        program_management.ddd.service.write.up_link_service.up_link(
             self.parent.node_id,
             self.link0.parent.node_id,
             self.link0.child.node_id,
@@ -79,7 +80,7 @@ class TestUpDownChildren(SimpleTestCase):
     @mock.patch("program_management.ddd.repositories.load_node.load_by_type")
     def test_up_action_on_link_should_increase_order_by_one(self, mock_load_child):
         mock_load_child.return_value = self.link1.child
-        order_link_service.up_link(
+        program_management.ddd.service.write.up_link_service.up_link(
             self.parent.node_id,
             self.link1.parent.node_id,
             self.link1.child.node_id,
@@ -94,7 +95,7 @@ class TestUpDownChildren(SimpleTestCase):
     @mock.patch("program_management.ddd.repositories.load_node.load_by_type")
     def test_down_action_on_link_should_decrease_order_by_one(self, mock_load_child):
         mock_load_child.return_value = self.link1.child
-        order_link_service.down_link(
+        down_link_service.down_link(
             self.parent.node_id,
             self.link1.parent.node_id,
             self.link1.child.node_id,
@@ -109,7 +110,7 @@ class TestUpDownChildren(SimpleTestCase):
     @mock.patch("program_management.ddd.repositories.load_node.load_by_type")
     def test_do_not_modify_order_when_applying_down_on_last_element(self, mock_load_child):
         mock_load_child.return_value = self.link2.child
-        order_link_service.down_link(
+        down_link_service.down_link(
             self.parent.node_id,
             self.link2.parent.node_id,
             self.link2.child.node_id,
