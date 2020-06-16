@@ -50,21 +50,23 @@ class TestIsPrerequisiteValidator(TestValidatorValidateMixin, SimpleTestCase):
 
     def test_should_not_raise_exception_when_children_of_node_to_detach_are_not_prerequisites(self):
         node_to_detach = self.common_core
+        path_parent_of_node_to_detach = "|".join([str(self.tree.root_node.node_id)])
         LinkFactory(parent=self.common_core, child=NodeLearningUnitYearFactory(is_prerequisite_of=[]))
         LinkFactory(parent=self.common_core, child=NodeLearningUnitYearFactory(is_prerequisite_of=[]))
 
-        validator = IsPrerequisiteValidator(self.tree, node_to_detach)
+        validator = IsPrerequisiteValidator(self.tree, path_parent_of_node_to_detach, node_to_detach)
         self.assertValidatorNotRaises(validator)
 
     def test_should_raise_exception_when_children_of_node_to_detach_are_prerequisites(self):
         node_to_detach = self.common_core
+        path_parent_of_node_to_detach = "|".join([str(self.tree.root_node.node_id)])
         link = LinkFactory(parent=self.common_core, child=NodeLearningUnitYearFactory(is_prerequisite_of=[]))
         link_with_child_that_is_prerequisite = LinkFactory(
             parent=self.common_core,
             child=NodeLearningUnitYearFactory(is_prerequisite_of=[link.child])
         )
 
-        validator = IsPrerequisiteValidator(self.tree, node_to_detach)
+        validator = IsPrerequisiteValidator(self.tree, path_parent_of_node_to_detach, node_to_detach)
         expected_message = _("Cannot detach education group year %(acronym)s as the following learning units "
                              "are prerequisite in %(formation)s: %(learning_units)s") % {
                                "acronym": node_to_detach.title,
@@ -74,13 +76,14 @@ class TestIsPrerequisiteValidator(TestValidatorValidateMixin, SimpleTestCase):
         self.assertValidatorRaises(validator, [expected_message])
 
     def test_should_raise_exception_when_node_to_detach_is_prerequisite(self):
+        path_parent_of_node_to_detach = "|".join([str(self.tree.root_node.node_id), str(self.common_core.node_id)])
         link_with_child_is_prerequisite = LinkFactory(
             parent=self.common_core,
             child=NodeLearningUnitYearFactory(is_prerequisite_of=[self.node_learning_unit])
         )
         node_to_detach = link_with_child_is_prerequisite.child
 
-        validator = IsPrerequisiteValidator(self.tree, node_to_detach)
+        validator = IsPrerequisiteValidator(self.tree, path_parent_of_node_to_detach, node_to_detach)
         expected_message = _(
             "Cannot detach learning unit %(acronym)s as it has a prerequisite or it is a prerequisite.") % {
                 "acronym": node_to_detach.code
@@ -94,7 +97,8 @@ class TestIsPrerequisiteValidator(TestValidatorValidateMixin, SimpleTestCase):
         LinkFactory(parent=self.tree.root_node, child=reused_node)
 
         node_to_detach = self.common_core
-        validator = IsPrerequisiteValidator(self.tree, node_to_detach)
+        path_parent_of_node_to_detach = "|".join([str(self.tree.root_node.node_id)])
+        validator = IsPrerequisiteValidator(self.tree, path_parent_of_node_to_detach, node_to_detach)
         self.assertValidatorNotRaises(validator)
 
 
