@@ -115,13 +115,6 @@ class ProgramTreeVersion(interface.RootEntity):
     def version_name(self) -> str:
         return self.entity_id.version_name
 
-    @property
-    def version_label(self):  # TODO :: to remove
-        if self.is_standard:
-            return 'Transition' if self.is_transition else ''
-        else:
-            return '{}-Transition'.format(self.version_name) if self.is_transition else self.version_name
-
 
 class ProgramTreeVersionIdentity(interface.EntityIdentity):
     def __init__(self, offer_acronym: str, year: int, version_name: str, is_transition: bool):

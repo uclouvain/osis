@@ -27,16 +27,35 @@ import factory.fuzzy
 
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType, GroupType
 from base.models.enums.learning_container_year_types import LearningContainerYearType
-from program_management.ddd.domain.node import NodeEducationGroupYear, NodeLearningUnitYear, NodeGroupYear, Node
+from program_management.ddd.domain.node import NodeEducationGroupYear, NodeLearningUnitYear, NodeGroupYear, Node, \
+    NodeNotAnnualizedIdentity, NodeIdentity
 
 
 def generate_end_date(node):
     return node.year + 10
 
 
+class NodeIdentityFactory(factory.Factory):
+    class Meta:
+        model = NodeIdentity
+        abstract = False
+
+    code = factory.Sequence(lambda n: 'Code%02d' % n)
+    year = factory.fuzzy.FuzzyInteger(low=1999, high=2099)
+
+
+class NodeNotAnnualizedIdentityFactory(factory.Factory):
+    class Meta:
+        model = NodeNotAnnualizedIdentity
+        abstract = False
+
+    uuid = factory.Sequence(lambda n: n+1)
+
+
 class NodeFactory(factory.Factory):
 
     node_id = factory.Sequence(lambda n: n+1)
+    not_annualized_id = factory.SubFactory(NodeNotAnnualizedIdentityFactory)
     code = factory.Sequence(lambda n: 'Code%02d' % n)
     title = factory.Sequence(lambda n: 'Acronym%02d' % n)
     year = factory.fuzzy.FuzzyInteger(low=1999, high=2099)
@@ -63,6 +82,10 @@ class NodeGroupYearFactory(NodeFactory):
         abstract = False
 
     node_type = factory.fuzzy.FuzzyChoice(TrainingType)
+    group_title_fr = factory.fuzzy.FuzzyText(length=240)
+    group_title_en = factory.fuzzy.FuzzyText(length=240)
+    remark_fr = factory.fuzzy.FuzzyText(length=240)
+    remark_en = factory.fuzzy.FuzzyText(length=240)
     offer_title_fr = factory.fuzzy.FuzzyText(length=240)
     offer_title_en = factory.fuzzy.FuzzyText(length=240)
     offer_partial_title_fr = factory.fuzzy.FuzzyText(length=240)

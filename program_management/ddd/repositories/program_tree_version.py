@@ -43,19 +43,28 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
     @classmethod
     def create(cls, program_tree_version: 'ProgramTreeVersion') -> 'ProgramTreeVersionIdentity':
         ProgramTreeRepository.create(program_tree_version.get_tree())
+
+        education_group_year_id = EducationGroupYear.objects.filter(
+            acronym=program_tree_version.entity_id.offer_acronym,
+            academic_year__year=program_tree_version.entity_id.year,
+        ).values_list(
+            'pk', flat=True
+        )[0]
+
+        group_year_id = GroupYear.objects.filter(
+            partial_acronym=program_tree_version.program_tree_identity.code,
+            academic_year__year=program_tree_version.program_tree_identity.year,
+        ).values_list(
+            'pk', flat=True
+        )[0]
+
         EducationGroupVersion(
             version_name=program_tree_version.version_name,
             title_fr=program_tree_version.title_fr,
             title_en=program_tree_version.title_en,
-            offer=EducationGroupYear.objects.filter(
-                acronym=program_tree_version.entity_id.offer_acronym,
-                academic_year__year=program_tree_version.entity_id.year
-            ).values_list('pk', flat=True)[0],
+            offer_id=education_group_year_id,
             is_transition=False,
-            root_group=GroupYear.objects.filter(
-                partial_acronym=program_tree_version.program_tree_identity.code,
-                academic_year=program_tree_version.program_tree_identity.year
-            ).values_list('pk', flat=True)[0]
+            root_group_id=group_year_id
         ).save()
         return program_tree_version.entity_id
 

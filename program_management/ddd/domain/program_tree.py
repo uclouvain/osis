@@ -63,7 +63,7 @@ class ProgramTreeIdentity(interface.EntityIdentity):
 
 class ProgramTreeBuilder:
     def build_from(self, from_tree: 'ProgramTree') -> 'ProgramTree':
-        new_root_node = node.NodeFactory().deepcopy_node_without_copy_children_recursively(from_tree.root_node)
+        new_root_node = node.factory.build_from(from_tree.root_node)
         new_root_node.code = generate_node_code_service.generate_node_code(
             from_tree.root_node.code,
             from_tree.root_node.year
@@ -83,7 +83,7 @@ class ProgramTreeBuilder:
         children_node_list = root_node.get_direct_children_as_nodes()
         for child_node in children_node_list:
             if child_node.node_type in child_types:
-                new_child_node = node.factory.deepcopy_node_without_copy_children_recursively(original_node=child_node)
+                new_child_node = node.factory.build_from(original_node=child_node)
                 root_node.add_child(new_child_node)
 
 

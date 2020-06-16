@@ -48,7 +48,7 @@ from program_management.models.enums.node_type import NodeType
 
 
 class NodeFactory:
-    def get_node(self, type: NodeType, **node_attrs):
+    def get_node(self, type: NodeType, **node_attrs) -> 'Node':
         node_cls = {
             NodeType.EDUCATION_GROUP: NodeEducationGroupYear,   # TODO: Remove when migration is done
 
@@ -58,7 +58,12 @@ class NodeFactory:
         }[type]
         return node_cls(**node_attrs)
 
-    def deepcopy_node_without_copy_children_recursively(self, original_node: 'Node'):
+    def build_from(self, node: 'Node') -> 'Node':  # TODO :: unit tests
+        copied_node = self.deepcopy_node_without_copy_children_recursively(node)
+        copied_node._has_changed = True
+        return copied_node
+
+    def deepcopy_node_without_copy_children_recursively(self, original_node: 'Node') -> 'Node':
         original_children = original_node.children
         original_node.children = []  # To avoid recursive deep copy of all children behind
         copied_node = copy.deepcopy(original_node)
@@ -81,19 +86,31 @@ class NodeIdentity(interface.EntityIdentity):
         return self.code == other.code and self.year == other.year
 
 
+class NodeNotAnnualizedIdentity(interface.ValueObject):
+    """
+    This ID is necessary to find a Node through years because code can be different through years.
+    """
+    def __init__(self, uuid: str):
+        self.uuid = uuid
+
+    def __hash__(self):
+        return hash(self.uuid)
+
+    def __eq__(self, other):
+        return self.uuid == other.uuid
+
+
 class Node(interface.Entity):
 
     _academic_year = None
 
     _deleted_children = None
-
-    code = None
-    year = None
-    type = None
+    _has_changed = False  # If True, need to persist changes on the Node
 
     def __init__(
             self,
             node_id: int = None,
+            not_annualized_id: NodeNotAnnualizedIdentity = None,
             node_type: EducationGroupTypesEnum = None,
             end_date: int = None,
             children: List['Link'] = None,
@@ -103,6 +120,7 @@ class Node(interface.Entity):
             credits: Decimal = None
     ):
         self.node_id = node_id
+        self.not_annualized_id = not_annualized_id
         self.children = children
         self._children = children or []
         self.node_type = node_type
