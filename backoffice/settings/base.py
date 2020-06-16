@@ -173,7 +173,7 @@ TEMPLATES = [
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': os.environ.get("DATABASE_NAME", 'osis_local'),
         'USER': os.environ.get("POSTGRES_USER", 'osis'),
         'PASSWORD': os.environ.get("POSTGRES_PASSWORD", 'osis'),
