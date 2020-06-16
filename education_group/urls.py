@@ -1,7 +1,10 @@
-from django.urls import include, path
+from django.urls import include, path, register_converter
 
+from education_group.converters import GroupTypeConverter
 from education_group.views import group, training, mini_training, general_information
 from education_group.views.proxy.read import ReadEducationGroupRedirectView
+
+register_converter(GroupTypeConverter, 'group_type')
 
 urlpatterns = [
     path(
@@ -10,7 +13,7 @@ urlpatterns = [
         name='education_group_read_proxy'
     ),
     path('groups/', include([
-        path('<str:type>/create', group.GroupCreateView.as_view(), name='group_create'),
+        path('<group_type:type>/create', group.GroupCreateView.as_view(), name='group_create'),
         path('<int:year>/<str:code>/', include([
             path('identification/', group.GroupReadIdentification.as_view(), name='group_identification'),
             path('content/', group.GroupReadContent.as_view(), name='group_content'),

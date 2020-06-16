@@ -28,6 +28,7 @@ from django.utils.translation import gettext_lazy as _
 
 from base.forms.education_group.common import MainCampusChoiceField, MainEntitiesVersionChoiceField
 from base.models.academic_year import AcademicYear
+from base.models.enums.constraint_type import ConstraintTypeEnum
 
 
 class GroupForm(forms.Form):
@@ -37,7 +38,7 @@ class GroupForm(forms.Form):
     title_fr = forms.CharField(max_length=240, label=_("Title in French"))
     title_en = forms.CharField(max_length=240, label=_("Title in English"))
     credits = forms.CharField(label=_("Credits"))
-    constraint_type = forms.ChoiceField(label=_("Type of constraint"))
+    constraint_type = forms.ChoiceField(choices=ConstraintTypeEnum.choices(), label=_("Type of constraint"))
     min_constraint = forms.CharField(label=_("minimum constraint"))
     max_constraint = forms.CharField(label=_("maximum constraint"))
     management_entity = MainEntitiesVersionChoiceField(queryset=None, label=_("Management entity"))
@@ -48,3 +49,21 @@ class GroupForm(forms.Form):
     def __init__(self, *args, user, **kwargs):
         self.user = user
         super().__init__(*args, **kwargs)
+
+    def clean_academic_year(self):
+        if self.cleaned_data['academic_year']:
+            return self.cleaned_data['academic_year'].year
+        return None
+
+    def clean_teaching_campus(self):
+        if self.cleaned_data['teaching_campus']:
+            return {
+                'name': self.cleaned_data['teaching_campus'].name,
+                'organization_name': self.cleaned_data['teaching_campus'].organization.name,
+            }
+        return None
+
+    def clean_management_entity(self):
+        if self.cleaned_data['management_entity']:
+            return self.cleaned_data['management_entity'].most_recent_acronym
+        return None
