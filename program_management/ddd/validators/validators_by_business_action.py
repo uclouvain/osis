@@ -157,7 +157,7 @@ class DetachNodeValidatorList(business_validator.BusinessListValidator):
                 DetachRootValidator(tree, path_to_parent),
                 MinimumEditableYearValidator(tree),
                 DetachAuthorizedRelationshipValidator(tree, node_to_detach, detach_from),
-                IsPrerequisiteValidator(tree, node_to_detach),
+                IsPrerequisiteValidator(tree, path_to_parent, node_to_detach),
                 DetachOptionValidator(tree, path_to_node_to_detach, tree_repository),
             ]
 
@@ -165,7 +165,7 @@ class DetachNodeValidatorList(business_validator.BusinessListValidator):
             self.validators = [
                 AuthorizedRelationshipLearningUnitValidator(tree, node_to_detach, detach_from),
                 MinimumEditableYearValidator(tree),
-                IsPrerequisiteValidator(tree, node_to_detach),
+                IsPrerequisiteValidator(tree, path_to_parent, node_to_detach),
             ]
 
         else:
