@@ -51,7 +51,7 @@ def navigation_learning_unit(user, obj: LearningUnitYear, url_name: str):
 
 
 @register.inclusion_tag('templatetags/navigation_education_group.html', takes_context=False)
-def navigation_group(user, obj: GroupYear, url_name: str, current_version: 'ProgramTreeVersion'):
+def navigation_group(user, obj: GroupYear, url_name: str, current_version: Optional['ProgramTreeVersion'] = None):
     return _navigation_base(_get_group_filter_class, _reverse_group_year_url, user, obj, url_name, "partial_acronym",
                             current_version)
 
