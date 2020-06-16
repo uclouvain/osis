@@ -31,11 +31,9 @@ from django.test import TestCase
 from django.urls import reverse
 
 from base.forms.learning_unit.search.simple import LearningUnitFilter
-from base.models.education_group_year import EducationGroupYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.templatetags import navigation
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.user import UserFactory
 from base.utils.cache import SearchParametersCache
@@ -47,6 +45,7 @@ from program_management.tests.factories.education_group_version import Education
 
 class TestNavigationMixin:
     search_type = "DEFINE"
+
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(current=True)
@@ -189,6 +188,7 @@ class TestNavigationLearningUnitYear(TestNavigationMixin, TestCase):
 
 class TestNavigationGroupYear(TestNavigationMixin, TestCase):
     search_type = GroupYear.__name__
+    current_version_value = 9  # TODO : Devrait être un programTreeVersion
 
     @classmethod
     def generate_elements(cls):
@@ -205,7 +205,7 @@ class TestNavigationGroupYear(TestNavigationMixin, TestCase):
         return 'training_identification'
 
     def navigation_function(self, *args, **kwargs):
-        return navigation.navigation_group(*args, **kwargs)
+        return navigation.navigation_group({}, *args, **kwargs)
 
     def test_navigation_when_no_search_query(self):
         self.cache.clear()
@@ -251,3 +251,17 @@ class TestNavigationGroupYear(TestNavigationMixin, TestCase):
             "previous_url": self._get_element_url(self.query_parameters, inner_element_index - 1),
         }
         self.assertNavigationContextEquals(expected_context, inner_element_index)
+
+    def navigation_function_with_current_version(self, *args, **kwargs):
+        return navigation.navigation_group({'current_version': self.current_version_value}, *args, **kwargs)
+
+    def test_navigation_with_version(self):
+        self.cache.clear()
+
+        context = self.navigation_function_with_current_version(
+            self.user,
+            self.elements_sorted_by_acronym[0],
+            self.url_name
+        )
+
+        self.assertEqual(context['current_version'], self.current_version_value)
