@@ -123,6 +123,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             display_warning_messages(self.request, message)
             return root_node
 
+    #  TODO add path in context
     def get_context_data(self, **kwargs):
         return {
             **super().get_context_data(**kwargs),

@@ -39,6 +39,7 @@ from program_management.ddd.service import order_link_service
 from program_management.models.enums import node_type
 
 
+#  TODO take path as only parameter
 @login_required
 @waffle_flag("education_group_update")
 @require_http_methods(['POST'])

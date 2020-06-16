@@ -29,6 +29,8 @@ from program_management.models.enums import node_type
 
 
 #  FIXME Use path in place of parent and child id when group element year form is refactored to use ddd
+#  TODO split this service into two files one for up and the other for down
+#  TODO take a command that have path
 def up_link(
         root_id: int,
         parent_id: int,
@@ -42,6 +44,7 @@ def up_link(
     link_to_up = tree.get_link(parent_node, child_node)
     parent_node = link_to_up.parent
 
+    # TODO extract this logic into node
     previous_order = link_to_up.order - 1
     if not previous_order >= 0:
         return []
