@@ -29,7 +29,6 @@ from program_management.models.enums import node_type
 
 
 #  FIXME Use path in place of parent and child id when group element year form is refactored to use ddd
-#  TODO split this service into two files one for up and the other for down
 #  TODO take a command that have path
 
 
