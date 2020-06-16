@@ -39,7 +39,9 @@ from base.utils.cache import SearchParametersCache
 from base.utils.db import convert_order_by_strings_to_expressions
 from base.views.learning_units.search.common import SearchTypes
 from education_group.models.group_year import GroupYear
+from program_management.ddd.business_types import *
 from program_management.forms.education_groups import GroupFilter
+from typing import Optional
 
 
 @register.inclusion_tag('templatetags/navigation_learning_unit.html', takes_context=False)
@@ -48,14 +50,14 @@ def navigation_learning_unit(user, obj: LearningUnitYear, url_name: str):
                             "acronym")
 
 
-@register.inclusion_tag('templatetags/navigation_education_group.html', takes_context=True)
-def navigation_group(context, user, obj: GroupYear, url_name: str):
+@register.inclusion_tag('templatetags/navigation_education_group.html', takes_context=False)
+def navigation_group(user, obj: GroupYear, url_name: str, current_version: 'ProgramTreeVersion'):
     return _navigation_base(_get_group_filter_class, _reverse_group_year_url, user, obj, url_name, "partial_acronym",
-                            context.get('current_version'))
+                            current_version)
 
 
 def _navigation_base(filter_class_function, reverse_url_function, user, obj, url_name, code_field_name,
-                     current_version=None):
+                     current_version: Optional['ProgramTreeVersion'] = None):
     context = {"current_element": obj}
     if current_version:
         context.update({'current_version': current_version})
