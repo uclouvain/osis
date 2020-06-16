@@ -183,9 +183,3 @@ class AddToGroupsSignalsTest(TestCase):
         self.create_test_entity_manager()
         self.assertTrue(self.is_member('entity_managers'),
                         'entity_manager_foo should be in entity_managers group')
-
-    def test_remove_from_entity_manager_group(self):
-        faculty_administrator_foo = self.create_test_entity_manager()
-        faculty_administrator_foo.delete()
-        self.assertFalse(self.is_member('entity_managers'),
-                         'faculty_administrator_foo should not be in entity_managers group anymore')

@@ -29,7 +29,6 @@ from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver, Signal
 
 from base import models as mdl
-from base.auth.roles import entity_manager
 from osis_common.models.serializable_model import SerializableModel
 from osis_common.models.signals.authentication import user_created_signal, user_updated_signal
 
@@ -130,13 +129,6 @@ def remove_from_tutor_group(sender, instance, **kwargs):
     if instance.person.user:
         tutors_group = Group.objects.get(name='tutors')
         instance.person.user.groups.remove(tutors_group)
-
-
-@receiver(post_delete, sender=entity_manager.EntityManager)
-def remove_from_entity_manager_group(sender, instance, **kwargs):
-    if instance.person.user:
-        entity_managers_group = get_or_create_group()
-        instance.person.user.groups.remove(entity_managers_group)
 
 
 @receiver(post_delete, sender=mdl.program_manager.ProgramManager)
