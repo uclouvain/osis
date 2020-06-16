@@ -2659,56 +2659,13 @@
         }
     },
     {
-            "model": "auth.group",
-            "fields": {
-                "name": "entity_managers",
-                "permissions": [
-                    [
-                        "view_educationgroup",
-                        "base",
-                        "educationgroup"
-                    ],
-                    [
-                        "change_scoresresponsible",
-                        "assessments",
-                        "scoresencoding"
-                    ],
-                    [
-                        "view_scoresresponsible",
-                        "assessments",
-                        "scoresencoding"
-                    ],
-                    [
-                        "change_programmanager",
-                        "base",
-                        "programmanager"
-                    ],
-                    [
-                        "view_programmanager",
-                        "base",
-                        "programmanager"
-                    ],
-                    [
-                        "can_access_catalog",
-                        "base",
-                        "offer"
-                    ],
-                    [
-                        "is_institution_administrator",
-                        "base",
-                        "person"
-                    ]
-                ]
-            }
-        },
-    {
         "model": "auth.group",
         "fields": {
             "name": "assistant_administrators",
             "permissions": [
                 [
                     "add_academicassistant",
-                    "assistant",
+                    "assistant",ls
                     "academicassistant"
                 ],
                 [
