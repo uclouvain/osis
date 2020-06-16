@@ -31,9 +31,10 @@ from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
 class EntityVersionAddressAdmin(VersionAdmin, OsisModelAdmin):
+    list_display = ('id', 'entity_version_id', 'is_main', 'country', 'city', 'postal_code',)
     search_fields = ['city', 'street', 'postal_code', 'country', 'entity_version_id']
     raw_id_fields = ('country', 'entity_version_id')
-    list_filter = ['country', 'is_main']
+    list_filter = ['is_main', 'country']
 
 
 class EntityVersionAddress(models.Model):
