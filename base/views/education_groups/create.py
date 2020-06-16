@@ -28,6 +28,7 @@ import re
 from django import forms
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import ValidationError, PermissionDenied
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -55,6 +56,7 @@ from base.views.mixins import FlagMixin, AjaxTemplateMixin
 from osis_common.decorators.ajax import ajax_required
 from osis_common.utils.models import get_object_or_none
 from osis_role import errors
+from osis_role.contrib.views import AjaxPermissionRequiredMixin
 from program_management.models.education_group_version import EducationGroupVersion
 
 FORMS_BY_CATEGORY = {
@@ -219,10 +221,10 @@ def validate_field(request, category, education_group_year_pk=None):
     return JsonResponse(response)
 
 
-class CreateEducationGroupSpecificVersion(AjaxTemplateMixin, CreateView):
+class CreateEducationGroupSpecificVersion(AjaxPermissionRequiredMixin, AjaxTemplateMixin, CreateView):
     template_name = "education_group/create_specific_version_inner.html"
     form_class = SpecificVersionForm
-    rules = [perms.is_eligible_to_add_education_group_year_version]
+    permission_required = 'base.create_specific_version'
 
     @cached_property
     def person(self):
@@ -230,7 +232,7 @@ class CreateEducationGroupSpecificVersion(AjaxTemplateMixin, CreateView):
 
     @cached_property
     def education_group_year(self):
-        return get_object_or_404(EducationGroupYear, pk=self.kwargs['education_group_year_id'])
+        return get_object_or_404(EducationGroupYear, academic_year__year=self.kwargs['year'], acronym=self.kwargs['code'])
 
     def _call_rule(self, rule):
         return rule(self.person, self.education_group_year)
@@ -246,25 +248,23 @@ class CreateEducationGroupSpecificVersion(AjaxTemplateMixin, CreateView):
     def get_context_data(self, **kwargs):
         context = super(CreateEducationGroupSpecificVersion, self).get_context_data(**kwargs)
         context['education_group_year'] = self.education_group_year
-        context['root_id'] = self.kwargs['root_id']
         context['form'] = self.get_form()
         return context
 
     def form_valid(self, form):
         response = super().form_valid(form)
-        for education_group_year in form.education_group_years_list:
-            message = \
-                _("Specific version for education group year %(acronym)s (%(academic_year)s) successfully created.") % \
-                {
-                    "acronym": form.clean_version_name(),
-                    "academic_year": education_group_year.academic_year,
-                }
-            display_success_messages(self.request, message)
-            return response
+        message = \
+            _("Specific version for education group year %(acronym)s (%(academic_year)s) successfully created.") % \
+            {
+                "acronym": self.education_group_year.partial_acronym,
+                "academic_year": self.education_group_year.academic_year,
+            }
+        display_success_messages(self.request, message)
+        return response
 
     def get_success_url(self):
-        return reverse("education_group_read",
-                       args=[self.kwargs['root_id'], self.kwargs['education_group_year_id']])
+        return reverse("training_identification", args=[self.education_group_year.academic_year.year,
+                                                        self.education_group_year.partial_acronym])
 
 
 @login_required

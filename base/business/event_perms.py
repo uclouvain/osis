@@ -206,10 +206,3 @@ class EventPermSummaryCourseSubmission(EventPerm):
     model = LearningUnitYear
     event_reference = academic_calendar_type.SUMMARY_COURSE_SUBMISSION
     error_msg = _("Summary course submission is not allowed for tutors during this period.")
-
-
-def generate_event_perm_creation_specific_version(person, obj=None, raise_exception=True):
-    if person.is_central_manager:
-        return EventPermOpened(obj, raise_exception)
-    else:
-        return EventPermClosed(obj, raise_exception)

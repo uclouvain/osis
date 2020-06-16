@@ -72,7 +72,7 @@ class ProgramTreeBuilder:
             authorized_relationships=from_tree.authorized_relationships,
             root_node=from_tree.root_node
         )
-        return ProgramTree(root_node=from_tree.root_node)
+        return ProgramTree(root_node=new_root_node)
 
     def _generate_mandatory_direct_children(
             self,
@@ -83,7 +83,7 @@ class ProgramTreeBuilder:
         children_node_list = root_node.get_direct_children_as_nodes()
         for child_node in children_node_list:
             if child_node.node_type in child_types:
-                new_child_node = node.factory.build_from(original_node=child_node)
+                new_child_node = node.factory.build_from(node=child_node)
                 root_node.add_child(new_child_node)
 
 

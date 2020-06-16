@@ -27,12 +27,13 @@ from education_group.models.group_year import GroupYear
 
 
 def generate_node_code(code_from_standard_root_node: str, year: int) -> str:
-    last_partial_acronym = _get_last_partial_acronym_using(code_from_standard_root_node, year)
+    last_partial_acronym = _get_last_partial_acronym_using(code_from_standard_root_node, year).partial_acronym
     return last_partial_acronym[:-4] + str(int(last_partial_acronym[-4:][:-1]) + 1) + last_partial_acronym[-1:]
 
 
 def _get_last_partial_acronym_using(code: str, year: int) -> bool:
-    return GroupYear.objects.get(
-        partial_acronym__startswith=code[-4:],
+    return GroupYear.objects.filter(
+        partial_acronym__startswith=code[:-4],
+        partial_acronym__endswith=code[-1:],
         academic_year__year=year
     ).order_by("partial_acronym").last()

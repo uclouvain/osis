@@ -59,7 +59,7 @@ def __update_or_create_nodes(tree: program_tree.ProgramTree):
 
 def __update_or_create_group_model(node: 'NodeGroupYear') -> Group:
     group, created = Group.objects.update_or_create(
-        pk=node.not_annualized_id.uuid,
+        pk=node.not_annualized_id.uuid if node.not_annualized_id else None,
         defaults={
             'start_year': AcademicYear.objects.get(year=node.start_year),
             'end_year': AcademicYear.objects.get(year=node.end_date) if node.end_date else None,

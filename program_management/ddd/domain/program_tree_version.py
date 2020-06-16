@@ -63,8 +63,9 @@ class ProgramTreeVersionBuilder:
             command: 'CreateProgramTreeVersionCommand'
     ) -> 'ProgramTreeVersion':
         from_tree = from_tree_version.get_tree()
+        new_program_tree = ProgramTreeBuilder().build_from(from_tree=from_tree)
         return ProgramTreeVersion(
-            program_tree_identity=from_tree_version.program_tree_identity,
+            program_tree_identity=new_program_tree.entity_id,
             program_tree_repository=from_tree_version.program_tree_repository,
             entity_identity=ProgramTreeVersionIdentity(
                 offer_acronym=from_tree_version.entity_id.offer_acronym,
@@ -74,7 +75,7 @@ class ProgramTreeVersionBuilder:
             ),
             title_en=command.title_en,
             title_fr=command.title_fr,
-            tree=ProgramTreeBuilder().build_from(from_tree=from_tree)
+            tree=new_program_tree
         )
 
 

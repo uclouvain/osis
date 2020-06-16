@@ -1,5 +1,6 @@
 from django.urls import include, path
 
+from base.views.education_groups import create
 from education_group.views import group, training, mini_training, general_information
 from education_group.views.proxy.read import ReadEducationGroupRedirectView
 
@@ -41,6 +42,8 @@ urlpatterns = [
         ),
     ])),
     path('trainings/<int:year>/<str:code>/', include([
+        path('create_education_group_version/', create.CreateEducationGroupSpecificVersion.as_view(),
+             name="create_education_group_version"),
         path('identification/', training.TrainingReadIdentification.as_view(), name='training_identification'),
         path('diplomas/', training.TrainingReadDiplomaCertificate.as_view(), name='training_diplomas'),
         path(
