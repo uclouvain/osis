@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,15 +23,31 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import factory
+from typing import List
 
-from base.tests.factories.structure import StructureFactory
-from osis_role.contrib.tests.factories import EntityModelFactory
+from base.models.entity import Entity
+from base.models.person import Person
+from education_group.auth.scope import Scope
+from osis_role import role
 
 
-class EntityManagerFactory(EntityModelFactory):
-    class Meta:
-        model = "base.EntityManager"
-        django_get_or_create = ('person', 'entity',)
+class EntityRoleHelper():
+    """
+       Utility class to provide role-related static methods
+    """
+    @staticmethod
+    def get_all_entities(person: Person, group_names: List[str]) -> List[Entity]:
+        role_mdls = [r for r in role.role_manager.roles if r.group_name in group_names]
+        qs = None
 
-    structure = factory.SubFactory(StructureFactory)
+        for role_mdl in role_mdls:
+            subqs = role_mdl.objects.filter(person=person)
+            if hasattr(role_mdl, 'scopes'):
+                subqs = subqs.filter(scopes=[Scope.ALL.value])
+            subqs = subqs.values('entity_id', 'with_child')
+            if qs is None:
+                qs = subqs
+            else:
+                qs = qs.union(subqs)
+
+        return qs.get_entities_ids() if qs else Entity.objects.none()
