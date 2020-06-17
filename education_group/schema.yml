@@ -511,7 +511,7 @@ paths:
   /mini_trainings/{year}/{partial_acronym}/versions:
     get:
       description: Return the versions list of the mini training
-      operationId: versions_list
+      operationId: mini_training_versions_list
       parameters:
         - in: path
           name: year
@@ -585,7 +585,7 @@ paths:
   /mini_trainings/{year}/{partial_acronym}/versions/{version_name}/tree:
     get:
       description: Return the tree of the version
-      operationId: versions_tree
+      operationId: mini_training_versions_tree
       parameters:
         - in: path
           name: year
