@@ -45,7 +45,7 @@ class EntityVersionAddress(models.Model):
     postal_code = models.PositiveIntegerField(blank=True, null=True)
     country = models.ForeignKey('reference.Country', on_delete=models.PROTECT, blank=True, null=True)
     entity_version_id = models.ForeignKey('EntityVersion', on_delete=models.PROTECT)
-    localisation = PointField(blank=True, null=True)
+    location = PointField(blank=True, null=True)
     is_main = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
