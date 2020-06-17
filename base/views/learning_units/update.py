@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from dal import autocomplete
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import IntegrityError
 from django.db.models import Q
@@ -54,12 +54,13 @@ from base.views.learning_unit import learning_unit_components
 from base.views.learning_units import perms
 from base.views.learning_units.common import get_learning_unit_identification_context, \
     get_common_context_learning_unit_year
+from learning_unit.views.utils import learning_unit_year_getter
+from osis_role.contrib.views import permission_required
 
 
 @login_required
 @waffle_flag("learning_unit_update")
-@permission_required('base.can_edit_learningunit_date', raise_exception=True)
-@perms.can_perform_end_date_modification
+@permission_required('base.can_edit_learningunit_date', raise_exception=True, fn=learning_unit_year_getter)
 def learning_unit_edition_end_date(request, learning_unit_year_id):
     learning_unit_year = get_object_or_404(LearningUnitYear, pk=learning_unit_year_id)
     person = get_object_or_404(Person, user=request.user)

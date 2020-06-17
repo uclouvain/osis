@@ -21,7 +21,7 @@ FACULTY_EDITABLE_CONTAINER_TYPES = (
 
 @predicate(bind=True)
 @predicate_failed_msg(message=_("You can only modify a learning unit when your are linked to its requirement entity"))
-def is_user_attached_to_initial_management_entity(self, user, learning_unit_year=None):
+def is_user_attached_to_initial_requirement_entity(self, user, learning_unit_year=None):
     if learning_unit_year:
         initial_container_year = learning_unit_year.initial_data.get("learning_container_year")
         requirement_entity_id = initial_container_year.get('requirement_entity')
@@ -31,9 +31,10 @@ def is_user_attached_to_initial_management_entity(self, user, learning_unit_year
 
 @predicate(bind=True)
 @predicate_failed_msg(message=_("You can only modify a learning unit when your are linked to its requirement entity"))
-def is_user_attached_to_current_management_entity(self, user, learning_unit_year=None):
+def is_user_attached_to_current_requirement_entity(self, user, learning_unit_year=None):
     if learning_unit_year:
-        return _is_attached_to_entity(learning_unit_year.management_entity_id, self)
+        current_container_year = learning_unit_year.learning_container_year
+        return _is_attached_to_entity(current_container_year.requirement_entity_id, self)
     return learning_unit_year
 
 
@@ -44,12 +45,16 @@ def _is_attached_to_entity(requirement_entity, self):
 
 @predicate(bind=True)
 @predicate_failed_msg(
-    message=_("You cannot change/delete a learning unit existing before %(limit_year)s") %
-    {"limit_year": settings.YEAR_LIMIT_LUE_MODIFICATION}
+    message="{}.  {}".format(
+        _("You can't modify learning unit under year : %(year)d") %
+        {"year": settings.YEAR_LIMIT_LUE_MODIFICATION + 1},
+        _("Modifications should be made in EPC under year %(year)d") %
+        {"year": settings.YEAR_LIMIT_LUE_MODIFICATION + 1},
+    )
 )
 def is_learning_unit_year_older_or_equals_than_limit_settings_year(self, user, learning_unit_year=None):
     if learning_unit_year:
-        return learning_unit_year.academic_year.year >= settings.YEAR_LIMIT_LUE_MODIFICATION
+        return learning_unit_year.academic_year.year > settings.YEAR_LIMIT_LUE_MODIFICATION
     return None
 
 
@@ -121,10 +126,9 @@ def is_learning_unit_year_full(self, user, learning_unit_year):
 
 @predicate(bind=True)
 @predicate_failed_msg(message=_("You can only edit co-graduation external learning units"))
-def is_external_learning_unit_cograduation(self, user, learning_unit_year):
-    if learning_unit_year:
-        return hasattr(learning_unit_year, 'externallearningunityear') or \
-             learning_unit_year.externallearningunityear.co_graduation
+def is_external_learning_unit_with_cograduation(self, user, learning_unit_year):
+    if hasattr(learning_unit_year, 'externallearningunityear'):
+        return learning_unit_year.externallearningunityear.co_graduation
     return None
 
 
@@ -132,7 +136,7 @@ def is_external_learning_unit_cograduation(self, user, learning_unit_year):
 @predicate_failed_msg(message=_("You cannot modify a learning unit of a previous year"))
 def is_learning_unit_year_not_in_past(self, user, learning_unit_year):
     if learning_unit_year:
-        return learning_unit_year.is_past()
+        return not learning_unit_year.is_past()
     return None
 
 
@@ -153,7 +157,7 @@ def is_learning_unit_year_a_partim(self, user, learning_unit_year):
 
 
 @predicate(bind=True)
-@predicate_failed_msg(message=_("Not a proposal"))
+@predicate_failed_msg(message=_("Not in proposal"))
 def is_proposal(self, user, learning_unit_year):
     if learning_unit_year:
         return ProposalLearningUnit.objects.filter(

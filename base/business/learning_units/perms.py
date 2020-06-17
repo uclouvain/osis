@@ -478,7 +478,7 @@ def _is_container_type_course_dissertation_or_internship(learning_unit_year, _, 
 def learning_unit_year_permissions(learning_unit_year, person):
     return {
         'can_propose': is_eligible_to_create_modification_proposal(learning_unit_year, person),
-        'can_edit_date': is_eligible_for_modification_end_date(learning_unit_year, person),
+        'can_edit_date': person.user.has_perm('base.can_edit_learningunit_date', learning_unit_year),
         'can_edit': is_eligible_for_modification(learning_unit_year, person),
         'can_delete': is_eligible_to_delete_learning_unit_year(learning_unit_year, person),
     }
@@ -592,6 +592,7 @@ class can_user_edit_educational_information(BasePerm):
     )
 
 
+# Moved to predicates
 def is_year_editable(learning_unit_year, raise_exception):
     result = learning_unit_year.academic_year.year > settings.YEAR_LIMIT_LUE_MODIFICATION
     msg = "{}.  {}".format(

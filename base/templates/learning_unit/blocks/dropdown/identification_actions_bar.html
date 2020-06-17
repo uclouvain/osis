@@ -4,6 +4,7 @@
 {% load waffle_tags %}
 {% load feature_flag %}
 {% load learning_unit learning_unit_li %}
+{% load osis_role %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
 * designed to manage the core business of higher education institutions,
@@ -68,9 +69,11 @@
                             {% url "edit_learning_unit" learning_unit_year_id=learning_unit_year.id as edit_learning_unit_url %}
                             {% li_edit_lu edit_learning_unit_url _('Modify') %}
 
+                            <li>
+                                {% url "learning_unit_edition_end_date" learning_unit_year_id=learning_unit_year.id as learning_unit_edition_end_date_url %}
+                                {% a_tag_has_perm learning_unit_edition_end_date_url _('Modify end date') 'base.can_edit_learningunit_date' user learning_unit_year %}
+                            </li>
 
-                            {% url "learning_unit_edition" learning_unit_year_id=learning_unit_year.id as learning_unit_edition_url %}
-                            {% li_edit_date_lu learning_unit_edition_url _('Modify end date') 'link_edit_date_learning_unit' %}
                             <li class="divider"></li>
                         {% endflag %}
                         {% url "learning_unit_comparison" learning_unit_year_id=learning_unit_year.id as url_lus_comparison %}

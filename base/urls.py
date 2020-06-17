@@ -43,12 +43,7 @@ import base.views.learning_units.search.service_course
 import base.views.learning_units.search.simple
 import base.views.learning_units.update
 from attribution.views import attribution, tutor_application
-from attribution.views.charge_repartition.create import SelectAttributionView, AddChargeRepartition
-from attribution.views.charge_repartition.update import EditChargeRepartition
-from attribution.views.learning_unit.create import CreateAttribution
-from attribution.views.learning_unit.delete import DeleteAttribution
-from attribution.views.learning_unit.update import UpdateAttributionView
-from base.views import learning_achievement, search, education_groups, user_list
+from base.views import learning_achievement, search, user_list
 from base.views import learning_unit, offer, common, institution, organization, academic_calendar, \
     my_osis, entity, student, notifications
 from base.views import teaching_material
@@ -193,7 +188,7 @@ urlpatterns = [
                 url(r'^consolidate/$', base.views.learning_units.proposal.consolidate.consolidate_proposal,
                     name="learning_unit_consolidate_proposal"),
             ])),
-            url(r'^update_end_date/$', learning_unit_edition_end_date, name="learning_unit_edition"),
+            url(r'^update_end_date/$', learning_unit_edition_end_date, name="learning_unit_edition_end_date"),
             url(r'^update/$', update_learning_unit, name="edit_learning_unit"),
             url(r'^specifications/$', learning_unit.learning_unit_specifications, name="learning_unit_specifications"),
             url(r'^specifications/edit/$', learning_unit.learning_unit_specifications_edit,
