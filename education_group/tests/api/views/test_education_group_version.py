@@ -127,7 +127,7 @@ class MiniTrainingVersionListTestCase(APITestCase):
     def test_get_result(self):
         response = self.client.get(self.url)
 
-        serializer = VersionListSerializer(self.versions, many=True, context={
+        serializer = VersionListSerializer([self.versions[0]], many=True, context={
             'request': RequestFactory().get(self.url),
             'language': settings.LANGUAGE_CODE_FR
         })
