@@ -39,7 +39,7 @@ from cms.tests.factories.translated_text import TranslatedTextFactory
 from cms.tests.factories.translated_text_label import TranslatedTextLabelFactory
 from education_group.tests.factories.group_year import GroupYearFactory
 from program_management.ddd.repositories import load_tree
-from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
+from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementFactory
 from webservices.api.serializers.general_information import GeneralInformationSerializer
 from webservices.business import EVALUATION_KEY, SKILLS_AND_ACHIEVEMENTS_INTRO, SKILLS_AND_ACHIEVEMENTS_EXTRA
@@ -57,7 +57,7 @@ class GeneralInformationTestCase(APITestCase):
             education_group_type__name=cls.egy.education_group_type.name
         )
         element = ElementFactory(group_year=cls.group)
-        EducationGroupVersionFactory(offer=cls.egy, root_group=cls.group)
+        StandardEducationGroupVersionFactory(offer=cls.egy, root_group=cls.group)
         cls.node = load_tree.load(element.id).root_node
         common_egy = EducationGroupYearCommonFactory(academic_year=cls.egy.academic_year)
         cls.pertinent_sections = {
