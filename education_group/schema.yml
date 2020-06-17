@@ -619,7 +619,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
       tags:
-        - trainings
+        - mini_trainings
   /mini_trainings/{year}/{partial_acronym}/offer_roots:
     get:
       description: Return the list of offer roots for a mini training.
