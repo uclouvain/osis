@@ -16,6 +16,7 @@ from base.models import entity
 from base.models import entity_calendar
 from base.models import entity_manager
 from base.models import entity_version
+from base.models import entity_version_address
 from base.models import exam_enrollment
 from base.models import external_learning_unit_year
 from base.models import external_learning_unit_year
