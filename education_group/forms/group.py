@@ -26,6 +26,7 @@
 from typing import Dict
 
 from django import forms
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
 
@@ -60,7 +61,19 @@ class GroupForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     def __init__(self, *args, user: User, group_type: str, **kwargs):
         self.user = user
         self.group_type = group_type
+
         super().__init__(*args, **kwargs)
+
+        self.__init_academic_year_field()
+
+    def __init_academic_year_field(self):
+        if not self.fields['academic_year'].disabled and self.user.person.is_faculty_manager:
+            self.fields['academic_year'].queryset = EventPermEducationGroupEdition.get_academic_years()\
+                .filter(year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION)
+        else:
+            self.fields['academic_year'].queryset = self.fields['academic_year'].queryset.filter(
+                year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION
+            )
 
     # ValidationRuleMixin
     def field_reference(self, field_name: str) -> str:
@@ -92,3 +105,13 @@ class GroupForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         if self.cleaned_data['management_entity']:
             return self.cleaned_data['management_entity'].most_recent_acronym
         return None
+
+    def clean_code(self):
+        data_cleaned = self.cleaned_data['code']
+        if data_cleaned:
+            return data_cleaned.upper()
+
+    def clean_abbreviated_title(self):
+        data_cleaned = self.cleaned_data['abbreviated_title']
+        if data_cleaned:
+            return data_cleaned.upper()

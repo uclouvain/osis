@@ -1,4 +1,5 @@
-from typing import List
+import operator
+from typing import List, Dict
 
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
@@ -7,7 +8,10 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.base import View
 
+from base.models.academic_year import starting_academic_year
+from base.models.campus import Campus
 from base.models.enums.education_group_types import GroupType
+from base.utils.cache import RequestCache
 from base.views.common import display_success_messages
 from education_group.ddd import command
 from education_group.ddd.domain.group import GroupIdentity
@@ -25,12 +29,26 @@ class GroupCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
     template_name = "education_group_app/group/upsert/create.html"
 
     def get(self, request, *args, **kwargs):
-        group_form = GroupForm(user=self.request.user, group_type=self.kwargs['type'])
+        group_form = GroupForm(
+            user=self.request.user,
+            group_type=self.kwargs['type'],
+            initial=self._get_initial_form()
+        )
         return render(request, self.template_name, {
             "group_form": group_form,
             "tabs": self.get_tabs(),
             "type_text": GroupType.get_value(self.kwargs['type'])
         })
+
+    def _get_initial_form(self) -> Dict:
+        default_campus = Campus.objects.filter(name='Louvain-la-Neuve').first()
+
+        request_cache = RequestCache(self.request.user, reverse('education_groups'))
+        default_academic_year = request_cache.get_value_cached('academic_year') or starting_academic_year()
+        return {
+            'teaching_campus': default_campus,
+            'academic_year': default_academic_year
+        }
 
     def post(self, request, *args, **kwargs):
         group_form = GroupForm(request.POST, user=self.request.user, group_type=self.kwargs['type'])
