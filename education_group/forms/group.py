@@ -23,16 +23,22 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Dict
+
 from django import forms
+from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
 
+from base.business.event_perms import EventPermEducationGroupEdition
 from base.forms.common import ValidationRuleMixin
 from base.forms.education_group.common import MainCampusChoiceField, MainEntitiesVersionChoiceField
 from base.models.academic_year import AcademicYear
 from base.models.enums.constraint_type import ConstraintTypeEnum
+from rules_management.enums import GROUP_PGRM_ENCODING_PERIOD, GROUP_DAILY_MANAGEMENT
+from rules_management.mixins import PermissionFieldMixin
 
 
-class GroupForm(ValidationRuleMixin, forms.Form):
+class GroupForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     code = forms.CharField(max_length=15, label=_("Code"), required=False)
     academic_year = forms.ModelChoiceField(queryset=AcademicYear.objects.all(), label=_("Validity"), required=False)
     abbreviated_title = forms.CharField(max_length=40, label=_("Acronym/Short title"), required=False)
@@ -51,14 +57,23 @@ class GroupForm(ValidationRuleMixin, forms.Form):
     remark_fr = forms.CharField(widget=forms.Textarea, label=_("Remark"), required=False)
     remark_en = forms.CharField(widget=forms.Textarea, label=_("remark in english"), required=False)
 
-    def __init__(self, *args, user, group_type, **kwargs):
+    def __init__(self, *args, user: User, group_type: str, **kwargs):
         self.user = user
         self.group_type = group_type
         super().__init__(*args, **kwargs)
 
     # ValidationRuleMixin
-    def field_reference(self, field_name: str):
+    def field_reference(self, field_name: str) -> str:
         return '.'.join(["GroupForm", self.group_type, field_name])
+
+    # PermissionFieldMixin
+    def get_context(self) -> str:
+        is_edition_period_opened = EventPermEducationGroupEdition(raise_exception=False).is_open()
+        return GROUP_PGRM_ENCODING_PERIOD if is_edition_period_opened else GROUP_DAILY_MANAGEMENT
+
+    # PermissionFieldMixin
+    def get_model_permission_filter_kwargs(self) -> Dict:
+        return {'context': self.get_context()}
 
     def clean_academic_year(self):
         if self.cleaned_data['academic_year']:
