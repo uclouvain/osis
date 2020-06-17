@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
                 ('street', models.CharField(blank=True, max_length=255)),
                 ('street_number', models.CharField(blank=True, max_length=12)),
                 ('postal_code', models.PositiveIntegerField(blank=True, null=True)),
-                ('localisation', django.contrib.gis.db.models.fields.PointField(blank=True, null=True, srid=4326)),
+                ('location', django.contrib.gis.db.models.fields.PointField(blank=True, null=True, srid=4326)),
                 ('is_main', models.BooleanField(default=False)),
                 ('country', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to='reference.Country')),
                 ('entity_version_id', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='base.EntityVersion')),
