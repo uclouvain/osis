@@ -39,7 +39,7 @@ class ProgramTreeVersionBuilder:
             from_tree: 'ProgramTreeVersion',
             command: 'CreateProgramTreeVersionCommand'
     ) -> 'ProgramTreeVersion':
-        validator = CreateProgramTreeVersionValidatorList(command.year, command.version_name, )
+        validator = CreateProgramTreeVersionValidatorList(command.year, command.version_name)
         if validator.is_valid():
             assert isinstance(from_tree, ProgramTreeVersion)
             assert from_tree.is_standard, "Forbidden to copy from a non Standard version"

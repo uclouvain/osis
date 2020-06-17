@@ -55,12 +55,18 @@ def create_news_program_tree_version(command: 'CreateProgramTreeVersionCommand')
 
 
 def extend_program_tree_version(command: 'CreateProgramTreeVersionCommand') -> List[ProgramTreeVersionIdentity]:
+    identity = ProgramTreeVersionIdentity(
+        offer_acronym=command.offer_acronym,
+        year=command.year,
+        version_name=command.version_name,
+        is_transition=command.is_transition
+    )
+    last_program_tree_version_existing = ProgramTreeVersionRepository().get_last_in_past(identity)
     identity_standard = ProgramTreeVersionIdentity(
         offer_acronym=command.offer_acronym,
         year=command.year,
         version_name='',
         is_transition=command.is_transition
     )
-    last_program_tree_version_existing = ProgramTreeVersionRepository().get_last_in_past(identity_standard)
-    command.year = last_program_tree_version_existing.entity_id.year
+    command.year = last_program_tree_version_existing.entity_id.year+1
     return create_program_tree_version(command, identity_standard)

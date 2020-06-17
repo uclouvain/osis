@@ -100,9 +100,25 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
     @classmethod
     def get_last_in_past(cls, entity_id: ProgramTreeVersionIdentity) -> 'ProgramTreeVersion':
         qs = EducationGroupVersion.objects.filter(
-            version_name=entity_id.version_name, offer__accronym=entity_id.offer_acronym,
-            offer__academic_year__year__lt=entity_id.year).order_by(
-            'offer__academic_year').last()
+            version_name=entity_id.version_name,
+            offer__acronym=entity_id.offer_acronym,
+            offer__academic_year__year__lt=entity_id.year,
+            is_transition=entity_id.is_transition,
+        ).annotate(
+            code=F('root_group__partial_acronym'),
+            offer_acronym=F('offer__acronym'),
+            offer_year=F('offer__academic_year__year'),
+            version_title_fr=F('title_fr'),
+            version_title_en=F('title_en'),
+        ).values(
+            'code',
+            'offer_acronym',
+            'offer_year',
+            'version_name',
+            'version_title_fr',
+            'version_title_en',
+            'is_transition',
+        ).order_by('offer__academic_year')
         if qs:
             return _instanciate_tree_version(qs[0])
 
