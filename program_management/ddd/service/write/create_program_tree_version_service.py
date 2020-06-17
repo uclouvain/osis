@@ -34,12 +34,14 @@ def create_program_tree_version(
         command: 'CreateProgramTreeVersionCommand',
         identity_standard: 'ProgramTreeVersionIdentity'
 ) -> List[ProgramTreeVersionIdentity]:
+    identities = []
     while command.year <= command.end_postponement:
         program_tree_version_standard = ProgramTreeVersionRepository().get(entity_id=identity_standard)
         new_program_tree_version = ProgramTreeVersionBuilder().build_from(program_tree_version_standard, command)
         ProgramTreeVersionRepository.create(program_tree_version=new_program_tree_version)
         command.year = command.year + 1
-    return new_program_tree_version.entity_id
+        identities.append(new_program_tree_version.entity_id)
+    return identities
 
 
 def create_news_program_tree_version(command: 'CreateProgramTreeVersionCommand') -> List[ProgramTreeVersionIdentity]:
