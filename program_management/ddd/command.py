@@ -44,7 +44,7 @@ class OrderLinkCommand(interface.CommandRequest):
 class CreateProgramTreeVersionCommand(interface.CommandRequest):
     def __init__(
             self,
-            end_postponement: int,
+            end_postponement: int,  # FIXME : to rename into end_year
             offer_acronym: str,
             version_name: str,
             year: int,
@@ -59,3 +59,19 @@ class CreateProgramTreeVersionCommand(interface.CommandRequest):
         self.is_transition = is_transition
         self.title_en = title_en
         self.title_fr = title_fr
+
+
+class PostponeProgramTreeVersionCommand(interface.CommandRequest):
+    def __init__(
+            self,
+            end_postponement: int,
+            from_offer_acronym: str,
+            from_version_name: str,
+            from_year: int,
+            from_is_transition: bool,
+    ):
+        self.end_postponement = end_postponement
+        self.from_offer_acronym = from_offer_acronym
+        self.from_version_name = from_version_name
+        self.from_year = from_year
+        self.from_is_transition = from_is_transition

@@ -31,13 +31,28 @@ from program_management.ddd.validators.program_tree_version import CreateProgram
 STANDARD = ""
 
 
+class ProgramTreeVersionNotAnnualizedIdentity(interface.ValueObject):
+    """
+    This ID is necessary to find a Node through years because code can be different through years.
+    """
+    def __init__(self, uuid: int):
+        self.uuid = uuid
+
+    def __hash__(self):
+        return hash(str(self.uuid))
+
+    def __eq__(self, other):
+        return self.uuid == other.uuid
+
+
 class ProgramTreeVersionBuilder:
     _tree_version = None
 
-    def build_from(
+    def build_from(  # TODO  :: rename to creat_from
             self,
             from_tree: 'ProgramTreeVersion',
-            command: 'CreateProgramTreeVersionCommand'
+            command: 'CreateProgramTreeVersionCommand',
+            identity_trough_year: int = None,
     ) -> 'ProgramTreeVersion':
         validator = CreateProgramTreeVersionValidatorList(command.year, command.version_name, )
         if validator.is_valid():
@@ -46,7 +61,11 @@ class ProgramTreeVersionBuilder:
             if from_tree.is_transition:
                 self._tree_version = self._build_from_transition(from_tree, command)
             else:
-                self._tree_version = self._build_from_standard(from_tree, command)
+                self._tree_version = self._build_from_standard(
+                    from_tree,
+                    command,
+                    identity_trough_year=identity_trough_year
+                )
             return self.program_tree_version
 
     @property
@@ -63,7 +82,8 @@ class ProgramTreeVersionBuilder:
     def _build_from_standard(
             self,
             from_tree_version: 'ProgramTreeVersion',
-            command: 'CreateProgramTreeVersionCommand'
+            command: 'CreateProgramTreeVersionCommand',
+            identity_trough_year: int = None,
     ) -> 'ProgramTreeVersion':
         from_tree = from_tree_version.get_tree()
         new_program_tree = ProgramTreeBuilder().build_from(from_tree=from_tree)
@@ -78,7 +98,8 @@ class ProgramTreeVersionBuilder:
             ),
             title_en=command.title_en,
             title_fr=command.title_fr,
-            tree=new_program_tree
+            tree=new_program_tree,
+            identity_trough_year=identity_trough_year,
         )
 
 
@@ -92,7 +113,8 @@ class ProgramTreeVersion(interface.RootEntity):
             program_tree_repository: 'ProgramTreeRepository',
             title_fr: str = None,
             title_en: str = None,
-            tree: 'ProgramTree' = None
+            tree: 'ProgramTree' = None,
+            identity_trough_year: int = None
     ):
         super(ProgramTreeVersion, self).__init__(entity_id=entity_identity)
         self.entity_id = entity_identity
@@ -101,6 +123,7 @@ class ProgramTreeVersion(interface.RootEntity):
         self.title_fr = title_fr
         self.title_en = title_en
         self._tree = tree
+        self.identity_trough_year = ProgramTreeVersionNotAnnualizedIdentity(uuid=identity_trough_year)
 
     def get_tree(self) -> 'ProgramTree':
         if not self._tree:

@@ -87,6 +87,20 @@ class ProgramTreeBuilder:
                 root_node.add_child(new_child_node)
 
 
+class ProgramTreeNotAnnualizedIdentity(interface.ValueObject):
+    """
+    This ID is necessary to find a Node through years because code can be different through years.
+    """
+    def __init__(self, uuid: int):
+        self.uuid = uuid
+
+    def __hash__(self):
+        return hash(str(self.uuid))
+
+    def __eq__(self, other):
+        return self.uuid == other.uuid
+
+
 class ProgramTree(interface.RootEntity):
 
     root_node = None
@@ -100,6 +114,10 @@ class ProgramTree(interface.RootEntity):
 
     def __eq__(self, other: 'ProgramTree'):
         return self.root_node == other.root_node
+
+    @property
+    def identity_not_annualized(self) -> ProgramTreeNotAnnualizedIdentity:
+        return ProgramTreeNotAnnualizedIdentity(uuid=self.root_node.not_annualized_id.uuid)
 
     def is_master_2m(self):
         return self.root_node.is_master_2m()

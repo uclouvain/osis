@@ -90,11 +90,11 @@ class NodeNotAnnualizedIdentity(interface.ValueObject):
     """
     This ID is necessary to find a Node through years because code can be different through years.
     """
-    def __init__(self, uuid: str):
+    def __init__(self, uuid: int):
         self.uuid = uuid
 
     def __hash__(self):
-        return hash(self.uuid)
+        return hash(str(self.uuid))
 
     def __eq__(self, other):
         return self.uuid == other.uuid

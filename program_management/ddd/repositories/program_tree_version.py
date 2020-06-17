@@ -32,7 +32,7 @@ from education_group.models.group_year import GroupYear
 from osis_common.ddd import interface
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersion, STANDARD
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 from program_management.models.education_group_version import EducationGroupVersion
@@ -100,11 +100,26 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
     @classmethod
     def get_last_in_past(cls, entity_id: ProgramTreeVersionIdentity) -> 'ProgramTreeVersion':
         qs = EducationGroupVersion.objects.filter(
-            version_name=entity_id.version_name, offer__accronym=entity_id.offer_acronym,
-            offer__academic_year__year__lt=entity_id.year).order_by(
-            'offer__academic_year').last()
+            version_name=entity_id.version_name,
+            offer__accronym=entity_id.offer_acronym,
+            offer__academic_year__year__lt=entity_id.year,
+        ).order_by(
+            'offer__academic_year'
+        ).annotate(
+            year=F('offer_academic_year__year'),
+        ).values(
+            'year',
+            flat=True,
+        )
         if qs:
-            return _instanciate_tree_version(qs[0])
+            last_past_year = qs[-1]
+            last_identity = ProgramTreeVersionIdentity(
+                offer_acronym=entity_id.offer_acronym,
+                year=last_past_year,
+                version_name=entity_id.version_name,
+                is_transition=entity_id.is_transition,
+            )
+            return cls.get(entity_id=last_identity)
 
     @classmethod
     def search(
