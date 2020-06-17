@@ -65,6 +65,6 @@ class SpecificVersionForm(forms.Form):
             end_postponement=end_postponement,
         )
         if self.save_type == "new_version":
-            create_program_tree_version_service.create_news_program_tree_version(command=command)
+            identities = create_program_tree_version_service.create_news_program_tree_version(command=command)
         if self.save_type == "extend":
-            create_program_tree_version_service.extend_program_tree_version(command=command)
+            identities = create_program_tree_version_service.extend_program_tree_version(command=command)

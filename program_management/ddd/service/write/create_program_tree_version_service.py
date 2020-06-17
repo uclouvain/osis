@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
+
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionBuilder, ProgramTreeVersionIdentity
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
@@ -31,7 +33,7 @@ from program_management.ddd.repositories.program_tree_version import ProgramTree
 def create_program_tree_version(
         command: 'CreateProgramTreeVersionCommand',
         identity_standard: 'ProgramTreeVersionIdentity'
-) -> ProgramTreeVersionIdentity:
+) -> List[ProgramTreeVersionIdentity]:
     while command.year <= command.end_postponement:
         program_tree_version_standard = ProgramTreeVersionRepository().get(entity_id=identity_standard)
         new_program_tree_version = ProgramTreeVersionBuilder().build_from(program_tree_version_standard, command)
@@ -40,7 +42,7 @@ def create_program_tree_version(
     return new_program_tree_version.entity_id
 
 
-def create_news_program_tree_version(command: 'CreateProgramTreeVersionCommand') -> ProgramTreeVersionIdentity:
+def create_news_program_tree_version(command: 'CreateProgramTreeVersionCommand') -> List[ProgramTreeVersionIdentity]:
     identity_standard = ProgramTreeVersionIdentity(
         offer_acronym=command.offer_acronym,
         year=command.year,
@@ -50,7 +52,7 @@ def create_news_program_tree_version(command: 'CreateProgramTreeVersionCommand')
     return create_program_tree_version(command, identity_standard)
 
 
-def extend_program_tree_version(command: 'CreateProgramTreeVersionCommand') -> ProgramTreeVersionIdentity:
+def extend_program_tree_version(command: 'CreateProgramTreeVersionCommand') -> List[ProgramTreeVersionIdentity]:
     identity_standard = ProgramTreeVersionIdentity(
         offer_acronym=command.offer_acronym,
         year=command.year,
