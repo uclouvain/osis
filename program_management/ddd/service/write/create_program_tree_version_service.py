@@ -57,6 +57,6 @@ def extend_program_tree_version(command: 'CreateProgramTreeVersionCommand') -> P
         version_name='',
         is_transition=command.is_transition
     )
-    last_program_tree_version_existing = ProgramTreeVersionRepository().last(identity_standard)
+    last_program_tree_version_existing = ProgramTreeVersionRepository().get_last_in_past(identity_standard)
     command.year = last_program_tree_version_existing.entity_id.year
     return create_program_tree_version(command, identity_standard)
