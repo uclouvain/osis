@@ -253,13 +253,6 @@ class CreateEducationGroupSpecificVersion(AjaxPermissionRequiredMixin, AjaxTempl
 
     def form_valid(self, form):
         response = super().form_valid(form)
-        message = \
-            _("Specific version for education group year %(acronym)s (%(academic_year)s) successfully created.") % \
-            {
-                "acronym": self.education_group_year.partial_acronym,
-                "academic_year": self.education_group_year.academic_year,
-            }
-        display_success_messages(self.request, message)
         return response
 
     def get_success_url(self):

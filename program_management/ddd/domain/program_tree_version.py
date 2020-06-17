@@ -26,6 +26,7 @@
 from osis_common.ddd import interface
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.program_tree import ProgramTreeBuilder
+from program_management.ddd.validators.program_tree_version import CreateProgramTreeVersionValidatorList
 
 STANDARD = ""
 
@@ -38,13 +39,15 @@ class ProgramTreeVersionBuilder:
             from_tree: 'ProgramTreeVersion',
             command: 'CreateProgramTreeVersionCommand'
     ) -> 'ProgramTreeVersion':
-        assert isinstance(from_tree, ProgramTreeVersion)
-        assert from_tree.is_standard, "Forbidden to copy from a non Standard version"
-        if from_tree.is_transition:
-            self._tree_version = self._build_from_transition(from_tree, command)
-        else:
-            self._tree_version = self._build_from_standard(from_tree, command)
-        return self.program_tree_version
+        validator = CreateProgramTreeVersionValidatorList(command.year, command.version_name, )
+        if validator.is_valid():
+            assert isinstance(from_tree, ProgramTreeVersion)
+            assert from_tree.is_standard, "Forbidden to copy from a non Standard version"
+            if from_tree.is_transition:
+                self._tree_version = self._build_from_transition(from_tree, command)
+            else:
+                self._tree_version = self._build_from_standard(from_tree, command)
+            return self.program_tree_version
 
     @property
     def program_tree_version(self):

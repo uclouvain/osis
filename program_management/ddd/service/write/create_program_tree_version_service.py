@@ -26,19 +26,18 @@
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionBuilder, ProgramTreeVersionIdentity
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
-from program_management.ddd.validators.program_tree_version import CreateProgramTreeVersionValidatorList
 
 
 def create_program_tree_version(command: 'CreateProgramTreeVersionCommand') -> ProgramTreeVersionIdentity:
-    validator = CreateProgramTreeVersionValidatorList(command.year, command.version_name, )
-    if validator.is_valid():
+    while command.year <= command.end_postponement:
         identity_standard = ProgramTreeVersionIdentity(
-            command.offer_acronym,
-            command.year,
-            '',
-            command.is_transition
+            offer_acronym=command.offer_acronym,
+            year=command.year,
+            version_name='',
+            is_transition=command.is_transition
         )
         program_tree_version_standard = ProgramTreeVersionRepository().get(entity_id=identity_standard)
         new_program_tree_version = ProgramTreeVersionBuilder().build_from(program_tree_version_standard, command)
         ProgramTreeVersionRepository.create(program_tree_version=new_program_tree_version)
-        return new_program_tree_version.entity_id
+        command.year = command.year + 1
+    return new_program_tree_version.entity_id

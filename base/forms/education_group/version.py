@@ -62,17 +62,14 @@ class SpecificVersionForm(forms.Form):
             year=self.education_group_year.academic_year.year,
             is_transition=False,
             title_en=self.cleaned_data.get("title_english"),
-            title_fr=self.cleaned_data.get("title")
+            title_fr=self.cleaned_data.get("title"),
+            end_postponement=end_postponement
         )
         if self.save_type == "new_version":
-            while command.year <= end_postponement:
-                create_program_tree_version_service.create_program_tree_version(command=command)
-                command.year = command.year+1
-        if self.save_type == "attach":
+            create_program_tree_version_service.create_program_tree_version(command=command)
+        if self.save_type == "extend":
             last_education_group_version_existing = base.views.education_groups.create.find_last_existed_version(
                 self.education_group_year, self.cleaned_data["version_name"]
             )
             command.year = last_education_group_version_existing.education_group_year.academic_year.year
-            while command.year <= end_postponement:
-                create_program_tree_version_service.create_program_tree_version(command=command)
-                command.year = command.year+1
+            create_program_tree_version_service.create_program_tree_version(command=command)

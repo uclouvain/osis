@@ -44,6 +44,7 @@ class OrderLinkCommand(interface.CommandRequest):
 class CreateProgramTreeVersionCommand(interface.CommandRequest):
     def __init__(
             self,
+            end_postponement: int,
             offer_acronym: str,
             version_name: str,
             year: int,
@@ -51,6 +52,7 @@ class CreateProgramTreeVersionCommand(interface.CommandRequest):
             title_en: str = "",
             title_fr: str = ""
     ):
+        self.end_postponement = end_postponement
         self.offer_acronym = offer_acronym
         self.version_name = version_name
         self.year = year
