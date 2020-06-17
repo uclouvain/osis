@@ -28,17 +28,23 @@ from unittest.mock import patch
 from django.test import TestCase
 
 from base.models.enums.education_group_types import TrainingType
+from base.models.enums.link_type import LinkTypes
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory, TrainingEducationGroupTypeFactory
 from base.tests.factories.entity_version import EntityVersionFactory
+from base.tests.factories.group_element_year import GroupElementYearFactory
 from education_group.models.group import Group
 from education_group.models.group_year import GroupYear
+from program_management.ddd.domain.link import Link
 from program_management.ddd.domain.node import Node
 from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 from program_management.models.element import Element
+from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeIdentityFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory, ProgramTreeIdentityFactory
+from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
+from program_management.tests.factories.element import ElementFactory
 
 
 class TestProgramTreeRepositoryCreateMethod(TestCase):
@@ -105,3 +111,82 @@ class TestProgramTreeRepositoryCreateMethod(TestCase):
         self.assertEqual(element_db_object.group_year, group_year_db_object)
         self.assertIsNone(element_db_object.learning_unit_year)
         self.assertIsNone(element_db_object.learning_class_year)
+
+
+class TestProgramTreeRepositoryGetMethod(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.year = AcademicYearFactory(current=True).year
+        cls.entity_id = ProgramTreeIdentityFactory(year=cls.year)
+        cls.repository = ProgramTreeRepository()
+
+        # cls.campus_model_obj = CampusFactory()
+        cls.entity_version_model_obj = EntityVersionFactory()
+
+    @patch.object(Node, '_has_changed', return_value=True)
+    def test_field_mapping(self, *mocks):
+        education_group_version_model_obj = EducationGroupVersionFactory(
+            root_group__partial_acronym=self.entity_id.code,
+            root_group__academic_year__year=self.entity_id.year,
+            root_group__management_entity_id=self.entity_version_model_obj.entity_id,
+            offer__management_entity_id=self.entity_version_model_obj.entity_id,
+        )
+        root_group_year_model_obj = education_group_version_model_obj.root_group
+        element_model_obj = ElementFactory(group_year=root_group_year_model_obj)
+        group_element_year_model_obj_1 = GroupElementYearFactory(
+            parent_element=element_model_obj,
+            link_type=LinkTypes.REFERENCE.name,
+        )
+        group_element_year_model_obj_2 = GroupElementYearFactory(parent_element=element_model_obj)
+
+        program_tree_domain_obj = self.repository.get(self.entity_id)
+        self.assertEqual(program_tree_domain_obj.entity_id, self.entity_id)
+
+        root_node_domain_obj = program_tree_domain_obj.root_node
+
+        self.assertEqual(root_node_domain_obj.code, root_group_year_model_obj.partial_acronym)
+        self.assertEqual(root_node_domain_obj.year, root_group_year_model_obj.academic_year.year)
+        self.assertEqual(root_node_domain_obj.not_annualized_id, root_group_year_model_obj.group_id)
+        self.assertEqual(root_node_domain_obj.node_type.name, root_group_year_model_obj.education_group_type.name)
+        self.assertEqual(root_node_domain_obj.credits, root_group_year_model_obj.credits)
+        self.assertEqual(root_node_domain_obj.constraint_type, root_group_year_model_obj.constraint_type)
+        self.assertEqual(root_node_domain_obj.min_constraint, root_group_year_model_obj.min_constraint)
+        self.assertEqual(root_node_domain_obj.max_constraint, root_group_year_model_obj.max_constraint)
+        self.assertEqual(root_node_domain_obj.group_title_fr, root_group_year_model_obj.title_fr)
+        self.assertEqual(root_node_domain_obj.group_title_en, root_group_year_model_obj.title_en)
+        self.assertEqual(root_node_domain_obj.remark_fr, root_group_year_model_obj.remark_fr)
+        self.assertEqual(root_node_domain_obj.remark_en, root_group_year_model_obj.remark_en)
+        self.assertEqual(root_node_domain_obj.management_entity_acronym, root_group_year_model_obj.management_entity.most_recent_acronym)
+        self.assertEqual(root_node_domain_obj.teaching_campus, root_group_year_model_obj.main_teaching_campus.name)
+
+        link_domain_obj_1: Link = root_node_domain_obj.children[0]
+        self.assertEqual(link_domain_obj_1.parent.entity_id, root_node_domain_obj.entity_id)
+        self.assertEqual(
+            link_domain_obj_1.child.entity_id,
+            NodeIdentityFactory(
+                code=group_element_year_model_obj_1.child_element.group_year.partial_acronym,
+                year=group_element_year_model_obj_1.child_element.group_year.academic_year.year,
+            )
+        )
+        self.assertEqual(link_domain_obj_1.relative_credits, group_element_year_model_obj_1.relative_credits)
+        self.assertEqual(link_domain_obj_1.min_credits, group_element_year_model_obj_1.min_credits)
+        self.assertEqual(link_domain_obj_1.max_credits, group_element_year_model_obj_1.max_credits)
+        self.assertEqual(link_domain_obj_1.is_mandatory, group_element_year_model_obj_1.is_mandatory)
+        self.assertEqual(link_domain_obj_1.block, group_element_year_model_obj_1.block)
+        self.assertEqual(link_domain_obj_1.access_condition, group_element_year_model_obj_1.access_condition)
+        self.assertEqual(link_domain_obj_1.comment, group_element_year_model_obj_1.comment)
+        self.assertEqual(link_domain_obj_1.comment_english, group_element_year_model_obj_1.comment_english)
+        self.assertEqual(link_domain_obj_1.own_comment, group_element_year_model_obj_1.own_comment)
+        self.assertEqual(link_domain_obj_1.quadrimester_derogation.name, group_element_year_model_obj_1.quadrimester_derogation)
+        self.assertEqual(link_domain_obj_1.link_type.name, group_element_year_model_obj_1.link_type)
+
+        link_domain_obj_2 = root_node_domain_obj.children[1]
+        self.assertEqual(link_domain_obj_2.parent.entity_id, root_node_domain_obj.entity_id)
+        self.assertEqual(
+            link_domain_obj_2.child.entity_id,
+            NodeIdentityFactory(
+                code=group_element_year_model_obj_2.child_element.group_year.partial_acronym,
+                year=group_element_year_model_obj_2.child_element.group_year.academic_year.year,
+            )
+        )

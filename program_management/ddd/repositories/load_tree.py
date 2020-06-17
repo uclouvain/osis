@@ -135,8 +135,8 @@ def __convert_link_type_to_enum(link_data: dict) -> None:
 
 
 def __convert_quadrimester_to_enum(gey_dict: dict) -> None:
-    if gey_dict.get('quadrimester'):
-        gey_dict['quadrimester'] = DerogationQuadrimester[gey_dict['quadrimester']]
+    if gey_dict.get('quadrimester_derogation'):
+        gey_dict['quadrimester_derogation'] = DerogationQuadrimester[gey_dict['quadrimester_derogation']]
 
 
 def __load_tree_links(tree_structure: TreeStructure) -> Dict[LinkKey, 'Link']:

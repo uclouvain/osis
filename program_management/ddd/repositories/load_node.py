@@ -157,6 +157,7 @@ def __load_multiple_node_group_year(node_group_year_ids: List[int]) -> QuerySet:
 
     return GroupYear.objects.filter(pk__in=node_group_year_ids).annotate(
         type=Value(NodeType.GROUP.name, output_field=CharField()),
+        not_annualized_id=F('group_id'),
         node_type=F('education_group_type__name'),
         category=F('education_group_type__name'),
         code=F('partial_acronym'),
@@ -165,9 +166,7 @@ def __load_multiple_node_group_year(node_group_year_ids: List[int]) -> QuerySet:
         start_year=F('group__start_year__year'),
         end_year=F('group__end_year__year'),
         management_entity_acronym=Subquery(subquery_management_entity),
-        teaching_campus=Concat(
-            F('main_teaching_campus__name'), Value(' - '), F('main_teaching_campus__organization__name')
-        ),
+        teaching_campus=F('main_teaching_campus__name'),
         offer_partial_title_fr=F('educationgroupversion__offer__partial_title'),
         offer_partial_title_en=F('educationgroupversion__offer__partial_title_english'),
         offer_title_fr=F('educationgroupversion__offer__title'),
@@ -179,6 +178,7 @@ def __load_multiple_node_group_year(node_group_year_ids: List[int]) -> QuerySet:
         group_title_en=F('title_en'),
     ).values(
         'id',
+        'not_annualized_id',
         'type',
         'node_type',
         'code',
