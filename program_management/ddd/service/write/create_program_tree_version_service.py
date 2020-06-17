@@ -28,16 +28,35 @@ from program_management.ddd.domain.program_tree_version import ProgramTreeVersio
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 
 
-def create_program_tree_version(command: 'CreateProgramTreeVersionCommand') -> ProgramTreeVersionIdentity:
+def create_program_tree_version(
+        command: 'CreateProgramTreeVersionCommand',
+        identity_standard: 'ProgramTreeVersionIdentity'
+) -> ProgramTreeVersionIdentity:
     while command.year <= command.end_postponement:
-        identity_standard = ProgramTreeVersionIdentity(
-            offer_acronym=command.offer_acronym,
-            year=command.year,
-            version_name='',
-            is_transition=command.is_transition
-        )
         program_tree_version_standard = ProgramTreeVersionRepository().get(entity_id=identity_standard)
         new_program_tree_version = ProgramTreeVersionBuilder().build_from(program_tree_version_standard, command)
         ProgramTreeVersionRepository.create(program_tree_version=new_program_tree_version)
         command.year = command.year + 1
     return new_program_tree_version.entity_id
+
+
+def create_news_program_tree_version(command: 'CreateProgramTreeVersionCommand') -> ProgramTreeVersionIdentity:
+    identity_standard = ProgramTreeVersionIdentity(
+        offer_acronym=command.offer_acronym,
+        year=command.year,
+        version_name='',
+        is_transition=command.is_transition
+    )
+    return create_program_tree_version(command, identity_standard)
+
+
+def extend_program_tree_version(command: 'CreateProgramTreeVersionCommand') -> ProgramTreeVersionIdentity:
+    identity_standard = ProgramTreeVersionIdentity(
+        offer_acronym=command.offer_acronym,
+        year=command.year,
+        version_name='',
+        is_transition=command.is_transition
+    )
+    last_program_tree_version_existing = ProgramTreeVersionRepository().last(identity_standard)
+    command.year = last_program_tree_version_existing.entity_id.year
+    return create_program_tree_version(command, identity_standard)

@@ -27,7 +27,6 @@ from django import forms
 from django.forms import TextInput
 from django.utils.translation import gettext_lazy as _
 
-import base.views.education_groups.create
 from base.forms.utils.choice_field import BLANK_CHOICE
 from base.models import academic_year
 from base.models.academic_year import compute_max_academic_year_adjournment
@@ -63,13 +62,9 @@ class SpecificVersionForm(forms.Form):
             is_transition=False,
             title_en=self.cleaned_data.get("title_english"),
             title_fr=self.cleaned_data.get("title"),
-            end_postponement=end_postponement
+            end_postponement=end_postponement,
         )
         if self.save_type == "new_version":
-            create_program_tree_version_service.create_program_tree_version(command=command)
+            create_program_tree_version_service.create_news_program_tree_version(command=command)
         if self.save_type == "extend":
-            last_education_group_version_existing = base.views.education_groups.create.find_last_existed_version(
-                self.education_group_year, self.cleaned_data["version_name"]
-            )
-            command.year = last_education_group_version_existing.education_group_year.academic_year.year
-            create_program_tree_version_service.create_program_tree_version(command=command)
+            create_program_tree_version_service.extend_program_tree_version(command=command)
