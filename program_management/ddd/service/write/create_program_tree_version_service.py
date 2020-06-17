@@ -96,8 +96,7 @@ def postpone_program_tree_version(command: 'PostponeProgramTreeVersionCommand') 
     return identities_created
 
 
-# TODO :: to rename to create_and_postpone_from_past_version
-def extend_program_tree_version(command: 'CreateProgramTreeVersionCommand') -> List[ProgramTreeVersionIdentity]:
+def create_and_postpone_from_past_version(command: 'CreateProgramTreeVersionCommand') -> List[ProgramTreeVersionIdentity]:
     # GIVEN
     creation_year = command.year
     identity_to_create = ProgramTreeVersionIdentity(

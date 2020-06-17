@@ -65,9 +65,9 @@ class SpecificVersionForm(forms.Form):
             end_postponement=end_postponement,
         )
         if self.save_type == "new_version":
-            identities = create_program_tree_version_service.create_news_program_tree_version(command=command)
+            identities = create_program_tree_version_service.create_and_postpone_from_past_version(command=command)
         if self.save_type == "extend":
-            identities = create_program_tree_version_service.extend_program_tree_version(command=command)
+            identities = create_program_tree_version_service.create_and_postpone_from_past_version(command=command)
         messages = []
         for identity in identities:
             messages.append(
