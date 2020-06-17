@@ -57,7 +57,9 @@ class GeneralInformation(generics.RetrieveAPIView):
             Q(offer__acronym__iexact=self.kwargs['acronym']) |
             Q(root_group__partial_acronym__iexact=self.kwargs['acronym']),
             offer__academic_year__year=self.kwargs['year'],
-            offer__education_group_type__name__in=general_information_sections.SECTIONS_PER_OFFER_TYPE.keys()
+            offer__education_group_type__name__in=general_information_sections.SECTIONS_PER_OFFER_TYPE.keys(),
+            version_name='',
+            is_transition=False
         )
         identity = ProgramTreeIdentity(
             code=self.egv.root_group.partial_acronym,
