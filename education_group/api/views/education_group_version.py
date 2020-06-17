@@ -57,7 +57,7 @@ class TrainingVersionList(LanguageContextSerializerMixin, generics.ListAPIView):
             acronym=self.kwargs['acronym'].upper(),
             academic_year__year=self.kwargs['year']
         )
-        return EducationGroupVersion.objects.filter(offer=education_group_year)
+        return EducationGroupVersion.objects.filter(offer=education_group_year, is_transition=False)
 
 
 class MiniTrainingVersionList(LanguageContextSerializerMixin, generics.ListAPIView):
@@ -79,4 +79,4 @@ class MiniTrainingVersionList(LanguageContextSerializerMixin, generics.ListAPIVi
             educationgroupversion__version_name='',
             educationgroupversion__is_transition=False
         )
-        return EducationGroupVersion.objects.filter(offer=group_year.educationgroupversion.offer)
+        return EducationGroupVersion.objects.filter(offer=group_year.educationgroupversion.offer, is_transition=False)

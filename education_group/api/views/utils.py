@@ -42,4 +42,4 @@ def filter_version_type(queryset, value):
         return queryset.filter(is_transition=True)
     elif value == VersionTypeEnum.SPECIAL.value:
         return queryset.exclude(version_name='')
-    return queryset
+    return queryset.filter(is_transition=False, version_name='')

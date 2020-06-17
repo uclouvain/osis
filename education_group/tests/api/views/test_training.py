@@ -100,9 +100,9 @@ class GetAllTrainingTestCase(APITestCase):
         offer1 = TrainingFactory(acronym='BIR1BA', partial_acronym='LBIR1000I', academic_year=cls.academic_year)
         offer2 = TrainingFactory(acronym='AGRO1BA', partial_acronym='LAGRO2111C', academic_year=cls.academic_year)
         offer3 = TrainingFactory(acronym='MED12M', partial_acronym='LMED12MA', academic_year=cls.academic_year)
-        EducationGroupVersionFactory(offer=offer1)
-        EducationGroupVersionFactory(offer=offer2)
-        EducationGroupVersionFactory(offer=offer3)
+        StandardEducationGroupVersionFactory(offer=offer1)
+        StandardEducationGroupVersionFactory(offer=offer2)
+        StandardEducationGroupVersionFactory(offer=offer3)
 
     def setUp(self):
         self.client.force_authenticate(user=self.user)
