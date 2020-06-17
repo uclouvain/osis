@@ -2,37 +2,25 @@ from collections import defaultdict
 from typing import List
 from unittest import mock
 
-from django.http import HttpResponseForbidden, HttpResponseBadRequest, HttpResponse
+from django.http import HttpResponseForbidden, HttpResponse
 from django.test import TestCase
 from django.urls import reverse, exceptions
 from django.utils.translation import gettext_lazy as _
 
-from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_type import GroupEducationGroupTypeFactory
 from base.tests.factories.person import PersonFactory
 from education_group.ddd.domain.group import GroupIdentity
 from education_group.forms.group import GroupForm
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
-from education_group.tests.factories.group_year import GroupYearFactory
 
 
 class TestCreateGroupGetMethod(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.academic_year = AcademicYearFactory(current=True)
         cls.type = GroupEducationGroupTypeFactory()
 
         cls.central_manager = CentralManagerFactory()
-        cls.parent = GroupYearFactory(
-            partial_acronym="LDROI1200",
-            academic_year=cls.academic_year,
-            management_entity=cls.central_manager.entity
-        )
-        cls.url = reverse('group_create', kwargs={'type': cls.type.name}) +\
-            "?attach_to={parent_code}_{parent_year}".format(
-                parent_code=cls.parent.partial_acronym,
-                parent_year=cls.parent.academic_year.year
-            )
+        cls.url = reverse('group_create', kwargs={'type': cls.type.name})
 
     def setUp(self) -> None:
         self.client.force_login(self.central_manager.person.user)
@@ -48,11 +36,6 @@ class TestCreateGroupGetMethod(TestCase):
 
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
-
-    def test_when_attach_to_querystring_arg_not_provided(self):
-        url_without_attach_to = reverse('group_create', kwargs={'type': self.type.name})
-        response = self.client.get(url_without_attach_to)
-        self.assertEqual(response.status_code, HttpResponseBadRequest.status_code)
 
     def test_when_type_in_url_is_not_supported(self):
         with self.assertRaises(exceptions.NoReverseMatch):
@@ -85,20 +68,9 @@ class TestCreateGroupGetMethod(TestCase):
 class TestCreateGroupPostMethod(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.academic_year = AcademicYearFactory(current=True)
         cls.type = GroupEducationGroupTypeFactory()
-
         cls.central_manager = CentralManagerFactory()
-        cls.parent = GroupYearFactory(
-            partial_acronym="LDROI1200",
-            academic_year=cls.academic_year,
-            management_entity=cls.central_manager.entity
-        )
-        cls.url = reverse('group_create', kwargs={'type': cls.type.name}) + \
-            "?attach_to={parent_code}_{parent_year}".format(
-              parent_code=cls.parent.partial_acronym,
-              parent_year=cls.parent.academic_year.year
-            )
+        cls.url = reverse('group_create', kwargs={'type': cls.type.name})
 
     def setUp(self) -> None:
         self.client.force_login(self.central_manager.person.user)
@@ -114,11 +86,6 @@ class TestCreateGroupPostMethod(TestCase):
 
         response = self.client.post(self.url, data={})
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
-
-    def test_when_attach_to_querystring_arg_not_provided(self):
-        url_without_attach_to = reverse('group_create', kwargs={'type': self.type.name})
-        response = self.client.post(url_without_attach_to, data={})
-        self.assertEqual(response.status_code, HttpResponseBadRequest.status_code)
 
     def test_post_missing_data_assert_template_and_context(self):
         with mock.patch('education_group.views.group.create.GroupForm.is_valid', return_value=False):

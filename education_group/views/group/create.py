@@ -1,12 +1,13 @@
 from typing import List
 
-from django.http import HttpResponseRedirect, HttpResponseBadRequest
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.base import View
 
+from base.models.enums.education_group_types import GroupType
 from base.views.common import display_success_messages
 from education_group.ddd import command
 from education_group.ddd.domain.group import GroupIdentity
@@ -23,20 +24,16 @@ class GroupCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
     template_name = "education_group_app/group/upsert/create.html"
 
-    def dispatch(self, request, *args, **kwargs):
-        if not self.request.GET.get('attach_to'):
-            return HttpResponseBadRequest()
-        return super().dispatch(request, *args, **kwargs)
-
     def get(self, request, *args, **kwargs):
-        group_form = GroupForm(user=self.request.user)
+        group_form = GroupForm(user=self.request.user, group_type=self.kwargs['type'])
         return render(request, self.template_name, {
             "group_form": group_form,
-            "tabs": self.get_tabs()
+            "tabs": self.get_tabs(),
+            "type_text": GroupType.get_value(self.kwargs['type'])
         })
 
     def post(self, request, *args, **kwargs):
-        group_form = GroupForm(request.POST, user=self.request.user)
+        group_form = GroupForm(request.POST, user=self.request.user, group_type=self.kwargs['type'])
         if group_form.is_valid():
             cmd_create = command.CreateGroupCommand(
                 code=group_form.cleaned_data['code'],
@@ -62,7 +59,8 @@ class GroupCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
         return render(request, self.template_name, {
             "group_form": group_form,
-            "tabs": self.get_tabs()
+            "tabs": self.get_tabs(),
+            "type_text": GroupType.get_value(self.kwargs['type'])
         })
 
     def get_success_url(self, group_id: GroupIdentity):
@@ -90,15 +88,19 @@ class GroupCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         Find the parent identity from 'attach_to' querypart
         Ex:  <...>?attach_to=<CODE>_<YEAR>
         """
-        code, year = self.request.GET.get('attach_to', '').split("_")
-        return GroupIdentity(code, int(year))
+        id_raw = self.request.GET.get('attach_to', '').split("_")
+        if len(id_raw) == 2:
+            return GroupIdentity(code=id_raw[0], year=int(id_raw[1]))
+        return None
 
     def get_permission_object(self):
         parent_id = self.get_parent_identity()
-        try:
-            return GroupYear.objects.get(
-                partial_acronym=parent_id.code,
-                academic_year__year=parent_id.year
-            )
-        except GroupYear.DoesNotExist:
-            return None
+        if parent_id:
+            try:
+                return GroupYear.objects.get(
+                    partial_acronym=parent_id.code,
+                    academic_year__year=parent_id.year
+                )
+            except GroupYear.DoesNotExist:
+                return None
+        return None

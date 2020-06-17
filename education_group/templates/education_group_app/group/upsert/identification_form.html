@@ -31,18 +31,20 @@
             <div class="panel panel-default">
                 <div class="panel-body">
                     <div class="row">
+                        {% bootstrap_field group_form.abbreviated_title form_group_class="col-md-6" %}
                         <div class="col-md-6">
-                            {% bootstrap_label group_form.code.label %}<strong>*</strong>
+                            <div class="control-label" style="height: 20px; margin-bottom: 5px;">
+                                {% bootstrap_label group_form.code.label  %}
+                                {% if group_form.fields.code.required %}
+                                    <strong>*</strong>
+                                {% endif %}
+                                <abbr title="{{ group_form.code.help_text }}"
+                                      data-toggle='tooltip' data-html='true'>
+                                    <span class="glyphicon glyphicon-question-sign"
+                                          style="font-size: 14pt;"></span>
+                                </abbr>
+                            </div>
                             {% bootstrap_field group_form.code show_label=False show_help=False %}
-                        </div>
-                        <div class="col-md-6">
-                            {% bootstrap_label group_form.abbreviated_title.label %}<strong>*</strong>
-                            <abbr title="{{ group_form.abbreviated_title.help_text }}"
-                                  data-toggle='tooltip' data-html='true'>
-                                <span class="glyphicon glyphicon-question-sign"
-                                      style="font-size: 14pt;"></span>
-                            </abbr>
-                            {% bootstrap_field group_form.abbreviated_title show_label=False show_help=False %}
                         </div>
                     </div>
                     <div class="row">
@@ -54,7 +56,7 @@
                         </div>
                         <div class="col-md-6">
                             <label>{% trans 'Type of training' %}</label><br>
-                            <input value="{% trans 'Group' %}"
+                            <input value="{{ type_text }}"
                                    disabled class="form-control"
                                    title="{% trans 'The field can contain only one value.' %}">
                         </div>
@@ -66,8 +68,8 @@
                     </div>
                     <br>
                     <div class="row">
-                        {% bootstrap_field group_form.min_constraint form_group_class="col-md-6" %}
-                        {% bootstrap_field group_form.max_constraint form_group_class="col-md-6" %}
+                        {% bootstrap_field group_form.min_constraint form_group_class="col-md-6" label_class="text-first-letter-capitalize" %}
+                        {% bootstrap_field group_form.max_constraint form_group_class="col-md-6" label_class="text-first-letter-capitalize" %}
                     </div>
                     <br>
                     {% bootstrap_field group_form.title_fr %}
@@ -87,8 +89,8 @@
     </div>
     <div class="panel panel-default">
         <div class="panel-body">
-            {% bootstrap_field group_form.remark_fr %}
-            {% bootstrap_field group_form.remark_en %}
+            {% bootstrap_field group_form.remark_fr label_class="text-first-letter-capitalize" %}
+            {% bootstrap_field group_form.remark_en label_class="text-first-letter-capitalize" %}
         </div>
     </div>
 </div>

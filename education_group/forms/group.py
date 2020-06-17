@@ -26,29 +26,39 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
+from base.forms.common import ValidationRuleMixin
 from base.forms.education_group.common import MainCampusChoiceField, MainEntitiesVersionChoiceField
 from base.models.academic_year import AcademicYear
 from base.models.enums.constraint_type import ConstraintTypeEnum
 
 
-class GroupForm(forms.Form):
-    code = forms.CharField(max_length=15, label=_("Code"))
-    academic_year = forms.ModelChoiceField(queryset=AcademicYear.objects.all(), label=_("Validity"))
-    abbreviated_title = forms.CharField(max_length=40, label=_("Acronym/Short title"))
-    title_fr = forms.CharField(max_length=240, label=_("Title in French"))
-    title_en = forms.CharField(max_length=240, label=_("Title in English"))
-    credits = forms.CharField(label=_("Credits"))
-    constraint_type = forms.ChoiceField(choices=ConstraintTypeEnum.choices(), label=_("Type of constraint"))
-    min_constraint = forms.CharField(label=_("minimum constraint"))
-    max_constraint = forms.CharField(label=_("maximum constraint"))
-    management_entity = MainEntitiesVersionChoiceField(queryset=None, label=_("Management entity"))
-    teaching_campus = MainCampusChoiceField(queryset=None, label=_("Learning location"))
-    remark_fr = forms.CharField(widget=forms.Textarea, label=_("Remark"))
-    remark_en = forms.CharField(widget=forms.Textarea, label=_("remark in english"))
+class GroupForm(ValidationRuleMixin, forms.Form):
+    code = forms.CharField(max_length=15, label=_("Code"), required=False)
+    academic_year = forms.ModelChoiceField(queryset=AcademicYear.objects.all(), label=_("Validity"), required=False)
+    abbreviated_title = forms.CharField(max_length=40, label=_("Acronym/Short title"), required=False)
+    title_fr = forms.CharField(max_length=240, label=_("Title in French"), required=False)
+    title_en = forms.CharField(max_length=240, label=_("Title in English"), required=False)
+    credits = forms.CharField(label=_("Credits"), required=False)
+    constraint_type = forms.ChoiceField(
+        choices=ConstraintTypeEnum.choices(),
+        label=_("Type of constraint"),
+        required=False
+    )
+    min_constraint = forms.CharField(label=_("minimum constraint"), required=False)
+    max_constraint = forms.CharField(label=_("maximum constraint"), required=False)
+    management_entity = MainEntitiesVersionChoiceField(queryset=None, label=_("Management entity"), required=False)
+    teaching_campus = MainCampusChoiceField(queryset=None, label=_("Learning location"), required=False)
+    remark_fr = forms.CharField(widget=forms.Textarea, label=_("Remark"), required=False)
+    remark_en = forms.CharField(widget=forms.Textarea, label=_("remark in english"), required=False)
 
-    def __init__(self, *args, user, **kwargs):
+    def __init__(self, *args, user, group_type, **kwargs):
         self.user = user
+        self.group_type = group_type
         super().__init__(*args, **kwargs)
+
+    # ValidationRuleMixin
+    def field_reference(self, field_name: str):
+        return '.'.join(["GroupForm", self.group_type, field_name])
 
     def clean_academic_year(self):
         if self.cleaned_data['academic_year']:
