@@ -57,7 +57,7 @@ class SpecificVersionForm(forms.Form):
             if not self.cleaned_data['end_year'] else int(self.cleaned_data['end_year'])
         command = CreateProgramTreeVersionCommand(
             offer_acronym=self.education_group_year.acronym,
-            version_name=self.cleaned_data.get("version_name"),
+            version_name=self.education_group_year.acronym+self.cleaned_data.get("version_name").upper(),
             year=self.education_group_year.academic_year.year,
             is_transition=False,
             title_en=self.cleaned_data.get("title_english"),
@@ -68,3 +68,10 @@ class SpecificVersionForm(forms.Form):
             identities = create_program_tree_version_service.create_news_program_tree_version(command=command)
         if self.save_type == "extend":
             identities = create_program_tree_version_service.extend_program_tree_version(command=command)
+        messages = []
+        for identity in identities:
+            messages.append(
+                _("Specific version for education group year %(acronym)s (%(academic_year)s) successfully created.") % {
+                    "acronym": identity.version_name,
+                    "academic_year": academic_year.find_academic_year_by_year(identity.year)})
+        self.cleaned_data["messages"] = messages

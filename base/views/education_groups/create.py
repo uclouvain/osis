@@ -221,7 +221,7 @@ def validate_field(request, category, education_group_year_pk=None):
     return JsonResponse(response)
 
 
-class CreateEducationGroupSpecificVersion(AjaxPermissionRequiredMixin, AjaxTemplateMixin, CreateView):
+class CreateEducationGroupSpecificVersion(AjaxPermissionRequiredMixin, SuccessMessageMixin, AjaxTemplateMixin, CreateView):
     template_name = "education_group/create_specific_version_inner.html"
     form_class = SpecificVersionForm
     permission_required = 'base.create_specific_version'
@@ -254,6 +254,9 @@ class CreateEducationGroupSpecificVersion(AjaxPermissionRequiredMixin, AjaxTempl
     def form_valid(self, form):
         response = super().form_valid(form)
         return response
+
+    def get_success_message(self, cleaned_data):
+        display_success_messages(self.request, cleaned_data["messages"])
 
     def get_success_url(self):
         return reverse("training_identification", args=[self.education_group_year.academic_year.year,
