@@ -155,8 +155,8 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
             version_title_fr=F('educationgroupversion__title_fr'),
             version_title_en=F('educationgroupversion__title_en'),
             is_transition=F('educationgroupversion__is_transition'),
-            identity_trough_year=F('root_group__group_id'),
-            root_group_year=F('root_group__academic_year__year'),
+            identity_trough_year=F('educationgroupversion__root_group__group_id'),
+            root_group_year=F('educationgroupversion__root_group__academic_year__year'),
         ).values(
             'code',
             'offer_acronym',
