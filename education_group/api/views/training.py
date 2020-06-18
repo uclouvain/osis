@@ -136,11 +136,14 @@ class TrainingTitle(LanguageContextSerializerMixin, generics.RetrieveAPIView):
     def get_object(self):
         acronym = self.kwargs['acronym']
         year = self.kwargs['year']
+        version_name = self.kwargs.get('version_name', '')
         egv = get_object_or_404(
             EducationGroupVersion.objects.all().select_related(
                 'offer__academic_year',
             ),
             offer__acronym__iexact=acronym,
-            offer__academic_year__year=year
+            offer__academic_year__year=year,
+            is_transition=False,
+            version_name__iexact=version_name
         )
         return egv

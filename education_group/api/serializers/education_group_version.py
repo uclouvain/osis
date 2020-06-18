@@ -26,12 +26,11 @@
 
 from rest_framework import serializers
 
-from education_group.api.serializers.utils import TrainingHyperlinkedIdentityField
+from education_group.api.serializers.utils import TrainingHyperlinkedIdentityField, MiniTrainingHyperlinkedIdentityField
 from program_management.models.education_group_version import EducationGroupVersion
 
 
 class VersionListSerializer(serializers.ModelSerializer):
-    url = TrainingHyperlinkedIdentityField(read_only=True)
     code = serializers.CharField(source='root_group.partial_acronym', read_only=True)
 
     class Meta:
@@ -42,3 +41,11 @@ class VersionListSerializer(serializers.ModelSerializer):
             'code',
             'is_transition'
         )
+
+
+class TrainingVersionListSerializer(VersionListSerializer):
+    url = TrainingHyperlinkedIdentityField(read_only=True)
+
+
+class MiniTrainingVersionListSerializer(VersionListSerializer):
+    url = MiniTrainingHyperlinkedIdentityField(read_only=True)

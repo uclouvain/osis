@@ -42,12 +42,17 @@ class EducationGroupTreeView(LanguageContextSerializerMixin, generics.RetrieveAP
 
     def get_object(self):
         queryset = self.filter_queryset(self.get_queryset())
-
+        version_name = self.kwargs.pop('version_name', '')
         filter_kwargs = {
             lookup_field: self.kwargs[lookup_url_kwarg]
             for lookup_field, lookup_url_kwarg in zip(self.lookup_fields, self.lookup_url_kwargs)
         }
-        element = get_object_or_404(queryset, **filter_kwargs)
+
+        element = get_object_or_404(
+            queryset,
+            **filter_kwargs,
+            group_year__educationgroupversion__version_name=version_name
+        )
         self.check_object_permissions(self.request, element.education_group_year_obj)
 
         tree = load_tree.load(element.id)
@@ -59,10 +64,13 @@ class TrainingTreeView(EducationGroupTreeView):
         Return the tree of the training
     """
     name = 'trainings_tree'
-    lookup_fields = ('group_year__academic_year__year', 'group_year__educationgroupversion__offer__acronym__iexact',)
-    lookup_url_kwargs = ('year', 'acronym',)
+    lookup_fields = (
+        'group_year__academic_year__year', 'group_year__educationgroupversion__offer__acronym__iexact',
+    )
+    lookup_url_kwargs = ('year', 'acronym')
     queryset = Element.objects.filter(
-        group_year__education_group_type__category=Categories.TRAINING.name
+        group_year__education_group_type__category=Categories.TRAINING.name,
+        group_year__educationgroupversion__is_transition=False
     ).annotate(
         education_group_year_obj=F('group_year__educationgroupversion__offer')
     ).select_related('education_group_year')
@@ -76,7 +84,8 @@ class MiniTrainingTreeView(EducationGroupTreeView):
     lookup_fields = ('group_year__academic_year__year', 'group_year__partial_acronym__iexact',)
     lookup_url_kwargs = ('year', 'partial_acronym',)
     queryset = Element.objects.filter(
-        group_year__education_group_type__category=Categories.MINI_TRAINING.name
+        group_year__education_group_type__category=Categories.MINI_TRAINING.name,
+        group_year__educationgroupversion__is_transition=False
     ).annotate(
         education_group_year_obj=F('group_year__educationgroupversion__offer')
     ).select_related('education_group_year')
