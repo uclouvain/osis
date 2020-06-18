@@ -59,6 +59,8 @@ from base.tests.factories.person import PersonFactory, CentralManagerForUEFactor
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.user import UserFactory
+from learning_unit.tests.factories.central_manager import CentralManagerFactory
+from learning_unit.tests.factories.faculty_manager import FacultyManagerFactory
 
 TYPES_PROPOSAL_NEEDED_TO_EDIT = (learning_container_year_types.COURSE,
                                  learning_container_year_types.DISSERTATION,
@@ -109,11 +111,8 @@ class PermsTestCase(TestCase):
     def test_not_eligible_if_has_application(self):
         luy = LearningUnitYearFactory(academic_year__year=2020)
         TutorApplicationFactory(learning_container_year=luy.learning_container_year)
-        self.assertFalse(
-            perms.is_eligible_for_modification_end_date(
-                luy, PersonWithPermissionsFactory('can_edit_learningunit_date')
-            )
-        )
+        central_manager = CentralManagerFactory()
+        self.assertFalse(central_manager.person.user.has_perm('base.can_edit_learningunit_date', luy))
 
     def test_can_faculty_manager_modify_end_date_full(self):
         for direct_edit_permitted_container_type in TYPES_DIRECT_EDIT_PERMITTED:
@@ -126,20 +125,18 @@ class PermsTestCase(TestCase):
             self.assertTrue(perms._is_learning_unit_year_in_state_to_be_modified(luy, self.person_fac, False))
 
     def test_cannot_faculty_manager_modify_end_date_full(self):
+        faculty_manager = FacultyManagerFactory()
         for proposal_needed_container_type in TYPES_PROPOSAL_NEEDED_TO_EDIT:
-            lunit_container_yr = LearningContainerYearFactory(academic_year=self.academic_yr,
-                                                              container_type=proposal_needed_container_type)
-            luy = LearningUnitYearFactory(academic_year=self.academic_yr,
-                                          learning_container_year=lunit_container_yr,
-                                          subtype=FULL)
-
-            self.assertFalse(perms.is_eligible_for_modification_end_date(luy,
-                                                                         create_person_with_permission_and_group(
-                                                                             FACULTY_MANAGER_GROUP)))
-            self.assertFalse(perms.is_eligible_for_modification_end_date(
-                luy,
-                create_person_with_permission_and_group(UE_FACULTY_MANAGER_GROUP)
-            ))
+            lunit_container_yr = LearningContainerYearFactory(
+                academic_year=self.academic_yr,
+                container_type=proposal_needed_container_type
+            )
+            luy = LearningUnitYearFactory(
+                academic_year=self.academic_yr,
+                learning_container_year=lunit_container_yr,
+                subtype=FULL
+            )
+            self.assertFalse(faculty_manager.person.user.has_perm('base.can_edit_learningunit_date', luy))
 
     def test_cannot_faculty_manager_modify_full(self):
         for proposal_needed_container_type in TYPES_PROPOSAL_NEEDED_TO_EDIT:
@@ -183,19 +180,17 @@ class PermsTestCase(TestCase):
         self.assertFalse(perms._is_learning_unit_year_in_state_to_be_modified(luy, self.person_fac, False))
 
     def test_can_central_manager_modify_end_date_full(self):
-        a_person = create_person_with_permission_and_group(CENTRAL_MANAGER_GROUP, 'can_edit_learningunit')
-        a_person.user.user_permissions.add(Permission.objects.get(codename='can_edit_learningunit_date'))
         generated_container = GenerateContainer(start_year=self.academic_yr,
                                                 end_year=self.academic_yr)
         generated_container_first_year = generated_container.generated_container_years[0]
         luy = generated_container_first_year.learning_unit_year_full
         requirement_entity = generated_container_first_year.requirement_entity_container_year
-        PersonEntityFactory(entity=requirement_entity, person=a_person)
+        central_manager = CentralManagerFactory(entity=requirement_entity)
         lunit_container_yr = LearningContainerYearFactory(academic_year=self.academic_yr)
         for proposal_needed_container_type in ALL_TYPES:
             lunit_container_yr.container_type = proposal_needed_container_type
             lunit_container_yr.save()
-            self.assertTrue(perms.is_eligible_for_modification_end_date(luy, a_person))
+            self.assertTrue(central_manager.person.user.has_perm('base.can_edit_learningunit_date', luy))
 
     def test_access_edit_learning_unit_proposal_as_central_manager(self):
         a_person = create_person_with_permission_and_group(CENTRAL_MANAGER_GROUP)
