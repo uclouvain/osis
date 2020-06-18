@@ -121,10 +121,8 @@ class TestProgramTreeRepositoryGetMethod(TestCase):
         cls.entity_id = ProgramTreeIdentityFactory(year=cls.year)
         cls.repository = ProgramTreeRepository()
 
-        # cls.campus_model_obj = CampusFactory()
         cls.entity_version_model_obj = EntityVersionFactory()
 
-    @patch.object(Node, '_has_changed', return_value=True)
     def test_field_mapping(self, *mocks):
         education_group_version_model_obj = EducationGroupVersionFactory(
             root_group__partial_acronym=self.entity_id.code,
@@ -150,7 +148,7 @@ class TestProgramTreeRepositoryGetMethod(TestCase):
         self.assertEqual(root_node_domain_obj.not_annualized_id, root_group_year_model_obj.group_id)
         self.assertEqual(root_node_domain_obj.node_type.name, root_group_year_model_obj.education_group_type.name)
         self.assertEqual(root_node_domain_obj.credits, root_group_year_model_obj.credits)
-        self.assertEqual(root_node_domain_obj.constraint_type, root_group_year_model_obj.constraint_type)
+        self.assertEqual(root_node_domain_obj.constraint_type.name, root_group_year_model_obj.constraint_type)
         self.assertEqual(root_node_domain_obj.min_constraint, root_group_year_model_obj.min_constraint)
         self.assertEqual(root_node_domain_obj.max_constraint, root_group_year_model_obj.max_constraint)
         self.assertEqual(root_node_domain_obj.group_title_fr, root_group_year_model_obj.title_fr)

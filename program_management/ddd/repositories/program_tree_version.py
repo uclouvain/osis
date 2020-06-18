@@ -86,6 +86,7 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
             version_title_fr=F('title_fr'),
             version_title_en=F('title_en'),
             identity_trough_year=F('root_group__group_id'),
+            root_group_year=F('root_group__academic_year__year'),
         ).values(
             'code',
             'offer_acronym',
@@ -95,6 +96,7 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
             'version_title_en',
             'is_transition',
             'identity_trough_year',
+            'root_group_year',
         )
         if qs:
             return _instanciate_tree_version(qs[0])
@@ -154,6 +156,7 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
             version_title_en=F('educationgroupversion__title_en'),
             is_transition=F('educationgroupversion__is_transition'),
             identity_trough_year=F('root_group__group_id'),
+            root_group_year=F('root_group__academic_year__year'),
         ).values(
             'code',
             'offer_acronym',
@@ -163,6 +166,7 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
             'version_title_en',
             'is_transition',
             'identity_trough_year',
+            'root_group_year',
         )
         results = []
         for record_dict in qs:
@@ -178,7 +182,7 @@ def _instanciate_tree_version(record_dict: dict) -> 'ProgramTreeVersion':
             record_dict['version_name'],
             record_dict['is_transition'],
         ),
-        program_tree_identity=ProgramTreeIdentity(record_dict['code'], record_dict['offer_year']),
+        program_tree_identity=ProgramTreeIdentity(record_dict['code'], record_dict['root_group_year']),
         program_tree_repository=ProgramTreeRepository(),
         title_fr=record_dict['version_title_fr'],
         title_en=record_dict['version_title_en'],

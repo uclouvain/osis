@@ -123,7 +123,9 @@ class ProgramTreeVersion(interface.RootEntity):
         self.title_fr = title_fr
         self.title_en = title_en
         self._tree = tree
-        self.identity_trough_year = ProgramTreeVersionNotAnnualizedIdentity(uuid=identity_trough_year)
+        self.identity_trough_year = ProgramTreeVersionNotAnnualizedIdentity(
+            uuid=identity_trough_year
+        ) if identity_trough_year else None
 
     def get_tree(self) -> 'ProgramTree':
         if not self._tree:

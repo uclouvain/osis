@@ -57,6 +57,7 @@ class ProgramTreeVersionFactory(factory.Factory):
         abstract = False
 
     entity_identity = factory.SubFactory(ProgramTreeVersionIdentityFactory)
+    identity_trough_year = factory.Sequence(lambda n: n + 1)
     program_tree_identity = factory.SubFactory(ProgramTreeIdentityFactory)
     program_tree_repository = ProgramTreeRepository()
     title_fr = factory.fuzzy.FuzzyText(length=240)
