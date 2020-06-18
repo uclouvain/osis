@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -539,7 +539,10 @@ class UploadXLSTest(TestCase):
         from assessments.business.score_encoding_export import HEADER
         header_expected_list = [_('Academic year'), _('Session'), _('Learning unit'), _('Program'),
                                 _('Registration number'), _('Lastname'), _('Firstname'), _('Email'),
-                                _('Numbered scores'), _('Justification (A,T)'), _('End date Prof')]
+                                _('Numbered scores'), _('Justification (A,T)'), _('End date Prof'),
+                                _('Type'), _('Arrangement additional time'), _('Arrangement appropriate copy'),
+                                _('Arrangement specific locale'), _('Arrangement other'), _('Guide'),
+                                ]
         self.assertListEqual(HEADER, header_expected_list)
 
 

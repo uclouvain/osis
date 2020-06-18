@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -35,7 +35,10 @@ from base import models as mdl
 from base.models.enums import exam_enrollment_justification_type
 
 HEADER = [_('Academic year'), _('Session'), _('Learning unit'), _('Program'), _('Registration number'), _('Lastname'),
-          _('Firstname'), _('Email'), _('Numbered scores'), _('Justification (A,T)'), _('End date Prof')]
+          _('Firstname'), _('Email'), _('Numbered scores'), _('Justification (A,T)'), _('End date Prof'),
+          _('Type'), _('Arrangement additional time'), _('Arrangement appropriate copy'),
+          _('Arrangement specific locale'), _('Arrangement other'), _('Guide'),
+          ]
 
 JUSTIFICATION_ALIASES = {
     exam_enrollment_justification_type.ABSENCE_JUSTIFIED: "M",
@@ -78,7 +81,14 @@ def export_xls(exam_enrollments):
                           person.email,
                           score,
                           str(justification),
-                          end_date if exam_enroll.enrollment_state == 'ENROLLED' else ''])
+                          end_date if exam_enroll.enrollment_state == 'ENROLLED' else '',
+                          '?',
+                          '?',
+                          '?',
+                          '?',
+                          '?',
+                          '?',
+                          ])
 
         row_number += 1
         __coloring_non_editable(worksheet, row_number, score, exam_enroll.justification_final)
@@ -142,7 +152,7 @@ def __coloring_non_editable(ws, row_number, score, justification):
     """
     pattern_fill_grey = PatternFill(patternType='solid', fgColor=Color('C1C1C1'))
     column_number = 1
-    while column_number < 12:
+    while column_number < 18:
         if column_number < 9 or column_number > 10:
             ws.cell(row=row_number, column=column_number).fill = pattern_fill_grey
         else:
