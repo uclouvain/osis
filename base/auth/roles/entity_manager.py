@@ -15,6 +15,7 @@ class EntityManagerAdmin(VersionAdmin, SerializableModelAdmin, osis_role_admin.E
 
 class EntityManager(osis_role_models.EntityRoleModel):
     structure = models.ForeignKey('Structure', on_delete=models.CASCADE)
+    with_child = models.BooleanField(default=True)
 
     class Meta:
         verbose_name = _("Entity manager")
