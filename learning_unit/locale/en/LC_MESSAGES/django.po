@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-25 00:17+0100\n"
+"POT-Creation-Date: 2020-06-17 16:32+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,5 +18,83 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+msgid "Central manager"
+msgstr ""
+
+msgid "Central managers"
+msgstr ""
+
+msgid "Faculty manager"
+msgstr ""
+
+msgid "Faculty managers"
+msgstr ""
+
+msgid "Learning unit is not full"
+msgstr ""
+
+msgid "Learning unit type is not deletable"
+msgstr ""
+
+msgid "Modification or transformation proposal not allowed during this period."
+msgstr ""
+
+#, python-format
+msgid "Modifications should be made in EPC under year %(year)d"
+msgstr ""
+
+msgid "Not in proposal"
+msgstr ""
+
 msgid "Only letters are allowed."
+msgstr ""
+
+msgid "Person not in accordance with proposal state"
+msgstr ""
+
+msgid "Proposal is not of modification type"
+msgstr ""
+
+msgid "Proposal not in eligible state for consolidation"
+msgstr ""
+
+msgid "The learning unit is a partim"
+msgstr ""
+
+msgid "The learning unit is not a partim"
+msgstr ""
+
+msgid "This learning unit has application"
+msgstr ""
+
+msgid "This learning unit has no application."
+msgstr ""
+
+msgid "This learning unit is not editable this period."
+msgstr ""
+
+msgid "This learning unit isn't eligible for modification because of it's type"
+msgstr ""
+
+msgid "You can only edit co-graduation external learning units"
+msgstr ""
+
+msgid ""
+"You can only modify a learning unit when your are linked to its requirement "
+"entity"
+msgstr ""
+
+msgid "You can't edit because the learning unit has proposal"
+msgstr ""
+
+#, python-format
+msgid "You can't modify learning unit under year : %(year)d"
+msgstr ""
+
+msgid ""
+"You cannot delete a learning unit which is prerequisite or has "
+"prerequisite(s)"
+msgstr ""
+
+msgid "You cannot modify a learning unit of a previous year"
 msgstr ""
