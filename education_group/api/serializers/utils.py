@@ -79,7 +79,6 @@ class MiniTrainingGetUrlMixin:
         url_kwargs = {
             'partial_acronym': obj.root_group.partial_acronym,
             'year': obj.offer.academic_year.year,
-            'version_name': obj.version_name
         }
         return reverse(view_name, kwargs=url_kwargs, request=request, format=format)
 

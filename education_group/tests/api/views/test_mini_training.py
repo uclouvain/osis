@@ -215,7 +215,12 @@ class GetMiniTrainingTestCase(APITestCase):
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(year=2018)
         cls.mini_training = MiniTrainingFactory(partial_acronym='LGENR100I', academic_year=cls.academic_year)
-        cls.version = StandardEducationGroupVersionFactory(offer=cls.mini_training)
+        cls.version = StandardEducationGroupVersionFactory(
+            offer=cls.mini_training,
+            root_group__academic_year=cls.academic_year,
+            root_group__education_group_type=cls.mini_training.education_group_type,
+            root_group__partial_acronym=cls.mini_training.partial_acronym
+        )
         cls.user = UserFactory()
         cls.url = reverse('education_group_api_v1:mini_training_read', kwargs={
             'partial_acronym': cls.version.root_group.partial_acronym,

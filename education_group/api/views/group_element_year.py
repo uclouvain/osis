@@ -103,3 +103,19 @@ class GroupTreeView(EducationGroupTreeView):
     ).annotate(
         education_group_year_obj=F('group_year__educationgroupversion__offer')
     ).select_related('education_group_year')
+
+    def get_object(self):
+        queryset = self.filter_queryset(self.get_queryset())
+        filter_kwargs = {
+            lookup_field: self.kwargs[lookup_url_kwarg]
+            for lookup_field, lookup_url_kwarg in zip(self.lookup_fields, self.lookup_url_kwargs)
+        }
+
+        element = get_object_or_404(
+            queryset,
+            **filter_kwargs,
+        )
+        self.check_object_permissions(self.request, element.education_group_year_obj)
+
+        tree = load_tree.load(element.id)
+        return link.factory.get_link(parent=None, child=tree.root_node)

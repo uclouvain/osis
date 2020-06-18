@@ -42,8 +42,8 @@ from education_group.api.serializers.education_group_title import EducationGroup
 from education_group.api.serializers.training import TrainingListSerializer, TrainingDetailSerializer
 from education_group.tests.factories.group_year import GroupYearFactory
 from program_management.models.education_group_version import EducationGroupVersion
-from program_management.tests.factories.education_group_version import EducationGroupVersionFactory, \
-    StandardEducationGroupVersionFactory, StandardTransitionEducationGroupVersionFactory
+from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory, \
+    StandardTransitionEducationGroupVersionFactory
 
 
 class TrainingTitleTestCase(APITestCase):
@@ -51,7 +51,7 @@ class TrainingTitleTestCase(APITestCase):
     def setUpTestData(cls):
         anac = AcademicYearFactory()
         cls.egy = TrainingFactory(academic_year=anac)
-        cls.version = EducationGroupVersionFactory(offer=cls.egy)
+        cls.version = StandardEducationGroupVersionFactory(offer=cls.egy)
         cls.person = PersonFactory()
         cls.url = reverse('education_group_api_v1:trainingstitle_read', kwargs={
             'acronym': cls.egy.acronym,

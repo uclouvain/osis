@@ -29,12 +29,12 @@ from django.urls import reverse
 
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearBachelorFactory
-from education_group.api.serializers.education_group_version import VersionListSerializer
+from education_group.api.serializers.education_group_version import TrainingVersionListSerializer
 from education_group.tests.factories.group_year import GroupYearFactory
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 
 
-class VersionListSerializerTestCase(TestCase):
+class TrainingVersionListSerializerTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(year=2018)
@@ -45,7 +45,7 @@ class VersionListSerializerTestCase(TestCase):
         cls.group = GroupYearFactory(academic_year=cls.academic_year, partial_acronym='LBIR100B')
         cls.version = EducationGroupVersionFactory(offer=cls.training, root_group=cls.group)
         url = reverse('education_group_api_v1:training-list')
-        cls.serializer = VersionListSerializer(cls.version, context={
+        cls.serializer = TrainingVersionListSerializer(cls.version, context={
             'request': RequestFactory().get(url),
             'language': settings.LANGUAGE_CODE_EN
         })
