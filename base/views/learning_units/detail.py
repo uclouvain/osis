@@ -34,7 +34,7 @@ from reversion.models import Version
 
 from base.business.learning_unit import get_all_attributions, get_components_identification
 from base.business.learning_unit_proposal import get_difference_of_proposal
-from base.business.learning_units.perms import is_eligible_to_create_partim, learning_unit_year_permissions, \
+from base.business.learning_units.perms import learning_unit_year_permissions, \
     learning_unit_proposal_permissions
 from base.models import proposal_learning_unit
 from base.models.academic_year import current_academic_year
@@ -141,7 +141,7 @@ class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
 
     def get_context_permission(self, proposal):
         context = {
-            "can_create_partim": is_eligible_to_create_partim(self.object, self.person),
+            "can_create_partim": self.person.user.has_perm('base.can_create_partim', self.object),
             'can_manage_volume': self.person.user.has_perm('base.can_edit_learningunit', self.object)
         }
 

@@ -43,7 +43,7 @@ from base.models.enums.proposal_type import ProposalType
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from osis_common.utils.datetime import get_tzinfo, convert_date_to_datetime
-from osis_common.utils.perms import conjunction, disjunction, negation, BasePerm
+from osis_common.utils.perms import disjunction, negation, BasePerm
 
 FACULTY_UPDATABLE_CONTAINER_TYPES = (learning_container_year_types.COURSE,
                                      learning_container_year_types.DISSERTATION,
@@ -111,15 +111,6 @@ def _has_no_applications_this_year(learning_unit_year, raise_exception=False):
         MSG_LEARNING_UNIT_HAS_APPLICATION
     )
     return result
-
-
-def is_eligible_to_create_partim(learning_unit_year, person, raise_exception=False):
-    return conjunction(
-        is_person_linked_to_entity_in_charge_of_lu,
-        _is_learning_unit_year_in_state_to_create_partim,
-        is_learning_unit_year_full,
-        is_external_learning_unit_cograduation
-    )(learning_unit_year, person, raise_exception)
 
 
 def is_eligible_to_create_modification_proposal(learning_unit_year, person, raise_exception=False):
