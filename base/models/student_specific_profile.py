@@ -49,14 +49,14 @@ class StudentSpecificProfile(models.Model):
         max_length=20,
         choices=peps_type.HtmSubtypes.choices(),
         blank=True,
-        null=True,
+        null=False,
         verbose_name=_('Sub type Disability')
     )
     subtype_sport = models.CharField(
         max_length=20,
         choices=peps_type.SportSubtypes.choices(),
         blank=True,
-        null=True,
+        null=False,
         verbose_name=_('Sub type Sport')
     )
     guide = models.ForeignKey('Person', on_delete=models.PROTECT, verbose_name=_('Guide'))
