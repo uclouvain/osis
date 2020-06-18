@@ -68,7 +68,8 @@ class TestProgramTreeRepositoryCreateMethod(TestCase):
             root_node__start_year=self.year,
             root_node__end_date=self.year,
             root_node__node_type=TrainingType[self.education_group_type_model_obj.name],
-            root_node__teaching_campus=self.campus_model_obj.name,
+            root_node__teaching_campus__name=self.campus_model_obj.name,
+            root_node__teaching_campus__university_name=self.campus_model_obj.organization.name,
             root_node__management_entity_acronym=self.entity_version_model_obj.acronym,
         )
 
@@ -105,7 +106,8 @@ class TestProgramTreeRepositoryCreateMethod(TestCase):
         self.assertEqual(group_year_db_object.remark_fr, new_program_tree.root_node.remark_fr)
         self.assertEqual(group_year_db_object.remark_en, new_program_tree.root_node.remark_en)
         self.assertEqual(group_year_db_object.management_entity.most_recent_acronym, new_program_tree.root_node.management_entity_acronym)
-        self.assertEqual(group_year_db_object.main_teaching_campus.name, new_program_tree.root_node.teaching_campus)
+        self.assertEqual(group_year_db_object.main_teaching_campus.name, new_program_tree.root_node.teaching_campus.name)
+        self.assertEqual(group_year_db_object.main_teaching_campus.organization.name, new_program_tree.root_node.teaching_campus.university_name)
 
         # Element Model field mapping assertions
         self.assertEqual(element_db_object.group_year, group_year_db_object)
@@ -156,7 +158,8 @@ class TestProgramTreeRepositoryGetMethod(TestCase):
         self.assertEqual(root_node_domain_obj.remark_fr, root_group_year_model_obj.remark_fr)
         self.assertEqual(root_node_domain_obj.remark_en, root_group_year_model_obj.remark_en)
         self.assertEqual(root_node_domain_obj.management_entity_acronym, root_group_year_model_obj.management_entity.most_recent_acronym)
-        self.assertEqual(root_node_domain_obj.teaching_campus, root_group_year_model_obj.main_teaching_campus.name)
+        self.assertEqual(root_node_domain_obj.teaching_campus.name, root_group_year_model_obj.main_teaching_campus.name)
+        self.assertEqual(root_node_domain_obj.teaching_campus.university_name, root_group_year_model_obj.main_teaching_campus.organization.name)
 
         link_domain_obj_1: Link = root_node_domain_obj.children[0]
         self.assertEqual(link_domain_obj_1.parent.entity_id, root_node_domain_obj.entity_id)
