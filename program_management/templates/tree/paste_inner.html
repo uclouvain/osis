@@ -52,7 +52,7 @@
                             {% if forloop.first %}
                                 {{ form.media }}
                             {% endif %}
-                            {% with nodes_by_id|get_item:form.node_id as node  %}
+                            {% with nodes_by_id|get_item:form.node_code as node  %}
                             <tr class="link-formset" data-formset-form id="{{ form.prefix }}">
                                 {{ form.id }}
                                 <td style="word-wrap: break-word; min-width: 75px;max-width: 75px;">{% if not node.is_learning_unit %}{{ node.title }}{% else %}-{% endif %}</td>
@@ -82,7 +82,7 @@
                                 {% if forloop.first %}
                                     {{ form.media }}
                                 {% endif %}
-                                {% with nodes_by_id|get_item:form.node_id as node  %}
+                                {% with nodes_by_id|get_item:form.node_code as node  %}
                                 <tr class="link-formset" data-formset-form id="{{ form.prefix }}">
                                     {{ form.id }}
                                     <td style="word-wrap: break-word; min-width: 75px;max-width: 75px;">{% if not node.is_learning_unit %}{{ node.title }}{% else %}-{% endif %}</td>
