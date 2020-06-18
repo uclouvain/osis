@@ -108,7 +108,7 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
         ).order_by(
             'offer__academic_year'
         ).annotate(
-            year=F('offer_academic_year__year'),
+            year=F('offer__academic_year__year'),
         ).values(
             'year',
             flat=True,
