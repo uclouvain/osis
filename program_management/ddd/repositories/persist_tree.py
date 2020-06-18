@@ -79,7 +79,9 @@ def __update_or_create_group_year_model(node: 'NodeGroupYear', group: Group) -> 
         academic_year=AcademicYear.objects.get(year=node.year),
         defaults={
             'acronym': node.title,
-            'education_group_type': EducationGroupType.objects.get(name=node.node_type.name) if node.node_type else None,
+            'education_group_type': EducationGroupType.objects.get(
+                name=node.node_type.name
+            ) if node.node_type else None,
             'credits': node.credits,
             'constraint_type': node.constraint_type,
             'min_constraint': node.min_constraint,
@@ -90,7 +92,10 @@ def __update_or_create_group_year_model(node: 'NodeGroupYear', group: Group) -> 
             'remark_fr': node.remark_fr,
             'remark_en': node.remark_en,
             'management_entity_id': entity_id,
-            'main_teaching_campus_id': Campus.objects.get(name=node.teaching_campus).pk if node.teaching_campus else None,
+            'main_teaching_campus_id': Campus.objects.get(
+                name=node.teaching_campus.name,
+                organization__name=node.teaching_campus.university_name,
+            ).pk if node.teaching_campus else None,
             # 'active': node.status,  # FIXME :: to implement in Repository.get() !
         }
     )

@@ -41,6 +41,7 @@ from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.models.enums.constraint_type import ConstraintTypes
 from osis_common.ddd import interface
 from program_management.ddd.business_types import *
+from program_management.ddd.domain._campus import Campus
 from program_management.ddd.domain.academic_year import AcademicYear
 from program_management.ddd.domain.link import factory as link_factory
 from program_management.ddd.domain.prerequisite import Prerequisite, NullPrerequisite
@@ -351,7 +352,7 @@ class NodeGroupYear(Node):
         offer_partial_title_en: str = None,
         category: GroupType = None,
         management_entity_acronym: str = None,
-        teaching_campus: str = None,
+        teaching_campus: Campus = None,
         schedule_type: ScheduleTypeEnum = None,
         offer_status: ActiveStatusEnum = None,
         keywords: str = None,
