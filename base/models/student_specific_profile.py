@@ -39,7 +39,7 @@ class StudentSpecificProfileAdmin(OsisModelAdmin):
 class StudentSpecificProfile(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
-    student = models.ForeignKey('Student', on_delete=models.PROTECT)
+    student = models.OneToOneField('Student', on_delete=models.PROTECT)
     type = models.CharField(
         max_length=20,
         choices=peps_type.PepsTypes.choices(),
