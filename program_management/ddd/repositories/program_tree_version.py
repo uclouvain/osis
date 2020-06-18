@@ -105,14 +105,12 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
     def get_last_in_past(cls, entity_id: ProgramTreeVersionIdentity) -> 'ProgramTreeVersion':
         qs = EducationGroupVersion.objects.filter(
             version_name=entity_id.version_name,
-            offer__accronym=entity_id.offer_acronym,
+            offer__acronym=entity_id.offer_acronym,
             offer__academic_year__year__lt=entity_id.year,
         ).order_by(
             'offer__academic_year'
-        ).annotate(
-            year=F('offer__academic_year__year'),
-        ).values(
-            'year',
+        ).values_list(
+            'offer__academic_year__year',
             flat=True,
         )
         if qs:

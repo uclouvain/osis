@@ -30,7 +30,7 @@ from django.utils.translation import gettext_lazy as _
 from base.forms.utils.choice_field import BLANK_CHOICE
 from base.models import academic_year
 from base.models.academic_year import compute_max_academic_year_adjournment
-from program_management.ddd.command import CreateProgramTreeVersionCommand
+from program_management.ddd.command import CreateProgramTreeVersionCommand, PostponeProgramTreeVersionCommand
 from program_management.ddd.service.write import create_program_tree_version_service
 
 
@@ -57,7 +57,7 @@ class SpecificVersionForm(forms.Form):
             if not self.cleaned_data['end_year'] else int(self.cleaned_data['end_year'])
         command = CreateProgramTreeVersionCommand(
             offer_acronym=self.education_group_year.acronym,
-            version_name=self.education_group_year.acronym+self.cleaned_data.get("version_name").upper(),
+            version_name=self.cleaned_data.get("version_name").upper(),
             year=self.education_group_year.academic_year.year,
             is_transition=False,
             title_en=self.cleaned_data.get("title_english"),
@@ -65,7 +65,18 @@ class SpecificVersionForm(forms.Form):
             end_postponement=end_postponement,
         )
         if self.save_type == "new_version":
-            identities = create_program_tree_version_service.create_and_postpone_from_past_version(command=command)
+            identity = create_program_tree_version_service.create_program_tree_version(command=command)
+            command_postpone = PostponeProgramTreeVersionCommand(
+                end_postponement=end_postponement,
+                from_offer_acronym=identity.offer_acronym,
+                from_version_name=identity.version_name,
+                from_year=identity.year,
+                from_is_transition=identity.is_transition,
+            )
+            identities_postpone = create_program_tree_version_service.postpone_program_tree_version(
+                command=command_postpone
+            )
+            identities = [identity] + identities_postpone
         if self.save_type == "extend":
             identities = create_program_tree_version_service.create_and_postpone_from_past_version(command=command)
         messages = []
