@@ -3758,9 +3758,3 @@ msgstr "oui"
 
 msgid "yes,no"
 msgstr "oui,non"
-
-#~ msgid "User %(person)s do not have rights on this proposal."
-#~ msgstr "L'utilisateur %(person)s n'a pas de droits sur cette proposition."
-
-#~ msgid "confirm"
-#~ msgstr "confirmer"
