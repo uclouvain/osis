@@ -33,6 +33,7 @@ from django.utils.translation import gettext_lazy as _
 from base.business.event_perms import EventPermEducationGroupEdition
 from base.forms.common import ValidationRuleMixin
 from base.forms.education_group.common import MainCampusChoiceField, MainEntitiesVersionChoiceField
+from base.forms.utils.choice_field import BLANK_CHOICE
 from base.models.academic_year import AcademicYear
 from base.models.enums.constraint_type import ConstraintTypeEnum
 from rules_management.enums import GROUP_PGRM_ENCODING_PERIOD, GROUP_DAILY_MANAGEMENT
@@ -45,14 +46,26 @@ class GroupForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     abbreviated_title = forms.CharField(max_length=40, label=_("Acronym/Short title"), required=False)
     title_fr = forms.CharField(max_length=240, label=_("Title in French"), required=False)
     title_en = forms.CharField(max_length=240, label=_("Title in English"), required=False)
-    credits = forms.CharField(label=_("Credits"), required=False)
-    constraint_type = forms.ChoiceField(
-        choices=ConstraintTypeEnum.choices(),
-        label=_("Type of constraint"),
-        required=False
+    credits = forms.IntegerField(
+        label=_("Credits"),
+        required=False,
+        widget=forms.TextInput
     )
-    min_constraint = forms.CharField(label=_("minimum constraint"), required=False)
-    max_constraint = forms.CharField(label=_("maximum constraint"), required=False)
+    constraint_type = forms.ChoiceField(
+        choices=BLANK_CHOICE + list(ConstraintTypeEnum.choices()),
+        label=_("Type of constraint"),
+        required=False,
+    )
+    min_constraint = forms.IntegerField(
+        label=_("minimum constraint"),
+        required=False,
+        widget=forms.TextInput
+    )
+    max_constraint = forms.IntegerField(
+        label=_("maximum constraint"),
+        required=False,
+        widget=forms.TextInput
+    )
     management_entity = MainEntitiesVersionChoiceField(queryset=None, label=_("Management entity"), required=False)
     teaching_campus = MainCampusChoiceField(queryset=None, label=_("Learning location"), required=False)
     remark_fr = forms.CharField(widget=forms.Textarea, label=_("Remark"), required=False)

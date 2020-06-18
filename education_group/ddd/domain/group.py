@@ -40,7 +40,7 @@ class GroupBuilder:
         group_id = GroupIdentity(code=cmd.code, year=cmd.year)
         titles = Titles(title_fr=cmd.title_fr, title_en=cmd.title_en)
         content_constraint = ContentConstraint(
-            type=ConstraintTypeEnum[cmd.constraint_type],
+            type=ConstraintTypeEnum[cmd.constraint_type] if cmd.constraint_type else None,
             minimum=cmd.min_constraint,
             maximum=cmd.max_constraint
         )

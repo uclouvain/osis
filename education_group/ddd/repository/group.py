@@ -90,7 +90,7 @@ class GroupRepository(interface.AbstractRepository):
             title_fr=group.titles.title_fr,
             title_en=group.titles.title_en,
             credits=group.credits,
-            constraint_type=group.content_constraint.type.name,
+            constraint_type=group.content_constraint.type.name if group.content_constraint.type else None,
             min_constraint=group.content_constraint.minimum,
             max_constraint=group.content_constraint.maximum,
             management_entity_id=management_entity.entity_id,

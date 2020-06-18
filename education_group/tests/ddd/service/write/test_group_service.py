@@ -53,7 +53,11 @@ class TestCreateGroup(SimpleTestCase):
             end_year=None,
         )
 
-    def test_assert_repository_called(self):
-        with patch('education_group.ddd.service.read.group_service.GroupRepository.create') as mock_grp_repo_create:
-            group_service.create_group(self.cmd)
-            mock_grp_repo_create.assert_called_once()
+    @patch('education_group.publisher.group_created', autospec=True)
+    @patch('education_group.ddd.service.read.group_service.GroupRepository.create')
+    def test_assert_repository_called_and_signal_dispateched(self, mock_create_repo, mock_publisher):
+        group_service.create_group(self.cmd)
+
+        mock_create_repo.assert_called_once()
+        # Ensure event is emited
+        mock_publisher.send.assert_called_once()
