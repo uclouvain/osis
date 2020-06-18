@@ -126,7 +126,7 @@ class MiniTrainingDetail(LanguageContextSerializerMixin, generics.RetrieveAPIVie
             ).prefetch_related(
                 'offer__management_entity__entityversion_set',
             ),
-            root_group__partial_acronym__iexact=partial_acronym,
+            offer__partial_acronym__iexact=partial_acronym,
             offer__academic_year__year=year,
             version_name__iexact=version
         )

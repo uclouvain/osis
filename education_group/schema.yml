@@ -72,6 +72,11 @@ paths:
           description: ''
           type: integer
       - in: query
+        name: version_type
+        schema:
+          description: ''
+          type: string
+      - in: query
         name: ordering
         schema:
           description: Which field to use when ordering the results.
@@ -506,118 +511,6 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
-      tags:
-        - mini_trainings
-  /mini_trainings/{year}/{partial_acronym}/versions:
-    get:
-      description: Return the versions list of the mini training
-      operationId: mini_training_versions_list
-      parameters:
-        - in: path
-          name: year
-          required: true
-          schema:
-            description: ''
-            type: string
-        - in: path
-          name: partial_acronym
-          required: true
-          schema:
-            description: ''
-            type: string
-        - in: query
-          name: is_transition
-          schema:
-            description: Is a transition version (default is standard version -> false)
-            type: boolean
-            default: false
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PaginatedVersion'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-      tags:
-        - mini_trainings
-  /mini_trainings/{year}/{partial_acronym}/versions/{version_name}:
-    get:
-      description: Return the detail of the mini training version
-      operationId: mini_training_version
-      parameters:
-        - in: path
-          name: year
-          required: true
-          schema:
-            description: ''
-            type: string
-        - in: path
-          name: partial_acronym
-          required: true
-          schema:
-            description: ''
-            type: string
-        - in: path
-          name: version_name
-          required: true
-          schema:
-            description: ''
-            type: string
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/MiniTrainingDetailed'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-      tags:
-        - mini_trainings
-  /mini_trainings/{year}/{partial_acronym}/versions/{version_name}/tree:
-    get:
-      description: Return the tree of the version
-      operationId: mini_training_versions_tree
-      parameters:
-        - in: path
-          name: year
-          required: true
-          schema:
-            description: ''
-            type: string
-        - in: path
-          name: partial_acronym
-          required: true
-          schema:
-            description: ''
-            type: string
-        - in: path
-          name: version_name
-          required: true
-          schema:
-            description: ''
-            type: string
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Tree'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
       tags:
         - mini_trainings
   /mini_trainings/{year}/{partial_acronym}/offer_roots:

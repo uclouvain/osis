@@ -26,7 +26,7 @@
 
 from rest_framework import serializers
 
-from education_group.api.serializers.utils import TrainingHyperlinkedIdentityField, MiniTrainingHyperlinkedIdentityField
+from education_group.api.serializers.utils import TrainingHyperlinkedIdentityField
 from program_management.models.education_group_version import EducationGroupVersion
 
 
@@ -45,7 +45,3 @@ class VersionListSerializer(serializers.ModelSerializer):
 
 class TrainingVersionListSerializer(VersionListSerializer):
     url = TrainingHyperlinkedIdentityField(read_only=True)
-
-
-class MiniTrainingVersionListSerializer(VersionListSerializer):
-    url = MiniTrainingHyperlinkedIdentityField(read_only=True)
