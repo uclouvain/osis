@@ -33,9 +33,8 @@ from rest_framework.test import APITestCase
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import TrainingFactory
 from base.tests.factories.user import UserFactory
-from education_group.api.serializers.education_group_version import VersionListSerializer
-from education_group.api.views.education_group_version import TrainingVersionList, MiniTrainingVersionList
-from education_group.tests.factories.group_year import GroupYearFactory
+from education_group.api.serializers.education_group_version import TrainingVersionListSerializer
+from education_group.api.views.education_group_version import TrainingVersionList
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory, \
     StandardEducationGroupVersionFactory, StandardTransitionEducationGroupVersionFactory
@@ -75,59 +74,7 @@ class TrainingVersionListTestCase(APITestCase):
     def test_get_result(self):
         response = self.client.get(self.url)
 
-        serializer = VersionListSerializer(self.versions, many=True, context={
-            'request': RequestFactory().get(self.url),
-            'language': settings.LANGUAGE_CODE_FR
-        })
-        self.assertCountEqual(response.data['results'], serializer.data)
-
-
-class MiniTrainingVersionListTestCase(APITestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.academic_year = AcademicYearFactory(year=2018)
-
-        cls.offer = TrainingFactory(academic_year=cls.academic_year)
-        cls.versions = []
-        cls.partial_acronym = 'LHIST100I'
-        group = GroupYearFactory(
-            academic_year=cls.academic_year,
-            partial_acronym=cls.partial_acronym,
-        )
-        cls.versions.append(StandardEducationGroupVersionFactory(offer=cls.offer, root_group=group))
-        group_transition = GroupYearFactory(
-            academic_year=cls.academic_year,
-            partial_acronym=cls.partial_acronym,
-        )
-        cls.versions.append(
-            StandardTransitionEducationGroupVersionFactory(offer=cls.offer, root_group=group_transition)
-        )
-        cls.user = UserFactory()
-        cls.url = reverse('education_group_api_v1:' + MiniTrainingVersionList.name, kwargs={
-            'year': cls.academic_year.year,
-            'partial_acronym': cls.partial_acronym
-        })
-
-    def setUp(self):
-        self.client.force_authenticate(user=self.user)
-
-    def test_get_not_authorized(self):
-        self.client.force_authenticate(user=None)
-
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-
-    def test_get_method_not_allowed(self):
-        methods_not_allowed = ['post', 'delete', 'put', 'patch']
-
-        for method in methods_not_allowed:
-            response = getattr(self.client, method)(self.url)
-            self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
-
-    def test_get_result(self):
-        response = self.client.get(self.url)
-
-        serializer = VersionListSerializer([self.versions[0]], many=True, context={
+        serializer = TrainingVersionListSerializer(self.versions, many=True, context={
             'request': RequestFactory().get(self.url),
             'language': settings.LANGUAGE_CODE_FR
         })
@@ -161,7 +108,7 @@ class FilterVersionTestCase(APITestCase):
 
         trainings = EducationGroupVersion.objects.filter(is_transition=False)
 
-        serializer = VersionListSerializer(
+        serializer = TrainingVersionListSerializer(
             trainings,
             many=True,
             context={'request': RequestFactory().get(self.url, query_string)},
