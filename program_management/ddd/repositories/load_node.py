@@ -119,13 +119,12 @@ def load_multiple(element_ids: List[int]) -> List[node.Node]:
 
 
 def __instanciate_node(**node_attrs):
-    teaching_campus = None
     if node_attrs.get('teaching_campus_name'):
-        teaching_campus = Campus(
+        node_attrs['teaching_campus'] = Campus(
             name=node_attrs.pop('teaching_campus_name'),
             university_name=node_attrs.pop('campus_university_name'),
         )
-    return node.factory.get_node(**__convert_string_to_enum(node_attrs), teaching_campus=teaching_campus)
+    return node.factory.get_node(**__convert_string_to_enum(node_attrs))
 
 
 def __convert_string_to_enum(node_data: dict) -> dict:
