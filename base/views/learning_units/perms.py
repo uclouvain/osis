@@ -121,16 +121,6 @@ def can_perform_cancel_proposal(view_func):
     return f_can_perform_cancel_proposal
 
 
-def can_perform_learning_unit_modification(view_func):
-    def f_can_perform_learning_unit_modification(request, learning_unit_year_id, *args, **kwargs):
-        learn_unit_year = get_object_or_404(learning_unit_year.LearningUnitYear, pk=learning_unit_year_id)
-        pers = get_object_or_404(Person, user=request.user)
-        if not business_perms.is_eligible_for_modification(learn_unit_year, pers):
-            raise PermissionDenied("Learning unit year cannot be modified.")
-        return view_func(request, learning_unit_year_id, *args, **kwargs)
-    return f_can_perform_learning_unit_modification
-
-
 def can_update_learning_achievement(view_func):
     def f_can_update_learning_achievement(request, learning_unit_year_id, *args, **kwargs):
         learn_unit_year = get_object_or_404(learning_unit_year.LearningUnitYear, pk=learning_unit_year_id)

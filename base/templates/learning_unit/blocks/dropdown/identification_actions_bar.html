@@ -66,9 +66,10 @@
                         {% endflag %}
 
                         {% flag "learning_unit_update" %}
-                            {% url "edit_learning_unit" learning_unit_year_id=learning_unit_year.id as edit_learning_unit_url %}
-                            {% li_edit_lu edit_learning_unit_url _('Modify') %}
-
+                            <li>
+                                {% url "edit_learning_unit" learning_unit_year_id=learning_unit_year.id as edit_learning_unit_url %}
+                                {% a_tag_has_perm edit_learning_unit_url _('Modify') 'base.can_edit_learningunit' user learning_unit_year %}
+                            </li>
                             <li>
                                 {% url "learning_unit_edition_end_date" learning_unit_year_id=learning_unit_year.id as learning_unit_edition_end_date_url %}
                                 {% a_tag_has_perm learning_unit_edition_end_date_url _('Modify end date') 'base.can_edit_learningunit_date' user learning_unit_year %}

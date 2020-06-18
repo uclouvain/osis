@@ -102,16 +102,6 @@ def is_external_learning_unit_cograduation(learning_unit_year, person, raise_exc
     return result
 
 
-def is_eligible_for_modification(learning_unit_year, person, raise_exception=False):
-    return \
-        check_lu_permission(person, 'base.can_edit_learningunit', raise_exception) and \
-        is_year_editable(learning_unit_year, raise_exception) and \
-        _is_learning_unit_year_in_state_to_be_modified(learning_unit_year, person, raise_exception) and \
-        is_person_linked_to_entity_in_charge_of_lu(learning_unit_year, person, raise_exception) and \
-        is_external_learning_unit_cograduation(learning_unit_year, person, raise_exception) and \
-        _check_proposal_edition(learning_unit_year, raise_exception)
-
-
 def _has_no_applications_this_year(learning_unit_year, raise_exception=False):
     result = not TutorApplication.objects.filter(
         learning_container_year=learning_unit_year.learning_container_year
@@ -468,7 +458,7 @@ def learning_unit_year_permissions(learning_unit_year, person):
     return {
         'can_propose': is_eligible_to_create_modification_proposal(learning_unit_year, person),
         'can_edit_date': person.user.has_perm('base.can_edit_learningunit_date', learning_unit_year),
-        'can_edit': is_eligible_for_modification(learning_unit_year, person),
+        'can_edit': person.user.has_perm('base.can_edit_learningunit', learning_unit_year),
         'can_delete': is_eligible_to_delete_learning_unit_year(learning_unit_year, person),
     }
 

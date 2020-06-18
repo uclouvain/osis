@@ -30,7 +30,7 @@ from django.test import TestCase
 from django.test.utils import override_settings
 
 from base.business.learning_units.perms import MSG_NOT_ELIGIBLE_TO_MODIFY_END_YEAR_PROPOSAL_ON_THIS_YEAR, \
-    is_eligible_for_modification, can_update_learning_achievement, is_eligible_to_update_learning_unit_pedagogy
+    can_update_learning_achievement, is_eligible_to_update_learning_unit_pedagogy
 from base.business.learning_units.perms import is_eligible_to_modify_end_year_by_proposal, \
     is_eligible_to_modify_by_proposal, MSG_NOT_ELIGIBLE_TO_PUT_IN_PROPOSAL_ON_THIS_YEAR
 from base.models.enums import learning_container_year_types
@@ -42,7 +42,8 @@ from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.person import FacultyManagerForUEFactory, AdministrativeManagerFactory, CentralManagerForUEFactory
+from base.tests.factories.person import FacultyManagerForUEFactory, AdministrativeManagerFactory, \
+    CentralManagerForUEFactory
 
 
 class TestPerms(TestCase):
@@ -116,7 +117,7 @@ class TestPerms(TestCase):
 
     def test_is_not_eligible_to_modify_cause_user_is_administrative_manager(self):
         administrative_manager = AdministrativeManagerFactory()
-        self.assertFalse(is_eligible_for_modification(self.luy, administrative_manager))
+        self.assertFalse(administrative_manager.user.has_perm('base.can_edit_learningunit', self.luy))
 
     @mock.patch('waffle.models.Flag.is_active_for_user', return_value=True)
     @override_settings(YEAR_LIMIT_LUE_MODIFICATION=2018)

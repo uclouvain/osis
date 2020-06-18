@@ -28,7 +28,7 @@ from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.utils.translation import gettext_lazy as _
 
-from base.business.learning_units.perms import is_eligible_for_modification, is_eligible_to_edit_proposal, \
+from base.business.learning_units.perms import is_eligible_to_edit_proposal, \
     is_eligible_for_cancel_of_proposal, \
     is_eligible_to_consolidate_proposal, is_eligible_to_delete_learning_unit_year, \
     is_eligible_to_modify_end_year_by_proposal, is_eligible_to_modify_by_proposal
@@ -40,13 +40,6 @@ register = template.Library()
 MSG_IS_NOT_A_PROPOSAL = _("Isn't a proposal")
 MSG_PROPOSAL_NOT_ON_CURRENT_LU = _("Proposal isn't on current learning unit year")
 DISABLED = "disabled"
-
-
-@register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
-def li_edit_lu(context, url, message, url_id="link_edit_lu"):
-    data = _get_common_data(context, message, url, url_id)
-    data['permission'] = is_eligible_for_modification
-    return li_with_permission(data)
 
 
 @register.inclusion_tag('blocks/button/li_template.html', takes_context=True)

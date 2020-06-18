@@ -139,6 +139,7 @@ class PermsTestCase(TestCase):
             self.assertFalse(faculty_manager.person.user.has_perm('base.can_edit_learningunit_date', luy))
 
     def test_cannot_faculty_manager_modify_full(self):
+        faculty_manager = FacultyManagerFactory()
         for proposal_needed_container_type in TYPES_PROPOSAL_NEEDED_TO_EDIT:
             lunit_container_yr = LearningContainerYearFactory(academic_year=self.academic_yr_6,
                                                               container_type=proposal_needed_container_type)
@@ -146,12 +147,7 @@ class PermsTestCase(TestCase):
                                           learning_container_year=lunit_container_yr,
                                           subtype=FULL)
 
-            self.assertFalse(perms.is_eligible_for_modification(luy, create_person_with_permission_and_group(
-                FACULTY_MANAGER_GROUP)))
-            self.assertFalse(perms.is_eligible_for_modification(
-                luy,
-                create_person_with_permission_and_group(UE_FACULTY_MANAGER_GROUP)
-            ))
+            self.assertFalse(faculty_manager.person.user.has_perm('base.can_edit_learningunit', luy))
 
     @mock.patch('base.business.learning_units.perms.is_year_editable')
     @mock.patch('base.business.learning_units.perms._is_learning_unit_year_in_state_to_be_modified')
