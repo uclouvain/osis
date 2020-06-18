@@ -43,7 +43,7 @@ class GeneralInformation(generics.RetrieveAPIView):
 
     def get_object(self):
         self.egv = get_object_or_404(
-            EducationGroupVersion.objects.select_related(
+            EducationGroupVersion.standard.select_related(
                 'offer__academic_year',
                 'offer__admissioncondition',
                 'offer__education_group_type',
@@ -58,7 +58,6 @@ class GeneralInformation(generics.RetrieveAPIView):
             Q(root_group__partial_acronym__iexact=self.kwargs['acronym']),
             offer__academic_year__year=self.kwargs['year'],
             offer__education_group_type__name__in=general_information_sections.SECTIONS_PER_OFFER_TYPE.keys(),
-            version_name='',
             is_transition=False
         )
         identity = ProgramTreeIdentity(
