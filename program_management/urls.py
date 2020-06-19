@@ -55,12 +55,12 @@ urlpatterns = [
         url(r'^pdf_content/(?P<language>[a-z\-]+)', groupelementyear_read.pdf_content, name="pdf_content"),
     ])),
     url(
-        r'reporting/(?P<education_group_year_pk>[0-9]+)/prerequisites/$',
+        r'reporting/(?P<year>[0-9]+)/(?P<code>[A-Za-z0-9]+)/prerequisites/$',
         excel.get_learning_unit_prerequisites_excel,
         name="education_group_learning_units_prerequisites"
     ),
     url(
-        r'reporting/(?P<education_group_year_pk>[0-9]+)/is_prerequisite_of/$',
+        r'reporting/(?P<year>[0-9]+)/(?P<code>[A-Za-z0-9]+)/is_prerequisite_of/$',
         excel.get_learning_units_is_prerequisite_for_excel,
         name="education_group_learning_units_is_prerequisite_for"
     ),

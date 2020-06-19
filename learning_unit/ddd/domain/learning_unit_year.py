@@ -141,8 +141,10 @@ class LearningUnitYear:
 
     @property
     def full_title_fr(self):
-        return self.common_title_fr + self.specific_title_fr
+        return "{}{}".format(self.common_title_fr,
+                             " - {}".format(self.specific_title_fr) if self.specific_title_fr else '')
 
     @property
     def full_title_en(self):
-        return self.common_title_en + self.specific_title_en
+        return "{}{}".format(self.common_title_en,
+                             " - {}".format(self.specific_title_en) if self.specific_title_en else '')
