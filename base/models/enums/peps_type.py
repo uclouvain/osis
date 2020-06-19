@@ -4,19 +4,19 @@ from base.models.utils.utils import ChoiceEnum
 
 
 class PepsTypes(ChoiceEnum):
-    NON_RENSEIGNE = _('Not defined')
-    HTM = _('Disability')
+    NOT_DEFINED = _('Not defined')
+    DISABILITY = _('Disability')
     SPORT = _('Sport')
-    ARTISTE = _('Artist')
-    ENTREPRENARIAT = _('Entrepreneur')
-    # TODO: Aménagement jury
+    ARTIST = _('Artist')
+    ENTREPRENEUR = _('Entrepreneur')
+    ARRANGEMENT_JURY = _('Arrangement Jury')
 
 
 class HtmSubtypes(ChoiceEnum):
-    PMR = _('Person with reduced mobility')
-    AUTRE_HTM = _('Other disability')
+    REDUCED_MOBILITY = _('Person with reduced mobility')
+    OTHER_DISABILITY = _('Other disability')
 
 
 class SportSubtypes(ChoiceEnum):
-    ESHN = _('High Level Promising athlete')
-    ES = _('Promising athlete')
+    PROMISING_ATHLETE_HL = _('High Level Promising athlete')
+    PROMISING_ATHLETE = _('Promising athlete')
