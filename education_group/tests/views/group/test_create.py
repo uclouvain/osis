@@ -9,6 +9,7 @@ from django.utils.translation import gettext_lazy as _
 
 from base.tests.factories.education_group_type import GroupEducationGroupTypeFactory
 from base.tests.factories.person import PersonFactory
+from education_group.ddd.domain.exception import GroupCodeAlreadyExistException
 from education_group.ddd.domain.group import GroupIdentity
 from education_group.forms.group import GroupForm
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
@@ -96,13 +97,34 @@ class TestCreateGroupPostMethod(TestCase):
             self.assertIsInstance(response.context['group_form'], GroupForm)
             self.assertIsInstance(response.context['tabs'], List)
 
+    @mock.patch('education_group.views.group.create.GroupForm.is_valid', return_value=True)
+    @mock.patch('education_group.views.group.create.GroupForm.cleaned_data',
+                new_callable=mock.PropertyMock, create=True)
     @mock.patch('education_group.views.group.create.group_service.create_group')
-    @mock.patch('education_group.views.group.create.GroupForm', create_autospec=True)
-    def test_post_assert_create_service_called(self, mock_group_form, mock_service_create_group):
-        mock_group_form.is_valid.return_value = True
-        mock_group_form.cleaned_data.return_value = defaultdict()
-
+    def test_post_assert_create_service_called(self,
+                                               mock_service_create_group,
+                                               mock_form_clean_data,
+                                               mock_form_is_valid):
         mock_service_create_group.return_value = GroupIdentity(code="LTRONC1000", year=2018)
+        mock_form_clean_data.return_value = defaultdict(lambda: None)
+        mock_form_is_valid.return_value = True
 
         self.client.post(self.url)
         mock_service_create_group.assert_called_once()
+
+    @mock.patch('education_group.views.group.create.GroupForm.is_valid', return_value=True)
+    @mock.patch('education_group.views.group.create.GroupForm.cleaned_data',
+                new_callable=mock.PropertyMock, create=True)
+    @mock.patch('education_group.views.group.create.group_service.create_group')
+    def test_post_assert_form_error_when_create_service_raise_exception(self,
+                                                                        mock_service_create_group,
+                                                                        mock_form_clean_data,
+                                                                        mock_form_is_valid):
+        mock_form_is_valid.return_value = True
+        mock_form_clean_data.return_value = defaultdict(lambda: None)
+
+        mock_service_create_group.side_effect = GroupCodeAlreadyExistException
+
+        response = self.client.post(self.url)
+        self.assertIsInstance(response.context['group_form'], GroupForm)
+        self.assertTrue(response.context['group_form'].has_error('code'))

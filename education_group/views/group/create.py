@@ -1,4 +1,3 @@
-import operator
 from typing import List, Dict
 
 from django.http import HttpResponseRedirect
@@ -14,10 +13,12 @@ from base.models.enums.education_group_types import GroupType
 from base.utils.cache import RequestCache
 from base.views.common import display_success_messages
 from education_group.ddd import command
+from education_group.ddd.domain.exception import GroupCodeAlreadyExistException
 from education_group.ddd.domain.group import GroupIdentity
 from education_group.ddd.service.write import group_service
 from education_group.forms.group import GroupForm
 from education_group.models.group_year import GroupYear
+from education_group.templatetags.academic_year_display import display_as_academic_year
 from osis_role.contrib.views import PermissionRequiredMixin
 
 
@@ -65,15 +66,22 @@ class GroupCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 min_constraint=group_form.cleaned_data['min_constraint'],
                 max_constraint=group_form.cleaned_data['max_constraint'],
                 management_entity_acronym=group_form.cleaned_data['management_entity'],
-                teaching_campus_name=group_form.cleaned_data['teaching_campus']['name'],
-                organization_name=group_form.cleaned_data['teaching_campus']['organization_name'],
+                teaching_campus_name=group_form.cleaned_data['teaching_campus']['name']
+                if group_form.cleaned_data['teaching_campus'] else None,
+                organization_name=group_form.cleaned_data['teaching_campus']['organization_name']
+                if group_form.cleaned_data['teaching_campus'] else None,
                 remark_fr=group_form.cleaned_data['remark_fr'],
                 remark_en=group_form.cleaned_data['remark_en'],
                 start_year=group_form.cleaned_data['academic_year'],
             )
-            group_id = group_service.create_group(cmd_create)
-            display_success_messages(request, self.get_success_msg(group_id))
-            return HttpResponseRedirect(self.get_success_url(group_id))
+            try:
+                group_id = group_service.create_group(cmd_create)
+            except GroupCodeAlreadyExistException as e:
+                group_form.add_error('code', e.message)
+
+            if not group_form.errors:
+                display_success_messages(request, self.get_success_msg(group_id), extra_tags='safe')
+                return HttpResponseRedirect(self.get_success_url(group_id))
 
         return render(request, self.template_name, {
             "group_form": group_form,
@@ -88,7 +96,7 @@ class GroupCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         return _("Group <a href='%(link)s'> %(code)s (%(academic_year)s) </a> successfully created.") % {
             "link": self.get_success_url(group_id),
             "code": group_id.code,
-            "academic_year": group_id.year,
+            "academic_year": display_as_academic_year(group_id.year),
         }
 
     def get_tabs(self) -> List:

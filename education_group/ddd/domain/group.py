@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import copy
+
 from base.models.enums.constraint_type import ConstraintTypeEnum
 from base.models.enums.education_group_types import GroupType
 from education_group.ddd import command
@@ -65,6 +67,12 @@ class GroupBuilder:
             unannualized_identity=None,
             end_year=cmd.end_year
         )
+
+    @classmethod
+    def build_next_year_group(cls, from_group: 'Group', year: int):
+        group = copy.deepcopy(from_group)
+        group.entity_id = GroupIdentity(code=from_group.code, year=year)
+        return group
 
 
 builder = GroupBuilder()

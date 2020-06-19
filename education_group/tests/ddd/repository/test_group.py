@@ -38,7 +38,7 @@ from education_group.ddd.domain._remark import Remark
 from education_group.ddd.domain._titles import Titles
 from education_group.ddd.domain._entity import Entity as EntityValueObject
 from education_group.ddd.domain.exception import AcademicYearNotFound, TypeNotFound, ManagementEntityNotFound, \
-    TeachingCampusNotFound
+    TeachingCampusNotFound, GroupCodeAlreadyExistException
 from education_group.ddd.domain.group import GroupIdentity, Group, GroupUnannualizedIdentity
 from education_group.ddd.factories.group import GroupFactory
 from education_group.ddd.repository.group import GroupRepository
@@ -218,3 +218,8 @@ class TestGroupRepositoryCreateMethod(TestCase):
             academic_year__year=group_identity.year
         )
         self.assertEqual(group_inserted.group.pk, group_db.pk)
+
+    def test_assert_raise_group_code_already_exist_exception(self):
+        GroupRepository.create(self.group)
+        with self.assertRaises(GroupCodeAlreadyExistException):
+            GroupRepository.create(self.group)

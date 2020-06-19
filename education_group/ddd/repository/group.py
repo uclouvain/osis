@@ -25,6 +25,7 @@
 ##############################################################################
 from typing import Optional, List
 
+from django.db import IntegrityError
 from django.db.models import Prefetch, Subquery, OuterRef
 from django.utils import timezone
 
@@ -82,21 +83,25 @@ class GroupRepository(interface.AbstractRepository):
             pk=getattr(group.unannualized_identity, 'uuid', None),
             defaults={'start_year': academic_year, 'end_year': end_year}
         )
-        group_year_created = GroupYearModelDb.objects.create(
-            partial_acronym=group.code,
-            academic_year=academic_year,
-            education_group_type=education_group_type,
-            acronym=group.abbreviated_title,
-            title_fr=group.titles.title_fr,
-            title_en=group.titles.title_en,
-            credits=group.credits,
-            constraint_type=group.content_constraint.type.name if group.content_constraint.type else None,
-            min_constraint=group.content_constraint.minimum,
-            max_constraint=group.content_constraint.maximum,
-            management_entity_id=management_entity.entity_id,
-            main_teaching_campus=teaching_campus,
-            group=group_upserted
-        )
+        try:
+            group_year_created = GroupYearModelDb.objects.create(
+                partial_acronym=group.code,
+                academic_year=academic_year,
+                education_group_type=education_group_type,
+                acronym=group.abbreviated_title,
+                title_fr=group.titles.title_fr,
+                title_en=group.titles.title_en,
+                credits=group.credits,
+                constraint_type=group.content_constraint.type.name if group.content_constraint.type else None,
+                min_constraint=group.content_constraint.minimum,
+                max_constraint=group.content_constraint.maximum,
+                management_entity_id=management_entity.entity_id,
+                main_teaching_campus=teaching_campus,
+                group=group_upserted
+            )
+        except IntegrityError:
+            raise exception.GroupCodeAlreadyExistException
+
         return GroupIdentity(
             code=group_year_created.partial_acronym,
             year=group_year_created.academic_year.year
