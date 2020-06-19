@@ -32,7 +32,7 @@ from osis_common.models.osis_model_admin import OsisModelAdmin
 
 class StudentSpecificProfileAdmin(OsisModelAdmin):
     list_display = ('student', 'guide', 'changed',)
-    list_filter = ('student', 'guide__last_name', 'guide__first_name')
+    list_filter = ('type', 'subtype_disability', 'subtype_sport')
     search_fields = ['guide__first_name', 'guide__last_name', 'student']
 
 
