@@ -31,8 +31,8 @@ from django.test import TestCase
 
 from attribution.tests.factories.tutor_application import TutorApplicationFactory
 from base.business.learning_units import perms
-from base.business.learning_units.perms import is_eligible_to_create_modification_proposal, \
-    FACULTY_UPDATABLE_CONTAINER_TYPES, is_eligible_to_consolidate_proposal, _check_proposal_edition
+from base.business.learning_units.perms import FACULTY_UPDATABLE_CONTAINER_TYPES, is_eligible_to_consolidate_proposal, \
+    _check_proposal_edition
 from base.business.perms import view_academicactors
 from base.models.academic_year import AcademicYear, LEARNING_UNIT_CREATION_SPAN_YEARS, MAX_ACADEMIC_YEAR_FACULTY, \
     MAX_ACADEMIC_YEAR_CENTRAL
@@ -435,10 +435,7 @@ class TestIsEligibleToCreateModificationProposal(TestCase):
             end_date=cls.current_academic_year.end_date - datetime.timedelta(days=365),
             year=cls.current_academic_year.year - 1
         )
-        cls.person = PersonFactory()
-        cls.person.user.user_permissions.add(
-            Permission.objects.get(codename='can_propose_learningunit'),
-        )
+        cls.person = CentralManagerFactory().person
 
     def setUp(self):
         requirement_entity = EntityFactory()
@@ -451,13 +448,13 @@ class TestIsEligibleToCreateModificationProposal(TestCase):
     def test_cannot_propose_modification_of_past_learning_unit(self):
         past_luy = LearningUnitYearFakerFactory(learning_container_year__academic_year=self.past_academic_year)
 
-        self.assertFalse(is_eligible_to_create_modification_proposal(past_luy, self.person))
+        self.assertFalse(self.person.user.has_perm('base.can_propose_learningunit', past_luy))
 
     def test_cannot_propose_modification_of_partim(self):
         self.luy.subtype = PARTIM
         self.luy.save()
 
-        self.assertFalse(is_eligible_to_create_modification_proposal(self.luy, self.person))
+        self.assertFalse(self.person.user.has_perm('base.can_propose_learningunit', self.luy))
 
     def test_can_only_propose_modification_for_course_internship_and_dissertation(self):
         other_types = (OTHER_COLLECTIVE, OTHER_INDIVIDUAL, MASTER_THESIS, EXTERNAL)
@@ -465,12 +462,12 @@ class TestIsEligibleToCreateModificationProposal(TestCase):
             with self.subTest(luy_container_type=luy_container_type):
                 self.luy.learning_container_year.container_type = luy_container_type
                 self.luy.learning_container_year.save()
-                self.assertFalse(is_eligible_to_create_modification_proposal(self.luy, self.person))
+                self.assertFalse(self.person.user.has_perm('base.can_propose_learningunit', self.luy))
 
     def test_can_only_propose_modification_for_luy_which_is_not_currently_in_proposition(self):
         ProposalLearningUnitFactory(learning_unit_year=self.luy)
 
-        self.assertFalse(is_eligible_to_create_modification_proposal(self.luy, self.person))
+        self.assertFalse(self.person.user.has_perm('base.can_propose_learningunit', self.luy))
 
     def test_can_only_propose_modification_for_lu_which_is_not_in_proposition_on_different_year(self):
         past_luy_with_proposal = LearningUnitYearFakerFactory(
@@ -479,19 +476,19 @@ class TestIsEligibleToCreateModificationProposal(TestCase):
         )
         ProposalLearningUnitFactory(learning_unit_year=past_luy_with_proposal)
 
-        self.assertFalse(is_eligible_to_create_modification_proposal(self.luy, self.person))
+        self.assertFalse(self.person.user.has_perm('base.can_propose_learningunit', self.luy))
 
     def test_cannot_propose_modification_for_luy_for_which_person_is_not_linked_to_entity(self):
         self.person_entity.delete()
 
-        self.assertFalse(is_eligible_to_create_modification_proposal(self.luy, self.person))
+        self.assertFalse(self.person.user.has_perm('base.can_propose_learningunit', self.luy))
 
     def test_all_requirements_are_met_to_propose_modification(self):
         for luy_container_type in FACULTY_UPDATABLE_CONTAINER_TYPES:
             with self.subTest(luy_container_type=luy_container_type):
                 self.luy.learning_container_year.container_type = luy_container_type
                 self.luy.learning_container_year.save()
-                self.assertTrue(is_eligible_to_create_modification_proposal(self.luy, self.person))
+                self.assertFalse(self.person.user.has_perm('base.can_propose_learningunit', self.luy))
 
     def test_check_proposal_edition_ko(self):
         past_luy_with_proposal = LearningUnitYearFakerFactory(

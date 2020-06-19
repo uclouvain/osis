@@ -113,23 +113,6 @@ def _has_no_applications_this_year(learning_unit_year, raise_exception=False):
     return result
 
 
-def is_eligible_to_create_modification_proposal(learning_unit_year, person, raise_exception=False):
-    result = \
-        check_lu_permission(person, 'base.can_propose_learningunit', raise_exception) and \
-        not(is_learning_unit_year_in_past(learning_unit_year, person, raise_exception)) and \
-        not(is_learning_unit_year_a_partim(learning_unit_year, person, raise_exception)) and \
-        _is_container_type_course_dissertation_or_internship(learning_unit_year, person, raise_exception) and \
-        not(is_learning_unit_year_in_proposal(learning_unit_year, person, raise_exception)) and \
-        is_person_linked_to_entity_in_charge_of_learning_unit(learning_unit_year, person) and \
-        is_external_learning_unit_cograduation(learning_unit_year, person, raise_exception)
-    #  TODO detail why button is disabled
-    can_raise_exception(
-        raise_exception, result,
-        MSG_NOT_ELIGIBLE_TO_CREATE_MODIFY_PROPOSAL
-    )
-    return result
-
-
 def is_eligible_for_cancel_of_proposal(proposal, person, raise_exception=False):
     result = \
         _is_person_in_accordance_with_proposal_state(proposal, person, raise_exception) and \
@@ -447,7 +430,7 @@ def _is_container_type_course_dissertation_or_internship(learning_unit_year, _, 
 
 def learning_unit_year_permissions(learning_unit_year, person):
     return {
-        'can_propose': is_eligible_to_create_modification_proposal(learning_unit_year, person),
+        'can_propose': person.user.has_perm('base.can_propose_learningunit', learning_unit_year),
         'can_edit_date': person.user.has_perm('base.can_edit_learningunit_date', learning_unit_year),
         'can_edit': person.user.has_perm('base.can_edit_learningunit', learning_unit_year),
         'can_delete': is_eligible_to_delete_learning_unit_year(learning_unit_year, person),
@@ -616,7 +599,7 @@ def _check_proposal_edition(learning_unit_year, raise_exception):
 
 
 def is_eligible_to_modify_end_year_by_proposal(learning_unit_year, person, raise_exception=False):
-    result = is_eligible_to_create_modification_proposal(learning_unit_year, person, raise_exception)
+    result = person.user.has_perm('base.can_propose_learningunit', learning_unit_year)
     if result:
         return can_modify_end_year_by_proposal(learning_unit_year, person, raise_exception)
     else:
@@ -644,7 +627,7 @@ def can_modify_end_year_by_proposal(learning_unit_year, person, raise_exception=
 
 
 def is_eligible_to_modify_by_proposal(learning_unit_year, person, raise_exception=False):
-    result = is_eligible_to_create_modification_proposal(learning_unit_year, person, raise_exception)
+    result = person.user.has_perm('base.can_propose_learningunit', learning_unit_year)
 
     if result:
         return can_modify_by_proposal(learning_unit_year, person, raise_exception)

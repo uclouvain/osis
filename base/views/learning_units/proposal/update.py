@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.shortcuts import redirect, get_object_or_404, render
 from django.utils.translation import gettext_lazy as _
@@ -39,12 +39,13 @@ from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.views.common import display_success_messages, show_error_message_for_form_invalid
 from base.views.learning_units import perms
 from base.views.learning_units.common import get_learning_unit_identification_context
+from learning_unit.views.utils import learning_unit_year_getter
+from osis_role.contrib.views import permission_required
 
 
 @waffle_flag('learning_unit_proposal_update')
 @login_required
-@perms.can_create_modification_proposal
-@permission_required('base.can_propose_learningunit', raise_exception=True)
+@permission_required('base.can_propose_learningunit', raise_exception=True, fn=learning_unit_year_getter)
 def learning_unit_modification_proposal(request, learning_unit_year_id):
     learning_unit_year = get_object_or_404(LearningUnitYear, id=learning_unit_year_id)
     return _update_or_create_proposal(request, learning_unit_year)
@@ -52,8 +53,7 @@ def learning_unit_modification_proposal(request, learning_unit_year_id):
 
 @waffle_flag('learning_unit_proposal_update')
 @login_required
-@perms.can_create_modification_proposal
-@permission_required('base.can_propose_learningunit', raise_exception=True)
+@permission_required('base.can_propose_learningunit', raise_exception=True, fn=learning_unit_year_getter)
 def learning_unit_suppression_proposal(request, learning_unit_year_id):
     learning_unit_year = get_object_or_404(LearningUnitYear, id=learning_unit_year_id)
     return _update_or_create_suppression_proposal(request, learning_unit_year)

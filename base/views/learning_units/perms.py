@@ -80,16 +80,6 @@ def can_delete_learning_unit_year(view_func):
     return f_can_delete_learning_unit_year
 
 
-def can_create_modification_proposal(view_func):
-    def f_can_perform_modification_proposal(request, learning_unit_year_id):
-        learn_unit_year = get_object_or_404(learning_unit_year.LearningUnitYear, pk=learning_unit_year_id)
-        pers = get_object_or_404(Person, user=request.user)
-        if not business_perms.is_eligible_to_create_modification_proposal(learn_unit_year, pers):
-            raise PermissionDenied("Learning unit year not eligible for proposal or user has not sufficient rights.")
-        return view_func(request, learning_unit_year_id)
-    return f_can_perform_modification_proposal
-
-
 def can_edit_learning_unit_proposal(view_func):
     def f_can_edit_learning_unit_proposal(request, learning_unit_year_id):
         proposal = proposal_learning_unit.find_by_learning_unit_year(learning_unit_year_id)
