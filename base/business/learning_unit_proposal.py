@@ -234,8 +234,12 @@ def cancel_proposals_and_send_report(proposals, author, research_criteria):
         _("cannot be canceled"),
         send_mail_util.send_mail_cancellation_learning_unit_proposals,
         research_criteria,
-        perms.is_eligible_for_cancel_of_proposal
+        can_cancel_proposal
     )
+
+
+def can_cancel_proposal(proposal, author, raise_exception):
+    return author.user.has_perm('base.can_cancel_proposal', proposal.learning_unit_year)
 
 
 def consolidate_proposals_and_send_report(proposals, author, research_criteria):

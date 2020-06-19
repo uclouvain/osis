@@ -30,7 +30,6 @@ from django.shortcuts import get_object_or_404
 from base.business.learning_units import perms as business_perms
 from base.models import learning_unit_year, proposal_learning_unit
 from base.models.person import Person
-from base.models.proposal_learning_unit import ProposalLearningUnit
 
 
 class PermissionDecorator:
@@ -89,16 +88,6 @@ def can_edit_learning_unit_proposal(view_func):
             raise PermissionDenied("User has not sufficient rights to edit proposal.")
         return view_func(request, learning_unit_year_id)
     return f_can_edit_learning_unit_proposal
-
-
-def can_perform_cancel_proposal(view_func):
-    def f_can_perform_cancel_proposal(request, learning_unit_year_id):
-        learning_unit_proposal = get_object_or_404(ProposalLearningUnit, learning_unit_year__id=learning_unit_year_id)
-        pers = get_object_or_404(Person, user=request.user)
-        if not business_perms.is_eligible_for_cancel_of_proposal(learning_unit_proposal, pers):
-            raise PermissionDenied("Learning unit proposal cannot be cancelled.")
-        return view_func(request, learning_unit_year_id)
-    return f_can_perform_cancel_proposal
 
 
 def can_update_learning_achievement(view_func):

@@ -113,20 +113,6 @@ def _has_no_applications_this_year(learning_unit_year, raise_exception=False):
     return result
 
 
-def is_eligible_for_cancel_of_proposal(proposal, person, raise_exception=False):
-    result = \
-        _is_person_in_accordance_with_proposal_state(proposal, person, raise_exception) and \
-        _is_not_proposal_of_type_with_applications(proposal, ProposalType.CREATION, raise_exception) and \
-        _is_attached_to_initial_or_current_requirement_entity(proposal, person, raise_exception) and \
-        _has_person_the_right_to_make_proposal(proposal, person, raise_exception) and \
-        is_external_learning_unit_cograduation(proposal.learning_unit_year, person, raise_exception)
-    can_raise_exception(
-        raise_exception, result,
-        MSG_NOT_ELIGIBLE_TO_CANCEL_PROPOSAL
-    )
-    return result
-
-
 def _is_person_in_accordance_with_proposal_state(proposal, person, raise_exception=False):
     result = person.is_central_manager or proposal.state == ProposalState.FACULTY.name
     can_raise_exception(
@@ -442,7 +428,7 @@ def learning_unit_proposal_permissions(proposal, person, current_learning_unit_y
                    'can_consolidate_proposal': False}
     if not proposal or proposal.learning_unit_year != current_learning_unit_year:
         return permissions
-    permissions['can_cancel_proposal'] = is_eligible_for_cancel_of_proposal(proposal, person)
+    permissions['can_cancel_proposal'] = person.user.has_perm('base.can_cancel_proposal', proposal.learning_unit_year)
     permissions['can_edit_learning_unit_proposal'] = is_eligible_to_edit_proposal(proposal, person)
     permissions['can_consolidate_proposal'] = is_eligible_to_consolidate_proposal(proposal, person)
     return permissions

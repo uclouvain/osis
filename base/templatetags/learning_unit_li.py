@@ -28,8 +28,8 @@ from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.utils.translation import gettext_lazy as _
 
+from base.business.learning_unit_proposal import can_cancel_proposal
 from base.business.learning_units.perms import is_eligible_to_edit_proposal, \
-    is_eligible_for_cancel_of_proposal, \
     is_eligible_to_consolidate_proposal, is_eligible_to_delete_learning_unit_year, \
     is_eligible_to_modify_end_year_by_proposal, is_eligible_to_modify_by_proposal
 from base.business.learning_units.perms import is_year_editable
@@ -70,7 +70,7 @@ def li_edit_proposal(context, url, message, url_id="link_proposal_edit", js_scri
 @register.inclusion_tag('blocks/button/li_template_lu.html', takes_context=True)
 def li_cancel_proposal(context, url, message, data_target, url_id="link_cancel_proposal", js_script=''):
     data = _get_common_proposal_data(context, message, url, url_id)
-    data['permission_function'] = is_eligible_for_cancel_of_proposal
+    data['permission_function'] = can_cancel_proposal
     data['obj'] = context['proposal']
     data['js_script'] = js_script
     data['load_modal'] = True
@@ -146,9 +146,7 @@ def li_with_permission(data):
 
 
 def _get_permission(context, permission):
-    return _get_permission_result(context.get('learning_unit_year'),
-                                  permission,
-                                  find_by_user(context.get('user')))
+    return _get_permission_result(context.get('learning_unit_year'), permission, find_by_user(context.get('user')))
 
 
 def _get_permission_result(learning_unit_year, permission, person):
@@ -211,9 +209,7 @@ def li_with_permission_for_proposal(data):
 
 def _get_permission_proposal(context, permission, object):
     # object is sometimes a proposal, sometimes a learning_unit_year it's why it's call 'object'
-    return _get_permission_result(object,
-                                  permission,
-                                  find_by_user(context.get('user')))
+    return _get_permission_result(object, permission, find_by_user(context.get('user')))
 
 
 def is_valid_proposal(context):

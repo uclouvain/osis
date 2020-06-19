@@ -265,24 +265,21 @@ class PermsTestCase(TestCase):
         luy = LearningUnitYearFactory(academic_year=self.academic_yr)
         an_entity = EntityFactory()
         luy.learning_container_year.requirement_entity = an_entity
+        luy.initial_data = {"learning_container_year": {"requirement_entity": an_entity.id}}
         luy.learning_container_year.save()
-        a_person = create_person_with_permission_and_group()
+        a_person = CentralManagerFactory().person
         a_proposal = ProposalLearningUnitFactory(
             learning_unit_year=luy,
             type=proposal_type.ProposalType.SUPPRESSION.name,
             state=proposal_state.ProposalState.CENTRAL.name,
-            initial_data={
-                "learning_container_year": {
-                    "requirement_entity": an_entity.id,
-                }
-            })
-        self.assertFalse(perms.is_eligible_for_cancel_of_proposal(a_proposal, a_person))
+        )
+        self.assertFalse(a_person.user.has_perm('base.can_cancel_proposal', luy))
         a_proposal.state = proposal_state.ProposalState.FACULTY.name
         a_proposal.save()
-        self.assertFalse(perms.is_eligible_for_cancel_of_proposal(a_proposal, a_person))
+        self.assertFalse(a_person.user.has_perm('base.can_cancel_proposal', luy))
         a_proposal.type = proposal_type.ProposalType.MODIFICATION.name
         a_proposal.save()
-        self.assertFalse(perms.is_eligible_for_cancel_of_proposal(a_proposal, a_person))
+        self.assertFalse(a_person.user.has_perm('base.can_cancel_proposal', luy))
 
     def test_is_eligible_for_cancel_of_proposal_for_creation(self):
         generated_container = GenerateContainer(start_year=self.academic_yr,
@@ -291,19 +288,17 @@ class PermsTestCase(TestCase):
         an_requirement_entity = generated_container_first_year.requirement_entity_container_year
 
         luy = generated_container_first_year.learning_unit_year_full
+        luy.initial_data = {"learning_container_year": {"requirement_entity": an_requirement_entity.id}}
 
-        faculty_managers = [
-            create_person_with_permission_and_group(FACULTY_MANAGER_GROUP, 'can_propose_learningunit'),
-            create_person_with_permission_and_group(UE_FACULTY_MANAGER_GROUP, 'can_propose_learningunit')
-        ]
+        central_manager = CentralManagerFactory(entity=an_requirement_entity).person
 
-        a_proposal = ProposalLearningUnitFactory(learning_unit_year=luy,
-                                                 type=proposal_type.ProposalType.CREATION.name,
-                                                 state=proposal_state.ProposalState.FACULTY.name)
+        ProposalLearningUnitFactory(
+            learning_unit_year=luy,
+            type=proposal_type.ProposalType.CREATION.name,
+            state=proposal_state.ProposalState.FACULTY.name
+        )
 
-        for manager in faculty_managers:
-            PersonEntityFactory(person=manager, entity=an_requirement_entity)
-            self.assertTrue(perms.is_eligible_for_cancel_of_proposal(a_proposal, manager))
+        self.assertTrue(central_manager.user.has_perm('base.can_cancel_proposal', luy))
 
     def test_is_eligible_for_cancel_of_proposal(self):
         generated_container = GenerateContainer(start_year=self.academic_yr, end_year=self.academic_yr)
@@ -311,13 +306,11 @@ class PermsTestCase(TestCase):
         an_requirement_entity = generated_container_first_year.requirement_entity_container_year
 
         luy = generated_container_first_year.learning_unit_year_full
+        luy.initial_data = {"learning_container_year": {"requirement_entity": an_requirement_entity.id}}
 
-        faculty_managers = [
-            create_person_with_permission_and_group(FACULTY_MANAGER_GROUP, 'can_propose_learningunit'),
-            create_person_with_permission_and_group(UE_FACULTY_MANAGER_GROUP, 'can_propose_learningunit')
-        ]
+        central_manager = CentralManagerFactory(entity=an_requirement_entity).person
 
-        a_proposal = ProposalLearningUnitFactory(
+        ProposalLearningUnitFactory(
             learning_unit_year=luy,
             type=proposal_type.ProposalType.MODIFICATION.name,
             state=proposal_state.ProposalState.FACULTY.name,
@@ -327,9 +320,7 @@ class PermsTestCase(TestCase):
                 }
             })
 
-        for manager in faculty_managers:
-            PersonEntityFactory(person=manager, entity=an_requirement_entity)
-            self.assertTrue(perms.is_eligible_for_cancel_of_proposal(a_proposal, manager))
+        self.assertTrue(central_manager.user.has_perm('base.can_cancel_proposal', luy))
 
     def test_is_eligible_for_cancel_of_proposal_wrong_state(self):
         generated_container = GenerateContainer(start_year=self.academic_yr,
@@ -338,13 +329,11 @@ class PermsTestCase(TestCase):
         an_requirement_entity = generated_container_first_year.requirement_entity_container_year
 
         luy = generated_container_first_year.learning_unit_year_full
+        luy.initial_data = {"learning_container_year": {"requirement_entity": an_requirement_entity.id}}
 
-        faculty_managers = [
-            create_person_with_permission_and_group(FACULTY_MANAGER_GROUP, 'can_propose_learningunit'),
-            create_person_with_permission_and_group(UE_FACULTY_MANAGER_GROUP, 'can_propose_learningunit')
-        ]
+        central_manager = CentralManagerFactory(entity=an_requirement_entity).person
 
-        a_proposal = ProposalLearningUnitFactory(
+        ProposalLearningUnitFactory(
             learning_unit_year=luy,
             type=proposal_type.ProposalType.MODIFICATION.name,
             state=proposal_state.ProposalState.CENTRAL.name,
@@ -354,31 +343,7 @@ class PermsTestCase(TestCase):
                 }
             })
 
-        for manager in faculty_managers:
-            PersonEntityFactory(person=manager, entity=an_requirement_entity)
-            self.assertFalse(perms.is_eligible_for_cancel_of_proposal(a_proposal, manager))
-
-    def test_is_eligible_for_cancel_of_proposal_as_central_manager(self):
-        generated_container = GenerateContainer(start_year=self.academic_yr,
-                                                end_year=self.academic_yr)
-        generated_container_first_year = generated_container.generated_container_years[0]
-        an_requirement_entity = generated_container_first_year.requirement_entity_container_year
-
-        luy = generated_container_first_year.learning_unit_year_full
-        a_person = create_person_with_permission_and_group(CENTRAL_MANAGER_GROUP,
-                                                           'can_propose_learningunit')
-
-        a_proposal = ProposalLearningUnitFactory(
-            learning_unit_year=luy,
-            type=proposal_type.ProposalType.MODIFICATION.name,
-            state=proposal_state.ProposalState.CENTRAL.name,
-            initial_data={
-                "learning_container_year": {
-                    "requirement_entity": an_requirement_entity.id,
-                }
-            })
-        PersonEntityFactory(person=a_person, entity=an_requirement_entity)
-        self.assertTrue(perms.is_eligible_for_cancel_of_proposal(a_proposal, a_person))
+        self.assertTrue(central_manager.user.has_perm('base.can_cancel_proposal', luy))
 
     def test_is_learning_unit_year_in_state_to_be_modified(self):
         luy = LearningUnitYearFactory(
@@ -408,18 +373,18 @@ class PermsTestCase(TestCase):
                 self.assertFalse(perms._is_learning_unit_year_in_state_to_be_modified(luy, self.person_fac, False))
 
     def test_is_not_eligible_if_creation_proposal_has_application(self):
+        central_manager = CentralManagerFactory()
         luy = LearningUnitYearFactory()
-        proposal = ProposalLearningUnitFactory(
+        luy.learning_container_year.requirement_entity = central_manager.entity
+        luy.initial_data = {"learning_container_year": {"requirement_entity": central_manager.entity.id}}
+
+        ProposalLearningUnitFactory(
             learning_unit_year=luy,
             type=ProposalType.CREATION.name
         )
         TutorApplicationFactory(learning_container_year=luy.learning_container_year)
 
-        self.assertFalse(
-            perms.is_eligible_for_cancel_of_proposal(
-                proposal, CentralManagerForUEFactory()
-            )
-        )
+        self.assertFalse(central_manager.person.user.has_perm('base.can_cancel_proposal', luy))
 
 
 def create_person_with_permission_and_group(group_name=None, permission_name='can_edit_learning_unit_proposal'):
