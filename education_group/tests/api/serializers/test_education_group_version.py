@@ -24,29 +24,37 @@
 #
 ##############################################################################
 from django.conf import settings
-from django.test import TestCase
+from django.test import TestCase, RequestFactory
+from django.urls import reverse
 
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory
-from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
+from base.tests.factories.education_group_year import EducationGroupYearBachelorFactory
+from education_group.api.serializers.education_group_version import TrainingVersionListSerializer
+from education_group.tests.factories.group_year import GroupYearFactory
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 
 
-class EducationGroupTitleSerializerTestCase(TestCase):
+class TrainingVersionListSerializerTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        academic_year = AcademicYearFactory()
-        cls.education_group_year = EducationGroupYearFactory(
-            academic_year=academic_year,
+        cls.academic_year = AcademicYearFactory(year=2018)
+        cls.training = EducationGroupYearBachelorFactory(
+            acronym='BIR1BA',
+            academic_year=cls.academic_year
         )
-        cls.version = EducationGroupVersionFactory(offer=cls.education_group_year)
-        cls.serializer = EducationGroupTitleSerializer(
-            cls.version,
-            context={'language': settings.LANGUAGE_CODE_EN}
-        )
+        cls.group = GroupYearFactory(academic_year=cls.academic_year, partial_acronym='LBIR100B')
+        cls.version = EducationGroupVersionFactory(offer=cls.training, root_group=cls.group)
+        url = reverse('education_group_api_v1:training-list')
+        cls.serializer = TrainingVersionListSerializer(cls.version, context={
+            'request': RequestFactory().get(url),
+            'language': settings.LANGUAGE_CODE_EN
+        })
 
     def test_contains_expected_fields(self):
         expected_fields = [
-            'title',
+            'url',
+            'version_name',
+            'code',
+            'is_transition'
         ]
-        self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
+        self.assertListEqual(list(self.serializer.data), expected_fields)

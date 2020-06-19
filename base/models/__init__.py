@@ -14,7 +14,6 @@ from base.models import education_group_year
 from base.models import education_group_year_domain
 from base.models import entity
 from base.models import entity_calendar
-from base.models import entity_manager
 from base.models import entity_version
 from base.models import entity_version_address
 from base.models import exam_enrollment

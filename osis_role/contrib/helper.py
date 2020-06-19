@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,30 +23,31 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf import settings
-from django.test import TestCase
+from typing import List
 
-from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory
-from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
-from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
+from base.models.entity import Entity
+from base.models.person import Person
+from education_group.auth.scope import Scope
+from osis_role import role
 
 
-class EducationGroupTitleSerializerTestCase(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        academic_year = AcademicYearFactory()
-        cls.education_group_year = EducationGroupYearFactory(
-            academic_year=academic_year,
-        )
-        cls.version = EducationGroupVersionFactory(offer=cls.education_group_year)
-        cls.serializer = EducationGroupTitleSerializer(
-            cls.version,
-            context={'language': settings.LANGUAGE_CODE_EN}
-        )
+class EntityRoleHelper():
+    """
+       Utility class to provide role-related static methods
+    """
+    @staticmethod
+    def get_all_entities(person: Person, group_names: List[str]) -> List[Entity]:
+        role_mdls = [r for r in role.role_manager.roles if r.group_name in group_names]
+        qs = None
 
-    def test_contains_expected_fields(self):
-        expected_fields = [
-            'title',
-        ]
-        self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
+        for role_mdl in role_mdls:
+            subqs = role_mdl.objects.filter(person=person)
+            if hasattr(role_mdl, 'scopes'):
+                subqs = subqs.filter(scopes=[Scope.ALL.value])
+            subqs = subqs.values('entity_id', 'with_child')
+            if qs is None:
+                qs = subqs
+            else:
+                qs = qs.union(subqs)
+
+        return qs.get_entities_ids() if qs else Entity.objects.none()
