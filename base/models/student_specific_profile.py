@@ -59,7 +59,7 @@ class StudentSpecificProfile(models.Model):
         null=False,
         verbose_name=_('Sub type Sport')
     )
-    guide = models.ForeignKey('Person', on_delete=models.PROTECT, verbose_name=_('Guide'), blank=True)
+    guide = models.ForeignKey('Person', on_delete=models.PROTECT, verbose_name=_('Guide'), blank=True, null=True)
     arrangement_additional_time = models.BooleanField(default=False, verbose_name=_('Arrangement additional time'))
     arrangement_appropriate_copy = models.BooleanField(default=False, verbose_name=_('Arrangement appropriate copy'))
     arrangement_other = models.BooleanField(default=False, verbose_name=_('Arrangement other'))
