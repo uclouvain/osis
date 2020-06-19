@@ -9,7 +9,7 @@ class PepsTypes(ChoiceEnum):
     SPORT = _('Sport')
     ARTISTE = _('Artist')
     ENTREPRENARIAT = _('Entrepreneur')
-    # TODO: Aménagement jury
+    AMENAGEMENT_JURY = _('Arrangement Jury')
 
 
 class HtmSubtypes(ChoiceEnum):
