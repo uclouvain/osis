@@ -80,7 +80,7 @@ def learning_unit_formations(request, learning_unit_year_id):
     #     "parent", "child_leaf", "parent__education_group_type"
     # ).order_by('parent__partial_acronym')
     group_elements_years = learn_unit_year.element.children_elements.select_related(
-        "parent_element", "child_element", "parent_element__education_group_type"
+        "parent_element", "child_element", "parent_element__group_year__education_group_type"
     ).order_by('parent_element__group_year__partial_acronym')
     education_groups_years = [group_element_year.parent_element for group_element_year in group_elements_years]
     formations_by_educ_group_year = program_management.ddd.repositories.find_roots.find_roots(

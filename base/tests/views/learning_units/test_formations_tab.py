@@ -31,7 +31,7 @@ from django.urls import reverse
 
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, TrainingFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFullFactory
@@ -58,7 +58,7 @@ class TestLearningUnitFormationsTab(TestCase):
         )
         cls.elem_learning_unit_year = ElementFactory(learning_unit_year=cls.learning_unit_year)
 
-        cls.education_group_year = EducationGroupYearFactory(
+        cls.education_group_year = TrainingFactory(
             academic_year=cls.academic_year
         )
 
@@ -78,7 +78,7 @@ class TestLearningUnitFormationsTab(TestCase):
             child_leaf=None
         )
 
-        cls.education_group_year_formation_parent = EducationGroupYearFactory(
+        cls.education_group_year_formation_parent = TrainingFactory(
             academic_year=cls.academic_year
         )
         cls.education_group_version_formation_parent = StandardEducationGroupVersionFactory(
@@ -97,7 +97,7 @@ class TestLearningUnitFormationsTab(TestCase):
             child_leaf=None
         )
 
-        cls.education_group_year_formation_great_parent_1 = EducationGroupYearFactory(
+        cls.education_group_year_formation_great_parent_1 = TrainingFactory(
             academic_year=cls.academic_year
         )
         cls.education_group_version_formation_great_parent_1 = StandardEducationGroupVersionFactory(
@@ -115,7 +115,7 @@ class TestLearningUnitFormationsTab(TestCase):
             child_branch=None,
             child_leaf=None
         )
-        cls.education_group_year_formation_great_parent_2 = EducationGroupYearFactory(
+        cls.education_group_year_formation_great_parent_2 = TrainingFactory(
             academic_year=cls.academic_year
         )
         cls.education_group_version_formation_great_parent_2 = StandardEducationGroupVersionFactory(
