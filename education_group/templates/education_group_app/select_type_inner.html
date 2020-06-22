@@ -25,7 +25,7 @@
 
 <div class="modal-content" id="form-modal-content">
     <div id="form-modal-body" class="modal-body">
-        <form method="post" id="form_education_group_type" action="{{ request.path }}">
+        <form method="post" id="form_education_group_type" action="{{ request.path }}?{{ request.GET.urlencode }}">
             {% csrf_token %}
             {% bootstrap_field form.name %}
         </form>

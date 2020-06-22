@@ -24,12 +24,13 @@
 #
 ##############################################################################
 from django import forms
+from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
 from base.models.education_group_type import EducationGroupType
 from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import MiniTrainingType, GroupType
-
+from program_management.business.group_element_years import management
 
 DISABLED_OFFER_TYPE = [
     MiniTrainingType.FSA_SPECIALITY.name,
@@ -51,7 +52,9 @@ class SelectTypeForm(forms.Form):
         required=True,
     )
 
-    def __init__(self, category, *args, **kwargs):
+    def __init__(self, category, parent=None, *args, **kwargs):
+        self.parent = parent
+
         super().__init__(*args, **kwargs)
         self.fields["name"].label = _("Which type of %(category)s do you want to create ?") % {
             "category": Categories[category].value
@@ -59,4 +62,14 @@ class SelectTypeForm(forms.Form):
         self.fields["name"].queryset = EducationGroupType.objects.filter(category=category)
 
     def clean_name(self):
-        return self.cleaned_data["name"].name
+        education_group_type = self.cleaned_data["name"]
+
+        # TODO: Use ValidateAuthorizedRelationshipForAllTrees instead
+        if self.parent and management.is_max_child_reached(self.parent, education_group_type.name):
+            raise ValidationError(
+                _("The number of children of type \"%(child_type)s\" for \"%(parent)s\" "
+                  "has already reached the limit.") % {
+                    'child_type': education_group_type.get_name_display(),
+                    'parent': self.parent
+                })
+        return education_group_type.name
