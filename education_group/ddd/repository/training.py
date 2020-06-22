@@ -27,9 +27,21 @@ from typing import Optional, List
 
 from django.db.models import Subquery, OuterRef, Prefetch
 
-from base.models.education_group_certificate_aim import EducationGroupCertificateAim
-from base.models.education_group_organization import EducationGroupOrganization
-from base.models.education_group_year import EducationGroupYear
+from base.models import entity_version
+from base.models.academic_year import AcademicYear as AcademicYearModelDb
+from base.models.campus import Campus as CampusModelDb
+from base.models.certificate_aim import CertificateAim as CertificateAimModelDb
+from base.models.education_group import EducationGroup as EducationGroupModelDb
+from base.models.education_group_certificate_aim \
+    import EducationGroupCertificateAim as EducationGroupCertificateAimModelDb
+from base.models.education_group_organization import EducationGroupOrganization as EducationGroupOrganizationModelDb
+from base.models.education_group_type import EducationGroupType as EducationGroupTypeModelDb
+from base.models.education_group_year import EducationGroupYear as EducationGroupYearModelDb
+from base.models.education_group_year_domain import EducationGroupYearDomain as EducationGroupYearDomainModelDb
+from base.models.hops import Hops as HopsModelDb
+from reference.models.language import Language as LanguageModelDb
+from reference.models.domain import Domain as DomainModelDb
+from reference.models.domain_isced import DomainIsced as DomainIscedModelDb
 from base.models.entity import Entity
 from base.models.entity_version import EntityVersion
 from base.models.enums.academic_type import AcademicTypes
@@ -50,7 +62,7 @@ from education_group.ddd.domain._address import Address
 from education_group.ddd.domain._campus import CampusIdentity
 from education_group.ddd.domain._co_graduation import CoGraduation
 from education_group.ddd.domain._co_organization import Coorganization, CoorganizationIdentity
-from education_group.ddd.domain._diploma import Diploma, DiplomaAim, DiplomaAimIdentity, DiplomaIdentity
+from education_group.ddd.domain._diploma import Diploma, DiplomaAim, DiplomaAimIdentity
 from education_group.ddd.domain._entity import Entity as EntityValueObject
 from education_group.ddd.domain._funding import Funding
 from education_group.ddd.domain._hops import HOPS
@@ -63,8 +75,98 @@ from osis_common.ddd import interface
 
 class TrainingRepository(interface.AbstractRepository):
     @classmethod
-    def create(cls, entity: 'Training') -> 'TrainingIdentity':
-        raise NotImplementedError
+    def create(cls, training: 'Training') -> 'TrainingIdentity':
+        education_group_db_obj = EducationGroupModelDb.objects.create(
+            start_year=AcademicYearModelDb.objects.get(year=training.start_year),
+            end_year=AcademicYearModelDb.objects.get(year=training.end_year) if training.end_year else None,
+        )
+
+        education_group_year_db_obj = EducationGroupYearModelDb.objects.create(
+            education_group_type=EducationGroupTypeModelDb.objects.get(name=training.type.name),
+            credits=training.credits,
+            schedule_type=training.schedule_type.name if training.schedule_type else None,
+            duration=training.duration,
+            education_group=education_group_db_obj,
+            title=training.titles.title_fr,
+            partial_title=training.titles.partial_title_fr,
+            title_english=training.titles.title_en,
+            partial_title_english=training.titles.partial_title_en,
+            keywords=training.keywords,
+            internship=training.internship.name if training.internship else None,
+            enrollment_enabled=training.is_enrollment_enabled,
+            web_re_registration=training.has_online_re_registration,
+            partial_deliberation=training.has_partial_deliberation,
+            admission_exam=training.has_admission_exam,
+            dissertation=training.has_dissertation,
+            university_certificate=training.produce_university_certificate,
+            decree_category=training.decree_category.name if training.decree_category else None,
+            rate_code=training.rate_code.name if training.rate_code else None,
+            primary_language=LanguageModelDb.objects.get(
+                name=training.main_language.name
+            ) if training.main_language else None,
+            english_activities=training.english_activities.name if training.english_activities else None,
+            other_language_activities=training.other_language_activities.name if training.other_language_activities else None,
+            internal_comment=training.internal_comment,
+            main_domain=DomainModelDb.objects.get(
+                code=training.main_domain.entity_id.code,
+                decree__name=training.main_domain.entity_id.decree_name,
+            ) if training.main_domain else None,
+            isced_domain=DomainIscedModelDb.objects.get(
+                code=training.isced_domain.entity_id.code
+            ) if training.isced_domain else None,
+            management_entity=entity_version.find_by_acronym_and_year(
+                acronym=training.management_entity.acronym,
+                year=training.year,
+            ).entity_id if training.management_entity else None,
+            administration_entity=entity_version.find_by_acronym_and_year(
+                acronym=training.administration_entity.acronym,
+                year=training.year,
+            ).entity_id if training.management_entity else None,
+            main_teaching_campus=CampusModelDb.objects.get(
+                name=training.teaching_campus.name,
+                university__name=training.teaching_campus.university_name,
+            ) if training.teaching_campus else None,
+            enrollment_campus=CampusModelDb.objects.get(
+                name=training.enrollment_campus.name,
+                university__name=training.enrollment_campus.university_name,
+            ) if training.teaching_campus else None,
+            other_campus_activities=training.other_campus_activities.name if training.other_campus_activities else None,
+            funding=training.funding.can_be_funded,
+            funding_direction=training.funding.funding_orientation.name if training.funding.funding_orientation else None,
+            funding_cud=training.funding.can_be_international_funded,
+            funding_direction_cud=training.funding.international_funding_orientation.name if training.funding.international_funding_orientation else None,
+            co_graduation=training.co_graduation.code_inter_cfb,
+            co_graduation_coefficient=training.co_graduation.coefficient,
+            academic_type=training.academic_type.name if training.academic_type else None,
+            duration_unit=training.duration_unit.name if training.duration_unit else None,
+            joint_diploma=training.diploma.leads_to_diploma,
+            diploma_printing_title=training.diploma.printing_title,
+            professional_title=training.diploma.professional_title,
+        )
+
+        # Secondary domains
+        for dom in training.secondary_domains:
+            EducationGroupYearDomainModelDb.objects.create(
+                education_group_year=education_group_year_db_obj,
+                domain=DomainModelDb.objects.get(code=dom.entity_id.code, decree__name=dom.decree_name),
+            )
+
+        # HOPS
+        HopsModelDb.objects.create(
+            education_group_year=education_group_year_db_obj,
+            ares_study=training.hops.ares_code,
+            ares_graca=training.hops.ares_graca,
+            ares_ability=training.hops.ares_authorization,
+        )
+
+        # Diploma aims
+        for aim in training.diploma.aims:
+            EducationGroupCertificateAimModelDb.objects.create(
+                education_group_year=education_group_year_db_obj,
+                certificate_aim=CertificateAimModelDb.objects.get(code=aim.entity_id.code)
+            )
+
+        return training.entity_id
 
     @classmethod
     def update(cls, entity: 'Training') -> 'TrainingIdentity':
@@ -72,7 +174,7 @@ class TrainingRepository(interface.AbstractRepository):
 
     @classmethod
     def get(cls, entity_id: 'TrainingIdentity') -> 'Training':
-        qs = EducationGroupYear.objects.filter(
+        qs = EducationGroupYearModelDb.objects.filter(
             acronym=entity_id.acronym,
             academic_year__year=entity_id.year
         ).select_related(
@@ -92,7 +194,7 @@ class TrainingRepository(interface.AbstractRepository):
             'secondary_domains',
             Prefetch(
                 'educationgrouporganization_set',
-                EducationGroupOrganization.objects.all().prefetch_related(
+                EducationGroupOrganizationModelDb.objects.all().prefetch_related(
                     Prefetch(
                         'organization__organizationaddress_set',
                         OrganizationAddress.objects.all().select_related('country')
@@ -121,13 +223,13 @@ class TrainingRepository(interface.AbstractRepository):
             ),
             Prefetch(
                 'educationgroupcertificateaim_set',
-                EducationGroupCertificateAim.objects.all().select_related('certificate_aim')
+                EducationGroupCertificateAimModelDb.objects.all().select_related('certificate_aim')
             ),
         )
 
         try:
             obj = qs.get()
-        except EducationGroupYear.DoesNotExist:
+        except EducationGroupYearModelDb.DoesNotExist:
             raise exception.TrainingNotFoundException
 
         secondary_domains = []

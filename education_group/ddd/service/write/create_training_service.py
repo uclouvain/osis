@@ -23,14 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import TYPE_CHECKING
 
-# FIXME :: Temporary solution ; waiting for update python to 3.8 for data structure
+from education_group.ddd import command
+from education_group.ddd.business_types import *
+from education_group.ddd.domain.training import TrainingBuilder
+from education_group.ddd.repository.training import TrainingRepository
 
-if TYPE_CHECKING:
-    from education_group.ddd.domain.training import Training, TrainingIdentity
-    from education_group.ddd.command import CreateTrainingCommand
-    from education_group.ddd.domain._study_domain import StudyDomainIdentity
-    from education_group.ddd.domain._campus import CampusIdentity
-    from education_group.ddd.domain._co_organization import CoorganizationIdentity
-    from education_group.ddd.domain._diploma import DiplomaAimIdentity
+
+def create_training(create_command: command.CreateTrainingCommand) -> 'TrainingIdentity':
+    training = TrainingBuilder().get_training(create_command)
+    training_id = TrainingRepository.create(training)
+    return training_id

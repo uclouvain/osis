@@ -24,28 +24,35 @@
 #
 ##############################################################################
 from _decimal import Decimal
-from typing import List
+from typing import List, TypeVar
 
 from base.models.enums.academic_type import AcademicTypes
 from base.models.enums.activity_presence import ActivityPresence
 from base.models.enums.decree_category import DecreeCategories
 from base.models.enums.duration_unit import DurationUnitsEnum
 from base.models.enums.education_group_types import TrainingType
+from base.models.enums.funding_codes import FundingCodes
 from base.models.enums.internship_presence import InternshipPresence
 from base.models.enums.rate_code import RateCode
 from base.models.enums.schedule_type import ScheduleTypeEnum
+from base.models.utils.utils import ChoiceEnum
 from education_group.ddd.domain._campus import CampusIdentity
 from education_group.ddd.domain._co_graduation import CoGraduation
 from education_group.ddd.domain._co_organization import Coorganization
-from education_group.ddd.domain._diploma import Diploma
+from education_group.ddd.domain._diploma import Diploma, DiplomaAim
 from education_group.ddd.domain._entity import Entity
 from education_group.ddd.domain._funding import Funding
 from education_group.ddd.domain._hops import HOPS
-from education_group.ddd.domain._isced_domain import IscedDomain
+from education_group.ddd.domain._isced_domain import IscedDomain, IscedDomainIdentity
 from education_group.ddd.domain._language import Language
 from education_group.ddd.domain._study_domain import StudyDomain
 from education_group.ddd.domain._titles import Titles
 from osis_common.ddd import interface
+
+from education_group.ddd.business_types import *
+
+
+T = TypeVar('T')
 
 
 class TrainingIdentity(interface.EntityIdentity):
@@ -58,6 +65,106 @@ class TrainingIdentity(interface.EntityIdentity):
 
     def __eq__(self, other):
         return self.acronym == other.acronym and self.year == other.year
+
+
+class TrainingBuilder:
+    def get_training(self, command: 'CreateTrainingCommand') -> 'Training':
+        training_identity = TrainingIdentity(command.acronym, command.year)
+        secondary_domains = []
+        for dom in command.secondary_domains:
+            secondary_domains.append(
+                StudyDomain(
+                    entity_id=StudyDomainIdentity(dom[0], dom[1]),
+                    domain_name=None,
+                )
+            )
+
+        command_aims = []
+        for aim in command.aims:
+            DiplomaAim(
+                entity_id=DiplomaAimIdentity(code=aim[0], section=aim[1]),
+                description=None,  # FIXME :: Training() object should receive entity_id instead of Object? And lazy load the DiplomaAim objects?
+            )
+
+        return Training(
+            entity_identity=training_identity,
+            type=self._get_enum_from_str(command.type, TrainingType),
+            credits=command.credits,
+            schedule_type=self._get_enum_from_str(command.schedule_type, ScheduleTypeEnum),
+            duration=command.duration,
+            duration_unit=self._get_enum_from_str(command.duration_unit, DurationUnitsEnum),
+            start_year=command.start_year,
+            titles=Titles(
+                title_fr=command.title_fr,
+                partial_title_fr=command.partial_title_fr,
+                title_en=command.title_en,
+                partial_title_en=command.partial_title_en,
+            ),
+            keywords=command.keywords,
+            internship=self._get_enum_from_str(command.internship, InternshipPresence),
+            is_enrollment_enabled=command.is_enrollment_enabled,
+            has_online_re_registration=command.has_online_re_registration,
+            has_partial_deliberation=command.has_partial_deliberation,
+            has_admission_exam=command.has_admission_exam,
+            has_dissertation=command.has_dissertation,
+            produce_university_certificate=command.produce_university_certificate,
+            decree_category=self._get_enum_from_str(command.decree_category, DecreeCategories),
+            rate_code=self._get_enum_from_str(command.rate_code, RateCode),
+            main_language=Language(command.main_language) if command.main_language else None,
+            english_activities=self._get_enum_from_str(command.english_activities, ActivityPresence),
+            other_language_activities=self._get_enum_from_str(command.other_language_activities, ActivityPresence),
+            internal_comment=command.internal_comment,
+            main_domain=StudyDomain(
+                entity_id=StudyDomainIdentity(decree_name=command.main_domain_decree, code=command.main_domain_code),
+                domain_name=None,
+            ),
+            secondary_domains=secondary_domains,
+            isced_domain=IscedDomain(
+                entity_id=IscedDomainIdentity(command.isced_domain_code),
+                title_fr=None,
+                title_en=None,
+            ),
+            management_entity=Entity(acronym=command.management_entity_acronym),
+            administration_entity=Entity(acronym=command.administration_entity_acronym),
+            end_year=command.end_year,
+            teaching_campus=command.teaching_campus,
+            enrollment_campus=command.enrollment_campus,
+            other_campus_activities=self._get_enum_from_str(command.other_campus_activities, ActivityPresence),
+            funding=Funding(
+                can_be_funded=command.can_be_funded,
+                funding_orientation=command.funding_orientation,
+                can_be_international_funded=command.can_be_international_funded,
+                international_funding_orientation=FundingCodes[
+                    command.international_funding_orientation
+                ] if command.international_funding_orientation else None,
+            ),
+            hops=HOPS(
+                ares_code=command.ares_code,
+                ares_graca=command.ares_graca,
+                ares_authorization=command.ares_authorization,
+            ),
+            co_graduation=CoGraduation(
+                code_inter_cfb=command.code_inter_cfb,
+                coefficient=command.coefficient,
+            ),
+            academic_type=self._get_enum_from_str(command.academic_type, AcademicTypes),
+            diploma=Diploma(
+                leads_to_diploma=command.leads_to_diploma,
+                printing_title=command.printing_title,
+                professional_title=command.professional_title,
+                aims=command_aims,
+            ),
+        )
+
+    def _get_enum_from_str(self, value: str, enum_class):
+        if value is None:
+            return None
+        try:
+            return enum_class[value]
+        except ValueError:
+            raise interface.BusinessException(
+                "Invalid enum choice (value={}, enumeration_class={})".format(value, enum_class)
+            )
 
 
 class Training(interface.RootEntity):
