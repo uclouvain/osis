@@ -50,7 +50,7 @@ class PermissionFieldMixin(ModelFormMixin):
     It enables/disables fields according to permissions and the context
     """
     model_permission = FieldReference
-    context: str = ""
+    context = ""
     user = None
 
     def __init__(self, *args, user=None, **kwargs):
