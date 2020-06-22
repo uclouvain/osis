@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,24 +23,37 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf import settings
-from rest_framework import serializers
+from django_filters import rest_framework as filters
+from rest_framework import generics
+from rest_framework.generics import get_object_or_404
 
+from backoffice.settings.rest_framework.common_views import LanguageContextSerializerMixin
+from base.models.education_group_year import EducationGroupYear
+from education_group.api.serializers.education_group_version import TrainingVersionListSerializer
 from program_management.models.education_group_version import EducationGroupVersion
 
 
-class EducationGroupTitleSerializer(serializers.ModelSerializer):
-    title = serializers.SerializerMethodField()
-
+class VersionFilter(filters.FilterSet):
     class Meta:
         model = EducationGroupVersion
-        fields = (
-            'title',
-        )
+        fields = ['is_transition']
 
-    def get_title(self, version):
-        language = self.context.get('language')
-        return getattr(
-            version.root_group,
-            'title_' + ('en' if language and language not in settings.LANGUAGE_CODE_FR else 'fr')
+
+class TrainingVersionList(LanguageContextSerializerMixin, generics.ListAPIView):
+    """
+       Return a list of all version of the training.
+    """
+    name = 'training_versions_list'
+    serializer_class = TrainingVersionListSerializer
+    filterset_class = VersionFilter
+    search_fields = (
+        'version_name',
+    )
+
+    def get_queryset(self):
+        education_group_year = get_object_or_404(
+            EducationGroupYear.objects.all(),
+            acronym=self.kwargs['acronym'].upper(),
+            academic_year__year=self.kwargs['year']
         )
+        return EducationGroupVersion.objects.filter(offer=education_group_year, is_transition=False)

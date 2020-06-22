@@ -25,6 +25,7 @@
 ##############################################################################
 from django.contrib import admin
 
+from base.auth.roles import entity_manager
 from base.models import *
 from base.models import validation_rule, education_group_achievement, education_group_detailed_achievement
 
@@ -192,6 +193,9 @@ admin.site.register(structure.Structure,
 
 admin.site.register(student.Student,
                     student.StudentAdmin)
+
+admin.site.register(student_specific_profile.StudentSpecificProfile,
+                    student_specific_profile.StudentSpecificProfileAdmin)
 
 admin.site.register(synchronization.Synchronization,
                     synchronization.SynchronizationAdmin)
