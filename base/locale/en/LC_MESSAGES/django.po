@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-03 08:33+0200\n"
+"POT-Creation-Date: 2020-06-19 10:19+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -382,6 +382,24 @@ msgid "Are you sure you want to delete the teaching material?"
 msgstr ""
 
 msgid "Are you sure?"
+msgstr ""
+
+msgid "Arrangement Jury"
+msgstr ""
+
+msgid "Arrangement additional time"
+msgstr ""
+
+msgid "Arrangement appropriate copy"
+msgstr ""
+
+msgid "Arrangement other"
+msgstr ""
+
+msgid "Arrangement specific locale"
+msgstr ""
+
+msgid "Artist"
 msgstr ""
 
 msgid "As displayed on the home page"
@@ -763,6 +781,9 @@ msgstr ""
 msgid "Direct Access"
 msgstr ""
 
+msgid "Disability"
+msgstr ""
+
 msgid "Disabled"
 msgstr ""
 
@@ -938,6 +959,9 @@ msgid "Entity charges"
 msgstr ""
 
 msgid "Entity managers"
+msgstr ""
+
+msgid "Entrepreneur"
 msgstr ""
 
 msgid "Error(s) in form: The modifications are not saved"
@@ -1135,7 +1159,13 @@ msgstr ""
 msgid "Groups"
 msgstr ""
 
+msgid "Guide"
+msgstr ""
+
 msgid "Help"
+msgstr ""
+
+msgid "High Level Promising athlete"
 msgstr ""
 
 msgid "Highlight description"
@@ -1723,6 +1753,9 @@ msgstr ""
 msgid "Not concerned"
 msgstr ""
 
+msgid "Not defined"
+msgstr ""
+
 msgid "Not eligible to delete learning units"
 msgstr ""
 
@@ -1826,6 +1859,9 @@ msgstr ""
 msgid "Other contacts"
 msgstr ""
 
+msgid "Other disability"
+msgstr ""
+
 msgid "Other individual"
 msgstr ""
 
@@ -1906,6 +1942,9 @@ msgid "Person entities"
 msgstr ""
 
 msgid "Person not in accordance with proposal state"
+msgstr ""
+
+msgid "Person with reduced mobility"
 msgstr ""
 
 msgid "Personalized access"
@@ -2069,6 +2108,9 @@ msgid "Prohibition to delete a learning unit before 2015."
 msgstr ""
 
 msgid "Prolong"
+msgstr ""
+
+msgid "Promising athlete"
 msgstr ""
 
 msgid "Proposal"
@@ -2370,6 +2412,9 @@ msgstr ""
 msgid "Specifications"
 msgstr ""
 
+msgid "Sport"
+msgstr ""
+
 msgid "Start"
 msgstr ""
 
@@ -2407,6 +2452,12 @@ msgid "Students"
 msgstr ""
 
 msgid "Sub group"
+msgstr ""
+
+msgid "Sub type Disability"
+msgstr ""
+
+msgid "Sub type Sport"
 msgstr ""
 
 msgid "Subject"
@@ -2945,10 +2996,6 @@ msgstr ""
 msgid "User"
 msgstr ""
 
-#, python-format
-msgid "User %(person)s do not have rights on this proposal."
-msgstr ""
-
 msgid "User interface language"
 msgstr ""
 
@@ -3241,9 +3288,6 @@ msgid "comment"
 msgstr ""
 
 msgid "comment (internal)"
-msgstr ""
-
-msgid "confirm"
 msgstr ""
 
 msgid "credits"
