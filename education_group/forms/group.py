@@ -36,6 +36,7 @@ from base.forms.education_group.common import MainCampusChoiceField, MainEntitie
 from base.forms.utils.choice_field import BLANK_CHOICE
 from base.models.academic_year import AcademicYear
 from base.models.enums.constraint_type import ConstraintTypeEnum
+from education_group.forms import fields
 from rules_management.enums import GROUP_PGRM_ENCODING_PERIOD, GROUP_DAILY_MANAGEMENT
 from rules_management.mixins import PermissionFieldMixin
 
@@ -66,7 +67,7 @@ class GroupForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         required=False,
         widget=forms.TextInput
     )
-    management_entity = MainEntitiesVersionChoiceField(queryset=None, label=_("Management entity"), required=False)
+    management_entity = fields.ManagementEntitiesChoiceField(person=None, initial=None, required=False)
     teaching_campus = MainCampusChoiceField(queryset=None, label=_("Learning location"), required=False)
     remark_fr = forms.CharField(widget=forms.Textarea, label=_("Remark"), required=False)
     remark_en = forms.CharField(widget=forms.Textarea, label=_("remark in english"), required=False)
@@ -78,6 +79,7 @@ class GroupForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         super().__init__(*args, **kwargs)
 
         self.__init_academic_year_field()
+        self.__init_management_entity_field()
 
     def __init_academic_year_field(self):
         if not self.fields['academic_year'].disabled and self.user.person.is_faculty_manager:
@@ -87,6 +89,13 @@ class GroupForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
             self.fields['academic_year'].queryset = self.fields['academic_year'].queryset.filter(
                 year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION
             )
+
+    def __init_management_entity_field(self):
+        self.fields['management_entity'] = fields.ManagementEntitiesChoiceField(
+            person=self.user.person,
+            initial=None,
+            disabled=self.fields['management_entity'].disabled,
+        )
 
     # ValidationRuleMixin
     def field_reference(self, field_name: str) -> str:
@@ -112,11 +121,6 @@ class GroupForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
                 'name': self.cleaned_data['teaching_campus'].name,
                 'organization_name': self.cleaned_data['teaching_campus'].organization.name,
             }
-        return None
-
-    def clean_management_entity(self):
-        if self.cleaned_data['management_entity']:
-            return self.cleaned_data['management_entity'].most_recent_acronym
         return None
 
     def clean_code(self):
