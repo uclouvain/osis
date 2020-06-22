@@ -41,15 +41,15 @@ class ContactsSerializerTestCase(TestCase):
     def setUpTestData(cls):
         cls.language = 'en'
         now = datetime.datetime.now()
-        entity = EntityFactory()
+        cls.entity = EntityFactory()
         EntityVersionFactory(
-            entity=entity,
+            entity=cls.entity,
             start_date=now.replace(year=now.year - 1)
         )
         cls.egy = EducationGroupYearFactory(
             academic_year__year=now.year,
-            management_entity=entity,
-            publication_contact_entity=entity
+            management_entity=cls.entity,
+            publication_contact_entity=cls.entity
         )
         cls.node = NodeEducationGroupYearFactory(code=cls.egy.partial_acronym, year=now.year)
         cls.serializer = ContactsSerializer(cls.node, context={'language': cls.language, 'offer': cls.egy})
@@ -62,6 +62,16 @@ class ContactsSerializerTestCase(TestCase):
             'management_entity'
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
+
+    def test_return_none_if_no_pubication_contact_entity(self):
+        egy = EducationGroupYearFactory(
+            academic_year__year=2018,
+            management_entity=self.entity,
+            publication_contact_entity=None
+        )
+        node = NodeEducationGroupYearFactory(code=egy.partial_acronym, year=2018)
+        serializer = ContactsSerializer(node, context={'language': self.language, 'offer': egy})
+        self.assertIsNone(serializer.data['entity'])
 
 
 class ContactSerializerTestCase(TestCase):
