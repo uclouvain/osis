@@ -46,8 +46,8 @@ from education_group.tests.ddd.factories.study_domain import StudyDomainFactory
 from education_group.tests.ddd.factories.titles import TitlesFactory
 
 
-def generate_end_date(node):
-    return node.year + 10
+def generate_end_date(training):
+    return training.entity_identity.year + 10
 
 
 class TrainingIdentityFactory(factory.Factory):
@@ -95,7 +95,7 @@ class TrainingFactory(factory.Factory):
     enrollment_campus = factory.SubFactory(CampusIdentityFactory)
     other_campus_activities = factory.fuzzy.FuzzyChoice(ActivityPresence)
     funding = factory.SubFactory(FundingFactory)
-    hops = factory.Sequence(HOPSFactory)
+    hops = factory.SubFactory(HOPSFactory)
     co_graduation = factory.SubFactory(CoGraduationFactory)
     co_organizations = []
     academic_type = factory.fuzzy.FuzzyChoice(AcademicTypes)

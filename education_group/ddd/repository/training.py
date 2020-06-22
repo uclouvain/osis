@@ -82,6 +82,8 @@ class TrainingRepository(interface.AbstractRepository):
         )
 
         education_group_year_db_obj = EducationGroupYearModelDb.objects.create(
+            academic_year=AcademicYearModelDb.objects.get(year=training.entity_id.year),
+            acronym=training.entity_id.acronym,
             education_group_type=EducationGroupTypeModelDb.objects.get(name=training.type.name),
             credits=training.credits,
             schedule_type=training.schedule_type.name if training.schedule_type else None,
@@ -114,21 +116,21 @@ class TrainingRepository(interface.AbstractRepository):
             isced_domain=DomainIscedModelDb.objects.get(
                 code=training.isced_domain.entity_id.code
             ) if training.isced_domain else None,
-            management_entity=entity_version.find_by_acronym_and_year(
+            management_entity_id=entity_version.find_by_acronym_and_year(
                 acronym=training.management_entity.acronym,
                 year=training.year,
             ).entity_id if training.management_entity else None,
-            administration_entity=entity_version.find_by_acronym_and_year(
+            administration_entity_id=entity_version.find_by_acronym_and_year(
                 acronym=training.administration_entity.acronym,
                 year=training.year,
             ).entity_id if training.management_entity else None,
             main_teaching_campus=CampusModelDb.objects.get(
                 name=training.teaching_campus.name,
-                university__name=training.teaching_campus.university_name,
+                organization__name=training.teaching_campus.university_name,
             ) if training.teaching_campus else None,
             enrollment_campus=CampusModelDb.objects.get(
                 name=training.enrollment_campus.name,
-                university__name=training.enrollment_campus.university_name,
+                organization__name=training.enrollment_campus.university_name,
             ) if training.teaching_campus else None,
             other_campus_activities=training.other_campus_activities.name if training.other_campus_activities else None,
             funding=training.funding.can_be_funded,

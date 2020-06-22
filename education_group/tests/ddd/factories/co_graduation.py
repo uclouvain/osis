@@ -33,5 +33,5 @@ class CoGraduationFactory(factory.Factory):
         model = CoGraduation
         abstract = False
 
-    code_inter_cfb = factory.fuzzy.FuzzyInteger(1, 50)
+    code_inter_cfb = factory.Sequence(lambda n: '%02d' % n)
     coefficient = factory.fuzzy.FuzzyDecimal(0, 10, precision=1)
