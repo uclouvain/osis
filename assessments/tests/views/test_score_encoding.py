@@ -69,8 +69,8 @@ class MixinSetupOnlineEncoding(AcademicYearMockMixin, SessionExamCalendarMockMix
         self.enrollments = data["exam_enrollments"]
         self.tutor = data["attribution"].tutor
         add_permission(self.tutor.person.user, "can_access_scoreencoding")
-        self.program_managers = [ProgramManagerFactory(offer_year=data["offer_years"][i]) for i in range(0,2)]
-        [add_permission(self.program_managers[i].person.user, "can_access_scoreencoding") for i in range(0,2)]
+        self.program_managers = [ProgramManagerFactory(offer_year=data["offer_years"][i]) for i in range(0, 2)]
+        [add_permission(self.program_managers[i].person.user, "can_access_scoreencoding") for i in range(0, 2)]
 
         # Mock academic_year / session_exam_calendar in order to be decouple test from system time
         self.mock_academic_year(
@@ -540,8 +540,8 @@ class UploadXLSTest(TestCase):
         header_expected_list = [_('Academic year'), _('Session'), _('Learning unit'), _('Program'),
                                 _('Registration number'), _('Lastname'), _('Firstname'), _('Email'),
                                 _('Numbered scores'), _('Justification (A,T)'), _('End date Prof'),
-                                _('Type'), _('Arrangement additional time'), _('Arrangement appropriate copy'),
-                                _('Arrangement specific locale'), _('Arrangement other'), _('Guide'),
+                                _('Type EPES'), _('Additional time'), _('Appropriate copy'),
+                                _('Specific locale'), _('Arrangement other'), _('Guide'),
                                 ]
         self.assertListEqual(HEADER, header_expected_list)
 

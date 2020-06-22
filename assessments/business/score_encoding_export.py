@@ -27,17 +27,19 @@ from django.http import HttpResponse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from openpyxl import Workbook
-from openpyxl.styles import Color, Style, PatternFill, Font, colors
+from openpyxl.styles import Color, PatternFill, Font, colors
 from openpyxl.writer.excel import save_virtual_workbook
 
 from assessments.business.enrollment_state import get_line_color, ENROLLED_LATE_COLOR, NOT_ENROLLED_COLOR
 from base import models as mdl
 from base.models.enums import exam_enrollment_justification_type
+from openpyxl.styles.borders import Border, Side, BORDER_THIN, BORDER_MEDIUM
+from openpyxl.styles import Style
 
 HEADER = [_('Academic year'), _('Session'), _('Learning unit'), _('Program'), _('Registration number'), _('Lastname'),
           _('Firstname'), _('Email'), _('Numbered scores'), _('Justification (A,T)'), _('End date Prof'),
-          _('Type'), _('Arrangement additional time'), _('Arrangement appropriate copy'),
-          _('Arrangement specific locale'), _('Arrangement other'), _('Guide'),
+          _('Type EPES'), _('Additional time'), _('Appropriate copy'),
+          _('Specific locale'), _('Arrangement other'), _('Guide'),
           ]
 
 JUSTIFICATION_ALIASES = {
@@ -48,6 +50,17 @@ JUSTIFICATION_ALIASES = {
 
 FIRST_COL_LEGEND_ENROLLMENT_STATUS = 7
 FIRST_ROW_LEGEND_ENROLLMENT_STATUS = 7
+
+FIRST_COL_PEPS = 'K'
+FIRST_ROW_PEPS = 12
+
+STYLE_BORDER_RIGHT = Style(
+    border=Border(
+        right=Side(border_style=BORDER_MEDIUM,
+                    color=Color('FF000000')
+                    ),
+    )
+)
 
 
 def export_xls(exam_enrollments):
@@ -70,7 +83,7 @@ def export_xls(exam_enrollments):
                 score = "{0:.0f}".format(exam_enroll.score_final)
 
         justification = JUSTIFICATION_ALIASES.get(exam_enroll.justification_final, "")
-
+        student_specific_profile = exam_enroll.learning_unit_enrollment.student.studentspecificprofile
         worksheet.append([str(exam_enroll.learning_unit_enrollment.learning_unit_year.academic_year),
                           str(exam_enroll.session_exam.number_session),
                           exam_enroll.session_exam.learning_unit_year.acronym,
@@ -82,17 +95,18 @@ def export_xls(exam_enrollments):
                           score,
                           str(justification),
                           end_date if exam_enroll.enrollment_state == 'ENROLLED' else '',
-                          '?',
-                          '?',
-                          '?',
-                          '?',
-                          '?',
-                          '?',
+                          str(_(student_specific_profile.get_type_display())) or "-",
+                          str(_('Yes')) if student_specific_profile.arrangement_additional_time else '-',
+                          str(_('Yes')) if student_specific_profile.arrangement_appropriate_copy else '-',
+                          str(_('Yes')) if student_specific_profile.arrangement_specific_locale else '-',
+                          str(_('Yes')) if student_specific_profile.arrangement_other else '-',
+                          student_specific_profile.guide.full_name if student_specific_profile.guide else '',
                           ])
 
         row_number += 1
         __coloring_non_editable(worksheet, row_number, score, exam_enroll.justification_final)
         _coloring_enrollment_state(worksheet, row_number, exam_enroll)
+        _set_peps_border(worksheet, row_number)
 
     lst_exam_enrollments = list(exam_enrollments)
     number_session = lst_exam_enrollments[0].session_exam.number_session
@@ -100,7 +114,8 @@ def export_xls(exam_enrollments):
     academic_year = lst_exam_enrollments[0].learning_unit_enrollment.learning_unit_year.academic_year
 
     filename = "session_%s_%s_%s.xlsx" % (str(academic_year.year), str(number_session), learn_unit_acronym)
-    response = HttpResponse(save_virtual_workbook(workbook), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response = HttpResponse(save_virtual_workbook(workbook),
+                            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     response['Content-Disposition'] = 'attachment; filename=%s' % filename
     return response
 
@@ -144,6 +159,16 @@ def __columns_resizing(ws):
     col_note.width = 15
     col_note = ws.column_dimensions['K']
     col_note.width = 15
+    col_note = ws.column_dimensions['L']
+    col_note.width = 20
+    col_note = ws.column_dimensions['N']
+    col_note.width = 15
+    col_note = ws.column_dimensions['O']
+    col_note.width = 15
+    col_note = ws.column_dimensions['P']
+    col_note.width = 20
+    col_note = ws.column_dimensions['Q']
+    col_note.width = 30
 
 
 def __coloring_non_editable(ws, row_number, score, justification):
@@ -237,7 +262,6 @@ def _coloring_enrollment_state(ws, row_number, exam_enroll):
     if enrollment_state_color:
         pattern_fill_enrollment_state = PatternFill(patternType='solid',
                                                     fgColor=enrollment_state_color.lstrip("#"))
-        style_enrollment_state = Style(fill=pattern_fill_enrollment_state)
         column_number = 1
         while column_number < 12:
             ws.cell(row=row_number, column=column_number).fill = pattern_fill_enrollment_state
@@ -251,10 +275,19 @@ def _color_legend(ws):
 
 
 def __apply_style_to_cells(ws, color_style, row):
-    style_enrollment_state = Style(fill=PatternFill(patternType='solid',
-                                                    fgColor=Color(color_style.lstrip("#"))))
     fill_pattern = PatternFill(
         patternType='solid',
         fgColor=Color(color_style.lstrip("#"))
     )
     ws.cell(row=row, column=FIRST_COL_LEGEND_ENROLLMENT_STATUS).fill = fill_pattern
+
+
+def _set_peps_border(ws, last_row_number):
+    """
+    Set border at the left of the first peps column
+    """
+    cpt = FIRST_ROW_PEPS
+    while cpt <= last_row_number:
+        cell = ws["{}{}".format(FIRST_COL_PEPS, cpt)]
+        cell.style = STYLE_BORDER_RIGHT
+        cpt += 1

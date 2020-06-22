@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-16 13:59+0100\n"
+"POT-Creation-Date: 2020-06-22 09:35+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -69,6 +69,9 @@ msgstr ""
 msgid "Add manager"
 msgstr ""
 
+msgid "Additional time"
+msgstr ""
+
 msgid "All"
 msgstr ""
 
@@ -86,6 +89,9 @@ msgstr ""
 
 msgid ""
 "All the scores were submitted. It is not possible to encode scores anymore."
+msgstr ""
+
+msgid "Appropriate copy"
 msgstr ""
 
 msgid "Are you sure you want to remove the following manager ?"
@@ -485,6 +491,9 @@ msgid "Session enrollment header"
 msgstr "Session number"
 
 msgid "Session number"
+msgstr ""
+
+msgid "Specific locale"
 msgstr ""
 
 msgid "State"
