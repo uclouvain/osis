@@ -23,7 +23,7 @@
 # ############################################################################
 from unittest.mock import patch
 
-from django.test import SimpleTestCase
+from django.test import TestCase
 
 from base.models.enums.constraint_type import ConstraintTypeEnum
 from base.models.enums.education_group_types import GroupType
@@ -31,9 +31,10 @@ from education_group.ddd import command
 from education_group.ddd.service.write import group_service
 
 
-class TestCreateGroup(SimpleTestCase):
-    def setUp(self):
-        self.cmd = command.CreateGroupCommand(
+class TestCreateGroup(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.cmd = command.CreateGroupCommand(
             year=2018,
             code="LTRONC1",
             type=GroupType.COMMON_CORE.name,

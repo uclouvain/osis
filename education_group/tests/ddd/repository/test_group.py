@@ -52,7 +52,8 @@ class TestGroupRepositoryGetMethod(TestCase):
     def setUpTestData(cls):
         cls.management_entity_version = EntityVersionFactory(acronym='DRT')
         cls.group_year_db = GroupYearFactory(
-            management_entity_id=cls.management_entity_version.entity_id
+            management_entity_id=cls.management_entity_version.entity_id,
+            education_group_type=GroupEducationGroupTypeFactory()
         )
         cls.group_identity = GroupIdentity(
             code=cls.group_year_db.partial_acronym,
