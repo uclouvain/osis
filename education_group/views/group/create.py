@@ -1,4 +1,4 @@
-from typing import List, Dict
+from typing import List, Dict, Union
 
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
@@ -15,11 +15,15 @@ from base.views.common import display_success_messages
 from education_group.ddd import command
 from education_group.ddd.domain.exception import GroupCodeAlreadyExistException
 from education_group.ddd.domain.group import GroupIdentity
-from education_group.ddd.service.write import group_service
+from education_group.ddd.service.write import create_group_service
 from education_group.forms.group import GroupForm
 from education_group.models.group_year import GroupYear
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from osis_role.contrib.views import PermissionRequiredMixin
+
+from program_management.ddd import command as command_pgrm
+from program_management.ddd.domain.program_tree import Path
+from program_management.ddd.service.write import paste_element_service
 
 
 class GroupCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
@@ -75,7 +79,9 @@ class GroupCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 start_year=group_form.cleaned_data['academic_year'],
             )
             try:
-                group_id = group_service.create_group(cmd_create)
+                group_id = create_group_service.create_group(cmd_create)
+                if self.get_attach_path():
+                    self.__attach_group(group_id)
             except GroupCodeAlreadyExistException as e:
                 group_form.add_error('code', e.message)
 
@@ -89,8 +95,20 @@ class GroupCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "type_text": GroupType.get_value(self.kwargs['type'])
         })
 
+    def __attach_group(self, group_id: GroupIdentity):
+        cmd_paste = command_pgrm.PasteElementCommand(
+            node_to_paste_code=group_id.code,
+            node_to_paste_year=group_id.year,
+            path_where_to_paste=self.get_attach_path()
+        )
+        paste_element_service.paste_element(cmd_paste)
+
     def get_success_url(self, group_id: GroupIdentity):
-        return reverse('group_identification', kwargs={'code': group_id.code, 'year': group_id.year})
+        url = reverse('group_identification', kwargs={'code': group_id.code, 'year': group_id.year})
+        path = self.get_attach_path()
+        if path:
+            url += "?path={}".format(path)
+        return url
 
     def get_success_msg(self, group_id: GroupIdentity):
         return _("Group <a href='%(link)s'> %(code)s (%(academic_year)s) </a> successfully created.") % {
@@ -109,24 +127,17 @@ class GroupCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             }
         ]
 
-    def get_parent_identity(self):
-        """
-        Find the parent identity from 'attach_to' querypart
-        Ex:  <...>?attach_to=<CODE>_<YEAR>
-        """
-        id_raw = self.request.GET.get('attach_to', '').split("_")
-        if len(id_raw) == 2:
-            return GroupIdentity(code=id_raw[0], year=int(id_raw[1]))
-        return None
+    def get_attach_path(self) -> Union[Path, None]:
+        return self.request.GET.get('path_to') or None
 
-    def get_permission_object(self):
-        parent_id = self.get_parent_identity()
-        if parent_id:
+    def get_permission_object(self) -> Union[GroupYear, None]:
+        path = self.get_attach_path()
+        if path:
+            # Take parent from path (latest element)
+            # Ex:  path: 4456|565|5656
+            parent_id = path.split("|")[-1]
             try:
-                return GroupYear.objects.get(
-                    partial_acronym=parent_id.code,
-                    academic_year__year=parent_id.year
-                )
+                return GroupYear.objects.get(element__pk=parent_id)
             except GroupYear.DoesNotExist:
                 return None
         return None

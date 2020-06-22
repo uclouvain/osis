@@ -13,6 +13,7 @@ from education_group.ddd.domain.exception import GroupCodeAlreadyExistException
 from education_group.ddd.domain.group import GroupIdentity
 from education_group.forms.group import GroupForm
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
+from program_management.tests.factories.element import ElementGroupYearFactory
 
 
 class TestCreateGroupGetMethod(TestCase):
@@ -66,7 +67,7 @@ class TestCreateGroupGetMethod(TestCase):
         )
 
 
-class TestCreateGroupPostMethod(TestCase):
+class TestCreateOrphanGroupPostMethod(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.type = GroupEducationGroupTypeFactory()
@@ -100,7 +101,7 @@ class TestCreateGroupPostMethod(TestCase):
     @mock.patch('education_group.views.group.create.GroupForm.is_valid', return_value=True)
     @mock.patch('education_group.views.group.create.GroupForm.cleaned_data',
                 new_callable=mock.PropertyMock, create=True)
-    @mock.patch('education_group.views.group.create.group_service.create_group')
+    @mock.patch('education_group.views.group.create.create_group_service.create_group')
     def test_post_assert_create_service_called(self,
                                                mock_service_create_group,
                                                mock_form_clean_data,
@@ -115,7 +116,7 @@ class TestCreateGroupPostMethod(TestCase):
     @mock.patch('education_group.views.group.create.GroupForm.is_valid', return_value=True)
     @mock.patch('education_group.views.group.create.GroupForm.cleaned_data',
                 new_callable=mock.PropertyMock, create=True)
-    @mock.patch('education_group.views.group.create.group_service.create_group')
+    @mock.patch('education_group.views.group.create.create_group_service.create_group')
     def test_post_assert_form_error_when_create_service_raise_exception(self,
                                                                         mock_service_create_group,
                                                                         mock_form_clean_data,
@@ -128,3 +129,57 @@ class TestCreateGroupPostMethod(TestCase):
         response = self.client.post(self.url)
         self.assertIsInstance(response.context['group_form'], GroupForm)
         self.assertTrue(response.context['group_form'].has_error('code'))
+
+
+class TestCreateNonOrphanGroupPostMethod(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.type = GroupEducationGroupTypeFactory()
+        cls.central_manager = CentralManagerFactory()
+
+        cls.parent_element = ElementGroupYearFactory(
+            group_year__management_entity=cls.central_manager.entity
+        )
+        cls.url = reverse('group_create', kwargs={'type': cls.type.name}) +\
+            "?path_to={}".format(str(cls.parent_element.pk))
+
+    def setUp(self) -> None:
+        self.client.force_login(self.central_manager.person.user)
+
+    @mock.patch('education_group.views.group.create.paste_element_service.paste_element')
+    @mock.patch('education_group.views.group.create.GroupForm.is_valid', return_value=True)
+    @mock.patch('education_group.views.group.create.GroupForm.cleaned_data',
+                new_callable=mock.PropertyMock, create=True)
+    @mock.patch('education_group.views.group.create.create_group_service.create_group')
+    def test_post_assert_create_service_paste_service_called(self,
+                                                             mock_service_create_group,
+                                                             mock_form_clean_data,
+                                                             mock_form_is_valid,
+                                                             mock_paste_element_service):
+        mock_service_create_group.return_value = GroupIdentity(code="LTRONC1000", year=2018)
+        mock_form_clean_data.return_value = defaultdict(lambda: None)
+        mock_form_is_valid.return_value = True
+
+        self.client.post(self.url)
+        mock_service_create_group.assert_called_once()
+        mock_paste_element_service.assert_called_once()
+
+    @mock.patch('education_group.views.group.create.paste_element_service.paste_element')
+    @mock.patch('education_group.views.group.create.GroupForm.is_valid', return_value=True)
+    @mock.patch('education_group.views.group.create.GroupForm.cleaned_data',
+                new_callable=mock.PropertyMock, create=True)
+    @mock.patch('education_group.views.group.create.create_group_service.create_group')
+    def test_post_assert_redirection_with_path_queryparam(self,
+                                                          mock_service_create_group,
+                                                          mock_form_clean_data,
+                                                          *args):
+
+        mock_service_create_group.return_value = GroupIdentity(code="LTRONC1000", year=2018)
+        mock_form_clean_data.return_value = defaultdict(lambda: None)
+
+        response = self.client.post(self.url)
+
+        expected_redirect = \
+            reverse('group_identification', kwargs={'code': 'LTRONC1000', 'year': 2018}) + \
+            "?path={}".format(str(self.parent_element.pk))
+        self.assertRedirects(response, expected_redirect, fetch_redirect_response=False)

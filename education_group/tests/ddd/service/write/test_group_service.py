@@ -28,7 +28,7 @@ from django.test import TestCase
 from base.models.enums.constraint_type import ConstraintTypeEnum
 from base.models.enums.education_group_types import GroupType
 from education_group.ddd import command
-from education_group.ddd.service.write import group_service
+from education_group.ddd.service.write import create_group_service
 
 
 class TestCreateGroup(TestCase):
@@ -57,7 +57,7 @@ class TestCreateGroup(TestCase):
     @patch('education_group.publisher.group_created', autospec=True)
     @patch('education_group.ddd.service.read.group_service.GroupRepository.create')
     def test_assert_repository_called_and_signal_dispateched(self, mock_create_repo, mock_publisher):
-        group_service.create_group(self.cmd)
+        create_group_service.create_group(self.cmd)
 
         mock_create_repo.assert_called_once()
         # Ensure event is emited
