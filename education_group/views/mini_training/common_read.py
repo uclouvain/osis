@@ -26,7 +26,6 @@
 import functools
 import json
 from collections import OrderedDict
-from enum import Enum
 
 from django.http import Http404
 from django.urls import reverse
@@ -40,8 +39,8 @@ from base.business.education_groups import general_information_sections
 from base.business.education_groups.general_information_sections import \
     MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION
 from base.models import academic_year
+from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import MiniTrainingType
-from base.utils.cache import ElementCache
 from base.views.common import display_warning_messages
 from education_group.forms.academic_year_choices import get_academic_year_choices
 from education_group.views.mixin import ElementSelectedClipBoardMixin
@@ -49,7 +48,6 @@ from education_group.views.proxy import read
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd.domain.node import NodeIdentity, NodeNotFoundException
 from program_management.ddd.repositories import load_tree
-from program_management.ddd.service.read import element_selected_service
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.models.element import Element
 from program_management.serializers.program_tree_view import program_tree_view_serializer
@@ -128,11 +126,27 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             ),
             "selected_element_clipboard": self.get_selected_element_clipboard_message(),
             # TODO: Remove when finished reoganized tempalate
-            "group_year": self.get_education_group_version().root_group
+            "group_year": self.get_education_group_version().root_group,
+
+            "create_group_url": self.get_create_group_url(),
+            "create_training_url": self.get_create_training_url(),
+            "create_mini_training_url": self.get_create_mini_training_url()
         }
 
     def get_permission_object(self):
         return self.get_education_group_version().offer
+
+    def get_create_group_url(self):
+        return reverse('create_select_type', kwargs={'category': Categories.GROUP.name}) + \
+               "?path_to={}".format(self.get_path())
+
+    def get_create_mini_training_url(self):
+        return reverse('create_select_type', kwargs={'category': Categories.MINI_TRAINING.name}) + \
+               "?path_to={}".format(self.get_path())
+
+    def get_create_training_url(self):
+        return reverse('create_select_type', kwargs={'category': Categories.TRAINING.name}) + \
+               "?path_to={}".format(self.get_path())
 
     def get_tab_urls(self):
         return OrderedDict({
