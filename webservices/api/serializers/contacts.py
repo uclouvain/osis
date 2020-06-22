@@ -54,7 +54,8 @@ class ContactsSerializer(serializers.Serializer):
 
     def get_entity(self, obj):
         offer = self.context.get('offer')
-        return offer.publication_contact_entity_version.acronym
+        contact_entity = offer.publication_contact_entity_version
+        return contact_entity.acronym if contact_entity else None
 
     def get_management_entity(self, obj):
         offer = self.context.get('offer')
