@@ -25,7 +25,7 @@
 ##############################################################################
 from _decimal import Decimal
 from collections import OrderedDict
-from typing import List, Set, Dict, Optional
+from typing import List, Set, Dict
 
 from base.models.enums.active_status import ActiveStatusEnum
 from base.models.enums.education_group_categories import Categories

@@ -131,6 +131,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             "enums": mdl.enums.education_group_categories,
             "tab_urls": self.get_tab_urls(),
             "node": self.get_object(),
+            "node_path": self.get_path(),
             "tree": json.dumps(program_tree_view_serializer(self.get_tree())),
             "form_xls_custom": CustomXlsForm(path=self.get_path()),
             "academic_year_choices": get_academic_year_choices(
