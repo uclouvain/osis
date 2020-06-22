@@ -194,6 +194,9 @@ admin.site.register(structure.Structure,
 admin.site.register(student.Student,
                     student.StudentAdmin)
 
+admin.site.register(student_specific_profile.StudentSpecificProfile,
+                    student_specific_profile.StudentSpecificProfileAdmin)
+
 admin.site.register(synchronization.Synchronization,
                     synchronization.SynchronizationAdmin)
 
