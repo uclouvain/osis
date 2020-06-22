@@ -33,6 +33,7 @@ from base.models.learning_unit_year import MAXIMUM_CREDITS, MINIMUM_CREDITS
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.education_group_type import GroupEducationGroupTypeFactory
+from base.tests.factories.entity import EntityFactory
 from education_group.models.enums.constraint_type import CREDITS
 from education_group.tests.factories.group import GroupFactory
 
@@ -66,3 +67,4 @@ class GroupYearFactory(factory.django.DjangoModelFactory):
     academic_year = factory.SubFactory(AcademicYearFactory)
     active = active_status.ACTIVE
     main_teaching_campus = factory.SubFactory(CampusFactory)
+    management_entity = factory.SubFactory(EntityFactory)
