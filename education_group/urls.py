@@ -1,5 +1,9 @@
 from django.urls import include, path
 
+from base.views.education_groups.achievement.delete import DeleteEducationGroupAchievement, \
+    DeleteEducationGroupDetailedAchievement
+from base.views.education_groups.achievement.update import EducationGroupAchievementAction, \
+    UpdateEducationGroupAchievement, EducationGroupDetailedAchievementAction, UpdateEducationGroupDetailedAchievement
 from education_group.views import group, training, mini_training, general_information
 from education_group.views.proxy.read import ReadEducationGroupRedirectView
 
@@ -41,6 +45,25 @@ urlpatterns = [
         ),
     ])),
     path('trainings/<int:year>/<str:code>/', include([
+        path(r'^(?P<education_group_achievement_pk>[0-9]+)/', include([
+            path(r'^actions$', EducationGroupAchievementAction.as_view(), name='education_group_achievements_actions'),
+            path(r'^update$', UpdateEducationGroupAchievement.as_view(), name='update_education_group_achievement'),
+            path(r'^delete$', DeleteEducationGroupAchievement.as_view(), name='delete_education_group_achievement'),
+            path(r'(?P<education_group_detail_achievement_pk>[0-9]+)/', include([
+                path(r'^actions$',
+                     EducationGroupDetailedAchievementAction.as_view(),
+                     name='education_group_detailed_achievements_actions'),
+
+                path(r'^update$',
+                     UpdateEducationGroupDetailedAchievement.as_view(),
+                     name='update_education_group_detailed_achievement'),
+
+                path(r'^delete$',
+                     DeleteEducationGroupDetailedAchievement.as_view(),
+                     name='delete_education_group_detailed_achievement'),
+
+            ]))
+            ])),
         path('identification/', training.TrainingReadIdentification.as_view(), name='training_identification'),
         path('diplomas/', training.TrainingReadDiplomaCertificate.as_view(), name='training_diplomas'),
         path(

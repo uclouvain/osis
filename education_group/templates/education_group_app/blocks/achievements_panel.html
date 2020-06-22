@@ -71,9 +71,9 @@
                         <div class="col-md-2">
                             {% if can_edit_information %}
                                 {# TODO: Fix URL for education group achievement  #}
-                                {% url "education_group_achievements_actions" node.pk node.pk achievement.pk as action_url %}
-                                {% url 'update_education_group_achievement' node.pk node.pk achievement.pk as update_url %}
-                                {% url 'delete_education_group_achievement' node.pk node.pk achievement.pk as delete_url %}
+                                {% url "education_group_achievements_actions" year code achievement.pk as action_url %}
+                                {% url 'update_education_group_achievement' year code achievement.pk as update_url %}
+                                {% url 'delete_education_group_achievement' year code achievement.pk as delete_url %}
                                 {% include "education_group/blocks/form/achievement_action_bar.html" with obj=achievement %}
                             {% endif %}
                         </div>

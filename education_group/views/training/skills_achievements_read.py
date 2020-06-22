@@ -48,6 +48,8 @@ class TrainingReadSkillsAchievements(TrainingRead):
         edition_perm_name = "base.change_admissioncondition"
         return {
             **super().get_context_data(**kwargs),
+            "year": kwargs['year'],
+            "code": kwargs['code'],
             "achievements": achievement.get_achievements(self.get_object()),
             "can_edit_information": self.request.user.has_perm(edition_perm_name, self.get_permission_object()),
             "program_aims_label": self.get_program_aims_label(),

@@ -42,11 +42,9 @@ class EducationGroupAchievementMixin(SingleObjectMixin):
     pk_url_kwarg = 'education_group_achievement_pk'
 
     def get_success_url(self):
-        # Redirect to a page fragment
-        training_identity = TrainingIdentitySearch().get_from_education_group_year_id(self.kwargs['offer_id'])
         url = reverse(
-            'education_group_read_proxy',
-            args=[training_identity.year, training_identity.acronym]
+            'training_skills_achievements',
+            args=[self.kwargs['year'], self.kwargs['code']]
         ) + '?tab={}'.format(Tab.SKILLS_ACHIEVEMENTS)
 
         obj = getattr(self, "object", None) or self.get_object()
@@ -62,7 +60,10 @@ class EducationGroupAchievementMixin(SingleObjectMixin):
 
     @cached_property
     def education_group_year(self):
-        return get_object_or_404(EducationGroupYear, pk=self.kwargs['education_group_year_id'])
+        return get_object_or_404(
+            EducationGroupYear, partial_acronym=self.kwargs['code'],
+            academic_year__year=self.kwargs['year']
+        )
 
 
 class EducationGroupDetailedAchievementMixin(EducationGroupAchievementMixin):

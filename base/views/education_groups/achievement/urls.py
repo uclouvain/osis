@@ -52,35 +52,35 @@ urlpatterns = [
     ),
 
     url(r'^(?P<education_group_achievement_pk>[0-9]+)/', include([
-        url(r'^actions$',
-            EducationGroupAchievementAction.as_view(),
-            name='education_group_achievements_actions'),
-
-        url(r'^update$',
-            UpdateEducationGroupAchievement.as_view(),
-            name='update_education_group_achievement'),
-
-        url(r'^delete$',
-            DeleteEducationGroupAchievement.as_view(),
-            name='delete_education_group_achievement'),
+        # url(r'^actions$',
+        #     EducationGroupAchievementAction.as_view(),
+        #     name='education_group_achievements_actions'),
+        #
+        # url(r'^update$',
+        #     UpdateEducationGroupAchievement.as_view(),
+        #     name='update_education_group_achievement'),
+        #
+        # url(r'^delete$',
+        #     DeleteEducationGroupAchievement.as_view(),
+        #     name='delete_education_group_achievement'),
 
         url(r'^create',
             CreateEducationGroupDetailedAchievement.as_view(),
             name='create_education_group_detailed_achievement'),
 
-        url(r'(?P<education_group_detail_achievement_pk>[0-9]+)/', include([
-            url(r'^actions$',
-                EducationGroupDetailedAchievementAction.as_view(),
-                name='education_group_detailed_achievements_actions'),
-
-            url(r'^update$',
-                UpdateEducationGroupDetailedAchievement.as_view(),
-                name='update_education_group_detailed_achievement'),
-
-            url(r'^delete$',
-                DeleteEducationGroupDetailedAchievement.as_view(),
-                name='delete_education_group_detailed_achievement'),
-
-        ]))
+        # url(r'(?P<education_group_detail_achievement_pk>[0-9]+)/', include([
+        #     url(r'^actions$',
+        #         EducationGroupDetailedAchievementAction.as_view(),
+        #         name='education_group_detailed_achievements_actions'),
+        #
+        #     url(r'^update$',
+        #         UpdateEducationGroupDetailedAchievement.as_view(),
+        #         name='update_education_group_detailed_achievement'),
+        #
+        #     url(r'^delete$',
+        #         DeleteEducationGroupDetailedAchievement.as_view(),
+        #         name='delete_education_group_detailed_achievement'),
+        #
+        # ]))
     ])),
 ]
