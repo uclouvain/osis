@@ -25,18 +25,29 @@
 {% endcomment %}
 
 <div class="btn-group  pull-right" role="group" aria-label="actions">
-{#    <form id="form_up_{{ group_child.id }}" method="POST" style="display:inline;"#}
-{#          action="{% url 'group_element_year_up' root.pk group.pk %}">#}
-{#        {% csrf_token %}#}
-{#        {% button_order_with_permission _("Go up") "btn_operation_up_"|addstr:group.id "up" %}#}
-{#    </form>#}
-{#    <form id="form_down_{{ group_child.id }}" method="POST" style="display:inline;"#}
-{#          action="{% url 'group_element_year_down' root.pk group.pk %}">#}
-{#        {% csrf_token %}#}
-{#        {% button_order_with_permission _("Go down") "btn_operation_down_"|addstr:group.id "down" %}#}
-{#    </form>#}
-    {% url 'tree_detach_node' node.node_id as detach_url %}
-    <a class="trigger_modal" data-url="{% url 'tree_detach_node' node.node_id%}?path={{ node_path|addstr:"|"|addstr:link.child.node_id }}">
+    <form id="form_up_{{ link.child.code }}" method="POST"
+          action="{% url 'group_element_year_up' node.node_id link.pk %}">
+        {% csrf_token %}
+        <button class="btn btn-link"
+                title="{% trans 'Go up' %}"
+                type="submit">
+            <span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>
+        </button>
+    </form>
+
+    <form id="form_down_{{ link.child.code }}" method="POST"
+          action="{% url 'group_element_year_down' node.node_id link.pk %}">
+        {% csrf_token %}
+        <button class="btn btn-link"
+                title="{% trans 'Go down' %}"
+                type="submit">
+            <span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>
+        </button>
+    </form>
+
+    <a class="trigger_modal"
+       data-url="{% url 'tree_detach_node' node.node_id%}?path={{ node_path|addstr:"|"|addstr:link.child.node_id }}"
+       title="{% trans "Detach" %}">
         <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
     </a>
 </div>

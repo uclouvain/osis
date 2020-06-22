@@ -34,8 +34,8 @@ def up_link(
         child_id: int,
         child_type: node_type.NodeType
 ) -> List[BusinessValidationMessage]:
-    parent_node = load_node.load_node_group_year(parent_id)
-    child_node = load_node.load_by_type(child_type, child_id)
+    parent_node = load_node.load(parent_id)
+    child_node = load_node.load(child_id)
 
     tree = load_tree.load(root_id)
     link_to_up = tree.get_link(parent_node, child_node)

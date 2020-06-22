@@ -62,12 +62,12 @@ def _order_content(
         order_function
 ):
     # FIXME When perm refactored remove this code so as to use ddd domain objects
-    group_element_year = get_object_or_none(GroupElementYear, pk=link_id)
+    group_element_year = get_object_or_none(GroupElementYear, pk=link_id)  # type: GroupElementYear
     perms.can_change_education_group(request.user, group_element_year.parent)
 
     child_node_type = node_type.NodeType.EDUCATION_GROUP if isinstance(group_element_year.child, EducationGroupYear) \
         else node_type.NodeType.LEARNING_UNIT
-    order_function(root_id, group_element_year.parent.id, group_element_year.child.id, child_node_type)
+    order_function(root_id, group_element_year.parent_element.id, group_element_year.child_element.id, child_node_type)
 
     success_msg = _("The %(acronym)s has been moved") % {'acronym': group_element_year.child.acronym}
     display_success_messages(request, success_msg)

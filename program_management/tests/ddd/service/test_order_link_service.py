@@ -55,16 +55,14 @@ class TestUpDownChildren(SimpleTestCase):
         self.mocked_persist_tree = self.persist_tree_patcher.start()
         self.addCleanup(self.persist_tree_patcher.stop)
 
-        self.load_node_group_year_patcher = mock.patch(
-            "program_management.ddd.repositories.load_node.load_node_group_year",
-            return_value=self.parent
+        self.load_node_element = mock.patch(
+            "program_management.ddd.repositories.load_node.load",
         )
-        self.mocked_load_node_group_year = self.load_node_group_year_patcher.start()
-        self.addCleanup(self.load_node_group_year_patcher.stop)
+        self.mocked_load_node_element = self.load_node_element.start()
+        self.addCleanup(self.load_node_element.stop)
 
-    @mock.patch("program_management.ddd.repositories.load_node.load_by_type")
-    def test_do_not_modify_order_when_applying_up_on_first_element(self, mock_load_child):
-        mock_load_child.return_value = self.link0.child
+    def test_do_not_modify_order_when_applying_up_on_first_element(self):
+        self.mocked_load_node_element.side_effect = [self.parent, self.link0.child]
         program_management.ddd.service.write.up_link_service.up_link(
             self.parent.node_id,
             self.link0.parent.node_id,
@@ -77,9 +75,8 @@ class TestUpDownChildren(SimpleTestCase):
         )
         self.assertFalse(self.mocked_persist_tree.called)
 
-    @mock.patch("program_management.ddd.repositories.load_node.load_by_type")
-    def test_up_action_on_link_should_increase_order_by_one(self, mock_load_child):
-        mock_load_child.return_value = self.link1.child
+    def test_up_action_on_link_should_increase_order_by_one(self):
+        self.mocked_load_node_element.side_effect = [self.parent, self.link1.child]
         program_management.ddd.service.write.up_link_service.up_link(
             self.parent.node_id,
             self.link1.parent.node_id,
@@ -92,9 +89,8 @@ class TestUpDownChildren(SimpleTestCase):
         )
         self.assertTrue(self.mocked_persist_tree.called)
 
-    @mock.patch("program_management.ddd.repositories.load_node.load_by_type")
-    def test_down_action_on_link_should_decrease_order_by_one(self, mock_load_child):
-        mock_load_child.return_value = self.link1.child
+    def test_down_action_on_link_should_decrease_order_by_one(self):
+        self.mocked_load_node_element.side_effect = [self.parent, self.link1.child]
         down_link_service.down_link(
             self.parent.node_id,
             self.link1.parent.node_id,
@@ -107,9 +103,8 @@ class TestUpDownChildren(SimpleTestCase):
         )
         self.assertTrue(self.mocked_persist_tree.called)
 
-    @mock.patch("program_management.ddd.repositories.load_node.load_by_type")
-    def test_do_not_modify_order_when_applying_down_on_last_element(self, mock_load_child):
-        mock_load_child.return_value = self.link2.child
+    def test_do_not_modify_order_when_applying_down_on_last_element(self):
+        self.mocked_load_node_element.side_effect = [self.parent, self.link2.child]
         down_link_service.down_link(
             self.parent.node_id,
             self.link2.parent.node_id,
