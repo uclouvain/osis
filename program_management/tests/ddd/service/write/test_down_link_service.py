@@ -25,13 +25,15 @@ from unittest import mock
 
 from django.test import SimpleTestCase
 
+from program_management.ddd.domain import program_tree
 from program_management.ddd.service.write import down_link_service
+from program_management.tests.ddd.factories.commands.order_down_link_command import OrderDownLinkCommandFactory
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
 
-class TestUpDownChildren(SimpleTestCase):
+class TestDownLink(SimpleTestCase):
 
     def setUp(self):
         self.tree = ProgramTreeFactory()
@@ -62,12 +64,10 @@ class TestUpDownChildren(SimpleTestCase):
 
     def test_down_action_on_link_should_decrease_order_by_one(self):
         self.mocked_load_node_element.side_effect = [self.parent, self.link1.child]
-        down_link_service.down_link(
-            self.parent.node_id,
-            self.link1.parent.node_id,
-            self.link1.child.node_id,
-            self.link1.child.type
-        )
+
+        command = OrderDownLinkCommandFactory(path=program_tree.build_path(self.parent, self.link1.child))
+        down_link_service.down_link(command)
+
         self.assertListEqual(
             [self.link0.order, self.link2.order, self.link1.order],
             [0, 1, 2]
@@ -76,12 +76,10 @@ class TestUpDownChildren(SimpleTestCase):
 
     def test_do_not_modify_order_when_applying_down_on_last_element(self):
         self.mocked_load_node_element.side_effect = [self.parent, self.link2.child]
-        down_link_service.down_link(
-            self.parent.node_id,
-            self.link2.parent.node_id,
-            self.link2.child.node_id,
-            self.link2.child.type
-        )
+
+        command = OrderDownLinkCommandFactory(path=program_tree.build_path(self.parent, self.link2.child))
+        down_link_service.down_link(command)
+
         self.assertListEqual(
             self.parent.children,
             [self.link0, self.link1, self.link2]

@@ -26,12 +26,14 @@ from unittest import mock
 from django.test import SimpleTestCase
 
 import program_management.ddd.service.write.up_link_service
+from program_management.ddd.domain import program_tree
+from program_management.tests.ddd.factories.commands.order_up_link_command import OrderUpLinkCommandFactory
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
 
-class TestUpDownChildren(SimpleTestCase):
+class TestUpLink(SimpleTestCase):
 
     def setUp(self):
         self.tree = ProgramTreeFactory()
@@ -62,12 +64,10 @@ class TestUpDownChildren(SimpleTestCase):
 
     def test_do_not_modify_order_when_applying_up_on_first_element(self):
         self.mocked_load_node_element.side_effect = [self.parent, self.link0.child]
-        program_management.ddd.service.write.up_link_service.up_link(
-            self.parent.node_id,
-            self.link0.parent.node_id,
-            self.link0.child.node_id,
-            self.link0.child.type
-        )
+
+        command = OrderUpLinkCommandFactory(path=program_tree.build_path(self.parent, self.link0.child))
+        program_management.ddd.service.write.up_link_service.up_link(command)
+
         self.assertListEqual(
             self.parent.children,
             [self.link0, self.link1, self.link2]
@@ -76,12 +76,10 @@ class TestUpDownChildren(SimpleTestCase):
 
     def test_up_action_on_link_should_increase_order_by_one(self):
         self.mocked_load_node_element.side_effect = [self.parent, self.link1.child]
-        program_management.ddd.service.write.up_link_service.up_link(
-            self.parent.node_id,
-            self.link1.parent.node_id,
-            self.link1.child.node_id,
-            self.link1.child.type
-        )
+
+        command = OrderUpLinkCommandFactory(path=program_tree.build_path(self.parent, self.link1.child))
+        program_management.ddd.service.write.up_link_service.up_link(command)
+
         self.assertListEqual(
             [self.link1.order, self.link0.order, self.link2.order],
             [0, 1, 2]

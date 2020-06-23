@@ -24,20 +24,15 @@
 from typing import List
 
 from base.ddd.utils.validation_message import BusinessValidationMessage
+from program_management.ddd import command
 from program_management.ddd.repositories import persist_tree, load_tree, load_node
 from program_management.models.enums import node_type
 
 
-#  FIXME Use path in place of parent and child id when group element year form is refactored to use ddd
-#  TODO take a command that have path
+def down_link(command_up: command.OrderDownLinkCommand):
+    root_id = int(command_up.path.split("|")[0])
+    *_, parent_id, child_id = [int(element_id) for element_id in command_up.path.split("|")]
 
-
-def down_link(
-        root_id: int,
-        parent_id: int,
-        child_id: int,
-        child_type: node_type.NodeType
-) -> List[BusinessValidationMessage]:
     parent_node = load_node.load(parent_id)
     child_node = load_node.load(child_id)
 

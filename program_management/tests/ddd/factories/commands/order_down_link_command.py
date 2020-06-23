@@ -21,29 +21,14 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+import factory.fuzzy
 
 from program_management.ddd import command
-from program_management.ddd.repositories import load_node, load_tree, persist_tree
 
 
-def up_link(command_up: command.OrderUpLinkCommand):
-    root_id = int(command_up.path.split("|")[0])
-    *_, parent_id, child_id = [int(element_id) for element_id in command_up.path.split("|")]
+class OrderDownLinkCommandFactory(factory.Factory):
+    class Meta:
+        model = command.OrderDownLinkCommand
+        abstract = False
 
-    parent_node = load_node.load(parent_id)
-    child_node = load_node.load(child_id)
-
-    tree = load_tree.load(root_id)
-    link_to_up = tree.get_link(parent_node, child_node)
-    parent_node = link_to_up.parent
-
-    # TODO extract this logic into node
-    previous_order = link_to_up.order - 1
-    if not previous_order >= 0:
-        return []
-    link_to_down = parent_node.children[previous_order]
-    link_to_up.order_up()
-    link_to_down.order_down()
-
-    persist_tree.persist(tree)
-    return []
+    path = "1|2"
