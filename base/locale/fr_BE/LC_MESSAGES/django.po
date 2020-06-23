@@ -420,7 +420,7 @@ msgid "Arrangement appropriate copy"
 msgstr "Aménagement Copie adaptée"
 
 msgid "Arrangement other"
-msgstr "Aménagement autre"
+msgstr "Autre aménagement"
 
 msgid "Arrangement specific locale"
 msgstr "Aménagement Local spécifique"
