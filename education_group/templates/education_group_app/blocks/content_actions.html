@@ -24,7 +24,7 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-<div class="btn-group  pull-right" role="group" aria-label="actions">
+<div class="container-align-items-center" aria-label="actions">
     <form id="form_up_{{ link.child.code }}" method="POST"
           action="{% url 'content_up' %}">
         {% csrf_token %}
@@ -49,7 +49,7 @@
 
     <a class="trigger_modal"
        data-url="{% url 'tree_detach_node' node.node_id%}?path={{ node_path|addstr:"|"|addstr:link.child.node_id }}"
-       title="{% trans "Detach" %}">
+       title="{% trans "Detach" %}" >
         <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
     </a>
 </div>
