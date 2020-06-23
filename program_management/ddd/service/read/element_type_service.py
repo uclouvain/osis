@@ -24,9 +24,12 @@
 from typing import Set
 
 from base.models.enums.education_group_categories import Categories
-from base.models.enums.education_group_types import GroupType, TrainingType, MiniTrainingType
+from base.models.enums.education_group_types import GroupType, TrainingType, MiniTrainingType, EducationGroupTypesEnum
+from osis_common.ddd.interface import BusinessExceptions
 from program_management.ddd import command
-from program_management.ddd.repositories import load_authorized_relationship, load_tree
+from program_management.ddd.domain.node import Node
+from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
+from program_management.ddd.repositories.node import NodeRepository
 from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 from program_management.ddd.validators._authorized_relationship import PasteAuthorizedRelationshipValidator
 
@@ -40,10 +43,22 @@ def get_allowed_child_types(cmd: command.GetAllowedChildTypeCommand) -> Set:
         allowed_child_types = GroupType
 
     if cmd.path_to_paste:
-        pass
-        # tree_id =
-        # tree = ProgramTreeRepository.get()
-        # authorized_relationship = load_authorized_relationship.load()
-        # PasteAuthorizedRelationshipValidator()
+        node_to_paste_into_id = NodeIdentitySearch.get_from_element_id(
+            element_id=int(cmd.path_to_paste.split('|')[-1])
+        )
+        node_to_paste_into = NodeRepository.get(node_to_paste_into_id)
+        tree = ProgramTreeRepository.get(node_to_paste_into_id)
+
+        def check_paste_validator(child_type: EducationGroupTypesEnum) -> bool:
+            try:
+                PasteAuthorizedRelationshipValidator(
+                    tree,
+                    Node(node_type=child_type),
+                    node_to_paste_into
+                ).validate()
+            except BusinessExceptions:
+                return False
+            return True
+        allowed_child_types = filter(check_paste_validator, allowed_child_types)
 
     return {child_type for child_type in allowed_child_types}
