@@ -83,26 +83,35 @@ def export_xls(exam_enrollments):
                 score = "{0:.0f}".format(exam_enroll.score_final)
 
         justification = JUSTIFICATION_ALIASES.get(exam_enroll.justification_final, "")
-        student_specific_profile = exam_enroll.learning_unit_enrollment.student.studentspecificprofile
-        worksheet.append([str(exam_enroll.learning_unit_enrollment.learning_unit_year.academic_year),
-                          str(exam_enroll.session_exam.number_session),
-                          exam_enroll.session_exam.learning_unit_year.acronym,
-                          offer.acronym,
-                          student.registration_id,
-                          person.last_name,
-                          person.first_name,
-                          person.email,
-                          score,
-                          str(justification),
-                          end_date if exam_enroll.enrollment_state == 'ENROLLED' else '',
-                          str(_(student_specific_profile.get_type_display())) or "-",
-                          str(_('Yes')) if student_specific_profile.arrangement_additional_time else '-',
-                          str(_('Yes')) if student_specific_profile.arrangement_appropriate_copy else '-',
-                          str(_('Yes')) if student_specific_profile.arrangement_specific_locale else '-',
-                          str(_('Yes')) if student_specific_profile.arrangement_other else '-',
-                          str(student_specific_profile.guide) if student_specific_profile.guide else '',
-                          ])
+        student_specific_profile = None
+        if hasattr(exam_enroll.learning_unit_enrollment.student, 'studentspecificprofile'):
+            student_specific_profile = exam_enroll.learning_unit_enrollment.student.studentspecificprofile
 
+        line_content = [
+            str(exam_enroll.learning_unit_enrollment.learning_unit_year.academic_year),
+            str(exam_enroll.session_exam.number_session),
+            exam_enroll.session_exam.learning_unit_year.acronym,
+            offer.acronym,
+            student.registration_id,
+            person.last_name,
+            person.first_name,
+            person.email,
+            score,
+            str(justification),
+            end_date if exam_enroll.enrollment_state == 'ENROLLED' else ''
+        ]
+        if student_specific_profile:
+            line_content.extend([
+                 str(_(student_specific_profile.get_type_display())) or "-",
+                 str(_('Yes')) if student_specific_profile.arrangement_additional_time else '-',
+                 str(_('Yes')) if student_specific_profile.arrangement_appropriate_copy else '-',
+                 str(_('Yes')) if student_specific_profile.arrangement_specific_locale else '-',
+                 str(_('Yes')) if student_specific_profile.arrangement_other else '-',
+                 str(student_specific_profile.guide) if student_specific_profile.guide else '',
+                 ])
+        else:
+            line_content.extend(["-", "-", "-", "-", "-", ""])
+        worksheet.append(line_content)
         row_number += 1
         __coloring_non_editable(worksheet, row_number, score, exam_enroll.justification_final)
         _coloring_enrollment_state(worksheet, row_number, exam_enroll)
