@@ -25,7 +25,6 @@ from unittest import mock
 
 from django.test import SimpleTestCase
 
-import program_management.ddd.service.write.up_link_service
 from program_management.ddd.service.write import down_link_service
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
@@ -60,34 +59,6 @@ class TestUpDownChildren(SimpleTestCase):
         )
         self.mocked_load_node_element = self.load_node_element.start()
         self.addCleanup(self.load_node_element.stop)
-
-    def test_do_not_modify_order_when_applying_up_on_first_element(self):
-        self.mocked_load_node_element.side_effect = [self.parent, self.link0.child]
-        program_management.ddd.service.write.up_link_service.up_link(
-            self.parent.node_id,
-            self.link0.parent.node_id,
-            self.link0.child.node_id,
-            self.link0.child.type
-        )
-        self.assertListEqual(
-            self.parent.children,
-            [self.link0, self.link1, self.link2]
-        )
-        self.assertFalse(self.mocked_persist_tree.called)
-
-    def test_up_action_on_link_should_increase_order_by_one(self):
-        self.mocked_load_node_element.side_effect = [self.parent, self.link1.child]
-        program_management.ddd.service.write.up_link_service.up_link(
-            self.parent.node_id,
-            self.link1.parent.node_id,
-            self.link1.child.node_id,
-            self.link1.child.type
-        )
-        self.assertListEqual(
-            [self.link1.order, self.link0.order, self.link2.order],
-            [0, 1, 2]
-        )
-        self.assertTrue(self.mocked_persist_tree.called)
 
     def test_down_action_on_link_should_decrease_order_by_one(self):
         self.mocked_load_node_element.side_effect = [self.parent, self.link1.child]
