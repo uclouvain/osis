@@ -87,36 +87,6 @@ class TestTrainingRepositoryCreateMethod(TestCase):
             ]
         )
 
-    def test_when_education_group_type_not_exists(self):
-        pass
-
-    def test_when_language_not_exists(self):
-        pass
-
-    def test_when_main_study_domain_not_exists(self):
-        pass
-
-    def test_when_isced_domain_not_exists(self):
-        pass
-
-    def test_when_management_entity_not_exists(self):
-        pass
-
-    def test_when_administration_entity_not_exists(self):
-        pass
-
-    def test_when_teaching_campus_not_exists(self):
-        pass
-
-    def test_when_enrollment_campus_not_exists(self):
-        pass
-
-    def test_when_secondary_study_domain_not_exists(self):
-        pass
-
-    def test_when_certificate_aim_not_exists(self):
-        pass
-
     def test_fields_mapping(self):
         entity_id = self.repository.create(self.training)
 
