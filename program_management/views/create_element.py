@@ -23,8 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Union
-
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseBadRequest
 from django.urls import reverse
@@ -34,7 +32,6 @@ from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import GroupType
 from base.views.mixins import AjaxTemplateMixin
 from program_management.forms.select_type import SelectTypeForm
-from education_group.models.group_year import GroupYear
 
 
 class SelectTypeCreateElementView(LoginRequiredMixin, AjaxTemplateMixin, FormView):
@@ -55,25 +52,8 @@ class SelectTypeCreateElementView(LoginRequiredMixin, AjaxTemplateMixin, FormVie
         return {
             **super().get_form_kwargs(),
             'category': self.kwargs["category"],
-            'parent': self.get_parent()
+            'path_to': self.request.GET.get('path_to')
         }
-
-    def get_parent(self) -> Union[GroupYear, None]:
-
-        try:
-            parent_id = self.get_parent_id() or -1
-            return GroupYear.objects.get(element__pk=parent_id)
-        except GroupYear.DoesNotExist:
-            pass
-        return None
-
-    def get_parent_id(self) -> str:
-        """
-        Parent element id will be passed in path_to queryparam
-        Ex:  ...?path_to=56556|4656|565
-        """
-        path_to = self.request.GET.get('path_to') or ''
-        return path_to.split('|')[-1]
 
     def form_valid(self, form):
         self.kwargs["type"] = form.cleaned_data["name"]

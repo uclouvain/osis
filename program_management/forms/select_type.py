@@ -24,52 +24,28 @@
 #
 ##############################################################################
 from django import forms
-from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
-from base.models.education_group_type import EducationGroupType
 from base.models.enums.education_group_categories import Categories
-from base.models.enums.education_group_types import MiniTrainingType, GroupType
-from program_management.business.group_element_years import management
-
-DISABLED_OFFER_TYPE = [
-    MiniTrainingType.FSA_SPECIALITY.name,
-    MiniTrainingType.MOBILITY_PARTNERSHIP.name,
-    GroupType.MAJOR_LIST_CHOICE.name,
-    GroupType.MOBILITY_PARTNERSHIP_LIST_CHOICE.name
-]
-
-
-class EducationGroupTypeModelChoiceField(forms.ModelChoiceField):
-    def label_from_instance(self, obj):
-        return obj.get_name_display()
+from program_management.ddd import command
+from program_management.ddd.service.read import element_type_service
 
 
 class SelectTypeForm(forms.Form):
-    name = EducationGroupTypeModelChoiceField(
-        EducationGroupType.objects.none(),
-        label=_("Type of training"),
-        required=True,
-    )
+    name = forms.ChoiceField(required=True)
 
-    def __init__(self, category, parent=None, *args, **kwargs):
-        self.parent = parent
-
+    def __init__(self, category, path_to=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
         self.fields["name"].label = _("Which type of %(category)s do you want to create ?") % {
             "category": Categories[category].value
         }
-        self.fields["name"].queryset = EducationGroupType.objects.filter(category=category)
+        self.__init_name_choice(category, path_to)
 
-    def clean_name(self):
-        education_group_type = self.cleaned_data["name"]
-
-        # TODO: Use ValidateAuthorizedRelationshipForAllTrees instead
-        if self.parent and management.is_max_child_reached(self.parent, education_group_type.name):
-            raise ValidationError(
-                _("The number of children of type \"%(child_type)s\" for \"%(parent)s\" "
-                  "has already reached the limit.") % {
-                    'child_type': education_group_type.get_name_display(),
-                    'parent': self.parent
-                })
-        return education_group_type.name
+    def __init_name_choice(self, category, path_to):
+        cmd = command.GetAllowedChildTypeCommand(category=Categories[category], path_to_paste=path_to)
+        allowed_child_types = element_type_service.get_allowed_child_types(cmd)
+        self.fields["name"].choices = sorted(
+            tuple((allowed_type.name, allowed_type.value) for allowed_type in allowed_child_types),
+            key=lambda type: type[1]
+        )
