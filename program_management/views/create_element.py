@@ -60,5 +60,10 @@ class SelectTypeCreateElementView(LoginRequiredMixin, AjaxTemplateMixin, FormVie
         return super().form_valid(form)
 
     def get_success_url(self):
+        url = ""
         if self.kwargs["type"] in GroupType.get_names():
-            return reverse('group_create', kwargs={'type': self.kwargs['type']})
+            url = reverse('group_create', kwargs={'type': self.kwargs['type']})
+
+        if "path_to" in self.request.GET:
+            url += "?path_to={}".format(self.request.GET['path_to'])
+        return url

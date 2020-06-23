@@ -40,9 +40,9 @@ class SelectTypeForm(forms.Form):
         self.fields["name"].label = _("Which type of %(category)s do you want to create ?") % {
             "category": Categories[category].value
         }
-        self.__init_name_choice(category, path_to)
+        self._init_name_choice(category, path_to)
 
-    def __init_name_choice(self, category, path_to):
+    def _init_name_choice(self, category, path_to):
         cmd = command.GetAllowedChildTypeCommand(category=Categories[category], path_to_paste=path_to)
         allowed_child_types = element_type_service.get_allowed_child_types(cmd)
         self.fields["name"].choices = sorted(

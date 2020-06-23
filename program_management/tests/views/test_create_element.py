@@ -49,5 +49,24 @@ class TestSelectTypeCreateView(TestCase):
 
         self.assertRedirects(
             response,
-            reverse('group_create', kwargs={'type': GroupType.COMMON_CORE.name})
+            reverse('group_create', kwargs={'type': GroupType.COMMON_CORE.name}),
+            fetch_redirect_response=False
         )
+
+    @mock.patch('program_management.views.create_element.SelectTypeForm._init_name_choice')
+    @mock.patch('program_management.views.create_element.SelectTypeForm.is_valid', return_value=True)
+    @mock.patch('program_management.views.create_element.SelectTypeForm.cleaned_data',
+                new_callable=mock.PropertyMock, create=True)
+    def test_case_group_type_valid_post_assert_redirect_to_group_create_with_path_queryparam(
+            self,
+            mock_form_cleaned_data,
+            *args, **kwargs
+    ):
+        mock_form_cleaned_data.return_value = {'name': GroupType.COMMON_CORE.name}
+
+        url_with_path_to_queryparam = self.url + "?path_to=656|45454|6556"
+        response = self.client.post(url_with_path_to_queryparam, data={})
+
+        expected_redirect = reverse('group_create', kwargs={'type': GroupType.COMMON_CORE.name}) + \
+            "?path_to=656|45454|6556"
+        self.assertRedirects(response, expected_redirect, fetch_redirect_response=False)
