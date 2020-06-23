@@ -26,7 +26,7 @@
 
 <div class="btn-group  pull-right" role="group" aria-label="actions">
     <form id="form_up_{{ link.child.code }}" method="POST"
-          action="{% url 'group_element_year_up' %}">
+          action="{% url 'content_up' %}">
         {% csrf_token %}
         <input type="hidden" name="path" value="{{ node_path|addstr:"|"|addstr:link.child.node_id }}">
         <button class="btn btn-link"
@@ -37,7 +37,7 @@
     </form>
 
     <form id="form_down_{{ link.child.code }}" method="POST"
-          action="{% url 'group_element_year_down' %}">
+          action="{% url 'content_down' %}">
         {% csrf_token %}
         <input type="hidden" name="path" value="{{ node_path|addstr:"|"|addstr:link.child.node_id }}">
         <button class="btn btn-link"
