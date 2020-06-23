@@ -100,7 +100,7 @@ def export_xls(exam_enrollments):
                           str(_('Yes')) if student_specific_profile.arrangement_appropriate_copy else '-',
                           str(_('Yes')) if student_specific_profile.arrangement_specific_locale else '-',
                           str(_('Yes')) if student_specific_profile.arrangement_other else '-',
-                          student_specific_profile.guide.full_name if student_specific_profile.guide else '',
+                          str(student_specific_profile.guide) if student_specific_profile.guide else '',
                           ])
 
         row_number += 1
