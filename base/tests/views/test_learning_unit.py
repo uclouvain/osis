@@ -631,7 +631,6 @@ class LearningUnitViewTestCase(TestCase):
         group_element1 = GroupElementYearFactory(
             child_element=learning_unit_year_element,
             parent_element=ElementFactory(group_year=parent_1_version.root_group),
-            child_leaf=None,
             child_branch=None,
             parent=None)
 
@@ -646,7 +645,6 @@ class LearningUnitViewTestCase(TestCase):
         group_element2 = GroupElementYearFactory(
             child_element=learning_unit_year_element,
             parent_element=ElementFactory(group_year=parent_2_version.root_group),
-            child_leaf=None,
             child_branch=None,
             parent=None)
 
@@ -661,7 +659,6 @@ class LearningUnitViewTestCase(TestCase):
         group_element3 = GroupElementYearFactory(
             child_element=learning_unit_year_element,
             parent_element=ElementFactory(group_year=parent_3_version.root_group),
-            child_leaf=None,
             child_branch=None,
             parent=None)
 

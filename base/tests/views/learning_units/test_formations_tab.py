@@ -67,7 +67,6 @@ class TestLearningUnitFormationsTab(TestCase):
             child_element=cls.elem_learning_unit_year,
             parent=None,
             child_branch=None,
-            child_leaf=None
         )
 
         cls.education_group_year_formation_parent = TrainingFactory(
@@ -86,7 +85,6 @@ class TestLearningUnitFormationsTab(TestCase):
             child_element=cls.elem_group_year,
             parent=None,
             child_branch=None,
-            child_leaf=None
         )
 
         cls.education_group_year_formation_great_parent_1 = TrainingFactory(
@@ -106,7 +104,6 @@ class TestLearningUnitFormationsTab(TestCase):
             child_element=cls.elem_group_year,
             parent=None,
             child_branch=None,
-            child_leaf=None
         )
         cls.education_group_year_formation_great_parent_2 = TrainingFactory(
             academic_year=cls.academic_year
@@ -125,7 +122,6 @@ class TestLearningUnitFormationsTab(TestCase):
             child_element=cls.elem_group_year,
             parent=None,
             child_branch=None,
-            child_leaf=None
         )
 
     def setUp(self):
