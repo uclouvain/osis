@@ -101,10 +101,11 @@ class TestLearningUnitFormationsTab(TestCase):
             root_group__partial_acronym=cls.education_group_year_formation_great_parent_1.partial_acronym
         )
         cls.elem_education_group_version_formation_great_parent_1 = ElementFactory(
-            group_year=cls.education_group_version_formation_great_parent_1.root_group)
+            group_year=cls.education_group_version_formation_great_parent_1.root_group
+        )
         GroupElementYearFactory(
             parent_element=cls.elem_education_group_version_formation_great_parent_1,
-            child_element=cls.elem_education_group_version_formation_parent,
+            child_element=cls.elem_group_year,
             parent=None,
             child_branch=None,
             child_leaf=None
@@ -119,10 +120,11 @@ class TestLearningUnitFormationsTab(TestCase):
             root_group__partial_acronym=cls.education_group_year_formation_great_parent_2.partial_acronym
         )
         cls.elem_education_group_version_formation_great_parent_2 = ElementFactory(
-            group_year=cls.education_group_version_formation_great_parent_2.root_group)
+            group_year=cls.education_group_version_formation_great_parent_2.root_group
+        )
         GroupElementYearFactory(
             parent_element=cls.elem_education_group_version_formation_great_parent_2,
-            child_element=cls.elem_education_group_version_formation_parent,
+            child_element=cls.elem_group_year,
             parent=None,
             child_branch=None,
             child_leaf=None
@@ -134,16 +136,14 @@ class TestLearningUnitFormationsTab(TestCase):
 
     def test_formations_tab(self):
         response = self.client.get(self.url)
-        print(response.context['formations_by_educ_group_year'])
         with self.subTest('1'):
-            print(self.group_year.pk)
-            self.assertCountEqual(response.context['formations_by_educ_group_year'].get(self.group_year.pk),
-                                  [self.education_group_year_formation_parent])
+            self.assertCountEqual(response.context['formations_by_educ_group_year'].get(self.elem_learning_unit_year.pk),
+                                  [self.elem_group_year])
         with self.subTest('2'):
-            self.assertCountEqual(response.context['formations_by_educ_group_year'].
-                                  get(self.education_group_year_formation_parent.pk),
-                                  [self.education_group_year_formation_great_parent_1,
-                                   self.education_group_year_formation_great_parent_2]
+            self.assertCountEqual(response.context['formations_by_educ_group_year'].get(self.elem_group_year.pk),
+                                  [self.elem_education_group_version_formation_parent,
+                                   self.elem_education_group_version_formation_great_parent_1,
+                                   self.elem_education_group_version_formation_great_parent_2]
                                   )
 
         with self.subTest('3'):
