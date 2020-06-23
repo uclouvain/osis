@@ -50,7 +50,7 @@
                     </button>
                     <ul class="dropdown-menu dropdown-menu-large row text-right pull-right">
                          <li>
-                            {% url 'create_select_type' enums.GROUP as create_group_url %}
+                            {% url 'create_element_select_type' enums.GROUP as create_group_url %}
                             {% a_tag_modal_has_perm create_group_url _('New Education Group') 'base.add_group' user %}
                          </li>
                     </ul>

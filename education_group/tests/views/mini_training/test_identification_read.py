@@ -156,11 +156,11 @@ class TestMiniTrainingReadIdentification(TestCase):
 
     def test_assert_create_urls_correctly_computed(self):
         path = "{}".format(self.root_group_element.pk)
-        expected_create_group_url = reverse('create_select_type', kwargs={'category': Categories.GROUP.name}) + \
+        expected_create_group_url = reverse('create_element_select_type', kwargs={'category': Categories.GROUP.name}) + \
             "?path_to={}".format(path)
-        expected_create_training_url = reverse('create_select_type', kwargs={'category': Categories.TRAINING.name}) + \
+        expected_create_training_url = reverse('create_element_select_type', kwargs={'category': Categories.TRAINING.name}) + \
             "?path_to={}".format(path)
-        expected_create_mini_training_url = reverse('create_select_type',
+        expected_create_mini_training_url = reverse('create_element_select_type',
                                                     kwargs={'category': Categories.MINI_TRAINING.name}) + \
             "?path_to={}".format(path)
 

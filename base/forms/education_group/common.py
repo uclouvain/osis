@@ -43,7 +43,7 @@ from base.models.entity_version import find_pedagogical_entities_version, get_la
 from base.models.enums import education_group_categories, groups
 from base.models.enums.education_group_categories import TRAINING
 from base.models.enums.education_group_types import MiniTrainingType, GroupType
-from education_group.forms.select_type import EducationGroupTypeModelChoiceField
+from program_management.forms.select_type import EducationGroupTypeModelChoiceField
 from education_group.models.group_year import GroupYear
 from osis_role.contrib.forms.fields import EntityRoleChoiceField
 from reference.models.language import Language

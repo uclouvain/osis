@@ -33,12 +33,12 @@ from django.views.generic import FormView
 from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import GroupType
 from base.views.mixins import AjaxTemplateMixin
-from education_group.forms.select_type import SelectTypeForm
+from program_management.forms.select_type import SelectTypeForm
 from education_group.models.group_year import GroupYear
 
 
-class SelectTypeCreateView(LoginRequiredMixin, AjaxTemplateMixin, FormView):
-    template_name = "education_group_app/select_type_inner.html"
+class SelectTypeCreateElementView(LoginRequiredMixin, AjaxTemplateMixin, FormView):
+    template_name = "select_type_inner.html"
     form_class = SelectTypeForm
 
     def get(self, request, *args, **kwargs):
