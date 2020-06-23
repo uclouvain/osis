@@ -33,8 +33,10 @@ from openpyxl.writer.excel import save_virtual_workbook
 from assessments.business.enrollment_state import get_line_color, ENROLLED_LATE_COLOR, NOT_ENROLLED_COLOR
 from base import models as mdl
 from base.models.enums import exam_enrollment_justification_type
-from openpyxl.styles.borders import Border, Side, BORDER_THIN, BORDER_MEDIUM
+from openpyxl.styles.borders import Border, Side, BORDER_MEDIUM
 from openpyxl.styles import Style
+from base.models.enums import peps_type
+from base.models.student_specific_profile import StudentSpecificProfile
 
 HEADER = [_('Academic year'), _('Session'), _('Learning unit'), _('Program'), _('Registration number'), _('Lastname'),
           _('Firstname'), _('Email'), _('Numbered scores'), _('Justification (A,T)'), _('End date Prof'),
@@ -102,7 +104,7 @@ def export_xls(exam_enrollments):
         ]
         if student_specific_profile:
             line_content.extend([
-                 str(_(student_specific_profile.get_type_display())) or "-",
+                _get_type_peps(student_specific_profile),
                  str(_('Yes')) if student_specific_profile.arrangement_additional_time else '-',
                  str(_('Yes')) if student_specific_profile.arrangement_appropriate_copy else '-',
                  str(_('Yes')) if student_specific_profile.arrangement_specific_locale else '-',
@@ -300,3 +302,18 @@ def _set_peps_border(ws, last_row_number):
         cell = ws["{}{}".format(FIRST_COL_PEPS, cpt)]
         cell.style = STYLE_BORDER_RIGHT
         cpt += 1
+
+
+def _get_type_peps(student_specific_profile: StudentSpecificProfile) -> str:
+    if student_specific_profile.type == peps_type.PepsTypes.SPORT.name:
+        return "{} - {}".format(
+            str(_(student_specific_profile.get_type_display())) or "-",
+            str(_(student_specific_profile.get_subtype_sport_display())) or "-",
+        )
+    if student_specific_profile.type == peps_type.PepsTypes.DISABILITY.name:
+        return "{} - {}".format(
+            str(_(student_specific_profile.get_type_display())) or "-",
+            str(_(student_specific_profile.get_subtype_disability_display())) or "-",
+        )
+
+    return str(_(student_specific_profile.get_type_display())) or "-"
