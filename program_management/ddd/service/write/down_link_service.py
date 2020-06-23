@@ -39,13 +39,7 @@ def down_link(command_up: command.OrderDownLinkCommand):
     tree = load_tree.load(root_id)
     link_to_down = tree.get_link(parent_node, child_node)
     parent_node = link_to_down.parent
-
-    next_order = link_to_down.order + 1
-    if not len(parent_node.children) > next_order:
-        return []
-    link_to_up = parent_node.children[next_order]
-    link_to_up.order_up()
-    link_to_down.order_down()
+    parent_node.down_child(child_node)
 
     persist_tree.persist(tree)
     return []

@@ -72,7 +72,6 @@ class TestDownLink(SimpleTestCase):
             [self.link0.order, self.link2.order, self.link1.order],
             [0, 1, 2]
         )
-        self.assertTrue(self.mocked_persist_tree.called)
 
     def test_do_not_modify_order_when_applying_down_on_last_element(self):
         self.mocked_load_node_element.side_effect = [self.parent, self.link2.child]
@@ -84,4 +83,3 @@ class TestDownLink(SimpleTestCase):
             self.parent.children,
             [self.link0, self.link1, self.link2]
         )
-        self.assertFalse(self.mocked_persist_tree.called)

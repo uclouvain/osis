@@ -36,14 +36,7 @@ def up_link(command_up: command.OrderUpLinkCommand):
     tree = load_tree.load(root_id)
     link_to_up = tree.get_link(parent_node, child_node)
     parent_node = link_to_up.parent
-
-    # TODO extract this logic into node
-    previous_order = link_to_up.order - 1
-    if not previous_order >= 0:
-        return []
-    link_to_down = parent_node.children[previous_order]
-    link_to_up.order_up()
-    link_to_down.order_down()
+    parent_node.up_child(child_node)
 
     persist_tree.persist(tree)
     return []

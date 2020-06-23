@@ -261,6 +261,26 @@ class Node(interface.Entity):
     def get_link(self, link_id: int) -> 'Link':
         return next((link for link in self.children if link.pk == link_id), None)
 
+    def up_child(self, node_to_up: 'Node') -> None:
+        index = self.children_as_nodes.index(node_to_up)
+
+        is_first_element = index == 0
+        if is_first_element:
+            return
+
+        self.children[index].order_up()
+        self.children[index-1].order_down()
+
+    def down_child(self, node_to_down: 'Node') -> None:
+        index = self.children_as_nodes.index(node_to_down)
+
+        is_last_element = index == len(self.children) - 1
+        if is_last_element:
+            return
+
+        self.children[index].order_down()
+        self.children[index+1].order_up()
+
 
 def _get_descendents(root_node: Node, current_path: 'Path' = None) -> Dict['Path', 'Node']:
     _descendents = OrderedDict()
