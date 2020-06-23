@@ -37,8 +37,6 @@ from base.tests.factories.learning_container_year import LearningContainerYearFa
 from base.tests.factories.learning_unit_year import LearningUnitYearFullFactory
 from base.tests.factories.person import PersonWithPermissionsFactory
 
-
-# @skip("FIXME in OSIS-4746")
 from education_group.tests.factories.group_year import GroupYearFactory
 from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementFactory
