@@ -71,6 +71,9 @@ class NodeIdentity(interface.EntityIdentity):
     def __eq__(self, other):
         return type(other) == type(self) and (self.code, self.year) == (other.code, other.year)
 
+    def __repr__(self):
+        return "NodeIdentity(code={code}, year={year})".format(code=self.code, year=self.year)
+
 
 class Node(interface.Entity):
 

@@ -27,9 +27,10 @@ from base.ddd.utils.validation_message import BusinessValidationMessage
 from program_management.ddd import command
 from program_management.ddd.repositories import persist_tree, load_tree, load_node
 from program_management.models.enums import node_type
+from program_management.ddd.business_types import *
 
 
-def down_link(command_up: command.OrderDownLinkCommand):
+def down_link(command_up: command.OrderDownLinkCommand) -> 'NodeIdentity':
     root_id = int(command_up.path.split("|")[0])
     *_, parent_id, child_id = [int(element_id) for element_id in command_up.path.split("|")]
 
@@ -42,4 +43,4 @@ def down_link(command_up: command.OrderDownLinkCommand):
     parent_node.down_child(child_node)
 
     persist_tree.persist(tree)
-    return []
+    return child_node.entity_id

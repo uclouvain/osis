@@ -23,10 +23,11 @@
 # ############################################################################
 
 from program_management.ddd import command
+from program_management.ddd.business_types import *
 from program_management.ddd.repositories import load_node, load_tree, persist_tree
 
 
-def up_link(command_up: command.OrderUpLinkCommand):
+def up_link(command_up: command.OrderUpLinkCommand) -> 'NodeIdentity':
     root_id = int(command_up.path.split("|")[0])
     *_, parent_id, child_id = [int(element_id) for element_id in command_up.path.split("|")]
 
@@ -39,4 +40,4 @@ def up_link(command_up: command.OrderUpLinkCommand):
     parent_node.up_child(child_node)
 
     persist_tree.persist(tree)
-    return []
+    return child_node.entity_id

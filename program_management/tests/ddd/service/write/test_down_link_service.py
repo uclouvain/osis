@@ -25,7 +25,7 @@ from unittest import mock
 
 from django.test import SimpleTestCase
 
-from program_management.ddd.domain import program_tree
+from program_management.ddd.domain import program_tree, link, node
 from program_management.ddd.service.write import down_link_service
 from program_management.tests.ddd.factories.commands.order_down_link_command import OrderDownLinkCommandFactory
 from program_management.tests.ddd.factories.link import LinkFactory
@@ -62,24 +62,16 @@ class TestDownLink(SimpleTestCase):
         self.mocked_load_node_element = self.load_node_element.start()
         self.addCleanup(self.load_node_element.stop)
 
-    def test_down_action_on_link_should_decrease_order_by_one(self):
+    def test_should_return_node_identity_of_node_downed(self):
         self.mocked_load_node_element.side_effect = [self.parent, self.link1.child]
 
         command = OrderDownLinkCommandFactory(path=program_tree.build_path(self.parent, self.link1.child))
-        down_link_service.down_link(command)
-
-        self.assertListEqual(
-            [self.link0.order, self.link2.order, self.link1.order],
-            [0, 1, 2]
+        result = down_link_service.down_link(command)
+        expected = node.NodeIdentity(
+            code=self.link1.child.code,
+            year=self.link1.child.academic_year.year
         )
-
-    def test_do_not_modify_order_when_applying_down_on_last_element(self):
-        self.mocked_load_node_element.side_effect = [self.parent, self.link2.child]
-
-        command = OrderDownLinkCommandFactory(path=program_tree.build_path(self.parent, self.link2.child))
-        down_link_service.down_link(command)
-
-        self.assertListEqual(
-            self.parent.children,
-            [self.link0, self.link1, self.link2]
+        self.assertEqual(
+            result,
+            expected
         )
