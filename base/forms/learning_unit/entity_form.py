@@ -51,5 +51,9 @@ def find_additional_requirement_entities_choices():
     date = timezone.now()
     return EntityVersion.objects.current(date).filter(
         Q(entity__organization__type=MAIN) |
-        (Q(entity__organization__type=ACADEMIC_PARTNER) & Q(entity__organization__is_current_partner=True))
+        Q(
+            entity__organization__type=ACADEMIC_PARTNER,
+            parent__isnull=True,
+            end_date__isnull=True,
+        )
     ).select_related('entity', 'entity__organization').order_by('acronym')

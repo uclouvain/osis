@@ -26,7 +26,7 @@
 from dal import autocomplete
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
-from django.db.models import Q, Prefetch
+from django.db.models import BooleanField, OuterRef, Q, Prefetch, Subquery
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
@@ -151,7 +151,14 @@ class CountryAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
 
 class CampusAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
     def get_queryset(self):
-        qs = Campus.objects.filter(organization__is_current_partner=True)
+        qs = Campus.objects.annotate(
+            organization_is_current_partner=Subquery(
+                Organization.objects.filter(
+                    pk=OuterRef('organization_id'),
+                ).values('is_current_partner')[:1],
+                output_field=BooleanField(),
+            )
+        ).filter(organization_is_current_partner=True)
 
         country = self.forwarded.get('country_external_institution', None)
 
