@@ -25,6 +25,7 @@
 ##############################################################################
 from django.test import TestCase
 
+from base.models.certificate_aim import CertificateAim
 from base.models.education_group import EducationGroup
 from base.models.education_group_certificate_aim import EducationGroupCertificateAim
 from base.models.education_group_year import EducationGroupYear as EducationGroupYearModelDb
@@ -37,6 +38,7 @@ from base.tests.factories.education_group_type import TrainingEducationGroupType
 from base.tests.factories.entity_version import EntityVersionFactory as EntityVersionModelDbFactory
 from education_group.ddd.repository.training import TrainingRepository
 from education_group.tests.ddd.factories.campus import CampusIdentityFactory
+from education_group.tests.ddd.factories.diploma import DiplomaAimFactory, DiplomaAimIdentityFactory
 from education_group.tests.ddd.factories.isced_domain import IscedDomainIdentityFactory
 from education_group.tests.ddd.factories.study_domain import StudyDomainIdentityFactory, StudyDomainFactory
 from education_group.tests.ddd.factories.training import TrainingFactory, TrainingIdentityFactory
@@ -63,6 +65,8 @@ class TestTrainingRepositoryCreateMethod(TestCase):
         cls.certificate_aim = CertificateAimModelDbFactory()
 
         study_domain_identity = StudyDomainIdentityFactory(decree_name=cls.study_domain.decree.name, code=cls.study_domain.code)
+        diploma_aim_identity = DiplomaAimIdentityFactory(code=cls.certificate_aim.code, section=cls.certificate_aim.section)
+        campus_identity = CampusIdentityFactory(name=cls.campus.name, university_name=cls.campus.organization.name)
         cls.training = TrainingFactory(
             entity_identity=TrainingIdentityFactory(year=cls.year),
             start_year=cls.year,
@@ -73,11 +77,14 @@ class TestTrainingRepositoryCreateMethod(TestCase):
             isced_domain__entity_id=IscedDomainIdentityFactory(code=cls.isced_domain.code),
             management_entity__acronym=cls.entity_version.acronym,
             administration_entity__acronym=cls.entity_version.acronym,
-            teaching_campus=CampusIdentityFactory(name=cls.campus.name, university_name=cls.campus.organization.name),
-            enrollment_campus=CampusIdentityFactory(name=cls.campus.name, university_name=cls.campus.organization.name),
+            teaching_campus=campus_identity,
+            enrollment_campus=campus_identity,
             secondary_domains=[
                 StudyDomainFactory(entity_id=study_domain_identity)
             ],
+            diploma__aims=[
+                DiplomaAimFactory(entity_id=diploma_aim_identity)
+            ]
         )
 
     def test_when_education_group_type_not_exists(self):
@@ -196,4 +203,4 @@ class TestTrainingRepositoryCreateMethod(TestCase):
         qs_aims = EducationGroupCertificateAim.objects.filter(education_group_year=education_group_year)
         self.assertEqual(1, qs_aims.count())
         educ_group_certificate_aim = qs_aims.get()
-        self.assertEqual(educ_group_certificate_aim.certificate_aim.code, self.training.diploma.aims[0].entity_id.code)
+        self.assertEqual(educ_group_certificate_aim.certificate_aim, CertificateAim.objects.get(code=self.training.diploma.aims[0].entity_id.code))
