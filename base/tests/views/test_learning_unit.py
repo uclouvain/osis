@@ -650,7 +650,7 @@ class LearningUnitViewTestCase(TestCase):
             child_branch=None,
             parent=None)
 
-        parent_3 = EducationGroupYearFactory(partial_acronym='LBIOL601R', academic_year=self.current_academic_year,
+        parent_3 = EducationGroupYearFactory(partial_acronym='LBIOL608R', academic_year=self.current_academic_year,
                                              education_group_type=educ_group_type_matching_filters)
         parent_3_version = StandardEducationGroupVersionFactory(
             offer=parent_3,
@@ -671,7 +671,7 @@ class LearningUnitViewTestCase(TestCase):
         self.assertTemplateUsed(response, 'learning_unit/formations.html')
         self.assertEqual(context['current_academic_year'], self.current_academic_year)
         self.assertEqual(context['learning_unit_year'], learning_unit_year)
-        expected_order = [group_element2, group_element1, group_element3]
+        expected_order = [group_element2, group_element3, group_element1]
         self._assert_group_elements_ordered_by_partial_acronym(context, expected_order)
         self.assertIn('root_formations', context)
 
@@ -1030,6 +1030,7 @@ class LearningUnitViewTestCase(TestCase):
 
     def test_learning_unit(self):
         learning_unit_year = LearningUnitYearFactory()
+        ElementFactory(learning_unit_year=learning_unit_year)
         education_group_year_1 = EducationGroupYearFactory()
         education_group_year_2 = EducationGroupYearFactory()
         LearningUnitEnrollmentFactory(offer_enrollment__education_group_year=education_group_year_1,
