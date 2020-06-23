@@ -39,6 +39,7 @@ from base.tests.factories.person import PersonWithPermissionsFactory
 
 
 # @skip("FIXME in OSIS-4746")
+from education_group.tests.factories.group_year import GroupYearFactory
 from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementFactory
 
@@ -58,20 +59,13 @@ class TestLearningUnitFormationsTab(TestCase):
         )
         cls.elem_learning_unit_year = ElementFactory(learning_unit_year=cls.learning_unit_year)
 
-        cls.education_group_year = TrainingFactory(
+        cls.group_year = GroupYearFactory(
             academic_year=cls.academic_year
         )
 
-        cls.education_group_version = StandardEducationGroupVersionFactory(
-            offer=cls.education_group_year,
-            root_group__academic_year=cls.academic_year,
-            root_group__education_group_type=cls.education_group_year.education_group_type,
-            root_group__partial_acronym=cls.education_group_year.partial_title
-        )
-
-        cls.elem_education_group_version = ElementFactory(group_year=cls.education_group_version.root_group)
+        cls.elem_group_year = ElementFactory(group_year=cls.group_year)
         cls.group_element_year = GroupElementYearFactory(
-            parent_element=cls.elem_education_group_version,
+            parent_element=cls.elem_group_year,
             child_element=cls.elem_learning_unit_year,
             parent=None,
             child_branch=None,
@@ -85,13 +79,13 @@ class TestLearningUnitFormationsTab(TestCase):
             offer=cls.education_group_year_formation_parent,
             root_group__academic_year=cls.academic_year,
             root_group__education_group_type=cls.education_group_year_formation_parent.education_group_type,
-            root_group__partial_acronym=cls.education_group_year_formation_parent.partial_title
+            root_group__partial_acronym=cls.education_group_year_formation_parent.partial_acronym
         )
         cls.elem_education_group_version_formation_parent = ElementFactory(
             group_year=cls.education_group_version_formation_parent.root_group)
         GroupElementYearFactory(
             parent_element=cls.elem_education_group_version_formation_parent,
-            child_element=cls.elem_education_group_version,
+            child_element=cls.elem_group_year,
             parent=None,
             child_branch=None,
             child_leaf=None
@@ -104,7 +98,7 @@ class TestLearningUnitFormationsTab(TestCase):
             offer=cls.education_group_year_formation_great_parent_1,
             root_group__academic_year=cls.academic_year,
             root_group__education_group_type=cls.education_group_year_formation_great_parent_1.education_group_type,
-            root_group__partial_acronym=cls.education_group_year_formation_great_parent_1.partial_title
+            root_group__partial_acronym=cls.education_group_year_formation_great_parent_1.partial_acronym
         )
         cls.elem_education_group_version_formation_great_parent_1 = ElementFactory(
             group_year=cls.education_group_version_formation_great_parent_1.root_group)
@@ -122,7 +116,7 @@ class TestLearningUnitFormationsTab(TestCase):
             offer=cls.education_group_year_formation_great_parent_2,
             root_group__academic_year=cls.academic_year,
             root_group__education_group_type=cls.education_group_year_formation_great_parent_2.education_group_type,
-            root_group__partial_acronym=cls.education_group_year_formation_great_parent_2.partial_title
+            root_group__partial_acronym=cls.education_group_year_formation_great_parent_2.partial_acronym
         )
         cls.elem_education_group_version_formation_great_parent_2 = ElementFactory(
             group_year=cls.education_group_version_formation_great_parent_2.root_group)
@@ -142,7 +136,8 @@ class TestLearningUnitFormationsTab(TestCase):
         response = self.client.get(self.url)
         print(response.context['formations_by_educ_group_year'])
         with self.subTest('1'):
-            self.assertCountEqual(response.context['formations_by_educ_group_year'].get(self.education_group_year.pk),
+            print(self.group_year.pk)
+            self.assertCountEqual(response.context['formations_by_educ_group_year'].get(self.group_year.pk),
                                   [self.education_group_year_formation_parent])
         with self.subTest('2'):
             self.assertCountEqual(response.context['formations_by_educ_group_year'].
