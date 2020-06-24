@@ -29,14 +29,14 @@ from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import GroupType, TrainingType, MiniTrainingType
 from osis_common.ddd.interface import BusinessExceptions
 from program_management.ddd import command
-from program_management.ddd.service.read import element_type_service
+from program_management.ddd.service.read import allowed_children_types_service
 
 
 class TestGetAllowedChildTypes(SimpleTestCase):
     def test_get_allowed_type_with_only_group_category_on_command(self):
-        cmd = command.GetAllowedChildTypeCommand(category=Categories.GROUP)
+        cmd = command.GetAllowedChildTypeCommand(category=Categories.GROUP.name)
 
-        result = element_type_service.get_allowed_child_types(cmd)
+        result = allowed_children_types_service.get_allowed_child_types(cmd)
         self.assertIsInstance(result, set)
 
         self.assertSetEqual(
@@ -45,9 +45,9 @@ class TestGetAllowedChildTypes(SimpleTestCase):
         )
 
     def test_get_allowed_type_with_only_training_category_on_command(self):
-        cmd = command.GetAllowedChildTypeCommand(category=Categories.TRAINING)
+        cmd = command.GetAllowedChildTypeCommand(category=Categories.TRAINING.name)
 
-        result = element_type_service.get_allowed_child_types(cmd)
+        result = allowed_children_types_service.get_allowed_child_types(cmd)
         self.assertIsInstance(result, set)
 
         self.assertSetEqual(
@@ -56,9 +56,9 @@ class TestGetAllowedChildTypes(SimpleTestCase):
         )
 
     def test_get_allowed_type_with_only_mini_training_category_on_command(self):
-        cmd = command.GetAllowedChildTypeCommand(category=Categories.MINI_TRAINING)
+        cmd = command.GetAllowedChildTypeCommand(category=Categories.MINI_TRAINING.name)
 
-        result = element_type_service.get_allowed_child_types(cmd)
+        result = allowed_children_types_service.get_allowed_child_types(cmd)
         self.assertIsInstance(result, set)
 
         self.assertSetEqual(
@@ -66,10 +66,12 @@ class TestGetAllowedChildTypes(SimpleTestCase):
             {child_type for child_type in MiniTrainingType}
         )
 
-    @mock.patch('program_management.ddd.service.read.element_type_service.NodeIdentitySearch.get_from_element_id')
-    @mock.patch('program_management.ddd.service.read.element_type_service.NodeRepository.get')
-    @mock.patch('program_management.ddd.service.read.element_type_service.ProgramTreeRepository.get')
-    @mock.patch('program_management.ddd.service.read.element_type_service.PasteAuthorizedRelationshipValidator')
+    @mock.patch('program_management.ddd.service.read.allowed_children_types_service.NodeIdentitySearch.'
+                'get_from_element_id')
+    @mock.patch('program_management.ddd.service.read.allowed_children_types_service.NodeRepository.get')
+    @mock.patch('program_management.ddd.service.read.allowed_children_types_service.ProgramTreeRepository.get')
+    @mock.patch('program_management.ddd.service.read.allowed_children_types_service.'
+                'PasteAuthorizedRelationshipValidator')
     def test_get_allowed_type_with_path_to_paste_assert_validator_called(
             self,
             mock_validator,
@@ -79,9 +81,9 @@ class TestGetAllowedChildTypes(SimpleTestCase):
     ):
         mock_validator.return_value.validate.side_effect = BusinessExceptions(messages=[])
 
-        cmd = command.GetAllowedChildTypeCommand(category=Categories.GROUP, path_to_paste='4656|5656')
+        cmd = command.GetAllowedChildTypeCommand(category=Categories.GROUP.name, path_to_paste='4656|5656')
 
-        result = element_type_service.get_allowed_child_types(cmd)
+        result = allowed_children_types_service.get_allowed_child_types(cmd)
         self.assertIsInstance(result, set)
         self.assertSetEqual(result, set())
 

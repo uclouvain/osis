@@ -31,6 +31,11 @@ from base.models.enums.constraint_type import ConstraintTypeEnum
 from base.models.enums.education_group_types import GroupType
 from education_group.ddd.command import CreateGroupCommand
 from education_group.ddd.domain import group
+from education_group.ddd.domain._campus import Campus
+from education_group.ddd.domain._content_constraint import ContentConstraint
+from education_group.ddd.domain._remark import Remark
+from education_group.ddd.domain._titles import Titles
+from education_group.ddd.domain._entity import Entity
 from education_group.ddd.domain.group import GroupIdentity, Group
 from education_group.ddd.factories.group import GroupFactory
 
@@ -45,6 +50,10 @@ class TestGroupIdentity(SimpleTestCase):
     def test_assert_object_is_hashable(self):
         group_identity_1 = GroupIdentity(code="LTONC1000", year=2010)
         self.assertIsInstance(group_identity_1, collections.Hashable)
+
+    def test_assert_code_is_upperized(self):
+        group_identity_1 = GroupIdentity(code="ltronc1000", year=2010)
+        self.assertEqual(group_identity_1.code, "LTRONC1000")
 
 
 class TestGroup(SimpleTestCase):
@@ -62,6 +71,21 @@ class TestGroup(SimpleTestCase):
             self.group.year,
             self.group.entity_id.year
         )
+
+    def test_assert_code_is_upperized(self):
+        group = Group(
+            entity_identity=GroupIdentity(code="LTONC1000", year=2010),
+            type=GroupType.COMMON_CORE,
+            abbreviated_title='titletobeupper',
+            titles=Titles(title_fr='', title_en=''),
+            credits=5,
+            content_constraint=ContentConstraint(type=ConstraintTypeEnum.CREDITS, minimum=0, maximum=15),
+            management_entity=Entity(acronym="DRT"),
+            teaching_campus=Campus(name="Fucam Mons", university_name="UCLouvain"),
+            remark=Remark(text_fr='', text_en=''),
+            start_year=2010
+        )
+        self.assertEqual(group.abbreviated_title, "TITLETOBEUPPER")
 
 
 class TestGroupBuilder(SimpleTestCase):

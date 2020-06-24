@@ -34,10 +34,10 @@ from program_management.ddd.repositories.program_tree import ProgramTreeReposito
 from program_management.ddd.validators._authorized_relationship import PasteAuthorizedRelationshipValidator
 
 
-def get_allowed_child_types(cmd: command.GetAllowedChildTypeCommand) -> Set:
-    if cmd.category == Categories.TRAINING:
+def get_allowed_child_types(cmd: command.GetAllowedChildTypeCommand) -> Set[EducationGroupTypesEnum]:
+    if cmd.category == Categories.TRAINING.name:
         allowed_child_types = TrainingType
-    elif cmd.category == Categories.MINI_TRAINING:
+    elif cmd.category == Categories.MINI_TRAINING.name:
         allowed_child_types = MiniTrainingType
     else:
         allowed_child_types = GroupType

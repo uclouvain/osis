@@ -1,10 +1,18 @@
+from django import forms
 from django.utils.translation import gettext_lazy as _
 
+from base.models import campus
 from osis_role.contrib.forms.fields import EntityRoleChoiceField
 
 from base.models.entity_version import EntityVersion
 from education_group.auth.roles.central_manager import CentralManager
 from education_group.auth.roles.faculty_manager import FacultyManager
+
+
+class MainCampusChoiceField(forms.ModelChoiceField):
+    def __init__(self, queryset, *args, **kwargs):
+        queryset = campus.find_main_campuses()
+        super().__init__(queryset,  *args, **kwargs)
 
 
 class ManagementEntitiesChoiceField(EntityRoleChoiceField):

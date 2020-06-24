@@ -28,7 +28,7 @@ from django.utils.translation import gettext_lazy as _
 
 from base.models.enums.education_group_categories import Categories
 from program_management.ddd import command
-from program_management.ddd.service.read import element_type_service
+from program_management.ddd.service.read import allowed_children_types_service
 
 
 class SelectTypeForm(forms.Form):
@@ -43,8 +43,8 @@ class SelectTypeForm(forms.Form):
         self._init_name_choice(category, path_to)
 
     def _init_name_choice(self, category, path_to):
-        cmd = command.GetAllowedChildTypeCommand(category=Categories[category], path_to_paste=path_to)
-        allowed_child_types = element_type_service.get_allowed_child_types(cmd)
+        cmd = command.GetAllowedChildTypeCommand(category=category, path_to_paste=path_to)
+        allowed_child_types = allowed_children_types_service.get_allowed_child_types(cmd)
         self.fields["name"].choices = sorted(
             tuple((allowed_type.name, allowed_type.value) for allowed_type in allowed_child_types),
             key=lambda type: type[1]

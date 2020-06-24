@@ -25,7 +25,6 @@
 ##############################################################################
 from typing import Optional
 
-from base.models.enums.education_group_categories import Categories
 from base.models.enums.link_type import LinkTypes
 from osis_common.ddd import interface
 from program_management.ddd.business_types import *
@@ -85,14 +84,14 @@ class PasteElementCommand(interface.CommandRequest):
             node_to_paste_code: str,
             node_to_paste_year: int,
             path_where_to_paste: 'Path',
-            access_condition: Optional[bool] = None,
-            is_mandatory: Optional[bool] = None,
-            block: Optional[int] = None,
-            link_type: Optional[LinkTypes] = None,
+            access_condition: bool = None,
+            is_mandatory: bool = None,
+            block: int = None,
+            link_type: LinkTypes = None,
             comment: str = None,
             comment_english: str = None,
-            relative_credits: Optional[int] = None,
-            path_where_to_detach: Optional['Path'] = None
+            relative_credits: int = None,
+            path_where_to_detach: 'Path' = None
     ) -> None:
         self.node_to_paste_code = node_to_paste_code
         self.node_to_paste_year = node_to_paste_year
@@ -139,8 +138,8 @@ class CheckPasteNodeCommand(interface.CommandRequest):
 class GetAllowedChildTypeCommand(interface.CommandRequest):
     def __init__(
             self,
-            category: Categories,
-            path_to_paste: Optional[str] = None,
+            category: str,
+            path_to_paste: str = None,
     ):
         self.category = category
         self.path_to_paste = path_to_paste

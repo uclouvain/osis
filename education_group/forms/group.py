@@ -32,7 +32,6 @@ from django.utils.translation import gettext_lazy as _
 
 from base.business.event_perms import EventPermEducationGroupEdition
 from base.forms.common import ValidationRuleMixin
-from base.forms.education_group.common import MainCampusChoiceField
 from base.forms.utils.choice_field import BLANK_CHOICE
 from base.models.academic_year import AcademicYear
 from base.models.enums.constraint_type import ConstraintTypeEnum
@@ -68,7 +67,7 @@ class GroupForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         widget=forms.TextInput
     )
     management_entity = fields.ManagementEntitiesChoiceField(person=None, initial=None, required=False)
-    teaching_campus = MainCampusChoiceField(queryset=None, label=_("Learning location"), required=False)
+    teaching_campus = fields.MainCampusChoiceField(queryset=None, label=_("Learning location"), required=False)
     remark_fr = forms.CharField(widget=forms.Textarea, label=_("Remark"), required=False)
     remark_en = forms.CharField(widget=forms.Textarea, label=_("remark in english"), required=False)
 
@@ -122,13 +121,3 @@ class GroupForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
                 'organization_name': self.cleaned_data['teaching_campus'].organization.name,
             }
         return None
-
-    def clean_code(self):
-        data_cleaned = self.cleaned_data['code']
-        if data_cleaned:
-            return data_cleaned.upper()
-
-    def clean_abbreviated_title(self):
-        data_cleaned = self.cleaned_data['abbreviated_title']
-        if data_cleaned:
-            return data_cleaned.upper()

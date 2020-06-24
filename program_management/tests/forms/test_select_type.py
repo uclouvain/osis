@@ -33,12 +33,13 @@ from program_management.forms.select_type import SelectTypeForm
 
 
 class TestSelectTypeForm(SimpleTestCase):
-    @mock.patch("program_management.forms.select_type.element_type_service.get_allowed_child_types", return_value=set())
-    def test_assert_call_element_type_service(self, mock_get_allowed_child_types):
+    @mock.patch("program_management.forms.select_type.allowed_children_types_service.get_allowed_child_types",
+                return_value=set())
+    def test_assert_call_allowed_children_types_service(self, mock_get_allowed_child_types):
         SelectTypeForm(category=Categories.GROUP.name, path_to=None)
         mock_get_allowed_child_types.assert_called()
 
-    @mock.patch("program_management.forms.select_type.element_type_service.get_allowed_child_types")
+    @mock.patch("program_management.forms.select_type.allowed_children_types_service.get_allowed_child_types")
     def test_assert_name_choice_is_sorted(self, mock_get_allowed_child_types):
         mock_get_allowed_child_types.return_value = {
             GroupType.SUB_GROUP,
@@ -54,7 +55,8 @@ class TestSelectTypeForm(SimpleTestCase):
             ]
         )
 
-    @mock.patch("program_management.forms.select_type.element_type_service.get_allowed_child_types", return_value=set())
+    @mock.patch("program_management.forms.select_type.allowed_children_types_service.get_allowed_child_types",
+                return_value=set())
     def test_assert_label_is_adapted_to_category(self, mock_get_allowed_child_types):
         form = SelectTypeForm(category=Categories.GROUP.name, path_to=None)
 

@@ -69,9 +69,9 @@ class GroupBuilder:
         )
 
     @classmethod
-    def build_next_year_group(cls, from_group: 'Group', year: int):
+    def build_next_year_group(cls, from_group: 'Group'):
         group = copy.deepcopy(from_group)
-        group.entity_id = GroupIdentity(code=from_group.code, year=year)
+        group.entity_id = GroupIdentity(code=from_group.code, year=from_group.year + 1)
         return group
 
 
@@ -80,7 +80,7 @@ builder = GroupBuilder()
 
 class GroupIdentity(interface.EntityIdentity):
     def __init__(self, code: str, year: int):
-        self.code = code
+        self.code = code.upper()
         self.year = year
 
     def __hash__(self):
@@ -123,7 +123,7 @@ class Group(interface.RootEntity):
         super(Group, self).__init__(entity_id=entity_identity)
         self.entity_id = entity_identity
         self.type = type
-        self.abbreviated_title = abbreviated_title
+        self.abbreviated_title = abbreviated_title.upper()
         self.titles = titles
         self.credits = credits
         self.content_constraint = content_constraint

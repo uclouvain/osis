@@ -34,14 +34,14 @@ from education_group.ddd.service.write.create_group_service import create_group
 @transaction.atomic()
 def copy_group(cmd: command.CopyGroupCommand) -> List['GroupIdentity']:
     """
-    Copy a group from a year (=excl) to a specific year(=incl)
+    Copy a group from a year (=excluded) to a specific year (=included)
     """
     group_ids = []
-    for year in range(start=cmd.from_year + 1, stop=cmd.to_year):
-        cmd_get_group = command.GetGroupCommand(code=cmd.from_code, year=year - 1)
+    for to_year in range(start=cmd.from_year + 1, stop=cmd.to_year):
+        cmd_get_group = command.GetGroupCommand(code=cmd.from_code, year=to_year - 1)
         grp = group_service_read.get_group(cmd_get_group)
 
-        group_next_year = group.builder.build_next_year_group(from_group=grp, year=year)
+        group_next_year = group.builder.build_next_year_group(from_group=grp)
         cmd_create_group = command.CreateGroupCommand(
             code=group_next_year.code,
             year=group_next_year.year,
@@ -61,6 +61,7 @@ def copy_group(cmd: command.CopyGroupCommand) -> List['GroupIdentity']:
             start_year=group_next_year.start_year,
             end_year=group_next_year.end_year
         )
+        # TODO: Be carefull to keep same entity_id_through_years property
         group_next_year_id = create_group(cmd_create_group)
         group_ids.append(group_next_year_id)
     return group_ids
