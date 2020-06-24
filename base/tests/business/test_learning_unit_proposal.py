@@ -38,10 +38,9 @@ from attribution.tests.factories.tutor_application import TutorApplicationFactor
 from base import models as mdl_base
 from base.business import learning_unit_proposal as lu_proposal_business
 from base.business.learning_unit_proposal import compute_proposal_type, consolidate_proposal, modify_proposal_state, \
-    copy_learning_unit_data, _apply_action_on_proposals
+    copy_learning_unit_data, _apply_action_on_proposals, can_consolidate_learningunit_proposal
 from base.business.learning_unit_proposal import consolidate_proposals_and_send_report
-from base.business.learning_units.perms import PROPOSAL_CONSOLIDATION_ELIGIBLE_STATES, \
-    is_eligible_to_consolidate_proposal
+from base.business.learning_units.perms import PROPOSAL_CONSOLIDATION_ELIGIBLE_STATES
 from base.models.academic_year import AcademicYear, LEARNING_UNIT_CREATION_SPAN_YEARS
 from base.models.enums import learning_component_year_type
 from base.models.enums import organization_type, proposal_type, entity_type, \
@@ -60,7 +59,7 @@ from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
-from reference.tests.factories.language import LanguageFactory, FrenchLanguageFactory
+from reference.tests.factories.language import FrenchLanguageFactory
 
 
 class TestLearningUnitProposalCancel(TestCase):
@@ -279,7 +278,7 @@ class TestConsolidateProposals(TestCase):
             [proposal],
             consolidate_proposal,
             self.author,
-            is_eligible_to_consolidate_proposal
+            can_consolidate_learningunit_proposal
         )
 
         self.assertEqual(

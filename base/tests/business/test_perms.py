@@ -31,8 +31,7 @@ from django.test import TestCase
 
 from attribution.tests.factories.tutor_application import TutorApplicationFactory
 from base.business.learning_units import perms
-from base.business.learning_units.perms import FACULTY_UPDATABLE_CONTAINER_TYPES, is_eligible_to_consolidate_proposal, \
-    _check_proposal_edition
+from base.business.learning_units.perms import FACULTY_UPDATABLE_CONTAINER_TYPES, _check_proposal_edition
 from base.business.perms import view_academicactors
 from base.models.academic_year import AcademicYear, LEARNING_UNIT_CREATION_SPAN_YEARS, MAX_ACADEMIC_YEAR_FACULTY, \
     MAX_ACADEMIC_YEAR_CENTRAL
@@ -42,7 +41,6 @@ from base.models.enums.learning_container_year_types import OTHER_COLLECTIVE, OT
 from base.models.enums.learning_unit_year_subtypes import FULL, PARTIM
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
-from base.models.person import Person
 from base.tests.factories.academic_calendar import generate_modification_transformation_proposal_calendars, \
     generate_learning_unit_edition_calendars
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year, \
@@ -471,36 +469,41 @@ class TestIsEligibleToCreateModificationProposal(TestCase):
 class TestIsEligibleToConsolidateLearningUnitProposal(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.person_with_right_to_consolidate = PersonFactory()
-        cls.person_with_right_to_consolidate.user.user_permissions.add(
-            Permission.objects.get(codename="can_consolidate_learningunit_proposal")
-        )
-
-        cls.person_without_right_to_consolidate = PersonFactory()
+        cls.central_manager = CentralManagerFactory()
+        cls.person = PersonFactory()
 
     def test_when_person_has_no_right_to_consolidate(self):
-        proposal_in_state_accepted = ProposalLearningUnitFactory(state=proposal_state.ProposalState.ACCEPTED.name)
-        self.assertFalse(is_eligible_to_consolidate_proposal(proposal_in_state_accepted,
-                                                             self.person_without_right_to_consolidate))
+        luy = ProposalLearningUnitFactory(state=proposal_state.ProposalState.ACCEPTED.name).learning_unit_year
+        self.assertFalse(self.person.user.has_perm('base.can_consolidate_learningunit_proposal', luy))
 
     def test_when_person_has_right_to_consolidate_but_proposal_state_is_neither_accepted_nor_refused(self):
-        states = (state.name for state in proposal_state.ProposalState
-                  if state not in (proposal_state.ProposalState.ACCEPTED, proposal_state.ProposalState.REFUSED))
+        states = (
+            state.name for state in proposal_state.ProposalState if state not in (
+                proposal_state.ProposalState.ACCEPTED, proposal_state.ProposalState.REFUSED
+            )
+        )
         for state in states:
             with self.subTest(state=state):
-                proposal = ProposalLearningUnitFactory(state=state)
-                self.assertFalse(is_eligible_to_consolidate_proposal(proposal, self.person_with_right_to_consolidate))
+                luy = ProposalLearningUnitFactory(state=state).learning_unit_year
+                user = self.central_manager.person.user
+                self.assertFalse(user.has_perm('base.can_consolidate_learningunit_proposal', luy))
 
     def test_when_person_not_linked_to_entity(self):
         proposal = ProposalLearningUnitFactory(
             state=proposal_state.ProposalState.ACCEPTED.name,
             learning_unit_year__learning_container_year__requirement_entity=EntityFactory(),
         )
-        self.assertFalse(is_eligible_to_consolidate_proposal(proposal, self.person_with_right_to_consolidate))
+        proposal.learning_unit_year.initial_data = {
+            'learning_container_year': proposal.learning_unit_year.learning_container_year
+        }
+        user = self.central_manager.person.user
+        self.assertFalse(user.has_perm('base.can_consolidate_learningunit_proposal', proposal.learning_unit_year))
 
     def test_when_person_is_linked_to_entity(self):
-        states = (state.name for state in proposal_state.ProposalState
-                  if state in (proposal_state.ProposalState.ACCEPTED, proposal_state.ProposalState.REFUSED))
+        states = (
+            state.name for state in proposal_state.ProposalState
+            if state in (proposal_state.ProposalState.ACCEPTED, proposal_state.ProposalState.REFUSED)
+        )
 
         for state in states:
             with self.subTest(state=state):
@@ -509,12 +512,10 @@ class TestIsEligibleToConsolidateLearningUnitProposal(TestCase):
                 container_year.requirement_entity = EntityFactory()
                 container_year.save()
 
-                PersonEntityFactory(person=self.person_with_right_to_consolidate,
-                                    entity=container_year.requirement_entity)
-                # Refresh permissions
-                self.person_with_right_to_consolidate = Person.objects.get(pk=self.person_with_right_to_consolidate.pk)
-
-                self.assertTrue(is_eligible_to_consolidate_proposal(proposal, self.person_with_right_to_consolidate))
+                user = CentralManagerFactory(entity=container_year.requirement_entity).person.user
+                self.assertTrue(
+                    user.has_perm('base.can_consolidate_learningunit_proposal', proposal.learning_unit_year)
+                )
 
     def test_is_not_eligible_consolidate_delete_proposal_if_has_applications(self):
         requirement_entity = EntityFactory()
@@ -525,13 +526,8 @@ class TestIsEligibleToConsolidateLearningUnitProposal(TestCase):
             state=ProposalState.ACCEPTED.name
         )
         TutorApplicationFactory(learning_container_year=luy.learning_container_year)
-        person = PersonWithPermissionsFactory('can_consolidate_learningunit_proposal')
-        PersonEntityFactory(person=person, entity=requirement_entity)
-        self.assertFalse(
-            perms.is_eligible_to_consolidate_proposal(
-                proposal, person
-            )
-        )
+        user = CentralManagerFactory(entity=requirement_entity).person.user
+        self.assertFalse(user.has_perm('base.can_consolidate_learningunit_proposal', proposal.learning_unit_year))
 
 
 class TestIsAcademicYearInRangeToCreatePartim(TestCase):

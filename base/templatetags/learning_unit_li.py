@@ -28,9 +28,10 @@ from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.utils.translation import gettext_lazy as _
 
-from base.business.learning_unit_proposal import can_cancel_proposal, can_delete_learningunit, can_edit_proposal
-from base.business.learning_units.perms import is_eligible_to_consolidate_proposal, \
-    is_eligible_to_modify_end_year_by_proposal, is_eligible_to_modify_by_proposal
+from base.business.learning_unit_proposal import can_cancel_proposal, can_delete_learningunit, can_edit_proposal, \
+    can_consolidate_learningunit_proposal
+from base.business.learning_units.perms import is_eligible_to_modify_end_year_by_proposal, \
+    is_eligible_to_modify_by_proposal
 from base.business.learning_units.perms import is_year_editable
 from base.models.person import find_by_user
 
@@ -92,7 +93,7 @@ def _get_common_proposal_data(context, message, url, url_id):
 @register.inclusion_tag('blocks/button/li_template_lu.html', takes_context=True)
 def li_consolidate_proposal(context, url, message, data_target, url_id="link_consolidate_proposal", js_script=''):
     data = _get_common_proposal_data(context, message, url, url_id)
-    data['permission_function'] = is_eligible_to_consolidate_proposal
+    data['permission_function'] = can_consolidate_learningunit_proposal
     data['obj'] = context['proposal']
     data['js_script'] = js_script
     data['load_modal'] = True

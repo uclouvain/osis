@@ -31,15 +31,12 @@ from django.utils.translation import gettext_lazy as _
 from waffle.models import Flag
 
 from attribution.business.perms import _is_tutor_attributed_to_the_learning_unit
-from attribution.models.tutor_application import TutorApplication
 from base.business import event_perms
 from base.business.institution import find_summary_course_submission_dates_for_entity_version
 from base.models import tutor
-from base.models.entity import Entity
 from base.models.entity_version import EntityVersion
 from base.models.enums import learning_container_year_types
 from base.models.enums.proposal_state import ProposalState
-from base.models.enums.proposal_type import ProposalType
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from osis_common.utils.datetime import get_tzinfo, convert_date_to_datetime
@@ -85,38 +82,6 @@ def is_external_learning_unit_cograduation(learning_unit_year, person, raise_exc
     return result
 
 
-def _is_not_proposal_of_type_with_applications(proposal, proposal_of_type, raise_exception=False):
-    result = proposal.type != proposal_of_type.name or not TutorApplication.objects.filter(
-        learning_container_year=proposal.learning_unit_year.learning_container_year
-    ).exists()
-    can_raise_exception(
-        raise_exception, result,
-        MSG_LEARNING_UNIT_HAS_APPLICATION
-    )
-    return result
-
-
-def is_eligible_to_consolidate_proposal(proposal, person, raise_exception=False):
-    msg = None
-
-    if not _has_person_the_right_to_consolidate(proposal, person):
-        msg = MSG_NO_RIGHTS_TO_CONSOLIDATE
-    elif not _is_proposal_in_state_to_be_consolidated(proposal, person):
-        msg = MSG_PROPOSAL_NOT_IN_CONSOLIDATION_ELIGIBLE_STATES
-    elif not _is_attached_to_initial_or_current_requirement_entity(proposal, person, raise_exception):
-        msg = MSG_CAN_EDIT_PROPOSAL_NO_LINK_TO_ENTITY
-    elif not _is_not_proposal_of_type_with_applications(proposal, ProposalType.SUPPRESSION, raise_exception):
-        msg = MSG_LEARNING_UNIT_HAS_APPLICATION
-
-    result = False if msg else True
-    can_raise_exception(
-        raise_exception,
-        result,
-        msg
-    )
-    return result
-
-
 def can_edit_summary_locked_field(learning_unit_year, person):
     flag = Flag.get('educational_information_block_action')
     return flag.is_active_for_user(person.user) and \
@@ -142,10 +107,6 @@ def is_eligible_to_manage_attributions(learning_unit_year, person):
     return person.user.has_perm("base.can_manage_attribution") and \
         luy_container_type in learning_container_year_types.TYPE_ALLOWED_FOR_ATTRIBUTIONS and \
         person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year)
-
-
-def _has_person_the_right_to_consolidate(_, person):
-    return person.user.has_perm('base.can_consolidate_learningunit_proposal')
 
 
 def is_learning_unit_year_in_past(learning_unit_year, _, raise_exception=False):
@@ -189,33 +150,6 @@ def _is_learning_unit_year_in_state_to_be_modified(learning_unit_year, person, r
     return result
 
 
-def _is_proposal_in_state_to_be_consolidated(proposal, _):
-    return proposal.state in PROPOSAL_CONSOLIDATION_ELIGIBLE_STATES
-
-
-def _is_attached_to_initial_or_current_requirement_entity(proposal, person, raise_exception=False):
-    result = \
-        _is_attached_to_initial_entity(proposal, person) or \
-        person.is_linked_to_entity_in_charge_of_learning_unit_year(proposal.learning_unit_year)
-
-    can_raise_exception(
-        raise_exception,
-        result,
-        MSG_CAN_EDIT_PROPOSAL_NO_LINK_TO_ENTITY
-    )
-    return result
-
-
-def _is_attached_to_initial_entity(learning_unit_proposal, a_person):
-    initial_container_year = learning_unit_proposal.initial_data.get("learning_container_year")
-    if not initial_container_year:
-        return False
-    requirement_entity = initial_container_year.get('requirement_entity')
-    if not requirement_entity:
-        return False
-    return a_person.is_attached_entities(Entity.objects.filter(pk=requirement_entity))
-
-
 def learning_unit_year_permissions(learning_unit_year, person):
     return {
         'can_propose': person.user.has_perm('base.can_propose_learningunit', learning_unit_year),
@@ -233,7 +167,7 @@ def learning_unit_proposal_permissions(proposal, person, current_learning_unit_y
     luy = proposal.learning_unit_year
     permissions['can_cancel_proposal'] = person.user.has_perm('base.can_cancel_proposal', luy)
     permissions['can_edit_learning_unit_proposal'] = person.user.has_perm('base.can_edit_learning_unit_proposal', luy)
-    permissions['can_consolidate_proposal'] = is_eligible_to_consolidate_proposal(proposal, person)
+    permissions['can_consolidate_proposal'] = person.user.has_perm('base.can_consolidate_learningunit_proposal', luy)
     return permissions
 
 

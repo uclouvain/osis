@@ -37,7 +37,6 @@ from base import models as mdl_base
 from base.business import learning_unit_year_with_context
 from base.business.learning_unit import compose_components_dict
 from base.business.learning_unit_year_with_context import volume_from_initial_learning_component_year
-from base.business.learning_units import perms
 from base.business.learning_units.edition import edit_learning_unit_end_date, update_learning_unit_year_with_report, \
     update_partim_acronym
 from base.business.learning_units.simple import deletion as business_deletion
@@ -259,8 +258,12 @@ def consolidate_proposals_and_send_report(proposals, author, research_criteria):
         _('cannot be consolidated'),
         send_mail_util.send_mail_consolidation_learning_unit_proposal,
         research_criteria,
-        perms.is_eligible_to_consolidate_proposal
+        can_consolidate_learningunit_proposal
     )
+
+
+def can_consolidate_learningunit_proposal(proposal, author, raise_exception):
+    return author.user.has_perm('base.can_consolidate_learningunit_proposal', proposal.learning_unit_year)
 
 
 def _apply_action_on_proposals_and_send_report(proposals, author, action_method, success_msg_id, error_msg_id,
