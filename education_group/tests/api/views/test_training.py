@@ -33,6 +33,7 @@ from rest_framework.test import APITestCase
 
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
+from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import TrainingFactory
 from base.tests.factories.hops import HopsFactory
