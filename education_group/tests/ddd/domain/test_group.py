@@ -72,7 +72,7 @@ class TestGroup(SimpleTestCase):
             self.group.entity_id.year
         )
 
-    def test_assert_code_is_upperized(self):
+    def test_assert_abbreviated_title_is_upperized(self):
         group = Group(
             entity_identity=GroupIdentity(code="LTONC1000", year=2010),
             type=GroupType.COMMON_CORE,
