@@ -66,6 +66,7 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
 
     # panel_informations_form.html
     acronym = forms.CharField(max_length=15, label=_("Acronym/Short title"), required=False)
+    code = forms.CharField(max_length=15, label=_("Code"), required=False)
     active = forms.ChoiceField(
         initial=ActiveStatusEnum.ACTIVE,
         choices=BLANK_CHOICE + list(ActiveStatusEnum.choices()),
@@ -81,10 +82,25 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         required=False,
         widget=forms.TextInput(),
     )
-    title = forms.CharField(max_length=240, label=_("Title in French"))
-    title_english = forms.CharField(max_length=240, label=_("Title in English"), required=False)
-    partial_title = forms.CharField(max_length=240, label=_("Partial title in French"), required=False)
-    partial_title_english = forms.CharField(max_length=240, label=_("Partial title in English"), required=False)
+    constraint_type = forms.ChoiceField(
+        choices=BLANK_CHOICE + list(ConstraintTypeEnum.choices()),
+        label=_("Type of constraint"),
+        required=False,
+    )
+    min_constraint = forms.IntegerField(
+        label=_("minimum constraint"),
+        required=False,
+        widget=forms.TextInput
+    )
+    max_constraint = forms.IntegerField(
+        label=_("maximum constraint"),
+        required=False,
+        widget=forms.TextInput
+    )
+    title_fr = forms.CharField(max_length=240, label=_("Title in French"))
+    title_en = forms.CharField(max_length=240, label=_("Title in English"), required=False)
+    partial_title_fr = forms.CharField(max_length=240, label=_("Partial title in French"), required=False)
+    partial_title_en = forms.CharField(max_length=240, label=_("Partial title in English"), required=False)
     keywords = forms.CharField(max_length=320, label=_('Keywords'))
 
     # panel_academic_informations_form.html
@@ -112,7 +128,7 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         label=_("Internship"),
         required=False,
     )
-    enrollment_enabled = forms.BooleanField(initial=False, label=_('Enrollment enabled'))
+    is_enrollment_enabled = forms.BooleanField(initial=False, label=_('Enrollment enabled'))
     has_online_re_registration = forms.BooleanField(initial=True, label=_('Web re-registration'))
     has_partial_deliberation = forms.BooleanField(initial=False, label=_('Partial deliberation'))
     has_admission_exam = forms.BooleanField(initial=False, label=_('Admission exam'))
@@ -173,7 +189,7 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     )
     teaching_campus = MainCampusChoiceField(queryset=None, label=_("Learning location"), required=False)
     enrollment_campus = forms.ModelChoiceField(  # FIXME :: to replace by choice field (to prevent link to DB model)
-        queryset=Campus.objects.all(),
+        queryset=Campus.objects.all().select_related('organization'),
         label=_("Enrollment campus"),
         required=False,
     )
@@ -208,25 +224,6 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     ares_ability = forms.CharField(widget=forms.TextInput(), required=False)
     code_inter_cfb = forms.CharField(max_length=8, label=_('Code co-graduation inter CfB'), required=False)
     coefficient = forms.DecimalField(widget=forms.TextInput())
-
-    # FIXME :: reuse groupForm instead ?
-    # academic_year = forms.ModelChoiceField(queryset=AcademicYear.objects.all(), label=_("Validity"), required=False)
-    # code = forms.CharField(max_length=15, label=_("Code"), required=False)
-    # constraint_type = forms.ChoiceField(
-    #     choices=BLANK_CHOICE + list(ConstraintTypeEnum.choices()),
-    #     label=_("Type of constraint"),
-    #     required=False,
-    # )
-    # min_constraint = forms.IntegerField(
-    #     label=_("minimum constraint"),
-    #     required=False,
-    #     widget=forms.TextInput
-    # )
-    # max_constraint = forms.IntegerField(
-    #     label=_("maximum constraint"),
-    #     required=False,
-    #     widget=forms.TextInput
-    # )
 
     # Diploma tab
     section = forms.ChoiceField(choices=lazy(_get_section_choices, list), required=False)
@@ -309,29 +306,6 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     # PermissionFieldMixin
     def get_model_permission_filter_kwargs(self) -> Dict:
         return {'context': self.get_context()}
-
-    def clean_academic_year(self):
-        if self.cleaned_data['academic_year']:
-            return self.cleaned_data['academic_year'].year
-        return None
-
-    def clean_teaching_campus(self):
-        if self.cleaned_data['teaching_campus']:
-            return {
-                'name': self.cleaned_data['teaching_campus'].name,
-                'organization_name': self.cleaned_data['teaching_campus'].organization.name,
-            }
-        return None
-
-    def clean_code(self):
-        data_cleaned = self.cleaned_data['code']
-        if data_cleaned:
-            return data_cleaned.upper()
-
-    def clean_abbreviated_title(self):
-        data_cleaned = self.cleaned_data['abbreviated_title']
-        if data_cleaned:
-            return data_cleaned.upper()
 
 
 class UpdateTrainingForm(CreateTrainingForm):
