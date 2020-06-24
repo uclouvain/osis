@@ -23,8 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from datetime import datetime
+
 from django.db import models
-from django.db.models import F, Func, OuterRef, Subquery
+from django.db.models import F, Func, OuterRef, Q, Subquery
 from django.utils.safestring import mark_safe
 
 from base.models.entity_version import EntityVersion
@@ -120,15 +122,15 @@ class Organization(SerializableModel):
 
     @property
     def website(self):
-        # Get the latest root entity
-        root_entity = self.entity_set.annotate(
-            version_parent=Subquery(
-                EntityVersion.objects.filter(
-                    entity=OuterRef('pk')
-                ).order_by('-start_date').values('parent_id')[:1],
-            ),
-        ).filter(version_parent__isnull=True).first()
+        # Get the current root entity version
+        now = datetime.now()
+        root_entity_version = EntityVersion.objects.filter(
+            Q(end_date=None) | Q(end_date__gte=now),
+            entity__organization=self.pk,
+            parent__isnull=True,
+            start_date__lte=now,
+        ).order_by('-start_date').first()
 
-        if root_entity:
-            return root_entity.website
+        if root_entity_version:
+            return root_entity_version.entity.website
         return None
