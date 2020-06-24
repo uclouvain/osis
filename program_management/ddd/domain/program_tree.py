@@ -27,6 +27,8 @@ import copy
 from collections import Counter
 from typing import List, Set, Optional
 
+import attr
+
 from base.models.authorized_relationship import AuthorizedRelationshipList
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, GroupType
 from osis_common.ddd import interface
@@ -43,16 +45,10 @@ PATH_SEPARATOR = '|'
 Path = str  # Example : "root|node1|node2|child_leaf"
 
 
+@attr.s(frozen=True, slots=True, auto_attribs=True)
 class ProgramTreeIdentity(interface.EntityIdentity):
-    def __init__(self, code: str, year: int):
-        self.code = code
-        self.year = year
-
-    def __hash__(self):
-        return hash(self.code + str(self.year))
-
-    def __eq__(self, other):
-        return self.code == other.code and self.year == other.year
+    code: str
+    year: int
 
 
 class ProgramTree(interface.RootEntity):
