@@ -42,13 +42,14 @@ class GroupCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         return render(request, self.template_name, {
             "group_form": group_form,
             "tabs": self.get_tabs(),
-            "type_text": GroupType.get_value(self.kwargs['type'])
+            "type_text": GroupType.get_value(self.kwargs['type']),
+            "cancel_url": self.get_cancel_url()
         })
 
     def _get_initial_form(self) -> Dict:
         default_campus = Campus.objects.filter(name='Louvain-la-Neuve').first()
 
-        request_cache = RequestCache(self.request.user, reverse('education_groups'))
+        request_cache = RequestCache(self.request.user, reverse('version_program'))
         default_academic_year = request_cache.get_value_cached('academic_year') or starting_academic_year()
         return {
             'teaching_campus': default_campus,
@@ -92,7 +93,8 @@ class GroupCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         return render(request, self.template_name, {
             "group_form": group_form,
             "tabs": self.get_tabs(),
-            "type_text": GroupType.get_value(self.kwargs['type'])
+            "type_text": GroupType.get_value(self.kwargs['type']),
+            "cancel_url": self.get_cancel_url()
         })
 
     def __attach_group(self, group_id: GroupIdentity):
@@ -127,6 +129,9 @@ class GroupCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             }
         ]
 
+    def get_cancel_url(self) -> str:
+        return reverse('version_program')
+
     def get_attach_path(self) -> Union[Path, None]:
         return self.request.GET.get('path_to') or None
 
@@ -137,7 +142,7 @@ class GroupCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             # Ex:  path: 4456|565|5656
             parent_id = path.split("|")[-1]
             try:
-                return GroupYear.objects.get(element__pk=parent_id)
+                return GroupYear.objects.select_related('academic_year', 'management_entity').get(element__pk=parent_id)
             except GroupYear.DoesNotExist:
                 return None
         return None
