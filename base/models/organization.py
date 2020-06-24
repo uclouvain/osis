@@ -124,11 +124,9 @@ class Organization(SerializableModel):
     def website(self):
         # Get the current root entity version
         now = datetime.now()
-        root_entity_version = EntityVersion.objects.filter(
-            Q(end_date=None) | Q(end_date__gte=now),
+        root_entity_version = EntityVersion.objects.current(now).filter(
             entity__organization=self.pk,
             parent__isnull=True,
-            start_date__lte=now,
         ).order_by('-start_date').first()
 
         if root_entity_version:
