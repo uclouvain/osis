@@ -42,17 +42,8 @@ class EducationGroupAchievementMixin(SingleObjectMixin):
     pk_url_kwarg = 'education_group_achievement_pk'
 
     def get_success_url(self):
-        url = reverse(
-            'training_skills_achievements',
-            args=[self.kwargs['year'], self.kwargs['code']]
-        ) + '?tab={}'.format(Tab.SKILLS_ACHIEVEMENTS)
-
-        obj = getattr(self, "object", None) or self.get_object()
-        if obj:
-            # Remove the last / otherwise URL will be malformed
-            url = url.rstrip('/') + "#{}_{}".format(self.context_object_name, obj.pk)
-
-        return url
+        return reverse('training_skills_achievements',
+                       args=[self.kwargs['year'], self.kwargs['code']]) + '?tab={}'.format(Tab.SKILLS_ACHIEVEMENTS)
 
     @cached_property
     def person(self):
