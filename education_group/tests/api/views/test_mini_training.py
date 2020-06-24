@@ -31,14 +31,16 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from base.models.enums import organization_type
+from base.models.education_group_year import EducationGroupYear
+from base.models.enums import organization_type, education_group_categories
+from base.models.enums.education_group_types import MiniTrainingType
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import MiniTrainingFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.user import UserFactory
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
-from education_group.api.serializers.mini_training import MiniTrainingDetailSerializer
+from education_group.api.serializers.mini_training import MiniTrainingDetailSerializer, MiniTrainingListSerializer
 from education_group.api.views.mini_training import MiniTrainingList
 
 
@@ -174,6 +176,37 @@ class MiniTrainingListTestCase(APITestCase):
         self.assertEqual(response.data['results'][0]['code'], self.mini_trainings[2].partial_acronym)
         self.assertEqual(response.data['results'][1]['code'], self.mini_trainings[1].partial_acronym)
         self.assertEqual(response.data['results'][2]['code'], self.mini_trainings[0].partial_acronym)
+
+    def test_get_case_filter_campus(self):
+        query_string = {'campus': self.mini_trainings[2].main_teaching_campus.name}
+
+        response = self.client.get(self.url, data=query_string)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        serializer = MiniTrainingListSerializer(
+            [self.mini_trainings[2]],
+            many=True,
+            context={'request': RequestFactory().get(self.url, query_string)},
+        )
+        self.assertEqual(response.data['results'], serializer.data)
+
+    def test_get_training_case_filter_for_catalog(self):
+        query_string = {'for_catalog': 'true'}
+
+        response = self.client.get(self.url, data=query_string)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        trainings = EducationGroupYear.objects.filter(
+            education_group_type__category=education_group_categories.MINI_TRAINING,
+            education_group_type__name__in=MiniTrainingType.for_catalog_publication()
+        )
+
+        serializer = MiniTrainingListSerializer(
+            trainings,
+            many=True,
+            context={'request': RequestFactory().get(self.url, query_string)},
+        )
+        self.assertCountEqual(response.data['results'], serializer.data)
 
 
 class GetMiniTrainingTestCase(APITestCase):
