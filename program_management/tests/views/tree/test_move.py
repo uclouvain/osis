@@ -23,98 +23,59 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from unittest import mock, skip
+from unittest import mock
 
-from django.contrib.auth.models import Permission
-from django.http import HttpResponse
+from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
 from waffle.testutils import override_flag
 
-from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
-from base.tests.factories.education_group_year import EducationGroupYearFactory
-from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.person import CentralManagerForUEFactory
+from program_management.ddd.domain import node
+from program_management.tests.ddd.factories.commands.order_down_link_command import OrderDownLinkCommandFactory
+from program_management.tests.ddd.factories.commands.order_up_link_command import OrderUpLinkCommandFactory
+from program_management.tests.factories.element import ElementGroupYearFactory
 
 
 @override_flag('education_group_update', active=True)
 class TestUp(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.academic_year = AcademicYearFactory(current=True)
-        cls.education_group_year = EducationGroupYearFactory(academic_year=cls.academic_year)
-        # Create contents of education group years [3 elements]
-        cls.group_element_year_1 = GroupElementYearFactory(parent=cls.education_group_year,
-                                                           child_branch__academic_year=cls.academic_year)
-        cls.group_element_year_2 = GroupElementYearFactory(parent=cls.education_group_year,
-                                                           child_branch__academic_year=cls.academic_year)
-        cls.group_element_year_3 = GroupElementYearFactory(parent=cls.education_group_year,
-                                                           child_branch__academic_year=cls.academic_year)
-
-        cls.person = CentralManagerForUEFactory()
-        cls.person.user.user_permissions.add(Permission.objects.get(codename="view_educationgroup"))
-        cls.url = reverse(
-            "content_up",
-            args=[cls.education_group_year.id, cls.group_element_year_3.id]
-        )
-        cls.post_valid_data = {}
-
     def setUp(self):
+        self.person = CentralManagerForUEFactory()
+        element_group_year = ElementGroupYearFactory()
+        self.url = reverse("content_up")
+        self.path = "19774|{}|789".format(element_group_year.id)
+        self.post_valid_data = {"path": self.path}
         self.client.force_login(self.person.user)
 
-    @mock.patch("program_management.ddd.service.order_link_service.up_link")
-    @mock.patch("osis_role.contrib.permissions.ObjectPermissionBackend.has_perm")
+    @mock.patch("program_management.ddd.service.write.up_link_service.up_link")
+    @mock.patch.object(User, "has_perms", return_value=True)
     def test_up_case_success(self, mock_permission, mock_up):
-        mock_permission.return_value = True
-        http_referer = reverse(
-            'education_group_content',
-            args=[
-                self.education_group_year.id,
-                self.education_group_year.id,
-            ]
-        )
-        response = self.client.post(self.url, data=self.post_valid_data, follow=True, HTTP_REFERER=http_referer)
-        self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTrue(mock_up.called)
+        mock_up.return_value = node.NodeIdentity(code="CODE", year=2020)
+        http_referer = reverse('home')
+
+        response = self.client.post(self.url, data=self.post_valid_data, HTTP_REFERER=http_referer)
+        self.assertRedirects(response, http_referer)
+
+        mock_up.assert_called_with(OrderUpLinkCommandFactory(path=self.path))
 
 
 @override_flag('education_group_update', active=True)
 class TestDown(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.current_academic_year = create_current_academic_year()
-        cls.education_group_year = EducationGroupYearFactory(academic_year=cls.current_academic_year)
-        # Create contents of education group years [3 elements]
-        cls.group_element_year_1 = GroupElementYearFactory(parent=cls.education_group_year,
-                                                           child_branch__academic_year=cls.current_academic_year)
-        cls.group_element_year_2 = GroupElementYearFactory(parent=cls.education_group_year,
-                                                           child_branch__academic_year=cls.current_academic_year)
-        cls.group_element_year_3 = GroupElementYearFactory(parent=cls.education_group_year,
-                                                           child_branch__academic_year=cls.current_academic_year)
-
-        cls.person = CentralManagerForUEFactory()
-        cls.person.user.user_permissions.add(Permission.objects.get(codename="view_educationgroup"))
-        cls.url = reverse(
-            "content_down",
-            args=[cls.education_group_year.id, cls.group_element_year_3.id]
-        )
-        cls.post_valid_data = {}
-
     def setUp(self):
+        self.person = CentralManagerForUEFactory()
+        element_group_year = ElementGroupYearFactory()
+        self.url = reverse("content_down")
+        self.path = "19774|{}|789".format(element_group_year.id)
+        self.post_valid_data = {"path": self.path}
         self.client.force_login(self.person.user)
 
-    @skip("FIXME in OSIS-4730")
-    @mock.patch("program_management.ddd.service.order_link_service.down_link")
-    @mock.patch("osis_role.contrib.permissions.ObjectPermissionBackend.has_perm")
+    @mock.patch("program_management.ddd.service.write.down_link_service.down_link")
+    @mock.patch.object(User, "has_perms", return_value=True)
     def test_down_case_success(self, mock_permission, mock_down):
-        mock_permission.return_value = True
-        http_referer = reverse(
-            'education_group_content',
-            args=[
-                self.education_group_year.id,
-                self.education_group_year.id,
-            ]
-        )
-        response = self.client.post(self.url, data=self.post_valid_data, follow=True, HTTP_REFERER=http_referer)
-        self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTrue(mock_down.called)
+        mock_down.return_value = node.NodeIdentity(code="CODE", year=2020)
+        http_referer = reverse('home')
+
+        response = self.client.post(self.url, data=self.post_valid_data, HTTP_REFERER=http_referer)
+        self.assertRedirects(response, http_referer)
+
+        mock_down.assert_called_with(OrderDownLinkCommandFactory(path=self.path))

@@ -21,13 +21,10 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from typing import List
 
-from base.ddd.utils.validation_message import BusinessValidationMessage
 from program_management.ddd import command
-from program_management.ddd.repositories import persist_tree, load_tree, load_node
-from program_management.models.enums import node_type
 from program_management.ddd.business_types import *
+from program_management.ddd.repositories import persist_tree, load_tree, load_node
 
 
 def down_link(command_up: command.OrderDownLinkCommand) -> 'NodeIdentity':
