@@ -24,13 +24,39 @@
 #
 ##############################################################################
 
+from django.db import transaction
+
 from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain.training import TrainingBuilder
 from education_group.ddd.repository.training import TrainingRepository
 
 
-def create_training(create_command: command.CreateTrainingCommand) -> 'TrainingIdentity':
-    training = TrainingBuilder().get_training(create_command)
+@transaction.atomic()
+def create_orphan_training(create_training_cmd: command.CreateTrainingCommand) -> 'TrainingIdentity':
+    training = TrainingBuilder().get_training(create_training_cmd)
     training_id = TrainingRepository.create(training)
+    group_id = create_group_service.create_orphan_group(__get_create_group_command(training_cmd=create_training_cmd))
     return training_id
+
+
+def __get_create_group_command(training_cmd: command.CreateTrainingCommand) -> command.CreateGroupCommand:
+    return command.CreateGroupCommand(
+        code=training_cmd.code,
+        year=training_cmd.year,
+        type=training_cmd.type,
+        abbreviated_title=training_cmd.abbreviated_title,
+        title_fr=training_cmd.title_fr,
+        title_en=training_cmd.title_en,
+        credits=training_cmd.credits,
+        constraint_type=training_cmd.constraint_type,
+        min_constraint=training_cmd.min_constraint,
+        max_constraint=training_cmd.max_constraint,
+        management_entity_acronym=training_cmd.management_entity_acronym,
+        teaching_campus_name=training_cmd.teaching_campus_name,
+        organization_name=training_cmd.teaching_campus_organization_name,
+        remark_fr=training_cmd.remark_fr,
+        remark_en=training_cmd.remark_en,
+        start_year=training_cmd.year,
+        end_year=training_cmd.end_year,
+    )
