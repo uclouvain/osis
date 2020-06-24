@@ -23,7 +23,7 @@ from osis_role.contrib.views import PermissionRequiredMixin
 
 from program_management.ddd import command as command_pgrm
 from program_management.ddd.domain.program_tree import Path
-from program_management.ddd.service.write import paste_element_service
+from program_management.ddd.service.write import create_group_and_attach_service
 
 
 class GroupCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
@@ -59,30 +59,51 @@ class GroupCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         group_form = GroupForm(request.POST, user=self.request.user, group_type=self.kwargs['type'])
         if group_form.is_valid():
-            cmd_create = command.CreateGroupCommand(
-                code=group_form.cleaned_data['code'],
-                year=group_form.cleaned_data['academic_year'],
-                type=self.kwargs['type'],
-                abbreviated_title=group_form.cleaned_data['abbreviated_title'],
-                title_fr=group_form.cleaned_data['title_fr'],
-                title_en=group_form.cleaned_data['title_en'],
-                credits=group_form.cleaned_data['credits'],
-                constraint_type=group_form.cleaned_data['constraint_type'],
-                min_constraint=group_form.cleaned_data['min_constraint'],
-                max_constraint=group_form.cleaned_data['max_constraint'],
-                management_entity_acronym=group_form.cleaned_data['management_entity'],
-                teaching_campus_name=group_form.cleaned_data['teaching_campus']['name']
-                if group_form.cleaned_data['teaching_campus'] else None,
-                organization_name=group_form.cleaned_data['teaching_campus']['organization_name']
-                if group_form.cleaned_data['teaching_campus'] else None,
-                remark_fr=group_form.cleaned_data['remark_fr'],
-                remark_en=group_form.cleaned_data['remark_en'],
-                start_year=group_form.cleaned_data['academic_year'],
-            )
             try:
-                group_id = create_group_service.create_group(cmd_create)
                 if self.get_attach_path():
-                    self.__attach_group(group_id)
+                    cmd_create = command_pgrm.CreateGroupAndAttachCommand(
+                        code=group_form.cleaned_data['code'],
+                        year=group_form.cleaned_data['academic_year'],
+                        type=self.kwargs['type'],
+                        abbreviated_title=group_form.cleaned_data['abbreviated_title'],
+                        title_fr=group_form.cleaned_data['title_fr'],
+                        title_en=group_form.cleaned_data['title_en'],
+                        credits=group_form.cleaned_data['credits'],
+                        constraint_type=group_form.cleaned_data['constraint_type'],
+                        min_constraint=group_form.cleaned_data['min_constraint'],
+                        max_constraint=group_form.cleaned_data['max_constraint'],
+                        management_entity_acronym=group_form.cleaned_data['management_entity'],
+                        teaching_campus_name=group_form.cleaned_data['teaching_campus']['name']
+                        if group_form.cleaned_data['teaching_campus'] else None,
+                        organization_name=group_form.cleaned_data['teaching_campus']['organization_name']
+                        if group_form.cleaned_data['teaching_campus'] else None,
+                        remark_fr=group_form.cleaned_data['remark_fr'],
+                        remark_en=group_form.cleaned_data['remark_en'],
+                        path_to_paste=self.get_attach_path(),
+                    )
+                    group_id = create_group_and_attach_service.create_group_and_attach(cmd_create)
+                else:
+                    cmd_create = command.CreateOrphanGroupCommand(
+                        code=group_form.cleaned_data['code'],
+                        year=group_form.cleaned_data['academic_year'],
+                        type=self.kwargs['type'],
+                        abbreviated_title=group_form.cleaned_data['abbreviated_title'],
+                        title_fr=group_form.cleaned_data['title_fr'],
+                        title_en=group_form.cleaned_data['title_en'],
+                        credits=group_form.cleaned_data['credits'],
+                        constraint_type=group_form.cleaned_data['constraint_type'],
+                        min_constraint=group_form.cleaned_data['min_constraint'],
+                        max_constraint=group_form.cleaned_data['max_constraint'],
+                        management_entity_acronym=group_form.cleaned_data['management_entity'],
+                        teaching_campus_name=group_form.cleaned_data['teaching_campus']['name']
+                        if group_form.cleaned_data['teaching_campus'] else None,
+                        organization_name=group_form.cleaned_data['teaching_campus']['organization_name']
+                        if group_form.cleaned_data['teaching_campus'] else None,
+                        remark_fr=group_form.cleaned_data['remark_fr'],
+                        remark_en=group_form.cleaned_data['remark_en'],
+                        start_year=group_form.cleaned_data['academic_year'],
+                    )
+                    group_id = create_group_service.create_orphan_group(cmd_create)
             except GroupCodeAlreadyExistException as e:
                 group_form.add_error('code', e.message)
 
@@ -96,14 +117,6 @@ class GroupCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "type_text": GroupType.get_value(self.kwargs['type']),
             "cancel_url": self.get_cancel_url()
         })
-
-    def __attach_group(self, group_id: GroupIdentity):
-        cmd_paste = command_pgrm.PasteElementCommand(
-            node_to_paste_code=group_id.code,
-            node_to_paste_year=group_id.year,
-            path_where_to_paste=self.get_attach_path()
-        )
-        paste_element_service.paste_element(cmd_paste)
 
     def get_success_url(self, group_id: GroupIdentity):
         url = reverse('group_identification', kwargs={'code': group_id.code, 'year': group_id.year})

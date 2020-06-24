@@ -101,7 +101,7 @@ class TestCreateOrphanGroupPostMethod(TestCase):
     @mock.patch('education_group.views.group.create.GroupForm.is_valid', return_value=True)
     @mock.patch('education_group.views.group.create.GroupForm.cleaned_data',
                 new_callable=mock.PropertyMock, create=True)
-    @mock.patch('education_group.views.group.create.create_group_service.create_group')
+    @mock.patch('education_group.views.group.create.create_group_service.create_orphan_group')
     def test_post_assert_create_service_called(self,
                                                mock_service_create_group,
                                                mock_form_clean_data,
@@ -116,7 +116,7 @@ class TestCreateOrphanGroupPostMethod(TestCase):
     @mock.patch('education_group.views.group.create.GroupForm.is_valid', return_value=True)
     @mock.patch('education_group.views.group.create.GroupForm.cleaned_data',
                 new_callable=mock.PropertyMock, create=True)
-    @mock.patch('education_group.views.group.create.create_group_service.create_group')
+    @mock.patch('education_group.views.group.create.create_group_service.create_orphan_group')
     def test_post_assert_form_error_when_create_service_raise_exception(self,
                                                                         mock_service_create_group,
                                                                         mock_form_clean_data,
@@ -146,29 +146,25 @@ class TestCreateNonOrphanGroupPostMethod(TestCase):
     def setUp(self) -> None:
         self.client.force_login(self.central_manager.person.user)
 
-    @mock.patch('education_group.views.group.create.paste_element_service.paste_element')
     @mock.patch('education_group.views.group.create.GroupForm.is_valid', return_value=True)
     @mock.patch('education_group.views.group.create.GroupForm.cleaned_data',
                 new_callable=mock.PropertyMock, create=True)
-    @mock.patch('education_group.views.group.create.create_group_service.create_group')
+    @mock.patch('education_group.views.group.create.create_group_and_attach_service.create_group_and_attach')
     def test_post_assert_create_service_paste_service_called(self,
                                                              mock_service_create_group,
                                                              mock_form_clean_data,
-                                                             mock_form_is_valid,
-                                                             mock_paste_element_service):
+                                                             mock_form_is_valid):
         mock_service_create_group.return_value = GroupIdentity(code="LTRONC1000", year=2018)
         mock_form_clean_data.return_value = defaultdict(lambda: None)
         mock_form_is_valid.return_value = True
 
         self.client.post(self.url)
         mock_service_create_group.assert_called_once()
-        mock_paste_element_service.assert_called_once()
 
-    @mock.patch('education_group.views.group.create.paste_element_service.paste_element')
     @mock.patch('education_group.views.group.create.GroupForm.is_valid', return_value=True)
     @mock.patch('education_group.views.group.create.GroupForm.cleaned_data',
                 new_callable=mock.PropertyMock, create=True)
-    @mock.patch('education_group.views.group.create.create_group_service.create_group')
+    @mock.patch('education_group.views.group.create.create_group_and_attach_service.create_group_and_attach')
     def test_post_assert_redirection_with_path_queryparam(self,
                                                           mock_service_create_group,
                                                           mock_form_clean_data,

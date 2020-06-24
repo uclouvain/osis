@@ -24,19 +24,42 @@
 
 from django.db import transaction
 
-from education_group import publisher
-from education_group.ddd import command
-from education_group.ddd.domain import group
+from education_group.ddd import command as command_education_group
+from program_management.ddd import command as command_pgrm
 
 from education_group.ddd.domain.group import GroupIdentity
-from education_group.ddd.repository.group import GroupRepository
+
+from education_group.ddd.service.write import create_group_service
+from program_management.ddd.service.write import paste_element_service
 
 
 # TODO : Implement Validator (Actually in GroupFrom via ValidationRules)
 @transaction.atomic()
-def create_orphan_group(cmd: command.CreateOrphanGroupCommand) -> 'GroupIdentity':
-    grp = group.builder.build_from_create_cmd(cmd)
-    group_id = GroupRepository.create(grp)
-    # Emit group_created event
-    publisher.group_created.send(None, group_identity=group_id)
+def create_group_and_attach(cmd: command_pgrm.CreateGroupAndAttachCommand) -> 'GroupIdentity':
+    cmd_orphan_group = command_education_group.CreateOrphanGroupCommand(
+        code=cmd.code,
+        year=cmd.year,
+        type=cmd.type,
+        abbreviated_title=cmd.abbreviated_title,
+        title_fr=cmd.title_fr,
+        title_en=cmd.title_en,
+        credits=cmd.credits,
+        constraint_type=cmd.constraint_type,
+        min_constraint=cmd.min_constraint,
+        max_constraint=cmd.max_constraint,
+        management_entity_acronym=cmd.management_entity_acronym,
+        teaching_campus_name=cmd.teaching_campus_name,
+        organization_name=cmd.organization_name,
+        remark_fr=cmd.remark_fr,
+        remark_en=cmd.remark_en,
+        #start_year=            #Take start year from parent (Found in path)
+    )
+    group_id = create_group_service.create_orphan_group(cmd_orphan_group)
+
+    cmd_paste = command_pgrm.PasteElementCommand(
+        node_to_paste_code=group_id.code,
+        node_to_paste_year=group_id.year,
+        path_where_to_paste=cmd.path_to_paste
+    )
+    paste_element_service.paste_element(cmd_paste)
     return group_id

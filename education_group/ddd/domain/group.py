@@ -38,7 +38,7 @@ from osis_common.ddd import interface
 
 class GroupBuilder:
     @classmethod
-    def build_from_create_cmd(self, cmd: command.CreateGroupCommand):
+    def build_from_create_cmd(self, cmd: command.CreateOrphanGroupCommand):
         group_id = GroupIdentity(code=cmd.code, year=cmd.year)
         titles = Titles(title_fr=cmd.title_fr, title_en=cmd.title_en)
         content_constraint = ContentConstraint(

@@ -34,7 +34,7 @@ from education_group.ddd.service.write import create_group_service
 class TestCreateGroup(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.cmd = command.CreateGroupCommand(
+        cls.cmd = command.CreateOrphanGroupCommand(
             year=2018,
             code="LTRONC1",
             type=GroupType.COMMON_CORE.name,
@@ -57,7 +57,7 @@ class TestCreateGroup(TestCase):
     @patch('education_group.publisher.group_created', autospec=True)
     @patch('education_group.ddd.service.read.group_service.GroupRepository.create')
     def test_assert_repository_called_and_signal_dispateched(self, mock_create_repo, mock_publisher):
-        create_group_service.create_group(self.cmd)
+        create_group_service.create_orphan_group(self.cmd)
 
         mock_create_repo.assert_called_once()
         # Ensure event is emited
