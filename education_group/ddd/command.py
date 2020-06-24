@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from _decimal import Decimal
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 
 from osis_common.ddd import interface
 from education_group.ddd.business_types import *
@@ -42,7 +42,9 @@ AimSection = int
 class CreateTrainingCommand(interface.CommandRequest):
     def __init__(
             self,
-            acronym: str,
+            abbreviated_title: str,
+            status: str,
+            code: str,
             year: int,
             type: str,
             credits: Decimal,
@@ -51,60 +53,71 @@ class CreateTrainingCommand(interface.CommandRequest):
             start_year: int,
 
             title_fr: str,
-            partial_title_fr: str = None,
-            title_en: str = None,
-            partial_title_en: str = None,
+            partial_title_fr: Optional[str],
+            title_en: Optional[str],
+            partial_title_en: Optional[str],
 
-            keywords: str = None,
-            internship: str = None,
-            is_enrollment_enabled: bool = True,
-            has_online_re_registration: bool = True,
-            has_partial_deliberation: bool = False,
-            has_admission_exam: bool = False,
-            has_dissertation: bool = False,
-            produce_university_certificate: bool = False,
-            decree_category: str = None,
-            rate_code: str = None,
-            main_language: str = None,
-            english_activities: str = None,
-            other_language_activities: str = None,
-            internal_comment: str = None,
-            main_domain_code: str = None,
-            main_domain_decree: str = None,
+            keywords: Optional[str],
+            internship: Optional[str],
+            is_enrollment_enabled: Optional[bool],
+            has_online_re_registration: Optional[bool],
+            has_partial_deliberation: Optional[bool],
+            has_admission_exam: Optional[bool],
+            has_dissertation: Optional[bool],
+            produce_university_certificate: Optional[bool],
+            decree_category: Optional[str],
+            rate_code: Optional[str],
+            main_language: Optional[str],
+            english_activities: Optional[str],
+            other_language_activities: Optional[str],
+            internal_comment: Optional[str],
+            main_domain_code: Optional[str],
+            main_domain_decree: Optional[str],
 
-            secondary_domains: List[Tuple[DecreeName, DomainCode]] = None,
+            secondary_domains: Optional[List[Tuple[DecreeName, DomainCode]]],
 
-            isced_domain_code: str = None,
-            management_entity_acronym: str = None,
-            administration_entity_acronym: str = None,
-            end_year: int = None,
+            isced_domain_code: Optional[str],
+            management_entity_acronym: Optional[str],
+            administration_entity_acronym: Optional[str],
+            end_year: Optional[int],
 
-            teaching_campus: Tuple[CampusName, UniversityName] = None,
-            enrollment_campus: Tuple[CampusName, UniversityName] = None,
+            teaching_campus_name: Optional[str],
+            teaching_campus_organization_name: Optional[str],
 
-            other_campus_activities: str = None,
+            enrollment_campus_name: Optional[str],
+            enrollment_campus_organization_name: Optional[str],
 
-            can_be_funded: bool = False,
-            funding_orientation: str = None,
-            can_be_international_funded: bool = False,
-            international_funding_orientation: str = None,
+            other_campus_activities: Optional[str],
 
-            ares_code: int = None,
-            ares_graca: int = None,
-            ares_authorization: int = None,
+            can_be_funded: Optional[bool],
+            funding_orientation: Optional[str],
+            can_be_international_funded: Optional[bool],
+            international_funding_orientation: Optional[str],
 
-            code_inter_cfb: str = None,
-            coefficient: Decimal = None,
+            ares_code: Optional[int],
+            ares_graca: Optional[int],
+            ares_authorization: Optional[int],
 
-            academic_type: str = None,
-            duration_unit: str = None,
+            code_inter_cfb: Optional[str],
+            coefficient: Optional[Decimal],
 
-            leads_to_diploma: bool = None,
-            printing_title: str = None,
-            professional_title: str = None,
-            aims: List[Tuple[AimCode, AimSection]] = None
+            academic_type: Optional[str],
+            duration_unit: Optional[str],
+
+            leads_to_diploma: Optional[bool],
+            printing_title: Optional[str],
+            professional_title: Optional[str],
+            aims: Optional[List[Tuple[AimCode, AimSection]]],
+
+            constraint_type: Optional[str],
+            min_constraint: Optional[int],
+            max_constraint: Optional[int],
+            remark_fr: Optional[str],
+            remark_en: Optional[str],
     ):
-        self.acronym = acronym
+        self.abbreviated_title = abbreviated_title
+        self.status = status
+        self.code = code
         self.year = year
         self.type = type
         self.credits = credits
@@ -136,8 +149,10 @@ class CreateTrainingCommand(interface.CommandRequest):
         self.management_entity_acronym = management_entity_acronym
         self.administration_entity_acronym = administration_entity_acronym
         self.end_year = end_year
-        self.teaching_campus = teaching_campus
-        self.enrollment_campus = enrollment_campus
+        self.teaching_campus_name = teaching_campus_name
+        self.teaching_campus_organization_name = teaching_campus_organization_name
+        self.enrollment_campus_name = enrollment_campus_name
+        self.enrollment_campus_organization_name = enrollment_campus_organization_name
         self.other_campus_activities = other_campus_activities
         self.can_be_funded = can_be_funded
         self.funding_orientation = funding_orientation
@@ -154,3 +169,8 @@ class CreateTrainingCommand(interface.CommandRequest):
         self.printing_title = printing_title
         self.professional_title = professional_title
         self.aims = aims
+        self.constraint_type = constraint_type
+        self.min_constraint = min_constraint
+        self.max_constraint = max_constraint
+        self.remark_fr = remark_fr
+        self.remark_en = remark_en
