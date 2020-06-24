@@ -62,7 +62,7 @@ from rules_management.enums import GROUP_PGRM_ENCODING_PERIOD, GROUP_DAILY_MANAG
 from rules_management.mixins import PermissionFieldMixin
 
 
-class TrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
+class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
 
     # panel_informations_form.html
     acronym = forms.CharField(max_length=15, label=_("Acronym/Short title"), required=False)
@@ -159,12 +159,12 @@ class TrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     # panel_entities_form.html
     management_entity = fields.ManagementEntitiesChoiceField(person=None, initial=None, required=False)
     administration_entity = MainEntitiesVersionChoiceField(queryset=None)  # FIXME :: class to move into 'fields.py'
-    start_year = forms.ModelChoiceField(
+    academic_year = forms.ModelChoiceField(
         queryset=EventPermEducationGroupEdition.get_academic_years().filter(
             year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION
         ),
         label=_("Start"),
-    )
+    )  # Equivalent to start_year
     end_year = forms.ModelChoiceField(
         queryset=EventPermEducationGroupEdition.get_academic_years().filter(
             year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION
@@ -263,7 +263,6 @@ class TrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
                 year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION
             )
 
-        if self.is_creation_form():
             self.fields['academic_year'].label = _('Start')
 
     def __init_management_entity_field(self):
@@ -285,14 +284,8 @@ class TrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
             self.fields['joint_diploma'].initial = False
             self.fields['diploma_printing_title'].required = False
 
-    def is_update_form(self) -> bool:
-        return self.initial
-
-    def is_creation_form(self) -> bool:
-        return not self.is_update_form
-
     def is_valid(self):
-        valid = super(TrainingForm, self).is_valid()
+        valid = super(CreateTrainingForm, self).is_valid()
 
         hops_fields_values = [self.cleaned_data.get(hops_field) for hops_field in self.hops_fields]
         if any(hops_fields_values) and not all(hops_fields_values):
@@ -339,3 +332,10 @@ class TrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         data_cleaned = self.cleaned_data['abbreviated_title']
         if data_cleaned:
             return data_cleaned.upper()
+
+
+class UpdateTrainingForm(CreateTrainingForm):
+
+    def __init__(self, *args, **kwargs):
+        super(UpdateTrainingForm, self).__init__(*args, **kwargs)
+        self.fields['academic_year'].label = _('Validity')
