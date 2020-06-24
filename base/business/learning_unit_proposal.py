@@ -215,8 +215,12 @@ def force_state_of_proposals(proposals, author, new_state):
         _("cannot be changed state"),
         None,
         None,
-        perms.is_eligible_to_edit_proposal
+        can_edit_proposal
     )
+
+
+def can_edit_proposal(proposal, author, raise_exception):
+    return author.user.has_perm('base.can_edit_learning_unit_proposal', proposal.learning_unit_year)
 
 
 def modify_proposal_state(new_state, proposal):

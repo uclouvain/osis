@@ -110,7 +110,7 @@ def is_learning_unit_edition_period_open(self, user, learning_unit_year):
 def is_proposal_edition_period_open(self, user, learning_unit_year):
     if learning_unit_year:
         for role in self.context['role_qs']:
-            event_perms.generate_event_perm_modification_transformation_proposal(
+            return event_perms.generate_event_perm_modification_transformation_proposal(
                 role.person, learning_unit_year
             ).is_open()
     return None
@@ -241,10 +241,10 @@ def is_proposal_in_state_to_be_consolidated(self, user, learning_unit_year):
 
 
 @predicate(bind=True)
-@predicate_failed_msg(message=_("Proposal is not of modification type"))
-def is_modification_proposal_type(self, user, learning_unit_year):
+@predicate_failed_msg(message=_("Proposal is of modification type"))
+def is_not_modification_proposal_type(self, user, learning_unit_year):
     if learning_unit_year:
         learning_unit_proposal = get_object_or_none(ProposalLearningUnit, learning_unit_year__id=learning_unit_year.pk)
         if learning_unit_proposal:
-            return learning_unit_proposal.type == ProposalType.MODIFICATION.name
+            return learning_unit_proposal.type != ProposalType.MODIFICATION.name
     return None

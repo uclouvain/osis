@@ -37,7 +37,6 @@ from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.views.common import display_success_messages, show_error_message_for_form_invalid
-from base.views.learning_units import perms
 from base.views.learning_units.common import get_learning_unit_identification_context
 from learning_unit.views.utils import learning_unit_year_getter
 from osis_role.contrib.views import permission_required
@@ -61,7 +60,7 @@ def learning_unit_suppression_proposal(request, learning_unit_year_id):
 
 @waffle_flag('learning_unit_proposal_update')
 @login_required
-@perms.can_edit_learning_unit_proposal
+@permission_required('base.can_edit_learning_unit_proposal', raise_exception=True, fn=learning_unit_year_getter)
 def update_learning_unit_proposal(request, learning_unit_year_id):
     proposal = get_object_or_404(ProposalLearningUnit, learning_unit_year=learning_unit_year_id)
 

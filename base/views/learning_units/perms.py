@@ -28,7 +28,7 @@ from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
 
 from base.business.learning_units import perms as business_perms
-from base.models import learning_unit_year, proposal_learning_unit
+from base.models import learning_unit_year
 from base.models.person import Person
 
 
@@ -67,17 +67,6 @@ class PermissionDecorator:
     def _call_permission_method(self, request, obj):
         person = get_object_or_404(Person, user=request.user)
         return self.permission_method(obj, person)
-
-
-def can_edit_learning_unit_proposal(view_func):
-    def f_can_edit_learning_unit_proposal(request, learning_unit_year_id):
-        proposal = proposal_learning_unit.find_by_learning_unit_year(learning_unit_year_id)
-        pers = get_object_or_404(Person, user=request.user)
-
-        if not business_perms.is_eligible_to_edit_proposal(proposal, pers):
-            raise PermissionDenied("User has not sufficient rights to edit proposal.")
-        return view_func(request, learning_unit_year_id)
-    return f_can_edit_learning_unit_proposal
 
 
 def can_update_learning_achievement(view_func):

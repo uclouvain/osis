@@ -96,21 +96,6 @@ def _is_not_proposal_of_type_with_applications(proposal, proposal_of_type, raise
     return result
 
 
-def is_eligible_to_edit_proposal(proposal, person, raise_exception=False):
-    if not proposal:
-        return False
-
-    result = \
-        _is_attached_to_initial_or_current_requirement_entity(proposal, person, raise_exception) and \
-        _is_person_eligible_to_edit_proposal_based_on_state(proposal, person, raise_exception) and \
-        _has_person_the_right_edit_proposal(proposal, person)
-    can_raise_exception(
-        raise_exception, result,
-        MSG_NOT_ELIGIBLE_TO_EDIT_PROPOSAL
-    )
-    return result
-
-
 def is_eligible_to_consolidate_proposal(proposal, person, raise_exception=False):
     msg = None
 
@@ -146,35 +131,6 @@ def can_update_learning_achievement(learning_unit_year, person):
         is_year_editable(learning_unit_year, raise_exception=False)
 
 
-def _is_person_eligible_to_edit_proposal_based_on_state(proposal, person, raise_exception=False):
-    if person.is_central_manager:
-        return True
-    elif person.is_faculty_manager:
-        if proposal.state != ProposalState.FACULTY.name:
-            can_raise_exception(
-                raise_exception,
-                False,
-                MSG_NOT_PROPOSAL_STATE_FACULTY
-            )
-            return False
-
-        if proposal.type == ProposalType.MODIFICATION.name and \
-                not event_perms.generate_event_perm_modification_transformation_proposal(
-                    person=person,
-                    obj=proposal.learning_unit_year,
-                    raise_exception=False
-                ).is_open():
-            can_raise_exception(
-                raise_exception,
-                False,
-                MSG_PROPOSAL_IS_ON_AN_OTHER_YEAR
-            )
-            return False
-        return True
-
-    return False
-
-
 def is_eligible_to_manage_charge_repartition(learning_unit_year, person):
     return person.user.has_perm("base.can_manage_charge_repartition") and \
         learning_unit_year.is_partim() and \
@@ -186,10 +142,6 @@ def is_eligible_to_manage_attributions(learning_unit_year, person):
     return person.user.has_perm("base.can_manage_attribution") and \
         luy_container_type in learning_container_year_types.TYPE_ALLOWED_FOR_ATTRIBUTIONS and \
         person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year)
-
-
-def _has_person_the_right_edit_proposal(_, person):
-    return person.user.has_perm('base.can_edit_learning_unit_proposal')
 
 
 def _has_person_the_right_to_consolidate(_, person):
@@ -278,8 +230,9 @@ def learning_unit_proposal_permissions(proposal, person, current_learning_unit_y
                    'can_consolidate_proposal': False}
     if not proposal or proposal.learning_unit_year != current_learning_unit_year:
         return permissions
-    permissions['can_cancel_proposal'] = person.user.has_perm('base.can_cancel_proposal', proposal.learning_unit_year)
-    permissions['can_edit_learning_unit_proposal'] = is_eligible_to_edit_proposal(proposal, person)
+    luy = proposal.learning_unit_year
+    permissions['can_cancel_proposal'] = person.user.has_perm('base.can_cancel_proposal', luy)
+    permissions['can_edit_learning_unit_proposal'] = person.user.has_perm('base.can_edit_learning_unit_proposal', luy)
     permissions['can_consolidate_proposal'] = is_eligible_to_consolidate_proposal(proposal, person)
     return permissions
 

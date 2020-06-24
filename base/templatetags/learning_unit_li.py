@@ -28,9 +28,9 @@ from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.utils.translation import gettext_lazy as _
 
-from base.business.learning_unit_proposal import can_cancel_proposal, can_delete_learningunit
-from base.business.learning_units.perms import is_eligible_to_edit_proposal, \
-    is_eligible_to_consolidate_proposal, is_eligible_to_modify_end_year_by_proposal, is_eligible_to_modify_by_proposal
+from base.business.learning_unit_proposal import can_cancel_proposal, can_delete_learningunit, can_edit_proposal
+from base.business.learning_units.perms import is_eligible_to_consolidate_proposal, \
+    is_eligible_to_modify_end_year_by_proposal, is_eligible_to_modify_by_proposal
 from base.business.learning_units.perms import is_year_editable
 from base.models.person import find_by_user
 
@@ -61,7 +61,7 @@ def li_modification_proposal(context, url, message, url_id="link_proposal_modifi
 @register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
 def li_edit_proposal(context, url, message, url_id="link_proposal_edit", js_script=''):
     data = _get_common_proposal_data(context, message, url, url_id)
-    data['permission_function'] = is_eligible_to_edit_proposal
+    data['permission_function'] = can_edit_proposal
     data['obj'] = context['proposal']
     return li_with_permission_for_proposal(data)
 

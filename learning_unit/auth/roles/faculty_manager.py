@@ -40,11 +40,11 @@ class FacultyManager(osis_role_models.EntityRoleModel):
                 predicates.is_not_proposal,
             'base.can_edit_learning_unit_proposal':
                 predicates.is_proposal &
-                predicates.is_user_attached_to_current_requirement_entity |
-                predicates.is_user_attached_to_initial_requirement_entity &
+                (predicates.is_user_attached_to_current_requirement_entity |
+                 predicates.is_user_attached_to_initial_requirement_entity) &
                 predicates.has_faculty_proposal_state &
-                predicates.is_modification_proposal_type &
-                predicates.is_proposal_edition_period_open,
+                (predicates.is_not_modification_proposal_type |
+                 predicates.is_proposal_edition_period_open),
             'base.add_externallearningunityear': rules.always_allow,
             'base.can_propose_learningunit':
                 predicates.is_learning_unit_year_not_in_past &

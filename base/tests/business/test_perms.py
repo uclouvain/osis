@@ -38,7 +38,6 @@ from base.models.academic_year import AcademicYear, LEARNING_UNIT_CREATION_SPAN_
     MAX_ACADEMIC_YEAR_CENTRAL
 from base.models.enums import proposal_state, proposal_type, learning_container_year_types, learning_unit_year_subtypes
 from base.models.enums.attribution_procedure import EXTERNAL
-from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP, UE_FACULTY_MANAGER_GROUP
 from base.models.enums.learning_container_year_types import OTHER_COLLECTIVE, OTHER_INDIVIDUAL, MASTER_THESIS, COURSE
 from base.models.enums.learning_unit_year_subtypes import FULL, PARTIM
 from base.models.enums.proposal_state import ProposalState
@@ -151,7 +150,7 @@ class PermsTestCase(TestCase):
 
     @mock.patch('base.business.learning_units.perms.is_year_editable')
     @mock.patch('base.business.learning_units.perms._is_learning_unit_year_in_state_to_be_modified')
-    @mock.patch('base.business.learning_units.perms.is_person_linked_to_entity_in_charge_of_lu')
+    @mock.patch('learning_unit.auth.predicates.is_user_attached_to_current_requirement_entity')
     def test_when_external_learning_unit_is_not_co_graduation(
             self,
             mock_is_person_linked_to_entity_in_charge_of_lu,
@@ -189,51 +188,41 @@ class PermsTestCase(TestCase):
             self.assertTrue(central_manager.person.user.has_perm('base.can_edit_learningunit_date', luy))
 
     def test_access_edit_learning_unit_proposal_as_central_manager(self):
-        a_person = create_person_with_permission_and_group(CENTRAL_MANAGER_GROUP)
-        generated_container = GenerateContainer(start_year=self.academic_yr,
-                                                end_year=self.academic_yr)
+        generated_container = GenerateContainer(start_year=self.academic_yr, end_year=self.academic_yr)
         generated_container_first_year = generated_container.generated_container_years[0]
         luy = generated_container_first_year.learning_unit_year_full
         requirement_entity = generated_container_first_year.requirement_entity_container_year
-        PersonEntityFactory(entity=requirement_entity, person=a_person)
+        central_manager = CentralManagerFactory(entity=requirement_entity)
+        self.assertFalse(central_manager.person.user.has_perm('base.can_edit_learning_unit_proposal', luy))
 
-        self.assertFalse(perms.is_eligible_to_edit_proposal(None, a_person))
+        ProposalLearningUnitFactory(learning_unit_year=luy)
+        self.assertTrue(central_manager.person.user.has_perm('base.can_edit_learning_unit_proposal', luy))
 
-        a_proposal = ProposalLearningUnitFactory(learning_unit_year=luy)
-        self.assertTrue(perms.is_eligible_to_edit_proposal(a_proposal, a_person))
-
-    def test_access_edit_learning_unit_proposal_of_current_academic_year_as_faculty_manager(self):
-        faculty_managers = [
-            create_person_with_permission_and_group(FACULTY_MANAGER_GROUP),
-            create_person_with_permission_and_group(UE_FACULTY_MANAGER_GROUP)
-        ]
-        generated_container = GenerateContainer(start_year=self.academic_yr,
-                                                end_year=self.academic_yr)
+    @mock.patch('base.business.event_perms.EventPerm.is_open', return_value=False)
+    def test_access_edit_learning_unit_proposal_of_current_academic_year_as_faculty_manager(self, mock_period_closed):
+        generated_container = GenerateContainer(start_year=self.academic_yr, end_year=self.academic_yr)
         generated_container_first_year = generated_container.generated_container_years[0]
         luy = generated_container_first_year.learning_unit_year_full
         an_requirement_entity = generated_container_first_year.requirement_entity_container_year
-        a_proposal = ProposalLearningUnitFactory(learning_unit_year=luy,
-                                                 type=proposal_type.ProposalType.MODIFICATION.name,
-                                                 state=proposal_state.ProposalState.FACULTY.name)
-        for manager in faculty_managers:
-            PersonEntityFactory(entity=an_requirement_entity, person=manager)
-            self.assertFalse(perms.is_eligible_to_edit_proposal(a_proposal, manager))
+        ProposalLearningUnitFactory(
+            learning_unit_year=luy,
+            type=proposal_type.ProposalType.MODIFICATION.name,
+            state=proposal_state.ProposalState.FACULTY.name
+        )
+        faculty_manager = FacultyManagerFactory(entity=an_requirement_entity)
+        self.assertFalse(faculty_manager.person.user.has_perm('base.can_edit_learning_unit_proposal', luy))
 
     def test_access_edit_learning_unit_proposal_as_faculty_manager(self):
-        generated_container = GenerateContainer(start_year=self.academic_yr_1,
-                                                end_year=self.academic_yr_1)
+        generated_container = GenerateContainer(start_year=self.academic_yr_1, end_year=self.academic_yr_1)
         generated_container_first_year = generated_container.generated_container_years[0]
         an_requirement_entity = generated_container_first_year.requirement_entity_container_year
 
         luy = generated_container_first_year.learning_unit_year_full
-        faculty_managers = [
-            create_person_with_permission_and_group(FACULTY_MANAGER_GROUP),
-            create_person_with_permission_and_group(UE_FACULTY_MANAGER_GROUP)
-        ]
+        faculty_manager = FacultyManagerFactory(entity=an_requirement_entity)
 
         a_proposal = ProposalLearningUnitFactory(
             state=proposal_state.ProposalState.CENTRAL.name,
-            type=proposal_type.ProposalType.SUPPRESSION.name,
+            type=proposal_type.ProposalType.MODIFICATION.name,
             learning_unit_year=luy
         )
 
@@ -241,25 +230,22 @@ class PermsTestCase(TestCase):
             [self.academic_yr, self.academic_yr_1, self.academic_yr_2, self.academic_yr_6]
         )
 
-        for manager in faculty_managers:
-            a_proposal.state = proposal_state.ProposalState.CENTRAL.name
+        a_proposal.state = proposal_state.ProposalState.CENTRAL.name
+        a_proposal.save()
+
+        self.assertFalse(faculty_manager.person.user.has_perm('base.can_edit_learning_unit_proposal', luy))
+
+        a_proposal.state = proposal_state.ProposalState.FACULTY.name
+        a_proposal.save()
+        self.assertTrue(faculty_manager.person.user.has_perm('base.can_edit_learning_unit_proposal', luy))
+
+        for tag in ProposalType.choices():
+            a_proposal.type = tag[0]
             a_proposal.save()
-            PersonEntityFactory(entity=an_requirement_entity, person=manager)
-
-            self.assertFalse(perms.is_eligible_to_edit_proposal(None, manager))
-            self.assertFalse(perms.is_eligible_to_edit_proposal(a_proposal, manager))
-
-            a_proposal.state = proposal_state.ProposalState.FACULTY.name
-            a_proposal.save()
-            self.assertTrue(perms.is_eligible_to_edit_proposal(a_proposal, manager))
-
-            for tag in ProposalType.choices():
-                a_proposal.type = tag[0]
-                a_proposal.save()
-                if a_proposal.type != ProposalType.MODIFICATION:
-                    self.assertTrue(perms.is_eligible_to_edit_proposal(a_proposal, manager))
-                else:
-                    self.assertFalse(perms.is_eligible_to_edit_proposal(a_proposal, manager))
+            if a_proposal.type != ProposalType.MODIFICATION:
+                self.assertTrue(faculty_manager.person.user.has_perm('base.can_edit_learning_unit_proposal', luy))
+            else:
+                self.assertFalse(faculty_manager.person.user.has_perm('base.can_edit_learning_unit_proposal', luy))
 
     def test_is_not_eligible_for_cancel_of_proposal(self):
         luy = LearningUnitYearFactory(academic_year=self.academic_yr)
