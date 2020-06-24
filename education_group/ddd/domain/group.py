@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import copy
+
 from base.models.enums.constraint_type import ConstraintTypeEnum
 from base.models.enums.education_group_types import GroupType
 from education_group.ddd import command
@@ -40,7 +42,7 @@ class GroupBuilder:
         group_id = GroupIdentity(code=cmd.code, year=cmd.year)
         titles = Titles(title_fr=cmd.title_fr, title_en=cmd.title_en)
         content_constraint = ContentConstraint(
-            type=ConstraintTypeEnum[cmd.constraint_type],
+            type=ConstraintTypeEnum[cmd.constraint_type] if cmd.constraint_type else None,
             minimum=cmd.min_constraint,
             maximum=cmd.max_constraint
         )
@@ -66,13 +68,19 @@ class GroupBuilder:
             end_year=cmd.end_year
         )
 
+    @classmethod
+    def build_next_year_group(cls, from_group: 'Group'):
+        group = copy.deepcopy(from_group)
+        group.entity_id = GroupIdentity(code=from_group.code, year=from_group.year + 1)
+        return group
+
 
 builder = GroupBuilder()
 
 
 class GroupIdentity(interface.EntityIdentity):
     def __init__(self, code: str, year: int):
-        self.code = code
+        self.code = code.upper()
         self.year = year
 
     def __hash__(self):
@@ -115,7 +123,7 @@ class Group(interface.RootEntity):
         super(Group, self).__init__(entity_id=entity_identity)
         self.entity_id = entity_identity
         self.type = type
-        self.abbreviated_title = abbreviated_title
+        self.abbreviated_title = abbreviated_title.upper()
         self.titles = titles
         self.credits = credits
         self.content_constraint = content_constraint

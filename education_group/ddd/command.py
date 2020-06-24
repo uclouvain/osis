@@ -72,3 +72,10 @@ class CreateGroupCommand(interface.CommandRequest):
         self.remark_en = remark_en
         self.start_year = start_year
         self.end_year = end_year
+
+
+class CopyGroupCommand(interface.CommandRequest):
+    def __init__(self, from_code: str, from_year: int, to_year: int):
+        self.from_code = from_code
+        self.from_year = from_year
+        self.to_year = to_year

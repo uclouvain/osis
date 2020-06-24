@@ -21,6 +21,10 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+
+from django.db import transaction
+
+from education_group import publisher
 from education_group.ddd import command
 from education_group.ddd.domain import group
 
@@ -28,6 +32,11 @@ from education_group.ddd.domain.group import GroupIdentity
 from education_group.ddd.repository.group import GroupRepository
 
 
+# TODO : Implement Validator (Actually in GroupFrom via ValidationRules)
+@transaction.atomic()
 def create_group(cmd: command.CreateGroupCommand) -> 'GroupIdentity':
     grp = group.builder.build_from_create_cmd(cmd)
-    return GroupRepository.create(grp)
+    group_id = GroupRepository.create(grp)
+    # Emit group_created event
+    publisher.group_created.send(None, group_identity=group_id)
+    return group_id

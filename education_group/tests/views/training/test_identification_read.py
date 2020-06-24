@@ -30,6 +30,7 @@ from django.http import HttpResponseForbidden, HttpResponse, HttpResponseNotFoun
 from django.test import TestCase
 from django.urls import reverse
 
+from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.factories.user import UserFactory
@@ -54,7 +55,7 @@ class TestTrainingReadIdentification(TestCase):
             root_group__academic_year__year=2019,
             root_group__education_group_type__name=TrainingType.PGRM_MASTER_120.name,
         )
-        ElementGroupYearFactory(group_year=cls.training_version.root_group)
+        cls.root_group_element = ElementGroupYearFactory(group_year=cls.training_version.root_group)
         cls.url = reverse('training_identification', kwargs={'year': 2019, 'code': 'LDROI200M'})
         cls._build_education_group_versions()
 
@@ -252,3 +253,18 @@ class TestTrainingReadIdentification(TestCase):
         self.assertEqual(particular_b.version_name,
                          'CRIM2MB')
         self.assertFalse(particular_b.is_transition)
+
+    def test_assert_create_urls_correctly_computed(self):
+        path = "{}".format(self.root_group_element.pk)
+        expected_create_group_url = reverse('create_element_select_type', kwargs={'category': Categories.GROUP.name}) + \
+            "?path_to={}".format(path)
+        expected_create_training_url = reverse('create_element_select_type', kwargs={'category': Categories.TRAINING.name}) + \
+            "?path_to={}".format(path)
+        expected_create_mini_training_url = reverse('create_element_select_type',
+                                                    kwargs={'category': Categories.MINI_TRAINING.name}) + \
+            "?path_to={}".format(path)
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.context['create_group_url'], expected_create_group_url)
+        self.assertEqual(response.context['create_training_url'], expected_create_training_url)
+        self.assertEqual(response.context['create_mini_training_url'], expected_create_mini_training_url)

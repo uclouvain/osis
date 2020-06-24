@@ -23,15 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import collections
 from typing import Optional
-
-from django.contrib.auth import models
 
 from base.models.enums.link_type import LinkTypes
 from osis_common.ddd import interface
 from program_management.ddd.business_types import *
-from program_management.models.enums import node_type
 
 
 class DetachNodeCommand(interface.CommandRequest):
@@ -88,24 +84,24 @@ class PasteElementCommand(interface.CommandRequest):
             node_to_paste_code: str,
             node_to_paste_year: int,
             path_where_to_paste: 'Path',
-            access_condition: Optional[bool],
-            is_mandatory: Optional[bool],
-            block: Optional[int],
-            link_type: Optional[LinkTypes],
-            comment: str,
-            comment_english: str,
-            relative_credits: Optional[int],
-            path_where_to_detach: Optional['Path']
+            access_condition: bool = None,
+            is_mandatory: bool = None,
+            block: int = None,
+            link_type: LinkTypes = None,
+            comment: str = None,
+            comment_english: str = None,
+            relative_credits: int = None,
+            path_where_to_detach: 'Path' = None
     ) -> None:
         self.node_to_paste_code = node_to_paste_code
         self.node_to_paste_year = node_to_paste_year
         self.path_where_to_paste = path_where_to_paste
-        self.access_condition = access_condition
-        self.is_mandatory = is_mandatory
+        self.access_condition = access_condition if access_condition is not None else False
+        self.is_mandatory = is_mandatory if is_mandatory is not None else True
         self.block = block
         self.link_type = link_type
-        self.comment = comment
-        self.comment_english = comment_english
+        self.comment = comment or ''
+        self.comment_english = comment_english or ''
         self.relative_credits = relative_credits
         self.path_where_to_detach = path_where_to_detach
 
@@ -137,3 +133,17 @@ class CheckPasteNodeCommand(interface.CommandRequest):
         parameters = ", ".join([str(self.root_id), str(self.node_to_paste_code),
                                 str(self.node_to_paste_year), str(self.path_to_paste), str(self.path_to_detach)])
         return "CheckPasteNodeCommand({parameters})".format(parameters=parameters)
+
+
+class GetAllowedChildTypeCommand(interface.CommandRequest):
+    def __init__(
+            self,
+            category: str,
+            path_to_paste: str = None,
+    ):
+        self.category = category
+        self.path_to_paste = path_to_paste
+
+    def __repr__(self) -> str:
+        parameters = ", ".join([str(self.category), str(self.path_to_paste)])
+        return "GetAllowedChildTypeCommand({parameters})".format(parameters=parameters)

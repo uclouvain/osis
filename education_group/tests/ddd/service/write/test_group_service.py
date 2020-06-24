@@ -23,17 +23,18 @@
 # ############################################################################
 from unittest.mock import patch
 
-from django.test import SimpleTestCase
+from django.test import TestCase
 
 from base.models.enums.constraint_type import ConstraintTypeEnum
 from base.models.enums.education_group_types import GroupType
 from education_group.ddd import command
-from education_group.ddd.service.write import group_service
+from education_group.ddd.service.write import create_group_service
 
 
-class TestCreateGroup(SimpleTestCase):
-    def setUp(self):
-        self.cmd = command.CreateGroupCommand(
+class TestCreateGroup(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.cmd = command.CreateGroupCommand(
             year=2018,
             code="LTRONC1",
             type=GroupType.COMMON_CORE.name,
@@ -53,7 +54,11 @@ class TestCreateGroup(SimpleTestCase):
             end_year=None,
         )
 
-    def test_assert_repository_called(self):
-        with patch('education_group.ddd.service.read.group_service.GroupRepository.create') as mock_grp_repo_create:
-            group_service.create_group(self.cmd)
-            mock_grp_repo_create.assert_called_once()
+    @patch('education_group.publisher.group_created', autospec=True)
+    @patch('education_group.ddd.service.read.group_service.GroupRepository.create')
+    def test_assert_repository_called_and_signal_dispateched(self, mock_create_repo, mock_publisher):
+        create_group_service.create_group(self.cmd)
+
+        mock_create_repo.assert_called_once()
+        # Ensure event is emited
+        mock_publisher.send.assert_called_once()
