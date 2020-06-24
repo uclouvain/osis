@@ -33,6 +33,7 @@ from rest_framework.test import APITestCase
 
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
+from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import TrainingFactory
 from base.tests.factories.person import PersonFactory
@@ -169,11 +170,18 @@ class FilterTrainingTestCase(APITestCase):
     def setUpTestData(cls):
         cls.user = UserFactory()
         cls.url = reverse('education_group_api_v1:training-list')
+        cls.trainings = []
         for year in [2018, 2019, 2020]:
             academic_year = AcademicYearFactory(year=year)
-            TrainingFactory(acronym='BIR1BA', partial_acronym='LBIR1000I', academic_year=academic_year)
-            TrainingFactory(acronym='AGRO1BA', partial_acronym='LAGRO2111C', academic_year=academic_year)
-            TrainingFactory(acronym='MED12M', partial_acronym='LMED12MA', academic_year=academic_year)
+            cls.trainings.append(
+                TrainingFactory(acronym='BIR1BA', partial_acronym='LBIR1000I', academic_year=academic_year)
+            )
+            cls.trainings.append(
+                TrainingFactory(acronym='AGRO1BA', partial_acronym='LAGRO2111C', academic_year=academic_year)
+            )
+            cls.trainings.append(
+                TrainingFactory(acronym='MED12M', partial_acronym='LMED12MA', academic_year=academic_year)
+            )
 
     def setUp(self):
         self.client.force_authenticate(user=self.user)
@@ -237,6 +245,55 @@ class FilterTrainingTestCase(APITestCase):
             context={'request': RequestFactory().get(self.url, query_string)},
         )
         self.assertEqual(response.data['results'], serializer.data)
+
+    def test_get_training_case_filter_campus(self):
+        query_string = {'campus': self.trainings[2].main_teaching_campus.name}
+
+        response = self.client.get(self.url, data=query_string)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        serializer = TrainingListSerializer(
+            [self.trainings[2]],
+            many=True,
+            context={'request': RequestFactory().get(self.url, query_string)},
+        )
+        self.assertEqual(response.data['results'], serializer.data)
+
+    def test_get_training_case_filter_for_catalog(self):
+        query_string = {'for_catalog': 'true'}
+
+        response = self.client.get(self.url, data=query_string)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        trainings = EducationGroupYear.objects.filter(
+            education_group_type__category=education_group_categories.TRAINING,
+            education_group_type__name__in=TrainingType.for_catalog_publication()
+        )
+
+        serializer = TrainingListSerializer(
+            trainings,
+            many=True,
+            context={'request': RequestFactory().get(self.url, query_string)},
+        )
+        self.assertCountEqual(response.data['results'], serializer.data)
+
+    def test_get_training_case_filter_with_possible_registration(self):
+        query_string = {'with_possible_registration': 'true'}
+
+        response = self.client.get(self.url, data=query_string)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        trainings = EducationGroupYear.objects.filter(
+            education_group_type__category=education_group_categories.TRAINING,
+            education_group_type__name__in=TrainingType.with_possible_registration()
+        )
+
+        serializer = TrainingListSerializer(
+            trainings,
+            many=True,
+            context={'request': RequestFactory().get(self.url, query_string)},
+        )
+        self.assertCountEqual(response.data['results'], serializer.data)
 
 
 class GetTrainingTestCase(APITestCase):

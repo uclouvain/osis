@@ -30,6 +30,7 @@ from rest_framework.generics import get_object_or_404
 from backoffice.settings.rest_framework.common_views import LanguageContextSerializerMixin
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
+from base.models.enums.education_group_types import TrainingType
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
 from education_group.api.serializers.training import TrainingListSerializer, TrainingDetailSerializer
 
@@ -37,11 +38,30 @@ from education_group.api.serializers.training import TrainingListSerializer, Tra
 class TrainingFilter(filters.FilterSet):
     from_year = filters.NumberFilter(field_name="academic_year__year", lookup_expr='gte')
     to_year = filters.NumberFilter(field_name="academic_year__year", lookup_expr='lte')
-    in_type = filters.CharFilter(field_name="education_group_type__name", lookup_expr='contains')
+    in_type = filters.CharFilter(field_name="education_group_type__name", lookup_expr='icontains')
+    campus = filters.CharFilter(field_name='main_teaching_campus__name', lookup_expr='icontains')
+    for_catalog = filters.BooleanFilter(method='filter_for_catalog')
+    with_possible_registration = filters.BooleanFilter(method='filter_with_possible_registration')
 
     class Meta:
         model = EducationGroupYear
         fields = ['acronym', 'partial_acronym', 'title', 'title_english', 'from_year', 'to_year']
+
+    @staticmethod
+    def filter_for_catalog(queryset, _, value):
+        if value:
+            return queryset.filter(
+                education_group_type__name__in=TrainingType.for_catalog_publication()
+            )
+        return queryset
+
+    @staticmethod
+    def filter_with_possible_registration(queryset, _, value):
+        if value:
+            return queryset.filter(
+                education_group_type__name__in=TrainingType.with_possible_registration()
+            )
+        return queryset
 
 
 class TrainingList(LanguageContextSerializerMixin, generics.ListAPIView):
@@ -51,7 +71,7 @@ class TrainingList(LanguageContextSerializerMixin, generics.ListAPIView):
     name = 'training-list'
     queryset = EducationGroupYear.objects.filter(
         education_group_type__category=education_group_categories.TRAINING
-    ).select_related('education_group_type', 'academic_year')\
+    ).select_related('education_group_type', 'academic_year') \
         .prefetch_related(
         'administration_entity__entityversion_set',
         'management_entity__entityversion_set'
