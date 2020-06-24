@@ -97,8 +97,8 @@ class PasteElementCommand(interface.CommandRequest):
         self.node_to_paste_code = node_to_paste_code
         self.node_to_paste_year = node_to_paste_year
         self.path_where_to_paste = path_where_to_paste
-        self.access_condition = access_condition if access_condition is not None else False,
-        self.is_mandatory = is_mandatory if is_mandatory is not None else True,
+        self.access_condition = access_condition if access_condition is not None else False
+        self.is_mandatory = is_mandatory if is_mandatory is not None else True
         self.block = block
         self.link_type = link_type
         self.comment = comment or ''
