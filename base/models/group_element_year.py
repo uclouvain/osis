@@ -394,8 +394,6 @@ class GroupElementYear(OrderedModel):
         ]
 
     def __str__(self):
-        if self.parent or self.child:
-            return "{} - {}".format(self.parent, self.child)
         return "{} - {}".format(self.parent_element, self.child_element)
 
     @cached_property
