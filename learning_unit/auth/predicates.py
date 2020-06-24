@@ -60,9 +60,9 @@ def is_learning_unit_year_older_or_equals_than_limit_settings_year(self, user, l
 
 @predicate(bind=True)
 @predicate_failed_msg(message=_("You cannot delete a learning unit which is prerequisite or has prerequisite(s)"))
-def is_learning_unit_year_prerequisite(self, user, learning_unit_year):
+def is_learning_unit_year_not_prerequisite(self, user, learning_unit_year):
     if learning_unit_year:
-        return learning_unit_year.is_prerequisite()
+        return not learning_unit_year.is_prerequisite()
     return None
 
 
@@ -213,7 +213,7 @@ def is_not_proposal_of_type_suppression_with_applications(self, user, learning_u
 
 
 @predicate(bind=True)
-@predicate_failed_msg(message=_("This learning unit has application"))
+@predicate_failed_msg(message=_("This learning unit has application this year"))
 def has_learning_unit_no_application_this_year(self, user, learning_unit_year):
     if learning_unit_year:
         learning_container_year = learning_unit_year.learning_container_year
@@ -222,10 +222,12 @@ def has_learning_unit_no_application_this_year(self, user, learning_unit_year):
 
 @predicate(bind=True)
 @predicate_failed_msg(message=_("This learning unit has application"))
-def has_learning_unit_no_application_this_year(self, user, learning_unit_year):
+def has_learning_unit_no_application_all_year(self, user, learning_unit_year):
     if learning_unit_year:
-        learning_container_year = learning_unit_year.learning_container_year
-        return not TutorApplication.objects.filter(learning_container_year=learning_container_year).exists()
+        learning_container = learning_unit_year.learning_container_year.learning_container
+        return not TutorApplication.objects.filter(
+            learning_container_year__learning_container=learning_container
+        ).exists()
 
 
 @predicate(bind=True)

@@ -29,10 +29,9 @@ class CentralManager(osis_role_models.EntityRoleModel):
                 predicates.is_external_learning_unit_with_cograduation,
             'base.can_access_learningunit': rules.always_allow,
             'base.can_delete_learningunit':
-                predicates.is_learning_unit_container_type_deletable &
                 predicates.is_user_attached_to_current_requirement_entity &
-                predicates.is_learning_unit_year_prerequisite &
-                predicates.has_learning_unit_applications,
+                predicates.is_learning_unit_year_not_prerequisite &
+                predicates.has_learning_unit_no_application_all_year,
             'base.can_edit_learningunit':
                 predicates.is_user_attached_to_current_requirement_entity &
                 predicates.is_learning_unit_year_older_or_equals_than_limit_settings_year &

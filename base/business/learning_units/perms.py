@@ -183,35 +183,6 @@ def can_update_learning_achievement(learning_unit_year, person):
         is_year_editable(learning_unit_year, raise_exception=False)
 
 
-def is_eligible_to_delete_learning_unit_year(learning_unit_year, person, raise_exception=False):
-    msg = None
-    checked_ok = \
-        check_lu_permission(person, 'base.can_delete_learningunit', raise_exception) and \
-        _can_delete_learning_unit_year_according_type(learning_unit_year, person, raise_exception)
-
-    if not checked_ok:
-        msg = MSG_NOT_ELIGIBLE_TO_DELETE_LU
-    elif not person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year):
-        msg = MSG_ONLY_IF_YOUR_ARE_LINK_TO_ENTITY
-    elif learning_unit_year.is_prerequisite():
-        msg = MSG_LEARNING_UNIT_IS_OR_HAS_PREREQUISITE
-    elif LearningUnitYear.objects.filter(learning_unit=learning_unit_year.learning_unit,
-                                         academic_year__year__lt=settings.YEAR_LIMIT_LUE_MODIFICATION):
-        msg = _("You cannot delete a learning unit which is existing before %(limit_year)s") % {
-            "limit_year": settings.YEAR_LIMIT_LUE_MODIFICATION}
-    elif not _has_no_applications_all_years(learning_unit_year, raise_exception):
-        msg = MSG_LEARNING_UNIT_HAS_APPLICATION
-
-    result = False if msg else True
-    can_raise_exception(
-        raise_exception,
-        result,
-        msg
-    )
-
-    return result
-
-
 def _has_no_applications_all_years(learning_unit_year, raise_exception=False):
     result = not TutorApplication.objects.filter(
         learning_container_year__learning_container=learning_unit_year.learning_container_year.learning_container
@@ -419,7 +390,7 @@ def learning_unit_year_permissions(learning_unit_year, person):
         'can_propose': person.user.has_perm('base.can_propose_learningunit', learning_unit_year),
         'can_edit_date': person.user.has_perm('base.can_edit_learningunit_date', learning_unit_year),
         'can_edit': person.user.has_perm('base.can_edit_learningunit', learning_unit_year),
-        'can_delete': is_eligible_to_delete_learning_unit_year(learning_unit_year, person),
+        'can_delete': person.user.has_perm('base.can_delete_learningunit', learning_unit_year),
     }
 
 

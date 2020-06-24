@@ -28,10 +28,9 @@ from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.utils.translation import gettext_lazy as _
 
-from base.business.learning_unit_proposal import can_cancel_proposal
+from base.business.learning_unit_proposal import can_cancel_proposal, can_delete_learningunit
 from base.business.learning_units.perms import is_eligible_to_edit_proposal, \
-    is_eligible_to_consolidate_proposal, is_eligible_to_delete_learning_unit_year, \
-    is_eligible_to_modify_end_year_by_proposal, is_eligible_to_modify_by_proposal
+    is_eligible_to_consolidate_proposal, is_eligible_to_modify_end_year_by_proposal, is_eligible_to_modify_by_proposal
 from base.business.learning_units.perms import is_year_editable
 from base.models.person import find_by_user
 
@@ -104,7 +103,7 @@ def li_consolidate_proposal(context, url, message, data_target, url_id="link_con
 @register.inclusion_tag('blocks/button/li_template_lu.html', takes_context=True)
 def li_delete_all_lu(context, url, message, data_target, url_id="link_delete_lus"):
     data = _get_common_data(context, message, url, url_id)
-    data['permission'] = is_eligible_to_delete_learning_unit_year
+    data['permission'] = can_delete_learningunit
     data['load_modal'] = True
     data['data_target'] = data_target
     return li_with_permission(data)

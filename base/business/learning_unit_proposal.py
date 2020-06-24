@@ -242,6 +242,10 @@ def can_cancel_proposal(proposal, author, raise_exception):
     return author.user.has_perm('base.can_cancel_proposal', proposal.learning_unit_year)
 
 
+def can_delete_learningunit(learning_unit_year, author, raise_exception):
+    return author.user.has_perm('base.can_delete_learningunit', learning_unit_year)
+
+
 def consolidate_proposals_and_send_report(proposals, author, research_criteria):
     return _apply_action_on_proposals_and_send_report(
         proposals,
