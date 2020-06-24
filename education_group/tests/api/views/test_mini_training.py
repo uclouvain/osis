@@ -206,6 +206,7 @@ class MiniTrainingListTestCase(APITestCase):
             many=True,
             context={'request': RequestFactory().get(self.url, query_string)},
         )
+
         self.assertCountEqual(response.data['results'], serializer.data)
 
 
