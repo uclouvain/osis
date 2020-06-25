@@ -52,8 +52,11 @@
                class="btn btn-default"
                data-code="{{ learning_unit_year.acronym }}"
                role="button"
+               {% if can_edit_information %}
                href="{% url "access_publication" code=learning_unit_year.acronym year=learning_unit_year.academic_year.year %}"
-               target="_blank">
+               target="_blank"
+               {% endif %}
+               {% if not can_edit_information %}disabled{% endif %}>
                 {% trans 'Refresh and visualize publication' %}
             </a>
         </div>
@@ -104,6 +107,7 @@
             }
         }
 
+        {% if can_edit_information %}
         function display_refresh_message() {
             code = this.dataset.code
             fmts = gettext('The learning unit %(code)s will be published soon.');
@@ -112,6 +116,9 @@
         }
         btn_visualize_refreshed_publication = document.getElementById("visualize_refreshed_publication_btn")
         btn_visualize_refreshed_publication.onclick = display_refresh_message;
+
+        {% endif %}
+
 
     </script>
 {% endblock %}
