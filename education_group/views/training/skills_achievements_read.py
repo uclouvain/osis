@@ -55,7 +55,8 @@ class TrainingReadSkillsAchievements(TrainingRead):
             "program_aims_label": self.get_program_aims_label(),
             "program_aims_update_url": self.get_program_aims_update_url(),
             "additional_information_skills_label": self.get_additional_information_skills_label(),
-            "additional_information_skills_update_url": self.get_additional_information_skills_update_url()
+            "additional_information_skills_update_url": self.get_additional_information_skills_update_url(),
+            "path": self.request.GET['path']
         }
 
     def get_program_aims_update_url(self):

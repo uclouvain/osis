@@ -45,7 +45,9 @@ class DeleteEducationGroupAchievement(PermissionRequiredMixin, DeleteViewWithDep
 
     def get_success_url(self):
         return reverse('training_skills_achievements',
-                       args=[self.kwargs['year'], self.kwargs['code']]) + '?tab={}'.format(Tab.SKILLS_ACHIEVEMENTS)
+                       args=[self.kwargs['year'],
+                             self.kwargs['code']]
+                       ) + '?path={}&tab={}'.format(self.kwargs['path'], Tab.SKILLS_ACHIEVEMENTS)
 
 
 class DeleteEducationGroupDetailedAchievement(PermissionRequiredMixin,

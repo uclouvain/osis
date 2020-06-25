@@ -47,8 +47,8 @@ urlpatterns = [
         ),
     ])),
     path('trainings/<int:year>/<str:code>/', include([
-        path('create/', CreateEducationGroupAchievement.as_view(), name='create_education_group_achievement'),
-        path('<int:education_group_achievement_pk>/', include([
+        path('create/<int:path>/', CreateEducationGroupAchievement.as_view(), name='create_education_group_achievement'),
+        path('<int:education_group_achievement_pk>/<int:path>/', include([
             path('actions/', EducationGroupAchievementAction.as_view(), name='education_group_achievements_actions'),
             path('delete/', DeleteEducationGroupAchievement.as_view(), name='delete_education_group_achievement'),
             path('create/', CreateEducationGroupDetailedAchievement.as_view(),

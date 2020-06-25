@@ -83,11 +83,16 @@ class UpdateEducationGroupAchievement(PermissionRequiredMixin, AjaxTemplateMixin
 
     def get_success_url(self):
         return reverse('training_skills_achievements',
-                       args=[self.kwargs['year'], self.kwargs['code']]) + '?tab={}'.format(Tab.SKILLS_ACHIEVEMENTS)
+                       args=[self.kwargs['year'],
+                             self.kwargs['code']]
+                       ) + '?path={}&tab={}'.format(self.kwargs['path'], Tab.SKILLS_ACHIEVEMENTS)
 
 
 class UpdateEducationGroupDetailedAchievement(EducationGroupDetailedAchievementMixin, UpdateEducationGroupAchievement):
     form_class = EducationGroupDetailedAchievementForm
+
+    def get_permission_object(self):
+        return self.education_group_achievement.education_group_year
 
 
 class EducationGroupDetailedAchievementAction(EducationGroupDetailedAchievementMixin, EducationGroupAchievementAction):
