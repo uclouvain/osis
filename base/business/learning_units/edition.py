@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Dict, List, Any
 
 from django.conf import settings
 from django.db import IntegrityError, transaction, Error
@@ -297,8 +298,12 @@ def get_next_academic_years(learning_unit_to_edit, year):
     return AcademicYear.objects.filter(year__range=(end_date, year)).order_by('year')
 
 
-# TODO :: Use LearningUnitPostponementForm to extend/shorten a LearningUnit and remove all this code
-def update_learning_unit_year_with_report(luy_to_update, fields_to_update, entities_by_type_to_update, **kwargs):
+# TODO report volumes also
+def update_learning_unit_year_with_report(
+        luy_to_update: LearningUnitYear,
+        fields_to_update: Dict[str, Any],
+        entities_by_type_to_update: Dict,
+        **kwargs) -> None:
     with_report = kwargs.get('with_report', True)
     override_postponement_consistency = kwargs.get('override_postponement_consistency', False)
     lu_to_consolidate = kwargs.get('lu_to_consolidate', None)
@@ -326,7 +331,9 @@ def update_learning_unit_year_with_report(luy_to_update, fields_to_update, entit
 
 
 # TODO :: Use LearningUnitPostponementForm to extend/shorten a LearningUnit and remove all this code
-def get_postponement_conflict_report(luy_start, override_postponement_consistency=False):
+def get_postponement_conflict_report(
+        luy_start: LearningUnitYear,
+        override_postponement_consistency: bool = False) -> Dict[str, List[LearningUnitYear]]:
     """
     This function will return a list of learning unit year (luy_without_conflict) ( > luy_start)
     which doesn't have any conflict. If any conflict found, the variable 'errors' will store it.
@@ -352,8 +359,11 @@ def check_postponement_conflict_report_errors(conflict_report):
         )
 
 
-# FIXME should used include and not exclude
-def _update_learning_unit_year(luy_to_update, fields_to_update, with_report, entities_to_update_by_type):
+def _update_learning_unit_year(
+        luy_to_update: LearningUnitYear,
+        fields_to_update: Dict[str, Any],
+        with_report: bool,
+        entities_to_update_by_type: Dict) -> None:
     fields_to_exclude = ()
     if with_report:
         fields_to_exclude = FIELDS_TO_EXCLUDE_WITH_REPORT
@@ -376,7 +386,7 @@ def _update_learning_unit_year(luy_to_update, fields_to_update, with_report, ent
                                     exclude=fields_to_exclude + ("in_charge",))
 
 
-def _check_postponement_conflict(luy, next_luy):
+def _check_postponement_conflict(luy: LearningUnitYear, next_luy: LearningUnitYear):
     error_list = []
     lcy = luy.learning_container_year
     next_lcy = next_luy.learning_container_year
