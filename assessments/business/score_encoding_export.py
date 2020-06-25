@@ -40,7 +40,7 @@ from base.models.student_specific_profile import StudentSpecificProfile
 
 HEADER = [_('Academic year'), _('Session'), _('Learning unit'), _('Program'), _('Registration number'), _('Lastname'),
           _('Firstname'), _('Email'), _('Numbered scores'), _('Justification (A,T)'), _('End date Prof'),
-          _('Type PEPS'), _('Additional time'), _('Appropriate copy'),
+          _('Type of specific profile'), _('Additional time'), _('Appropriate copy'),
           _('Specific locale'), _('Arrangement other'), _('Guide'),
           ]
 
@@ -105,12 +105,12 @@ def export_xls(exam_enrollments):
         if student_specific_profile:
             line_content.extend([
                 _get_type_peps(student_specific_profile),
-                 str(_('Yes')) if student_specific_profile.arrangement_additional_time else '-',
-                 str(_('Yes')) if student_specific_profile.arrangement_appropriate_copy else '-',
-                 str(_('Yes')) if student_specific_profile.arrangement_specific_locale else '-',
-                 str(_('Yes')) if student_specific_profile.arrangement_other else '-',
-                 str(student_specific_profile.guide) if student_specific_profile.guide else '',
-                 ])
+                str(_('Yes')) if student_specific_profile.arrangement_additional_time else '-',
+                str(_('Yes')) if student_specific_profile.arrangement_appropriate_copy else '-',
+                str(_('Yes')) if student_specific_profile.arrangement_specific_locale else '-',
+                str(_('Yes')) if student_specific_profile.arrangement_other else '-',
+                str(student_specific_profile.guide) if student_specific_profile.guide else '-',
+                ])
         else:
             line_content.extend(["-", "-", "-", "-", "-", ""])
         worksheet.append(line_content)
