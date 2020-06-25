@@ -112,7 +112,7 @@ def export_xls(exam_enrollments):
                 str(student_specific_profile.guide) if student_specific_profile.guide else '-',
                 ])
         else:
-            line_content.extend(["-", "-", "-", "-", "-", ""])
+            line_content.extend(["-", "-", "-", "-", "-", "-"])
         worksheet.append(line_content)
         row_number += 1
         __coloring_non_editable(worksheet, row_number, score, exam_enroll.justification_final)
