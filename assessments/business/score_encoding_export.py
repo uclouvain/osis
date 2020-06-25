@@ -40,7 +40,7 @@ from base.models.student_specific_profile import StudentSpecificProfile
 
 HEADER = [_('Academic year'), _('Session'), _('Learning unit'), _('Program'), _('Registration number'), _('Lastname'),
           _('Firstname'), _('Email'), _('Numbered scores'), _('Justification (A,T)'), _('End date Prof'),
-          _('Type PEPS'), _('Additional time'), _('Appropriate copy'),
+          _('Type of specific profile'), _('Additional time'), _('Appropriate copy'),
           _('Specific locale'), _('Arrangement other'), _('Guide'),
           ]
 
