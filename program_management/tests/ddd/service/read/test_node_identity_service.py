@@ -21,10 +21,18 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from typing import Optional
+from unittest import mock
 
-from base.utils import cache
+from django.test import SimpleTestCase
+
+from program_management.ddd import command
+from program_management.ddd.service.read import node_identity_service
 
 
-def retrieve_element_selected(user_id: int) -> Optional[dict]:
-    return cache.ElementCache(user_id).cached_data
+class TestNodeIdentityService(SimpleTestCase):
+    @mock.patch('program_management.ddd.service.read.node_identity_service.NodeIdentitySearch')
+    def test_assert_call_node_identity_business_service(self, mock_identity_search):
+        cmd = command.GetNodeIdentityFromElementId(element_id=4454)
+        node_identity_service.get_node_identity_from_element_id(cmd)
+
+        mock_identity_search.get_from_element_id.assert_called_once()

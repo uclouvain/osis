@@ -23,8 +23,10 @@
 # ############################################################################
 from typing import Optional
 
-from base.utils import cache
+from program_management.ddd import command
+from program_management.ddd.domain.node import NodeIdentity
+from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
 
 
-def retrieve_element_selected(user_id: int) -> Optional[dict]:
-    return cache.ElementCache(user_id).cached_data
+def get_node_identity_from_element_id(cmd: command.GetNodeIdentityFromElementId) -> Optional[NodeIdentity]:
+    return NodeIdentitySearch.get_from_element_id(cmd.element_id)

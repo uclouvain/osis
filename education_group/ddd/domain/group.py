@@ -26,7 +26,7 @@
 import copy
 
 from base.models.enums.constraint_type import ConstraintTypeEnum
-from base.models.enums.education_group_types import GroupType
+from base.models.enums.education_group_types import GroupType, EducationGroupTypesEnum
 from education_group.ddd import command
 from education_group.ddd.domain._campus import Campus
 from education_group.ddd.domain._content_constraint import ContentConstraint
@@ -108,7 +108,7 @@ class Group(interface.RootEntity):
     def __init__(
         self,
         entity_identity: 'GroupIdentity',
-        type: GroupType,
+        type: EducationGroupTypesEnum,
         abbreviated_title: str,
         titles: Titles,
         credits: int,

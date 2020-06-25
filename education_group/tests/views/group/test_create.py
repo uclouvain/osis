@@ -11,12 +11,12 @@ from base.tests.factories.education_group_type import GroupEducationGroupTypeFac
 from base.tests.factories.person import PersonFactory
 from education_group.ddd.domain.exception import GroupCodeAlreadyExistException
 from education_group.ddd.domain.group import GroupIdentity
-from education_group.forms.group import GroupForm
+from education_group.forms.group import GroupForm, GroupAttachForm
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from program_management.tests.factories.element import ElementGroupYearFactory
 
 
-class TestCreateGroupGetMethod(TestCase):
+class TestCreateOrphanGroupGetMethod(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.type = GroupEducationGroupTypeFactory()
@@ -52,6 +52,7 @@ class TestCreateGroupGetMethod(TestCase):
 
         self.assertIsInstance(response.context['group_form'], GroupForm)
         self.assertIsInstance(response.context['tabs'], List)
+        self.assertIsInstance(response.context['cancel_url'], str)
 
     def test_assert_contains_only_identification_tabs(self):
         response = self.client.get(self.url)
@@ -65,6 +66,12 @@ class TestCreateGroupGetMethod(TestCase):
                 "include_html": "education_group_app/group/upsert/identification_form.html"
             }]
         )
+
+    def test_assert_cancel_url_computed(self):
+        response = self.client.get(self.url)
+
+        expected_url = reverse('version_program')
+        self.assertEqual(response.context['cancel_url'], expected_url)
 
 
 class TestCreateOrphanGroupPostMethod(TestCase):
@@ -129,6 +136,38 @@ class TestCreateOrphanGroupPostMethod(TestCase):
         response = self.client.post(self.url)
         self.assertIsInstance(response.context['group_form'], GroupForm)
         self.assertTrue(response.context['group_form'].has_error('code'))
+
+
+class TestCreateNonOrphanGroupGetMethod(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.type = GroupEducationGroupTypeFactory()
+
+        cls.central_manager = CentralManagerFactory()
+        cls.parent_element = ElementGroupYearFactory(
+            group_year__management_entity=cls.central_manager.entity
+        )
+        cls.url = reverse('group_create', kwargs={'type': cls.type.name}) +\
+            "?path_to={}".format(str(cls.parent_element.pk))
+
+    def setUp(self) -> None:
+        self.client.force_login(self.central_manager.person.user)
+
+    def test_assert_form_instance(self):
+        response = self.client.get(self.url)
+        self.assertIsInstance(response.context['group_form'], GroupAttachForm)
+
+    def test_assert_cancel_url_computed(self):
+        response = self.client.get(self.url)
+
+        expected_url = reverse(
+            'element_identification',
+            kwargs={
+                'code': self.parent_element.group_year.partial_acronym,
+                'year': self.parent_element.group_year.academic_year.year
+            }
+        ) + "?path={}".format(str(self.parent_element.pk))
+        self.assertEqual(response.context['cancel_url'], expected_url)
 
 
 class TestCreateNonOrphanGroupPostMethod(TestCase):

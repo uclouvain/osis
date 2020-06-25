@@ -153,7 +153,6 @@ class CreateGroupAndAttachCommand(interface.CommandRequest):
     def __init__(
             self,
             code: str,
-            year: int,
             type: str,
             abbreviated_title: str,
             title_fr: str,
@@ -170,7 +169,6 @@ class CreateGroupAndAttachCommand(interface.CommandRequest):
             path_to_paste: str,
     ):
         self.code = code
-        self.year = year
         self.type = type
         self.abbreviated_title = abbreviated_title
         self.title_fr = title_fr
@@ -193,3 +191,12 @@ class CreateGroupAndAttachCommand(interface.CommandRequest):
             str(self.max_constraint), str(self.management_entity_acronym), str(self.teaching_campus_name),
             str(self.organization_name), str(self.remark_fr), str(self.remark_en), str(self.path_to_paste),])
         return "CreateGroupAndAttachCommand({parameters})".format(parameters=parameters)
+
+
+class GetNodeIdentityFromElementId(interface.CommandRequest):
+    def __init__(self, element_id: int):
+        self.element_id = element_id
+
+    def __repr__(self) -> str:
+        parameters = ", ".join([str(self.element_id)])
+        return "GetNodeIdentityFromElementId({parameters})".format(parameters=parameters)

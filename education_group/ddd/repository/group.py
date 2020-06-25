@@ -40,7 +40,7 @@ from education_group.ddd.domain.group import GroupUnannualizedIdentity
 from education_group.models.group_year import GroupYear as GroupYearModelDb
 from education_group.models.group import Group as GroupModelDb
 from base.models.enums.constraint_type import ConstraintTypeEnum
-from base.models.enums.education_group_types import GroupType
+from base.models.enums.education_group_types import GroupType, TrainingType, MiniTrainingType
 from education_group.ddd.domain import exception, group
 from education_group.ddd.domain.group import GroupIdentity
 from education_group.ddd.domain._campus import Campus
@@ -143,7 +143,7 @@ class GroupRepository(interface.AbstractRepository):
             entity_identity=entity_id,
             # TODO: Create UUID field on group model and use it insteaf of group_id
             unannualized_identity=GroupUnannualizedIdentity(uuid=obj.group_id),
-            type=GroupType[obj.education_group_type.name],
+            type=_convert_type(obj.education_group_type),
             abbreviated_title=obj.acronym,
             titles=Titles(
                 title_fr=obj.title_fr,
@@ -151,7 +151,7 @@ class GroupRepository(interface.AbstractRepository):
             ),
             credits=obj.credits,
             content_constraint=ContentConstraint(
-                type=ConstraintTypeEnum[obj.constraint_type],
+                type=ConstraintTypeEnum[obj.constraint_type] if obj.constraint_type else None,
                 minimum=obj.min_constraint,
                 maximum=obj.max_constraint,
             ),
@@ -177,3 +177,13 @@ class GroupRepository(interface.AbstractRepository):
     @classmethod
     def delete(cls, entity_id: 'GroupIdentity') -> None:
         raise NotImplementedError
+
+
+def _convert_type(education_group_type):
+    if education_group_type.name in GroupType.get_names():
+        return GroupType[education_group_type.name]
+    elif education_group_type.name in TrainingType.get_names():
+        return TrainingType[education_group_type.name]
+    elif education_group_type.name in MiniTrainingType.get_names():
+        return MiniTrainingType[education_group_type.name]
+    raise Exception('Unsupported group type')

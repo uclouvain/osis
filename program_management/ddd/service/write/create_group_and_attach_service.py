@@ -30,15 +30,30 @@ from program_management.ddd import command as command_pgrm
 from education_group.ddd.domain.group import GroupIdentity
 
 from education_group.ddd.service.write import create_group_service
+from program_management.ddd.domain.program_tree import Path
+from program_management.ddd.service.read import node_identity_service
 from program_management.ddd.service.write import paste_element_service
 
 
 # TODO : Implement Validator (Actually in GroupFrom via ValidationRules)
 @transaction.atomic()
 def create_group_and_attach(cmd: command_pgrm.CreateGroupAndAttachCommand) -> 'GroupIdentity':
-    cmd_orphan_group = command_education_group.CreateOrphanGroupCommand(
+    cmd_orphan_group = __get_orphan_group_cmd_from_create_group_and_attach_cmd(cmd)
+    group_id = create_group_service.create_orphan_group(cmd_orphan_group)
+
+    cmd_paste = __get_paste_cmd(group_id, cmd.path_to_paste)
+    paste_element_service.paste_element(cmd_paste)
+    return group_id
+
+
+def __get_orphan_group_cmd_from_create_group_and_attach_cmd(cmd: command_pgrm.CreateGroupAndAttachCommand) -> \
+        command_education_group.CreateOrphanGroupCommand:
+    cmd_get_node_id = __get_node_identity_cmd(cmd.path_to_paste)
+    node_id = node_identity_service.get_node_identity_from_element_id(cmd_get_node_id)
+
+    return command_education_group.CreateOrphanGroupCommand(
         code=cmd.code,
-        year=cmd.year,
+        year=node_id.year,
         type=cmd.type,
         abbreviated_title=cmd.abbreviated_title,
         title_fr=cmd.title_fr,
@@ -52,14 +67,18 @@ def create_group_and_attach(cmd: command_pgrm.CreateGroupAndAttachCommand) -> 'G
         organization_name=cmd.organization_name,
         remark_fr=cmd.remark_fr,
         remark_en=cmd.remark_en,
-        #start_year=            #Take start year from parent (Found in path)
+        start_year=node_id.year
     )
-    group_id = create_group_service.create_orphan_group(cmd_orphan_group)
 
-    cmd_paste = command_pgrm.PasteElementCommand(
+
+def __get_node_identity_cmd(path_to_paste: Path) -> command_pgrm.GetNodeIdentityFromElementId:
+    parent_id = path_to_paste.split('|')[-1]
+    return command_pgrm.GetNodeIdentityFromElementId(element_id=int(parent_id))
+
+
+def __get_paste_cmd(group_id: GroupIdentity, path_to_paste: Path) -> command_pgrm.PasteElementCommand:
+    return command_pgrm.PasteElementCommand(
         node_to_paste_code=group_id.code,
         node_to_paste_year=group_id.year,
-        path_where_to_paste=cmd.path_to_paste
+        path_where_to_paste=path_to_paste
     )
-    paste_element_service.paste_element(cmd_paste)
-    return group_id
