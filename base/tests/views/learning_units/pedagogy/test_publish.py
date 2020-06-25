@@ -1,4 +1,4 @@
-############################################################################
+# ############################################################################
 #  OSIS stands for Open Student Information System. It's an application
 #  designed to manage the core business of higher education institutions,
 #  such as universities, faculties, institutes and professional schools.
@@ -22,16 +22,26 @@
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
 from django.conf import settings
-from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseRedirect
+from django.test import TestCase
+from django.urls import reverse
+
+from base.tests.factories.person import PersonFactory
 
 
-@login_required
-def access_refreshed_publication(request, code: str, year: int):
-    redirect_url = get_learning_unit_portal_updated_cache_url(code, year)
-    return HttpResponseRedirect(redirect_url)
+class TestPublish(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.person = PersonFactory()
 
+    def setUp(self) -> None:
+        self.client.force_login(self.person.user)
 
-def get_learning_unit_portal_updated_cache_url(code: str, year: int):
-    url = settings.LEARNING_UNIT_PORTAL_URL_WITH_UPDATED_CACHE
-    return url.format(year=year, acronym=code)
+    def test_should_redirect_to_learning_unit_portal_with_updated_cache_url_when_accessed(self):
+        code = "LOSIS1452"
+        year = 2020
+        url = reverse("access_publication", kwargs={"code": code, "year": 2020})
+        response = self.client.get(url, follow=False)
+
+        expected_url = settings.LEARNING_UNIT_PORTAL_URL_WITH_UPDATED_CACHE.format(year=year, acronym=code)
+        self.assertRedirects(response, expected_url, fetch_redirect_response=False)
+
