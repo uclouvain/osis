@@ -105,12 +105,12 @@ def export_xls(exam_enrollments):
         if student_specific_profile:
             line_content.extend([
                 _get_type_peps(student_specific_profile),
-                 str(_('Yes')) if student_specific_profile.arrangement_additional_time else '-',
-                 str(_('Yes')) if student_specific_profile.arrangement_appropriate_copy else '-',
-                 str(_('Yes')) if student_specific_profile.arrangement_specific_locale else '-',
-                 str(_('Yes')) if student_specific_profile.arrangement_other else '-',
-                 str(student_specific_profile.guide) if student_specific_profile.guide else '',
-                 ])
+                str(_('Yes')) if student_specific_profile.arrangement_additional_time else '-',
+                str(_('Yes')) if student_specific_profile.arrangement_appropriate_copy else '-',
+                str(_('Yes')) if student_specific_profile.arrangement_specific_locale else '-',
+                str(_('Yes')) if student_specific_profile.arrangement_other else '-',
+                str(student_specific_profile.guide) if student_specific_profile.guide else '-',
+                ])
         else:
             line_content.extend(["-", "-", "-", "-", "-", ""])
         worksheet.append(line_content)
