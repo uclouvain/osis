@@ -36,7 +36,7 @@ from base.models.enums.internship_presence import InternshipPresence
 from base.models.enums.rate_code import RateCode
 from base.models.enums.schedule_type import ScheduleTypeEnum
 from base.models.utils.utils import ChoiceEnum
-from education_group.ddd.domain._campus import CampusIdentity
+from education_group.ddd.domain._campus import Campus
 from education_group.ddd.domain._co_graduation import CoGraduation
 from education_group.ddd.domain._co_organization import Coorganization
 from education_group.ddd.domain._diploma import Diploma, DiplomaAim
@@ -124,11 +124,11 @@ class TrainingBuilder:
             management_entity=Entity(acronym=command.management_entity_acronym),
             administration_entity=Entity(acronym=command.administration_entity_acronym),
             end_year=command.end_year,
-            teaching_campus=CampusIdentity(
+            teaching_campus=Campus(
                 name=command.teaching_campus_name,
                 university_name=command.teaching_campus_organization_name,
             ),
-            enrollment_campus=CampusIdentity(
+            enrollment_campus=Campus(
                 name=command.enrollment_campus_name,
                 university_name=command.enrollment_campus_organization_name,
             ),
@@ -202,8 +202,8 @@ class Training(interface.RootEntity):
             management_entity: Entity = None,
             administration_entity: Entity = None,
             end_year: int = None,
-            teaching_campus: CampusIdentity = None,
-            enrollment_campus: CampusIdentity = None,
+            teaching_campus: Campus = None,
+            enrollment_campus: Campus = None,
             other_campus_activities: ActivityPresence = None,
             funding: Funding = None,
             hops: HOPS = None,

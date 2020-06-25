@@ -25,12 +25,12 @@
 ##############################################################################
 import factory.fuzzy
 
-from education_group.ddd.domain._campus import CampusIdentity
+from education_group.ddd.domain._campus import Campus
 
 
 class CampusIdentityFactory(factory.Factory):
     class Meta:
-        model = CampusIdentity
+        model = Campus
         abstract = False
 
     name = factory.Sequence(lambda n: 'Campus %02d' % n)
