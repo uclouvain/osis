@@ -42,38 +42,6 @@ from base.tests.factories.education_group_year import TrainingFactory, Education
 from base.tests.factories.group_element_year import GroupElementYearFactory
 
 
-from base.tests.factories.group_element_year import GroupElementYearFactory, GroupElementYearChildLeafFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-
-
-@override_settings(ESB_API_URL="api.esb.com",
-                   ESB_AUTHORIZATION="Basic dummy:1234",
-                   ESB_REFRESH_PEDAGOGY_ENDPOINT="offer/{year}/{code}/refresh",
-                   ESB_REFRESH_COMMON_PEDAGOGY_ENDPOINT='offer/{year}/common/refresh',
-                   ESB_REFRESH_COMMON_ADMISSION_ENDPOINT='offer/{year}/common_admission/refresh')
-class TestPublishLearningUnit(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.training = TrainingFactory(
-            education_group_type__name=TrainingType.PGRM_MASTER_120.name,
-            academic_year__current=True
-        )
-        cls.learning_unit_year = LearningUnitYearFactory(academic_year__current=True)
-        GroupElementYearChildLeafFactory(parent=cls.training, child_leaf=cls.learning_unit_year)
-
-    @override_settings(ESB_REFRESH_PEDAGOGY_ENDPOINT=None)
-    def test_publish_case_missing_settings(self):
-        with self.assertRaises(ImproperlyConfigured):
-            general_information.publish_learning_unit_year(self.learning_unit_year)
-
-    @mock.patch('requests.get', return_value=HttpResponse)
-    @mock.patch('threading.Thread')
-    def test_publish_call_seperate_thread(self, mock_thread, mock_get):
-        mock_thread.start.return_value = True
-        general_information.publish_learning_unit_year(self.learning_unit_year)
-        self.assertTrue(mock_thread.start)
-
-
 @override_settings(ESB_API_URL="api.esb.com",
                    ESB_AUTHORIZATION="Basic dummy:1234",
                    ESB_REFRESH_PEDAGOGY_ENDPOINT="offer/{year}/{code}/refresh",
