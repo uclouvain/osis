@@ -42,7 +42,7 @@ class EntityVersionAddress(models.Model):
     city = models.CharField(max_length=255, blank=True)
     street = models.CharField(max_length=255, blank=True)
     street_number = models.CharField(max_length=12, blank=True)
-    postal_code = models.PositiveIntegerField(blank=True, null=True)
+    postal_code = models.CharField(max_length=32, blank=True)
     country = models.ForeignKey('reference.Country', on_delete=models.PROTECT, blank=True, null=True)
     entity_version_id = models.ForeignKey('EntityVersion', on_delete=models.PROTECT)
     location = PointField(blank=True, null=True)
