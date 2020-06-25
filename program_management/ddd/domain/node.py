@@ -27,6 +27,9 @@ from _decimal import Decimal
 from collections import OrderedDict
 from typing import List, Set, Dict, Optional
 
+from django.utils import translation
+
+from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.models.enums.active_status import ActiveStatusEnum
 from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, MiniTrainingType, GroupType
@@ -406,6 +409,15 @@ class NodeLearningUnitYear(Node):
     @property
     def has_proposal(self) -> bool:
         return bool(self.proposal_type)
+
+    @property
+    def complete_title(luy: 'NodeLearningUnitYear'):
+        if translation.get_language() == LANGUAGE_CODE_EN:
+            return "{}{}".format(luy.common_title_en,
+                                 " - {}".format(luy.specific_title_en) if luy.specific_title_en else '')
+
+        return "{}{}".format(luy.common_title_fr,
+                             " - {}".format(luy.specific_title_fr) if luy.specific_title_fr else '')
 
     def get_is_prerequisite_of(self) -> List['NodeLearningUnitYear']:
         return sorted(self.is_prerequisite_of, key=lambda node: node.code)

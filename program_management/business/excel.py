@@ -43,6 +43,8 @@ from program_management.ddd.business_types import *
 from program_management.ddd.repositories import load_tree
 from program_management.ddd.domain.prerequisite import Prerequisite, PrerequisiteItem
 from program_management.ddd.domain import link
+from program_management.ddd.domain.node import NodeIdentity
+
 
 STYLE_BORDER_BOTTOM = Style(
     border=Border(
@@ -119,7 +121,7 @@ def _build_excel_lines(tree: 'ProgramTree') -> List:
     links = tree.get_all_links()
     for luy in tree.get_nodes_that_have_prerequisites():
         content.append(
-            LearningUnitYearLine(luy_acronym=luy.code, luy_title=complete_title_i18n(luy))
+            LearningUnitYearLine(luy_acronym=luy.code, luy_title=luy.complete_title)
         )
 
         if not luy.prerequisite:
@@ -130,7 +132,8 @@ def _build_excel_lines(tree: 'ProgramTree') -> List:
                 for link_obj in links:
                     if link_obj.child.code == prerequisite_item.code and link_obj.child.year == prerequisite_item.year:
                         prerequisite_item_links.append(link_obj)
-                prerequisite_line = _prerequisite_item_line(prerequisite_item, prerequisite_item_links,
+                prerequisite_line = _prerequisite_item_line(tree,
+                                                            prerequisite_item, prerequisite_item_links,
                                                             luy.prerequisite, group_number, position,
                                                             len(group.prerequisite_items))
                 content.append(prerequisite_line)
@@ -166,23 +169,23 @@ def _get_item_acronym(prerequisite_item: PrerequisiteItem, position: int, group_
         acronym_format = "{acronym})"
     return acronym_format.format(acronym=prerequisite_item.code)
 
-
-def _get_item_credits(prerequisite_item: PrerequisiteItem, links: List[link.Link]):
-    distinct_credits_repr = []
-    for link_obj in links:
-        if link_obj.child.code == prerequisite_item.code and link_obj.child.year == prerequisite_item.year:
-            if link_obj.relative_credits_repr not in distinct_credits_repr:
-                distinct_credits_repr.append(link_obj.relative_credits_repr)
-
-    return " ; ".join(
-        set(["{}".format(credits) for credits in distinct_credits_repr])
-    )
-
-
-def _get_item_blocks(links: List[link.Link]):
-    return " ; ".join(
-        [str(grp.block) for grp in links if grp.block]
-    )
+#
+# def c(prerequisite_item: PrerequisiteItem, links: List[link.Link]):
+#     distinct_credits_repr = []
+#     for link_obj in links:
+#         if link_obj.child.code == prerequisite_item.code and link_obj.child.year == prerequisite_item.year:
+#             if link_obj.relative_credits_repr not in distinct_credits_repr:
+#                 distinct_credits_repr.append(link_obj.relative_credits_repr)
+#
+#     return " ; ".join(
+#         set(["{}".format(credits) for credits in distinct_credits_repr])
+#     )
+#
+#
+# def _get_item_blocks(links: List[link.Link]):
+#     return " ; ".join(
+#         [str(grp.block) for grp in links if grp.block]
+#     )
 
 
 def _get_style_to_apply(excel_lines: list):
@@ -351,21 +354,25 @@ def get_complete_title(luy: 'NodeLearningUnitYear'):
     if translation.get_language() == LANGUAGE_CODE_EN:
         complete_title = "{}{}".format(luy.common_title_en,
                                        " - {}".format(luy.specific_title_en) if luy.specific_title_en else '')
+
     else:
         complete_title = "{}{}".format(luy.common_title_fr,
                                        " - {}".format(luy.specific_title_fr) if luy.specific_title_fr else '')
+
     return complete_title
 
 
 def complete_title_i18n(luy: 'NodeLearningUnitYear'):
+
     complete_title = get_complete_title(luy)
     if translation.get_language() == LANGUAGE_CODE_EN:
         complete_title = luy.complete_title_english or complete_title
     return complete_title
 
 
-def _prerequisite_item_line(prerequisite_item: PrerequisiteItem, links: List[link.Link], prerequisite: Prerequisite,
-                            group_number: int, position: int, number_of_prerequisite_item: int):
+def _prerequisite_item_line(tree, prerequisite_item: PrerequisiteItem, links: List[link.Link],
+                            prerequisite: Prerequisite, group_number: int, position: int,
+                            number_of_prerequisite_item: int):
     item_link = next(
         (link_obj for link_obj in links
          if link_obj.child.code == prerequisite_item.code and link_obj.child.year == prerequisite_item.year
@@ -380,13 +387,12 @@ def _prerequisite_item_line(prerequisite_item: PrerequisiteItem, links: List[lin
     text = (_("has as prerequisite") + " :") \
         if group_number == 1 and position == 1 else None
     luy_acronym = _get_item_acronym(prerequisite_item, position, number_of_prerequisite_item)
-
     return PrerequisiteItemLine(
         text=text,
         operator=_get_operator(prerequisite, group_number, position),
         luy_acronym=luy_acronym,
         luy_title=title,
-        credits=_get_item_credits(prerequisite_item,  links),
-        block=_get_item_blocks(links),
+        credits=tree.get_relative_credits_values(NodeIdentity(prerequisite_item.code, prerequisite_item.year)),
+        block=tree.get_blocks_values(NodeIdentity(prerequisite_item.code, prerequisite_item.year)),
         mandatory=_("Yes") if item_link and item_link.is_mandatory else _("No")
     )

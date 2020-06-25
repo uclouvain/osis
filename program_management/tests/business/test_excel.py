@@ -24,132 +24,153 @@
 #
 ##############################################################################
 
-from django.test import TestCase
+from django.test import SimpleTestCase
 from django.utils.translation import gettext_lazy as _
-
+from django.test.utils import override_settings
 from base.models.enums.prerequisite_operator import AND, OR
-from base.tests.factories.education_group_year import EducationGroupYearFactory
-from base.tests.factories.group_element_year import GroupElementYearChildLeafFactory
-from base.tests.factories.prerequisite import PrerequisiteFactory
-from program_management.business.excel import EducationGroupYearLearningUnitsPrerequisitesToExcel
-from program_management.tests.factories.element import ElementGroupYearFactory, ElementLearningUnitYearFactory
-from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
-from education_group.tests.factories.group_year import GroupYearFactory as GroupYearFactoryModel
+
+from program_management.tests.ddd.factories.link import LinkFactory
+from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory
+from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
+
+from program_management.tests.ddd.factories.prerequisite import PrerequisiteFactory, PrerequisiteItemGroupFactory, PrerequisiteItemFactory
+from program_management.tests.ddd.factories.prerequisite import cast_to_prerequisite
+from program_management.business.excel import _build_excel_lines
+from program_management.business.excel import HeaderLine, OfficialTextLine, LearningUnitYearLine, PrerequisiteItemLine
 
 
-class TestGeneratePrerequisitesWorkbook(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.education_group_year = EducationGroupYearFactory()
-        academic_year = cls.education_group_year.academic_year
-        cls.grp_yr = GroupYearFactoryModel(academic_year=academic_year)
-        cls.element_root = ElementGroupYearFactory(group_year=cls.grp_yr)
-        cls.root = cls.element_root.group_year
-        cls.education_group_version = EducationGroupVersionFactory(offer=cls.education_group_year,
-                                                                   root_group=cls.element_root.group_year)
-        ElementLearningUnitYearFactory()
+class TestGeneratePrerequisitesWorkbook(SimpleTestCase):
 
-        cls.child_leaves = []
-        for i in range(1, 7):
-            cls.child_leaves.append(GroupElementYearChildLeafFactory(
-                child_element=ElementLearningUnitYearFactory(learning_unit_year__academic_year=academic_year,
-                                                             learning_unit_year__acronym="LFAC100{}".format(i)),
-                parent_element=cls.element_root)
-            )
-
-        luy_acronyms = ["LCORS124" + str(i) for i in range(0, len(cls.child_leaves))]
-        for node, acronym in zip(cls.child_leaves, luy_acronyms):
-            node.child_element.acronym = acronym
-            node.child_element.save()
-
-        cls.luy_children = [child.child_element.learning_unit_year for child in cls.child_leaves]
-
-        PrerequisiteFactory(
-            learning_unit_year=cls.luy_children[0],
-            education_group_year=cls.education_group_year,
-            items__groups=(
-                (cls.luy_children[1],),
-            ),
-            education_group_version=cls.education_group_version
+    def setUp(self):
+        self.program_tree = ProgramTreeFactory()
+        yr = 2019
+        self.link0 = LinkFactory(
+            parent=self.program_tree.root_node,
+            child=NodeLearningUnitYearFactory(code="LOSIS1121",
+                                              year=yr)
+        )
+        self.link1 = LinkFactory(
+            parent=self.program_tree.root_node,
+            child=NodeLearningUnitYearFactory(code="MARC2547",
+                                              year=yr)
+        )
+        self.link2 = LinkFactory(
+            parent=self.program_tree.root_node,
+            child=NodeLearningUnitYearFactory(code="MECK8960",
+                                              year=yr)
+        )
+        self.link3 = LinkFactory(
+            parent=self.program_tree.root_node,
+            child=NodeLearningUnitYearFactory(code="BREM5890",
+                                              year=yr)
+        )
+        self.link4 = LinkFactory(
+            parent=self.program_tree.root_node,
+            child=NodeLearningUnitYearFactory(code="MARC2548",
+                                              year=yr)
+        )
+        self.link5 = LinkFactory(
+            parent=self.program_tree.root_node,
+            child=NodeLearningUnitYearFactory(code="MECK8968",
+                                              year=yr)
+        )
+        link6 = LinkFactory(
+            parent=self.program_tree.root_node,
+            child=NodeLearningUnitYearFactory(code="BREM5898",
+                                              year=yr)
         )
 
-        PrerequisiteFactory(
-            learning_unit_year=cls.luy_children[2],
-            education_group_year=cls.education_group_year,
-            items__groups=(
-                (cls.luy_children[3],),
-                (cls.luy_children[4], cls.luy_children[5])
-            ),
-            education_group_version=cls.education_group_version
+        self.children = [self.link0.child, self.link1.child, self.link2.child, self.link3.child, self.link4.child, self.link5.child, link6.child]
+        self.luy_children = [self.link0.child, self.link1.child, self.link2.child, self.link3.child, self.link4.child, self.link5.child, link6.child]
+        node_that_is_prerequisite = self.link1.child
+        self.link0.child.set_prerequisite(cast_to_prerequisite(node_that_is_prerequisite))
+
+        item3 = PrerequisiteItemFactory(code=self.link3.child.code, year=self.link3.child.year)
+        item4 = PrerequisiteItemFactory(code=self.link4.child.code, year=self.link4.child.year)
+        item5 = PrerequisiteItemFactory(code=self.link5.child.code, year=self.link5.child.year)
+        prerequisite = PrerequisiteFactory(
+            prerequisite_item_groups=[
+                PrerequisiteItemGroupFactory(
+                    prerequisite_items=[item3]
+                ),
+                PrerequisiteItemGroupFactory(
+                    prerequisite_items=[item4, item5]
+                ),
+            ]
         )
+
+        self.link2.child.set_prerequisite(prerequisite)
 
     def test_header_lines(self):
-        # tree.root_node.code,
-        # egy_title = tree.root_node.title,
-        expected_headers = [
-            [self.grp_yr.acronym, self.grp_yr.title_fr, _('Code'), _('Title'),
-             _('Cred. rel./abs.'), _('Block'), _('Mandatory')],
-            [_("Official"), None, None, None, None, None, None]
-        ]
+        expected_first_line = HeaderLine(egy_acronym=self.program_tree.root_node.title,
+                                         egy_title=self.program_tree.root_node.group_title_en,
+                                         code_header=_('Code'),
+                                         title_header=_('Title'),
+                                         credits_header=_('Cred. rel./abs.'),
+                                         block_header=_('Block'),
+                                         mandatory_header=_('Mandatory')
+                                         )
+        expected_second_line = OfficialTextLine(text=_("Official"))
 
-        workbook_prerequisites = \
-            EducationGroupYearLearningUnitsPrerequisitesToExcel(self.root.academic_year.year,
-                                                                self.root.partial_acronym)._to_workbook()
-        sheet_prerequisites = workbook_prerequisites.worksheets[0]
+        headers = _build_excel_lines(self.program_tree)
+        self.assertEqual(expected_first_line, headers[0])
+        self.assertEqual(expected_second_line, headers[1])
 
-        headers = [row_to_value(row) for row in sheet_prerequisites.iter_rows(range_string="A1:G2")]
-
-        self.assertListEqual(headers, expected_headers)
-
+    @override_settings(LANGUAGES=[('en', 'English'), ], LANGUAGE_CODE='en')
     def test_when_learning_unit_year_has_one_prerequisite(self):
-        # ici
-        expected_content = [
-            [self.luy_children[0].acronym, self.luy_children[0].complete_title, None, None, None, None, None],
+        content = _build_excel_lines(self.program_tree)
+        learning_unit_year_line = content[2]
+        prerequisite_item_line = content[3]
 
-            [_("has as prerequisite") + " :", '',
-             self.luy_children[1].acronym,
-             self.luy_children[1].complete_title_i18n,
-             "{} / {}".format(self.child_leaves[1].relative_credits, self.luy_children[1].credits),
-             str(self.child_leaves[1].block) if self.child_leaves[1].block else '',
-             _("Yes") if self.child_leaves[1].is_mandatory else _("No")]
-        ]
-        workbook_prerequisites = \
-            EducationGroupYearLearningUnitsPrerequisitesToExcel(self.root.academic_year.year,
-                                                                self.root.partial_acronym)._to_workbook()
-        sheet_prerequisites = workbook_prerequisites.worksheets[0]
-        content = [row_to_value(row) for row in sheet_prerequisites.iter_rows(range_string="A3:G4")]
+        expected_learning_unit_year_line = LearningUnitYearLine(luy_acronym=self.luy_children[0].code,
+                                                                luy_title=self.luy_children[0].complete_title)
+        expected_prerequisite_item_line = PrerequisiteItemLine(text='{} :'.format(_('has as prerequisite')),
+                                                               operator=None,
+                                                               luy_acronym=self.luy_children[1].code,
+                                                               luy_title=self.luy_children[1].title,
+                                                               credits=self.link1.relative_credits_repr,
+                                                               block=str(self.link1.block),
+                                                               mandatory=_("Yes") if self.link1.is_mandatory else _("No")
+                                                               )
+        self.assertEqual(expected_learning_unit_year_line, learning_unit_year_line)
+        self.assertEqual(expected_prerequisite_item_line, prerequisite_item_line)
 
-        self.assertListEqual(expected_content, content)
-
+    @override_settings(LANGUAGES=[('en', 'English'), ], LANGUAGE_CODE='en')
     def test_when_learning_unit_year_has_multiple_prerequisites(self):
-        expected_content = [
-            [self.luy_children[2].acronym, self.luy_children[2].complete_title, None, None, None, None, None],
+        content = _build_excel_lines(self.program_tree)
 
-            [_("has as prerequisite") + " :", '', self.luy_children[3].acronym,
-             self.luy_children[3].complete_title_i18n,
-             "{} / {}".format(self.child_leaves[3].relative_credits, self.luy_children[3].credits),
-             str(self.child_leaves[3].block) if self.child_leaves[3].block else '',
-             _("Yes") if self.child_leaves[3].is_mandatory else _("No")],
+        prerequisite_item_line_1 = content[5]
+        expected_prerequisite_item_line1 = PrerequisiteItemLine(
+            text='{} :'.format(_('has as prerequisite')),
+            operator=None,
+            luy_acronym=self.luy_children[3].code,
+            luy_title=self.luy_children[3].title,
+            credits=self.link3.relative_credits_repr,
+            block=str(self.link3.block) if self.link3.block else '',
+            mandatory=_("Yes") if self.link3.is_mandatory else _("No")
+        )
+        self.assertEqual(prerequisite_item_line_1, expected_prerequisite_item_line1)
 
-            ['', _(AND), "(" + self.luy_children[4].acronym, self.luy_children[4].complete_title_i18n,
-             "{} / {}".format(self.child_leaves[4].relative_credits, self.luy_children[4].credits),
-             str(self.child_leaves[4].block) if self.child_leaves[4].block else '',
-             _("Yes") if self.child_leaves[4].is_mandatory else _("No")
-             ],
+        prerequisite_item_line_2 = content[6]
+        expected_prerequisite_item_line2 = PrerequisiteItemLine(
+            text=None,
+            operator=_(AND),
+            luy_acronym="({}".format(self.luy_children[4].code),
+            luy_title=self.luy_children[4].title,
+            credits=self.link4.relative_credits_repr,
+            block=str(self.link4.block) if self.link4.block else '',
+            mandatory=_("Yes") if self.link4.is_mandatory else _("No")
+        )
+        self.assertEqual(prerequisite_item_line_2, expected_prerequisite_item_line2)
 
-            ['', _(OR), self.luy_children[5].acronym + ")", self.luy_children[5].complete_title_i18n,
-             "{} / {}".format(self.child_leaves[5].relative_credits, self.luy_children[5].credits),
-             str(self.child_leaves[5].block) if self.child_leaves[5].block else '',
-             _("Yes") if self.child_leaves[5].is_mandatory else _("No")
-             ]
-        ]
-        workbook_prerequisites = \
-            EducationGroupYearLearningUnitsPrerequisitesToExcel(self.root.academic_year.year,
-                                                                self.root.partial_acronym)._to_workbook()
-        sheet_prerequisites = workbook_prerequisites.worksheets[0]
-        content = [row_to_value(row) for row in sheet_prerequisites.iter_rows(range_string="A5:G8")]
-        self.assertListEqual(expected_content, content)
-
-
-def row_to_value(sheet_row):
-    return [cell.value for cell in sheet_row]
+        prerequisite_item_line_3 = content[7]
+        expected_prerequisite_item_line3 = PrerequisiteItemLine(
+            text=None,
+            operator=_(OR),
+            luy_acronym="{})".format(self.luy_children[5].code),
+            luy_title=self.luy_children[5].title,
+            credits=self.link5.relative_credits_repr,
+            block=str(self.link5.block) if self.link5.block else '',
+            mandatory=_("Yes") if self.link5.is_mandatory else _("No")
+        )
+        self.assertEqual(prerequisite_item_line_3, expected_prerequisite_item_line3)
