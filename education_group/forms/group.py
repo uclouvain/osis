@@ -66,7 +66,7 @@ class GroupForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         required=False,
         widget=forms.TextInput
     )
-    management_entity = fields.ManagementEntitiesChoiceField(person=None, initial=None, required=False)
+    management_entity = forms.CharField(required=False)  # TODO: Replace with select2 widget
     teaching_campus = fields.MainCampusChoiceField(queryset=None, label=_("Learning location"), required=False)
     remark_fr = forms.CharField(widget=forms.Textarea, label=_("Remark"), required=False)
     remark_en = forms.CharField(widget=forms.Textarea, label=_("remark in english"), required=False)
