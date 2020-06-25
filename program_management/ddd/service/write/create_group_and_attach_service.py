@@ -25,7 +25,7 @@
 from django.db import transaction
 
 from education_group.ddd import command as command_education_group
-from program_management.ddd import command as command_pgrm
+from program_management.ddd import command as command_program_mangement
 
 from education_group.ddd.domain.group import GroupIdentity
 
@@ -37,7 +37,7 @@ from program_management.ddd.service.write import paste_element_service
 
 # TODO : Implement Validator (Actually in GroupFrom via ValidationRules)
 @transaction.atomic()
-def create_group_and_attach(cmd: command_pgrm.CreateGroupAndAttachCommand) -> 'GroupIdentity':
+def create_group_and_attach(cmd: command_program_mangement.CreateGroupAndAttachCommand) -> 'GroupIdentity':
     cmd_orphan_group = __get_orphan_group_cmd_from_create_group_and_attach_cmd(cmd)
     group_id = create_group_service.create_orphan_group(cmd_orphan_group)
 
@@ -46,7 +46,7 @@ def create_group_and_attach(cmd: command_pgrm.CreateGroupAndAttachCommand) -> 'G
     return group_id
 
 
-def __get_orphan_group_cmd_from_create_group_and_attach_cmd(cmd: command_pgrm.CreateGroupAndAttachCommand) -> \
+def __get_orphan_group_cmd_from_create_group_and_attach_cmd(cmd: command_program_mangement.CreateGroupAndAttachCommand) -> \
         command_education_group.CreateOrphanGroupCommand:
     cmd_get_node_id = __get_node_identity_cmd(cmd.path_to_paste)
     node_id = node_identity_service.get_node_identity_from_element_id(cmd_get_node_id)
@@ -71,13 +71,13 @@ def __get_orphan_group_cmd_from_create_group_and_attach_cmd(cmd: command_pgrm.Cr
     )
 
 
-def __get_node_identity_cmd(path_to_paste: Path) -> command_pgrm.GetNodeIdentityFromElementId:
+def __get_node_identity_cmd(path_to_paste: Path) -> command_program_mangement.GetNodeIdentityFromElementId:
     parent_id = path_to_paste.split('|')[-1]
-    return command_pgrm.GetNodeIdentityFromElementId(element_id=int(parent_id))
+    return command_program_mangement.GetNodeIdentityFromElementId(element_id=int(parent_id))
 
 
-def __get_paste_cmd(group_id: GroupIdentity, path_to_paste: Path) -> command_pgrm.PasteElementCommand:
-    return command_pgrm.PasteElementCommand(
+def __get_paste_cmd(group_id: GroupIdentity, path_to_paste: Path) -> command_program_mangement.PasteElementCommand:
+    return command_program_mangement.PasteElementCommand(
         node_to_paste_code=group_id.code,
         node_to_paste_year=group_id.year,
         path_where_to_paste=path_to_paste

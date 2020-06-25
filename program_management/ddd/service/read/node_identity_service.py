@@ -28,5 +28,7 @@ from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
 
 
+# TODO: Fix me: This is not an application service because element_id is a technical notion
+#  (Path is badly construct... Normally, we should have something like "?path=LDROI1200_2015|...."
 def get_node_identity_from_element_id(cmd: command.GetNodeIdentityFromElementId) -> Optional[NodeIdentity]:
     return NodeIdentitySearch.get_from_element_id(cmd.element_id)
