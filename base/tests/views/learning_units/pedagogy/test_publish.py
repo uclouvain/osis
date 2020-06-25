@@ -39,7 +39,7 @@ class TestPublish(TestCase):
     def test_should_redirect_to_learning_unit_portal_with_updated_cache_url_when_accessed(self):
         code = "LOSIS1452"
         year = 2020
-        url = reverse("publish_educational_information", kwargs={"code": code, "year": 2020})
+        url = reverse("access_publication", kwargs={"code": code, "year": 2020})
         response = self.client.get(url, follow=False)
 
         expected_url = settings.LEARNING_UNIT_PORTAL_URL_WITH_UPDATED_CACHE.format(year=year, acronym=code)

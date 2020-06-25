@@ -27,7 +27,7 @@ from django.http import HttpResponseRedirect
 
 
 @login_required
-def publish(request, code: str, year: int):
+def access_refreshed_publication(request, code: str, year: int):
     redirect_url = get_learning_unit_portal_updated_cache_url(code, year)
     return HttpResponseRedirect(redirect_url)
 

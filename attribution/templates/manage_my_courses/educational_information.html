@@ -48,13 +48,14 @@
 <div class="panel panel-default">
     <div class="panel-body" id="tabs">
         <div class="pull-right">
-            <form action="{% url "publish_educational_information" code=learning_unit_year.acronym year=learning_unit_year.academic_year.year %}"
-                  method="post">
-                {% csrf_token %}
-                <button class="btn btn-default btn-publish" {% if not can_edit_information %}disabled{% endif %}>
-                    {% trans 'Refresh publication' %}
-                </button>
-            </form>
+            <a id="visualize_refreshed_publication_btn"
+               class="btn btn-default"
+               data-code="{{ learning_unit_year.acronym }}"
+               role="button"
+               href="{% url "access_publication" code=learning_unit_year.acronym year=learning_unit_year.academic_year.year %}"
+               target="_blank">
+                {% trans 'Refresh and visualize publication' %}
+            </a>
         </div>
         {% include "manage_my_courses/blocks/tabs.html" %}
         <br>
@@ -102,5 +103,15 @@
                 button.className = "glyphicon glyphicon-collapse-down"
             }
         }
+
+        function display_refresh_message() {
+            code = this.dataset.code
+            fmts = gettext('The learning unit %s will be published soon.');
+            success_message = interpolate(fmts, [code]);
+            displaySuccessMessage(success_message);
+        }
+        btn_visualize_refreshed_publication = document.getElementById("visualize_refreshed_publication_btn")
+        btn_visualize_refreshed_publication.onclick = display_refresh_message;
+
     </script>
 {% endblock %}
