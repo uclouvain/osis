@@ -349,6 +349,9 @@ msgstr "Master complémentaire en spécialisation médicale"
 msgid "Aggregation"
 msgstr "Agrégation"
 
+msgid "Agreements"
+msgstr "Accords"
+
 msgid "Alert"
 msgstr "Alerte"
 
@@ -1680,6 +1683,9 @@ msgstr "Téléphone mobile (GSM)"
 
 msgid "Mobility"
 msgstr "Mobilité"
+
+msgid "Mobility management entities"
+msgstr "Entités de gestion mobilité"
 
 msgid "Mobility partnership"
 msgstr "Partenariat de mobilité"
