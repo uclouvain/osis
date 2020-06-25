@@ -52,9 +52,6 @@ from osis_common.ddd import interface
 from education_group.ddd.business_types import *
 
 
-T = TypeVar('T')
-
-
 class TrainingIdentity(interface.EntityIdentity):
     def __init__(self, acronym: str, year: int):
         self.acronym = acronym
@@ -69,7 +66,7 @@ class TrainingIdentity(interface.EntityIdentity):
 
 class TrainingBuilder:
     def get_training(self, command: 'CreateTrainingCommand') -> 'Training':
-        training_identity = TrainingIdentity(command.acronym, command.year)
+        training_identity = TrainingIdentity(command.abbreviated_title, command.year)
         secondary_domains = []
         for dom in command.secondary_domains:
             secondary_domains.append(
@@ -127,8 +124,14 @@ class TrainingBuilder:
             management_entity=Entity(acronym=command.management_entity_acronym),
             administration_entity=Entity(acronym=command.administration_entity_acronym),
             end_year=command.end_year,
-            teaching_campus=command.teaching_campus,
-            enrollment_campus=command.enrollment_campus,
+            teaching_campus=CampusIdentity(
+                name=command.teaching_campus_name,
+                university_name=command.teaching_campus_organization_name,
+            ),
+            enrollment_campus=CampusIdentity(
+                name=command.enrollment_campus_name,
+                university_name=command.enrollment_campus_organization_name,
+            ),
             other_campus_activities=self._get_enum_from_str(command.other_campus_activities, ActivityPresence),
             funding=Funding(
                 can_be_funded=command.can_be_funded,
