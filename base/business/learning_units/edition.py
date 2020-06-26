@@ -676,17 +676,23 @@ def _descriptive_fiche_and_achievements_update(proposal_learning_unit_year: Lear
 
 
 def _report_volume(reference: LearningUnitYear, to_postpone_to: List[LearningUnitYear]) -> None:
-    lecturing_component = LearningComponentYear.objects.get(
-        learning_unit_year=reference,
-        type=learning_component_year_type.LECTURING
-    )
-    __report_component(lecturing_component, to_postpone_to)
+    try:
+        lecturing_component = LearningComponentYear.objects.get(
+            learning_unit_year=reference,
+            type=learning_component_year_type.LECTURING
+        )
+        __report_component(lecturing_component, to_postpone_to)
+    except LearningComponentYear.DoesNotExist:
+        pass
 
-    practical_component = LearningComponentYear.objects.get(
-        learning_unit_year=reference,
-        type=learning_component_year_type.PRACTICAL_EXERCISES
-    )
-    __report_component(practical_component, to_postpone_to)
+    try:
+        practical_component = LearningComponentYear.objects.get(
+            learning_unit_year=reference,
+            type=learning_component_year_type.PRACTICAL_EXERCISES
+        )
+        __report_component(practical_component, to_postpone_to)
+    except LearningComponentYear.DoesNotExist:
+        pass
 
 
 def __report_component(reference: LearningComponentYear, to_postpone_to: List[LearningUnitYear]) -> None:
