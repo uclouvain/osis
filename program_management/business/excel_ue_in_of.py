@@ -58,8 +58,9 @@ from program_management.ddd.repositories import load_tree
 from program_management.forms.custom_xls import CustomXlsForm
 from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYearIdentity
 from program_management.ddd.business_types import *
-from program_management.ddd.domain import prerequisite as prerequisite_domain, program_tree
 from program_management.ddd.domain.node import NodeLearningUnitYear
+from program_management.ddd.repositories.program_tree import ProgramTreeRepository
+from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 
 ILLEGAL_CHARACTERS_RE = re.compile(r'[\000-\010]|[\013-\014]|[\016-\037]')
 

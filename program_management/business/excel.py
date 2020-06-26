@@ -43,7 +43,8 @@ from program_management.ddd.domain.prerequisite import Prerequisite, Prerequisit
 from program_management.ddd.domain import link
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.node import NodeIdentity
-
+from program_management.ddd.repositories.program_tree import ProgramTreeRepository
+from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 
 STYLE_BORDER_BOTTOM = Style(
     border=Border(

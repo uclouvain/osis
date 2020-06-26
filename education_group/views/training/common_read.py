@@ -145,6 +145,14 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             # TODO: Two lines below to remove when finished reorganized templates
             "education_group_version": self.education_group_version,
             "group_year": self.education_group_version.root_group,
+            "xls_ue_prerequisites": reverse("education_group_learning_units_prerequisites",
+                                            args=[self.education_group_version.root_group.academic_year.year,
+                                                  self.education_group_version.root_group.partial_acronym]
+                                            ),
+            "xls_ue_is_prerequisite": reverse("education_group_learning_units_is_prerequisite_for",
+                                              args=[self.education_group_version.root_group.academic_year.year,
+                                                    self.education_group_version.root_group.partial_acronym]
+                                              ),
         }
 
     def get_permission_object(self):
