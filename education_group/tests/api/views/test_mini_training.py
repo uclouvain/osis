@@ -222,19 +222,6 @@ class MiniTrainingListTestCase(APITestCase):
         )
         self.assertEqual(response.data['results'], serializer.data)
 
-    def test_get_case_filter_campus(self):
-        query_string = {'campus': self.mini_trainings[2].main_teaching_campus.name}
-
-        response = self.client.get(self.url, data=query_string)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-        serializer = MiniTrainingListSerializer(
-            [self.mini_trainings[2]],
-            many=True,
-            context={'request': RequestFactory().get(self.url, query_string)},
-        )
-        self.assertEqual(response.data['results'], serializer.data)
-
 
 class GetMiniTrainingTestCase(APITestCase):
     @classmethod
