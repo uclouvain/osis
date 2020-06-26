@@ -47,6 +47,15 @@ paths:
           description: ''
           type: string
       - in: query
+        name: education_group_type
+        schema:
+          description: Filter result by specified training types
+          type: array
+          items:
+            type: string
+        style: form
+        explode: true
+      - in: query
         name: from_year
         schema:
           description: From which training year we want to display
@@ -66,16 +75,6 @@ paths:
         schema:
           description: ''
           type: string
-      - in: query
-        name: for_catalog
-        schema:
-          description: Training types useful for catalog publication
-          type: boolean
-      - in: query
-        name: with_possible_registration
-        schema:
-          description: Training types with a possible registration
-          type: boolean
       - in: query
         name: ordering
         schema:
@@ -359,11 +358,6 @@ paths:
           schema:
             description: ''
             type: string
-        - in: query
-          name: for_catalog
-          schema:
-            description: Mini training types useful for catalog publication
-            type: boolean
         - in: query
           name: ordering
           schema:

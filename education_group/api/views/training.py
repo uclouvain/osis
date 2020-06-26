@@ -40,28 +40,16 @@ class TrainingFilter(filters.FilterSet):
     to_year = filters.NumberFilter(field_name="academic_year__year", lookup_expr='lte')
     in_type = filters.CharFilter(field_name="education_group_type__name", lookup_expr='icontains')
     campus = filters.CharFilter(field_name='main_teaching_campus__name', lookup_expr='icontains')
-    for_catalog = filters.BooleanFilter(method='filter_for_catalog')
-    with_possible_registration = filters.BooleanFilter(method='filter_with_possible_registration')
+    education_group_type = filters.MultipleChoiceFilter(
+        field_name='education_group_type__name',
+        choices=TrainingType.choices()
+    )
 
     class Meta:
         model = EducationGroupYear
-        fields = ['acronym', 'partial_acronym', 'title', 'title_english', 'from_year', 'to_year']
-
-    @staticmethod
-    def filter_for_catalog(queryset, _, value):
-        if value:
-            return queryset.filter(
-                education_group_type__name__in=TrainingType.for_catalog_publication()
-            )
-        return queryset
-
-    @staticmethod
-    def filter_with_possible_registration(queryset, _, value):
-        if value:
-            return queryset.filter(
-                education_group_type__name__in=TrainingType.with_possible_registration()
-            )
-        return queryset
+        fields = [
+            'acronym', 'partial_acronym', 'title', 'title_english', 'from_year', 'to_year', 'education_group_type'
+        ]
 
 
 class TrainingList(LanguageContextSerializerMixin, generics.ListAPIView):
