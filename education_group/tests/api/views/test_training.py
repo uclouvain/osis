@@ -269,7 +269,7 @@ class FilterTrainingTestCase(APITestCase):
 
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['count'], 3)
+        self.assertEqual(response.data['count'], 9)
 
 
 class GetTrainingTestCase(APITestCase):
