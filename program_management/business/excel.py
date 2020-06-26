@@ -121,7 +121,7 @@ def _build_excel_lines(tree: 'ProgramTree') -> List:
     links = tree.get_all_links()
     for luy in tree.get_nodes_that_have_prerequisites():
         content.append(
-            LearningUnitYearLine(luy_acronym=luy.code, luy_title=luy.complete_title)
+            LearningUnitYearLine(luy_acronym=luy.code, luy_title=complete_title(luy))
         )
 
         if not luy.prerequisite:
@@ -396,3 +396,9 @@ def _prerequisite_item_line(tree, prerequisite_item: PrerequisiteItem, links: Li
         block=tree.get_blocks_values(NodeIdentity(prerequisite_item.code, prerequisite_item.year)),
         mandatory=_("Yes") if item_link and item_link.is_mandatory else _("No")
     )
+
+
+def complete_title(luy: 'NodeLearningUnitYear'):
+    if translation.get_language() == LANGUAGE_CODE_EN:
+        return luy.full_title_en
+    return luy.full_title_fr
