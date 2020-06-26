@@ -93,7 +93,7 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
     @functools.lru_cache()
     def get_education_group_version(self):
         try:
-            root_element_id = self.get_path().split("|")[0]
+            root_element_id = self.get_path().split("|")[-1]
             return EducationGroupVersion.objects.select_related(
                 'offer', 'root_group'
             ).get(root_group__element__pk=root_element_id)
