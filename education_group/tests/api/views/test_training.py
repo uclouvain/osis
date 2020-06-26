@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import urllib
 
 from django.conf import settings
 from django.test import RequestFactory
@@ -263,11 +262,10 @@ class FilterTrainingTestCase(APITestCase):
         """
         This test ensure that multiple filtering by education_group_type will act as an OR
         """
-        url = self.url + "?" + urllib.parse.urlencode({
-            'education_group_type': [training.education_group_type.name for training in self.trainings]
-        }, doseq=True)
+        data = {'education_group_type': [training.education_group_type.name for training in self.trainings]}
 
-        response = self.client.get(url)
+        response = self.client.get(self.url, data=data)
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['count'], 9)
 
