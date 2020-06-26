@@ -62,6 +62,21 @@ paths:
           description: ''
           type: string
       - in: query
+        name: campus
+        schema:
+          description: ''
+          type: string
+      - in: query
+        name: for_catalog
+        schema:
+          description: Training types useful for catalog publication
+          type: boolean
+      - in: query
+        name: with_possible_registration
+        schema:
+          description: Training types with a possible registration
+          type: boolean
+      - in: query
         name: ordering
         schema:
           description: Which field to use when ordering the results.
@@ -333,12 +348,22 @@ paths:
         - in: query
           name: education_group_type
           schema:
-              description: Filter result by specified mini-training types
-              type: array
-              items:
-                type: string
+            description: Filter result by specified mini-training types
+            type: array
+            items:
+              type: string
           style: form
           explode: true
+        - in: query
+          name: campus
+          schema:
+            description: ''
+            type: string
+        - in: query
+          name: for_catalog
+          schema:
+            description: Mini training types useful for catalog publication
+            type: boolean
         - in: query
           name: ordering
           schema:
