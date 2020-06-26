@@ -125,11 +125,11 @@ class MiniTrainingListTestCase(APITestCase):
         """
         This test ensure that multiple filtering by education_group_type will act as an OR
         """
-        url = self.url + "?" + urllib.parse.urlencode({
+        data = {
             'education_group_type': [mini_training.education_group_type.name for mini_training in self.mini_trainings]
-        }, doseq=True)
+        }
 
-        response = self.client.get(url)
+        response = self.client.get(self.url, data=data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['count'], 3)
 
