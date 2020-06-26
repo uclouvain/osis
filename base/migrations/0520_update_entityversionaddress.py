@@ -19,4 +19,9 @@ class Migration(migrations.Migration):
             name='postal_code',
             field=models.CharField(blank=True, max_length=32),
         ),
+        migrations.AddField(
+            model_name='entityversionaddress',
+            name='state',
+            field=models.CharField(blank=True, max_length=255),
+        ),
     ]
