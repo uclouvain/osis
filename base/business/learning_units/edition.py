@@ -299,7 +299,6 @@ def get_next_academic_years(learning_unit_to_edit, year):
     return AcademicYear.objects.filter(year__range=(end_date, year)).order_by('year')
 
 
-# TODO report volumes also
 def update_learning_unit_year_with_report(
         luy_to_update: LearningUnitYear,
         fields_to_update: Dict[str, Any],
@@ -325,8 +324,8 @@ def update_learning_unit_year_with_report(
 
     # Show conflict error if exists
     check_postponement_conflict_report_errors(conflict_report)
-    #  TODO add report volumes
     if lu_to_consolidate:
+        _report_volume(lu_to_consolidate, luy_to_update_list)
         postpone_teaching_materials(luy_to_update)
         _descriptive_fiche_and_achievements_update(lu_to_consolidate, luy_to_update)
 
