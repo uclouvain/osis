@@ -117,21 +117,19 @@ def _build_excel_lines(tree: 'ProgramTree') -> List:
         )
     )
 
-    for luy in tree.get_nodes_that_have_prerequisites():
+    for node in tree.get_nodes_that_have_prerequisites():
         content.append(
-            LearningUnitYearLine(luy_acronym=luy.code, luy_title=complete_title(luy))
+            LearningUnitYearLine(luy_acronym=node.code, luy_title=complete_title(node))
         )
 
-        if not luy.prerequisite:
-            continue
-        for group_number, group in enumerate(luy.prerequisite.prerequisite_item_groups, start=1):
+        for group_number, group in enumerate(node.prerequisite.prerequisite_item_groups, start=1):
             for position, prerequisite_item in enumerate(group.prerequisite_items, start=1):
                 prerequisite_item_links = tree.get_links_using_node(
                     tree.get_node_by_code_and_year(code=prerequisite_item.code, year=prerequisite_item.year)
                 )
                 prerequisite_line = _prerequisite_item_line(tree,
                                                             prerequisite_item, prerequisite_item_links,
-                                                            luy.prerequisite, group_number, position,
+                                                            node.prerequisite, group_number, position,
                                                             len(group.prerequisite_items))
                 content.append(prerequisite_line)
 
@@ -328,40 +326,10 @@ def clean_worksheet_title(title: str) -> str:
     return title[:25].replace("/", "_")
 
 
-def get_complete_title(luy: 'NodeLearningUnitYear'):
-
-    if translation.get_language() == LANGUAGE_CODE_EN:
-        complete_title = "{}{}".format(luy.common_title_en,
-                                       " - {}".format(luy.specific_title_en) if luy.specific_title_en else '')
-
-    else:
-        complete_title = "{}{}".format(luy.common_title_fr,
-                                       " - {}".format(luy.specific_title_fr) if luy.specific_title_fr else '')
-
-    return complete_title
-
-
-def complete_title_i18n(luy: 'NodeLearningUnitYear'):
-
-    complete_title = get_complete_title(luy)
-    if translation.get_language() == LANGUAGE_CODE_EN:
-        complete_title = luy.complete_title_english or complete_title
-    return complete_title
-
-
 def _prerequisite_item_line(tree, prerequisite_item: PrerequisiteItem, links: List[link.Link],
                             prerequisite: Prerequisite, group_number: int, position: int,
                             number_of_prerequisite_item: int):
-    item_link = next(
-        (link_obj for link_obj in links
-         if link_obj.child.code == prerequisite_item.code and link_obj.child.year == prerequisite_item.year
-         ),
-        None
-    )
-
-    title = "{}".format(
-        item_link.child.title
-    ) if item_link else ""
+    item_link = links[0]
 
     text = (_("has as prerequisite") + " :") \
         if group_number == 1 and position == 1 else None
@@ -370,7 +338,7 @@ def _prerequisite_item_line(tree, prerequisite_item: PrerequisiteItem, links: Li
         text=text,
         operator=_get_operator(prerequisite, group_number, position),
         luy_acronym=_get_item_code(prerequisite_item, position, number_of_prerequisite_item),
-        luy_title=title,
+        luy_title=item_link.child.title,
         credits=tree.get_relative_credits_values(NodeIdentity(prerequisite_item.code, prerequisite_item.year)),
         block=tree.get_blocks_values(NodeIdentity(prerequisite_item.code, prerequisite_item.year)),
         mandatory=_("Yes") if item_link and item_link.is_mandatory else _("No")
