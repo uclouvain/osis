@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import logging
 from typing import Dict, List, Any, Iterable
 
 from django.conf import settings
@@ -62,6 +63,8 @@ from learning_unit.models.learning_class_year import LearningClassYear
 from osis_common.utils.numbers import normalize_fraction
 from reference.models.language import Language
 
+
+logger = logging.getLogger(settings.DEFAULT_LOGGER)
 FIELDS_TO_EXCLUDE_WITH_REPORT = ("is_vacant", "type_declaration_vacant", "attribution_procedure")
 NO_DATA = _('No data')
 
@@ -673,19 +676,17 @@ def _descriptive_fiche_and_achievements_update(proposal_learning_unit_year: Lear
 
 
 def _report_volume(reference: LearningUnitYear, to_postpone_to: List[LearningUnitYear]) -> None:
-    lecturing_component = LearningComponentYear.objects.filter(
+    lecturing_component = LearningComponentYear.objects.get(
         learning_unit_year=reference,
         type=learning_component_year_type.LECTURING
-    ).first()
-    if lecturing_component:
-        __report_component(lecturing_component, to_postpone_to)
+    )
+    __report_component(lecturing_component, to_postpone_to)
 
-    practical_component = LearningComponentYear.objects.filter(
+    practical_component = LearningComponentYear.objects.get(
         learning_unit_year=reference,
         type=learning_component_year_type.PRACTICAL_EXERCISES
-    ).first()
-    if practical_component:
-        __report_component(practical_component, to_postpone_to)
+    )
+    __report_component(practical_component, to_postpone_to)
 
 
 def __report_component(reference: LearningComponentYear, to_postpone_to: List[LearningUnitYear]) -> None:
