@@ -100,12 +100,12 @@ class ProgramTreeVersion(interface.RootEntity):
             return '{}-Transition'.format(self.version_name) if self.is_transition else self.version_name
 
 
-@attr.s(frozen=True, slots=True, auto_attribs=True)
+@attr.s(frozen=True, slots=True)
 class ProgramTreeVersionIdentity(interface.EntityIdentity):
-    offer_acronym: str
-    year: int
-    version_name: str
-    is_transition: bool
+    offer_acronym = attr.ib(type=str)
+    year = attr.ib(type=int)
+    version_name = attr.ib(type=str)
+    is_transition = attr.ib(type=bool)
 
 
 class ProgramTreeVersionNotFoundException(Exception):

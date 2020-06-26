@@ -33,12 +33,12 @@ from program_management.ddd.business_types import *
 from program_management.models.enums.node_type import NodeType
 
 
-@attr.s(frozen=True, slots=True, auto_attribs=True)
+@attr.s(frozen=True, slots=True)
 class LinkIdentity(interface.EntityIdentity):
-    parent_code: str
-    child_code: str
-    parent_year: int
-    child_year: int
+    parent_code = attr.ib(type=str)
+    child_code = attr.ib(type=str)
+    parent_year = attr.ib(type=int)
+    child_year = attr.ib(type=int)
 
 
 class Link(interface.Entity):

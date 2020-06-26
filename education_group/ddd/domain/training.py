@@ -50,10 +50,10 @@ from education_group.ddd.domain._titles import Titles
 from osis_common.ddd import interface
 
 
-@attr.s(frozen=True, slots=True, auto_attribs=True)
+@attr.s(frozen=True, slots=True)
 class TrainingIdentity(interface.EntityIdentity):
-    acronym: str
-    year: int
+    acronym = attr.ib(type=str)
+    year = attr.ib(type=int)
 
 
 class Training(interface.RootEntity):

@@ -31,9 +31,9 @@ from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYea
 from osis_common.ddd import interface
 
 
-@attr.s(frozen=True, slots=True, auto_attribs=True)
+@attr.s(frozen=True, slots=True)
 class AttributionIdentity(interface.EntityIdentity):
-    id: int
+    id = attr.ib(type=int)
 
 
 class Attribution(interface.RootEntity):

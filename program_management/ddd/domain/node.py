@@ -62,10 +62,10 @@ class NodeFactory:
 factory = NodeFactory()
 
 
-@attr.s(frozen=True, slots=True, auto_attribs=True)
+@attr.s(frozen=True, slots=True)
 class NodeIdentity(interface.EntityIdentity):
-    code: str
-    year: int
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)
 
 
 class Node(interface.Entity):

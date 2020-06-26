@@ -45,10 +45,10 @@ PATH_SEPARATOR = '|'
 Path = str  # Example : "root|node1|node2|child_leaf"
 
 
-@attr.s(frozen=True, slots=True, auto_attribs=True)
+@attr.s(frozen=True, slots=True)
 class ProgramTreeIdentity(interface.EntityIdentity):
-    code: str
-    year: int
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)
 
 
 class ProgramTree(interface.RootEntity):
