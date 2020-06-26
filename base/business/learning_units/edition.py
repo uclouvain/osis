@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Iterable
 
 from django.conf import settings
 from django.db import IntegrityError, transaction, Error
@@ -46,11 +46,12 @@ from base.forms.utils.choice_field import NO_PLANNED_END_DISPLAY
 from base.models import academic_year
 from base.models.academic_year import AcademicYear, compute_max_academic_year_adjournment
 from base.models.entity import Entity
-from base.models.enums import learning_unit_year_subtypes
+from base.models.enums import learning_unit_year_subtypes, learning_component_year_type
 from base.models.enums.component_type import COMPONENT_TYPES
 from base.models.enums.entity_container_year_link_type import ENTITY_TYPE_LIST
 from base.models.enums.proposal_type import ProposalType
 from base.models.learning_achievement import LearningAchievement
+from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.proposal_learning_unit import ProposalLearningUnit
@@ -324,7 +325,7 @@ def update_learning_unit_year_with_report(
 
     # Show conflict error if exists
     check_postponement_conflict_report_errors(conflict_report)
-
+    #  TODO add report volumes
     if lu_to_consolidate:
         postpone_teaching_materials(luy_to_update)
         _descriptive_fiche_and_achievements_update(lu_to_consolidate, luy_to_update)
@@ -670,3 +671,37 @@ def _descriptive_fiche_and_achievements_update(proposal_learning_unit_year: Lear
         ac_year_postponement_range = get_academic_year_postponement_range(proposal_learning_unit_year)
         _update_descriptive_fiche(ac_year_postponement_range, proposal_learning_unit_year, luy_to_update)
         _update_luy_achievements_in_future(ac_year_postponement_range, proposal_learning_unit_year)
+
+
+def _report_volume(reference: LearningUnitYear, to_postpone_to: List[LearningUnitYear]) -> None:
+    lecturing_component = LearningComponentYear.objects.filter(
+        learning_unit_year=reference,
+        type=learning_component_year_type.LECTURING
+    ).first()
+    if lecturing_component:
+        __report_component(lecturing_component, to_postpone_to)
+
+    practical_component = LearningComponentYear.objects.filter(
+        learning_unit_year=reference,
+        type=learning_component_year_type.PRACTICAL_EXERCISES
+    ).first()
+    if practical_component:
+        __report_component(practical_component, to_postpone_to)
+
+
+def __report_component(reference: LearningComponentYear, to_postpone_to: List[LearningUnitYear]) -> None:
+    for learning_unit_year_obj in to_postpone_to:
+        LearningComponentYear.objects.update_or_create(
+            defaults={
+                "planned_classes": reference.planned_classes,
+                "hourly_volume_total_annual": reference.hourly_volume_total_annual,
+                "hourly_volume_partial_q1": reference.hourly_volume_partial_q1,
+                "hourly_volume_partial_q2": reference.hourly_volume_partial_q2,
+                "repartition_volume_requirement_entity": reference.repartition_volume_requirement_entity,
+                "repartition_volume_additional_entity_1": reference.repartition_volume_additional_entity_1,
+                "repartition_volume_additional_entity_2": reference.repartition_volume_additional_entity_2,
+            },
+            learning_unit_year=learning_unit_year_obj,
+            type=reference.type,
+        )
+
