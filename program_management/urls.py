@@ -67,11 +67,9 @@ urlpatterns = [
         path('update/', tree.update.UpdateLinkView.as_view(), name='tree_update_link'),
         path('detach/', tree.detach.DetachNodeView.as_view(), name='tree_detach_node'),
         path('move/', tree.paste.PasteNodesView.as_view(), name='group_element_year_move'),
-        path('<int:link_id>/', include([
-            path('up/', tree.move.up, name="group_element_year_up"),
-            path('down/', tree.move.down, name="group_element_year_down")
-        ])),
     ])),
+    path('up/', tree.move.up, name="content_up"),
+    path('down/', tree.move.down, name="content_down"),
     path('check_paste/', tree.paste.CheckPasteView.as_view(), name="check_tree_paste_node"),
     path('paste/', tree.paste.PasteNodesView.as_view(), name='tree_paste_node'),
     path('cut_element/', tree.copy_cut.cut_to_cache, name='cut_element'),
