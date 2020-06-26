@@ -33,7 +33,8 @@ from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
-from program_management.tests.ddd.factories.prerequisite import PrerequisiteFactory, PrerequisiteItemGroupFactory, PrerequisiteItemFactory
+from program_management.tests.ddd.factories.prerequisite import PrerequisiteFactory, PrerequisiteItemGroupFactory, \
+    PrerequisiteItemFactory
 from program_management.tests.ddd.factories.prerequisite import cast_to_prerequisite
 from program_management.business.excel import _build_excel_lines
 from program_management.business.excel import HeaderLine, OfficialTextLine, LearningUnitYearLine, PrerequisiteItemLine
@@ -44,41 +45,7 @@ class TestGeneratePrerequisitesWorkbook(SimpleTestCase):
     def setUp(self):
         self.program_tree = ProgramTreeFactory()
         yr = 2019
-        # self.link0 = LinkFactory(
-        #     parent=self.program_tree.root_node,
-        #     child=NodeLearningUnitYearFactory(code="LOSIS1121",
-        #                                       year=yr)
-        # )
-        # self.link1 = LinkFactory(
-        #     parent=self.program_tree.root_node,
-        #     child=NodeLearningUnitYearFactory(code="MARC2547",
-        #                                       year=yr)
-        # )
-        # self.link2 = LinkFactory(
-        #     parent=self.program_tree.root_node,
-        #     child=NodeLearningUnitYearFactory(code="MECK8960",
-        #                                       year=yr)
-        # )
-        # self.link3 = LinkFactory(
-        #     parent=self.program_tree.root_node,
-        #     child=NodeLearningUnitYearFactory(code="BREM5890",
-        #                                       year=yr)
-        # )
-        # self.link4 = LinkFactory(
-        #     parent=self.program_tree.root_node,
-        #     child=NodeLearningUnitYearFactory(code="MARC2548",
-        #                                       year=yr)
-        # )
-        # self.link5 = LinkFactory(
-        #     parent=self.program_tree.root_node,
-        #     child=NodeLearningUnitYearFactory(code="MECK8968",
-        #                                       year=yr)
-        # )
-        # link6 = LinkFactory(
-        #     parent=self.program_tree.root_node,
-        #     child=NodeLearningUnitYearFactory(code="BREM5898",
-        #                                       year=yr)
-        # )
+
         self.links = [
             LinkFactory(parent=self.program_tree.root_node, child=NodeLearningUnitYearFactory(code=code, year=yr)) for code in ['LOSIS1121', 'MARC2547', 'MECK8960', 'BREM5890', 'MARC2548', 'MECK8968', 'BREM5898']
         ]
@@ -133,7 +100,7 @@ class TestGeneratePrerequisitesWorkbook(SimpleTestCase):
                                                                luy_acronym=self.luy_children[1].code,
                                                                luy_title=self.luy_children[1].title,
                                                                credits=self.links[1].relative_credits_repr,
-                                                               block=str(self.links[1].block),
+                                                               block=str(self.links[1].block) if self.links[1].block else '',
                                                                mandatory=_("Yes") if self.links[1].is_mandatory else _("No")
                                                                )
         self.assertEqual(expected_learning_unit_year_line, learning_unit_year_line)

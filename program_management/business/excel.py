@@ -39,10 +39,9 @@ from backoffice.settings.base import LEARNING_UNIT_PORTAL_URL
 from base.models.enums.prerequisite_operator import OR, AND
 from osis_common.document.xls_build import _build_worksheet, CONTENT_KEY, HEADER_TITLES_KEY, WORKSHEET_TITLE_KEY, \
     STYLED_CELLS, STYLE_NO_GRAY
-from program_management.ddd.business_types import *
-from program_management.ddd.repositories import load_tree
 from program_management.ddd.domain.prerequisite import Prerequisite, PrerequisiteItem
 from program_management.ddd.domain import link
+from program_management.ddd.business_types import *
 from program_management.ddd.domain.node import NodeIdentity
 
 
@@ -81,7 +80,7 @@ HeaderLinePrerequisiteOf = namedtuple('HeaderLinePrerequisiteOf', ['egy_acronym'
 
 class EducationGroupYearLearningUnitsPrerequisitesToExcel:
     def __init__(self, year: int, code: str):
-        self.tree = load_tree.load_from_year_and_code(year, code)
+        self.tree = ProgramTreeRepository.get(ProgramTreeIdentity(code, year))
 
     def _to_workbook(self):
         return generate_prerequisites_workbook(self.tree)
@@ -158,7 +157,7 @@ def _get_operator(prerequisite: Prerequisite, group_number: int, position: int):
     return _(prerequisite.secondary_operator())
 
 
-def _get_item_acronym(prerequisite_item: PrerequisiteItem, position: int, group_len: int):
+def _get_item_code(prerequisite_item: PrerequisiteItem, position: int, group_len: int):
     acronym_format = "{acronym}"
 
     if position == 1 and group_len > 1:
@@ -242,7 +241,7 @@ def _add_hyperlink(excel_lines, workbook: Workbook, year):
 class EducationGroupYearLearningUnitsIsPrerequisiteOfToExcel:
 
     def __init__(self, year: int, code: str):
-        self.tree = load_tree.load_from_year_and_code(year, code)
+        self.tree = ProgramTreeRepository.get(ProgramTreeIdentity(code, year))
         self.acronym = "{}-{}"
 
     def _to_workbook(self):
@@ -366,11 +365,11 @@ def _prerequisite_item_line(tree, prerequisite_item: PrerequisiteItem, links: Li
 
     text = (_("has as prerequisite") + " :") \
         if group_number == 1 and position == 1 else None
-    luy_acronym = _get_item_acronym(prerequisite_item, position, number_of_prerequisite_item)
+
     return PrerequisiteItemLine(
         text=text,
         operator=_get_operator(prerequisite, group_number, position),
-        luy_acronym=luy_acronym,
+        luy_acronym=_get_item_code(prerequisite_item, position, number_of_prerequisite_item),
         luy_title=title,
         credits=tree.get_relative_credits_values(NodeIdentity(prerequisite_item.code, prerequisite_item.year)),
         block=tree.get_blocks_values(NodeIdentity(prerequisite_item.code, prerequisite_item.year)),
