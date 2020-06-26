@@ -104,7 +104,7 @@ def _get_or_create_branch(child_education_group_type, title_initial_value, parti
     edy_acronym = "{child_title}{parent_acronym}".format(
         child_title=title_initial_value.replace(" ", "").upper(),
         parent_acronym=parent_egy.acronym
-    )
+    )[:EducationGroupYear._meta.get_field("acronym").max_length]
 
     if not previous_grp_ele:
         ed = EducationGroup.objects.filter(
@@ -115,6 +115,7 @@ def _get_or_create_branch(child_education_group_type, title_initial_value, parti
         else:
             child_eg = EducationGroup.objects.create(start_year=academic_year, end_year=academic_year)
     else:
+        edy_acronym = previous_grp_ele.child_branch.acronym
         child_eg = previous_grp_ele.child_branch.education_group
 
     child_egy, _ = EducationGroupYear.objects.update_or_create(
