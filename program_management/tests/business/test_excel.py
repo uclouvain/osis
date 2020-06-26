@@ -44,50 +44,54 @@ class TestGeneratePrerequisitesWorkbook(SimpleTestCase):
     def setUp(self):
         self.program_tree = ProgramTreeFactory()
         yr = 2019
-        self.link0 = LinkFactory(
-            parent=self.program_tree.root_node,
-            child=NodeLearningUnitYearFactory(code="LOSIS1121",
-                                              year=yr)
-        )
-        self.link1 = LinkFactory(
-            parent=self.program_tree.root_node,
-            child=NodeLearningUnitYearFactory(code="MARC2547",
-                                              year=yr)
-        )
-        self.link2 = LinkFactory(
-            parent=self.program_tree.root_node,
-            child=NodeLearningUnitYearFactory(code="MECK8960",
-                                              year=yr)
-        )
-        self.link3 = LinkFactory(
-            parent=self.program_tree.root_node,
-            child=NodeLearningUnitYearFactory(code="BREM5890",
-                                              year=yr)
-        )
-        self.link4 = LinkFactory(
-            parent=self.program_tree.root_node,
-            child=NodeLearningUnitYearFactory(code="MARC2548",
-                                              year=yr)
-        )
-        self.link5 = LinkFactory(
-            parent=self.program_tree.root_node,
-            child=NodeLearningUnitYearFactory(code="MECK8968",
-                                              year=yr)
-        )
-        link6 = LinkFactory(
-            parent=self.program_tree.root_node,
-            child=NodeLearningUnitYearFactory(code="BREM5898",
-                                              year=yr)
-        )
+        # self.link0 = LinkFactory(
+        #     parent=self.program_tree.root_node,
+        #     child=NodeLearningUnitYearFactory(code="LOSIS1121",
+        #                                       year=yr)
+        # )
+        # self.link1 = LinkFactory(
+        #     parent=self.program_tree.root_node,
+        #     child=NodeLearningUnitYearFactory(code="MARC2547",
+        #                                       year=yr)
+        # )
+        # self.link2 = LinkFactory(
+        #     parent=self.program_tree.root_node,
+        #     child=NodeLearningUnitYearFactory(code="MECK8960",
+        #                                       year=yr)
+        # )
+        # self.link3 = LinkFactory(
+        #     parent=self.program_tree.root_node,
+        #     child=NodeLearningUnitYearFactory(code="BREM5890",
+        #                                       year=yr)
+        # )
+        # self.link4 = LinkFactory(
+        #     parent=self.program_tree.root_node,
+        #     child=NodeLearningUnitYearFactory(code="MARC2548",
+        #                                       year=yr)
+        # )
+        # self.link5 = LinkFactory(
+        #     parent=self.program_tree.root_node,
+        #     child=NodeLearningUnitYearFactory(code="MECK8968",
+        #                                       year=yr)
+        # )
+        # link6 = LinkFactory(
+        #     parent=self.program_tree.root_node,
+        #     child=NodeLearningUnitYearFactory(code="BREM5898",
+        #                                       year=yr)
+        # )
+        self.links = [
+            LinkFactory(parent=self.program_tree.root_node, child=NodeLearningUnitYearFactory(code=code, year=yr)) for code in ['LOSIS1121', 'MARC2547', 'MECK8960', 'BREM5890', 'MARC2548', 'MECK8968', 'BREM5898']
+        ]
 
-        self.children = [self.link0.child, self.link1.child, self.link2.child, self.link3.child, self.link4.child, self.link5.child, link6.child]
-        self.luy_children = [self.link0.child, self.link1.child, self.link2.child, self.link3.child, self.link4.child, self.link5.child, link6.child]
-        node_that_is_prerequisite = self.link1.child
-        self.link0.child.set_prerequisite(cast_to_prerequisite(node_that_is_prerequisite))
+        self.children = [link.child for link in self.links]
+        self.luy_children = list(self.children)
 
-        item3 = PrerequisiteItemFactory(code=self.link3.child.code, year=self.link3.child.year)
-        item4 = PrerequisiteItemFactory(code=self.link4.child.code, year=self.link4.child.year)
-        item5 = PrerequisiteItemFactory(code=self.link5.child.code, year=self.link5.child.year)
+        node_that_is_prerequisite = self.children[1]
+        self.children[0].set_prerequisite(cast_to_prerequisite(node_that_is_prerequisite))
+
+        item3 = PrerequisiteItemFactory(code=self.children[3].code, year=self.children[3].year)
+        item4 = PrerequisiteItemFactory(code=self.children[4].code, year=self.children[4].year)
+        item5 = PrerequisiteItemFactory(code=self.children[5].code, year=self.children[5].year)
         prerequisite = PrerequisiteFactory(
             prerequisite_item_groups=[
                 PrerequisiteItemGroupFactory(
@@ -99,7 +103,7 @@ class TestGeneratePrerequisitesWorkbook(SimpleTestCase):
             ]
         )
 
-        self.link2.child.set_prerequisite(prerequisite)
+        self.children[2].set_prerequisite(prerequisite)
 
     def test_header_lines(self):
         expected_first_line = HeaderLine(egy_acronym=self.program_tree.root_node.title,
@@ -123,14 +127,14 @@ class TestGeneratePrerequisitesWorkbook(SimpleTestCase):
         prerequisite_item_line = content[3]
 
         expected_learning_unit_year_line = LearningUnitYearLine(luy_acronym=self.luy_children[0].code,
-                                                                luy_title=self.luy_children[0].complete_title)
+                                                                luy_title=self.luy_children[0].full_title_en)
         expected_prerequisite_item_line = PrerequisiteItemLine(text='{} :'.format(_('has as prerequisite')),
                                                                operator=None,
                                                                luy_acronym=self.luy_children[1].code,
                                                                luy_title=self.luy_children[1].title,
-                                                               credits=self.link1.relative_credits_repr,
-                                                               block=str(self.link1.block),
-                                                               mandatory=_("Yes") if self.link1.is_mandatory else _("No")
+                                                               credits=self.links[1].relative_credits_repr,
+                                                               block=str(self.links[1].block),
+                                                               mandatory=_("Yes") if self.links[1].is_mandatory else _("No")
                                                                )
         self.assertEqual(expected_learning_unit_year_line, learning_unit_year_line)
         self.assertEqual(expected_prerequisite_item_line, prerequisite_item_line)
@@ -145,9 +149,9 @@ class TestGeneratePrerequisitesWorkbook(SimpleTestCase):
             operator=None,
             luy_acronym=self.luy_children[3].code,
             luy_title=self.luy_children[3].title,
-            credits=self.link3.relative_credits_repr,
-            block=str(self.link3.block) if self.link3.block else '',
-            mandatory=_("Yes") if self.link3.is_mandatory else _("No")
+            credits=self.links[3].relative_credits_repr,
+            block=str(self.links[3].block) if self.links[3].block else '',
+            mandatory=_("Yes") if self.links[3].is_mandatory else _("No")
         )
         self.assertEqual(prerequisite_item_line_1, expected_prerequisite_item_line1)
 
@@ -157,9 +161,9 @@ class TestGeneratePrerequisitesWorkbook(SimpleTestCase):
             operator=_(AND),
             luy_acronym="({}".format(self.luy_children[4].code),
             luy_title=self.luy_children[4].title,
-            credits=self.link4.relative_credits_repr,
-            block=str(self.link4.block) if self.link4.block else '',
-            mandatory=_("Yes") if self.link4.is_mandatory else _("No")
+            credits=self.links[4].relative_credits_repr,
+            block=str(self.links[4].block) if self.links[4].block else '',
+            mandatory=_("Yes") if self.links[4].is_mandatory else _("No")
         )
         self.assertEqual(prerequisite_item_line_2, expected_prerequisite_item_line2)
 
@@ -169,8 +173,8 @@ class TestGeneratePrerequisitesWorkbook(SimpleTestCase):
             operator=_(OR),
             luy_acronym="{})".format(self.luy_children[5].code),
             luy_title=self.luy_children[5].title,
-            credits=self.link5.relative_credits_repr,
-            block=str(self.link5.block) if self.link5.block else '',
-            mandatory=_("Yes") if self.link5.is_mandatory else _("No")
+            credits=self.links[5].relative_credits_repr,
+            block=str(self.links[5].block) if self.links[5].block else '',
+            mandatory=_("Yes") if self.links[5].is_mandatory else _("No")
         )
         self.assertEqual(prerequisite_item_line_3, expected_prerequisite_item_line3)
