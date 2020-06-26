@@ -71,6 +71,9 @@ class NodeIdentity(interface.EntityIdentity):
     def __eq__(self, other):
         return type(other) == type(self) and (self.code, self.year) == (other.code, other.year)
 
+    def __repr__(self):
+        return "NodeIdentity(code={code}, year={year})".format(code=self.code, year=self.year)
+
 
 class Node(interface.Entity):
 
@@ -181,6 +184,9 @@ class Node(interface.Entity):
     def get_option_list(self) -> Set['Node']:
         return {l.child for l in self.get_all_children() if l.child.is_option()}
 
+    def get_finality_list(self) -> Set['Node']:
+        return {l.child for l in self.get_all_children() if l.child.is_finality()}
+
     def get_all_children_as_nodes(
             self,
             take_only: Set[EducationGroupTypesEnum] = None,
@@ -260,6 +266,26 @@ class Node(interface.Entity):
 
     def get_link(self, link_id: int) -> 'Link':
         return next((link for link in self.children if link.pk == link_id), None)
+
+    def up_child(self, node_to_up: 'Node') -> None:
+        index = self.children_as_nodes.index(node_to_up)
+
+        is_first_element = index == 0
+        if is_first_element:
+            return
+
+        self.children[index].order_up()
+        self.children[index-1].order_down()
+
+    def down_child(self, node_to_down: 'Node') -> None:
+        index = self.children_as_nodes.index(node_to_down)
+
+        is_last_element = index == len(self.children) - 1
+        if is_last_element:
+            return
+
+        self.children[index].order_down()
+        self.children[index+1].order_up()
 
 
 def _get_descendents(root_node: Node, current_path: 'Path' = None) -> Dict['Path', 'Node']:
