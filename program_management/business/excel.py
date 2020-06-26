@@ -118,7 +118,6 @@ def _build_excel_lines(tree: 'ProgramTree') -> List:
         )
     )
 
-    links = tree.get_all_links()
     for luy in tree.get_nodes_that_have_prerequisites():
         content.append(
             LearningUnitYearLine(luy_acronym=luy.code, luy_title=complete_title(luy))
@@ -128,10 +127,9 @@ def _build_excel_lines(tree: 'ProgramTree') -> List:
             continue
         for group_number, group in enumerate(luy.prerequisite.prerequisite_item_groups, start=1):
             for position, prerequisite_item in enumerate(group.prerequisite_items, start=1):
-                prerequisite_item_links = []
-                for link_obj in links:
-                    if link_obj.child.code == prerequisite_item.code and link_obj.child.year == prerequisite_item.year:
-                        prerequisite_item_links.append(link_obj)
+                prerequisite_item_links = tree.get_links_using_node(
+                    tree.get_node_by_code_and_year(code=prerequisite_item.code, year=prerequisite_item.year)
+                )
                 prerequisite_line = _prerequisite_item_line(tree,
                                                             prerequisite_item, prerequisite_item_links,
                                                             luy.prerequisite, group_number, position,
@@ -168,24 +166,6 @@ def _get_item_acronym(prerequisite_item: PrerequisiteItem, position: int, group_
     elif position == group_len and group_len > 1:
         acronym_format = "{acronym})"
     return acronym_format.format(acronym=prerequisite_item.code)
-
-#
-# def c(prerequisite_item: PrerequisiteItem, links: List[link.Link]):
-#     distinct_credits_repr = []
-#     for link_obj in links:
-#         if link_obj.child.code == prerequisite_item.code and link_obj.child.year == prerequisite_item.year:
-#             if link_obj.relative_credits_repr not in distinct_credits_repr:
-#                 distinct_credits_repr.append(link_obj.relative_credits_repr)
-#
-#     return " ; ".join(
-#         set(["{}".format(credits) for credits in distinct_credits_repr])
-#     )
-#
-#
-# def _get_item_blocks(links: List[link.Link]):
-#     return " ; ".join(
-#         [str(grp.block) for grp in links if grp.block]
-#     )
 
 
 def _get_style_to_apply(excel_lines: list):
