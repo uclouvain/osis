@@ -51,7 +51,7 @@ class EntityVersionAddress(models.Model):
 
     def save(self, *args, **kwargs):
         if self.is_main and EntityVersionAddress.objects.filter(
-                is_main=True, entity_version_id=self.entity_version_id).exists():
+                is_main=True, entity_version_id=self.entity_version_id).exclude(pk=self.pk).exists():
             raise AttributeError(
                 "There is already an EntityVersionAddress with this entity_version_id and is_main = True"
             )
