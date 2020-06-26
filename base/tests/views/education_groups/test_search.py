@@ -52,7 +52,7 @@ from base.tests.factories.user import UserFactory
 from base.tests.views.learning_units.search.search_test_mixin import TestRenderToExcelMixin
 from base.utils.cache import RequestCache
 
-EDUCATION_GROUPS_URL = "education_groups"
+EDUCATION_GROUPS_URL = "version_program"
 
 FILTER_DATA = {"acronym": ["LBIR"], "title": ["dummy filter"]}
 TITLE_EDPH2 = "Edph training 2"
