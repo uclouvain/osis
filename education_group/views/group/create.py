@@ -14,7 +14,8 @@ from base.models.enums.education_group_types import GroupType
 from base.utils.cache import RequestCache
 from base.views.common import display_success_messages
 from education_group.ddd import command
-from education_group.ddd.domain.exception import GroupCodeAlreadyExistException
+from education_group.ddd.domain.exception import GroupCodeAlreadyExistException, ContentConstraintTypeMissing, \
+    ContentConstraintMinimumMaximumMissing, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum
 from education_group.ddd.domain.group import GroupIdentity, Group
 from education_group.ddd.service.read import group_service
 from education_group.ddd.service.write import create_group_service
@@ -120,6 +121,12 @@ class GroupCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                     group_id = create_group_service.create_orphan_group(cmd_create)
             except GroupCodeAlreadyExistException as e:
                 group_form.add_error('code', e.message)
+            except ContentConstraintTypeMissing as e:
+                group_form.add_error('constraint_type', e.message)
+            except (ContentConstraintMinimumMaximumMissing, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum)\
+                    as e:
+                group_form.add_error('min_constraint', e.message)
+                group_form.add_error('max_constraint', '')
 
             if not group_form.errors:
                 display_success_messages(request, self.get_success_msg(group_id), extra_tags='safe')

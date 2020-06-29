@@ -56,9 +56,9 @@ class TestCreateGroup(TestCase):
 
     @patch('education_group.publisher.group_created', autospec=True)
     @patch('education_group.ddd.service.read.group_service.GroupRepository.create')
-    def test_assert_repository_called_and_signal_dispateched(self, mock_create_repo, mock_publisher):
+    def test_assert_repository_called_and_signal_dispatched(self, mock_create_repo, mock_publisher):
         create_group_service.create_orphan_group(self.cmd)
 
-        mock_create_repo.assert_called_once()
+        mock_create_repo.assert_called()
         # Ensure event is emited
-        mock_publisher.send.assert_called_once()
+        mock_publisher.send.assert_called()

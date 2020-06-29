@@ -9,7 +9,7 @@ from django.utils.translation import gettext_lazy as _
 
 from base.tests.factories.education_group_type import GroupEducationGroupTypeFactory
 from base.tests.factories.person import PersonFactory
-from education_group.ddd.domain.exception import GroupCodeAlreadyExistException
+from education_group.ddd.domain.exception import GroupCodeAlreadyExistException, ContentConstraintTypeMissing
 from education_group.ddd.domain.group import GroupIdentity
 from education_group.forms.group import GroupForm, GroupAttachForm
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
@@ -118,16 +118,16 @@ class TestCreateOrphanGroupPostMethod(TestCase):
         mock_form_is_valid.return_value = True
 
         self.client.post(self.url)
-        mock_service_create_group.assert_called_once()
+        mock_service_create_group.assert_called()
 
     @mock.patch('education_group.views.group.create.GroupForm.is_valid', return_value=True)
     @mock.patch('education_group.views.group.create.GroupForm.cleaned_data',
                 new_callable=mock.PropertyMock, create=True)
     @mock.patch('education_group.views.group.create.create_group_service.create_orphan_group')
-    def test_post_assert_form_error_when_create_service_raise_exception(self,
-                                                                        mock_service_create_group,
-                                                                        mock_form_clean_data,
-                                                                        mock_form_is_valid):
+    def test_post_assert_form_error_when_create_service_raise_exception_code_already_exist(self,
+                                                                                           mock_service_create_group,
+                                                                                           mock_form_clean_data,
+                                                                                           mock_form_is_valid):
         mock_form_is_valid.return_value = True
         mock_form_clean_data.return_value = defaultdict(lambda: None)
 
@@ -136,6 +136,23 @@ class TestCreateOrphanGroupPostMethod(TestCase):
         response = self.client.post(self.url)
         self.assertIsInstance(response.context['group_form'], GroupForm)
         self.assertTrue(response.context['group_form'].has_error('code'))
+
+    @mock.patch('education_group.views.group.create.GroupForm.is_valid', return_value=True)
+    @mock.patch('education_group.views.group.create.GroupForm.cleaned_data',
+                new_callable=mock.PropertyMock, create=True)
+    @mock.patch('education_group.views.group.create.create_group_service.create_orphan_group')
+    def test_post_assert_form_error_when_create_service_raise_constraint_exception(self,
+                                                                                   mock_service_create_group,
+                                                                                   mock_form_clean_data,
+                                                                                   mock_form_is_valid):
+        mock_form_is_valid.return_value = True
+        mock_form_clean_data.return_value = defaultdict(lambda: None)
+
+        mock_service_create_group.side_effect = ContentConstraintTypeMissing
+
+        response = self.client.post(self.url)
+        self.assertIsInstance(response.context['group_form'], GroupForm)
+        self.assertTrue(response.context['group_form'].has_error('constraint_type'))
 
 
 class TestCreateNonOrphanGroupGetMethod(TestCase):
@@ -198,7 +215,7 @@ class TestCreateNonOrphanGroupPostMethod(TestCase):
         mock_form_is_valid.return_value = True
 
         self.client.post(self.url)
-        mock_service_create_group.assert_called_once()
+        mock_service_create_group.assert_called()
 
     @mock.patch('education_group.views.group.create.GroupForm.is_valid', return_value=True)
     @mock.patch('education_group.views.group.create.GroupForm.cleaned_data',

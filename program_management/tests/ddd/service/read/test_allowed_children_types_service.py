@@ -85,5 +85,5 @@ class TestGetAllowedChildTypes(SimpleTestCase):
         self.assertIsInstance(result, set)
         self.assertSetEqual(result, set())
 
-        mock_program_tree_repo.assert_called_once()
-        mock_identity_search.assert_called_once()
+        mock_program_tree_repo.assert_called()
+        mock_identity_search.assert_called()
