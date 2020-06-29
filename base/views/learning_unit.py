@@ -44,7 +44,6 @@ from base.business.learning_unit import get_cms_label_data, \
 from base.business.learning_unit_proposal import _get_value_from_enum, clean_attribute_initial_value
 from base.business.learning_units.comparison import FIELDS_FOR_LEARNING_UNIT_YR_COMPARISON, \
     FIELDS_FOR_LEARNING_CONTAINER_YR_COMPARISON
-from base.business.learning_units.perms import can_update_learning_achievement
 from base.enums.component_detail import VOLUME_TOTAL, VOLUME_Q1, VOLUME_Q2, PLANNED_CLASSES, \
     VOLUME_REQUIREMENT_ENTITY, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2
 from base.forms.learning_unit_specifications import LearningUnitSpecificationsForm, LearningUnitSpecificationsEditForm
@@ -129,7 +128,9 @@ def learning_unit_specifications(request, learning_unit_year_id):
         context.get("achievements_FR", []),
         context.get("achievements_EN", [])
     ))
-    context['can_update_learning_achievement'] = can_update_learning_achievement(learning_unit_year, person)
+    context['can_update_learning_achievement'] = person.user.has_perm(
+        'base.can_update_learning_achievement', learning_unit_year
+    )
     context['tab_active'] = 'learning_unit_specifications'  # Corresponds to url_name
     return render(request, "learning_unit/specifications.html", context)
 

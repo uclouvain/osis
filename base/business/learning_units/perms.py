@@ -28,7 +28,6 @@ import datetime
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.utils.translation import gettext_lazy as _
-from waffle.models import Flag
 
 from attribution.business.perms import _is_tutor_attributed_to_the_learning_unit
 from base.business import event_perms
@@ -66,20 +65,6 @@ MSG_CANNOT_EDIT_BECAUSE_OF_PROPOSAL = _("You can't edit because the learning uni
 MSG_NOT_ELIGIBLE_TO_MODIFY_END_YEAR_PROPOSAL_ON_THIS_YEAR = _(
     "You are not allowed to change the end year for this academic year")
 MSG_NOT_ELIGIBLE_TO_PUT_IN_PROPOSAL_ON_THIS_YEAR = _("You are not allowed to put in proposal for this academic year")
-
-
-def can_edit_summary_locked_field(learning_unit_year, person):
-    flag = Flag.get('educational_information_block_action')
-    return flag.is_active_for_user(person.user) and \
-        person.is_faculty_manager and \
-        person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year)
-
-
-def can_update_learning_achievement(learning_unit_year, person):
-    flag = Flag.get('learning_achievement_update')
-    return flag.is_active_for_user(person.user) and \
-        person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year) and \
-        is_year_editable(learning_unit_year, raise_exception=False)
 
 
 def learning_unit_year_permissions(learning_unit_year, person):

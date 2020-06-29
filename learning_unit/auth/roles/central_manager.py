@@ -78,4 +78,10 @@ class CentralManager(osis_role_models.EntityRoleModel):
             'base.can_manage_attribution':
                 predicates.is_learning_unit_type_allowed_for_attributions &
                 predicates.is_user_attached_to_current_requirement_entity,
+            'base.can_edit_summary_locked_field':
+                # to be verified (may be add failed message)
+                rules.always_deny,
+            'base.can_update_learning_achievement':
+                predicates.is_user_attached_to_current_requirement_entity &
+                predicates.is_learning_unit_year_older_or_equals_than_limit_settings_year
         })
