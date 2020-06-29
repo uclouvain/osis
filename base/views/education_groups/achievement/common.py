@@ -58,10 +58,16 @@ class EducationGroupAchievementMixin(SingleObjectMixin):
         }
 
     def get_success_url(self):
-        return reverse('training_skills_achievements',
-                       args=[self.kwargs['year'],
-                             self.kwargs['code']]
-                       ) + '?path={}&tab={}'.format(self.request.POST['path'], Tab.SKILLS_ACHIEVEMENTS)
+        if self.education_group_year.category == 'TRAINING':
+            return reverse('training_skills_achievements',
+                           args=[self.kwargs['year'],
+                                 self.kwargs['code']]
+                           ) + '?path={}&tab={}'.format(self.request.POST['path'], Tab.SKILLS_ACHIEVEMENTS)
+        else:
+            return reverse('mini_training_skills_achievements',
+                           args=[self.kwargs['year'],
+                                 self.kwargs['code']]
+                           ) + '?path={}&tab={}'.format(self.request.POST['path'], Tab.SKILLS_ACHIEVEMENTS)
 
 
 class EducationGroupDetailedAchievementMixin(EducationGroupAchievementMixin):
