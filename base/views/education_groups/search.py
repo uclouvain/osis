@@ -51,16 +51,6 @@ def _get_filter(form):
     return OrderedDict(itertools.chain(get_research_criteria(form)))
 
 
-def _create_xls(view_obj, context, **response_kwargs):
-    user = view_obj.request.user
-    egys = context["filter"].qs
-    filters = _get_filter(context["form"])
-    # FIXME: use ordering args in filter_form! Remove xls_order_col/xls_order property
-    order = {ORDER_COL: view_obj.request.GET.get('xls_order_col'),
-             ORDER_DIRECTION: view_obj.request.GET.get('xls_order')}
-    return create_xls(user, egys, filters, order)
-
-
 def _create_xls_administrative_data(view_obj, context, **response_kwargs):
     user = view_obj.request.user
     egys = context["filter"].qs
@@ -72,7 +62,6 @@ def _create_xls_administrative_data(view_obj, context, **response_kwargs):
 
 
 @RenderToExcel("xls_administrative", _create_xls_administrative_data)
-@RenderToExcel("xls", _create_xls)
 class EducationGroupSearch(LoginRequiredMixin, PermissionRequiredMixin, CacheFilterMixin,
                            SearchMixin, FilterView):
     model = EducationGroupYear
