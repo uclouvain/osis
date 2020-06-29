@@ -31,7 +31,6 @@ from django.views.generic.detail import SingleObjectMixin
 from base.models.education_group_achievement import EducationGroupAchievement
 from base.models.education_group_detailed_achievement import EducationGroupDetailedAchievement
 from base.models.education_group_year import EducationGroupYear
-from education_group.ddd.domain.service.identity_search import TrainingIdentitySearch
 from education_group.views.proxy.read import Tab
 
 
@@ -40,12 +39,6 @@ class EducationGroupAchievementMixin(SingleObjectMixin):
     model = EducationGroupAchievement
     context_object_name = "education_group_achievement"
     pk_url_kwarg = 'education_group_achievement_pk'
-
-    def get_success_url(self):
-        return reverse('training_skills_achievements',
-                       args=[self.kwargs['year'],
-                             self.kwargs['code']]
-                       ) + '?path={}&tab={}'.format(self.kwargs['path'], Tab.SKILLS_ACHIEVEMENTS)
 
     @cached_property
     def person(self):
@@ -57,6 +50,18 @@ class EducationGroupAchievementMixin(SingleObjectMixin):
             EducationGroupYear, partial_acronym=self.kwargs['code'],
             academic_year__year=self.kwargs['year']
         )
+
+    def get_context_data(self, **kwargs):
+        return {
+            **super().get_context_data(**kwargs),
+            'path': self.request.GET['path']
+        }
+
+    def get_success_url(self):
+        return reverse('training_skills_achievements',
+                       args=[self.kwargs['year'],
+                             self.kwargs['code']]
+                       ) + '?path={}&tab={}'.format(self.request.POST['path'], Tab.SKILLS_ACHIEVEMENTS)
 
 
 class EducationGroupDetailedAchievementMixin(EducationGroupAchievementMixin):

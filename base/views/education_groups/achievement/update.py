@@ -70,6 +70,12 @@ class EducationGroupAchievementAction(EducationGroupAchievementMixin, FormView):
     def get_permission_object(self):
         return self.get_object().education_group_year
 
+    def get_success_url(self):
+        return reverse('training_skills_achievements',
+                       args=[self.kwargs['year'],
+                             self.kwargs['code']]
+                       ) + '?path={}&tab={}'.format(self.request.GET['path'], Tab.SKILLS_ACHIEVEMENTS)
+
 
 class UpdateEducationGroupAchievement(PermissionRequiredMixin, AjaxTemplateMixin, EducationGroupAchievementMixin,
                                       UpdateView):
@@ -80,12 +86,6 @@ class UpdateEducationGroupAchievement(PermissionRequiredMixin, AjaxTemplateMixin
 
     def get_permission_object(self):
         return self.get_object().education_group_year
-
-    def get_success_url(self):
-        return reverse('training_skills_achievements',
-                       args=[self.kwargs['year'],
-                             self.kwargs['code']]
-                       ) + '?path={}&tab={}'.format(self.kwargs['path'], Tab.SKILLS_ACHIEVEMENTS)
 
 
 class UpdateEducationGroupDetailedAchievement(EducationGroupDetailedAchievementMixin, UpdateEducationGroupAchievement):

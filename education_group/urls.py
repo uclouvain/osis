@@ -47,12 +47,12 @@ urlpatterns = [
         ),
     ])),
     path('trainings/<int:year>/<str:code>/', include([
-        path('create/<int:path>/', CreateEducationGroupAchievement.as_view(), name='create_education_group_achievement'),
-        path('<int:education_group_achievement_pk>/<int:path>/', include([
+        path('create/', CreateEducationGroupAchievement.as_view(), name='create_education_group_achievement'),
+        path('<int:education_group_achievement_pk>/', include([
             path('actions/', EducationGroupAchievementAction.as_view(), name='education_group_achievements_actions'),
-            path('delete/', DeleteEducationGroupAchievement.as_view(), name='delete_education_group_achievement'),
             path('create/', CreateEducationGroupDetailedAchievement.as_view(),
                  name='create_education_group_detailed_achievement'),
+            path('delete/', DeleteEducationGroupAchievement.as_view(), name='delete_education_group_achievement'),
             path('update/', UpdateEducationGroupAchievement.as_view(), name='update_education_group_achievement'),
             path('<int:education_group_detail_achievement_pk>/', include([
                 path('actions/', EducationGroupDetailedAchievementAction.as_view(),
@@ -63,6 +63,8 @@ urlpatterns = [
                      name='update_education_group_detailed_achievement'),
             ]))
         ])),
+    ])),
+    path('trainings/<int:year>/<str:code>/', include([
         path('identification/', training.TrainingReadIdentification.as_view(), name='training_identification'),
         path('diplomas/', training.TrainingReadDiplomaCertificate.as_view(), name='training_diplomas'),
         path(
