@@ -94,7 +94,7 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
     @functools.lru_cache()
     def get_education_group_version(self):
         try:
-            root_element_id = self.get_path().split("|")[0]
+            root_element_id = self.get_path().split("|")[-1]
             return EducationGroupVersion.objects.select_related(
                 'offer', 'root_group'
             ).get(root_group__element__pk=root_element_id)
@@ -126,6 +126,7 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             "person": self.request.user.person,
             "enums": mdl.enums.education_group_categories,
             "node": self.get_object(),
+            "node_path": self.get_path(),
             "tab_urls": self.get_tab_urls(),
             "tree": json.dumps(program_tree_view_serializer(self.get_tree())),
             "education_group_version": self.get_education_group_version(),

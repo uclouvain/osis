@@ -72,6 +72,8 @@ urlpatterns = [
             path('down/', tree.move.down, name="group_element_year_down")
         ])),
     ])),
+    path('up/', tree.move.up, name="content_up"),
+    path('down/', tree.move.down, name="content_down"),
     path('create_element/<str:category>', create_element.SelectTypeCreateElementView.as_view(),
          name='create_element_select_type'),
     path('check_paste/', tree.paste.CheckPasteView.as_view(), name="check_tree_paste_node"),

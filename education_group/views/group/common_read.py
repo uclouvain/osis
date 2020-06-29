@@ -66,19 +66,20 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
     raise_exception = True
     active_tab = None
 
-    def get(self, request, *args, **kwargs):
-        self.path = self.request.GET.get('path')
-        if self.path is None:
+    @functools.lru_cache()
+    def get_path(self) -> str:
+        path = self.request.GET.get('path')
+        if path is None:
             root_element = Element.objects.get(
                 group_year__academic_year__year=self.kwargs['year'],
-                group_year__partial_acronym=self.kwargs['code']
+                group_year__partial_acronym=self.kwargs['code'].upper()
             )
-            self.path = str(root_element.pk)
-        return super().get(request, *args, **kwargs)
+            path = str(root_element.pk)
+        return path
 
     @functools.lru_cache()
     def get_tree(self):
-        root_element_id = self.path.split("|")[0]
+        root_element_id = self.get_path().split("|")[0]
         return load_tree.load(int(root_element_id))
 
     @cached_property
@@ -88,7 +89,7 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
     @functools.lru_cache()
     def get_object(self) -> 'Node':
         try:
-            return self.get_tree().get_node(self.path)
+            return self.get_tree().get_node(self.get_path())
         except NodeNotFoundException:
             root_node = self.get_tree().root_node
             message = _(
@@ -112,10 +113,11 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
             "form_xls_custom": CustomXlsForm(),
             "tree": json.dumps(program_tree_view_serializer(self.get_tree())),
             "node": self.get_object(),
+            "node_path": self.get_path(),
             "tab_urls": self.get_tab_urls(),
             "academic_year_choices": get_academic_year_choices(
                 self.node_identity,
-                self.path,
+                self.get_path(),
                 _get_view_name_from_tab(self.active_tab),
             ),
             "selected_element_clipboard": self.get_selected_element_clipboard_message(),
@@ -158,25 +160,25 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
                 'text': _('Identification'),
                 'active': Tab.IDENTIFICATION == self.active_tab,
                 'display': True,
-                'url': get_tab_urls(Tab.IDENTIFICATION, self.node_identity, self.path),
+                'url': get_tab_urls(Tab.IDENTIFICATION, self.node_identity, self.get_path()),
             },
             Tab.CONTENT: {
                 'text': _('Content'),
                 'active': Tab.CONTENT == self.active_tab,
                 'display': True,
-                'url': get_tab_urls(Tab.CONTENT, self.node_identity, self.path),
+                'url': get_tab_urls(Tab.CONTENT, self.node_identity, self.get_path()),
             },
             Tab.UTILIZATION: {
                 'text': _('Utilizations'),
                 'active': Tab.UTILIZATION == self.active_tab,
                 'display': True,
-                'url': get_tab_urls(Tab.UTILIZATION, self.node_identity, self.path),
+                'url': get_tab_urls(Tab.UTILIZATION, self.node_identity, self.get_path()),
             },
             Tab.GENERAL_INFO: {
                 'text': _('General informations'),
                 'active': Tab.GENERAL_INFO == self.active_tab,
                 'display': self.have_general_information_tab(),
-                'url': get_tab_urls(Tab.GENERAL_INFO, self.node_identity, self.path),
+                'url': get_tab_urls(Tab.GENERAL_INFO, self.node_identity, self.get_path()),
             }
         })
 

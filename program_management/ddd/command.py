@@ -135,6 +135,26 @@ class CheckPasteNodeCommand(interface.CommandRequest):
         return "CheckPasteNodeCommand({parameters})".format(parameters=parameters)
 
 
+class OrderUpLinkCommand(interface.CommandRequest):
+    def __init__(self, path: str):
+        self.path = path
+
+    def __eq__(self, other):
+        if isinstance(other, OrderUpLinkCommand):
+            return self.path == other.path
+        return False
+
+
+class OrderDownLinkCommand(interface.CommandRequest):
+    def __init__(self, path: str):
+        self.path = path
+
+    def __eq__(self, other):
+        if isinstance(other, OrderDownLinkCommand):
+            return self.path == other.path
+        return False
+
+
 class GetAllowedChildTypeCommand(interface.CommandRequest):
     def __init__(
             self,
