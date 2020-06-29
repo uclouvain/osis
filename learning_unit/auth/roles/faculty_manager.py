@@ -24,6 +24,7 @@ class FacultyManager(osis_role_models.EntityRoleModel):
             'base.can_create_partim':
                 predicates.is_user_attached_to_current_requirement_entity &
                 predicates.is_learning_unit_edition_period_open &
+                predicates.is_learning_unit_with_container &
                 predicates.is_learning_unit_year_full &
                 predicates.is_external_learning_unit_with_cograduation,
             'base.can_access_learningunit': rules.always_allow,
@@ -77,4 +78,10 @@ class FacultyManager(osis_role_models.EntityRoleModel):
                 predicates.is_user_attached_to_current_requirement_entity |
                 predicates.is_user_attached_to_initial_requirement_entity &
                 predicates.is_not_proposal_of_type_suppression_with_applications,
+            'base.can_manage_charge_repartition':
+                predicates.is_learning_unit_year_a_partim &
+                predicates.is_user_attached_to_current_requirement_entity,
+            'base.can_manage_attribution':
+                predicates.is_learning_unit_type_allowed_for_attributions &
+                predicates.is_user_attached_to_current_requirement_entity,
         })

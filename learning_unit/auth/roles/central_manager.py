@@ -72,4 +72,10 @@ class CentralManager(osis_role_models.EntityRoleModel):
                 (predicates.is_user_attached_to_current_requirement_entity |
                  predicates.is_user_attached_to_initial_requirement_entity) &
                 predicates.is_not_proposal_of_type_suppression_with_applications,
+            'base.can_manage_charge_repartition':
+                predicates.is_learning_unit_year_a_partim &
+                predicates.is_user_attached_to_current_requirement_entity,
+            'base.can_manage_attribution':
+                predicates.is_learning_unit_type_allowed_for_attributions &
+                predicates.is_user_attached_to_current_requirement_entity,
         })

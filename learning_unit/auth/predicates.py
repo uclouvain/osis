@@ -34,7 +34,9 @@ def is_user_attached_to_initial_requirement_entity(self, user, learning_unit_yea
 def is_user_attached_to_current_requirement_entity(self, user, learning_unit_year=None):
     if learning_unit_year:
         current_container_year = learning_unit_year.learning_container_year
-        return _is_attached_to_entity(current_container_year.requirement_entity_id, self)
+        return current_container_year is not None and _is_attached_to_entity(
+            current_container_year.requirement_entity_id, self
+        )
     return learning_unit_year
 
 
@@ -127,7 +129,7 @@ def is_learning_unit_year_full(self, user, learning_unit_year):
 @predicate(bind=True)
 @predicate_failed_msg(message=_("You can only edit co-graduation external learning units"))
 def is_external_learning_unit_with_cograduation(self, user, learning_unit_year):
-    if hasattr(learning_unit_year, 'externallearningunityear'):
+    if learning_unit_year and hasattr(learning_unit_year, 'externallearningunityear'):
         return learning_unit_year.externallearningunityear.co_graduation
     return None
 
@@ -247,4 +249,21 @@ def is_not_modification_proposal_type(self, user, learning_unit_year):
         learning_unit_proposal = get_object_or_none(ProposalLearningUnit, learning_unit_year__id=learning_unit_year.pk)
         if learning_unit_proposal:
             return learning_unit_proposal.type != ProposalType.MODIFICATION.name
+    return None
+
+
+@predicate(bind=True)
+@predicate_failed_msg(message=_("Learning unit type is not allowed for attributions"))
+def is_learning_unit_type_allowed_for_attributions(self, user, learning_unit_year):
+    if learning_unit_year:
+        container_type = learning_unit_year.learning_container_year.container_type
+        return container_type in learning_container_year_types.TYPE_ALLOWED_FOR_ATTRIBUTIONS
+    return None
+
+
+@predicate(bind=True)
+@predicate_failed_msg(message=_("Learning unit has no container"))
+def is_learning_unit_with_container(self, user, learning_unit_year):
+    if learning_unit_year:
+        return learning_unit_year.learning_container_year
     return None

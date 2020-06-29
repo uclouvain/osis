@@ -24,13 +24,13 @@
 #
 ##############################################################################
 import datetime
+from types import SimpleNamespace
 from unittest import mock
 
 from django.contrib.auth.models import Permission
 from django.test import TestCase
 
 from attribution.tests.factories.tutor_application import TutorApplicationFactory
-from base.business.learning_units import perms
 from base.business.learning_units.perms import FACULTY_UPDATABLE_CONTAINER_TYPES, _check_proposal_edition
 from base.business.perms import view_academicactors
 from base.models.academic_year import AcademicYear, LEARNING_UNIT_CREATION_SPAN_YEARS, MAX_ACADEMIC_YEAR_FACULTY, \
@@ -47,15 +47,18 @@ from base.tests.factories.academic_year import AcademicYearFactory, create_curre
     create_past_academic_year
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
 from base.tests.factories.entity import EntityFactory
+from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearFakerFactory
 from base.tests.factories.person import PersonFactory, CentralManagerForUEFactory, \
-    PersonWithPermissionsFactory, FacultyManagerForUEFactory
+    PersonWithPermissionsFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.user import UserFactory
+from learning_unit.auth import predicates
+from learning_unit.auth.predicates import FACULTY_EDITABLE_CONTAINER_TYPES
 from learning_unit.tests.factories.central_manager import CentralManagerFactory
 from learning_unit.tests.factories.faculty_manager import FacultyManagerFactory
 
@@ -74,7 +77,6 @@ ALL_TYPES = TYPES_PROPOSAL_NEEDED_TO_EDIT + TYPES_DIRECT_EDIT_PERMITTED
 class PermsTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.person_fac = FacultyManagerForUEFactory()
         cls.academic_yr = create_current_academic_year()
         cls.academic_yr_1 = AcademicYearFactory.build(year=cls.academic_yr.year + 1)
         super(AcademicYear, cls.academic_yr_1).save()
@@ -92,18 +94,24 @@ class PermsTestCase(TestCase):
             subtype=FULL,
             learning_unit=LearningUnitFactory(start_year=create_past_academic_year(), end_year=cls.academic_yr)
         )
+        cls.entity = cls.luy.learning_container_year.requirement_entity
+        cls.faculty_manager = FacultyManagerFactory(entity=cls.entity)
         academic_years = [cls.academic_yr, cls.academic_yr_1, cls.academic_yr_2]
         generate_learning_unit_edition_calendars(academic_years)
 
     def test_can_faculty_manager_modify_end_date_partim(self):
-        for container_type in ALL_TYPES:
-            lunit_container_yr = LearningContainerYearFactory(academic_year=self.academic_yr,
-                                                              container_type=container_type)
-            luy = LearningUnitYearFactory(academic_year=self.academic_yr,
-                                          learning_container_year=lunit_container_yr,
-                                          subtype=PARTIM)
-
-            self.assertTrue(perms._is_learning_unit_year_in_state_to_be_modified(luy, self.person_fac, False))
+        for container_type in FACULTY_EDITABLE_CONTAINER_TYPES:
+            lunit_container_yr = LearningContainerYearFactory(
+                academic_year=self.academic_yr,
+                container_type=container_type,
+                requirement_entity=self.entity
+            )
+            luy = LearningUnitYearFactory(
+                academic_year=self.academic_yr,
+                learning_container_year=lunit_container_yr,
+                subtype=PARTIM
+            )
+            self.assertTrue(self.faculty_manager.person.user.has_perm('base.can_edit_learningunit_date', luy))
 
     def test_not_eligible_if_has_application(self):
         luy = LearningUnitYearFactory(academic_year__year=2020)
@@ -112,14 +120,18 @@ class PermsTestCase(TestCase):
         self.assertFalse(central_manager.person.user.has_perm('base.can_edit_learningunit_date', luy))
 
     def test_can_faculty_manager_modify_end_date_full(self):
-        for direct_edit_permitted_container_type in TYPES_DIRECT_EDIT_PERMITTED:
-            lunit_container_yr = LearningContainerYearFactory(academic_year=self.academic_yr,
-                                                              container_type=direct_edit_permitted_container_type)
-            luy = LearningUnitYearFactory(academic_year=self.academic_yr,
-                                          learning_container_year=lunit_container_yr,
-                                          subtype=FULL)
-
-            self.assertTrue(perms._is_learning_unit_year_in_state_to_be_modified(luy, self.person_fac, False))
+        for direct_edit_permitted_container_type in FACULTY_EDITABLE_CONTAINER_TYPES:
+            lunit_container_yr = LearningContainerYearFactory(
+                academic_year=self.academic_yr,
+                container_type=direct_edit_permitted_container_type,
+                requirement_entity=self.entity
+            )
+            luy = LearningUnitYearFactory(
+                academic_year=self.academic_yr,
+                learning_container_year=lunit_container_yr,
+                subtype=FULL
+            )
+            self.assertTrue(self.faculty_manager.person.user.has_perm('base.can_edit_learningunit_date', luy))
 
     def test_cannot_faculty_manager_modify_end_date_full(self):
         faculty_manager = FacultyManagerFactory()
@@ -160,21 +172,23 @@ class PermsTestCase(TestCase):
         a_person = CentralManagerForUEFactory()
         luy = LearningUnitYearFactory(academic_year=self.academic_yr)
         ExternalLearningUnitYearFactory(learning_unit_year=luy, co_graduation=False)
-        self.assertFalse(perms.is_external_learning_unit_cograduation(luy, a_person, False))
+        check_external = predicates.is_external_learning_unit_with_cograduation.__wrapped__
+        mock_context = SimpleNamespace(context={'perm_name': 'undefined perm'})
+        self.assertFalse(check_external(mock_context, a_person.user, luy))
 
     def test_when_learning_unit_is_not_external(self):
         learning_unit_year = LearningUnitYearFactory()
         person = PersonFactory()
-        self.assertTrue(perms.is_external_learning_unit_cograduation(learning_unit_year, person, False))
+        check_external = predicates.is_external_learning_unit_with_cograduation.__wrapped__
+        mock_context = SimpleNamespace(context={'perm_name': 'undefined perm'})
+        self.assertFalse(check_external(mock_context, person.user, learning_unit_year))
 
     def test_cannot_faculty_manager_modify_end_date_no_container(self):
-        luy = LearningUnitYearFactory(academic_year=self.academic_yr,
-                                      learning_container_year=None)
-        self.assertFalse(perms._is_learning_unit_year_in_state_to_be_modified(luy, self.person_fac, False))
+        luy = LearningUnitYearFactory(academic_year=self.academic_yr, learning_container_year=None)
+        self.assertFalse(self.faculty_manager.person.user.has_perm('base.can_edit_learningunit_date', luy))
 
     def test_can_central_manager_modify_end_date_full(self):
-        generated_container = GenerateContainer(start_year=self.academic_yr,
-                                                end_year=self.academic_yr)
+        generated_container = GenerateContainer(start_year=self.academic_yr, end_year=self.academic_yr)
         generated_container_first_year = generated_container.generated_container_years[0]
         luy = generated_container_first_year.learning_unit_year_full
         requirement_entity = generated_container_first_year.requirement_entity_container_year
@@ -334,27 +348,38 @@ class PermsTestCase(TestCase):
             acronym="LDROI1004",
             specific_title="Juridic law courses",
             academic_year=self.academic_yr,
-            subtype=learning_unit_year_subtypes.FULL
+            subtype=learning_unit_year_subtypes.FULL,
+            learning_container_year__requirement_entity=self.entity,
         )
         start_year = AcademicYearFactory(year=self.academic_yr.year - 3)
         end_year = AcademicYearFactory(year=self.academic_yr.year - 1)
         previous_academic_years = GenerateAcademicYear(start_year=start_year, end_year=end_year).academic_years
         next_academic_years = GenerateAcademicYear(
             start_year=self.academic_yr_1, end_year=self.academic_yr_6).academic_years
-        previous_luys = [LearningUnitYearFactory(academic_year=ac, learning_unit=luy.learning_unit)
-                         for ac in previous_academic_years]
-        next_luys = [LearningUnitYearFactory(academic_year=ac, learning_unit=luy.learning_unit)
-                     for ac in next_academic_years]
+        previous_luys = [
+            LearningUnitYearFactory(
+                academic_year=ac,
+                learning_unit=luy.learning_unit,
+                learning_container_year__requirement_entity=self.entity
+            ) for ac in previous_academic_years
+        ]
+        next_luys = [
+            LearningUnitYearFactory(
+                academic_year=ac,
+                learning_unit=luy.learning_unit,
+                learning_container_year__requirement_entity=self.entity
+            ) for ac in next_academic_years
+        ]
 
         learning_units_can_be_modified = [luy, next_luys[0], next_luys[1]]
         for luy in learning_units_can_be_modified:
             with self.subTest(luy=luy):
-                self.assertTrue(perms._is_learning_unit_year_in_state_to_be_modified(luy, self.person_fac, False))
+                self.assertTrue(self.faculty_manager.person.user.has_perm('base.can_edit_learningunit', luy))
 
         learning_units_cannot_be_modified = previous_luys + [next_luys[2], next_luys[3], next_luys[4]]
         for luy in learning_units_cannot_be_modified:
             with self.subTest(luy=luy):
-                self.assertFalse(perms._is_learning_unit_year_in_state_to_be_modified(luy, self.person_fac, False))
+                self.assertFalse(self.faculty_manager.person.user.has_perm('base.can_edit_learningunit', luy))
 
     def test_is_not_eligible_if_creation_proposal_has_application(self):
         central_manager = CentralManagerFactory()
@@ -539,25 +564,33 @@ class TestIsAcademicYearInRangeToCreatePartim(TestCase):
         cls.generated_ac_years = GenerateAcademicYear(start_year, end_year)
         cls.academic_years = GenerateAcademicYear(start_year, end_year).academic_years
         cls.academic_years[LEARNING_UNIT_CREATION_SPAN_YEARS] = cls.current_acy
-        cls.learning_unit_years = [LearningUnitYearFactory(academic_year=acy) for acy in cls.academic_years]
+        entity = EntityVersionFactory().entity
+        cls.learning_unit_years = [
+            LearningUnitYearFactory(
+                academic_year=acy,
+                learning_container_year__requirement_entity=entity,
+                subtype=learning_unit_year_subtypes.FULL
+            )
+            for acy in cls.academic_years
+        ]
         generate_learning_unit_edition_calendars(cls.academic_years)
 
-        cls.central_manager = CentralManagerForUEFactory()
-        cls.faculty_manager_for_ue = FacultyManagerForUEFactory()
+        cls.central_manager = CentralManagerFactory(entity=entity)
+        cls.faculty_manager_for_ue = FacultyManagerFactory(entity=entity)
 
     def test_for_faculty_manager_for_ue(self):
-        self._test_can_create_partim_based_on_person(self.faculty_manager_for_ue, MAX_ACADEMIC_YEAR_FACULTY)
+        self._test_can_create_partim_based_on_person(self.faculty_manager_for_ue.person, MAX_ACADEMIC_YEAR_FACULTY)
 
     def test_for_central_manager(self):
-        self._test_can_create_partim_based_on_person(self.central_manager, MAX_ACADEMIC_YEAR_CENTRAL)
+        self._test_can_create_partim_based_on_person(self.central_manager.person, MAX_ACADEMIC_YEAR_CENTRAL)
 
     def _test_can_create_partim_based_on_person(self, person, max_range):
         for luy in self.learning_unit_years:
             with self.subTest(academic_year=luy.academic_year):
                 if self.current_acy.year <= luy.academic_year.year <= self.current_acy.year + max_range:
-                    self.assertTrue(perms._is_learning_unit_year_in_state_to_create_partim(luy, person))
+                    self.assertTrue(person.user.has_perm('base.can_create_partim', luy))
                 else:
-                    self.assertFalse(perms._is_learning_unit_year_in_state_to_create_partim(luy, person))
+                    self.assertFalse(person.user.has_perm('base.can_create_partim', luy))
 
 
 class PermsViewAcademicActorCase(TestCase):

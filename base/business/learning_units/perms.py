@@ -54,7 +54,6 @@ MSG_CANNOT_MODIFY_ON_PREVIOUS_ACADEMIC_YR = _("You can't modify learning unit of
 MSG_ONLY_IF_YOUR_ARE_LINK_TO_ENTITY = _("You can only modify a learning unit when your are linked to its requirement "
                                         "entity")
 MSG_PERSON_NOT_IN_ACCORDANCE_WITH_PROPOSAL_STATE = _("Person not in accordance with proposal state")
-MSG_LEARNING_UNIT_HAS_APPLICATION = _("This learning unit has application.")
 MSG_NOT_PROPOSAL_STATE_FACULTY = _("You are faculty manager and the proposal state is not 'Faculty', so you can't edit")
 MSG_NOT_ELIGIBLE_TO_EDIT_PROPOSAL = _("You are not eligible to edit proposal")
 MSG_CAN_EDIT_PROPOSAL_NO_LINK_TO_ENTITY = _("You are not attached to initial or current requirement entity, so you "
@@ -63,23 +62,10 @@ MSG_NOT_GOOD_RANGE_OF_YEARS = _("Not in range of years which can be edited by yo
 MSG_NO_RIGHTS_TO_CONSOLIDATE = _("You don't have the rights to consolidate")
 MSG_PROPOSAL_NOT_IN_CONSOLIDATION_ELIGIBLE_STATES = _("Proposal not in eligible state for consolidation")
 MSG_CAN_DELETE_ACCORDING_TO_TYPE = _("Can delete according to the type of the learning unit")
-MSG_PROPOSAL_IS_ON_AN_OTHER_YEAR = _("You can't modify proposal which is on an other year")
-MSG_CANNOT_UPDATE_EXTERNAL_UNIT_NOT_COGRADUATION = _("You can only edit co-graduation external learning units")
 MSG_CANNOT_EDIT_BECAUSE_OF_PROPOSAL = _("You can't edit because the learning unit has proposal")
 MSG_NOT_ELIGIBLE_TO_MODIFY_END_YEAR_PROPOSAL_ON_THIS_YEAR = _(
     "You are not allowed to change the end year for this academic year")
 MSG_NOT_ELIGIBLE_TO_PUT_IN_PROPOSAL_ON_THIS_YEAR = _("You are not allowed to put in proposal for this academic year")
-
-
-def is_external_learning_unit_cograduation(learning_unit_year, person, raise_exception):
-    result = not hasattr(learning_unit_year, 'externallearningunityear') or \
-             learning_unit_year.externallearningunityear.co_graduation
-    can_raise_exception(
-        raise_exception,
-        result,
-        MSG_CANNOT_UPDATE_EXTERNAL_UNIT_NOT_COGRADUATION,
-    )
-    return result
 
 
 def can_edit_summary_locked_field(learning_unit_year, person):
@@ -94,60 +80,6 @@ def can_update_learning_achievement(learning_unit_year, person):
     return flag.is_active_for_user(person.user) and \
         person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year) and \
         is_year_editable(learning_unit_year, raise_exception=False)
-
-
-def is_eligible_to_manage_charge_repartition(learning_unit_year, person):
-    return person.user.has_perm("base.can_manage_charge_repartition") and \
-        learning_unit_year.is_partim() and \
-        person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year)
-
-
-def is_eligible_to_manage_attributions(learning_unit_year, person):
-    luy_container_type = learning_unit_year.learning_container_year.container_type
-    return person.user.has_perm("base.can_manage_attribution") and \
-        luy_container_type in learning_container_year_types.TYPE_ALLOWED_FOR_ATTRIBUTIONS and \
-        person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year)
-
-
-def is_learning_unit_year_in_past(learning_unit_year, _, raise_exception=False):
-    result = learning_unit_year.is_past()
-    can_raise_exception(
-        raise_exception,
-        not result,
-        MSG_CANNOT_MODIFY_ON_PREVIOUS_ACADEMIC_YR
-    )
-    return result
-
-
-def _is_learning_unit_year_in_state_to_create_partim(learning_unit_year, person, raise_exception=False):
-    business_check = (person.is_central_manager and not is_learning_unit_year_in_past(learning_unit_year, person)) or \
-        (person.is_faculty_manager and learning_unit_year.learning_container_year)
-
-    calendar_check = event_perms.generate_event_perm_learning_unit_edition(
-        person=person,
-        obj=learning_unit_year,
-        raise_exception=False
-    ).is_open()
-
-    return business_check and calendar_check
-
-
-def _is_learning_unit_year_in_state_to_be_modified(learning_unit_year, person, raise_exception):
-    business_check = person.is_central_manager or learning_unit_year.learning_container_year
-
-    calendar_check = event_perms.generate_event_perm_learning_unit_edition(
-        person=person,
-        obj=learning_unit_year,
-        raise_exception=False
-    ).is_open()
-
-    result = business_check and calendar_check
-    can_raise_exception(
-        raise_exception,
-        result,
-        MSG_NOT_GOOD_RANGE_OF_YEARS,
-        )
-    return result
 
 
 def learning_unit_year_permissions(learning_unit_year, person):
