@@ -18,7 +18,7 @@ msgstr ""
 
 #, python-format
 msgid "%(max)s must be greater or equals than %(min)s"
-msgstr ""
+msgstr "%(max)s doit être plus grand ou égal à %(min)s"
 
 msgid "ARES ability"
 msgstr ""
