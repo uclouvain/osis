@@ -75,47 +75,36 @@ class GroupCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         group_form = self.get_form_class()(request.POST, user=self.request.user, group_type=self.kwargs['type'])
         if group_form.is_valid():
+            common_data = {
+                'code': group_form.cleaned_data['code'],
+                'type': self.kwargs['type'],
+                'abbreviated_title': group_form.cleaned_data['abbreviated_title'],
+                'title_fr': group_form.cleaned_data['title_fr'],
+                'title_en': group_form.cleaned_data['title_en'],
+                'credits': group_form.cleaned_data['credits'],
+                'constraint_type': group_form.cleaned_data['constraint_type'],
+                'min_constraint': group_form.cleaned_data['min_constraint'],
+                'max_constraint': group_form.cleaned_data['max_constraint'],
+                'management_entity_acronym': group_form.cleaned_data['management_entity'],
+                'teaching_campus_name': group_form.cleaned_data['teaching_campus']['name'] if group_form.cleaned_data[
+                    'teaching_campus'] else None,
+                'organization_name': group_form.cleaned_data['teaching_campus']['organization_name'] if
+                group_form.cleaned_data['teaching_campus'] else None,
+                'remark_fr': group_form.cleaned_data['remark_fr'],
+                'remark_en': group_form.cleaned_data['remark_en'],
+            }
+
             try:
                 if self.get_attach_path():
                     cmd_create = command_pgrm.CreateGroupAndAttachCommand(
-                        code=group_form.cleaned_data['code'],
-                        type=self.kwargs['type'],
-                        abbreviated_title=group_form.cleaned_data['abbreviated_title'],
-                        title_fr=group_form.cleaned_data['title_fr'],
-                        title_en=group_form.cleaned_data['title_en'],
-                        credits=group_form.cleaned_data['credits'],
-                        constraint_type=group_form.cleaned_data['constraint_type'],
-                        min_constraint=group_form.cleaned_data['min_constraint'],
-                        max_constraint=group_form.cleaned_data['max_constraint'],
-                        management_entity_acronym=group_form.cleaned_data['management_entity'],
-                        teaching_campus_name=group_form.cleaned_data['teaching_campus']['name']
-                        if group_form.cleaned_data['teaching_campus'] else None,
-                        organization_name=group_form.cleaned_data['teaching_campus']['organization_name']
-                        if group_form.cleaned_data['teaching_campus'] else None,
-                        remark_fr=group_form.cleaned_data['remark_fr'],
-                        remark_en=group_form.cleaned_data['remark_en'],
+                        **common_data,
                         path_to_paste=self.get_attach_path(),
                     )
                     group_id = create_group_and_attach_service.create_group_and_attach(cmd_create)
                 else:
                     cmd_create = command.CreateOrphanGroupCommand(
-                        code=group_form.cleaned_data['code'],
+                        **common_data,
                         year=group_form.cleaned_data['academic_year'],
-                        type=self.kwargs['type'],
-                        abbreviated_title=group_form.cleaned_data['abbreviated_title'],
-                        title_fr=group_form.cleaned_data['title_fr'],
-                        title_en=group_form.cleaned_data['title_en'],
-                        credits=group_form.cleaned_data['credits'],
-                        constraint_type=group_form.cleaned_data['constraint_type'],
-                        min_constraint=group_form.cleaned_data['min_constraint'],
-                        max_constraint=group_form.cleaned_data['max_constraint'],
-                        management_entity_acronym=group_form.cleaned_data['management_entity'],
-                        teaching_campus_name=group_form.cleaned_data['teaching_campus']['name']
-                        if group_form.cleaned_data['teaching_campus'] else None,
-                        organization_name=group_form.cleaned_data['teaching_campus']['organization_name']
-                        if group_form.cleaned_data['teaching_campus'] else None,
-                        remark_fr=group_form.cleaned_data['remark_fr'],
-                        remark_en=group_form.cleaned_data['remark_en'],
                         start_year=group_form.cleaned_data['academic_year'],
                     )
                     group_id = create_group_service.create_orphan_group(cmd_create)
