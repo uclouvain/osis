@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-24 09:33+0200\n"
+"POT-Creation-Date: 2020-06-29 14:39+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,10 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#, python-format
+msgid "%(max)s must be greater or equals than %(min)s"
+msgstr ""
 
 msgid "ARES ability"
 msgstr ""
@@ -547,6 +551,12 @@ msgstr ""
 #, python-format
 msgid ""
 "You cannot change/delete a education group existing before %(limit_year)s"
+msgstr ""
+
+msgid "You should precise at least minimum or maximum constraint"
+msgstr ""
+
+msgid "You should precise constraint type"
 msgstr ""
 
 msgid "activate to sort column ascending"

@@ -68,7 +68,6 @@ class TestGetAllowedChildTypes(SimpleTestCase):
 
     @mock.patch('program_management.ddd.service.read.allowed_children_types_service.NodeIdentitySearch.'
                 'get_from_element_id')
-    @mock.patch('program_management.ddd.service.read.allowed_children_types_service.NodeRepository.get')
     @mock.patch('program_management.ddd.service.read.allowed_children_types_service.ProgramTreeRepository.get')
     @mock.patch('program_management.ddd.service.read.allowed_children_types_service.'
                 'PasteAuthorizedRelationshipValidator')
@@ -76,7 +75,6 @@ class TestGetAllowedChildTypes(SimpleTestCase):
             self,
             mock_validator,
             mock_program_tree_repo,
-            mock_node_repo,
             mock_identity_search
     ):
         mock_validator.return_value.validate.side_effect = BusinessExceptions(messages=[])
@@ -87,6 +85,5 @@ class TestGetAllowedChildTypes(SimpleTestCase):
         self.assertIsInstance(result, set)
         self.assertSetEqual(result, set())
 
-        mock_program_tree_repo.assert_called_once()
-        mock_node_repo.assert_called_once()
-        mock_identity_search.assert_called_once()
+        mock_program_tree_repo.assert_called()
+        mock_identity_search.assert_called()

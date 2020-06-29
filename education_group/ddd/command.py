@@ -34,7 +34,7 @@ class GetGroupCommand(interface.CommandRequest):
         self.year = year
 
 
-class CreateGroupCommand(interface.CommandRequest):
+class CreateOrphanGroupCommand(interface.CommandRequest):
     def __init__(
             self,
             code: str,

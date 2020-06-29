@@ -21,27 +21,18 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+from unittest import mock
 
-from django.db import transaction
+from django.test import SimpleTestCase
 
-from education_group import publisher
-from education_group.ddd import command
-from education_group.ddd.domain import group
-
-from education_group.ddd.domain.group import GroupIdentity
-from education_group.ddd.repository.group import GroupRepository
+from program_management.ddd import command
+from program_management.ddd.service.read import node_identity_service
 
 
-from education_group.ddd.validators.validators_by_business_action import CreateGroupValidatorList
+class TestNodeIdentityService(SimpleTestCase):
+    @mock.patch('program_management.ddd.service.read.node_identity_service.NodeIdentitySearch')
+    def test_assert_call_node_identity_business_service(self, mock_identity_search):
+        cmd = command.GetNodeIdentityFromElementId(element_id=4454)
+        node_identity_service.get_node_identity_from_element_id(cmd)
 
-
-# TODO : Implement Validator (Actually in GroupFrom via ValidationRules)
-@transaction.atomic()
-def create_orphan_group(cmd: command.CreateOrphanGroupCommand) -> 'GroupIdentity':
-    grp = group.builder.build_from_create_cmd(cmd)
-
-    CreateGroupValidatorList(grp).validate()
-    group_id = GroupRepository.create(grp)
-    # Emit group_created event
-    publisher.group_created.send(None, group_identity=group_id)
-    return group_id
+        mock_identity_search.get_from_element_id.assert_called()

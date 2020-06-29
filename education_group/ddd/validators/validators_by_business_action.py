@@ -23,22 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Optional
+from base.ddd.utils import business_validator
+from education_group.ddd.domain.group import Group
+from education_group.ddd.validators._content_constraint import ContentConstraintValidator
 
-from base.models.enums.constraint_type import ConstraintTypeEnum
-from osis_common.ddd import interface
 
+class CreateGroupValidatorList(business_validator.BusinessListValidator):
 
-class ContentConstraint(interface.ValueObject):
-    def __init__(self, type: Optional[ConstraintTypeEnum], minimum: Optional[int], maximum: Optional[int]):
-        self.type = type
-        self.minimum = minimum
-        self.maximum = maximum
-
-    def __eq__(self, other):
-        return self.type == other.type \
-               and self.minimum == other.minimum \
-               and self.maximum == other.maximum
-
-    def __hash__(self):
-        return hash(str(self.type) + str(self.minimum) + str(self.maximum))
+    def __init__(
+            self,
+            group: Group
+    ):
+        self.validators = [
+            ContentConstraintValidator(group.content_constraint),
+        ]
+        super().__init__()

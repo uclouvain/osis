@@ -29,7 +29,7 @@ from django.test import SimpleTestCase
 
 from base.models.enums.constraint_type import ConstraintTypeEnum
 from base.models.enums.education_group_types import GroupType
-from education_group.ddd.command import CreateGroupCommand
+from education_group.ddd.command import CreateOrphanGroupCommand
 from education_group.ddd.domain import group
 from education_group.ddd.domain._campus import Campus
 from education_group.ddd.domain._content_constraint import ContentConstraint
@@ -90,7 +90,7 @@ class TestGroup(SimpleTestCase):
 
 class TestGroupBuilder(SimpleTestCase):
     def setUp(self):
-        self.cmd = CreateGroupCommand(
+        self.cmd = CreateOrphanGroupCommand(
             code="LTRONC100T",
             year=2018,
             type=GroupType.COMMON_CORE.name,

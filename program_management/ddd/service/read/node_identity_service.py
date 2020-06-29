@@ -21,27 +21,14 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+from typing import Optional
 
-from django.db import transaction
-
-from education_group import publisher
-from education_group.ddd import command
-from education_group.ddd.domain import group
-
-from education_group.ddd.domain.group import GroupIdentity
-from education_group.ddd.repository.group import GroupRepository
+from program_management.ddd import command
+from program_management.ddd.domain.node import NodeIdentity
+from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
 
 
-from education_group.ddd.validators.validators_by_business_action import CreateGroupValidatorList
-
-
-# TODO : Implement Validator (Actually in GroupFrom via ValidationRules)
-@transaction.atomic()
-def create_orphan_group(cmd: command.CreateOrphanGroupCommand) -> 'GroupIdentity':
-    grp = group.builder.build_from_create_cmd(cmd)
-
-    CreateGroupValidatorList(grp).validate()
-    group_id = GroupRepository.create(grp)
-    # Emit group_created event
-    publisher.group_created.send(None, group_identity=group_id)
-    return group_id
+# TODO: Fix me: This is not an application service because element_id is a technical notion
+#  (Path is badly construct... Normally, we should have something like "?path=LDROI1200_2015|...."
+def get_node_identity_from_element_id(cmd: command.GetNodeIdentityFromElementId) -> Optional[NodeIdentity]:
+    return NodeIdentitySearch.get_from_element_id(cmd.element_id)

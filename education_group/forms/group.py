@@ -66,7 +66,7 @@ class GroupForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         required=False,
         widget=forms.TextInput
     )
-    management_entity = fields.ManagementEntitiesChoiceField(person=None, initial=None, required=False)
+    management_entity = forms.CharField(required=False)  # TODO: Replace with select2 widget
     teaching_campus = fields.MainCampusChoiceField(queryset=None, label=_("Learning location"), required=False)
     remark_fr = forms.CharField(widget=forms.Textarea, label=_("Remark"), required=False)
     remark_en = forms.CharField(widget=forms.Textarea, label=_("remark in english"), required=False)
@@ -81,7 +81,7 @@ class GroupForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         self.__init_management_entity_field()
 
     def __init_academic_year_field(self):
-        if not self.fields['academic_year'].disabled and self.user.person.is_faculty_manager:
+        if self.user.person.is_faculty_manager:
             self.fields['academic_year'].queryset = EventPermEducationGroupEdition.get_academic_years()\
                 .filter(year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION)
         else:
@@ -121,3 +121,10 @@ class GroupForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
                 'organization_name': self.cleaned_data['teaching_campus'].organization.name,
             }
         return None
+
+
+class GroupAttachForm(GroupForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['academic_year'].disabled = True
+        self.fields['academic_year'].required = False
