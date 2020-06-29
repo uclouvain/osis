@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-24 09:33+0200\n"
+"POT-Creation-Date: 2020-06-29 14:39+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -15,6 +15,10 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#, python-format
+msgid "%(max)s must be greater or equals than %(min)s"
+msgstr ""
 
 msgid "ARES ability"
 msgstr ""
@@ -265,7 +269,9 @@ msgstr ""
 msgid ""
 "Group <a href='%(link)s'> %(code)s (%(academic_year)s) </a> successfully "
 "created."
-msgstr "Le groupement <a href='%(link)s'> %(code)s (%(academic_year)s) </a> a été créé avec succès"
+msgstr ""
+"Le groupement <a href='%(link)s'> %(code)s (%(academic_year)s) </a> a été "
+"créé avec succès"
 
 msgid "Holders of a 2nd cycle University degree"
 msgstr ""
@@ -567,6 +573,12 @@ msgstr ""
 "Vous ne pouvez pas supprimer/modifier une formation existant avant "
 "%(limit_year)s"
 
+msgid "You should precise at least minimum or maximum constraint"
+msgstr "Vous devez préciser au moins la contrainte minimum ou maximum"
+
+msgid "You should precise constraint type"
+msgstr "Vous devez préciser le type de contrainte"
+
 msgid "activate to sort column ascending"
 msgstr ""
 
@@ -638,4 +650,3 @@ msgstr ""
 
 msgid "unspecified"
 msgstr ""
-
