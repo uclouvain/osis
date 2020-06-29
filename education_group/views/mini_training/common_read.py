@@ -137,8 +137,16 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             "selected_element_clipboard": self.get_selected_element_clipboard_message(),
             "current_version": self.current_version,
             "versions_choices": get_tree_versions_choices(self.node_identity, _get_view_name_from_tab(self.active_tab)),
+            "xls_ue_prerequisites": reverse("education_group_learning_units_prerequisites",
+                                            args=[self.get_education_group_version().root_group.academic_year.year,
+                                                  self.get_education_group_version().root_group.partial_acronym]
+                                            ),
+            "xls_ue_is_prerequisite": reverse("education_group_learning_units_is_prerequisite_for",
+                                              args=[self.get_education_group_version().root_group.academic_year.year,
+                                                    self.get_education_group_version().root_group.partial_acronym]
+                                              ),
             # TODO: Remove when finished reoganized tempalate
-            "group_year": self.get_education_group_version().root_group
+            "group_year": self.get_education_group_version().root_group,
         }
 
     def get_permission_object(self):
