@@ -145,44 +145,60 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
         return self.get_education_group_version().offer
 
     def get_tab_urls(self):
-        return OrderedDict({
-            Tab.IDENTIFICATION: {
-                'text': _('Identification'),
-                'active': Tab.IDENTIFICATION == self.active_tab,
-                'display': True,
-                'url': get_tab_urls(Tab.IDENTIFICATION, self.node_identity, self.get_path()),
-            },
-            Tab.CONTENT: {
-                'text': _('Content'),
-                'active': Tab.CONTENT == self.active_tab,
-                'display': True,
-                'url': get_tab_urls(Tab.CONTENT, self.node_identity, self.get_path()),
-            },
-            Tab.UTILIZATION: {
-                'text': _('Utilizations'),
-                'active': Tab.UTILIZATION == self.active_tab,
-                'display': True,
-                'url': get_tab_urls(Tab.UTILIZATION, self.node_identity, self.get_path()),
-            },
-            Tab.GENERAL_INFO: {
-                'text': _('General informations'),
-                'active': Tab.GENERAL_INFO == self.active_tab,
-                'display': self.have_general_information_tab(),
-                'url': get_tab_urls(Tab.GENERAL_INFO, self.node_identity, self.get_path()),
-            },
-            Tab.SKILLS_ACHIEVEMENTS: {
-                'text': capfirst(_('skills and achievements')),
-                'active': Tab.SKILLS_ACHIEVEMENTS == self.active_tab,
-                'display': self.have_skills_and_achievements_tab(),
-                'url': get_tab_urls(Tab.SKILLS_ACHIEVEMENTS, self.node_identity, self.get_path()),
-            },
-            Tab.ADMISSION_CONDITION: {
-                'text': _('Conditions'),
-                'active': Tab.ADMISSION_CONDITION == self.active_tab,
-                'display': self.have_admission_condition_tab(),
-                'url': get_tab_urls(Tab.ADMISSION_CONDITION, self.node_identity, self.get_path()),
-            },
-        })
+        if self.get_education_group_version().version_name == '':
+            return OrderedDict({
+                Tab.IDENTIFICATION: {
+                    'text': _('Identification'),
+                    'active': Tab.IDENTIFICATION == self.active_tab,
+                    'display': True,
+                    'url': get_tab_urls(Tab.IDENTIFICATION, self.node_identity, self.get_path()),
+                },
+                Tab.CONTENT: {
+                    'text': _('Content'),
+                    'active': Tab.CONTENT == self.active_tab,
+                    'display': True,
+                    'url': get_tab_urls(Tab.CONTENT, self.node_identity, self.get_path()),
+                },
+                Tab.UTILIZATION: {
+                    'text': _('Utilizations'),
+                    'active': Tab.UTILIZATION == self.active_tab,
+                    'display': True,
+                    'url': get_tab_urls(Tab.UTILIZATION, self.node_identity, self.get_path()),
+                },
+                Tab.GENERAL_INFO: {
+                    'text': _('General informations'),
+                    'active': Tab.GENERAL_INFO == self.active_tab,
+                    'display': self.have_general_information_tab(),
+                    'url': get_tab_urls(Tab.GENERAL_INFO, self.node_identity, self.get_path()),
+                },
+                Tab.SKILLS_ACHIEVEMENTS: {
+                    'text': capfirst(_('skills and achievements')),
+                    'active': Tab.SKILLS_ACHIEVEMENTS == self.active_tab,
+                    'display': self.have_skills_and_achievements_tab(),
+                    'url': get_tab_urls(Tab.SKILLS_ACHIEVEMENTS, self.node_identity, self.get_path()),
+                },
+                Tab.ADMISSION_CONDITION: {
+                    'text': _('Conditions'),
+                    'active': Tab.ADMISSION_CONDITION == self.active_tab,
+                    'display': self.have_admission_condition_tab(),
+                    'url': get_tab_urls(Tab.ADMISSION_CONDITION, self.node_identity, self.get_path()),
+                },
+            })
+        else:
+            return OrderedDict({
+                Tab.IDENTIFICATION: {
+                    'text': _('Identification'),
+                    'active': Tab.IDENTIFICATION == self.active_tab,
+                    'display': True,
+                    'url': get_tab_urls(Tab.IDENTIFICATION, self.node_identity, self.get_path()),
+                },
+                Tab.CONTENT: {
+                    'text': _('Content'),
+                    'active': Tab.CONTENT == self.active_tab,
+                    'display': True,
+                    'url': get_tab_urls(Tab.CONTENT, self.node_identity, self.get_path()),
+                },
+            })
 
     def have_general_information_tab(self):
         node_category = self.get_object().category
