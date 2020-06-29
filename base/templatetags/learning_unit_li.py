@@ -24,16 +24,11 @@
 #
 ##############################################################################
 from django import template
-from django.conf import settings
-from django.core.exceptions import PermissionDenied
 from django.utils.translation import gettext_lazy as _
 
-from base.business.learning_unit_proposal import can_cancel_proposal, can_delete_learningunit, can_edit_proposal, \
-    can_consolidate_learningunit_proposal
-from base.business.learning_units.perms import is_eligible_to_modify_end_year_by_proposal, \
-    is_eligible_to_modify_by_proposal
-from base.business.learning_units.perms import is_year_editable
+from base.business.learning_unit_proposal import can_delete_learningunit
 from base.models.person import find_by_user
+from osis_role.errors import get_permission_error
 
 register = template.Library()
 
@@ -45,7 +40,7 @@ DISABLED = "disabled"
 @register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
 def li_suppression_proposal(context, url, message, url_id="link_proposal_suppression", js_script=''):
     data = _get_common_proposal_data(context, message, url, url_id)
-    data['permission'] = is_eligible_to_modify_end_year_by_proposal
+    data['permission'] = context['user'].has_perm('base.can_propose_learningunit', context['learning_unit_year'])
     data['obj'] = context['learning_unit_year']
     data['load_modal'] = False
 
@@ -55,27 +50,27 @@ def li_suppression_proposal(context, url, message, url_id="link_proposal_suppres
 @register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
 def li_modification_proposal(context, url, message, url_id="link_proposal_modification", js_script=''):
     data = _get_common_data(context, message, url, url_id)
-    data['permission'] = is_eligible_to_modify_by_proposal
+    data['permission'] = 'base.can_edit_learning_unit_proposal'
     return li_with_permission(data)
 
 
 @register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
 def li_edit_proposal(context, url, message, url_id="link_proposal_edit", js_script=''):
     data = _get_common_proposal_data(context, message, url, url_id)
-    data['permission_function'] = can_edit_proposal
+    permission = 'base.can_edit_learning_unit_proposal'
     data['obj'] = context['proposal']
-    return li_with_permission_for_proposal(data)
+    return li_with_permission_for_proposal(data, permission)
 
 
 @register.inclusion_tag('blocks/button/li_template_lu.html', takes_context=True)
 def li_cancel_proposal(context, url, message, data_target, url_id="link_cancel_proposal", js_script=''):
     data = _get_common_proposal_data(context, message, url, url_id)
-    data['permission_function'] = can_cancel_proposal
+    permission = 'base.can_cancel_proposal'
     data['obj'] = context['proposal']
     data['js_script'] = js_script
     data['load_modal'] = True
     data['data_target'] = data_target
-    return li_with_permission_for_proposal(data)
+    return li_with_permission_for_proposal(data, permission)
 
 
 def _get_common_proposal_data(context, message, url, url_id):
@@ -93,12 +88,12 @@ def _get_common_proposal_data(context, message, url, url_id):
 @register.inclusion_tag('blocks/button/li_template_lu.html', takes_context=True)
 def li_consolidate_proposal(context, url, message, data_target, url_id="link_consolidate_proposal", js_script=''):
     data = _get_common_proposal_data(context, message, url, url_id)
-    data['permission_function'] = can_consolidate_learningunit_proposal
+    permission = 'base.can_consolidate_learningunit_proposal'
     data['obj'] = context['proposal']
     data['js_script'] = js_script
     data['load_modal'] = True
     data['data_target'] = data_target
-    return li_with_permission_for_proposal(data)
+    return li_with_permission_for_proposal(data, permission)
 
 
 @register.inclusion_tag('blocks/button/li_template_lu.html', takes_context=True)
@@ -150,20 +145,14 @@ def _get_permission(context, permission):
 
 
 def _get_permission_result(learning_unit_year, permission, person):
-    permission_denied_message = ""
-    try:
-        result = permission(learning_unit_year, person, raise_exception=True)
-    except PermissionDenied as e:
-        result = False
-        permission_denied_message = str(e)
-
+    result = person.user.has_perm(permission, learning_unit_year)
+    permission_denied_message = get_permission_error(person.user, permission)
     return permission_denied_message, "" if result else DISABLED
 
 
 # TODO data should be a kwargs
-def li_with_permission_for_proposal(data):
+def li_with_permission_for_proposal(data, permission):
     context = data['context']
-    permission = data['permission_function']
     url = data['url']
     message = data['message']
     url_id = data['url_id']
@@ -172,21 +161,10 @@ def li_with_permission_for_proposal(data):
     js_script = data.get('js_script', '')
     obj = data['obj']
 
-    proposal = context['proposal']
-
     permission_denied_message, disabled = is_valid_proposal(context)
 
     if not disabled:
-        if not is_year_editable(proposal.learning_unit_year, raise_exception=False):
-            disabled = "disabled"
-            permission_denied_message = "{}.  {}".format(
-                _("You can't modify learning unit under year : %(year)d") %
-                {"year": settings.YEAR_LIMIT_LUE_MODIFICATION + 1},
-                _("Modifications should be made in EPC for year %(year)d") %
-                {"year": proposal.learning_unit_year.academic_year.year},
-                )
-        else:
-            permission_denied_message, disabled = _get_permission_proposal(context, permission, obj)
+        disabled = not context['user'].has_perm(permission, obj.learning_unit_year)
 
     if not disabled:
         href = url
@@ -194,9 +172,10 @@ def li_with_permission_for_proposal(data):
         href = "#"
         load_modal = False
         data_target = ''
+        permission_denied_message = get_permission_error(context['user'], permission)
 
     return {
-        "class_li": disabled,
+        "class_li": 'disabled' if disabled else '',
         "load_modal": load_modal,
         "url": href,
         "id_li": url_id,

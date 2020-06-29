@@ -495,7 +495,7 @@ msgstr "CAPAES"
 msgid "Campus"
 msgstr "Campus"
 
-msgid "Can delete according to the type of the learning unit"
+msgid "Cannot delete according to the type of the learning unit"
 msgstr ""
 "Vous ne pouvez pas supprimer cette unité d'enseignement en raison de son type"
 

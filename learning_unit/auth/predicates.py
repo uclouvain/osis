@@ -24,7 +24,7 @@ FACULTY_EDITABLE_CONTAINER_TYPES = (
 def is_user_attached_to_initial_requirement_entity(self, user, learning_unit_year=None):
     if learning_unit_year:
         initial_container_year = learning_unit_year.initial_data.get("learning_container_year")
-        requirement_entity_id = initial_container_year.requirement_entity
+        requirement_entity_id = initial_container_year.requirement_entity_id
         return _is_attached_to_entity(requirement_entity_id, self)
     return learning_unit_year
 
@@ -109,10 +109,21 @@ def is_learning_unit_edition_period_open(self, user, learning_unit_year):
 
 @predicate(bind=True)
 @predicate_failed_msg(message=_("Modification or transformation proposal not allowed during this period."))
-def is_proposal_edition_period_open(self, user, learning_unit_year):
+def is_proposal_date_edition_period_open(self, user, learning_unit_year):
     if learning_unit_year:
         for role in self.context['role_qs']:
             return event_perms.generate_event_perm_modification_transformation_proposal(
+                role.person, learning_unit_year
+            ).is_open()
+    return None
+
+
+@predicate(bind=True)
+@predicate_failed_msg(message=_("Date creation or modification of proposal not allowed during this period."))
+def is_proposal_edition_period_open(self, user, learning_unit_year):
+    if learning_unit_year:
+        for role in self.context['role_qs']:
+            return event_perms.generate_event_perm_creation_end_date_proposal(
                 role.person, learning_unit_year
             ).is_open()
     return None
