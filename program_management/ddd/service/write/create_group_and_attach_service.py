@@ -46,8 +46,8 @@ def create_group_and_attach(cmd: command_program_mangement.CreateGroupAndAttachC
     return group_id
 
 
-def __get_orphan_group_cmd_from_create_group_and_attach_cmd(cmd: command_program_mangement.CreateGroupAndAttachCommand) -> \
-        command_education_group.CreateOrphanGroupCommand:
+def __get_orphan_group_cmd_from_create_group_and_attach_cmd(cmd: command_program_mangement.CreateGroupAndAttachCommand)\
+        -> command_education_group.CreateOrphanGroupCommand:
     cmd_get_node_id = __get_node_identity_cmd(cmd.path_to_paste)
     node_id = node_identity_service.get_node_identity_from_element_id(cmd_get_node_id)
 

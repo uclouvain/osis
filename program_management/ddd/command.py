@@ -186,10 +186,10 @@ class CreateGroupAndAttachCommand(interface.CommandRequest):
 
     def __repr__(self) -> str:
         parameters = ", ".join([
-            str(self.code), str(self.year), str(self.type), str(self.abbreviated_title), str(self.title_fr),
+            str(self.code), str(self.type), str(self.abbreviated_title), str(self.title_fr),
             str(self.title_en), str(self.credits), str(self.constraint_type), str(self.min_constraint),
             str(self.max_constraint), str(self.management_entity_acronym), str(self.teaching_campus_name),
-            str(self.organization_name), str(self.remark_fr), str(self.remark_en), str(self.path_to_paste),])
+            str(self.organization_name), str(self.remark_fr), str(self.remark_en), str(self.path_to_paste), ])
         return "CreateGroupAndAttachCommand({parameters})".format(parameters=parameters)
 
 
