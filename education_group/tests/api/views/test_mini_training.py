@@ -31,9 +31,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from base.models.education_group_year import EducationGroupYear
-from base.models.enums import organization_type, education_group_categories
-from base.models.enums.education_group_types import MiniTrainingType
+from base.models.enums import organization_type
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import MiniTrainingFactory
 from base.tests.factories.entity_version import EntityVersionFactory
@@ -127,11 +125,11 @@ class MiniTrainingListTestCase(APITestCase):
         """
         This test ensure that multiple filtering by education_group_type will act as an OR
         """
-        url = self.url + "?" + urllib.parse.urlencode({
+        data = {
             'education_group_type': [mini_training.education_group_type.name for mini_training in self.mini_trainings]
-        }, doseq=True)
+        }
 
-        response = self.client.get(url)
+        response = self.client.get(self.url, data=data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['count'], 3)
 
@@ -189,25 +187,6 @@ class MiniTrainingListTestCase(APITestCase):
             context={'request': RequestFactory().get(self.url, query_string)},
         )
         self.assertEqual(response.data['results'], serializer.data)
-
-    def test_get_training_case_filter_for_catalog(self):
-        query_string = {'for_catalog': 'true'}
-
-        response = self.client.get(self.url, data=query_string)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-        trainings = EducationGroupYear.objects.filter(
-            education_group_type__category=education_group_categories.MINI_TRAINING,
-            education_group_type__name__in=MiniTrainingType.for_catalog_publication()
-        )
-
-        serializer = MiniTrainingListSerializer(
-            trainings,
-            many=True,
-            context={'request': RequestFactory().get(self.url, query_string)},
-        )
-
-        self.assertCountEqual(response.data['results'], serializer.data)
 
 
 class GetMiniTrainingTestCase(APITestCase):

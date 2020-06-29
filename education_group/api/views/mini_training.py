@@ -44,7 +44,6 @@ class MiniTrainingFilter(filters.FilterSet):
         field_name='education_group_type__name',
         choices=MiniTrainingType.choices()
     )
-    for_catalog = filters.BooleanFilter(method='filter_for_catalog')
     campus = filters.CharFilter(field_name='main_teaching_campus__name', lookup_expr='icontains')
 
     order_by_field = 'ordering'

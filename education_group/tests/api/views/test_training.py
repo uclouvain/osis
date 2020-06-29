@@ -33,7 +33,6 @@ from rest_framework.test import APITestCase
 
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
-from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import TrainingFactory
 from base.tests.factories.person import PersonFactory
@@ -259,41 +258,16 @@ class FilterTrainingTestCase(APITestCase):
         )
         self.assertEqual(response.data['results'], serializer.data)
 
-    def test_get_training_case_filter_for_catalog(self):
-        query_string = {'for_catalog': 'true'}
+    def test_get_filter_by_multiple_education_group_type(self):
+        """
+        This test ensure that multiple filtering by education_group_type will act as an OR
+        """
+        data = {'education_group_type': [training.education_group_type.name for training in self.trainings]}
 
-        response = self.client.get(self.url, data=query_string)
+        response = self.client.get(self.url, data=data)
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-        trainings = EducationGroupYear.objects.filter(
-            education_group_type__category=education_group_categories.TRAINING,
-            education_group_type__name__in=TrainingType.for_catalog_publication()
-        )
-
-        serializer = TrainingListSerializer(
-            trainings,
-            many=True,
-            context={'request': RequestFactory().get(self.url, query_string)},
-        )
-        self.assertCountEqual(response.data['results'], serializer.data)
-
-    def test_get_training_case_filter_with_possible_registration(self):
-        query_string = {'with_possible_registration': 'true'}
-
-        response = self.client.get(self.url, data=query_string)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-        trainings = EducationGroupYear.objects.filter(
-            education_group_type__category=education_group_categories.TRAINING,
-            education_group_type__name__in=TrainingType.with_possible_registration()
-        )
-
-        serializer = TrainingListSerializer(
-            trainings,
-            many=True,
-            context={'request': RequestFactory().get(self.url, query_string)},
-        )
-        self.assertCountEqual(response.data['results'], serializer.data)
+        self.assertEqual(response.data['count'], 9)
 
 
 class GetTrainingTestCase(APITestCase):
