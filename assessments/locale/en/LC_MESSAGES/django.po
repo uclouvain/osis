@@ -69,9 +69,6 @@ msgstr ""
 msgid "Add manager"
 msgstr ""
 
-msgid "Additional time"
-msgstr ""
-
 msgid "All"
 msgstr ""
 
@@ -89,9 +86,6 @@ msgstr ""
 
 msgid ""
 "All the scores were submitted. It is not possible to encode scores anymore."
-msgstr ""
-
-msgid "Appropriate copy"
 msgstr ""
 
 msgid "Are you sure you want to remove the following manager ?"
@@ -199,6 +193,9 @@ msgstr ""
 msgid "Evaluations"
 msgstr ""
 
+msgid "Extra time (33% generally)"
+msgstr ""
+
 msgid "Fax"
 msgstr ""
 
@@ -250,6 +247,9 @@ msgid "Justified absence"
 msgstr ""
 
 msgid "LU code"
+msgstr ""
+
+msgid "Large print"
 msgstr ""
 
 msgid "Last synchronization"
@@ -493,7 +493,7 @@ msgstr "Session number"
 msgid "Session number"
 msgstr ""
 
-msgid "Specific locale"
+msgid "Specific room of examination"
 msgstr ""
 
 msgid "State"

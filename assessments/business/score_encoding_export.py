@@ -40,8 +40,8 @@ from base.models.student_specific_profile import StudentSpecificProfile
 
 HEADER = [_('Academic year'), _('Session'), _('Learning unit'), _('Program'), _('Registration number'), _('Lastname'),
           _('Firstname'), _('Email'), _('Numbered scores'), _('Justification (A,T)'), _('End date Prof'),
-          _('Type of specific profile'), _('Additional time'), _('Appropriate copy'),
-          _('Specific locale'), _('Arrangement other'), _('Guide'),
+          _('Type of specific profile'), _('Extra time (33% generally)'), _('Large print'),
+          _('Specific room of examination'), _('Other educational facilities'), _('Guide'),
           ]
 
 JUSTIFICATION_ALIASES = {
@@ -172,12 +172,14 @@ def __columns_resizing(ws):
     col_note.width = 15
     col_note = ws.column_dimensions['L']
     col_note.width = 20
+    col_note = ws.column_dimensions['M']
+    col_note.width = 25
     col_note = ws.column_dimensions['N']
     col_note.width = 15
     col_note = ws.column_dimensions['O']
-    col_note.width = 15
+    col_note.width = 25
     col_note = ws.column_dimensions['P']
-    col_note.width = 20
+    col_note.width = 25
     col_note = ws.column_dimensions['Q']
     col_note.width = 30
 

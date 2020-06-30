@@ -78,9 +78,6 @@ msgstr "Ajouter"
 msgid "Add manager"
 msgstr "Ajouter un gestionnaire"
 
-msgid "Additional time"
-msgstr "Tiers-Temps"
-
 msgid "All"
 msgstr "Tous"
 
@@ -105,9 +102,6 @@ msgid ""
 msgstr ""
 "Toutes les notes ont été soumises. Il n'est plus possible d'encoder des "
 "notes."
-
-msgid "Appropriate copy"
-msgstr "Copie adaptée"
 
 msgid "Are you sure you want to remove the following manager ?"
 msgstr "Êtes-vous sûr de vouloir supprimer le gestionnaire suivant ?"
@@ -214,6 +208,9 @@ msgstr "Entité"
 msgid "Evaluations"
 msgstr "Evaluations"
 
+msgid "Extra time (33% generally)"
+msgstr "Tiers-Temps"
+
 msgid "Fax"
 msgstr "Fax"
 
@@ -272,6 +269,9 @@ msgstr "Absence justifiée"
 
 msgid "LU code"
 msgstr "Code de l'UE"
+
+msgid "Large print"
+msgstr "Copie adaptée"
 
 msgid "Last synchronization"
 msgstr "Dernière synchronisation"
@@ -524,7 +524,7 @@ msgstr "Session"
 msgid "Session number"
 msgstr "Numéro de session"
 
-msgid "Specific locale"
+msgid "Specific room of examination"
 msgstr "Local spécifique"
 
 msgid "State"

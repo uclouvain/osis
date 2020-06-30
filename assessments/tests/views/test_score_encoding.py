@@ -540,8 +540,8 @@ class UploadXLSTest(TestCase):
         header_expected_list = [_('Academic year'), _('Session'), _('Learning unit'), _('Program'),
                                 _('Registration number'), _('Lastname'), _('Firstname'), _('Email'),
                                 _('Numbered scores'), _('Justification (A,T)'), _('End date Prof'),
-                                _('Type of specific profile'), _('Additional time'), _('Appropriate copy'),
-                                _('Specific locale'), _('Arrangement other'), _('Guide'),
+                                _('Type of specific profile'), _('Extra time (33% generally)'), _('Large print'),
+                                _('Specific room of examination'), _('Other educational facilities'), _('Guide'),
                                 ]
         self.assertListEqual(HEADER, header_expected_list)
 

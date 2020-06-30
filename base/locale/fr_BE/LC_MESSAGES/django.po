@@ -419,9 +419,6 @@ msgstr "Aménagement Tiers-Temps"
 msgid "Arrangement appropriate copy"
 msgstr "Aménagement Copie adaptée"
 
-msgid "Arrangement other"
-msgstr "Autre aménagement"
-
 msgid "Arrangement specific locale"
 msgstr "Aménagement Local spécifique"
 
@@ -1201,9 +1198,6 @@ msgstr "Groupe"
 msgid "Groups"
 msgstr "Groupes"
 
-msgid "Guide"
-msgstr "Accompagnateur"
-
 msgid "Help"
 msgstr "Aide"
 
@@ -1936,6 +1930,9 @@ msgstr "Autres contacts"
 
 msgid "Other disability"
 msgstr "Autre HTM"
+
+msgid "Other educational facilities"
+msgstr "Autre aménagement"
 
 msgid "Other individual"
 msgstr "Autre individuel"
@@ -3504,6 +3501,9 @@ msgstr "mémoire"
 
 msgid "duration unit"
 msgstr "type durée"
+
+msgid "Educational tutor"
+msgstr "Accompagnateur"
 
 msgid "email"
 msgstr "email"
