@@ -35,4 +35,4 @@ class TestNodeIdentityService(SimpleTestCase):
         cmd = command.GetNodeIdentityFromElementId(element_id=4454)
         node_identity_service.get_node_identity_from_element_id(cmd)
 
-        mock_identity_search.get_from_element_id.assert_called()
+        self.assertTrue(mock_identity_search.get_from_element_id.called)

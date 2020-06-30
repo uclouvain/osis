@@ -59,9 +59,9 @@ class TestCreateGroupAndAttachService(TestCase):
                                            mock_node_id_service):
         create_group_and_attach_service.create_group_and_attach(self.cmd)
 
-        mock_create_group_service.create_orphan_group.assert_called()
-        mock_paste_element_service.paste_element.assert_called()
-        mock_node_id_service.get_node_identity_from_element_id.assert_called()
+        self.assertTrue(mock_create_group_service.create_orphan_group.called)
+        self.assertTrue(mock_paste_element_service.paste_element.called)
+        self.assertTrue(mock_node_id_service.get_node_identity_from_element_id.called)
 
     @mock.patch('program_management.ddd.service.write.create_group_and_attach_service.node_identity_service')
     @mock.patch('program_management.ddd.service.write.create_group_and_attach_service.paste_element_service')
