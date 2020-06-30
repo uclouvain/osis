@@ -27,7 +27,7 @@ from osis_common.ddd import interface
 from program_management.ddd.business_types import *
 from base.models.education_group_year import EducationGroupYear
 from education_group.models.group_year import GroupYear
-
+import attr
 STANDARD = ""
 
 
@@ -100,21 +100,12 @@ class ProgramTreeVersion(interface.RootEntity):
             return '{}-Transition'.format(self.version_name) if self.is_transition else self.version_name
 
 
+@attr.s(frozen=True, slots=True)
 class ProgramTreeVersionIdentity(interface.EntityIdentity):
-    def __init__(self, offer_acronym: str, year: int, version_name: str, is_transition: bool):
-        self.offer_acronym = offer_acronym
-        self.year = year
-        self.version_name = version_name
-        self.is_transition = is_transition
-
-    def __hash__(self):
-        return hash(str(self.offer_acronym) + str(self.year) + str(self.version_name) + str(self.is_transition))
-
-    def __eq__(self, other):
-        return self.offer_acronym == other.offer_acronym \
-               and self.year == other.year \
-               and self.version_name == other.version_name \
-               and self.is_transition == other.is_transition
+    offer_acronym = attr.ib(type=str)
+    year = attr.ib(type=int)
+    version_name = attr.ib(type=str)
+    is_transition = attr.ib(type=bool)
 
 
 class ProgramTreeVersionNotFoundException(Exception):
