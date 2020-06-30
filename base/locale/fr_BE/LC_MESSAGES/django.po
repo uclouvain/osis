@@ -728,6 +728,9 @@ msgstr "Couper"
 msgid "Cut element"
 msgstr "Élément coupé"
 
+msgid "DDI"
+msgstr "HTM"
+
 msgid "Daily"
 msgstr "Horaire de jour"
 
@@ -913,6 +916,9 @@ msgstr ""
 
 msgid "Education_groups"
 msgstr "Formations"
+
+msgid "Educational facilities accepted by Jury"
+msgstr "Aménagement Jury"
 
 msgid "Educational information ending"
 msgstr "Fermeture informations pédagoqiques"
@@ -1942,6 +1948,9 @@ msgstr "Activités dans d'autres langues"
 
 msgid "Other remark (intended for publication)"
 msgstr "Autre remarque (destinée à la publication)"
+
+msgid "Other special needs"
+msgstr "Autre HTM"
 
 msgid "Others Bachelors of the French speaking Community of Belgium"
 msgstr "Autres bacheliers de la Communauté française de Belgique"

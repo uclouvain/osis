@@ -694,6 +694,9 @@ msgstr ""
 msgid "Cut element"
 msgstr ""
 
+msgid "DDI"
+msgstr ""
+
 msgid "Daily"
 msgstr ""
 
@@ -871,6 +874,9 @@ msgid ""
 msgstr ""
 
 msgid "Education_groups"
+msgstr ""
+
+msgid "Educational facilities accepted by Jury"
 msgstr ""
 
 msgid "Educational information ending"
@@ -1866,6 +1872,9 @@ msgid "Other languages activities"
 msgstr ""
 
 msgid "Other remark (intended for publication)"
+msgstr ""
+
+msgid "Other special needs"
 msgstr ""
 
 msgid "Others Bachelors of the French speaking Community of Belgium"
