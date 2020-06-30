@@ -33,6 +33,7 @@ from django.urls import reverse
 from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.factories.user import UserFactory
+from education_group.views.proxy.read import Tab
 from program_management.ddd.domain.node import NodeGroupYear
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory
@@ -52,9 +53,11 @@ class TestTrainingReadSkillAchievementsRead(TestCase):
             root_group__academic_year__year=2019,
             root_group__education_group_type__name=TrainingType.PGRM_MASTER_120.name,
         )
-        ElementGroupYearFactory(group_year=cls.training_version.root_group)
+        cls.element_group_year = ElementGroupYearFactory(group_year=cls.training_version.root_group)
 
-        cls.url = reverse('training_skills_achievements', kwargs={'year': 2019, 'code': 'LDROI200M'})
+        cls.url = reverse(
+            'training_skills_achievements', kwargs={'year': 2019, 'code': 'LDROI200M'}
+        ) + '?path={}&tab={}'.format(cls.element_group_year.id, Tab.SKILLS_ACHIEVEMENTS)
 
     def setUp(self) -> None:
         self.client.force_login(self.person.user)
