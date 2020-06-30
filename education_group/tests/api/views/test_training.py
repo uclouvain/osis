@@ -169,11 +169,18 @@ class FilterTrainingTestCase(APITestCase):
     def setUpTestData(cls):
         cls.user = UserFactory()
         cls.url = reverse('education_group_api_v1:training-list')
+        cls.trainings = []
         for year in [2018, 2019, 2020]:
             academic_year = AcademicYearFactory(year=year)
-            TrainingFactory(acronym='BIR1BA', partial_acronym='LBIR1000I', academic_year=academic_year)
-            TrainingFactory(acronym='AGRO1BA', partial_acronym='LAGRO2111C', academic_year=academic_year)
-            TrainingFactory(acronym='MED12M', partial_acronym='LMED12MA', academic_year=academic_year)
+            cls.trainings.append(
+                TrainingFactory(acronym='BIR1BA', partial_acronym='LBIR1000I', academic_year=academic_year)
+            )
+            cls.trainings.append(
+                TrainingFactory(acronym='AGRO1BA', partial_acronym='LAGRO2111C', academic_year=academic_year)
+            )
+            cls.trainings.append(
+                TrainingFactory(acronym='MED12M', partial_acronym='LMED12MA', academic_year=academic_year)
+            )
 
     def setUp(self):
         self.client.force_authenticate(user=self.user)
@@ -237,6 +244,30 @@ class FilterTrainingTestCase(APITestCase):
             context={'request': RequestFactory().get(self.url, query_string)},
         )
         self.assertEqual(response.data['results'], serializer.data)
+
+    def test_get_training_case_filter_campus(self):
+        query_string = {'campus': self.trainings[2].main_teaching_campus.name}
+
+        response = self.client.get(self.url, data=query_string)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        serializer = TrainingListSerializer(
+            [self.trainings[2]],
+            many=True,
+            context={'request': RequestFactory().get(self.url, query_string)},
+        )
+        self.assertEqual(response.data['results'], serializer.data)
+
+    def test_get_filter_by_multiple_education_group_type(self):
+        """
+        This test ensure that multiple filtering by education_group_type will act as an OR
+        """
+        data = {'education_group_type': [training.education_group_type.name for training in self.trainings]}
+
+        response = self.client.get(self.url, data=data)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 9)
 
 
 class GetTrainingTestCase(APITestCase):
