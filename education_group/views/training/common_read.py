@@ -152,7 +152,6 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
 
     def get_tab_urls(self):
         node_identity = self.get_object().entity_id
-        show = self.current_version.is_standard_version
 
         return OrderedDict({
             Tab.IDENTIFICATION: {
@@ -164,7 +163,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             Tab.DIPLOMAS_CERTIFICATES: {
                 'text': _('Diplomas /  Certificates'),
                 'active': Tab.DIPLOMAS_CERTIFICATES == self.active_tab,
-                'display': show,
+                'display': self.current_version.is_standard_version,
                 'url': get_tab_urls(Tab.DIPLOMAS_CERTIFICATES, node_identity, self.get_path()),
             },
             Tab.ADMINISTRATIVE_DATA: {
