@@ -99,6 +99,10 @@ class ProgramTreeVersion(interface.RootEntity):
         else:
             return '{}-Transition'.format(self.version_name) if self.is_transition else self.version_name
 
+    @property
+    def is_standard_version(self):
+        return self.entity_id.version_name == STANDARD and not self.entity_id.is_transition
+
 
 class ProgramTreeVersionIdentity(interface.EntityIdentity):
     def __init__(self, offer_acronym: str, year: int, version_name: str, is_transition: bool):

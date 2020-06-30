@@ -199,7 +199,7 @@ class TestMiniTrainingReadIdentificationTabs(TestCase):
 
         self.assertTrue(response.context['tab_urls'][Tab.IDENTIFICATION]['display'])
         self.assertTrue(response.context['tab_urls'][Tab.CONTENT]['display'])
-        self.assertFalse(response.context['tab_urls'][Tab.UTILIZATION]['display'])
+        self.assertTrue(response.context['tab_urls'][Tab.UTILIZATION]['display'])
         self.assertFalse(response.context['tab_urls'][Tab.GENERAL_INFO]['display'])
         self.assertFalse(response.context['tab_urls'][Tab.SKILLS_ACHIEVEMENTS]['display'])
         self.assertFalse(response.context['tab_urls'][Tab.ADMISSION_CONDITION]['display'])
