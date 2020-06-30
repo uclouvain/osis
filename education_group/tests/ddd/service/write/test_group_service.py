@@ -59,6 +59,6 @@ class TestCreateGroup(TestCase):
     def test_assert_repository_called_and_signal_dispatched(self, mock_create_repo, mock_publisher):
         create_group_service.create_orphan_group(self.cmd)
 
-        mock_create_repo.assert_called()
+        self.assertTrue(mock_create_repo.called)
         # Ensure event is emited
-        mock_publisher.send.assert_called()
+        self.assertTrue(mock_publisher.send.called)

@@ -144,15 +144,15 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
 
     def get_create_group_url(self):
         return reverse('create_element_select_type', kwargs={'category': Categories.GROUP.name}) + \
-               "?path_to={}".format(self.path)
+               "?path_to={}".format(self.get_path())
 
     def get_create_mini_training_url(self):
         return reverse('create_element_select_type', kwargs={'category': Categories.MINI_TRAINING.name}) + \
-               "?path_to={}".format(self.path)
+               "?path_to={}".format(self.get_path())
 
     def get_create_training_url(self):
         return reverse('create_element_select_type', kwargs={'category': Categories.TRAINING.name}) + \
-               "?path_to={}".format(self.path)
+               "?path_to={}".format(self.get_path())
 
     def get_tab_urls(self):
         return OrderedDict({

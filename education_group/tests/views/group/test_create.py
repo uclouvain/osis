@@ -118,7 +118,7 @@ class TestCreateOrphanGroupPostMethod(TestCase):
         mock_form_is_valid.return_value = True
 
         self.client.post(self.url)
-        mock_service_create_group.assert_called()
+        self.assertTrue(mock_service_create_group.called)
 
     @mock.patch('education_group.views.group.create.GroupForm.is_valid', return_value=True)
     @mock.patch('education_group.views.group.create.GroupForm.cleaned_data',
@@ -215,7 +215,7 @@ class TestCreateNonOrphanGroupPostMethod(TestCase):
         mock_form_is_valid.return_value = True
 
         self.client.post(self.url)
-        mock_service_create_group.assert_called()
+        self.assertTrue(mock_service_create_group.called)
 
     @mock.patch('education_group.views.group.create.GroupForm.is_valid', return_value=True)
     @mock.patch('education_group.views.group.create.GroupForm.cleaned_data',
