@@ -40,6 +40,7 @@ bleach==3.1.4
 django-cte==1.1.5
 pycodestyle==2.4.0
 pylint==2.4.4
+diff-cover==3.0.1
 
 
 -r ./osis_common/requirements.txt
