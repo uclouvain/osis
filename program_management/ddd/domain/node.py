@@ -27,6 +27,8 @@ from _decimal import Decimal
 from collections import OrderedDict
 from typing import List, Set, Dict
 
+import attr
+
 from base.models.enums.active_status import ActiveStatusEnum
 from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, MiniTrainingType, GroupType
@@ -60,19 +62,10 @@ class NodeFactory:
 factory = NodeFactory()
 
 
+@attr.s(frozen=True, slots=True)
 class NodeIdentity(interface.EntityIdentity):
-    def __init__(self, code: str, year: int):
-        self.code = code
-        self.year = year
-
-    def __hash__(self):
-        return hash(self.code + str(self.year))
-
-    def __eq__(self, other):
-        return type(other) == type(self) and (self.code, self.year) == (other.code, other.year)
-
-    def __repr__(self):
-        return "NodeIdentity(code={code}, year={year})".format(code=self.code, year=self.year)
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)
 
 
 class Node(interface.Entity):
