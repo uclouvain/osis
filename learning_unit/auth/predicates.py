@@ -24,7 +24,6 @@ FACULTY_EDITABLE_CONTAINER_TYPES = (
 def is_user_attached_to_initial_requirement_entity(self, user, learning_unit_year=None):
     if learning_unit_year:
         initial_container_year = learning_unit_year.initial_data.get("learning_container_year")
-        print(initial_container_year)
         requirement_entity_id = initial_container_year.requirement_entity
         return _is_attached_to_entity(requirement_entity_id, self)
     return learning_unit_year

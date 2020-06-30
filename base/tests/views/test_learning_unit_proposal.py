@@ -75,6 +75,8 @@ from base.tests.factories.user import UserFactory
 from base.views.learning_units.proposal.update import update_learning_unit_proposal, \
     learning_unit_modification_proposal, learning_unit_suppression_proposal
 from base.views.learning_units.search.proposal import ACTION_CONSOLIDATE, ACTION_BACK_TO_INITIAL, ACTION_FORCE_STATE
+from learning_unit.tests.factories.central_manager import CentralManagerFactory
+from learning_unit.tests.factories.faculty_manager import FacultyManagerFactory
 from reference.tests.factories.language import LanguageFactory, FrenchLanguageFactory
 
 LABEL_VALUE_BEFORE_PROPOSAL = _('Value before proposal')
@@ -724,11 +726,9 @@ class TestEditProposal(TestCase):
         cls.generated_container = GenerateContainer(cls.current_academic_year, end_year)
         cls.generated_container_first_year = cls.generated_container.generated_container_years[1]
         cls.learning_unit_year = cls.generated_container_first_year.learning_unit_year_full
-
-        cls.person = person_factory.FacultyManagerForUEFactory("can_edit_learning_unit_proposal")
+        cls.learning_unit_year
         cls.requirement_entity_of_luy = cls.generated_container_first_year.requirement_entity_container_year
-        PersonEntityFactory(entity=cls.requirement_entity_of_luy, person=cls.person)
-        cls.person_entity = PersonEntityFactory(person=cls.person, entity=cls.entity)
+        cls.person = FacultyManagerFactory(entity=cls.requirement_entity_of_luy).person
 
         cls.url = reverse(update_learning_unit_proposal, args=[cls.learning_unit_year.id])
         cls.academic_year_for_suppression_proposal = AcademicYear.objects.filter(
@@ -751,7 +751,7 @@ class TestEditProposal(TestCase):
         self.assertTemplateUsed(response, 'access_denied.html')
 
     def test_edit_proposal_get_regular_user_with_permission(self):
-        person = person_factory.PersonWithPermissionsFactory("can_edit_learning_unit_proposal")
+        person = FacultyManagerFactory().person
         self.client.force_login(person.user)
         response = self.client.get(self.url)
 
@@ -1043,23 +1043,15 @@ class TestLearningUnitProposalDisplay(TestCase):
 
 @override_flag('learning_unit_proposal_delete', active=True)
 class TestCreationProposalCancel(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.a_person_central_manager = person_factory.CentralManagerForUEFactory(
-            'can_propose_learningunit', 'can_access_learningunit'
-        )
 
-    def setUp(self):
-        self.client.force_login(self.a_person_central_manager.user)
-
-    @mock.patch('base.views.learning_units.perms.business_perms.is_eligible_for_cancel_of_proposal',
-                side_effect=lambda *args: True)
     @mock.patch('base.utils.send_mail.send_mail_cancellation_learning_unit_proposals')
-    def test_cancel_proposal_of_learning_unit(self, mock_send_mail, mock_perms):
+    def test_cancel_proposal_of_learning_unit(self, mock_send_mail):
         a_proposal = _create_proposal_learning_unit("LOSIS1211")
         luy = a_proposal.learning_unit_year
         url = reverse('learning_unit_cancel_proposal', args=[luy.id])
 
+        self.central_manager = CentralManagerFactory(entity=luy.learning_container_year.requirement_entity)
+        self.client.force_login(self.central_manager.person.user)
         response = self.client.post(url, data={})
 
         redirected_url = reverse('learning_unit', args=[luy.id])
@@ -1068,4 +1060,3 @@ class TestCreationProposalCancel(TestCase):
         self.assertRedirects(response, redirected_url, fetch_redirect_response=False)
         self.assertEqual(len(msgs), 2)
         self.assertTrue(mock_send_mail.called)
-        self.assertTrue(mock_perms.called)

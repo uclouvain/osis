@@ -51,7 +51,7 @@ from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFact
 from cms.models.translated_text import TranslatedText
 from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory
-from reference.tests.factories.language import LanguageFactory, FrenchLanguageFactory, EnglishLanguageFactory
+from reference.tests.factories.language import FrenchLanguageFactory, EnglishLanguageFactory
 
 NEW_TEXT = "new text begins in  {}"
 EN_CODE_LANGUAGE = 'EN'
@@ -134,8 +134,7 @@ class TestConsolidate(TestCase):
         self.assertRedirects(response, expected_redirect_url)
         mock_consolidate.assert_called_once_with([self.proposal], self.person, {})
 
-    @mock.patch("base.business.learning_units.perms.is_eligible_to_consolidate_proposal", return_value=True)
-    def test_creation_proposal_consolidation(self, mock_perms):
+    def test_creation_proposal_consolidation(self):
         creation_proposal = ProposalLearningUnitFactory(
             type=proposal_type.ProposalType.CREATION,
             state=proposal_state.ProposalState.ACCEPTED.name,
