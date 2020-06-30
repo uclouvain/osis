@@ -36,7 +36,9 @@ from base.tests.factories.user import UserFactory
 from education_group.ddd.domain.training import Training
 from program_management.ddd.domain.node import NodeGroupYear
 from program_management.forms.custom_xls import CustomXlsForm
-from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
+from program_management.tests.factories.education_group_version import EducationGroupVersionFactory, \
+    StandardEducationGroupVersionFactory, ParticularTransitionEducationGroupVersionFactory, \
+    StandardTransitionEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory
 from education_group.views.training.common_read import Tab
 
@@ -45,7 +47,7 @@ class TestTrainingReadIdentification(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.person = PersonWithPermissionsFactory('view_educationgroup')
-        cls.training_version = EducationGroupVersionFactory(
+        cls.training_version = StandardEducationGroupVersionFactory(
             offer__acronym="DROI2M",
             offer__partial_acronym="LDROI200M",
             offer__academic_year__year=2019,
@@ -54,7 +56,6 @@ class TestTrainingReadIdentification(TestCase):
             root_group__partial_acronym="LDROI200M",
             root_group__academic_year__year=2019,
             root_group__education_group_type__name=TrainingType.PGRM_MASTER_120.name,
-            version_name=''
         )
         ElementGroupYearFactory(group_year=cls.training_version.root_group)
         cls.url = reverse('training_identification', kwargs={'year': 2019, 'code': 'LDROI200M'})
@@ -62,17 +63,16 @@ class TestTrainingReadIdentification(TestCase):
 
     @classmethod
     def _build_education_group_versions(cls):
-        cls.training_version_standard = EducationGroupVersionFactory(
+        cls.training_version_standard = StandardEducationGroupVersionFactory(
             offer__acronym="CRIM2M",
             offer__partial_acronym="LCRIM200M",
             offer__academic_year__year=2019,
             root_group__partial_acronym="LCRIM200M",
             root_group__academic_year__year=2019,
             root_group__education_group_type__name=TrainingType.PGRM_MASTER_120.name,
-            version_name=''
         )
         ElementGroupYearFactory(group_year=cls.training_version_standard.root_group)
-        cls.training_version_standard_transition = EducationGroupVersionFactory(
+        cls.training_version_standard_transition = StandardTransitionEducationGroupVersionFactory(
             offer__acronym="CRIM2M",
             offer__partial_acronym="LCRIM200M",
             offer__academic_year__year=2019,
@@ -80,8 +80,6 @@ class TestTrainingReadIdentification(TestCase):
             root_group__partial_acronym="LCRIM200M1",
             root_group__academic_year__year=2019,
             root_group__education_group_type__name=TrainingType.PGRM_MASTER_120.name,
-            is_transition=True,
-            version_name=''
         )
         ElementGroupYearFactory(group_year=cls.training_version_standard_transition.root_group)
         cls.training_version_particular_b = EducationGroupVersionFactory(
@@ -260,8 +258,7 @@ class TestTrainingReadIdentificationTabs(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.person = PersonWithPermissionsFactory('view_educationgroup')
-        cls.training_standard = EducationGroupVersionFactory(
-            version_name='',
+        cls.training_standard = StandardEducationGroupVersionFactory(
             offer__acronym="CRIM2M",
             offer__partial_acronym="LCRIM200M",
             offer__academic_year__year=2019,
@@ -273,14 +270,13 @@ class TestTrainingReadIdentificationTabs(TestCase):
         ElementGroupYearFactory(group_year=cls.training_standard.root_group)
         cls.url_standard = reverse('training_identification', kwargs={'year': 2019,
                                                                       'code': 'LCRIM200M2'})
-        cls.training_particular = EducationGroupVersionFactory(
+        cls.training_particular = ParticularTransitionEducationGroupVersionFactory(
             offer__acronym="DRT2M",
             offer__partial_acronym="LDRT200M",
             offer__academic_year__year=2019,
             root_group__partial_acronym="LDRT200M3",
             root_group__academic_year__year=2019,
             root_group__education_group_type__name=TrainingType.PGRM_MASTER_120.name,
-            version_name='CEMS'
         )
         ElementGroupYearFactory(group_year=cls.training_particular.root_group)
 
