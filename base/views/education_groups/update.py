@@ -69,7 +69,7 @@ def get_education_group_year_by_pk(request, root_id, education_group_year_id):
 
 # TODO: Split view of update_certification_aims with update_education_group
 @login_required
-def update_education_group(request, root_id, education_group_year_id):
+def update_education_group(request, offer_id, education_group_year_id):
     education_group_year = get_object_or_404(
         EducationGroupYear.objects.select_related('education_group'),
         pk=education_group_year_id
@@ -78,8 +78,8 @@ def update_education_group(request, root_id, education_group_year_id):
 
     if program_manager.is_program_manager(request.user, education_group=education_group_year.education_group) \
             and not any((request.user.is_superuser, person.is_faculty_manager, person.is_central_manager)):
-        return _update_certificate_aims(request, root_id, education_group_year)
-    return update_education_group_year(request, root_id, education_group_year_id)
+        return _update_certificate_aims(request, offer_id, education_group_year)
+    return update_education_group_year(request, offer_id, education_group_year_id)
 
 
 @permission_required('base.change_educationgroupcertificateaim',
@@ -172,7 +172,13 @@ def _common_success_redirect(request, form, root, groupelementyear_form=None):
 
 
 def _get_success_message_for_update_education_group_year(root_id, education_group_year):
-    link = reverse("education_group_read", args=[root_id, education_group_year.id])
+    link = reverse(
+        "element_identification",
+        kwargs={
+            "year": education_group_year.academic_year.year,
+            "code": education_group_year.partial_acronym
+        }
+    )
     return _("Education group year <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> successfuly updated.") % {
         "link": link,
         "acronym": education_group_year.acronym,
@@ -191,12 +197,24 @@ def _get_success_redirect_url(root, education_group_year):
     is_current_viewed_deleted = not mdl_base.education_group_year.search(id=education_group_year.id).exists()
     if is_current_viewed_deleted:
         # Case current updated is deleted, we will take the latest existing [At this stage, we always have lastest]
-        qs = mdl_base.education_group_year.search().filter(education_group=education_group_year.education_group) \
+        lastest = mdl_base.education_group_year.search().filter(education_group=education_group_year.education_group) \
             .order_by('academic_year__year') \
             .last()
-        url = reverse("education_group_read", args=[qs.pk, qs.id])
+        url = reverse(
+            "element_identification",
+            kwargs={
+                "year": lastest.academic_year.year,
+                "code": lastest.partial_acronym
+            }
+        )
     else:
-        url = reverse("education_group_read", args=[root.pk, education_group_year.id])
+        url = reverse(
+            "element_identification",
+            kwargs={
+                "year": education_group_year.academic_year.year,
+                "code": education_group_year.partial_acronym
+            }
+        )
     return url
 
 

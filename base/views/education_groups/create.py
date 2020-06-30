@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -102,7 +102,7 @@ def create_education_group(request, category, education_group_type_pk, root_id=N
     if not request.user.has_perm(perm, parent):
         raise PermissionDenied(errors.get_permission_error(request.user, perm))
 
-    request_cache = RequestCache(request.user, reverse('education_groups'))
+    request_cache = RequestCache(request.user, reverse('version_program'))
     cached_data = request_cache.cached_data or {}
     academic_year = cached_data.get('academic_year')
     if not academic_year:
@@ -155,13 +155,24 @@ def _common_success_redirect(request, form, root_id=None):
     display_success_messages(request, success_msg, extra_tags='safe')
 
     # Redirect
-    url = reverse("education_group_read", args=[root_id, education_group_year.pk])
+    url = reverse(
+        "element_identification",
+        kwargs={
+            "year": education_group_year.academic_year.year,
+            "code": education_group_year.partial_acronym
+        }
+    )
     return redirect(url)
 
 
 def _get_success_message_for_creation_education_group_year(root_id, education_group_year):
+    link = reverse("element_identification", kwargs={
+            "year": education_group_year.academic_year.year,
+            "code": education_group_year.partial_acronym
+        }
+    )
     return _("Education group year <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> successfully created.") % {
-        "link": reverse("education_group_read", args=[root_id, education_group_year.pk]),
+        "link": link,
         "acronym": education_group_year.acronym,
         "academic_year": education_group_year.academic_year,
     }

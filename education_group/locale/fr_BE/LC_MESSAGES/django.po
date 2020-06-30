@@ -28,6 +28,9 @@ msgstr "Année académique de fin"
 msgid "End year must be greater than the start year, or equal"
 msgstr "L'année de fin doit être supérieure ou égale à l'année de début "
 
+msgid "of version"
+msgstr "de la version"
+
 msgid "Start academic year"
 msgstr "Année académique de début"
 
@@ -44,3 +47,12 @@ msgstr "La portée de l'utilisateur est limitée et empêche la réalisation de 
 
 msgid "You cannot change/delete a education group existing before %(limit_year)s"
 msgstr "Vous ne pouvez pas supprimer/modifier une formation existant avant %(limit_year)s"
+
+msgid ""
+"The formation you work with doesn't exist (or is not at the same position) "
+"in the tree {root.title} in {root.year}.You've been redirected to the root "
+"{root.code} ({root.year})"
+msgstr ""
+"La formation avec laquelle vous travaillez n'existe pas (ou n'est pas à la même position) "
+"dans le programme de {root.title} en {root.year}."
+"Vous avez été redirigé vers la racine du programme : {root.title} ({root.year})."

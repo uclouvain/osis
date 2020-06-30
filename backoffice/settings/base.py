@@ -90,6 +90,7 @@ INSTALLED_APPS = (
     'compat',
     'hijack_admin',
     'reversion',
+    'django.contrib.gis',
 )
 
 
@@ -173,7 +174,7 @@ TEMPLATES = [
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': os.environ.get("DATABASE_NAME", 'osis_local'),
         'USER': os.environ.get("POSTGRES_USER", 'osis'),
         'PASSWORD': os.environ.get("POSTGRES_PASSWORD", 'osis'),
@@ -479,6 +480,10 @@ YEAR_LIMIT_EDG_MODIFICATION = int(os.environ.get("YEAR_LIMIT_EDG_MODIFICATION", 
 STAFF_FUNDING_URL = os.environ.get('STAFF_FUNDING_URL', '')
 VIRTUAL_DESKTOP_URL = os.environ.get('VIRTUAL_DESKTOP_URL', '')
 LEARNING_UNIT_PORTAL_URL = os.environ.get('LEARNING_UNIT_PORTAL_URL', 'https://uclouvain.be/cours-{year}-{acronym}')
+LEARNING_UNIT_PORTAL_URL_WITH_UPDATED_CACHE = os.environ.get(
+    'LEARNING_UNIT_PORTAL_URL_WITH_UPDATED_CACHE',
+    'https://uclouvain.be/cours-{year}-{acronym}'
+)
 
 # SITE_ID for Django "sites framework"
 SITE_ID = os.environ.get('SITE_ID', 1)
