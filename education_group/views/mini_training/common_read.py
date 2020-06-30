@@ -145,7 +145,7 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
         return self.get_education_group_version().offer
 
     def get_tab_urls(self):
-        show = True if not self.get_education_group_version().version_name == '' else False
+        show = True if self.get_education_group_version().version_name == '' else False
 
         return OrderedDict({
             Tab.IDENTIFICATION: {

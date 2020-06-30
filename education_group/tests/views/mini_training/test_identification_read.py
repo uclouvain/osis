@@ -50,6 +50,7 @@ class TestMiniTrainingReadIdentification(TestCase):
             root_group__partial_acronym="LBIOL100P",
             root_group__academic_year__year=2019,
             root_group__education_group_type__name=MiniTrainingType.DEEPENING.name,
+            version_name=''
         )
         ElementGroupYearFactory(group_year=cls.mini_training_version.root_group)
 
@@ -180,7 +181,7 @@ class TestMiniTrainingReadIdentificationTabs(TestCase):
         )
         ElementGroupYearFactory(group_year=cls.non_standard_mini_training_version.root_group)
 
-        cls.url_non_standard = reverse('mini_training_identification', kwargs={'year': 2019, 'code': 'LBIOL100P'})
+        cls.url_non_particular = reverse('mini_training_identification', kwargs={'year': 2019, 'code': 'LDRT100P'})
 
     def setUp(self) -> None:
         self.client.force_login(self.person.user)
@@ -195,8 +196,8 @@ class TestMiniTrainingReadIdentificationTabs(TestCase):
         self.assertTrue(response.context['tab_urls'][Tab.SKILLS_ACHIEVEMENTS]['display'])
         self.assertTrue(response.context['tab_urls'][Tab.ADMISSION_CONDITION]['display'])
 
-    def test_assert_tabs_displayed_for_standard_version(self):
-        response = self.client.get(self.url_non_standard)
+    def test_assert_tabs_displayed_for_particular_version(self):
+        response = self.client.get(self.url_non_particular)
 
         self.assertTrue(response.context['tab_urls'][Tab.IDENTIFICATION]['display'])
         self.assertTrue(response.context['tab_urls'][Tab.CONTENT]['display'])

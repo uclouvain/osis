@@ -152,7 +152,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
 
     def get_tab_urls(self):
         node_identity = self.get_object().entity_id
-        show = True if not self.education_group_version.version_name == '' else False
+        show = True if self.education_group_version.version_name == '' else False
 
         return OrderedDict({
             Tab.IDENTIFICATION: {
