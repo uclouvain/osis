@@ -145,6 +145,8 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
         return self.get_education_group_version().offer
 
     def get_tab_urls(self):
+        show = True if self.current_version.is_standard else False
+
         return OrderedDict({
             Tab.IDENTIFICATION: {
                 'text': _('Identification'),
@@ -161,7 +163,7 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             Tab.UTILIZATION: {
                 'text': _('Utilizations'),
                 'active': Tab.UTILIZATION == self.active_tab,
-                'display': True,
+                'display': show,
                 'url': get_tab_urls(Tab.UTILIZATION, self.node_identity, self.get_path()),
             },
             Tab.GENERAL_INFO: {
@@ -186,17 +188,20 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
 
     def have_general_information_tab(self):
         node_category = self.get_object().category
-        return node_category.name in general_information_sections.SECTIONS_PER_OFFER_TYPE and \
+        return self.current_version.is_standard and \
+            node_category.name in general_information_sections.SECTIONS_PER_OFFER_TYPE and \
             self._is_general_info_and_condition_admission_in_display_range
 
     def have_skills_and_achievements_tab(self):
         node_category = self.get_object().category
-        return node_category.name in MiniTrainingType.with_skills_achievements() and \
+        return self.current_version.is_standard and \
+            node_category.name in MiniTrainingType.with_skills_achievements() and \
             self._is_general_info_and_condition_admission_in_display_range
 
     def have_admission_condition_tab(self):
         node_category = self.get_object().category
-        return node_category.name in MiniTrainingType.with_admission_condition() and \
+        return self.current_version.is_standard and \
+            node_category.name in MiniTrainingType.with_admission_condition() and \
             self._is_general_info_and_condition_admission_in_display_range
 
     def _is_general_info_and_condition_admission_in_display_range(self):
