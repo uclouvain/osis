@@ -38,7 +38,7 @@ from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.user import UserFactory
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
-from education_group.api.serializers.mini_training import MiniTrainingDetailSerializer
+from education_group.api.serializers.mini_training import MiniTrainingDetailSerializer, MiniTrainingListSerializer
 from education_group.api.views.mini_training import MiniTrainingList
 
 
@@ -125,11 +125,11 @@ class MiniTrainingListTestCase(APITestCase):
         """
         This test ensure that multiple filtering by education_group_type will act as an OR
         """
-        url = self.url + "?" + urllib.parse.urlencode({
+        data = {
             'education_group_type': [mini_training.education_group_type.name for mini_training in self.mini_trainings]
-        }, doseq=True)
+        }
 
-        response = self.client.get(url)
+        response = self.client.get(self.url, data=data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['count'], 3)
 
@@ -174,6 +174,19 @@ class MiniTrainingListTestCase(APITestCase):
         self.assertEqual(response.data['results'][0]['code'], self.mini_trainings[2].partial_acronym)
         self.assertEqual(response.data['results'][1]['code'], self.mini_trainings[1].partial_acronym)
         self.assertEqual(response.data['results'][2]['code'], self.mini_trainings[0].partial_acronym)
+
+    def test_get_case_filter_campus(self):
+        query_string = {'campus': self.mini_trainings[2].main_teaching_campus.name}
+
+        response = self.client.get(self.url, data=query_string)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        serializer = MiniTrainingListSerializer(
+            [self.mini_trainings[2]],
+            many=True,
+            context={'request': RequestFactory().get(self.url, query_string)},
+        )
+        self.assertEqual(response.data['results'], serializer.data)
 
 
 class GetMiniTrainingTestCase(APITestCase):
