@@ -51,9 +51,11 @@ class TestMiniTrainingReadSkillAchievementsRead(TestCase):
             root_group__academic_year__year=2019,
             root_group__education_group_type__name=MiniTrainingType.DEEPENING.name,
         )
-        ElementGroupYearFactory(group_year=cls.mini_training_version.root_group)
+        cls.element_group_year = ElementGroupYearFactory(group_year=cls.mini_training_version.root_group)
 
-        cls.url = reverse('mini_training_skills_achievements', kwargs={'year': 2019, 'code': 'LBIOL100P'})
+        cls.url = reverse(
+            'mini_training_skills_achievements', kwargs={'year': 2019, 'code': 'LBIOL100P'}
+        ) + '?path={}&tab={}'.format(cls.element_group_year.id, Tab.SKILLS_ACHIEVEMENTS)
 
     def setUp(self) -> None:
         self.client.force_login(self.person.user)
