@@ -121,8 +121,8 @@ class TestPerms(TestCase):
     @override_settings(YEAR_LIMIT_LUE_MODIFICATION=2018)
     def test_is_not_eligible_to_update_learning_pedagogy_cause_before_2018(self):
         self.luy.academic_year = AcademicYearFactory(year=2015)
-        self.assertFalse(is_eligible_to_update_learning_unit_pedagogy(self.luy, self.central_manager))
+        self.assertFalse(is_eligible_to_update_learning_unit_pedagogy(self.luy, self.central_manager.person))
 
     def test_is_eligible_to_update_learning_pedagogy_after_2017(self):
         self.luy.academic_year = AcademicYearFactory(year=2019)
-        self.assertTrue(is_eligible_to_update_learning_unit_pedagogy(self.luy, self.central_manager))
+        self.assertTrue(is_eligible_to_update_learning_unit_pedagogy(self.luy, self.central_manager.person))
