@@ -83,6 +83,7 @@ class EducationGroupSearch(LoginRequiredMixin, PermissionRequiredMixin, CacheFil
 
     serializer_class = EducationGroupSerializer
     cache_search = True
+    cache_exclude_params = ['xls_status']
 
     def get_context_data(self, **kwargs):
         person = get_object_or_404(Person, user=self.request.user)
