@@ -419,9 +419,6 @@ msgstr "Aménagement Tiers-Temps"
 msgid "Arrangement appropriate copy"
 msgstr "Aménagement Copie adaptée"
 
-msgid "Arrangement other"
-msgstr "Autre aménagement"
-
 msgid "Arrangement specific locale"
 msgstr "Aménagement Local spécifique"
 
@@ -731,6 +728,9 @@ msgstr "Couper"
 msgid "Cut element"
 msgstr "Élément coupé"
 
+msgid "DDI"
+msgstr "HTM"
+
 msgid "Daily"
 msgstr "Horaire de jour"
 
@@ -916,6 +916,9 @@ msgstr ""
 
 msgid "Education_groups"
 msgstr "Formations"
+
+msgid "Educational facilities accepted by Jury"
+msgstr "Aménagement Jury"
 
 msgid "Educational information ending"
 msgstr "Fermeture informations pédagoqiques"
@@ -1200,9 +1203,6 @@ msgstr "Groupe"
 
 msgid "Groups"
 msgstr "Groupes"
-
-msgid "Guide"
-msgstr "Accompagnateur"
 
 msgid "Help"
 msgstr "Aide"
@@ -1937,6 +1937,9 @@ msgstr "Autres contacts"
 msgid "Other disability"
 msgstr "Autre HTM"
 
+msgid "Other educational facilities"
+msgstr "Autre aménagement"
+
 msgid "Other individual"
 msgstr "Autre individuel"
 
@@ -1945,6 +1948,9 @@ msgstr "Activités dans d'autres langues"
 
 msgid "Other remark (intended for publication)"
 msgstr "Autre remarque (destinée à la publication)"
+
+msgid "Other special needs"
+msgstr "Autre HTM"
 
 msgid "Others Bachelors of the French speaking Community of Belgium"
 msgstr "Autres bacheliers de la Communauté française de Belgique"
@@ -3504,6 +3510,9 @@ msgstr "mémoire"
 
 msgid "duration unit"
 msgstr "type durée"
+
+msgid "Educational tutor"
+msgstr "Accompagnateur"
 
 msgid "email"
 msgstr "email"
