@@ -3761,15 +3761,3 @@ msgstr "oui"
 
 msgid "yes,no"
 msgstr "oui,non"
-
-#~ msgid "Disability"
-#~ msgstr "HTM"
-
-#~ msgid "Other disability"
-#~ msgstr "Autre HTM"
-
-#~ msgid "Other educational facilities"
-#~ msgstr "Autre aménagement"
-
-#~ msgid "Educational tutor"
-#~ msgstr "Accompagnateur"
