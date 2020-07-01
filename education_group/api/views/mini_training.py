@@ -78,14 +78,6 @@ class MiniTrainingFilter(filters.FilterSet):
     def filter_version_type(queryset, name, value):
         return utils.filter_version_type(queryset, value)
 
-    @staticmethod
-    def filter_for_catalog(queryset, _, value):
-        if value:
-            return queryset.filter(
-                education_group_type__name__in=MiniTrainingType.for_catalog_publication()
-            )
-        return queryset
-
 
 class MiniTrainingList(LanguageContextSerializerMixin, generics.ListAPIView):
     """
