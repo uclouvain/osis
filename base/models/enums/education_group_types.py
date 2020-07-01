@@ -148,36 +148,6 @@ class TrainingType(EducationGroupTypesEnum):
             cls.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.name
         ]
 
-    @classmethod
-    def for_catalog_publication(cls):
-        return [
-            cls.BACHELOR.name,
-            cls.RESEARCH_CERTIFICATE.name,
-            cls.CERTIFICATE.name,
-            cls.CERTIFICATE_OF_PARTICIPATION.name,
-            cls.CERTIFICATE_OF_SUCCESS.name,
-            cls.CERTIFICATE_OF_HOLDING_CREDITS.name,
-            cls.CAPAES.name,
-            cls.PGRM_MASTER_180_240.name,
-            cls.PGRM_MASTER_120.name,
-            cls.MASTER_M1.name,
-            cls.MASTER_MC.name,
-            cls.UNIVERSITY_FIRST_CYCLE_CERTIFICATE.name,
-            cls.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.name,
-            cls.AGGREGATION.name
-        ]
-
-    @classmethod
-    def with_possible_registration(cls):
-        return cls.for_catalog_publication() + cls.finality_types() + [
-            cls.JUNIOR_YEAR.name,
-            cls.PHD.name,
-            cls.FORMATION_PHD.name,
-            cls.ISOLATED_CLASS.name,
-            cls.LANGUAGE_CLASS.name,
-            cls.ACCESS_CONTEST.name
-        ]
-
 
 class MiniTrainingType(EducationGroupTypesEnum):
     DEEPENING = _("Deepening")
@@ -209,10 +179,6 @@ class MiniTrainingType(EducationGroupTypesEnum):
             cls.DISCIPLINARY_COMPLEMENT_MINOR.name,
             cls.FSA_SPECIALITY.name,
         ]
-
-    @classmethod
-    def for_catalog_publication(cls):
-        return cls.minors() + [cls.DEEPENING.name]
 
 
 class GroupType(EducationGroupTypesEnum):
