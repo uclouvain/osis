@@ -49,6 +49,7 @@ class MiniTrainingFilter(filters.FilterSet):
         field_name='offer__education_group_type__name',
         choices=MiniTrainingType.choices()
     )
+    campus = filters.CharFilter(field_name='root_group__main_teaching_campus__name', lookup_expr='icontains')
     version_type = filters.CharFilter(method='filter_version_type')
     acronym = filters.CharFilter(field_name="offer__acronym", lookup_expr='icontains')
     title = filters.CharFilter(field_name="root_group__title_fr", lookup_expr='icontains')
@@ -76,6 +77,14 @@ class MiniTrainingFilter(filters.FilterSet):
     @staticmethod
     def filter_version_type(queryset, name, value):
         return utils.filter_version_type(queryset, value)
+
+    @staticmethod
+    def filter_for_catalog(queryset, _, value):
+        if value:
+            return queryset.filter(
+                education_group_type__name__in=MiniTrainingType.for_catalog_publication()
+            )
+        return queryset
 
 
 class MiniTrainingList(LanguageContextSerializerMixin, generics.ListAPIView):
