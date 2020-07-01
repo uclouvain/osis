@@ -160,6 +160,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
 
     def get_tab_urls(self):
         node_identity = self.get_object().entity_id
+
         return OrderedDict({
             Tab.IDENTIFICATION: {
                 'text': _('Identification'),
@@ -170,7 +171,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             Tab.DIPLOMAS_CERTIFICATES: {
                 'text': _('Diplomas /  Certificates'),
                 'active': Tab.DIPLOMAS_CERTIFICATES == self.active_tab,
-                'display': True,
+                'display': self.current_version.is_standard_version,
                 'url': get_tab_urls(Tab.DIPLOMAS_CERTIFICATES, node_identity, self.get_path()),
             },
             Tab.ADMINISTRATIVE_DATA: {
@@ -216,21 +217,24 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
         return academic_year.starting_academic_year()
 
     def have_administrative_data_tab(self):
-        return not self.get_object().is_master_2m() and self.current_version.is_standard
+        return not self.get_object().is_master_2m() and self.current_version.is_standard_version
 
     def have_general_information_tab(self):
         node_category = self.get_object().category
-        return node_category.name in general_information_sections.SECTIONS_PER_OFFER_TYPE and \
+        return self.current_version.is_standard_version and \
+            node_category.name in general_information_sections.SECTIONS_PER_OFFER_TYPE and \
             self._is_general_info_and_condition_admission_in_display_range
 
     def have_skills_and_achievements_tab(self):
         node_category = self.get_object().category
-        return node_category.name in TrainingType.with_skills_achievements() and \
+        return self.current_version.is_standard_version and \
+            node_category.name in TrainingType.with_skills_achievements() and \
             self._is_general_info_and_condition_admission_in_display_range
 
     def have_admission_condition_tab(self):
         node_category = self.get_object().category
-        return node_category.name in TrainingType.with_admission_condition() and \
+        return self.current_version.is_standard_version and \
+            node_category.name in TrainingType.with_admission_condition() and \
             self._is_general_info_and_condition_admission_in_display_range
 
     def _is_general_info_and_condition_admission_in_display_range(self):
