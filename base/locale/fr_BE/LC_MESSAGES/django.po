@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-19 10:19+0200\n"
+"POT-Creation-Date: 2020-07-01 14:44+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -410,14 +410,14 @@ msgstr "Êtes-vous sûr·e de vouloir supprimer le support de cours?"
 msgid "Are you sure?"
 msgstr "Êtes-vous sûr·e?"
 
-msgid "Arrangement Jury"
-msgstr "Aménagement Jury"
-
 msgid "Arrangement additional time"
 msgstr "Aménagement Tiers-Temps"
 
 msgid "Arrangement appropriate copy"
 msgstr "Aménagement Copie adaptée"
+
+msgid "Arrangement other"
+msgstr "Autre"
 
 msgid "Arrangement specific locale"
 msgstr "Aménagement Local spécifique"
@@ -812,9 +812,6 @@ msgstr "Diplômes /  Certificats"
 msgid "Direct Access"
 msgstr "Accès direct"
 
-msgid "Disability"
-msgstr "HTM"
-
 msgid "Disabled"
 msgstr "Désactivé"
 
@@ -1203,6 +1200,9 @@ msgstr "Groupe"
 
 msgid "Groups"
 msgstr "Groupes"
+
+msgid "Guide"
+msgstr ""
 
 msgid "Help"
 msgstr "Aide"
@@ -1933,12 +1933,6 @@ msgstr "Autre contact"
 
 msgid "Other contacts"
 msgstr "Autres contacts"
-
-msgid "Other disability"
-msgstr "Autre HTM"
-
-msgid "Other educational facilities"
-msgstr "Autre aménagement"
 
 msgid "Other individual"
 msgstr "Autre individuel"
@@ -3511,9 +3505,6 @@ msgstr "mémoire"
 msgid "duration unit"
 msgstr "type durée"
 
-msgid "Educational tutor"
-msgstr "Accompagnateur"
-
 msgid "email"
 msgstr "email"
 
@@ -3770,3 +3761,15 @@ msgstr "oui"
 
 msgid "yes,no"
 msgstr "oui,non"
+
+#~ msgid "Disability"
+#~ msgstr "HTM"
+
+#~ msgid "Other disability"
+#~ msgstr "Autre HTM"
+
+#~ msgid "Other educational facilities"
+#~ msgstr "Autre aménagement"
+
+#~ msgid "Educational tutor"
+#~ msgstr "Accompagnateur"
