@@ -190,10 +190,6 @@ class MiniTrainingType(EducationGroupTypesEnum):
         ]
 
     @classmethod
-    def for_catalog_publication(cls):
-        return cls.minors() + [cls.DEEPENING.name]
-
-    @classmethod
     def with_skills_achievements(cls):
         return cls.with_admission_condition()
 
