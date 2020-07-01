@@ -316,7 +316,7 @@ class FilterTrainingTestCase(APITestCase):
         response = self.client.get(self.url, data=data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['count'], 10)
+        self.assertEqual(response.data['count'], 3)
 
     def test_get_training_case_filter_lowercase_acronym(self):
         query_string = {'acronym': 'agro1ba'}
