@@ -48,10 +48,16 @@ class TrainingFilter(filters.FilterSet):
     title_english = filters.CharFilter(field_name="root_group__title_en", lookup_expr='icontains')
     ares_ability = filters.NumberFilter(field_name="offer__hops__ares_ability")
     year = filters.NumberFilter(field_name="offer__academic_year__year")
+    education_group_type = filters.MultipleChoiceFilter(
+        field_name='offer__education_group_type__name',
+        choices=TrainingType.choices()
+    )
 
     class Meta:
         model = EducationGroupVersion
-        fields = ['acronym', 'partial_acronym', 'title', 'title_english', 'from_year', 'to_year']
+        fields = [
+            'acronym', 'partial_acronym', 'title', 'title_english', 'from_year', 'to_year', 'education_group_type'
+        ]
 
     @staticmethod
     def filter_version_type(queryset, name, value):
