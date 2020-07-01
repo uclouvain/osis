@@ -37,6 +37,7 @@ from django_filters.views import FilterView
 from base.forms.organization import OrganizationFilter
 from base.forms.organization_address import OrganizationAddressForm
 from base.models.campus import Campus
+from base.models.enums.organization_type import ACADEMIC_PARTNER
 from base.models.organization import Organization
 from base.models.organization_address import OrganizationAddress
 from reference.models.country import Country
@@ -121,7 +122,7 @@ def organization_address_delete(request, organization_address_id):
 
 class OrganizationAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
     def get_queryset(self):
-        qs = Organization.objects.all()
+        qs = Organization.objects.filter(type=ACADEMIC_PARTNER)
 
         country = self.forwarded.get('country', None)
         if country:
@@ -155,6 +156,7 @@ class CampusAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
             organization_is_current_partner=Subquery(
                 Organization.objects.filter(
                     pk=OuterRef('organization_id'),
+                    type=ACADEMIC_PARTNER,
                 ).values('is_current_partner')[:1],
                 output_field=BooleanField(),
             )
