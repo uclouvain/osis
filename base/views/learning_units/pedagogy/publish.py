@@ -21,37 +21,17 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404
-from django.urls import reverse
-from django.utils.translation import gettext_lazy as _
-from django.views.decorators.http import require_http_methods
-
-from base.business.education_groups import general_information
-from base.business.education_groups.general_information import PublishException
-from base.models.learning_unit_year import LearningUnitYear
-from base.views.common import display_error_messages, display_success_messages
 
 
 @login_required
-@require_http_methods(['POST'])
-def publish(request, code: str, year: int):
-    learning_unit_year = get_object_or_404(
-        LearningUnitYear,
-        acronym=code,
-        academic_year__year=year
-    )
+def access_refreshed_publication(request, code: str, year: int):
+    redirect_url = get_learning_unit_portal_updated_cache_url(code, year)
+    return HttpResponseRedirect(redirect_url)
 
-    try:
-        general_information.publish_learning_unit_year(learning_unit_year)
-        message = _("The learning unit %(code)s will be published soon") % {'code': learning_unit_year.acronym}
-        display_success_messages(request, message, extra_tags='safe')
-    except PublishException as e:
-        display_error_messages(request, str(e))
 
-    default_redirect_view = reverse(
-        'view_educational_information',
-        kwargs={'learning_unit_year_id': learning_unit_year.id}
-    )
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER', default_redirect_view))
+def get_learning_unit_portal_updated_cache_url(code: str, year: int):
+    url = settings.LEARNING_UNIT_PORTAL_URL_WITH_UPDATED_CACHE
+    return url.format(year=year, acronym=code)
