@@ -119,6 +119,14 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
                 self.get_path(),
                 _get_view_name_from_tab(self.active_tab),
             ),
+            "xls_ue_prerequisites": reverse("education_group_learning_units_prerequisites",
+                                            args=[self.get_group_year().academic_year.year,
+                                                  self.get_group_year().partial_acronym]
+                                            ),
+            "xls_ue_is_prerequisite": reverse("education_group_learning_units_is_prerequisite_for",
+                                              args=[self.get_group_year().academic_year.year,
+                                                    self.get_group_year().partial_acronym]
+                                              ),
             "selected_element_clipboard": self.get_selected_element_clipboard_message(),
             "group_year": self.get_group_year()  # TODO: Should be remove and use DDD object
         }

@@ -413,6 +413,10 @@ class NodeLearningUnitYear(Node):
         self.volume_total_lecturing = volume_total_lecturing
         self.volume_total_practical = volume_total_practical
         self.node_type = NodeType.LEARNING_UNIT  # Used for authorized_relationship
+        self.full_title_fr = "{}{}".format(common_title_fr,
+                                           " - {}".format(specific_title_fr) if specific_title_fr else '')
+        self.full_title_en = "{}{}".format(common_title_en,
+                                           " - {}".format(specific_title_en) if specific_title_en else '')
 
     @property
     def has_prerequisite(self) -> bool:
