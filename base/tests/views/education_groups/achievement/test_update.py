@@ -42,6 +42,7 @@ from cms.models.translated_text import TranslatedText
 from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
+from education_group.views.proxy.read import Tab
 from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
 
 
@@ -65,10 +66,10 @@ class TestEducationGroupAchievementActionUpdateDelete(TestCase):
             reverse(
                 "education_group_achievements_actions",
                 args=[
-                    self.education_group_year.pk,
-                    self.education_group_year.pk,
+                    self.education_group_year.academic_year.year,
+                    self.education_group_year.partial_acronym,
                     self.achievement_2.pk,
-                ]), data={"action": "up"}
+                ]) + '?path={}&tab={}'.format(1111, Tab.SKILLS_ACHIEVEMENTS), data={"action": "up"}
         )
 
         self.assertEqual(response.status_code, 302)
@@ -80,10 +81,10 @@ class TestEducationGroupAchievementActionUpdateDelete(TestCase):
             reverse(
                 "education_group_achievements_actions",
                 args=[
-                    self.education_group_year.pk,
-                    self.education_group_year.pk,
+                    self.education_group_year.academic_year.year,
+                    self.education_group_year.partial_acronym,
                     self.achievement_0.pk,
-                ]), data={"action": "down"}
+                ]) + '?path={}&tab={}'.format(1111, Tab.SKILLS_ACHIEVEMENTS), data={"action": "down"}
         )
 
         self.assertEqual(response.status_code, 302)
@@ -95,10 +96,10 @@ class TestEducationGroupAchievementActionUpdateDelete(TestCase):
             reverse(
                 "education_group_achievements_actions",
                 args=[
-                    self.education_group_year.pk,
-                    self.education_group_year.pk,
+                    self.education_group_year.academic_year.year,
+                    self.education_group_year.partial_acronym,
                     self.achievement_2.pk,
-                ]), data={"action": "not_an_action"}
+                ]) + '?path={}&tab={}'.format(1111, Tab.SKILLS_ACHIEVEMENTS), data={"action": "not_an_action"}
         )
 
         self.assertEqual(response.status_code, 302)
@@ -112,10 +113,10 @@ class TestEducationGroupAchievementActionUpdateDelete(TestCase):
             reverse(
                 "update_education_group_achievement",
                 args=[
-                    self.education_group_year.pk,
-                    self.education_group_year.pk,
+                    self.education_group_year.academic_year.year,
+                    self.education_group_year.partial_acronym,
                     self.achievement_2.pk,
-                ]), data={"code_name": code}
+                ]) + '?path={}&tab={}'.format(1111, Tab.SKILLS_ACHIEVEMENTS)
         )
 
         self.assertEqual(response.status_code, 302)
@@ -142,10 +143,10 @@ class TestEducationGroupAchievementActionUpdateDelete(TestCase):
             reverse(
                 "delete_education_group_achievement",
                 args=[
-                    self.education_group_year.pk,
-                    self.education_group_year.pk,
+                    self.education_group_year.academic_year.year,
+                    self.education_group_year.partial_acronym,
                     self.achievement_0.pk,
-                ]), data={}
+                ]) + '?path={}&tab={}'.format(1111, Tab.SKILLS_ACHIEVEMENTS)
         )
 
         self.assertEqual(response.status_code, 302)
@@ -158,10 +159,10 @@ class TestEducationGroupAchievementActionUpdateDelete(TestCase):
             reverse(
                 "delete_education_group_achievement",
                 args=[
-                    self.education_group_year.pk,
-                    self.education_group_year.pk,
+                    self.education_group_year.academic_year.year,
+                    self.education_group_year.partial_acronym,
                     self.achievement_2.pk,
-                ]), data={}
+                ]), data={"path": 1111}
         )
         self.assertEqual(response.status_code, 403)
 

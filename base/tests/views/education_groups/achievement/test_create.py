@@ -57,9 +57,9 @@ class TestCreateEducationGroupAchievement(TestCase):
             reverse(
                 "create_education_group_achievement",
                 args=[
-                    self.education_group_year.pk,
-                    self.education_group_year.pk,
-                ]), data={"code_name": code}
+                    self.education_group_year.academic_year.year,
+                    self.education_group_year.partial_acronym,
+                ]), data={"code_name": code, "path": 1111}
         )
 
         self.assertEqual(response.status_code, 302)
@@ -72,10 +72,10 @@ class TestCreateEducationGroupAchievement(TestCase):
             reverse(
                 "create_education_group_detailed_achievement",
                 args=[
-                    self.education_group_year.pk,
-                    self.education_group_year.pk,
+                    self.education_group_year.academic_year.year,
+                    self.education_group_year.partial_acronym,
                     achievement.pk,
-                ]), data={"code_name": code}
+                ]), data={"code_name": code, "path": 1111}
         )
 
         self.assertEqual(response.status_code, 302)
@@ -89,9 +89,9 @@ class TestCreateEducationGroupAchievement(TestCase):
             reverse(
                 "create_education_group_achievement",
                 args=[
-                    self.education_group_year.pk,
-                    self.education_group_year.pk,
-                ]), data={"code_name": code}
+                    self.education_group_year.academic_year.year,
+                    self.education_group_year.partial_acronym,
+                ]), data={"code_name": code, "path": 1111}
         )
 
         self.assertEqual(response.status_code, 403)
