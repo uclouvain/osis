@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import itertools
 from typing import Iterable
 
 from django.contrib import messages
@@ -123,7 +124,7 @@ def _fetch_achievements_by_language(learning_unit_year: LearningUnitYear) -> Ite
     fr_achievement_code = "achievements_FR"
     en_achievement_code = "achievements_EN"
     achievements = get_achievements_group_by_language(learning_unit_year)
-    return zip(achievements[fr_achievement_code], achievements[en_achievement_code])
+    return itertools.zip_longest(achievements.get(fr_achievement_code, []), achievements.get(en_achievement_code, []))
 
 
 @login_required
