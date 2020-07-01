@@ -1,6 +1,6 @@
 [MASTER]
 jobs=0
-ignore=migrations, tests, fixtures, features
+ignore=migrations, tests, fixtures
 
 [MESSAGES CONTROL]
 disable=all
@@ -11,4 +11,4 @@ min-public-methods=0
 
 [FORMAT]
 max-line-length=120
-max-modules-lines=250
+max-modules-lines=500
