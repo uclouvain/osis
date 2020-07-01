@@ -76,10 +76,10 @@ ORGANIZATION_KEYS = ['ALLOCATION_ENTITY', 'REQUIREMENT_ENTITY',
 def learning_unit_formations(request, learning_unit_year_id):
     context = get_common_context_learning_unit_year(learning_unit_year_id, get_object_or_404(Person, user=request.user))
     learn_unit_year = context["learning_unit_year"]
-    group_elements_years = learn_unit_year.child_leaf.select_related(
-        "parent", "child_leaf", "parent__education_group_type"
-    ).order_by('parent__partial_acronym')
-    education_groups_years = [group_element_year.parent for group_element_year in group_elements_years]
+    group_elements_years = learn_unit_year.element.children_elements.select_related(
+        "parent_element", "child_element", "parent_element__group_year__education_group_type"
+    ).order_by('parent_element__group_year__partial_acronym')
+    education_groups_years = [group_element_year.child_element for group_element_year in group_elements_years]
     formations_by_educ_group_year = program_management.ddd.repositories.find_roots.find_roots(
         education_groups_years,
         as_instances=True,
