@@ -23,36 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from osis_common.ddd import interface
+from base.ddd.utils import business_validator
+from education_group.ddd.domain.group import Group
 
 
-class UpdateGroupCommand(interface.CommandRequest):
+class UpdateGroupValidatorList(business_validator.BusinessListValidator):
+
     def __init__(
             self,
-            code: str,
-            abbreviated_title: str,
-            title_fr: str,
-            title_en: str,
-            credits: int,
-            constraint_type: str,
-            min_constraint: int,
-            max_constraint: int,
-            management_entity_acronym: str,
-            teaching_campus_name: str,
-            organization_name: str,
-            remark_fr: str,
-            remark_en: str,
+            group: Group
     ):
-        self.code = code
-        self.abbreviated_title = abbreviated_title
-        self.title_fr = title_fr
-        self.title_en = title_en
-        self.credits = credits
-        self.constraint_type = constraint_type
-        self.min_constraint = min_constraint
-        self.max_constraint = max_constraint
-        self.management_entity_acronym = management_entity_acronym
-        self.teaching_campus_name = teaching_campus_name
-        self.organization_name = organization_name
-        self.remark_fr = remark_fr
-        self.remark_en = remark_en
+        self.validators = [
+
+        ]
+        super().__init__()
