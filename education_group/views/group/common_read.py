@@ -104,7 +104,7 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
             'base.change_educationgroup',
             self.get_permission_object()
         )
-        is_root_node = self.get_tree().root_node.pk == self.get_object().pk
+        is_root_node = self.node_identity == self.get_tree().root_node.entity_id
         return {
             **super().get_context_data(**kwargs),
             "person": self.request.user.person,

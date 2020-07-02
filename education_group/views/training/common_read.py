@@ -124,8 +124,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             return root_node
 
     def get_context_data(self, **kwargs):
-        print("{} {}".format((self.get_tree().root_node.pk), self.get_object().pk))
-        is_root_node = self.get_tree().root_node.pk == self.get_object().pk
+        is_root_node = self.node_identity == self.get_tree().root_node.entity_id
         return {
             **super().get_context_data(**kwargs),
             "person": self.request.user.person,
