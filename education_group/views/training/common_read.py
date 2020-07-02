@@ -124,6 +124,8 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             return root_node
 
     def get_context_data(self, **kwargs):
+        print("{} {}".format((self.get_tree().root_node.pk), self.get_object().pk))
+        is_root_node = self.get_tree().root_node.pk == self.get_object().pk
         return {
             **super().get_context_data(**kwargs),
             "person": self.request.user.person,
@@ -137,11 +139,11 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
                 self.node_identity,
                 self.get_path(),
                 _get_view_name_from_tab(self.active_tab),
-            ),
+            ) if is_root_node else None,
             "selected_element_clipboard": self.get_selected_element_clipboard_message(),
             "current_version": self.current_version,
             "versions_choices": get_tree_versions_choices(self.node_identity, _get_view_name_from_tab(self.active_tab)),
-
+            "is_root_node": is_root_node,
             # TODO: Two lines below to remove when finished reorganized templates
             "education_group_version": self.education_group_version,
             "group_year": self.education_group_version.root_group,

@@ -104,6 +104,7 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
             'base.change_educationgroup',
             self.get_permission_object()
         )
+        is_root_node = self.get_tree().root_node.pk == self.get_object().pk
         return {
             **super().get_context_data(**kwargs),
             "person": self.request.user.person,
@@ -117,8 +118,8 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
             "academic_year_choices": get_academic_year_choices(
                 self.node_identity,
                 self.get_path(),
-                _get_view_name_from_tab(self.active_tab),
-            ),
+                _get_view_name_from_tab(self.active_tab)
+            ) if is_root_node else None,
             "xls_ue_prerequisites": reverse("education_group_learning_units_prerequisites",
                                             args=[self.get_group_year().academic_year.year,
                                                   self.get_group_year().partial_acronym]
@@ -128,7 +129,8 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
                                                     self.get_group_year().partial_acronym]
                                               ),
             "selected_element_clipboard": self.get_selected_element_clipboard_message(),
-            "group_year": self.get_group_year()  # TODO: Should be remove and use DDD object
+            "group_year": self.get_group_year(),  # TODO: Should be remove and use DDD object
+            "is_root_node": is_root_node,
         }
 
     @functools.lru_cache()
