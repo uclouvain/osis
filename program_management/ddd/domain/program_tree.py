@@ -327,6 +327,23 @@ class ProgramTree(interface.RootEntity):
             if n not in pruned_tree_children:
                 n.remove_all_prerequisite_items()
 
+    def get_relative_credits_values(self, child_node: 'NodeIdentity'):
+        distinct_credits_repr = []
+        node = self.get_node_by_code_and_year(child_node.code, child_node.year)
+
+        for link_obj in self.get_links_using_node(node):
+            if link_obj.relative_credits_repr not in distinct_credits_repr:
+                distinct_credits_repr.append(link_obj.relative_credits_repr)
+        return " ; ".join(
+            set(["{}".format(credits) for credits in distinct_credits_repr])
+        )
+
+    def get_blocks_values(self, child_node: 'NodeIdentity'):
+        node = self.get_node_by_code_and_year(child_node.code, child_node.year)
+        return " ; ".join(
+            [str(grp.block) for grp in self.get_links_using_node(node) if grp.block]
+        )
+
 
 def _nodes_from_root(root: 'Node') -> List['Node']:
     nodes = [root]
