@@ -1,10 +1,11 @@
 from django.urls import include, path, register_converter
 
-from education_group.converters import GroupTypeConverter
+from education_group.converters import GroupTypeConverter, MiniTrainingTypeConverter
 from education_group.views import group, training, mini_training, general_information
 from education_group.views.proxy.read import ReadEducationGroupRedirectView
 
 register_converter(GroupTypeConverter, 'group_type')
+register_converter(MiniTrainingTypeConverter, 'mini_training_type')
 
 urlpatterns = [
     path(
@@ -21,30 +22,35 @@ urlpatterns = [
             path('general_information/', group.GroupReadGeneralInformation.as_view(), name='group_general_information'),
         ]))
     ])),
-    path('mini_trainings/<int:year>/<str:code>/', include([
-        path(
-            'identification/',
-            mini_training.MiniTrainingReadIdentification.as_view(),
-            name='mini_training_identification'
-        ),
-        path('content/', mini_training.MiniTrainingReadContent.as_view(), name='mini_training_content'),
-        path('utilization/', mini_training.MiniTrainingReadUtilization.as_view(), name='mini_training_utilization'),
-        path(
-            'general_information/',
-            mini_training.MiniTrainingReadGeneralInformation.as_view(),
-            name='mini_training_general_information'
-        ),
-        path(
-            'skills_achievements/',
-            mini_training.MiniTrainingReadSkillsAchievements.as_view(),
-            name='mini_training_skills_achievements'
-        ),
-        path(
-            'admission_conditions/',
-            mini_training.MiniTrainingReadAdmissionCondition.as_view(),
-            name='mini_training_admission_condition'
-        ),
+    path('mini_trainings/', include([
+        path('<mini_training_type:type>/create', mini_training.MiniTrainingCreateView.as_view(),
+             name='mini_training_create'),
+        path('<int:year>/<str:code>/', include([
+            path(
+                'identification/',
+                mini_training.MiniTrainingReadIdentification.as_view(),
+                name='mini_training_identification'
+            ),
+            path('content/', mini_training.MiniTrainingReadContent.as_view(), name='mini_training_content'),
+            path('utilization/', mini_training.MiniTrainingReadUtilization.as_view(), name='mini_training_utilization'),
+            path(
+                'general_information/',
+                mini_training.MiniTrainingReadGeneralInformation.as_view(),
+                name='mini_training_general_information'
+            ),
+            path(
+                'skills_achievements/',
+                mini_training.MiniTrainingReadSkillsAchievements.as_view(),
+                name='mini_training_skills_achievements'
+            ),
+            path(
+                'admission_conditions/',
+                mini_training.MiniTrainingReadAdmissionCondition.as_view(),
+                name='mini_training_admission_condition'
+            ),
+        ])),
     ])),
+
     path('trainings/<int:year>/<str:code>/', include([
         path('identification/', training.TrainingReadIdentification.as_view(), name='training_identification'),
         path('diplomas/', training.TrainingReadDiplomaCertificate.as_view(), name='training_diplomas'),
