@@ -63,8 +63,6 @@ urlpatterns = [
                      name='update_education_group_detailed_achievement'),
             ]))
         ])),
-    ])),
-    path('trainings/<int:year>/<str:code>/', include([
         path('identification/', training.TrainingReadIdentification.as_view(), name='training_identification'),
         path('diplomas/', training.TrainingReadDiplomaCertificate.as_view(), name='training_diplomas'),
         path(
