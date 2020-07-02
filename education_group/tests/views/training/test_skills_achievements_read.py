@@ -73,7 +73,9 @@ class TestTrainingReadSkillAchievementsRead(TestCase):
     def test_case_user_not_logged(self):
         self.client.logout()
         response = self.client.get(self.url)
-        self.assertRedirects(response, '/login/?next={}'.format(self.url))
+        self.assertTrue(
+            '/login/?next=/educationgroups/trainings/2019/LDROI200M/skills_achievements/' in response.url
+        )
 
     def test_case_user_have_not_permission(self):
         self.client.force_login(UserFactory())

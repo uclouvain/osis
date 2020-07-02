@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import urllib.parse
 from typing import List
 from unittest import mock
 
@@ -35,7 +36,7 @@ from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.factories.user import UserFactory
 from education_group.views.mini_training.common_read import Tab
 from program_management.ddd.domain.node import NodeGroupYear
-from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
+from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory
 
 
@@ -43,7 +44,7 @@ class TestMiniTrainingReadSkillAchievementsRead(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.person = PersonWithPermissionsFactory('view_educationgroup')
-        cls.mini_training_version = EducationGroupVersionFactory(
+        cls.mini_training_version = StandardEducationGroupVersionFactory(
             offer__acronym="APPBIOL",
             offer__academic_year__year=2019,
             offer__education_group_type__name=MiniTrainingType.DEEPENING.name,
@@ -71,7 +72,9 @@ class TestMiniTrainingReadSkillAchievementsRead(TestCase):
     def test_case_user_not_logged(self):
         self.client.logout()
         response = self.client.get(self.url)
-        self.assertRedirects(response, '/login/?next={}'.format(self.url))
+        self.assertTrue(
+            '/login/?next=/educationgroups/mini_trainings/2019/LBIOL100P/skills_achievements/' in response.url
+        )
 
     def test_case_user_have_not_permission(self):
         self.client.force_login(UserFactory())

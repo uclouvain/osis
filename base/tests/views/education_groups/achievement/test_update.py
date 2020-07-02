@@ -121,10 +121,10 @@ class TestEducationGroupAchievementActionUpdateDelete(TestCase):
                     self.education_group_year.academic_year.year,
                     self.education_group_year.partial_acronym,
                     self.achievement_2.pk,
-                ]) + '?path={}&tab={}'.format(1111, Tab.SKILLS_ACHIEVEMENTS), data={'path': 1111}
+                ]) + '?path={}&tab={}'.format(1111, Tab.SKILLS_ACHIEVEMENTS), data={"code_name": code, 'path': 1111}
         )
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 302)
         self.achievement_2.refresh_from_db()
         self.assertEqual(self.achievement_2.code_name, code)
 
