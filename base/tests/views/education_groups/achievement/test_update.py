@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ############################################################################
+from django.contrib.auth.models import Permission
 from django.contrib.messages import get_messages
 from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase
@@ -57,6 +58,10 @@ class TestEducationGroupAchievementActionUpdateDelete(TestCase):
 
         cls.person = PersonFactory()
         CentralManagerFactory(person=cls.person, entity=cls.education_group_year.management_entity)
+        permission_delete = Permission.objects.get(codename='delete_educationgroupachievement')
+        cls.person.user.user_permissions.add(permission_delete)
+        permission_update = Permission.objects.get(codename='change_educationgroupachievement')
+        cls.person.user.user_permissions.add(permission_update)
 
     def setUp(self):
         self.client.force_login(self.person.user)
@@ -116,10 +121,10 @@ class TestEducationGroupAchievementActionUpdateDelete(TestCase):
                     self.education_group_year.academic_year.year,
                     self.education_group_year.partial_acronym,
                     self.achievement_2.pk,
-                ]) + '?path={}&tab={}'.format(1111, Tab.SKILLS_ACHIEVEMENTS)
+                ]) + '?path={}&tab={}'.format(1111, Tab.SKILLS_ACHIEVEMENTS), data={'path': 1111}
         )
 
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
         self.achievement_2.refresh_from_db()
         self.assertEqual(self.achievement_2.code_name, code)
 
@@ -146,7 +151,7 @@ class TestEducationGroupAchievementActionUpdateDelete(TestCase):
                     self.education_group_year.academic_year.year,
                     self.education_group_year.partial_acronym,
                     self.achievement_0.pk,
-                ]) + '?path={}&tab={}'.format(1111, Tab.SKILLS_ACHIEVEMENTS)
+                ]), data={'path': 1111}
         )
 
         self.assertEqual(response.status_code, 302)
