@@ -32,18 +32,35 @@ from base.business.event_perms import EventPermEducationGroupEdition
 from base.forms.common import ValidationRuleMixin
 from base.forms.utils.choice_field import BLANK_CHOICE
 from base.models.academic_year import AcademicYear
+from base.models.enums import active_status, schedule_type as schedule_type_enum
 from base.models.enums.constraint_type import ConstraintTypeEnum
 from education_group.forms import fields
 from rules_management.enums import MINI_TRAINING_PGRM_ENCODING_PERIOD, MINI_TRAINING_DAILY_MANAGEMENT
 from rules_management.mixins import PermissionFieldMixin
 
 
+#  TODO set academic year greater or equal than current academic year or based on calendar
 class MiniTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     code = forms.CharField(max_length=15, label=_("Code"), required=False)
-    academic_year = forms.ModelChoiceField(queryset=AcademicYear.objects.all(), label=_("Validity"), required=False)
+    academic_year = forms.ModelChoiceField(queryset=AcademicYear.objects.all(), label=_("Validity"), empty_label=None)
+    end_year = forms.ModelChoiceField(
+        queryset=AcademicYear.objects.all(),
+        label=_('Last year of organization'),
+        required=False
+    )
     abbreviated_title = forms.CharField(max_length=40, label=_("Acronym/Short title"), required=False)
     title_fr = forms.CharField(max_length=240, label=_("Title in French"), required=False)
     title_en = forms.CharField(max_length=240, label=_("Title in English"), required=False)
+    status = forms.ChoiceField(
+        choices=active_status.ACTIVE_STATUS_LIST,
+        initial=active_status.ACTIVE,
+        label=_('Status')
+    )
+    schedule_type = forms.ChoiceField(
+        choices=schedule_type_enum.SCHEDULE_TYPES,
+        initial=schedule_type_enum.DAILY,
+        label=_('Schedule type')
+    )
     credits = forms.IntegerField(
         label=_("Credits"),
         required=False,
