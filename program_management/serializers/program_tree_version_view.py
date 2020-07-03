@@ -23,40 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.urls import reverse
 
-from base.utils.urls import reverse_with_get
-from program_management.serializers.node_view import serialize_children
 from program_management.ddd.business_types import *
+from program_management.serializers.program_tree_view import program_tree_view_serializer
 
 
 def program_tree_version_view_serializer(program_tree_version: 'ProgramTreeVersion') -> dict:
-    tree = program_tree_version.get_tree()
-    path = str(tree.root_node.pk)
-    return {
-        'text': '%(code)s - %(title)s %(version_label)s' %
-                {'code': tree.root_node.code,
-                 'title': tree.root_node.title,
-                 'version_label': '[%(label)s]' % {'label': program_tree_version.version_label} if program_tree_version.version_label else ''
-                 },
-        'id': path,
-        'icon': None,
-        'children': serialize_children(
-            children=tree.root_node.children,
-            path=path,
-            context={'root': tree.root_node}
-        ),
-        'a_attr': {
-            'href': reverse('element_identification', args=[tree.root_node.year, tree.root_node.code]),
-            'element_id': tree.root_node.pk,
-            'element_type': tree.root_node.type.name,
-            'element_code': tree.root_node.code,
-            'element_year': tree.root_node.year,
-            'paste_url': reverse_with_get('tree_paste_node', get={"path": str(tree.root_node.pk)}),
-            'search_url': reverse_with_get(
-                'quick_search_education_group',
-                args=[tree.root_node.academic_year.year],
-                get={"path": str(tree.root_node.pk)}
-            ),
-        }
-    }
+    tree_dict = program_tree_view_serializer(program_tree_version.get_tree())
+
+    if program_tree_version.version_label:
+        tree_dict.update({'text': '%(text)s %(version_label)s' % {
+            'text': tree_dict['text'],
+            'version_label': '[%(label)s]' % {'label': program_tree_version.version_label} if program_tree_version.version_label else ''
+        }})
+
+    return tree_dict
