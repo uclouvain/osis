@@ -28,12 +28,17 @@ from django.urls import reverse
 from base.utils.urls import reverse_with_get
 from program_management.serializers.node_view import serialize_children
 from program_management.ddd.business_types import *
+from typing import Optional
 
 
-def program_tree_view_serializer(tree: 'ProgramTree') -> dict:
+def program_tree_view_serializer(tree: 'ProgramTree', version_label: Optional[str] = None) -> dict:
     path = str(tree.root_node.pk)
     return {
-        'text': '%(code)s - %(title)s' % {'code': tree.root_node.code, 'title': tree.root_node.title},
+        'text': '%(code)s - %(title)s %(version_label)s' %
+                {'code': tree.root_node.code,
+                 'title': tree.root_node.title,
+                 'version_label': '[%(label)s]' % {'label': version_label}  if version_label else ''
+                 },
         'id': path,
         'icon': None,
         'children': serialize_children(
