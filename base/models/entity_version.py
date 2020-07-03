@@ -461,15 +461,9 @@ def find(acronym, date=None):
     if date is None:
         date = timezone.now()
     try:
-        entity_version = EntityVersion.objects.get(
-            acronym=acronym,
-            start_date__lte=date,
-            end_date__gte=date
-        )
+        return EntityVersion.objects.current(date).get(acronym=acronym)
     except EntityVersion.DoesNotExist:
         return None
-
-    return entity_version
 
 
 def find_latest_version(date) -> EntityVersionQuerySet:
