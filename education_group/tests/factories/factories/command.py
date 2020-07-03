@@ -21,17 +21,35 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+import operator
 
-from django.db import transaction
+import factory.fuzzy
 
+from base.models.enums import education_group_types, schedule_type as schedule_type_enum, active_status, constraint_type
 from education_group.ddd import command
-from education_group.ddd.domain import mini_training
-from education_group.ddd.repository.mini_training import MiniTrainingRepository
 
 
-# TODO : Implement Validator (Actually in GroupFrom via ValidationRules)
-@transaction.atomic()
-def create_orphan_mini_training(cmd: command.CreateOrphanMiniTrainingCommand) -> 'mini_training.MiniTrainingIdentity':
-    mini_training_object = mini_training.MiniTrainingBuilder.build_from_create_cmd(cmd)
-    mini_training_identity = MiniTrainingRepository.create(mini_training_object)
-    return mini_training_identity
+class CreateOrphanMiniTrainingCommandFactory(factory.Factory):
+    class Meta:
+        model = command.CreateOrphanMiniTrainingCommand
+        abstract = False
+
+    code = "LOSIS2547"
+    year = 2018
+    type = factory.Iterator(education_group_types.MiniTrainingType.choices(), getter=operator.itemgetter(0))
+    abbreviated_title = "Abbr title"
+    title_fr = "Fr titre"
+    title_en = "En title"
+    status = factory.Iterator(active_status.ACTIVE_STATUS_LIST, getter=operator.itemgetter(0))
+    schedule_type = factory.Iterator(schedule_type_enum.SCHEDULE_TYPES, getter=operator.itemgetter(0))
+    credits = 30
+    constraint_type = factory.Iterator(constraint_type.CONSTRAINT_TYPE, getter=operator.itemgetter(0))
+    min_constraint = None
+    max_constraint = None
+    management_entity_acronym = "ACRON"
+    teaching_campus_name = "LLN"
+    organization_name = "ORG"
+    remark_fr = ""
+    remark_en = ""
+    start_year = 2018
+    end_year = None

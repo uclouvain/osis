@@ -29,6 +29,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from base.tests.factories.education_group_type import MiniTrainingEducationGroupTypeFactory
+from education_group.ddd.domain import mini_training
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 
 
@@ -40,7 +41,7 @@ class TestCreate(TestCase):
         cls.central_manager = CentralManagerFactory()
         cls.url = reverse("mini_training_create", args=[cls.mini_training_type.name])
 
-        cls.form_valid = mock.MagicMock(is_valid=True, cleaned_data=collections.defaultdict(lambda: None))
+        cls.form_valid = mock.MagicMock(is_valid=lambda: True, cleaned_data=collections.defaultdict(lambda: None))
 
     def setUp(self) -> None:
         self.client.force_login(self.central_manager.person.user)
@@ -57,16 +58,21 @@ class TestCreate(TestCase):
     @mock.patch('education_group.views.mini_training.create.MiniTrainingCreateView.get_form')
     @mock.patch("education_group.ddd.service.write.create_mini_training_service.create_orphan_mini_training")
     def test_should_call_create_mini_training_service_when_request_is_post(self, mock_service_orphan, mock_form):
-        response = self.client.post(self.url, data={})
-        mock_service_orphan.return_value = None
+        mini_training_identity = mini_training.MiniTrainingIdentity(code="CODE", year=2020)
+        mock_service_orphan.return_value = mini_training_identity
         mock_form.return_value = self.form_valid
+
+        response = self.client.post(self.url, data={})
 
         self.assertTrue(mock_form.called)
         self.assertTrue(mock_service_orphan.called)
 
         self.assertRedirects(
             response,
-            reverse("home"),
+            reverse(
+                "mini_training_identification",
+                kwargs={"code": mini_training_identity.code, "year": mini_training_identity.year}
+            ),
             fetch_redirect_response=False
         )
 

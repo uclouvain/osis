@@ -21,17 +21,3 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-
-from django.db import transaction
-
-from education_group.ddd import command
-from education_group.ddd.domain import mini_training
-from education_group.ddd.repository.mini_training import MiniTrainingRepository
-
-
-# TODO : Implement Validator (Actually in GroupFrom via ValidationRules)
-@transaction.atomic()
-def create_orphan_mini_training(cmd: command.CreateOrphanMiniTrainingCommand) -> 'mini_training.MiniTrainingIdentity':
-    mini_training_object = mini_training.MiniTrainingBuilder.build_from_create_cmd(cmd)
-    mini_training_identity = MiniTrainingRepository.create(mini_training_object)
-    return mini_training_identity

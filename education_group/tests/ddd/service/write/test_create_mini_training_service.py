@@ -21,17 +21,27 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+import mock
+from django.test import TestCase
 
-from django.db import transaction
-
-from education_group.ddd import command
 from education_group.ddd.domain import mini_training
-from education_group.ddd.repository.mini_training import MiniTrainingRepository
+from education_group.ddd.service.write import create_mini_training_service
+from education_group.tests.factories.factories.command import CreateOrphanMiniTrainingCommandFactory
 
 
-# TODO : Implement Validator (Actually in GroupFrom via ValidationRules)
-@transaction.atomic()
-def create_orphan_mini_training(cmd: command.CreateOrphanMiniTrainingCommand) -> 'mini_training.MiniTrainingIdentity':
-    mini_training_object = mini_training.MiniTrainingBuilder.build_from_create_cmd(cmd)
-    mini_training_identity = MiniTrainingRepository.create(mini_training_object)
-    return mini_training_identity
+class TestCreateOprhanMiniTraining(TestCase):
+    def setUp(self):
+        self.command = CreateOrphanMiniTrainingCommandFactory()
+
+    @mock.patch("education_group.ddd.service.write.create_mini_training_service.MiniTrainingRepository.create")
+    def test_should_return_mini_training_identity(self, mock_repository_create):
+        mock_repository_create.return_value = mini_training.MiniTrainingIdentity(
+            code=self.command.code,
+            year=self.command.start_year
+        )
+        result = create_mini_training_service.create_orphan_mini_training(self.command)
+        self.assertEqual(
+            result,
+            mini_training.MiniTrainingIdentity(code=self.command.code, year=self.command.start_year)
+        )
+

@@ -49,7 +49,7 @@ class MiniTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         required=False
     )
     abbreviated_title = forms.CharField(max_length=40, label=_("Acronym/Short title"), required=False)
-    title_fr = forms.CharField(max_length=240, label=_("Title in French"), required=False)
+    title_fr = forms.CharField(max_length=240, label=_("Title in French"))
     title_en = forms.CharField(max_length=240, label=_("Title in English"), required=False)
     status = forms.ChoiceField(
         choices=active_status.ACTIVE_STATUS_LIST,
@@ -63,7 +63,6 @@ class MiniTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     )
     credits = forms.IntegerField(
         label=_("Credits"),
-        required=False,
         widget=forms.TextInput
     )
     constraint_type = forms.ChoiceField(
@@ -82,7 +81,7 @@ class MiniTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         widget=forms.TextInput
     )
     management_entity = forms.CharField(required=False)  # TODO: Replace with select2 widget
-    teaching_campus = fields.MainCampusChoiceField(queryset=None, label=_("Learning location"), required=False)
+    teaching_campus = fields.MainCampusChoiceField(queryset=None, label=_("Learning location"))
     remark_fr = forms.CharField(widget=forms.Textarea, label=_("Remark"), required=False)
     remark_en = forms.CharField(widget=forms.Textarea, label=_("remark in english"), required=False)
 

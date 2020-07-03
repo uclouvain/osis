@@ -21,17 +21,16 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+from django.test import SimpleTestCase
 
-from django.db import transaction
-
-from education_group.ddd import command
 from education_group.ddd.domain import mini_training
-from education_group.ddd.repository.mini_training import MiniTrainingRepository
+from education_group.tests.factories.factories.command import CreateOrphanMiniTrainingCommandFactory
 
 
-# TODO : Implement Validator (Actually in GroupFrom via ValidationRules)
-@transaction.atomic()
-def create_orphan_mini_training(cmd: command.CreateOrphanMiniTrainingCommand) -> 'mini_training.MiniTrainingIdentity':
-    mini_training_object = mini_training.MiniTrainingBuilder.build_from_create_cmd(cmd)
-    mini_training_identity = MiniTrainingRepository.create(mini_training_object)
-    return mini_training_identity
+class TestMiniTrainingBuilder(SimpleTestCase):
+    def setUp(self):
+        self.command = CreateOrphanMiniTrainingCommandFactory()
+
+    def test_should_derive_values_from_command_when_build_from_command(self):
+        result = mini_training.MiniTrainingBuilder.build_from_create_cmd(self.command)
+        self.assertIsInstance(result, mini_training.MiniTraining)
