@@ -23,14 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ############################################################################
-from django.urls import reverse
 from django.views.generic import CreateView
 
 from base.forms.education_group.achievement import EducationGroupAchievementForm, EducationGroupDetailedAchievementForm
 from base.views.education_groups.achievement.common import EducationGroupAchievementMixin, \
     EducationGroupDetailedAchievementMixin
 from base.views.mixins import AjaxTemplateMixin
-from education_group.views.proxy.read import Tab
 from osis_role.contrib.views import PermissionRequiredMixin
 
 

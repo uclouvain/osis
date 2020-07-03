@@ -67,7 +67,7 @@ def __get_achievement_formated(achievement, year, code, path):
         'url_action': reverse(
             'education_group_achievements_actions',
             args=[year, code, achievement.pk]
-        ) + '?path={}&tab={}#achievement_{}'.format(path, Tab.SKILLS_ACHIEVEMENTS, achievement.pk),
+        ) + '?path={}&tab={}'.format(path, Tab.SKILLS_ACHIEVEMENTS),
 
         'url_update': reverse(
             'update_education_group_achievement', args=[year, code, achievement.pk]
@@ -79,7 +79,7 @@ def __get_achievement_formated(achievement, year, code, path):
 
         'url_create': reverse(
             'create_education_group_detailed_achievement', args=[year, code, achievement.pk]
-        ) + '?path={}&tab={}#achievement_{}'.format(path, Tab.SKILLS_ACHIEVEMENTS, achievement.pk)
+        ) + '?path={}&tab={}'.format(path, Tab.SKILLS_ACHIEVEMENTS, achievement.pk)
     }
 
 
@@ -92,7 +92,7 @@ def __get_detail_achievement_formated(achievement, d_achievement, year, code, pa
 
         'url_action': reverse(
             'education_group_detailed_achievements_actions', args=[year, code, achievement.pk, d_achievement.pk]
-        ) + '?path={}&tab={}#achievement_{}'.format(path, Tab.SKILLS_ACHIEVEMENTS, achievement.pk),
+        ) + '?path={}&tab={}'.format(path, Tab.SKILLS_ACHIEVEMENTS),
 
         'url_update': reverse(
             'update_education_group_detailed_achievement', args=[year, code, achievement.pk, d_achievement.pk]
@@ -100,7 +100,7 @@ def __get_detail_achievement_formated(achievement, d_achievement, year, code, pa
 
         'url_delete': reverse(
             'delete_education_group_detailed_achievement', args=[year, code, achievement.pk, d_achievement.pk]
-        ) + '?path={}&tab={}#achievement_{}'.format(path, Tab.SKILLS_ACHIEVEMENTS, achievement.pk),
+        ) + '?path={}&tab={}'.format(path, Tab.SKILLS_ACHIEVEMENTS),
     }
 
 

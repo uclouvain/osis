@@ -76,7 +76,7 @@
                     </div>
                     <br>
                     <!-- Detailed achievements -->
-                    <div id="detail_achievements_{{ detail_achievement.pk }}" class="row collapse in"
+                    <div id="detail_achievements_{{ forloop.counter }}" class="row collapse in"
                         style="padding-left: 20px">
                         {% for detail_achievement in achievement.detailed_achievements %}
                              <div class="col-md-1">
