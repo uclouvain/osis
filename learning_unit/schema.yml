@@ -49,15 +49,25 @@ paths:
         name: lang
         schema:
           type: string
+      - in: query
+        name: campus
+        schema:
+          description: ''
+          type: string
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/LearningUnit'
+                allOf:
+                  - $ref: '#/components/schemas/Pagination'
+                  - type: object
+                    properties:
+                      results:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/LearningUnit'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -391,6 +401,17 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
   schemas:
+    Pagination:
+      type: object
+      properties:
+        count:
+          type: integer
+        next:
+          type: string
+          format: uri
+        previous:
+          type: string
+          format: uri
     LearningUnit:
       type: object
       properties:
