@@ -30,10 +30,15 @@ from program_management.serializers.node_view import serialize_children
 from program_management.ddd.business_types import *
 
 
-def program_tree_view_serializer(tree: 'ProgramTree') -> dict:
+def program_tree_version_view_serializer(program_tree_version: 'ProgramTreeVersion') -> dict:
+    tree = program_tree_version.get_tree()
     path = str(tree.root_node.pk)
     return {
-        'text': '%(code)s - %(title)s' % {'code': tree.root_node.code, 'title': tree.root_node.title},
+        'text': '%(code)s - %(title)s %(version_label)s' %
+                {'code': tree.root_node.code,
+                 'title': tree.root_node.title,
+                 'version_label': '[%(label)s]' % {'label': program_tree_version.version_label} if program_tree_version.version_label else ''
+                 },
         'id': path,
         'icon': None,
         'children': serialize_children(
