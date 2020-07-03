@@ -34,6 +34,10 @@ class GetGroupCommand(interface.CommandRequest):
         self.year = year
 
 
+class CreateOrphanMiniTrainingCommand(interface.CommandRequest):
+    pass
+
+
 class CreateOrphanGroupCommand(interface.CommandRequest):
     def __init__(
             self,

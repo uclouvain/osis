@@ -21,6 +21,9 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+import collections
+
+import mock
 from django.http import HttpResponse
 from django.test import TestCase
 from django.urls import reverse
@@ -37,10 +40,12 @@ class TestCreate(TestCase):
         cls.central_manager = CentralManagerFactory()
         cls.url = reverse("mini_training_create", args=[cls.mini_training_type.name])
 
+        cls.form_valid = mock.MagicMock(is_valid=True, cleaned_data=collections.defaultdict(lambda: None))
+
     def setUp(self) -> None:
         self.client.force_login(self.central_manager.person.user)
 
-    def test_should_instantiate_form_when_accessed(self):
+    def test_should_instantiate_form_when_request_is_get(self):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, HttpResponse.status_code)
@@ -48,3 +53,20 @@ class TestCreate(TestCase):
 
         context = response.context
         self.assertTrue(context["mini_training_form"])
+
+    @mock.patch('education_group.views.mini_training.create.MiniTrainingCreateView.get_form')
+    @mock.patch("education_group.ddd.service.write.create_mini_training_service.create_orphan_mini_training")
+    def test_should_call_create_mini_training_service_when_request_is_post(self, mock_service_orphan, mock_form):
+        response = self.client.post(self.url, data={})
+        mock_service_orphan.return_value = None
+        mock_form.return_value = self.form_valid
+
+        self.assertTrue(mock_form.called)
+        self.assertTrue(mock_service_orphan.called)
+
+        self.assertRedirects(
+            response,
+            reverse("home"),
+            fetch_redirect_response=False
+        )
+

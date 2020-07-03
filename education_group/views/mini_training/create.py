@@ -23,11 +23,13 @@
 # ############################################################################
 from typing import List, Dict, Type
 
+from django.urls import reverse
 from django.views.generic import FormView
 from django.utils.translation import gettext_lazy as _
 from rules.contrib.views import LoginRequiredMixin
 
 from base.models.enums.education_group_types import MiniTrainingType
+from education_group.ddd.service.write import create_mini_training_service
 from education_group.forms import mini_training as mini_training_form
 from osis_role.contrib.views import PermissionRequiredMixin
 
@@ -54,6 +56,10 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
         context["type_text"] = MiniTrainingType.get_value(self.kwargs['type'])
         return context
 
+    def form_valid(self, form):
+        create_mini_training_service.create_orphan_mini_training(None)
+        return super().form_valid(form)
+
     def get_tabs(self) -> List:
         return [
             {
@@ -63,3 +69,6 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
                 "include_html": "education_group_app/mini_training/upsert/identification_form.html"
             }
         ]
+
+    def get_success_url(self):
+        return reverse("home")
