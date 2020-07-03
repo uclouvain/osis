@@ -27,7 +27,7 @@ import functools
 import json
 from collections import OrderedDict
 
-from django.http import Http404
+from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
@@ -134,11 +134,11 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
 
     @functools.lru_cache()
     def get_group_year(self):
-        try:
-            return GroupYear.objects.select_related('education_group_type', 'academic_year', 'management_entity')\
-                                .get(academic_year__year=self.kwargs['year'], partial_acronym=self.kwargs['code'])
-        except GroupYear.DoesNotExist:
-            raise Http404
+        return get_object_or_404(
+            GroupYear.objects.select_related('education_group_type', 'academic_year', 'management_entity'),
+            academic_year__year=self.kwargs['year'],
+            partial_acronym=self.kwargs['code']
+        )
 
     @functools.lru_cache()
     def get_current_academic_year(self):
