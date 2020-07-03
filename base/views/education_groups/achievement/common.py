@@ -62,12 +62,18 @@ class EducationGroupAchievementMixin(SingleObjectMixin):
             return reverse('training_skills_achievements',
                            args=[self.kwargs['year'],
                                  self.kwargs['code']]
-                           ) + '?path={}&tab={}'.format(self.request.POST['path'], Tab.SKILLS_ACHIEVEMENTS)
+                           ) + '?path={}&tab={}'.format(
+                self.request.POST['path'],
+                Tab.SKILLS_ACHIEVEMENTS,
+                self.object.pk)
         else:
             return reverse('mini_training_skills_achievements',
                            args=[self.kwargs['year'],
                                  self.kwargs['code']]
-                           ) + '?path={}&tab={}'.format(self.request.POST['path'], Tab.SKILLS_ACHIEVEMENTS)
+                           ) + '?path={}&tab={}'.format(
+                self.request.POST['path'],
+                Tab.SKILLS_ACHIEVEMENTS,
+                self.object.pk)
 
 
 class EducationGroupDetailedAchievementMixin(EducationGroupAchievementMixin):
@@ -79,3 +85,21 @@ class EducationGroupDetailedAchievementMixin(EducationGroupAchievementMixin):
     @cached_property
     def education_group_achievement(self):
         return get_object_or_404(EducationGroupAchievement, pk=self.kwargs["education_group_achievement_pk"])
+
+    def get_success_url(self):
+        if self.education_group_year.category == 'TRAINING':
+            return reverse('training_skills_achievements',
+                           args=[self.kwargs['year'],
+                                 self.kwargs['code']]
+                           ) + '?path={}&tab={}'.format(
+                self.request.POST['path'],
+                Tab.SKILLS_ACHIEVEMENTS,
+                self.kwargs['education_group_detail_achievement_pk'])
+        else:
+            return reverse('mini_training_skills_achievements',
+                           args=[self.kwargs['year'],
+                                 self.kwargs['code']]
+                           ) + '?path={}&tab={}'.format(
+                self.request.POST['path'],
+                Tab.SKILLS_ACHIEVEMENTS,
+                self.kwargs['education_group_detail_achievement_pk'])

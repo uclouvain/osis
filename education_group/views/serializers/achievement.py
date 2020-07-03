@@ -63,22 +63,23 @@ def __get_achievement_formated(achievement, year, code, path):
         'code_name': achievement.code_name,
         'text_fr': achievement.french_text,
         'text_en': achievement.english_text,
+
         'url_action': reverse(
             'education_group_achievements_actions',
             args=[year, code, achievement.pk]
-        )+'?path={}&tab={}'.format(path, Tab.SKILLS_ACHIEVEMENTS),
+        ) + '?path={}&tab={}#achievement_{}'.format(path, Tab.SKILLS_ACHIEVEMENTS, achievement.pk),
+
         'url_update': reverse(
-            'update_education_group_achievement',
-            args=[year, code, achievement.pk]
-        )+'?path={}&tab={}'.format(path, Tab.SKILLS_ACHIEVEMENTS),
-        'url_delete': reverse(
-            'delete_education_group_achievement',
-            args=[year, code, achievement.pk]
+            'update_education_group_achievement', args=[year, code, achievement.pk]
         ) + '?path={}&tab={}'.format(path, Tab.SKILLS_ACHIEVEMENTS),
+
+        'url_delete': reverse(
+            'delete_education_group_achievement', args=[year, code, achievement.pk]
+        ) + '?path={}&tab={}'.format(path, Tab.SKILLS_ACHIEVEMENTS),
+
         'url_create': reverse(
-            'create_education_group_detailed_achievement',
-            args=[year, code, achievement.pk]
-        ) + '?path={}&tab={}'.format(path, Tab.SKILLS_ACHIEVEMENTS)
+            'create_education_group_detailed_achievement', args=[year, code, achievement.pk]
+        ) + '?path={}&tab={}#achievement_{}'.format(path, Tab.SKILLS_ACHIEVEMENTS, achievement.pk)
     }
 
 
@@ -88,18 +89,18 @@ def __get_detail_achievement_formated(achievement, d_achievement, year, code, pa
         'code_name': d_achievement.code_name,
         'text_fr': d_achievement.french_text,
         'text_en': d_achievement.english_text,
+
         'url_action': reverse(
-            'education_group_detailed_achievements_actions',
-            args=[year, code, achievement.pk, d_achievement.pk]
-        ) + '?path={}&tab={}'.format(path, Tab.SKILLS_ACHIEVEMENTS),
+            'education_group_detailed_achievements_actions', args=[year, code, achievement.pk, d_achievement.pk]
+        ) + '?path={}&tab={}#achievement_{}'.format(path, Tab.SKILLS_ACHIEVEMENTS, achievement.pk),
+
         'url_update': reverse(
-            'update_education_group_detailed_achievement',
-            args=[year, code, achievement.pk, d_achievement.pk]
+            'update_education_group_detailed_achievement', args=[year, code, achievement.pk, d_achievement.pk]
         ) + '?path={}&tab={}'.format(path, Tab.SKILLS_ACHIEVEMENTS),
+
         'url_delete': reverse(
-            'delete_education_group_detailed_achievement',
-            args=[year, code, achievement.pk, d_achievement.pk]
-        ) + '?path={}&tab={}'.format(path, Tab.SKILLS_ACHIEVEMENTS),
+            'delete_education_group_detailed_achievement', args=[year, code, achievement.pk, d_achievement.pk]
+        ) + '?path={}&tab={}#achievement_{}'.format(path, Tab.SKILLS_ACHIEVEMENTS, achievement.pk),
     }
 
 

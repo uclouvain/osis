@@ -105,6 +105,18 @@ class EducationGroupDetailedAchievementAction(EducationGroupDetailedAchievementM
     def get_permission_object(self):
         return self.education_group_achievement.education_group_year
 
+    def get_success_url(self):
+        if self.education_group_year.category == 'TRAINING':
+            return reverse('training_skills_achievements',
+                           args=[self.kwargs['year'],
+                                 self.kwargs['code']]
+                           ) + '?path={}&tab={}'.format(self.request.GET['path'], Tab.SKILLS_ACHIEVEMENTS)
+        else:
+            return reverse('mini_training_skills_achievements',
+                           args=[self.kwargs['year'],
+                                 self.kwargs['code']]
+                           ) + '?path={}&tab={}'.format(self.request.GET['path'], Tab.SKILLS_ACHIEVEMENTS)
+
 
 class EducationGroupAchievementCMS(PermissionRequiredMixin, SuccessMessageMixin, AjaxTemplateMixin, FormView):
     cms_text_label = None
