@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-19 10:19+0200\n"
+"POT-Creation-Date: 2020-07-01 14:44+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -410,9 +410,6 @@ msgstr "Êtes-vous sûr·e de vouloir supprimer le support de cours?"
 msgid "Are you sure?"
 msgstr "Êtes-vous sûr·e?"
 
-msgid "Arrangement Jury"
-msgstr "Aménagement Jury"
-
 msgid "Arrangement additional time"
 msgstr "Aménagement Tiers-Temps"
 
@@ -420,7 +417,7 @@ msgid "Arrangement appropriate copy"
 msgstr "Aménagement Copie adaptée"
 
 msgid "Arrangement other"
-msgstr "Aménagement autre"
+msgstr "Autre"
 
 msgid "Arrangement specific locale"
 msgstr "Aménagement Local spécifique"
@@ -731,6 +728,9 @@ msgstr "Couper"
 msgid "Cut element"
 msgstr "Élément coupé"
 
+msgid "DDI"
+msgstr "HTM"
+
 msgid "Daily"
 msgstr "Horaire de jour"
 
@@ -811,9 +811,6 @@ msgstr "Diplômes /  Certificats"
 
 msgid "Direct Access"
 msgstr "Accès direct"
-
-msgid "Disability"
-msgstr "HTM"
 
 msgid "Disabled"
 msgstr "Désactivé"
@@ -916,6 +913,9 @@ msgstr ""
 
 msgid "Education_groups"
 msgstr "Formations"
+
+msgid "Educational facilities accepted by Jury"
+msgstr "Aménagement Jury"
 
 msgid "Educational information ending"
 msgstr "Fermeture informations pédagoqiques"
@@ -1202,7 +1202,7 @@ msgid "Groups"
 msgstr "Groupes"
 
 msgid "Guide"
-msgstr "Accompagnateur"
+msgstr ""
 
 msgid "Help"
 msgstr "Aide"
@@ -1934,9 +1934,6 @@ msgstr "Autre contact"
 msgid "Other contacts"
 msgstr "Autres contacts"
 
-msgid "Other disability"
-msgstr "Autre HTM"
-
 msgid "Other individual"
 msgstr "Autre individuel"
 
@@ -1945,6 +1942,9 @@ msgstr "Activités dans d'autres langues"
 
 msgid "Other remark (intended for publication)"
 msgstr "Autre remarque (destinée à la publication)"
+
+msgid "Other special needs"
+msgstr "Autre HTM"
 
 msgid "Others Bachelors of the French speaking Community of Belgium"
 msgstr "Autres bacheliers de la Communauté française de Belgique"
