@@ -30,3 +30,24 @@ class ManagementEntityNotFound(Exception):
 
 class TeachingCampusNotFound(Exception):
     pass
+
+
+class ContentConstraintTypeMissing(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _("You should precise constraint type")
+        super().__init__(message, **kwargs)
+
+
+class ContentConstraintMinimumMaximumMissing(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _("You should precise at least minimum or maximum constraint")
+        super().__init__(message, **kwargs)
+
+
+class ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _("%(max)s must be greater or equals than %(min)s") % {
+                    "max": _("maximum constraint").title(),
+                    "min": _("minimum constraint").title(),
+                 }
+        super().__init__(message, **kwargs)

@@ -9,14 +9,14 @@ from django.utils.translation import gettext_lazy as _
 
 from base.tests.factories.education_group_type import GroupEducationGroupTypeFactory
 from base.tests.factories.person import PersonFactory
-from education_group.ddd.domain.exception import GroupCodeAlreadyExistException
+from education_group.ddd.domain.exception import GroupCodeAlreadyExistException, ContentConstraintTypeMissing
 from education_group.ddd.domain.group import GroupIdentity
-from education_group.forms.group import GroupForm
+from education_group.forms.group import GroupForm, GroupAttachForm
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from program_management.tests.factories.element import ElementGroupYearFactory
 
 
-class TestCreateGroupGetMethod(TestCase):
+class TestCreateOrphanGroupGetMethod(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.type = GroupEducationGroupTypeFactory()
@@ -52,6 +52,7 @@ class TestCreateGroupGetMethod(TestCase):
 
         self.assertIsInstance(response.context['group_form'], GroupForm)
         self.assertIsInstance(response.context['tabs'], List)
+        self.assertIsInstance(response.context['cancel_url'], str)
 
     def test_assert_contains_only_identification_tabs(self):
         response = self.client.get(self.url)
@@ -65,6 +66,12 @@ class TestCreateGroupGetMethod(TestCase):
                 "include_html": "education_group_app/group/upsert/identification_form.html"
             }]
         )
+
+    def test_assert_cancel_url_computed(self):
+        response = self.client.get(self.url)
+
+        expected_url = reverse('version_program')
+        self.assertEqual(response.context['cancel_url'], expected_url)
 
 
 class TestCreateOrphanGroupPostMethod(TestCase):
@@ -101,7 +108,7 @@ class TestCreateOrphanGroupPostMethod(TestCase):
     @mock.patch('education_group.views.group.create.GroupForm.is_valid', return_value=True)
     @mock.patch('education_group.views.group.create.GroupForm.cleaned_data',
                 new_callable=mock.PropertyMock, create=True)
-    @mock.patch('education_group.views.group.create.create_group_service.create_group')
+    @mock.patch('education_group.views.group.create.create_group_service.create_orphan_group')
     def test_post_assert_create_service_called(self,
                                                mock_service_create_group,
                                                mock_form_clean_data,
@@ -111,16 +118,16 @@ class TestCreateOrphanGroupPostMethod(TestCase):
         mock_form_is_valid.return_value = True
 
         self.client.post(self.url)
-        mock_service_create_group.assert_called_once()
+        self.assertTrue(mock_service_create_group.called)
 
     @mock.patch('education_group.views.group.create.GroupForm.is_valid', return_value=True)
     @mock.patch('education_group.views.group.create.GroupForm.cleaned_data',
                 new_callable=mock.PropertyMock, create=True)
-    @mock.patch('education_group.views.group.create.create_group_service.create_group')
-    def test_post_assert_form_error_when_create_service_raise_exception(self,
-                                                                        mock_service_create_group,
-                                                                        mock_form_clean_data,
-                                                                        mock_form_is_valid):
+    @mock.patch('education_group.views.group.create.create_group_service.create_orphan_group')
+    def test_post_assert_form_error_when_create_service_raise_exception_code_already_exist(self,
+                                                                                           mock_service_create_group,
+                                                                                           mock_form_clean_data,
+                                                                                           mock_form_is_valid):
         mock_form_is_valid.return_value = True
         mock_form_clean_data.return_value = defaultdict(lambda: None)
 
@@ -129,6 +136,55 @@ class TestCreateOrphanGroupPostMethod(TestCase):
         response = self.client.post(self.url)
         self.assertIsInstance(response.context['group_form'], GroupForm)
         self.assertTrue(response.context['group_form'].has_error('code'))
+
+    @mock.patch('education_group.views.group.create.GroupForm.is_valid', return_value=True)
+    @mock.patch('education_group.views.group.create.GroupForm.cleaned_data',
+                new_callable=mock.PropertyMock, create=True)
+    @mock.patch('education_group.views.group.create.create_group_service.create_orphan_group')
+    def test_post_assert_form_error_when_create_service_raise_constraint_exception(self,
+                                                                                   mock_service_create_group,
+                                                                                   mock_form_clean_data,
+                                                                                   mock_form_is_valid):
+        mock_form_is_valid.return_value = True
+        mock_form_clean_data.return_value = defaultdict(lambda: None)
+
+        mock_service_create_group.side_effect = ContentConstraintTypeMissing
+
+        response = self.client.post(self.url)
+        self.assertIsInstance(response.context['group_form'], GroupForm)
+        self.assertTrue(response.context['group_form'].has_error('constraint_type'))
+
+
+class TestCreateNonOrphanGroupGetMethod(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.type = GroupEducationGroupTypeFactory()
+
+        cls.central_manager = CentralManagerFactory()
+        cls.parent_element = ElementGroupYearFactory(
+            group_year__management_entity=cls.central_manager.entity
+        )
+        cls.url = reverse('group_create', kwargs={'type': cls.type.name}) +\
+            "?path_to={}".format(str(cls.parent_element.pk))
+
+    def setUp(self) -> None:
+        self.client.force_login(self.central_manager.person.user)
+
+    def test_assert_form_instance(self):
+        response = self.client.get(self.url)
+        self.assertIsInstance(response.context['group_form'], GroupAttachForm)
+
+    def test_assert_cancel_url_computed(self):
+        response = self.client.get(self.url)
+
+        expected_url = reverse(
+            'element_identification',
+            kwargs={
+                'code': self.parent_element.group_year.partial_acronym,
+                'year': self.parent_element.group_year.academic_year.year
+            }
+        ) + "?path={}".format(str(self.parent_element.pk))
+        self.assertEqual(response.context['cancel_url'], expected_url)
 
 
 class TestCreateNonOrphanGroupPostMethod(TestCase):
@@ -146,29 +202,25 @@ class TestCreateNonOrphanGroupPostMethod(TestCase):
     def setUp(self) -> None:
         self.client.force_login(self.central_manager.person.user)
 
-    @mock.patch('education_group.views.group.create.paste_element_service.paste_element')
     @mock.patch('education_group.views.group.create.GroupForm.is_valid', return_value=True)
     @mock.patch('education_group.views.group.create.GroupForm.cleaned_data',
                 new_callable=mock.PropertyMock, create=True)
-    @mock.patch('education_group.views.group.create.create_group_service.create_group')
+    @mock.patch('education_group.views.group.create.create_group_and_attach_service.create_group_and_attach')
     def test_post_assert_create_service_paste_service_called(self,
                                                              mock_service_create_group,
                                                              mock_form_clean_data,
-                                                             mock_form_is_valid,
-                                                             mock_paste_element_service):
+                                                             mock_form_is_valid):
         mock_service_create_group.return_value = GroupIdentity(code="LTRONC1000", year=2018)
         mock_form_clean_data.return_value = defaultdict(lambda: None)
         mock_form_is_valid.return_value = True
 
         self.client.post(self.url)
-        mock_service_create_group.assert_called_once()
-        mock_paste_element_service.assert_called_once()
+        self.assertTrue(mock_service_create_group.called)
 
-    @mock.patch('education_group.views.group.create.paste_element_service.paste_element')
     @mock.patch('education_group.views.group.create.GroupForm.is_valid', return_value=True)
     @mock.patch('education_group.views.group.create.GroupForm.cleaned_data',
                 new_callable=mock.PropertyMock, create=True)
-    @mock.patch('education_group.views.group.create.create_group_service.create_group')
+    @mock.patch('education_group.views.group.create.create_group_and_attach_service.create_group_and_attach')
     def test_post_assert_redirection_with_path_queryparam(self,
                                                           mock_service_create_group,
                                                           mock_form_clean_data,

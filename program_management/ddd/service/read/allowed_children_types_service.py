@@ -29,7 +29,6 @@ from osis_common.ddd.interface import BusinessExceptions
 from program_management.ddd import command
 from program_management.ddd.domain.node import Node
 from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
-from program_management.ddd.repositories.node import NodeRepository
 from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 from program_management.ddd.validators._authorized_relationship import PasteAuthorizedRelationshipValidator
 
@@ -46,7 +45,6 @@ def get_allowed_child_types(cmd: command.GetAllowedChildTypeCommand) -> Set[Educ
         node_to_paste_into_id = NodeIdentitySearch.get_from_element_id(
             element_id=int(cmd.path_to_paste.split('|')[-1])
         )
-        node_to_paste_into = NodeRepository.get(node_to_paste_into_id)
         tree = ProgramTreeRepository.get(node_to_paste_into_id)
 
         def check_paste_validator(child_type: EducationGroupTypesEnum) -> bool:
@@ -54,7 +52,7 @@ def get_allowed_child_types(cmd: command.GetAllowedChildTypeCommand) -> Set[Educ
                 PasteAuthorizedRelationshipValidator(
                     tree,
                     Node(node_type=child_type),
-                    node_to_paste_into
+                    tree.root_node
                 ).validate()
             except BusinessExceptions:
                 return False

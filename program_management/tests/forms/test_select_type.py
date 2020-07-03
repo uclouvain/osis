@@ -37,7 +37,7 @@ class TestSelectTypeForm(SimpleTestCase):
                 return_value=set())
     def test_assert_call_allowed_children_types_service(self, mock_get_allowed_child_types):
         SelectTypeForm(category=Categories.GROUP.name, path_to=None)
-        mock_get_allowed_child_types.assert_called()
+        self.assertTrue(mock_get_allowed_child_types.called)
 
     @mock.patch("program_management.forms.select_type.allowed_children_types_service.get_allowed_child_types")
     def test_assert_name_choice_is_sorted(self, mock_get_allowed_child_types):

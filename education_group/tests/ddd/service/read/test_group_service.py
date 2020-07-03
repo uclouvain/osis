@@ -36,4 +36,4 @@ class TestGetGroup(SimpleTestCase):
     def test_assert_repository_called(self):
         with patch('education_group.ddd.service.read.group_service.GroupRepository.get') as mock_grp_repo_get:
             group_service.get_group(self.cmd)
-            mock_grp_repo_get.assert_called_once()
+            self.assertTrue(mock_grp_repo_get.called)

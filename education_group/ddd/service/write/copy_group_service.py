@@ -28,7 +28,7 @@ from django.db import transaction
 from education_group.ddd import command
 from education_group.ddd.domain import group
 from education_group.ddd.service.read import group_service as group_service_read
-from education_group.ddd.service.write.create_group_service import create_group
+from education_group.ddd.service.write.create_group_service import create_orphan_group
 
 
 @transaction.atomic()
@@ -42,7 +42,7 @@ def copy_group(cmd: command.CopyGroupCommand) -> List['GroupIdentity']:
         grp = group_service_read.get_group(cmd_get_group)
 
         group_next_year = group.builder.build_next_year_group(from_group=grp)
-        cmd_create_group = command.CreateGroupCommand(
+        cmd_create_group = command.CreateOrphanGroupCommand(
             code=group_next_year.code,
             year=group_next_year.year,
             type=group_next_year.type.name,
@@ -62,6 +62,6 @@ def copy_group(cmd: command.CopyGroupCommand) -> List['GroupIdentity']:
             end_year=group_next_year.end_year
         )
         # TODO: Be carefull to keep same entity_id_through_years property
-        group_next_year_id = create_group(cmd_create_group)
+        group_next_year_id = create_orphan_group(cmd_create_group)
         group_ids.append(group_next_year_id)
     return group_ids
