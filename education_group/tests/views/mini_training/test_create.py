@@ -40,8 +40,11 @@ class TestCreate(TestCase):
     def setUp(self) -> None:
         self.client.force_login(self.central_manager.person.user)
 
-    def test_url_is_accessible(self):
+    def test_should_instantiate_form_when_accessed(self):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, "education_group_app/mini_training/upsert/create.html")
+
+        context = response.context
+        self.assertTrue(context["mini_training_form"])
