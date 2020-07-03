@@ -27,7 +27,7 @@ from django.conf.urls import url
 from django.urls import include, path
 
 import program_management.views.tree.copy_cut
-from program_management.views import quick_search
+from program_management.views import quick_search, create_element
 from program_management.views.proxy.identification import IdentificationRedirectView
 from program_management.views import groupelementyear_update, \
     groupelementyear_read, element_utilization, excel, search, tree, prerequisite_read, prerequisite_update
@@ -67,9 +67,15 @@ urlpatterns = [
         path('update/', tree.update.UpdateLinkView.as_view(), name='tree_update_link'),
         path('detach/', tree.detach.DetachNodeView.as_view(), name='tree_detach_node'),
         path('move/', tree.paste.PasteNodesView.as_view(), name='group_element_year_move'),
+        path('<int:link_id>/', include([
+            path('up/', tree.move.up, name="group_element_year_up"),
+            path('down/', tree.move.down, name="group_element_year_down")
+        ])),
     ])),
     path('up/', tree.move.up, name="content_up"),
     path('down/', tree.move.down, name="content_down"),
+    path('create_element/<str:category>', create_element.SelectTypeCreateElementView.as_view(),
+         name='create_element_select_type'),
     path('check_paste/', tree.paste.CheckPasteView.as_view(), name="check_tree_paste_node"),
     path('paste/', tree.paste.PasteNodesView.as_view(), name='tree_paste_node'),
     path('cut_element/', tree.copy_cut.cut_to_cache, name='cut_element'),
