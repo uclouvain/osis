@@ -54,7 +54,6 @@ class TestLoadLearningUnitVolumes(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-
         cls.l_unit_1 = LearningUnitYearFactory()
         cls.practical_volume = PracticalLearningComponentYearFactory(learning_unit_year=cls.l_unit_1,
                                                                      hourly_volume_total_annual=20,
@@ -108,7 +107,6 @@ class TestLoadLearningUnitDescriptionFiche(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-
         cls.l_unit_1 = LearningUnitYearFactory()
         dict_labels = {}
         for cms_label in CMS_LABEL_PEDAGOGY + CMS_LABEL_SPECIFICATIONS:

@@ -65,6 +65,7 @@ def can_change_general_information(view_func):
         if not request.user.has_perm(perm_name, object):
             raise PermissionDenied
         return view_func(request, *args, **kwargs)
+
     return f_can_change_general_information
 
 
@@ -82,4 +83,5 @@ def can_change_admission_condition(view_func):
         if not request.user.has_perm(perm_name, education_group_year):
             raise PermissionDenied
         return view_func(request, *args, **kwargs)
+
     return f_can_change_admission_condition

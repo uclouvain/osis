@@ -45,6 +45,7 @@ from reference.tests.factories.language import EnglishLanguageFactory
 
 class LearningUnitPedagogyContextMixin(TestCase):
     """"This mixin is used in this test file in order to setup an environment for testing pedagogy"""
+
     @classmethod
     def setUpTestData(cls):
         cls.language = EnglishLanguageFactory()
