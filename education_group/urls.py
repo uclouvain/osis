@@ -10,6 +10,7 @@ urlpatterns = [
         name='education_group_read_proxy'
     ),
     path('groups/<int:year>/<str:code>/', include([
+        path('update/', group.GroupUpdateView.as_view(), name='group_update'),
         path('identification/', group.GroupReadIdentification.as_view(), name='group_identification'),
         path('content/', group.GroupReadContent.as_view(), name='group_content'),
         path('utilization/', group.GroupReadUtilization.as_view(), name='group_utilization'),

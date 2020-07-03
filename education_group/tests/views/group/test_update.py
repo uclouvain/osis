@@ -1,0 +1,103 @@
+##############################################################################
+#
+#    OSIS stands for Open Student Information System. It's an application
+#    designed to manage the core business of higher education institutions,
+#    such as universities, faculties, institutes and professional schools.
+#    The core business involves the administration of students, teachers,
+#    courses, programs and so on.
+#
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    A copy of this license - GNU General Public License - is available
+#    at the root of the source code of this program.  If not,
+#    see http://www.gnu.org/licenses/.
+#
+##############################################################################
+from typing import List
+
+from django.http import HttpResponseForbidden
+from django.test import TestCase
+from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
+
+from base.tests.factories.person import PersonFactory
+from education_group.forms.content import ContentFormSet
+from education_group.tests.factories.auth.central_manager import CentralManagerFactory
+
+
+class TestUpdateGroupGetMethod(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        # cls.group_identity = GroupIdentity()
+
+        cls.central_manager = CentralManagerFactory()
+        cls.url = reverse('group_update', kwargs={'year': 2018, 'code': 'LBIR100M'})
+
+    def setUp(self) -> None:
+        self.client.force_login(self.central_manager.person.user)
+
+    def test_case_when_user_not_logged(self):
+        self.client.logout()
+        response = self.client.get(self.url)
+        self.assertRedirects(response, "/login/?next={}".format(self.url))
+
+    def test_when_user_has_no_permission(self):
+        a_person_without_permission = PersonFactory()
+        self.client.force_login(a_person_without_permission.user)
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+
+    def test_assert_template_used(self):
+        response = self.client.get(self.url)
+        self.assertTemplateUsed(response, "education_group_app/group/upsert/update.html")
+
+    def test_assert_context(self):
+        response = self.client.get(self.url)
+
+        # self.assertIsInstance(response.context['group_form'], GroupForm)
+        self.assertIsInstance(response.context['content_formset'], ContentFormSet)
+        self.assertIsInstance(response.context['tabs'], List)
+        self.assertIsInstance(response.context['cancel_url'], str)
+
+    def test_assert_contains_identification_and_content_tabs(self):
+        response = self.client.get(self.url)
+
+        self.assertListEqual(
+            response.context['tabs'],
+            [{
+                "text": _("Identification"),
+                "active": True,
+                "display": True,
+                "include_html": "education_group_app/group/upsert/identification_form.html"
+            }, {
+                "text": _("Content"),
+                "active": True,
+                "display": True,
+                "include_html": "education_group_app/group/upsert/content_form.html"
+            }]
+        )
+
+    def test_assert_cancel_url_computed(self):
+        response = self.client.get(self.url)
+
+        expected_url = reverse('element_identification', kwargs={'year': 2018, 'code': 'LBIR100M'})
+        self.assertEqual(response.context['cancel_url'], expected_url)
+
+    def test_assert_cancel_url_keep_path_queryparam(self):
+        url_with_path = self.url + "?path=25656565|56565"
+
+        response = self.client.get(url_with_path)
+        expected_url = reverse('element_identification', kwargs={'year': 2018, 'code': 'LBIR100M'}) + \
+            "?path=25656565|56565"
+        self.assertEqual(response.context['cancel_url'], expected_url)

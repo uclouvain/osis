@@ -1,0 +1,93 @@
+{% load static bootstrap3 %}
+{% load i18n %}
+{% comment "License" %}
+* OSIS stands for Open Student Information System. It's an application
+* designed to manage the core business of higher education institutions,
+* such as universities, faculties, institutes and professional schools.
+* The core business involves the administration of students, teachers,
+* courses, programs and so on.
+*
+* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* A copy of this license - GNU General Public License - is available
+* at the root of the source code of this program.  If not,
+* see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+<div class="content-form">
+    {{ content_formset.management_form }}
+    {{ content_formset.media }}
+    <div class="panel panel-default">
+        <div class="panel-body" data-formset-prefix="{{ content_formset.prefix }}">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>{% trans 'Acronym/Short title' context 'abbreviation' %}</th>
+                        <th>{% trans 'Code' %}</th>
+                        <th>{% trans 'Title' %}</th>
+                        <th>{% trans 'Cred. rel./abs.' %}</th>
+                        <th class="text-center">{% trans 'Mandatory' %}</th>
+                        <th>{% trans 'Block' %}</th>
+                        <th>{% trans 'Link type' %}</th>
+                        <th>{% trans 'Comment' %}</th>
+                        <th>{% trans 'English comment' %}</th>
+                    </tr>
+                </thead>
+                <tbody data-formset-body id="content-forms">
+                    {% for form in content_formset.forms %}
+                        {% if forloop.first %}
+                            {{ form.media }}
+                        {% endif %}
+                        <tr class="link-row" data-formset-form id="{{ form.prefix }}">
+                            {{ form.id }}
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td style="width:6%" class="text-center">
+                                {{ form.is_mandatory }}
+                            </td>
+                            <td style="width:3%">
+                                {% bootstrap_field form.block show_label=False %}
+                            </td>
+                            <td style="width:9%">
+                                {% bootstrap_field form.link_type show_label=False|default_if_none:'-' %}
+                            </td>
+                            <td style="width:23%">
+                                {% bootstrap_field form.comment show_label=False %}
+                            </td>
+                            <td style="width:23%">
+                                {% bootstrap_field form.comment_english show_label=False %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'js/jquery.formset.js' %}"></script>
+<script>
+    $('.link-row').formset({
+        prefix: '{{ content_formset.prefix }}',
+        addText: '',
+        deleteText: ''
+    });
+</script>
+
+
+
+
+
+
