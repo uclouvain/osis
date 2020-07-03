@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-19 10:19+0200\n"
+"POT-Creation-Date: 2020-07-01 14:44+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -384,9 +384,6 @@ msgstr ""
 msgid "Are you sure?"
 msgstr ""
 
-msgid "Arrangement Jury"
-msgstr ""
-
 msgid "Arrangement additional time"
 msgstr ""
 
@@ -697,6 +694,9 @@ msgstr ""
 msgid "Cut element"
 msgstr ""
 
+msgid "DDI"
+msgstr ""
+
 msgid "Daily"
 msgstr ""
 
@@ -776,9 +776,6 @@ msgid "Diplomas /  Certificates"
 msgstr ""
 
 msgid "Direct Access"
-msgstr ""
-
-msgid "Disability"
 msgstr ""
 
 msgid "Disabled"
@@ -874,6 +871,9 @@ msgid ""
 msgstr ""
 
 msgid "Education_groups"
+msgstr ""
+
+msgid "Educational facilities accepted by Jury"
 msgstr ""
 
 msgid "Educational information ending"
@@ -1856,9 +1856,6 @@ msgstr ""
 msgid "Other contacts"
 msgstr ""
 
-msgid "Other disability"
-msgstr ""
-
 msgid "Other individual"
 msgstr ""
 
@@ -1866,6 +1863,9 @@ msgid "Other languages activities"
 msgstr ""
 
 msgid "Other remark (intended for publication)"
+msgstr ""
+
+msgid "Other special needs"
 msgstr ""
 
 msgid "Others Bachelors of the French speaking Community of Belgium"
