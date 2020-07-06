@@ -23,12 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Optional
+
 from base.models.enums.constraint_type import ConstraintTypeEnum
 from osis_common.ddd import interface
 
 
 class ContentConstraint(interface.ValueObject):
-    def __init__(self, type: ConstraintTypeEnum, minimum: int, maximum: int):
+    def __init__(self, type: Optional[ConstraintTypeEnum], minimum: Optional[int], maximum: Optional[int]):
         self.type = type
         self.minimum = minimum
         self.maximum = maximum

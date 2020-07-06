@@ -32,10 +32,15 @@ from education_group.ddd.domain.group import GroupIdentity
 from education_group.ddd.repository.group import GroupRepository
 
 
+from education_group.ddd.validators.validators_by_business_action import CreateGroupValidatorList
+
+
 # TODO : Implement Validator (Actually in GroupFrom via ValidationRules)
 @transaction.atomic()
-def create_group(cmd: command.CreateGroupCommand) -> 'GroupIdentity':
+def create_orphan_group(cmd: command.CreateOrphanGroupCommand) -> 'GroupIdentity':
     grp = group.builder.build_from_create_cmd(cmd)
+
+    CreateGroupValidatorList(grp).validate()
     group_id = GroupRepository.create(grp)
     # Emit group_created event
     publisher.group_created.send(None, group_identity=group_id)

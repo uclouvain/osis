@@ -135,6 +135,26 @@ class CheckPasteNodeCommand(interface.CommandRequest):
         return "CheckPasteNodeCommand({parameters})".format(parameters=parameters)
 
 
+class OrderUpLinkCommand(interface.CommandRequest):
+    def __init__(self, path: str):
+        self.path = path
+
+    def __eq__(self, other):
+        if isinstance(other, OrderUpLinkCommand):
+            return self.path == other.path
+        return False
+
+
+class OrderDownLinkCommand(interface.CommandRequest):
+    def __init__(self, path: str):
+        self.path = path
+
+    def __eq__(self, other):
+        if isinstance(other, OrderDownLinkCommand):
+            return self.path == other.path
+        return False
+
+
 class GetAllowedChildTypeCommand(interface.CommandRequest):
     def __init__(
             self,
@@ -147,3 +167,56 @@ class GetAllowedChildTypeCommand(interface.CommandRequest):
     def __repr__(self) -> str:
         parameters = ", ".join([str(self.category), str(self.path_to_paste)])
         return "GetAllowedChildTypeCommand({parameters})".format(parameters=parameters)
+
+
+class CreateGroupAndAttachCommand(interface.CommandRequest):
+    def __init__(
+            self,
+            code: str,
+            type: str,
+            abbreviated_title: str,
+            title_fr: str,
+            title_en: str,
+            credits: int,
+            constraint_type: str,
+            min_constraint: int,
+            max_constraint: int,
+            management_entity_acronym: str,
+            teaching_campus_name: str,
+            organization_name: str,
+            remark_fr: str,
+            remark_en: str,
+            path_to_paste: str,
+    ):
+        self.code = code
+        self.type = type
+        self.abbreviated_title = abbreviated_title
+        self.title_fr = title_fr
+        self.title_en = title_en
+        self.credits = credits
+        self.constraint_type = constraint_type
+        self.min_constraint = min_constraint
+        self.max_constraint = max_constraint
+        self.management_entity_acronym = management_entity_acronym
+        self.teaching_campus_name = teaching_campus_name
+        self.organization_name = organization_name
+        self.remark_fr = remark_fr
+        self.remark_en = remark_en
+        self.path_to_paste = path_to_paste
+
+    def __repr__(self) -> str:
+        parameters = ", ".join([
+            str(self.code), str(self.type), str(self.abbreviated_title), str(self.title_fr),
+            str(self.title_en), str(self.credits), str(self.constraint_type), str(self.min_constraint),
+            str(self.max_constraint), str(self.management_entity_acronym), str(self.teaching_campus_name),
+            str(self.organization_name), str(self.remark_fr), str(self.remark_en), str(self.path_to_paste), ])
+        return "CreateGroupAndAttachCommand({parameters})".format(parameters=parameters)
+
+
+class GetNodeIdentityFromElementId(interface.CommandRequest):
+    def __init__(self, element_id: int):
+        self.element_id = element_id
+
+    def __repr__(self) -> str:
+        parameters = ", ".join([str(self.element_id)])
+        return "GetNodeIdentityFromElementId({parameters})".format(parameters=parameters)
