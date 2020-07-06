@@ -39,6 +39,7 @@ from base.business.education_groups import general_information_sections
 from base.business.education_groups.general_information_sections import \
     MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION
 from base.models import academic_year
+from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import MiniTrainingType
 from base.views.common import display_warning_messages
 from education_group.forms.academic_year_choices import get_academic_year_choices
@@ -148,11 +149,27 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
                                               ),
             # TODO: Remove when finished reoganized tempalate
             "group_year": self.get_education_group_version().root_group,
+
+            "create_group_url": self.get_create_group_url(),
+            "create_training_url": self.get_create_training_url(),
+            "create_mini_training_url": self.get_create_mini_training_url(),
             "is_root_node": is_root_node,
         }
 
     def get_permission_object(self):
         return self.get_education_group_version().offer
+
+    def get_create_group_url(self):
+        return reverse('create_element_select_type', kwargs={'category': Categories.GROUP.name}) + \
+               "?path_to={}".format(self.get_path())
+
+    def get_create_mini_training_url(self):
+        return reverse('create_element_select_type', kwargs={'category': Categories.MINI_TRAINING.name}) + \
+               "?path_to={}".format(self.get_path())
+
+    def get_create_training_url(self):
+        return reverse('create_element_select_type', kwargs={'category': Categories.TRAINING.name}) + \
+               "?path_to={}".format(self.get_path())
 
     def get_tab_urls(self):
         return OrderedDict({
