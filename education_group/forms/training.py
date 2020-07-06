@@ -66,21 +66,20 @@ from rules_management.mixins import PermissionFieldMixin
 class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
 
     # panel_informations_form.html
-    acronym = forms.CharField(max_length=15, label=_("Acronym/Short title"), required=False)
-    code = forms.CharField(max_length=15, label=_("Code"), required=False)
+    acronym = forms.CharField(max_length=15, label=_("Acronym/Short title"))
+    code = forms.CharField(max_length=15, label=_("Code"))
     active = forms.ChoiceField(
-        initial=ActiveStatusEnum.ACTIVE,
+        initial=ActiveStatusEnum.ACTIVE.value,
         choices=BLANK_CHOICE + list(ActiveStatusEnum.choices()),
         label=_("Status"),
     )
     schedule_type = forms.ChoiceField(
-        initial=ScheduleTypeEnum.DAILY,
+        initial=ScheduleTypeEnum.DAILY.value,
         choices=BLANK_CHOICE + list(ScheduleTypeEnum.choices()),
         label=_("Schedule type"),
     )
     credits = forms.IntegerField(
         label=_("Credits"),
-        required=False,
         widget=forms.TextInput(),
     )
     constraint_type = forms.ChoiceField(
@@ -102,7 +101,7 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     title_en = forms.CharField(max_length=240, label=_("Title in English"), required=False)
     partial_title_fr = forms.CharField(max_length=240, label=_("Partial title in French"), required=False)
     partial_title_en = forms.CharField(max_length=240, label=_("Partial title in English"), required=False)
-    keywords = forms.CharField(max_length=320, label=_('Keywords'))
+    keywords = forms.CharField(max_length=320, label=_('Keywords'), required=False)
 
     # panel_academic_informations_form.html
     academic_type = forms.ChoiceField(
@@ -113,7 +112,6 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     duration = forms.IntegerField(
         initial=1,
         label=_("Duration"),
-        required=False,
         validators=[MinValueValidator(1)],
         widget=forms.TextInput(),
     )
@@ -127,14 +125,13 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         initial=InternshipPresence.NO.value,
         choices=BLANK_CHOICE + list(InternshipPresence.choices()),
         label=_("Internship"),
-        required=False,
     )
-    is_enrollment_enabled = forms.BooleanField(initial=False, label=_('Enrollment enabled'))
-    has_online_re_registration = forms.BooleanField(initial=True, label=_('Web re-registration'))
-    has_partial_deliberation = forms.BooleanField(initial=False, label=_('Partial deliberation'))
-    has_admission_exam = forms.BooleanField(initial=False, label=_('Admission exam'))
-    has_dissertation = forms.BooleanField(initial=False, label=_('dissertation').capitalize())
-    produce_university_certificate = forms.BooleanField(initial=False, label=_('University certificate'))
+    is_enrollment_enabled = forms.BooleanField(initial=False, label=_('Enrollment enabled'), required=False)
+    has_online_re_registration = forms.BooleanField(initial=True, label=_('Web re-registration'), required=False)
+    has_partial_deliberation = forms.BooleanField(initial=False, label=_('Partial deliberation'), required=False)
+    has_admission_exam = forms.BooleanField(initial=False, label=_('Admission exam'), required=False)
+    has_dissertation = forms.BooleanField(initial=False, label=_('dissertation').capitalize(), required=False)
+    produce_university_certificate = forms.BooleanField(initial=False, label=_('University certificate'), required=False)
     decree_category = forms.ChoiceField(
         choices=BLANK_CHOICE + sorted(list(DecreeCategories.choices()), key=lambda c: c[1]),
         label=_("Decree category"),
@@ -147,7 +144,6 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     )
     main_language = forms.ModelChoiceField(  # FIXME :: to replace by choice field (to prevent link to DB model)
         queryset=Language.objects.all().order_by('name'),
-        required=False,
         label=_('Primary language'),
     )
     english_activities = forms.ChoiceField(
@@ -170,7 +166,7 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         show_help_text=True,
         label=_('secondary domains').title(),
     )
-    isced_domain = forms.ModelChoiceField(queryset=DomainIsced.objects.all())
+    isced_domain = forms.ModelChoiceField(queryset=DomainIsced.objects.all(), required=False)
     internal_comment = forms.CharField(max_length=500, label=_("comment (internal)").capitalize(), required=False)
 
     # panel_entities_form.html
@@ -183,13 +179,10 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     end_year = forms.ModelChoiceField(
         queryset=AcademicYear.objects.all(),
         label=_('Last year of organization'),
-    )
-    teaching_campus = MainCampusChoiceField(queryset=None, label=_("Learning location"), required=False)
-    enrollment_campus = forms.ModelChoiceField(  # FIXME :: to replace by choice field (to prevent link to DB model)
-        queryset=Campus.objects.all().order_by('name').select_related('organization'),
-        label=_("Enrollment campus"),
         required=False,
     )
+    teaching_campus = MainCampusChoiceField(queryset=None, label=_("Learning location"))
+    enrollment_campus = MainCampusChoiceField(queryset=None, label=_("Enrollment campus"))
     other_campus_activities = forms.ChoiceField(
         choices=BLANK_CHOICE + list(ActivityPresence.choices()),
         label=_("Activities on other campus"),
