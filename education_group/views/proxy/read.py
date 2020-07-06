@@ -71,7 +71,7 @@ def _get_view_name_from_tab(node: 'Node', tab: Tab):
         prefix = 'mini_training'
 
     return {
-        Tab.IDENTIFICATION: '{prefix}_{suffix}}'.format(prefix=prefix, suffix=SUFFIX_IDENTIFICATION),
+        Tab.IDENTIFICATION: '{prefix}_{suffix}'.format(prefix=prefix, suffix=SUFFIX_IDENTIFICATION),
         Tab.DIPLOMAS_CERTIFICATES: '{prefix}_{suffix}'.format(prefix=prefix, suffix=SUFFIX_DIPLOMAS_CERTIFICATES),
         Tab.ADMINISTRATIVE_DATA: '{prefix}_{suffix}'.format(prefix=prefix, suffix=SUFFIX_ADMINISTRATIVE_DATA),
         Tab.CONTENT: '{prefix}_{suffix}'.format(prefix=prefix, suffix=SUFFIX_CONTENT),
