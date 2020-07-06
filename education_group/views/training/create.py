@@ -34,7 +34,7 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         training_form = CreateTrainingForm(
             user=self.request.user,
-            group_type=self.kwargs['type'],
+            training_type=self.kwargs['type'],
             initial=self._get_initial_form(),
         )
         return render(request, self.template_name, {
@@ -46,7 +46,7 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
     def _get_initial_form(self) -> Dict:
         default_campus = Campus.objects.filter(name='Louvain-la-Neuve').first()
 
-        request_cache = RequestCache(self.request.user, reverse('education_groups'))
+        request_cache = RequestCache(self.request.user, reverse('version_program'))
         default_academic_year = request_cache.get_value_cached('academic_year') or starting_academic_year()
         return {
             'teaching_campus': default_campus,
@@ -175,7 +175,7 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 "text": _("Identification"),
                 "active": True,
                 "display": True,
-                "include_html": "education_group_app/training/upsert/identification_form.html"
+                "include_html": "education_group_app/training/upsert/training_identification_form.html"
             }
         ]
 

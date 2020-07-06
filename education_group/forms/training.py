@@ -41,6 +41,7 @@ from base.forms.education_group.training import _get_section_choices
 from base.forms.utils.choice_field import BLANK_CHOICE
 from base.models.academic_year import AcademicYear
 from base.models.campus import Campus
+from base.models.certificate_aim import CertificateAim
 from base.models.enums.academic_type import AcademicTypes
 from base.models.enums.active_status import ActiveStatusEnum
 from base.models.enums.activity_presence import ActivityPresence
@@ -230,15 +231,20 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     joint_diploma = forms.BooleanField(initial=False, label=_('Leads to diploma/certificate'))
     diploma_printing_title = forms.CharField(max_length=240, required=False, label=_('Diploma title'))
     professional_title = forms.CharField(max_length=320, required=False, label=_('Professionnal title'))
-    certificate_aims = autocomplete.ModelSelect2Multiple(
-        url='certificate_aim_autocomplete',
-        attrs={
-            'data-html': True,
-            'data-placeholder': _('Search...'),
-            'data-width': '100%',
-        },
-        forward=['section'],
-    ),
+    certificate_aims = forms.ModelMultipleChoiceField(
+        label=_('certifiate aims'),
+        queryset=CertificateAim.objects.all(),
+        required=False,
+        widget=autocomplete.ModelSelect2Multiple(
+            url='certificate_aim_autocomplete',
+            attrs={
+                'data-html': True,
+                'data-placeholder': _('Search...'),
+                'data-width': '100%',
+            },
+            forward=['section'],
+        )
+    )
 
     def __init__(self, *args, user: User, training_type: str, **kwargs):
         self.user = user
