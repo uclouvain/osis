@@ -47,12 +47,29 @@ class EducationGroupTreeView(LanguageContextSerializerMixin, generics.RetrieveAP
             lookup_field: self.kwargs[lookup_url_kwarg]
             for lookup_field, lookup_url_kwarg in zip(self.lookup_fields, self.lookup_url_kwargs)
         }
-
-        element = get_object_or_404(
+        element_standard = get_object_or_404(
             queryset,
             **filter_kwargs,
-            group_year__educationgroupversion__version_name=version_name
+            group_year__educationgroupversion__version_name=''
         )
+        if element_standard.group_year.is_mini_training:
+            main_offer = element_standard.group_year.educationgroupversion.offer
+            version = get_object_or_404(
+                main_offer.educationgroupversion_set,
+                version_name=version_name
+            )
+            element = get_object_or_404(
+                Element.objects.annotate(
+                    education_group_year_obj=F('group_year__educationgroupversion__offer')
+                ).select_related('education_group_year'),
+                group_year__educationgroupversion=version
+            )
+        else:
+            element = get_object_or_404(
+                queryset,
+                **filter_kwargs,
+                group_year__educationgroupversion__version_name=version_name
+            )
         self.check_object_permissions(self.request, element.education_group_year_obj)
 
         tree = load_tree.load(element.id)
@@ -65,7 +82,7 @@ class TrainingTreeView(EducationGroupTreeView):
     """
     name = 'trainings_tree'
     lookup_fields = (
-        'group_year__academic_year__year', 'group_year__educationgroupversion__offer__acronym__iexact',
+        'group_year__academic_year__year', 'group_year__partial_acronym__iexact',
     )
     lookup_url_kwargs = ('year', 'acronym')
     queryset = Element.objects.filter(
@@ -81,7 +98,9 @@ class MiniTrainingTreeView(EducationGroupTreeView):
         Return the tree of the mini-training
     """
     name = 'minitrainings_tree'
-    lookup_fields = ('group_year__academic_year__year', 'group_year__partial_acronym__iexact',)
+    lookup_fields = (
+        'group_year__academic_year__year', 'group_year__educationgroupversion__offer__partial_acronym__iexact',
+    )
     lookup_url_kwargs = ('year', 'partial_acronym',)
     queryset = Element.objects.filter(
         group_year__education_group_type__category=Categories.MINI_TRAINING.name,
