@@ -42,6 +42,7 @@ from base.forms.utils.choice_field import BLANK_CHOICE
 from base.models.academic_year import AcademicYear
 from base.models.campus import Campus
 from base.models.certificate_aim import CertificateAim
+from base.models.entity_version import get_last_version
 from base.models.enums.academic_type import AcademicTypes
 from base.models.enums.active_status import ActiveStatusEnum
 from base.models.enums.activity_presence import ActivityPresence
@@ -80,7 +81,7 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     )
     credits = forms.IntegerField(
         label=_("Credits"),
-        widget=forms.TextInput(),
+        widget=forms.TextInput,
     )
     constraint_type = forms.ChoiceField(
         choices=BLANK_CHOICE + list(ConstraintTypeEnum.choices()),
@@ -170,7 +171,7 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     internal_comment = forms.CharField(max_length=500, label=_("comment (internal)").capitalize(), required=False)
 
     # panel_entities_form.html
-    management_entity = fields.ManagementEntitiesChoiceField(person=None, initial=None, required=False)
+    management_entity = forms.CharField()
     administration_entity = MainEntitiesVersionChoiceField(queryset=None)  # FIXME :: class to move into 'fields.py'
     academic_year = forms.ModelChoiceField(
         queryset=AcademicYear.objects.all(),
@@ -190,13 +191,17 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     )
 
     # panel_funding_form.html
-    can_be_funded = forms.BooleanField(initial=False, label=_('Funding'))
+    can_be_funded = forms.BooleanField(initial=False, label=_('Funding'), required=False)
     funding_direction = forms.ChoiceField(
         choices=BLANK_CHOICE + list(FundingCodes.choices()),
         label=_("Funding direction"),
         required=False,
     )
-    can_be_international_funded = forms.BooleanField(initial=False, label=_('Funding international cooperation CCD/CUD'))
+    can_be_international_funded = forms.BooleanField(
+        initial=False,
+        label=_('Funding international cooperation CCD/CUD'),
+        required=False
+    )
     international_funding_orientation = forms.ChoiceField(
         choices=BLANK_CHOICE + list(FundingCodes.choices()),
         label=_("Funding international cooperation CCD/CUD direction"),
@@ -213,7 +218,7 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     ares_graca = forms.CharField(widget=forms.TextInput(), required=False)
     ares_authorization = forms.CharField(widget=forms.TextInput(), required=False)
     code_inter_cfb = forms.CharField(max_length=8, label=_('Code co-graduation inter CfB'), required=False)
-    coefficient = forms.DecimalField(widget=forms.TextInput())
+    coefficient = forms.DecimalField(widget=forms.TextInput(), required=False)
 
     # Diploma tab
     section = forms.ChoiceField(

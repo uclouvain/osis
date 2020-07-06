@@ -47,7 +47,7 @@ from education_group.ddd.domain._funding import Funding
 from education_group.ddd.domain._hops import HOPS
 from education_group.ddd.domain._isced_domain import IscedDomain, IscedDomainIdentity
 from education_group.ddd.domain._language import Language
-from education_group.ddd.domain._study_domain import StudyDomain
+from education_group.ddd.domain._study_domain import StudyDomain, StudyDomainIdentity
 from education_group.ddd.domain._titles import Titles
 from osis_common.ddd import interface
 
@@ -110,13 +110,13 @@ class TrainingBuilder:
             main_domain=StudyDomain(
                 entity_id=StudyDomainIdentity(decree_name=command.main_domain_decree, code=command.main_domain_code),
                 domain_name=None,
-            ),
+            ) if command.main_domain_code else None,
             secondary_domains=secondary_domains,
             isced_domain=IscedDomain(
                 entity_id=IscedDomainIdentity(command.isced_domain_code),
                 title_fr=None,
                 title_en=None,
-            ),
+            ) if command.isced_domain_code else None,
             management_entity=Entity(acronym=command.management_entity_acronym),
             administration_entity=Entity(acronym=command.administration_entity_acronym),
             end_year=command.end_year,
@@ -141,7 +141,7 @@ class TrainingBuilder:
                 ares_code=command.ares_code,
                 ares_graca=command.ares_graca,
                 ares_authorization=command.ares_authorization,
-            ),
+            ) if all((command.ares_code, command.ares_graca, command.ares_authorization)) else None,
             co_graduation=CoGraduation(
                 code_inter_cfb=command.code_inter_cfb,
                 coefficient=command.coefficient,
@@ -156,7 +156,7 @@ class TrainingBuilder:
         )
 
     def _get_enum_from_str(self, value: str, enum_class):
-        if value is None:
+        if not value:
             return None
         try:
             return enum_class[value]
@@ -213,13 +213,13 @@ class Training(interface.RootEntity):
         self.entity_id = entity_identity
         self.type = type
         self.credits = credits
-        self.schedule_type = schedule_type
-        self.duration = duration
+        self.schedule_type = schedule_type or ScheduleTypeEnum.DAILY
+        self.duration = duration or 1
         self.duration_unit = duration_unit or DurationUnitsEnum.QUADRIMESTER
         self.start_year = start_year
         self.titles = titles
-        self.keywords = keywords
-        self.internship = internship
+        self.keywords = keywords or ""
+        self.internship = internship or InternshipPresence.NO
         self.is_enrollment_enabled = is_enrollment_enabled or True
         self.has_online_re_registration = has_online_re_registration or True
         self.has_partial_deliberation = has_partial_deliberation or False

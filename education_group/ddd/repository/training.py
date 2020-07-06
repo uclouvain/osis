@@ -76,12 +76,13 @@ from osis_common.ddd import interface
 class TrainingRepository(interface.AbstractRepository):
     @classmethod
     def create(cls, training: 'Training') -> 'TrainingIdentity':
-        education_group_db_obj = EducationGroupModelDb.objects.create(
+        education_group_db_obj = EducationGroupModelDb(
             start_year=AcademicYearModelDb.objects.get(year=training.start_year),
             end_year=AcademicYearModelDb.objects.get(year=training.end_year) if training.end_year else None,
         )
+        education_group_db_obj.save()
 
-        education_group_year_db_obj = EducationGroupYearModelDb.objects.create(
+        education_group_year_db_obj = EducationGroupYearModelDb(
             academic_year=AcademicYearModelDb.objects.get(year=training.entity_id.year),
             acronym=training.entity_id.acronym,
             education_group_type=EducationGroupTypeModelDb.objects.get(name=training.type.name),
@@ -134,9 +135,9 @@ class TrainingRepository(interface.AbstractRepository):
             ) if training.teaching_campus else None,
             other_campus_activities=training.other_campus_activities.name if training.other_campus_activities else None,
             funding=training.funding.can_be_funded,
-            funding_direction=training.funding.funding_orientation.name if training.funding.funding_orientation else None,
+            funding_direction=training.funding.funding_orientation if training.funding else None,
             funding_cud=training.funding.can_be_international_funded,
-            funding_direction_cud=training.funding.international_funding_orientation.name if training.funding.international_funding_orientation else None,
+            funding_direction_cud=training.funding.international_funding_orientation if training.funding else None,
             co_graduation=training.co_graduation.code_inter_cfb,
             co_graduation_coefficient=training.co_graduation.coefficient,
             academic_type=training.academic_type.name if training.academic_type else None,
@@ -145,28 +146,31 @@ class TrainingRepository(interface.AbstractRepository):
             diploma_printing_title=training.diploma.printing_title,
             professional_title=training.diploma.professional_title,
         )
+        education_group_year_db_obj.save()
 
         # Secondary domains
         for dom in training.secondary_domains:
-            EducationGroupYearDomainModelDb.objects.create(
+            EducationGroupYearDomainModelDb(
                 education_group_year=education_group_year_db_obj,
                 domain=DomainModelDb.objects.get(code=dom.entity_id.code, decree__name=dom.decree_name),
-            )
+            ).save()
 
         # HOPS
-        HopsModelDb.objects.create(
-            education_group_year=education_group_year_db_obj,
-            ares_study=training.hops.ares_code,
-            ares_graca=training.hops.ares_graca,
-            ares_ability=training.hops.ares_authorization,
-        )
+        if training.hops:
+            HopsModelDb(
+                education_group_year=education_group_year_db_obj,
+                ares_study=training.hops.ares_code,
+                ares_graca=training.hops.ares_graca,
+                ares_ability=training.hops.ares_authorization,
+            ).save()
 
         # Diploma aims
-        for aim in training.diploma.aims:
-            EducationGroupCertificateAimModelDb.objects.create(
-                education_group_year=education_group_year_db_obj,
-                certificate_aim=CertificateAimModelDb.objects.get(code=aim.entity_id.code)
-            )
+        if training.diploma:
+            for aim in training.diploma.aims:
+                EducationGroupCertificateAimModelDb(
+                    education_group_year=education_group_year_db_obj,
+                    certificate_aim=CertificateAimModelDb.objects.get(code=aim.entity_id.code)
+                ).save()
 
         return training.entity_id
 

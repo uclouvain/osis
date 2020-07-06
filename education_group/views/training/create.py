@@ -54,7 +54,7 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         }
 
     def post(self, request, *args, **kwargs):
-        training_form = CreateTrainingForm(data=request.POST, user=self.request.user, group_type=self.kwargs['type'])
+        training_form = CreateTrainingForm(data=request.POST, user=self.request.user, training_type=self.kwargs['type'])
         if training_form.is_valid():
             create_training_cmd = command.CreateTrainingCommand(
                 abbreviated_title=training_form.cleaned_data['acronym'],
@@ -65,7 +65,7 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 credits=training_form.cleaned_data['credits'],
                 schedule_type=training_form.cleaned_data['schedule_type'],
                 duration=training_form.cleaned_data['duration'],
-                start_year=training_form.cleaned_data['start_year'].year,
+                start_year=training_form.cleaned_data['academic_year'].year,
                 title_fr=training_form.cleaned_data['title_fr'],
                 partial_title_fr=training_form.cleaned_data['partial_title_fr'],
                 title_en=training_form.cleaned_data['title_en'],
@@ -84,28 +84,24 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 english_activities=training_form.cleaned_data['english_activities'],
                 other_language_activities=training_form.cleaned_data['other_language_activities'],
                 internal_comment=training_form.cleaned_data['internal_comment'],
-                main_domain_code=training_form.cleaned_data['main_domain_code'].code,
-                main_domain_decree=training_form.cleaned_data['main_domain_decree'].decree.name,
+                main_domain_code=training_form.cleaned_data['main_domain'].code,
+                main_domain_decree=training_form.cleaned_data['main_domain'].decree.name,
                 secondary_domains=[
                     (obj.decree.name, obj.code) for obj in training_form.cleaned_data['secondary_domains']
                 ],
-                isced_domain_code=training_form.cleaned_data['isced_domain_code'].code,
-                management_entity_acronym=find_entity_version_according_academic_year(
-                    an_entity=training_form.cleaned_data['management_entity_acronym'].id,
-                    an_academic_year=training_form.cleaned_data['academic_year'],
-                ) if training_form.cleaned_data['management_entity_acronym'] else None,
-                administration_entity_acronym=find_entity_version_according_academic_year(
-                    an_entity=training_form.cleaned_data['administration_entity_acronym'].id,
-                    an_academic_year=training_form.cleaned_data['academic_year'],
-                ) if training_form.cleaned_data['administration_entity_acronym'] else None,
-                end_year=training_form.cleaned_data['end_year'].year,
+                isced_domain_code=training_form.cleaned_data['isced_domain'].code
+                if training_form.cleaned_data['isced_domain'] else None,
+                management_entity_acronym=training_form.cleaned_data['management_entity'],
+                administration_entity_acronym=training_form.cleaned_data['administration_entity'],
+                end_year=training_form.cleaned_data['end_year'].year
+                if training_form.cleaned_data['end_year'] else None,
                 teaching_campus_name=training_form.cleaned_data['teaching_campus'].name,
                 teaching_campus_organization_name=training_form.cleaned_data['teaching_campus'].organization.name,
                 enrollment_campus_name=training_form.cleaned_data['enrollment_campus'].name,
                 enrollment_campus_organization_name=training_form.cleaned_data['enrollment_campus'].organization.name,
                 other_campus_activities=training_form.cleaned_data['other_campus_activities'],
                 can_be_funded=training_form.cleaned_data['can_be_funded'],
-                funding_orientation=training_form.cleaned_data['funding_orientation'],
+                funding_orientation=training_form.cleaned_data['funding_direction'],
                 can_be_international_funded=training_form.cleaned_data['can_be_international_funded'],
                 international_funding_orientation=training_form.cleaned_data['international_funding_orientation'],
                 ares_code=training_form.cleaned_data['ares_code'],
@@ -119,13 +115,13 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 printing_title=training_form.cleaned_data['diploma_printing_title'],
                 professional_title=training_form.cleaned_data['professional_title'],
                 aims=[
-                    (aim.code, aim.section) for aim in training_form.cleaned_data['aims']
+                    (aim.code, aim.section) for aim in (training_form.cleaned_data['certificate_aims'] or [])
                 ],
                 constraint_type=training_form.cleaned_data['constraint_type'],
                 min_constraint=training_form.cleaned_data['min_constraint'],
                 max_constraint=training_form.cleaned_data['max_constraint'],
                 remark_fr=training_form.cleaned_data['remark_fr'],
-                remark_en=training_form.cleaned_data['remark_en'],
+                remark_en=training_form.cleaned_data['remark_english'],
             )
             try:
                 if self.get_attach_path():
@@ -139,8 +135,8 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
             except GroupCodeAlreadyExistException as e:
                 training_form.add_error('code', e.message)
-            except Exception as e:
-                training_form._errors.append(str(e))
+            # except Exception as e:
+            #     training_form._errors.append(str(e))
 
             if not training_form.errors:
                 display_success_messages(request, self.get_success_msg(training_id), extra_tags='safe')
