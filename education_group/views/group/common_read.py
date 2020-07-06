@@ -39,6 +39,7 @@ from base.business.education_groups import general_information_sections
 from base.business.education_groups.general_information_sections import \
     MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION
 from base.models import academic_year
+from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import GroupType
 from base.utils.cache import ElementCache
 from base.views.common import display_warning_messages
@@ -130,6 +131,9 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
                                               ),
             "selected_element_clipboard": self.get_selected_element_clipboard_message(),
             "group_year": self.get_group_year(),  # TODO: Should be remove and use DDD object
+            "create_group_url": self.get_create_group_url(),
+            "create_training_url": self.get_create_training_url(),
+            "create_mini_training_url": self.get_create_mini_training_url()
             "is_root_node": is_root_node,
         }
 
@@ -147,6 +151,18 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
 
     def get_permission_object(self):
         return self.get_group_year()
+
+    def get_create_group_url(self):
+        return reverse('create_element_select_type', kwargs={'category': Categories.GROUP.name}) + \
+               "?path_to={}".format(self.get_path())
+
+    def get_create_mini_training_url(self):
+        return reverse('create_element_select_type', kwargs={'category': Categories.MINI_TRAINING.name}) + \
+               "?path_to={}".format(self.get_path())
+
+    def get_create_training_url(self):
+        return reverse('create_element_select_type', kwargs={'category': Categories.TRAINING.name}) + \
+               "?path_to={}".format(self.get_path())
 
     def get_tab_urls(self):
         return OrderedDict({

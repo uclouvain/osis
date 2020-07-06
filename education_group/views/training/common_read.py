@@ -39,6 +39,7 @@ from base.business.education_groups import general_information_sections
 from base.business.education_groups.general_information_sections import \
     MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION
 from base.models import academic_year
+from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import TrainingType
 from base.views.common import display_warning_messages
 from education_group.ddd.business_types import *
@@ -146,6 +147,9 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             # TODO: Two lines below to remove when finished reorganized templates
             "education_group_version": self.education_group_version,
             "group_year": self.education_group_version.root_group,
+            "create_group_url": self.get_create_group_url(),
+            "create_training_url": self.get_create_training_url(),
+            "create_mini_training_url": self.get_create_mini_training_url(),
             "xls_ue_prerequisites": reverse("education_group_learning_units_prerequisites",
                                             args=[self.education_group_version.root_group.academic_year.year,
                                                   self.education_group_version.root_group.partial_acronym]
@@ -158,6 +162,18 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
 
     def get_permission_object(self):
         return self.education_group_version.offer
+
+    def get_create_group_url(self):
+        return reverse('create_element_select_type', kwargs={'category': Categories.GROUP.name}) + \
+               "?path_to={}".format(self.get_path())
+
+    def get_create_mini_training_url(self):
+        return reverse('create_element_select_type', kwargs={'category': Categories.MINI_TRAINING.name}) + \
+               "?path_to={}".format(self.get_path())
+
+    def get_create_training_url(self):
+        return reverse('create_element_select_type', kwargs={'category': Categories.TRAINING.name}) + \
+               "?path_to={}".format(self.get_path())
 
     def get_tab_urls(self):
         node_identity = self.get_object().entity_id
