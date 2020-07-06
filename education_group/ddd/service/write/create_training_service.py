@@ -30,6 +30,7 @@ from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain.training import TrainingBuilder
 from education_group.ddd.repository.training import TrainingRepository
+from education_group.ddd.service.write import create_group_service
 
 
 @transaction.atomic()
@@ -40,8 +41,8 @@ def create_orphan_training(create_training_cmd: command.CreateTrainingCommand) -
     return training_id
 
 
-def __get_create_group_command(training_cmd: command.CreateTrainingCommand) -> command.CreateGroupCommand:
-    return command.CreateGroupCommand(
+def __get_create_group_command(training_cmd: command.CreateTrainingCommand) -> command.CreateOrphanGroupCommand:
+    return command.CreateOrphanGroupCommand(
         code=training_cmd.code,
         year=training_cmd.year,
         type=training_cmd.type,
