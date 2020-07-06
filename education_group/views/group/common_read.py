@@ -133,7 +133,7 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
             "group_year": self.get_group_year(),  # TODO: Should be remove and use DDD object
             "create_group_url": self.get_create_group_url(),
             "create_training_url": self.get_create_training_url(),
-            "create_mini_training_url": self.get_create_mini_training_url()
+            "create_mini_training_url": self.get_create_mini_training_url(),
             "is_root_node": is_root_node,
         }
 

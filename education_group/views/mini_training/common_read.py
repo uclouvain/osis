@@ -152,7 +152,7 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
 
             "create_group_url": self.get_create_group_url(),
             "create_training_url": self.get_create_training_url(),
-            "create_mini_training_url": self.get_create_mini_training_url()
+            "create_mini_training_url": self.get_create_mini_training_url(),
             "is_root_node": is_root_node,
         }
 
