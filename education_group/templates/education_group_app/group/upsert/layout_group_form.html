@@ -37,7 +37,7 @@
                 {% for tab in tabs %}
                     {% if tab.display %}
                         <li role="presentation" {% if tab.active %} class="active" {% endif %}>
-                            <a href="tab-{{ forloop.counter }}" role="tab">
+                            <a data-toggle="tab" href="#tab-{{ forloop.counter }}" role="tab">
                                 {{ tab.text }}
                             </a>
                         </li>

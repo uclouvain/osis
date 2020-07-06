@@ -92,7 +92,7 @@ class GroupForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     def __init_management_entity_field(self):
         self.fields['management_entity'] = fields.ManagementEntitiesChoiceField(
             person=self.user.person,
-            initial=None,
+            initial=self.initial['management_entity'].pk if self.initial['management_entity'] else None,
             disabled=self.fields['management_entity'].disabled,
         )
 

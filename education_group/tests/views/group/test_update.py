@@ -24,26 +24,38 @@
 #
 ##############################################################################
 from typing import List
+from unittest import mock
 
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, HttpResponseNotFound
 from django.test import TestCase
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from base.tests.factories.person import PersonFactory
+from education_group.ddd.domain.exception import GroupNotFoundException
+from education_group.ddd.domain.group import GroupIdentity
+from education_group.ddd.factories.group import GroupFactory
 from education_group.forms.content import ContentFormSet
+from education_group.forms.group import GroupForm
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 
 
 class TestUpdateGroupGetMethod(TestCase):
     @classmethod
     def setUpTestData(cls):
-        # cls.group_identity = GroupIdentity()
-
+        cls.group = GroupFactory()
+        cls.group.entity_identity = GroupIdentity(year=2018, code='LBIR100M')
         cls.central_manager = CentralManagerFactory()
-        cls.url = reverse('group_update', kwargs={'year': 2018, 'code': 'LBIR100M'})
+        cls.url = reverse('group_update', kwargs={'year': cls.group.year, 'code': cls.group.code})
 
     def setUp(self) -> None:
+        self.perm_patcher = mock.patch(
+            "education_group.views.group.update.group_service.get_group",
+            return_value=self.group
+        )
+        self.mocked_perm = self.perm_patcher.start()
+        self.addCleanup(self.perm_patcher.stop)
+
         self.client.force_login(self.central_manager.person.user)
 
     def test_case_when_user_not_logged(self):
@@ -58,6 +70,11 @@ class TestUpdateGroupGetMethod(TestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
+    @mock.patch('education_group.views.group.update.group_service.get_group', side_effect=GroupNotFoundException)
+    def test_assert_404_when_group_not_found(self, mock_get_group):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
+
     def test_assert_template_used(self):
         response = self.client.get(self.url)
         self.assertTemplateUsed(response, "education_group_app/group/upsert/update.html")
@@ -65,7 +82,7 @@ class TestUpdateGroupGetMethod(TestCase):
     def test_assert_context(self):
         response = self.client.get(self.url)
 
-        # self.assertIsInstance(response.context['group_form'], GroupForm)
+        self.assertIsInstance(response.context['group_form'], GroupForm)
         self.assertIsInstance(response.context['content_formset'], ContentFormSet)
         self.assertIsInstance(response.context['tabs'], List)
         self.assertIsInstance(response.context['cancel_url'], str)
@@ -82,7 +99,7 @@ class TestUpdateGroupGetMethod(TestCase):
                 "include_html": "education_group_app/group/upsert/identification_form.html"
             }, {
                 "text": _("Content"),
-                "active": True,
+                "active": False,
                 "display": True,
                 "include_html": "education_group_app/group/upsert/content_form.html"
             }]
@@ -91,13 +108,28 @@ class TestUpdateGroupGetMethod(TestCase):
     def test_assert_cancel_url_computed(self):
         response = self.client.get(self.url)
 
-        expected_url = reverse('element_identification', kwargs={'year': 2018, 'code': 'LBIR100M'})
+        expected_url = reverse('element_identification', kwargs={'year': self.group.year, 'code': self.group.code})
         self.assertEqual(response.context['cancel_url'], expected_url)
 
     def test_assert_cancel_url_keep_path_queryparam(self):
         url_with_path = self.url + "?path=25656565|56565"
 
         response = self.client.get(url_with_path)
-        expected_url = reverse('element_identification', kwargs={'year': 2018, 'code': 'LBIR100M'}) + \
+        expected_url = reverse('element_identification', kwargs={'year': self.group.year, 'code': self.group.code}) + \
             "?path=25656565|56565"
         self.assertEqual(response.context['cancel_url'], expected_url)
+
+    def test_assert_group_form_initial_computed(self):
+        response = self.client.get(self.url)
+
+        initials = response.context['group_form'].initial
+        self.assertEqual(initials['code'], self.group.code)
+        self.assertEqual(initials['abbreviated_title'], self.group.abbreviated_title)
+        self.assertEqual(initials['title_fr'], self.group.titles.title_fr)
+        self.assertEqual(initials['title_en'], self.group.titles.title_en)
+        self.assertEqual(initials['credits'], self.group.credits)
+        self.assertEqual(initials['constraint_type'], self.group.content_constraint.type)
+        self.assertEqual(initials['min_constraint'], self.group.content_constraint.minimum)
+        self.assertEqual(initials['max_constraint'], self.group.content_constraint.maximum)
+        self.assertEqual(initials['remark_fr'], self.group.remark.text_fr)
+        self.assertEqual(initials['remark_en'], self.group.remark.text_en)

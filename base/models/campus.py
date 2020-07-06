@@ -58,3 +58,10 @@ def find_by_id(campus_id):
         return Campus.objects.get(id=campus_id)
     except Campus.DoesNotExist:
         return None
+
+
+def find_by_name_and_organization_name(name, organization_name):
+    try:
+        return Campus.objects.get(name=name, organization__name=organization_name)
+    except Campus.DoesNotExist:
+        return None
