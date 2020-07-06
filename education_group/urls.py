@@ -1,10 +1,11 @@
 from django.urls import include, path, register_converter
 
-from education_group.converters import GroupTypeConverter
+from education_group.converters import GroupTypeConverter, TrainingTypeConverter
 from education_group.views import group, training, mini_training, general_information
 from education_group.views.proxy.read import ReadEducationGroupRedirectView
 
 register_converter(GroupTypeConverter, 'group_type')
+register_converter(TrainingTypeConverter, 'training_type')
 
 urlpatterns = [
     path(
@@ -45,31 +46,34 @@ urlpatterns = [
             name='mini_training_admission_condition'
         ),
     ])),
-    path('trainings/<int:year>/<str:code>/', include([
-        path('identification/', training.TrainingReadIdentification.as_view(), name='training_identification'),
-        path('diplomas/', training.TrainingReadDiplomaCertificate.as_view(), name='training_diplomas'),
-        path(
-            'administrative_data/',
-            training.TrainingReadAdministrativeData.as_view(),
-            name='training_administrative_data'
-        ),
-        path('content/', training.TrainingReadContent.as_view(), name='training_content'),
-        path('utilization/', training.TrainingReadUtilization.as_view(), name='training_utilization'),
-        path(
-            'general_information/',
-            training.TrainingReadGeneralInformation.as_view(),
-            name='training_general_information'
-        ),
-        path(
-            'skills_achievements/',
-            training.TrainingReadSkillsAchievements.as_view(),
-            name='training_skills_achievements'
-        ),
-        path(
-            'admission_conditions/',
-            training.TrainingReadAdmissionCondition.as_view(),
-            name='training_admission_condition'
-        ),
+    path('trainings/', include([
+        path('<training_type:type>/create/', training.TrainingCreateView.as_view(), name='training_create'),
+        path('<int:year>/<str:code>/', include([
+            path('identification/', training.TrainingReadIdentification.as_view(), name='training_identification'),
+            path('diplomas/', training.TrainingReadDiplomaCertificate.as_view(), name='training_diplomas'),
+            path(
+                'administrative_data/',
+                training.TrainingReadAdministrativeData.as_view(),
+                name='training_administrative_data'
+            ),
+            path('content/', training.TrainingReadContent.as_view(), name='training_content'),
+            path('utilization/', training.TrainingReadUtilization.as_view(), name='training_utilization'),
+            path(
+                'general_information/',
+                training.TrainingReadGeneralInformation.as_view(),
+                name='training_general_information'
+            ),
+            path(
+                'skills_achievements/',
+                training.TrainingReadSkillsAchievements.as_view(),
+                name='training_skills_achievements'
+            ),
+            path(
+                'admission_conditions/',
+                training.TrainingReadAdmissionCondition.as_view(),
+                name='training_admission_condition'
+            ),
+        ])),
     ])),
     path('general_information/<int:year>/', include([
         path('common/', general_information.CommonGeneralInformation.as_view(), name="common_general_information"),
