@@ -1,5 +1,5 @@
 {% load static bootstrap3 %}
-{% load i18n %}
+{% load i18n static %}
 
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
@@ -37,8 +37,8 @@
                 {% for tab in tabs %}
                     {% if tab.display %}
                         <li role="presentation" {% if tab.active %} class="active" {% endif %}>
-                            <a href="tab-{{ forloop.counter }}" role="tab">
-                                {{ tab.text }}
+                            <a data-toggle="tab" href="#tab-{{ forloop.counter }}" role="tab">
+                                {{ tab.text }} <span id="spn_{{ forloop.counter }}_errors" class="error"></span>
                             </a>
                         </li>
                     {% endif %}
@@ -57,3 +57,7 @@
         </div>
     </div>
 </form>
+
+{{ training_form.media }}
+
+<script type="text/javascript" src="{% static 'js/education_group/update_training_errors.js' %}"></script>

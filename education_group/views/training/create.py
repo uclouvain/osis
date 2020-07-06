@@ -116,7 +116,7 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 academic_type=training_form.cleaned_data['academic_type'],
                 duration_unit=training_form.cleaned_data['duration_unit'],
                 leads_to_diploma=training_form.cleaned_data['leads_to_diploma'],
-                printing_title=training_form.cleaned_data['printing_title'],
+                printing_title=training_form.cleaned_data['diploma_printing_title'],
                 professional_title=training_form.cleaned_data['professional_title'],
                 aims=[
                     (aim.code, aim.section) for aim in training_form.cleaned_data['aims']
@@ -176,7 +176,13 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 "active": True,
                 "display": True,
                 "include_html": "education_group_app/training/upsert/training_identification_form.html"
-            }
+            },
+            {
+                "text": _("Diplomas /  Certificates"),
+                "active": False,
+                "display": True,
+                "include_html": "education_group_app/training/upsert/blocks/panel_diplomas_certificates_form.html"
+            },
         ]
 
     def get_attach_path(self) -> Union[Path, None]:

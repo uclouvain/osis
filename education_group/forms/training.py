@@ -89,12 +89,12 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         required=False,
     )
     min_constraint = forms.IntegerField(
-        label=_("minimum constraint"),
+        label=_("minimum constraint").capitalize(),
         required=False,
         widget=forms.TextInput
     )
     max_constraint = forms.IntegerField(
-        label=_("maximum constraint"),
+        label=_("maximum constraint").capitalize(),
         required=False,
         widget=forms.TextInput
     )
@@ -119,8 +119,8 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     )
     duration_unit = forms.ChoiceField(
         initial=DurationUnits.QUADRIMESTER.value,
-        choices=BLANK_CHOICE + list(DurationUnits.choices()),
-        label=_("duration unit"),
+        choices=BLANK_CHOICE + sorted(list(DurationUnits.choices()), key=lambda c: c[1]),
+        label=_("duration unit").capitalize(),
         required=False,
     )
     internship = forms.ChoiceField(
@@ -133,7 +133,7 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     has_online_re_registration = forms.BooleanField(initial=True, label=_('Web re-registration'))
     has_partial_deliberation = forms.BooleanField(initial=False, label=_('Partial deliberation'))
     has_admission_exam = forms.BooleanField(initial=False, label=_('Admission exam'))
-    has_dissertation = forms.BooleanField(initial=False, label=_('dissertation'))
+    has_dissertation = forms.BooleanField(initial=False, label=_('dissertation').capitalize())
     produce_university_certificate = forms.BooleanField(initial=False, label=_('University certificate'))
     decree_category = forms.ChoiceField(
         choices=BLANK_CHOICE + sorted(list(DecreeCategories.choices()), key=lambda c: c[1]),
@@ -152,7 +152,7 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     )
     english_activities = forms.ChoiceField(
         choices=BLANK_CHOICE + list(ActivityPresence.choices()),
-        label=_("activities in English"),
+        label=_("activities in English").capitalize(),
         required=False,
     )
     other_language_activities = forms.ChoiceField(
@@ -171,26 +171,22 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         label=_('secondary domains').title(),
     )
     isced_domain = forms.ModelChoiceField(queryset=DomainIsced.objects.all())
-    internal_comment = forms.CharField(max_length=500, label=_("comment (internal)"), required=False)
+    internal_comment = forms.CharField(max_length=500, label=_("comment (internal)").capitalize(), required=False)
 
     # panel_entities_form.html
     management_entity = fields.ManagementEntitiesChoiceField(person=None, initial=None, required=False)
     administration_entity = MainEntitiesVersionChoiceField(queryset=None)  # FIXME :: class to move into 'fields.py'
     academic_year = forms.ModelChoiceField(
-        queryset=EventPermEducationGroupEdition.get_academic_years().filter(
-            year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION
-        ),
+        queryset=AcademicYear.objects.all(),
         label=_("Start"),
     )  # Equivalent to start_year
     end_year = forms.ModelChoiceField(
-        queryset=EventPermEducationGroupEdition.get_academic_years().filter(
-            year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION
-        ),
+        queryset=AcademicYear.objects.all(),
         label=_('Last year of organization'),
     )
     teaching_campus = MainCampusChoiceField(queryset=None, label=_("Learning location"), required=False)
     enrollment_campus = forms.ModelChoiceField(  # FIXME :: to replace by choice field (to prevent link to DB model)
-        queryset=Campus.objects.all().select_related('organization'),
+        queryset=Campus.objects.all().order_by('name').select_related('organization'),
         label=_("Enrollment campus"),
         required=False,
     )
@@ -216,25 +212,30 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
 
     # panel_remarks_form.html  # FIXME :: group form ??
     remark_fr = forms.CharField(widget=forms.Textarea, label=_("Remark"), required=False)
-    remark_english = forms.CharField(widget=forms.Textarea, label=_("remark in english"), required=False)
+    remark_english = forms.CharField(widget=forms.Textarea, label=_("remark in english").capitalize(), required=False)
 
     # HOPS panel
-    hops_fields = ('ares_study', 'ares_graca', 'ares_ability')
-    ares_study = forms.CharField(widget=forms.TextInput(), required=False)
+    hops_fields = ('ares_code', 'ares_graca', 'ares_authorization')
+    ares_code = forms.CharField(widget=forms.TextInput(), required=False)
     ares_graca = forms.CharField(widget=forms.TextInput(), required=False)
-    ares_ability = forms.CharField(widget=forms.TextInput(), required=False)
+    ares_authorization = forms.CharField(widget=forms.TextInput(), required=False)
     code_inter_cfb = forms.CharField(max_length=8, label=_('Code co-graduation inter CfB'), required=False)
     coefficient = forms.DecimalField(widget=forms.TextInput())
 
     # Diploma tab
-    section = forms.ChoiceField(choices=lazy(_get_section_choices, list), required=False)
-    joint_diploma = forms.BooleanField(initial=False, label=_('Leads to diploma/certificate'))
+    section = forms.ChoiceField(
+        label=_('filter by section').capitalize() + ':',
+        choices=lazy(_get_section_choices, list),
+        required=False,
+    )
+    leads_to_diploma = forms.BooleanField(initial=False, label=_('Leads to diploma/certificate'))
     diploma_printing_title = forms.CharField(max_length=240, required=False, label=_('Diploma title'))
     professional_title = forms.CharField(max_length=320, required=False, label=_('Professionnal title'))
     certificate_aims = forms.ModelMultipleChoiceField(
-        label=_('certifiate aims'),
+        label=_('certificate aims').capitalize(),
         queryset=CertificateAim.objects.all(),
         required=False,
+        disabled=True,
         widget=autocomplete.ModelSelect2Multiple(
             url='certificate_aim_autocomplete',
             attrs={
@@ -259,10 +260,16 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
 
     def __init_academic_year_field(self):
         if not self.fields['academic_year'].disabled and self.user.person.is_faculty_manager:
-            self.fields['academic_year'].queryset = EventPermEducationGroupEdition.get_academic_years() \
-                .filter(year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION)
+            academic_years = EventPermEducationGroupEdition.get_academic_years().filter(
+                year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION
+            )
+            self.fields['academic_year'].queryset = academic_years
+            self.fields['end_year'].queryset = academic_years
         else:
             self.fields['academic_year'].queryset = self.fields['academic_year'].queryset.filter(
+                year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION
+            )
+            self.fields['end_year'].queryset = self.fields['end_year'].queryset.filter(
                 year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION
             )
 
@@ -281,10 +288,10 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
 
     def __init_diploma_fields(self):
         if self.training_type in TrainingType.with_diploma_values_set_initially_as_true():
-            self.fields['joint_diploma'].initial = True
+            self.fields['leads_to_diploma'].initial = True
             self.fields['diploma_printing_title'].required = True
         else:
-            self.fields['joint_diploma'].initial = False
+            self.fields['leads_to_diploma'].initial = False
             self.fields['diploma_printing_title'].required = False
 
     def is_valid(self):

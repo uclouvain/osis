@@ -24,17 +24,32 @@
     * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-<div class="panel panel-default">
-    <div class="panel-body">
-        <div class="row">
-            {% bootstrap_field training_form.ares_code form_group_class="col-md-4" %}
-            {% bootstrap_field training_form.ares_graca form_group_class="col-md-4" %}
-            {% bootstrap_field training_form.ares_authorization form_group_class="col-md-4" %}
-        </div>
-        <br>
-        <div class="row">
-            {% bootstrap_field training_form.code_inter_cfb form_group_class="col-md-4" %}
-            {% bootstrap_field training_form.coefficient form_group_class="col-md-4" %}
+{% block details %}
+    <div class="row">
+        <div class="col-md-12">
+
+            <div class="row">
+                {% bootstrap_field training_form.leads_to_diploma form_group_class="col-md-12" %}
+            </div>
+            <br>
+
+            <div class="row">
+                {% bootstrap_field training_form.diploma_printing_title form_group_class="col-md-12" %}
+            </div>
+            <br>
+
+            <div class="row">
+                {% bootstrap_field training_form.professional_title form_group_class="col-md-12" %}
+            </div>
+            <br>
+
+            <div class="row">
+                {% bootstrap_field training_form.section form_group_class="col-md-2" %}
+                {% bootstrap_field training_form.certificate_aims form_group_class="col-md-10" %}
+            </div>
+            <br>
+
+
         </div>
     </div>
-</div>
+{% endblock details %}
