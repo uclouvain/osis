@@ -118,8 +118,6 @@ def get_tab_from_referer(node: 'Node', referer: str):
                     SUFFIX_ADMISSION_CONDITION: Tab.ADMISSION_CONDITION
                     }
 
-        for key, tab in tabs.items():
-            if key in referer:
-                return tab
+        return next((tab for key, tab in tabs.items() if key in referer), Tab.IDENTIFICATION)
     return Tab.IDENTIFICATION
 
