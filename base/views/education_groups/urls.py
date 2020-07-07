@@ -94,10 +94,6 @@ urlpatterns = [
                 name="publication_contact_delete"),
         ])),
     ])),
-    url(r'^admission_conditions/line/order$',
-        education_group.education_group_year_admission_condition_line_order,
-        name='education_group_year_admission_condition_line_order'
-        ),
     url(r'^(?P<year>[0-9]+)/(?P<code>[A-Za-z0-9]+)/', include([
        url(
            r'^admission_conditions/remove_line$',
@@ -114,7 +110,10 @@ urlpatterns = [
            education_group.education_group_year_admission_condition_update_text,
            name='education_group_year_admission_condition_update_text'),
 
-
+       url(
+           r'^admission_conditions/line/order$',
+           education_group.education_group_year_admission_condition_line_order,
+           name='education_group_year_admission_condition_line_order'),
        url(
            r'^admission_conditions/lang/edit/(?P<language>[A-Za-z-]+)/$',
            education_group.education_group_year_admission_condition_tab_lang_edit,

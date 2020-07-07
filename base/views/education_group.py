@@ -280,7 +280,7 @@ def education_group_year_admission_condition_update_text(request, year: int, cod
 @login_required
 @ajax_required
 @can_change_admission_condition
-def education_group_year_admission_condition_line_order(request):
+def education_group_year_admission_condition_line_order(request, year: int, code: str):
     info = json.loads(request.body.decode('utf-8'))
 
     admission_condition_line = get_object_or_404(
