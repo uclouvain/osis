@@ -74,11 +74,11 @@ class TrainingReadAdmissionCondition(TrainingRead):
         return context
 
     def __get_language_list(self):
-        # TODO : Use sluggify URL
-        offer_id = self.education_group_version.offer_id
         return [
-            {'text': "fr-be", 'url':  reverse('tab_lang_edit', args=[offer_id, offer_id, 'fr-be'])},
-            {'text': "en", 'url': reverse('tab_lang_edit', args=[offer_id, offer_id, 'en'])}
+            {'text': "fr-be", 'url':  reverse('tab_lang_edit', args=[self.node_identity.year,
+                                                                     self.node_identity.code, 'fr-be'])},
+            {'text': "en", 'url': reverse('tab_lang_edit', args=[self.node_identity.year,
+                                                                 self.node_identity.code, 'en'])}
         ]
 
     @functools.lru_cache()
