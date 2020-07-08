@@ -89,7 +89,7 @@ class CreateEducationGroupDetailedAchievement(PermissionRequiredMixin, AjaxTempl
                            ) + '?path={}&tab={}#detail_achievements_{}'.format(
                 self.request.POST['path'],
                 Tab.SKILLS_ACHIEVEMENTS,
-                str(self.object.pk)
+                self.object.pk
             )
         else:
             return reverse('mini_training_skills_achievements',
@@ -98,5 +98,5 @@ class CreateEducationGroupDetailedAchievement(PermissionRequiredMixin, AjaxTempl
                            ) + '?path={}&tab={}#detail_achievements_{}'.format(
                 self.request.POST['path'],
                 Tab.SKILLS_ACHIEVEMENTS,
-                str(self.object.pk)
+                self.object.pk
             )

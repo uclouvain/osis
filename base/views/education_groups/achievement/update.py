@@ -78,7 +78,7 @@ class EducationGroupAchievementAction(EducationGroupAchievementMixin, FormView):
                            ) + '?path={}&tab={}#achievement_{}'.format(
                 self.request.GET['path'],
                 Tab.SKILLS_ACHIEVEMENTS,
-                str(self.kwargs['education_group_achievement_pk'])
+                self.kwargs['education_group_achievement_pk']
             )
         else:
             return reverse('mini_training_skills_achievements',
@@ -87,7 +87,7 @@ class EducationGroupAchievementAction(EducationGroupAchievementMixin, FormView):
                            ) + '?path={}&tab={}#achievement_{}'.format(
                 self.request.GET['path'],
                 Tab.SKILLS_ACHIEVEMENTS,
-                str(self.kwargs['education_group_achievement_pk'])
+                self.kwargs['education_group_achievement_pk']
             )
 
 
@@ -121,7 +121,7 @@ class EducationGroupDetailedAchievementAction(EducationGroupDetailedAchievementM
                            ) + '?path={}&tab={}#detail_achievements_{}'.format(
                 self.request.GET['path'],
                 Tab.SKILLS_ACHIEVEMENTS,
-                str(self.kwargs['education_group_detail_achievement_pk'])
+                self.kwargs['education_group_detail_achievement_pk']
             )
         else:
             return reverse('mini_training_skills_achievements',
@@ -130,7 +130,7 @@ class EducationGroupDetailedAchievementAction(EducationGroupDetailedAchievementM
                            ) + '?path={}&tab={}#detail_achievements_{}'.format(
                 self.request.GET['path'],
                 Tab.SKILLS_ACHIEVEMENTS,
-                str(self.kwargs['education_group_detail_achievement_pk'])
+                self.kwargs['education_group_detail_achievement_pk']
             )
 
 
