@@ -1,4 +1,4 @@
-from django.urls import include, path
+from django.urls import include, path, register_converter
 
 from base.views.education_groups.achievement.create import CreateEducationGroupDetailedAchievement, \
     CreateEducationGroupAchievement
@@ -6,8 +6,11 @@ from base.views.education_groups.achievement.delete import DeleteEducationGroupA
     DeleteEducationGroupDetailedAchievement
 from base.views.education_groups.achievement.update import EducationGroupAchievementAction, \
     UpdateEducationGroupAchievement, EducationGroupDetailedAchievementAction, UpdateEducationGroupDetailedAchievement
+from education_group.converters import GroupTypeConverter
 from education_group.views import group, training, mini_training, general_information
 from education_group.views.proxy.read import ReadEducationGroupRedirectView
+
+register_converter(GroupTypeConverter, 'group_type')
 
 urlpatterns = [
     path(
@@ -15,13 +18,15 @@ urlpatterns = [
         ReadEducationGroupRedirectView.as_view(),
         name='education_group_read_proxy'
     ),
-    path('groups/<int:year>/<str:code>/', include([
-        path('identification/', group.GroupReadIdentification.as_view(), name='group_identification'),
-        path('content/', group.GroupReadContent.as_view(), name='group_content'),
-        path('utilization/', group.GroupReadUtilization.as_view(), name='group_utilization'),
-        path('general_information/', group.GroupReadGeneralInformation.as_view(), name='group_general_information'),
+    path('groups/', include([
+        path('<group_type:type>/create', group.GroupCreateView.as_view(), name='group_create'),
+        path('<int:year>/<str:code>/', include([
+            path('identification/', group.GroupReadIdentification.as_view(), name='group_identification'),
+            path('content/', group.GroupReadContent.as_view(), name='group_content'),
+            path('utilization/', group.GroupReadUtilization.as_view(), name='group_utilization'),
+            path('general_information/', group.GroupReadGeneralInformation.as_view(), name='group_general_information'),
+        ]))
     ])),
-
     path('mini_trainings/<int:year>/<str:code>/', include([
         path(
             'identification/',
