@@ -21,20 +21,11 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from typing import List
-
-from education_group.ddd import command
-from education_group.ddd.business_types import *
-
-from education_group.ddd.domain.group import GroupIdentity
-from education_group.ddd.repository.group import GroupRepository
+from program_management.ddd import command
+from program_management.ddd.domain.program_tree import ProgramTree, ProgramTreeIdentity
+from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 
 
-def get_group(cmd: command.GetGroupCommand) -> 'Group':
-    group_id = GroupIdentity(code=cmd.code, year=cmd.year)
-    return GroupRepository.get(group_id)
-
-
-def get_multiple_groups(cmds: List[command.GetGroupCommand]) -> List['Group']:
-    group_ids = [GroupIdentity(code=cmd.code, year=cmd.year) for cmd in cmds]
-    return GroupRepository.search(entity_ids=group_ids)
+def get_program_tree(cmd: command.GetProgramTree) -> ProgramTree:
+    program_tree_id = ProgramTreeIdentity(code=cmd.code, year=cmd.year)
+    return ProgramTreeRepository.get(program_tree_id)

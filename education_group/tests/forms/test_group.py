@@ -15,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,33 +23,22 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import factory.fuzzy
+from unittest import TestCase
 
-from base.tests.factories.group_element_year import _generate_block_value
-from base.tests.factories.utils.fuzzy import FuzzyBoolean
-from program_management.ddd.domain.link import Link
-from program_management.tests.ddd.factories.node import NodeGroupYearFactory
+from base.models.enums.education_group_types import GroupType
+from base.tests.factories.person import PersonFactory
+from education_group.forms.group import GroupUpdateForm
 
 
-class LinkFactory(factory.Factory):
-    class Meta:
-        model = Link
-        abstract = False
+class TestGroupUpdateForm(TestCase):
+    def setUp(self) -> None:
+        self.person = PersonFactory()
+        self.form = GroupUpdateForm(user=self.person.user, group_type=GroupType.COMMON_CORE.name)
 
-    pk = factory.Sequence(lambda n: n+1)
-    parent = factory.SubFactory(NodeGroupYearFactory)
-    child = factory.SubFactory(NodeGroupYearFactory)
-    relative_credits = factory.fuzzy.FuzzyInteger(0, 10)
-    is_mandatory = FuzzyBoolean()
-    order = None
-    block = factory.LazyFunction(_generate_block_value)
-    comment = factory.fuzzy.FuzzyText(length=50)
-    comment_english = factory.fuzzy.FuzzyText(length=50)
-    link_type = None
+    def test_assert_code_is_disabled(self):
+        self.assertTrue(self.form.fields['code'].disabled)
+        self.assertFalse(self.form.fields['code'].required)
 
-    @factory.post_generation
-    def _add_children(self, create, extracted, ** kwargs):
-        if not self.parent.children:
-            self.parent.children = [self]
-        else:
-            self.parent.children.append(self)
+    def test_assert_academic_year_is_disabled(self):
+        self.assertTrue(self.form.fields['academic_year'].disabled)
+        self.assertFalse(self.form.fields['academic_year'].required)

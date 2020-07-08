@@ -36,25 +36,36 @@ from education_group.ddd.domain.exception import GroupNotFoundException
 from education_group.ddd.domain.group import GroupIdentity
 from education_group.ddd.factories.group import GroupFactory
 from education_group.forms.content import ContentFormSet
-from education_group.forms.group import GroupForm
+from education_group.forms.group import GroupUpdateForm
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
+from program_management.tests.ddd.factories.link import LinkFactory
+from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
 
 class TestUpdateGroupGetMethod(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.group = GroupFactory()
+        cls.program_tree = ProgramTreeFactory()
+
         cls.group.entity_identity = GroupIdentity(year=2018, code='LBIR100M')
         cls.central_manager = CentralManagerFactory()
         cls.url = reverse('group_update', kwargs={'year': cls.group.year, 'code': cls.group.code})
 
     def setUp(self) -> None:
-        self.perm_patcher = mock.patch(
+        self.get_group_patcher = mock.patch(
             "education_group.views.group.update.group_service.get_group",
             return_value=self.group
         )
-        self.mocked_perm = self.perm_patcher.start()
-        self.addCleanup(self.perm_patcher.stop)
+        self.mocked_get_group = self.get_group_patcher.start()
+        self.addCleanup(self.get_group_patcher.stop)
+
+        self.get_program_tree_patcher = mock.patch(
+            "education_group.views.group.update.get_program_tree_service.get_program_tree",
+            return_value=self.program_tree
+        )
+        self.mocked_get_program_tree = self.get_program_tree_patcher.start()
+        self.addCleanup(self.get_program_tree_patcher.stop)
 
         self.client.force_login(self.central_manager.person.user)
 
@@ -82,12 +93,19 @@ class TestUpdateGroupGetMethod(TestCase):
     def test_assert_context(self):
         response = self.client.get(self.url)
 
-        self.assertIsInstance(response.context['group_form'], GroupForm)
+        self.assertIsInstance(response.context['group_form'], GroupUpdateForm)
         self.assertIsInstance(response.context['content_formset'], ContentFormSet)
         self.assertIsInstance(response.context['tabs'], List)
         self.assertIsInstance(response.context['cancel_url'], str)
 
-    def test_assert_contains_identification_and_content_tabs(self):
+    @mock.patch('education_group.views.group.update.GroupUpdateView.get_children_objs')
+    @mock.patch('education_group.views.group.update.GroupUpdateView.get_link_objs')
+    def test_assert_contains_identification_and_content_tabs_when_group_have_children(self,
+                                                                                      mock_get_links,
+                                                                                      mock_get_children_obj):
+        mock_get_links.return_value = [LinkFactory()]
+        mock_get_children_obj.return_value = [GroupFactory()]
+
         response = self.client.get(self.url)
 
         self.assertListEqual(
@@ -101,6 +119,26 @@ class TestUpdateGroupGetMethod(TestCase):
                 "text": _("Content"),
                 "active": False,
                 "display": True,
+                "include_html": "education_group_app/group/upsert/content_form.html"
+            }]
+        )
+
+    @mock.patch('education_group.views.group.update.GroupUpdateView.get_link_objs')
+    def test_assert_contains_only_identification_tabs_when_group_dont_have_children(self, mock_get_links):
+        mock_get_links.return_value = []
+        response = self.client.get(self.url)
+
+        self.assertListEqual(
+            response.context['tabs'],
+            [{
+                "text": _("Identification"),
+                "active": True,
+                "display": True,
+                "include_html": "education_group_app/group/upsert/identification_form.html"
+            }, {
+                "text": _("Content"),
+                "active": False,
+                "display": False,
                 "include_html": "education_group_app/group/upsert/content_form.html"
             }]
         )
@@ -133,3 +171,26 @@ class TestUpdateGroupGetMethod(TestCase):
         self.assertEqual(initials['max_constraint'], self.group.content_constraint.maximum)
         self.assertEqual(initials['remark_fr'], self.group.remark.text_fr)
         self.assertEqual(initials['remark_en'], self.group.remark.text_en)
+
+    @mock.patch('education_group.views.group.update.GroupUpdateView.get_children_objs')
+    @mock.patch('education_group.views.group.update.GroupUpdateView.get_link_objs')
+    def test_assert_content_formset_initial_computed(self, mock_get_link_objs, mock_get_children_objs):
+        link_child_1 = LinkFactory()
+        mock_get_link_objs.return_value = [link_child_1]
+        mock_get_children_objs.return_value = [
+            GroupFactory(
+                entity_identity=GroupIdentity(code=link_child_1.child.code, year=link_child_1.child.year)
+            )
+        ]
+
+        response = self.client.get(self.url)
+
+        initials = response.context['content_formset'].initial
+        self.assertEqual(len(initials), 1)
+
+        self.assertEqual(initials[0]['relative_credits'], link_child_1.relative_credits)
+        self.assertEqual(initials[0]['link_type'], link_child_1.link_type)
+        self.assertEqual(initials[0]['access_condition'], link_child_1.access_condition)
+        self.assertEqual(initials[0]['block'], link_child_1.block)
+        self.assertEqual(initials[0]['comment'], link_child_1.comment)
+        self.assertEqual(initials[0]['comment_english'], link_child_1.comment_english)

@@ -23,18 +23,12 @@
 # ############################################################################
 from typing import List
 
-from education_group.ddd import command
-from education_group.ddd.business_types import *
-
-from education_group.ddd.domain.group import GroupIdentity
-from education_group.ddd.repository.group import GroupRepository
-
-
-def get_group(cmd: command.GetGroupCommand) -> 'Group':
-    group_id = GroupIdentity(code=cmd.code, year=cmd.year)
-    return GroupRepository.get(group_id)
+from learning_unit.ddd import command
+from learning_unit.ddd.domain.learning_unit_year import LearningUnitYear
+from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYearIdentity
+from learning_unit.ddd.repository import load_learning_unit_year
 
 
-def get_multiple_groups(cmds: List[command.GetGroupCommand]) -> List['Group']:
-    group_ids = [GroupIdentity(code=cmd.code, year=cmd.year) for cmd in cmds]
-    return GroupRepository.search(entity_ids=group_ids)
+def get_multiple_learning_unit_years(cmds: List[command.GetLearningUnitYearCommand]) -> List[LearningUnitYear]:
+    learning_unit_year_ids = [LearningUnitYearIdentity(code=cmd.code, year=cmd.year) for cmd in cmds]
+    return load_learning_unit_year.load_multiple_by_identity(learning_unit_year_ids)
