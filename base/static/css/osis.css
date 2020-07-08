@@ -600,3 +600,13 @@ table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:after, 
     display: flex;
     align-items: center;
 }
+
+.form-tab.has-error > a::after{
+    content: '';
+    display: inline-block;
+    width: 0.8em;
+    height: 0.8em;
+    border-radius: 1em;
+    margin-left: 0.5em;
+    background-color: red;
+}
