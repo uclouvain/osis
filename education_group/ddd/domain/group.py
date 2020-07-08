@@ -26,19 +26,20 @@
 import copy
 
 from base.models.enums.constraint_type import ConstraintTypeEnum
-from base.models.enums.education_group_types import GroupType, EducationGroupTypesEnum
+from base.models.enums.education_group_types import EducationGroupTypesEnum
 from education_group.ddd import command
 from education_group.ddd.domain._campus import Campus
 from education_group.ddd.domain._content_constraint import ContentConstraint
 from education_group.ddd.domain._entity import Entity
 from education_group.ddd.domain._remark import Remark
 from education_group.ddd.domain._titles import Titles
+from education_group.ddd.domain.service import enum_converter
 from osis_common.ddd import interface
 
 
 class GroupBuilder:
     @classmethod
-    def build_from_create_cmd(self, cmd: command.CreateOrphanGroupCommand):
+    def build_from_create_cmd(cls, cmd: command.CreateOrphanGroupCommand):
         group_id = GroupIdentity(code=cmd.code, year=cmd.year)
         titles = Titles(title_fr=cmd.title_fr, title_en=cmd.title_en)
         content_constraint = ContentConstraint(
@@ -55,7 +56,7 @@ class GroupBuilder:
 
         return Group(
             entity_identity=group_id,
-            type=GroupType[cmd.type],
+            type=enum_converter.convert_type_str_to_enum(cmd.type),
             abbreviated_title=cmd.abbreviated_title,
             titles=titles,
             credits=cmd.credits,

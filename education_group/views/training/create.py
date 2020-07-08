@@ -14,7 +14,8 @@ from base.models.enums.education_group_types import GroupType, TrainingType
 from base.utils.cache import RequestCache
 from base.views.common import display_success_messages
 from education_group.ddd import command
-from education_group.ddd.domain.exception import GroupCodeAlreadyExistException
+from education_group.ddd.domain.exception import GroupCodeAlreadyExistException, ContentConstraintTypeMissing, \
+    ContentConstraintMinimumMaximumMissing, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum
 from education_group.ddd.domain.training import TrainingIdentity
 from education_group.ddd.service.write import create_training_service
 from education_group.forms.training import CreateTrainingForm
@@ -135,6 +136,12 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
             except GroupCodeAlreadyExistException as e:
                 training_form.add_error('code', e.message)
+            except ContentConstraintTypeMissing as e:
+                training_form.add_error('constraint_type', e.message)
+            except (ContentConstraintMinimumMaximumMissing, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum) \
+                    as e:
+                training_form.add_error('min_constraint', e.message)
+                training_form.add_error('max_constraint', '')
             # except Exception as e:
             #     training_form._errors.append(str(e))
 

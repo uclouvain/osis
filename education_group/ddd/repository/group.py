@@ -29,6 +29,7 @@ from django.db import IntegrityError
 from django.db.models import Prefetch, Subquery, OuterRef
 from django.utils import timezone
 
+from education_group.ddd import domain
 from education_group.ddd.business_types import *
 
 from base.models.academic_year import AcademicYear as AcademicYearModelDb
@@ -37,6 +38,7 @@ from base.models.entity import Entity as EntityModelDb
 from base.models.entity_version import EntityVersion as EntityVersionModelDb
 from base.models.campus import Campus as CampusModelDb
 from education_group.ddd.domain.group import GroupUnannualizedIdentity
+from education_group.ddd.domain.service.enum_converter import convert_type_str_to_enum
 from education_group.models.group_year import GroupYear as GroupYearModelDb
 from education_group.models.group import Group as GroupModelDb
 from base.models.enums.constraint_type import ConstraintTypeEnum
@@ -143,7 +145,7 @@ class GroupRepository(interface.AbstractRepository):
             entity_identity=entity_id,
             # TODO: Create UUID field on group model and use it insteaf of group_id
             unannualized_identity=GroupUnannualizedIdentity(uuid=obj.group_id),
-            type=_convert_type(obj.education_group_type),
+            type=domain.service.enum_converter.convert_type_str_to_enum(obj.education_group_type.name),
             abbreviated_title=obj.acronym,
             titles=Titles(
                 title_fr=obj.title_fr,
@@ -177,13 +179,3 @@ class GroupRepository(interface.AbstractRepository):
     @classmethod
     def delete(cls, entity_id: 'GroupIdentity') -> None:
         raise NotImplementedError
-
-
-def _convert_type(education_group_type):
-    if education_group_type.name in GroupType.get_names():
-        return GroupType[education_group_type.name]
-    elif education_group_type.name in TrainingType.get_names():
-        return TrainingType[education_group_type.name]
-    elif education_group_type.name in MiniTrainingType.get_names():
-        return MiniTrainingType[education_group_type.name]
-    raise Exception('Unsupported group type')
