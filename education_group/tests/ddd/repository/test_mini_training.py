@@ -35,6 +35,7 @@ from education_group.ddd.domain.mini_training import MiniTrainingIdentity, MiniT
 from education_group.ddd.repository import mini_training
 from education_group.models import group_year, group
 from education_group.tests.factories.mini_training import MiniTrainingFactory
+from program_management.models import education_group_version
 
 
 class TestMiniTrainingRepositoryCreateMethod(TestCase):
@@ -62,12 +63,33 @@ class TestMiniTrainingRepositoryCreateMethod(TestCase):
     def test_should_create_db_data_with_correct_values_taken_from_domain_object(self):
         mini_training_identity = mini_training.MiniTrainingRepository.create(self.mini_training)
 
+        version = education_group_version.EducationGroupVersion.objects.get(
+            root_group__partial_acronym=mini_training_identity.code,
+            root_group__academic_year__year=mini_training_identity.year
+        )
         group_year_created = group_year.GroupYear.objects.get(
             partial_acronym=mini_training_identity.code,
             academic_year__year=mini_training_identity.year
         )
+        self.assert_education_group_version_equal_to_domain(version, self.mini_training)
         self.assert_group_equal_to_domain(group_year_created.group, self.mini_training)
         self.assert_group_year_equal_to_domain(group_year_created, self.mini_training)
+
+    def assert_education_group_version_equal_to_domain(
+            self,
+            db_version: education_group_version.EducationGroupVersion,
+            domain_obj: MiniTraining):
+        expected_values = {
+            "title_fr": domain_obj.titles.title_fr,
+            "title_en": domain_obj.titles.title_en,
+            "is_transition": False,
+            "version_name": ""
+        }
+        actual_values = model_to_dict(
+            db_version,
+            fields=("title_fr", "title_en", "is_transition", "version_name")
+        )
+        self.assertDictEqual(expected_values, actual_values)
 
     def assert_group_equal_to_domain(self, db_obj: group.Group, domain_obj: MiniTraining):
         expected_values = {

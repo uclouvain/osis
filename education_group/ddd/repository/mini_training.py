@@ -32,6 +32,7 @@ from base.models.entity_version import EntityVersion as EntityVersionModelDb
 from education_group.ddd.domain import mini_training
 from education_group.models.group import Group as GroupModelDb
 from education_group.models.group_year import GroupYear as GroupYearModelDb
+from program_management.models.education_group_version import EducationGroupVersion as EducationGroupVersionModelDb
 from osis_common.ddd import interface
 from osis_common.ddd.interface import Entity, EntityIdentity
 
@@ -68,6 +69,14 @@ class MiniTrainingRepository(interface.AbstractRepository):
             max_constraint=mini_training_obj.content_constraint.maximum,
             management_entity_id=management_entity.entity_id,
             main_teaching_campus=teaching_campus,
+        )
+
+        version = EducationGroupVersionModelDb.objects.create(
+            root_group=mini_training_db_obj,
+            is_transition=False,
+            version_name="",
+            title_en=mini_training_obj.titles.title_en,
+            title_fr=mini_training_obj.titles.title_fr
         )
 
         return mini_training.MiniTrainingIdentity(
