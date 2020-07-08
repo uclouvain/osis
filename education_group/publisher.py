@@ -26,3 +26,4 @@
 from django.dispatch import Signal
 
 group_created = Signal(providing_args=['group_identity'])
+mini_training_created = Signal(providing_args=['mini_training_identity'])

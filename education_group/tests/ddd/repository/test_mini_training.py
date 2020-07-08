@@ -24,6 +24,7 @@
 from django.forms import model_to_dict
 from django.test import TestCase
 
+from base.models import education_group_year
 from base.models.enums import education_group_types
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.campus import CampusFactory
@@ -72,8 +73,9 @@ class TestMiniTrainingRepositoryCreateMethod(TestCase):
             academic_year__year=mini_training_identity.year
         )
         self.assert_education_group_version_equal_to_domain(version, self.mini_training)
-        self.assert_group_equal_to_domain(group_year_created.group, self.mini_training)
-        self.assert_group_year_equal_to_domain(group_year_created, self.mini_training)
+        self.assert_education_group_year_equal_to_domain(version.offer, self.mini_training)
+        self.assert_group_equal_to_domain(version.root_group.group, self.mini_training)
+        self.assert_group_year_equal_to_domain(version.root_group, self.mini_training)
 
     def assert_education_group_version_equal_to_domain(
             self,
@@ -88,6 +90,35 @@ class TestMiniTrainingRepositoryCreateMethod(TestCase):
         actual_values = model_to_dict(
             db_version,
             fields=("title_fr", "title_en", "is_transition", "version_name")
+        )
+        self.assertDictEqual(expected_values, actual_values)
+
+    def assert_education_group_year_equal_to_domain(
+            self,
+            db_education_group_year: education_group_year.EducationGroupYear,
+            domain_obj: MiniTraining):
+        expected_values = {
+            "academic_year": self.academic_year.id,
+            "partial_acronym": domain_obj.code,
+            "education_group_type": self.education_group_type.id,
+            "acronym": domain_obj.abbreviated_title,
+            "title": domain_obj.titles.title_fr,
+            "title_english": domain_obj.titles.title_en,
+            "credits": domain_obj.credits,
+            "constraint_type": domain_obj.content_constraint.type.name,
+            "min_constraint": domain_obj.content_constraint.minimum,
+            "max_constraint": domain_obj.content_constraint.maximum,
+            "management_entity": self.management_entity_version.entity.id,
+            "main_teaching_campus": self.campus.id,
+        }
+
+        actual_values = model_to_dict(
+            db_education_group_year,
+            fields=(
+                "academic_year", "partial_acronym", "education_group_type", "acronym", "title", "title_english",
+                "credits", "constraint_type", "min_constraint", "max_constraint", "management_entity",
+                "main_teaching_campus"
+            )
         )
         self.assertDictEqual(expected_values, actual_values)
 

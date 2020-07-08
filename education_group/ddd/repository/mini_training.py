@@ -32,6 +32,8 @@ from base.models.entity_version import EntityVersion as EntityVersionModelDb
 from education_group.ddd.domain import mini_training
 from education_group.models.group import Group as GroupModelDb
 from education_group.models.group_year import GroupYear as GroupYearModelDb
+from base.models.education_group_year import EducationGroupYear as EducationGroupYearModelDb
+from base.models.education_group import EducationGroup as EducationGroupModelDb
 from program_management.models.education_group_version import EducationGroupVersion as EducationGroupVersionModelDb
 from osis_common.ddd import interface
 from osis_common.ddd.interface import Entity, EntityIdentity
@@ -71,8 +73,31 @@ class MiniTrainingRepository(interface.AbstractRepository):
             main_teaching_campus=teaching_campus,
         )
 
+        education_group = EducationGroupModelDb.objects.create(
+            start_year=start_year,
+            end_year=end_year
+        )
+
+        offer = EducationGroupYearModelDb.objects.create(
+            education_group=education_group,
+            academic_year=start_year,
+            partial_acronym=mini_training_obj.code,
+            education_group_type=education_group_type,
+            acronym=mini_training_obj.abbreviated_title,
+            title=mini_training_obj.titles.title_fr,
+            title_english=mini_training_obj.titles.title_en,
+            credits=mini_training_obj.credits,
+            constraint_type=mini_training_obj.content_constraint.type.name
+            if mini_training_obj.content_constraint.type else None,
+            min_constraint=mini_training_obj.content_constraint.minimum,
+            max_constraint=mini_training_obj.content_constraint.maximum,
+            management_entity_id=management_entity.entity_id,
+            main_teaching_campus=teaching_campus,
+        )
+
         version = EducationGroupVersionModelDb.objects.create(
             root_group=mini_training_db_obj,
+            offer=offer,
             is_transition=False,
             version_name="",
             title_en=mini_training_obj.titles.title_en,

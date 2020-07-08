@@ -24,6 +24,7 @@
 
 from django.db import transaction
 
+from education_group import publisher
 from education_group.ddd import command
 from education_group.ddd.domain import mini_training
 from education_group.ddd.repository.mini_training import MiniTrainingRepository
@@ -35,4 +36,6 @@ from education_group.ddd.repository.mini_training import MiniTrainingRepository
 def create_orphan_mini_training(cmd: command.CreateOrphanMiniTrainingCommand) -> 'mini_training.MiniTrainingIdentity':
     mini_training_object = mini_training.MiniTrainingBuilder.build_from_create_cmd(cmd)
     mini_training_identity = MiniTrainingRepository.create(mini_training_object)
+
+    publisher.mini_training_created.send(None, mini_training_identity=mini_training_identity)
     return mini_training_identity

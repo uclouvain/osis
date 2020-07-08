@@ -128,6 +128,11 @@ class MiniTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
             return self.cleaned_data['academic_year'].year
         return None
 
+    def clean_end_year(self):
+        if self.cleaned_data['end_year']:
+            return self.cleaned_data['end_year'].year
+        return None
+
     def clean_teaching_campus(self):
         if self.cleaned_data['teaching_campus']:
             return {
