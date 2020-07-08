@@ -6,6 +6,10 @@ class TrainingNotFoundException(Exception):
     pass
 
 
+class MiniTrainingNotFoundException(Exception):
+    pass
+
+
 class GroupNotFoundException(Exception):
     pass
 

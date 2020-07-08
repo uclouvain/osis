@@ -37,6 +37,12 @@ class GetGroupCommand(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True)
+class GetMiniTrainingCommand(interface.CommandRequest):
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
 class CreateOrphanMiniTrainingCommand(interface.CommandRequest):
     code = attr.ib(type=str)
     year = attr.ib(type=int)

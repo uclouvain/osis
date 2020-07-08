@@ -23,13 +23,24 @@
 # ############################################################################
 from typing import Optional, List
 
+from django.db.models import Prefetch, Subquery, OuterRef
 from django.utils import timezone
 
 from base.models.academic_year import AcademicYear as AcademicYearModelDb
 from base.models.campus import Campus as CampusModelDb
 from base.models.education_group_type import EducationGroupType as EducationGroupTypeModelDb
 from base.models.entity_version import EntityVersion as EntityVersionModelDb
-from education_group.ddd.domain import mini_training
+from base.models.entity import Entity as EntityModelDb
+from base.models.enums.active_status import ActiveStatusEnum
+from base.models.enums.constraint_type import ConstraintTypeEnum
+from base.models.enums.education_group_types import MiniTrainingType
+from base.models.enums.schedule_type import ScheduleTypeEnum
+from education_group.ddd.domain import mini_training, exception
+from education_group.ddd.domain._campus import Campus
+from education_group.ddd.domain._content_constraint import ContentConstraint
+from education_group.ddd.domain._remark import Remark
+from education_group.ddd.domain._titles import Titles
+from education_group.ddd.domain._entity import Entity as EntityValueObject
 from education_group.models.group import Group as GroupModelDb
 from education_group.models.group_year import GroupYear as GroupYearModelDb
 from base.models.education_group_year import EducationGroupYear as EducationGroupYearModelDb
@@ -43,7 +54,8 @@ class MiniTrainingRepository(interface.AbstractRepository):
     @classmethod
     def create(cls, mini_training_obj: mini_training.MiniTraining) -> mini_training.MiniTrainingIdentity:
         start_year = AcademicYearModelDb.objects.get(year=mini_training_obj.year)
-        end_year = AcademicYearModelDb.objects.get(year=mini_training_obj.end_year) if mini_training_obj.end_year else None
+        end_year = AcademicYearModelDb.objects.get(year=mini_training_obj.end_year) \
+            if mini_training_obj.end_year else None
         education_group_type = EducationGroupTypeModelDb.objects.only('id').get(name=mini_training_obj.type.name)
         management_entity = EntityVersionModelDb.objects.current(timezone.now()).only('entity_id').get(
             acronym=mini_training_obj.management_entity.acronym,
@@ -66,7 +78,8 @@ class MiniTrainingRepository(interface.AbstractRepository):
             title_fr=mini_training_obj.titles.title_fr,
             title_en=mini_training_obj.titles.title_en,
             credits=mini_training_obj.credits,
-            constraint_type=mini_training_obj.content_constraint.type.name if mini_training_obj.content_constraint.type else None,
+            constraint_type=mini_training_obj.content_constraint.type.name
+            if mini_training_obj.content_constraint.type else None,
             min_constraint=mini_training_obj.content_constraint.minimum,
             max_constraint=mini_training_obj.content_constraint.maximum,
             management_entity_id=management_entity.entity_id,
@@ -93,6 +106,8 @@ class MiniTrainingRepository(interface.AbstractRepository):
             max_constraint=mini_training_obj.content_constraint.maximum,
             management_entity_id=management_entity.entity_id,
             main_teaching_campus=teaching_campus,
+            schedule_type=mini_training_obj.schedule_type.name,
+            active=mini_training_obj.status.name
         )
 
         version = EducationGroupVersionModelDb.objects.create(
@@ -114,8 +129,65 @@ class MiniTrainingRepository(interface.AbstractRepository):
         pass
 
     @classmethod
-    def get(cls, entity_id: EntityIdentity) -> Entity:
-        pass
+    def get(cls, entity_id: mini_training.MiniTrainingIdentity) -> mini_training.MiniTraining:
+        try:
+            version = EducationGroupVersionModelDb.objects.filter(
+                root_group__partial_acronym=entity_id.code,
+                root_group__academic_year__year=entity_id.year
+            ).select_related(
+                "offer",
+                "root_group",
+                "root_group__academic_year",
+                "root_group__group__start_year",
+                "root_group__group__end_year",
+                "root_group__education_group_type",
+                "root_group__main_teaching_campus__organization"
+            ).prefetch_related(
+                Prefetch(
+                    'root_group__management_entity',
+                    EntityModelDb.objects.all().annotate(
+                        most_recent_acronym=Subquery(
+                            EntityVersionModelDb.objects.filter(
+                                entity__id=OuterRef('pk')
+                            ).order_by('-start_date').values('acronym')[:1]
+                        )
+                    )
+                ),
+            ).get()
+        except EducationGroupVersionModelDb.DoesNotExist:
+            raise exception.MiniTrainingNotFoundException
+        return mini_training.MiniTraining(
+            entity_identity=entity_id,
+            unannualized_identity=mini_training.MiniTrainingUnannualizedIdentity(uuid=version.root_group.group_id),
+            type=_convert_type(version.root_group.education_group_type),
+            abbreviated_title=version.root_group.acronym,
+            titles=Titles(
+                title_fr=version.root_group.title_fr,
+                title_en=version.root_group.title_en,
+            ),
+            credits=version.root_group.credits,
+            content_constraint=ContentConstraint(
+                type=ConstraintTypeEnum[version.root_group.constraint_type]
+                if version.root_group.constraint_type else None,
+                minimum=version.root_group.min_constraint,
+                maximum=version.root_group.max_constraint,
+            ),
+            management_entity=EntityValueObject(
+                acronym=version.root_group.management_entity.most_recent_acronym,
+            ),
+            teaching_campus=Campus(
+                name=version.root_group.main_teaching_campus.name,
+                university_name=version.root_group.main_teaching_campus.organization.name,
+            ),
+            remark=Remark(
+                text_fr=version.root_group.remark_fr,
+                text_en=version.root_group.remark_en
+            ),
+            start_year=version.root_group.group.start_year.year,
+            end_year=version.root_group.group.end_year.year if version.root_group.group.end_year else None,
+            schedule_type=ScheduleTypeEnum[version.offer.schedule_type] if version.offer.schedule_type else None,
+            status=ActiveStatusEnum[version.offer.active] if version.offer.active else None
+        )
 
     @classmethod
     def search(cls, entity_ids: Optional[List[EntityIdentity]] = None, **kwargs) -> List[Entity]:
@@ -125,3 +197,8 @@ class MiniTrainingRepository(interface.AbstractRepository):
     def delete(cls, entity_id: EntityIdentity) -> None:
         pass
 
+
+def _convert_type(education_group_type):
+    if education_group_type.name in MiniTrainingType.get_names():
+        return MiniTrainingType[education_group_type.name]
+    raise Exception('Unsupported group type')

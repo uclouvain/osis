@@ -30,6 +30,7 @@ from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.education_group_type import MiniTrainingEducationGroupTypeFactory
 from base.tests.factories.entity_version import EntityVersionFactory
+from education_group.ddd.domain import exception
 from education_group.ddd.domain._campus import Campus
 from education_group.ddd.domain._entity import Entity as EntityValueObject
 from education_group.ddd.domain.mini_training import MiniTrainingIdentity, MiniTraining
@@ -37,6 +38,7 @@ from education_group.ddd.repository import mini_training
 from education_group.models import group_year, group
 from education_group.tests.factories.mini_training import MiniTrainingFactory
 from program_management.models import education_group_version
+from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 
 
 class TestMiniTrainingRepositoryCreateMethod(TestCase):
@@ -159,5 +161,26 @@ class TestMiniTrainingRepositoryCreateMethod(TestCase):
         )
         self.assertDictEqual(expected_values, actual_values)
 
+
+class TestMiniTrainingRepositoryGetMethod(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.version = EducationGroupVersionFactory(root_group__education_group_type__minitraining=True)
+
+    def test_should_raise_mini_training_not_found_exception_when_matching_mini_training_does_not_exist(self):
+        inexistent_mini_training_identity = MiniTrainingIdentity(code="INEXISTENT", year=2025)
+        with self.assertRaises(exception.MiniTrainingNotFoundException):
+            mini_training.MiniTrainingRepository.get(inexistent_mini_training_identity)
+
+    def test_should_return_domain_object_when_matching_mini_training_found(self):
+        existing_mini_training_identity = MiniTrainingIdentity(
+            code=self.version.root_group.partial_acronym,
+            year=self.version.root_group.academic_year.year
+        )
+        result = mini_training.MiniTrainingRepository.get(existing_mini_training_identity)
+        self.assertEqual(
+            result.entity_id,
+            existing_mini_training_identity
+        )
 
 

@@ -31,6 +31,7 @@ from django.utils.translation import gettext_lazy as _
 from base.business.event_perms import EventPermEducationGroupEdition
 from base.forms.common import ValidationRuleMixin
 from base.forms.utils.choice_field import BLANK_CHOICE
+from base.models import campus
 from base.models.academic_year import AcademicYear
 from base.models.enums import active_status, schedule_type as schedule_type_enum
 from base.models.enums.constraint_type import ConstraintTypeEnum
@@ -42,7 +43,12 @@ from rules_management.mixins import PermissionFieldMixin
 #  TODO set academic year greater or equal than current academic year or based on calendar
 class MiniTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     code = forms.CharField(max_length=15, label=_("Code"), required=False)
-    academic_year = forms.ModelChoiceField(queryset=AcademicYear.objects.all(), label=_("Validity"), empty_label=None)
+    academic_year = forms.ModelChoiceField(
+        queryset=AcademicYear.objects.all(),
+        label=_("Validity"),
+        empty_label=None,
+        to_field_name="year"
+    )
     end_year = forms.ModelChoiceField(
         queryset=AcademicYear.objects.all(),
         label=_('Last year of organization'),
@@ -81,7 +87,12 @@ class MiniTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         widget=forms.TextInput
     )
     management_entity = forms.CharField(required=False)  # TODO: Replace with select2 widget
-    teaching_campus = fields.MainCampusChoiceField(queryset=None, label=_("Learning location"))
+    teaching_campus = fields.MainCampusChoiceField(
+        queryset=None,
+        label=_("Learning location"),
+        to_field_name="name",
+        initial=campus.LOUVAIN_LA_NEUVE_CAMPUS_NAME
+    )
     remark_fr = forms.CharField(widget=forms.Textarea, label=_("Remark"), required=False)
     remark_en = forms.CharField(widget=forms.Textarea, label=_("remark in english"), required=False)
 
@@ -108,6 +119,7 @@ class MiniTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
             person=self.user.person,
             initial=None,
             disabled=self.fields['management_entity'].disabled,
+            to_field_name="acronym"
         )
 
     # ValidationRuleMixin

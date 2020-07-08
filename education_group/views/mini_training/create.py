@@ -29,10 +29,14 @@ from django.views.generic import FormView
 from django.utils.translation import gettext_lazy as _
 from rules.contrib.views import LoginRequiredMixin
 
+from base.models import entity_version
+from base.models.academic_year import starting_academic_year
 from base.models.enums.education_group_types import MiniTrainingType
+from base.utils.cache import RequestCache
 from base.views.common import display_success_messages
 from education_group.ddd import command
 from education_group.ddd.domain import mini_training
+from education_group.ddd.service.read import mini_training_service, group_service
 from education_group.ddd.service.write import create_mini_training_service
 from education_group.forms import mini_training as mini_training_form
 from education_group.templatetags.academic_year_display import display_as_academic_year
@@ -55,6 +59,7 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
         form_kwargs = super().get_form_kwargs()
         form_kwargs["user"] = self.request.user
         form_kwargs["mini_training_type"] = self.kwargs['type']
+        form_kwargs["initial"] = self._get_initial_form()
         return form_kwargs
 
     #  TODO incorporate type in mini training form
@@ -95,6 +100,24 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
         display_success_messages(self.request, self.get_success_msg(mini_training_identity), extra_tags='safe')
 
         return super().form_valid(form)
+
+    def _get_initial_form(self) -> Dict:
+        request_cache = RequestCache(self.request.user, reverse('version_program'))
+        default_academic_year = request_cache.get_value_cached('academic_year') or starting_academic_year()
+        default_management_entity = None
+
+        parent_identity = self.get_parent_identity()
+        if parent_identity:
+            default_academic_year = parent_identity.year
+            domain_obj = group_service.get_group(
+                command.GetGroupCommand(code=parent_identity.code, year=parent_identity.year)
+            )
+            default_management_entity = domain_obj.management_entity.acronym
+
+        return {
+            'academic_year': default_academic_year,
+            'management_entity': default_management_entity
+        }
 
     def get_tabs(self) -> List:
         return [

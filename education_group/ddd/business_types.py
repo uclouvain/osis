@@ -30,3 +30,4 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from education_group.ddd.domain.training import Training, TrainingIdentity
     from education_group.ddd.domain.group import Group, GroupIdentity
+    from education_group.ddd.domain.mini_training import MiniTraining, MiniTrainingIdentity
