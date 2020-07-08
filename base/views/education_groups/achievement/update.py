@@ -118,7 +118,7 @@ class EducationGroupDetailedAchievementAction(EducationGroupDetailedAchievementM
             return reverse('training_skills_achievements',
                            args=[self.kwargs['year'],
                                  self.kwargs['code']]
-                           ) + '?path={}&tab={}#education_group_detail_achievement_{}'.format(
+                           ) + '?path={}&tab={}#detail_achievements_{}'.format(
                 self.request.GET['path'],
                 Tab.SKILLS_ACHIEVEMENTS,
                 str(self.kwargs['education_group_detail_achievement_pk'])
@@ -127,7 +127,7 @@ class EducationGroupDetailedAchievementAction(EducationGroupDetailedAchievementM
             return reverse('mini_training_skills_achievements',
                            args=[self.kwargs['year'],
                                  self.kwargs['code']]
-                           ) + '?path={}&tab={}#education_group_detail_achievement_{}'.format(
+                           ) + '?path={}&tab={}#detail_achievements_{}'.format(
                 self.request.GET['path'],
                 Tab.SKILLS_ACHIEVEMENTS,
                 str(self.kwargs['education_group_detail_achievement_pk'])

@@ -60,7 +60,7 @@
                     </span>
                 </div>
                 <div class="col-md-11">
-                    <div class="row" id="education_group_achievement_{{ achievement.pk }}">
+                    <div class="row">
                         <div class="col-md-5">
                             {{ achievement.text_fr | safe }}
                         </div>
@@ -76,14 +76,13 @@
                     </div>
                     <br>
                     <!-- Detailed achievements -->
-                    <div id="detail_achievements_{{ forloop.counter }}" class="row collapse in"
-                        style="padding-left: 20px">
+                    <div class="row collapse in"  style="padding-left: 20px">
                         {% for detail_achievement in achievement.detailed_achievements %}
-                             <div class="col-md-1">
+                             <div class="col-md-1" id="detail_achievements_{{ detail_achievement.pk }}">
                                  <strong>{{ detail_achievement.code_name }}</strong>
                              </div>
                              <div class="col-md-11">
-                                <div class="row" id="education_group_detail_achievement_{{ detail_achievement.pk }}">
+                                <div class="row">
                                     <div class="col-md-5">
                                         {{ detail_achievement.text_fr | safe }}
                                     </div>
