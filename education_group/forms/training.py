@@ -58,7 +58,7 @@ from education_group.forms import fields
 from reference.models.domain import Domain
 from reference.models.domain_isced import DomainIsced
 from reference.models.enums.domain_type import UNIVERSITY
-from reference.models.language import Language
+from reference.models.language import Language, FR_CODE_LANGUAGE
 from rules_management.enums import GROUP_PGRM_ENCODING_PERIOD, GROUP_DAILY_MANAGEMENT, TRAINING_PGRM_ENCODING_PERIOD, \
     TRAINING_DAILY_MANAGEMENT
 from rules_management.mixins import PermissionFieldMixin
@@ -124,7 +124,7 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     )
     internship = forms.ChoiceField(
         initial=InternshipPresence.NO.value,
-        choices=BLANK_CHOICE + list(InternshipPresence.choices()),
+        choices=sorted(list(InternshipPresence.choices()), key=lambda c: c[1]),
         label=_("Internship"),
     )
     is_enrollment_enabled = forms.BooleanField(initial=False, label=_('Enrollment enabled'), required=False)
@@ -144,6 +144,7 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         required=False,
     )
     main_language = forms.ModelChoiceField(  # FIXME :: to replace by choice field (to prevent link to DB model)
+        initial=Language.objects.all().get(code=FR_CODE_LANGUAGE),
         queryset=Language.objects.all().order_by('name'),
         label=_('Primary language'),
     )
@@ -158,7 +159,8 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         required=False,
     )
     main_domain = forms.ModelChoiceField(
-        queryset=Domain.objects.filter(type=UNIVERSITY).select_related('decree')
+        queryset=Domain.objects.filter(type=UNIVERSITY).select_related('decree'),
+        required=False,
     )
     secondary_domains = AutoCompleteSelectMultipleField(
         'university_domains',
