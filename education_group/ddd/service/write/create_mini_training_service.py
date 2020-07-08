@@ -31,7 +31,6 @@ from education_group.ddd.repository.mini_training import MiniTrainingRepository
 
 
 # TODO : Implement Validator (Actually in GroupFrom via ValidationRules)
-# TODO implement signal
 @transaction.atomic()
 def create_orphan_mini_training(cmd: command.CreateOrphanMiniTrainingCommand) -> 'mini_training.MiniTrainingIdentity':
     mini_training_object = mini_training.MiniTrainingBuilder.build_from_create_cmd(cmd)

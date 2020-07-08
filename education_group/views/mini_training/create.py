@@ -37,7 +37,9 @@ from education_group.ddd.service.write import create_mini_training_service
 from education_group.forms import mini_training as mini_training_form
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from osis_role.contrib.views import PermissionRequiredMixin
-from program_management.ddd.domain.program_tree import Path
+from program_management.ddd.business_types import *
+from program_management.ddd import command as command_pgrm
+from program_management.ddd.service.read import node_identity_service
 
 
 class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormView):
@@ -61,6 +63,7 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
         context["mini_training_form"] = context["form"]
         context["tabs"] = self.get_tabs()
         context["type_text"] = MiniTrainingType.get_value(self.kwargs['type'])
+        context["cancel_url"] = self.get_cancel_url()
         return context
 
     def form_valid(self, form: mini_training_form.MiniTrainingForm) -> response.HttpResponseBase:
@@ -103,7 +106,7 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
             }
         ]
 
-    def get_attach_path(self) -> Optional[Path]:
+    def get_attach_path(self) -> Optional['Path']:
         return self.request.GET.get('path_to') or None
 
     def set_success_url(self, mini_training_identity: mini_training.MiniTrainingIdentity) -> None:
@@ -125,3 +128,21 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
             "code": mini_training_identity.code,
             "academic_year": display_as_academic_year(mini_training_identity.year),
         }
+
+    def get_cancel_url(self) -> str:
+        if self.get_attach_path():
+            parent_identity = self.get_parent_identity()
+            return reverse(
+                'element_identification',
+                kwargs={'code': parent_identity.code, 'year': parent_identity.year}
+            ) + "?path={}".format(self.get_attach_path())
+        return reverse('version_program')
+
+    def get_parent_identity(self) -> Optional['NodeIdentity']:
+        if self.get_attach_path():
+            cmd_get_node_id = command_pgrm.GetNodeIdentityFromElementId(
+                int(self.get_attach_path().split('|')[-1])
+            )
+            parent_id = node_identity_service.get_node_identity_from_element_id(cmd_get_node_id)
+            return parent_id
+        return None
