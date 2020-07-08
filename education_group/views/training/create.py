@@ -9,7 +9,6 @@ from django.views.generic.base import View
 
 from base.models.academic_year import starting_academic_year
 from base.models.campus import Campus
-from base.models.entity_version import find_entity_version_according_academic_year
 from base.models.enums.education_group_types import GroupType, TrainingType
 from base.utils.cache import RequestCache
 from base.views.common import display_success_messages
