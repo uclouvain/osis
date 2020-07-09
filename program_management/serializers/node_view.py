@@ -35,6 +35,7 @@ from base.utils.urls import reverse_with_get
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.program_tree import PATH_SEPARATOR
 from program_management.models.enums.node_type import NodeType
+from program_management.ddd.domain.node import NodeIdentity
 
 
 def serialize_children(children: List['Link'], path: str, context=None) -> List[dict]:
@@ -44,7 +45,7 @@ def serialize_children(children: List['Link'], path: str, context=None) -> List[
         if link.child.is_learning_unit():
             serialized_node = _leaf_view_serializer(link, child_path, context=context)
         else:
-            serialized_node = _get_node_view_serializer(link, child_path, context=context)
+            serialized_node = _get_node_view_serializer(link, child_path, context)
         serialized_children.append(serialized_node)
     return serialized_children
 
@@ -110,11 +111,22 @@ def __get_title(obj: 'Link') -> str:
 
 
 def _get_node_view_serializer(link: 'Link', path: str, context=None) -> dict:
+    version_label = None
+    mini_training_tree_versions = context.get('mini_training_tree_versions')
+    if mini_training_tree_versions:
+        for t in mini_training_tree_versions.get(NodeIdentity(link.child.code, link.child.year), []):
+            if t.get_tree().root_node.pk == link.child.node_id:
+                version_label = t.version_label
+                break
     return {
         'id': path,
         'path': path,
         'icon': _get_group_node_icon(link),
-        'text': '%(code)s - %(title)s' % {'code': link.child.code, 'title': link.child.title},
+        'text': '%(code)s - %(title)s%(version)s' %
+                {'code': link.child.code,
+                 'title': link.child.title,
+                 'version': ' [%(version_label)s]' % {'version_label': version_label} if version_label else ''
+                 },
         'children': serialize_children(
             children=link.child.children,
             path=path,
