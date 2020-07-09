@@ -152,7 +152,7 @@ def _get_admission_condition_success_url(year: int, acronym: str):
     return reverse('education_group_read_proxy', args=[year, acronym]) + '?tab={}'.format(Tab.ADMISSION_CONDITION)
 
 
-def get_content_of_admission_condition_line(message, admission_condition_line: AdmissionConditionLine, lang: str):
+def get_content_of_admission_condition_line(message: str, admission_condition_line: AdmissionConditionLine, lang: str):
     return {
         'message': message,
         'section': admission_condition_line.section,
@@ -179,7 +179,7 @@ def education_group_year_admission_condition_update_line_post(request, education
     return redirect(_get_admission_condition_success_url(training_identity.year, training_identity.acronym))
 
 
-def save_form_to_admission_condition_line(education_group_year_id: int, creation_mode, form):
+def save_form_to_admission_condition_line(education_group_year_id: int, creation_mode: bool, form: UpdateLineForm):
     admission_condition_line_id = form.cleaned_data['admission_condition_line']
     language = form.cleaned_data['language']
     lang = '' if language == 'fr-be' else '_en'
