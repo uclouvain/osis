@@ -70,6 +70,7 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
         context["cancel_url"] = self.get_cancel_url()
         return context
 
+    #  TODO exceptions catching
     def form_valid(self, form: mini_training_form.MiniTrainingForm) -> response.HttpResponseBase:
         if self.get_attach_path():
             create_and_paste_command = command_pgrm.CreateMiniTrainingAndPasteCommand(
