@@ -295,7 +295,7 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
             self.fields['diploma_printing_title'].required = False
 
     def is_valid(self):
-        valid = super(CreateTrainingForm, self).is_valid()
+        valid = super().is_valid()
 
         hops_fields_values = [self.cleaned_data.get(hops_field) for hops_field in self.hops_fields]
         if any(hops_fields_values) and not all(hops_fields_values):
