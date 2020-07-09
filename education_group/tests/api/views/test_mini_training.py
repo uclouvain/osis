@@ -44,8 +44,7 @@ from education_group.api.serializers.mini_training import MiniTrainingDetailSeri
 from education_group.api.views.mini_training import MiniTrainingList
 from education_group.api.views.mini_training import OfferRoots
 from education_group.tests.factories.group_year import GroupYearFactory
-from program_management.tests.factories.education_group_version import EducationGroupVersionFactory, \
-    StandardEducationGroupVersionFactory
+from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementFactory
 
 
@@ -55,11 +54,11 @@ class MiniTrainingTitleTestCase(APITestCase):
         anac = AcademicYearFactory()
 
         cls.egy = MiniTrainingFactory(academic_year=anac)
-        cls.version = EducationGroupVersionFactory(offer=cls.egy)
+        cls.version = StandardEducationGroupVersionFactory(offer=cls.egy, is_transition=False)
         cls.person = PersonFactory()
         cls.url = reverse('education_group_api_v1:minitrainingstitle_read', kwargs={
-            'partial_acronym': cls.version.root_group.partial_acronym,
-            'year': cls.egy.academic_year.year
+            'official_partial_acronym': cls.version.root_group.partial_acronym,
+            'year': cls.version.root_group.academic_year.year
         })
 
     def setUp(self):
@@ -80,7 +79,7 @@ class MiniTrainingTitleTestCase(APITestCase):
 
     def test_get_results_case_education_group_year_not_found(self):
         invalid_url = reverse('education_group_api_v1:minitrainingstitle_read', kwargs={
-            'partial_acronym': 'ACRO',
+            'official_partial_acronym': 'ACRO',
             'year': 2019
         })
         response = self.client.get(invalid_url)
@@ -117,7 +116,7 @@ class MiniTrainingListTestCase(APITestCase):
             )
 
             cls.mini_trainings.append(mini_training)
-            cls.versions.append(EducationGroupVersionFactory(
+            cls.versions.append(StandardEducationGroupVersionFactory(
                 root_group=mini_training,
                 offer=offer
             ))
@@ -302,7 +301,7 @@ class OfferRootsTestCase(APITestCase):
 
         cls.user = UserFactory()
         cls.url = reverse('education_group_api_v1:' + OfferRoots.name, kwargs={
-            'partial_acronym': cls.minor.partial_acronym,
+            'official_partial_acronym': cls.minor.partial_acronym,
             'year': cls.academic_year.year
         })
 

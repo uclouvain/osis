@@ -143,7 +143,7 @@ class MiniTrainingTitle(LanguageContextSerializerMixin, generics.RetrieveAPIView
     serializer_class = EducationGroupTitleSerializer
 
     def get_object(self):
-        acronym = self.kwargs['partial_acronym']
+        acronym = self.kwargs['official_partial_acronym']
         year = self.kwargs['year']
         version_name = self.kwargs.get('version_name', '')
 
@@ -153,8 +153,8 @@ class MiniTrainingTitle(LanguageContextSerializerMixin, generics.RetrieveAPIView
                 'offer__academic_year',
                 'root_group'
             ),
-            offer__partial_acronym__iexact=acronym,
-            offer__academic_year__year=year,
+            root_group__partial_acronym__iexact=acronym,
+            root_group__academic_year__year=year,
             version_name=version_name
         )
         return egv
@@ -168,7 +168,7 @@ class OfferRoots(LanguageContextSerializerMixin, generics.ListAPIView):
     serializer_class = TrainingListSerializer
 
     def get_queryset(self):
-        acronym = self.kwargs['partial_acronym']
+        acronym = self.kwargs['official_partial_acronym']
         year = self.kwargs['year']
         element = get_object_or_404(
             Element.objects.all().select_related(

@@ -196,8 +196,8 @@ class MiniTrainingTreeViewTestCase(APITestCase):
         cls.mini_training_version = StandardEducationGroupVersionFactory(
             offer=cls.mini_training,
             root_group__education_group_type=cls.mini_training.education_group_type,
-            root_group__partial_acronym='LBIOL212O',
-            root_group__academic_year=cls.academic_year,
+            root_group__partial_acronym=cls.mini_training.partial_acronym,
+            root_group__academic_year=cls.academic_year
         )
         cls.mini_training_element = ElementFactory(group_year=cls.mini_training_version.root_group)
         cls.common_core = GroupYearFactory(
@@ -216,8 +216,8 @@ class MiniTrainingTreeViewTestCase(APITestCase):
 
         cls.person = PersonFactory()
         url_kwargs = {
-            'partial_acronym': cls.mini_training_version.root_group.partial_acronym,
-            'year': cls.mini_training.academic_year.year
+            'official_partial_acronym': cls.mini_training_version.root_group.partial_acronym,
+            'year': cls.mini_training_version.root_group.academic_year.year
         }
         cls.url = reverse('education_group_api_v1:' + MiniTrainingTreeView.name, kwargs=url_kwargs)
 
@@ -240,7 +240,7 @@ class MiniTrainingTreeViewTestCase(APITestCase):
     def test_get_mini_training_not_found(self):
         invalid_url = reverse(
             'education_group_api_v1:' + MiniTrainingTreeView.name,
-            kwargs={'partial_acronym': 'LDROI100O', 'year': 2018}
+            kwargs={'official_partial_acronym': 'LDROI100O', 'year': 2018}
         )
         response = self.client.get(invalid_url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
@@ -259,7 +259,7 @@ class MiniTrainingTreeViewTestCase(APITestCase):
 
     def test_get_result_with_lowercase_acronym(self):
         url_kwargs = {
-            'partial_acronym': self.mini_training_version.root_group.partial_acronym.lower(),
+            'official_partial_acronym': self.mini_training_version.root_group.partial_acronym.lower(),
             'year': self.mini_training.academic_year.year
         }
         url = reverse('education_group_api_v1:' + MiniTrainingTreeView.name, kwargs=url_kwargs)
