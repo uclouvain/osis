@@ -93,15 +93,7 @@ class MiniTrainingTreeView(EducationGroupTreeView):
     ).select_related('education_group_year')
 
     def get_object(self):
-        queryset = self.filter_queryset(self.get_queryset())
-        version_name = self.kwargs.pop('version_name', '')
-        filter_kwargs = {
-            lookup_field: self.kwargs[lookup_url_kwarg]
-            for lookup_field, lookup_url_kwarg in zip(self.lookup_fields, self.lookup_url_kwargs)
-        }
-
-        element_standard = self.get_element_standard(filter_kwargs, queryset)
-        version = self.get_mini_training_version(element_standard, version_name)
+        version = self.get_mini_training_version()
 
         element = get_object_or_404(
             Element.objects.annotate(
@@ -115,16 +107,21 @@ class MiniTrainingTreeView(EducationGroupTreeView):
         tree = load_tree.load(element.id)
         return link.factory.get_link(parent=None, child=tree.root_node)
 
-    @staticmethod
-    def get_element_standard(filter_kwargs, queryset):
+    def get_element_standard(self):
+        queryset = self.filter_queryset(self.get_queryset())
+        filter_kwargs = {
+            lookup_field: self.kwargs[lookup_url_kwarg]
+            for lookup_field, lookup_url_kwarg in zip(self.lookup_fields, self.lookup_url_kwargs)
+        }
         return get_object_or_404(
             queryset,
             **filter_kwargs,
             group_year__educationgroupversion__version_name=''
         )
 
-    @staticmethod
-    def get_mini_training_version(element_standard, version_name):
+    def get_mini_training_version(self):
+        element_standard = self.get_element_standard()
+        version_name = self.kwargs.pop('version_name', '')
         main_offer = element_standard.group_year.educationgroupversion.offer
         return get_object_or_404(
             main_offer.educationgroupversion_set,
