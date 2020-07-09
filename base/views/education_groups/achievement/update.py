@@ -80,15 +80,14 @@ class EducationGroupAchievementAction(EducationGroupAchievementMixin, FormView):
                 Tab.SKILLS_ACHIEVEMENTS,
                 self.kwargs['education_group_achievement_pk']
             )
-        else:
-            return reverse('mini_training_skills_achievements',
-                           args=[self.kwargs['year'],
-                                 self.kwargs['code']]
-                           ) + '?path={}&tab={}#achievement_{}'.format(
-                self.request.GET['path'],
-                Tab.SKILLS_ACHIEVEMENTS,
-                self.kwargs['education_group_achievement_pk']
-            )
+        return reverse('mini_training_skills_achievements',
+                       args=[self.kwargs['year'],
+                             self.kwargs['code']]
+                       ) + '?path={}&tab={}#achievement_{}'.format(
+            self.request.GET['path'],
+            Tab.SKILLS_ACHIEVEMENTS,
+            self.kwargs['education_group_achievement_pk']
+        )
 
 
 class UpdateEducationGroupAchievement(PermissionRequiredMixin, AjaxTemplateMixin, EducationGroupAchievementMixin,
@@ -123,15 +122,14 @@ class EducationGroupDetailedAchievementAction(EducationGroupDetailedAchievementM
                 Tab.SKILLS_ACHIEVEMENTS,
                 self.kwargs['education_group_detail_achievement_pk']
             )
-        else:
-            return reverse('mini_training_skills_achievements',
-                           args=[self.kwargs['year'],
-                                 self.kwargs['code']]
-                           ) + '?path={}&tab={}#detail_achievements_{}'.format(
-                self.request.GET['path'],
-                Tab.SKILLS_ACHIEVEMENTS,
-                self.kwargs['education_group_detail_achievement_pk']
-            )
+        return reverse('mini_training_skills_achievements',
+                       args=[self.kwargs['year'],
+                             self.kwargs['code']]
+                       ) + '?path={}&tab={}#detail_achievements_{}'.format(
+            self.request.GET['path'],
+            Tab.SKILLS_ACHIEVEMENTS,
+            self.kwargs['education_group_detail_achievement_pk']
+        )
 
 
 class EducationGroupAchievementCMS(PermissionRequiredMixin, SuccessMessageMixin, AjaxTemplateMixin, FormView):

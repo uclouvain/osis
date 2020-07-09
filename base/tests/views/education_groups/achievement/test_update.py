@@ -58,10 +58,9 @@ class TestEducationGroupAchievementActionUpdateDelete(TestCase):
 
         cls.person = PersonFactory()
         CentralManagerFactory(person=cls.person, entity=cls.education_group_year.management_entity)
-        permission_delete = Permission.objects.get(codename='delete_educationgroupachievement')
-        cls.person.user.user_permissions.add(permission_delete)
-        permission_update = Permission.objects.get(codename='change_educationgroupachievement')
-        cls.person.user.user_permissions.add(permission_update)
+        for perm_name in ['delete_educationgroupachievement', 'change_educationgroupachievement']:
+            perm = Permission.objects.get(codename=perm_name)
+            cls.person.user.user_permissions.add(perm)
 
     def setUp(self):
         self.client.force_login(self.person.user)

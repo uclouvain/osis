@@ -57,15 +57,14 @@ class CreateEducationGroupAchievement(PermissionRequiredMixin, AjaxTemplateMixin
                 Tab.SKILLS_ACHIEVEMENTS,
                 str(self.object.pk)
             )
-        else:
-            return reverse('mini_training_skills_achievements',
-                           args=[self.kwargs['year'],
-                                 self.kwargs['code']]
-                           ) + '?path={}&tab={}#achievement_{}'.format(
-                self.request.POST['path'],
-                Tab.SKILLS_ACHIEVEMENTS,
-                str(self.object.pk)
-            )
+        return reverse('mini_training_skills_achievements',
+                       args=[self.kwargs['year'],
+                             self.kwargs['code']]
+                       ) + '?path={}&tab={}#achievement_{}'.format(
+            self.request.POST['path'],
+            Tab.SKILLS_ACHIEVEMENTS,
+            str(self.object.pk)
+        )
 
 
 class CreateEducationGroupDetailedAchievement(PermissionRequiredMixin, AjaxTemplateMixin,
@@ -91,12 +90,11 @@ class CreateEducationGroupDetailedAchievement(PermissionRequiredMixin, AjaxTempl
                 Tab.SKILLS_ACHIEVEMENTS,
                 self.object.pk
             )
-        else:
-            return reverse('mini_training_skills_achievements',
-                           args=[self.kwargs['year'],
-                                 self.kwargs['code']]
-                           ) + '?path={}&tab={}#detail_achievements_{}'.format(
-                self.request.POST['path'],
-                Tab.SKILLS_ACHIEVEMENTS,
-                self.object.pk
-            )
+        return reverse('mini_training_skills_achievements',
+                       args=[self.kwargs['year'],
+                             self.kwargs['code']]
+                       ) + '?path={}&tab={}#detail_achievements_{}'.format(
+            self.request.POST['path'],
+            Tab.SKILLS_ACHIEVEMENTS,
+            self.object.pk
+        )
