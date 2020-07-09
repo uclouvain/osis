@@ -53,11 +53,7 @@ class EducationGroupTreeView(LanguageContextSerializerMixin, generics.RetrieveAP
             group_year__educationgroupversion__version_name=''
         )
         if element_standard.group_year.is_mini_training:
-            main_offer = element_standard.group_year.educationgroupversion.offer
-            version = get_object_or_404(
-                main_offer.educationgroupversion_set,
-                version_name=version_name
-            )
+            version = self.get_mini_training_version(element_standard, version_name)
             element = get_object_or_404(
                 Element.objects.annotate(
                     education_group_year_obj=F('group_year__educationgroupversion__offer')
@@ -74,6 +70,14 @@ class EducationGroupTreeView(LanguageContextSerializerMixin, generics.RetrieveAP
 
         tree = load_tree.load(element.id)
         return link.factory.get_link(parent=None, child=tree.root_node)
+
+    def get_mini_training_version(self, element_standard, version_name):
+        main_offer = element_standard.group_year.educationgroupversion.offer
+        version = get_object_or_404(
+            main_offer.educationgroupversion_set,
+            version_name=version_name
+        )
+        return version
 
 
 class TrainingTreeView(EducationGroupTreeView):
