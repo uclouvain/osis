@@ -56,4 +56,4 @@ class GroupReadGeneralInformation(GroupRead):
 
     def get_update_label_url(self):
         offer_id = self.get_group_year().pk
-        return reverse('education_group_pedagogy_edit', args=[offer_id, offer_id])
+        return reverse('education_group_pedagogy_edit', args=[offer_id])
