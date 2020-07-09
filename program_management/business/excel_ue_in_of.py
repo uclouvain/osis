@@ -44,6 +44,7 @@ from base.business.learning_units.xls_generator import hyperlinks_to_string
 from base.models.enums.education_group_types import GroupType
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
+from base.models.learning_unit_year import LearningUnitYear
 from learning_unit.ddd.domain.achievement import Achievement
 from learning_unit.ddd.domain.description_fiche import DescriptionFiche
 from learning_unit.ddd.domain.learning_unit_year import LearningUnitYear as DddLearningUnitYear
@@ -172,8 +173,10 @@ def _build_excel_lines_ues(custom_xls_form: CustomXlsForm, tree: 'ProgramTree'):
 
     for path, child_node in tree.root_node.descendents.items():
         if isinstance(child_node, NodeLearningUnitYear):
-            learning_unit_years = load_multiple_by_identity([LearningUnitYearIdentity(code=child_node.code,
-                                                                                      year=child_node.year)])
+            learning_unit_years = load_multiple_by_identity([LearningUnitYearIdentity(
+                code=child_node.code,
+                year=child_node.year
+            )])
 
             if learning_unit_years:
                 luy = learning_unit_years[0]
@@ -182,12 +185,13 @@ def _build_excel_lines_ues(custom_xls_form: CustomXlsForm, tree: 'ProgramTree'):
                 parents_data = get_explore_parents(tree.get_parents(path))
 
                 if not parents_data[EXCLUDE_UE_KEY]:
-                    content.append(_get_optional_data(_fix_data(link, luy, parents_data),
-                                                      luy,
-                                                      optional_data_needed,
-                                                      link))
-                    if luy.proposal and luy.proposal.type:
-                        font_rows[PROPOSAL_LINE_STYLES.get(luy.proposal.type)].append(idx)
+                    content.append(_get_optional_data(
+                        _fix_data(link, luy, parents_data),
+                        luy,
+                        optional_data_needed,
+                        link
+                    ))
+                    font_rows.update(_get_proposal_style(font_rows, luy, idx))
                     idx += 1
 
     return {
@@ -199,6 +203,15 @@ def _build_excel_lines_ues(custom_xls_form: CustomXlsForm, tree: 'ProgramTree'):
              'stop': (len(content)) + 1}
             if optional_data_needed['has_description_fiche'] or optional_data_needed['has_specifications'] else {}
     }
+
+
+def _get_proposal_style(font_rows, luy: LearningUnitYear, idx: int):
+    initial_list = font_rows[PROPOSAL_LINE_STYLES.get(luy.proposal.type)]
+    if luy.proposal and luy.proposal.type:
+        return {
+            PROPOSAL_LINE_STYLES.get(luy.proposal.type): initial_list.append(idx)
+        }
+    return {}
 
 
 def _optional_data(custom_xls_form: CustomXlsForm):
