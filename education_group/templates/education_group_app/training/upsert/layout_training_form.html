@@ -56,8 +56,8 @@
             {% include "education_group/blocks/form/create_cancel_buttons.html" %}
         </div>
     </div>
+    {% include "blocks/modal/confirmation_modal.html" %}
 </form>
 
 {{ training_form.media }}
-
 <script type="text/javascript" src="{% static 'js/education_group/update_training_errors.js' %}"></script>
