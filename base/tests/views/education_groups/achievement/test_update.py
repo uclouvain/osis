@@ -68,7 +68,7 @@ class TestEducationGroupAchievementActionUpdateDelete(TestCase):
     def test_form_valid_up(self):
         response = self.client.post(
             reverse(
-                "education_group_achievements_actions",
+                "training_achievement_actions",
                 args=[
                     self.education_group_year.academic_year.year,
                     self.education_group_year.partial_acronym,
@@ -83,7 +83,7 @@ class TestEducationGroupAchievementActionUpdateDelete(TestCase):
     def test_form_valid_down(self):
         response = self.client.post(
             reverse(
-                "education_group_achievements_actions",
+                "training_achievement_actions",
                 args=[
                     self.education_group_year.academic_year.year,
                     self.education_group_year.partial_acronym,
@@ -98,7 +98,7 @@ class TestEducationGroupAchievementActionUpdateDelete(TestCase):
     def test_form_invalid(self):
         response = self.client.post(
             reverse(
-                "education_group_achievements_actions",
+                "training_achievement_actions",
                 args=[
                     self.education_group_year.academic_year.year,
                     self.education_group_year.partial_acronym,
@@ -115,7 +115,7 @@ class TestEducationGroupAchievementActionUpdateDelete(TestCase):
         code = "The life is like a box of chocolates"
         response = self.client.post(
             reverse(
-                "update_education_group_achievement",
+                "training_achievement_update",
                 args=[
                     self.education_group_year.academic_year.year,
                     self.education_group_year.partial_acronym,
@@ -132,7 +132,7 @@ class TestEducationGroupAchievementActionUpdateDelete(TestCase):
         code = "The life is like a box of chocolates"
         response = self.client.post(
             reverse(
-                "update_education_group_achievement",
+                "training_achievement_update",
                 args=[
                     self.education_group_year.pk,
                     self.education_group_year.pk,
@@ -145,7 +145,7 @@ class TestEducationGroupAchievementActionUpdateDelete(TestCase):
     def test_delete(self):
         response = self.client.post(
             reverse(
-                "delete_education_group_achievement",
+                "training_achievement_delete",
                 args=[
                     self.education_group_year.academic_year.year,
                     self.education_group_year.partial_acronym,
@@ -161,7 +161,7 @@ class TestEducationGroupAchievementActionUpdateDelete(TestCase):
         self.client.force_login(user=UserFactory())
         response = self.client.post(
             reverse(
-                "delete_education_group_achievement",
+                "training_achievement_delete",
                 args=[
                     self.education_group_year.academic_year.year,
                     self.education_group_year.partial_acronym,

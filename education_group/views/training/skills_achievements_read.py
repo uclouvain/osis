@@ -57,7 +57,7 @@ class TrainingReadSkillsAchievements(TrainingRead):
             "additional_information_skills_label": self.get_additional_information_skills_label(),
             "additional_information_skills_update_url": self.get_additional_information_skills_update_url(),
             "url_create": reverse(
-                'create_education_group_achievement',
+                'training_achievement_create',
                 args=[kwargs['year'], kwargs['code']]
             ) + '?path={}&tab={}'.format(self.request.GET['path'], Tab.SKILLS_ACHIEVEMENTS),
         }

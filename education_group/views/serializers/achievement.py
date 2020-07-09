@@ -58,6 +58,7 @@ def get_achievements(node: NodeGroupYear, path: str):
 
 
 def __get_achievement_formated(achievement, node, path):
+    url_names = _get_url_name_achievements(achievement)
     return {
         'pk': achievement.pk,
         'code_name': achievement.code_name,
@@ -65,25 +66,42 @@ def __get_achievement_formated(achievement, node, path):
         'text_en': achievement.english_text,
 
         'url_action': reverse(
-            'education_group_achievements_actions',
+            url_names["url_action"],
             args=[node.year, node.code, achievement.pk]
         ) + '?path={}&tab={}'.format(path, Tab.SKILLS_ACHIEVEMENTS),
 
         'url_update': reverse(
-            'update_education_group_achievement', args=[node.year, node.code, achievement.pk]
+            url_names["url_update"], args=[node.year, node.code, achievement.pk]
         ) + '?path={}&tab={}'.format(path, Tab.SKILLS_ACHIEVEMENTS),
 
         'url_delete': reverse(
-            'delete_education_group_achievement', args=[node.year, node.code, achievement.pk]
+            url_names["url_delete"], args=[node.year, node.code, achievement.pk]
         ) + '?path={}&tab={}'.format(path, Tab.SKILLS_ACHIEVEMENTS),
 
         'url_create': reverse(
-            'create_education_group_detailed_achievement', args=[node.year, node.code, achievement.pk]
+            url_names["url_create"], args=[node.year, node.code, achievement.pk]
         ) + '?path={}&tab={}'.format(path, Tab.SKILLS_ACHIEVEMENTS, achievement.pk)
     }
 
 
+def _get_url_name_achievements(achievement):
+    if achievement.education_group_year.is_training:
+        return {
+            'url_action': "training_"+"achievement_actions",
+            'url_update': "training_"+"achievement_update",
+            'url_delete': "training_"+"achievement_delete",
+            'url_create': "training_"+"detailed_achievement_create"
+        }
+    return {
+        'url_action': "minitraining_"+"achievement_actions",
+        'url_update': "minitraining_"+"achievement_update",
+        'url_delete': "minitraining_"+"achievement_delete",
+        'url_create': "minitraining_"+"detailed_achievement_create"
+    }
+
+
 def __get_detail_achievement_formated(achievement, d_achievement, node, path):
+    url_names = _get_url_name_detail_achievements(achievement)
     return {
         'pk': d_achievement.pk,
         'code_name': d_achievement.code_name,
@@ -91,17 +109,31 @@ def __get_detail_achievement_formated(achievement, d_achievement, node, path):
         'text_en': d_achievement.english_text,
 
         'url_action': reverse(
-            'education_group_detailed_achievements_actions',
+            url_names["url_action"],
             args=[node.year, node.code, achievement.pk, d_achievement.pk]
         ) + '?path={}&tab={}'.format(path, Tab.SKILLS_ACHIEVEMENTS),
 
         'url_update': reverse(
-            'update_education_group_detailed_achievement', args=[node.year, node.code, achievement.pk, d_achievement.pk]
+            url_names["url_update"], args=[node.year, node.code, achievement.pk, d_achievement.pk]
         ) + '?path={}&tab={}'.format(path, Tab.SKILLS_ACHIEVEMENTS),
 
         'url_delete': reverse(
-            'delete_education_group_detailed_achievement', args=[node.year, node.code, achievement.pk, d_achievement.pk]
+            url_names["url_delete"], args=[node.year, node.code, achievement.pk, d_achievement.pk]
         ) + '?path={}&tab={}'.format(path, Tab.SKILLS_ACHIEVEMENTS),
+    }
+
+
+def _get_url_name_detail_achievements(achievement):
+    if achievement.education_group_year.is_training:
+        return {
+            'url_action': "training_"+"detailed_achievement_actions",
+            'url_update': "training_"+"detailed_achievement_update",
+            'url_delete': "training_"+"detailed_achievement_delete",
+        }
+    return {
+        'url_action': "minitraining_"+"detailed_achievement_actions",
+        'url_update': "minitraining_"+"detailed_achievement_update",
+        'url_delete': "minitraining_"+"detailed_achievement_delete",
     }
 
 
