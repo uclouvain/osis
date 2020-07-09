@@ -29,6 +29,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from base.tests.factories.education_group_type import MiniTrainingEducationGroupTypeFactory
+from base.utils.urls import reverse_with_get
 from education_group.ddd.domain import mini_training
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 
@@ -40,8 +41,6 @@ class TestCreate(TestCase):
 
         cls.central_manager = CentralManagerFactory()
         cls.url = reverse("mini_training_create", args=[cls.mini_training_type.name])
-
-        cls.form_valid = mock.MagicMock(is_valid=lambda: True, cleaned_data=collections.defaultdict(lambda: None))
 
     def setUp(self) -> None:
         self.client.force_login(self.central_manager.person.user)
@@ -60,7 +59,7 @@ class TestCreate(TestCase):
     def test_should_call_create_mini_training_service_when_request_is_post(self, mock_service_orphan, mock_form):
         mini_training_identity = mini_training.MiniTrainingIdentity(code="CODE", year=2020)
         mock_service_orphan.return_value = mini_training_identity
-        mock_form.return_value = self.form_valid
+        mock_form.return_value = self._get_mock_form_valid()
 
         response = self.client.post(self.url, data={})
 
@@ -76,3 +75,38 @@ class TestCreate(TestCase):
             fetch_redirect_response=False
         )
 
+    @mock.patch('education_group.views.mini_training.create.MiniTrainingCreateView.get_form')
+    @mock.patch("program_management.ddd.service.write."
+                "create_mini_training_and_attach_service.create_mini_training_and_attach")
+    def test_should_call_create_mini_training_and_paste_service_when_request_is_post_and_path_as_parameter(
+            self,
+            mock_service,
+            mock_form):
+        mini_training_identity = mini_training.MiniTrainingIdentity(code="CODE", year=2020)
+        mock_service.return_value = mini_training_identity
+        mock_form.return_value = self._get_mock_form_valid()
+
+        url_with_path = reverse_with_get(
+            "mini_training_create",
+            args=[self.mini_training_type.name],
+            get={"path_to": "10|25"}
+        )
+        response = self.client.post(url_with_path, data={})
+
+        self.assertTrue(mock_form.called)
+        self.assertTrue(mock_service.called)
+
+        expected_reverse = reverse_with_get(
+            "mini_training_identification",
+            kwargs={"code": mini_training_identity.code, "year": mini_training_identity.year},
+            get={"path": "10|25"}
+
+        )
+        self.assertRedirects(response, expected_reverse, fetch_redirect_response=False)
+
+    def _get_mock_form_valid(self):
+        cleaned_data = collections.defaultdict(lambda: None)
+        cleaned_data["teaching_campus"] = {"name": "", "organization_name": ""}
+        cleaned_data["code"] = "CODE"
+        cleaned_data["academic_year"] = 2020
+        return mock.MagicMock(is_valid=lambda: True, cleaned_data=cleaned_data)

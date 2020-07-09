@@ -25,25 +25,25 @@ from typing import List, Dict, Type, Optional
 
 from django.http import response
 from django.urls import reverse
-from django.views.generic import FormView
 from django.utils.translation import gettext_lazy as _
+from django.views.generic import FormView
 from rules.contrib.views import LoginRequiredMixin
 
-from base.models import entity_version
 from base.models.academic_year import starting_academic_year
 from base.models.enums.education_group_types import MiniTrainingType
 from base.utils.cache import RequestCache
 from base.views.common import display_success_messages
 from education_group.ddd import command
 from education_group.ddd.domain import mini_training
-from education_group.ddd.service.read import mini_training_service, group_service
+from education_group.ddd.service.read import group_service
 from education_group.ddd.service.write import create_mini_training_service
 from education_group.forms import mini_training as mini_training_form
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from osis_role.contrib.views import PermissionRequiredMixin
-from program_management.ddd.business_types import *
 from program_management.ddd import command as command_pgrm
+from program_management.ddd.business_types import *
 from program_management.ddd.service.read import node_identity_service
+from program_management.ddd.service.write import create_mini_training_and_attach_service
 
 
 class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormView):
@@ -72,28 +72,55 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
         return context
 
     def form_valid(self, form: mini_training_form.MiniTrainingForm) -> response.HttpResponseBase:
-        create_command = command.CreateOrphanMiniTrainingCommand(
-            code=form.cleaned_data['code'],
-            year=form.cleaned_data["academic_year"],
-            type=self.kwargs['type'],
-            abbreviated_title=form.cleaned_data['abbreviated_title'],
-            title_fr=form.cleaned_data['title_fr'],
-            title_en=form.cleaned_data['title_en'],
-            status=form.cleaned_data['status'],
-            schedule_type=form.cleaned_data['schedule_type'],
-            credits=form.cleaned_data['credits'],
-            constraint_type=form.cleaned_data['constraint_type'],
-            min_constraint=form.cleaned_data['min_constraint'],
-            max_constraint=form.cleaned_data['max_constraint'],
-            management_entity_acronym=form.cleaned_data['management_entity'],
-            teaching_campus_name=form.cleaned_data['teaching_campus']['name'],
-            organization_name=form.cleaned_data['teaching_campus']['organization_name'],
-            remark_fr=form.cleaned_data['remark_fr'],
-            remark_en=form.cleaned_data['remark_en'],
-            start_year=form.cleaned_data['academic_year'],
-            end_year=form.cleaned_data['end_year'],
-        )
-        mini_training_identity = create_mini_training_service.create_orphan_mini_training(create_command)
+        if self.get_attach_path():
+            create_and_paste_command = command_pgrm.CreateMiniTrainingAndPasteCommand(
+                code=form.cleaned_data['code'],
+                year=form.cleaned_data["academic_year"],
+                type=self.kwargs['type'],
+                abbreviated_title=form.cleaned_data['abbreviated_title'],
+                title_fr=form.cleaned_data['title_fr'],
+                title_en=form.cleaned_data['title_en'],
+                status=form.cleaned_data['status'],
+                schedule_type=form.cleaned_data['schedule_type'],
+                credits=form.cleaned_data['credits'],
+                constraint_type=form.cleaned_data['constraint_type'],
+                min_constraint=form.cleaned_data['min_constraint'],
+                max_constraint=form.cleaned_data['max_constraint'],
+                management_entity_acronym=form.cleaned_data['management_entity'],
+                teaching_campus_name=form.cleaned_data['teaching_campus']['name'],
+                organization_name=form.cleaned_data['teaching_campus']['organization_name'],
+                remark_fr=form.cleaned_data['remark_fr'],
+                remark_en=form.cleaned_data['remark_en'],
+                start_year=form.cleaned_data['academic_year'],
+                end_year=form.cleaned_data['end_year'],
+                path_to_paste=self.get_attach_path()
+            )
+            mini_training_identity = create_mini_training_and_attach_service.create_mini_training_and_attach(
+                create_and_paste_command
+            )
+        else:
+            create_command = command.CreateOrphanMiniTrainingCommand(
+                code=form.cleaned_data['code'],
+                year=form.cleaned_data["academic_year"],
+                type=self.kwargs['type'],
+                abbreviated_title=form.cleaned_data['abbreviated_title'],
+                title_fr=form.cleaned_data['title_fr'],
+                title_en=form.cleaned_data['title_en'],
+                status=form.cleaned_data['status'],
+                schedule_type=form.cleaned_data['schedule_type'],
+                credits=form.cleaned_data['credits'],
+                constraint_type=form.cleaned_data['constraint_type'],
+                min_constraint=form.cleaned_data['min_constraint'],
+                max_constraint=form.cleaned_data['max_constraint'],
+                management_entity_acronym=form.cleaned_data['management_entity'],
+                teaching_campus_name=form.cleaned_data['teaching_campus']['name'],
+                organization_name=form.cleaned_data['teaching_campus']['organization_name'],
+                remark_fr=form.cleaned_data['remark_fr'],
+                remark_en=form.cleaned_data['remark_en'],
+                start_year=form.cleaned_data['academic_year'],
+                end_year=form.cleaned_data['end_year'],
+            )
+            mini_training_identity = create_mini_training_service.create_orphan_mini_training(create_command)
 
         self.set_success_url(mini_training_identity)
 

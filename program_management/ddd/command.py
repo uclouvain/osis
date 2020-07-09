@@ -25,6 +25,8 @@
 ##############################################################################
 from typing import Optional
 
+import attr
+
 from base.models.enums.link_type import LinkTypes
 from osis_common.ddd import interface
 from program_management.ddd.business_types import *
@@ -211,6 +213,30 @@ class CreateGroupAndAttachCommand(interface.CommandRequest):
             str(self.max_constraint), str(self.management_entity_acronym), str(self.teaching_campus_name),
             str(self.organization_name), str(self.remark_fr), str(self.remark_en), str(self.path_to_paste), ])
         return "CreateGroupAndAttachCommand({parameters})".format(parameters=parameters)
+
+
+@attr.s(frozen=True, slots=True)
+class CreateMiniTrainingAndPasteCommand(interface.CommandRequest):
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)
+    type = attr.ib(type=str)
+    abbreviated_title = attr.ib(type=str)
+    title_fr = attr.ib(type=str)
+    title_en = attr.ib(type=str)
+    status = attr.ib(type=str)
+    schedule_type = attr.ib(type=str)
+    credits = attr.ib(type=int)
+    constraint_type = attr.ib(type=str)
+    min_constraint = attr.ib(type=int)
+    max_constraint = attr.ib(type=int)
+    management_entity_acronym = attr.ib(type=str)
+    teaching_campus_name = attr.ib(type=str)
+    organization_name = attr.ib(type=str)
+    remark_fr = attr.ib(type=str)
+    remark_en = attr.ib(type=str)
+    start_year = attr.ib(type=int)
+    end_year = attr.ib(type=Optional[int])
+    path_to_paste = attr.ib(type=str)
 
 
 class GetNodeIdentityFromElementId(interface.CommandRequest):
