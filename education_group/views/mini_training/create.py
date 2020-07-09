@@ -22,7 +22,7 @@
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
 import collections
-from typing import List, Dict, Type, Optional
+from typing import List, Dict, Optional
 
 from django.http import response
 from django.urls import reverse
@@ -31,7 +31,6 @@ from django.views.generic import FormView
 from rules.contrib.views import LoginRequiredMixin
 
 from base.models.academic_year import starting_academic_year
-from base.models.enums.education_group_types import MiniTrainingType
 from base.utils.cache import RequestCache
 from base.views.common import display_success_messages
 from education_group.ddd import command
@@ -53,10 +52,9 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
     permission_required = 'base.add_minitraining'
     raise_exception = True
 
-    template_name = "education_group_app/mini_training/upsert/create.html"
+    form_class = mini_training_form.MiniTrainingForm
 
-    def get_form_class(self) -> Type[mini_training_form.MiniTrainingForm]:
-        return mini_training_form.MiniTrainingForm
+    template_name = "education_group_app/mini_training/upsert/create.html"
 
     def get_form_kwargs(self) -> Dict:
         form_kwargs = super().get_form_kwargs()
@@ -65,12 +63,10 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
         form_kwargs["initial"] = self._get_initial_form()
         return form_kwargs
 
-    #  TODO incorporate type in mini training form
     def get_context_data(self, **kwargs) -> Dict:
         context = super().get_context_data(**kwargs)
         context["mini_training_form"] = context["form"]
         context["tabs"] = self.get_tabs()
-        context["type_text"] = MiniTrainingType.get_value(self.kwargs['type'])
         context["cancel_url"] = self.get_cancel_url()
         return context
 

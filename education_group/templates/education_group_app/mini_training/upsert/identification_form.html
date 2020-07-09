@@ -39,18 +39,8 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-6">
-                            <label>{% trans 'Category' %}</label><br>
-                            <input value="{% trans 'Mini-Training' %}"
-                                   disabled class="form-control"
-                                   title="{% trans 'The field can contain only one value.' %}">
-                        </div>
-                        <div class="col-md-6">
-                            <label>{% trans 'Type of training' %}</label><br>
-                            <input value="{{ type_text }}"
-                                   disabled class="form-control"
-                                   title="{% trans 'The field can contain only one value.' %}">
-                        </div>
+                        {% bootstrap_field mini_training_form.category form_group_class="col-md-6" %}
+                        {% bootstrap_field mini_training_form.type form_group_class="col-md-6" %}
                     </div>
                     <br>
                     <div class="row">

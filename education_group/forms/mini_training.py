@@ -33,7 +33,8 @@ from base.forms.common import ValidationRuleMixin
 from base.forms.utils.choice_field import BLANK_CHOICE
 from base.models import campus
 from base.models.academic_year import AcademicYear
-from base.models.enums import active_status, schedule_type as schedule_type_enum
+from base.models.enums import active_status, schedule_type as schedule_type_enum, education_group_categories, \
+    education_group_types
 from base.models.enums.constraint_type import ConstraintTypeEnum
 from education_group.forms import fields
 from rules_management.enums import MINI_TRAINING_PGRM_ENCODING_PERIOD, MINI_TRAINING_DAILY_MANAGEMENT
@@ -57,6 +58,17 @@ class MiniTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     abbreviated_title = forms.CharField(max_length=40, label=_("Acronym/Short title"), required=False)
     title_fr = forms.CharField(max_length=240, label=_("Title in French"))
     title_en = forms.CharField(max_length=240, label=_("Title in English"), required=False)
+    category = forms.ChoiceField(
+        choices=education_group_categories.Categories.choices(),
+        initial=education_group_categories.Categories.MINI_TRAINING.name,
+        required=False,
+        disabled=True
+    )
+    type = forms.ChoiceField(
+        choices=education_group_types.MiniTrainingType.choices(),
+        required=False,
+        disabled=True
+    )
     status = forms.ChoiceField(
         choices=active_status.ACTIVE_STATUS_LIST,
         initial=active_status.ACTIVE,
@@ -104,6 +116,7 @@ class MiniTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
 
         self.__init_academic_year_field()
         self.__init_management_entity_field()
+        self.__init_type_field()
 
     def __init_academic_year_field(self):
         if self.user.person.is_faculty_manager:
@@ -121,6 +134,9 @@ class MiniTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
             disabled=self.fields['management_entity'].disabled,
             to_field_name="acronym"
         )
+
+    def __init_type_field(self):
+        self.fields["type"].initial = self.group_type
 
     # ValidationRuleMixin
     def field_reference(self, field_name: str) -> str:
