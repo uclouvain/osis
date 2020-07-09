@@ -36,10 +36,8 @@
             <ul class="nav nav-tabs" role="tablist">
                 {% for tab in tabs %}
                     {% if tab.display %}
-                        <li role="presentation" {% if tab.active %} class="active" {% endif %}>
-                            <a data-toggle="tab" href="#tab-{{ forloop.counter }}" role="tab">
-                                {{ tab.text }} <span id="spn_{{ forloop.counter }}_errors" class="error"></span>
-                            </a>
+                        <li role="presentation" class="form-tab {% if tab.active %}active{% endif %}">
+                            <a data-toggle="tab" href="#tab-{{ forloop.counter }}" role="tab">{{ tab.text }}</a>
                         </li>
                     {% endif %}
                 {% endfor %}
