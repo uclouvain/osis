@@ -21,19 +21,14 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from unittest.mock import patch
-
-from django.test import SimpleTestCase
 
 from education_group.ddd import command
-from education_group.ddd.service.read import group_service
+from education_group.ddd.business_types import *
+
+from education_group.ddd.domain.group import GroupIdentity
+from education_group.ddd.repository.group import GroupRepository
 
 
-class TestGetGroup(SimpleTestCase):
-    def setUp(self):
-        self.cmd = command.GetGroupCommand(year=2018, code="LTRONC1")
-
-    def test_assert_repository_called(self):
-        with patch('education_group.ddd.service.read.group_service.GroupRepository.get') as mock_grp_repo_get:
-            group_service.get_group(self.cmd)
-            self.assertTrue(mock_grp_repo_get.called)
+def get_group(cmd: command.GetGroupCommand) -> 'Group':
+    group_id = GroupIdentity(code=cmd.code, year=cmd.year)
+    return GroupRepository.get(group_id)

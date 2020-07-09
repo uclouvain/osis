@@ -54,7 +54,7 @@ class TestUpdateGroupGetMethod(TestCase):
 
     def setUp(self) -> None:
         self.get_group_patcher = mock.patch(
-            "education_group.views.group.update.group_service.get_group",
+            "education_group.views.group.update.get_group_service.get_group",
             return_value=self.group
         )
         self.mocked_get_group = self.get_group_patcher.start()
@@ -81,7 +81,7 @@ class TestUpdateGroupGetMethod(TestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
-    @mock.patch('education_group.views.group.update.group_service.get_group', side_effect=GroupNotFoundException)
+    @mock.patch('education_group.views.group.update.get_group_service.get_group', side_effect=GroupNotFoundException)
     def test_assert_404_when_group_not_found(self, mock_get_group):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
@@ -99,11 +99,13 @@ class TestUpdateGroupGetMethod(TestCase):
         self.assertIsInstance(response.context['cancel_url'], str)
 
     @mock.patch('education_group.views.group.update.GroupUpdateView.get_children_objs')
-    @mock.patch('education_group.views.group.update.GroupUpdateView.get_link_objs')
+    @mock.patch('education_group.views.group.update.GroupUpdateView.get_program_tree_obj')
     def test_assert_contains_identification_and_content_tabs_when_group_have_children(self,
-                                                                                      mock_get_links,
+                                                                                      mock_get_program_tree,
                                                                                       mock_get_children_obj):
-        mock_get_links.return_value = [LinkFactory()]
+        root_link = LinkFactory()
+        program_tree = ProgramTreeFactory(root_node=root_link.parent)
+        mock_get_program_tree.return_value = program_tree
         mock_get_children_obj.return_value = [GroupFactory()]
 
         response = self.client.get(self.url)
@@ -123,9 +125,9 @@ class TestUpdateGroupGetMethod(TestCase):
             }]
         )
 
-    @mock.patch('education_group.views.group.update.GroupUpdateView.get_link_objs')
-    def test_assert_contains_only_identification_tabs_when_group_dont_have_children(self, mock_get_links):
-        mock_get_links.return_value = []
+    @mock.patch('education_group.views.group.update.GroupUpdateView.get_program_tree_obj')
+    def test_assert_contains_only_identification_tabs_when_group_dont_have_children(self, mock_get_program_tree):
+        mock_get_program_tree.return_value = ProgramTreeFactory()
         response = self.client.get(self.url)
 
         self.assertListEqual(
@@ -173,10 +175,10 @@ class TestUpdateGroupGetMethod(TestCase):
         self.assertEqual(initials['remark_en'], self.group.remark.text_en)
 
     @mock.patch('education_group.views.group.update.GroupUpdateView.get_children_objs')
-    @mock.patch('education_group.views.group.update.GroupUpdateView.get_link_objs')
-    def test_assert_content_formset_initial_computed(self, mock_get_link_objs, mock_get_children_objs):
+    @mock.patch('education_group.views.group.update.GroupUpdateView.get_program_tree_obj')
+    def test_assert_content_formset_initial_computed(self, mock_get_program_tree_objs, mock_get_children_objs):
         link_child_1 = LinkFactory()
-        mock_get_link_objs.return_value = [link_child_1]
+        mock_get_program_tree_objs.return_value = ProgramTreeFactory(root_node=link_child_1.parent)
         mock_get_children_objs.return_value = [
             GroupFactory(
                 entity_identity=GroupIdentity(code=link_child_1.child.code, year=link_child_1.child.year)
@@ -192,5 +194,5 @@ class TestUpdateGroupGetMethod(TestCase):
         self.assertEqual(initials[0]['link_type'], link_child_1.link_type)
         self.assertEqual(initials[0]['access_condition'], link_child_1.access_condition)
         self.assertEqual(initials[0]['block'], link_child_1.block)
-        self.assertEqual(initials[0]['comment'], link_child_1.comment)
-        self.assertEqual(initials[0]['comment_english'], link_child_1.comment_english)
+        self.assertEqual(initials[0]['comment_fr'], link_child_1.comment)
+        self.assertEqual(initials[0]['comment_en'], link_child_1.comment_english)

@@ -16,8 +16,8 @@ class LinkForm(forms.Form):
     access_condition = forms.BooleanField(required=False)
     link_type = forms.ChoiceField(choices=choice_field.add_blank(LinkTypes.choices()), required=False)
     block = forms.CharField(required=False)
-    comment = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows': 3}))
-    comment_english = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows': 3}))
+    comment_fr = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows': 3}))
+    comment_en = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows': 3}))
 
     def __init__(self, *args, parent_obj: Group = None, child_obj: Union[Group, LearningUnitYear] = None, **kwargs):
         self.parent_obj = parent_obj
@@ -34,8 +34,8 @@ class LinkForm(forms.Form):
                 'is_mandatory',
                 'link_type',
                 'block',
-                'comment',
-                'comment_english',
+                'comment_fr',
+                'comment_en',
             )
         elif self.is_a_child_minor_major_option_list_choice() and \
                 self.parent_obj.type.name in TrainingType.get_names():
@@ -44,8 +44,8 @@ class LinkForm(forms.Form):
                 'is_mandatory',
                 'link_type',
                 'access_condition',
-                'comment',
-                'comment_english',
+                'comment_fr',
+                'comment_en',
             )
         elif self.is_a_link_with_child_of_learning_unit():
             fields_to_exclude = (
@@ -63,11 +63,11 @@ class LinkForm(forms.Form):
         return isinstance(self.child_obj, LearningUnitYear)
 
     def is_a_parent_minor_major_option_list_choice(self):
-        return self.parent_obj and self.parent_obj.type.name in GroupType.minor_major_option_list_choice()
+        return self.parent_obj and self.parent_obj.is_minor_major_option_list_choice()
 
     def is_a_child_minor_major_option_list_choice(self):
         return isinstance(self.child_obj, Group) and \
-               self.child_obj.type.name in GroupType.minor_major_option_list_choice()
+               self.child_obj.is_minor_major_option_list_choice()
 
 
 class BaseContentFormSet(BaseFormSet):

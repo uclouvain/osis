@@ -21,20 +21,24 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from typing import List
+from unittest.mock import patch
 
-from education_group.ddd import command
-from education_group.ddd.business_types import *
+from django.test import SimpleTestCase
 
-from education_group.ddd.domain.group import GroupIdentity
-from education_group.ddd.repository.group import GroupRepository
-
-
-def get_group(cmd: command.GetGroupCommand) -> 'Group':
-    group_id = GroupIdentity(code=cmd.code, year=cmd.year)
-    return GroupRepository.get(group_id)
+from learning_unit.ddd import command
+from learning_unit.ddd.service.read import get_multiple_learning_unit_years_service
 
 
-def get_multiple_groups(cmds: List[command.GetGroupCommand]) -> List['Group']:
-    group_ids = [GroupIdentity(code=cmd.code, year=cmd.year) for cmd in cmds]
-    return GroupRepository.search(entity_ids=group_ids)
+class TestGetMultipleLearningUnitYear(SimpleTestCase):
+    def setUp(self):
+        self.cmds = [
+            command.GetLearningUnitYearCommand(year=2018, code="LTRON100B"),
+            command.GetLearningUnitYearCommand(year=2018, code="LAGRO100B"),
+            command.GetLearningUnitYearCommand(year=2018, code="LAGRO200B"),
+        ]
+
+    def test_assert_repository_called(self):
+        with patch('learning_unit.ddd.service.read.learning_unit_year_service.load_learning_unit_year.'
+                   'load_multiple_by_identity') as mock_repo_multiple:
+            get_multiple_learning_unit_years_service.get_multiple_learning_unit_years(self.cmds)
+            self.assertTrue(mock_repo_multiple.called)

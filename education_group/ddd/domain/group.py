@@ -141,3 +141,6 @@ class Group(interface.RootEntity):
     @property
     def year(self) -> int:
         return self.entity_id.year
+
+    def is_minor_major_option_list_choice(self):
+        return self.type.name in GroupType.minor_major_option_list_choice()

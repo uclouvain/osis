@@ -25,20 +25,15 @@ from unittest.mock import patch
 
 from django.test import SimpleTestCase
 
-from learning_unit.ddd import command
-from learning_unit.ddd.service.read import learning_unit_year_service
+from education_group.ddd import command
+from education_group.ddd.service.read import get_group_service
 
 
-class TestGetMultipleLearningUnitYear(SimpleTestCase):
+class TestGetGroup(SimpleTestCase):
     def setUp(self):
-        self.cmds = [
-            command.GetLearningUnitYearCommand(year=2018, code="LTRON100B"),
-            command.GetLearningUnitYearCommand(year=2018, code="LAGRO100B"),
-            command.GetLearningUnitYearCommand(year=2018, code="LAGRO200B"),
-        ]
+        self.cmd = command.GetGroupCommand(year=2018, code="LTRONC1")
 
     def test_assert_repository_called(self):
-        with patch('learning_unit.ddd.service.read.learning_unit_year_service.load_learning_unit_year.'
-                   'load_multiple_by_identity') as mock_repo_multiple:
-            learning_unit_year_service.get_multiple_learning_unit_years(self.cmds)
-            self.assertTrue(mock_repo_multiple.called)
+        with patch('education_group.ddd.service.read.get_group_service.GroupRepository.get') as mock_grp_repo_get:
+            get_group_service.get_group(self.cmd)
+            self.assertTrue(mock_grp_repo_get.called)

@@ -27,7 +27,7 @@ from django.db import transaction
 
 from education_group.ddd import command
 from education_group.ddd.domain import group
-from education_group.ddd.service.read import group_service as group_service_read
+from education_group.ddd.service.read import get_group_service as group_service_read
 from education_group.ddd.service.write.create_group_service import create_orphan_group
 
 

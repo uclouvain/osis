@@ -208,6 +208,23 @@ class Node(interface.Entity):
     def children_as_nodes(self) -> List['Node']:
         return [link.child for link in self.children]
 
+    def get_direct_children_as_nodes(
+            self,
+            take_only: Set[EducationGroupTypesEnum] = None,
+            ignore_children_from: Set[EducationGroupTypesEnum] = None
+    ) -> List['Node']:
+        """
+            :param take_only: Result will only contain all children nodes if their type matches with this param
+            :param ignore_children_from: Result will not contain direct nodes if their type matches with this param
+            :return: A flat list of all direct children nodes
+        """
+        children = self.children_as_nodes
+        if ignore_children_from:
+            children = [child for child in children if child.node_type not in ignore_children_from]
+        if take_only:
+            children = [child for child in children if child.node_type in take_only]
+        return children
+
     def children_and_reference_children(
             self,
             except_within: Set[EducationGroupTypesEnum] = None
