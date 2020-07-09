@@ -21,6 +21,7 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+import collections
 from typing import List, Dict, Type, Optional
 
 from django.http import response
@@ -44,6 +45,8 @@ from program_management.ddd import command as command_pgrm
 from program_management.ddd.business_types import *
 from program_management.ddd.service.read import node_identity_service
 from program_management.ddd.service.write import create_mini_training_and_attach_service
+
+FormTab = collections.namedtuple("FormTab", "text active display include_html")
 
 
 class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormView):
@@ -146,14 +149,14 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
             'management_entity': default_management_entity
         }
 
-    def get_tabs(self) -> List:
+    def get_tabs(self) -> List[FormTab]:
         return [
-            {
-                "text": _("Identification"),
-                "active": True,
-                "display": True,
-                "include_html": "education_group_app/mini_training/upsert/identification_form.html"
-            }
+            FormTab(
+                _("Identification"),
+                True,
+                True,
+                "education_group_app/mini_training/upsert/identification_form.html"
+            )
         ]
 
     def get_attach_path(self) -> Optional['Path']:
