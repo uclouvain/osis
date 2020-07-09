@@ -1,4 +1,5 @@
 from django import forms
+from django.forms import ModelChoiceField
 from django.utils.translation import gettext_lazy as _
 
 from base.models import campus
@@ -33,6 +34,7 @@ class ManagementEntitiesChoiceField(EntityRoleChoiceField):
         return qs
 
     def clean(self, value):
-        if value is not None:
+        value = super(ModelChoiceField, self).clean(value)
+        if value:
             return EntityVersion.objects.get(pk=value).acronym
-        return value
+        return None
