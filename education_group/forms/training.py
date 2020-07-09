@@ -40,9 +40,7 @@ from base.forms.education_group.common import MainCampusChoiceField, MainEntitie
 from base.forms.education_group.training import _get_section_choices
 from base.forms.utils.choice_field import BLANK_CHOICE
 from base.models.academic_year import AcademicYear
-from base.models.campus import Campus
 from base.models.certificate_aim import CertificateAim
-from base.models.entity_version import get_last_version
 from base.models.enums.academic_type import AcademicTypes
 from base.models.enums.active_status import ActiveStatusEnum
 from base.models.enums.activity_presence import ActivityPresence
@@ -59,7 +57,7 @@ from reference.models.domain import Domain
 from reference.models.domain_isced import DomainIsced
 from reference.models.enums.domain_type import UNIVERSITY
 from reference.models.language import Language, FR_CODE_LANGUAGE
-from rules_management.enums import GROUP_PGRM_ENCODING_PERIOD, GROUP_DAILY_MANAGEMENT, TRAINING_PGRM_ENCODING_PERIOD, \
+from rules_management.enums import TRAINING_PGRM_ENCODING_PERIOD, \
     TRAINING_DAILY_MANAGEMENT
 from rules_management.mixins import PermissionFieldMixin
 
@@ -144,7 +142,6 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         required=False,
     )
     main_language = forms.ModelChoiceField(  # FIXME :: to replace by choice field (to prevent link to DB model)
-        initial=Language.objects.all().get(code=FR_CODE_LANGUAGE),
         queryset=Language.objects.all().order_by('name'),
         label=_('Primary language'),
     )
@@ -257,6 +254,7 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         self.__init_management_entity_field()
         self.__init_certificate_aims_field()
         self.__init_diploma_fields()
+        self.__init_main_language()
 
     def __init_academic_year_field(self):
         if not self.fields['academic_year'].disabled and self.user.person.is_faculty_manager:
@@ -293,6 +291,9 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         else:
             self.fields['leads_to_diploma'].initial = False
             self.fields['diploma_printing_title'].required = False
+
+    def __init_main_language(self):
+        self.fields["main_language"].initial = Language.objects.all().get(code=FR_CODE_LANGUAGE)
 
     def is_valid(self):
         valid = super().is_valid()
