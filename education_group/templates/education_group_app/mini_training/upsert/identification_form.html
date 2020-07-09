@@ -31,18 +31,30 @@
             <div class="panel panel-default">
                 <div class="panel-body">
                     <div class="row">
-                        {% bootstrap_field mini_training_form.abbreviated_title form_group_class="col-md-6" %}
+                        <div class="col-md-6">
+                            {% bootstrap_label mini_training_form.abbreviated_title.label %}
+                            {% if mini_training_form.fields.abbreviated_title.required %}
+                                <strong>*</strong>
+                            {% endif %}
+                            <abbr title="{{ mini_training_form.abbreviated_title.help_text | safe }}"
+                                  data-toggle='tooltip' data-html='true'>
+                                <span class="glyphicon glyphicon-question-sign" style="font-size: 14pt;"></span>
+                            </abbr>
+                            {% bootstrap_field mini_training_form.abbreviated_title show_label=False show_help=False %}
+                        </div>
                         <div class="col-md-6">
                             <div class="control-label" style="height: 20px; margin-bottom: 5px;">
                                 {% bootstrap_label mini_training_form.code.label  %}
                                 {% if mini_training_form.fields.code.required %}
                                     <strong>*</strong>
                                 {% endif %}
+                                {% if mini_training_form.code.help_text %}
                                 <abbr title="{{ mini_training_form.code.help_text }}"
                                       data-toggle='tooltip' data-html='true'>
                                     <span class="glyphicon glyphicon-question-sign"
                                           style="font-size: 14pt;"></span>
                                 </abbr>
+                                {% endif %}
                             </div>
                             {% bootstrap_field mini_training_form.code show_label=False show_help=False %}
                         </div>
