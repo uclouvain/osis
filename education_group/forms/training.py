@@ -224,6 +224,7 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         label=_('filter by section').capitalize() + ':',
         choices=lazy(_get_section_choices, list),
         required=False,
+        disabled=True
     )
     leads_to_diploma = forms.BooleanField(initial=False, label=_('Leads to diploma/certificate'))
     diploma_printing_title = forms.CharField(max_length=240, required=False, label=_('Diploma title'))
@@ -232,7 +233,6 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         label=_('certificate aims').capitalize(),
         queryset=CertificateAim.objects.all(),
         required=False,
-        disabled=True,
         widget=autocomplete.ModelSelect2Multiple(
             url='certificate_aim_autocomplete',
             attrs={
