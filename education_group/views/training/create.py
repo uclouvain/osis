@@ -84,8 +84,10 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 english_activities=training_form.cleaned_data['english_activities'],
                 other_language_activities=training_form.cleaned_data['other_language_activities'],
                 internal_comment=training_form.cleaned_data['internal_comment'],
-                main_domain_code=training_form.cleaned_data['main_domain'].code,
-                main_domain_decree=training_form.cleaned_data['main_domain'].decree.name,
+                main_domain_code=training_form.cleaned_data['main_domain'].code
+                if training_form.cleaned_data['main_domain'] else None,
+                main_domain_decree=training_form.cleaned_data['main_domain'].decree.name
+                if training_form.cleaned_data['main_domain'] else None,
                 secondary_domains=[
                     (obj.decree.name, obj.code) for obj in training_form.cleaned_data['secondary_domains']
                 ],
