@@ -71,22 +71,11 @@ class EducationGroupAchievementAction(EducationGroupAchievementMixin, FormView):
         return self.get_object().education_group_year
 
     def get_success_url(self):
-        if self.education_group_year.category == 'TRAINING':
-            return reverse('training_skills_achievements',
-                           args=[self.kwargs['year'],
-                                 self.kwargs['code']]
-                           ) + '?path={}&tab={}#achievement_{}'.format(
-                self.request.GET['path'],
-                Tab.SKILLS_ACHIEVEMENTS,
-                self.kwargs['education_group_achievement_pk']
-            )
-        return reverse('mini_training_skills_achievements',
-                       args=[self.kwargs['year'],
-                             self.kwargs['code']]
-                       ) + '?path={}&tab={}#achievement_{}'.format(
-            self.request.GET['path'],
-            Tab.SKILLS_ACHIEVEMENTS,
-            self.kwargs['education_group_achievement_pk']
+        prefix = 'training_' if self.education_group_year.is_training else 'mini_training_'
+        return reverse(
+            prefix + 'skills_achievements', args=[self.kwargs['year'], self.kwargs['code']]
+        ) + '?path={}&tab={}#achievement_{}'.format(
+            self.request.GET['path'], Tab.SKILLS_ACHIEVEMENTS, self.kwargs['education_group_achievement_pk']
         )
 
 
@@ -113,22 +102,11 @@ class EducationGroupDetailedAchievementAction(EducationGroupDetailedAchievementM
         return self.education_group_achievement.education_group_year
 
     def get_success_url(self):
-        if self.education_group_year.category == 'TRAINING':
-            return reverse('training_skills_achievements',
-                           args=[self.kwargs['year'],
-                                 self.kwargs['code']]
-                           ) + '?path={}&tab={}#detail_achievements_{}'.format(
-                self.request.GET['path'],
-                Tab.SKILLS_ACHIEVEMENTS,
-                self.kwargs['education_group_detail_achievement_pk']
-            )
-        return reverse('mini_training_skills_achievements',
-                       args=[self.kwargs['year'],
-                             self.kwargs['code']]
-                       ) + '?path={}&tab={}#detail_achievements_{}'.format(
-            self.request.GET['path'],
-            Tab.SKILLS_ACHIEVEMENTS,
-            self.kwargs['education_group_detail_achievement_pk']
+        prefix = 'training_' if self.education_group_year.is_training else 'mini_training_'
+        return reverse(
+            prefix + 'skills_achievements', args=[self.kwargs['year'], self.kwargs['code']]
+        ) + '?path={}&tab={}#detail_achievements_{}'.format(
+            self.request.GET['path'], Tab.SKILLS_ACHIEVEMENTS, self.kwargs['education_group_detail_achievement_pk']
         )
 
 

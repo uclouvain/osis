@@ -64,20 +64,16 @@ def __get_achievement_formated(achievement, node, path):
         'code_name': achievement.code_name,
         'text_fr': achievement.french_text,
         'text_en': achievement.english_text,
-
         'url_action': reverse(
             url_names["url_action"],
             args=[node.year, node.code, achievement.pk]
         ) + '?path={}&tab={}'.format(path, Tab.SKILLS_ACHIEVEMENTS),
-
         'url_update': reverse(
             url_names["url_update"], args=[node.year, node.code, achievement.pk]
         ) + '?path={}&tab={}'.format(path, Tab.SKILLS_ACHIEVEMENTS),
-
         'url_delete': reverse(
             url_names["url_delete"], args=[node.year, node.code, achievement.pk]
         ) + '?path={}&tab={}'.format(path, Tab.SKILLS_ACHIEVEMENTS),
-
         'url_create': reverse(
             url_names["url_create"], args=[node.year, node.code, achievement.pk]
         ) + '?path={}&tab={}'.format(path, Tab.SKILLS_ACHIEVEMENTS, achievement.pk)
@@ -85,18 +81,12 @@ def __get_achievement_formated(achievement, node, path):
 
 
 def _get_url_name_achievements(achievement):
-    if achievement.education_group_year.is_training:
-        return {
-            'url_action': "training_"+"achievement_actions",
-            'url_update': "training_"+"achievement_update",
-            'url_delete': "training_"+"achievement_delete",
-            'url_create': "training_"+"detailed_achievement_create"
-        }
+    prefix = 'training_' if achievement.education_group_year.is_training else 'minitraining_'
     return {
-        'url_action': "minitraining_"+"achievement_actions",
-        'url_update': "minitraining_"+"achievement_update",
-        'url_delete': "minitraining_"+"achievement_delete",
-        'url_create': "minitraining_"+"detailed_achievement_create"
+        'url_action': prefix+"achievement_actions",
+        'url_update': prefix+"achievement_update",
+        'url_delete': prefix+"achievement_delete",
+        'url_create': prefix+"detailed_achievement_create"
     }
 
 
@@ -107,16 +97,13 @@ def __get_detail_achievement_formated(achievement, d_achievement, node, path):
         'code_name': d_achievement.code_name,
         'text_fr': d_achievement.french_text,
         'text_en': d_achievement.english_text,
-
         'url_action': reverse(
             url_names["url_action"],
             args=[node.year, node.code, achievement.pk, d_achievement.pk]
         ) + '?path={}&tab={}'.format(path, Tab.SKILLS_ACHIEVEMENTS),
-
         'url_update': reverse(
             url_names["url_update"], args=[node.year, node.code, achievement.pk, d_achievement.pk]
         ) + '?path={}&tab={}'.format(path, Tab.SKILLS_ACHIEVEMENTS),
-
         'url_delete': reverse(
             url_names["url_delete"], args=[node.year, node.code, achievement.pk, d_achievement.pk]
         ) + '?path={}&tab={}'.format(path, Tab.SKILLS_ACHIEVEMENTS),
@@ -124,16 +111,11 @@ def __get_detail_achievement_formated(achievement, d_achievement, node, path):
 
 
 def _get_url_name_detail_achievements(achievement):
-    if achievement.education_group_year.is_training:
-        return {
-            'url_action': "training_"+"detailed_achievement_actions",
-            'url_update': "training_"+"detailed_achievement_update",
-            'url_delete': "training_"+"detailed_achievement_delete",
-        }
+    prefix = 'training_' if achievement.education_group_year.is_training else 'minitraining_'
     return {
-        'url_action': "minitraining_"+"detailed_achievement_actions",
-        'url_update': "minitraining_"+"detailed_achievement_update",
-        'url_delete': "minitraining_"+"detailed_achievement_delete",
+        'url_action': prefix+"detailed_achievement_actions",
+        'url_update': prefix+"detailed_achievement_update",
+        'url_delete': prefix+"detailed_achievement_delete",
     }
 
 
