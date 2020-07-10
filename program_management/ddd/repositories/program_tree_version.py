@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Optional, List
+from typing import Optional, List, Set
 
 from django.db.models import F
 
@@ -35,6 +35,7 @@ from program_management.ddd.domain.program_tree_version import ProgramTreeVersio
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 from program_management.models.education_group_version import EducationGroupVersion
+from django.db.models import Q
 
 
 class ProgramTreeVersionRepository(interface.AbstractRepository):
@@ -90,6 +91,16 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
             root_group__partial_acronym=root_node_identity.code,
             root_group__academic_year__year=root_node_identity.year
         ).values_list('offer_id', flat=True)
+
+        return cls._search_all_version(list(version_ids))
+
+    @classmethod
+    def search_all_versions_from_root_nodes(cls, node_identities: Set['Node']) -> List['ProgramTreeVersion']:
+        version_ids = _search_by_node_entities(list(node_identities))
+        return cls._search_all_version(version_ids)
+
+    @classmethod
+    def _search_all_version(cls, version_ids: List [int]):
         qs = GroupYear.objects.filter(
             educationgroupversion__offer_id__in=version_ids,
         ).order_by(
@@ -129,4 +140,23 @@ def _instanciate_tree_version(record_dict: dict) -> 'ProgramTreeVersion':
         program_tree_repository=ProgramTreeRepository(),
         title_fr=record_dict['version_title_fr'],
         title_en=record_dict['version_title_en'],
+    )
+
+
+def _search_by_node_entities(entity_ids: List['Node']) -> List[int]:
+    qs = EducationGroupVersion.objects.all().values_list('offer_id', flat=True)
+
+    filter_search_from = _build_where_clause(entity_ids[0])
+    for identity in entity_ids[1:]:
+        filter_search_from |= _build_where_clause(identity)
+    qs = qs.filter(filter_search_from)
+    return list(qs)
+
+
+def _build_where_clause(node_identity: 'Node') -> Q:
+    return Q(
+        Q(
+            root_group__partial_acronym=node_identity.code,
+            root_group__academic_year__year=node_identity.year
+        )
     )

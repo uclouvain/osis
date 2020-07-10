@@ -23,15 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import collections
-from typing import Optional
-
-from django.contrib.auth import models
+from typing import Optional, Set
 
 from base.models.enums.link_type import LinkTypes
 from osis_common.ddd import interface
 from program_management.ddd.business_types import *
-from program_management.models.enums import node_type
 
 
 class DetachNodeCommand(interface.CommandRequest):
@@ -157,3 +153,8 @@ class OrderDownLinkCommand(interface.CommandRequest):
         if isinstance(other, OrderDownLinkCommand):
             return self.path == other.path
         return False
+
+
+class SearchAllVersionsFromRootNodesCommand(interface.CommandRequest):
+    def __init__(self, node_identities: Set['Node']):
+        self.node_identities = node_identities

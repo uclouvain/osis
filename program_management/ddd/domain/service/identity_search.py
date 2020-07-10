@@ -63,3 +63,8 @@ class NodeIdentitySearch(interface.DomainService):
         )
         if values:
             return NodeIdentity(code=values[0]['partial_acronym'], year=training_identity.year)
+
+
+class ProgramTreeIdentitySearch(interface.DomainService):
+    def get_from_node_identity(self, node_identity: 'NodeIdentity') -> 'ProgramTreeIdentity':
+        return ProgramTreeIdentity(code=node_identity.code, year=node_identity.year)
