@@ -20,6 +20,12 @@ class GroupCodeAlreadyExistException(BusinessException):
         super().__init__(message, **kwargs)
 
 
+class MiniTrainingCodeAlreadyExistException(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _("Code already exists")
+        super().__init__(message, **kwargs)
+
+
 class AcademicYearNotFound(Exception):
     pass
 

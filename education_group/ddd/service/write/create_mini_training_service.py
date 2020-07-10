@@ -34,9 +34,10 @@ from education_group.ddd.validators import validators_by_business_action
 @transaction.atomic()
 def create_orphan_mini_training(cmd: command.CreateOrphanMiniTrainingCommand) -> 'mini_training.MiniTrainingIdentity':
     mini_training_object = mini_training.MiniTrainingBuilder.build_from_create_cmd(cmd)
-    mini_training_identity = MiniTrainingRepository.create(mini_training_object)
 
     validators_by_business_action.CreateMiniTrainingValidatorList(mini_training_object).validate()
+
+    mini_training_identity = MiniTrainingRepository.create(mini_training_object)
 
     publisher.mini_training_created.send(None, mini_training_identity=mini_training_identity)
     return mini_training_identity

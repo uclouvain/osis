@@ -34,7 +34,7 @@ from base.models.academic_year import starting_academic_year
 from base.utils.cache import RequestCache
 from base.views.common import display_success_messages
 from education_group.ddd import command
-from education_group.ddd.domain import mini_training
+from education_group.ddd.domain import mini_training, exception
 from education_group.ddd.service.read import group_service
 from education_group.ddd.service.write import create_mini_training_service
 from education_group.forms import mini_training as mini_training_form
@@ -63,6 +63,31 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
         form_kwargs["initial"] = self._get_initial_form()
         return form_kwargs
 
+    def form_valid(self, form: mini_training_form.MiniTrainingForm) -> response.HttpResponseBase:
+        try:
+            if self.get_attach_path():
+                mini_training_identity = create_mini_training_and_attach_service.create_mini_training_and_attach(
+                    self._generate_create_and_attach_command_from_valid_form(form)
+                )
+            else:
+                mini_training_identity = create_mini_training_service.create_orphan_mini_training(
+                    self._generate_create_command_from_valid_form(form)
+                )
+            self.set_success_url(mini_training_identity)
+            display_success_messages(self.request, self.get_success_msg(mini_training_identity), extra_tags='safe')
+            return super().form_valid(form)
+
+        except exception.MiniTrainingCodeAlreadyExistException as e:
+            form.add_error("code", e.message)
+        except exception.ContentConstraintTypeMissing as e:
+            form.add_error('constraint_type', e.message)
+        except (exception.ContentConstraintMinimumMaximumMissing,
+                exception.ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum) as e:
+            form.add_error('min_constraint', e.message)
+            form.add_error('max_constraint', '')
+
+        return self.form_invalid(form)
+
     def get_context_data(self, **kwargs) -> Dict:
         context = super().get_context_data(**kwargs)
         context["mini_training_form"] = context["form"]
@@ -70,63 +95,37 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
         context["cancel_url"] = self.get_cancel_url()
         return context
 
-    #  TODO exceptions catching
-    def form_valid(self, form: mini_training_form.MiniTrainingForm) -> response.HttpResponseBase:
+    def get_attach_path(self) -> Optional['Path']:
+        return self.request.GET.get('path_to') or None
+
+    def set_success_url(self, mini_training_identity: mini_training.MiniTrainingIdentity) -> None:
+        self.success_url = self._generate_success_url(mini_training_identity)
+
+    def get_success_msg(self, mini_training_identity: mini_training.MiniTrainingIdentity) -> str:
+        return _("Mini-training <a href='%(link)s'> %(code)s (%(academic_year)s) </a> successfully created.") % {
+            "link": self.success_url,
+            "code": mini_training_identity.code,
+            "academic_year": display_as_academic_year(mini_training_identity.year),
+        }
+
+    def get_tabs(self) -> List[FormTab]:
+        return [
+            FormTab(
+                _("Identification"),
+                True,
+                True,
+                "education_group_app/mini_training/upsert/identification_form.html"
+            )
+        ]
+
+    def get_cancel_url(self) -> str:
         if self.get_attach_path():
-            create_and_paste_command = command_pgrm.CreateMiniTrainingAndPasteCommand(
-                code=form.cleaned_data['code'],
-                year=form.cleaned_data["academic_year"],
-                type=self.kwargs['type'],
-                abbreviated_title=form.cleaned_data['abbreviated_title'],
-                title_fr=form.cleaned_data['title_fr'],
-                title_en=form.cleaned_data['title_en'],
-                status=form.cleaned_data['status'],
-                schedule_type=form.cleaned_data['schedule_type'],
-                credits=form.cleaned_data['credits'],
-                constraint_type=form.cleaned_data['constraint_type'],
-                min_constraint=form.cleaned_data['min_constraint'],
-                max_constraint=form.cleaned_data['max_constraint'],
-                management_entity_acronym=form.cleaned_data['management_entity'],
-                teaching_campus_name=form.cleaned_data['teaching_campus']['name'],
-                organization_name=form.cleaned_data['teaching_campus']['organization_name'],
-                remark_fr=form.cleaned_data['remark_fr'],
-                remark_en=form.cleaned_data['remark_en'],
-                start_year=form.cleaned_data['academic_year'],
-                end_year=form.cleaned_data['end_year'],
-                path_to_paste=self.get_attach_path()
-            )
-            mini_training_identity = create_mini_training_and_attach_service.create_mini_training_and_attach(
-                create_and_paste_command
-            )
-        else:
-            create_command = command.CreateOrphanMiniTrainingCommand(
-                code=form.cleaned_data['code'],
-                year=form.cleaned_data["academic_year"],
-                type=self.kwargs['type'],
-                abbreviated_title=form.cleaned_data['abbreviated_title'],
-                title_fr=form.cleaned_data['title_fr'],
-                title_en=form.cleaned_data['title_en'],
-                status=form.cleaned_data['status'],
-                schedule_type=form.cleaned_data['schedule_type'],
-                credits=form.cleaned_data['credits'],
-                constraint_type=form.cleaned_data['constraint_type'],
-                min_constraint=form.cleaned_data['min_constraint'],
-                max_constraint=form.cleaned_data['max_constraint'],
-                management_entity_acronym=form.cleaned_data['management_entity'],
-                teaching_campus_name=form.cleaned_data['teaching_campus']['name'],
-                organization_name=form.cleaned_data['teaching_campus']['organization_name'],
-                remark_fr=form.cleaned_data['remark_fr'],
-                remark_en=form.cleaned_data['remark_en'],
-                start_year=form.cleaned_data['academic_year'],
-                end_year=form.cleaned_data['end_year'],
-            )
-            mini_training_identity = create_mini_training_service.create_orphan_mini_training(create_command)
-
-        self.set_success_url(mini_training_identity)
-
-        display_success_messages(self.request, self.get_success_msg(mini_training_identity), extra_tags='safe')
-
-        return super().form_valid(form)
+            parent_identity = self.get_parent_identity()
+            return reverse(
+                'element_identification',
+                kwargs={'code': parent_identity.code, 'year': parent_identity.year}
+            ) + "?path={}".format(self.get_attach_path())
+        return reverse('version_program')
 
     def _get_initial_form(self) -> Dict:
         request_cache = RequestCache(self.request.user, reverse('version_program'))
@@ -146,21 +145,65 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
             'management_entity': default_management_entity
         }
 
-    def get_tabs(self) -> List[FormTab]:
-        return [
-            FormTab(
-                _("Identification"),
-                True,
-                True,
-                "education_group_app/mini_training/upsert/identification_form.html"
+    def get_parent_identity(self) -> Optional['NodeIdentity']:
+        if self.get_attach_path():
+            cmd_get_node_id = command_pgrm.GetNodeIdentityFromElementId(
+                int(self.get_attach_path().split('|')[-1])
             )
-        ]
+            parent_id = node_identity_service.get_node_identity_from_element_id(cmd_get_node_id)
+            return parent_id
+        return None
 
-    def get_attach_path(self) -> Optional['Path']:
-        return self.request.GET.get('path_to') or None
+    def _generate_create_command_from_valid_form(
+            self,
+            form: mini_training_form.MiniTrainingForm) -> command.CreateOrphanMiniTrainingCommand:
+        return command.CreateOrphanMiniTrainingCommand(
+            code=form.cleaned_data['code'],
+            year=form.cleaned_data["academic_year"],
+            type=form.cleaned_data["type"],
+            abbreviated_title=form.cleaned_data['abbreviated_title'],
+            title_fr=form.cleaned_data['title_fr'],
+            title_en=form.cleaned_data['title_en'],
+            status=form.cleaned_data['status'],
+            schedule_type=form.cleaned_data['schedule_type'],
+            credits=form.cleaned_data['credits'],
+            constraint_type=form.cleaned_data['constraint_type'],
+            min_constraint=form.cleaned_data['min_constraint'],
+            max_constraint=form.cleaned_data['max_constraint'],
+            management_entity_acronym=form.cleaned_data['management_entity'],
+            teaching_campus_name=form.cleaned_data['teaching_campus']['name'],
+            organization_name=form.cleaned_data['teaching_campus']['organization_name'],
+            remark_fr=form.cleaned_data['remark_fr'],
+            remark_en=form.cleaned_data['remark_en'],
+            start_year=form.cleaned_data['academic_year'],
+            end_year=form.cleaned_data['end_year'],
+        )
 
-    def set_success_url(self, mini_training_identity: mini_training.MiniTrainingIdentity) -> None:
-        self.success_url = self._generate_success_url(mini_training_identity)
+    def _generate_create_and_attach_command_from_valid_form(
+            self,
+            form: mini_training_form.MiniTrainingForm) -> command_pgrm.CreateMiniTrainingAndPasteCommand:
+        return command_pgrm.CreateMiniTrainingAndPasteCommand(
+            code=form.cleaned_data['code'],
+            year=form.cleaned_data["academic_year"],
+            type=self.kwargs['type'],
+            abbreviated_title=form.cleaned_data['abbreviated_title'],
+            title_fr=form.cleaned_data['title_fr'],
+            title_en=form.cleaned_data['title_en'],
+            status=form.cleaned_data['status'],
+            schedule_type=form.cleaned_data['schedule_type'],
+            credits=form.cleaned_data['credits'],
+            constraint_type=form.cleaned_data['constraint_type'],
+            min_constraint=form.cleaned_data['min_constraint'],
+            max_constraint=form.cleaned_data['max_constraint'],
+            management_entity_acronym=form.cleaned_data['management_entity'],
+            teaching_campus_name=form.cleaned_data['teaching_campus']['name'],
+            organization_name=form.cleaned_data['teaching_campus']['organization_name'],
+            remark_fr=form.cleaned_data['remark_fr'],
+            remark_en=form.cleaned_data['remark_en'],
+            start_year=form.cleaned_data['academic_year'],
+            end_year=form.cleaned_data['end_year'],
+            path_to_paste=self.get_attach_path()
+        )
 
     def _generate_success_url(self, mini_training_identity: mini_training.MiniTrainingIdentity) -> str:
         success_url = reverse(
@@ -171,28 +214,3 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
         if path:
             success_url += "?path={}".format(path)
         return success_url
-
-    def get_success_msg(self, mini_training_identity: mini_training.MiniTrainingIdentity) -> str:
-        return _("Mini-training <a href='%(link)s'> %(code)s (%(academic_year)s) </a> successfully created.") % {
-            "link": self.success_url,
-            "code": mini_training_identity.code,
-            "academic_year": display_as_academic_year(mini_training_identity.year),
-        }
-
-    def get_cancel_url(self) -> str:
-        if self.get_attach_path():
-            parent_identity = self.get_parent_identity()
-            return reverse(
-                'element_identification',
-                kwargs={'code': parent_identity.code, 'year': parent_identity.year}
-            ) + "?path={}".format(self.get_attach_path())
-        return reverse('version_program')
-
-    def get_parent_identity(self) -> Optional['NodeIdentity']:
-        if self.get_attach_path():
-            cmd_get_node_id = command_pgrm.GetNodeIdentityFromElementId(
-                int(self.get_attach_path().split('|')[-1])
-            )
-            parent_id = node_identity_service.get_node_identity_from_element_id(cmd_get_node_id)
-            return parent_id
-        return None
