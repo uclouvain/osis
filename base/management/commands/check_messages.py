@@ -47,7 +47,8 @@ class Command(makemessages.Command):
         try:
             subprocess.run(
                 ["msgcmp", fr_po_file_location, pot_file_location],
-                capture_output=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
                 universal_newlines=True,
                 check=True
             )
