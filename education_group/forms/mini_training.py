@@ -119,12 +119,14 @@ class MiniTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
 
     def __init_academic_year_field(self):
         if self.user.person.is_faculty_manager:
-            self.fields['academic_year'].queryset = EventPermEducationGroupEdition.get_academic_years() \
+            academic_year_qs = EventPermEducationGroupEdition.get_academic_years() \
                 .filter(year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION)
         else:
-            self.fields['academic_year'].queryset = self.fields['academic_year'].queryset.filter(
+            academic_year_qs = self.fields['academic_year'].queryset.filter(
                 year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION
             )
+        self.fields['academic_year'].queryset = academic_year_qs
+        self.fields["end_year"].queryset = academic_year_qs
 
     def __init_management_entity_field(self):
         self.fields['management_entity'] = fields.ManagementEntitiesChoiceField(

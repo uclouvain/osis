@@ -61,3 +61,9 @@ class ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum(BusinessExcepti
                     "min": _("minimum constraint").title(),
                  }
         super().__init__(message, **kwargs)
+
+
+class StartYearGreaterThanEndYearException(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _("Validity cannot be greater than last year of organization")
+        super().__init__(message, **kwargs)

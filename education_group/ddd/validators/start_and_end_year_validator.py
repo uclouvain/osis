@@ -21,35 +21,19 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-import operator
+from typing import Optional
 
-import factory.fuzzy
-
-from base.models.enums import education_group_types, schedule_type as schedule_type_enum, active_status, constraint_type
-from education_group.ddd import command
+from base.ddd.utils import business_validator
+from education_group.ddd.domain import exception
 
 
-class CreateOrphanMiniTrainingCommandFactory(factory.Factory):
-    class Meta:
-        model = command.CreateOrphanMiniTrainingCommand
-        abstract = False
+class StartAndEndYearValidator(business_validator.BusinessValidator):
+    def __init__(self, start_year: int, end_year: Optional[int]):
+        super().__init__()
+        self.start_year = start_year
+        self.end_year = end_year
 
-    code = "LOSIS2547"
-    year = 2018
-    type = factory.Iterator(education_group_types.MiniTrainingType.choices(), getter=operator.itemgetter(0))
-    abbreviated_title = "Abbr title"
-    title_fr = "Fr titre"
-    title_en = "En title"
-    status = factory.Iterator(active_status.ACTIVE_STATUS_LIST, getter=operator.itemgetter(0))
-    schedule_type = factory.Iterator(schedule_type_enum.SCHEDULE_TYPES, getter=operator.itemgetter(0))
-    credits = 30
-    constraint_type = factory.Iterator(constraint_type.CONSTRAINT_TYPE, getter=operator.itemgetter(0))
-    min_constraint = 1
-    max_constraint = 10
-    management_entity_acronym = "ACRON"
-    teaching_campus_name = "LLN"
-    organization_name = "ORG"
-    remark_fr = ""
-    remark_en = ""
-    start_year = 2018
-    end_year = None
+    def validate(self, *args, **kwargs):
+        if self.end_year and self.start_year > self.end_year:
+            raise exception.StartYearGreaterThanEndYearException
+

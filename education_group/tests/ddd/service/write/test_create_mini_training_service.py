@@ -33,8 +33,9 @@ class TestCreateOprhanMiniTraining(TestCase):
     def setUp(self):
         self.command = CreateOrphanMiniTrainingCommandFactory()
 
+    @mock.patch('education_group.publisher.mini_training_created', autospec=True)
     @mock.patch("education_group.ddd.service.write.create_mini_training_service.MiniTrainingRepository.create")
-    def test_should_return_mini_training_identity(self, mock_repository_create):
+    def test_should_return_mini_training_identity(self, mock_repository_create, mock_publisher):
         mock_repository_create.return_value = mini_training.MiniTrainingIdentity(
             code=self.command.code,
             year=self.command.start_year
@@ -44,4 +45,5 @@ class TestCreateOprhanMiniTraining(TestCase):
             result,
             mini_training.MiniTrainingIdentity(code=self.command.code, year=self.command.start_year)
         )
+        self.assertTrue(mock_publisher.send.called)
 

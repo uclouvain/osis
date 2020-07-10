@@ -27,6 +27,7 @@ from base.ddd.utils import business_validator
 from education_group.ddd.domain import mini_training
 from education_group.ddd.domain.group import Group
 from education_group.ddd.validators._content_constraint import ContentConstraintValidator
+from education_group.ddd.validators.start_and_end_year_validator import StartAndEndYearValidator
 
 
 class CreateGroupValidatorList(business_validator.BusinessListValidator):
@@ -45,5 +46,6 @@ class CreateMiniTrainingValidatorList(business_validator.BusinessListValidator):
     def __init__(self, mini_training_domain_obj: mini_training.MiniTraining):
         self.validators = [
             ContentConstraintValidator(mini_training_domain_obj.content_constraint),
+            StartAndEndYearValidator(mini_training_domain_obj.start_year, mini_training_domain_obj.end_year)
         ]
         super().__init__()

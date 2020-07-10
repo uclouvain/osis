@@ -21,35 +21,21 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-import operator
+from django.test import SimpleTestCase
 
-import factory.fuzzy
-
-from base.models.enums import education_group_types, schedule_type as schedule_type_enum, active_status, constraint_type
-from education_group.ddd import command
+from education_group.ddd.domain import exception
+from education_group.ddd.validators import start_and_end_year_validator
 
 
-class CreateOrphanMiniTrainingCommandFactory(factory.Factory):
-    class Meta:
-        model = command.CreateOrphanMiniTrainingCommand
-        abstract = False
+class TestStartAndEndYearValidator(SimpleTestCase):
+    def test_should_raise_exception_when_start_year_strictly_superior_than_end_year(self):
+        with self.assertRaises(exception.StartYearGreaterThanEndYearException):
+            start_and_end_year_validator.StartAndEndYearValidator(2019, 2018).validate()
 
-    code = "LOSIS2547"
-    year = 2018
-    type = factory.Iterator(education_group_types.MiniTrainingType.choices(), getter=operator.itemgetter(0))
-    abbreviated_title = "Abbr title"
-    title_fr = "Fr titre"
-    title_en = "En title"
-    status = factory.Iterator(active_status.ACTIVE_STATUS_LIST, getter=operator.itemgetter(0))
-    schedule_type = factory.Iterator(schedule_type_enum.SCHEDULE_TYPES, getter=operator.itemgetter(0))
-    credits = 30
-    constraint_type = factory.Iterator(constraint_type.CONSTRAINT_TYPE, getter=operator.itemgetter(0))
-    min_constraint = 1
-    max_constraint = 10
-    management_entity_acronym = "ACRON"
-    teaching_campus_name = "LLN"
-    organization_name = "ORG"
-    remark_fr = ""
-    remark_en = ""
-    start_year = 2018
-    end_year = None
+    def test_should_not_raise_exception_when_start_year_inferior_to_end_year(self):
+        result = start_and_end_year_validator.StartAndEndYearValidator(2017, 2018).validate()
+        self.assertIsNone(result)
+
+    def test_should_not_raise_exception_when_start_year_equal_to_end_year(self):
+        result = start_and_end_year_validator.StartAndEndYearValidator(2018, 2018).validate()
+        self.assertIsNone(result)
