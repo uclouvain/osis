@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
+
 from django.test import TestCase
 
 from base.models.enums.constraint_type import ConstraintTypeEnum
@@ -224,3 +226,50 @@ class TestGroupRepositoryCreateMethod(TestCase):
         GroupRepository.create(self.group)
         with self.assertRaises(GroupCodeAlreadyExistException):
             GroupRepository.create(self.group)
+
+
+class TestGroupRepositorySearchMethod(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.management_entity_version = EntityVersionFactory(acronym='DRT')
+        cls.group_year_db = GroupYearFactory(
+            management_entity_id=cls.management_entity_version.entity_id,
+            education_group_type=GroupEducationGroupTypeFactory()
+        )
+        cls.group_identity = GroupIdentity(
+            code=cls.group_year_db.partial_acronym,
+            year=cls.group_year_db.academic_year.year,
+        )
+
+        cls.group_year_db_2 = GroupYearFactory(
+            management_entity_id=cls.management_entity_version.entity_id,
+            education_group_type=GroupEducationGroupTypeFactory()
+        )
+        cls.group_identity_2 = GroupIdentity(
+            code=cls.group_year_db_2.partial_acronym,
+            year=cls.group_year_db_2.academic_year.year,
+        )
+
+    def test_assert_search_case_empty_list(self):
+        self.assertListEqual(
+            GroupRepository.search([]),
+            []
+        )
+
+    def test_assert_search_one_entity_id(self):
+        results = GroupRepository.search([self.group_identity])
+
+        self.assertIsInstance(results, List)
+        self.assertEqual(len(results), 1, msg="Should have one result because search only on one ID")
+        self.assertIsInstance(results[0], Group)
+        self.assertEqual(
+            results[0].entity_id,
+            self.group_identity
+        )
+
+    def test_assert_search_multiple_entity_id(self):
+        results = GroupRepository.search([self.group_identity, self.group_identity_2])
+
+        self.assertIsInstance(results, List)
+        self.assertEqual(len(results), 2, msg="Should have two results because search on multiple ID")
+        self.assertIsInstance(results[0], Group)

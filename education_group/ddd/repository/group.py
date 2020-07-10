@@ -26,7 +26,7 @@
 from typing import Optional, List
 
 from django.db import IntegrityError
-from django.db.models import Prefetch, Subquery, OuterRef
+from django.db.models import Prefetch, Subquery, OuterRef, Q
 from django.utils import timezone
 
 from education_group.ddd.business_types import *
@@ -113,70 +113,78 @@ class GroupRepository(interface.AbstractRepository):
 
     @classmethod
     def get(cls, entity_id: 'GroupIdentity') -> 'Group':
-        qs = GroupYearModelDb.objects.filter(
-            partial_acronym=entity_id.code,
-            academic_year__year=entity_id.year
-        ).select_related(
-            'academic_year',
-            'education_group_type',
-            'main_teaching_campus__organization',
-            'group__start_year',
-            'group__end_year',
-        ).prefetch_related(
-            Prefetch(
-                'management_entity',
-                EntityModelDb.objects.all().annotate(
-                    most_recent_acronym=Subquery(
-                        EntityVersionModelDb.objects.filter(
-                            entity__id=OuterRef('pk')
-                        ).order_by('-start_date').values('acronym')[:1]
-                    )
-                )
-            ),
-        )
-        try:
-            obj = qs.get()
-        except GroupYearModelDb.DoesNotExist:
+        results = cls.search([entity_id])
+        if not results:
             raise exception.GroupNotFoundException
-
-        return group.Group(
-            entity_identity=entity_id,
-            # TODO: Create UUID field on group model and use it insteaf of group_id
-            unannualized_identity=GroupUnannualizedIdentity(uuid=obj.group_id),
-            type=_convert_type(obj.education_group_type),
-            abbreviated_title=obj.acronym,
-            titles=Titles(
-                title_fr=obj.title_fr,
-                title_en=obj.title_en,
-            ),
-            credits=obj.credits,
-            content_constraint=ContentConstraint(
-                type=ConstraintTypeEnum[obj.constraint_type] if obj.constraint_type else None,
-                minimum=obj.min_constraint,
-                maximum=obj.max_constraint,
-            ),
-            management_entity=EntityValueObject(
-                acronym=obj.management_entity.most_recent_acronym,
-            ),
-            teaching_campus=Campus(
-                name=obj.main_teaching_campus.name,
-                university_name=obj.main_teaching_campus.organization.name,
-            ),
-            remark=Remark(
-                text_fr=obj.remark_fr,
-                text_en=obj.remark_en
-            ),
-            start_year=obj.group.start_year.year,
-            end_year=obj.group.end_year.year if obj.group.end_year else None,
-        )
+        return results[0]
 
     @classmethod
     def search(cls, entity_ids: Optional[List['GroupIdentity']] = None, **kwargs) -> List['Group']:
-        raise NotImplementedError
+        if entity_ids:
+            qs = GroupYearModelDb.objects.all().select_related(
+                'academic_year',
+                'education_group_type',
+                'main_teaching_campus__organization',
+                'group__start_year',
+                'group__end_year',
+            ).prefetch_related(
+                Prefetch(
+                    'management_entity',
+                    EntityModelDb.objects.all().annotate(
+                        most_recent_acronym=Subquery(
+                            EntityVersionModelDb.objects.filter(
+                                entity__id=OuterRef('pk')
+                            ).order_by('-start_date').values('acronym')[:1]
+                        )
+                    )
+                ),
+            )
+            filter_or_clause = Q()
+            for entity_id in entity_ids:
+                filter_or_clause |= Q(
+                    partial_acronym=entity_id.code,
+                    academic_year__year=entity_id.year
+                )
+            return [_convert_db_model_to_ddd_model(obj) for obj in qs.filter(filter_or_clause)]
+        return []
 
     @classmethod
     def delete(cls, entity_id: 'GroupIdentity') -> None:
         raise NotImplementedError
+
+
+def _convert_db_model_to_ddd_model(obj: GroupYearModelDb) -> 'Group':
+    entity_id = GroupIdentity(code=obj.partial_acronym, year=obj.academic_year.year)
+    return group.Group(
+        entity_identity=entity_id,
+        # TODO: Create UUID field on group model and use it insteaf of group_id
+        unannualized_identity=GroupUnannualizedIdentity(uuid=obj.group_id),
+        type=_convert_type(obj.education_group_type),
+        abbreviated_title=obj.acronym,
+        titles=Titles(
+            title_fr=obj.title_fr,
+            title_en=obj.title_en,
+        ),
+        credits=obj.credits,
+        content_constraint=ContentConstraint(
+            type=ConstraintTypeEnum[obj.constraint_type] if obj.constraint_type else None,
+            minimum=obj.min_constraint,
+            maximum=obj.max_constraint,
+        ),
+        management_entity=EntityValueObject(
+            acronym=obj.management_entity.most_recent_acronym,
+        ),
+        teaching_campus=Campus(
+            name=obj.main_teaching_campus.name,
+            university_name=obj.main_teaching_campus.organization.name,
+        ),
+        remark=Remark(
+            text_fr=obj.remark_fr,
+            text_en=obj.remark_en
+        ),
+        start_year=obj.group.start_year.year,
+        end_year=obj.group.end_year.year if obj.group.end_year else None,
+    )
 
 
 def _convert_type(education_group_type):

@@ -23,33 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import factory.fuzzy
-
-from base.tests.factories.group_element_year import _generate_block_value
-from base.tests.factories.utils.fuzzy import FuzzyBoolean
-from program_management.ddd.domain.link import Link
-from program_management.tests.ddd.factories.node import NodeGroupYearFactory
+from osis_common.ddd import interface
 
 
-class LinkFactory(factory.Factory):
-    class Meta:
-        model = Link
-        abstract = False
-
-    pk = factory.Sequence(lambda n: n+1)
-    parent = factory.SubFactory(NodeGroupYearFactory)
-    child = factory.SubFactory(NodeGroupYearFactory)
-    relative_credits = factory.fuzzy.FuzzyInteger(0, 10)
-    is_mandatory = FuzzyBoolean()
-    order = None
-    block = factory.LazyFunction(_generate_block_value)
-    comment = factory.fuzzy.FuzzyText(length=50)
-    comment_english = factory.fuzzy.FuzzyText(length=50)
-    link_type = None
-
-    @factory.post_generation
-    def _add_children(self, create, extracted, ** kwargs):
-        if not self.parent.children:
-            self.parent.children = [self]
-        else:
-            self.parent.children.append(self)
+class GetLearningUnitYearCommand(interface.CommandRequest):
+    def __init__(self, code: str, year: int):
+        self.code = code
+        self.year = year
