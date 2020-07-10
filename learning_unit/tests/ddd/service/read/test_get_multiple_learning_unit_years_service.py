@@ -38,7 +38,7 @@ class TestGetMultipleLearningUnitYear(SimpleTestCase):
         ]
 
     def test_assert_repository_called(self):
-        with patch('learning_unit.ddd.service.read.learning_unit_year_service.load_learning_unit_year.'
+        with patch('learning_unit.ddd.service.read.get_multiple_learning_unit_years_service.load_learning_unit_year.'
                    'load_multiple_by_identity') as mock_repo_multiple:
             get_multiple_learning_unit_years_service.get_multiple_learning_unit_years(self.cmds)
             self.assertTrue(mock_repo_multiple.called)
