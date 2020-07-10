@@ -220,3 +220,13 @@ class GetNodeIdentityFromElementId(interface.CommandRequest):
     def __repr__(self) -> str:
         parameters = ", ".join([str(self.element_id)])
         return "GetNodeIdentityFromElementId({parameters})".format(parameters=parameters)
+
+
+class GetProgramTree(interface.CommandRequest):
+    def __init__(self, code: str, year: int):
+        self.code = code
+        self.year = year
+
+    def __repr__(self) -> str:
+        parameters = ", ".join([str(self.code), str(self.year)])
+        return "GetProgramTree({parameters})".format(parameters=parameters)

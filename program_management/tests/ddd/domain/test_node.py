@@ -415,3 +415,36 @@ class TestGetFinalitiesList(SimpleTestCase):
         link2 = LinkFactory(parent=link1.child, child__node_type=TrainingType.MASTER_MS_120)
         expected_result = {link2.child}
         self.assertEqual(link2.parent.get_finality_list(), expected_result, "Should contain children of children")
+
+
+class TestGetDirectChildrenAsNodes(SimpleTestCase):
+    def setUp(self):
+        self.parent = NodeGroupYearFactory()
+        self.child_link_0 = LinkFactory(
+            parent=self.parent,
+            child=NodeGroupYearFactory(node_type=GroupType.COMMON_CORE),
+            order=0
+        )
+        self.child_link_1 = LinkFactory(
+            parent=self.parent,
+            child=NodeGroupYearFactory(node_type=GroupType.MAJOR_LIST_CHOICE),
+            order=1
+        )
+
+    def test_assert_return_empty_list_when_no_children(self):
+        self.assertEqual(
+            NodeGroupYearFactory().get_direct_children_as_nodes(),
+            []
+        )
+
+    def test_assert_filter_take_only(self):
+        self.assertEqual(
+            self.parent.get_direct_children_as_nodes(take_only={GroupType.COMMON_CORE}),
+            [self.child_link_0.child]
+        )
+
+    def test_assert_filter_ignore_children_from(self):
+        self.assertEqual(
+            self.parent.get_direct_children_as_nodes(ignore_children_from={GroupType.COMMON_CORE}),
+            [self.child_link_1.child]
+        )

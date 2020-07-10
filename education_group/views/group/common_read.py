@@ -131,6 +131,7 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
             "selected_element_clipboard": self.get_selected_element_clipboard_message(),
             "group_year": self.get_group_year(),  # TODO: Should be remove and use DDD object
             "create_group_url": self.get_create_group_url(),
+            "update_group_url": self.get_update_group_url(),
             "create_training_url": self.get_create_training_url(),
             "create_mini_training_url": self.get_create_mini_training_url()
         }
@@ -152,6 +153,10 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
 
     def get_create_group_url(self):
         return reverse('create_element_select_type', kwargs={'category': Categories.GROUP.name}) + \
+               "?path_to={}".format(self.get_path())
+
+    def get_update_group_url(self):
+        return reverse('group_update', kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}) + \
                "?path_to={}".format(self.get_path())
 
     def get_create_mini_training_url(self):

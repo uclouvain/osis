@@ -21,19 +21,11 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from unittest.mock import patch
-
-from django.test import SimpleTestCase
-
-from education_group.ddd import command
-from education_group.ddd.service.read import group_service
+from program_management.ddd import command
+from program_management.ddd.domain.program_tree import ProgramTree, ProgramTreeIdentity
+from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 
 
-class TestGetGroup(SimpleTestCase):
-    def setUp(self):
-        self.cmd = command.GetGroupCommand(year=2018, code="LTRONC1")
-
-    def test_assert_repository_called(self):
-        with patch('education_group.ddd.service.read.group_service.GroupRepository.get') as mock_grp_repo_get:
-            group_service.get_group(self.cmd)
-            self.assertTrue(mock_grp_repo_get.called)
+def get_program_tree(cmd: command.GetProgramTree) -> ProgramTree:
+    program_tree_id = ProgramTreeIdentity(code=cmd.code, year=cmd.year)
+    return ProgramTreeRepository.get(program_tree_id)
