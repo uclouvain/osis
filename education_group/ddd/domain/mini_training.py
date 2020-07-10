@@ -93,7 +93,7 @@ class MiniTrainingIdentity(interface.EntityIdentity):
 @attr.s(frozen=True, slots=True)
 class MiniTrainingUnannualizedIdentity(interface.ValueObject):
     """
-    This ID is necessary to find a GROUP through years because code can be different through years
+    This ID is necessary to find a Mini Training through years because code can be different through years
     """
     uuid = attr.ib(type=int)
 

@@ -41,7 +41,7 @@ def copy_group(cmd: command.CopyGroupCommand) -> List['GroupIdentity']:
         cmd_get_group = command.GetGroupCommand(code=cmd.from_code, year=to_year - 1)
         grp = group_service_read.get_group(cmd_get_group)
 
-        group_next_year = group.builder.build_next_year_group(from_mini_training=grp)
+        group_next_year = group.builder.build_next_year_group(from_group=grp)
         cmd_create_group = command.CreateOrphanGroupCommand(
             code=group_next_year.code,
             year=group_next_year.year,

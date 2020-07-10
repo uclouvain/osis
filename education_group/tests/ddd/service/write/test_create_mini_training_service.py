@@ -45,5 +45,6 @@ class TestCreateOprhanMiniTraining(TestCase):
             result,
             mini_training.MiniTrainingIdentity(code=self.command.code, year=self.command.start_year)
         )
+        self.assertTrue(mock_repository_create.called)
         self.assertTrue(mock_publisher.send.called)
 
