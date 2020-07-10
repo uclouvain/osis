@@ -60,7 +60,8 @@ def check_messages_for_app(app_name: str) -> Tuple[OUTPUT_MESSAGE, RETURN_CODE]:
 
     completed_process = subprocess.run(
         ["../manage.py", "check_messages"],
-        capture_output=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
         universal_newlines=True,
         cwd=app_name
     )
