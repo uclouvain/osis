@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,40 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import itertools
-from collections import OrderedDict
 
 from dal import autocomplete
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils.html import format_html
 
-from base.business.education_group import create_xls, ORDER_COL, ORDER_DIRECTION, create_xls_administrative_data
-from base.forms.search.search_form import get_research_criteria
 from base.models.education_group_type import EducationGroupType
-
-
-def _get_filter(form):
-    return OrderedDict(itertools.chain(get_research_criteria(form)))
-
-
-def _create_xls(view_obj, context, **response_kwargs):
-    user = view_obj.request.user
-    egys = context["filter"].qs
-    filters = _get_filter(context["form"])
-    # FIXME: use ordering args in filter_form! Remove xls_order_col/xls_order property
-    order = {ORDER_COL: view_obj.request.GET.get('xls_order_col'),
-             ORDER_DIRECTION: view_obj.request.GET.get('xls_order')}
-    return create_xls(user, egys, filters, order)
-
-
-def _create_xls_administrative_data(view_obj, context, **response_kwargs):
-    user = view_obj.request.user
-    egys = context["filter"].qs
-    filters = _get_filter(context["form"])
-    # FIXME: use ordering args in filter_form! Remove xls_order_col/xls_order property
-    order = {ORDER_COL: view_obj.request.GET.get('xls_order_col'),
-             ORDER_DIRECTION: view_obj.request.GET.get('xls_order')}
-    return create_xls_administrative_data(user, egys, filters, order)
 
 
 class EducationGroupTypeAutoComplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
