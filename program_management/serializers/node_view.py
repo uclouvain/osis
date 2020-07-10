@@ -125,7 +125,7 @@ def _get_node_view_serializer(link: 'Link', path: str, context=None) -> dict:
         'text': '%(code)s - %(title)s%(version)s' %
                 {'code': link.child.code,
                  'title': link.child.title,
-                 'version': ' [%(version_label)s]' % {'version_label': version_label} if version_label else ''
+                 'version': '%(version_label)s' % {'version_label': version_label} if version_label else ''
                  },
         'children': serialize_children(
             children=link.child.children,

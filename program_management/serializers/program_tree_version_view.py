@@ -32,9 +32,9 @@ def program_tree_version_view_serializer(program_tree_version: 'ProgramTreeVersi
     tree_dict = program_tree_view_serializer(program_tree_version.get_tree())
 
     if program_tree_version.version_label:
-        tree_dict.update({'text': '%(text)s %(version_label)s' % {
+        tree_dict.update({'text': '%(text)s%(version_label)s' % {
             'text': tree_dict['text'],
-            'version_label': '[%(label)s]' % {'label': program_tree_version.version_label} if program_tree_version.version_label else ''
+            'version_label': '%(label)s' % {'label': program_tree_version.version_label} if program_tree_version.version_label else ''
         }})
 
     return tree_dict
