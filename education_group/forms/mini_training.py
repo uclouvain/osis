@@ -41,7 +41,6 @@ from rules_management.enums import MINI_TRAINING_PGRM_ENCODING_PERIOD, MINI_TRAI
 from rules_management.mixins import PermissionFieldMixin
 
 
-#  TODO set academic year greater or equal than current academic year or based on calendar
 class MiniTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     code = forms.CharField(max_length=15, label=_("Code"), required=False)
     academic_year = forms.ModelChoiceField(
