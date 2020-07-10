@@ -65,4 +65,3 @@ def check_messages_for_app(app_name: str) -> Tuple[OUTPUT_MESSAGE, RETURN_CODE]:
         cwd=app_name
     )
     return completed_process.stderr, completed_process.returncode
-
