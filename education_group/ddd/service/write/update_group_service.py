@@ -24,6 +24,7 @@
 
 from django.db import transaction
 
+from base.models.enums.constraint_type import ConstraintTypeEnum
 from education_group.ddd import command
 from education_group.ddd.domain._campus import Campus
 from education_group.ddd.domain._content_constraint import ContentConstraint
@@ -46,7 +47,7 @@ def update_group(cmd: command.UpdateGroupCommand) -> 'GroupIdentity':
         titles=Titles(title_fr=cmd.title_fr, title_en=cmd.title_en),
         credits=cmd.credits,
         content_constraint=ContentConstraint(
-            type=cmd.constraint_type,
+            type=ConstraintTypeEnum[cmd.constraint_type] if cmd.constraint_type else None,
             minimum=cmd.min_constraint,
             maximum=cmd.max_constraint
         ),
