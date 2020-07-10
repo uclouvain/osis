@@ -85,6 +85,8 @@ class CopyGroupCommand(interface.CommandRequest):
 
 @attr.s(frozen=True, slots=True)
 class UpdateGroupCommand(interface.CommandRequest):
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)
     abbreviated_title = attr.ib(type=str)
     title_fr = attr.ib(type=str)
     title_en = attr.ib(type=str)

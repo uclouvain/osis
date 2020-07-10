@@ -25,19 +25,36 @@
 from django.db import transaction
 
 from education_group.ddd import command
-from education_group.ddd.domain import group
+from education_group.ddd.domain._campus import Campus
+from education_group.ddd.domain._content_constraint import ContentConstraint
+from education_group.ddd.domain._entity import Entity
+from education_group.ddd.domain._remark import Remark
+from education_group.ddd.domain._titles import Titles
 
 from education_group.ddd.domain.group import GroupIdentity
 from education_group.ddd.repository.group import GroupRepository
 
 
-from education_group.ddd.validators.validators_by_business_action import UpdateGroupValidatorList
-
-
 # TODO : Implement Validator (Actually in GroupFrom via ValidationRules)
 @transaction.atomic()
 def update_group(cmd: command.UpdateGroupCommand) -> 'GroupIdentity':
-    grp = group.builder.build_from_update_cmd(cmd)
+    group_identity = GroupIdentity(code=cmd.code, year=cmd.year)
+    grp = GroupRepository.get(group_identity)
 
-    UpdateGroupValidatorList(grp).validate()
+    grp.update(
+        abbreviated_title=cmd.abbreviated_title,
+        titles=Titles(title_fr=cmd.title_fr, title_en=cmd.title_en),
+        credits=cmd.credits,
+        content_constraint=ContentConstraint(
+            type=cmd.constraint_type,
+            minimum=cmd.min_constraint,
+            maximum=cmd.max_constraint
+        ),
+        management_entity=Entity(acronym=cmd.management_entity_acronym),
+        teaching_campus=Campus(
+            name=cmd.teaching_campus_name,
+            university_name=cmd.organization_name
+        ),
+        remark=Remark(text_fr=cmd.remark_fr, text_en=cmd.remark_en)
+    )
     return GroupRepository.update(grp)

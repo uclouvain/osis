@@ -108,8 +108,39 @@ class GroupRepository(interface.AbstractRepository):
         )
 
     @classmethod
-    def update(cls, entity: 'Group') -> 'GroupIdentity':
-        raise NotImplementedError
+    def update(cls, group: 'Group') -> 'GroupIdentity':
+        try:
+            management_entity = EntityVersionModelDb.objects.current(timezone.now()).only('entity_id').get(
+                acronym=group.management_entity.acronym,
+            )
+            teaching_campus = CampusModelDb.objects.only('id').get(
+                name=group.teaching_campus.name,
+                organization__name=group.teaching_campus.university_name
+            )
+        except EntityVersionModelDb.DoesNotExist:
+            raise ManagementEntityNotFound
+        except CampusModelDb.DoesNotExist:
+            raise TeachingCampusNotFound
+
+        try:
+            group_db_obj = GroupYearModelDb.objects.get(
+                partial_acronym=group.entity_id.code,
+                academic_year__year=group.entity_id.year
+            )
+        except GroupYearModelDb.DoesNotExist:
+            raise exception.GroupNotFoundException
+
+        group_db_obj.acronym = group.abbreviated_title
+        group_db_obj.title_fr = group.titles.title_fr
+        group_db_obj.title_en = group.titles.title_en
+        group_db_obj.credits = group.credits
+        group_db_obj.constraint_type = group.content_constraint.type.name if group.content_constraint.type else None
+        group_db_obj.min_constraint = group.content_constraint.minimum
+        group_db_obj.max_constraint = group.content_constraint.maximum
+        group_db_obj.management_entity_id = management_entity.entity_id
+        group_db_obj.main_teaching_campus = teaching_campus
+        group_db_obj.save()
+        return group.entity_id
 
     @classmethod
     def get(cls, entity_id: 'GroupIdentity') -> 'Group':
