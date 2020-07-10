@@ -53,7 +53,7 @@ class Command(makemessages.Command):
                 check=True
             )
         except subprocess.CalledProcessError as e:
-            print(e.stderr, file=sys.stderr)
+            self.stderr.write(e.stderr)
             raise SystemExit(1)
         finally:
             self.remove_potfiles()

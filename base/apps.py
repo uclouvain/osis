@@ -36,4 +36,3 @@ class BaseConfig(AppConfig):
         from assessments.views.score_encoding import get_json_data_scores_sheets
         # if django.core.exceptions.AppRegistryNotReady: Apps aren't loaded yet.
         # ===> This exception says that there is an error in the implementation of method ready(self) !!
-        from base.checks import makemessages_check
