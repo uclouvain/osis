@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -75,7 +75,7 @@ class EducationGroupPedagogyUpdateViewTestCase(TestCase):
             language=settings.LANGUAGE_CODE_EN,
         )
         cls.person = PersonFactory()
-        cls.url = reverse("education_group_pedagogy_edit", args=[cls.training.pk, cls.training.pk])
+        cls.url = reverse("education_group_pedagogy_edit", args=[cls.training.pk])
 
     def setUp(self):
         self.perm_patcher = mock.patch("django.contrib.auth.models.User.has_perm", return_value=True)
@@ -151,7 +151,7 @@ class EducationGroupPedagogyUpdateViewTestCase(TestCase):
         request = RequestFactory().post(self.url, data=post_data)
 
         from base.views.education_group import education_group_year_pedagogy_edit_post
-        response = education_group_year_pedagogy_edit_post(request, self.training.pk, self.training.pk)
+        response = education_group_year_pedagogy_edit_post(request, self.training.pk)
 
         self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
         anchor_expected = '#section_welcome_introduction'
@@ -257,7 +257,7 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
     def test_case_admission_condition_remove_line_not_found(self):
         delete_url = reverse(
             "education_group_year_admission_condition_remove_line",
-            args=[self.education_group_parent.pk, self.education_group_child.pk]
+            args=[self.education_group_child.academic_year.year, self.education_group_child.partial_acronym]
         )
         response = self.client.get(delete_url, data={'id': 0})
 
@@ -266,7 +266,7 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
     def test_case_admission_condition_remove_line(self):
         delete_url = reverse(
             "education_group_year_admission_condition_remove_line",
-            args=[self.education_group_parent.pk, self.education_group_child.pk]
+            args=[self.education_group_child.academic_year.year, self.education_group_child.partial_acronym]
         )
 
         admission_condition = AdmissionCondition.objects.create(education_group_year=self.education_group_child)
@@ -284,7 +284,7 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
     def test_case_admission_condition_update_line(self, mock_edit_post, mock_edit_get):
         update_url = reverse(
             "education_group_year_admission_condition_update_line",
-            args=[self.education_group_parent.pk, self.education_group_child.pk]
+            args=[self.education_group_child.academic_year.year, self.education_group_child.partial_acronym]
         )
         response = self.client.get(update_url)
         self.assertEqual(response.status_code, HttpResponse.status_code)
@@ -388,9 +388,10 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
             'admission_condition_line': '',
         }
         request = RequestFactory().post('/', form)
-        response = education_group_year_admission_condition_update_line_post(request,
-                                                                             self.education_group_parent.id,
-                                                                             self.education_group_child.id)
+        response = education_group_year_admission_condition_update_line_post(
+            request,
+            self.education_group_child.id
+        )
         # the form is not called because this one is not valid
         mock_save_form.not_called()
         # we can not test the redirection because we don't have a client with the returned response.
@@ -409,9 +410,10 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
             'access': CONDITION_ADMISSION_ACCESSES[2][0],
         }
         request = RequestFactory().post('/', form)
-        response = education_group_year_admission_condition_update_line_post(request,
-                                                                             self.education_group_parent.id,
-                                                                             self.education_group_child.id)
+        response = education_group_year_admission_condition_update_line_post(
+            request,
+            self.education_group_child.id
+        )
 
         education_group_id, creation_mode, unused = mock_save_form.call_args[0]
         self.assertEqual(education_group_id, self.education_group_child.id)
@@ -436,7 +438,6 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         request = RequestFactory().post('/', form)
         education_group_year_admission_condition_update_line_post(
             request,
-            self.education_group_parent.id,
             self.education_group_child.id
         )
 
@@ -463,7 +464,7 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
     def test_case_update_text_admission_condition_without_perms(self, mock_update_get, mock_update_post, mock_perms):
         update_url = reverse(
             "education_group_year_admission_condition_update_text",
-            args=[self.education_group_parent.pk, self.education_group_child.pk]
+            args=[self.education_group_child.academic_year.year, self.education_group_child.partial_acronym]
         )
         response = self.client.get(update_url)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
@@ -477,7 +478,7 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
     def test_case_get_update_text_admission_condition(self, mock_update_get, mock_update_post):
         update_url = reverse(
             "education_group_year_admission_condition_update_text",
-            args=[self.education_group_parent.pk, self.education_group_child.pk]
+            args=[self.education_group_child.academic_year.year, self.education_group_child.partial_acronym]
         )
         response = self.client.get(update_url)
         self.assertEqual(response.status_code, HttpResponse.status_code)
@@ -491,7 +492,7 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
     def test_case_post_update_text_admission_condition(self, mock_update_get, mock_update_post):
         update_url = reverse(
             "education_group_year_admission_condition_update_text",
-            args=[self.education_group_parent.pk, self.education_group_child.pk]
+            args=[self.education_group_child.academic_year.year, self.education_group_child.partial_acronym]
         )
         response = self.client.post(update_url)
         self.assertEqual(response.status_code, HttpResponse.status_code)
@@ -509,7 +510,7 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
 
         update_url = reverse(
             "education_group_year_admission_condition_update_text",
-            args=[self.education_group_parent.pk, self.education_group_child.pk]
+            args=[self.education_group_child.academic_year.year, self.education_group_child.partial_acronym]
         )
         querystring_data = {'section': 'free', 'language': 'fr', 'title': 'Free Text'}
         request = RequestFactory().get(update_url, data=querystring_data)
@@ -534,7 +535,7 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
 
         update_url = reverse(
             "education_group_year_admission_condition_update_text",
-            args=[self.education_group_parent.pk, self.education_group_child.pk]
+            args=[self.education_group_child.academic_year.year, self.education_group_child.partial_acronym]
         )
         post_data = {'section': 'free', 'text_fr': 'Texte en Français', 'text_en': 'Text in English'}
         request = RequestFactory().post(update_url, data=post_data)
@@ -543,7 +544,6 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         from base.views.education_group import education_group_year_admission_condition_update_text_post
         response = education_group_year_admission_condition_update_text_post(
             request,
-            self.education_group_parent.id,
             self.education_group_child.id,
         )
 
@@ -556,14 +556,13 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
     def test_education_group_year_admission_condition_update_text_post_form_is_not_valid(self, mock_is_valid):
         update_url = reverse(
             "education_group_year_admission_condition_update_text",
-            args=[self.education_group_parent.pk, self.education_group_child.pk]
+            args=[self.education_group_child.academic_year.year, self.education_group_child.partial_acronym]
         )
         request = RequestFactory().post(update_url, data={})
 
         from base.views.education_group import education_group_year_admission_condition_update_text_post
         response = education_group_year_admission_condition_update_text_post(
             request,
-            self.education_group_parent.id,
             self.education_group_child.id,
         )
 
@@ -580,8 +579,8 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         self.assertLess(admission_condition_line_1.order, admission_condition_line_2.order)
 
         url = reverse('education_group_year_admission_condition_line_order', kwargs={
-            'offer_id': self.education_group_parent.id,
-            'education_group_year_id': self.education_group_child.id,
+            'year': self.education_group_child.academic_year.year,
+            'code': self.education_group_child.partial_acronym,
         })
 
         data = {
@@ -613,6 +612,7 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         self.assertLess(admission_condition_line_1.order, admission_condition_line_2.order)
 
     def test_education_group_year_admission_condition_change_lang_tab(self):
-        url = reverse('tab_lang_edit', args=[self.education_group_parent.pk, self.education_group_child.pk, 'fr'])
+        url = reverse('tab_lang_edit', args=[self.education_group_child.academic_year.year,
+                                             self.education_group_child.partial_acronym, 'fr'])
         response = self.client.get(url)
         self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
