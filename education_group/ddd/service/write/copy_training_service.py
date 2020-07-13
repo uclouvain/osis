@@ -23,12 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.db import transaction
 
 from education_group.ddd import command
 from education_group.ddd.domain.training import TrainingBuilder, TrainingIdentity
 from education_group.ddd.repository.training import TrainingRepository
 
 
+@transaction.atomic()
 def copy_training_to_next_year(copy_cmd: command.CopyTrainingToNextYearCommand) -> 'TrainingIdentity':
     # GIVEN
     repository = TrainingRepository()

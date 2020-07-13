@@ -25,11 +25,14 @@
 ##############################################################################
 from typing import List
 
+from django.db import transaction
+
 from program_management.ddd.business_types import *
 from program_management.ddd.command import PostponeProgramTreeCommand, CopyProgramTreeToNextYearCommand
 from program_management.ddd.service.write import copy_program_tree_service
 
 
+@transaction.atomic()
 def postpone_program_tree(
         postpone_cmd: 'PostponeProgramTreeCommand'
 ) -> List['ProgramTreeIdentity']:

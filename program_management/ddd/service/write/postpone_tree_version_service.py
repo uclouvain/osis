@@ -25,11 +25,14 @@
 ##############################################################################
 from typing import List
 
+from django.db import transaction
+
 from program_management.ddd.command import PostponeProgramTreeVersionCommand, CopyTreeVersionToNextYearCommand
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 from program_management.ddd.service.write import copy_program_version_service
 
 
+@transaction.atomic()
 def postpone_program_tree_version(
         postpone_cmd: 'PostponeProgramTreeVersionCommand'
 ) -> List['ProgramTreeVersionIdentity']:

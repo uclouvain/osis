@@ -23,12 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.db import transaction
+
 from education_group.ddd.service.write.create_group_service import create_orphan_group
 from program_management.ddd.command import CopyProgramTreeToNextYearCommand
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity, ProgramTreeBuilder
 from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 
 
+@transaction.atomic()
 def copy_program_tree_to_next_year(copy_cmd: CopyProgramTreeToNextYearCommand) -> 'ProgramTreeIdentity':
     # GIVEN
     repository = ProgramTreeRepository()

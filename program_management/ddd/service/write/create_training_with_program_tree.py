@@ -25,13 +25,10 @@
 ##############################################################################
 from typing import List
 
-import attr
 from django.db import transaction
 
 from education_group.ddd import command
 from education_group.ddd.business_types import *
-from education_group.ddd.domain.training import TrainingBuilder
-from education_group.ddd.repository.training import TrainingRepository
 from education_group.ddd.service.write import create_group_service, copy_group_service, create_orphan_training_service
 from program_management.ddd.command import CreateStandardVersionCommand, PostponeProgramTreeVersionCommand, \
     PostponeProgramTreeCommand
@@ -39,6 +36,7 @@ from program_management.ddd.service.write import create_standard_version_service
     create_standard_program_tree_service, postpone_program_tree_service
 
 
+@transaction.atomic()
 def create_and_report_training_with_program_tree(
         create_training_cmd: command.CreateTrainingCommand
 ) -> List['TrainingIdentity']:
@@ -65,7 +63,14 @@ def create_and_report_training_with_program_tree(
     )
 
     # 3. Create Program tree
-    program_tree_identity = create_standard_program_tree_service.create_standard_program_tree(cmd)
+
+    program_tree_identity = create_standard_program_tree_service.create_standard_program_tree(
+        CreateStandardVersionCommand(
+            offer_acronym=create_training_cmd.abbreviated_title,
+            code=create_training_cmd.code,
+            year=create_training_cmd.year,
+        )
+    )
 
     # 4. Postpone Program tree
     postpone_program_tree_service.postpone_program_tree(

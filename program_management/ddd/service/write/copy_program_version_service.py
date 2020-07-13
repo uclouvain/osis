@@ -23,12 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.db import transaction
 
 from program_management.ddd.command import CopyTreeVersionToNextYearCommand
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionBuilder, ProgramTreeVersionIdentity
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 
 
+@transaction.atomic()
 def copy_tree_version_to_next_year(copy_cmd: CopyTreeVersionToNextYearCommand) -> 'ProgramTreeVersionIdentity':
     # GIVEN
     repository = ProgramTreeVersionRepository()
