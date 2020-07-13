@@ -31,7 +31,6 @@ from django.views.generic.detail import SingleObjectMixin
 from base.models.education_group_achievement import EducationGroupAchievement
 from base.models.education_group_detailed_achievement import EducationGroupDetailedAchievement
 from base.models.education_group_year import EducationGroupYear
-from education_group.ddd.domain.service.identity_search import TrainingIdentitySearch
 from education_group.views.proxy.read import Tab
 
 
@@ -41,28 +40,30 @@ class EducationGroupAchievementMixin(SingleObjectMixin):
     context_object_name = "education_group_achievement"
     pk_url_kwarg = 'education_group_achievement_pk'
 
-    def get_success_url(self):
-        # Redirect to a page fragment
-        training_identity = TrainingIdentitySearch().get_from_education_group_year_id(self.kwargs['offer_id'])
-        url = reverse(
-            'education_group_read_proxy',
-            args=[training_identity.year, training_identity.acronym]
-        ) + '?tab={}'.format(Tab.SKILLS_ACHIEVEMENTS)
-
-        obj = getattr(self, "object", None) or self.get_object()
-        if obj:
-            # Remove the last / otherwise URL will be malformed
-            url = url.rstrip('/') + "#{}_{}".format(self.context_object_name, obj.pk)
-
-        return url
-
     @cached_property
     def person(self):
         return self.request.user.person
 
     @cached_property
     def education_group_year(self):
-        return get_object_or_404(EducationGroupYear, pk=self.kwargs['education_group_year_id'])
+        return get_object_or_404(
+            EducationGroupYear, partial_acronym=self.kwargs['code'],
+            academic_year__year=self.kwargs['year']
+        )
+
+    def get_context_data(self, **kwargs):
+        return {
+            **super().get_context_data(**kwargs),
+            'path': self.request.GET['path']
+        }
+
+    def get_success_url(self):
+        prefix = 'training_' if self.education_group_year.is_training else 'mini_training_'
+        return reverse(
+            prefix + 'skills_achievements', args=[self.kwargs['year'], self.kwargs['code']]
+        ) + '?path={}&tab={}#achievement_{}'.format(
+            self.request.POST['path'], Tab.SKILLS_ACHIEVEMENTS, self.kwargs['education_group_achievement_pk']
+        )
 
 
 class EducationGroupDetailedAchievementMixin(EducationGroupAchievementMixin):
@@ -74,3 +75,11 @@ class EducationGroupDetailedAchievementMixin(EducationGroupAchievementMixin):
     @cached_property
     def education_group_achievement(self):
         return get_object_or_404(EducationGroupAchievement, pk=self.kwargs["education_group_achievement_pk"])
+
+    def get_success_url(self):
+        prefix = 'training_' if self.education_group_year.is_training else 'mini_training_'
+        return reverse(
+            prefix + 'skills_achievements', args=[self.kwargs['year'], self.kwargs['code']]
+        ) + '?path={}&tab={}#detail_achievements_{}'.format(
+            self.request.POST['path'], Tab.SKILLS_ACHIEVEMENTS, self.kwargs['education_group_detail_achievement_pk']
+        )
