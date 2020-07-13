@@ -144,13 +144,15 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
 
 
 def _instanciate_tree_version(record_dict: dict) -> 'ProgramTreeVersion':
+    identity = ProgramTreeVersionIdentity(
+        record_dict['offer_acronym'],
+        record_dict['offer_year'],
+        record_dict['version_name'],
+        record_dict['is_transition'],
+    )
     return ProgramTreeVersion(
-        entity_identity=ProgramTreeVersionIdentity(
-            record_dict['offer_acronym'],
-            record_dict['offer_year'],
-            record_dict['version_name'],
-            record_dict['is_transition'],
-        ),
+        entity_identity=identity,
+        entity_id=identity,
         program_tree_identity=ProgramTreeIdentity(record_dict['code'], record_dict['offer_year']),
         program_tree_repository=ProgramTreeRepository(),
         title_fr=record_dict['version_title_fr'],

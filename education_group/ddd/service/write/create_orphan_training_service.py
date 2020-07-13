@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
+
 from django.db import transaction
 
 from education_group.ddd import command
@@ -33,7 +35,7 @@ from education_group.ddd.service.write import postpone_training_service
 
 
 @transaction.atomic()
-def create_orphan_training(create_training_cmd: command.CreateTrainingCommand) -> 'TrainingIdentity':
+def create_and_postpone_orphan_training(create_training_cmd: command.CreateTrainingCommand) -> List['TrainingIdentity']:
     # GIVEN
     cmd = create_training_cmd
 
@@ -42,7 +44,7 @@ def create_orphan_training(create_training_cmd: command.CreateTrainingCommand) -
 
     # THEN
     training_id = TrainingRepository.create(training)
-    postpone_training_service.postpone_training(
+    training_identities = postpone_training_service.postpone_training(
         command.PostponeTrainingCommand(
             acronym=training_id.acronym,
             postpone_from_year=training_id.year,
@@ -50,4 +52,4 @@ def create_orphan_training(create_training_cmd: command.CreateTrainingCommand) -
         )
     )
 
-    return training_id
+    return [training_id] + training_identities

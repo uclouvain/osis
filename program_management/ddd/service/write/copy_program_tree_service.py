@@ -23,32 +23,26 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
-from django.db import transaction
-
-from program_management.ddd import command
-from program_management.ddd.business_types import *
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionBuilder
+from education_group.ddd.service.write.create_group_service import create_orphan_group
+from program_management.ddd.command import CopyProgramTreeToNextYearCommand
+from program_management.ddd.domain.program_tree import ProgramTreeIdentity, ProgramTreeBuilder
 from program_management.ddd.repositories.program_tree import ProgramTreeRepository
-from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
-from program_management.ddd.service.write import create_standard_program_tree_service
 
 
-@transaction.atomic()
-def create_standard_program_version(
-        create_standard_cmd: command.CreateStandardVersionCommand
-) -> 'ProgramTreeVersionIdentity':
-
+def copy_program_tree_to_next_year(copy_cmd: CopyProgramTreeToNextYearCommand) -> 'ProgramTreeIdentity':
     # GIVEN
-    cmd = create_standard_cmd
-
-    # WHEN
-    program_tree_version = ProgramTreeVersionBuilder().build_standard_version(
-        cmd=cmd,
-        tree_repository=ProgramTreeRepository()
+    repository = ProgramTreeRepository()
+    existing_program_tree_version = repository.get(
+        entity_id=ProgramTreeIdentity(
+            code=copy_cmd.code,
+            year=copy_cmd.year,
+        )
     )
 
+    # WHEN
+    program_tree_next_year = ProgramTreeBuilder().copy_to_next_year(existing_program_tree_version, repository)
+
     # THEN
-    program_tree_version_identity = ProgramTreeVersionRepository().create(program_tree_version)
-    
-    return program_tree_version_identity
+    identity = repository.create(program_tree_next_year, create_group_service=create_orphan_group)
+
+    return identity

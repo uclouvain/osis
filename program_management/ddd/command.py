@@ -229,3 +229,33 @@ class CreateStandardVersionCommand(interface.CommandRequest):
     offer_acronym = attr.ib(type=str)
     code = attr.ib(type=str)
     year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class PostponeProgramTreeCommand(interface.CommandRequest):
+    postpone_until_year = attr.ib(type=int)
+    from_code = attr.ib(type=str)
+    from_year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class CopyProgramTreeToNextYearCommand(interface.CommandRequest):
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class PostponeProgramTreeVersionCommand(interface.CommandRequest):
+    postpone_until_year = attr.ib(type=int)
+    from_offer_acronym = attr.ib(type=str)
+    from_version_name = attr.ib(type=str)
+    from_year = attr.ib(type=int)
+    from_is_transition = attr.ib(type=bool)
+
+
+@attr.s(frozen=True, slots=True)
+class CopyTreeVersionToNextYearCommand(interface.CommandRequest):
+    from_year = attr.ib(type=int)
+    from_offer_acronym = attr.ib(type=str)
+    from_version_name = attr.ib(type=str)
+    from_is_transition = attr.ib(type=bool)

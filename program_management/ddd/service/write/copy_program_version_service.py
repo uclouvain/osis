@@ -24,31 +24,27 @@
 #
 ##############################################################################
 
-from django.db import transaction
-
-from program_management.ddd import command
-from program_management.ddd.business_types import *
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionBuilder
-from program_management.ddd.repositories.program_tree import ProgramTreeRepository
+from program_management.ddd.command import CopyTreeVersionToNextYearCommand
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionBuilder, ProgramTreeVersionIdentity
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
-from program_management.ddd.service.write import create_standard_program_tree_service
 
 
-@transaction.atomic()
-def create_standard_program_version(
-        create_standard_cmd: command.CreateStandardVersionCommand
-) -> 'ProgramTreeVersionIdentity':
-
+def copy_tree_version_to_next_year(copy_cmd: CopyTreeVersionToNextYearCommand) -> 'ProgramTreeVersionIdentity':
     # GIVEN
-    cmd = create_standard_cmd
-
-    # WHEN
-    program_tree_version = ProgramTreeVersionBuilder().build_standard_version(
-        cmd=cmd,
-        tree_repository=ProgramTreeRepository()
+    repository = ProgramTreeVersionRepository()
+    existing_program_tree_version = repository.get(
+        entity_id=ProgramTreeVersionIdentity(
+            offer_acronym=copy_cmd.from_offer_acronym,
+            year=copy_cmd.from_year,
+            version_name=copy_cmd.from_version_name,
+            is_transition=copy_cmd.from_is_transition,
+        )
     )
 
+    # WHEN
+    tree_version_next_year = ProgramTreeVersionBuilder().copy_to_next_year(existing_program_tree_version, repository)
+
     # THEN
-    program_tree_version_identity = ProgramTreeVersionRepository().create(program_tree_version)
-    
-    return program_tree_version_identity
+    identity = repository.create(tree_version_next_year)
+
+    return identity

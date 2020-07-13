@@ -23,32 +23,32 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
 
-from django.db import transaction
-
-from program_management.ddd import command
 from program_management.ddd.business_types import *
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionBuilder
-from program_management.ddd.repositories.program_tree import ProgramTreeRepository
-from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
-from program_management.ddd.service.write import create_standard_program_tree_service
+from program_management.ddd.command import PostponeProgramTreeCommand, CopyProgramTreeToNextYearCommand
+from program_management.ddd.service.write import copy_program_tree_service
 
 
-@transaction.atomic()
-def create_standard_program_version(
-        create_standard_cmd: command.CreateStandardVersionCommand
-) -> 'ProgramTreeVersionIdentity':
+def postpone_program_tree(
+        postpone_cmd: 'PostponeProgramTreeCommand'
+) -> List['ProgramTreeIdentity']:
 
-    # GIVEN
-    cmd = create_standard_cmd
+    identities_created = []
 
-    # WHEN
-    program_tree_version = ProgramTreeVersionBuilder().build_standard_version(
-        cmd=cmd,
-        tree_repository=ProgramTreeRepository()
-    )
+    from_year = postpone_cmd.from_year
+    while from_year < postpone_cmd.postpone_until_year:
+        # GIVEN
+        cmd_copy_from = CopyProgramTreeToNextYearCommand(
+            code=postpone_cmd.from_code,
+            year=postpone_cmd.from_year,
+        )
 
-    # THEN
-    program_tree_version_identity = ProgramTreeVersionRepository().create(program_tree_version)
-    
-    return program_tree_version_identity
+        # WHEN
+        identity_next_year = copy_program_tree_service.copy_program_tree_to_next_year(cmd_copy_from)
+
+        # THEN
+        identities_created.append(identity_next_year)
+        from_year += 1
+
+    return identities_created

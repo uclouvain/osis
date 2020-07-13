@@ -24,12 +24,14 @@
 #
 ##############################################################################
 from django.db import transaction
+from django.db.models import Q
 
 from base.models.group_element_year import GroupElementYear
 from osis_common.decorators.deprecated import deprecated
 from program_management.ddd.domain import program_tree
 from program_management.ddd.domain.node import Node
 from program_management.ddd.repositories import _persist_prerequisite
+from program_management.models.element import Element
 
 
 @deprecated  # use ProgramTreeRepository.create() or .update() instead
@@ -50,8 +52,19 @@ def __update_or_create_links(node: Node):
 
 def __persist_group_element_year(link):
     group_element_year, _ = GroupElementYear.objects.update_or_create(
-        parent_element_id=link.parent.pk,
-        child_element_id=link.child.pk,
+        parent_element_id=Element.objects.get(
+            group_year__partial_acronym=link.parent.code,
+            group_year__academic_year__year=link.parent.year,
+        ).pk,
+        child_element_id=Element.objects.get(
+            Q(
+                group_year__partial_acronym=link.child.code,
+                group_year__academic_year__year=link.child.year,
+            ) | Q(
+                learning_unit_year__acronym=link.child.code,
+                learning_unit_year__academic_year__year=link.child.year,
+            )
+        ).pk,
         defaults={
             'relative_credits': link.relative_credits,
             'min_credits': link.min_credits,

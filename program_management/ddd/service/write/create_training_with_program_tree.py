@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
+
 import attr
 from django.db import transaction
 
@@ -31,18 +33,20 @@ from education_group.ddd.business_types import *
 from education_group.ddd.domain.training import TrainingBuilder
 from education_group.ddd.repository.training import TrainingRepository
 from education_group.ddd.service.write import create_group_service, copy_group_service, create_orphan_training_service
-from program_management.ddd.command import CreateStandardVersionCommand
-from program_management.ddd.service.write import create_standard_version_service
+from program_management.ddd.command import CreateStandardVersionCommand, PostponeProgramTreeVersionCommand, \
+    PostponeProgramTreeCommand
+from program_management.ddd.service.write import create_standard_version_service, postpone_tree_version_service, \
+    create_standard_program_tree_service, postpone_program_tree_service
 
 
 def create_and_report_training_with_program_tree(
         create_training_cmd: command.CreateTrainingCommand
-) -> 'TrainingIdentity':
+) -> List['TrainingIdentity']:
     # GIVEN
     cmd = create_training_cmd
 
     # WHEN
-    training_identity = create_orphan_training_service.create_orphan_training(cmd)
+    training_identities = create_orphan_training_service.create_and_postpone_orphan_training(cmd)
 
     # THEN
 
@@ -60,8 +64,20 @@ def create_and_report_training_with_program_tree(
         )
     )
 
-    # 3. Create standard version of program tree
-    create_standard_version_service.create_standard_program_version(
+    # 3. Create Program tree
+    program_tree_identity = create_standard_program_tree_service.create_standard_program_tree(cmd)
+
+    # 4. Postpone Program tree
+    postpone_program_tree_service.postpone_program_tree(
+        PostponeProgramTreeCommand(
+            postpone_until_year=program_tree_identity.year + 6,
+            from_code=program_tree_identity.code,
+            from_year=program_tree_identity.year,
+        )
+    )
+
+    # 5. Create standard version of program tree
+    program_tree_version_identity = create_standard_version_service.create_standard_program_version(
         CreateStandardVersionCommand(
             offer_acronym=create_training_cmd.abbreviated_title,
             code=create_training_cmd.code,
@@ -69,7 +85,18 @@ def create_and_report_training_with_program_tree(
         )
     )
 
-    return training_identity
+    # 6. Postpone standard version of program tree
+    postpone_tree_version_service.postpone_program_tree_version(
+        PostponeProgramTreeVersionCommand(
+            postpone_until_year=program_tree_version_identity.year + 6,  # FIXME :: to calculate with end_year and to with HARD CODE "+6"
+            from_offer_acronym=program_tree_version_identity.offer_acronym,
+            from_version_name=program_tree_version_identity.version_name,
+            from_year=program_tree_version_identity.year,
+            from_is_transition=program_tree_version_identity.is_transition,
+        )
+    )
+
+    return training_identities
 
 
 def __convert_to_group_command(training_cmd: command.CreateTrainingCommand) -> command.CreateOrphanGroupCommand:

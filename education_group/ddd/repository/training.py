@@ -287,6 +287,7 @@ class TrainingRepository(interface.AbstractRepository):
 
         return training.Training(
             entity_identity=entity_id,
+            entity_id=entity_id,
             type=TrainingType[obj.education_group_type.name],
             credits=obj.credits,
             schedule_type=ScheduleTypeEnum[obj.schedule_type],

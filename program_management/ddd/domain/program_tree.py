@@ -35,7 +35,7 @@ from osis_common.ddd import interface
 from osis_common.decorators.deprecated import deprecated
 from program_management.ddd import command
 from program_management.ddd.business_types import *
-from program_management.ddd.domain.node import factory as node_factory, NodeIdentity
+from program_management.ddd.domain.node import factory as node_factory, NodeIdentity, Node
 from program_management.ddd.domain import prerequisite
 from program_management.ddd.domain.service import generate_node_code_service, validation_rule, \
     generate_node_abbreviated_title
@@ -57,6 +57,22 @@ class ProgramTreeIdentity(interface.EntityIdentity):
 
 
 class ProgramTreeBuilder:
+
+    def copy_to_next_year(self, copy_from: 'ProgramTree', repository: 'ProgramTreeRepository') -> 'ProgramTree':
+        identity_next_year = attr.evolve(copy_from.entity_id, year=copy_from.entity_id.year + 1)
+        program_tree_next_year = repository.get(identity_next_year)
+        if program_tree_next_year:
+            # Case update program tree to next year
+            # TODO :: To implement in OSIS-????
+            pass
+        else:
+            # Case create program tree to next year
+            program_tree_next_year = attr.evolve(  # Copy to new object
+                copy_from,
+                entity_id=identity_next_year,
+            )
+        return program_tree_next_year
+
     def build_from_orphan_group_as_root(
             self,
             orphan_group_as_root: 'Group',
@@ -99,19 +115,22 @@ class ProgramTreeBuilder:
         return children
 
 
+@attr.s(slots=True)
 class ProgramTree(interface.RootEntity):
 
-    root_node = None
-    authorized_relationships = None
+    root_node = attr.ib(type=Node)
+    authorized_relationships = attr.ib(type=AuthorizedRelationshipList, factory=list)
+    entity_id = attr.ib(type=ProgramTreeIdentity)  # FIXME :: pass entity_id as mandatory param !
 
-    def __init__(self, root_node: 'Node', authorized_relationships: AuthorizedRelationshipList = None):
-        self.root_node = root_node
-        self.authorized_relationships = authorized_relationships
-        # FIXME :: pass entity_id into the __init__ param !
-        super(ProgramTree, self).__init__(entity_id=ProgramTreeIdentity(self.root_node.code, self.root_node.year))
+    # def __init__(self, root_node: 'Node', authorized_relationships: AuthorizedRelationshipList = None):
+    #     self.root_node = root_node
+    #     self.authorized_relationships = authorized_relationships
+    #     # FIXME :: pass entity_id into the __init__ param !
+    #     super(ProgramTree, self).__init__(entity_id=ProgramTreeIdentity(self.root_node.code, self.root_node.year))
 
-    def __eq__(self, other: 'ProgramTree'):
-        return self.root_node == other.root_node
+    @entity_id.default
+    def _entity_id(self) -> 'ProgramTreeIdentity':
+        return ProgramTreeIdentity(self.root_node.code, self.root_node.year)
 
     def is_master_2m(self):
         return self.root_node.is_master_2m()
