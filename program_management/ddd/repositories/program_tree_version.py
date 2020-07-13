@@ -144,7 +144,7 @@ def _instanciate_tree_version(record_dict: dict) -> 'ProgramTreeVersion':
 
 
 def _search_by_node_entities(entity_ids: List['Node']) -> List[int]:
-    if entity_ids:
+    if entity_ids and len(entity_ids) >= 1:
         qs = EducationGroupVersion.objects.all().values_list('offer_id', flat=True)
 
         filter_search_from = _build_where_clause(entity_ids[0])
