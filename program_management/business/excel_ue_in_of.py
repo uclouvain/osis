@@ -48,6 +48,7 @@ from base.models.learning_unit_year import LearningUnitYear
 from learning_unit.ddd.domain.achievement import Achievement
 from learning_unit.ddd.domain.description_fiche import DescriptionFiche
 from learning_unit.ddd.domain.learning_unit_year import LearningUnitYear as DddLearningUnitYear
+from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYearIdentity
 from learning_unit.ddd.domain.specifications import Specifications
 from learning_unit.ddd.domain.teaching_material import TeachingMaterial
 from learning_unit.ddd.repository.load_learning_unit_year import load_multiple_by_identity
@@ -55,13 +56,12 @@ from osis_common.document.xls_build import _build_worksheet, CONTENT_KEY, HEADER
     STYLED_CELLS, ROW_HEIGHT, FONT_ROWS
 from program_management.business.excel import clean_worksheet_title
 from program_management.business.utils import html2text
-from program_management.ddd.repositories import load_tree
-from program_management.forms.custom_xls import CustomXlsForm
-from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYearIdentity
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.node import NodeLearningUnitYear
-from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
+from program_management.ddd.repositories import load_tree
+from program_management.ddd.repositories.program_tree import ProgramTreeRepository
+from program_management.forms.custom_xls import CustomXlsForm
 
 ILLEGAL_CHARACTERS_RE = re.compile(r'[\000-\010]|[\013-\014]|[\016-\037]')
 
@@ -191,9 +191,10 @@ def _build_excel_lines_ues(custom_xls_form: CustomXlsForm, tree: 'ProgramTree'):
                         optional_data_needed,
                         link
                     ))
-                    font_rows.update(_get_proposal_style(font_rows, luy, idx))
+                    if luy.proposal and luy.proposal.type:
+                        font_rows[PROPOSAL_LINE_STYLES.get(luy.proposal.type)].append(idx)
                     idx += 1
-
+    font_rows[BOLD_FONT].append(0)
     return {
         'content': content,
         'font_rows': font_rows,
@@ -203,15 +204,6 @@ def _build_excel_lines_ues(custom_xls_form: CustomXlsForm, tree: 'ProgramTree'):
              'stop': (len(content)) + 1}
             if optional_data_needed['has_description_fiche'] or optional_data_needed['has_specifications'] else {}
     }
-
-
-def _get_proposal_style(font_rows, luy: LearningUnitYear, idx: int):
-    initial_list = font_rows[PROPOSAL_LINE_STYLES.get(luy.proposal.type)]
-    if luy.proposal and luy.proposal.type:
-        return {
-            PROPOSAL_LINE_STYLES.get(luy.proposal.type): initial_list.append(idx)
-        }
-    return {}
 
 
 def _optional_data(custom_xls_form: CustomXlsForm):

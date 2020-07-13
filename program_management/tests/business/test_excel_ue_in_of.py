@@ -706,7 +706,6 @@ class TestRowHeight(TestCase):
         custom_form = CustomXlsForm({})
         data = _build_excel_lines_ues(custom_form, self.tree)
         # First line (Header line) is always bold
-        # HELP: Do not find where I broke something
         self.assertListEqual(data.get('font_rows')[BOLD_FONT], [0])
 
     def test_exclude_options_list_for_2M(self):
