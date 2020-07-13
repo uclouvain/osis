@@ -25,6 +25,7 @@
 ##############################################################################
 from typing import Optional, List
 
+from education_group.ddd.command import CreateOrphanGroupCommand
 from osis_common.ddd import interface
 from osis_common.ddd.interface import Entity
 from program_management.ddd.business_types import *
@@ -49,7 +50,34 @@ class ProgramTreeRepository(interface.AbstractRepository):
         raise NotImplementedError
 
     @classmethod
-    def create(cls, program_tree: 'ProgramTree') -> 'ProgramTreeIdentity':
+    def create(
+            cls,
+            program_tree: 'ProgramTree',
+            create_group_service: interface.ApplicationService  # FIXME :: add this param into osis-common.interface?
+            # services: List[interface.ApplicationService] = None
+    ) -> 'ProgramTreeIdentity':
+        for child_node in program_tree.root_node.children_as_nodes:
+            create_group_service(
+                CreateOrphanGroupCommand(
+                    code=child_node.code,
+                    year=child_node.year,
+                    type=child_node.node_type.name,
+                    abbreviated_title=child_node.title,
+                    title_fr=child_node.group_title_fr,
+                    title_en=child_node.group_title_en,
+                    credits=int(child_node.credits),
+                    constraint_type=child_node.constraint_type.name,
+                    min_constraint=child_node.min_constraint,
+                    max_constraint=child_node.max_constraint,
+                    management_entity_acronym=child_node.management_entity_acronym,
+                    teaching_campus_name=None,  # FIXME :: use ValueObject for Campus
+                    organization_name=None,  # FIXME :: use ValueObject for Campus
+                    remark_fr=child_node.remark_fr,
+                    remark_en=child_node.remark_en,
+                    start_year=child_node.start_year,
+                    end_year=child_node.end_date,
+                )
+            )
         persist_tree.persist(program_tree)
         return program_tree.entity_id
 
