@@ -9,7 +9,6 @@ from django.views.generic.base import View
 
 from base.models.academic_year import starting_academic_year
 from base.models.campus import Campus
-from base.models.entity_version import find_entity_version_according_academic_year
 from base.models.enums.education_group_types import GroupType, TrainingType
 from base.utils.cache import RequestCache
 from base.views.common import display_success_messages
@@ -85,8 +84,10 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 english_activities=training_form.cleaned_data['english_activities'],
                 other_language_activities=training_form.cleaned_data['other_language_activities'],
                 internal_comment=training_form.cleaned_data['internal_comment'],
-                main_domain_code=training_form.cleaned_data['main_domain'].code,
-                main_domain_decree=training_form.cleaned_data['main_domain'].decree.name,
+                main_domain_code=training_form.cleaned_data['main_domain'].code
+                if training_form.cleaned_data['main_domain'] else None,
+                main_domain_decree=training_form.cleaned_data['main_domain'].decree.name
+                if training_form.cleaned_data['main_domain'] else None,
                 secondary_domains=[
                     (obj.decree.name, obj.code) for obj in training_form.cleaned_data['secondary_domains']
                 ],
