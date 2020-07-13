@@ -70,8 +70,8 @@ class ProgramTreeRepository(interface.AbstractRepository):
                     min_constraint=child_node.min_constraint,
                     max_constraint=child_node.max_constraint,
                     management_entity_acronym=child_node.management_entity_acronym,
-                    teaching_campus_name=None,  # FIXME :: use ValueObject for Campus
-                    organization_name=None,  # FIXME :: use ValueObject for Campus
+                    teaching_campus_name=child_node.teaching_campus.name,
+                    organization_name=child_node.teaching_campus.university_name,
                     remark_fr=child_node.remark_fr,
                     remark_en=child_node.remark_en,
                     start_year=child_node.start_year,
