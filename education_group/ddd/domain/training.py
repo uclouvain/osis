@@ -49,6 +49,7 @@ from education_group.ddd.domain._isced_domain import IscedDomain, IscedDomainIde
 from education_group.ddd.domain._language import Language
 from education_group.ddd.domain._study_domain import StudyDomain, StudyDomainIdentity
 from education_group.ddd.domain._titles import Titles
+from education_group.ddd.domain.exception import TrainingNotFoundException
 from osis_common.ddd import interface
 
 from education_group.ddd.business_types import *
@@ -63,15 +64,16 @@ class TrainingIdentity(interface.EntityIdentity):
 class TrainingBuilder:
 
     def copy_to_next_year(self, training_from: 'Training', training_repository: 'TrainingRepository') -> 'Training':
-        training_next_year = training_repository.get(training_from.entity_id)
-        if training_next_year:
+        identity_next_year = TrainingIdentity(acronym=training_from.acronym, year=training_from.year + 1)
+        try:
+            training_next_year = training_repository.get(identity_next_year)
             # TODO :: Case update training next year - to implement in OSIS-4809
-            pass
-        else:
+        except TrainingNotFoundException:
             # Case create training next year
             training_next_year = attr.evolve(  # Copy to new object
                 training_from,
-                entity_identity=TrainingIdentity(acronym=training_from.acronym, year=training_from.year),
+                entity_identity=identity_next_year,
+                entity_id=identity_next_year,
             )
         return training_next_year
 
@@ -95,6 +97,7 @@ class TrainingBuilder:
 
         return Training(
             entity_identity=training_identity,
+            entity_id=training_identity,
             type=self._get_enum_from_str(command.type, TrainingType),
             credits=command.credits,
             schedule_type=self._get_enum_from_str(command.schedule_type, ScheduleTypeEnum),
