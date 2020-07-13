@@ -34,8 +34,8 @@ from base.models.enums.education_group_types import EducationGroupTypesEnum, Tra
 from osis_common.ddd import interface
 from osis_common.decorators.deprecated import deprecated
 from program_management.ddd import command
-from program_management.ddd.domain.node import factory as node_factory
 from program_management.ddd.business_types import *
+from program_management.ddd.domain.node import factory as node_factory, NodeIdentity
 from program_management.ddd.domain import prerequisite
 from program_management.ddd.domain.service import generate_node_code_service, validation_rule, \
     generate_node_abbreviated_title
@@ -74,8 +74,13 @@ class ProgramTreeBuilder:
         root_node = program_tree.root_node
         children = []
         for child_type in program_tree.get_mandatory_children_types(program_tree.root_node):
+            generated_child_title = validation_rule.get_validation_rule_for_field(
+                child_type,
+                'title_fr'
+            ).initial_value.replace(" ", "").upper()
             child = node_factory.get_node(
                 type=NodeType.GROUP,
+                node_type=child_type,
                 code=generate_node_code_service.generate_code_based_on_parent(root_node, child_type),
                 title=generate_node_abbreviated_title.generate_base_on_parent(
                     parent_node=root_node,
@@ -84,9 +89,9 @@ class ProgramTreeBuilder:
                 year=root_node.year,
                 teaching_campus=root_node.teaching_campus,
                 management_entity_acronym=root_node.management_entity_acronym,
-                group_title_fr="{child_title} {parent_title}".format(
-                    child_title=validation_rule.get_validation_rule_for_field(child_type, 'title').initial_value,
-                    parent_title=root_node.title
+                group_title_fr="{child_title} {parent_abbreviated_title}".format(
+                    child_title=generated_child_title,
+                    parent_abbreviated_title=root_node.title
                 ),
             )
             root_node.add_child(child)
