@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -25,29 +25,17 @@
 ##############################################################################
 import json
 
-from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import PermissionDenied
 from django.db.models import F
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
-from rules.contrib.views import permission_required
-from waffle.decorators import waffle_flag
 
-from base import models as mdl
-from base.business import education_group as education_group_business
-from base.business.education_group import assert_category_of_education_group_year
 from base.forms.education_group_admission import UpdateLineForm, UpdateTextForm
 from base.forms.education_group_pedagogy_edit import EducationGroupPedagogyEditForm
-from base.forms.education_groups_administrative_data import CourseEnrollmentForm, AdministrativeDataFormset, \
-    AdditionalInfoForm
 from base.models.admission_condition import AdmissionConditionLine, AdmissionCondition
 from base.models.education_group_year import EducationGroupYear
-from base.models.enums import academic_calendar_type
-from base.models.enums import education_group_categories
 from base.models.person import get_user_interface_language
 from base.utils.cache import cache
 from base.utils.cache_keys import get_tab_lang_keys, CACHE_TIMEOUT
@@ -61,7 +49,7 @@ from education_group.views.proxy.read import Tab
 from osis_common.decorators.ajax import ajax_required
 
 
-def education_group_year_pedagogy_edit_post(request, education_group_year_id, root_id):
+def education_group_year_pedagogy_edit_post(request, education_group_year_id):
     form = EducationGroupPedagogyEditForm(request.POST)
     training_identity = TrainingIdentitySearch().get_from_education_group_year_id(education_group_year_id)
     redirect_url = _get_admission_condition_success_url(training_identity.year, training_identity.acronym)
@@ -122,22 +110,23 @@ def education_group_year_pedagogy_edit_get(request, education_group_year_id):
 @login_required
 @require_http_methods(['GET', 'POST'])
 @can_change_general_information
-def education_group_year_pedagogy_edit(request, offer_id, education_group_year_id):
+def education_group_year_pedagogy_edit(request, education_group_year_id):
     if request.method == 'POST':
-        return education_group_year_pedagogy_edit_post(request, education_group_year_id, offer_id)
+        return education_group_year_pedagogy_edit_post(request, education_group_year_id)
     return education_group_year_pedagogy_edit_get(request, education_group_year_id)
 
 
 @login_required
 @can_change_admission_condition
-def education_group_year_admission_condition_remove_line(request, offer_id, education_group_year_id):
+def education_group_year_admission_condition_remove_line(request, year: int, code: str):
     admission_condition_line_id = request.GET['id']
     admission_condition = get_object_or_404(
         AdmissionCondition.objects.annotate(
             acronym=F('education_group_year__acronym'),
             year=F('education_group_year__academic_year__year')
         ),
-        education_group_year__pk=education_group_year_id
+        education_group_year__partial_acronym=code,
+        education_group_year__academic_year__year=year,
     )
     admission_condition_line = get_object_or_404(AdmissionConditionLine,
                                                  admission_condition=admission_condition,
@@ -162,7 +151,7 @@ def get_content_of_admission_condition_line(message, admission_condition_line, l
     }
 
 
-def education_group_year_admission_condition_update_line_post(request, root_id, education_group_year_id):
+def education_group_year_admission_condition_update_line_post(request, education_group_year_id):
     creation_mode = request.POST.get('admission_condition_line') == ''
     if creation_mode:
         # bypass the validation of the form
@@ -232,13 +221,17 @@ def education_group_year_admission_condition_update_line_get(request):
 
 @login_required
 @can_change_admission_condition
-def education_group_year_admission_condition_update_line(request, offer_id, education_group_year_id):
+def education_group_year_admission_condition_update_line(request, year: int, code: str):
     if request.method == 'POST':
-        return education_group_year_admission_condition_update_line_post(request, offer_id, education_group_year_id)
+        education_group_year = get_object_or_404(EducationGroupYear,
+                                                 partial_acronym=code,
+                                                 academic_year__year=year)
+        return education_group_year_admission_condition_update_line_post(request, education_group_year.id)
+
     return education_group_year_admission_condition_update_line_get(request)
 
 
-def education_group_year_admission_condition_update_text_post(request, root_id, education_group_year_id):
+def education_group_year_admission_condition_update_text_post(request, education_group_year_id):
     form = UpdateTextForm(request.POST)
 
     if form.is_valid():
@@ -275,16 +268,19 @@ def education_group_year_admission_condition_update_text_get(request, education_
 
 @login_required
 @can_change_admission_condition
-def education_group_year_admission_condition_update_text(request, offer_id, education_group_year_id):
+def education_group_year_admission_condition_update_text(request, year: int, code: str):
+    education_group_year = get_object_or_404(EducationGroupYear,
+                                             partial_acronym=code,
+                                             academic_year__year=year)
     if request.method == 'POST':
-        return education_group_year_admission_condition_update_text_post(request, offer_id, education_group_year_id)
-    return education_group_year_admission_condition_update_text_get(request, education_group_year_id)
+        return education_group_year_admission_condition_update_text_post(request, education_group_year.id)
+    return education_group_year_admission_condition_update_text_get(request, education_group_year.id)
 
 
 @login_required
 @ajax_required
 @can_change_admission_condition
-def education_group_year_admission_condition_line_order(request, offer_id, education_group_year_id):
+def education_group_year_admission_condition_line_order(request, year: int, code: str):
     info = json.loads(request.body.decode('utf-8'))
 
     admission_condition_line = get_object_or_404(
@@ -307,7 +303,10 @@ def education_group_year_admission_condition_line_order(request, offer_id, educa
 
 
 @login_required
-def education_group_year_admission_condition_tab_lang_edit(request, offer_id, education_group_year_id, language):
+def education_group_year_admission_condition_tab_lang_edit(request, year: int, code: str, language: str):
+    education_group_year = get_object_or_404(EducationGroupYear,
+                                             partial_acronym=code,
+                                             academic_year__year=year)
     cache.set(get_tab_lang_keys(request.user), language, timeout=CACHE_TIMEOUT)
-    training_identity = TrainingIdentitySearch().get_from_education_group_year_id(education_group_year_id)
+    training_identity = TrainingIdentitySearch().get_from_education_group_year_id(education_group_year.id)
     return redirect(_get_admission_condition_success_url(training_identity.year, training_identity.acronym))
