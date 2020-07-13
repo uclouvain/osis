@@ -29,6 +29,8 @@ from django.db import transaction
 from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionBuilder
+from program_management.ddd.repositories.program_tree import ProgramTreeRepository
+from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.ddd.service.write import create_standard_program_tree_service
 
 
