@@ -1,6 +1,6 @@
 [MASTER]
 jobs=0
-ignore=migrations, tests, fixtures
+ignore=*/tests/*, */migrations/*, */fixtures/*
 
 [MESSAGES CONTROL]
 disable=all
