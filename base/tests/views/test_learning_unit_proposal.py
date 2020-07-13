@@ -261,24 +261,26 @@ class TestLearningUnitModificationProposal(TestCase):
 class TestLearningUnitSuppressionProposal(TestCase):
     @classmethod
     def setUpTestData(cls):
-        AcademicYearFactory.produce(number_past=3, number_future=10)
+        cls.academic_years = AcademicYearFactory.produce(number_past=3, number_future=10)
         cls.person = person_factory.CentralManagerFactory("can_propose_learningunit", "can_access_learningunit")
         an_organization = OrganizationFactory(type=organization_type.MAIN)
-        cls.academic_years = AcademicYearFactory.produce_in_future(quantity=8)
-        cls.current_academic_year = cls.academic_years[0]
-        cls.next_academic_year = cls.academic_years[1]
+        cls.current_academic_year = cls.academic_years[4]
+        cls.next_academic_year = cls.academic_years[5]
+        cls.previous_academic_year = cls.academic_years[3]
         generate_creation_or_end_date_proposal_calendars(cls.academic_years)
 
         an_entity = EntityFactory(organization=an_organization)
         cls.entity_version = EntityVersionFactory(entity=an_entity, entity_type=entity_type.FACULTY,
-                                                  start_date=cls.current_academic_year.start_date,
-                                                  end_date=cls.academic_years[7].end_date)
-        learning_container_year = LearningContainerYearFactory(
-            academic_year=cls.current_academic_year,
-            container_type=learning_container_year_types.COURSE,
-            requirement_entity=cls.entity_version.entity,
-            allocation_entity=cls.entity_version.entity,
-        )
+                                                  start_date=cls.previous_academic_year.start_date,
+                                                  end_date=cls.academic_years[-1].end_date)
+        learning_container_years = [
+            LearningContainerYearFactory(
+                academic_year=year,
+                container_type=learning_container_year_types.COURSE,
+                requirement_entity=cls.entity_version.entity,
+                allocation_entity=cls.entity_version.entity,
+            ) for year in [cls.previous_academic_year, cls.current_academic_year]
+        ]
         cls.learning_unit = LearningUnitFactory(
             start_year=AcademicYear.objects.first(),
             end_year=None
@@ -288,13 +290,24 @@ class TestLearningUnitSuppressionProposal(TestCase):
             acronym="LOSIS1212",
             subtype=learning_unit_year_subtypes.FULL,
             academic_year=cls.current_academic_year,
-            learning_container_year=learning_container_year,
+            learning_container_year=learning_container_years[1],
             quadrimester=None,
             learning_unit=cls.learning_unit,
             campus=CampusFactory(
                 organization=an_organization,
                 is_administration=True
             ),
+            periodicity=learning_unit_year_periodicity.ANNUAL
+        )
+
+        cls.previous_learning_unit_year = LearningUnitYearFakerFactory(
+            acronym="LOSIS1212",
+            subtype=learning_unit_year_subtypes.FULL,
+            academic_year=cls.previous_academic_year,
+            learning_container_year=learning_container_years[0],
+            quadrimester=None,
+            learning_unit=cls.learning_unit,
+            campus=cls.learning_unit_year.campus,
             periodicity=learning_unit_year_periodicity.ANNUAL
         )
 
@@ -337,6 +350,17 @@ class TestLearningUnitSuppressionProposal(TestCase):
         self.assertTrue(form_end_date.fields['academic_year'].required)
         self.assertEqual(form_proposal.fields['folder_id'].initial, None)
         self.assertEqual(form_proposal.fields['entity'].initial, None)
+
+    def test_get_request_first_year_of_UE(self):
+        url = reverse(learning_unit_suppression_proposal, args=[self.previous_learning_unit_year.id])
+        response = self.client.get(url)
+        redirected_url = reverse("learning_unit", args=[self.previous_learning_unit_year.id])
+        self.assertRedirects(response, redirected_url)
+        msgs = [str(message) for message in get_messages(response.wsgi_request)]
+        self.assertEqual(
+            msgs[0],
+            _("You cannot put in proposal for ending date on the first year of the learning unit.")
+        )
 
     def test_get_request_academic_year_list_in_form_for_central_manager(self):
         person_factory.add_person_to_groups(self.person, [groups.CENTRAL_MANAGER_GROUP])
