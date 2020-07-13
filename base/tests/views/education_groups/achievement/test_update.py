@@ -193,12 +193,8 @@ class TestEducationGroupAchievementActionUpdateDelete(TestCase):
 
     def test_training_detailed_achievement_actions(self):
         achievement = EducationGroupAchievementFactory(education_group_year=self.education_group_year)
-        d_achievement_1 = EducationGroupDetailedAchievementFactory(education_group_achievement=achievement)
-        d_achievement_2 = EducationGroupDetailedAchievementFactory(education_group_achievement=achievement)
-        d_achievement_1.order = 0
-        d_achievement_1.save()
-        d_achievement_2.order = 1
-        d_achievement_2.save()
+        d_achievement_1 = EducationGroupDetailedAchievementFactory(education_group_achievement=achievement, order=0)
+        d_achievement_2 = EducationGroupDetailedAchievementFactory(education_group_achievement=achievement, order=1)
         response = self.client.post(
             reverse(
                 "training_detailed_achievement_actions",
