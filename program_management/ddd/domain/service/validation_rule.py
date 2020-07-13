@@ -29,5 +29,5 @@ from base.models.validation_rule import ValidationRule
 
 
 def get_validation_rule_for_field(node_type: EducationGroupTypesEnum, field_name: str) -> ValidationRule:
-    field_reference_value = 'GroupFrom.{type}.{field_name}'.format(type=node_type.name, field_name=field_name)
+    field_reference_value = 'GroupForm.{type}.{field_name}'.format(type=node_type.name, field_name=field_name)
     return ValidationRule.objects.get(field_reference=field_reference_value)
