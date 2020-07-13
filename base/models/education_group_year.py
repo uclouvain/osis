@@ -1001,5 +1001,3 @@ def _find_with_learning_unit_enrollment_count(learning_unit_year):
     return EducationGroupYear.objects \
         .filter(offerenrollment__learningunitenrollment__learning_unit_year_id=learning_unit_year) \
         .annotate(count_learning_unit_enrollments=Count('offerenrollment__learningunitenrollment')).order_by('acronym')
-
-

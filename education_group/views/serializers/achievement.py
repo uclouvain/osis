@@ -101,4 +101,3 @@ def get_skills_labels(node: NodeGroupYear, language_code: str):
             # Default value if not found on database
             labels_translated.append({'label_id': label_id, 'label_translated': '', 'text_fr': '', 'text_en': ''})
     return labels_translated
-
