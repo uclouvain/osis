@@ -26,6 +26,7 @@
 from django.contrib.auth.decorators import login_required, permission_required
 from django.db import transaction
 from django.shortcuts import redirect, get_object_or_404, render
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from waffle.decorators import waffle_flag
 
@@ -36,7 +37,7 @@ from base.models.enums.proposal_type import ProposalType
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.models.proposal_learning_unit import ProposalLearningUnit
-from base.views.common import display_success_messages, show_error_message_for_form_invalid
+from base.views.common import display_success_messages, show_error_message_for_form_invalid, display_warning_messages
 from base.views.learning_units import perms
 from base.views.learning_units.common import get_learning_unit_identification_context
 
@@ -56,6 +57,15 @@ def learning_unit_modification_proposal(request, learning_unit_year_id):
 @permission_required('base.can_propose_learningunit', raise_exception=True)
 def learning_unit_suppression_proposal(request, learning_unit_year_id):
     learning_unit_year = get_object_or_404(LearningUnitYear, id=learning_unit_year_id)
+    if LearningUnitYear.objects.filter(
+        learning_unit=learning_unit_year.learning_unit
+    ).order_by("academic_year__year").first() == learning_unit_year:
+        redirect_url = reverse('learning_unit', kwargs={'learning_unit_year_id': learning_unit_year_id})
+        display_warning_messages(
+            request,
+            _("You cannot put in proposal for ending date on the first year of the learning unit.")
+        )
+        return redirect(redirect_url)
     return _update_or_create_suppression_proposal(request, learning_unit_year)
 
 
