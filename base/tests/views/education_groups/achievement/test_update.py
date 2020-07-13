@@ -33,8 +33,10 @@ from django.utils.translation import gettext_lazy as _
 from backoffice.settings.base import LANGUAGE_CODE_FR, LANGUAGE_CODE_EN
 from base.business.education_groups.general_information_sections import CMS_LABEL_PROGRAM_AIM, \
     CMS_LABEL_ADDITIONAL_INFORMATION
+from base.models.education_group_detailed_achievement import EducationGroupDetailedAchievement
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_achievement import EducationGroupAchievementFactory
+from base.tests.factories.education_group_detailed_achievement import EducationGroupDetailedAchievementFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.user import UserFactory
@@ -169,6 +171,25 @@ class TestEducationGroupAchievementActionUpdateDelete(TestCase):
                 ]), data={"path": 1111}
         )
         self.assertEqual(response.status_code, 403)
+
+    def test_update_detailed_achievement(self):
+        code = "The life is like a box of chocolates"
+        achievement = EducationGroupAchievementFactory(education_group_year=self.education_group_year)
+        d_achievement = EducationGroupDetailedAchievementFactory(education_group_achievement=achievement)
+        response = self.client.post(
+            reverse(
+                "training_detailed_achievement_update",
+                args=[
+                    self.education_group_year.academic_year.year,
+                    self.education_group_year.partial_acronym,
+                    achievement.pk,
+                    d_achievement.pk
+                ]), data={"code_name": code, "path": 1111}
+        )
+
+        self.assertEqual(response.status_code, 302)
+        d_achievement.refresh_from_db()
+        self.assertEqual(d_achievement.code_name, code)
 
 
 class TestEducationGroupAchievementCMSSetup(TestCase):
