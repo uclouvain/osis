@@ -144,13 +144,15 @@ def _instanciate_tree_version(record_dict: dict) -> 'ProgramTreeVersion':
 
 
 def _search_by_node_entities(entity_ids: List['Node']) -> List[int]:
-    qs = EducationGroupVersion.objects.all().values_list('offer_id', flat=True)
+    if entity_ids:
+        qs = EducationGroupVersion.objects.all().values_list('offer_id', flat=True)
 
-    filter_search_from = _build_where_clause(entity_ids[0])
-    for identity in entity_ids[1:]:
-        filter_search_from |= _build_where_clause(identity)
-    qs = qs.filter(filter_search_from)
-    return list(qs)
+        filter_search_from = _build_where_clause(entity_ids[0])
+        for identity in entity_ids[1:]:
+            filter_search_from |= _build_where_clause(identity)
+        qs = qs.filter(filter_search_from)
+        return list(qs)
+    return []
 
 
 def _build_where_clause(node_identity: 'Node') -> Q:
