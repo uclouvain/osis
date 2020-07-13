@@ -28,12 +28,35 @@ from program_management.ddd.business_types import *
 from base.models.education_group_year import EducationGroupYear
 from education_group.models.group_year import GroupYear
 import attr
+
+from program_management.ddd.command import CreateStandardVersionCommand
+
 STANDARD = ""
 
 
 class ProgramTreeVersionBuilder:
 
     _tree_version = None
+
+    def build_standard_version(
+            self,
+            cmd: CreateStandardVersionCommand,
+            tree_repository: 'ProgramTreeRepository'
+    ) -> 'ProgramTreeVersion':
+        tree_version_identity = ProgramTreeVersionIdentity(
+            offer_acronym=cmd.offer_acronym,
+            year=cmd.year,
+            version_name=STANDARD,
+            is_transition=False,
+        )
+        tree_identity = ProgramTreeIdentity(code=cmd.code, year=cmd.year)
+        return ProgramTreeVersion(
+            entity_identity=tree_version_identity,
+            program_tree_identity=tree_identity,
+            program_tree_repository=tree_repository,
+            title_fr=None,
+            title_en=None,
+        )
 
     def build_from(self, from_tree: 'ProgramTreeVersion', **tree_version_attrs) -> 'ProgramTreeVersion':
         assert isinstance(from_tree, ProgramTreeVersion)
