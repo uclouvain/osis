@@ -25,6 +25,8 @@
 ##############################################################################
 from typing import Optional
 
+import attr
+
 from base.models.enums.link_type import LinkTypes
 from osis_common.ddd import interface
 from program_management.ddd.business_types import *
@@ -220,3 +222,10 @@ class GetNodeIdentityFromElementId(interface.CommandRequest):
     def __repr__(self) -> str:
         parameters = ", ".join([str(self.element_id)])
         return "GetNodeIdentityFromElementId({parameters})".format(parameters=parameters)
+
+
+@attr.s(frozen=True, slots=True)
+class CreateStandardVersionCommand(interface.CommandRequest):
+    offer_acronym = attr.ib(type=str)
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)

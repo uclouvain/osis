@@ -26,9 +26,9 @@
 from _decimal import Decimal
 from typing import List, Tuple, Optional
 
-from osis_common.ddd import interface
-from education_group.ddd.business_types import *
+import attr
 
+from osis_common.ddd import interface
 
 DecreeName = str
 DomainCode = str
@@ -227,3 +227,16 @@ class CopyGroupCommand(interface.CommandRequest):
         self.from_code = from_code
         self.from_year = from_year
         self.to_year = to_year
+
+
+@attr.s(frozen=True, slots=True)
+class PostponeTrainingCommand(interface.CommandRequest):
+    acronym = attr.ib(type=str)
+    postpone_from_year = attr.ib(type=int)
+    postpone_until_year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class CopyTrainingToNextYearCommand(interface.CommandRequest):
+    acronym = attr.ib(type=str)
+    postpone_from_year = attr.ib(type=int)
