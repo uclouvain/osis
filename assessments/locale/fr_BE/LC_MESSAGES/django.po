@@ -134,7 +134,7 @@ msgid "Complete"
 msgstr "Compléter"
 
 msgid "Confirm delete for : "
-msgstr ""
+msgstr "Confirmer suppression pour : "
 
 msgid "Country"
 msgstr "Pays"
@@ -242,7 +242,7 @@ msgstr ""
 "Si vous tentez d'introduire des valeurs décimales,elles seront ignorées."
 
 msgid "Include subordinate entities"
-msgstr ""
+msgstr "Inclure les entités subordonnées"
 
 msgid "Inject"
 msgstr "Injecter"
@@ -295,7 +295,7 @@ msgid "M=Justified Absence"
 msgstr "M=Absence Justifiée"
 
 msgid "Main"
-msgstr ""
+msgstr "Principal"
 
 msgid "Manager"
 msgstr "Gestionnaire"

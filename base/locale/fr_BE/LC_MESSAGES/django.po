@@ -481,7 +481,7 @@ msgid "Cannot set end year to %(end_year)s :"
 msgstr "Impossible de mettre la fin à %(end_year)s :"
 
 msgid "Catalogue"
-msgstr ""
+msgstr "Catalogue"
 
 msgid "Category"
 msgstr "Catégorie"
@@ -942,10 +942,8 @@ msgstr "Entité"
 msgid "Entity charges"
 msgstr "Entités de charges"
 
-#, fuzzy
-#| msgid "Entity managers"
 msgid "Entity manager"
-msgstr "Gestionnaires d'entités"
+msgstr "Gestionnaire d'entités"
 
 msgid "Entity managers"
 msgstr "Gestionnaires d'entités"
@@ -1413,7 +1411,7 @@ msgid "Logout"
 msgstr "Logout"
 
 msgid "M."
-msgstr ""
+msgstr "M."
 
 msgid "Main"
 msgstr "Principal"
@@ -1727,7 +1725,7 @@ msgid "Offers enrollments"
 msgstr "Inscriptions aux formations"
 
 msgid "Ok"
-msgstr ""
+msgstr "Ok"
 
 msgid "On the file: direct access or access with additional training"
 msgstr ""
@@ -1876,7 +1874,7 @@ msgid "Ph.D"
 msgstr "Doctorat"
 
 msgid "Placeholder"
-msgstr ""
+msgstr "Espace reservé"
 
 msgid "Planned classes"
 msgstr "Classes prévues"
@@ -2299,7 +2297,7 @@ msgid "Specifications"
 msgstr "Cahier des charges"
 
 msgid "Sport"
-msgstr ""
+msgstr "Sport"
 
 msgid "Start"
 msgstr "Début"
@@ -2637,13 +2635,9 @@ msgid "The title is made up of the common part and / or any supplement"
 msgstr ""
 "L’intitulé est composé de la partie commune et/ou de l’éventuel complément"
 
-#, fuzzy
-#| msgid "The user has not permission to change education groups."
 msgid "The user does not have permission to change education groups."
 msgstr "L'utilisateur n'a pas la permission de modifier les formations."
 
-#, fuzzy
-#| msgid "The user has not permission to create education groups."
 msgid "The user does not have permission to create education groups."
 msgstr "L'utilisateur n'a pas la permission de créer des formations."
 
@@ -3079,7 +3073,7 @@ msgstr ""
 "qui est prérequis."
 
 msgid "You cannot have a specific summary course submission event."
-msgstr ""
+msgstr "Vous ne pouvez pas avoir un évènement soumission des fiches descriptives spécifique"
 
 msgid "You don't have the rights to consolidate"
 msgstr "Vous n'avez pas le droit de consolider"
@@ -3303,7 +3297,7 @@ msgid "parameters"
 msgstr "paramètres"
 
 msgid "partnerships_financing_configuration"
-msgstr ""
+msgstr "Configuration des financements"
 
 msgid "person"
 msgstr "personne"
@@ -3457,299 +3451,3 @@ msgstr "oui"
 
 msgid "yes,no"
 msgstr "oui,non"
-
-#~ msgid "%(start_index)s to %(end_index)s of %(total_counts)s trainings"
-#~ msgstr "%(start_index)s à %(end_index)s sur %(total_counts)s formations"
-
-#~ msgid ""
-#~ "<b>Syntax rules</b>:<ul><li>No double parentheses.</li><li>Valid "
-#~ "operators are OU or ET.</li><li>The operator must be the same inside all "
-#~ "parentheses (groups).</li><li>The operator that linked groups must be "
-#~ "different than the one that linked LU inside groups (parentheses).</"
-#~ "li><li>The LU code cannot include spaces (ex: LDROI1001 and not "
-#~ "LDROI&nbsp;1001).</li></ul></p><p><b>Examples</b>:<ul><li>A OU B OU C: "
-#~ "valid</li><li>A ET B ET C : valid</li><li>A ET (B OU C) ET (D OU E): "
-#~ "valid</li><li>A ET (B OU C) OU (D OU E): not valid</li><li>A ET (B ET C) "
-#~ "ET (D ET E): not valid</li><li>A ET (B OU C) ET (D ET E): not valid</li></"
-#~ "ul>"
-#~ msgstr ""
-#~ "<b>Règles de syntaxe:</b><ul><li>Pas de doubles parenthèses.</li><li>Les "
-#~ "opérateurs valides sont OU et ET.</li><li>L'opérateur doit être le même à "
-#~ "l'intérieur de toutes les parenthèses (groupes).</li><li>L'opérateur qui "
-#~ "unit les groupes doit être différent de celui qui unit les UEs dans un "
-#~ "groupe (parenthèses).</li><li>Le code de l'UE ne peut pas comporter "
-#~ "d'espaces (ex: LDROI1001 et non LDROI&nbsp;1001).</li></ul></"
-#~ "p><p><b>Exemples</b>:<ul><li>A OU B OU C: valide</li><li>A ET B ET C : "
-#~ "valide</li><li>A ET (B OU C) ET (D OU E): valide</li><li>A ET (B OU C) OU "
-#~ "(D OU E): non valide</li><li>A ET (B ET C) ET (D ET E): non valide</"
-#~ "li><li>A ET (B OU C) ET (D ET E): non valide</li></ul>"
-
-#~ msgid "A learning unit cannot be prerequisite to itself : %(acronym)s"
-#~ msgstr ""
-#~ "Une unité d'enseignement ne peut pas être un prérequis d'elle-même : "
-#~ "%(acronym)s"
-
-#~ msgid "Additional info"
-#~ msgstr "Infos complémentaires"
-
-#~ msgid "Administrative data"
-#~ msgstr "Données administratives"
-
-#~ msgid "Admission and Enrolment Procedures for general registration"
-#~ msgstr "Procédures d'admission et d'inscription"
-
-#~ msgid "Adults taking up their university training"
-#~ msgstr "Adultes en reprise d'études"
-
-#~ msgid "Alert Message"
-#~ msgstr "Message d'alerte"
-
-#~ msgid "Bachelors of the Dutch speaking Community of Belgium"
-#~ msgstr "Bachelier de la Communauté flamande de Belgique"
-
-#~ msgid "Clear clipboard"
-#~ msgstr "Vider le presse-papier"
-
-#~ msgid "Copied element"
-#~ msgstr "Élément copié"
-
-#~ msgid "Copy the content from %(previous_anac)s to %(current_anac)s"
-#~ msgstr "Recopier le contenu de %(previous_anac)s à %(current_anac)s"
-
-#~ msgid "Cut element"
-#~ msgstr "Élément coupé"
-
-#~ msgid "Foreign Bachelors"
-#~ msgstr "Bacheliers étrangers"
-
-#~ msgid "French language proficiency examination"
-#~ msgstr "Maîtrise de la langue française"
-
-#~ msgid "General Conditions"
-#~ msgstr "Conditions Générales"
-
-#~ msgid "General informations"
-#~ msgstr "Infos générales"
-
-#~ msgid "Go down"
-#~ msgstr "Descendre"
-
-#~ msgid "Go up"
-#~ msgstr "Monter"
-
-#~ msgid "Graduates"
-#~ msgstr "Diplômés"
-
-#~ msgid "Holders of a 2nd cycle University degree"
-#~ msgstr "Diplômés du 2° cycle universitaire"
-
-#~ msgid "Holders of a non-University 2nd cycle degree"
-#~ msgstr "Diplômés de 2° cycle non universitaire"
-
-#~ msgid "It is forbidden to add an element to itself."
-#~ msgstr "Il est interdit d’ajouter un élément à lui-même."
-
-#~ msgid "It is forbidden to add an element to one of its included elements."
-#~ msgstr ""
-#~ "Il est interdit d'ajouter un élement à un autre élement y étant inclus."
-
-#~ msgid ""
-#~ "It is forbidden to save a GroupElementYear with a child branch and a "
-#~ "child leaf."
-#~ msgstr ""
-#~ "Il est interdit de sauvegarder un GroupElementYear avec un Child branch "
-#~ "et un child leaf."
-
-#~ msgid "It is not possible to %(action)s the root element."
-#~ msgstr "Il n'est pas possible de %(action)s l'élément racine."
-
-#~ msgid "It is not possible to detach the root element."
-#~ msgstr "Il n'est pas possible de retirer l'élément racine."
-
-#~ msgid ""
-#~ "It is prohibited to attach a group, mini-training or training to an "
-#~ "element of another academic year."
-#~ msgstr ""
-#~ "Il est interdit d'attacher un groupement, une mini-formation ou une "
-#~ "formation à un élément d'une autre année académique."
-
-#~ msgid "Jury"
-#~ msgstr "Jury"
-
-#~ msgid "Language Exam"
-#~ msgstr "Examen de langue"
-
-#~ msgid "List of trainings"
-#~ msgstr "Liste des formations"
-
-#~ msgid "Masters"
-#~ msgstr "Masters"
-
-#~ msgid "No match has been found for this learning unit :  %(acronym)s"
-#~ msgstr ""
-#~ "Aucune correspondance n'a été trouvée pour cette unité d'enseignement : "
-#~ "%(acronym)s"
-
-#~ msgctxt "female"
-#~ msgid ""
-#~ "No type of %(child_category)s can be created as child of %(category)s of "
-#~ "type %(type)s"
-#~ msgstr ""
-#~ "Aucun type de %(child_category)s ne peut être créé comme enfant d'une "
-#~ "%(category)s de type %(type)s"
-
-#~ msgid "Non university Bachelors"
-#~ msgstr "Bacheliers non universitaires"
-
-#~ msgid ""
-#~ "Only program managers of the education group OR central manager linked to "
-#~ "entity can edit."
-#~ msgstr ""
-#~ "Seuls les gestionnaires de programme des formations OU les gestionnaires "
-#~ "facultaires lié·es à l'entité peuvent modifier."
-
-#~ msgid "Opening to Adults"
-#~ msgstr "Ouverture aux adultes"
-
-#~ msgid "Others Bachelors of the French speaking Community of Belgium"
-#~ msgstr "Autres bacheliers de la Communauté française de Belgique"
-
-#~ msgid "Own comment"
-#~ msgstr "Commentaire propre"
-
-#~ msgid "Paste"
-#~ msgstr "Coller"
-
-#~ msgid "Personalized access"
-#~ msgstr "Accès personnalisé"
-
-#~ msgid "Please cut or copy an item before attach it"
-#~ msgstr "Veuillez copier ou couper un élément avant de coller"
-
-#~ msgid "Prerequisite"
-#~ msgstr "Prérequis"
-
-#~ msgid "Prerequisites are invalid"
-#~ msgstr "Prérequis invalides"
-
-#~ msgid "Produce xls of trainings with administrative data"
-#~ msgstr ""
-#~ "Produire un fichier Excel avec la liste des formations et données "
-#~ "administratives"
-
-#~ msgid "Produce xls with a list of trainings"
-#~ msgstr "Produire un fichier Excel avec la liste des formations"
-
-#~ msgid "Reduction"
-#~ msgstr "Inscriptions en allègement"
-
-#~ msgid "Refresh publication"
-#~ msgstr "Réactualiser la publication"
-
-#~ msgid "Search"
-#~ msgstr "Recherche"
-
-#~ msgid "Session"
-#~ msgstr "Session"
-
-#~ msgid "Special Conditions"
-#~ msgstr "Conditions spéciales"
-
-#~ msgid "Specific Conditions"
-#~ msgstr "Conditions Particulières"
-
-#~ msgid "Specific admission requirements"
-#~ msgstr "Conditions spécifiques d'admission"
-
-#~ msgid "The administrative data has been successfully modified"
-#~ msgstr "Les données administratives ont été sauvegardées avec succès"
-
-#~ msgid "The education group is not a training type"
-#~ msgstr "Il ne s'agit pas d'une formation"
-
-#~ msgid "The learning unit %(acronym)s is not contained inside the formation"
-#~ msgstr ""
-#~ "L'unité d'enseignement %(acronym)s n'est pas incluse dans la formation"
-
-#~ msgid ""
-#~ "The number of children of type \"%(child_type)s\" for \"%(parent)s\" has "
-#~ "already reached the limit."
-#~ msgstr ""
-#~ "Le nombre d'enfants de type \"%(child_type)s\" pour \"%(parent)s\" a "
-#~ "atteint la limite maximum."
-
-#~ msgid "The program %(acronym)s will be published soon"
-#~ msgstr "Le programme %(acronym)s sera publié sous peu"
-
-#~ msgid "The user doesn't have right to update admission condition"
-#~ msgstr ""
-#~ "L’utilisateur n’a pas le droit de mettre à jour la condition d’admission"
-
-#~ msgid "The user doesn't have right to update general information"
-#~ msgstr ""
-#~ "L’utilisateur n’a pas le droit de mettre à jour les informations générales"
-
-#~ msgctxt "female"
-#~ msgid "The user does not have permission to create a %(category)s."
-#~ msgstr "L'utilisateur n'a pas la permission de créer une %(category)s."
-
-#~ msgctxt "male"
-#~ msgid "The user does not have permission to create a %(category)s."
-#~ msgstr "L'utilisateur n'a pas la permission de créer un %(category)s."
-
-#~ msgid "The user has not permission to delete education groups."
-#~ msgstr "L'utilisateur n'a pas la permission de supprimer les formations."
-
-#~ msgid "The user is not the program manager of the education group"
-#~ msgstr ""
-#~ "L'utilisateur n'est pas gestionnaire de programme de cette formation"
-
-#~ msgid "The value of this attribute is inherited from the standard OF"
-#~ msgstr "La valeur de ce champ est hérité de l'OF standard"
-
-#~ msgid "This label %s does not exist"
-#~ msgstr "Ce label %s n’existe pas"
-
-#~ msgid "Type of constraint"
-#~ msgstr "Type de contrainte"
-
-#~ msgid "UCL Bachelors"
-#~ msgstr "Bacheliers UCL"
-
-#~ msgid "University Bachelors"
-#~ msgstr "Bacheliers universitaires"
-
-#~ msgid "Which type of %(category)s do you want to create ?"
-#~ msgstr "Quel type de %(category)s voulez-vous créer ?"
-
-#~ msgid "You are not allowed to create a reference with a learning unit"
-#~ msgstr ""
-#~ "Vous n'êtes pas autorisé·e à créer une référence avec une unité "
-#~ "d’enseignement"
-
-#~ msgid "activate to sort column ascending"
-#~ msgstr "activer pour trier la colonne par ordre croissant"
-
-#~ msgid "activate to sort column descending"
-#~ msgstr "activer pour trier la colonne par ordre décroissant"
-
-#~ msgid "agreements"
-#~ msgstr "accords"
-
-#~ msgid "at"
-#~ msgstr "à"
-
-#~ msgid "date and time"
-#~ msgstr "Date et heure"
-
-#~ msgid "is using in"
-#~ msgstr "est utilisée dans"
-
-#~ msgid "partnerships"
-#~ msgstr "partenariats"
-
-#~ msgid "skills and achievements"
-#~ msgstr "compétences et acquis"
-
-#~ msgid "unspecified"
-#~ msgstr "indéterminé"

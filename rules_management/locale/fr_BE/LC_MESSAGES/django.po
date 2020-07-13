@@ -46,7 +46,7 @@ msgstr "Gestion des mini-formations dans le cadre des propositions"
 
 #: apps.py:32
 msgid "Rules Management"
-msgstr ""
+msgstr "Administration des règles"
 
 #: enums.py:40
 msgid "Training management day-to-day"
