@@ -41,6 +41,7 @@ from osis_common.document.xls_build import _build_worksheet, CONTENT_KEY, HEADER
     FILL_NO_GRAY, FONT_CELLS, FILL_CELLS
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import link
+from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.prerequisite import Prerequisite, PrerequisiteItem
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 from program_management.ddd.repositories.program_tree import ProgramTreeRepository

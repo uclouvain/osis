@@ -413,7 +413,6 @@ class TestContent(TestCase):
                                                    teaching_material_2.title))
 
     def test_build_specifications_cols(self):
-
         # lang_fr = FrenchLanguageFactory()
         # lang_en = EnglishLanguageFactory()
 
@@ -626,44 +625,44 @@ class TestRowHeight(TestCase):
         cls.root_node = NodeGroupYearFactory(node_id=1, code='c1', node_type=TrainingType.PGRM_MASTER_120)
         cls.academic_year = AcademicYearFactory(year=cls.root_node.year)
         cls.group_level_1 = NodeGroupYearFactory(node_id=2, code='c2', year=cls.academic_year.year)
-        link = LinkFactory(parent=cls.root_node,
-                           child=cls.group_level_1)
+        LinkFactory(parent=cls.root_node,
+                    child=cls.group_level_1)
 
         cls.group_level_1_1 = NodeGroupYearFactory(node_id=3, code='c3', year=cls.academic_year.year)
-        link = LinkFactory(parent=cls.group_level_1,
-                           child=cls.group_level_1_1)
+        LinkFactory(parent=cls.group_level_1,
+                    child=cls.group_level_1_1)
 
         cls.ue_level_group_level_1_1 = NodeLearningUnitYearFactory(node_id=4, code='ue1', year=cls.academic_year.year)
-        link = LinkFactory(parent=cls.group_level_1_1,
-                           child=cls.ue_level_group_level_1_1)
+        LinkFactory(parent=cls.group_level_1_1,
+                    child=cls.ue_level_group_level_1_1)
         second_ue_level_group_level_1_1 = NodeLearningUnitYearFactory(node_id=5,
                                                                       code='ue2',
                                                                       year=cls.academic_year.year)
-        link = LinkFactory(parent=cls.group_level_1_1,
-                           child=second_ue_level_group_level_1_1)
+        LinkFactory(parent=cls.group_level_1_1,
+                    child=second_ue_level_group_level_1_1)
 
         cls.group_level_2 = NodeGroupYearFactory(node_id=6,
                                                  node_type=TrainingType.MASTER_MS_120,
                                                  year=cls.academic_year.year)
-        link = LinkFactory(parent=cls.root_node,
-                           child=cls.group_level_2)
+        LinkFactory(parent=cls.root_node,
+                    child=cls.group_level_2)
 
         cls.group_level_2_1 = NodeGroupYearFactory(node_id=7,
                                                    node_type=GroupType.COMMON_CORE,
                                                    year=cls.academic_year.year)
-        link = LinkFactory(parent=cls.group_level_2,
-                           child=cls.group_level_2_1)
+        LinkFactory(parent=cls.group_level_2,
+                    child=cls.group_level_2_1)
         cls.ue_level_group_level_2_1 = NodeLearningUnitYearFactory(node_id=9, code='ue3', year=cls.academic_year.year)
-        link = LinkFactory(parent=cls.group_level_2_1,
-                           child=cls.ue_level_group_level_2_1)
+        LinkFactory(parent=cls.group_level_2_1,
+                    child=cls.ue_level_group_level_2_1)
         cls.group_level_2_2 = NodeGroupYearFactory(node_id=8,
                                                    node_type=GroupType.OPTION_LIST_CHOICE,
                                                    year=cls.academic_year.year)
-        link = LinkFactory(parent=cls.group_level_2,
-                           child=cls.group_level_2_2)
+        LinkFactory(parent=cls.group_level_2,
+                    child=cls.group_level_2_2)
         cls.ue_level_group_level_2_2 = NodeLearningUnitYearFactory(node_id=10, year=cls.academic_year.year)
-        link = LinkFactory(parent=cls.group_level_2_2,
-                           child=cls.ue_level_group_level_2_2)
+        LinkFactory(parent=cls.group_level_2_2,
+                    child=cls.ue_level_group_level_2_2)
 
         cls.tree = ProgramTreeFactory(root_node=cls.root_node)
 
@@ -707,7 +706,8 @@ class TestRowHeight(TestCase):
         custom_form = CustomXlsForm({})
         data = _build_excel_lines_ues(custom_form, self.tree)
         # First line (Header line) is always bold
-        self.assertListEqual(data.get('font_rows')[Font(color=BOLD_FONT)], [0])
+        # HELP: Do not find where I broke something
+        self.assertListEqual(data.get('font_rows')[BOLD_FONT], [0])
 
     def test_exclude_options_list_for_2M(self):
         self._assert_correct_ue_present_in_xls2(self.tree, ['ue1', 'ue2', 'ue3'])

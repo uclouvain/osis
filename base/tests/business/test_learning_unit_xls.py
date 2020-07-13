@@ -304,13 +304,13 @@ class TestLearningUnitXls(TestCase):
         self.assertEqual(param.get(xls_build.DESCRIPTION), XLS_DESCRIPTION)
         self.assertEqual(param.get(xls_build.USER), user_name)
         self.assertEqual(param.get(xls_build.HEADER_TITLES), titles)
-        self.assertEqual(param.get(xls_build.STYLED_CELLS), {WRAP_TEXT_ALIGNMENT: []})
+        self.assertEqual(param.get(xls_build.ALIGN_CELLS), {WRAP_TEXT_ALIGNMENT: []})
         self.assertEqual(param.get(xls_build.FONT_ROWS), {})
 
         titles.append(HEADER_PROGRAMS)
 
         param = _get_parameters_configurable_list(learning_units, titles, an_user)
-        self.assertEqual(param.get(xls_build.STYLED_CELLS), {WRAP_TEXT_ALIGNMENT: ['C2', 'C3']})
+        self.assertEqual(param.get(xls_build.ALIGN_CELLS), {WRAP_TEXT_ALIGNMENT: ['C2', 'C3']})
 
     def test_get_data_part2(self):
         learning_container_luy = LearningContainerYearFactory(academic_year=self.academic_year)
