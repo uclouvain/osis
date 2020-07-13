@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ############################################################################
+from django.contrib.auth.models import Permission
 from django.contrib.messages import get_messages
 from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase
@@ -32,8 +33,10 @@ from django.utils.translation import gettext_lazy as _
 from backoffice.settings.base import LANGUAGE_CODE_FR, LANGUAGE_CODE_EN
 from base.business.education_groups.general_information_sections import CMS_LABEL_PROGRAM_AIM, \
     CMS_LABEL_ADDITIONAL_INFORMATION
+from base.models.education_group_detailed_achievement import EducationGroupDetailedAchievement
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_achievement import EducationGroupAchievementFactory
+from base.tests.factories.education_group_detailed_achievement import EducationGroupDetailedAchievementFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.user import UserFactory
@@ -42,6 +45,7 @@ from cms.models.translated_text import TranslatedText
 from cms.tests.factories.text_label import OfferTextLabelFactory
 from cms.tests.factories.translated_text import OfferTranslatedTextFactory
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
+from education_group.views.proxy.read import Tab
 from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
 
 
@@ -56,6 +60,9 @@ class TestEducationGroupAchievementActionUpdateDelete(TestCase):
 
         cls.person = PersonFactory()
         CentralManagerFactory(person=cls.person, entity=cls.education_group_year.management_entity)
+        for perm_name in ['delete_educationgroupachievement', 'change_educationgroupachievement']:
+            perm = Permission.objects.get(codename=perm_name)
+            cls.person.user.user_permissions.add(perm)
 
     def setUp(self):
         self.client.force_login(self.person.user)
@@ -63,12 +70,12 @@ class TestEducationGroupAchievementActionUpdateDelete(TestCase):
     def test_form_valid_up(self):
         response = self.client.post(
             reverse(
-                "education_group_achievements_actions",
+                "training_achievement_actions",
                 args=[
-                    self.education_group_year.pk,
-                    self.education_group_year.pk,
+                    self.education_group_year.academic_year.year,
+                    self.education_group_year.partial_acronym,
                     self.achievement_2.pk,
-                ]), data={"action": "up"}
+                ]) + '?path={}&tab={}'.format(1111, Tab.SKILLS_ACHIEVEMENTS), data={"action": "up"}
         )
 
         self.assertEqual(response.status_code, 302)
@@ -78,12 +85,12 @@ class TestEducationGroupAchievementActionUpdateDelete(TestCase):
     def test_form_valid_down(self):
         response = self.client.post(
             reverse(
-                "education_group_achievements_actions",
+                "training_achievement_actions",
                 args=[
-                    self.education_group_year.pk,
-                    self.education_group_year.pk,
+                    self.education_group_year.academic_year.year,
+                    self.education_group_year.partial_acronym,
                     self.achievement_0.pk,
-                ]), data={"action": "down"}
+                ]) + '?path={}&tab={}'.format(1111, Tab.SKILLS_ACHIEVEMENTS), data={"action": "down"}
         )
 
         self.assertEqual(response.status_code, 302)
@@ -93,12 +100,12 @@ class TestEducationGroupAchievementActionUpdateDelete(TestCase):
     def test_form_invalid(self):
         response = self.client.post(
             reverse(
-                "education_group_achievements_actions",
+                "training_achievement_actions",
                 args=[
-                    self.education_group_year.pk,
-                    self.education_group_year.pk,
+                    self.education_group_year.academic_year.year,
+                    self.education_group_year.partial_acronym,
                     self.achievement_2.pk,
-                ]), data={"action": "not_an_action"}
+                ]) + '?path={}&tab={}'.format(1111, Tab.SKILLS_ACHIEVEMENTS), data={"action": "not_an_action"}
         )
 
         self.assertEqual(response.status_code, 302)
@@ -110,12 +117,12 @@ class TestEducationGroupAchievementActionUpdateDelete(TestCase):
         code = "The life is like a box of chocolates"
         response = self.client.post(
             reverse(
-                "update_education_group_achievement",
+                "training_achievement_update",
                 args=[
-                    self.education_group_year.pk,
-                    self.education_group_year.pk,
+                    self.education_group_year.academic_year.year,
+                    self.education_group_year.partial_acronym,
                     self.achievement_2.pk,
-                ]), data={"code_name": code}
+                ]) + '?path={}&tab={}'.format(1111, Tab.SKILLS_ACHIEVEMENTS), data={"code_name": code, 'path': 1111}
         )
 
         self.assertEqual(response.status_code, 302)
@@ -127,7 +134,7 @@ class TestEducationGroupAchievementActionUpdateDelete(TestCase):
         code = "The life is like a box of chocolates"
         response = self.client.post(
             reverse(
-                "update_education_group_achievement",
+                "training_achievement_update",
                 args=[
                     self.education_group_year.pk,
                     self.education_group_year.pk,
@@ -140,12 +147,12 @@ class TestEducationGroupAchievementActionUpdateDelete(TestCase):
     def test_delete(self):
         response = self.client.post(
             reverse(
-                "delete_education_group_achievement",
+                "training_achievement_delete",
                 args=[
-                    self.education_group_year.pk,
-                    self.education_group_year.pk,
+                    self.education_group_year.academic_year.year,
+                    self.education_group_year.partial_acronym,
                     self.achievement_0.pk,
-                ]), data={}
+                ]), data={'path': 1111}
         )
 
         self.assertEqual(response.status_code, 302)
@@ -156,14 +163,55 @@ class TestEducationGroupAchievementActionUpdateDelete(TestCase):
         self.client.force_login(user=UserFactory())
         response = self.client.post(
             reverse(
-                "delete_education_group_achievement",
+                "training_achievement_delete",
                 args=[
-                    self.education_group_year.pk,
-                    self.education_group_year.pk,
+                    self.education_group_year.academic_year.year,
+                    self.education_group_year.partial_acronym,
                     self.achievement_2.pk,
-                ]), data={}
+                ]), data={"path": 1111}
         )
         self.assertEqual(response.status_code, 403)
+
+    def test_update_detailed_achievement(self):
+        code = "The life is like a box of chocolates"
+        achievement = EducationGroupAchievementFactory(education_group_year=self.education_group_year)
+        d_achievement = EducationGroupDetailedAchievementFactory(education_group_achievement=achievement)
+        response = self.client.post(
+            reverse(
+                "training_detailed_achievement_update",
+                args=[
+                    self.education_group_year.academic_year.year,
+                    self.education_group_year.partial_acronym,
+                    achievement.pk,
+                    d_achievement.pk
+                ]), data={"code_name": code, "path": 1111}
+        )
+
+        self.assertEqual(response.status_code, 302)
+        d_achievement.refresh_from_db()
+        self.assertEqual(d_achievement.code_name, code)
+
+    def test_training_detailed_achievement_actions(self):
+        achievement = EducationGroupAchievementFactory(education_group_year=self.education_group_year)
+        d_achievement_1 = EducationGroupDetailedAchievementFactory(education_group_achievement=achievement, order=0)
+        d_achievement_2 = EducationGroupDetailedAchievementFactory(education_group_achievement=achievement, order=1)
+        response = self.client.post(
+            reverse(
+                "training_detailed_achievement_actions",
+                args=[
+                    self.education_group_year.academic_year.year,
+                    self.education_group_year.partial_acronym,
+                    self.achievement_2.pk,
+                    d_achievement_2.pk
+
+                ]) + '?path={}&tab={}'.format(1111, Tab.SKILLS_ACHIEVEMENTS), data={"action": "up"}
+        )
+
+        self.assertEqual(response.status_code, 302)
+        d_achievement_1.refresh_from_db()
+        d_achievement_2.refresh_from_db()
+        self.assertEqual(d_achievement_1.order, 1)
+        self.assertEqual(d_achievement_2.order, 0)
 
 
 class TestEducationGroupAchievementCMSSetup(TestCase):
