@@ -25,8 +25,7 @@
 ##############################################################################
 
 from education_group.ddd import command
-from education_group.ddd.business_types import *
-from education_group.ddd.domain.training import TrainingBuilder
+from education_group.ddd.domain.training import TrainingBuilder, TrainingIdentity
 from education_group.ddd.repository.training import TrainingRepository
 
 

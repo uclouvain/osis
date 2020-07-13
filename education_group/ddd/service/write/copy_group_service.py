@@ -37,7 +37,7 @@ def copy_group(cmd: command.CopyGroupCommand) -> List['GroupIdentity']:
     Copy a group from a year (=excluded) to a specific year (=included)
     """
     group_ids = []
-    for to_year in range(start=cmd.from_year + 1, stop=cmd.to_year):
+    for to_year in range(cmd.from_year + 1, cmd.to_year):
         cmd_get_group = command.GetGroupCommand(code=cmd.from_code, year=to_year - 1)
         grp = group_service_read.get_group(cmd_get_group)
 
@@ -50,7 +50,7 @@ def copy_group(cmd: command.CopyGroupCommand) -> List['GroupIdentity']:
             title_fr=group_next_year.titles.title_fr,
             title_en=group_next_year.titles.title_en,
             credits=group_next_year.credits,
-            constraint_type=group_next_year.content_constraint.type.name,
+            constraint_type=group_next_year.content_constraint.type.name if group_next_year.content_constraint.type else None,
             min_constraint=group_next_year.content_constraint.minimum,
             max_constraint=group_next_year.content_constraint.maximum,
             management_entity_acronym=group_next_year.management_entity.acronym,

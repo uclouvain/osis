@@ -23,13 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from osis_common.ddd import interface
-from program_management.ddd.business_types import *
-from base.models.education_group_year import EducationGroupYear
-from education_group.models.group_year import GroupYear
 import attr
 
+from osis_common.ddd import interface
+from program_management.ddd.business_types import *
 from program_management.ddd.command import CreateStandardVersionCommand
+from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 
 STANDARD = ""
 
