@@ -23,13 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ############################################################################
+from django.urls import reverse
 from django.views.generic import CreateView
-from osis_role.contrib.views import PermissionRequiredMixin
 
 from base.forms.education_group.achievement import EducationGroupAchievementForm, EducationGroupDetailedAchievementForm
 from base.views.education_groups.achievement.common import EducationGroupAchievementMixin, \
     EducationGroupDetailedAchievementMixin
 from base.views.mixins import AjaxTemplateMixin
+from education_group.views.proxy.read import Tab
+from osis_role.contrib.views import PermissionRequiredMixin
 
 
 class CreateEducationGroupAchievement(PermissionRequiredMixin, AjaxTemplateMixin, EducationGroupAchievementMixin,
@@ -45,6 +47,14 @@ class CreateEducationGroupAchievement(PermissionRequiredMixin, AjaxTemplateMixin
     def get_permission_object(self):
         return self.education_group_year
 
+    def get_success_url(self):
+        prefix = 'training_' if self.education_group_year.is_training else 'mini_training_'
+        return reverse(
+            prefix + 'skills_achievements', args=[self.kwargs['year'], self.kwargs['code']]
+        ) + '?path={}&tab={}#achievement_{}'.format(
+            self.request.POST['path'], Tab.SKILLS_ACHIEVEMENTS, str(self.object.pk)
+        )
+
 
 class CreateEducationGroupDetailedAchievement(PermissionRequiredMixin, AjaxTemplateMixin,
                                               EducationGroupDetailedAchievementMixin, CreateView):
@@ -58,3 +68,11 @@ class CreateEducationGroupDetailedAchievement(PermissionRequiredMixin, AjaxTempl
 
     def get_permission_object(self):
         return self.education_group_year
+
+    def get_success_url(self):
+        prefix = 'training_' if self.education_group_year.is_training else 'mini_training_'
+        return reverse(
+            prefix + 'skills_achievements', args=[self.kwargs['year'], self.kwargs['code']]
+        ) + '?path={}&tab={}#detail_achievements_{}'.format(
+            self.request.POST['path'], Tab.SKILLS_ACHIEVEMENTS, self.object.pk
+        )
