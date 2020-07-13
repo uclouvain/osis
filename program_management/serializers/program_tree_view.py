@@ -65,8 +65,9 @@ def program_tree_view_serializer(tree: 'ProgramTree') -> dict:
 
 
 def _get_program_tree_version_for_all_mini_training(mini_trainings: Set['Node']) -> List['ProgramTreeVersion']:
-    command = program_management.ddd.command.SearchAllVersionsFromRootNodesCommand(
-        node_identities=mini_trainings,
-    )
-    return search_all_versions_from_root_nodes(command)
+    commands = []
+    for node in mini_trainings:
+        commands.append(program_management.ddd.command.SearchAllVersionsFromRootNodesCommand(code=node.code,
+                                                                                             year=node.year))
+    return search_all_versions_from_root_nodes(commands)
 

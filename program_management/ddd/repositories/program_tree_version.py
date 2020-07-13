@@ -87,45 +87,17 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
 
     @classmethod
     def search_all_versions_from_root_node(cls, root_node_identity: 'NodeIdentity') -> List['ProgramTreeVersion']:
-        version_ids = EducationGroupVersion.objects.filter(
+        offer_ids = EducationGroupVersion.objects.filter(
             root_group__partial_acronym=root_node_identity.code,
             root_group__academic_year__year=root_node_identity.year
         ).values_list('offer_id', flat=True)
 
-        return cls._search_all_version(list(version_ids))
+        return _search_versions_from_offer_ids(list(offer_ids))
 
     @classmethod
     def search_all_versions_from_root_nodes(cls, node_identities: Set['Node']) -> List['ProgramTreeVersion']:
-        version_ids = _search_by_node_entities(list(node_identities))
-        return cls._search_all_version(version_ids)
-
-    @classmethod
-    def _search_all_version(cls, version_ids: List [int]):
-        qs = GroupYear.objects.filter(
-            educationgroupversion__offer_id__in=version_ids,
-        ).order_by(
-            'educationgroupversion__version_name'
-        ).annotate(
-            code=F('partial_acronym'),
-            offer_acronym=F('educationgroupversion__offer__acronym'),
-            offer_year=F('educationgroupversion__offer__academic_year__year'),
-            version_name=F('educationgroupversion__version_name'),
-            version_title_fr=F('educationgroupversion__title_fr'),
-            version_title_en=F('educationgroupversion__title_en'),
-            is_transition=F('educationgroupversion__is_transition'),
-        ).values(
-            'code',
-            'offer_acronym',
-            'offer_year',
-            'version_name',
-            'version_title_fr',
-            'version_title_en',
-            'is_transition',
-        )
-        results = []
-        for record_dict in qs:
-            results.append(_instanciate_tree_version(record_dict))
-        return results
+        offer_ids = _search_by_node_entities(list(node_identities))
+        return _search_versions_from_offer_ids(offer_ids)
 
 
 def _instanciate_tree_version(record_dict: dict) -> 'ProgramTreeVersion':
@@ -162,3 +134,31 @@ def _build_where_clause(node_identity: 'Node') -> Q:
             root_group__academic_year__year=node_identity.year
         )
     )
+
+
+def _search_versions_from_offer_ids(offer_ids: List[int]) -> List['ProgramTreeVersion']:
+    qs = GroupYear.objects.filter(
+        educationgroupversion__offer_id__in=offer_ids,
+    ).order_by(
+        'educationgroupversion__version_name'
+    ).annotate(
+        code=F('partial_acronym'),
+        offer_acronym=F('educationgroupversion__offer__acronym'),
+        offer_year=F('educationgroupversion__offer__academic_year__year'),
+        version_name=F('educationgroupversion__version_name'),
+        version_title_fr=F('educationgroupversion__title_fr'),
+        version_title_en=F('educationgroupversion__title_en'),
+        is_transition=F('educationgroupversion__is_transition'),
+    ).values(
+        'code',
+        'offer_acronym',
+        'offer_year',
+        'version_name',
+        'version_title_fr',
+        'version_title_en',
+        'is_transition',
+    )
+    results = []
+    for record_dict in qs:
+        results.append(_instanciate_tree_version(record_dict))
+    return results

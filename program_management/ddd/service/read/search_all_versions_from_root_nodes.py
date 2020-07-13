@@ -24,9 +24,14 @@
 from typing import List
 
 from program_management.ddd import command
+from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 
 
-def search_all_versions_from_root_nodes(command: command.SearchAllVersionsFromRootNodesCommand) -> List['ProgramTreeVersion']:
-    return ProgramTreeVersionRepository.search_all_versions_from_root_nodes(command.node_identities)
+def search_all_versions_from_root_nodes(commands: List[command.SearchAllVersionsFromRootNodesCommand]) -> List['ProgramTreeVersion']:
+    node_identities = []
+    for command in commands:
+        node_identities.append(NodeIdentity(code=command.code, year=command.year))
+
+    return ProgramTreeVersionRepository.search_all_versions_from_root_nodes(node_identities)

@@ -223,5 +223,6 @@ class GetNodeIdentityFromElementId(interface.CommandRequest):
 
 
 class SearchAllVersionsFromRootNodesCommand(interface.CommandRequest):
-    def __init__(self, node_identities: Set['Node']):
-        self.node_identities = node_identities
+    def __init__(self, code: str, year: int):
+        self.code = code
+        self.year = year

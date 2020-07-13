@@ -173,7 +173,10 @@ def __get_program_tree_version_name(link, mini_training_tree_versions: List['Pro
     if mini_training_tree_versions:
         program_tree_identity = ProgramTreeIdentitySearch().get_from_node_identity(NodeIdentity(link.child.code,
                                                                                                 link.child.year))
-        for program_tree_version in mini_training_tree_versions:
-            if program_tree_version.program_tree_identity == program_tree_identity:
-                return program_tree_version.version_label
+        return next(
+            (
+                program_tree_version.version_label for program_tree_version in mini_training_tree_versions
+                if program_tree_version.program_tree_identity == program_tree_identity
+             ),
+            '')
     return ''
