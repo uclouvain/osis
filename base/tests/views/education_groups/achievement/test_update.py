@@ -191,6 +191,32 @@ class TestEducationGroupAchievementActionUpdateDelete(TestCase):
         d_achievement.refresh_from_db()
         self.assertEqual(d_achievement.code_name, code)
 
+    def test_training_detailed_achievement_actions(self):
+        achievement = EducationGroupAchievementFactory(education_group_year=self.education_group_year)
+        d_achievement_1 = EducationGroupDetailedAchievementFactory(education_group_achievement=achievement)
+        d_achievement_2 = EducationGroupDetailedAchievementFactory(education_group_achievement=achievement)
+        d_achievement_1.order = 0
+        d_achievement_1.save()
+        d_achievement_2.order = 1
+        d_achievement_2.save()
+        response = self.client.post(
+            reverse(
+                "training_detailed_achievement_actions",
+                args=[
+                    self.education_group_year.academic_year.year,
+                    self.education_group_year.partial_acronym,
+                    self.achievement_2.pk,
+                    d_achievement_2.pk
+
+                ]) + '?path={}&tab={}'.format(1111, Tab.SKILLS_ACHIEVEMENTS), data={"action": "up"}
+        )
+
+        self.assertEqual(response.status_code, 302)
+        d_achievement_1.refresh_from_db()
+        d_achievement_2.refresh_from_db()
+        self.assertEqual(d_achievement_1.order, 1)
+        self.assertEqual(d_achievement_2.order, 0)
+
 
 class TestEducationGroupAchievementCMSSetup(TestCase):
     def setUp(self):
