@@ -19,7 +19,7 @@ class IdentificationRedirectView(RedirectView):
         root_node = NodeRepository().get(NodeIdentity(code=code, year=year))
         if root_node.is_training():
             url_name = "training_{}".format(get_url_name_suffix_from_referer(self.request.META.get('HTTP_REFERER'),
-                                                                             get_training_available_tabs())),
+                                                                             get_training_available_tabs()))
             url_kwargs = {'year': root_node.year, 'code': root_node.code}
         elif root_node.is_mini_training():
             url_name = "mini_training_{}".format(get_url_name_suffix_from_referer(self.request.META.get('HTTP_REFERER'),
