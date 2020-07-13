@@ -36,7 +36,10 @@ def postpone_training(postpone_cmd: command.PostponeTrainingCommand) -> List['Tr
     from_year = postpone_cmd.postpone_from_year
     while from_year < postpone_cmd.postpone_until_year:
         # GIVEN
-        cmd_copy_from = command.CopyTrainingToNextYearCommand(acronym=postpone_cmd.acronym, postpone_from_year=from_year)
+        cmd_copy_from = command.CopyTrainingToNextYearCommand(
+            acronym=postpone_cmd.acronym,
+            postpone_from_year=from_year
+        )
 
         # WHEN
         identity_next_year = copy_training_service.copy_training_to_next_year(cmd_copy_from)
