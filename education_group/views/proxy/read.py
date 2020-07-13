@@ -92,32 +92,46 @@ def get_tab_urls(tab: Tab, node: 'Node', path: 'Path' = None) -> str:
 
 def get_tab_from_referer(node: 'Node', referer: str):
     if referer:
-        tabs = {SUFFIX_IDENTIFICATION: Tab.IDENTIFICATION,
-                SUFFIX_CONTENT: Tab.CONTENT,
-                SUFFIX_UTILIZATION: Tab.UTILIZATION,
-                SUFFIX_GENERAL_INFO: Tab.GENERAL_INFO,
-                }
+        tabs = get_group_available_tabs()
 
         if node.is_training():
-            tabs = {SUFFIX_IDENTIFICATION: Tab.IDENTIFICATION,
-                    SUFFIX_DIPLOMAS_CERTIFICATES: Tab.DIPLOMAS_CERTIFICATES,
-                    SUFFIX_ADMINISTRATIVE_DATA: Tab.ADMINISTRATIVE_DATA,
-                    SUFFIX_CONTENT: Tab.CONTENT,
-                    SUFFIX_UTILIZATION: Tab.UTILIZATION,
-                    SUFFIX_GENERAL_INFO: Tab.GENERAL_INFO,
-                    SUFFIX_SKILLS_ACHIEVEMENTS: Tab.SKILLS_ACHIEVEMENTS,
-                    SUFFIX_ADMISSION_CONDITION: Tab.ADMISSION_CONDITION
-                    }
+            tabs = get_training_available_tabs()
 
         if node.is_mini_training():
-            tabs = {SUFFIX_IDENTIFICATION: Tab.IDENTIFICATION,
-                    SUFFIX_CONTENT: Tab.CONTENT,
-                    SUFFIX_UTILIZATION: Tab.UTILIZATION,
-                    SUFFIX_GENERAL_INFO: Tab.GENERAL_INFO,
-                    SUFFIX_SKILLS_ACHIEVEMENTS: Tab.SKILLS_ACHIEVEMENTS,
-                    SUFFIX_ADMISSION_CONDITION: Tab.ADMISSION_CONDITION
-                    }
+            tabs = get_mini_training_available_tabs()
 
         return next((tab for key, tab in tabs.items() if key in referer), Tab.IDENTIFICATION)
     return Tab.IDENTIFICATION
 
+
+def get_group_available_tabs():
+    return {
+        SUFFIX_IDENTIFICATION: Tab.IDENTIFICATION,
+        SUFFIX_CONTENT: Tab.CONTENT,
+        SUFFIX_UTILIZATION: Tab.UTILIZATION,
+        SUFFIX_GENERAL_INFO: Tab.GENERAL_INFO,
+    }
+
+
+def get_training_available_tabs():
+    return {
+        SUFFIX_IDENTIFICATION: Tab.IDENTIFICATION,
+        SUFFIX_DIPLOMAS_CERTIFICATES: Tab.DIPLOMAS_CERTIFICATES,
+        SUFFIX_ADMINISTRATIVE_DATA: Tab.ADMINISTRATIVE_DATA,
+        SUFFIX_CONTENT: Tab.CONTENT,
+        SUFFIX_UTILIZATION: Tab.UTILIZATION,
+        SUFFIX_GENERAL_INFO: Tab.GENERAL_INFO,
+        SUFFIX_SKILLS_ACHIEVEMENTS: Tab.SKILLS_ACHIEVEMENTS,
+        SUFFIX_ADMISSION_CONDITION: Tab.ADMISSION_CONDITION
+    }
+
+
+def get_mini_training_available_tabs():
+    return {
+        SUFFIX_IDENTIFICATION: Tab.IDENTIFICATION,
+        SUFFIX_CONTENT: Tab.CONTENT,
+        SUFFIX_UTILIZATION: Tab.UTILIZATION,
+        SUFFIX_GENERAL_INFO: Tab.GENERAL_INFO,
+        SUFFIX_SKILLS_ACHIEVEMENTS: Tab.SKILLS_ACHIEVEMENTS,
+        SUFFIX_ADMISSION_CONDITION: Tab.ADMISSION_CONDITION
+    }
