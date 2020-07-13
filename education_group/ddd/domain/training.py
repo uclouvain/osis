@@ -61,6 +61,20 @@ class TrainingIdentity(interface.EntityIdentity):
 
 
 class TrainingBuilder:
+
+    def copy_to_next_year(self, training_from: 'Training', training_repository: 'TrainingRepository') -> 'Training':
+        training_next_year = training_repository.get(training_from.entity_id)
+        if training_next_year:
+            # TODO :: Case update training next year - to implement in OSIS-4809
+            pass
+        else:
+            # Case create training next year
+            training_next_year = attr.evolve(  # Copy to new object
+                training_from,
+                entity_identity=TrainingIdentity(acronym=training_from.acronym, year=training_from.year),
+            )
+        return training_next_year
+
     def get_training(self, command: 'CreateTrainingCommand') -> 'Training':
         training_identity = TrainingIdentity(command.abbreviated_title, command.year)
         secondary_domains = []
@@ -166,87 +180,47 @@ class TrainingBuilder:
             )
 
 
+@attr.s(slots=True)
 class Training(interface.RootEntity):
 
-    # FIXME :: split into ValueObjects (to discuss with business people)
-    def __init__(
-            self,
-            entity_identity: 'TrainingIdentity',
-            type: TrainingType,
-            credits: Decimal,
-            schedule_type: ScheduleTypeEnum,
-            duration: int,
-            start_year: int,
-            titles: Titles,
-            keywords: str = None,
-            internship: InternshipPresence = None,
-            is_enrollment_enabled: bool = True,
-            has_online_re_registration: bool = True,
-            has_partial_deliberation: bool = False,
-            has_admission_exam: bool = False,
-            has_dissertation: bool = False,
-            produce_university_certificate: bool = False,
-            decree_category: DecreeCategories = None,
-            rate_code: RateCode = None,
-            main_language: Language = None,
-            english_activities: ActivityPresence = None,
-            other_language_activities: ActivityPresence = None,
-            internal_comment: str = None,
-            main_domain: StudyDomain = None,
-            secondary_domains: List[StudyDomain] = None,
-            isced_domain: IscedDomain = None,
-            management_entity: Entity = None,
-            administration_entity: Entity = None,
-            end_year: int = None,
-            teaching_campus: Campus = None,
-            enrollment_campus: Campus = None,
-            other_campus_activities: ActivityPresence = None,
-            funding: Funding = None,
-            hops: HOPS = None,
-            co_graduation: CoGraduation = None,
-            co_organizations: List[Coorganization] = None,
-            academic_type: AcademicTypes = None,
-            duration_unit: DurationUnitsEnum = None,
-            diploma: Diploma = None,
-    ):
-        super(Training, self).__init__(entity_id=entity_identity)
-        self.entity_id = entity_identity
-        self.type = type
-        self.credits = credits
-        self.schedule_type = schedule_type or ScheduleTypeEnum.DAILY
-        self.duration = duration or 1
-        self.duration_unit = duration_unit or DurationUnitsEnum.QUADRIMESTER
-        self.start_year = start_year
-        self.titles = titles
-        self.keywords = keywords or ""
-        self.internship = internship or InternshipPresence.NO
-        self.is_enrollment_enabled = is_enrollment_enabled or True
-        self.has_online_re_registration = has_online_re_registration or True
-        self.has_partial_deliberation = has_partial_deliberation or False
-        self.has_admission_exam = has_admission_exam or False
-        self.has_dissertation = has_dissertation or False
-        self.produce_university_certificate = produce_university_certificate or False
-        self.decree_category = decree_category
-        self.rate_code = rate_code
-        self.main_language = main_language
-        self.english_activities = english_activities
-        self.other_language_activities = other_language_activities
-        self.internal_comment = internal_comment
-        self.main_domain = main_domain
-        self.secondary_domains = secondary_domains
-        self.isced_domain = isced_domain
-        self.management_entity = management_entity
-        self.administration_entity = administration_entity
-        self.end_year = end_year
-        self.teaching_campus = teaching_campus
-        self.enrollment_campus = enrollment_campus
-        self.other_campus_activities = other_campus_activities
-        self.funding = funding
-        self.hops = hops
-        self.co_graduation = co_graduation
-        self.co_organizations = co_organizations
-        self.academic_type = academic_type
-        self.diploma = diploma
+    # FIXME :: split fields into separate ValueObjects (to discuss with business people)
+    entity_id = entity_identity = attr.ib(type=TrainingIdentity)
+    type = attr.ib(type=TrainingType)
+    credits = attr.ib(type=Decimal)
+    start_year = attr.ib(type=int)
+    titles = attr.ib(type=Titles)
+    schedule_type = attr.ib(type=ScheduleTypeEnum, default=ScheduleTypeEnum.DAILY)
+    duration = attr.ib(type=int, default=1)
+    duration_unit = attr.ib(type=DurationUnitsEnum, default=DurationUnitsEnum.QUADRIMESTER)
+    keywords = attr.ib(type=str, default="")
+    internship = attr.ib(type=InternshipPresence, default=InternshipPresence.NO)
+    is_enrollment_enabled = attr.ib(type=bool, default=True)
+    has_online_re_registration = attr.ib(type=bool, default=True)
+    has_partial_deliberation = attr.ib(type=bool, default=False)
+    has_admission_exam = attr.ib(type=bool, default=False)
+    has_dissertation = attr.ib(type=bool, default=False)
+    produce_university_certificate = attr.ib(type=bool, default=False)
+    decree_category = attr.ib(type=DecreeCategories, default=None)
+    rate_code = attr.ib(type=RateCode, default=None)
+    main_language = attr.ib(type=Language, default=None)
+    english_activities = attr.ib(type=ActivityPresence, default=None)
+    other_language_activities = attr.ib(type=ActivityPresence, default=None)
+    internal_comment = attr.ib(type=str, default=None)
+    main_domain = attr.ib(type=StudyDomain, default=None)
+    secondary_domains = attr.ib(type=List[StudyDomain], default=[])
+    isced_domain = attr.ib(type=IscedDomain, default=None)
+    management_entity = attr.ib(type=Entity, default=None)
+    administration_entity = attr.ib(type=Entity, default=None)
+    end_year = attr.ib(type=int, default=None)
+    teaching_campus = attr.ib(type=Campus, default=None)
+    enrollment_campus = attr.ib(type=Campus, default=None)
+    other_campus_activities = attr.ib(type=ActivityPresence, default=None)
+    funding = attr.ib(type=Funding, default=None)
+    hops = attr.ib(type=HOPS, default=None)
+    co_graduation = attr.ib(type=CoGraduation, default=None)
+    co_organizations = attr.ib(type=List[Coorganization], default=[])
+    academic_type = attr.ib(type=AcademicTypes, default=None)
+    diploma = attr.ib(type=Diploma, default=None)
 
     @property
     def acronym(self) -> str:
