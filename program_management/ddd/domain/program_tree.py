@@ -34,12 +34,17 @@ from base.models.enums.education_group_types import EducationGroupTypesEnum, Tra
 from osis_common.ddd import interface
 from osis_common.decorators.deprecated import deprecated
 from program_management.ddd import command
+from program_management.ddd.domain.node import factory as node_factory
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import prerequisite
+from program_management.ddd.domain.service import generate_node_code_service, validation_rule, \
+    generate_node_abbreviated_title
+from program_management.ddd.repositories import load_authorized_relationship
 from program_management.ddd.validators import validators_by_business_action
 from program_management.ddd.validators._path_validator import PathValidator
 from program_management.models.enums import node_type
 from program_management.models.enums.node_type import NodeType
+from education_group.ddd.business_types import *
 
 PATH_SEPARATOR = '|'
 Path = str  # Example : "root|node1|node2|child_leaf"
@@ -49,6 +54,44 @@ Path = str  # Example : "root|node1|node2|child_leaf"
 class ProgramTreeIdentity(interface.EntityIdentity):
     code = attr.ib(type=str)
     year = attr.ib(type=int)
+
+
+class ProgramTreeBuilder:
+    def build_from_orphan_group_as_root(
+            self,
+            orphan_group_as_root: 'Group',
+            node_repository: 'NodeRepository'
+    ) -> 'ProgramTree':
+        root_node = node_repository.get(NodeIdentity(code=orphan_group_as_root.code, year=orphan_group_as_root.year))
+        program_tree = ProgramTree(root_node=root_node, authorized_relationships=load_authorized_relationship.load())
+        self._generate_mandatory_direct_children(program_tree=program_tree)
+        return program_tree
+
+    def _generate_mandatory_direct_children(
+            self,
+            program_tree: 'ProgramTree'
+    ) -> List['Node']:
+        root_node = program_tree.root_node
+        children = []
+        for child_type in program_tree.get_mandatory_children_types(program_tree.root_node):
+            child = node_factory.get_node(
+                type=NodeType.GROUP,
+                code=generate_node_code_service.generate_code_based_on_parent(root_node, child_type),
+                title=generate_node_abbreviated_title.generate_base_on_parent(
+                    parent_node=root_node,
+                    child_node_type=child_type,
+                ),
+                year=root_node.year,
+                teaching_campus=root_node.teaching_campus,
+                management_entity_acronym=root_node.management_entity_acronym,
+                group_title_fr="{child_title} {parent_title}".format(
+                    child_title=validation_rule.get_validation_rule_for_field(child_type, 'title').initial_value,
+                    parent_title=root_node.title
+                ),
+            )
+            root_node.add_child(child)
+            children.append(child)
+        return children
 
 
 class ProgramTree(interface.RootEntity):
@@ -230,6 +273,13 @@ class ProgramTree(interface.RootEntity):
     def prune(self, ignore_children_from: Set[EducationGroupTypesEnum] = None) -> 'ProgramTree':
         copied_root_node = _copy(self.root_node, ignore_children_from=ignore_children_from)
         return ProgramTree(root_node=copied_root_node, authorized_relationships=self.authorized_relationships)
+
+    def get_mandatory_children_types(self, parent_node: 'Node') -> Set[EducationGroupTypesEnum]:
+        return set(
+            authorized_type
+            for authorized_type in self.authorized_relationships.get_authorized_children_types(parent_node.node_type)
+            if isinstance(authorized_type, EducationGroupTypesEnum)
+        )
 
     def paste_node(
             self,
