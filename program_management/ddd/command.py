@@ -236,8 +236,6 @@ class GetProgramTree(interface.CommandRequest):
 
 @attr.s(frozen=True, slots=True)
 class UpdateLinkCommand(interface.CommandRequest):
-    parent_node_code = attr.ib(type=str)
-    parent_node_year = attr.ib(type=int)
     child_node_code = attr.ib(type=str)
     child_node_year = attr.ib(type=int)
 
@@ -248,3 +246,11 @@ class UpdateLinkCommand(interface.CommandRequest):
     comment = attr.ib(type=str)
     comment_english = attr.ib(type=str)
     relative_credits = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class BulkUpdateLinkCommand(interface.CommandRequest):
+    parent_node_code = attr.ib(type=str)
+    parent_node_year = attr.ib(type=int)
+
+    update_link_cmds = attr.ib(factory=list, type=UpdateLinkCommand)

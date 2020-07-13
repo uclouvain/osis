@@ -38,6 +38,7 @@ from education_group.ddd.factories.group import GroupFactory
 from education_group.forms.content import ContentFormSet
 from education_group.forms.group import GroupUpdateForm
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
+from education_group.views.proxy.read import Tab
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
@@ -125,6 +126,20 @@ class TestUpdateGroupGetMethod(TestCase):
             }]
         )
 
+    @mock.patch('education_group.views.group.update.GroupUpdateView.get_children_objs')
+    @mock.patch('education_group.views.group.update.GroupUpdateView.get_program_tree_obj')
+    def test_assert_content_tab_active_when_tab_queryparm(self, mock_get_program_tree, mock_get_children_obj):
+        root_link = LinkFactory()
+        program_tree = ProgramTreeFactory(root_node=root_link.parent)
+        mock_get_program_tree.return_value = program_tree
+        mock_get_children_obj.return_value = [GroupFactory()]
+
+        url_with_tab_queryparam = self.url + "?tab={}".format(Tab.CONTENT)
+        response = self.client.get(url_with_tab_queryparam)
+
+        self.assertFalse(response.context['tabs'][0]['active'])
+        self.assertTrue(response.context['tabs'][1]['active'])
+
     @mock.patch('education_group.views.group.update.GroupUpdateView.get_program_tree_obj')
     def test_assert_contains_only_identification_tabs_when_group_dont_have_children(self, mock_get_program_tree):
         mock_get_program_tree.return_value = ProgramTreeFactory()
@@ -168,7 +183,7 @@ class TestUpdateGroupGetMethod(TestCase):
         self.assertEqual(initials['title_fr'], self.group.titles.title_fr)
         self.assertEqual(initials['title_en'], self.group.titles.title_en)
         self.assertEqual(initials['credits'], self.group.credits)
-        self.assertEqual(initials['constraint_type'], self.group.content_constraint.type)
+        self.assertEqual(initials['constraint_type'], self.group.content_constraint.type.name)
         self.assertEqual(initials['min_constraint'], self.group.content_constraint.minimum)
         self.assertEqual(initials['max_constraint'], self.group.content_constraint.maximum)
         self.assertEqual(initials['remark_fr'], self.group.remark.text_fr)
@@ -196,3 +211,77 @@ class TestUpdateGroupGetMethod(TestCase):
         self.assertEqual(initials[0]['block'], link_child_1.block)
         self.assertEqual(initials[0]['comment_fr'], link_child_1.comment)
         self.assertEqual(initials[0]['comment_en'], link_child_1.comment_english)
+
+
+class TestUpdateGroupPostMethod(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.group = GroupFactory()
+        cls.program_tree = ProgramTreeFactory()
+
+        cls.group.entity_identity = GroupIdentity(year=2018, code='LBIR100M')
+        cls.central_manager = CentralManagerFactory()
+        cls.url = reverse('group_update', kwargs={'year': cls.group.year, 'code': cls.group.code})
+
+    def setUp(self) -> None:
+        self.get_group_patcher = mock.patch(
+            "education_group.views.group.update.get_group_service.get_group",
+            return_value=self.group
+        )
+        self.mocked_get_group = self.get_group_patcher.start()
+        self.addCleanup(self.get_group_patcher.stop)
+
+        self.get_program_tree_patcher = mock.patch(
+            "education_group.views.group.update.get_program_tree_service.get_program_tree",
+            return_value=self.program_tree
+        )
+        self.mocked_get_program_tree = self.get_program_tree_patcher.start()
+        self.addCleanup(self.get_program_tree_patcher.stop)
+
+        self.update_group_patcher = mock.patch(
+            "education_group.views.group.update.update_group_service.update_group",
+            return_value=self.group
+        )
+        self.mocked_update_group = self.update_group_patcher.start()
+        self.addCleanup(self.update_group_patcher.stop)
+
+        self.update_links_patcher = mock.patch(
+            "education_group.views.group.update.update_link_service.bulk_update_links",
+            return_value=[]
+        )
+        self.mocked_update_links = self.update_links_patcher.start()
+        self.addCleanup(self.update_links_patcher.stop)
+
+        self.client.force_login(self.central_manager.person.user)
+
+    def test_case_when_user_not_logged(self):
+        self.client.logout()
+        response = self.client.post(self.url)
+        self.assertRedirects(response, "/login/?next={}".format(self.url))
+
+    def test_when_user_has_no_permission(self):
+        a_person_without_permission = PersonFactory()
+        self.client.force_login(a_person_without_permission.user)
+
+        response = self.client.post(self.url, data={})
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+
+    @mock.patch('education_group.views.group.update.get_group_service.get_group', side_effect=GroupNotFoundException)
+    def test_assert_404_when_group_not_found(self, mock_get_group):
+        response = self.client.post(self.url, data={})
+        self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
+
+    @mock.patch('education_group.views.group.update.GroupUpdateView.is_all_forms_valid')
+    @mock.patch('education_group.views.group.update.ContentFormSet')
+    @mock.patch('education_group.views.group.update.GroupUpdateForm')
+    def test_case_all_forms_valid_assert_redirection(self, mock_group_form, mock_content_formset,
+                                                     mock_is_all_form_valid):
+        mock_group_form.return_value.is_valid.return_value = True
+        mock_content_formset.return_value.is_valid.return_value = True
+        mock_is_all_form_valid.return_value = True
+
+        expected_redirect = reverse(
+            'element_identification', kwargs={'code': self.group.code, 'year': self.group.year}
+        )
+        response = self.client.post(self.url, data={})
+        self.assertRedirects(response, expected_redirect, fetch_redirect_response=False)

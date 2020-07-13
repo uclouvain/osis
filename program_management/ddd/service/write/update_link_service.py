@@ -21,24 +21,38 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from program_management.ddd import command
+from typing import List
+
+from django.db import transaction
+
+from program_management.ddd.business_types import *
+
+from program_management.ddd.command import BulkUpdateLinkCommand
+from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 
 
-def update_link(cmd: command.UpdateLinkCommand) -> 'NodeIdentity':
+@transaction.atomic()
+def bulk_update_links(cmd: BulkUpdateLinkCommand) -> List['Link']:
     tree_id = ProgramTreeIdentity(code=cmd.parent_node_code, year=cmd.parent_node_year)
     tree = ProgramTreeRepository.get(tree_id)
-    child_node = tree.root_node.get_direct_child(code=cmd.child_node_code, year=cmd.child_node_year)
 
-    tree.root_node.update_link_of_child_node(
-        child_node,
-        relative_credits=cmd.relative_credits,
-        access_condition=cmd.access_condition,
-        is_mandatory=cmd.is_mandatory,
-        block=cmd.block,
-        link_type=cmd.link_type,
-        comment=cmd.comment,
-        comment_english=cmd.comment_english
-    )
+    links_updated = []
+    for update_cmd in cmd.update_link_cmds:
+        child_id = NodeIdentity(code=update_cmd.child_node_code, year=update_cmd.child_node_year)
+        link_updated = tree.update_link(
+            parent_path=str(tree.root_node.node_id),
+            child_id=child_id,
+
+            relative_credits=update_cmd.relative_credits,
+            access_condition=update_cmd.access_condition,
+            is_mandatory=update_cmd.is_mandatory,
+            block=update_cmd.block,
+            link_type=update_cmd.link_type,
+            comment=update_cmd.comment,
+            comment_english=update_cmd.comment_english
+        )
+        links_updated.append(link_updated)
     ProgramTreeRepository.update(tree)
+    return links_updated

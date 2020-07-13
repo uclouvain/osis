@@ -162,8 +162,11 @@ class Node(interface.Entity):
     def is_minor_major_list_choice(self) -> bool:
         return self.node_type in GroupType.minor_major_list_choice_enums()
 
-    def get_direct_child(self, code: str, year: int) -> 'Node':
-        return next(node for node in self.get_direct_children_as_nodes() if node.code == code and node.year == year)
+    def is_minor_major_list_choice(self) -> bool:
+        return self.node_type in GroupType.minor_major_list_choice_enums()
+
+    def get_direct_child_as_node(self, node_id: 'NodeIdentity') -> 'Node':
+        return next(node for node in self.get_direct_children_as_nodes() if node.entity_id == node_id)
 
     def get_all_children(
             self,
@@ -265,27 +268,32 @@ class Node(interface.Entity):
     def descendents(self) -> Dict['Path', 'Node']:   # TODO :: add unit tests
         return _get_descendents(self)
 
-    def update_link_of_child_node(
+    def update_link_of_direct_child_node(
             self,
-            child_node: 'Node',
-            **link_attrs
+            child_id: 'NodeIdentity',
+            relative_credits: int,
+            access_condition: bool,
+            is_mandatory: bool,
+            block: int,
+            link_type: str,
+            comment: str,
+            comment_english: str
     ) -> 'Link':
-        link_to_update = next(link for link in self.children if link.child == child_node)
-        if 'relative_credits' in link_attrs:
-            link_to_update.relative_credits = link_attrs['relative_credits']
-        if 'is_mandatory' in link_attrs:
-            link_to_update.is_mandatory = link_attrs['is_mandatory']
-        if 'block' in link_attrs:
-            link_to_update.block = link_attrs['block']
-        if 'access_condition' in link_attrs:
-            link_to_update.access_condition = link_attrs['access_condition']
-        if 'comment' in link_attrs:
-            link_to_update.comment = link_attrs['comment']
-        if 'comment_english' in link_attrs:
-            link_to_update.comment_english = link_attrs['comment_english']
-        if 'link_type' in link_attrs:
-            link_to_update.link_type = link_attrs['link_type']
-        link_to_update._has_changed = len(link_attrs.keys())
+        link_to_update = next(link for link in self.children if link.child.entity_id == child_id)
+
+        if self.is_minor_major_list_choice() and \
+                not link_to_update.child.is_minor_major_list_choice():
+            link_type = LinkTypes.REFERENCE
+
+        link_to_update.relative_credits = relative_credits
+        link_to_update.access_condition = access_condition
+        link_to_update.is_mandatory = is_mandatory
+        link_to_update.block = block
+        link_to_update.link_type = link_type
+        link_to_update.comment = comment
+        link_to_update.comment_english = comment_english
+
+        link_to_update._has_changed = True
         return link_to_update
 
     def add_child(self, node: 'Node', **link_attrs) -> 'Link':

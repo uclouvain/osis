@@ -9,18 +9,23 @@ from django.shortcuts import render
 from django.views import View
 from rules.contrib.views import LoginRequiredMixin
 
+from education_group.ddd.business_types import *
+
 import education_group.ddd.service.read.get_multiple_groups_service
 from base.models import entity_version, academic_year, campus
 from base.views.common import display_success_messages
 from education_group.ddd import command
 from education_group.ddd.service.write import update_group_service
 from education_group.templatetags.academic_year_display import display_as_academic_year
+from education_group.views.proxy.read import Tab
 from learning_unit.ddd import command as command_learning_unit_year
 from learning_unit.ddd.domain.learning_unit_year import LearningUnitYear
+from education_group.ddd.domain.group import Group
 from learning_unit.ddd.service.read import get_multiple_learning_unit_years_service
 from program_management.ddd import command as command_program_management
 from education_group.ddd.domain.exception import GroupNotFoundException, ContentConstraintTypeMissing, \
-    ContentConstraintMinimumMaximumMissing, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum
+    ContentConstraintMinimumMaximumMissing, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum, \
+    CreditShouldBeGreaterOrEqualsThanZero
 from education_group.ddd.service.read import get_group_service
 from education_group.forms.content import ContentFormSet
 from education_group.forms.group import GroupUpdateForm
@@ -28,9 +33,8 @@ from education_group.models.group_year import GroupYear
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.ddd.service.read import get_program_tree_service
+from program_management.ddd.service.write import update_link_service
 from program_management.models.enums.node_type import NodeType
-
-from education_group.ddd.business_types import *
 
 
 class GroupUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
@@ -54,6 +58,7 @@ class GroupUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             ],
         )
         return render(request, self.template_name, {
+            "group": self.get_group_obj(),
             "group_form": group_form,
             "type_text": self.get_group_obj().type.value,
             "content_formset": content_formset,
@@ -80,11 +85,12 @@ class GroupUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             group_id = self.__send_update_group_cmd(group_form)
             self.__send_multiple_update_link_cmd(content_formset)
 
-            if not any([group_form.errors, content_formset.errors]):
+            if self.is_all_forms_valid(group_form, content_formset):
                 display_success_messages(request, self.get_success_msg(group_id), extra_tags='safe')
                 return HttpResponseRedirect(self.get_success_url(group_id))
 
         return render(request, self.template_name, {
+            "group": self.get_group_obj(),
             "group_form": group_form,
             "type_text": self.get_group_obj().type.value,
             "content_formset": content_formset,
@@ -113,6 +119,8 @@ class GroupUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         )
         try:
             return update_group_service.update_group(cmd_update)
+        except CreditShouldBeGreaterOrEqualsThanZero as e:
+            group_form.add_error('credits', e.message)
         except ContentConstraintTypeMissing as e:
             group_form.add_error('constraint_type', e.message)
         except (ContentConstraintMinimumMaximumMissing, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum) \
@@ -121,7 +129,31 @@ class GroupUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             group_form.add_error('max_constraint', '')
 
     def __send_multiple_update_link_cmd(self, content_formset: ContentFormSet):
-        pass
+        update_link_cmds = []
+        for form in content_formset.forms:
+            cmd_update_link = command_program_management.UpdateLinkCommand(
+                child_node_code=form.child_obj.code if isinstance(form.child_obj, Group) else form.child_obj.acronym,
+                child_node_year=form.child_obj.year,
+
+                access_condition=form.cleaned_data.get('access_condition', False),
+                is_mandatory=form.cleaned_data.get('is_mandatory', True),
+                block=form.cleaned_data.get('block'),
+                link_type=form.cleaned_data.get('link_type'),
+                comment=form.cleaned_data.get('comment_fr'),
+                comment_english=form.cleaned_data.get('comment_en'),
+                relative_credits=form.cleaned_data.get('relative_credits'),
+            )
+            update_link_cmds.append(cmd_update_link)
+
+        cmd_bulk = command_program_management.BulkUpdateLinkCommand(
+            parent_node_code=self.kwargs['code'],
+            parent_node_year=self.kwargs['year'],
+            update_link_cmds=update_link_cmds
+        )
+        update_link_service.bulk_update_links(cmd_bulk)
+
+    def is_all_forms_valid(self, group_form, content_formset):
+        return not any([group_form.errors, content_formset.total_error_count()])
 
     @functools.lru_cache()
     def get_group_obj(self) -> 'Group':
@@ -196,7 +228,7 @@ class GroupUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         group_obj = self.get_group_obj()
         return {
             'code': group_obj.code,
-            'academic_year': academic_year.find_academic_year_by_year(year=group_obj.year).pk,
+            'academic_year': getattr(academic_year.find_academic_year_by_year(year=group_obj.year), 'pk', None),
             'abbreviated_title': group_obj.abbreviated_title,
             'title_fr': group_obj.titles.title_fr,
             'title_en': group_obj.titles.title_en,
@@ -218,7 +250,7 @@ class GroupUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         return [{
             'relative_credits': link.relative_credits,
             'is_mandatory': link.is_mandatory,
-            'link_type': link.link_type,
+            'link_type': link.link_type.name if link.link_type else None,
             'access_condition': link.access_condition,
             'block': link.block,
             'comment_fr': link.comment,
@@ -229,17 +261,20 @@ class GroupUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         return [
             {
                 "text": _("Identification"),
-                "active": True,
+                "active": not self.is_content_active_tab(),
                 "display": True,
                 "include_html": "education_group_app/group/upsert/identification_form.html"
             },
             {
                 "text": _("Content"),
-                "active": False,
+                "active": self.is_content_active_tab(),
                 "display": bool(self.get_program_tree_obj().root_node.get_all_children()),
                 "include_html": "education_group_app/group/upsert/content_form.html"
             }
         ]
+
+    def is_content_active_tab(self):
+        return self.request.GET.get('tab') == str(Tab.CONTENT.value)
 
     def get_permission_object(self) -> Union[GroupYear, None]:
         try:

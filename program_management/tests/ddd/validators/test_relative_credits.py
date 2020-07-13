@@ -23,18 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from education_group.views.group.common_read import Tab, GroupRead
+from django.test import SimpleTestCase
+
+from program_management.ddd.domain.exception import RelativeCreditShouldBeGreaterOrEqualsThanZero
+
+from program_management.ddd.validators._relative_credits import RelativeCreditsValidator
 
 
-class GroupReadContent(GroupRead):
-    template_name = "education_group_app/group/content_read.html"
-    active_tab = Tab.CONTENT
+class TestRelativeCreditsValidator(SimpleTestCase):
+    def test_assert_raise_exception_case_relative_credits_lower_than_zero(self):
+        validator = RelativeCreditsValidator(-1)
+        with self.assertRaises(RelativeCreditShouldBeGreaterOrEqualsThanZero):
+            validator.is_valid()
 
-    def get_context_data(self, **kwargs):
-        return {
-            **super().get_context_data(**kwargs),
-            "children": self.get_object().children
-        }
-
-    def get_update_group_url(self) -> str:
-        return super().get_update_group_url() + "&tab={}".format(self.active_tab)
+    def test_assert_relative_credits_must_be_greater_or_equals_to_zero(self):
+        validator = RelativeCreditsValidator(0)
+        self.assertTrue(validator.is_valid())

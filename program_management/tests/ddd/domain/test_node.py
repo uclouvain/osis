@@ -448,3 +448,45 @@ class TestGetDirectChildrenAsNodes(SimpleTestCase):
             self.parent.get_direct_children_as_nodes(ignore_children_from={GroupType.COMMON_CORE}),
             [self.child_link_1.child]
         )
+
+
+class TestUpdateLinkOfDirectChildNode(SimpleTestCase):
+    def test_assert_has_changed_property(self):
+        parent = NodeGroupYearFactory()
+        child_link_0 = LinkFactory(
+            parent=parent,
+            child=NodeGroupYearFactory(node_type=GroupType.COMMON_CORE),
+            order=0
+        )
+
+        link_updated = parent.update_link_of_direct_child_node(
+            child_id=child_link_0.child.entity_id,
+            relative_credits=0,
+            access_condition=False,
+            is_mandatory=False,
+            block=1,
+            link_type=None,
+            comment="",
+            comment_english="english"
+        )
+        self.assertTrue(link_updated._has_changed)
+
+    def test_assert_link_type_reference_when_parent_major_minor_list_choice_and_child_other(self):
+        minor_list_choice = NodeGroupYearFactory(node_type=GroupType.MINOR_LIST_CHOICE)
+        child_link = LinkFactory(
+            parent=minor_list_choice,
+            child=NodeGroupYearFactory(node_type=GroupType.SUB_GROUP),
+            order=0
+        )
+
+        link_updated = minor_list_choice.update_link_of_direct_child_node(
+            child_id=child_link.child.entity_id,
+            relative_credits=0,
+            access_condition=True,
+            is_mandatory=True,
+            block=1,
+            link_type=None,
+            comment="",
+            comment_english="english"
+        )
+        self.assertEqual(link_updated.link_type, LinkTypes.REFERENCE)
