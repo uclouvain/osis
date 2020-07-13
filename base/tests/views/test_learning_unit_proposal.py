@@ -278,8 +278,8 @@ class TestLearningUnitSuppressionProposal(TestCase):
         cls.entity_version = EntityVersionFactory(
             entity__organization=an_organization,
             entity_type=entity_type.FACULTY,
-            start_date=cls.current_academic_year.start_date,
-            end_date=cls.academic_years[7].end_date
+            start_date=cls.academic_years[0].start_date,
+            end_date=cls.academic_years[-1].end_date
         )
         learning_container_years = [
             LearningContainerYearFactory(
