@@ -115,9 +115,9 @@ def export_xls(exam_enrollments):
             line_content.extend(["-", "-", "-", "-", "-", "-"])
         worksheet.append(line_content)
         row_number += 1
+        _set_peps_border(worksheet, row_number)
         __coloring_non_editable(worksheet, row_number, score, exam_enroll.justification_final)
         _coloring_enrollment_state(worksheet, row_number, exam_enroll)
-        _set_peps_border(worksheet, row_number)
 
     lst_exam_enrollments = list(exam_enrollments)
     number_session = lst_exam_enrollments[0].session_exam.number_session
