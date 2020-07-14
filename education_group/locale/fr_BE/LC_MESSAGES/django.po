@@ -284,7 +284,7 @@ msgid ""
 "updated."
 msgstr ""
 "Le groupement <a href='%(link)s'> %(code)s (%(academic_year)s) </a> a été "
-"créé avec succès"
+"mis à jour avec succès"
 
 msgid "Holders of a 2nd cycle University degree"
 msgstr ""
