@@ -39,9 +39,11 @@ from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.service.identity_search import ProgramTreeIdentitySearch
 
 
-def serialize_children(children: List['Link'], path: str, context=None,
-                       mini_training_tree_versions: List['ProgramTreeVersion'] = None) \
-        -> List[dict]:
+def serialize_children(children: List['Link'],
+                       path: str,
+                       context=None,
+                       mini_training_tree_versions: List['ProgramTreeVersion'] = None
+                       ) -> List[dict]:
     serialized_children = []
     for link in children:
         child_path = path + PATH_SEPARATOR + str(link.child.pk)
@@ -113,9 +115,11 @@ def __get_title(obj: 'Link') -> str:
     return title
 
 
-def _get_node_view_serializer(link: 'Link', path: str, context=None,
-                              mini_training_tree_versions: List['ProgramTreeVersion'] = None) \
-        -> dict:
+def _get_node_view_serializer(link: 'Link',
+                              path: str,
+                              context=None,
+                              mini_training_tree_versions: List['ProgramTreeVersion'] = None
+                              ) -> dict:
 
     return {
         'id': path,
@@ -177,6 +181,6 @@ def __get_program_tree_version_name(link, mini_training_tree_versions: List['Pro
             (
                 program_tree_version.version_label for program_tree_version in mini_training_tree_versions
                 if program_tree_version.program_tree_identity == program_tree_identity
-             ),
+            ),
             '')
     return ''

@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List, Dict, Set
+from typing import List, Set
 
 from django.urls import reverse
 
@@ -65,9 +65,9 @@ def program_tree_view_serializer(tree: 'ProgramTree') -> dict:
 
 
 def _get_program_tree_version_for_all_mini_training(mini_trainings: Set['Node']) -> List['ProgramTreeVersion']:
-    commands = []
-    for node in mini_trainings:
-        commands.append(program_management.ddd.command.SearchAllVersionsFromRootNodesCommand(code=node.code,
-                                                                                             year=node.year))
+    commands = [
+        program_management.ddd.command.SearchAllVersionsFromRootNodesCommand(code=node.code,
+                                                                             year=node.year) for node in mini_trainings
+    ]
     return search_all_versions_from_root_nodes(commands)
 

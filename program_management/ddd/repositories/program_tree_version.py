@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Optional, List, Set
+from typing import Optional, List
 
 from django.db.models import F
 
@@ -95,7 +95,7 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
         return _search_versions_from_offer_ids(list(offer_ids))
 
     @classmethod
-    def search_all_versions_from_root_nodes(cls, node_identities: Set['Node']) -> List['ProgramTreeVersion']:
+    def search_all_versions_from_root_nodes(cls, node_identities: List['Node']) -> List['ProgramTreeVersion']:
         offer_ids = _search_by_node_entities(list(node_identities))
         return _search_versions_from_offer_ids(offer_ids)
 
@@ -116,7 +116,8 @@ def _instanciate_tree_version(record_dict: dict) -> 'ProgramTreeVersion':
 
 
 def _search_by_node_entities(entity_ids: List['Node']) -> List[int]:
-    if entity_ids and len(entity_ids) >= 1:
+    if bool(entity_ids):
+
         qs = EducationGroupVersion.objects.all().values_list('offer_id', flat=True)
 
         filter_search_from = _build_where_clause(entity_ids[0])

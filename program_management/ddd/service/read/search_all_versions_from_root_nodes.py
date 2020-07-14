@@ -29,9 +29,8 @@ from program_management.ddd.domain.program_tree_version import ProgramTreeVersio
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 
 
-def search_all_versions_from_root_nodes(commands: List[command.SearchAllVersionsFromRootNodesCommand]) -> List['ProgramTreeVersion']:
-    node_identities = []
-    for command in commands:
-        node_identities.append(NodeIdentity(code=command.code, year=command.year))
+def search_all_versions_from_root_nodes(commands: List[command.SearchAllVersionsFromRootNodesCommand]
+                                        ) -> List['ProgramTreeVersion']:
+    node_identities = [NodeIdentity(code=command.code, year=command.year) for command in commands]
 
     return ProgramTreeVersionRepository.search_all_versions_from_root_nodes(node_identities)
