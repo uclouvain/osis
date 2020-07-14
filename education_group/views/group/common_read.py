@@ -51,7 +51,6 @@ from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.node import NodeIdentity, NodeNotFoundException
 from program_management.ddd.repositories import load_tree
-from program_management.ddd.service.read import element_selected_service
 from program_management.forms.custom_xls import CustomXlsForm
 from program_management.models.element import Element
 from program_management.serializers.program_tree_view import program_tree_view_serializer
@@ -101,6 +100,9 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
             return root_node
 
     def get_context_data(self, **kwargs):
+        if not self.active_tab:
+            self.active_tab = read.get_tab_from_referer(self.get_object(), self.request.META.get('HTTP_REFERER'))
+
         can_change_education_group = self.request.user.has_perm(
             'base.change_educationgroup',
             self.get_permission_object()
