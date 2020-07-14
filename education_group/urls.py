@@ -1,6 +1,13 @@
 from django.urls import include, path, register_converter
 
 from education_group.converters import GroupTypeConverter, MiniTrainingTypeConverter
+from base.views.education_groups.achievement.create import CreateEducationGroupDetailedAchievement, \
+    CreateEducationGroupAchievement
+from base.views.education_groups.achievement.delete import DeleteEducationGroupAchievement, \
+    DeleteEducationGroupDetailedAchievement
+from base.views.education_groups.achievement.update import EducationGroupAchievementAction, \
+    UpdateEducationGroupAchievement, EducationGroupDetailedAchievementAction, UpdateEducationGroupDetailedAchievement
+from education_group.converters import GroupTypeConverter
 from education_group.views import group, training, mini_training, general_information
 from education_group.views.proxy.read import ReadEducationGroupRedirectView
 
@@ -50,8 +57,64 @@ urlpatterns = [
             ),
         ])),
     ])),
+    path('mini_trainings/<int:year>/<str:code>/', include([
+        path('create/', CreateEducationGroupAchievement.as_view(), name='minitraining_achievement_create'),
+        path('<int:education_group_achievement_pk>/', include([
+            path('actions/', EducationGroupAchievementAction.as_view(), name='minitraining_achievement_actions'),
+            path('create/', CreateEducationGroupDetailedAchievement.as_view(),
+                 name='minitraining_detailed_achievement_create'),
+            path('delete/', DeleteEducationGroupAchievement.as_view(), name='minitraining_achievement_delete'),
+            path('update/', UpdateEducationGroupAchievement.as_view(), name='minitraining_achievement_update'),
+            path('<int:education_group_detail_achievement_pk>/', include([
+                path('actions/', EducationGroupDetailedAchievementAction.as_view(),
+                     name='minitraining_detailed_achievement_actions'),
+                path('delete/', DeleteEducationGroupDetailedAchievement.as_view(),
+                     name='minitraining_detailed_achievement_delete'),
+                path('update/', UpdateEducationGroupDetailedAchievement.as_view(),
+                     name='minitraining_detailed_achievement_update'),
+            ]))
+        ])),
+        path(
+            'identification/',
+            mini_training.MiniTrainingReadIdentification.as_view(),
+            name='mini_training_identification'
+        ),
+        path('content/', mini_training.MiniTrainingReadContent.as_view(), name='mini_training_content'),
+        path('utilization/', mini_training.MiniTrainingReadUtilization.as_view(), name='mini_training_utilization'),
+        path(
+            'general_information/',
+            mini_training.MiniTrainingReadGeneralInformation.as_view(),
+            name='mini_training_general_information'
+        ),
+        path(
+            'skills_achievements/',
+            mini_training.MiniTrainingReadSkillsAchievements.as_view(),
+            name='mini_training_skills_achievements'
+        ),
+        path(
+            'admission_conditions/',
+            mini_training.MiniTrainingReadAdmissionCondition.as_view(),
+            name='mini_training_admission_condition'
+        ),
+    ])),
 
     path('trainings/<int:year>/<str:code>/', include([
+        path('create/', CreateEducationGroupAchievement.as_view(), name='training_achievement_create'),
+        path('<int:education_group_achievement_pk>/', include([
+            path('actions/', EducationGroupAchievementAction.as_view(), name='training_achievement_actions'),
+            path('create/', CreateEducationGroupDetailedAchievement.as_view(),
+                 name='training_detailed_achievement_create'),
+            path('delete/', DeleteEducationGroupAchievement.as_view(), name='training_achievement_delete'),
+            path('update/', UpdateEducationGroupAchievement.as_view(), name='training_achievement_update'),
+            path('<int:education_group_detail_achievement_pk>/', include([
+                path('actions/', EducationGroupDetailedAchievementAction.as_view(),
+                     name='training_detailed_achievement_actions'),
+                path('delete/', DeleteEducationGroupDetailedAchievement.as_view(),
+                     name='training_detailed_achievement_delete'),
+                path('update/', UpdateEducationGroupDetailedAchievement.as_view(),
+                     name='training_detailed_achievement_update'),
+            ]))
+        ])),
         path('identification/', training.TrainingReadIdentification.as_view(), name='training_identification'),
         path('diplomas/', training.TrainingReadDiplomaCertificate.as_view(), name='training_diplomas'),
         path(

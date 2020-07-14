@@ -120,6 +120,10 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             return root_node
 
     def get_context_data(self, **kwargs):
+        if not self.active_tab:
+            self.active_tab = read.get_tab_from_referer(self.get_object(), self.request.META.get('HTTP_REFERER'))
+
+        is_root_node = self.node_identity == self.get_tree().root_node.entity_id
         return {
             **super().get_context_data(**kwargs),
             "person": self.request.user.person,
@@ -133,7 +137,7 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
                 self.node_identity,
                 self.get_path(),
                 _get_view_name_from_tab(self.active_tab),
-            ),
+            ) if is_root_node else None,
             "selected_element_clipboard": self.get_selected_element_clipboard_message(),
             "current_version": self.current_version,
             "versions_choices": get_tree_versions_choices(self.node_identity, _get_view_name_from_tab(self.active_tab)),
@@ -150,7 +154,8 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
 
             "create_group_url": self.get_create_group_url(),
             "create_training_url": self.get_create_training_url(),
-            "create_mini_training_url": self.get_create_mini_training_url()
+            "create_mini_training_url": self.get_create_mini_training_url(),
+            "is_root_node": is_root_node,
         }
 
     def get_permission_object(self):

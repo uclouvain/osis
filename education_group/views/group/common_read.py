@@ -51,7 +51,6 @@ from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.node import NodeIdentity, NodeNotFoundException
 from program_management.ddd.repositories import load_tree
-from program_management.ddd.service.read import element_selected_service
 from program_management.forms.custom_xls import CustomXlsForm
 from program_management.models.element import Element
 from program_management.serializers.program_tree_view import program_tree_view_serializer
@@ -101,10 +100,14 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
             return root_node
 
     def get_context_data(self, **kwargs):
+        if not self.active_tab:
+            self.active_tab = read.get_tab_from_referer(self.get_object(), self.request.META.get('HTTP_REFERER'))
+
         can_change_education_group = self.request.user.has_perm(
             'base.change_educationgroup',
             self.get_permission_object()
         )
+        is_root_node = self.node_identity == self.get_tree().root_node.entity_id
         return {
             **super().get_context_data(**kwargs),
             "person": self.request.user.person,
@@ -118,8 +121,8 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
             "academic_year_choices": get_academic_year_choices(
                 self.node_identity,
                 self.get_path(),
-                _get_view_name_from_tab(self.active_tab),
-            ),
+                _get_view_name_from_tab(self.active_tab)
+            ) if is_root_node else None,
             "xls_ue_prerequisites": reverse("education_group_learning_units_prerequisites",
                                             args=[self.get_group_year().academic_year.year,
                                                   self.get_group_year().partial_acronym]
@@ -132,7 +135,8 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
             "group_year": self.get_group_year(),  # TODO: Should be remove and use DDD object
             "create_group_url": self.get_create_group_url(),
             "create_training_url": self.get_create_training_url(),
-            "create_mini_training_url": self.get_create_mini_training_url()
+            "create_mini_training_url": self.get_create_mini_training_url(),
+            "is_root_node": is_root_node,
         }
 
     @functools.lru_cache()

@@ -27,7 +27,6 @@ from django.conf import settings
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 
-from base.models.enums.education_group_categories import Categories
 from education_group.api.views.group import GroupDetail
 from education_group.api.views.mini_training import MiniTrainingDetail
 from education_group.api.views.training import TrainingDetail
@@ -100,7 +99,7 @@ class CommonNodeTreeSerializer(BaseCommonNodeTreeSerializer):
         return getattr(obj, 'comment' + field_suffix)
 
 
-class EducationGroupRootNodeTreeSerializer(BaseCommonNodeTreeSerializer):
+class EducationGroupCommonNodeTreeSerializer(serializers.Serializer):
     node_type = serializers.SerializerMethodField(read_only=True)
     subtype = serializers.CharField(source='child.node_type.name', read_only=True)
     acronym = serializers.CharField(source='child.title', read_only=True)
@@ -111,7 +110,8 @@ class EducationGroupRootNodeTreeSerializer(BaseCommonNodeTreeSerializer):
     max_constraint = serializers.IntegerField(source='child.max_constraint', read_only=True)
     constraint_type = serializers.CharField(source='child.constraint_type', read_only=True)
 
-    def get_node_type(self, obj):
+    @staticmethod
+    def get_node_type(obj):
         if obj.child.is_training():
             return NodeType.TRAINING.name
         elif obj.child.is_mini_training():
@@ -124,8 +124,9 @@ class EducationGroupRootNodeTreeSerializer(BaseCommonNodeTreeSerializer):
         return getattr(obj.child, 'remark' + field_suffix)
 
     def get_title(self, obj):
-        field_suffix = '_en' if self.context.get('language') == settings.LANGUAGE_CODE_EN else '_fr'
-        return getattr(obj.child, 'offer_title' + field_suffix)
+        field_suffix = 'en' if self.context.get('language') == settings.LANGUAGE_CODE_EN else 'fr'
+        field_prefix = 'offer' if obj.child.is_training() else 'group'
+        return getattr(obj.child, '{}_title_{}'.format(field_prefix, field_suffix))
 
     def get_partial_title(self, obj):
         field_suffix = '_en' if self.context.get('language') == settings.LANGUAGE_CODE_EN else '_fr'
@@ -138,7 +139,22 @@ class EducationGroupRootNodeTreeSerializer(BaseCommonNodeTreeSerializer):
         return data
 
 
-class EducationGroupNodeTreeSerializer(CommonNodeTreeSerializer, EducationGroupRootNodeTreeSerializer):
+class EducationGroupRootNodeTreeSerializer(BaseCommonNodeTreeSerializer, EducationGroupCommonNodeTreeSerializer):
+    acronym = serializers.SerializerMethodField(read_only=True)
+
+    def get_acronym(self, obj):
+        version_name = self.context.get('version_name')
+        return obj.child.title + ('[{}]'.format(version_name) if version_name else '')
+
+    def get_title(self, obj):
+        field_suffix = '_en' if self.context.get('language') == settings.LANGUAGE_CODE_EN else '_fr'
+        version_title = self.context.get('version_title' + field_suffix)
+        title_suffix = ' [{}]'.format(version_title) if version_title else ''
+        title = getattr(obj.child, 'offer_title' + field_suffix)
+        return title + title_suffix if title else None
+
+
+class EducationGroupNodeTreeSerializer(CommonNodeTreeSerializer, EducationGroupCommonNodeTreeSerializer):
     pass
 
 
