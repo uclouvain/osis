@@ -57,22 +57,12 @@ class MiniTrainingBuilder:
         )
         remark = Remark(text_fr=cmd.remark_fr, text_en=cmd.remark_en)
 
-        return MiniTraining(
-            entity_identity=mini_training_id,
-            type=MiniTrainingType[cmd.type],
-            abbreviated_title=cmd.abbreviated_title,
-            titles=titles,
-            status=ActiveStatusEnum[cmd.status],
-            schedule_type=ScheduleTypeEnum[cmd.schedule_type],
-            credits=cmd.credits,
-            content_constraint=content_constraint,
-            management_entity=management_entity,
-            teaching_campus=teaching_campus,
-            remark=remark,
-            start_year=cmd.start_year,
-            unannualized_identity=None,
-            end_year=cmd.end_year
-        )
+        return MiniTraining(entity_identity=mini_training_id, type=MiniTrainingType[cmd.type],
+                            abbreviated_title=cmd.abbreviated_title, titles=titles, status=ActiveStatusEnum[cmd.status],
+                            schedule_type=ScheduleTypeEnum[cmd.schedule_type], credits=cmd.credits,
+                            content_constraint=content_constraint, management_entity=management_entity,
+                            teaching_campus=teaching_campus, remark=remark, start_year=cmd.start_year,
+                            end_year=cmd.end_year)
 
     @classmethod
     def build_next_year_mini_training(cls, from_mini_training: 'MiniTraining'):
@@ -90,14 +80,6 @@ class MiniTrainingIdentity(interface.EntityIdentity):
     year = attr.ib(type=int)
 
 
-@attr.s(frozen=True, slots=True)
-class MiniTrainingUnannualizedIdentity(interface.ValueObject):
-    """
-    This ID is necessary to find a Mini Training through years because code can be different through years
-    """
-    uuid = attr.ib(type=int)
-
-
 class MiniTraining(interface.RootEntity):
     def __init__(
             self,
@@ -113,8 +95,7 @@ class MiniTraining(interface.RootEntity):
             teaching_campus: Campus,
             remark: Remark,
             start_year: int,
-            unannualized_identity: 'MiniTrainingUnannualizedIdentity' = None,
-            end_year: int = None,
+            end_year: int = None
     ):
         super().__init__(entity_id=entity_identity)
         self.entity_id = entity_identity
@@ -129,7 +110,6 @@ class MiniTraining(interface.RootEntity):
         self.teaching_campus = teaching_campus
         self.remark = remark
         self.start_year = start_year
-        self.unannualized_identity = unannualized_identity
         self.end_year = end_year
 
     @property

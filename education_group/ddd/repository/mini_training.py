@@ -76,7 +76,7 @@ class MiniTrainingRepository(interface.AbstractRepository):
             raise exception.TeachingCampusNotFound
 
         group_db_obj, _created = GroupModelDb.objects.update_or_create(
-            pk=getattr(mini_training_obj.unannualized_identity, 'uuid', None),
+            groupyear__partial_acronym=mini_training_obj.code,
             defaults={"start_year": start_year, "end_year": end_year}
         )
 
@@ -170,38 +170,29 @@ class MiniTrainingRepository(interface.AbstractRepository):
             ).get()
         except EducationGroupVersionModelDb.DoesNotExist:
             raise exception.MiniTrainingNotFoundException
-        return mini_training.MiniTraining(
-            entity_identity=entity_id,
-            unannualized_identity=mini_training.MiniTrainingUnannualizedIdentity(uuid=version.root_group.group_id),
-            type=_convert_type(version.root_group.education_group_type),
-            abbreviated_title=version.root_group.acronym,
-            titles=Titles(
+        return mini_training.MiniTraining(entity_identity=entity_id,
+                                          type=_convert_type(version.root_group.education_group_type),
+                                          abbreviated_title=version.root_group.acronym, titles=Titles(
                 title_fr=version.root_group.title_fr,
                 title_en=version.root_group.title_en,
-            ),
-            credits=version.root_group.credits,
-            content_constraint=ContentConstraint(
+            ), status=ActiveStatusEnum[version.offer.active] if version.offer.active else None,
+                                          schedule_type=ScheduleTypeEnum[
+                                              version.offer.schedule_type] if version.offer.schedule_type else None,
+                                          credits=version.root_group.credits, content_constraint=ContentConstraint(
                 type=ConstraintTypeEnum[version.root_group.constraint_type]
                 if version.root_group.constraint_type else None,
                 minimum=version.root_group.min_constraint,
                 maximum=version.root_group.max_constraint,
-            ),
-            management_entity=EntityValueObject(
+            ), management_entity=EntityValueObject(
                 acronym=version.root_group.management_entity.most_recent_acronym,
-            ),
-            teaching_campus=Campus(
+            ), teaching_campus=Campus(
                 name=version.root_group.main_teaching_campus.name,
                 university_name=version.root_group.main_teaching_campus.organization.name,
-            ),
-            remark=Remark(
+            ), remark=Remark(
                 text_fr=version.root_group.remark_fr,
                 text_en=version.root_group.remark_en
-            ),
-            start_year=version.root_group.group.start_year.year,
-            end_year=version.root_group.group.end_year.year if version.root_group.group.end_year else None,
-            schedule_type=ScheduleTypeEnum[version.offer.schedule_type] if version.offer.schedule_type else None,
-            status=ActiveStatusEnum[version.offer.active] if version.offer.active else None
-        )
+            ), start_year=version.root_group.group.start_year.year,
+                                          end_year=version.root_group.group.end_year.year if version.root_group.group.end_year else None)
 
     @classmethod
     def search(cls, entity_ids: Optional[List[EntityIdentity]] = None, **kwargs) -> List[Entity]:
