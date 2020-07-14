@@ -4,7 +4,6 @@ function redirect_after_success(modal, xhr) {
         $(xhr["partial_reload"]).load(xhr["success_url"]);
     } else if (xhr.hasOwnProperty('success_url')) {
         window.location.href = xhr["success_url"];
-        window.location.reload();
     } else {
         window.location.reload();
     }
