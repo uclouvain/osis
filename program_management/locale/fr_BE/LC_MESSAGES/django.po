@@ -87,7 +87,7 @@ msgid "Acronym/Short title"
 msgstr "Sigle/Intitulé abrégé"
 
 msgid "Actions"
-msgstr ""
+msgstr "Actions"
 
 msgid "Active"
 msgstr ""
@@ -228,7 +228,7 @@ msgid "Evaluation methods"
 msgstr "Mode d'évaluation des acquis des étudiants"
 
 msgid "Export"
-msgstr ""
+msgstr "Exporter"
 
 #, python-format
 msgid ""
@@ -667,7 +667,7 @@ msgstr "Volume"
 
 #, python-format
 msgid "Which type of %(category)s do you want to create ?"
-msgstr ""
+msgstr "Quel type de %(category)s voulez-vous créer ?"
 
 msgid "Yes"
 msgstr "Oui"

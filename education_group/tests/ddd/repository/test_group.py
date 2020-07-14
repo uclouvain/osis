@@ -305,12 +305,11 @@ class TestGroupRepositoryUpdateMethod(TestCase):
             GroupRepository.update(group)
 
     def test_assert_update_modify_field(self):
-        # Create new entity on db
-        EntityVersionFactory(acronym='AGRO')
+        new_entity = EntityVersionFactory(acronym='AGRO')
 
         group = GroupFactory(
             entity_identity=self.group_identity,
-            management_entity=EntityValueObject(acronym='AGRO'),
+            management_entity=EntityValueObject(acronym=new_entity.acronym),
             teaching_campus=Campus(
                 name=self.group_year_db.main_teaching_campus.name,
                 university_name=self.group_year_db.main_teaching_campus.organization.name,

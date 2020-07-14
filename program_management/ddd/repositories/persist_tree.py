@@ -64,7 +64,7 @@ def __persist_group_element_year(link):
             'comment_english': link.comment_english,
             'own_comment': link.own_comment,
             'quadrimester_derogation': link.quadrimester_derogation,
-            # TODO : Find a rules for enum in order to be consistant
+            # FIXME : Find a rules for enum in order to be consistant
             'link_type': link.link_type.name if isinstance(link.link_type, LinkTypes) else link.link_type,
             'order': link.order,
 
