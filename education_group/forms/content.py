@@ -1,13 +1,17 @@
 from typing import Union
 
 from django import forms
+from django.core.exceptions import ValidationError
 from django.forms import formset_factory, BaseFormSet
 
 from base.forms.utils import choice_field
-from base.models.enums.education_group_types import GroupType, TrainingType
+from base.models.enums.education_group_types import TrainingType
 from base.models.enums.link_type import LinkTypes
 from education_group.ddd.domain.group import Group
 from learning_unit.ddd.domain.learning_unit_year import LearningUnitYear
+from osis_common.ddd import interface
+from program_management.ddd.domain.exception import RelativeCreditShouldBeGreaterOrEqualsThanZero
+from program_management.ddd.validators import _block_validator, _relative_credits
 
 
 class LinkForm(forms.Form):
@@ -15,7 +19,7 @@ class LinkForm(forms.Form):
     is_mandatory = forms.BooleanField(required=False)
     access_condition = forms.BooleanField(required=False)
     link_type = forms.ChoiceField(choices=choice_field.add_blank(LinkTypes.choices()), required=False)
-    block = forms.CharField(required=False)
+    block = forms.IntegerField(required=False)
     comment_fr = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows': 3}))
     comment_en = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows': 3}))
 
@@ -58,6 +62,22 @@ class LinkForm(forms.Form):
                 'access_condition',
             )
         [self.fields.pop(field_name) for field_name in fields_to_exclude]
+
+    def clean_block(self):
+        cleaned_block_type = self.cleaned_data.get('block', None)
+        try:
+            _block_validator.BlockValidator(cleaned_block_type).validate()
+        except interface.BusinessExceptions as business_exception:
+            raise ValidationError(business_exception.messages)
+        return cleaned_block_type
+
+    def clean_relative_credits(self):
+        cleaned_relative_credits = self.cleaned_data.get('relative_credits', None)
+        try:
+            _relative_credits.RelativeCreditsValidator(cleaned_relative_credits).validate()
+        except RelativeCreditShouldBeGreaterOrEqualsThanZero as e:
+            raise ValidationError(e.message)
+        return cleaned_relative_credits
 
     def is_a_link_with_child_of_learning_unit(self):
         return isinstance(self.child_obj, LearningUnitYear)

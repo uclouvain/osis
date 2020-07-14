@@ -1,16 +1,16 @@
 {% extends "education_group_app/blocks/layout.html" %}
-{% load i18n %}
+{% load i18n academic_year_display %}
 
 {% block breadcrumb %}
     {{ block.super }}
-    <li class="active">
-        {% trans 'Update' %}
-    </li>
+    <li class="active"> {{ group.code }}</li>
+    <li>{% trans 'Modification' %}</li>
 {% endblock breadcrumb %}
 
 {% block header_content %}
     <div class="page-header">
-        <h2>{% trans 'Update' %}</h2>
+        <h2>{{ group.abbreviated_title }} - {{ group.year|display_as_academic_year }}</h2>
+        <h3>{{ group.titles.title_fr }}</h3>
     </div>
 {% endblock header_content %}
 

@@ -23,18 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from education_group.views.group.common_read import Tab, GroupRead
+from osis_common.ddd.interface import BusinessException
+from django.utils.translation import gettext_lazy as _
 
 
-class GroupReadContent(GroupRead):
-    template_name = "education_group_app/group/content_read.html"
-    active_tab = Tab.CONTENT
-
-    def get_context_data(self, **kwargs):
-        return {
-            **super().get_context_data(**kwargs),
-            "children": self.get_object().children
-        }
-
-    def get_update_group_url(self) -> str:
-        return super().get_update_group_url() + "&tab={}".format(self.active_tab)
+class RelativeCreditShouldBeGreaterOrEqualsThanZero(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _("Relative credits must be greater or equals than 0")
+        super().__init__(message, **kwargs)

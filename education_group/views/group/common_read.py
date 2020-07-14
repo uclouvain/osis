@@ -161,7 +161,7 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
 
     def get_update_group_url(self):
         return reverse('group_update', kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}) + \
-               "?path_to={}".format(self.get_path())
+               "?path={}".format(self.get_path())
 
     def get_create_mini_training_url(self):
         return reverse('create_element_select_type', kwargs={'category': Categories.MINI_TRAINING.name}) + \
