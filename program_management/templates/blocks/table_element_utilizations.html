@@ -23,7 +23,7 @@
                 {% url 'element_identification' row.link.parent.year row.link.parent.code as url_parent_identification %}
                 <a href="{{ url_parent_identification }}">{{ row.link.parent.code | default_if_none:'' }}</a>
             </td>
-            <td>{{ row.link.parent.title | default_if_none:'' }}</td>
+            <td>{{ row.link.parent.title | default_if_none:'' }}{{ row.link_parent_version_label }}</td>
             <td>{{ row.link.parent.group_title_fr | default_if_none:'' }}</td>
             <td>
                 {{ row.link.relative_credits | default_if_none:'-' }} /
@@ -37,7 +37,7 @@
                 {% for root_node in row.root_nodes %}
                     {# TODO: Compute URL #}
                     {% url 'element_identification' root_node.year root_node.code as url_root_identification  %}
-                    <a href="{{ url_root_identification }}">{{ root_node.title }}</a>
+                    <a href="{{ url_root_identification }}">{{ root_node.title }}{{ row.root_version_label }}</a>
                     {% if not forloop.last %} - {% endif %}
                 {% empty %}
                     -

@@ -25,8 +25,6 @@
 ##############################################################################
 from osis_common.ddd import interface
 from program_management.ddd.business_types import *
-from base.models.education_group_year import EducationGroupYear
-from education_group.models.group_year import GroupYear
 import attr
 STANDARD = ""
 
@@ -97,7 +95,9 @@ class ProgramTreeVersion(interface.RootEntity):
         if self.is_standard:
             return '[Transition]' if self.is_transition else ''
         else:
-            return '[{}-Transition]'.format(self.version_name) if self.is_transition else '[{}]'.format(self.version_name)
+            return '[{}-Transition]'.format(
+                self.version_name
+            ) if self.is_transition else '[{}]'.format(self.version_name)
 
     @property
     def is_standard_version(self):
