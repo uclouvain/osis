@@ -35,6 +35,7 @@ from program_management.ddd.domain.program_tree_version import ProgramTreeVersio
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 from program_management.models.education_group_version import EducationGroupVersion
+from django.db.models import Q
 
 
 class ProgramTreeVersionRepository(interface.AbstractRepository):
@@ -86,35 +87,17 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
 
     @classmethod
     def search_all_versions_from_root_node(cls, root_node_identity: 'NodeIdentity') -> List['ProgramTreeVersion']:
-        version_ids = EducationGroupVersion.objects.filter(
+        offer_ids = EducationGroupVersion.objects.filter(
             root_group__partial_acronym=root_node_identity.code,
             root_group__academic_year__year=root_node_identity.year
         ).values_list('offer_id', flat=True)
-        qs = GroupYear.objects.filter(
-            educationgroupversion__offer_id__in=version_ids,
-        ).order_by(
-            'educationgroupversion__version_name'
-        ).annotate(
-            code=F('partial_acronym'),
-            offer_acronym=F('educationgroupversion__offer__acronym'),
-            offer_year=F('educationgroupversion__offer__academic_year__year'),
-            version_name=F('educationgroupversion__version_name'),
-            version_title_fr=F('educationgroupversion__title_fr'),
-            version_title_en=F('educationgroupversion__title_en'),
-            is_transition=F('educationgroupversion__is_transition'),
-        ).values(
-            'code',
-            'offer_acronym',
-            'offer_year',
-            'version_name',
-            'version_title_fr',
-            'version_title_en',
-            'is_transition',
-        )
-        results = []
-        for record_dict in qs:
-            results.append(_instanciate_tree_version(record_dict))
-        return results
+
+        return _search_versions_from_offer_ids(list(offer_ids))
+
+    @classmethod
+    def search_all_versions_from_root_nodes(cls, node_identities: List['Node']) -> List['ProgramTreeVersion']:
+        offer_ids = _search_by_node_entities(list(node_identities))
+        return _search_versions_from_offer_ids(offer_ids)
 
 
 def _instanciate_tree_version(record_dict: dict) -> 'ProgramTreeVersion':
@@ -130,3 +113,53 @@ def _instanciate_tree_version(record_dict: dict) -> 'ProgramTreeVersion':
         title_fr=record_dict['version_title_fr'],
         title_en=record_dict['version_title_en'],
     )
+
+
+def _search_by_node_entities(entity_ids: List['Node']) -> List[int]:
+    if bool(entity_ids):
+
+        qs = EducationGroupVersion.objects.all().values_list('offer_id', flat=True)
+
+        filter_search_from = _build_where_clause(entity_ids[0])
+        for identity in entity_ids[1:]:
+            filter_search_from |= _build_where_clause(identity)
+        qs = qs.filter(filter_search_from)
+        return list(qs)
+    return []
+
+
+def _build_where_clause(node_identity: 'Node') -> Q:
+    return Q(
+        Q(
+            root_group__partial_acronym=node_identity.code,
+            root_group__academic_year__year=node_identity.year
+        )
+    )
+
+
+def _search_versions_from_offer_ids(offer_ids: List[int]) -> List['ProgramTreeVersion']:
+    qs = GroupYear.objects.filter(
+        educationgroupversion__offer_id__in=offer_ids,
+    ).order_by(
+        'educationgroupversion__version_name'
+    ).annotate(
+        code=F('partial_acronym'),
+        offer_acronym=F('educationgroupversion__offer__acronym'),
+        offer_year=F('educationgroupversion__offer__academic_year__year'),
+        version_name=F('educationgroupversion__version_name'),
+        version_title_fr=F('educationgroupversion__title_fr'),
+        version_title_en=F('educationgroupversion__title_en'),
+        is_transition=F('educationgroupversion__is_transition'),
+    ).values(
+        'code',
+        'offer_acronym',
+        'offer_year',
+        'version_name',
+        'version_title_fr',
+        'version_title_en',
+        'is_transition',
+    )
+    results = []
+    for record_dict in qs:
+        results.append(_instanciate_tree_version(record_dict))
+    return results

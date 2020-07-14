@@ -26,7 +26,6 @@
 import functools
 import json
 from collections import OrderedDict
-from enum import Enum
 
 from django.http import Http404
 from django.urls import reverse
@@ -41,7 +40,6 @@ from base.business.education_groups.general_information_sections import \
 from base.models import academic_year
 from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import GroupType
-from base.utils.cache import ElementCache
 from base.views.common import display_warning_messages
 from education_group.forms.academic_year_choices import get_academic_year_choices
 from education_group.models.group_year import GroupYear
@@ -53,8 +51,9 @@ from program_management.ddd.domain.node import NodeIdentity, NodeNotFoundExcepti
 from program_management.ddd.repositories import load_tree
 from program_management.forms.custom_xls import CustomXlsForm
 from program_management.models.element import Element
-from program_management.serializers.program_tree_view import program_tree_view_serializer
-
+from program_management.serializers.program_tree_version_view import program_tree_version_view_serializer
+from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
+from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 
 Tab = read.Tab  # FIXME :: fix imports (and remove this line)
 
@@ -85,6 +84,15 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
     def node_identity(self) -> 'NodeIdentity':
         return NodeIdentity(code=self.kwargs['code'], year=self.kwargs['year'])
 
+    @cached_property
+    def program_tree_version_identity(self) -> 'ProgramTreeVersionIdentity':
+        return ProgramTreeVersionIdentitySearch().get_from_node_identity(
+            NodeIdentity(code=self.get_tree().root_node.code, year=self.get_tree().root_node.year))
+
+    @cached_property
+    def current_version(self) -> 'ProgramTreeVersion':
+        return ProgramTreeVersionRepository.get(self.program_tree_version_identity)
+
     @functools.lru_cache()
     def get_object(self) -> 'Node':
         try:
@@ -114,7 +122,7 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
             "enums": mdl.enums.education_group_categories,
             "can_change_education_group": can_change_education_group,
             "form_xls_custom": CustomXlsForm(),
-            "tree": json.dumps(program_tree_view_serializer(self.get_tree())),
+            "tree": json.dumps(program_tree_version_view_serializer(self.current_version)),
             "node": self.get_object(),
             "node_path": self.get_path(),
             "tab_urls": self.get_tab_urls(),
