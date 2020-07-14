@@ -30,7 +30,7 @@ from typing import List, Set, Optional
 import attr
 
 from base.models.authorized_relationship import AuthorizedRelationshipList
-from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, GroupType
+from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, GroupType, MiniTrainingType
 from osis_common.ddd import interface
 from osis_common.decorators.deprecated import deprecated
 from program_management.ddd import command
@@ -214,6 +214,10 @@ class ProgramTree(interface.RootEntity):
     def get_all_finalities(self) -> Set['Node']:
         finality_types = set(TrainingType.finality_types_enum())
         return self.get_all_nodes(types=finality_types)
+
+    def get_all_mini_training(self) -> Set['Node']:
+        mini_training_types = set(MiniTrainingType.mini_training_types_enum())
+        return self.get_all_nodes(types=mini_training_types)
 
     def get_greater_block_value(self) -> int:
         all_links = self.get_all_links()

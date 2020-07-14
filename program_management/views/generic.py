@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -47,8 +47,11 @@ from osis_common.utils.models import get_object_or_none
 from osis_role.contrib.views import AjaxPermissionRequiredMixin
 from program_management.ddd.repositories import load_tree
 from program_management.models.enums.node_type import NodeType
-from program_management.serializers import program_tree_view
 from program_management.ddd.business_types import *
+from program_management.serializers.program_tree_version_view import program_tree_version_view_serializer
+from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
+from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
+from program_management.ddd.domain.node import NodeIdentity
 
 NO_PREREQUISITES = TrainingType.finality_types() + [
     MiniTrainingType.OPTION.name,
@@ -137,6 +140,15 @@ class LearningUnitGeneric(CatalogGenericDetailView, TemplateView):
             raise Http404
         return node
 
+    @cached_property
+    def program_tree_version_identity(self) -> 'ProgramTreeVersionIdentity':
+        return ProgramTreeVersionIdentitySearch().get_from_node_identity(
+            NodeIdentity(code=self.program_tree.root_node.code, year=self.program_tree.root_node.year))
+
+    @cached_property
+    def current_version(self) -> 'ProgramTreeVersion':
+        return ProgramTreeVersionRepository.get(self.program_tree_version_identity)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
@@ -147,7 +159,7 @@ class LearningUnitGeneric(CatalogGenericDetailView, TemplateView):
         context['root_id'] = self.program_tree.root_node.pk
         context['parent'] = self.program_tree.root_node
         context['node'] = self.node
-        context['tree'] = json.dumps(program_tree_view.program_tree_view_serializer(self.program_tree))
+        context['tree'] = json.dumps(program_tree_version_view_serializer(self.current_version))
         context['group_to_parent'] = self.request.GET.get("group_to_parent") or '0'
         context['show_prerequisites'] = self.show_prerequisites(self.program_tree.root_node)
         context['selected_element_clipboard'] = self.get_selected_element_for_clipboard()

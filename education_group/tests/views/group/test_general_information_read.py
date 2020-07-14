@@ -35,6 +35,7 @@ from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.factories.user import UserFactory
 from education_group.views.group.common_read import Tab
 from program_management.ddd.domain.node import NodeGroupYear
+from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory
 
 
@@ -48,6 +49,8 @@ class TestGroupReadGeneralInformation(TestCase):
             group_year__academic_year__year=2018,
             group_year__education_group_type__name=GroupType.COMMON_CORE.name
         )
+        EducationGroupVersionFactory(offer__academic_year=cls.element_group_year.group_year.academic_year,
+                                     root_group=cls.element_group_year.group_year)
         cls.url = reverse('group_general_information', kwargs={'year': 2018, 'code': 'LTRONC100B'})
 
     def setUp(self) -> None:
