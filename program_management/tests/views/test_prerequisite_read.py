@@ -90,6 +90,7 @@ class TestLearningUnitPrerequisiteGroup(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(current=True)
+        cls.offer = TrainingFactory(academic_year=cls.academic_year)
         cls.root_group = GroupYearFactory(
             academic_year=cls.academic_year,
             education_group_type__category=Categories.GROUP.name,
@@ -101,6 +102,7 @@ class TestLearningUnitPrerequisiteGroup(TestCase):
             learning_unit_year__learning_container_year__academic_year=cls.academic_year,
         )
         GroupElementYearChildLeafFactory(parent_element=cls.root_element, child_element=cls.element_learning_unit_year)
+        cls.education_group_version = EducationGroupVersionFactory(offer=cls.offer, root_group=cls.root_group)
 
         cls.person = PersonWithPermissionsFactory("view_educationgroup")
         cls.url = reverse(
