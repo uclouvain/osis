@@ -39,7 +39,6 @@ from base.business.education_groups.general_information_sections import \
     MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION
 from base.models import academic_year
 from base.models.enums.education_group_categories import Categories
-from base.models.enums.education_group_types import GroupType
 from base.views.common import display_warning_messages
 from education_group.forms.academic_year_choices import get_academic_year_choices
 from education_group.models.group_year import GroupYear
@@ -48,13 +47,12 @@ from education_group.views.proxy import read
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.node import NodeIdentity, NodeNotFoundException
+from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories import load_tree
+from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.forms.custom_xls import CustomXlsForm
 from program_management.models.element import Element
-from program_management.serializers.program_tree_view import program_tree_view_serializer
 from program_management.serializers.program_tree_version_view import program_tree_version_view_serializer
-from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
-from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 
 Tab = read.Tab  # FIXME :: fix imports (and remove this line)
 
@@ -123,7 +121,8 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
             "enums": mdl.enums.education_group_categories,
             "can_change_education_group": can_change_education_group,
             "form_xls_custom": CustomXlsForm(),
-            "tree": json.dumps(program_tree_version_view_serializer(self.current_version)),
+            "tree": json.dumps(
+                program_tree_version_view_serializer(self.current_version)) if self.current_version else {},
             "node": self.get_object(),
             "node_path": self.get_path(),
             "tab_urls": self.get_tab_urls(),
