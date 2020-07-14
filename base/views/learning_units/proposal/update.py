@@ -149,7 +149,8 @@ def _update_or_create_suppression_proposal(request, learning_unit_year, proposal
 
 
 def _get_max_year(learning_unit_year, proposal):
-    return proposal.initial_data.get('end_year') if proposal else learning_unit_year.learning_unit.end_year
+    max_year = proposal.initial_data.get('end_year') if proposal else learning_unit_year.learning_unit.end_year
+    return max_year.year if max_year else None
 
 
 def _get_initial(learning_unit_year, proposal, user_person, proposal_type=ProposalType.TRANSFORMATION.name):
