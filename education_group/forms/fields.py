@@ -23,6 +23,7 @@ class ManagementEntitiesChoiceField(EntityRoleChoiceField):
             person=person,
             group_names=group_names,
             label=_('Management entity'),
+            to_field_name="acronym",
             **kwargs,
         )
 
@@ -31,11 +32,3 @@ class ManagementEntitiesChoiceField(EntityRoleChoiceField):
         if self.initial:
             qs |= EntityVersion.objects.filter(pk=self.initial)
         return qs
-
-    def clean(self, value):
-        if value is not None:
-            #  Case the to_attr name is set to acronym. We don't need extra query to fetch the acronym
-            if type(value) == str and not value.isnumeric():
-                return value
-            return EntityVersion.objects.get(pk=value).acronym
-        return value

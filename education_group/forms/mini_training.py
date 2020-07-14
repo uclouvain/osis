@@ -101,8 +101,7 @@ class MiniTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     teaching_campus = fields.MainCampusChoiceField(
         queryset=None,
         label=_("Learning location"),
-        to_field_name="name",
-        initial=campus.LOUVAIN_LA_NEUVE_CAMPUS_NAME
+        to_field_name="name"
     )
     remark_fr = forms.CharField(widget=forms.Textarea, label=_("Remark"), required=False)
     remark_en = forms.CharField(widget=forms.Textarea, label=_("remark in english"), required=False)
@@ -116,6 +115,7 @@ class MiniTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         self.__init_academic_year_field()
         self.__init_management_entity_field()
         self.__init_type_field()
+        self.__init_teaching_campus()
 
     def __init_academic_year_field(self):
         if self.user.person.is_faculty_manager:
@@ -133,11 +133,13 @@ class MiniTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
             person=self.user.person,
             initial=None,
             disabled=self.fields['management_entity'].disabled,
-            to_field_name="acronym"
         )
 
     def __init_type_field(self):
         self.fields["type"].initial = self.group_type
+
+    def __init_teaching_campus(self):
+        self.fields["teaching_campus"].initial = campus.LOUVAIN_LA_NEUVE_CAMPUS_NAME
 
     # ValidationRuleMixin
     def field_reference(self, field_name: str) -> str:

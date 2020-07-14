@@ -35,7 +35,7 @@ from base.utils.cache import RequestCache
 from base.views.common import display_success_messages
 from education_group.ddd import command
 from education_group.ddd.domain import mini_training, exception
-from education_group.ddd.service.read import group_service, get_mini_training_service
+from education_group.ddd.service.read import group_service
 from education_group.ddd.service.write import create_mini_training_service
 from education_group.forms import mini_training as mini_training_form
 from education_group.templatetags.academic_year_display import display_as_academic_year
