@@ -41,6 +41,9 @@ from base.models import academic_year
 from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import GroupType
 from base.views.common import display_warning_messages
+from education_group.ddd.business_types import *
+from education_group.ddd import command
+from education_group.ddd.service.read import get_group_service
 from education_group.forms.academic_year_choices import get_academic_year_choices
 from education_group.models.group_year import GroupYear
 from education_group.views.mixin import ElementSelectedClipBoardMixin
@@ -123,6 +126,7 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
             "can_change_education_group": can_change_education_group,
             "form_xls_custom": CustomXlsForm(),
             "tree": json.dumps(program_tree_version_view_serializer(self.current_version)),
+            "group": self.get_group(),
             "node": self.get_object(),
             "node_path": self.get_path(),
             "tab_urls": self.get_tab_urls(),
@@ -155,6 +159,11 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
                                 .get(academic_year__year=self.kwargs['year'], partial_acronym=self.kwargs['code'])
         except GroupYear.DoesNotExist:
             raise Http404
+
+    @functools.lru_cache()
+    def get_group(self) -> 'Group':
+        get_group_cmd = command.GetGroupCommand(year=self.kwargs['year'], code=self.kwargs['code'])
+        return get_group_service.get_group(get_group_cmd)
 
     @functools.lru_cache()
     def get_current_academic_year(self):
