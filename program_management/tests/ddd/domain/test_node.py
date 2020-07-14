@@ -48,6 +48,22 @@ class TestAddChildNode(SimpleTestCase):
         self.assertEqual(link_created.relative_credits, 5)
         self.assertEqual(link_created.comment, 'Dummy comment')
 
+    def test_assert_order_correctly_computed(self):
+        group_year_node = NodeGroupYearFactory(node_id=0, code="LDROI100T", title="Tronc commun", year=2018)
+        subgroup_node = NodeGroupYearFactory(node_id=1, code="LDROI100R", title="Sous-groupe", year=2018)
+        learning_unit_year_node = NodeLearningUnitYearFactory(
+            node_id=2,
+            code="LDROI100",
+            title="Introduction",
+            year=2018
+        )
+
+        link_1_created = group_year_node.add_child(subgroup_node)
+        link_2_created = group_year_node.add_child(learning_unit_year_node)
+
+        self.assertEqual(link_1_created.order, 0)
+        self.assertEqual(link_2_created.order, 1)
+
 
 class TestDescendentsPropertyNode(SimpleTestCase):
     def setUp(self):
