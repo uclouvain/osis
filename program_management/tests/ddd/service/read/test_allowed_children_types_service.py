@@ -41,7 +41,10 @@ class TestGetAllowedChildTypes(SimpleTestCase):
 
         self.assertSetEqual(
             result,
-            {child_type for child_type in GroupType}
+            {
+                child_type for child_type in GroupType
+                if child_type not in [GroupType.MAJOR_LIST_CHOICE, GroupType.MOBILITY_PARTNERSHIP_LIST_CHOICE]
+            }
         )
 
     def test_get_allowed_type_with_only_training_category_on_command(self):

@@ -37,8 +37,9 @@
                 {% for tab in tabs %}
                     {% if tab.display %}
                         <li role="presentation" {% if tab.active %} class="active" {% endif %}>
-                            <a href="tab-{{ forloop.counter }}" role="tab">
+                            <a data-toggle="tab" href="#tab_{{ tab.id }}" role="tab">
                                 {{ tab.text }}
+                                <span id="spn_{{ tab.id }}_errors" class="error"></span>
                             </a>
                         </li>
                     {% endif %}
@@ -46,7 +47,7 @@
             </ul>
             <div class="tab-content">
                 {% for tab in tabs %}
-                    <div id="tab-{{ forloop.counter }}" class="tab-pane {% if tab.active %}active{% endif %}">
+                    <div id="tab_{{ tab.id }}" class="tab-pane {% if tab.active %}active{% endif %}">
                          {% include tab.include_html %}
                     </div>
                 {% endfor %}
@@ -57,3 +58,5 @@
         </div>
     </div>
 </form>
+
+<script type="text/javascript" src="{% static 'js/education_group/update_training_errors.js' %}"></script>

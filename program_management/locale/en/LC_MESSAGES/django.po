@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-12 15:15+0200\n"
+"POT-Creation-Date: 2020-07-13 16:09+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -79,6 +79,9 @@ msgstr ""
 
 msgctxt "abbreviation"
 msgid "Acronym/Short title"
+msgstr ""
+
+msgid "Actions"
 msgstr ""
 
 msgid "Active"
@@ -212,6 +215,9 @@ msgstr ""
 msgid "Evaluation methods"
 msgstr ""
 
+msgid "Export"
+msgstr ""
+
 #, python-format
 msgid ""
 "Finality \"%(acronym)s\" has an end date greater than %(root_acronym)s "
@@ -295,6 +301,12 @@ msgstr ""
 msgid "List of teachers"
 msgstr ""
 
+msgid "List of trainings"
+msgstr ""
+
+msgid "List of trainings with administrative data"
+msgstr ""
+
 msgid "Made in"
 msgstr ""
 
@@ -326,6 +338,9 @@ msgid "Name"
 msgstr ""
 
 msgid "Name of the teacher responsible"
+msgstr ""
+
+msgid "New Education Group"
 msgstr ""
 
 msgid "No"
@@ -430,6 +445,12 @@ msgstr ""
 msgid "Prerequisites saved."
 msgstr ""
 
+msgid "Produce xls of trainings with administrative data"
+msgstr ""
+
+msgid "Produce xls with a list of trainings"
+msgstr ""
+
 msgid "Proposal status"
 msgstr ""
 
@@ -449,6 +470,9 @@ msgid "Registration form for the content of"
 msgstr ""
 
 msgid "Relative credits"
+msgstr ""
+
+msgid "Relative credits must be greater or equals than 0"
 msgstr ""
 
 msgid "Req. Entity"
@@ -599,6 +623,10 @@ msgid "Version name"
 msgstr ""
 
 msgid "Volume"
+msgstr ""
+
+#, python-format
+msgid "Which type of %(category)s do you want to create ?"
 msgstr ""
 
 msgid "Yes"
