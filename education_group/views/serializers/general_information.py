@@ -32,18 +32,19 @@ from base.business.education_groups import general_information_sections
 from base.models.education_group_publication_contact import EducationGroupPublicationContact
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import GroupType
+from cms.enums import entity_name
+from cms.models import translated_text
 from cms.models.text_label import TextLabel
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
-from education_group.models.group_year import GroupYear
 from program_management.ddd.domain.node import NodeGroupYear
 
 
 def get_sections_of_common(year: int, language_code: str):
     reference_pk = EducationGroupYear.objects.get_common(academic_year__year=year).pk
     labels = general_information_sections.SECTIONS_PER_OFFER_TYPE['common']['specific']
-
-    translated_labels = __get_translated_labels(reference_pk, labels, language_code)
+    empty_group_node = NodeGroupYear(node_type=GroupType.COMMON_CORE)
+    translated_labels = __get_translated_labels(reference_pk, labels, language_code, empty_group_node)
     sections = {}
     for section in general_information_sections.SECTION_LIST:
         for label in filter(lambda l: l in labels, section.labels):
@@ -73,16 +74,9 @@ def get_sections(node: NodeGroupYear, language_code: str):
 
 def __get_specific_translated_labels(node: NodeGroupYear, language_code: str):
     labels = __get_specific_labels(node)
-    reference_pk = __get_reference_pk(node)
+    reference_pk = translated_text.get_groups_or_offers_cms_reference_object(node).pk
 
-    return __get_translated_labels(reference_pk, labels, language_code)
-
-
-def __get_reference_pk(node: NodeGroupYear):
-    if node.category.name in GroupType.get_names():
-        return GroupYear.objects.get(element__pk=node.pk).pk
-    else:
-        return EducationGroupYear.objects.get(educationgroupversion__root_group__element__pk=node.pk).pk
+    return __get_translated_labels(reference_pk, labels, language_code, node)
 
 
 def __get_specific_labels(node: NodeGroupYear) -> List[str]:
@@ -93,7 +87,7 @@ def __get_common_translated_labels(node: NodeGroupYear, language_code: str):
     labels = __get_common_labels(node)
     try:
         reference_pk = EducationGroupYear.objects.get_common(academic_year__year=node.year).pk
-        translated_labels = __get_translated_labels(reference_pk, labels, language_code)
+        translated_labels = __get_translated_labels(reference_pk, labels, language_code, node)
     except EducationGroupYear.DoesNotExist:
         translated_labels = {}
     return translated_labels
@@ -103,18 +97,24 @@ def __get_common_labels(node: NodeGroupYear) -> List[str]:
     return general_information_sections.SECTIONS_PER_OFFER_TYPE[node.category.name]['common']
 
 
-def __get_translated_labels(reference_pk: int, labels: List[str], language_code: str):
-    subqstranslated_fr = TranslatedText.objects.filter(reference=reference_pk, text_label=OuterRef('pk'),
-                                                       language=settings.LANGUAGE_CODE_FR).values('text')[:1]
-    subqstranslated_en = TranslatedText.objects.filter(reference=reference_pk, text_label=OuterRef('pk'),
-                                                       language=settings.LANGUAGE_CODE_EN).values('text')[:1]
+def __get_translated_labels(reference_pk: int, labels: List[str], language_code: str, node: NodeGroupYear):
+    entity = entity_name.get_offers_or_groups_entity_from_node(node)
+    subqstranslated_fr = TranslatedText.objects.filter(
+        reference=reference_pk, text_label=OuterRef('pk'),
+        language=settings.LANGUAGE_CODE_FR, entity=entity
+    ).values('text')[:1]
+    subqstranslated_en = TranslatedText.objects.filter(
+        reference=reference_pk, text_label=OuterRef('pk'),
+        language=settings.LANGUAGE_CODE_EN, entity=entity
+    ).values('text')[:1]
     subqslabel = TranslatedTextLabel.objects.filter(
         text_label=OuterRef('pk'),
         language=language_code
     ).values('label')[:1]
 
     qs = TextLabel.objects.filter(
-        label__in=labels
+        label__in=labels,
+        entity=entity
     ).annotate(
         label_id=F('label'),
         label_translated=Subquery(subqslabel, output_field=fields.CharField()),
