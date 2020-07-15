@@ -114,11 +114,13 @@ class TestUpdateGroupGetMethod(TestCase):
         self.assertListEqual(
             response.context['tabs'],
             [{
+                "id": "identification",
                 "text": _("Identification"),
                 "active": True,
                 "display": True,
                 "include_html": "education_group_app/group/upsert/identification_form.html"
             }, {
+                "id": "content",
                 "text": _("Content"),
                 "active": False,
                 "display": True,
@@ -148,11 +150,13 @@ class TestUpdateGroupGetMethod(TestCase):
         self.assertListEqual(
             response.context['tabs'],
             [{
+                "id": "identification",
                 "text": _("Identification"),
                 "active": True,
                 "display": True,
                 "include_html": "education_group_app/group/upsert/identification_form.html"
             }, {
+                "id": "content",
                 "text": _("Content"),
                 "active": False,
                 "display": False,

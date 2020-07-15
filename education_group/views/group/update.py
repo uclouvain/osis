@@ -14,7 +14,7 @@ from program_management.ddd.business_types import *
 
 import education_group.ddd.service.read.get_multiple_groups_service
 from base.models import entity_version, academic_year, campus
-from base.views.common import display_success_messages
+from base.views.common import display_success_messages, display_error_messages
 from education_group.ddd import command
 from education_group.ddd.service.write import update_group_service
 from education_group.templatetags.academic_year_display import display_as_academic_year
@@ -91,6 +91,9 @@ class GroupUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 if link_updated:
                     display_success_messages(request, self.get_link_success_msg(link_updated), extra_tags='safe')
                 return HttpResponseRedirect(self.get_success_url(group_id))
+            else:
+                msg = _("Error(s) in form: The modifications are not saved")
+                display_error_messages(request, msg)
 
         return render(request, self.template_name, {
             "group": self.get_group_obj(),
@@ -278,12 +281,14 @@ class GroupUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
     def get_tabs(self) -> List:
         return [
             {
+                "id": "identification",
                 "text": _("Identification"),
                 "active": not self.is_content_active_tab(),
                 "display": True,
                 "include_html": "education_group_app/group/upsert/identification_form.html"
             },
             {
+                "id": "content",
                 "text": _("Content"),
                 "active": self.is_content_active_tab(),
                 "display": bool(self.get_program_tree_obj().root_node.get_all_children()),
