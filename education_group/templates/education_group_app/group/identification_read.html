@@ -87,15 +87,6 @@
                             <p>{{ node.group_title_fr }}</p>
                         </div>
                     </div>
-                    {% if not current_version.is_standard or current_version.is_transition %}
-                        <br>
-                        <div class="row">
-                            <div class="col-md-12" id="version_title_fr">
-                                {% bootstrap_label _("Title in French") %} {% bootstrap_label _("of version") %}
-                                <p>{{ current_version.title_fr | default_if_none:'' }}</p>
-                            </div>
-                        </div>
-                    {% endif %}
                     <br>
                     <div class="row">
                         <div class="col-md-12">
@@ -103,15 +94,6 @@
                             <p>{{ node.group_title_en }}</p>
                         </div>
                     </div>
-                    {% if not current_version.is_standard  or current_version.is_transition %}
-                        <br>
-                        <div class="row">
-                            <div class="col-md-12" id="version_title_en">
-                                {% bootstrap_label _("Title in English") %} {% bootstrap_label _("of version") %}
-                                <p>{{ current_version.title_en | default_if_none:'' }}</p>
-                            </div>
-                        </div>
-                    {% endif %}
                 </div>
             </div>
         </div>
