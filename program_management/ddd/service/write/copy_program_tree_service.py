@@ -35,7 +35,7 @@ from program_management.ddd.repositories.program_tree import ProgramTreeReposito
 def copy_program_tree_to_next_year(copy_cmd: CopyProgramTreeToNextYearCommand) -> 'ProgramTreeIdentity':
     # GIVEN
     repository = ProgramTreeRepository()
-    existing_program_tree_version = repository.get(
+    existing_program_tree = repository.get(
         entity_id=ProgramTreeIdentity(
             code=copy_cmd.code,
             year=copy_cmd.year,
@@ -43,7 +43,7 @@ def copy_program_tree_to_next_year(copy_cmd: CopyProgramTreeToNextYearCommand) -
     )
 
     # WHEN
-    program_tree_next_year = ProgramTreeBuilder().copy_to_next_year(existing_program_tree_version, repository)
+    program_tree_next_year = ProgramTreeBuilder().copy_to_next_year(existing_program_tree, repository)
 
     # THEN
     identity = repository.create(program_tree_next_year, create_group_service=create_orphan_group)
