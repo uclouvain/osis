@@ -67,7 +67,7 @@
                             </td>
                             {% if group.is_minor_major_option_list_choice %}
                                 <td>
-                                    {{ link.child.access_condition | yesno }}
+                                    {{ link.access_condition | yesno }}
                                 </td>
                             {% else %}
                                 <td>{{ link.relative_credits | default_if_none:'-' }}
