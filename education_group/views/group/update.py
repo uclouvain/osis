@@ -10,6 +10,7 @@ from django.views import View
 from rules.contrib.views import LoginRequiredMixin
 
 from education_group.ddd.business_types import *
+from program_management.ddd.business_types import *
 
 import education_group.ddd.service.read.get_multiple_groups_service
 from base.models import entity_version, academic_year, campus
@@ -83,10 +84,12 @@ class GroupUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         )
         if all([group_form.is_valid(), content_formset.is_valid()]):
             group_id = self.__send_update_group_cmd(group_form)
-            self.__send_multiple_update_link_cmd(content_formset)
+            link_updated = self.__send_multiple_update_link_cmd(content_formset)
 
             if self.is_all_forms_valid(group_form, content_formset):
                 display_success_messages(request, self.get_success_msg(group_id), extra_tags='safe')
+                if link_updated:
+                    display_success_messages(request, self.get_link_success_msg(link_updated), extra_tags='safe')
                 return HttpResponseRedirect(self.get_success_url(group_id))
 
         return render(request, self.template_name, {
@@ -128,9 +131,13 @@ class GroupUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             group_form.add_error('min_constraint', e.message)
             group_form.add_error('max_constraint', '')
 
-    def __send_multiple_update_link_cmd(self, content_formset: ContentFormSet):
+    def __send_multiple_update_link_cmd(self, content_formset: ContentFormSet) -> List['Link']:
+        forms_changed = [form for form in content_formset.forms if form.has_changed()]
+        if not forms_changed:
+            return []
+
         update_link_cmds = []
-        for form in content_formset.forms:
+        for form in forms_changed:
             cmd_update_link = command_program_management.UpdateLinkCommand(
                 child_node_code=form.child_obj.code if isinstance(form.child_obj, Group) else form.child_obj.acronym,
                 child_node_year=form.child_obj.year,
@@ -150,7 +157,7 @@ class GroupUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             parent_node_year=self.kwargs['year'],
             update_link_cmds=update_link_cmds
         )
-        update_link_service.bulk_update_links(cmd_bulk)
+        return update_link_service.bulk_update_links(cmd_bulk)
 
     def is_all_forms_valid(self, group_form, content_formset):
         return not any([group_form.errors, content_formset.total_error_count()])
@@ -217,6 +224,17 @@ class GroupUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "code": group_id.code,
             "academic_year": display_as_academic_year(group_id.year),
         }
+
+    def get_link_success_msg(self, link_updated: List['Link']) -> str:
+        return "{} : <ul><li>{}</li></ul>".format(
+            _("The following links has been updated"),
+            "</li><li>".join([
+                " - ".join([link.child.code, display_as_academic_year(link.child.year)])
+                if link.child.is_learning_unit() else
+                " - ".join([link.child.code, link.child.title, display_as_academic_year(link.child.year)])
+                for link in link_updated
+            ])
+        )
 
     def get_success_url(self, group_id: 'GroupIdentity') -> str:
         url = reverse('element_identification', kwargs={'code': group_id.code, 'year': group_id.year})
