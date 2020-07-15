@@ -246,7 +246,8 @@ class TestEditEducationGroupAchievementProgramAim(TestEducationGroupAchievementC
         """This test ensure that the french version is updated and the english version is created"""
         data = {
             "text_french": 'dummy text in french',
-            "text_english": 'dummy text in english'
+            "text_english": 'dummy text in english',
+            "path": self.education_group_year.pk
         }
 
         response = self.client.post(self.url, data=data)
@@ -300,7 +301,8 @@ class TestEditEducationGroupAchievementAdditionalInformation(TestEducationGroupA
         """This test ensure that the french version is updated and the english version is created"""
         data = {
             "text_french": 'dummy text in french',
-            "text_english": 'dummy text in english'
+            "text_english": 'dummy text in english',
+            "path": self.education_group_year.pk
         }
 
         response = self.client.post(self.url, data=data)
