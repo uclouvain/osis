@@ -76,7 +76,7 @@ class MiniTrainingVersionList(LanguageContextSerializerMixin, generics.ListAPIVi
             EducationGroupVersion.objects.select_related(
                 'root_group', 'root_group__academic_year', 'offer'
             ).prefetch_related('offer__educationgroupversion_set'),
-            root_group__partial_acronym=self.kwargs['partial_acronym'].upper(),
+            root_group__partial_acronym=self.kwargs['official_partial_acronym'].upper(),
             root_group__academic_year__year=self.kwargs['year']
         )
         return version.offer.educationgroupversion_set.filter(is_transition=False)
