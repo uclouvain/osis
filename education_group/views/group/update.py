@@ -82,18 +82,20 @@ class GroupUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 for child in self.get_children_objs()
             ],
         )
-        if all([group_form.is_valid(), content_formset.is_valid()]):
+
+        if group_form.is_valid():
             group_id = self.__send_update_group_cmd(group_form)
+        if content_formset.is_valid():
             link_updated = self.__send_multiple_update_link_cmd(content_formset)
 
-            if self.is_all_forms_valid(group_form, content_formset):
-                display_success_messages(request, self.get_success_msg(group_id), extra_tags='safe')
-                if link_updated:
-                    display_success_messages(request, self.get_link_success_msg(link_updated), extra_tags='safe')
-                return HttpResponseRedirect(self.get_success_url(group_id))
-            else:
-                msg = _("Error(s) in form: The modifications are not saved")
-                display_error_messages(request, msg)
+        if self.is_all_forms_valid(group_form, content_formset):
+            display_success_messages(request, self.get_success_msg(group_id), extra_tags='safe')
+            if link_updated:
+                display_success_messages(request, self.get_link_success_msg(link_updated), extra_tags='safe')
+            return HttpResponseRedirect(self.get_success_url(group_id))
+        else:
+            msg = _("Error(s) in form: The modifications are not saved")
+            display_error_messages(request, msg)
 
         return render(request, self.template_name, {
             "group": self.get_group_obj(),
