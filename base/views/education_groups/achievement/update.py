@@ -35,10 +35,6 @@ from django.views.generic import FormView, UpdateView
 
 from base.business.education_groups.general_information_sections import CMS_LABEL_PROGRAM_AIM, \
     CMS_LABEL_ADDITIONAL_INFORMATION
-from education_group.ddd.domain.service.identity_search import TrainingIdentitySearch
-from education_group.views.proxy.read import Tab
-from osis_role.contrib.views import PermissionRequiredMixin
-
 from base.forms.education_group.achievement import ActionForm, EducationGroupAchievementForm, \
     EducationGroupDetailedAchievementForm, EducationGroupAchievementCMSForm
 from base.models.education_group_year import EducationGroupYear
@@ -49,6 +45,9 @@ from base.views.mixins import AjaxTemplateMixin
 from cms.enums import entity_name
 from cms.models import translated_text
 from cms.models.text_label import TextLabel
+from education_group.ddd.domain.service.identity_search import TrainingIdentitySearch
+from education_group.views.proxy.read import Tab
+from osis_role.contrib.views import PermissionRequiredMixin
 
 
 class EducationGroupAchievementAction(EducationGroupAchievementMixin, FormView):
@@ -71,6 +70,14 @@ class EducationGroupAchievementAction(EducationGroupAchievementMixin, FormView):
     def get_permission_object(self):
         return self.get_object().education_group_year
 
+    def get_success_url(self):
+        prefix = 'training_' if self.education_group_year.is_training else 'mini_training_'
+        return reverse(
+            prefix + 'skills_achievements', args=[self.kwargs['year'], self.kwargs['code']]
+        ) + '?path={}&tab={}#achievement_{}'.format(
+            self.request.GET['path'], Tab.SKILLS_ACHIEVEMENTS, self.kwargs['education_group_achievement_pk']
+        )
+
 
 class UpdateEducationGroupAchievement(PermissionRequiredMixin, AjaxTemplateMixin, EducationGroupAchievementMixin,
                                       UpdateView):
@@ -82,14 +89,29 @@ class UpdateEducationGroupAchievement(PermissionRequiredMixin, AjaxTemplateMixin
     def get_permission_object(self):
         return self.get_object().education_group_year
 
+    def get_success_url(self):
+        # Simply reload the page
+        return
+
 
 class UpdateEducationGroupDetailedAchievement(EducationGroupDetailedAchievementMixin, UpdateEducationGroupAchievement):
     form_class = EducationGroupDetailedAchievementForm
+
+    def get_permission_object(self):
+        return self.education_group_achievement.education_group_year
 
 
 class EducationGroupDetailedAchievementAction(EducationGroupDetailedAchievementMixin, EducationGroupAchievementAction):
     def get_permission_object(self):
         return self.education_group_achievement.education_group_year
+
+    def get_success_url(self):
+        prefix = 'training_' if self.education_group_year.is_training else 'mini_training_'
+        return reverse(
+            prefix + 'skills_achievements', args=[self.kwargs['year'], self.kwargs['code']]
+        ) + '?path={}&tab={}#detail_achievements_{}'.format(
+            self.request.GET['path'], Tab.SKILLS_ACHIEVEMENTS, self.kwargs['education_group_detail_achievement_pk']
+        )
 
 
 class EducationGroupAchievementCMS(PermissionRequiredMixin, SuccessMessageMixin, AjaxTemplateMixin, FormView):

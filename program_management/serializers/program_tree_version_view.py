@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,19 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from base.models.enums.education_group_types import GroupType
-from program_management.ddd.domain.node import Node
 
-LEARNING_UNIT_YEAR = "learning_unit_year"
-OFFER_YEAR = "offer_year"
-GROUP_YEAR = "group_year"
-
-ENTITY_NAME = (
-    (LEARNING_UNIT_YEAR, LEARNING_UNIT_YEAR),
-    (OFFER_YEAR, OFFER_YEAR),
-    (GROUP_YEAR, GROUP_YEAR)
-)
+from program_management.ddd.business_types import *
+from program_management.serializers.program_tree_view import program_tree_view_serializer
 
 
-def get_offers_or_groups_entity_from_node(node: Node):
-    return GROUP_YEAR if node.node_type.name in GroupType.get_names() else OFFER_YEAR
+def program_tree_version_view_serializer(program_tree_version: 'ProgramTreeVersion') -> dict:
+    tree_dict = program_tree_view_serializer(program_tree_version.get_tree())
+
+    if program_tree_version.version_label:
+        tree_dict.update({'text': '%(text)s%(version_label)s' % {
+            'text': tree_dict['text'],
+            'version_label': '%(label)s' % {'label': program_tree_version.version_label} if program_tree_version.version_label else ''
+        }})
+
+    return tree_dict

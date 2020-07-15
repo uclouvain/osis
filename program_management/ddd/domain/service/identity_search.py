@@ -76,6 +76,11 @@ class NodeIdentitySearch(interface.DomainService):
             return None
 
 
+class ProgramTreeIdentitySearch(interface.DomainService):
+    def get_from_node_identity(self, node_identity: 'NodeIdentity') -> 'ProgramTreeIdentity':
+        return ProgramTreeIdentity(code=node_identity.code, year=node_identity.year)
+
+
 class TrainingIdentitySearch(interface.DomainService):
 
     @classmethod
