@@ -141,7 +141,7 @@ class EducationGroupAchievementCMS(PermissionRequiredMixin, SuccessMessageMixin,
         return reverse(
             'education_group_read_proxy',
             args=[training_identity.year, training_identity.acronym]
-        ) + '?tab={}'.format(Tab.SKILLS_ACHIEVEMENTS)
+        ) + '?path={}&tab={}#achievement_'.format(self.request.POST['path'], Tab.SKILLS_ACHIEVEMENTS)
 
     def get_initial(self):
         initial = super().get_initial()
@@ -174,6 +174,7 @@ class EducationGroupAchievementProgramAim(EducationGroupAchievementCMS):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["translated_label"] = _('the program aims')
+        context["path"] = self.request.GET['path']
         return context
 
     # SuccessMessageMixin
@@ -193,6 +194,7 @@ class EducationGroupAchievementAdditionalInformation(EducationGroupAchievementCM
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["translated_label"] = _('additional informations')
+        context["path"] = self.request.GET['path']
         return context
 
     # SuccessMessageMixin

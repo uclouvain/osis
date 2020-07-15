@@ -69,13 +69,13 @@ def __get_achievement_formated(achievement, node, path):
         ) + '?path={}&tab={}'.format(path, Tab.SKILLS_ACHIEVEMENTS),
         'url_update': reverse(
             url_names["url_update"], args=[node.year, node.code, achievement.pk]
-        ) + '?path={}&tab={}'.format(path, Tab.SKILLS_ACHIEVEMENTS),
+        ) + '?path={}&tab={}#achievement_{}'.format(path, Tab.SKILLS_ACHIEVEMENTS, achievement.pk),
         'url_delete': reverse(
             url_names["url_delete"], args=[node.year, node.code, achievement.pk]
         ) + '?path={}&tab={}'.format(path, Tab.SKILLS_ACHIEVEMENTS),
         'url_create': reverse(
             url_names["url_create"], args=[node.year, node.code, achievement.pk]
-        ) + '?path={}&tab={}'.format(path, Tab.SKILLS_ACHIEVEMENTS, achievement.pk)
+        ) + '?path={}&tab={}achievement.pk'.format(path, Tab.SKILLS_ACHIEVEMENTS, achievement.pk)
     }
 
 
@@ -102,10 +102,10 @@ def __get_detail_achievement_formated(achievement, d_achievement, node, path):
         ) + '?path={}&tab={}'.format(path, Tab.SKILLS_ACHIEVEMENTS),
         'url_update': reverse(
             url_names["url_update"], args=[node.year, node.code, achievement.pk, d_achievement.pk]
-        ) + '?path={}&tab={}'.format(path, Tab.SKILLS_ACHIEVEMENTS),
+        ) + '?path={}&tab={}#detail_achievements_{}'.format(path, Tab.SKILLS_ACHIEVEMENTS, d_achievement.pk),
         'url_delete': reverse(
             url_names["url_delete"], args=[node.year, node.code, achievement.pk, d_achievement.pk]
-        ) + '?path={}&tab={}'.format(path, Tab.SKILLS_ACHIEVEMENTS),
+        ) + '?path={}&tab={}#achievement_{}'.format(path, Tab.SKILLS_ACHIEVEMENTS, achievement.pk),
     }
 
 
