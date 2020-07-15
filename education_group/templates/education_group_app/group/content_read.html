@@ -30,44 +30,58 @@
             <table class="table table-hover">
                 <thead>
                 <tr>
-                    <th>{% trans 'Acronym/Short title' context 'abbreviation' %}</th>
-                    <th>{% trans 'Code' %}</th>
-                    <th>{% trans "Title" %}</th>
+                    <th style="width:10%">{% trans 'Acronym/Short title' context 'abbreviation' %}</th>
+                    <th style="width:10%">{% trans 'Code' %}</th>
+                    <th style="width:25%">{% trans "Title" %}</th>
                     {% if group.is_minor_major_option_list_choice %}
-                        <th>{% trans 'Access condition' %}</th>
+                        <th style="width:20%">{% trans 'Access condition' %}</th>
                     {% else %}
-                        <th>{% trans 'Cred. rel./abs.' %}</th>
-                        <th>{% trans 'Mandatory' %}</th>
-                        <th>{% trans 'Block' %}</th>
-                        <th>{% trans 'Link type' %}</th>
-                        <th>{% trans 'Comment' %}</th>
-                        <th>{% trans 'English comment' %}</th>
+                        <th style="width:6%">{% trans 'Cred. rel./abs.' %}</th>
+                        <th style="width:6%">{% trans 'Mandatory' %}</th>
+                        <th style="width:3%">{% trans 'Block' %}</th>
+                        <th style="width:7%">{% trans 'Link type' %}</th>
+                        <th style="width:20%">{% trans 'Comment' %}</th>
+                        <th style="width:20%">{% trans 'English comment' %}</th>
                     {% endif %}
-                    <th style="min-width: 70px;"></th>
+                    <th style="width:5%"></th>
                 </tr>
                 </thead>
                 <tbody>
                      {% for link in children %}
                         <tr>
-                            <td style="width:10%">{{ link.child.title }}</td>
-                            <td style="width:10%">
+                            <td>
+                                {% if not link.child.is_learning_unit %}
+                                    {{ link.child.title }}
+                                {% endif %}
+                            </td>
+                            <td>
                                 <a href="{% url 'element_identification' link.child.year link.child.code %}"
                                    id="lnk_education_group_{{ link.child.pk }}">{{ link.child.code }}</a>
                             </td>
-                            <td style="width:25%">
-                                {{ link.child.group_title_fr }}
+                            <td>
+                                {% if link.child.is_learning_unit %}
+                                    {{ link.child.title }}
+                                {% else %}
+                                    {{ link.child.group_title_fr }}
+                                {% endif %}
                             </td>
                             {% if group.is_minor_major_option_list_choice %}
-                                <td style="width:20%">
+                                <td>
                                     {{ link.child.access_condition | yesno }}
                                 </td>
                             {% else %}
-                                <td style="width:6%">{{ link.relative_credits | default_if_none:'-' }}
+                                <td>{{ link.relative_credits | default_if_none:'-' }}
                                     / {{ link.child.credits|floatformat:-2 | default_if_none:'-' }}</td>
-                                <td style="width:6%">{{ link.is_mandatory | yesno }}</td>
-                                <td style="width:3%">{{ link.block | default_if_none:'-' }}</td>
-                                <td style="width:6%">{{ link.link_type|default_if_none:'-' }}</td>
-                                <td style="width:20%">
+                                <td>{{ link.is_mandatory | yesno }}</td>
+                                <td>{{ link.block | default_if_none:'-' }}</td>
+                                <td>
+                                    {% if link.link_type %}
+                                        {{ link.link_type.name }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td >
                                     {% with comment=link.comment|default_if_none:'-' %}
                                         {% if comment|length > 40 %}
                                             <span data-toggle="tooltip" title='{{ comment }}'>
@@ -78,7 +92,7 @@
                                         {% endif %}
                                     {% endwith %}
                                 </td>
-                                <td style="width:20%">
+                                <td >
                                     {% with comment_english=link.comment_english|default_if_none:'-' %}
                                         {% if comment_english|length > 40 %}
                                             <span data-toggle="tooltip" title='{{ comment_english }}'>
@@ -90,7 +104,7 @@
                                     {% endwith %}
                                 </td>
                             {% endif %}
-                            <td style="width:6%">
+                            <td>
                                 <div class="btn-group pull-right" role="group" aria-label="actions">
                                     {% include "education_group_app/blocks/content_actions.html" with up_disabled=forloop.first down_disabled=forloop.last%}
                                 </div>
