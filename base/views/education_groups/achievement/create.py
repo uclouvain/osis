@@ -49,7 +49,7 @@ class CreateEducationGroupAchievement(PermissionRequiredMixin, AjaxTemplateMixin
         return self.education_group_year
 
     def get_success_url(self):
-        prefix = 'training_' if self.education_group_year.is_training else 'mini_training_'
+        prefix = 'training_' if self.education_group_year.is_training() else 'mini_training_'
         return reverse(
             prefix + 'skills_achievements', args=[self.kwargs['year'], self.kwargs['code']]
         ) + '?path={}&tab={}#achievement_{}'.format(
@@ -72,7 +72,7 @@ class CreateEducationGroupDetailedAchievement(PermissionRequiredMixin, AjaxTempl
         return self.education_group_year
 
     def get_success_url(self):
-        prefix = 'training_' if self.education_group_year.is_training else 'mini_training_'
+        prefix = 'training_' if self.education_group_year.is_training() else 'mini_training_'
         return reverse(
             prefix + 'skills_achievements', args=[self.kwargs['year'], self.kwargs['code']]
         ) + '?path={}&tab={}#detail_achievements_{}'.format(

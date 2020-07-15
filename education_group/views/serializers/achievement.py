@@ -80,7 +80,7 @@ def __get_achievement_formated(achievement, node, path):
 
 
 def _get_url_name_achievements(achievement):
-    prefix = 'training_' if achievement.education_group_year.is_training else 'minitraining_'
+    prefix = 'training_' if achievement.education_group_year.is_training() else 'minitraining_'
     return {
         'url_action': prefix+"achievement_actions",
         'url_update': prefix+"achievement_update",
@@ -110,7 +110,7 @@ def __get_detail_achievement_formated(achievement, d_achievement, node, path):
 
 
 def _get_url_name_detail_achievements(achievement):
-    prefix = 'training_' if achievement.education_group_year.is_training else 'minitraining_'
+    prefix = 'training_' if achievement.education_group_year.is_training() else 'minitraining_'
     return {
         'url_action': prefix+"detailed_achievement_actions",
         'url_update': prefix+"detailed_achievement_update",

@@ -65,7 +65,7 @@ class MiniTrainingReadSkillsAchievements(MiniTrainingRead):
         return reverse(
             'education_group_achievement_program_aim',
             args=[mini_training_id, mini_training_id]
-        ) + '?path={}&tab={}'.format(self.request.GET['path'], Tab.SKILLS_ACHIEVEMENTS)
+        ) + '?path={}&tab={}#achievement_'.format(self.request.GET['path'], Tab.SKILLS_ACHIEVEMENTS)
 
     def get_program_aims_label(self):
         return next(
@@ -78,7 +78,7 @@ class MiniTrainingReadSkillsAchievements(MiniTrainingRead):
         return reverse(
             'education_group_achievement_additional_information',
             args=[mini_training_id, mini_training_id]
-        ) + '?path={}&tab={}'.format(self.request.GET['path'], Tab.SKILLS_ACHIEVEMENTS)
+        ) + '?path={}&tab={}#achievement_'.format(self.request.GET['path'], Tab.SKILLS_ACHIEVEMENTS)
 
     def get_additional_information_skills_label(self):
         return next(
