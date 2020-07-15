@@ -115,11 +115,13 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
             self.get_permission_object()
         )
         is_root_node = self.node_identity == self.get_tree().root_node.entity_id
+
         return {
             **super().get_context_data(**kwargs),
             "person": self.request.user.person,
             "enums": mdl.enums.education_group_categories,
             "can_change_education_group": can_change_education_group,
+            "current_version": self.current_version,
             "form_xls_custom": CustomXlsForm(),
             "tree": json.dumps(
                 program_tree_version_view_serializer(self.current_version)) if self.current_version else {},
