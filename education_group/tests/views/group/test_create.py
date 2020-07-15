@@ -217,17 +217,18 @@ class TestCreateNonOrphanGroupPostMethod(TestCase):
         self.client.post(self.url)
         self.assertTrue(mock_service_create_group.called)
 
-    @mock.patch('education_group.views.group.create.GroupForm.is_valid', return_value=True)
-    @mock.patch('education_group.views.group.create.GroupForm.cleaned_data',
-                new_callable=mock.PropertyMock, create=True)
+    @mock.patch('education_group.views.group.create.GroupAttachForm')
     @mock.patch('education_group.views.group.create.create_group_and_attach_service.create_group_and_attach')
     def test_post_assert_redirection_with_path_queryparam(self,
                                                           mock_service_create_group,
-                                                          mock_form_clean_data,
+                                                          mock_form,
                                                           *args):
 
+        mock_form.return_value.is_valid.return_value = True
+        mock_form.return_value.errors = []
+        mock_form.return_value.cleaned_data = defaultdict(lambda: None)
+
         mock_service_create_group.return_value = GroupIdentity(code="LTRONC1000", year=2018)
-        mock_form_clean_data.return_value = defaultdict(lambda: None)
 
         response = self.client.post(self.url)
 

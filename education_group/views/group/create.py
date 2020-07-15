@@ -112,7 +112,6 @@ class GroupCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                     as e:
                 group_form.add_error('min_constraint', e.message)
                 group_form.add_error('max_constraint', '')
-
             if not group_form.errors:
                 display_success_messages(request, self.get_success_msg(group_id), extra_tags='safe')
                 return HttpResponseRedirect(self.get_success_url(group_id))

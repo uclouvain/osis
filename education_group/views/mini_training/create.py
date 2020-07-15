@@ -43,7 +43,7 @@ from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command as command_pgrm
 from program_management.ddd.business_types import *
 from program_management.ddd.service.read import node_identity_service
-from program_management.ddd.service.write import create_mini_training_and_attach_service
+from program_management.ddd.service.write import create_mini_training_and_paste_service
 
 FormTab = collections.namedtuple("FormTab", "text active display include_html")
 
@@ -66,8 +66,8 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
     def form_valid(self, form: mini_training_form.MiniTrainingForm) -> response.HttpResponseBase:
         try:
             if self.get_attach_path():
-                mini_training_identity = create_mini_training_and_attach_service.create_mini_training_and_attach(
-                    self._generate_create_and_attach_command_from_valid_form(form)
+                mini_training_identity = create_mini_training_and_paste_service.create_mini_training_and_paste(
+                    self._generate_create_and_paste_command_from_valid_form(form)
                 )
             else:
                 mini_training_identity = create_mini_training_service.create_orphan_mini_training(
@@ -182,7 +182,7 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
             end_year=form.cleaned_data['end_year'],
         )
 
-    def _generate_create_and_attach_command_from_valid_form(
+    def _generate_create_and_paste_command_from_valid_form(
             self,
             form: mini_training_form.MiniTrainingForm) -> command_pgrm.CreateMiniTrainingAndPasteCommand:
         return command_pgrm.CreateMiniTrainingAndPasteCommand(

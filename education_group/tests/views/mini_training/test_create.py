@@ -77,7 +77,7 @@ class TestCreate(TestCase):
 
     @mock.patch('education_group.views.mini_training.create.MiniTrainingCreateView.get_form')
     @mock.patch("program_management.ddd.service.write."
-                "create_mini_training_and_attach_service.create_mini_training_and_attach")
+                "create_mini_training_and_paste_service.create_mini_training_and_paste")
     def test_should_call_create_mini_training_and_paste_service_when_request_is_post_and_path_as_parameter(
             self,
             mock_service,
