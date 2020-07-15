@@ -235,7 +235,7 @@ class GetMiniTrainingTestCase(APITestCase):
         )
         cls.user = UserFactory()
         cls.url = reverse('education_group_api_v1:mini_training_read', kwargs={
-            'partial_acronym': cls.version.root_group.partial_acronym,
+            'official_partial_acronym': cls.version.root_group.partial_acronym,
             'year': cls.academic_year.year
         })
 
@@ -270,7 +270,7 @@ class GetMiniTrainingTestCase(APITestCase):
 
     def test_get_invalid_mini_training_case_not_found(self):
         invalid_url = reverse('education_group_api_v1:mini_training_read', kwargs={
-            'partial_acronym': 'ACRO',
+            'official_partial_acronym': 'ACRO',
             'year': 2033
         })
         response = self.client.get(invalid_url)

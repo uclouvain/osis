@@ -80,7 +80,7 @@ urlpatterns = [
         ])
     ),
     url(
-        r'^mini_trainings/(?P<year>[\d]{4})/(?P<partial_acronym>[\w]+)$',
+        r'^mini_trainings/(?P<year>[\d]{4})/(?P<official_partial_acronym>[\w]+)$',
         MiniTrainingDetail.as_view(),
         name=MiniTrainingDetail.name
     ),
