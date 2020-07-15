@@ -54,8 +54,7 @@ class ProgramTreeRepository(interface.AbstractRepository):
     def create(
             cls,
             program_tree: 'ProgramTree',
-            create_group_service: interface.ApplicationService  # FIXME :: add this param into osis-common.interface?
-            # services: List[interface.ApplicationService] = None
+            create_group_service: interface.ApplicationService = None  # FIXME :: add this param into osis-common.interface?
     ) -> 'ProgramTreeIdentity':
         for child_node in [n for n in program_tree.get_all_nodes() if n._has_changed is True]:
             create_group_service(

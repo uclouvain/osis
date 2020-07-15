@@ -29,7 +29,7 @@ from program_management.ddd.domain.service import validation_rule
 from program_management.ddd.business_types import *
 
 
-def generate_base_on_parent(parent_node: 'Node', child_node_type: EducationGroupTypesEnum) -> str:
+def generate_from_parent_node(parent_node: 'Node', child_node_type: EducationGroupTypesEnum) -> str:
     default_value = validation_rule.get_validation_rule_for_field(child_node_type, 'abbreviated_title').initial_value
     return "{child_title}{parent_abbreviated_title}".format(
         child_title=default_value.replace(" ", "").upper(),

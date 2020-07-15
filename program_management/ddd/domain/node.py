@@ -65,30 +65,12 @@ class NodeFactory:
             )
         return node_cls(**node_attrs)
 
-    def copy_from(self, node: 'Node') -> 'Node':  # TODO :: unit tests
-        copied_node = self.deepcopy_node_without_copy_children_recursively(node)
-        copied_node._has_changed = True
-        return copied_node
-
-    def deepcopy_node_without_copy_children_recursively(self, original_node: 'Node') -> 'Node':
-        original_children = original_node.children
-        original_node.children = []  # To avoid recursive deep copy of all children behind
-        copied_node = copy.deepcopy(original_node)
-        original_node.children = original_children
-        return copied_node
-
 
 factory = NodeFactory()
 
 
 @attr.s(frozen=True, slots=True)
 class NodeIdentity(interface.EntityIdentity):
-    # def __eq__(self, other):
-    #     return self.code == other.code and self.year == other.year
-    #
-    # def __hash__(self):
-    #     return hash(self.code + str(self.year))
-
     code = attr.ib(type=str)
     year = attr.ib(type=int)
 
@@ -114,11 +96,6 @@ class Node(interface.Entity):
 
     _academic_year = None
     _has_changed = False
-
-    # def __eq__(self, other):
-    #     if self.__class__ == other.__class__:
-    #         return self.node_id == other.node_id
-    #     return False
 
     @entity_id.default
     def _entity_id(self) -> NodeIdentity:

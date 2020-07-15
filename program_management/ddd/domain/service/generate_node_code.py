@@ -42,7 +42,7 @@ MAX_CNUM = 999
 WIDTH_CNUM = 3
 
 
-def generate_code_based_on_parent(parent_node: 'Node', child_node_type: EducationGroupTypesEnum) -> NodeCode:
+def generate_code_from_parent_node(parent_node: 'Node', child_node_type: EducationGroupTypesEnum) -> NodeCode:
     reg_parent_code = re.compile(REGEX_TRAINING_PARTIAL_ACRONYM)
     reg_common_partial_acronym = re.compile(REGEX_COMMON_PARTIAL_ACRONYM)
     # FIXME : Sometimes parent does not have a partial acronym, it is a dirty situation. We have to clean the DB.

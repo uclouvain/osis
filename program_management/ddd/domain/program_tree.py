@@ -37,7 +37,7 @@ from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.node import factory as node_factory, NodeIdentity, Node
 from program_management.ddd.domain import prerequisite, exception
-from program_management.ddd.domain.service import generate_node_code_service, validation_rule, \
+from program_management.ddd.domain.service import generate_node_code, validation_rule, \
     generate_node_abbreviated_title
 from program_management.ddd.repositories import load_authorized_relationship
 from program_management.ddd.validators import validators_by_business_action
@@ -63,7 +63,7 @@ class ProgramTreeBuilder:
         try:
             program_tree_next_year = repository.get(identity_next_year)
             # Case update program tree to next year
-            # TODO :: To implement in OSIS-????
+            # TODO :: To implement in OSIS-4809
             pass
         except exception.ProgramTreeNotFoundException:
             # Case create program tree to next year
@@ -122,8 +122,8 @@ class ProgramTreeBuilder:
             child = node_factory.get_node(
                 type=NodeType.GROUP,
                 node_type=child_type,
-                code=generate_node_code_service.generate_code_based_on_parent(root_node, child_type),
-                title=generate_node_abbreviated_title.generate_base_on_parent(
+                code=generate_node_code.generate_code_from_parent_node(root_node, child_type),
+                title=generate_node_abbreviated_title.generate_from_parent_node(
                     parent_node=root_node,
                     child_node_type=child_type,
                 ),

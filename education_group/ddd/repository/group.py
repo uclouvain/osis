@@ -26,7 +26,7 @@
 from typing import Optional, List
 
 from django.db import IntegrityError
-from django.db.models import Prefetch, Subquery, OuterRef, Q
+from django.db.models import Prefetch, Subquery, OuterRef
 from django.utils import timezone
 
 from education_group.ddd import domain
@@ -42,7 +42,6 @@ from education_group.ddd.domain.service.enum_converter import convert_type_str_t
 from education_group.models.group_year import GroupYear as GroupYearModelDb
 from education_group.models.group import Group as GroupModelDb
 from base.models.enums.constraint_type import ConstraintTypeEnum
-from base.models.enums.education_group_types import GroupType, TrainingType, MiniTrainingType
 from education_group.ddd.domain import exception, group
 from education_group.ddd.domain.group import GroupIdentity
 from education_group.ddd.domain._campus import Campus

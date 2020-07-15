@@ -97,7 +97,7 @@ class TrainingBuilder:
         for aim in command.aims:
             DiplomaAim(
                 entity_id=DiplomaAimIdentity(code=aim[0], section=aim[1]),
-                description=None,  # FIXME :: Training() object should receive entity_id instead of Object? And lazy load the DiplomaAim objects?
+                description=None,
             )
 
         return Training(
@@ -227,7 +227,7 @@ class Training(interface.RootEntity):
     funding = attr.ib(type=Funding, default=None)
     hops = attr.ib(type=HOPS, default=None)
     co_graduation = attr.ib(type=CoGraduation, default=None)
-    co_organizations = attr.ib(type=List[Coorganization], default=[])
+    co_organizations = attr.ib(type=List[Coorganization], factory=list)
     academic_type = attr.ib(type=AcademicTypes, default=None)
     diploma = attr.ib(type=Diploma, default=None)
 
