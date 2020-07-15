@@ -30,7 +30,7 @@ from django.utils.translation import gettext_lazy as _
 
 from base.business.event_perms import EventPermEducationGroupEdition
 from base.forms.common import ValidationRuleMixin
-from base.forms.utils.choice_field import BLANK_CHOICE
+from base.forms.utils import choice_field
 from base.models import campus
 from base.models.academic_year import AcademicYear
 from base.models.enums import active_status, schedule_type as schedule_type_enum, education_group_categories, \
@@ -83,7 +83,7 @@ class MiniTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         widget=forms.TextInput
     )
     constraint_type = forms.ChoiceField(
-        choices=BLANK_CHOICE + list(ConstraintTypeEnum.choices()),
+        choices=choice_field.add_blank(ConstraintTypeEnum.choices()),
         label=_("Type of constraint"),
         required=False,
     )
