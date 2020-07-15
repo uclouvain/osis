@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Optional
+from typing import Optional, Set
 
 from base.models.enums.link_type import LinkTypes
 from osis_common.ddd import interface
@@ -220,3 +220,9 @@ class GetNodeIdentityFromElementId(interface.CommandRequest):
     def __repr__(self) -> str:
         parameters = ", ".join([str(self.element_id)])
         return "GetNodeIdentityFromElementId({parameters})".format(parameters=parameters)
+
+
+class SearchAllVersionsFromRootNodesCommand(interface.CommandRequest):
+    def __init__(self, code: str, year: int):
+        self.code = code
+        self.year = year
