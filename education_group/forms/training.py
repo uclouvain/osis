@@ -130,7 +130,11 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     has_partial_deliberation = forms.BooleanField(initial=False, label=_('Partial deliberation'), required=False)
     has_admission_exam = forms.BooleanField(initial=False, label=_('Admission exam'), required=False)
     has_dissertation = forms.BooleanField(initial=False, label=_('dissertation').capitalize(), required=False)
-    produce_university_certificate = forms.BooleanField(initial=False, label=_('University certificate'), required=False)
+    produce_university_certificate = forms.BooleanField(
+        initial=False,
+        label=_('University certificate'),
+        required=False,
+    )
     decree_category = forms.ChoiceField(
         choices=BLANK_CHOICE + sorted(list(DecreeCategories.choices()), key=lambda c: c[1]),
         label=_("Decree category"),

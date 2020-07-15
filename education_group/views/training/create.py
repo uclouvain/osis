@@ -73,7 +73,7 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 training_form.add_error('code', e.message)
             except ContentConstraintTypeMissing as e:
                 training_form.add_error('constraint_type', e.message)
-            except (ContentConstraintMinimumMaximumMissing, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum) \
+            except (ContentConstraintMinimumMaximumMissing, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum)\
                     as e:
                 training_form.add_error('min_constraint', e.message)
                 training_form.add_error('max_constraint', '')
