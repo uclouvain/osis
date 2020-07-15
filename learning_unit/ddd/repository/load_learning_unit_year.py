@@ -28,10 +28,11 @@ import itertools
 from typing import List, Dict
 
 from django.conf import settings
-from django.db.models import F, Subquery, OuterRef, QuerySet, Q
+from django.db.models import F, Subquery, OuterRef, QuerySet, Q, Prefetch
 
 from attribution.ddd.repositories.attribution_repository import AttributionRepository
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY, CMS_LABEL_PEDAGOGY_FR_AND_EN, CMS_LABEL_SPECIFICATIONS
+from base.models import teaching_material
 from base.models.entity_version import EntityVersion
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.learning_container_year_types import LearningContainerYearType
@@ -158,7 +159,6 @@ def load_multiple(learning_unit_year_ids: List[int]) -> List['LearningUnitYear']
             **__instanciate_volume_domain_object(__convert_string_to_enum(learning_unit_data)),
             proposal=Proposal(learning_unit_data.pop('proposal_type'),
                               learning_unit_data.pop('proposal_state')),
-            # achievements=load_achievements(learning_unit_data['acronym'], learning_unit_data['year']),
             entities=Entities(requirement_entity_acronym=learning_unit_data.pop('requirement_entity_acronym'),
                               allocation_entity_acronym=learning_unit_data.pop('allocation_entity_acronym')),
             description_fiche=DescriptionFiche(
@@ -181,7 +181,7 @@ def load_multiple(learning_unit_year_ids: List[int]) -> List['LearningUnitYear']
                 prerequisite=learning_unit_data.pop('cms_prerequisite'),
                 prerequisite_en=learning_unit_data.pop('cms_prerequisite_en')
                 ),
-            teaching_materials=load_teaching_materials(learning_unit_data['acronym'], learning_unit_data['year'])
+            teaching_materials=[]
             )
         results.append(luy)
     return results

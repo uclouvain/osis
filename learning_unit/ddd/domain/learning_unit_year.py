@@ -104,7 +104,7 @@ class LearningUnitYear:
             description_fiche: DescriptionFiche = None,
             specifications: Specifications = None,
 
-            teaching_materials: TeachingMaterial = None,
+            teaching_materials: List[TeachingMaterial] = None,
             subtype: str = None,
             session: str = None,
             main_language: str = None,
@@ -129,11 +129,11 @@ class LearningUnitYear:
         self.quadrimester = quadrimester
         self.lecturing_volume = lecturing_volume
         self.practical_volume = practical_volume
-        self.achievements = achievements
+        self.achievements = achievements or []
         self.entities = entities
         self.description_fiche = description_fiche
         self.specifications = specifications
-        self.teaching_materials = teaching_materials
+        self.teaching_materials = teaching_materials or []
         self.subtype = subtype
         self.session = session
         self.main_language = main_language
