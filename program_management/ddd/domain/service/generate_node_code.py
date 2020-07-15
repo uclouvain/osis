@@ -65,7 +65,10 @@ def generate_code_from_parent_node(parent_node: 'Node', child_node_type: Educati
     return partial_acronym
 
 
-def __get_cnum_subdivision(child_node_type: EducationGroupTypesEnum, reg_child_initial_value: Pattern) -> Tuple[str, str]:
+def __get_cnum_subdivision(
+        child_node_type: EducationGroupTypesEnum,
+        reg_child_initial_value: Pattern
+) -> Tuple[str, str]:
     child_initial_value = validation_rule.get_validation_rule_for_field(child_node_type, 'code').initial_value
     match_result = reg_child_initial_value.search(child_initial_value)
     if match_result:

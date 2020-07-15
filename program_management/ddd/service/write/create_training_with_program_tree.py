@@ -29,7 +29,7 @@ from django.db import transaction
 
 from education_group.ddd import command
 from education_group.ddd.business_types import *
-from education_group.ddd.service.write import create_group_service, copy_group_service, create_orphan_training_service
+from education_group.ddd.service.write import create_group_service, create_orphan_training_service
 from program_management.ddd.command import CreateStandardVersionCommand, PostponeProgramTreeVersionCommand, \
     PostponeProgramTreeCommand
 from program_management.ddd.service.write import create_standard_version_service, postpone_tree_version_service, \
@@ -49,20 +49,11 @@ def create_and_report_training_with_program_tree(
     # THEN
 
     # 1. Create orphan root group
-    group_identity = create_group_service.create_orphan_group(
+    create_group_service.create_orphan_group(
         cmd=__convert_to_group_command(training_cmd=create_training_cmd)
     )
 
-    # 2. Postpone creation of root group
-    # copy_group_service.copy_group_to_next_year(
-    #     command.CopyGroupCommand(
-    #         from_code=group_identity.code,
-    #         from_year=group_identity.year,
-    #         to_year=group_identity.year + 6
-    #     )
-    # )
-
-    # 3. Create Program tree
+    # 2. Create Program tree
 
     program_tree_identity = create_standard_program_tree_service.create_standard_program_tree(
         CreateStandardVersionCommand(
@@ -72,7 +63,7 @@ def create_and_report_training_with_program_tree(
         )
     )
 
-    # 4. Postpone Program tree
+    # 3. Postpone Program tree
     postpone_program_tree_service.postpone_program_tree(
         PostponeProgramTreeCommand(
             postpone_until_year=program_tree_identity.year + 6,
@@ -81,7 +72,7 @@ def create_and_report_training_with_program_tree(
         )
     )
 
-    # 5. Create standard version of program tree
+    # 4. Create standard version of program tree
     program_tree_version_identity = create_standard_version_service.create_standard_program_version(
         CreateStandardVersionCommand(
             offer_acronym=create_training_cmd.abbreviated_title,
@@ -90,7 +81,7 @@ def create_and_report_training_with_program_tree(
         )
     )
 
-    # 6. Postpone standard version of program tree
+    # 5. Postpone standard version of program tree
     postpone_tree_version_service.postpone_program_tree_version(
         PostponeProgramTreeVersionCommand(
             postpone_until_year=program_tree_version_identity.year + 6,  # FIXME :: to calculate with end_year and to with HARD CODE "+6"
@@ -124,9 +115,3 @@ def __convert_to_group_command(training_cmd: command.CreateTrainingCommand) -> c
         start_year=training_cmd.year,
         end_year=training_cmd.end_year,
     )
-
-
-def postpone_training(postpone_cmd: command.PostponeTrainingCommand) -> 'TrainingIdentity':
-    # attr.evolve(instance, x=25)
-    pass
-

@@ -50,5 +50,5 @@ def create_standard_program_version(
 
     # THEN
     program_tree_version_identity = ProgramTreeVersionRepository().create(program_tree_version)
-    
+
     return program_tree_version_identity

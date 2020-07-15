@@ -66,7 +66,8 @@ def __convert_group_to_command(group_next_year: 'Group') -> command.CreateOrphan
         title_fr=group_next_year.titles.title_fr,
         title_en=group_next_year.titles.title_en,
         credits=group_next_year.credits,
-        constraint_type=group_next_year.content_constraint.type.name if group_next_year.content_constraint.type else None,
+        constraint_type=group_next_year.content_constraint.type.name
+        if group_next_year.content_constraint.type else None,
         min_constraint=group_next_year.content_constraint.minimum,
         max_constraint=group_next_year.content_constraint.maximum,
         management_entity_acronym=group_next_year.management_entity.acronym,
