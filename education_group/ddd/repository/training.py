@@ -76,7 +76,7 @@ from osis_common.ddd import interface
 
 class TrainingRepository(interface.AbstractRepository):
     @classmethod
-    def create(cls, training: 'Training') -> 'TrainingIdentity':
+    def create(cls, training: 'Training', **_) -> 'TrainingIdentity':
         education_group_db_obj = _save_education_group(training)
         education_group_year_db_obj = _save_education_group_year(training, education_group_db_obj)
         _save_secondary_domains(training, education_group_year_db_obj)
@@ -85,7 +85,7 @@ class TrainingRepository(interface.AbstractRepository):
         return training.entity_id
 
     @classmethod
-    def update(cls, entity: 'Training') -> 'TrainingIdentity':
+    def update(cls, entity: 'Training', **_) -> 'TrainingIdentity':
         raise NotImplementedError
 
     @classmethod
@@ -104,7 +104,7 @@ class TrainingRepository(interface.AbstractRepository):
         raise NotImplementedError
 
     @classmethod
-    def delete(cls, entity_id: 'TrainingIdentity') -> None:
+    def delete(cls, entity_id: 'TrainingIdentity', **_) -> None:
         raise NotImplementedError
 
 

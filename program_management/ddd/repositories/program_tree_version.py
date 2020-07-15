@@ -45,6 +45,7 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
     def create(
             cls,
             program_tree_version: 'ProgramTreeVersion',
+            **_
     ) -> 'ProgramTreeVersionIdentity':
         education_group_year_id = EducationGroupYear.objects.filter(
             acronym=program_tree_version.entity_id.offer_acronym,
@@ -71,7 +72,7 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
         return program_tree_version.entity_id
 
     @classmethod
-    def update(cls, entity: 'ProgramTreeVersion') -> 'ProgramTreeVersionIdentity':
+    def update(cls, entity: 'ProgramTreeVersion', **_) -> 'ProgramTreeVersionIdentity':
         raise NotImplementedError
 
     @classmethod
@@ -108,7 +109,7 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
         raise NotImplementedError
 
     @classmethod
-    def delete(cls, entity_id: 'ProgramTreeVersionIdentity') -> None:
+    def delete(cls, entity_id: 'ProgramTreeVersionIdentity', **_) -> None:
         raise NotImplementedError
 
     @classmethod

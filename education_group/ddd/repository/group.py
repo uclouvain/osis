@@ -56,7 +56,7 @@ from osis_common.ddd import interface
 
 class GroupRepository(interface.AbstractRepository):
     @classmethod
-    def create(cls, group: 'Group') -> 'GroupIdentity':
+    def create(cls, group: 'Group', **_) -> 'GroupIdentity':
         try:
             academic_year = AcademicYearModelDb.objects.only('id').get(year=group.year)
             education_group_type = EducationGroupTypeModelDb.objects.only('id').get(name=group.type.name)
@@ -114,7 +114,7 @@ class GroupRepository(interface.AbstractRepository):
         )
 
     @classmethod
-    def update(cls, entity: 'Group') -> 'GroupIdentity':
+    def update(cls, entity: 'Group', **_) -> 'GroupIdentity':
         raise NotImplementedError
 
     @classmethod
@@ -181,5 +181,5 @@ class GroupRepository(interface.AbstractRepository):
         raise NotImplementedError
 
     @classmethod
-    def delete(cls, entity_id: 'GroupIdentity') -> None:
+    def delete(cls, entity_id: 'GroupIdentity', **_) -> None:
         raise NotImplementedError
