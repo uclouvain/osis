@@ -21,13 +21,20 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from education_group.ddd import command
-from education_group.ddd.business_types import *
+from typing import Optional
 
-from education_group.ddd.domain.group import GroupIdentity
-from education_group.ddd.repository.group import GroupRepository
+from base.ddd.utils import business_validator
+from education_group.ddd.domain.exception import CreditShouldBeGreaterOrEqualsThanZero
 
 
-def get_group(cmd: command.GetGroupCommand) -> 'Group':
-    group_id = GroupIdentity(code=cmd.code, year=cmd.year)
-    return GroupRepository.get(group_id)
+class CreditsValidator(business_validator.BusinessValidator):
+    def __init__(self, credits: Optional[int]):
+        super().__init__()
+        self.credits = credits
+
+    def validate(self, *args, **kwargs):
+        if self.credits is None:
+            return
+
+        if self.credits < 0:
+            raise CreditShouldBeGreaterOrEqualsThanZero

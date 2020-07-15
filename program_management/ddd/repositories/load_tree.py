@@ -127,6 +127,7 @@ def __load_tree_links(tree_structure: TreeStructure) -> Dict[LinkKey, 'Link']:
         'relative_credits',
         'min_credits',
         'max_credits',
+        'access_condition',
         'is_mandatory',
         'block',
         'comment',

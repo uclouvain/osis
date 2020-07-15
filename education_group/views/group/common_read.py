@@ -39,7 +39,11 @@ from base.business.education_groups.general_information_sections import \
     MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION
 from base.models import academic_year
 from base.models.enums.education_group_categories import Categories
+from base.models.enums.education_group_types import GroupType
 from base.views.common import display_warning_messages
+from education_group.ddd.business_types import *
+from education_group.ddd import command
+from education_group.ddd.service.read import get_group_service
 from education_group.forms.academic_year_choices import get_academic_year_choices
 from education_group.models.group_year import GroupYear
 from education_group.views.mixin import ElementSelectedClipBoardMixin
@@ -47,12 +51,10 @@ from education_group.views.proxy import read
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.node import NodeIdentity, NodeNotFoundException
-from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories import load_tree
-from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.forms.custom_xls import CustomXlsForm
 from program_management.models.element import Element
-from program_management.serializers.program_tree_version_view import program_tree_version_view_serializer
+from program_management.serializers.program_tree_view import program_tree_view_serializer
 
 Tab = read.Tab  # FIXME :: fix imports (and remove this line)
 
@@ -83,15 +85,6 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
     def node_identity(self) -> 'NodeIdentity':
         return NodeIdentity(code=self.kwargs['code'], year=self.kwargs['year'])
 
-    @cached_property
-    def program_tree_version_identity(self) -> 'ProgramTreeVersionIdentity':
-        return ProgramTreeVersionIdentitySearch().get_from_node_identity(
-            NodeIdentity(code=self.get_tree().root_node.code, year=self.get_tree().root_node.year))
-
-    @cached_property
-    def current_version(self) -> 'ProgramTreeVersion':
-        return ProgramTreeVersionRepository.get(self.program_tree_version_identity)
-
     @functools.lru_cache()
     def get_object(self) -> 'Node':
         try:
@@ -121,8 +114,8 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
             "enums": mdl.enums.education_group_categories,
             "can_change_education_group": can_change_education_group,
             "form_xls_custom": CustomXlsForm(),
-            "tree": json.dumps(
-                program_tree_version_view_serializer(self.current_version)) if self.current_version else {},
+            "tree": json.dumps(program_tree_view_serializer(self.get_tree())),
+            "group": self.get_group(),
             "node": self.get_object(),
             "node_path": self.get_path(),
             "tab_urls": self.get_tab_urls(),
@@ -142,6 +135,7 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
             "selected_element_clipboard": self.get_selected_element_clipboard_message(),
             "group_year": self.get_group_year(),  # TODO: Should be remove and use DDD object
             "create_group_url": self.get_create_group_url(),
+            "update_group_url": self.get_update_group_url(),
             "create_training_url": self.get_create_training_url(),
             "create_mini_training_url": self.get_create_mini_training_url(),
             "is_root_node": is_root_node,
@@ -156,6 +150,11 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
         )
 
     @functools.lru_cache()
+    def get_group(self) -> 'Group':
+        get_group_cmd = command.GetGroupCommand(year=self.kwargs['year'], code=self.kwargs['code'])
+        return get_group_service.get_group(get_group_cmd)
+
+    @functools.lru_cache()
     def get_current_academic_year(self):
         return academic_year.starting_academic_year()
 
@@ -165,6 +164,10 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
     def get_create_group_url(self):
         return reverse('create_element_select_type', kwargs={'category': Categories.GROUP.name}) + \
                "?path_to={}".format(self.get_path())
+
+    def get_update_group_url(self):
+        return reverse('group_update', kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}) + \
+               "?path={}".format(self.get_path())
 
     def get_create_mini_training_url(self):
         return reverse('create_element_select_type', kwargs={'category': Categories.MINI_TRAINING.name}) + \

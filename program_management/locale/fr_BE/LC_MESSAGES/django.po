@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-12 15:15+0200\n"
+"POT-Creation-Date: 2020-07-13 16:09+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -85,6 +85,9 @@ msgstr "Sigle/Intitulé abrégé"
 msgctxt "abbreviation"
 msgid "Acronym/Short title"
 msgstr "Sigle/Intitulé abrégé"
+
+msgid "Actions"
+msgstr "Actions"
 
 msgid "Active"
 msgstr ""
@@ -224,6 +227,9 @@ msgstr "Entité Resp."
 msgid "Evaluation methods"
 msgstr "Mode d'évaluation des acquis des étudiants"
 
+msgid "Export"
+msgstr "Exporter"
+
 #, python-format
 msgid ""
 "Finality \"%(acronym)s\" has an end date greater than %(root_acronym)s "
@@ -318,6 +324,12 @@ msgstr "Liste UE"
 msgid "List of teachers"
 msgstr "Liste des enseignants"
 
+msgid "List of trainings"
+msgstr "Liste des enseignants"
+
+msgid "List of trainings with administrative data"
+msgstr "Liste des formations avec données administratives"
+
 msgid "Made in"
 msgstr "Fait à"
 
@@ -350,6 +362,9 @@ msgstr "Nom"
 
 msgid "Name of the teacher responsible"
 msgstr "Nom du professeur responsable de programme"
+
+msgid "New Education Group"
+msgstr "Nouveau Groupement"
 
 msgid "No"
 msgstr "Non"
@@ -458,6 +473,13 @@ msgstr "Prérequis non valides."
 msgid "Prerequisites saved."
 msgstr "Prérequis enregistrés."
 
+msgid "Produce xls of trainings with administrative data"
+msgstr "Produire un fichier Excel avec la liste des formations et données "
+"administratives"
+
+msgid "Produce xls with a list of trainings"
+msgstr "Produire un fichier Excel avec la liste des formations"
+
 msgid "Proposal status"
 msgstr "Légende proposition"
 
@@ -478,6 +500,9 @@ msgstr "Formulaire d'inscription au contenu de"
 
 msgid "Relative credits"
 msgstr "Crédits relatifs"
+
+msgid "Relative credits must be greater or equals than 0"
+msgstr "Crédits relatifs doit être plus grand ou égal à 0"
 
 msgid "Req. Entity"
 msgstr "Entité Resp."
@@ -639,6 +664,10 @@ msgstr "Sigle de la version"
 
 msgid "Volume"
 msgstr "Volume"
+
+#, python-format
+msgid "Which type of %(category)s do you want to create ?"
+msgstr "Quel type de %(category)s voulez-vous créer ?"
 
 msgid "Yes"
 msgstr "Oui"

@@ -38,6 +38,7 @@ from base.models.enums.link_type import LinkTypes
 from program_management.ddd.domain import node
 from program_management.ddd.domain import prerequisite
 from program_management.ddd.domain import program_tree
+from program_management.ddd.domain.link import Link
 from program_management.ddd.domain.prerequisite import PrerequisiteItem
 from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.ddd.domain.program_tree import build_path
@@ -764,3 +765,25 @@ class TestSetPrerequisite(SimpleTestCase, ValidatorPatcherMixin):
         self.mock_validator(UpdatePrerequisiteValidatorList, ["success_message_text"], level=MessageLevel.SUCCESS)
         self.tree.set_prerequisite("LOSIS1452 OU MARC2589", self.link1.child)
         self.assertTrue(self.link1.child.prerequisite)
+
+
+class TestUpdateLink(SimpleTestCase):
+    def setUp(self) -> None:
+        self.tree = ProgramTreeFactory()
+        self.link1 = LinkFactory(parent=self.tree.root_node, child=NodeLearningUnitYearFactory())
+
+    @mock.patch('program_management.ddd.domain.program_tree.validators_by_business_action.UpdateLinkValidatorList')
+    def test_assert_validator_called(self, mock_update_link_validator_list):
+        result = self.tree.update_link(
+            str(self.tree.root_node.pk),
+            child_id=self.link1.child.entity_id,
+            relative_credits=1,
+            access_condition=False,
+            is_mandatory=True,
+            block=123,
+            link_type=None,
+            comment="Comment",
+            comment_english="Comment english"
+        )
+        self.assertTrue(mock_update_link_validator_list.called)
+        self.assertIsInstance(result, Link)
