@@ -85,17 +85,15 @@ class UpdateEducationGroupAchievement(PermissionRequiredMixin, AjaxTemplateMixin
     form_class = EducationGroupAchievementForm
     permission_required = 'base.change_educationgroupachievement'
     raise_exception = True
+    force_reload = True
 
     def get_permission_object(self):
         return self.get_object().education_group_year
 
-    def get_success_url(self):
-        # Simply reload the page
-        return
-
 
 class UpdateEducationGroupDetailedAchievement(EducationGroupDetailedAchievementMixin, UpdateEducationGroupAchievement):
     form_class = EducationGroupDetailedAchievementForm
+    force_reload = True
 
     def get_permission_object(self):
         return self.education_group_achievement.education_group_year
