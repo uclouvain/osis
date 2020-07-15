@@ -172,25 +172,26 @@ def _build_excel_lines_ues(custom_xls_form: CustomXlsForm, tree: 'ProgramTree'):
     colored_cells = defaultdict(list)
     idx = 1
 
-    for path, child_node in tree.root_node.descendents.items():
-        if isinstance(child_node, NodeLearningUnitYear):
-            learning_unit_years = load_multiple_by_identity([LearningUnitYearIdentity(code=child_node.code,
-                                                                                      year=child_node.year)])
+    learning_unit_path_by_identities = {
+        LearningUnitYearIdentity(code=child_node.code, year=child_node.year): path
+        for path, child_node in tree.root_node.descendents.items()
+        if isinstance(child_node, NodeLearningUnitYear)
+    }
+    learning_unit_years = load_multiple_by_identity(list(learning_unit_path_by_identities.keys()))
+    for luy in learning_unit_years:
+        path = learning_unit_path_by_identities[luy.entity_id]
+        child_node = tree.get_node(path)
+        link = tree.get_first_link_occurence_using_node(child_node)
+        parents_data = get_explore_parents(tree.get_parents(path))
 
-            if learning_unit_years:
-                luy = learning_unit_years[0]
-
-                link = tree.get_first_link_occurence_using_node(child_node)
-                parents_data = get_explore_parents(tree.get_parents(path))
-
-                if not parents_data[EXCLUDE_UE_KEY]:
-                    content.append(_get_optional_data(_fix_data(link, luy, parents_data),
-                                                      luy,
-                                                      optional_data_needed,
-                                                      link))
-                    if luy.proposal and luy.proposal.type:
-                        colored_cells[PROPOSAL_LINE_STYLES.get(luy.proposal.type)].append(idx)
-                    idx += 1
+        if not parents_data[EXCLUDE_UE_KEY]:
+            content.append(_get_optional_data(_fix_data(link, luy, parents_data),
+                                              luy,
+                                              optional_data_needed,
+                                              link))
+            if luy.proposal and luy.proposal.type:
+                colored_cells[PROPOSAL_LINE_STYLES.get(luy.proposal.type)].append(idx)
+            idx += 1
 
     colored_cells[Style(font=BOLD_FONT)].append(0)
     return {

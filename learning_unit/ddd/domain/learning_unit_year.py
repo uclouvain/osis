@@ -32,6 +32,7 @@ from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from base.models.enums.quadrimesters import DerogationQuadrimester
 from learning_unit.ddd.domain.achievement import Achievement
 from learning_unit.ddd.domain.description_fiche import DescriptionFiche
+from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYearIdentity
 from learning_unit.ddd.domain.proposal import Proposal
 from learning_unit.ddd.domain.specifications import Specifications
 from learning_unit.ddd.domain.teaching_material import TeachingMaterial
@@ -78,6 +79,7 @@ class Entities:
 class LearningUnitYear:
     def __init__(
             self,
+            entity_id: LearningUnitYearIdentity = None,
             id: int = None,
             year: int = None,
             acronym: str = None,
@@ -111,6 +113,7 @@ class LearningUnitYear:
             attributions: List['Attribution'] = None,
 
     ):
+        self.entity_id = entity_id
         self.id = id
         self.year = year
         self.acronym = acronym
