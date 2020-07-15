@@ -1,12 +1,12 @@
 from typing import List
+
 from django.urls import reverse
 from django.views.generic import RedirectView
 
-from program_management.ddd.domain.node import NodeIdentity
-from program_management.ddd.repositories.node import NodeRepository
-
 from education_group.views.proxy.read import SUFFIX_IDENTIFICATION, get_group_available_tabs, \
     get_mini_training_available_tabs, get_training_available_tabs
+from program_management.ddd.domain.node import NodeIdentity
+from program_management.ddd.repositories.node import NodeRepository
 
 
 class IdentificationRedirectView(RedirectView):
@@ -30,7 +30,7 @@ class IdentificationRedirectView(RedirectView):
             url_kwargs = {'year': root_node.year, 'acronym': root_node.code}
         else:
             url_name = "group_{}".format(get_url_name_suffix_from_referer(self.request.META.get('HTTP_REFERER'),
-                                                                          get_group_available_tabs()))
+                                                                          get_group_available_tabs(root_node)))
             url_kwargs = {'year': root_node.year, 'code': root_node.code}
         self.url = reverse(
             url_name,

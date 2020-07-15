@@ -4,8 +4,9 @@ from django.urls import reverse
 from django.utils.functional import cached_property
 from django.views.generic import RedirectView
 
-from program_management.ddd.business_types import *
+from base.business.education_groups.general_information_sections import SECTIONS_PER_OFFER_TYPE
 from education_group.ddd.domain.training import TrainingIdentity
+from program_management.ddd.business_types import *
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
 from program_management.ddd.repositories.node import NodeRepository
@@ -92,7 +93,7 @@ def get_tab_urls(tab: Tab, node: 'Node', path: 'Path' = None) -> str:
 
 def get_tab_from_referer(node: 'Node', referer: str):
     if referer:
-        tabs = get_group_available_tabs()
+        tabs = get_group_available_tabs(node)
 
         if node.is_training():
             tabs = get_training_available_tabs()
@@ -104,13 +105,17 @@ def get_tab_from_referer(node: 'Node', referer: str):
     return Tab.IDENTIFICATION
 
 
-def get_group_available_tabs():
-    return {
+def get_group_available_tabs(node: 'Node'):
+    tabs = {
         SUFFIX_IDENTIFICATION: Tab.IDENTIFICATION,
         SUFFIX_CONTENT: Tab.CONTENT,
         SUFFIX_UTILIZATION: Tab.UTILIZATION,
-        SUFFIX_GENERAL_INFO: Tab.GENERAL_INFO,
     }
+    if node.node_type.name in SECTIONS_PER_OFFER_TYPE.keys():
+        tabs.update({
+            SUFFIX_GENERAL_INFO: Tab.GENERAL_INFO,
+        })
+    return tabs
 
 
 def get_training_available_tabs():
