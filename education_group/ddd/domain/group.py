@@ -33,12 +33,13 @@ from education_group.ddd.domain._content_constraint import ContentConstraint
 from education_group.ddd.domain._entity import Entity
 from education_group.ddd.domain._remark import Remark
 from education_group.ddd.domain._titles import Titles
+from education_group.ddd.validators.validators_by_business_action import UpdateGroupValidatorList
 from osis_common.ddd import interface
 
 
 class GroupBuilder:
     @classmethod
-    def build_from_create_cmd(self, cmd: command.CreateOrphanGroupCommand):
+    def build_from_create_cmd(cls, cmd: command.CreateOrphanGroupCommand):
         group_id = GroupIdentity(code=cmd.code, year=cmd.year)
         titles = Titles(title_fr=cmd.title_fr, title_en=cmd.title_en)
         content_constraint = ContentConstraint(
@@ -141,3 +142,26 @@ class Group(interface.RootEntity):
     @property
     def year(self) -> int:
         return self.entity_id.year
+
+    def is_minor_major_option_list_choice(self):
+        return self.type.name in GroupType.minor_major_option_list_choice()
+
+    def update(
+            self,
+            abbreviated_title: str,
+            titles: Titles,
+            credits: int,
+            content_constraint: ContentConstraint,
+            management_entity: Entity,
+            teaching_campus: Campus,
+            remark: Remark
+    ):
+        self.abbreviated_title = abbreviated_title.upper()
+        self.titles = titles
+        self.credits = credits
+        self.content_constraint = content_constraint
+        self.management_entity = management_entity
+        self.teaching_campus = teaching_campus
+        self.remark = remark
+        UpdateGroupValidatorList(self).validate()
+        return self
