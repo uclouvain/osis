@@ -76,7 +76,7 @@
                                 <td>{{ link.block | default_if_none:'-' }}</td>
                                 <td>
                                     {% if link.link_type %}
-                                        {{ link.link_type.name }}
+                                        {{ link.link_type.value }}
                                     {% else %}
                                         -
                                     {% endif %}
