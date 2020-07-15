@@ -54,13 +54,13 @@ def create_and_report_training_with_program_tree(
     )
 
     # 2. Postpone creation of root group
-    copy_group_service.copy_group(
-        command.CopyGroupCommand(
-            from_code=group_identity.code,
-            from_year=group_identity.year,
-            to_year=group_identity.year + 6
-        )
-    )
+    # copy_group_service.copy_group_to_next_year(
+    #     command.CopyGroupCommand(
+    #         from_code=group_identity.code,
+    #         from_year=group_identity.year,
+    #         to_year=group_identity.year + 6
+    #     )
+    # )
 
     # 3. Create Program tree
 

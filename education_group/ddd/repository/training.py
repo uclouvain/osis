@@ -39,6 +39,7 @@ from base.models.education_group_type import EducationGroupType as EducationGrou
 from base.models.education_group_year import EducationGroupYear as EducationGroupYearModelDb
 from base.models.education_group_year_domain import EducationGroupYearDomain as EducationGroupYearDomainModelDb
 from base.models.hops import Hops as HopsModelDb
+from education_group.ddd.domain.training import TrainingIdentityThroughYears
 from reference.models.language import Language as LanguageModelDb
 from reference.models.domain import Domain as DomainModelDb
 from reference.models.domain_isced import DomainIsced as DomainIscedModelDb
@@ -76,11 +77,13 @@ from osis_common.ddd import interface
 class TrainingRepository(interface.AbstractRepository):
     @classmethod
     def create(cls, training: 'Training') -> 'TrainingIdentity':
-        education_group_db_obj = EducationGroupModelDb(
-            start_year=AcademicYearModelDb.objects.get(year=training.start_year),
-            end_year=AcademicYearModelDb.objects.get(year=training.end_year) if training.end_year else None,
+        education_group_db_obj, created = EducationGroupModelDb.objects.update_or_create(
+            pk=training.identity_through_years.uuid if training.identity_through_years else None,
+            defaults={
+                'start_year':  AcademicYearModelDb.objects.get(year=training.start_year),
+                'end_year':  AcademicYearModelDb.objects.get(year=training.end_year) if training.end_year else None,
+            }
         )
-        education_group_db_obj.save()
 
         education_group_year_db_obj = EducationGroupYearModelDb(
             academic_year=AcademicYearModelDb.objects.get(year=training.entity_id.year),
@@ -288,6 +291,7 @@ class TrainingRepository(interface.AbstractRepository):
         return training.Training(
             entity_identity=entity_id,
             entity_id=entity_id,
+            identity_through_years=TrainingIdentityThroughYears(uuid=obj.education_group_id),
             type=TrainingType[obj.education_group_type.name],
             credits=obj.credits,
             schedule_type=ScheduleTypeEnum[obj.schedule_type],

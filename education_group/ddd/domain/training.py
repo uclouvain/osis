@@ -61,6 +61,11 @@ class TrainingIdentity(interface.EntityIdentity):
     year = attr.ib(type=int)
 
 
+@attr.s(frozen=True, slots=True)
+class TrainingIdentityThroughYears(interface.ValueObject):
+    uuid = attr.ib(type=int)
+
+
 class TrainingBuilder:
 
     def copy_to_next_year(self, training_from: 'Training', training_repository: 'TrainingRepository') -> 'Training':
@@ -192,6 +197,7 @@ class Training(interface.RootEntity):
     credits = attr.ib(type=Decimal)
     start_year = attr.ib(type=int)
     titles = attr.ib(type=Titles)
+    identity_through_years = attr.ib(type=TrainingIdentityThroughYears, default=None)
     schedule_type = attr.ib(type=ScheduleTypeEnum, default=ScheduleTypeEnum.DAILY)
     duration = attr.ib(type=int, default=1)
     duration_unit = attr.ib(type=DurationUnitsEnum, default=DurationUnitsEnum.QUADRIMESTER)

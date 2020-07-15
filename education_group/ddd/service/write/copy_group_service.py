@@ -32,13 +32,15 @@ from education_group.ddd.service.write.create_group_service import create_orphan
 
 
 @transaction.atomic()
-def copy_group(cmd: command.CopyGroupCommand) -> List['GroupIdentity']:
+def copy_group_to_next_year(cmd: command.CopyGroupCommand) -> List['GroupIdentity']:
     """
     Copy a group from a year (=excluded) to a specific year (=included)
     """
     group_ids = []
-    for to_year in range(cmd.from_year + 1, cmd.to_year):
-        cmd_get_group = command.GetGroupCommand(code=cmd.from_code, year=to_year - 1)
+
+    from_year = cmd.from_year
+    while from_year < cmd.to_year:
+        cmd_get_group = command.GetGroupCommand(code=cmd.from_code, year=from_year)
         grp = group_service_read.get_group(cmd_get_group)
 
         group_next_year = group.builder.build_next_year_group(from_group=grp)
@@ -64,4 +66,46 @@ def copy_group(cmd: command.CopyGroupCommand) -> List['GroupIdentity']:
         # TODO: Be carefull to keep same entity_id_through_years property
         group_next_year_id = create_orphan_group(cmd_create_group)
         group_ids.append(group_next_year_id)
+        from_year += 1
     return group_ids
+
+#
+# def copy_program_tree_to_next_year(copy_cmd: CopyProgramTreeToNextYearCommand) -> 'ProgramTreeIdentity':
+#     # GIVEN
+#     repository = ProgramTreeRepository()
+#     existing_program_tree_version = repository.get(
+#         entity_id=ProgramTreeIdentity(
+#             code=copy_cmd.code,
+#             year=copy_cmd.year,
+#         )
+#     )
+#
+#     # WHEN
+#     program_tree_next_year = ProgramTreeBuilder().copy_to_next_year(existing_program_tree_version, repository)
+#
+#     # THEN
+#     identity = repository.create(program_tree_next_year, create_group_service=create_orphan_group)
+#
+#     return identity
+#
+#
+#
+# def postpone_training(postpone_cmd: command.PostponeTrainingCommand) -> List['TrainingIdentity']:
+#     identities_created = []
+#
+#     from_year = postpone_cmd.postpone_from_year
+#     while from_year < postpone_cmd.postpone_until_year:
+#         # GIVEN
+#         cmd_copy_from = command.CopyTrainingToNextYearCommand(
+#             acronym=postpone_cmd.acronym,
+#             postpone_from_year=from_year
+#         )
+#
+#         # WHEN
+#         identity_next_year = copy_training_service.copy_training_to_next_year(cmd_copy_from)
+#
+#         # THEN
+#         identities_created.append(identity_next_year)
+#         from_year += 1
+#
+#     return identities_created

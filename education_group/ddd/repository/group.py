@@ -26,7 +26,7 @@
 from typing import Optional, List
 
 from django.db import IntegrityError
-from django.db.models import Prefetch, Subquery, OuterRef
+from django.db.models import Prefetch, Subquery, OuterRef, Q
 from django.utils import timezone
 
 from education_group.ddd import domain
@@ -81,8 +81,13 @@ class GroupRepository(interface.AbstractRepository):
         except CampusModelDb.DoesNotExist:
             raise TeachingCampusNotFound
 
-        group_upserted, _ = GroupModelDb.objects.update_or_create(
-            pk=getattr(group.unannualized_identity, 'uuid', None),
+        group_qs = GroupModelDb.objects.filter(
+            groupyear__partial_acronym=group.code
+        ).order_by('groupyear__academic_year__year')
+        group_pk = group_qs.only('pk').last().pk if group_qs else None
+
+        group_upserted, created = GroupModelDb.objects.update_or_create(
+            pk=group_pk,
             defaults={'start_year': academic_year, 'end_year': end_year}
         )
         try:

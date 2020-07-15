@@ -36,7 +36,7 @@ from osis_common.decorators.deprecated import deprecated
 from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.node import factory as node_factory, NodeIdentity, Node
-from program_management.ddd.domain import prerequisite
+from program_management.ddd.domain import prerequisite, exception
 from program_management.ddd.domain.service import generate_node_code_service, validation_rule, \
     generate_node_abbreviated_title
 from program_management.ddd.repositories import load_authorized_relationship
@@ -60,18 +60,43 @@ class ProgramTreeBuilder:
 
     def copy_to_next_year(self, copy_from: 'ProgramTree', repository: 'ProgramTreeRepository') -> 'ProgramTree':
         identity_next_year = attr.evolve(copy_from.entity_id, year=copy_from.entity_id.year + 1)
-        program_tree_next_year = repository.get(identity_next_year)
-        if program_tree_next_year:
+        try:
+            program_tree_next_year = repository.get(identity_next_year)
             # Case update program tree to next year
             # TODO :: To implement in OSIS-????
             pass
-        else:
+        except exception.ProgramTreeNotFoundException:
             # Case create program tree to next year
             program_tree_next_year = attr.evolve(  # Copy to new object
                 copy_from,
+                root_node=self._copy_node_and_children_to_next_year(copy_from.root_node),
                 entity_id=identity_next_year,
             )
         return program_tree_next_year
+
+    def _copy_node_and_children_to_next_year(self, copy_from_node: 'Node') -> 'Node':
+        next_year = copy_from_node.entity_id.year + 1
+        parent_next_year = attr.evolve(
+            copy_from_node,
+            entity_id=NodeIdentity(copy_from_node.entity_id.code, next_year),
+            year=next_year,
+            children=[],
+        )  # TODO :: to move into NodeBuilder
+        parent_next_year._has_changed = True
+        links_next_year = []
+        for copy_from_link in copy_from_node.children:
+            child_node = copy_from_link.child
+            child_next_year = self._copy_node_and_children_to_next_year(child_node)
+            child_next_year._has_changed = True
+            link_next_year = attr.evolve(
+                copy_from_link,
+                parent=parent_next_year,
+                child=child_next_year,
+            )  # TODO :: to move into LinkBuilder
+            parent_next_year.children.append(link_next_year)
+            link_next_year._has_changed = True
+            links_next_year.append(link_next_year)
+        return parent_next_year
 
     def build_from_orphan_group_as_root(
             self,
@@ -110,6 +135,7 @@ class ProgramTreeBuilder:
                     parent_abbreviated_title=root_node.title
                 ),
             )
+            child._has_changed = True
             root_node.add_child(child)
             children.append(child)
         return children
@@ -121,12 +147,6 @@ class ProgramTree(interface.RootEntity):
     root_node = attr.ib(type=Node)
     authorized_relationships = attr.ib(type=AuthorizedRelationshipList, factory=list)
     entity_id = attr.ib(type=ProgramTreeIdentity)  # FIXME :: pass entity_id as mandatory param !
-
-    # def __init__(self, root_node: 'Node', authorized_relationships: AuthorizedRelationshipList = None):
-    #     self.root_node = root_node
-    #     self.authorized_relationships = authorized_relationships
-    #     # FIXME :: pass entity_id into the __init__ param !
-    #     super(ProgramTree, self).__init__(entity_id=ProgramTreeIdentity(self.root_node.code, self.root_node.year))
 
     @entity_id.default
     def _entity_id(self) -> 'ProgramTreeIdentity':

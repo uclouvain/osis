@@ -23,35 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
-
-from django.db import transaction
-
-from program_management.ddd.business_types import *
-from program_management.ddd.command import PostponeProgramTreeCommand, CopyProgramTreeToNextYearCommand
-from program_management.ddd.service.write import copy_program_tree_service
 
 
-@transaction.atomic()
-def postpone_program_tree(
-        postpone_cmd: 'PostponeProgramTreeCommand'
-) -> List['ProgramTreeIdentity']:
-
-    identities_created = []
-
-    from_year = postpone_cmd.from_year
-    while from_year < postpone_cmd.postpone_until_year:
-        # GIVEN
-        cmd_copy_from = CopyProgramTreeToNextYearCommand(
-            code=postpone_cmd.from_code,
-            year=from_year,
-        )
-
-        # WHEN
-        identity_next_year = copy_program_tree_service.copy_program_tree_to_next_year(cmd_copy_from)
-
-        # THEN
-        identities_created.append(identity_next_year)
-        from_year += 1
-
-    return identities_created
+class ProgramTreeNotFoundException(Exception):
+    pass

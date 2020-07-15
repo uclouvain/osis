@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import copy
 from _decimal import Decimal
 from collections import OrderedDict
 from typing import List, Set, Dict
@@ -64,63 +65,67 @@ class NodeFactory:
             )
         return node_cls(**node_attrs)
 
+    def copy_from(self, node: 'Node') -> 'Node':  # TODO :: unit tests
+        copied_node = self.deepcopy_node_without_copy_children_recursively(node)
+        copied_node._has_changed = True
+        return copied_node
+
+    def deepcopy_node_without_copy_children_recursively(self, original_node: 'Node') -> 'Node':
+        original_children = original_node.children
+        original_node.children = []  # To avoid recursive deep copy of all children behind
+        copied_node = copy.deepcopy(original_node)
+        original_node.children = original_children
+        return copied_node
+
 
 factory = NodeFactory()
 
 
 @attr.s(frozen=True, slots=True)
 class NodeIdentity(interface.EntityIdentity):
+    # def __eq__(self, other):
+    #     return self.code == other.code and self.year == other.year
+    #
+    # def __hash__(self):
+    #     return hash(self.code + str(self.year))
+
     code = attr.ib(type=str)
     year = attr.ib(type=int)
 
 
+@attr.s(slots=True, hash=False)
 class Node(interface.Entity):
 
-    _academic_year = None
-
-    _deleted_children = None
-
-    code = None
-    year = None
     type = None
 
-    def __init__(
-            self,
-            node_id: int = None,
-            node_type: EducationGroupTypesEnum = None,
-            end_date: int = None,
-            children: List['Link'] = None,
-            code: str = None,
-            title: str = None,
-            year: int = None,
-            credits: Decimal = None
-    ):
-        self.node_id = node_id
-        self.children = children
-        self._children = children or []
-        self.node_type = node_type
-        self.end_date = end_date
-        self.code = code
-        self.title = title
-        self.year = year
-        self.credits = credits
-        self._deleted_children = set()
-        # FIXME :: pass entity_id into the __init__ param !
-        super(Node, self).__init__(entity_id=NodeIdentity(self.code, self.year))
+    node_id = attr.ib(type=int, default=None)
+    node_type = attr.ib(type=EducationGroupTypesEnum, default=None)
+    end_date = attr.ib(type=int, default=None)
+    children = attr.ib(type=List['Link'], factory=list)
+    code = attr.ib(type=str, default=None)
+    title = attr.ib(type=str, default=None)
+    year = attr.ib(type=int, default=None)
+    credits = attr.ib(type=Decimal, default=None)
 
-    def __eq__(self, other):
-        if self.__class__ == other.__class__:
-            return self.node_id == other.node_id
-        return False
+    entity_id = attr.ib(type=NodeIdentity)
 
-    def __hash__(self):
-        return hash(self.node_id)
+    _children = children
+    _deleted_children = attr.ib(type=List, factory=list)
+
+    _academic_year = None
+    _has_changed = False
+
+    # def __eq__(self, other):
+    #     if self.__class__ == other.__class__:
+    #         return self.node_id == other.node_id
+    #     return False
+
+    @entity_id.default
+    def _entity_id(self) -> NodeIdentity:
+        return NodeIdentity(self.code, self.year)
 
     def __str__(self):
         return '%(code)s (%(year)s)' % {'code': self.code, 'year': self.year}
-
-    def __repr__(self):
-        return str(self)
 
     @property
     def pk(self):
@@ -133,7 +138,7 @@ class Node(interface.Entity):
         return self._academic_year
 
     @property
-    def children(self):
+    def children(self) -> List['Link']:
         self._children.sort(key=lambda link_obj: link_obj.order or 0)
         return self._children
 
@@ -302,127 +307,86 @@ def _get_descendents(root_node: Node, current_path: 'Path' = None) -> Dict['Path
 
 
 # TODO: Remove this class because unused when migration is done
+@attr.s(slots=True, hash=False)
 class NodeEducationGroupYear(Node):
 
     type = NodeType.EDUCATION_GROUP
 
-    def __init__(
-            self,
-            constraint_type: ConstraintTypes = None,
-            min_constraint: int = None,
-            max_constraint: int = None,
-            remark_fr: str = None,
-            remark_en: str = None,
-            offer_title_fr: str = None,
-            offer_title_en: str = None,
-            offer_partial_title_fr: str = None,
-            offer_partial_title_en: str = None,
-            category: Categories = None,
-            **kwargs
-    ):
-        super().__init__(**kwargs)
-        self.constraint_type = constraint_type
-        self.min_constraint = min_constraint
-        self.max_constraint = max_constraint
-        self.remark_fr = remark_fr
-        self.remark_en = remark_en
-        self.offer_title_fr = offer_title_fr
-        self.offer_title_en = offer_title_en
-        self.offer_partial_title_fr = offer_partial_title_fr
-        self.offer_partial_title_en = offer_partial_title_en
-        self.category = category
+    constraint_type = attr.ib(type=ConstraintTypes, default=None)
+    min_constraint = attr.ib(type=int, default=None)
+    max_constraint = attr.ib(type=int, default=None)
+    remark_fr = attr.ib(type=str, default=None)
+    remark_en = attr.ib(type=str, default=None)
+    offer_title_fr = attr.ib(type=str, default=None)
+    offer_title_en = attr.ib(type=str, default=None)
+    offer_partial_title_fr = attr.ib(type=str, default=None)
+    offer_partial_title_en = attr.ib(type=str, default=None)
+    category = attr.ib(type=Categories, default=None)
 
 
+@attr.s(slots=True, hash=False)
 class NodeGroupYear(Node):
 
     type = NodeType.GROUP
 
-    def __init__(
-        self,
-        constraint_type: ConstraintTypes = None,
-        min_constraint: int = None,
-        max_constraint: int = None,
-        remark_fr: str = None,
-        remark_en: str = None,
-        start_year: int = None,
-        end_year: int = None,
-        offer_title_fr: str = None,
-        offer_title_en: str = None,
-        group_title_fr: str = None,
-        group_title_en: str = None,
-        offer_partial_title_fr: str = None,
-        offer_partial_title_en: str = None,
-        category: GroupType = None,
-        management_entity_acronym: str = None,
-        teaching_campus: Campus = None,
-        schedule_type: ScheduleTypeEnum = None,
-        offer_status: ActiveStatusEnum = None,
-        keywords: str = None,
-        **kwargs
-    ):
-        super().__init__(**kwargs)
-        self.constraint_type = constraint_type
-        self.min_constraint = min_constraint
-        self.max_constraint = max_constraint
-        self.remark_fr = remark_fr
-        self.remark_en = remark_en
-        self.start_year = start_year
-        self.end_date = end_year
-        self.offer_title_fr = offer_title_fr
-        self.offer_title_en = offer_title_en
-        self.group_title_fr = group_title_fr
-        self.group_title_en = group_title_en
-        self.offer_partial_title_fr = offer_partial_title_fr
-        self.offer_partial_title_en = offer_partial_title_en
-        self.offer_status = offer_status
-        self.schedule_type = schedule_type
-        self.keywords = keywords
-        self.category = category
-        self.management_entity_acronym = management_entity_acronym
-        self.teaching_campus = teaching_campus
+    constraint_type = attr.ib(type=ConstraintTypes, default=None)
+    min_constraint = attr.ib(type=int, default=None)
+    max_constraint = attr.ib(type=int, default=None)
+    remark_fr = attr.ib(type=str, default=None)
+    remark_en = attr.ib(type=str, default=None)
+    start_year = attr.ib(type=int, default=None)
+    end_year = attr.ib(type=int, default=None)
+    offer_title_fr = attr.ib(type=str, default=None)
+    offer_title_en = attr.ib(type=str, default=None)
+    group_title_fr = attr.ib(type=str, default=None)
+    group_title_en = attr.ib(type=str, default=None)
+    offer_partial_title_fr = attr.ib(type=str, default=None)
+    offer_partial_title_en = attr.ib(type=str, default=None)
+    category = attr.ib(type=GroupType, default=None)
+    management_entity_acronym = attr.ib(type=str, default=None)
+    teaching_campus = attr.ib(type=Campus, default=None)
+    schedule_type = attr.ib(type=ScheduleTypeEnum, default=None)
+    offer_status = attr.ib(type=ActiveStatusEnum, default=None)
+    keywords = attr.ib(type=str, default=None)
+
+    def __hash__(self):
+        return hash(self.entity_id)
 
 
+@attr.s(slots=True, hash=False)
 class NodeLearningUnitYear(Node):
 
     type = NodeType.LEARNING_UNIT
     node_type = NodeType.LEARNING_UNIT
 
-    def __init__(
-            self,
-            status: bool = None,
-            periodicity: PeriodicityEnum = None,
-            common_title_fr: str = None,
-            specific_title_fr: str = None,
-            common_title_en: str = None,
-            specific_title_en: str = None,
-            proposal_type: ProposalType = None,
-            learning_unit_type: LearningContainerYearType = None,
-            other_remark: str = None,
-            quadrimester: DerogationQuadrimester = None,
-            volume_total_lecturing: Decimal = None,
-            volume_total_practical: Decimal = None,
-            **common_node_kwargs
-    ):
-        self.is_prerequisite_of = common_node_kwargs.pop('is_prerequisite_of', []) or []
-        super().__init__(**common_node_kwargs)
-        self.status = status
-        self.periodicity = periodicity
-        self.prerequisite = NullPrerequisite()
-        self.common_title_fr = common_title_fr
-        self.specific_title_fr = specific_title_fr
-        self.common_title_en = common_title_en
-        self.specific_title_en = specific_title_en
-        self.proposal_type = proposal_type
-        self.learning_unit_type = learning_unit_type
-        self.other_remark = other_remark
-        self.quadrimester = quadrimester
-        self.volume_total_lecturing = volume_total_lecturing
-        self.volume_total_practical = volume_total_practical
-        self.node_type = NodeType.LEARNING_UNIT  # Used for authorized_relationship
-        self.full_title_fr = "{}{}".format(common_title_fr,
-                                           " - {}".format(specific_title_fr) if specific_title_fr else '')
-        self.full_title_en = "{}{}".format(common_title_en,
-                                           " - {}".format(specific_title_en) if specific_title_en else '')
+    is_prerequisite_of = attr.ib(type=List, factory=list)
+    status = attr.ib(type=bool, default=None)
+    periodicity = attr.ib(type=PeriodicityEnum, default=None)
+    prerequisite = attr.ib(type=Prerequisite, default=NullPrerequisite())
+    common_title_fr = attr.ib(type=str, default=None)
+    specific_title_fr = attr.ib(type=str, default=None)
+    common_title_en = attr.ib(type=str, default=None)
+    specific_title_en = attr.ib(type=str, default=None)
+    proposal_type = attr.ib(type=ProposalType, default=None)
+    learning_unit_type = attr.ib(type=LearningContainerYearType, default=None)
+    other_remark = attr.ib(type=str, default=None)
+    quadrimester = attr.ib(type=DerogationQuadrimester, default=None)
+    volume_total_lecturing = attr.ib(type=Decimal, default=None)
+    volume_total_practical = attr.ib(type=Decimal, default=None)
+
+    @property
+    def full_title_fr(self) -> str:
+        return "{}{}".format(
+            self.common_title_fr,
+            " - {}".format(self.specific_title_fr) if self.specific_title_fr else ''
+        )
+
+    @property
+    def full_title_en(self) -> str:
+        return "{}{}".format(
+            self.common_title_en,
+            " - {}".format(self.specific_title_en) if self.specific_title_en else ''
+        )
 
     @property
     def has_prerequisite(self) -> bool:

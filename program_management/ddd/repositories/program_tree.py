@@ -29,6 +29,7 @@ from education_group.ddd.command import CreateOrphanGroupCommand
 from osis_common.ddd import interface
 from osis_common.ddd.interface import Entity
 from program_management.ddd.business_types import *
+from program_management.ddd.domain import exception
 from program_management.ddd.repositories import persist_tree, load_tree, node
 from program_management.models.element import Element
 
@@ -56,7 +57,7 @@ class ProgramTreeRepository(interface.AbstractRepository):
             create_group_service: interface.ApplicationService  # FIXME :: add this param into osis-common.interface?
             # services: List[interface.ApplicationService] = None
     ) -> 'ProgramTreeIdentity':
-        for child_node in program_tree.root_node.children_as_nodes:
+        for child_node in [n for n in program_tree.get_all_nodes() if n._has_changed is True]:
             create_group_service(
                 CreateOrphanGroupCommand(
                     code=child_node.code,
@@ -88,8 +89,11 @@ class ProgramTreeRepository(interface.AbstractRepository):
 
     @classmethod
     def get(cls, entity_id: 'ProgramTreeIdentity') -> 'ProgramTree':
-        tree_root_id = Element.objects.get(
-            group_year__partial_acronym=entity_id.code,
-            group_year__academic_year__year=entity_id.year
-        ).pk
-        return load_tree.load(tree_root_id)
+        try:
+            tree_root_id = Element.objects.get(
+                group_year__partial_acronym=entity_id.code,
+                group_year__academic_year__year=entity_id.year
+            ).pk
+            return load_tree.load(tree_root_id)
+        except Element.DoesNotExist:
+            raise exception.ProgramTreeNotFoundException()
