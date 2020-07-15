@@ -27,7 +27,7 @@ import functools
 import json
 from collections import OrderedDict
 
-from django.http import Http404
+from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
@@ -143,11 +143,11 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
 
     @functools.lru_cache()
     def get_group_year(self):
-        try:
-            return GroupYear.objects.select_related('education_group_type', 'academic_year', 'management_entity')\
-                                .get(academic_year__year=self.kwargs['year'], partial_acronym=self.kwargs['code'])
-        except GroupYear.DoesNotExist:
-            raise Http404
+        return get_object_or_404(
+            GroupYear.objects.select_related('education_group_type', 'academic_year', 'management_entity'),
+            academic_year__year=self.kwargs['year'],
+            partial_acronym=self.kwargs['code']
+        )
 
     @functools.lru_cache()
     def get_group(self) -> 'Group':
@@ -207,7 +207,7 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
 
     def have_general_information_tab(self):
         return self.get_object().node_type.name in general_information_sections.SECTIONS_PER_OFFER_TYPE and \
-            self._is_general_info_and_condition_admission_in_display_range
+               self._is_general_info_and_condition_admission_in_display_range
 
     def _is_general_info_and_condition_admission_in_display_range(self):
         return MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION <= self.get_object().year < \

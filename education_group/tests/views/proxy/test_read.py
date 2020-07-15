@@ -42,7 +42,6 @@ class TestReadTabsRedirection(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-
         cls.person = PersonWithPermissionsFactory('view_educationgroup')
 
         cls.training_version = EducationGroupVersionFactory(
@@ -81,8 +80,12 @@ class TestReadTabsRedirection(TestCase):
         GroupElementYearFactory(parent_element=training_root_element, child_element=child_mini_training_element)
         GroupElementYearFactory(parent_element=training_root_element, child_element=child_group_element)
 
-        cls.url_training_achievements = reverse('mini_training_skills_achievements', kwargs={'year': ACADEMIC_YEAR_YEAR, 'code': 'LBIOL100P'})
-        cls.url_mini_training_content = reverse('mini_training_content', kwargs={'year': ACADEMIC_YEAR_YEAR, 'code': 'LBIOL100P'})
+        cls.url_training_achievements = reverse('mini_training_skills_achievements',
+                                                kwargs={'year': ACADEMIC_YEAR_YEAR, 'code': 'LBIOL100P'})
+        cls.url_training_general_info = reverse('mini_training_general_information',
+                                                kwargs={'year': ACADEMIC_YEAR_YEAR, 'code': 'LBIOL100P'})
+        cls.url_mini_training_content = reverse('mini_training_content',
+                                                kwargs={'year': ACADEMIC_YEAR_YEAR, 'code': 'LBIOL100P'})
 
     def setUp(self) -> None:
         self.client.force_login(self.person.user)
@@ -98,6 +101,15 @@ class TestReadTabsRedirection(TestCase):
 
     def test_keep_active_tab_achievements_not_available_for_group(self):
         header = {'HTTP_REFERER': self.url_training_achievements}
+
+        response = self.client.get('{}{}/{}/'.format(
+            START_OF_URL_WHEN_CLICKING_IN_TREE, ACADEMIC_YEAR_YEAR,
+            self.group_version.root_group.partial_acronym
+        ), follow=True, **header)
+        self.assertTrue(response.context['tab_urls'][Tab.IDENTIFICATION]['active'])
+
+    def test_keep_active_tab_general_information_not_available_for_group_other_than_common_core(self):
+        header = {'HTTP_REFERER': self.url_training_general_info}
 
         response = self.client.get('{}{}/{}/'.format(
             START_OF_URL_WHEN_CLICKING_IN_TREE, ACADEMIC_YEAR_YEAR,
