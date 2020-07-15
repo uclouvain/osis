@@ -326,3 +326,5 @@ class TestGroupRepositoryUpdateMethod(TestCase):
         self.assertEqual(group.content_constraint.type.name, self.group_year_db.constraint_type)
         self.assertEqual(group.content_constraint.minimum, self.group_year_db.min_constraint)
         self.assertEqual(group.content_constraint.maximum, self.group_year_db.max_constraint)
+        self.assertEqual(group.remark.text_fr, self.group_year_db.remark_fr)
+        self.assertEqual(group.remark.text_en, self.group_year_db.remark_en)
