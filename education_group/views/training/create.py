@@ -16,12 +16,14 @@ from education_group.ddd import command
 from education_group.ddd.domain.exception import GroupCodeAlreadyExistException, ContentConstraintTypeMissing, \
     ContentConstraintMinimumMaximumMissing, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum
 from education_group.ddd.domain.training import TrainingIdentity
-from education_group.ddd.service.write import create_training_service
+from program_management.ddd.service.write import create_training_with_program_tree
 from education_group.forms.training import CreateTrainingForm
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from education_group.views.proxy.read import Tab
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd.domain.program_tree import Path
+from program_management.ddd.service.write.create_training_with_program_tree import \
+    create_and_report_training_with_program_tree
 
 
 class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
@@ -127,13 +129,13 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             )
             try:
                 if self.get_attach_path():
-                    training_id = None
+                    training_ids = None
                     # create_and_attach_training_cmd = CreateAndAttachTrainingCommand(
                     #     **create_training_cmd
                     # )
                     # training_id = create_and_attach_training_service.create_and_attach_training(create_training_cmd)
                 else:
-                    training_id = create_training_service.create_orphan_training(create_training_cmd)
+                    training_ids = create_and_report_training_with_program_tree(create_training_cmd)
 
             except GroupCodeAlreadyExistException as e:
                 training_form.add_error('code', e.message)
@@ -147,8 +149,11 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             #     training_form._errors.append(str(e))
 
             if not training_form.errors:
-                display_success_messages(request, self.get_success_msg(training_id), extra_tags='safe')
-                return HttpResponseRedirect(self.get_success_url(training_id))
+                success_messages = [
+                    self.get_success_msg(training_id) for training_id in training_ids
+                ]
+                display_success_messages(request, success_messages, extra_tags='safe')
+                return HttpResponseRedirect(self.get_success_url(training_ids[0]))
 
         return render(request, self.template_name, {
             "training_form": training_form,
