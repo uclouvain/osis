@@ -139,6 +139,8 @@ class GroupRepository(interface.AbstractRepository):
         group_db_obj.max_constraint = group.content_constraint.maximum
         group_db_obj.management_entity_id = management_entity.entity_id
         group_db_obj.main_teaching_campus = teaching_campus
+        group_db_obj.remark_fr = group.remark.text_fr
+        group_db_obj.remark_en = group.remark.text_en
         group_db_obj.save()
         return group.entity_id
 
