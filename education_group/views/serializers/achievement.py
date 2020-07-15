@@ -29,12 +29,11 @@ from django.urls import reverse
 
 from base.business.education_groups import general_information_sections
 from base.models.education_group_achievement import EducationGroupAchievement
-from base.models.education_group_year import EducationGroupYear
-from base.models.enums.education_group_types import GroupType
+from cms.enums import entity_name
+from cms.models import translated_text
 from cms.models.text_label import TextLabel
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
-from education_group.models.group_year import GroupYear
 from program_management.ddd.domain.node import NodeGroupYear
 from education_group.views.proxy.read import Tab
 
@@ -120,11 +119,15 @@ def _get_url_name_detail_achievements(achievement):
 
 
 def get_skills_labels(node: NodeGroupYear, language_code: str):
-    reference_pk = __get_reference_pk(node)
-    subqstranslated_fr = TranslatedText.objects.filter(reference=reference_pk, text_label=OuterRef('pk'),
-                                                       language=settings.LANGUAGE_CODE_FR).values('text')[:1]
-    subqstranslated_en = TranslatedText.objects.filter(reference=reference_pk, text_label=OuterRef('pk'),
-                                                       language=settings.LANGUAGE_CODE_EN).values('text')[:1]
+    reference_pk = translated_text.get_groups_or_offers_cms_reference_object(node).pk
+    subqstranslated_fr = TranslatedText.objects.filter(
+        reference=reference_pk, text_label=OuterRef('pk'),
+        language=settings.LANGUAGE_CODE_FR, entity=entity_name.OFFER_YEAR
+    ).values('text')[:1]
+    subqstranslated_en = TranslatedText.objects.filter(
+        reference=reference_pk, text_label=OuterRef('pk'),
+        language=settings.LANGUAGE_CODE_EN, entity=entity_name.OFFER_YEAR
+    ).values('text')[:1]
     subqslabel = TranslatedTextLabel.objects.filter(
         text_label=OuterRef('pk'),
         language=language_code
@@ -136,7 +139,8 @@ def get_skills_labels(node: NodeGroupYear, language_code: str):
     ]
 
     qs = TextLabel.objects.filter(
-        label__in=label_ids
+        label__in=label_ids,
+        entity=entity_name.OFFER_YEAR
     ).annotate(
         label_id=F('label'),
         label_translated=Subquery(subqslabel, output_field=fields.CharField()),
@@ -152,10 +156,3 @@ def get_skills_labels(node: NodeGroupYear, language_code: str):
             # Default value if not found on database
             labels_translated.append({'label_id': label_id, 'label_translated': '', 'text_fr': '', 'text_en': ''})
     return labels_translated
-
-
-def __get_reference_pk(node: NodeGroupYear):
-    if node.category.name in GroupType.get_names():
-        return GroupYear.objects.get(element__pk=node.pk).pk
-    else:
-        return EducationGroupYear.objects.get(educationgroupversion__root_group__element__pk=node.pk).pk
