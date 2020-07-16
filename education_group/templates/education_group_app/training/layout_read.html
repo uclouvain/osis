@@ -29,11 +29,6 @@
     <title>OSIS - {{ node.title }} </title>
 {% endblock %}
 
-{% block breadcrumb %}
-    {{ block.super }}
-    <li class="active"> {{ node.code }} </li>
-{% endblock %}
-
 {% block header_content %}
     {% navigation_group request.user education_group_version.root_group request.resolver_match.url_name current_version %}
 {% endblock %}

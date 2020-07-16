@@ -87,6 +87,13 @@ class TestGroup(SimpleTestCase):
         )
         self.assertEqual(group.abbreviated_title, "TITLETOBEUPPER")
 
+    def test_assert_is_minor_major_option_list_choice(self):
+        group_types = [GroupType.MINOR_LIST_CHOICE, GroupType.OPTION_LIST_CHOICE, GroupType.MAJOR_LIST_CHOICE]
+        for group_type in group_types:
+            with self.subTest(group_type=group_type):
+                self.group.type = group_type
+                self.assertTrue(self.group.is_minor_major_option_list_choice())
+
 
 class TestGroupBuilder(SimpleTestCase):
     def setUp(self):
