@@ -184,6 +184,10 @@ class GroupYear(models.Model):
         super().save(*args, **kwargs)
 
     @property
+    def complete_title(self):
+        return self.title_fr
+
+    @property
     def is_minor_major_option_list_choice(self):
         return self.education_group_type.name in GroupType.minor_major_option_list_choice()
 
