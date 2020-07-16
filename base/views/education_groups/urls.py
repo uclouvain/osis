@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -70,30 +70,13 @@ urlpatterns = [
             url(r'^(?P<education_group_year_pk>[0-9]+)/', create.validate_field, name='validate_education_group_field'),
         ])
     ),
-    url(r'^(?P<offer_id>[0-9]+)/(?P<education_group_year_id>[0-9]+)/', include([
-        url(r'^update/$', update.update_education_group, name="update_education_group"),
+    url(r'^(?P<education_group_year_id>[0-9]+)/', include([
         url(r'^informations/edit/$', education_group.education_group_year_pedagogy_edit,
             name="education_group_pedagogy_edit"),
+    ])),
+    url(r'^(?P<offer_id>[0-9]+)/(?P<education_group_year_id>[0-9]+)/', include([
+        url(r'^update/$', update.update_education_group, name="update_education_group"),
         url(r'^skills_achievements/', include(urlpatterns_achievement)),
-
-        url(r'^admission_conditions/remove_line$',
-            education_group.education_group_year_admission_condition_remove_line,
-            name='education_group_year_admission_condition_remove_line'),
-
-        url(r'^admission_conditions/update_line$',
-            education_group.education_group_year_admission_condition_update_line,
-            name='education_group_year_admission_condition_update_line'),
-
-        url(r'^admission_conditions/update_text$',
-            education_group.education_group_year_admission_condition_update_text,
-            name='education_group_year_admission_condition_update_text'),
-
-        url(r'^admission_conditions/line/order$',
-            education_group.education_group_year_admission_condition_line_order,
-            name='education_group_year_admission_condition_line_order'),
-        url(r'^admission_conditions/lang/edit/(?P<language>[A-Za-z-]+)/$',
-            education_group.education_group_year_admission_condition_tab_lang_edit,
-            name='tab_lang_edit'),
         url(r'^delete/$', delete.DeleteGroupEducationView.as_view(), name="delete_education_group"),
 
         url(r'^publication_contact/', include([
@@ -110,5 +93,30 @@ urlpatterns = [
                 EducationGroupPublicationContactDeleteView.as_view(),
                 name="publication_contact_delete"),
         ])),
-    ]))
+    ])),
+    url(r'^(?P<year>[0-9]+)/(?P<code>[A-Za-z0-9]+)/', include([
+       url(
+           r'^admission_conditions/remove_line$',
+           education_group.education_group_year_admission_condition_remove_line,
+           name='education_group_year_admission_condition_remove_line'),
+
+       url(
+           r'^admission_conditions/update_line$',
+           education_group.education_group_year_admission_condition_update_line,
+           name='education_group_year_admission_condition_update_line'),
+
+       url(
+           r'^admission_conditions/update_text$',
+           education_group.education_group_year_admission_condition_update_text,
+           name='education_group_year_admission_condition_update_text'),
+
+       url(
+           r'^admission_conditions/line/order$',
+           education_group.education_group_year_admission_condition_line_order,
+           name='education_group_year_admission_condition_line_order'),
+       url(
+           r'^admission_conditions/lang/edit/(?P<language>[A-Za-z-]+)/$',
+           education_group.education_group_year_admission_condition_tab_lang_edit,
+           name='tab_lang_edit'),
+    ])),
 ] + education_group_urls.urlpatterns

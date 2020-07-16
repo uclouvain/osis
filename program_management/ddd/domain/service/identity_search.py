@@ -74,3 +74,8 @@ class NodeIdentitySearch(interface.DomainService):
             return NodeIdentity(code=group_year['partial_acronym'], year=group_year['academic_year__year'])
         except GroupYear.DoesNotExist:
             return None
+
+
+class ProgramTreeIdentitySearch(interface.DomainService):
+    def get_from_node_identity(self, node_identity: 'NodeIdentity') -> 'ProgramTreeIdentity':
+        return ProgramTreeIdentity(code=node_identity.code, year=node_identity.year)

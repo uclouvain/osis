@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
+
 from django.test import TestCase
 
 from base.models.enums.constraint_type import ConstraintTypeEnum
@@ -224,3 +226,105 @@ class TestGroupRepositoryCreateMethod(TestCase):
         GroupRepository.create(self.group)
         with self.assertRaises(GroupCodeAlreadyExistException):
             GroupRepository.create(self.group)
+
+
+class TestGroupRepositorySearchMethod(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.management_entity_version = EntityVersionFactory(acronym='DRT')
+        cls.group_year_db = GroupYearFactory(
+            management_entity_id=cls.management_entity_version.entity_id,
+            education_group_type=GroupEducationGroupTypeFactory()
+        )
+        cls.group_identity = GroupIdentity(
+            code=cls.group_year_db.partial_acronym,
+            year=cls.group_year_db.academic_year.year,
+        )
+
+        cls.group_year_db_2 = GroupYearFactory(
+            management_entity_id=cls.management_entity_version.entity_id,
+            education_group_type=GroupEducationGroupTypeFactory()
+        )
+        cls.group_identity_2 = GroupIdentity(
+            code=cls.group_year_db_2.partial_acronym,
+            year=cls.group_year_db_2.academic_year.year,
+        )
+
+    def test_assert_search_case_empty_list(self):
+        self.assertListEqual(
+            GroupRepository.search([]),
+            []
+        )
+
+    def test_assert_search_one_entity_id(self):
+        results = GroupRepository.search([self.group_identity])
+
+        self.assertIsInstance(results, List)
+        self.assertEqual(len(results), 1, msg="Should have one result because search only on one ID")
+        self.assertIsInstance(results[0], Group)
+        self.assertEqual(
+            results[0].entity_id,
+            self.group_identity
+        )
+
+    def test_assert_search_multiple_entity_id(self):
+        results = GroupRepository.search([self.group_identity, self.group_identity_2])
+
+        self.assertIsInstance(results, List)
+        self.assertEqual(len(results), 2, msg="Should have two results because search on multiple ID")
+        self.assertIsInstance(results[0], Group)
+
+
+class TestGroupRepositoryUpdateMethod(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.management_entity_version = EntityVersionFactory(acronym='DRT')
+        cls.education_group_type = GroupEducationGroupTypeFactory()
+
+    def setUp(self) -> None:
+        self.group_year_db = GroupYearFactory(
+            management_entity_id=self.management_entity_version.entity_id,
+            education_group_type=self.education_group_type
+        )
+        self.group_identity = GroupIdentity(
+            code=self.group_year_db.partial_acronym,
+            year=self.group_year_db.academic_year.year,
+        )
+
+    def test_case_group_not_exists(self):
+        dummy_group_identity = GroupIdentity(code="dummy-code", year=1966)
+        group = GroupFactory(
+            entity_identity=dummy_group_identity,
+            management_entity=EntityValueObject(acronym='DRT'),
+            teaching_campus=Campus(
+                name=self.group_year_db.main_teaching_campus.name,
+                university_name=self.group_year_db.main_teaching_campus.organization.name,
+            )
+        )
+        with self.assertRaises(exception.GroupNotFoundException):
+            GroupRepository.update(group)
+
+    def test_assert_update_modify_field(self):
+        new_entity = EntityVersionFactory(acronym='AGRO')
+
+        group = GroupFactory(
+            entity_identity=self.group_identity,
+            management_entity=EntityValueObject(acronym=new_entity.acronym),
+            teaching_campus=Campus(
+                name=self.group_year_db.main_teaching_campus.name,
+                university_name=self.group_year_db.main_teaching_campus.organization.name,
+            )
+        )
+        GroupRepository.update(group)
+
+        self.group_year_db.refresh_from_db()
+        self.assertEqual(group.abbreviated_title, self.group_year_db.acronym)
+        self.assertEqual(group.titles.title_fr, self.group_year_db.title_fr)
+        self.assertEqual(group.titles.title_en, self.group_year_db.title_en)
+        self.assertEqual(group.credits, self.group_year_db.credits)
+        self.assertEqual(group.management_entity.acronym, 'AGRO')
+        self.assertEqual(group.content_constraint.type.name, self.group_year_db.constraint_type)
+        self.assertEqual(group.content_constraint.minimum, self.group_year_db.min_constraint)
+        self.assertEqual(group.content_constraint.maximum, self.group_year_db.max_constraint)
+        self.assertEqual(group.remark.text_fr, self.group_year_db.remark_fr)
+        self.assertEqual(group.remark.text_en, self.group_year_db.remark_en)

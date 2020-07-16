@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-29 14:39+0200\n"
+"POT-Creation-Date: 2020-07-15 11:07+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -40,6 +40,9 @@ msgid "Academic year"
 msgstr ""
 
 msgid "Access"
+msgstr ""
+
+msgid "Access condition"
 msgstr ""
 
 msgid "Acronym/Short title"
@@ -146,6 +149,9 @@ msgid "Cred. rel./abs."
 msgstr ""
 
 msgid "Credits"
+msgstr ""
+
+msgid "Credits must be greater or equals than 0"
 msgstr ""
 
 msgid "Cut element"
@@ -268,6 +274,12 @@ msgid ""
 "created."
 msgstr ""
 
+#, python-format
+msgid ""
+"Group <a href='%(link)s'> %(code)s (%(academic_year)s) </a> successfully "
+"updated."
+msgstr ""
+
 msgid "Holders of a 2nd cycle University degree"
 msgstr ""
 
@@ -332,6 +344,9 @@ msgid "Mini training"
 msgstr ""
 
 msgid "Mini-Training"
+msgstr ""
+
+msgid "Modification"
 msgstr ""
 
 msgid "New Education Group"
@@ -459,6 +474,9 @@ msgid "Status"
 msgstr ""
 
 msgid "The field can contain only one value."
+msgstr ""
+
+msgid "The following links has been updated"
 msgstr ""
 
 #, python-brace-format

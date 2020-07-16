@@ -29,6 +29,7 @@ from base.models.entity import Entity
 from base.models.person import Person
 from education_group.auth.scope import Scope
 from osis_role import role
+from osis_role.contrib.models import EntityRoleModel
 
 
 class EntityRoleHelper():
@@ -37,7 +38,9 @@ class EntityRoleHelper():
     """
     @staticmethod
     def get_all_entities(person: Person, group_names: List[str]) -> List[Entity]:
-        role_mdls = [r for r in role.role_manager.roles if r.group_name in group_names]
+        role_mdls = [
+            r for r in role.role_manager.roles if issubclass(r, EntityRoleModel) and r.group_name in group_names
+        ]
         qs = None
 
         for role_mdl in role_mdls:

@@ -193,6 +193,13 @@ class MiniTrainingType(EducationGroupTypesEnum):
     def with_skills_achievements(cls):
         return cls.with_admission_condition()
 
+    @classmethod
+    def mini_training_types_enum(cls) -> List[EducationGroupTypesEnum]:
+        return [
+            cls.DEEPENING, cls.SOCIETY_MINOR, cls.ACCESS_MINOR,
+            cls.OPEN_MINOR, cls.DISCIPLINARY_COMPLEMENT_MINOR, cls.FSA_SPECIALITY, cls.OPTION, cls.MOBILITY_PARTNERSHIP
+        ]
+
 
 class GroupType(EducationGroupTypesEnum):
     COMMON_CORE = _("Common core")
