@@ -141,7 +141,7 @@ class EducationGroupAchievementCMS(PermissionRequiredMixin, SuccessMessageMixin,
         return reverse(
             'education_group_read_proxy',
             args=[training_identity.year, training_identity.acronym]
-        ) + '?path={}&tab={}#achievement_'.format(self.request.POST['path'], Tab.SKILLS_ACHIEVEMENTS)
+        ) + '?path={}&tab={}#achievement_'.format(self.request.GET['path'], Tab.SKILLS_ACHIEVEMENTS)
 
     def get_initial(self):
         initial = super().get_initial()
@@ -174,7 +174,10 @@ class EducationGroupAchievementProgramAim(EducationGroupAchievementCMS):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["translated_label"] = _('the program aims')
-        context["path"] = self.request.GET['path']
+        context["url_action"] = reverse(
+            'education_group_achievement_program_aim',
+            args=[self.kwargs["offer_id"], self.kwargs["offer_id"]]
+        ) + '?path={}&tab={}#achievement_'.format(self.request.GET['path'], Tab.SKILLS_ACHIEVEMENTS)
         return context
 
     # SuccessMessageMixin
@@ -194,7 +197,10 @@ class EducationGroupAchievementAdditionalInformation(EducationGroupAchievementCM
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["translated_label"] = _('additional informations')
-        context["path"] = self.request.GET['path']
+        context["url_action"] = reverse(
+            'education_group_achievement_additional_information',
+            args=[self.kwargs["offer_id"], self.kwargs["offer_id"]]
+        ) + '?path={}&tab={}#achievement_'.format(self.request.GET['path'], Tab.SKILLS_ACHIEVEMENTS)
         return context
 
     # SuccessMessageMixin
