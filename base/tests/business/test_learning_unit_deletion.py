@@ -108,7 +108,7 @@ class LearningUnitYearDeletion(TestCase):
         msg = deletion._check_related_partims_deletion(self.l_container_year)
         msg = list(msg.values())
 
-        self.assertEqual(len(msg), 5)
+        self.assertEqual(len(msg), 3)
         self.assertIn(
             _("There is %(count)d enrollments in %(subtype)s %(acronym)s for the year %(year)s") % {
                 'subtype': self.the_partim,
