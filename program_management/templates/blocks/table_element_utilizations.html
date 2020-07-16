@@ -34,15 +34,12 @@
         <td>{{ row.link.is_mandatory | yesno:_("yes,no") | title }}</td>
         <td>{{ row.link.block | default_if_none:'-' }}</td>
         <td>
-            {% for tree_version in row.tree_versions %}
-                {% with tree_version.get_tree.root_node as root_node %}
-                    {# TODO: Compute URL #}
-                    {% url 'element_identification' root_node.year root_node.code as url_root_identification %}
-                    <a href="{{ url_root_identification }}">
-                        {{ root_node.title }}{% if tree_version.version_name %}[{{ tree_version.version_name }}
-                            ]{% endif %}</a>
-                    {% if not forloop.last %} - {% endif %}
-                {% endwith %}
+            {% for root_node in row.root_nodes %}
+                {# TODO: Compute URL #}
+                {% url 'element_identification' root_node.year root_node.code as url_root_identification %}
+                <a href="{{ url_root_identification }}">
+                    {{ root_node.title }}{{ row.root_version_label }}</a>
+                {% if not forloop.last %} - {% endif %}
             {% empty %}
                 -
             {% endfor %}
