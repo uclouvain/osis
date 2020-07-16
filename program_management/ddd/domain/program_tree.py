@@ -349,6 +349,9 @@ class ProgramTree(interface.RootEntity):
             [str(grp.block) for grp in self.get_links_using_node(node) if grp.block]
         )
 
+    def is_empty(self):
+        return all([node.is_empty() for node in self.root_node.children])
+
     def update_link(
             self,
             parent_path: Path,

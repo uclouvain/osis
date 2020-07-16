@@ -99,3 +99,9 @@ class UpdateGroupCommand(interface.CommandRequest):
     organization_name = attr.ib(type=str)
     remark_fr = attr.ib(type=str)
     remark_en = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class DeleteOrphanGroupCommand(interface.CommandRequest):
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)

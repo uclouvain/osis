@@ -24,7 +24,6 @@
 #
 ##############################################################################
 from education_group.ddd.validators._credits import CreditsValidator
-from program_management.ddd.business_types import *
 
 from base.ddd.utils import business_validator
 from education_group.ddd.validators._content_constraint import ContentConstraintValidator
@@ -53,4 +52,14 @@ class UpdateGroupValidatorList(business_validator.BusinessListValidator):
             ContentConstraintValidator(group.content_constraint),
             CreditsValidator(group.credits),
         ]
+        super().__init__()
+
+
+class DeleteOrphanGroupValidatorList(business_validator.BusinessListValidator):
+
+    def __init__(
+            self,
+            group: 'Group',
+    ):
+        self.validators = []
         super().__init__()
