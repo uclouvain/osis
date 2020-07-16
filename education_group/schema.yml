@@ -260,7 +260,7 @@ paths:
   /trainings/{year}/{acronym}/versions/{version_name}/title:
     get:
       description: Return the title of the training
-      operationId: trainingstitle_read
+      operationId: trainingsversiontitle_read
       parameters:
         - in: path
           name: year
@@ -713,7 +713,7 @@ paths:
   /mini_trainings/{year}/{official_partial_acronym}/versions:
     get:
       description: Return the versions list of the mini training
-      operationId: versions_list
+      operationId: minitrainings_versions_list
       parameters:
         - in: path
           name: year
@@ -787,7 +787,7 @@ paths:
   /mini_trainings/{year}/{official_partial_acronym}/versions/{version_name}/tree:
     get:
       description: Return the tree of the version
-      operationId: versions_tree
+      operationId: minitraining_version_tree
       parameters:
         - in: path
           name: year
@@ -825,7 +825,7 @@ paths:
   /mini_trainings/{year}/{official_partial_acronym}/versions/{version_name}/title:
     get:
       description: Return the title of the mini training
-      operationId: minitrainingstitle_read
+      operationId: minitrainings_title_version_read
       parameters:
         - in: path
           name: year
