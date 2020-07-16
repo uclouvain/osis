@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from django.db.models import Q
 from django.utils import timezone
 
 from django.core.management.base import BaseCommand
@@ -51,6 +52,13 @@ class Command(BaseCommand):
             administration_entity_id=new_entity
         )
 
+        # Update for changed
+        qs = EducationGroupYear.objects.filter(
+            Q(management_entity_id=new_entity) | Q(administration_entity_id=new_entity)
+        )
+        for elem in qs:
+            elem.save()
+
     def modify_learning_unit(self, entities_to_change, new_entity):
         LearningContainerYear.objects.filter(
             academic_year__year__gte=2020,
@@ -76,6 +84,14 @@ class Command(BaseCommand):
         ).update(
             additional_entity_2_id=new_entity
         )
+
+        # Update for changed
+        qs = LearningContainerYear.objects.filter(
+            Q(requirement_entity_id=new_entity) | Q(allocation_entity_id=new_entity) |
+            Q(additional_entity_1_id=new_entity) | Q(additional_entity_2_id=new_entity)
+        )
+        for elem in qs:
+            elem.save()
 
     def add_person_entity(self, entities_to_change, new_entity):
         lines_to_add = PersonEntity.objects.filter(entity_id__in=entities_to_change)
