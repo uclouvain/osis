@@ -233,7 +233,7 @@ class TestEditEducationGroupAchievementProgramAim(TestEducationGroupAchievementC
                 self.education_group_year.pk,
                 self.education_group_year.pk,
             ]
-        )
+        ) + '?path={}&tab={}#achievement_'.format(self.education_group_year.pk, Tab.SKILLS_ACHIEVEMENTS)
         self.text_label = OfferTextLabelFactory(label=CMS_LABEL_PROGRAM_AIM)
         self.program_aim_french = OfferTranslatedTextFactory(
             text_label=self.text_label,
@@ -247,7 +247,6 @@ class TestEditEducationGroupAchievementProgramAim(TestEducationGroupAchievementC
         data = {
             "text_french": 'dummy text in french',
             "text_english": 'dummy text in english',
-            "path": self.education_group_year.pk
         }
 
         response = self.client.post(self.url, data=data)
@@ -274,7 +273,7 @@ class TestEditEducationGroupAchievementProgramAim(TestEducationGroupAchievementC
         self.client.logout()
         response = self.client.post(self.url, data={'french_text': 'Evil hacker'})
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, "/login/?next={}".format(self.url))
+        self.assertTrue("/login/?next=" in response.url)
 
 
 class TestEditEducationGroupAchievementAdditionalInformation(TestEducationGroupAchievementCMSSetup):
@@ -287,7 +286,7 @@ class TestEditEducationGroupAchievementAdditionalInformation(TestEducationGroupA
                 self.education_group_year.pk,
                 self.education_group_year.pk,
             ]
-        )
+        ) + '?path={}&tab={}#achievement_'.format(self.education_group_year.pk, Tab.SKILLS_ACHIEVEMENTS)
 
         self.text_label = OfferTextLabelFactory(label=CMS_LABEL_ADDITIONAL_INFORMATION)
         self.program_aim_french = OfferTranslatedTextFactory(
@@ -302,7 +301,6 @@ class TestEditEducationGroupAchievementAdditionalInformation(TestEducationGroupA
         data = {
             "text_french": 'dummy text in french',
             "text_english": 'dummy text in english',
-            "path": self.education_group_year.pk
         }
 
         response = self.client.post(self.url, data=data)
@@ -329,4 +327,4 @@ class TestEditEducationGroupAchievementAdditionalInformation(TestEducationGroupA
         self.client.logout()
         response = self.client.post(self.url, data={'french_text': 'Evil hacker'})
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, "/login/?next={}".format(self.url))
+        self.assertTrue("/login/?next=" in response.url)
