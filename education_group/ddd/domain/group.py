@@ -26,13 +26,14 @@
 import copy
 
 from base.models.enums.constraint_type import ConstraintTypeEnum
-from base.models.enums.education_group_types import EducationGroupTypesEnum
+from base.models.enums.education_group_types import EducationGroupTypesEnum, GroupType
 from education_group.ddd import command
 from education_group.ddd.domain._campus import Campus
 from education_group.ddd.domain._content_constraint import ContentConstraint
 from education_group.ddd.domain._entity import Entity
 from education_group.ddd.domain._remark import Remark
 from education_group.ddd.domain._titles import Titles
+from education_group.ddd.validators.validators_by_business_action import UpdateGroupValidatorList
 from education_group.ddd.domain.service import enum_converter
 from osis_common.ddd import interface
 
@@ -142,3 +143,26 @@ class Group(interface.RootEntity):
     @property
     def year(self) -> int:
         return self.entity_id.year
+
+    def is_minor_major_option_list_choice(self):
+        return self.type.name in GroupType.minor_major_option_list_choice()
+
+    def update(
+            self,
+            abbreviated_title: str,
+            titles: Titles,
+            credits: int,
+            content_constraint: ContentConstraint,
+            management_entity: Entity,
+            teaching_campus: Campus,
+            remark: Remark
+    ):
+        self.abbreviated_title = abbreviated_title.upper()
+        self.titles = titles
+        self.credits = credits
+        self.content_constraint = content_constraint
+        self.management_entity = management_entity
+        self.teaching_campus = teaching_campus
+        self.remark = remark
+        UpdateGroupValidatorList(self).validate()
+        return self

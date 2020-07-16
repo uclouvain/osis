@@ -230,6 +230,38 @@ class SearchAllVersionsFromRootNodesCommand(interface.CommandRequest):
         self.year = year
 
 
+class GetProgramTree(interface.CommandRequest):
+    def __init__(self, code: str, year: int):
+        self.code = code
+        self.year = year
+
+    def __repr__(self) -> str:
+        parameters = ", ".join([str(self.code), str(self.year)])
+        return "GetProgramTree({parameters})".format(parameters=parameters)
+
+
+@attr.s(frozen=True, slots=True)
+class UpdateLinkCommand(interface.CommandRequest):
+    child_node_code = attr.ib(type=str)
+    child_node_year = attr.ib(type=int)
+
+    access_condition = attr.ib(type=bool)
+    is_mandatory = attr.ib(type=bool)
+    block = attr.ib(type=str)
+    link_type = attr.ib(type=str)
+    comment = attr.ib(type=str)
+    comment_english = attr.ib(type=str)
+    relative_credits = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class BulkUpdateLinkCommand(interface.CommandRequest):
+    parent_node_code = attr.ib(type=str)
+    parent_node_year = attr.ib(type=int)
+
+    update_link_cmds = attr.ib(factory=list, type=UpdateLinkCommand)
+
+
 @attr.s(frozen=True, slots=True)
 class CreateStandardVersionCommand(interface.CommandRequest):
     offer_acronym = attr.ib(type=str)
