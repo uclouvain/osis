@@ -255,7 +255,7 @@ def _add_training_data(learning_unit_yr: LearningUnitYear) -> str:
     return ("\n".join([
         _concatenate_training_data(learning_unit_yr, group_element_year)
         for group_element_year in learning_unit_yr.element.children_elements.all()
-    ])).strip()
+    ])).strip() if hasattr(learning_unit_yr, "element") else ''
 
 
 def _concatenate_training_data(learning_unit_year: LearningUnitYear, group_element_year: GroupElementYear) -> str:
