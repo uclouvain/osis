@@ -264,6 +264,17 @@ class TestEditEducationGroupAchievementProgramAim(TestEducationGroupAchievementC
             text=data['text_english']
         ).exists())
 
+    def test_update_achievement_program_aim_context(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context_data["translated_label"], _('the program aims'))
+        self.assertEqual(
+            response.context_data["url_action"],
+            reverse(
+                'education_group_achievement_program_aim',
+                args=[self.education_group_year.id, self.education_group_year.id]
+            ) + '?path={}&tab={}#achievement_'.format(self.education_group_year.id, Tab.SKILLS_ACHIEVEMENTS))
+
     def test_update_without_permission(self):
         self.client.force_login(user=UserFactory())
         response = self.client.post(self.url, data={'french_text': 'Evil hacker'})
@@ -296,7 +307,7 @@ class TestEditEducationGroupAchievementAdditionalInformation(TestEducationGroupA
             text="dummy text"
         )
 
-    def test_update_achievement_program_aim(self):
+    def test_update_additional_information(self):
         """This test ensure that the french version is updated and the english version is created"""
         data = {
             "text_french": 'dummy text in french',
@@ -317,6 +328,17 @@ class TestEditEducationGroupAchievementAdditionalInformation(TestEducationGroupA
             entity=entity_name.OFFER_YEAR,
             text=data['text_english']
         ).exists())
+
+    def test_update_achievement_additional_information_context(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context_data["translated_label"], _('additional informations'))
+        self.assertEqual(
+            response.context_data["url_action"],
+            reverse(
+                'education_group_achievement_additional_information',
+                args=[self.education_group_year.id, self.education_group_year.id]
+            ) + '?path={}&tab={}#achievement_'.format(self.education_group_year.id, Tab.SKILLS_ACHIEVEMENTS))
 
     def test_update_without_permission(self):
         self.client.force_login(user=UserFactory())
