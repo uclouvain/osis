@@ -92,7 +92,7 @@ class GroupForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     def __init_management_entity_field(self):
         self.fields['management_entity'] = fields.ManagementEntitiesChoiceField(
             person=self.user.person,
-            initial=None,
+            initial=self.initial['management_entity'].pk if self.initial.get('management_entity') else None,
             disabled=self.fields['management_entity'].disabled,
         )
 
@@ -128,3 +128,12 @@ class GroupAttachForm(GroupForm):
         super().__init__(*args, **kwargs)
         self.fields['academic_year'].disabled = True
         self.fields['academic_year'].required = False
+
+
+class GroupUpdateForm(GroupForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['academic_year'].disabled = True
+        self.fields['academic_year'].required = False
+        self.fields['code'].disabled = True
+        self.fields['code'].required = False

@@ -17,7 +17,7 @@ from education_group.ddd import command
 from education_group.ddd.domain.exception import GroupCodeAlreadyExistException, ContentConstraintTypeMissing, \
     ContentConstraintMinimumMaximumMissing, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum
 from education_group.ddd.domain.group import GroupIdentity, Group
-from education_group.ddd.service.read import group_service
+from education_group.ddd.service.read import get_group_service
 from education_group.ddd.service.write import create_group_service
 from education_group.forms.group import GroupForm, GroupAttachForm
 from education_group.models.group_year import GroupYear
@@ -168,7 +168,7 @@ class GroupCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 int(self.get_attach_path().split('|')[-1])
             )
             parent_id = node_identity_service.get_node_identity_from_element_id(cmd_get_node_id)
-            return group_service.get_group(
+            return get_group_service.get_group(
                 command.GetGroupCommand(code=parent_id.code, year=parent_id.year)
             )
         return None

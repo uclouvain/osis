@@ -39,7 +39,10 @@ def get_allowed_child_types(cmd: command.GetAllowedChildTypeCommand) -> Set[Educ
     elif cmd.category == Categories.MINI_TRAINING.name:
         allowed_child_types = MiniTrainingType
     else:
-        allowed_child_types = GroupType
+        allowed_child_types = {
+            group_type for group_type in GroupType
+            if group_type not in [GroupType.MAJOR_LIST_CHOICE, GroupType.MOBILITY_PARTNERSHIP_LIST_CHOICE]
+        }
 
     if cmd.path_to_paste:
         node_to_paste_into_id = NodeIdentitySearch.get_from_element_id(

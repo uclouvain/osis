@@ -23,6 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from osis_common.ddd.interface import BusinessException
+from django.utils.translation import gettext_lazy as _
+
+
+class RelativeCreditShouldBeGreaterOrEqualsThanZero(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _("Relative credits must be greater or equals than 0")
+        super().__init__(message, **kwargs)
 
 
 class ProgramTreeNotFoundException(Exception):
