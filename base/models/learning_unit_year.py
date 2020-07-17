@@ -334,7 +334,7 @@ class LearningUnitYear(SerializableModel):
 
     # TODO: Change to pass by DDD services
     def find_list_group_element_year(self):
-        return self.child_leaf.filter(child_element__learning_unit_year=self).select_related('parent')
+        return self.child_leaf.filter(child_element__learning_unit_year=self).select_related('parent_element')
 
     def get_learning_unit_previous_year(self):
         try:
