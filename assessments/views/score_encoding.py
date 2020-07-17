@@ -178,6 +178,8 @@ def scores_encoding(request):
             number_session=number_session,
             academic_year=academic_yr
         )
+        print('**')
+        print(score_encoding_progress_list)
         all_offers = score_encoding_progress.find_related_offer_years(score_encoding_progress_list)
 
         context.update({'tutor': tutor,
