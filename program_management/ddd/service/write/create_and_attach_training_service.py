@@ -23,37 +23,36 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
 
 from django.db import transaction
 
-from education_group.ddd import command
 from education_group.ddd.business_types import *
-from education_group.ddd.domain.training import TrainingBuilder
-from education_group.ddd.repository.training import TrainingRepository
+from program_management.ddd import command as pgm_command
+from program_management.ddd.service.write import paste_element_service, create_training_with_program_tree
 
 
 @transaction.atomic()
-def create_and_attach_training(create_training_cmd: command.CreateAndAttachTrainingCommand) -> 'TrainingIdentity':
-    pass
+def create_and_attach_training(
+        create_and_attach_cmd: pgm_command.CreateAndAttachTrainingCommand
+) -> List['TrainingIdentity']:
+
+    # GIVEN
+    # Nothing (later, should contains permissions or access rights)
+
+    # WHEN
+    training_ids = create_training_with_program_tree.create_and_report_training_with_program_tree(create_and_attach_cmd)
+
+    # THEN
+    paste_element_service.paste_element(__convert_to_paste_element_cmd(create_and_attach_cmd))
+    return training_ids
 
 
-def __get_create_group_command(training_cmd: command.CreateTrainingCommand) -> command.CreateGroupCommand:
-    return command.CreateGroupCommand(
-        code=training_cmd.code,
-        year=training_cmd.year,
-        type=training_cmd.type,
-        abbreviated_title=training_cmd.abbreviated_title,
-        title_fr=training_cmd.title_fr,
-        title_en=training_cmd.title_en,
-        credits=training_cmd.credits,
-        constraint_type=training_cmd.constraint_type,
-        min_constraint=training_cmd.min_constraint,
-        max_constraint=training_cmd.max_constraint,
-        management_entity_acronym=training_cmd.management_entity_acronym,
-        teaching_campus_name=training_cmd.teaching_campus_name,
-        organization_name=training_cmd.teaching_campus_organization_name,
-        remark_fr=training_cmd.remark_fr,
-        remark_en=training_cmd.remark_en,
-        start_year=training_cmd.year,
-        end_year=training_cmd.end_year,
+def __convert_to_paste_element_cmd(
+        create_and_attach_training: pgm_command.CreateAndAttachTrainingCommand
+) -> pgm_command.PasteElementCommand:
+    return pgm_command.PasteElementCommand(
+        node_to_paste_code=create_and_attach_training.code,
+        node_to_paste_year=create_and_attach_training.year,
+        path_where_to_paste=create_and_attach_training.path_to_paste,
     )

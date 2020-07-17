@@ -389,9 +389,11 @@ def _save_education_group_year(
         ) if training.teaching_campus else None,
         other_campus_activities=training.other_campus_activities.name if training.other_campus_activities else None,
         funding=training.funding.can_be_funded,
-        funding_direction=training.funding.funding_orientation if training.funding else None,
+        funding_direction=training.funding.funding_orientation.name
+        if training.funding and training.funding.funding_orientation else '',
         funding_cud=training.funding.can_be_international_funded,
-        funding_direction_cud=training.funding.international_funding_orientation if training.funding else None,
+        funding_direction_cud=training.funding.international_funding_orientation.name
+        if training.funding and training.funding.international_funding_orientation else '',
         co_graduation=training.co_graduation.code_inter_cfb,
         co_graduation_coefficient=training.co_graduation.coefficient,
         academic_type=training.academic_type.name if training.academic_type else None,

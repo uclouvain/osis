@@ -28,6 +28,7 @@ from typing import Optional, Set
 import attr
 
 from base.models.enums.link_type import LinkTypes
+from education_group.ddd import command as education_group_command
 from osis_common.ddd import interface
 from program_management.ddd.business_types import *
 
@@ -297,3 +298,8 @@ class CopyTreeVersionToNextYearCommand(interface.CommandRequest):
     from_offer_acronym = attr.ib(type=str)
     from_version_name = attr.ib(type=str)
     from_is_transition = attr.ib(type=bool)
+
+
+@attr.s(frozen=True, slots=True)
+class CreateAndAttachTrainingCommand(education_group_command.CreateTrainingCommand):
+    path_to_paste = attr.ib(type=str)
