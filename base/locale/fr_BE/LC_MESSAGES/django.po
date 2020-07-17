@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-24 10:28+0200\n"
+"POT-Creation-Date: 2020-07-13 08:27+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -413,9 +413,6 @@ msgstr "Êtes-vous sûr·e de vouloir supprimer le support de cours?"
 msgid "Are you sure?"
 msgstr "Êtes-vous sûr·e?"
 
-msgid "Arrangement Jury"
-msgstr "Aménagement Jury"
-
 msgid "Arrangement additional time"
 msgstr "Aménagement Tiers-Temps"
 
@@ -734,6 +731,9 @@ msgstr "Couper"
 msgid "Cut element"
 msgstr "Élément coupé"
 
+msgid "DDI"
+msgstr "HTM"
+
 msgid "Daily"
 msgstr "Horaire de jour"
 
@@ -814,9 +814,6 @@ msgstr "Diplômes /  Certificats"
 
 msgid "Direct Access"
 msgstr "Accès direct"
-
-msgid "Disability"
-msgstr "HTM"
 
 msgid "Disabled"
 msgstr "Désactivé"
@@ -919,6 +916,9 @@ msgstr ""
 
 msgid "Education_groups"
 msgstr "Formations"
+
+msgid "Educational facilities accepted by Jury"
+msgstr "Aménagement Jury"
 
 msgid "Educational information ending"
 msgstr "Fermeture informations pédagoqiques"
@@ -1946,9 +1946,6 @@ msgstr "Autre contact"
 msgid "Other contacts"
 msgstr "Autres contacts"
 
-msgid "Other disability"
-msgstr "Autre HTM"
-
 msgid "Other individual"
 msgstr "Autre individuel"
 
@@ -1957,6 +1954,9 @@ msgstr "Activités dans d'autres langues"
 
 msgid "Other remark (intended for publication)"
 msgstr "Autre remarque (destinée à la publication)"
+
+msgid "Other special needs"
+msgstr "Autre HTM"
 
 msgid "Others Bachelors of the French speaking Community of Belgium"
 msgstr "Autres bacheliers de la Communauté française de Belgique"
@@ -3360,6 +3360,12 @@ msgstr ""
 
 msgid "You cannot have a specific summary course submission event."
 msgstr ""
+
+msgid ""
+"You cannot put in proposal for ending date on the first year of the learning "
+"unit."
+msgstr ""
+"Vous ne pouvez pas créer une proposition de fin d'enseignement sur la première année d'organisation de l'UE."
 
 msgid "You don't have the rights to consolidate"
 msgstr "Vous n'avez pas le droit de consolider"

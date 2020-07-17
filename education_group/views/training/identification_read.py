@@ -41,7 +41,7 @@ from program_management.models.education_group_version import EducationGroupVers
 
 class TrainingReadIdentification(TrainingRead):
     template_name = "education_group_app/training/identification_read.html"
-    active_tab = Tab.IDENTIFICATION
+    active_tab = None
 
     def get_context_data(self, **kwargs):
         return {

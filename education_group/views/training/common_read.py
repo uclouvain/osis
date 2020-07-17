@@ -39,6 +39,7 @@ from base.business.education_groups import general_information_sections
 from base.business.education_groups.general_information_sections import \
     MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION
 from base.models import academic_year
+from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import TrainingType
 from base.views.common import display_warning_messages
 from education_group.ddd.business_types import *
@@ -56,7 +57,7 @@ from program_management.ddd.repositories.program_tree_version import ProgramTree
 from program_management.forms.custom_xls import CustomXlsForm
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.models.element import Element
-from program_management.serializers.program_tree_view import program_tree_view_serializer
+from program_management.serializers.program_tree_version_view import program_tree_version_view_serializer
 
 Tab = read.Tab  # FIXME :: fix imports (and remove this line)
 
@@ -124,6 +125,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             return root_node
 
     def get_context_data(self, **kwargs):
+        is_root_node = self.node_identity == self.get_tree().root_node.entity_id
         return {
             **super().get_context_data(**kwargs),
             "person": self.request.user.person,
@@ -131,20 +133,23 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             "tab_urls": self.get_tab_urls(),
             "node": self.get_object(),
             "node_path": self.get_path(),
-            "tree": json.dumps(program_tree_view_serializer(self.get_tree())),
+            "tree": json.dumps(program_tree_version_view_serializer(self.current_version)),
             "form_xls_custom": CustomXlsForm(path=self.get_path()),
             "academic_year_choices": get_academic_year_choices(
                 self.node_identity,
                 self.get_path(),
                 _get_view_name_from_tab(self.active_tab),
-            ),
+            ) if is_root_node else None,
             "selected_element_clipboard": self.get_selected_element_clipboard_message(),
             "current_version": self.current_version,
             "versions_choices": get_tree_versions_choices(self.node_identity, _get_view_name_from_tab(self.active_tab)),
-
+            "is_root_node": is_root_node,
             # TODO: Two lines below to remove when finished reorganized templates
             "education_group_version": self.education_group_version,
             "group_year": self.education_group_version.root_group,
+            "create_group_url": self.get_create_group_url(),
+            "create_training_url": self.get_create_training_url(),
+            "create_mini_training_url": self.get_create_mini_training_url(),
             "xls_ue_prerequisites": reverse("education_group_learning_units_prerequisites",
                                             args=[self.education_group_version.root_group.academic_year.year,
                                                   self.education_group_version.root_group.partial_acronym]
@@ -158,8 +163,23 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
     def get_permission_object(self):
         return self.education_group_version.offer
 
+    def get_create_group_url(self):
+        return reverse('create_element_select_type', kwargs={'category': Categories.GROUP.name}) + \
+               "?path_to={}".format(self.get_path())
+
+    def get_create_mini_training_url(self):
+        return reverse('create_element_select_type', kwargs={'category': Categories.MINI_TRAINING.name}) + \
+               "?path_to={}".format(self.get_path())
+
+    def get_create_training_url(self):
+        return reverse('create_element_select_type', kwargs={'category': Categories.TRAINING.name}) + \
+               "?path_to={}".format(self.get_path())
+
     def get_tab_urls(self):
         node_identity = self.get_object().entity_id
+
+        if not self.active_tab:
+            self.active_tab = read.get_tab_from_referer(self.get_object(), self.request.META.get('HTTP_REFERER'))
 
         return OrderedDict({
             Tab.IDENTIFICATION: {

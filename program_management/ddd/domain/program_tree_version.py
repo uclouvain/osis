@@ -95,9 +95,9 @@ class ProgramTreeVersion(interface.RootEntity):
     @property
     def version_label(self):  # TODO :: to remove
         if self.is_standard:
-            return 'Transition' if self.is_transition else ''
+            return '[Transition]' if self.is_transition else ''
         else:
-            return '{}-Transition'.format(self.version_name) if self.is_transition else self.version_name
+            return '[{}-Transition]'.format(self.version_name) if self.is_transition else '[{}]'.format(self.version_name)
 
     @property
     def is_standard_version(self):

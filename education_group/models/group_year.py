@@ -164,6 +164,9 @@ class GroupYear(models.Model):
     objects = GroupYearManager()
     objects_version = GroupYearVersionManager()
 
+    class Meta:
+        unique_together = ("partial_acronym", "academic_year")
+
     def __str__(self):
         return "{} ({})".format(self.acronym,
                                 self.academic_year)
@@ -179,6 +182,10 @@ class GroupYear(models.Model):
             )
 
         super().save(*args, **kwargs)
+
+    @property
+    def complete_title(self):
+        return self.title_fr
 
     @property
     def is_minor_major_option_list_choice(self):
