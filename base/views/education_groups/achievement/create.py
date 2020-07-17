@@ -39,6 +39,7 @@ class CreateEducationGroupAchievement(PermissionRequiredMixin, AjaxTemplateMixin
     template_name = "education_group/blocks/form/update_achievement.html"
     form_class = EducationGroupAchievementForm
     permission_required = 'base.add_educationgroupachievement'
+    force_reload = True
 
     def form_valid(self, form):
         form.instance.education_group_year = self.education_group_year
@@ -48,7 +49,7 @@ class CreateEducationGroupAchievement(PermissionRequiredMixin, AjaxTemplateMixin
         return self.education_group_year
 
     def get_success_url(self):
-        prefix = 'training_' if self.education_group_year.is_training else 'mini_training_'
+        prefix = 'training_' if self.education_group_year.is_training() else 'mini_training_'
         return reverse(
             prefix + 'skills_achievements', args=[self.kwargs['year'], self.kwargs['code']]
         ) + '?path={}&tab={}#achievement_{}'.format(
@@ -61,6 +62,7 @@ class CreateEducationGroupDetailedAchievement(PermissionRequiredMixin, AjaxTempl
     form_class = EducationGroupDetailedAchievementForm
     template_name = "education_group/blocks/form/update_achievement.html"
     permission_required = 'base.add_educationgroupachievement'
+    force_reload = True
 
     def form_valid(self, form):
         form.instance.education_group_achievement = self.education_group_achievement
@@ -70,7 +72,7 @@ class CreateEducationGroupDetailedAchievement(PermissionRequiredMixin, AjaxTempl
         return self.education_group_year
 
     def get_success_url(self):
-        prefix = 'training_' if self.education_group_year.is_training else 'mini_training_'
+        prefix = 'training_' if self.education_group_year.is_training() else 'mini_training_'
         return reverse(
             prefix + 'skills_achievements', args=[self.kwargs['year'], self.kwargs['code']]
         ) + '?path={}&tab={}#detail_achievements_{}'.format(
