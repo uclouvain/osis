@@ -53,7 +53,7 @@ class NodeEducationGroupYearFactory(NodeFactory):
     offer_title_en = factory.fuzzy.FuzzyText(length=240)
     offer_partial_title_fr = factory.fuzzy.FuzzyText(length=240)
     offer_partial_title_en = factory.fuzzy.FuzzyText(length=240)
-    children = None
+    children = factory.LazyFunction(list)
 
 
 class NodeGroupYearFactory(NodeFactory):
@@ -86,7 +86,7 @@ class NodeLearningUnitYearFactory(NodeFactory):
         abstract = False
 
     node_type = None
-    is_prerequisite_of = []
+    is_prerequisite_of = factory.LazyFunction(list)
     credits = factory.fuzzy.FuzzyDecimal(0, 10, precision=1)
     specific_title_en = factory.fuzzy.FuzzyText(length=240)
     common_title_en = factory.fuzzy.FuzzyText(length=240)

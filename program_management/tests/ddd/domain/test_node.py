@@ -255,7 +255,7 @@ class TestGetAllChildrenAsNode(SimpleTestCase):
 class TestGetIsPrerequisiteOf(SimpleTestCase):
 
     def test_when_is_prerequisite_of_nothing(self):
-        node = NodeLearningUnitYearFactory(is_prerequisite_of=None)
+        node = NodeLearningUnitYearFactory(is_prerequisite_of=[])
         self.assertEqual(node.get_is_prerequisite_of(), [])
 
     def test_when_id_prerequisite_of_mutliple_nodes(self):

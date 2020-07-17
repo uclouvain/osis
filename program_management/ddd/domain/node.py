@@ -292,7 +292,7 @@ class Node(interface.Entity):
 
     def detach_child(self, node_to_detach: 'Node') -> 'Link':
         link_to_detach = next(link for link in self.children if link.child == node_to_detach)
-        self._deleted_children.add(link_to_detach)
+        self._deleted_children.append(link_to_detach)
         self.children.remove(link_to_detach)
         return link_to_detach
 
@@ -381,7 +381,7 @@ class NodeGroupYear(Node):
         return hash(self.entity_id)
 
 
-@attr.s(slots=True, hash=False)
+@attr.s(slots=True, hash=False, eq=False)
 class NodeLearningUnitYear(Node):
 
     type = NodeType.LEARNING_UNIT
@@ -401,6 +401,14 @@ class NodeLearningUnitYear(Node):
     quadrimester = attr.ib(type=DerogationQuadrimester, default=None)
     volume_total_lecturing = attr.ib(type=Decimal, default=None)
     volume_total_practical = attr.ib(type=Decimal, default=None)
+
+    def __eq__(self, other):
+        if isinstance(other, NodeLearningUnitYear):
+            return self.entity_id == other.entity_id
+        return False
+
+    def __hash__(self):
+        return hash(self.entity_id)
 
     @property
     def full_title_fr(self) -> str:
