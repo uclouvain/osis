@@ -332,6 +332,7 @@ class LearningUnitYear(SerializableModel):
             return self.learning_container_year.get_partims_related()
         return LearningUnitYear.objects.none()
 
+    # TODO: Change to pass by DDD services
     def find_list_group_element_year(self):
         return self.child_leaf.filter(child_element__learning_unit_year=self).select_related('parent')
 
