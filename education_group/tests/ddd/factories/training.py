@@ -33,7 +33,7 @@ from base.models.enums.education_group_types import TrainingType
 from base.models.enums.internship_presence import InternshipPresence
 from base.models.enums.rate_code import RateCode
 from base.models.enums.schedule_type import ScheduleTypeEnum
-from education_group.ddd.domain.training import Training, TrainingIdentity
+from education_group.ddd.domain.training import Training, TrainingIdentity, TrainingIdentityThroughYears
 from education_group.tests.ddd.factories.campus import CampusIdentityFactory
 from education_group.tests.ddd.factories.co_graduation import CoGraduationFactory
 from education_group.tests.ddd.factories.diploma import DiplomaFactory
@@ -66,7 +66,7 @@ class TrainingFactory(factory.Factory):
 
     entity_identity = factory.SubFactory(TrainingIdentityFactory)
     entity_id = factory.LazyAttribute(lambda o: o.entity_identity)
-    identity_through_years = factory.Sequence(lambda n: n + 1)
+    identity_through_years = TrainingIdentityThroughYears(uuid=20251489)
     type = factory.fuzzy.FuzzyChoice(TrainingType)
     credits = factory.fuzzy.FuzzyDecimal(0, 10, precision=1)
     schedule_type = factory.fuzzy.FuzzyChoice(ScheduleTypeEnum)
