@@ -277,7 +277,10 @@ def _get_view_name_from_tab(tab: Tab):
 
 def get_tab_urls(tab: Tab, node_identity: 'NodeIdentity', path: 'Path' = None) -> str:
     path = path or ""
+    url_parameters = \
+        "?path={}&tab={}#achievement_".format(path, tab) if tab == Tab.SKILLS_ACHIEVEMENTS else "?path={}".format(path)
+
     return reverse(
         _get_view_name_from_tab(tab),
         args=[node_identity.year, node_identity.code]
-    ) + "?path={}".format(path)
+    ) + url_parameters
