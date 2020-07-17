@@ -57,3 +57,15 @@ class CreditShouldBeGreaterOrEqualsThanZero(BusinessException):
     def __init__(self, *args, **kwargs):
         message = _("Credits must be greater or equals than 0")
         super().__init__(message, **kwargs)
+
+
+class AcronymRequired(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _("Acronym/Short title is required")
+        super().__init__(message, **kwargs)
+
+
+class TrainingAcronymAlreadyExist(BusinessException):
+    def __init__(self, abbreviated_title: str, *args, **kwargs):
+        message = _("Acronym/Short title '{}' already exists").format(abbreviated_title)
+        super().__init__(message, **kwargs)

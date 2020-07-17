@@ -23,33 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
 
-from django.db import transaction
-
-from education_group.ddd import command
-from education_group.ddd.business_types import *
-from education_group.ddd.domain.training import TrainingBuilder
-from education_group.ddd.repository.training import TrainingRepository
-from education_group.ddd.service.write import postpone_training_service
+from base.models.education_group_year import EducationGroupYear
+from osis_common.ddd import interface
 
 
-@transaction.atomic()
-def create_and_postpone_orphan_training(create_training_cmd: command.CreateTrainingCommand) -> List['TrainingIdentity']:
-    # GIVEN
-    cmd = create_training_cmd
-
-    # WHEN
-    training = TrainingBuilder().create_training(cmd)
-
-    # THEN
-    training_id = TrainingRepository.create(training)
-    training_identities = postpone_training_service.postpone_training(
-        command.PostponeTrainingCommand(
-            acronym=training_id.acronym,
-            postpone_from_year=training_id.year,
-            postpone_until_year=training_id.year + 6,
-        )
-    )
-
-    return [training_id] + training_identities
+class CheckAcronymExist(interface.DomainService):
+    @classmethod
+    def exists(cls, abbreviated_title: str) -> bool:
+        return EducationGroupYear.objects.filter(acronym=abbreviated_title).exists()

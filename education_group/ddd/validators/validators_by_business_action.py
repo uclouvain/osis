@@ -23,8 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from education_group.ddd.validators._abbreviated_title_already_exist import AcronymAlreadyExistValidator
 from education_group.ddd.validators._credits import CreditsValidator
-from program_management.ddd.business_types import *
+from education_group.ddd.business_types import *
 
 from base.ddd.utils import business_validator
 from education_group.ddd.validators._content_constraint import ContentConstraintValidator
@@ -52,5 +53,17 @@ class UpdateGroupValidatorList(business_validator.BusinessListValidator):
         self.validators = [
             ContentConstraintValidator(group.content_constraint),
             CreditsValidator(group.credits),
+        ]
+        super().__init__()
+
+
+class CreateTrainingValidatorList(business_validator.BusinessListValidator):
+
+    def __init__(
+            self,
+            training: 'Training'
+    ):
+        self.validators = [
+            AcronymAlreadyExistValidator(training),
         ]
         super().__init__()
