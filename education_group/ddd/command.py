@@ -39,194 +39,116 @@ AimCode = int
 AimSection = int
 
 
+@attr.s(frozen=True, slots=True)
 class CreateTrainingCommand(interface.CommandRequest):
-    def __init__(
-            self,
-            abbreviated_title: str,
-            status: str,
-            code: str,
-            year: int,
-            type: str,
-            credits: Decimal,
-            schedule_type: str,
-            duration: int,
-            start_year: int,
 
-            title_fr: str,
-            partial_title_fr: Optional[str],
-            title_en: Optional[str],
-            partial_title_en: Optional[str],
+    abbreviated_title = attr.ib(type=str)
+    status = attr.ib(type=str)
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)
+    type = attr.ib(type=str)
+    credits = attr.ib(type=Decimal)
+    schedule_type = attr.ib(type=str)
+    duration = attr.ib(type=int)
+    start_year = attr.ib(type=int)
 
-            keywords: Optional[str],
-            internship: Optional[str],
-            is_enrollment_enabled: Optional[bool],
-            has_online_re_registration: Optional[bool],
-            has_partial_deliberation: Optional[bool],
-            has_admission_exam: Optional[bool],
-            has_dissertation: Optional[bool],
-            produce_university_certificate: Optional[bool],
-            decree_category: Optional[str],
-            rate_code: Optional[str],
-            main_language: Optional[str],
-            english_activities: Optional[str],
-            other_language_activities: Optional[str],
-            internal_comment: Optional[str],
-            main_domain_code: Optional[str],
-            main_domain_decree: Optional[str],
+    title_fr = attr.ib(type=str)
+    partial_title_fr = attr.ib(type=Optional[str])
+    title_en = attr.ib(type=Optional[str])
+    partial_title_en = attr.ib(type=Optional[str])
 
-            secondary_domains: Optional[List[Tuple[DecreeName, DomainCode]]],
+    keywords = attr.ib(type=Optional[str])
+    internship = attr.ib(type=Optional[str])
+    is_enrollment_enabled = attr.ib(type=Optional[bool])
+    has_online_re_registration = attr.ib(type=Optional[bool])
+    has_partial_deliberation = attr.ib(type=Optional[bool])
+    has_admission_exam = attr.ib(type=Optional[bool])
+    has_dissertation = attr.ib(type=Optional[bool])
+    produce_university_certificate = attr.ib(type=Optional[bool])
+    decree_category = attr.ib(type=Optional[str])
+    rate_code = attr.ib(type=Optional[str])
+    main_language = attr.ib(type=Optional[str])
+    english_activities = attr.ib(type=Optional[str])
+    other_language_activities = attr.ib(type=Optional[str])
+    internal_comment = attr.ib(type=Optional[str])
+    main_domain_code = attr.ib(type=Optional[str])
+    main_domain_decree = attr.ib(type=Optional[str])
 
-            isced_domain_code: Optional[str],
-            management_entity_acronym: Optional[str],
-            administration_entity_acronym: Optional[str],
-            end_year: Optional[int],
+    secondary_domains = attr.ib(type=Optional[List[Tuple[DecreeName, DomainCode]]])
 
-            teaching_campus_name: Optional[str],
-            teaching_campus_organization_name: Optional[str],
+    isced_domain_code = attr.ib(type=Optional[str])
+    management_entity_acronym = attr.ib(type=Optional[str])
+    administration_entity_acronym = attr.ib(type=Optional[str])
+    end_year = attr.ib(type=Optional[int])
 
-            enrollment_campus_name: Optional[str],
-            enrollment_campus_organization_name: Optional[str],
+    teaching_campus_name = attr.ib(type=Optional[str])
+    teaching_campus_organization_name = attr.ib(type=Optional[str])
 
-            other_campus_activities: Optional[str],
+    enrollment_campus_name = attr.ib(type=Optional[str])
+    enrollment_campus_organization_name = attr.ib(type=Optional[str])
 
-            can_be_funded: Optional[bool],
-            funding_orientation: Optional[str],
-            can_be_international_funded: Optional[bool],
-            international_funding_orientation: Optional[str],
+    other_campus_activities = attr.ib(type=Optional[str])
 
-            ares_code: Optional[int],
-            ares_graca: Optional[int],
-            ares_authorization: Optional[int],
+    can_be_funded = attr.ib(type=Optional[bool])
+    funding_orientation = attr.ib(type=Optional[str])
+    can_be_international_funded = attr.ib(type=Optional[bool])
+    international_funding_orientation = attr.ib(type=Optional[str])
 
-            code_inter_cfb: Optional[str],
-            coefficient: Optional[Decimal],
+    ares_code = attr.ib(type=Optional[int])
+    ares_graca = attr.ib(type=Optional[int])
+    ares_authorization = attr.ib(type=Optional[int])
 
-            academic_type: Optional[str],
-            duration_unit: Optional[str],
+    code_inter_cfb = attr.ib(type=Optional[str])
+    coefficient = attr.ib(type=Optional[Decimal])
 
-            leads_to_diploma: Optional[bool],
-            printing_title: Optional[str],
-            professional_title: Optional[str],
-            aims: Optional[List[Tuple[AimCode, AimSection]]],
+    academic_type = attr.ib(type=Optional[str])
+    duration_unit = attr.ib(type=Optional[str])
 
-            constraint_type: Optional[str],
-            min_constraint: Optional[int],
-            max_constraint: Optional[int],
-            remark_fr: Optional[str],
-            remark_en: Optional[str],
-    ):
-        self.abbreviated_title = abbreviated_title
-        self.status = status
-        self.code = code
-        self.year = year
-        self.type = type
-        self.credits = credits
-        self.schedule_type = schedule_type
-        self.duration = duration
-        self.start_year = start_year
-        self.title_fr = title_fr
-        self.partial_title_fr = partial_title_fr
-        self.title_en = title_en
-        self.partial_title_en = partial_title_en
-        self.keywords = keywords
-        self.internship = internship
-        self.is_enrollment_enabled = is_enrollment_enabled
-        self.has_online_re_registration = has_online_re_registration
-        self.has_partial_deliberation = has_partial_deliberation
-        self.has_admission_exam = has_admission_exam
-        self.has_dissertation = has_dissertation
-        self.produce_university_certificate = produce_university_certificate
-        self.decree_category = decree_category
-        self.rate_code = rate_code
-        self.main_language = main_language
-        self.english_activities = english_activities
-        self.other_language_activities = other_language_activities
-        self.internal_comment = internal_comment
-        self.main_domain_code = main_domain_code
-        self.main_domain_decree = main_domain_decree
-        self.secondary_domains = secondary_domains
-        self.isced_domain_code = isced_domain_code
-        self.management_entity_acronym = management_entity_acronym
-        self.administration_entity_acronym = administration_entity_acronym
-        self.end_year = end_year
-        self.teaching_campus_name = teaching_campus_name
-        self.teaching_campus_organization_name = teaching_campus_organization_name
-        self.enrollment_campus_name = enrollment_campus_name
-        self.enrollment_campus_organization_name = enrollment_campus_organization_name
-        self.other_campus_activities = other_campus_activities
-        self.can_be_funded = can_be_funded
-        self.funding_orientation = funding_orientation
-        self.can_be_international_funded = can_be_international_funded
-        self.international_funding_orientation = international_funding_orientation
-        self.ares_code = ares_code
-        self.ares_graca = ares_graca
-        self.ares_authorization = ares_authorization
-        self.code_inter_cfb = code_inter_cfb
-        self.coefficient = coefficient
-        self.academic_type = academic_type
-        self.duration_unit = duration_unit
-        self.leads_to_diploma = leads_to_diploma
-        self.printing_title = printing_title
-        self.professional_title = professional_title
-        self.aims = aims
-        self.constraint_type = constraint_type
-        self.min_constraint = min_constraint
-        self.max_constraint = max_constraint
-        self.remark_fr = remark_fr
-        self.remark_en = remark_en
+    leads_to_diploma = attr.ib(type=Optional[bool])
+    printing_title = attr.ib(type=Optional[str])
+    professional_title = attr.ib(type=Optional[str])
+    aims = attr.ib(type=Optional[List[Tuple[AimCode, AimSection]]])
+
+    constraint_type = attr.ib(type=Optional[str])
+    min_constraint = attr.ib(type=Optional[int])
+    max_constraint = attr.ib(type=Optional[int])
+    remark_fr = attr.ib(type=Optional[str])
+    remark_en = attr.ib(type=Optional[str])
 
 
+@attr.s(frozen=True, slots=True)
 class GetGroupCommand(interface.CommandRequest):
-    def __init__(self, code: str, year: int):
-        self.code = code
-        self.year = year
+
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)
 
 
+@attr.s(frozen=True, slots=True)
 class CreateOrphanGroupCommand(interface.CommandRequest):
-    def __init__(
-            self,
-            code: str,
-            year: int,
-            type: str,
-            abbreviated_title: str,
-            title_fr: str,
-            title_en: str,
-            credits: int,
-            constraint_type: str,
-            min_constraint: int,
-            max_constraint: int,
-            management_entity_acronym: str,
-            teaching_campus_name: str,
-            organization_name: str,
-            remark_fr: str,
-            remark_en: str,
-            start_year: int,
-            end_year: Optional[int] = None
-    ):
-        self.code = code
-        self.year = year
-        self.type = type
-        self.abbreviated_title = abbreviated_title
-        self.title_fr = title_fr
-        self.title_en = title_en
-        self.credits = credits
-        self.constraint_type = constraint_type
-        self.min_constraint = min_constraint
-        self.max_constraint = max_constraint
-        self.management_entity_acronym = management_entity_acronym
-        self.teaching_campus_name = teaching_campus_name
-        self.organization_name = organization_name
-        self.remark_fr = remark_fr
-        self.remark_en = remark_en
-        self.start_year = start_year
-        self.end_year = end_year
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)
+    type = attr.ib(type=str)
+    abbreviated_title = attr.ib(type=str)
+    title_fr = attr.ib(type=str)
+    title_en = attr.ib(type=str)
+    credits = attr.ib(type=int)
+    constraint_type = attr.ib(type=str)
+    min_constraint = attr.ib(type=int)
+    max_constraint = attr.ib(type=int)
+    management_entity_acronym = attr.ib(type=str)
+    teaching_campus_name = attr.ib(type=str)
+    organization_name = attr.ib(type=str)
+    remark_fr = attr.ib(type=str)
+    remark_en = attr.ib(type=str)
+    start_year = attr.ib(type=int)
+    end_year = attr.ib(type=Optional[int])
 
 
+@attr.s(frozen=True, slots=True)
 class CopyGroupCommand(interface.CommandRequest):
-    def __init__(self, from_code: str, from_year: int, to_year: int):
-        self.from_code = from_code
-        self.from_year = from_year
-        self.to_year = to_year
+    from_code = attr.ib(type=str)
+    from_year = attr.ib(type=int)
+    to_year = attr.ib(type=int)
 
 
 @attr.s(frozen=True, slots=True)
