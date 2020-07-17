@@ -9,6 +9,7 @@ from django.views.generic.base import View
 
 from base.models.academic_year import starting_academic_year
 from base.models.campus import Campus
+from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import GroupType, TrainingType
 from base.utils.cache import RequestCache
 from base.views.common import display_success_messages
@@ -127,18 +128,25 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
     def get_attach_path(self) -> Union[Path, None]:
         return self.request.GET.get('path_to') or None
 
-    # TODO :: how to manage permissions when need to check for EducationGroupYear (create) + GroupYear (create + attach)?
-    # def get_permission_object(self) -> Union[EducationGroupYear, None]:
-    #     path = self.get_attach_path()
-    #     if path:
-    #         # Take parent from path (latest element)
-    #         # Ex:  path: 4456|565|5656
-    #         parent_id = path.split("|")[-1]
-    #         try:
-    #             return GroupYear.objects.get(element__pk=parent_id)
-    #         except GroupYear.DoesNotExist:
-    #             return None
-    #     return None
+    def get_permission_object(self) -> Union[EducationGroupYear, None]:
+        qs = EducationGroupYear.objects.select_related('academic_year', 'management_entity')
+        path = self.get_attach_path()
+        if path:
+            # Take parent from path (latest element)
+            # Ex:  path: 4456|565|5656
+            parent_id = path.split("|")[-1]
+            qs = qs.filter(
+                educationgroupversion__root_group__element_id=parent_id,
+            )
+        else:
+            qs = qs.filter(
+                partial_acronym=self.request.POST.get('code'),
+                academic_year__year=self.request.POST.get('year'),
+            )
+        try:
+            return qs.get()
+        except EducationGroupYear.DoesNotExist:
+            return None
 
 
 def _convert_training_form_to_command(training_form: CreateTrainingForm) -> command.CreateTrainingCommand:
