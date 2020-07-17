@@ -94,8 +94,8 @@ class LearningUnitYearDeletion(TestCase):
         elem_ue_1 = ElementFactory(learning_unit_year=l_unit_2)
         elem_ue_2 = ElementFactory(learning_unit_year=l_unit_2)
 
-        group_1 = GroupElementYearFactory(child_branch=None, child_leaf=l_unit_2, child_element=elem_ue_1)
-        group_2 = GroupElementYearFactory(child_branch=None, child_leaf=l_unit_2, child_element=elem_ue_2)
+        group_1 = GroupElementYearFactory(child_branch=None, child_leaf=None, child_element=elem_ue_1)
+        group_2 = GroupElementYearFactory(child_branch=None, child_leaf=None, child_element=elem_ue_2)
 
         component = LearningComponentYearFactory(learning_unit_year=l_unit_2)
 
@@ -140,13 +140,13 @@ class LearningUnitYearDeletion(TestCase):
         self.assertIn(msg_delete_offer_type
                       % {'subtype': self.the_partim,
                          'acronym': l_unit_2.acronym,
-                         'group': group_1.parent.partial_acronym,
+                         'group': group_1.parent_element.group_year.partial_acronym,
                          'year': l_unit_2.academic_year},
                       msg)
         self.assertIn(msg_delete_offer_type
                       % {'subtype': self.the_partim,
                          'acronym': l_unit_2.acronym,
-                         'group': group_2.parent.partial_acronym,
+                         'group': group_2.parent_element.group_year.partial_acronym,
                          'year': l_unit_2.academic_year},
                       msg)
 
