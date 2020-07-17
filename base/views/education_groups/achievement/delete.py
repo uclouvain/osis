@@ -35,6 +35,7 @@ class DeleteEducationGroupAchievement(PermissionRequiredMixin, EducationGroupAch
     template_name = "education_group/delete.html"
     permission_required = 'base.delete_educationgroupachievement'
     raise_exception = True
+    force_reload = True
 
     def get_permission_object(self):
         return self.education_group_year
@@ -45,6 +46,7 @@ class DeleteEducationGroupDetailedAchievement(PermissionRequiredMixin, Education
     template_name = "education_group/delete.html"
     permission_required = 'base.delete_educationgroupachievement'
     raise_exception = True
+    force_reload = True
 
     def get_permission_object(self):
         return self.education_group_year
