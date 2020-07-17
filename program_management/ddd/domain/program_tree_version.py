@@ -121,6 +121,8 @@ class ProgramTreeVersion(interface.RootEntity):
     title_en = attr.ib(type=str, default=None)
     tree = attr.ib(type=ProgramTree, default=None)
 
+    _tree = None
+
     def get_tree(self) -> 'ProgramTree':
         if not self._tree:
             self._tree = self.program_tree_repository.get(self.program_tree_identity)
