@@ -63,6 +63,7 @@ from cms.tests.factories.text_label import LearningUnitYearTextLabelFactory
 from cms.tests.factories.translated_text import LearningUnitYearTranslatedTextFactory
 from learning_unit.models.learning_class_year import LearningClassYear
 from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
+from program_management.tests.factories.element import ElementFactory
 
 
 class LearningUnitYearDeletion(TestCase):
@@ -90,8 +91,11 @@ class LearningUnitYearDeletion(TestCase):
         LearningUnitEnrollmentFactory(learning_unit_year=l_unit_2)
         LearningUnitEnrollmentFactory(learning_unit_year=l_unit_2)
 
-        group_1 = GroupElementYearFactory(child_branch=None, child_leaf=l_unit_2)
-        group_2 = GroupElementYearFactory(child_branch=None, child_leaf=l_unit_2)
+        elem_ue_1 = ElementFactory(learning_unit_year=l_unit_2)
+        elem_ue_2 = ElementFactory(learning_unit_year=l_unit_2)
+
+        group_1 = GroupElementYearFactory(child_branch=None, child_leaf=l_unit_2, child_element=elem_ue_1)
+        group_2 = GroupElementYearFactory(child_branch=None, child_leaf=l_unit_2, child_element=elem_ue_2)
 
         component = LearningComponentYearFactory(learning_unit_year=l_unit_2)
 
@@ -108,7 +112,7 @@ class LearningUnitYearDeletion(TestCase):
         msg = deletion._check_related_partims_deletion(self.l_container_year)
         msg = list(msg.values())
 
-        self.assertEqual(len(msg), 3)
+        self.assertEqual(len(msg), 5)
         self.assertIn(
             _("There is %(count)d enrollments in %(subtype)s %(acronym)s for the year %(year)s") % {
                 'subtype': self.the_partim,
