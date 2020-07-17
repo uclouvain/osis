@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from education_group.ddd.validators._abbreviated_title_already_exist import AcronymAlreadyExistValidator
+from education_group.ddd.validators._copy_check_end_date import CheckEndDateValidator
 from education_group.ddd.validators._credits import CreditsValidator
 from education_group.ddd.business_types import *
 
@@ -65,5 +66,17 @@ class CreateTrainingValidatorList(business_validator.BusinessListValidator):
     ):
         self.validators = [
             AcronymAlreadyExistValidator(training),
+        ]
+        super().__init__()
+
+
+class CopyTrainingValidatorList(business_validator.BusinessListValidator):
+
+    def __init__(
+            self,
+            training_next_year: 'Training'
+    ):
+        self.validators = [
+            CheckEndDateValidator(training_next_year),
         ]
         super().__init__()
