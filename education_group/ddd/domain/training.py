@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from _decimal import Decimal
-from typing import List, TypeVar
+from typing import List
 
 import attr
 
@@ -37,11 +37,11 @@ from base.models.enums.funding_codes import FundingCodes
 from base.models.enums.internship_presence import InternshipPresence
 from base.models.enums.rate_code import RateCode
 from base.models.enums.schedule_type import ScheduleTypeEnum
-from base.models.utils.utils import ChoiceEnum
+from education_group.ddd.business_types import *
 from education_group.ddd.domain._campus import Campus
 from education_group.ddd.domain._co_graduation import CoGraduation
 from education_group.ddd.domain._co_organization import Coorganization
-from education_group.ddd.domain._diploma import Diploma, DiplomaAim
+from education_group.ddd.domain._diploma import Diploma, DiplomaAim, DiplomaAimIdentity
 from education_group.ddd.domain._entity import Entity
 from education_group.ddd.domain._funding import Funding
 from education_group.ddd.domain._hops import HOPS
@@ -51,8 +51,6 @@ from education_group.ddd.domain._study_domain import StudyDomain, StudyDomainIde
 from education_group.ddd.domain._titles import Titles
 from education_group.ddd.domain.exception import TrainingNotFoundException
 from osis_common.ddd import interface
-
-from education_group.ddd.business_types import *
 
 
 @attr.s(frozen=True, slots=True)
@@ -153,7 +151,9 @@ class TrainingBuilder:
             other_campus_activities=self._get_enum_from_str(command.other_campus_activities, ActivityPresence),
             funding=Funding(
                 can_be_funded=command.can_be_funded,
-                funding_orientation=command.funding_orientation,
+                funding_orientation=FundingCodes[
+                    command.funding_orientation
+                ] if command.funding_orientation else None,
                 can_be_international_funded=command.can_be_international_funded,
                 international_funding_orientation=FundingCodes[
                     command.international_funding_orientation
