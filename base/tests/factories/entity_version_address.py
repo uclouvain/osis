@@ -42,6 +42,6 @@ class EntityVersionAddressFactory(factory.DjangoModelFactory):
     postal_code = factory.Faker('postcode')
     state = factory.Faker('text', max_nb_chars=255)
     country = factory.SubFactory(CountryFactory)
-    entity_version_id = factory.SubFactory(EntityVersionFactory)
+    entity_version = factory.SubFactory(EntityVersionFactory)
     location = None
     is_main = FuzzyBoolean()
