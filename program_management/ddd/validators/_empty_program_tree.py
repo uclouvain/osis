@@ -21,19 +21,16 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from typing import Callable
-
 from base.ddd.utils import business_validator
+from program_management.ddd.business_types import *
 from program_management.ddd.domain.exception import ProgramTreeNonEmpty
-from education_group.ddd.domain.group import GroupIdentity
 
 
-class EmptyValidator(business_validator.BusinessValidator):
-    def __init__(self, group_id: GroupIdentity, is_empty_content_service: Callable):
+class EmptyProgramTreeValidator(business_validator.BusinessValidator):
+    def __init__(self, program_tree: 'ProgramTree'):
         super().__init__()
-        self.group_id = group_id
-        self.is_empty_content_service = is_empty_content_service
+        self.program_tree = program_tree
 
     def validate(self, *args, **kwargs):
-        if not self.is_empty_content_service(code=self.group_id.code, year=self.group_id.year):
+        if not self.program_tree.is_empty():
             raise ProgramTreeNonEmpty

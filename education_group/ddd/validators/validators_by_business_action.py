@@ -26,7 +26,10 @@
 from education_group.ddd.validators._credits import CreditsValidator
 
 from base.ddd.utils import business_validator
+from education_group.ddd.business_types import *
 from education_group.ddd.validators._content_constraint import ContentConstraintValidator
+from education_group.ddd.validators._enrollments import TrainingEnrollmentsValidator, MiniTrainingEnrollmentsValidator
+from education_group.ddd.validators._link_with_epc import TrainingLinkWithEPCValidator, MiniTrainingLinkWithEPCValidator
 
 
 class CreateGroupValidatorList(business_validator.BusinessListValidator):
@@ -62,4 +65,30 @@ class DeleteOrphanGroupValidatorList(business_validator.BusinessListValidator):
             group: 'Group',
     ):
         self.validators = []
+        super().__init__()
+
+
+class DeleteOrphanTrainingValidatorList(business_validator.BusinessListValidator):
+
+    def __init__(
+            self,
+            training: 'Training',
+    ):
+        self.validators = [
+            TrainingEnrollmentsValidator(training.entity_id),
+            TrainingLinkWithEPCValidator(training.entity_id)
+        ]
+        super().__init__()
+
+
+class DeleteOrphanMiniTrainingValidatorList(business_validator.BusinessListValidator):
+
+    def __init__(
+            self,
+            mini_training: 'MiniTraining',
+    ):
+        self.validators = [
+            MiniTrainingEnrollmentsValidator(mini_training.entity_id),
+            MiniTrainingLinkWithEPCValidator(mini_training.entity_id)
+        ]
         super().__init__()

@@ -260,3 +260,9 @@ class BulkUpdateLinkCommand(interface.CommandRequest):
     parent_node_year = attr.ib(type=int)
 
     update_link_cmds = attr.ib(factory=list, type=UpdateLinkCommand)
+
+
+@attr.s(frozen=True, slots=True)
+class DeleteProgramTreeCommand(interface.CommandRequest):
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)

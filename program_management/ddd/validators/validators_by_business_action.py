@@ -39,6 +39,7 @@ from program_management.ddd.validators._authorized_root_type_for_prerequisite im
 from program_management.ddd.validators._block_validator import BlockValidator
 from program_management.ddd.validators._detach_option_2M import DetachOptionValidator
 from program_management.ddd.validators._detach_root import DetachRootValidator
+from program_management.ddd.validators._empty_program_tree import EmptyProgramTreeValidator
 from program_management.ddd.validators._has_or_is_prerequisite import IsPrerequisiteValidator
 from program_management.ddd.validators._infinite_recursivity import InfiniteRecursivityTreeValidator
 from program_management.ddd.validators._minimum_editable_year import \
@@ -212,5 +213,16 @@ class UpdateLinkValidatorList(business_validator.BusinessListValidator):
             AuthorizedLinkTypeValidator(parent_node, child_node, link.link_type),
             BlockValidator(link.block),
             RelativeCreditsValidator(link.relative_credits)
+        ]
+        super().__init__()
+
+
+class DeleteProgramTreeValidatorList(business_validator.BusinessListValidator):
+    def __init__(
+            self,
+            program_tree: 'ProgramTree',
+    ):
+        self.validators = [
+            EmptyProgramTreeValidator(program_tree),
         ]
         super().__init__()
