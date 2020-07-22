@@ -38,6 +38,7 @@ from base.models.education_group_organization import EducationGroupOrganization 
 from base.models.education_group_type import EducationGroupType as EducationGroupTypeModelDb
 from base.models.education_group_year import EducationGroupYear as EducationGroupYearModelDb
 from base.models.education_group_year_domain import EducationGroupYearDomain as EducationGroupYearDomainModelDb
+from base.models.enums.active_status import ActiveStatusEnum
 from base.models.hops import Hops as HopsModelDb
 from education_group.ddd.domain.training import TrainingIdentityThroughYears
 from reference.models.language import Language as LanguageModelDb
@@ -108,7 +109,10 @@ class TrainingRepository(interface.AbstractRepository):
         raise NotImplementedError
 
 
-def _convert_education_group_year_to_training(entity_id: 'TrainingIdentity', obj: EducationGroupYearModelDb) -> 'Training':
+def _convert_education_group_year_to_training(
+        entity_id: 'TrainingIdentity',
+        obj: EducationGroupYearModelDb
+) -> 'Training':
     secondary_domains = __convert_study_domains_from_db(obj)
 
     coorganizations = __convert_coorganizations_from_db(entity_id, obj)
@@ -130,6 +134,7 @@ def _convert_education_group_year_to_training(entity_id: 'TrainingIdentity', obj
             title_en=obj.title_english,
             partial_title_en=obj.partial_title_english,
         ),
+        status=ActiveStatusEnum[obj.active],
         keywords=obj.keywords,
         internship=InternshipPresence[obj.internship] if obj.internship else None,
         is_enrollment_enabled=obj.enrollment_enabled,
@@ -340,6 +345,7 @@ def _save_education_group_year(
         academic_year=AcademicYearModelDb.objects.get(year=training.entity_id.year),
         acronym=training.entity_id.acronym,
         education_group_type=EducationGroupTypeModelDb.objects.get(name=training.type.name),
+        active=training.status.name,
         credits=training.credits,
         schedule_type=training.schedule_type.name if training.schedule_type else None,
         duration=training.duration,

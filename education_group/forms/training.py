@@ -212,7 +212,7 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         required=False,
     )
 
-    # panel_remarks_form.html  # FIXME :: group form ??
+    # panel_remarks_form.html
     remark_fr = forms.CharField(widget=forms.Textarea, label=_("Remark"), required=False)
     remark_english = forms.CharField(widget=forms.Textarea, label=_("remark in english").capitalize(), required=False)
 

@@ -67,8 +67,10 @@ class TestTrainingRepositoryCreateMethod(TestCase):
         study_domain_identity = StudyDomainIdentityFactory(decree_name=cls.study_domain.decree.name, code=cls.study_domain.code)
         diploma_aim_identity = DiplomaAimIdentityFactory(code=cls.certificate_aim.code, section=cls.certificate_aim.section)
         campus_identity = CampusIdentityFactory(name=cls.campus.name, university_name=cls.campus.organization.name)
+        training_identity = TrainingIdentityFactory(year=cls.year)
         cls.training = TrainingFactory(
-            entity_identity=TrainingIdentityFactory(year=cls.year),
+            entity_id=training_identity,
+            entity_identity=training_identity,
             start_year=cls.year,
             end_year=cls.year,
             type=TrainingType[cls.education_group_type.name],
@@ -149,13 +151,7 @@ class TestTrainingRepositoryCreateMethod(TestCase):
         self.assertEqual(education_group_year.professional_title, self.training.diploma.professional_title)
         self.assertEqual(education_group_year.joint_diploma, self.training.diploma.leads_to_diploma)
         self.assertEqual(education_group_year.diploma_printing_title, self.training.diploma.printing_title)
-        # self.assertEqual(education_group_year.active, self.training.active)  # FIXME :: to implement !
-        # self.assertEqual(education_group_year.diploma_printing_orientation, self.training.diploma_focus)  # FIXME :: to implement !
-        # self.assertEqual(education_group_year.inter_organization_information, ???)  # FIXME :: to implement !
-        # self.assertEqual(education_group_year.inter_university_french_community, ???)  # FIXME :: to implement !
-        # self.assertEqual(education_group_year.inter_university_belgium, ???)  # FIXME :: to implement !
-        # self.assertEqual(education_group_year.inter_university_abroad, ???)  # FIXME :: to implement !
-        # self.assertEqual(education_group_year.language_association, ???)  # FIXME :: to implement !
+        self.assertEqual(education_group_year.active, self.training.status.name)
 
         # Secondary domains
         qs = EducationGroupYearDomain.objects.filter(education_group_year=education_group_year)

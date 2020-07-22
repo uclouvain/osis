@@ -29,6 +29,7 @@ from typing import List
 import attr
 
 from base.models.enums.academic_type import AcademicTypes
+from base.models.enums.active_status import ActiveStatusEnum
 from base.models.enums.activity_presence import ActivityPresence
 from base.models.enums.decree_category import DecreeCategories
 from base.models.enums.duration_unit import DurationUnitsEnum
@@ -119,6 +120,7 @@ class TrainingBuilder:
                 title_en=command.title_en,
                 partial_title_en=command.partial_title_en,
             ),
+            status=self._get_enum_from_str(command.status, ActiveStatusEnum),
             keywords=command.keywords,
             internship=self._get_enum_from_str(command.internship, InternshipPresence),
             is_enrollment_enabled=command.is_enrollment_enabled,
@@ -205,6 +207,7 @@ class Training(interface.RootEntity):
     credits = attr.ib(type=Decimal)
     start_year = attr.ib(type=int)
     titles = attr.ib(type=Titles)
+    status = attr.ib(type=ActiveStatusEnum, default=ActiveStatusEnum.ACTIVE)
     identity_through_years = attr.ib(type=TrainingIdentityThroughYears, default=None)
     schedule_type = attr.ib(type=ScheduleTypeEnum, default=ScheduleTypeEnum.DAILY)
     duration = attr.ib(type=int, default=1)
