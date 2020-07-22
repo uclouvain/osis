@@ -40,7 +40,7 @@ class CreateTrainingCommandFactory(factory.Factory):
     code = " Code "
     year = 2019
     type = " Type "
-    credits = Decimal(23)
+    credits = 23
     schedule_type = " schedule "
     duration = 3
     start_year = 2019
