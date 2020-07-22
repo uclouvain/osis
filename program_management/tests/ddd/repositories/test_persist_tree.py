@@ -180,4 +180,3 @@ class TestPersistPrerequisites(TestCase):
             mock_persist_prerequisite.call_count,
             number_learning_unit_removed
         )
-
