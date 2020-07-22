@@ -39,8 +39,8 @@ from program_management.ddd.business_types import *
 from program_management.ddd.domain.node import factory as node_factory, NodeIdentity, Node
 from program_management.ddd.domain.link import factory as link_factory
 from program_management.ddd.domain import prerequisite, exception
-from program_management.ddd.domain.service import generate_node_code, validation_rule, \
-    generate_node_abbreviated_title
+from program_management.ddd.domain.service import generate_node_code, generate_node_abbreviated_title
+from program_management.ddd.domain.service.validation_rule import FieldValidationRule
 from program_management.ddd.repositories import load_authorized_relationship
 from program_management.ddd.validators import validators_by_business_action
 from program_management.ddd.validators._path_validator import PathValidator
@@ -104,7 +104,7 @@ class ProgramTreeBuilder:
         root_node = program_tree.root_node
         children = []
         for child_type in program_tree.get_mandatory_children_types(program_tree.root_node):
-            generated_child_title = validation_rule.get_validation_rule_for_field(
+            generated_child_title = FieldValidationRule.get(
                 child_type,
                 'title_fr'
             ).initial_value.replace(" ", "").upper()

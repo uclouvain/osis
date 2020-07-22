@@ -27,10 +27,9 @@ import re
 from typing import Pattern, Tuple
 
 from base.models.enums.education_group_types import EducationGroupTypesEnum
-from base.models.validation_rule import ValidationRule
 from education_group.models.group_year import GroupYear
 from program_management.ddd.business_types import *
-from program_management.ddd.domain.service import validation_rule
+from program_management.ddd.domain.service.validation_rule import FieldValidationRule
 
 NodeCode = str
 
@@ -69,7 +68,7 @@ def __get_cnum_subdivision(
         child_node_type: EducationGroupTypesEnum,
         reg_child_initial_value: Pattern
 ) -> Tuple[str, str]:
-    child_initial_value = validation_rule.get_validation_rule_for_field(child_node_type, 'code').initial_value
+    child_initial_value = FieldValidationRule.get(child_node_type, 'code').initial_value
     match_result = reg_child_initial_value.search(child_initial_value)
     if match_result:
         cnum, subdivision = match_result.group("cnum", "subdivision")
