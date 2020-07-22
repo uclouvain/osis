@@ -41,7 +41,7 @@ class LinkIdentity(interface.EntityIdentity):
     child_year = attr.ib(type=int)
 
 
-@attr.s(slots=True)
+@attr.s(slots=True, str=False, hash=False, eq=False)
 class Link(interface.Entity):
 
     parent = attr.ib(type='Node')
@@ -75,6 +75,11 @@ class Link(interface.Entity):
 
     def __str__(self):
         return "%(parent)s - %(child)s" % {'parent': self.parent, 'child': self.child}
+
+    def __eq__(self, other):
+        if isinstance(other, Link):
+            return self.entity_id == other.entity_id
+        return False
 
     def is_reference(self):
         return self.link_type == LinkTypes.REFERENCE

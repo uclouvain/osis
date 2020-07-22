@@ -211,17 +211,6 @@ class TestGroupRepositoryCreateMethod(TestCase):
         self.assertEqual(group_inserted.group.start_year.year, 2017)
         self.assertIsNone(group_inserted.group.end_year)
 
-    def test_assert_unannualized_identity_same_if_provided(self):
-        group_db = GroupModelDbFactory()
-        self.group.unannualized_identity = GroupUnannualizedIdentity(uuid=group_db.pk)
-        group_identity = GroupRepository.create(self.group)
-
-        group_inserted = GroupYearModelDb.objects.get(
-            partial_acronym=group_identity.code,
-            academic_year__year=group_identity.year
-        )
-        self.assertEqual(group_inserted.group.pk, group_db.pk)
-
     def test_assert_raise_group_code_already_exist_exception(self):
         GroupRepository.create(self.group)
         with self.assertRaises(GroupCodeAlreadyExistException):

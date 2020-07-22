@@ -33,6 +33,7 @@ from education_group.ddd.domain.training import TrainingIdentity
 from education_group.forms.training import CreateTrainingForm
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from education_group.views.proxy.read import Tab
+from reference.tests.factories.language import FrenchLanguageFactory
 
 
 class TestTrainingCreateView(TestCase):
@@ -40,6 +41,7 @@ class TestTrainingCreateView(TestCase):
     def setUpTestData(cls):
         cls.central_manager = CentralManagerFactory()
         cls.training_type = EducationGroupTypeFactory()
+        FrenchLanguageFactory()
         cls.url = reverse('training_create', kwargs={"type": cls.training_type.name})
 
     def setUp(self):
@@ -55,12 +57,12 @@ class TestTrainingCreateView(TestCase):
         self.assertIsInstance(context["training_form"], CreateTrainingForm)
         self.assertEqual(context["type_text"], str(self.training_type))
 
-    @mock.patch("education_group.ddd.service.write.create_training_service.create_orphan_training")
+    @mock.patch("education_group.views.training.create.create_and_report_training_with_program_tree")
     @mock.patch("education_group.views.training.create.CreateTrainingForm")
     def test_should_call_create_orphan_service_when_valid_post_request(self, mock_form, mock_service):
         training_id = TrainingIdentity(acronym="Acronym", year=2020)
         mock_form.return_value = self._get_form_valid_mock()
-        mock_service.return_value = training_id
+        mock_service.return_value = [training_id]
         response = self.client.post(self.url, data={})
 
         self.assertTrue(mock_service.called)
