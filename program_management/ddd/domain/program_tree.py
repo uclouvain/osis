@@ -39,8 +39,8 @@ from program_management.ddd.business_types import *
 from program_management.ddd.domain.node import factory as node_factory, NodeIdentity, Node
 from program_management.ddd.domain.link import factory as link_factory
 from program_management.ddd.domain import prerequisite, exception
-from program_management.ddd.domain.service import generate_node_code
 from program_management.ddd.domain.service.generate_node_abbreviated_title import GenerateNodeAbbreviatedTitle
+from program_management.ddd.domain.service.generate_node_code import GenerateNodeCode
 from program_management.ddd.domain.service.validation_rule import FieldValidationRule
 from program_management.ddd.repositories import load_authorized_relationship
 from program_management.ddd.validators import validators_by_business_action
@@ -112,7 +112,7 @@ class ProgramTreeBuilder:
             child = node_factory.get_node(
                 type=NodeType.GROUP,
                 node_type=child_type,
-                code=generate_node_code.generate_code_from_parent_node(root_node, child_type),
+                code=GenerateNodeCode.generate_from_parent_node(root_node, child_type),
                 title=GenerateNodeAbbreviatedTitle.generate(
                     parent_node=root_node,
                     child_node_type=child_type,

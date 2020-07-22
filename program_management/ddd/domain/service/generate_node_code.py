@@ -28,6 +28,7 @@ from typing import Pattern, Tuple
 
 from base.models.enums.education_group_types import EducationGroupTypesEnum
 from education_group.models.group_year import GroupYear
+from osis_common.ddd import interface
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.service.validation_rule import FieldValidationRule
 
@@ -41,30 +42,33 @@ MAX_CNUM = 999
 WIDTH_CNUM = 3
 
 
-def generate_code_from_parent_node(parent_node: 'Node', child_node_type: EducationGroupTypesEnum) -> NodeCode:
-    reg_parent_code = re.compile(REGEX_TRAINING_PARTIAL_ACRONYM)
-    reg_common_partial_acronym = re.compile(REGEX_COMMON_PARTIAL_ACRONYM)
-    # FIXME : Sometimes parent does not have a partial acronym, it is a dirty situation. We have to clean the DB.
-    if not parent_node.code:
-        return ""
-    match_result = reg_parent_code.search(parent_node.code) or reg_common_partial_acronym.search(parent_node.code)
-    sigle_ele = match_result.group("sigle_ele")
+class GenerateNodeCode(interface.DomainService):
 
-    reg_child_initial_value = re.compile(REGEX_GROUP_PARTIAL_ACRONYM_INITIAL_VALUE)
-    cnum, subdivision = __get_cnum_subdivision(child_node_type, reg_child_initial_value)
+    @classmethod
+    def generate_from_parent_node(cls, parent_node: 'Node', child_node_type: EducationGroupTypesEnum) -> NodeCode:
+        reg_parent_code = re.compile(REGEX_TRAINING_PARTIAL_ACRONYM)
+        reg_common_partial_acronym = re.compile(REGEX_COMMON_PARTIAL_ACRONYM)
+        # FIXME : Sometimes parent does not have a partial acronym, it is a dirty situation. We have to clean the DB.
+        if not parent_node.code:
+            return ""
+        match_result = reg_parent_code.search(parent_node.code) or reg_common_partial_acronym.search(parent_node.code)
+        sigle_ele = match_result.group("sigle_ele")
 
-    partial_acronym = "{}{}{}".format(sigle_ele, cnum, subdivision)
-    while GroupYear.objects.filter(partial_acronym=partial_acronym).exists():
-        cnum = "{:0{width}d}".format(
-            (int(cnum) + 1) % MAX_CNUM,
-            width=WIDTH_CNUM
-        )
+        reg_child_initial_value = re.compile(REGEX_GROUP_PARTIAL_ACRONYM_INITIAL_VALUE)
+        cnum, subdivision = _get_cnum_subdivision(child_node_type, reg_child_initial_value)
+
         partial_acronym = "{}{}{}".format(sigle_ele, cnum, subdivision)
+        while GroupYear.objects.filter(partial_acronym=partial_acronym).exists():
+            cnum = "{:0{width}d}".format(
+                (int(cnum) + 1) % MAX_CNUM,
+                width=WIDTH_CNUM
+            )
+            partial_acronym = "{}{}{}".format(sigle_ele, cnum, subdivision)
 
-    return partial_acronym
+        return partial_acronym
 
 
-def __get_cnum_subdivision(
+def _get_cnum_subdivision(
         child_node_type: EducationGroupTypesEnum,
         reg_child_initial_value: Pattern
 ) -> Tuple[str, str]:
