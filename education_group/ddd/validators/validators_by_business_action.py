@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from education_group.ddd.validators._abbreviated_title_already_exist import AcronymAlreadyExistValidator
+from education_group.ddd.validators._acronym_required import AcronymRequiredValidator
 from education_group.ddd.validators._certificate_aim_type_2 import CertificateAimType2Validator
 from education_group.ddd.validators._copy_check_end_date import CheckEndDateValidator
 from education_group.ddd.validators._credits import CreditsValidator
@@ -67,6 +68,7 @@ class CreateTrainingValidatorList(business_validator.BusinessListValidator):
             training: 'Training'
     ):
         self.validators = [
+            AcronymRequiredValidator(training),
             AcronymAlreadyExistValidator(training),
             StartYearEndYearValidator(training),
             CertificateAimType2Validator(training),

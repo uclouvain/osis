@@ -24,15 +24,14 @@
 
 from base.ddd.utils import business_validator
 from education_group.ddd.business_types import *
-from education_group.ddd.domain.exception import TrainingAcronymAlreadyExist
-from education_group.ddd.domain.service.abbreviated_title_exist import CheckAcronymExist
+from education_group.ddd.domain.exception import AcronymRequired
 
 
-class AcronymAlreadyExistValidator(business_validator.BusinessValidator):
+class AcronymRequiredValidator(business_validator.BusinessValidator):
     def __init__(self, training: 'Training'):
         super().__init__()
         self.acronym = training.acronym
 
     def validate(self, *args, **kwargs):
-        if CheckAcronymExist.exists(self.acronym):
-            raise TrainingAcronymAlreadyExist(self.acronym)
+        if not self.acronym:
+            raise AcronymRequired()
