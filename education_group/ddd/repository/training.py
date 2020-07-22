@@ -384,7 +384,7 @@ def _save_education_group_year(
         administration_entity_id=entity_version.find_by_acronym_and_year(
             acronym=training.administration_entity.acronym,
             year=training.year,
-        ).entity_id if training.management_entity else None,
+        ).entity_id if training.administration_entity else None,
         main_teaching_campus=CampusModelDb.objects.get(
             name=training.teaching_campus.name,
             organization__name=training.teaching_campus.university_name,
