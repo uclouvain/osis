@@ -121,7 +121,7 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         label=_("duration unit").capitalize(),
         required=False,
     )
-    internship = forms.ChoiceField(
+    internship_presence = forms.ChoiceField(
         initial=InternshipPresence.NO.name,
         choices=sorted(list(InternshipPresence.choices()), key=lambda c: c[1]),
         label=_("Internship"),

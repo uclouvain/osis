@@ -49,7 +49,7 @@ class CreateTrainingCommandFactory(factory.Factory):
     partial_title_fr = None
     partial_title_en = None
     keywords = None
-    internship = None
+    internship_presence = None
     is_enrollment_enabled = None
     has_online_re_registration = None
     has_partial_deliberation = None

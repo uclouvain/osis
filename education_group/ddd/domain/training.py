@@ -122,7 +122,7 @@ class TrainingBuilder:
             ),
             status=self._get_enum_from_str(command.status, ActiveStatusEnum),
             keywords=command.keywords,
-            internship=self._get_enum_from_str(command.internship, InternshipPresence),
+            internship_presence=self._get_enum_from_str(command.internship_presence, InternshipPresence),
             is_enrollment_enabled=command.is_enrollment_enabled,
             has_online_re_registration=command.has_online_re_registration,
             has_partial_deliberation=command.has_partial_deliberation,
@@ -213,7 +213,7 @@ class Training(interface.RootEntity):
     duration = attr.ib(type=int, default=1)
     duration_unit = attr.ib(type=DurationUnitsEnum, default=DurationUnitsEnum.QUADRIMESTER)
     keywords = attr.ib(type=str, default="")
-    internship = attr.ib(type=InternshipPresence, default=InternshipPresence.NO)
+    internship_presence = attr.ib(type=InternshipPresence, default=InternshipPresence.NO)
     is_enrollment_enabled = attr.ib(type=bool, default=True)
     has_online_re_registration = attr.ib(type=bool, default=True)
     has_partial_deliberation = attr.ib(type=bool, default=False)

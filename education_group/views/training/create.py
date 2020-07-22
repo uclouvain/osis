@@ -181,7 +181,7 @@ def _convert_training_form_to_data_for_service(training_form: CreateTrainingForm
         'title_en': training_form.cleaned_data['title_en'],
         'partial_title_en': training_form.cleaned_data['partial_title_en'],
         'keywords': training_form.cleaned_data['keywords'],
-        'internship': training_form.cleaned_data['internship'],
+        'internship_presence': training_form.cleaned_data['internship_presence'],
         'is_enrollment_enabled': training_form.cleaned_data['is_enrollment_enabled'],
         'has_online_re_registration': training_form.cleaned_data['has_online_re_registration'],
         'has_partial_deliberation': training_form.cleaned_data['has_partial_deliberation'],

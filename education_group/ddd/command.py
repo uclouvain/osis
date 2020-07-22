@@ -58,7 +58,7 @@ class CreateTrainingCommand(interface.CommandRequest):
     partial_title_en = attr.ib(type=Optional[str])
 
     keywords = attr.ib(type=Optional[str])
-    internship = attr.ib(type=Optional[str])
+    internship_presence = attr.ib(type=Optional[str])
     is_enrollment_enabled = attr.ib(type=Optional[bool])
     has_online_re_registration = attr.ib(type=Optional[bool])
     has_partial_deliberation = attr.ib(type=Optional[bool])
