@@ -75,7 +75,7 @@ class NodeIdentity(interface.EntityIdentity):
     year = attr.ib(type=int)
 
 
-@attr.s(slots=True, hash=False)
+@attr.s(slots=True, eq=False, hash=False)
 class Node(interface.Entity):
 
     type = None
@@ -103,6 +103,14 @@ class Node(interface.Entity):
 
     def __str__(self):
         return '%(code)s (%(year)s)' % {'code': self.code, 'year': self.year}
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.entity_id == other.entity_id
+        return False
+
+    def __hash__(self):
+        return hash(self.entity_id)
 
     @property
     def pk(self):
@@ -352,7 +360,7 @@ class NodeEducationGroupYear(Node):
     category = attr.ib(type=Categories, default=None)
 
 
-@attr.s(slots=True, hash=False)
+@attr.s(slots=True, eq=False, hash=False)
 class NodeGroupYear(Node):
 
     type = NodeType.GROUP
@@ -377,9 +385,6 @@ class NodeGroupYear(Node):
     offer_status = attr.ib(type=ActiveStatusEnum, default=None)
     keywords = attr.ib(type=str, default=None)
 
-    def __hash__(self):
-        return hash(self.entity_id)
-
 
 @attr.s(slots=True, hash=False, eq=False)
 class NodeLearningUnitYear(Node):
@@ -402,13 +407,7 @@ class NodeLearningUnitYear(Node):
     volume_total_lecturing = attr.ib(type=Decimal, default=None)
     volume_total_practical = attr.ib(type=Decimal, default=None)
 
-    def __eq__(self, other):
-        if isinstance(other, NodeLearningUnitYear):
-            return self.entity_id == other.entity_id
-        return False
 
-    def __hash__(self):
-        return hash(self.entity_id)
 
     @property
     def full_title_fr(self) -> str:

@@ -89,25 +89,15 @@ class TestDescendentsPropertyNode(SimpleTestCase):
 
 class TestEq(SimpleTestCase):
 
-    def setUp(self):
-        self.node_id = 1
-        self.node = NodeGroupYearFactory(node_id=1)
+    def test_should_return_true_when_the_entity_id_are_equals(self):
+        node = NodeGroupYearFactory()
+        node_with_same_identity = NodeGroupYearFactory(code=node.code, year=node.year)
+        self.assertTrue(node == node_with_same_identity)
 
-    def test_when_nodes_group_year_are_equal(self):
-        node_with_same_id = NodeGroupYearFactory(node_id=self.node_id)
-        self.assertTrue(self.node == node_with_same_id)
-
-    def test_when_nodes_group_year_are_not_equal(self):
-        node_with_different_id = NodeGroupYearFactory(node_id=self.node_id + 1)
-        self.assertFalse(self.node == node_with_different_id)
-
-    def test_when_nodes_learning_unit_are_equal(self):
-        node_with_same_id = NodeLearningUnitYearFactory(node_id=self.node_id)
-        self.assertFalse(self.node == node_with_same_id)
-
-    def test_when_nodes_learning_unit_are_not_equal(self):
-        node_with_different_id = NodeLearningUnitYearFactory(node_id=self.node_id + 1)
-        self.assertFalse(self.node == node_with_different_id)
+    def test_when_should_return_false_when_entity_id_are_not_equals(self):
+        node = NodeGroupYearFactory()
+        node_with_different_identity = NodeGroupYearFactory(year=node.year+1)
+        self.assertFalse(node == node_with_different_identity)
 
 
 class TestStr(SimpleTestCase):
