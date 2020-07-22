@@ -30,6 +30,7 @@ from education_group.ddd.business_types import *
 
 from base.ddd.utils import business_validator
 from education_group.ddd.validators._content_constraint import ContentConstraintValidator
+from education_group.ddd.validators._start_year_end_year import StartYearEndYearValidator
 
 
 class CreateGroupValidatorList(business_validator.BusinessListValidator):
@@ -66,6 +67,7 @@ class CreateTrainingValidatorList(business_validator.BusinessListValidator):
     ):
         self.validators = [
             AcronymAlreadyExistValidator(training),
+            StartYearEndYearValidator(training),
         ]
         super().__init__()
 
