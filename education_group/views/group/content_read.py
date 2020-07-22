@@ -35,3 +35,6 @@ class GroupReadContent(GroupRead):
             **super().get_context_data(**kwargs),
             "children": self.get_object().children
         }
+
+    def get_update_group_url(self) -> str:
+        return super().get_update_group_url() + "&tab={}".format(self.active_tab)

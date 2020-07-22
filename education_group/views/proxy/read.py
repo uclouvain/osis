@@ -55,8 +55,12 @@ class ReadEducationGroupRedirectView(RedirectView):
         except ValueError:
             return Tab.IDENTIFICATION
 
+    def _get_current_path(self) -> str:
+        return self.request.GET.get('path')
+
     def get_redirect_url(self, *args, **kwargs):
         url = get_tab_urls(
+            path=self._get_current_path(),
             tab=self._get_current_tab(),
             node=self.node,
         )
@@ -87,7 +91,7 @@ def get_tab_urls(tab: Tab, node: 'Node', path: 'Path' = None) -> str:
     path = path or ""
     url = reverse(_get_view_name_from_tab(node, tab), args=[node.year, node.code])
     if path:
-        url += "?path={}".format(path)
+        url += "?path={}&tab={}#achievement_".format(path, tab)
     return url
 
 

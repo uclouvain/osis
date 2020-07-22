@@ -58,12 +58,17 @@ class CommonNodeHyperlinkedRelatedField(serializers.HyperlinkedIdentityField):
             }
         else:
             view_name = 'education_group_api_v1:' + GroupDetail.name
-            if obj.child.is_mini_training():
-                view_name = 'education_group_api_v1:' + MiniTrainingDetail.name
             url_kwargs = {
                 'year': obj.child.year,
                 'partial_acronym': obj.child.code,
             }
+            if obj.child.is_mini_training():
+                view_name = 'education_group_api_v1:' + MiniTrainingDetail.name
+                url_kwargs = {
+                    'year': obj.child.year,
+                    'official_partial_acronym': obj.child.code,
+                }
+
         return reverse(view_name, kwargs=url_kwargs, request=request, format=format)
 
 

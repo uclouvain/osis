@@ -25,6 +25,7 @@
 ##############################################################################
 from django.db import transaction
 
+from base.models.enums.link_type import LinkTypes
 from base.models.group_element_year import GroupElementYear
 from osis_common.decorators.deprecated import deprecated
 from program_management.ddd.domain import program_tree
@@ -63,7 +64,8 @@ def __persist_group_element_year(link):
             'comment_english': link.comment_english,
             'own_comment': link.own_comment,
             'quadrimester_derogation': link.quadrimester_derogation,
-            'link_type': link.link_type,
+            # FIXME : Find a rules for enum in order to be consistant
+            'link_type': link.link_type.name if isinstance(link.link_type, LinkTypes) else link.link_type,
             'order': link.order,
 
         }

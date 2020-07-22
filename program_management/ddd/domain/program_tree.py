@@ -31,6 +31,7 @@ import attr
 
 from base.models.authorized_relationship import AuthorizedRelationshipList
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, GroupType, MiniTrainingType
+from base.models.enums.link_type import LinkTypes
 from osis_common.ddd import interface
 from osis_common.decorators.deprecated import deprecated
 from program_management.ddd import command
@@ -347,6 +348,52 @@ class ProgramTree(interface.RootEntity):
         return " ; ".join(
             [str(grp.block) for grp in self.get_links_using_node(node) if grp.block]
         )
+
+    def update_link(
+            self,
+            parent_path: Path,
+            child_id: 'NodeIdentity',
+            relative_credits: int,
+            access_condition: bool,
+            is_mandatory: bool,
+            block: int,
+            link_type: str,
+            comment: str,
+            comment_english: str
+    ) -> 'Link':
+        """
+        Update link's attributes between parent_path and child_node
+        :param parent_path: The parent path node
+        :param child_id: The identity of child node
+        :param relative_credits: The link's relative credits
+        :param access_condition: The link's access_condition
+        :param is_mandatory: The link's is_mandatory
+        :param block: The block of link
+        :param link_type: The type of link
+        :param comment: The comment of link
+        :param comment_english: The comment english of link
+        :return: Updated link
+        """
+        parent_node = self.get_node(parent_path)
+        child_node = parent_node.get_direct_child_as_node(child_id)
+
+        link_updated = parent_node.update_link_of_direct_child_node(
+            child_id,
+            relative_credits=relative_credits,
+            access_condition=access_condition,
+            is_mandatory=is_mandatory,
+            block=block,
+            link_type=link_type,
+            comment=comment,
+            comment_english=comment_english
+        )
+
+        validators_by_business_action.UpdateLinkValidatorList(
+            parent_node,
+            child_node,
+            link_updated
+        ).validate()
+        return link_updated
 
 
 def _nodes_from_root(root: 'Node') -> List['Node']:
