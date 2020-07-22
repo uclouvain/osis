@@ -23,11 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from education_group.ddd.validators._credits import CreditsValidator
+from education_group.ddd.business_types import *
+
 from base.ddd.utils import business_validator
 from education_group.ddd.domain import mini_training
-from education_group.ddd.domain.group import Group
 from education_group.ddd.validators._content_constraint import ContentConstraintValidator
-from education_group.ddd.validators._credits import CreditsValidator
 from education_group.ddd.validators.start_and_end_year_validator import StartAndEndYearValidator
 
 

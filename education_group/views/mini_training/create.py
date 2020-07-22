@@ -35,7 +35,7 @@ from base.utils.cache import RequestCache
 from base.views.common import display_success_messages
 from education_group.ddd import command
 from education_group.ddd.domain import mini_training, exception
-from education_group.ddd.service.read import group_service
+from education_group.ddd.service.read import get_group_service
 from education_group.ddd.service.write import create_mini_training_service
 from education_group.forms import mini_training as mini_training_form
 from education_group.templatetags.academic_year_display import display_as_academic_year
@@ -138,7 +138,7 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
         parent_identity = self.get_parent_identity()
         if parent_identity:
             default_academic_year = parent_identity.year
-            domain_obj = group_service.get_group(
+            domain_obj = get_group_service.get_group(
                 command.GetGroupCommand(code=parent_identity.code, year=parent_identity.year)
             )
             default_management_entity = domain_obj.management_entity.acronym
