@@ -47,7 +47,7 @@ class CreateTrainingCommand(interface.CommandRequest):
     code = attr.ib(type=str)
     year = attr.ib(type=int)
     type = attr.ib(type=str)
-    credits = attr.ib(type=Decimal)
+    credits = attr.ib(type=int)
     schedule_type = attr.ib(type=str)
     duration = attr.ib(type=int)
     start_year = attr.ib(type=int)

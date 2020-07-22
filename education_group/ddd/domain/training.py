@@ -204,7 +204,7 @@ class Training(interface.RootEntity):
     # FIXME :: split fields into separate ValueObjects (to discuss with business people)
     entity_id = entity_identity = attr.ib(type=TrainingIdentity)
     type = attr.ib(type=TrainingType)
-    credits = attr.ib(type=Decimal)
+    credits = attr.ib(type=int)
     start_year = attr.ib(type=int)
     titles = attr.ib(type=Titles)
     status = attr.ib(type=ActiveStatusEnum, default=ActiveStatusEnum.ACTIVE)
