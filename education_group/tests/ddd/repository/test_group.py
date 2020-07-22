@@ -41,7 +41,7 @@ from education_group.ddd.domain._titles import Titles
 from education_group.ddd.domain._entity import Entity as EntityValueObject
 from education_group.ddd.domain.exception import AcademicYearNotFound, TypeNotFound, ManagementEntityNotFound, \
     TeachingCampusNotFound, GroupCodeAlreadyExistException
-from education_group.ddd.domain.group import GroupIdentity, Group, GroupUnannualizedIdentity
+from education_group.ddd.domain.group import GroupIdentity, Group
 from education_group.ddd.factories.group import GroupFactory
 from education_group.ddd.repository.group import GroupRepository
 from education_group.tests.factories.group_year import GroupYearFactory
@@ -120,14 +120,6 @@ class TestGroupRepositoryGetMethod(TestCase):
             Remark(
                 text_fr=self.group_year_db.remark_fr,
                 text_en=self.group_year_db.remark_en
-            )
-        )
-
-        self.assertIsInstance(group.unannualized_identity, GroupUnannualizedIdentity)
-        self.assertEqual(
-            group.unannualized_identity,
-            GroupUnannualizedIdentity(
-                uuid=self.group_year_db.group_id
             )
         )
 

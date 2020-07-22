@@ -92,20 +92,6 @@ class GroupIdentity(interface.EntityIdentity):
         return self.code == other.code and self.year == other.year
 
 
-class GroupUnannualizedIdentity(interface.ValueObject):
-    """
-    This ID is necessary to find a GROUP through years because code can be different through years
-    """
-    def __init__(self, uuid: int):
-        self.uuid = uuid
-
-    def __hash__(self):
-        return hash(self.uuid)
-
-    def __eq__(self, other):
-        return self.uuid == other.uuid
-
-
 class Group(interface.RootEntity):
     def __init__(
         self,
@@ -119,7 +105,6 @@ class Group(interface.RootEntity):
         teaching_campus: Campus,
         remark: Remark,
         start_year: int,
-        unannualized_identity: 'GroupUnannualizedIdentity' = None,
         end_year: int = None,
     ):
         super(Group, self).__init__(entity_id=entity_identity)
@@ -133,7 +118,6 @@ class Group(interface.RootEntity):
         self.teaching_campus = teaching_campus
         self.remark = remark
         self.start_year = start_year
-        self.unannualized_identity = unannualized_identity
         self.end_year = end_year
 
     @property

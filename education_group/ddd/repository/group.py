@@ -37,7 +37,6 @@ from base.models.education_group_type import EducationGroupType as EducationGrou
 from base.models.entity import Entity as EntityModelDb
 from base.models.entity_version import EntityVersion as EntityVersionModelDb
 from base.models.campus import Campus as CampusModelDb
-from education_group.ddd.domain.group import GroupUnannualizedIdentity
 from education_group.ddd.domain.service.enum_converter import convert_type_str_to_enum
 from education_group.models.group_year import GroupYear as GroupYearModelDb
 from education_group.models.group import Group as GroupModelDb
@@ -196,8 +195,6 @@ def _convert_db_model_to_ddd_model(obj: GroupYearModelDb) -> 'Group':
     entity_id = GroupIdentity(code=obj.partial_acronym, year=obj.academic_year.year)
     return group.Group(
         entity_identity=entity_id,
-        # TODO: Create UUID field on group model and use it insteaf of group_id
-        unannualized_identity=GroupUnannualizedIdentity(uuid=obj.group_id),
         type=domain.service.enum_converter.convert_type_str_to_enum(obj.education_group_type.name),
         abbreviated_title=obj.acronym,
         titles=Titles(
