@@ -97,9 +97,11 @@ class TrainingBuilder:
 
         command_aims = []
         for aim in command.aims:
-            DiplomaAim(
-                entity_id=DiplomaAimIdentity(code=aim[0], section=aim[1]),
-                description=None,
+            command_aims.append(
+                DiplomaAim(
+                    entity_id=DiplomaAimIdentity(code=aim[0], section=aim[1]),
+                    description=None,
+                )
             )
 
         training = Training(
