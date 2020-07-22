@@ -17,7 +17,7 @@ from education_group.ddd import command
 from program_management.ddd import command as program_management_command
 from education_group.ddd.domain.exception import GroupCodeAlreadyExistException, ContentConstraintTypeMissing, \
     ContentConstraintMinimumMaximumMissing, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum, \
-    TrainingAcronymAlreadyExist, StartYearGreaterThanEndYear
+    TrainingAcronymAlreadyExist, StartYearGreaterThanEndYear, MaximumCertificateAimType2Reached
 from education_group.ddd.domain.training import TrainingIdentity
 from program_management.ddd.service.write import create_training_with_program_tree, create_and_attach_training_service
 from education_group.forms.training import CreateTrainingForm
@@ -81,13 +81,16 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 training_form.add_error('acronym', e.message)
             except ContentConstraintTypeMissing as e:
                 training_form.add_error('constraint_type', e.message)
-            except StartYearGreaterThanEndYear as e:
-                training_form.add_error('end_year', e.message)
-                training_form.add_error('academic_year', '')
             except (ContentConstraintMinimumMaximumMissing, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum)\
                     as e:
                 training_form.add_error('min_constraint', e.message)
                 training_form.add_error('max_constraint', '')
+            except StartYearGreaterThanEndYear as e:
+                training_form.add_error('end_year', e.message)
+                training_form.add_error('academic_year', '')
+            except MaximumCertificateAimType2Reached as e:
+                training_form.add_error('certificate_aims', e.message)
+                training_form.add_error('section', '')
 
             if not training_form.errors:
                 success_messages = [

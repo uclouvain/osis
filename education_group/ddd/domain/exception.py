@@ -89,3 +89,9 @@ class StartYearGreaterThanEndYear(BusinessException):
     def __init__(self, *args, **kwargs):
         message = _('End year must be greater than the start year, or equal')
         super().__init__(message, **kwargs)
+
+
+class MaximumCertificateAimType2Reached(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _("There can only be one type 2 expectation")
+        super().__init__(message, **kwargs)
