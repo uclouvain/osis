@@ -12,7 +12,7 @@ from base.models.campus import Campus
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import GroupType, TrainingType
 from base.utils.cache import RequestCache
-from base.views.common import display_success_messages
+from base.views.common import display_success_messages, display_error_messages
 from education_group.ddd import command
 from program_management.ddd import command as program_management_command
 from education_group.ddd.domain.exception import GroupCodeAlreadyExistException, ContentConstraintTypeMissing, \
@@ -98,6 +98,9 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 ]
                 display_success_messages(request, success_messages, extra_tags='safe')
                 return HttpResponseRedirect(self.get_success_url(training_ids[0]))
+            else:
+                msg = _("Error(s) in form: The modifications are not saved")
+                display_error_messages(request, msg)
 
         return render(request, self.template_name, {
             "training_form": training_form,
