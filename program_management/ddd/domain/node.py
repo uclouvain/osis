@@ -417,8 +417,6 @@ class NodeLearningUnitYear(Node):
     volume_total_lecturing = attr.ib(type=Decimal, default=None)
     volume_total_practical = attr.ib(type=Decimal, default=None)
 
-
-
     @property
     def full_title_fr(self) -> str:
         return "{}{}".format(
