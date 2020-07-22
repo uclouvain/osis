@@ -76,12 +76,12 @@ class TrainingBuilder:
             # TODO :: Case update training next year - to implement in OSIS-4809
         except TrainingNotFoundException:
             # Case create training next year
+            CopyTrainingValidatorList(training_from).validate()
             training_next_year = attr.evolve(  # Copy to new object
                 training_from,
                 entity_identity=identity_next_year,
                 entity_id=identity_next_year,
             )
-            CopyTrainingValidatorList(training_next_year).validate()
         return training_next_year
 
     def create_training(self, command: 'CreateTrainingCommand') -> 'Training':

@@ -78,9 +78,9 @@ class CopyTrainingValidatorList(business_validator.BusinessListValidator):
 
     def __init__(
             self,
-            training_next_year: 'Training'
+            training_from: 'Training'
     ):
         self.validators = [
-            CheckEndDateValidator(training_next_year),
+            CheckEndDateValidator(training_from),
         ]
         super().__init__()
