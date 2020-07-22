@@ -25,13 +25,17 @@
 ##############################################################################
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import EducationGroupTypesEnum
+from osis_common.ddd import interface
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.service.validation_rule import FieldValidationRule
 
 
-def generate_from_parent_node(parent_node: 'Node', child_node_type: EducationGroupTypesEnum) -> str:
-    default_value = FieldValidationRule.get(child_node_type, 'abbreviated_title').initial_value
-    return "{child_title}{parent_abbreviated_title}".format(
-        child_title=default_value.replace(" ", "").upper(),
-        parent_abbreviated_title=parent_node.title
-    )[:EducationGroupYear._meta.get_field("acronym").max_length]
+class GenerateNodeAbbreviatedTitle(interface.DomainService):
+
+    @classmethod
+    def generate(cls, parent_node: 'Node', child_node_type: EducationGroupTypesEnum) -> str:
+        default_value = FieldValidationRule.get(child_node_type, 'abbreviated_title').initial_value
+        return "{child_title}{parent_abbreviated_title}".format(
+            child_title=default_value.replace(" ", "").upper(),
+            parent_abbreviated_title=parent_node.title
+        )[:EducationGroupYear._meta.get_field("acronym").max_length]
