@@ -21,7 +21,7 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from education_group.ddd.service.write import create_mini_training_service
+from education_group.ddd.service.write import create_orphan_mini_training_service
 from program_management.ddd import command as command_program_mangement
 from education_group.ddd import command as command_education_group
 from education_group.ddd.domain.mini_training import MiniTrainingIdentity
@@ -31,7 +31,7 @@ from program_management.ddd.service.write import paste_element_service
 def create_mini_training_and_paste(
         cmd: command_program_mangement.CreateMiniTrainingAndPasteCommand) -> 'MiniTrainingIdentity':
     cmd_create = _get_create_orphan_mini_training_command_from_create_mini_training_and_attach_command(cmd)
-    mini_training_identity = create_mini_training_service.create_orphan_mini_training(cmd_create)
+    mini_training_identity = create_orphan_mini_training_service.create_orphan_mini_training(cmd_create)
 
     cmd_paste = _get_paste_element_command_from_create_mini_training_and_paste_command(cmd)
     paste_element_service.paste_element(cmd_paste)

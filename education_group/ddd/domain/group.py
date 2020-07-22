@@ -66,7 +66,6 @@ class GroupBuilder:
             teaching_campus=teaching_campus,
             remark=remark,
             start_year=cmd.start_year,
-            unannualized_identity=None,
             end_year=cmd.end_year
         )
 

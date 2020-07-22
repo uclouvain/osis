@@ -225,10 +225,6 @@ class TestCreateNonOrphanGroupPostMethod(TestCase):
                                                           mock_form,
                                                           *args):
 
-        mock_form.return_value.is_valid.return_value = True
-        mock_form.return_value.errors = []
-        mock_form.return_value.cleaned_data = defaultdict(lambda: None)
-
         mock_service_create_group.return_value = GroupIdentity(code="LTRONC1000", year=2018)
 
         response = self.client.post(self.url)

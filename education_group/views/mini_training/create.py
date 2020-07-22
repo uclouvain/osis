@@ -36,7 +36,7 @@ from base.views.common import display_success_messages
 from education_group.ddd import command
 from education_group.ddd.domain import mini_training, exception
 from education_group.ddd.service.read import get_group_service
-from education_group.ddd.service.write import create_mini_training_service
+from education_group.ddd.service.write import create_orphan_mini_training_service
 from education_group.forms import mini_training as mini_training_form
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from osis_role.contrib.views import PermissionRequiredMixin
@@ -70,7 +70,7 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
                     self._generate_create_and_paste_command_from_valid_form(form)
                 )
             else:
-                mini_training_identity = create_mini_training_service.create_orphan_mini_training(
+                mini_training_identity = create_orphan_mini_training_service.create_orphan_mini_training(
                     self._generate_create_command_from_valid_form(form)
                 )
             self.set_success_url(mini_training_identity)

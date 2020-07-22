@@ -25,7 +25,7 @@ import mock
 from django.test import TestCase
 
 from education_group.ddd.domain import mini_training
-from education_group.ddd.service.write import create_mini_training_service
+from education_group.ddd.service.write import create_orphan_mini_training_service
 from education_group.tests.factories.factories.command import CreateOrphanMiniTrainingCommandFactory
 
 
@@ -34,13 +34,13 @@ class TestCreateOprhanMiniTraining(TestCase):
         self.command = CreateOrphanMiniTrainingCommandFactory()
 
     @mock.patch('education_group.publisher.mini_training_created', autospec=True)
-    @mock.patch("education_group.ddd.service.write.create_mini_training_service.MiniTrainingRepository.create")
+    @mock.patch("education_group.ddd.service.write.create_orphan_mini_training_service.MiniTrainingRepository.create")
     def test_should_return_mini_training_identity(self, mock_repository_create, mock_publisher):
         mock_repository_create.return_value = mini_training.MiniTrainingIdentity(
             code=self.command.code,
             year=self.command.start_year
         )
-        result = create_mini_training_service.create_orphan_mini_training(self.command)
+        result = create_orphan_mini_training_service.create_orphan_mini_training(self.command)
         self.assertEqual(
             result,
             mini_training.MiniTrainingIdentity(code=self.command.code, year=self.command.start_year)

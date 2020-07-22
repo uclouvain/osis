@@ -30,10 +30,13 @@ from program_management.ddd.service.write import postpone_tree_version_service
 
 
 class TestPostponeProgramTree(TestCase):
+    @mock.patch("program_management.ddd.domain.service.calculate_end_postponement"
+                ".CalculateEndPostponement.calculate_year_of_end_postponement", return_value=2021)
     @mock.patch("program_management.ddd.service.write.copy_program_version_service.copy_tree_version_to_next_year")
     def test_should_return_a_number_of_identities_equal_to_difference_of_from_year_and_until_year(
             self,
-            mock_copy_program_to_next_year):
+            mock_copy_program_to_next_year,
+            mock_calculate_end_year_of_postponement):
 
         program_tree_version_identities = [
             program_tree_version.ProgramTreeVersionIdentity(
@@ -58,7 +61,6 @@ class TestPostponeProgramTree(TestCase):
         mock_copy_program_to_next_year.side_effect = program_tree_version_identities
 
         cmd = command.PostponeProgramTreeVersionCommand(
-            postpone_until_year=2021,
             from_year=2018,
             from_offer_acronym="offer",
             from_is_transition=False,
