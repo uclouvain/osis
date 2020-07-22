@@ -29,7 +29,6 @@ from django.db import IntegrityError
 from django.db.models import Prefetch, Subquery, OuterRef, Q
 from django.utils import timezone
 
-from education_group.ddd import domain
 from education_group.ddd.business_types import *
 
 from base.models.academic_year import AcademicYear as AcademicYearModelDb
@@ -37,7 +36,7 @@ from base.models.education_group_type import EducationGroupType as EducationGrou
 from base.models.entity import Entity as EntityModelDb
 from base.models.entity_version import EntityVersion as EntityVersionModelDb
 from base.models.campus import Campus as CampusModelDb
-from education_group.ddd.domain.service.enum_converter import convert_type_str_to_enum
+from education_group.ddd.domain.service.enum_converter import EducationGroupTypeConverter
 from education_group.models.group_year import GroupYear as GroupYearModelDb
 from education_group.models.group import Group as GroupModelDb
 from base.models.enums.constraint_type import ConstraintTypeEnum
@@ -195,7 +194,7 @@ def _convert_db_model_to_ddd_model(obj: GroupYearModelDb) -> 'Group':
     entity_id = GroupIdentity(code=obj.partial_acronym, year=obj.academic_year.year)
     return group.Group(
         entity_identity=entity_id,
-        type=domain.service.enum_converter.convert_type_str_to_enum(obj.education_group_type.name),
+        type=EducationGroupTypeConverter.convert_type_str_to_enum(obj.education_group_type.name),
         abbreviated_title=obj.acronym,
         titles=Titles(
             title_fr=obj.title_fr,
