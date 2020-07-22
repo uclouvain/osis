@@ -29,6 +29,7 @@ from base.models.enums.education_group_types import TrainingType, MiniTrainingTy
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from program_management.ddd.domain.node import NodeEducationGroupYear, NodeLearningUnitYear, NodeGroupYear, Node, \
     NodeIdentity
+from program_management.models.enums.node_type import NodeType
 
 
 def generate_end_date(node):
@@ -91,7 +92,7 @@ class NodeLearningUnitYearFactory(NodeFactory):
         model = NodeLearningUnitYear
         abstract = False
 
-    node_type = None
+    node_type = NodeType.LEARNING_UNIT
     is_prerequisite_of = factory.LazyFunction(list)
     credits = factory.fuzzy.FuzzyDecimal(0, 10, precision=1)
     specific_title_en = factory.fuzzy.FuzzyText(length=240)
