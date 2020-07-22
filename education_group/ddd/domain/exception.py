@@ -1,5 +1,6 @@
 from osis_common.ddd.interface import BusinessException
 from django.utils.translation import gettext_lazy as _
+from education_group.ddd.business_types import *
 
 
 class TrainingNotFoundException(Exception):
@@ -56,4 +57,29 @@ class ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum(BusinessExcepti
 class CreditShouldBeGreaterOrEqualsThanZero(BusinessException):
     def __init__(self, *args, **kwargs):
         message = _("Credits must be greater or equals than 0")
+        super().__init__(message, **kwargs)
+
+
+class AcronymRequired(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _("Acronym/Short title is required")
+        super().__init__(message, **kwargs)
+
+
+class TrainingAcronymAlreadyExist(BusinessException):
+    def __init__(self, abbreviated_title: str, *args, **kwargs):
+        message = _("Acronym/Short title '{}' already exists").format(abbreviated_title)
+        super().__init__(message, **kwargs)
+
+
+class CannotCopyDueToEndDate(BusinessException):
+    def __init__(self, training_next_year: 'Training', *args, **kwargs):
+        message = _(
+            "You can't copy the training '{acronym}' from {from_year} to {to_year} because it ends in {end_year}"
+        ).format(
+            acronym=training_next_year.acronym,
+            from_year=training_next_year.year - 1,
+            to_year=training_next_year.year,
+            end_year=training_next_year.end_year,
+        )
         super().__init__(message, **kwargs)

@@ -50,6 +50,8 @@ from education_group.ddd.domain._language import Language
 from education_group.ddd.domain._study_domain import StudyDomain, StudyDomainIdentity
 from education_group.ddd.domain._titles import Titles
 from education_group.ddd.domain.exception import TrainingNotFoundException
+from education_group.ddd.validators.validators_by_business_action import CreateTrainingValidatorList, \
+    CopyTrainingValidatorList
 from osis_common.ddd import interface
 
 
@@ -78,10 +80,12 @@ class TrainingBuilder:
                 entity_identity=identity_next_year,
                 entity_id=identity_next_year,
             )
+            CopyTrainingValidatorList(training_next_year).validate()
         return training_next_year
 
-    def get_training(self, command: 'CreateTrainingCommand') -> 'Training':
+    def create_training(self, command: 'CreateTrainingCommand') -> 'Training':
         training_identity = TrainingIdentity(command.abbreviated_title, command.year)
+
         secondary_domains = []
         for dom in command.secondary_domains:
             secondary_domains.append(
@@ -98,7 +102,7 @@ class TrainingBuilder:
                 description=None,
             )
 
-        return Training(
+        training = Training(
             entity_identity=training_identity,
             entity_id=training_identity,
             type=self._get_enum_from_str(command.type, TrainingType),
@@ -176,6 +180,8 @@ class TrainingBuilder:
                 aims=command_aims,
             ),
         )
+        CreateTrainingValidatorList(training).validate()
+        return training
 
     def _get_enum_from_str(self, value: str, enum_class):
         if not value:

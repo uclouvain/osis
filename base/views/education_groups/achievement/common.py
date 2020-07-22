@@ -58,7 +58,7 @@ class EducationGroupAchievementMixin(SingleObjectMixin):
         }
 
     def get_success_url(self):
-        prefix = 'training_' if self.education_group_year.is_training else 'mini_training_'
+        prefix = 'training_' if self.education_group_year.is_training() else 'mini_training_'
         return reverse(
             prefix + 'skills_achievements', args=[self.kwargs['year'], self.kwargs['code']]
         ) + '?path={}&tab={}#achievement_{}'.format(
@@ -77,7 +77,7 @@ class EducationGroupDetailedAchievementMixin(EducationGroupAchievementMixin):
         return get_object_or_404(EducationGroupAchievement, pk=self.kwargs["education_group_achievement_pk"])
 
     def get_success_url(self):
-        prefix = 'training_' if self.education_group_year.is_training else 'mini_training_'
+        prefix = 'training_' if self.education_group_year.is_training() else 'mini_training_'
         return reverse(
             prefix + 'skills_achievements', args=[self.kwargs['year'], self.kwargs['code']]
         ) + '?path={}&tab={}#detail_achievements_{}'.format(
