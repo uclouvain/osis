@@ -23,32 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
-
-from django.db import transaction
-
-from education_group.ddd import command
+from base.models import academic_year
 from education_group.ddd.business_types import *
-from education_group.ddd.domain.training import TrainingBuilder
-from education_group.ddd.repository.training import TrainingRepository
-from education_group.ddd.service.write import postpone_training_service
+from osis_common.ddd import interface
 
 
-@transaction.atomic()
-def create_and_postpone_orphan_training(create_training_cmd: command.CreateTrainingCommand) -> List['TrainingIdentity']:
-    # GIVEN
-    cmd = create_training_cmd
+class CalculateEndPostponement(interface.DomainService):
 
-    # WHEN
-    training = TrainingBuilder().create_training(cmd)
-
-    # THEN
-    training_id = TrainingRepository.create(training)
-    training_identities = postpone_training_service.postpone_training(
-        command.PostponeTrainingCommand(
-            acronym=training_id.acronym,
-            postpone_from_year=training_id.year,
-        )
-    )
-
-    return [training_id] + training_identities
+    @classmethod
+    def calculate_year_of_end_postponement(cls, training: 'Training') -> int:
+        default_years_to_postpone = 6
+        current_year = academic_year.starting_academic_year().year
+        if training.end_year:
+            default_years_to_postpone = training.end_year - training.year
+        return current_year + default_years_to_postpone

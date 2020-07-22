@@ -27,8 +27,12 @@ from typing import List
 
 from django.db import transaction
 
-from program_management.ddd.business_types import *
+from education_group.ddd.domain.training import TrainingIdentity
+from education_group.ddd.repository.training import TrainingRepository
 from program_management.ddd.command import PostponeProgramTreeCommand, CopyProgramTreeToNextYearCommand
+from program_management.ddd.domain.program_tree import ProgramTreeIdentity
+from program_management.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
+from program_management.ddd.domain.service.identity_search import TrainingIdentitySearch
 from program_management.ddd.service.write import copy_program_tree_service
 
 
@@ -39,16 +43,22 @@ def postpone_program_tree(
 
     identities_created = []
 
+    # GIVEN
     from_year = postpone_cmd.from_year
-    while from_year < postpone_cmd.postpone_until_year:
-        # GIVEN
-        cmd_copy_from = CopyProgramTreeToNextYearCommand(
-            code=postpone_cmd.from_code,
-            year=from_year,
-        )
+    end_postponement_year = CalculateEndPostponement.calculate_year_of_end_postponement(
+        training_identity=TrainingIdentity(acronym=postpone_cmd.offer_acronym, year=postpone_cmd.from_year),
+        training_repository=TrainingRepository()
+    )
 
-        # WHEN
-        identity_next_year = copy_program_tree_service.copy_program_tree_to_next_year(cmd_copy_from)
+    # WHEN
+    while from_year < end_postponement_year:
+
+        identity_next_year = copy_program_tree_service.copy_program_tree_to_next_year(
+            copy_cmd=CopyProgramTreeToNextYearCommand(
+                code=postpone_cmd.from_code,
+                year=from_year,
+            )
+        )
 
         # THEN
         identities_created.append(identity_next_year)

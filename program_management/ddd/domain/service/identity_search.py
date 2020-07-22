@@ -33,6 +33,8 @@ from osis_common.ddd import interface
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
+from education_group.ddd.domain.service.identity_search import TrainingIdentitySearch \
+    as EducationGroupTrainingIdentitySearch
 
 
 class ProgramTreeVersionIdentitySearch(interface.DomainService):
@@ -89,3 +91,12 @@ class TrainingIdentitySearch(interface.DomainService):
             version_identity: 'ProgramTreeVersionIdentity'
     ) -> 'TrainingIdentity':
         return TrainingIdentity(acronym=version_identity.offer_acronym, year=version_identity.year)
+
+    @classmethod
+    def get_from_program_tree_identity(
+            cls,
+            identity: 'ProgramTreeIdentity'
+    ) -> 'TrainingIdentity':
+        return EducationGroupTrainingIdentitySearch().get_from_node_identity(
+            node_identity=NodeIdentitySearch().get_from_program_tree_identity(tree_identity=identity)
+        )

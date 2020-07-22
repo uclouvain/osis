@@ -66,9 +66,9 @@ def create_and_report_training_with_program_tree(
     # 3. Postpone Program tree
     postpone_program_tree_service.postpone_program_tree(
         PostponeProgramTreeCommand(
-            postpone_until_year=program_tree_identity.year + 6,
             from_code=program_tree_identity.code,
             from_year=program_tree_identity.year,
+            offer_acronym=create_training_cmd.abbreviated_title,
         )
     )
 
@@ -84,7 +84,6 @@ def create_and_report_training_with_program_tree(
     # 5. Postpone standard version of program tree
     postpone_tree_version_service.postpone_program_tree_version(
         PostponeProgramTreeVersionCommand(
-            postpone_until_year=program_tree_version_identity.year + 6,  # FIXME :: to calculate with end_year and to with HARD CODE "+6"
             from_offer_acronym=program_tree_version_identity.offer_acronym,
             from_version_name=program_tree_version_identity.version_name,
             from_year=program_tree_version_identity.year,

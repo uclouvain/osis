@@ -28,7 +28,9 @@ from typing import List
 from django.db import transaction
 
 from education_group.ddd import command
-from education_group.ddd.business_types import *
+from education_group.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
+from education_group.ddd.domain.training import TrainingIdentity
+from education_group.ddd.repository.training import TrainingRepository
 from education_group.ddd.service.write import copy_training_service
 
 
@@ -36,16 +38,22 @@ from education_group.ddd.service.write import copy_training_service
 def postpone_training(postpone_cmd: command.PostponeTrainingCommand) -> List['TrainingIdentity']:
     identities_created = []
 
+    # GIVEN
     from_year = postpone_cmd.postpone_from_year
-    while from_year < postpone_cmd.postpone_until_year:
-        # GIVEN
-        cmd_copy_from = command.CopyTrainingToNextYearCommand(
-            acronym=postpone_cmd.acronym,
-            postpone_from_year=from_year
-        )
+    copy_from_training = TrainingRepository().get(
+        entity_id=TrainingIdentity(acronym=postpone_cmd.acronym, year=from_year)
+    )
+    end_postponement_year = CalculateEndPostponement.calculate_year_of_end_postponement(copy_from_training)
 
-        # WHEN
-        identity_next_year = copy_training_service.copy_training_to_next_year(cmd_copy_from)
+    # WHEN
+    while from_year < end_postponement_year:
+
+        identity_next_year = copy_training_service.copy_training_to_next_year(
+            copy_cmd=command.CopyTrainingToNextYearCommand(
+                acronym=postpone_cmd.acronym,
+                postpone_from_year=from_year
+            )
+        )
 
         # THEN
         identities_created.append(identity_next_year)
