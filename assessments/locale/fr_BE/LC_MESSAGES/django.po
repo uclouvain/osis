@@ -239,7 +239,7 @@ msgstr "Récupérer le fichier Excel"
 
 msgid "If you try to put decimal values, it will be ignored."
 msgstr ""
-"Si vous tentez d'introduire des valeurs décimales,elles seront ignorées."
+"Si vous tentez d'introduire des valeurs décimales, elles seront ignorées."
 
 msgid "Include subordinate entities"
 msgstr ""

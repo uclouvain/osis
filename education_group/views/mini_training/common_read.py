@@ -50,7 +50,7 @@ from program_management.ddd.domain.node import NodeIdentity, NodeNotFoundExcepti
 from program_management.ddd.repositories import load_tree
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.models.element import Element
-from program_management.serializers.program_tree_view import program_tree_view_serializer
+from program_management.serializers.program_tree_version_view import program_tree_version_view_serializer
 from education_group.forms.tree_version_choices import get_tree_versions_choices
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
@@ -131,7 +131,7 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             "node": self.get_object(),
             "node_path": self.get_path(),
             "tab_urls": self.get_tab_urls(),
-            "tree": json.dumps(program_tree_view_serializer(self.get_tree())),
+            "tree": json.dumps(program_tree_version_view_serializer(self.current_version)),
             "education_group_version": self.get_education_group_version(),
             "academic_year_choices": get_academic_year_choices(
                 self.node_identity,
@@ -249,7 +249,10 @@ def _get_view_name_from_tab(tab: Tab):
 
 def get_tab_urls(tab: Tab, node_identity: 'NodeIdentity', path: 'Path' = None) -> str:
     path = path or ""
+    url_parameters = \
+        "?path={}&tab={}#achievement_".format(path, tab) if tab == Tab.SKILLS_ACHIEVEMENTS else "?path={}".format(path)
+
     return reverse(
         _get_view_name_from_tab(tab),
         args=[node_identity.year, node_identity.code]
-    ) + "?path={}".format(path)
+    ) + url_parameters

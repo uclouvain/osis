@@ -27,6 +27,7 @@ from base.ddd.utils import business_validator
 from education_group.ddd.domain import mini_training
 from education_group.ddd.domain.group import Group
 from education_group.ddd.validators._content_constraint import ContentConstraintValidator
+from education_group.ddd.validators._credits import CreditsValidator
 from education_group.ddd.validators.start_and_end_year_validator import StartAndEndYearValidator
 
 
@@ -34,10 +35,24 @@ class CreateGroupValidatorList(business_validator.BusinessListValidator):
 
     def __init__(
             self,
-            group: Group
+            group: 'Group'
     ):
         self.validators = [
             ContentConstraintValidator(group.content_constraint),
+            CreditsValidator(group.credits),
+        ]
+        super().__init__()
+
+
+class UpdateGroupValidatorList(business_validator.BusinessListValidator):
+
+    def __init__(
+            self,
+            group: 'Group'
+    ):
+        self.validators = [
+            ContentConstraintValidator(group.content_constraint),
+            CreditsValidator(group.credits),
         ]
         super().__init__()
 

@@ -67,3 +67,9 @@ class StartYearGreaterThanEndYearException(BusinessException):
     def __init__(self, *args, **kwargs):
         message = _("Validity cannot be greater than last year of organization")
         super().__init__(message, **kwargs)
+
+
+class CreditShouldBeGreaterOrEqualsThanZero(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _("Credits must be greater or equals than 0")
+        super().__init__(message, **kwargs)

@@ -29,7 +29,7 @@
           action="{% url 'content_up' %}">
         {% csrf_token %}
         <input type="hidden" name="path" value="{{ node_path|addstr:"|"|addstr:link.child.node_id }}">
-        <button class="btn btn-link"
+        <button class="btn-link nopadding"
                 title="{% trans 'Go up' %}"
                 type="submit"
                 {% if up_disabled %}disabled{% endif %}>
@@ -41,7 +41,7 @@
           action="{% url 'content_down' %}">
         {% csrf_token %}
         <input type="hidden" name="path" value="{{ node_path|addstr:"|"|addstr:link.child.node_id }}">
-        <button class="btn btn-link"
+        <button class="btn-link nopadding"
                 title="{% trans 'Go down' %}"
                 type="submit"
                 {% if down_disabled %}disabled{% endif %}>

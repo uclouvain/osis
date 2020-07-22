@@ -374,6 +374,12 @@ class TestLearningUnitSuppressionProposal(TestCase):
             _("You cannot put in proposal for ending date on the first year of the learning unit.")
         )
 
+    def test_get_request_on_UE_with_end_date(self):
+        self.learning_unit.end_year = self.next_academic_year
+        self.learning_unit.save()
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+
     def test_get_request_academic_year_list_in_form_for_central_manager(self):
         person_factory.add_person_to_groups(self.person, [groups.CENTRAL_MANAGER_GROUP])
         response = self.client.get(self.url)
