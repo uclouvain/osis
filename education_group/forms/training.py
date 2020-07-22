@@ -230,7 +230,11 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         required=False,
         disabled=True
     )
-    leads_to_diploma = forms.BooleanField(initial=False, label=_('Leads to diploma/certificate'))
+    leads_to_diploma = forms.BooleanField(
+        initial=False,
+        label=_('Leads to diploma/certificate'),
+        required=False,
+    )
     diploma_printing_title = forms.CharField(max_length=240, required=False, label=_('Diploma title'))
     professional_title = forms.CharField(max_length=320, required=False, label=_('Professionnal title'))
     certificate_aims = forms.ModelMultipleChoiceField(
