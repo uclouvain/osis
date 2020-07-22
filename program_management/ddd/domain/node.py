@@ -50,6 +50,19 @@ from program_management.models.enums.node_type import NodeType
 
 
 class NodeFactory:
+
+    @classmethod
+    def copy_to_next_year(cls, copy_from_node: 'Node') -> 'Node':
+        next_year = copy_from_node.entity_id.year + 1
+        node_next_year = attr.evolve(
+            copy_from_node,
+            entity_id=NodeIdentity(copy_from_node.entity_id.code, next_year),
+            year=next_year,
+            children=[],
+        )
+        node_next_year._has_changed = True
+        return node_next_year
+
     def get_node(self, type: NodeType, **node_attrs):
         node_cls = {
             NodeType.EDUCATION_GROUP: NodeEducationGroupYear,   # TODO: Remove when migration is done

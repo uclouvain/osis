@@ -37,6 +37,7 @@ from osis_common.decorators.deprecated import deprecated
 from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.node import factory as node_factory, NodeIdentity, Node
+from program_management.ddd.domain.link import factory as link_factory
 from program_management.ddd.domain import prerequisite, exception
 from program_management.ddd.domain.service import generate_node_code, validation_rule, \
     generate_node_abbreviated_title
@@ -76,26 +77,13 @@ class ProgramTreeBuilder:
         return program_tree_next_year
 
     def _copy_node_and_children_to_next_year(self, copy_from_node: 'Node') -> 'Node':
-        next_year = copy_from_node.entity_id.year + 1
-        parent_next_year = attr.evolve(
-            copy_from_node,
-            entity_id=NodeIdentity(copy_from_node.entity_id.code, next_year),
-            year=next_year,
-            children=[],
-        )  # TODO :: to move into NodeBuilder
-        parent_next_year._has_changed = True
+        parent_next_year = node_factory.copy_to_next_year(copy_from_node)
         links_next_year = []
         for copy_from_link in copy_from_node.children:
             child_node = copy_from_link.child
             child_next_year = self._copy_node_and_children_to_next_year(child_node)
-            child_next_year._has_changed = True
-            link_next_year = attr.evolve(
-                copy_from_link,
-                parent=parent_next_year,
-                child=child_next_year,
-            )  # TODO :: to move into LinkBuilder
+            link_next_year = link_factory.copy_to_next_year(copy_from_link, parent_next_year, child_next_year)
             parent_next_year.children.append(link_next_year)
-            link_next_year._has_changed = True
             links_next_year.append(link_next_year)
         return parent_next_year
 

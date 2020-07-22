@@ -128,6 +128,15 @@ class LinkWithChildBranch(Link):
 
 class LinkFactory:
 
+    def copy_to_next_year(self, copy_from_link: 'Link', parent_next_year: 'Node', child_next_year: 'Node') -> 'Link':
+        link_next_year = attr.evolve(
+            copy_from_link,
+            parent=parent_next_year,
+            child=child_next_year,
+        )  # TODO :: to move into LinkBuilder
+        link_next_year._has_changed = True
+        return link_next_year
+
     def get_link(self, parent: 'Node', child: 'Node', **kwargs) -> Link:
         if parent and parent.node_type == NodeType.LEARNING_UNIT.name:
             return LinkWithChildLeaf(parent, child, **kwargs)
