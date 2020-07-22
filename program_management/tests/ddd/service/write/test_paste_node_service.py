@@ -26,7 +26,7 @@
 from unittest import mock
 from unittest.mock import patch
 
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, TestCase
 from django.utils.translation import gettext as _
 
 import osis_common.ddd.interface
@@ -48,7 +48,7 @@ from program_management.tests.ddd.factories.program_tree import ProgramTreeFacto
 from program_management.tests.ddd.service.mixins import ValidatorPatcherMixin
 
 
-class TestPasteNode(SimpleTestCase, ValidatorPatcherMixin):
+class TestPasteNode(TestCase, ValidatorPatcherMixin):
 
     def setUp(self):
         self.root_node = NodeGroupYearFactory(node_type=TrainingType.BACHELOR)

@@ -14,6 +14,7 @@ from education_group.ddd.domain.group import GroupIdentity
 from education_group.forms.group import GroupForm, GroupAttachForm
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from program_management.tests.factories.element import ElementGroupYearFactory
+from testing import mocks
 
 
 class TestCreateOrphanGroupGetMethod(TestCase):
@@ -217,17 +218,14 @@ class TestCreateNonOrphanGroupPostMethod(TestCase):
         self.client.post(self.url)
         self.assertTrue(mock_service_create_group.called)
 
-    @mock.patch('education_group.views.group.create.GroupForm.is_valid', return_value=True)
-    @mock.patch('education_group.views.group.create.GroupForm.cleaned_data',
-                new_callable=mock.PropertyMock, create=True)
+    @mock.patch('education_group.views.group.create.GroupAttachForm', new_callable=mocks.MockFormValid)
     @mock.patch('education_group.views.group.create.create_group_and_attach_service.create_group_and_attach')
     def test_post_assert_redirection_with_path_queryparam(self,
                                                           mock_service_create_group,
-                                                          mock_form_clean_data,
+                                                          mock_form,
                                                           *args):
 
         mock_service_create_group.return_value = GroupIdentity(code="LTRONC1000", year=2018)
-        mock_form_clean_data.return_value = defaultdict(lambda: None)
 
         response = self.client.post(self.url)
 
@@ -235,3 +233,6 @@ class TestCreateNonOrphanGroupPostMethod(TestCase):
             reverse('group_identification', kwargs={'code': 'LTRONC1000', 'year': 2018}) + \
             "?path={}".format(str(self.parent_element.pk))
         self.assertRedirects(response, expected_redirect, fetch_redirect_response=False)
+
+
+

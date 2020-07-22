@@ -25,7 +25,7 @@
 ##############################################################################
 from unittest.mock import patch
 
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, TestCase
 
 import osis_common.ddd.interface
 from base.ddd.utils import business_validator
@@ -41,7 +41,7 @@ from program_management.tests.ddd.factories.program_tree import ProgramTreeFacto
 from program_management.tests.ddd.service.mixins import ValidatorPatcherMixin
 
 
-class TestDetachNode(SimpleTestCase, ValidatorPatcherMixin):
+class TestDetachNode(TestCase, ValidatorPatcherMixin):
 
     def setUp(self):
         self.root_node = NodeEducationGroupYearFactory(

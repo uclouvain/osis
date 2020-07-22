@@ -72,7 +72,8 @@ class TrainingFactory(factory.Factory):
         model = Training
         abstract = False
 
-    entity_id = entity_identity = factory.SubFactory(TrainingIdentityFactory)
+    entity_identity = factory.SubFactory(TrainingIdentityFactory)
+    entity_id = factory.LazyAttribute(lambda o: o.entity_identity)
     identity_through_years = factory.SubFactory(TrainingIdentityThroughYearsFactory)
     type = factory.fuzzy.FuzzyChoice(TrainingType)
     credits = factory.fuzzy.FuzzyDecimal(0, 10, precision=1)

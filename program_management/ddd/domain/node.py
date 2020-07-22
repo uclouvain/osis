@@ -75,7 +75,7 @@ class NodeIdentity(interface.EntityIdentity):
     year = attr.ib(type=int)
 
 
-@attr.s(slots=True, hash=False)
+@attr.s(slots=True, eq=False, hash=False)
 class Node(interface.Entity):
 
     type = None
@@ -103,6 +103,11 @@ class Node(interface.Entity):
 
     def __str__(self):
         return '%(code)s (%(year)s)' % {'code': self.code, 'year': self.year}
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.entity_id == other.entity_id
+        return False
 
     @property
     def pk(self):
@@ -292,7 +297,7 @@ class Node(interface.Entity):
 
     def detach_child(self, node_to_detach: 'Node') -> 'Link':
         link_to_detach = next(link for link in self.children if link.child == node_to_detach)
-        self._deleted_children.add(link_to_detach)
+        self._deleted_children.append(link_to_detach)
         self.children.remove(link_to_detach)
         return link_to_detach
 
@@ -352,7 +357,7 @@ class NodeEducationGroupYear(Node):
     category = attr.ib(type=Categories, default=None)
 
 
-@attr.s(slots=True, hash=False)
+@attr.s(slots=True, eq=False, hash=False)
 class NodeGroupYear(Node):
 
     type = NodeType.GROUP
@@ -377,11 +382,8 @@ class NodeGroupYear(Node):
     offer_status = attr.ib(type=ActiveStatusEnum, default=None)
     keywords = attr.ib(type=str, default=None)
 
-    def __hash__(self):
-        return hash(self.entity_id)
 
-
-@attr.s(slots=True, hash=False)
+@attr.s(slots=True, hash=False, eq=False)
 class NodeLearningUnitYear(Node):
 
     type = NodeType.LEARNING_UNIT
@@ -401,6 +403,8 @@ class NodeLearningUnitYear(Node):
     quadrimester = attr.ib(type=DerogationQuadrimester, default=None)
     volume_total_lecturing = attr.ib(type=Decimal, default=None)
     volume_total_practical = attr.ib(type=Decimal, default=None)
+
+
 
     @property
     def full_title_fr(self) -> str:
