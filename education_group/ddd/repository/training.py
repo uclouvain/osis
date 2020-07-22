@@ -58,6 +58,7 @@ from education_group.ddd.domain._isced_domain import IscedDomain
 from education_group.ddd.domain._language import Language
 from education_group.ddd.domain._study_domain import StudyDomain
 from education_group.ddd.domain._titles import Titles
+from education_group.ddd.domain.exception import TrainingNotFoundException
 from osis_common.ddd import interface
 
 
@@ -262,4 +263,11 @@ class TrainingRepository(interface.AbstractRepository):
 
     @classmethod
     def delete(cls, entity_id: 'TrainingIdentity') -> None:
-        raise NotImplementedError
+        try:
+            edy_db = EducationGroupYear.objects.get(
+                acronym=entity_id.acronym,
+                academic_year__year=entity_id.year
+            )
+            edy_db.delete()
+        except EducationGroupYear.DoesNotExist:
+            raise TrainingNotFoundException
