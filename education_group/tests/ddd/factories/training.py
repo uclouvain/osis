@@ -82,7 +82,7 @@ class TrainingFactory(factory.Factory):
     start_year = factory.fuzzy.FuzzyInteger(1999, 2099)
     titles = factory.SubFactory(TitlesFactory)
     keywords = factory.fuzzy.FuzzyText()
-    internship = factory.fuzzy.FuzzyChoice(InternshipPresence)
+    internship_presence = factory.fuzzy.FuzzyChoice(InternshipPresence)
     is_enrollment_enabled = True
     has_online_re_registration = True
     has_partial_deliberation = True
