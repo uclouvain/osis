@@ -122,6 +122,9 @@ class Node(interface.Entity):
             return self.entity_id == other.entity_id
         return False
 
+    def __hash__(self):
+        return hash(self.entity_id)
+
     @property
     def pk(self):
         return self.node_id

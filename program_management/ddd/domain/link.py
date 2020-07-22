@@ -81,6 +81,9 @@ class Link(interface.Entity):
             return self.entity_id == other.entity_id
         return False
 
+    def __hash__(self):
+        return hash(self.entity_id)
+
     def is_reference(self):
         return self.link_type == LinkTypes.REFERENCE
 
