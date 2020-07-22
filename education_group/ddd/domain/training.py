@@ -39,7 +39,6 @@ from base.models.enums.internship_presence import InternshipPresence
 from base.models.enums.rate_code import RateCode
 from base.models.enums.schedule_type import ScheduleTypeEnum
 from base.models.utils import utils
-from base.utils import enumeration
 from education_group.ddd.business_types import *
 from education_group.ddd.domain._campus import Campus
 from education_group.ddd.domain._co_graduation import CoGraduation

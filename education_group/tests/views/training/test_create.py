@@ -22,13 +22,15 @@
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
 import collections
+from typing import List
 
 import mock
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseForbidden
 from django.test import TestCase
-from django.urls import reverse
+from django.urls import reverse, exceptions
 
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
+from base.tests.factories.person import PersonFactory
 from education_group.ddd.domain.training import TrainingIdentity
 from education_group.forms.training import CreateTrainingForm
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
@@ -46,6 +48,28 @@ class TestTrainingCreateView(TestCase):
 
     def setUp(self):
         self.client.force_login(self.central_manager.person.user)
+
+    def test_case_when_user_not_logged(self):
+        self.client.logout()
+        response = self.client.get(self.url)
+        self.assertRedirects(response, "/login/?next={}".format(self.url))
+
+    def test_when_user_has_no_permission(self):
+        a_person_without_permission = PersonFactory()
+        self.client.force_login(a_person_without_permission.user)
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+
+    def test_when_type_in_url_is_not_supported(self):
+        with self.assertRaises(exceptions.NoReverseMatch):
+            reverse('training_create', kwargs={'type': 'dummy-type'})
+
+    def test_assert_context(self):
+        response = self.client.get(self.url)
+        self.assertIsInstance(response.context['training_form'], CreateTrainingForm)
+        self.assertIsInstance(response.context['tabs'], List)
+        self.assertIsInstance(response.context['type_text'], str)
 
     def test_should_render_template_with_correct_context_when_get_request_on_view(self):
         response = self.client.get(self.url)
