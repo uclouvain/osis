@@ -1,4 +1,4 @@
-from base.models.enums.education_group_types import GroupType, MiniTrainingType
+from base.models.enums.education_group_types import GroupType, TrainingType, MiniTrainingType
 
 
 class GroupTypeConverter:
@@ -19,6 +19,18 @@ class MiniTrainingTypeConverter:
     def to_python(self, value):
         if value not in MiniTrainingType.get_names():
             raise ValueError("%s value: is not a valid mini-training type")
+        return value
+
+    def to_url(self, value):
+        return value
+
+
+class TrainingTypeConverter:
+    regex = '\w+'
+
+    def to_python(self, value):
+        if value not in TrainingType.get_names():
+            raise ValueError("%s value: is not a valid training type")
         return value
 
     def to_url(self, value):

@@ -14,6 +14,7 @@ from education_group.ddd.domain.group import GroupIdentity
 from education_group.forms.group import GroupForm, GroupAttachForm
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from program_management.tests.factories.element import ElementGroupYearFactory
+from testing import mocks
 
 
 class TestCreateOrphanGroupGetMethod(TestCase):
@@ -217,7 +218,7 @@ class TestCreateNonOrphanGroupPostMethod(TestCase):
         self.client.post(self.url)
         self.assertTrue(mock_service_create_group.called)
 
-    @mock.patch('education_group.views.group.create.GroupAttachForm')
+    @mock.patch('education_group.views.group.create.GroupAttachForm', new_callable=mocks.MockFormValid)
     @mock.patch('education_group.views.group.create.create_group_and_attach_service.create_group_and_attach')
     def test_post_assert_redirection_with_path_queryparam(self,
                                                           mock_service_create_group,

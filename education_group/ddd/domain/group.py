@@ -26,7 +26,7 @@
 import copy
 
 from base.models.enums.constraint_type import ConstraintTypeEnum
-from base.models.enums.education_group_types import GroupType, EducationGroupTypesEnum
+from base.models.enums.education_group_types import EducationGroupTypesEnum, GroupType
 from education_group.ddd import command
 from education_group.ddd.domain._campus import Campus
 from education_group.ddd.domain._content_constraint import ContentConstraint
@@ -34,6 +34,7 @@ from education_group.ddd.domain._entity import Entity
 from education_group.ddd.domain._remark import Remark
 from education_group.ddd.domain._titles import Titles
 from education_group.ddd.validators.validators_by_business_action import UpdateGroupValidatorList
+from education_group.ddd.domain.service import enum_converter
 from osis_common.ddd import interface
 
 
@@ -56,7 +57,7 @@ class GroupBuilder:
 
         return Group(
             entity_identity=group_id,
-            type=GroupType[cmd.type],
+            type=enum_converter.convert_type_str_to_enum(cmd.type),
             abbreviated_title=cmd.abbreviated_title,
             titles=titles,
             credits=cmd.credits,
@@ -91,20 +92,6 @@ class GroupIdentity(interface.EntityIdentity):
         return self.code == other.code and self.year == other.year
 
 
-class GroupUnannualizedIdentity(interface.ValueObject):
-    """
-    This ID is necessary to find a GROUP through years because code can be different through years
-    """
-    def __init__(self, uuid: int):
-        self.uuid = uuid
-
-    def __hash__(self):
-        return hash(self.uuid)
-
-    def __eq__(self, other):
-        return self.uuid == other.uuid
-
-
 class Group(interface.RootEntity):
     def __init__(
         self,
@@ -118,7 +105,6 @@ class Group(interface.RootEntity):
         teaching_campus: Campus,
         remark: Remark,
         start_year: int,
-        unannualized_identity: 'GroupUnannualizedIdentity' = None,
         end_year: int = None,
     ):
         super(Group, self).__init__(entity_id=entity_identity)
@@ -132,7 +118,6 @@ class Group(interface.RootEntity):
         self.teaching_campus = teaching_campus
         self.remark = remark
         self.start_year = start_year
-        self.unannualized_identity = unannualized_identity
         self.end_year = end_year
 
     @property

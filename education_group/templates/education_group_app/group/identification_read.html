@@ -110,7 +110,7 @@
                     <div class="row">
                         <div class="col-md-12">
                             {% bootstrap_label _("Learning location") label_class='d-block'%}
-                            <p>{{ node.teaching_campus }} </p>
+                            <p>{{ node.teaching_campus.name }} - {{ node.teaching_campus.university_name }}</p>
                         </div>
                     </div>
                 </div>

@@ -56,6 +56,8 @@
                         <li>
                             {% url 'create_element_select_type' enums.MINI_TRAINING as create_mini_training_url %}
                             {% a_tag_modal_has_perm create_mini_training_url _('New Mini-Training') 'base.add_minitraining' user %}
+                            {% url 'create_element_select_type' enums.TRAINING as create_training_url %}
+                            {% a_tag_modal_has_perm create_training_url _('New training') 'base.add_training' user %}
                         </li>
                     </ul>
                  </div>
