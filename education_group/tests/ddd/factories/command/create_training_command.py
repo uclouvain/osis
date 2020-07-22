@@ -27,6 +27,7 @@ from decimal import Decimal
 
 import factory.fuzzy
 
+from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.ddd import command
 
 
@@ -41,7 +42,7 @@ class CreateTrainingCommandFactory(factory.Factory):
     year = 2019
     type = " Type "
     credits = 23
-    schedule_type = " schedule "
+    schedule_type = ScheduleTypeEnum.DAILY.name
     duration = 3
     start_year = 2019
     title_fr = "fr  title "
