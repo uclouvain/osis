@@ -27,21 +27,30 @@ from django.test import TestCase
 from education_group.ddd import command
 from education_group.ddd.domain import training
 from education_group.ddd.service.write import postpone_training_service
+from education_group.tests.ddd.factories.training import TrainingFactory
 
 
 class TestPostponeTraining(TestCase):
+    @mock.patch("education_group.ddd.repository.training.TrainingRepository.get")
     @mock.patch("education_group.ddd.service.write.copy_training_service.copy_training_to_next_year")
     def test_should_return_a_number_of_identities_equal_to_difference_of_from_year_and_until_year(
             self,
-            mock_copy_training_to_next_year_service):
+            mock_copy_training_to_next_year_service,
+            mock_repository_get
+    ):
+        existing_training = TrainingFactory(
+            entity_identity=training.TrainingIdentity(acronym="ACRO", year=2018),
+            end_year=2020
+        )
         training_identities = [
-            training.TrainingIdentity(acronym="ACRO", year=2018),
+            existing_training.entity_identity,
             training.TrainingIdentity(acronym="ACRO", year=2019),
             training.TrainingIdentity(acronym="ACRO", year=2020)
         ]
         mock_copy_training_to_next_year_service.side_effect = training_identities
+        mock_repository_get.return_value = existing_training
 
-        cmd = command.PostponeTrainingCommand(acronym="ACRO", postpone_from_year=2018, postpone_until_year=2021)
+        cmd = command.PostponeTrainingCommand(acronym="ACRO", postpone_from_year=2018)
         result = postpone_training_service.postpone_training(cmd)
 
         self.assertListEqual(training_identities, result)
