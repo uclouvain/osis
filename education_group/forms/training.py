@@ -36,7 +36,8 @@ from django.utils.translation import gettext_lazy as _
 
 from base.business.event_perms import EventPermEducationGroupEdition
 from base.forms.common import ValidationRuleMixin
-from base.forms.education_group.common import MainCampusChoiceField, MainEntitiesVersionChoiceField
+from base.forms.education_group.common import MainCampusChoiceField
+from education_group.forms.fields import MainEntitiesVersionChoiceField
 from base.forms.education_group.training import _get_section_choices
 from base.forms.utils.choice_field import BLANK_CHOICE
 from base.models.academic_year import AcademicYear
@@ -175,7 +176,7 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
 
     # panel_entities_form.html
     management_entity = forms.CharField()
-    administration_entity = MainEntitiesVersionChoiceField(queryset=None)  # FIXME :: class to move into 'fields.py'
+    administration_entity = MainEntitiesVersionChoiceField(queryset=None)
     academic_year = forms.ModelChoiceField(
         queryset=AcademicYear.objects.all(),
         label=_("Start"),

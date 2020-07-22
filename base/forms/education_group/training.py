@@ -35,7 +35,8 @@ from base.business.education_groups import shorten
 from base.business.education_groups.postponement import PostponementEducationGroupYearMixin, \
     CheckConsistencyCertificateAimsMixin
 from base.forms.education_group.common import CommonBaseForm, EducationGroupModelForm, \
-    MainEntitiesVersionChoiceField, EducationGroupYearModelForm, PermissionFieldTrainingMixin
+    EducationGroupYearModelForm, PermissionFieldTrainingMixin
+from education_group.forms.fields import MainEntitiesVersionChoiceField
 from base.forms.utils.choice_field import add_blank
 from base.models.certificate_aim import CertificateAim
 from base.models.education_group_certificate_aim import EducationGroupCertificateAim
