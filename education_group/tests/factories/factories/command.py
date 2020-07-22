@@ -31,7 +31,7 @@ from education_group.ddd import command
 
 class CreateOrphanMiniTrainingCommandFactory(factory.Factory):
     class Meta:
-        model = command.CreateOrphanMiniTrainingCommand
+        model = command.CreateMiniTrainingCommand
         abstract = False
 
     code = "LOSIS2547"

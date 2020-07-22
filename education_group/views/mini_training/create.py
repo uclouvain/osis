@@ -159,8 +159,8 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
 
     def _generate_create_command_from_valid_form(
             self,
-            form: mini_training_form.MiniTrainingForm) -> command.CreateOrphanMiniTrainingCommand:
-        return command.CreateOrphanMiniTrainingCommand(
+            form: mini_training_form.MiniTrainingForm) -> command.CreateMiniTrainingCommand:
+        return command.CreateMiniTrainingCommand(
             code=form.cleaned_data['code'],
             year=form.cleaned_data["academic_year"],
             type=form.cleaned_data["type"],

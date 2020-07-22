@@ -40,8 +40,8 @@ def create_mini_training_and_paste(
 
 def _get_create_orphan_mini_training_command_from_create_mini_training_and_attach_command(
         cmd: command_program_mangement.CreateMiniTrainingAndPasteCommand
-) -> command_education_group.CreateOrphanMiniTrainingCommand:
-    return command_education_group.CreateOrphanMiniTrainingCommand(
+) -> command_education_group.CreateMiniTrainingCommand:
+    return command_education_group.CreateMiniTrainingCommand(
         code=cmd.code,
         year=cmd.year,
         type=cmd.type,

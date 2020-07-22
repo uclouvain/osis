@@ -130,7 +130,7 @@ class GetMiniTrainingCommand(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True)
-class CreateOrphanMiniTrainingCommand(interface.CommandRequest):
+class CreateMiniTrainingCommand(interface.CommandRequest):
     code = attr.ib(type=str)
     year = attr.ib(type=int)
     type = attr.ib(type=str)

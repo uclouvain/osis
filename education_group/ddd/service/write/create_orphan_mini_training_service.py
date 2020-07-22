@@ -32,7 +32,7 @@ from education_group.ddd.validators import validators_by_business_action
 
 
 @transaction.atomic()
-def create_orphan_mini_training(cmd: command.CreateOrphanMiniTrainingCommand) -> 'mini_training.MiniTrainingIdentity':
+def create_orphan_mini_training(cmd: command.CreateMiniTrainingCommand) -> 'mini_training.MiniTrainingIdentity':
     mini_training_object = mini_training.MiniTrainingBuilder.build_from_create_cmd(cmd)
 
     validators_by_business_action.CreateMiniTrainingValidatorList(mini_training_object).validate()

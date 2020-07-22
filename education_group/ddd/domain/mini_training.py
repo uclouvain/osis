@@ -42,7 +42,7 @@ from osis_common.ddd import interface
 
 class MiniTrainingBuilder:
     @classmethod
-    def build_from_create_cmd(self, cmd: command.CreateOrphanMiniTrainingCommand):
+    def build_from_create_cmd(self, cmd: command.CreateMiniTrainingCommand):
         mini_training_id = MiniTrainingIdentity(code=cmd.code, year=cmd.year)
         titles = Titles(title_fr=cmd.title_fr, title_en=cmd.title_en)
         content_constraint = ContentConstraint(
