@@ -208,3 +208,9 @@ class PostponeTrainingCommand(interface.CommandRequest):
 class CopyTrainingToNextYearCommand(interface.CommandRequest):
     acronym = attr.ib(type=str)
     postpone_from_year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class CopyMiniTrainingToNextYearCommand(interface.CommandRequest):
+    code = attr.ib(type=str)
+    postpone_from_year = attr.ib(type=int)

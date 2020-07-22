@@ -21,10 +21,13 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+import mock
 from django.test import SimpleTestCase
 
-from education_group.ddd.domain import mini_training
+from education_group.ddd.domain import mini_training, exception
 from education_group.tests.factories.factories.command import CreateOrphanMiniTrainingCommandFactory
+from education_group.tests.factories.mini_training import MiniTrainingFactory
+from testing import mocks
 
 
 class TestMiniTrainingBuilder(SimpleTestCase):
@@ -34,3 +37,27 @@ class TestMiniTrainingBuilder(SimpleTestCase):
     def test_should_derive_values_from_command_when_build_from_command(self):
         result = mini_training.MiniTrainingBuilder.build_from_create_cmd(self.command)
         self.assertIsInstance(result, mini_training.MiniTraining)
+
+
+class TestMiniTrainingBuilderCopyToNextYear(SimpleTestCase):
+    @mock.patch("education_group.ddd.repository.mini_training.MiniTrainingRepository",
+                new_callable=mocks.MockRepository)
+    def test_should_return_existing_training_when_training_exists_for_next_year(self, mock_repository):
+        mini_training_source = MiniTrainingFactory()
+        mini_training_next_year = MiniTrainingFactory()
+
+        mock_repository.get.return_value = mini_training_next_year
+
+        result = mini_training.MiniTrainingBuilder().copy_to_next_year(mini_training_source, mock_repository)
+
+        self.assertEqual(mini_training_next_year, result)
+
+    @mock.patch("education_group.ddd.repository.mini_training.MiniTrainingRepository", new_callable=mocks.MockRepository)
+    def test_should_copy_with_increment_year_when_training_does_not_exists_for_next_year(self, mock_repository):
+        mini_training_source = MiniTrainingFactory()
+
+        mock_repository.get.side_effect = exception.MiniTrainingNotFoundException
+
+        result = mini_training.MiniTrainingBuilder().copy_to_next_year(mini_training_source, mock_repository)
+
+        self.assertEqual(mini_training_source.entity_id.year + 1, result.entity_id.year)

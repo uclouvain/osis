@@ -23,18 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import TYPE_CHECKING
+from django.db import transaction
 
-# FIXME :: Temporary solution ; waiting for update python to 3.8 for data structure
+from education_group.ddd import command
+from education_group.ddd.domain.mini_training import MiniTrainingIdentity, MiniTrainingBuilder
+from education_group.ddd.repository.mini_training import MiniTrainingRepository
 
-if TYPE_CHECKING:
-    from education_group.ddd.domain.training import Training, TrainingIdentity
-    from education_group.ddd.domain.group import Group, GroupIdentity
-    from education_group.ddd.domain.mini_training import MiniTraining, MiniTrainingIdentity
-    from education_group.ddd.command import CreateTrainingCommand
-    from education_group.ddd.domain._study_domain import StudyDomainIdentity
-    from education_group.ddd.domain._campus import Campus
-    from education_group.ddd.domain._co_organization import CoorganizationIdentity
-    from education_group.ddd.domain._diploma import DiplomaAimIdentity
-    from education_group.ddd.repository.training import TrainingRepository
-    from education_group.ddd.repository.mini_training import MiniTrainingRepository
+
+@transaction.atomic()
+def copy_mini_training_to_next_year(copy_cmd: command.CopyMiniTrainingToNextYearCommand) -> 'MiniTrainingIdentity':
+    # GIVEN
+    repository = MiniTrainingRepository()
+    existing_mini_training = repository.get(
+        entity_id=MiniTrainingIdentity(code=copy_cmd.code, year=copy_cmd.postpone_from_year)
+    )
+
+    # WHEN
+    mini_training_next_year = MiniTrainingBuilder().copy_to_next_year(existing_mini_training, repository)
+
+    # THEN
+    identity = repository.create(mini_training_next_year)
+
+    return identity

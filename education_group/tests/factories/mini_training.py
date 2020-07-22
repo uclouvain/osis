@@ -91,6 +91,7 @@ class MiniTrainingFactory(factory.Factory):
         abstract = False
 
     entity_identity = factory.LazyAttribute(generate_mini_training_identity)
+    entity_id = factory.LazyAttribute(lambda o: o.entity_identity)
     type = factory.Iterator(MiniTrainingType)
     abbreviated_title = factory.fuzzy.FuzzyText(length=20, chars=string.ascii_uppercase)
     titles = factory.LazyAttribute(generate_titles)

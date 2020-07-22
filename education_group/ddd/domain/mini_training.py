@@ -24,14 +24,17 @@
 #
 ##############################################################################
 import copy
+from typing import Optional
 
 import attr
 
+from education_group.ddd.business_types import *
 from base.models.enums.active_status import ActiveStatusEnum
 from base.models.enums.constraint_type import ConstraintTypeEnum
 from base.models.enums.education_group_types import EducationGroupTypesEnum, MiniTrainingType
 from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.ddd import command
+from education_group.ddd.domain import exception
 from education_group.ddd.domain._campus import Campus
 from education_group.ddd.domain._content_constraint import ContentConstraint
 from education_group.ddd.domain._entity import Entity
@@ -41,6 +44,25 @@ from osis_common.ddd import interface
 
 
 class MiniTrainingBuilder:
+    @classmethod
+    def copy_to_next_year(
+            self,
+            mini_training_from: 'MiniTraining',
+            mini_training_repository: 'MiniTrainingRepository') -> 'MiniTraining':
+
+        identity_next_year = MiniTrainingIdentity(code=mini_training_from.code, year=mini_training_from.year + 1)
+        try:
+            mini_training_next_year = mini_training_repository.get(identity_next_year)
+        except exception.MiniTrainingNotFoundException:
+            # Case create training next year
+            mini_training_next_year = attr.evolve(  # Copy to new object
+                mini_training_from,
+                entity_identity=identity_next_year,
+                entity_id=identity_next_year,
+            )
+            # TODO important check end date still valid
+        return mini_training_next_year
+
     @classmethod
     def build_from_create_cmd(self, cmd: command.CreateMiniTrainingCommand):
         mini_training_id = MiniTrainingIdentity(code=cmd.code, year=cmd.year)
@@ -57,18 +79,22 @@ class MiniTrainingBuilder:
         )
         remark = Remark(text_fr=cmd.remark_fr, text_en=cmd.remark_en)
 
-        return MiniTraining(entity_identity=mini_training_id, type=MiniTrainingType[cmd.type],
-                            abbreviated_title=cmd.abbreviated_title, titles=titles, status=ActiveStatusEnum[cmd.status],
-                            schedule_type=ScheduleTypeEnum[cmd.schedule_type], credits=cmd.credits,
-                            content_constraint=content_constraint, management_entity=management_entity,
-                            teaching_campus=teaching_campus, remark=remark, start_year=cmd.start_year,
-                            end_year=cmd.end_year)
-
-    @classmethod
-    def build_next_year_mini_training(cls, from_mini_training: 'MiniTraining'):
-        mini_training = copy.deepcopy(from_mini_training)
-        mini_training.entity_id = MiniTrainingIdentity(code=from_mini_training.code, year=from_mini_training.year + 1)
-        return mini_training
+        return MiniTraining(
+            entity_identity=mini_training_id,
+            entity_id=mini_training_id,
+            type=MiniTrainingType[cmd.type],
+            abbreviated_title=cmd.abbreviated_title,
+            titles=titles,
+            status=ActiveStatusEnum[cmd.status],
+            schedule_type=ScheduleTypeEnum[cmd.schedule_type],
+            credits=cmd.credits,
+            content_constraint=content_constraint,
+            management_entity=management_entity,
+            teaching_campus=teaching_campus,
+            remark=remark,
+            start_year=cmd.start_year,
+            end_year=cmd.end_year
+        )
 
 
 builder = MiniTrainingBuilder()
@@ -80,37 +106,21 @@ class MiniTrainingIdentity(interface.EntityIdentity):
     year = attr.ib(type=int)
 
 
+@attr.s(slots=True, eq=False, hash=False)
 class MiniTraining(interface.RootEntity):
-    def __init__(
-            self,
-            entity_identity: 'MiniTrainingIdentity',
-            type: EducationGroupTypesEnum,
-            abbreviated_title: str,
-            titles: Titles,
-            status: ActiveStatusEnum,
-            schedule_type: ScheduleTypeEnum,
-            credits: int,
-            content_constraint: ContentConstraint,
-            management_entity: Entity,
-            teaching_campus: Campus,
-            remark: Remark,
-            start_year: int,
-            end_year: int = None
-    ):
-        super().__init__(entity_id=entity_identity)
-        self.entity_id = entity_identity
-        self.type = type
-        self.abbreviated_title = abbreviated_title.upper()
-        self.titles = titles
-        self.status = status
-        self.schedule_type = schedule_type
-        self.credits = credits
-        self.content_constraint = content_constraint
-        self.management_entity = management_entity
-        self.teaching_campus = teaching_campus
-        self.remark = remark
-        self.start_year = start_year
-        self.end_year = end_year
+    entity_id = entity_identity = attr.ib(type=MiniTrainingIdentity)
+    type = attr.ib(type=EducationGroupTypesEnum)
+    abbreviated_title = attr.ib(type=str)
+    titles = attr.ib(type=Titles)
+    status = attr.ib(type=ActiveStatusEnum)
+    schedule_type = attr.ib(type=ScheduleTypeEnum)
+    credits = attr.ib(type=int)
+    content_constraint = attr.ib(type=ContentConstraint)
+    management_entity = attr.ib(type=Entity)
+    teaching_campus = attr.ib(type=Campus)
+    remark = attr.ib(type=Remark)
+    start_year = attr.ib(type=int)
+    end_year = attr.ib(type=Optional[int], default=None)
 
     @property
     def code(self) -> str:
