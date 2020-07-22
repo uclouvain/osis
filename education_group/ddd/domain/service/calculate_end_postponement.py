@@ -37,3 +37,11 @@ class CalculateEndPostponement(interface.DomainService):
         if training.end_year:
             default_years_to_postpone = training.end_year - training.year
         return current_year + default_years_to_postpone
+
+    @classmethod
+    def calculate_year_of_end_postponement_for_mini(cls, training: 'MiniTraining') -> int:
+        default_years_to_postpone = 6
+        current_year = academic_year.starting_academic_year().year
+        if training.end_year:
+            default_years_to_postpone = training.end_year - training.year
+        return current_year + default_years_to_postpone
