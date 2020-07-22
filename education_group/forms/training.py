@@ -47,7 +47,7 @@ from base.models.enums.active_status import ActiveStatusEnum
 from base.models.enums.activity_presence import ActivityPresence
 from base.models.enums.constraint_type import ConstraintTypeEnum
 from base.models.enums.decree_category import DecreeCategories
-from base.models.enums.duration_unit import DurationUnits
+from base.models.enums.duration_unit import DurationUnitsEnum
 from base.models.enums.education_group_types import TrainingType
 from base.models.enums.funding_codes import FundingCodes
 from base.models.enums.internship_presence import InternshipPresence
@@ -69,12 +69,12 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     acronym = forms.CharField(max_length=15, label=_("Acronym/Short title"))
     code = forms.CharField(max_length=15, label=_("Code"))
     active = forms.ChoiceField(
-        initial=ActiveStatusEnum.ACTIVE.value,
+        initial=ActiveStatusEnum.ACTIVE.name,
         choices=BLANK_CHOICE + list(ActiveStatusEnum.choices()),
         label=_("Status"),
     )
     schedule_type = forms.ChoiceField(
-        initial=ScheduleTypeEnum.DAILY.value,
+        initial=ScheduleTypeEnum.DAILY.name,
         choices=BLANK_CHOICE + list(ScheduleTypeEnum.choices()),
         label=_("Schedule type"),
     )
@@ -116,13 +116,13 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         widget=forms.TextInput(),
     )
     duration_unit = forms.ChoiceField(
-        initial=DurationUnits.QUADRIMESTER.value,
-        choices=BLANK_CHOICE + sorted(list(DurationUnits.choices()), key=lambda c: c[1]),
+        initial=DurationUnitsEnum.QUADRIMESTER.name,
+        choices=BLANK_CHOICE + sorted(list(DurationUnitsEnum.choices()), key=lambda c: c[1]),
         label=_("duration unit").capitalize(),
         required=False,
     )
     internship = forms.ChoiceField(
-        initial=InternshipPresence.NO.value,
+        initial=InternshipPresence.NO.name,
         choices=sorted(list(InternshipPresence.choices()), key=lambda c: c[1]),
         label=_("Internship"),
     )
@@ -172,7 +172,12 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         label=_('secondary domains').title(),
     )
     isced_domain = forms.ModelChoiceField(queryset=DomainIsced.objects.all(), required=False)
-    internal_comment = forms.CharField(max_length=500, label=_("comment (internal)").capitalize(), required=False)
+    internal_comment = forms.CharField(
+        max_length=500,
+        label=_("comment (internal)").capitalize(),
+        required=False,
+        widget=forms.Textarea,
+    )
 
     # panel_entities_form.html
     management_entity = forms.CharField()

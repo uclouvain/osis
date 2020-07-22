@@ -50,7 +50,7 @@ from base.models.enums.academic_type import AcademicTypes
 from base.models.enums.activity_presence import ActivityPresence
 from base.models.enums.decree_category import DecreeCategories
 from base.models.enums.diploma_coorganization import DiplomaCoorganizationTypes
-from base.models.enums.duration_unit import DurationUnits, DurationUnitsEnum
+from base.models.enums.duration_unit import DurationUnitsEnum
 from base.models.enums.education_group_types import TrainingType
 from base.models.enums.funding_codes import FundingCodes
 from base.models.enums.internship_presence import InternshipPresence
