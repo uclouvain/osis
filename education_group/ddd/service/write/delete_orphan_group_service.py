@@ -21,9 +21,6 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-
-from django.db import transaction
-
 from education_group.ddd import command
 
 from education_group.ddd.domain.group import GroupIdentity
@@ -31,7 +28,6 @@ from education_group.ddd.repository.group import GroupRepository
 from education_group.ddd.validators.validators_by_business_action import DeleteOrphanGroupValidatorList
 
 
-@transaction.atomic()
 def delete_orphan_group(cmd: command.DeleteOrphanGroupCommand) -> 'GroupIdentity':
     group_id = GroupIdentity(code=cmd.code, year=cmd.year)
     grp = GroupRepository.get(group_id)

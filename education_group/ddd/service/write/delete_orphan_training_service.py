@@ -21,26 +21,18 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from education_group.ddd.service.write import delete_orphan_group_service, delete_orphan_training_service, \
-    delete_orphan_mini_training_service
-from program_management.ddd import command
-from program_management.ddd.domain.program_tree import ProgramTreeIdentity
-from program_management.ddd.repositories.program_tree import ProgramTreeRepository
-from program_management.ddd.validators.validators_by_business_action import DeleteProgramTreeValidatorList
+from education_group.ddd import command
+from education_group.ddd.domain.training import TrainingIdentity
+
+from education_group.ddd.repository.training import TrainingRepository
+from education_group.ddd.validators.validators_by_business_action import DeleteOrphanTrainingValidatorList
 
 
-def delete_program_tree(cmd: command.DeleteProgramTreeCommand) -> ProgramTreeIdentity:
-    program_tree_id = ProgramTreeIdentity(code=cmd.code, year=cmd.year)
-    program_tree = ProgramTreeRepository.get(program_tree_id)
+def delete_orphan_training(cmd: command.DeleteOrphanTrainingCommand) -> 'TrainingIdentity':
+    training_id = TrainingIdentity(acronym=cmd.acronym, year=cmd.year)
+    training = TrainingRepository.get(training_id)
 
-    DeleteProgramTreeValidatorList(program_tree).validate()
+    DeleteOrphanTrainingValidatorList(training).validate()
 
-    ProgramTreeRepository.delete(
-        program_tree_id,
-
-        # Service Dependancy injection
-        delete_orphan_group_service=delete_orphan_group_service.delete_orphan_group,
-        delete_orphan_training_service=delete_orphan_training_service.delete_orphan_training,
-        delete_orphan_minitraining_service=delete_orphan_mini_training_service.delete_orphan_mini_training,
-    )
-    return program_tree_id
+    TrainingRepository.delete(training_id)
+    return training_id

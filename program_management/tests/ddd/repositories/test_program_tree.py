@@ -22,12 +22,19 @@
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
 from django.test import TestCase
+from mock import Mock
 
+from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
+from base.models.group_element_year import GroupElementYear
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
+from education_group.ddd import command
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 from program_management.ddd.repositories import program_tree
+from program_management.ddd.repositories.program_tree import ProgramTreeRepository
+from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
+from program_management.tests.factories.element import ElementGroupYearFactory
 
 
 class TestSearchTreesFromChildren(TestCase):
@@ -102,3 +109,82 @@ class TestSearchTreesFromChildren(TestCase):
             [tree.entity_id for tree in result],
             expected_tree_identities
         )
+
+
+class TestDeleteProgramTree(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory()
+
+    def setUp(self) -> None:
+        """
+        |root_node (Training)
+        |--- subgroup (Group)
+           |---- mini_training (Mini-Training)
+        """
+        self.training_version = StandardEducationGroupVersionFactory(
+            root_group__academic_year=self.academic_year,
+            root_group__education_group_type__name=TrainingType.BACHELOR.name,
+            offer__academic_year=self.academic_year,
+            offer__education_group_type__name=TrainingType.BACHELOR.name,
+        )
+        self.root_node = ElementGroupYearFactory(group_year=self.training_version.root_group)
+        self.subgroup = ElementGroupYearFactory(
+            group_year__academic_year=self.academic_year,
+            group_year__education_group_type__name=GroupType.SUB_GROUP.name
+        )
+        self.mini_training_version = StandardEducationGroupVersionFactory(
+            root_group__academic_year=self.academic_year,
+            root_group__education_group_type__name=MiniTrainingType.OPTION.name,
+            offer__academic_year=self.academic_year,
+            offer__education_group_type__name=MiniTrainingType.OPTION.name,
+        )
+        self.mini_training_element = ElementGroupYearFactory(group_year=self.mini_training_version.root_group)
+
+        GroupElementYearFactory(parent_element=self.root_node, child_element=self.subgroup)
+        GroupElementYearFactory(parent_element=self.subgroup, child_element=self.mini_training_element)
+
+        self.program_tree_id = ProgramTreeIdentity(
+            code=self.root_node.group_year.partial_acronym,
+            year=self.root_node.group_year.academic_year.year
+        )
+
+    def test_assert_all_linked_are_removed(self):
+        ProgramTreeRepository.delete(
+            self.program_tree_id,
+            delete_orphan_group_service=Mock(),
+            delete_orphan_training_service=Mock(),
+            delete_orphan_minitraining_service=Mock()
+        )
+
+        self.assertEqual(GroupElementYear.objects.all().count(), 0)
+
+    def test_assert_called_right_service_according_to_node_type(self):
+        mock_delete_training_service = Mock()
+        mock_delete_mini_training_service = Mock()
+        mock_delete_group_service = Mock()
+
+        ProgramTreeRepository.delete(
+            self.program_tree_id,
+            delete_orphan_group_service=mock_delete_group_service,
+            delete_orphan_training_service=mock_delete_training_service,
+            delete_orphan_minitraining_service=mock_delete_mini_training_service
+        )
+
+        cmd_delete_group = command.DeleteOrphanGroupCommand(
+            code=self.subgroup.group_year.partial_acronym,
+            year=self.subgroup.group_year.academic_year.year
+        )
+        mock_delete_group_service.assert_called_once_with(cmd_delete_group)
+
+        cmd_delete_training = command.DeleteOrphanTrainingCommand(
+            acronym=self.training_version.offer.acronym,
+            year=self.training_version.offer.academic_year.year
+        )
+        mock_delete_training_service.assert_called_once_with(cmd_delete_training)
+
+        cmd_delete_mini_training = command.DeleteOrphanMiniTrainingCommand(
+            acronym=self.mini_training_version.offer.acronym,
+            year=self.mini_training_version.offer.academic_year.year
+        )
+        mock_delete_mini_training_service.assert_called_once_with(cmd_delete_mini_training)
