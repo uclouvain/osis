@@ -42,5 +42,5 @@ class MockFormValid(mock.Mock):
 
 
 class MockRepository(mock.MagicMock):
-    def __int__(self, *args , **kwargs):
+    def __int__(self, *args, **kwargs):
         return super().__init__(*args, spec=interface.AbstractRepository, **kwargs)
