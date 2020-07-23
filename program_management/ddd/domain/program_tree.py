@@ -104,11 +104,12 @@ class ProgramTreeBuilder:
     ) -> List['Node']:
         root_node = program_tree.root_node
         children = []
-        for child_type in program_tree.get_mandatory_children_types(program_tree.root_node):
+        ordered = program_tree.get_ordered_mandatory_children_types(program_tree.root_node)
+        for child_type in ordered:
             generated_child_title = FieldValidationRule.get(
                 child_type,
                 'title_fr'
-            ).initial_value.replace(" ", "").upper()
+            ).initial_value
             child = node_factory.get_node(
                 type=NodeType.GROUP,
                 node_type=child_type,
@@ -318,6 +319,15 @@ class ProgramTree(interface.RootEntity):
             for authorized_type in self.authorized_relationships.get_authorized_children_types(parent_node.node_type)
             if isinstance(authorized_type, EducationGroupTypesEnum)
         )
+
+    def get_ordered_mandatory_children_types(self, parent_node: 'Node') -> List[EducationGroupTypesEnum]:
+        ordered_group_types = {group_type: order for order, group_type in enumerate(GroupType.ordered())}
+        mandatory_children_types = self.get_mandatory_children_types(parent_node)
+        types_with_order_value = [
+            (child_type, ordered_group_types.get(child_type.name, 999))
+            for child_type in mandatory_children_types
+        ]
+        return [child_type for child_type, order in sorted(types_with_order_value, key=lambda tuple: tuple[1])]
 
     def paste_node(
             self,
