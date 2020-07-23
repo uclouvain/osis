@@ -308,3 +308,9 @@ class CreateAndAttachTrainingCommand(education_group_command.CreateTrainingComma
 class DeleteProgramTreeCommand(interface.CommandRequest):
     code = attr.ib(type=str)
     year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class DeleteStandardVersionCommand(interface.CommandRequest):
+    acronym = attr.ib(type=str)
+    year = attr.ib(type=int)

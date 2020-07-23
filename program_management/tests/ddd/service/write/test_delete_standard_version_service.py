@@ -26,35 +26,36 @@ from unittest import mock
 from django.test import SimpleTestCase
 
 from program_management.ddd import command
-from program_management.ddd.service.write import delete_program_tree_service
+from program_management.ddd.service.write import delete_standard_version_service
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory
-from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
+from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
 
 
-class TestDeleteProgramTreeService(SimpleTestCase):
+class TestDeleteStandardVersionService(SimpleTestCase):
     def setUp(self):
-        self.tree = ProgramTreeFactory()
-        self.parent = self.tree.root_node
+        self.tree_version = ProgramTreeVersionFactory()
+        self.parent = self.tree_version.tree.root_node
         self.link1 = LinkFactory(parent=self.parent, child=NodeGroupYearFactory(), order=0)
 
         self.get_tree_patcher = mock.patch(
-            "program_management.ddd.service.write.delete_program_tree_service.ProgramTreeRepository.get",
-            return_value=self.tree
+            "program_management.ddd.service.write.delete_standard_version_service.ProgramTreeVersionRepository.get",
+            return_value=self.tree_version
         )
         self.mocked_get_tree = self.get_tree_patcher.start()
         self.addCleanup(self.get_tree_patcher.stop)
 
         self.delete_tree_patcher = mock.patch(
-            "program_management.ddd.service.write.delete_program_tree_service.ProgramTreeRepository.delete",
+            "program_management.ddd.service.write.delete_standard_version_service.ProgramTreeVersionRepository.delete",
             return_value=None
         )
         self.mocked_delete_tree = self.delete_tree_patcher.start()
         self.addCleanup(self.delete_tree_patcher.stop)
 
-    @mock.patch('program_management.ddd.service.write.delete_program_tree_service.DeleteProgramTreeValidatorList')
+    @mock.patch('program_management.ddd.service.write.delete_standard_version_service.'
+                'DeleteStandardVersionValidatorList')
     def test_assert_delete_program_tree_validator_called(self, mock_validator):
-        cmd = command.DeleteProgramTreeCommand(code=self.parent.code, year=self.parent.year)
-        delete_program_tree_service.delete_program_tree(cmd)
+        cmd = command.DeleteStandardVersionCommand(acronym="Dummy", year=2018)
+        delete_standard_version_service.delete_standard_version(cmd)
 
         self.assertTrue(mock_validator.called)

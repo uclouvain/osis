@@ -117,14 +117,6 @@ class Node(interface.Entity):
     def __str__(self):
         return '%(code)s (%(year)s)' % {'code': self.code, 'year': self.year}
 
-    # def __eq__(self, other):
-    #     if isinstance(other, self.__class__):
-    #         return self.entity_id == other.entity_id
-    #     return False
-    #
-    # def __hash__(self):
-    #     return hash(self.entity_id)
-
     @property
     def pk(self):
         return self.node_id
