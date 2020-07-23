@@ -1,8 +1,18 @@
-from django.urls import include, path
+from django.urls import include, path, register_converter
 
-from base.views.education_groups import create
+from base.views.education_groups.achievement.create import CreateEducationGroupDetailedAchievement, \
+    CreateEducationGroupAchievement
+from base.views.education_groups.achievement.delete import DeleteEducationGroupAchievement, \
+    DeleteEducationGroupDetailedAchievement
+from base.views.education_groups.achievement.update import EducationGroupAchievementAction, \
+    UpdateEducationGroupAchievement, EducationGroupDetailedAchievementAction, UpdateEducationGroupDetailedAchievement
+from education_group.converters import GroupTypeConverter, TrainingTypeConverter
 from education_group.views import group, training, mini_training, general_information
 from education_group.views.proxy.read import ReadEducationGroupRedirectView
+from base.views.education_groups import create
+
+register_converter(GroupTypeConverter, 'group_type')
+register_converter(TrainingTypeConverter, 'training_type')
 
 urlpatterns = [
     path(
@@ -10,14 +20,36 @@ urlpatterns = [
         ReadEducationGroupRedirectView.as_view(),
         name='education_group_read_proxy'
     ),
-    path('groups/<int:year>/<str:code>/', include([
-        path('identification/', group.GroupReadIdentification.as_view(), name='group_identification'),
-        path('content/', group.GroupReadContent.as_view(), name='group_content'),
-        path('utilization/', group.GroupReadUtilization.as_view(), name='group_utilization'),
-        path('general_information/', group.GroupReadGeneralInformation.as_view(), name='group_general_information'),
+    path('groups/', include([
+        path('<group_type:type>/create', group.GroupCreateView.as_view(), name='group_create'),
+        path('<int:year>/<str:code>/', include([
+            path('update/', group.GroupUpdateView.as_view(), name='group_update'),
+            path('identification/', group.GroupReadIdentification.as_view(), name='group_identification'),
+            path('content/', group.GroupReadContent.as_view(), name='group_content'),
+            path('utilization/', group.GroupReadUtilization.as_view(), name='group_utilization'),
+            path('general_information/', include([
+                path('read/', group.GroupReadGeneralInformation.as_view(), name='group_general_information'),
+                path('update/', group.GroupUpdateGeneralInformation.as_view(), name='group_general_information_update'),
+            ]))
+        ]))
     ])),
-
     path('mini_trainings/<int:year>/<str:code>/', include([
+        path('create/', CreateEducationGroupAchievement.as_view(), name='minitraining_achievement_create'),
+        path('<int:education_group_achievement_pk>/', include([
+            path('actions/', EducationGroupAchievementAction.as_view(), name='minitraining_achievement_actions'),
+            path('create/', CreateEducationGroupDetailedAchievement.as_view(),
+                 name='minitraining_detailed_achievement_create'),
+            path('delete/', DeleteEducationGroupAchievement.as_view(), name='minitraining_achievement_delete'),
+            path('update/', UpdateEducationGroupAchievement.as_view(), name='minitraining_achievement_update'),
+            path('<int:education_group_detail_achievement_pk>/', include([
+                path('actions/', EducationGroupDetailedAchievementAction.as_view(),
+                     name='minitraining_detailed_achievement_actions'),
+                path('delete/', DeleteEducationGroupDetailedAchievement.as_view(),
+                     name='minitraining_detailed_achievement_delete'),
+                path('update/', UpdateEducationGroupDetailedAchievement.as_view(),
+                     name='minitraining_detailed_achievement_update'),
+            ]))
+        ])),
         path(
             'identification/',
             mini_training.MiniTrainingReadIdentification.as_view(),
@@ -41,33 +73,52 @@ urlpatterns = [
             name='mini_training_admission_condition'
         ),
     ])),
-    path('trainings/<int:year>/<str:code>/', include([
-        path('create_education_group_version/', create.CreateEducationGroupSpecificVersion.as_view(),
-             name="create_education_group_version"),
-        path('identification/', training.TrainingReadIdentification.as_view(), name='training_identification'),
-        path('diplomas/', training.TrainingReadDiplomaCertificate.as_view(), name='training_diplomas'),
-        path(
-            'administrative_data/',
-            training.TrainingReadAdministrativeData.as_view(),
-            name='training_administrative_data'
-        ),
-        path('content/', training.TrainingReadContent.as_view(), name='training_content'),
-        path('utilization/', training.TrainingReadUtilization.as_view(), name='training_utilization'),
-        path(
-            'general_information/',
-            training.TrainingReadGeneralInformation.as_view(),
-            name='training_general_information'
-        ),
-        path(
-            'skills_achievements/',
-            training.TrainingReadSkillsAchievements.as_view(),
-            name='training_skills_achievements'
-        ),
-        path(
-            'admission_conditions/',
-            training.TrainingReadAdmissionCondition.as_view(),
-            name='training_admission_condition'
-        ),
+    path('trainings/', include([
+        path('<training_type:type>/create/', training.TrainingCreateView.as_view(), name='training_create'),
+        path('<int:year>/<str:code>/', include([
+            path('create_education_group_version/', create.CreateEducationGroupSpecificVersion.as_view(),
+                 name="create_education_group_version"),
+            path('create/', CreateEducationGroupAchievement.as_view(), name='training_achievement_create'),
+            path('<int:education_group_achievement_pk>/', include([
+                path('actions/', EducationGroupAchievementAction.as_view(), name='training_achievement_actions'),
+                path('create/', CreateEducationGroupDetailedAchievement.as_view(),
+                     name='training_detailed_achievement_create'),
+                path('delete/', DeleteEducationGroupAchievement.as_view(), name='training_achievement_delete'),
+                path('update/', UpdateEducationGroupAchievement.as_view(), name='training_achievement_update'),
+                path('<int:education_group_detail_achievement_pk>/', include([
+                    path('actions/', EducationGroupDetailedAchievementAction.as_view(),
+                         name='training_detailed_achievement_actions'),
+                    path('delete/', DeleteEducationGroupDetailedAchievement.as_view(),
+                         name='training_detailed_achievement_delete'),
+                    path('update/', UpdateEducationGroupDetailedAchievement.as_view(),
+                         name='training_detailed_achievement_update'),
+                ]))
+            ])),
+            path('identification/', training.TrainingReadIdentification.as_view(), name='training_identification'),
+            path('diplomas/', training.TrainingReadDiplomaCertificate.as_view(), name='training_diplomas'),
+            path(
+                'administrative_data/',
+                training.TrainingReadAdministrativeData.as_view(),
+                name='training_administrative_data'
+            ),
+            path('content/', training.TrainingReadContent.as_view(), name='training_content'),
+            path('utilization/', training.TrainingReadUtilization.as_view(), name='training_utilization'),
+            path(
+                'general_information/',
+                training.TrainingReadGeneralInformation.as_view(),
+                name='training_general_information'
+            ),
+            path(
+                'skills_achievements/',
+                training.TrainingReadSkillsAchievements.as_view(),
+                name='training_skills_achievements'
+            ),
+            path(
+                'admission_conditions/',
+                training.TrainingReadAdmissionCondition.as_view(),
+                name='training_admission_condition'
+            ),
+        ])),
     ])),
     path('general_information/<int:year>/', include([
         path('common/', general_information.CommonGeneralInformation.as_view(), name="common_general_information"),

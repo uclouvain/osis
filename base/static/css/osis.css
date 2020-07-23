@@ -549,6 +549,12 @@ table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:after, 
     cursor: not-allowed;
 }
 
+.text-first-letter-capitalize:first-letter,
+.text-first-letter-capitalize::first-letter
+{
+  text-transform: capitalize;
+}
+
 .of_unversioned_field #academic_type,
 .of_unversioned_field #duration,
 .of_unversioned_field #internship,
@@ -568,11 +574,7 @@ table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:after, 
 .of_unversioned_field #isced_domain,
 .of_unversioned_field #internal_comment,
 .of_unversioned_field #panel_coorganization,
-.of_unversioned_field #management_entity,
-.of_unversioned_field #management_entity,
-.of_unversioned_field #start_year,
-.of_unversioned_field #end_year,
-.of_unversioned_field #teaching_campus,
+.of_unversioned_field #administration_entity,
 .of_unversioned_field #enrollment_campus,
 .of_unversioned_field #other_campus_activities,
 .of_unversioned_field #funding_can_be_funded,
@@ -592,4 +594,19 @@ table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:after, 
 .of_unversioned_field #group_title_en
 {
     color: grey;
+}
+
+.container-align-items-center {
+    display: flex;
+    align-items: center;
+}
+
+.form-tab.has-error > a::after{
+    content: '';
+    display: inline-block;
+    width: 0.8em;
+    height: 0.8em;
+    border-radius: 1em;
+    margin-left: 0.5em;
+    background-color: red;
 }

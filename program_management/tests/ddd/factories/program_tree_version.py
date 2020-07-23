@@ -23,19 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import string
-import random
-
-import exrex
 import factory.fuzzy
 
+from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersion, ProgramTreeVersionIdentity
-from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory, ProgramTreeIdentityFactory
-
-
-def string_generator(nb_char=8):
-    return ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(nb_char))
 
 
 class ProgramTreeVersionIdentityFactory(factory.Factory):
@@ -56,13 +48,13 @@ class ProgramTreeVersionFactory(factory.Factory):
         model = ProgramTreeVersion
         abstract = False
 
-    entity_identity = factory.SubFactory(ProgramTreeVersionIdentityFactory)
-    identity_trough_year = factory.Sequence(lambda n: n + 1)
-    program_tree_identity = factory.SubFactory(ProgramTreeIdentityFactory)
-    program_tree_repository = ProgramTreeRepository()
-    title_fr = factory.fuzzy.FuzzyText(length=240)
-    title_en = factory.fuzzy.FuzzyText(length=240)
-    tree = None
-
-
-
+    tree = factory.SubFactory(ProgramTreeFactory)
+    entity_identity = None
+    program_tree_identity = ProgramTreeIdentity(code="CODE", year=2020)
+    program_tree_repository = None
+    entity_id = ProgramTreeVersionIdentity(
+        offer_acronym="OFFER",
+        year=2020,
+        version_name="",
+        is_transition=False
+    )

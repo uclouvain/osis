@@ -31,41 +31,50 @@ from django.utils.translation import gettext_lazy as _
 
 from base.models.enums import link_type
 from base.models.enums.proposal_type import ProposalType
+from base.utils.urls import reverse_with_get
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.program_tree import PATH_SEPARATOR
 from program_management.models.enums.node_type import NodeType
+from program_management.ddd.domain.node import NodeIdentity
+from program_management.ddd.domain.service.identity_search import ProgramTreeIdentitySearch
 
 
-def serialize_children(children: List['Link'], path: str, context=None) -> List[dict]:
+def serialize_children(
+        children: List['Link'],
+        path: str,
+        context=None,
+        mini_training_tree_versions: List['ProgramTreeVersion'] = None
+) -> List[dict]:
     serialized_children = []
     for link in children:
         child_path = path + PATH_SEPARATOR + str(link.child.pk)
         if link.child.is_learning_unit():
             serialized_node = _leaf_view_serializer(link, child_path, context=context)
         else:
-            serialized_node = _get_node_view_serializer(link, child_path, context=context)
+            serialized_node = _get_node_view_serializer(link, child_path, context, mini_training_tree_versions)
         serialized_children.append(serialized_node)
     return serialized_children
 
 
 def _get_node_view_attribute_serializer(link: 'Link', path: 'Path', context=None) -> dict:
     return {
-        'href': reverse('element_identification', args=[link.child.year, link.child.code]) + "?path=%s" % path,
+        'path': path,
+        'href': reverse_with_get('element_identification', args=[link.child.year, link.child.code], get={"path": path}),
         'root': context['root'].pk,
         'group_element_year': link.pk,
         'element_id': link.child.pk,
         'element_type': link.child.type.name,
+        'element_code': link.child.code,
+        'element_year': link.child.year,
         'title': link.child.code,
-        'attach_url': reverse('education_group_attach', args=[context['root'].pk, link.child.pk]) + "?path=%s" % path,
-        'detach_url': reverse('tree_detach_node', args=[context['root'].pk]) + "?path=%s" % path,
+        'paste_url': reverse_with_get('tree_paste_node', get={"path": path}),
+        'detach_url': reverse_with_get('tree_detach_node', args=[context['root'].pk], get={"path": path}),
         'modify_url': reverse('group_element_year_update', args=[context['root'].pk, link.child.pk, link.pk]),
-        'attach_disabled': False,
-        'attach_msg': None,
-        'detach_disabled': False,
-        'detach_msg': None,
-        'modification_disabled': False,
-        'modification_msg': None,
-        'search_url': reverse('quick_search_education_group', args=[context['root'].pk, path]),
+        'search_url': reverse_with_get(
+            'quick_search_education_group',
+            args=[link.child.academic_year.year],
+            get={"path": path}
+        ),
     }
 
 
@@ -75,7 +84,8 @@ def _get_leaf_view_attribute_serializer(link: 'Link', path: str, context=None) -
         'path': path,
         'icon': None,
         'href': reverse('learning_unit_utilization', args=[context['root'].pk, link.child.pk]),
-        'attach_url': None,
+        'paste_url': None,
+        'search_url': None,
         'has_prerequisite': link.child.has_prerequisite,
         'is_prerequisite': link.child.is_prerequisite,
         'css_class': __get_css_class(link),
@@ -106,16 +116,27 @@ def __get_title(obj: 'Link') -> str:
     return title
 
 
-def _get_node_view_serializer(link: 'Link', path: str, context=None) -> dict:
+def _get_node_view_serializer(
+        link: 'Link',
+        path: str,
+        context=None,
+        mini_training_tree_versions: List['ProgramTreeVersion'] = None
+) -> dict:
+
     return {
         'id': path,
         'path': path,
         'icon': _get_group_node_icon(link),
-        'text': '%(code)s - %(title)s' % {'code': link.child.code, 'title': link.child.title},
+        'text': '%(code)s - %(title)s%(version)s' %
+                {'code': link.child.code,
+                 'title': link.child.title,
+                 'version': __get_program_tree_version_name(link, mini_training_tree_versions)
+                 },
         'children': serialize_children(
             children=link.child.children,
             path=path,
-            context=context
+            context=context,
+            mini_training_tree_versions=mini_training_tree_versions
         ),
         'a_attr': _get_node_view_attribute_serializer(link, path, context=context),
     }
@@ -152,3 +173,17 @@ def __get_learning_unit_node_text(link: 'Link', context=None):
     if context['root'].year != link.child.year:
         text += '|{}'.format(link.child.year)
     return text
+
+
+def __get_program_tree_version_name(link, mini_training_tree_versions: List['ProgramTreeVersion']):
+    if mini_training_tree_versions:
+        program_tree_identity = ProgramTreeIdentitySearch().get_from_node_identity(NodeIdentity(link.child.code,
+                                                                                                link.child.year))
+        return next(
+            (
+                program_tree_version.version_label for program_tree_version in mini_training_tree_versions
+                if program_tree_version.program_tree_identity == program_tree_identity
+            ),
+            ''
+        )
+    return ''

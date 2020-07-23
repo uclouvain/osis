@@ -42,11 +42,27 @@ class TestAddChildNode(SimpleTestCase):
             year=2018
         )
 
-        group_year_node.add_child(learning_unit_year_node, relative_credits=5, comment='Dummy comment')
-        self.assertEqual(len(group_year_node.children), 1)
+        link_created = group_year_node.add_child(learning_unit_year_node, relative_credits=5, comment='Dummy comment')
+        self.assertIn(link_created, group_year_node.children)
 
-        self.assertEqual(group_year_node.children[0].relative_credits, 5)
-        self.assertEqual(group_year_node.children[0].comment, 'Dummy comment')
+        self.assertEqual(link_created.relative_credits, 5)
+        self.assertEqual(link_created.comment, 'Dummy comment')
+
+    def test_assert_order_correctly_computed(self):
+        group_year_node = NodeGroupYearFactory(node_id=0, code="LDROI100T", title="Tronc commun", year=2018)
+        subgroup_node = NodeGroupYearFactory(node_id=1, code="LDROI100R", title="Sous-groupe", year=2018)
+        learning_unit_year_node = NodeLearningUnitYearFactory(
+            node_id=2,
+            code="LDROI100",
+            title="Introduction",
+            year=2018
+        )
+
+        link_1_created = group_year_node.add_child(subgroup_node)
+        link_2_created = group_year_node.add_child(learning_unit_year_node)
+
+        self.assertEqual(link_1_created.order, 0)
+        self.assertEqual(link_2_created.order, 1)
 
 
 class TestDescendentsPropertyNode(SimpleTestCase):
@@ -73,25 +89,15 @@ class TestDescendentsPropertyNode(SimpleTestCase):
 
 class TestEq(SimpleTestCase):
 
-    def setUp(self):
-        self.node_id = 1
-        self.node = NodeGroupYearFactory(node_id=1)
+    def test_should_return_true_when_the_entity_id_are_equals(self):
+        node = NodeGroupYearFactory()
+        node_with_same_identity = NodeGroupYearFactory(code=node.code, year=node.year)
+        self.assertTrue(node == node_with_same_identity)
 
-    def test_when_nodes_group_year_are_equal(self):
-        node_with_same_id = NodeGroupYearFactory(node_id=self.node_id)
-        self.assertTrue(self.node == node_with_same_id)
-
-    def test_when_nodes_group_year_are_not_equal(self):
-        node_with_different_id = NodeGroupYearFactory(node_id=self.node_id + 1)
-        self.assertFalse(self.node == node_with_different_id)
-
-    def test_when_nodes_learning_unit_are_equal(self):
-        node_with_same_id = NodeLearningUnitYearFactory(node_id=self.node_id)
-        self.assertFalse(self.node == node_with_same_id)
-
-    def test_when_nodes_learning_unit_are_not_equal(self):
-        node_with_different_id = NodeLearningUnitYearFactory(node_id=self.node_id + 1)
-        self.assertFalse(self.node == node_with_different_id)
+    def test_when_should_return_false_when_entity_id_are_not_equals(self):
+        node = NodeGroupYearFactory()
+        node_with_different_identity = NodeGroupYearFactory(year=node.year+1)
+        self.assertFalse(node == node_with_different_identity)
 
 
 class TestStr(SimpleTestCase):
@@ -239,7 +245,7 @@ class TestGetAllChildrenAsNode(SimpleTestCase):
 class TestGetIsPrerequisiteOf(SimpleTestCase):
 
     def test_when_is_prerequisite_of_nothing(self):
-        node = NodeLearningUnitYearFactory(is_prerequisite_of=None)
+        node = NodeLearningUnitYearFactory(is_prerequisite_of=[])
         self.assertEqual(node.get_is_prerequisite_of(), [])
 
     def test_when_id_prerequisite_of_mutliple_nodes(self):
@@ -318,15 +324,13 @@ class TestDetachChild(SimpleTestCase):
         link2 = LinkFactory(parent=common_parent)
         link3 = LinkFactory(parent=common_parent)
 
-        common_parent.detach_child(link1.child)
+        link_deleted = common_parent.detach_child(link1.child)
 
-        expected_result = [link2, link3]
         assertion_msg = "Link {} should have been removed from children".format(link1)
-        self.assertListEqual(common_parent.children, expected_result, assertion_msg)
+        self.assertNotIn(link_deleted, common_parent.children, assertion_msg)
 
         assertion_msg = "Link {} should have been added to deleted children".format(link1)
-        expected_result = {link1}
-        self.assertSetEqual(common_parent._deleted_children, expected_result,assertion_msg)
+        self.assertIn(link_deleted, common_parent._deleted_children, assertion_msg)
 
 
 class TestIsOption(SimpleTestCase):
@@ -358,3 +362,137 @@ class TestGetOptionsList(SimpleTestCase):
         link2 = LinkFactory(parent=link1.child, child__node_type=MiniTrainingType.OPTION)
         expected_result = {link2.child}
         self.assertEqual(link2.parent.get_option_list(), expected_result, "Should contain children of children")
+
+
+class TestUpDownChild(SimpleTestCase):
+    def setUp(self) -> None:
+        self.parent_node = NodeGroupYearFactory()
+        self.link1 = LinkFactory(parent=self.parent_node, order=0)
+        self.link2 = LinkFactory(parent=self.parent_node, order=1)
+        self.link3 = LinkFactory(parent=self.parent_node, order=2)
+
+    def test_should_not_change_order_when_applying_up_on_first_link(self):
+        self.parent_node.up_child(self.link1.child)
+
+        self.assertListEqual(
+            self.parent_node.children,
+            [self.link1, self.link2, self.link3]
+        )
+
+    def test_should_not_change_order_when_applying_down_on_last_link(self):
+        self.parent_node.down_child(self.link3.child)
+
+        self.assertListEqual(
+            self.parent_node.children,
+            [self.link1, self.link2, self.link3]
+        )
+
+    def test_should_not_change_order_when_applying_up_then_down_on_link(self):
+        self.parent_node.up_child(self.link2.child)
+
+        self.assertListEqual(
+            self.parent_node.children,
+            [self.link2, self.link1, self.link3]
+        )
+
+        self.parent_node.down_child(self.link2.child)
+        self.assertListEqual(
+            self.parent_node.children,
+            [self.link1, self.link2, self.link3]
+        )
+
+
+class TestGetFinalitiesList(SimpleTestCase):
+    def test_when_has_no_children(self):
+        node = NodeGroupYearFactory()
+        self.assertEqual(node.get_finality_list(), set())
+
+    def test_when_node_is_finality(self):
+        node = NodeGroupYearFactory(node_type=TrainingType.MASTER_MS_120)
+        self.assertEqual(node.get_finality_list(), set(), "Should not contains himself in children finalities list")
+
+    def test_when_has_direct_child_finality(self):
+        link = LinkFactory(child__node_type=TrainingType.MASTER_MS_120)
+        expected_result = {link.child}
+        self.assertEqual(link.parent.get_finality_list(), expected_result, "Should contain direct children")
+
+    def test_when_sub_child_is_finality(self):
+        link1 = LinkFactory(child__node_type=GroupType.FINALITY_120_LIST_CHOICE)
+        link2 = LinkFactory(parent=link1.child, child__node_type=TrainingType.MASTER_MS_120)
+        expected_result = {link2.child}
+        self.assertEqual(link2.parent.get_finality_list(), expected_result, "Should contain children of children")
+
+
+class TestGetDirectChildrenAsNodes(SimpleTestCase):
+    def setUp(self):
+        self.parent = NodeGroupYearFactory()
+        self.child_link_0 = LinkFactory(
+            parent=self.parent,
+            child=NodeGroupYearFactory(node_type=GroupType.COMMON_CORE),
+            order=0
+        )
+        self.child_link_1 = LinkFactory(
+            parent=self.parent,
+            child=NodeGroupYearFactory(node_type=GroupType.MAJOR_LIST_CHOICE),
+            order=1
+        )
+
+    def test_assert_return_empty_list_when_no_children(self):
+        self.assertEqual(
+            NodeGroupYearFactory().get_direct_children_as_nodes(),
+            []
+        )
+
+    def test_assert_filter_take_only(self):
+        self.assertEqual(
+            self.parent.get_direct_children_as_nodes(take_only={GroupType.COMMON_CORE}),
+            [self.child_link_0.child]
+        )
+
+    def test_assert_filter_ignore_children_from(self):
+        self.assertEqual(
+            self.parent.get_direct_children_as_nodes(ignore_children_from={GroupType.COMMON_CORE}),
+            [self.child_link_1.child]
+        )
+
+
+class TestUpdateLinkOfDirectChildNode(SimpleTestCase):
+    def test_assert_has_changed_property(self):
+        parent = NodeGroupYearFactory()
+        child_link_0 = LinkFactory(
+            parent=parent,
+            child=NodeGroupYearFactory(node_type=GroupType.COMMON_CORE),
+            order=0
+        )
+
+        link_updated = parent.update_link_of_direct_child_node(
+            child_id=child_link_0.child.entity_id,
+            relative_credits=0,
+            access_condition=False,
+            is_mandatory=False,
+            block=1,
+            link_type=None,
+            comment="",
+            comment_english="english"
+        )
+        self.assertTrue(link_updated._has_changed)
+
+    def test_assert_link_type_reference_when_parent_major_minor_list_choice_and_child_other(self):
+        minor_list_choice = NodeGroupYearFactory(node_type=GroupType.MINOR_LIST_CHOICE)
+        child_link = LinkFactory(
+            parent=minor_list_choice,
+            child=NodeGroupYearFactory(node_type=GroupType.SUB_GROUP),
+            order=0
+        )
+
+        link_updated = minor_list_choice.update_link_of_direct_child_node(
+            child_id=child_link.child.entity_id,
+            relative_credits=0,
+            access_condition=True,
+            is_mandatory=True,
+            block=1,
+            link_type=None,
+            comment="",
+            comment_english="english"
+        )
+        self.assertEqual(link_updated.link_type, LinkTypes.REFERENCE)

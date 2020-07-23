@@ -24,100 +24,122 @@
 #
 ##############################################################################
 from collections import Counter
-from typing import List, Set, Tuple, Optional
+from typing import List, Set, Optional
+
+import attr
 
 from base.models.authorized_relationship import AuthorizedRelationshipList
-from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, GroupType
+from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, GroupType, MiniTrainingType
 from base.models.enums.link_type import LinkTypes
 from osis_common.ddd import interface
 from osis_common.decorators.deprecated import deprecated
+from program_management.ddd import command
 from program_management.ddd.business_types import *
-from program_management.ddd.domain import prerequisite, node
-from program_management.ddd.domain.link import LinkFactory
-from program_management.ddd.domain.node import NodeFactory
-from program_management.ddd.domain.service import generate_node_code_service
-from program_management.ddd.service import command
-from program_management.ddd.validators._detach_root import DetachRootValidator
+from program_management.ddd.domain.node import factory as node_factory, NodeIdentity, Node
+from program_management.ddd.domain.link import factory as link_factory
+from program_management.ddd.domain import prerequisite, exception
+from program_management.ddd.domain.service.generate_node_abbreviated_title import GenerateNodeAbbreviatedTitle
+from program_management.ddd.domain.service.generate_node_code import GenerateNodeCode
+from program_management.ddd.domain.service.validation_rule import FieldValidationRule
+from program_management.ddd.repositories import load_authorized_relationship
+from program_management.ddd.validators import validators_by_business_action
 from program_management.ddd.validators._path_validator import PathValidator
-from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList, \
-    UpdatePrerequisiteValidatorList
-from program_management.ddd.validators.validators_by_business_action import DetachNodeValidatorList
 from program_management.models.enums import node_type
 from program_management.models.enums.node_type import NodeType
+from education_group.ddd.business_types import *
 
 PATH_SEPARATOR = '|'
 Path = str  # Example : "root|node1|node2|child_leaf"
 
 
+@attr.s(frozen=True, slots=True)
 class ProgramTreeIdentity(interface.EntityIdentity):
-    def __init__(self, code: str, year: int):
-        self.code = code
-        self.year = year
-
-    def __hash__(self):
-        return hash(self.code + str(self.year))
-
-    def __eq__(self, other):
-        return self.code == other.code and self.year == other.year
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)
 
 
 class ProgramTreeBuilder:
-    def build_from(self, from_tree: 'ProgramTree') -> 'ProgramTree':
-        new_root_node = node.factory.build_from(from_tree.root_node)
-        new_root_node.code = generate_node_code_service.generate_node_code(
-            from_tree.root_node.code,
-            from_tree.root_node.year
-        )
-        self._generate_mandatory_direct_children(
-            authorized_relationships=from_tree.authorized_relationships,
-            root_node=from_tree.root_node
-        )
-        return ProgramTree(root_node=new_root_node)
+
+    def copy_to_next_year(self, copy_from: 'ProgramTree', repository: 'ProgramTreeRepository') -> 'ProgramTree':
+        identity_next_year = attr.evolve(copy_from.entity_id, year=copy_from.entity_id.year + 1)
+        try:
+            program_tree_next_year = repository.get(identity_next_year)
+            # Case update program tree to next year
+            # TODO :: To implement in OSIS-4809
+            pass
+        except exception.ProgramTreeNotFoundException:
+            # Case create program tree to next year
+            program_tree_next_year = attr.evolve(  # Copy to new object
+                copy_from,
+                root_node=self._copy_node_and_children_to_next_year(copy_from.root_node),
+                entity_id=identity_next_year,
+            )
+        return program_tree_next_year
+
+    def _copy_node_and_children_to_next_year(self, copy_from_node: 'Node') -> 'Node':
+        parent_next_year = node_factory.copy_to_next_year(copy_from_node)
+        links_next_year = []
+        for copy_from_link in copy_from_node.children:
+            child_node = copy_from_link.child
+            child_next_year = self._copy_node_and_children_to_next_year(child_node)
+            link_next_year = link_factory.copy_to_next_year(copy_from_link, parent_next_year, child_next_year)
+            parent_next_year.children.append(link_next_year)
+            links_next_year.append(link_next_year)
+        return parent_next_year
+
+    def build_from_orphan_group_as_root(
+            self,
+            orphan_group_as_root: 'Group',
+            node_repository: 'NodeRepository'
+    ) -> 'ProgramTree':
+        root_node = node_repository.get(NodeIdentity(code=orphan_group_as_root.code, year=orphan_group_as_root.year))
+        program_tree = ProgramTree(root_node=root_node, authorized_relationships=load_authorized_relationship.load())
+        self._generate_mandatory_direct_children(program_tree=program_tree)
+        return program_tree
 
     def _generate_mandatory_direct_children(
             self,
-            authorized_relationships: 'AuthorizedRelationshipList',
-            root_node: 'Node'
-    ):
-        child_types = authorized_relationships.get_default_authorized_children_types(root_node.node_type)
-        children_node_list = root_node.get_direct_children_as_nodes()
-        for child_node in children_node_list:
-            if child_node.node_type in child_types:
-                new_child_node = node.factory.build_from(node=child_node)
-                root_node.add_child(new_child_node)
+            program_tree: 'ProgramTree'
+    ) -> List['Node']:
+        root_node = program_tree.root_node
+        children = []
+        for child_type in program_tree.get_mandatory_children_types(program_tree.root_node):
+            generated_child_title = FieldValidationRule.get(
+                child_type,
+                'title_fr'
+            ).initial_value.replace(" ", "").upper()
+            child = node_factory.get_node(
+                type=NodeType.GROUP,
+                node_type=child_type,
+                code=GenerateNodeCode.generate_from_parent_node(root_node, child_type),
+                title=GenerateNodeAbbreviatedTitle.generate(
+                    parent_node=root_node,
+                    child_node_type=child_type,
+                ),
+                year=root_node.year,
+                teaching_campus=root_node.teaching_campus,
+                management_entity_acronym=root_node.management_entity_acronym,
+                group_title_fr="{child_title} {parent_abbreviated_title}".format(
+                    child_title=generated_child_title,
+                    parent_abbreviated_title=root_node.title
+                ),
+            )
+            child._has_changed = True
+            root_node.add_child(child)
+            children.append(child)
+        return children
 
 
-class ProgramTreeNotAnnualizedIdentity(interface.ValueObject):
-    """
-    This ID is necessary to find a Node through years because code can be different through years.
-    """
-    def __init__(self, uuid: int):
-        self.uuid = uuid
-
-    def __hash__(self):
-        return hash(str(self.uuid))
-
-    def __eq__(self, other):
-        return self.uuid == other.uuid
-
-
+@attr.s(slots=True)
 class ProgramTree(interface.RootEntity):
 
-    root_node = None
-    authorized_relationships = None
+    root_node = attr.ib(type=Node)
+    authorized_relationships = attr.ib(type=AuthorizedRelationshipList, factory=list)
+    entity_id = attr.ib(type=ProgramTreeIdentity)  # FIXME :: pass entity_id as mandatory param !
 
-    def __init__(self, root_node: 'Node', authorized_relationships: AuthorizedRelationshipList = None):
-        self.root_node = root_node
-        self.authorized_relationships = authorized_relationships
-        # FIXME :: pass entity_id into the __init__ param !
-        super(ProgramTree, self).__init__(entity_id=ProgramTreeIdentity(self.root_node.code, self.root_node.year))
-
-    def __eq__(self, other: 'ProgramTree'):
-        return self.root_node == other.root_node
-
-    @property
-    def identity_not_annualized(self) -> ProgramTreeNotAnnualizedIdentity:
-        return ProgramTreeNotAnnualizedIdentity(uuid=self.root_node.not_annualized_id.uuid)
+    @entity_id.default
+    def _entity_id(self) -> 'ProgramTreeIdentity':
+        return ProgramTreeIdentity(self.root_node.code, self.root_node.year)
 
     def is_master_2m(self):
         return self.root_node.is_master_2m()
@@ -269,6 +291,10 @@ class ProgramTree(interface.RootEntity):
         finality_types = set(TrainingType.finality_types_enum())
         return self.get_all_nodes(types=finality_types)
 
+    def get_all_mini_training(self) -> Set['Node']:
+        mini_training_types = set(MiniTrainingType.mini_training_types_enum())
+        return self.get_all_nodes(types=mini_training_types)
+
     def get_greater_block_value(self) -> int:
         all_links = self.get_all_links()
         if not all_links:
@@ -285,45 +311,46 @@ class ProgramTree(interface.RootEntity):
         copied_root_node = _copy(self.root_node, ignore_children_from=ignore_children_from)
         return ProgramTree(root_node=copied_root_node, authorized_relationships=self.authorized_relationships)
 
-    def attach_node(
+    def get_mandatory_children_types(self, parent_node: 'Node') -> Set[EducationGroupTypesEnum]:
+        return set(
+            authorized_type
+            for authorized_type in self.authorized_relationships.get_authorized_children_types(parent_node.node_type)
+            if isinstance(authorized_type, EducationGroupTypesEnum)
+        )
+
+    def paste_node(
             self,
-            node_to_attach: 'Node',
-            path: Optional[Path],
-            attach_command: command.AttachNodeCommand
-    ) -> List['BusinessValidationMessage']:
+            node_to_paste: 'Node',
+            paste_command: command.PasteElementCommand,
+            tree_repository: 'ProgramTreeRepository'
+    ) -> 'Link':
         """
         Add a node to the tree
-        :param node_to_attach: Node to add on the tree
-        :param path: [Optional]The position where the node must be added
-        :param attach_command: an attach node command
+        :param node_to_paste: Node to paste into the tree
+        :param paste_command: a paste node command
+        :param tree_repository: a tree repository
+        :return: the created link
         """
-        parent = self.get_node(path) if path else self.root_node
-        path = path or str(self.root_node.node_id)
-        link_type = attach_command.link_type
-        block = attach_command.block
-        is_valid, messages = self.clean_attach_node(node_to_attach, path, link_type, block)
-        if is_valid:
-            parent.add_child(
-                node_to_attach,
-                access_condition=attach_command.access_condition,
-                is_mandatory=attach_command.is_mandatory,
-                block=attach_command.block,
-                link_type=attach_command.link_type,
-                comment=attach_command.comment,
-                comment_english=attach_command.comment_english,
-                relative_credits=attach_command.relative_credits
-            )
-        return messages
-
-    def clean_attach_node(
+        validator = validators_by_business_action.PasteNodeValidatorList(
             self,
-            node_to_attach: 'Node',
-            path: Path,
-            link_type: Optional[LinkTypes],
-            block: Optional[int]
-    ) -> Tuple[bool, List['BusinessValidationMessage']]:
-        validator = AttachNodeValidatorList(self, node_to_attach, path, link_type, block)
-        return validator.is_valid(), validator.messages
+            node_to_paste,
+            paste_command,
+            tree_repository
+        )
+        validator.validate()
+
+        path_to_paste_to = paste_command.path_where_to_paste
+        node_to_paste_to = self.get_node(path_to_paste_to)
+        return node_to_paste_to.add_child(
+                node_to_paste,
+                access_condition=paste_command.access_condition,
+                is_mandatory=paste_command.is_mandatory,
+                block=paste_command.block,
+                link_type=paste_command.link_type,
+                comment=paste_command.comment,
+                comment_english=paste_command.comment_english,
+                relative_credits=paste_command.relative_credits
+        )
 
     def set_prerequisite(
             self,
@@ -345,47 +372,110 @@ class ProgramTree(interface.RootEntity):
             prerequisite_expression: 'PrerequisiteExpression',
             node: 'NodeLearningUnitYear'
     ) -> (bool, List['BusinessValidationMessage']):
-        validator = UpdatePrerequisiteValidatorList(prerequisite_expression, node, self)
+        validator = validators_by_business_action.UpdatePrerequisiteValidatorList(prerequisite_expression, node, self)
         return validator.is_valid(), validator.messages
 
-    def detach_node(self, path_to_node_to_detach: Path) -> Tuple[bool, List['BusinessValidationMessage']]:
+    def detach_node(self, path_to_node_to_detach: Path, tree_repository: 'ProgramTreeRepository') -> 'Link':
         """
         Detach a node from tree
         :param path_to_node_to_detach: The path node to detach
-        :return:
+        :param tree_repository: a tree repository
+        :return: the suppressed link
         """
-        validator = PathValidator(path_to_node_to_detach)
-        if not validator.is_valid():
-            return False, validator.messages
+        PathValidator(path_to_node_to_detach).validate()
 
-        validator = DetachRootValidator(self, path_to_node_to_detach)
-        if not validator.is_valid():
-            return False, validator.messages
-
-        parent_path, *__ = path_to_node_to_detach.rsplit(PATH_SEPARATOR, 1)
-        parent = self.get_node(parent_path)
         node_to_detach = self.get_node(path_to_node_to_detach)
-        is_valid, messages = self.clean_detach_node(node_to_detach, parent_path)
-        if is_valid:
-            self.remove_prerequisites(node_to_detach)
-            parent.detach_child(node_to_detach)
-        return is_valid, messages
+        parent_path, *__ = path_to_node_to_detach.rsplit(PATH_SEPARATOR, 1)
+        validators_by_business_action.DetachNodeValidatorList(
+            self,
+            node_to_detach,
+            parent_path,
+            tree_repository
+        ).validate()
 
-    def remove_prerequisites(self, detached_node: 'Node'):
+        self.remove_prerequisites(node_to_detach, parent_path)
+        parent = self.get_node(parent_path)
+        return parent.detach_child(node_to_detach)
+
+    def __copy__(self) -> 'ProgramTree':
+        return ProgramTree(root_node=_copy(self.root_node))
+
+    def remove_prerequisites(self, detached_node: 'Node', parent_path):
+        pruned_tree = ProgramTree(root_node=_copy(self.root_node))
+        pruned_tree.get_node(parent_path).detach_child(detached_node)
+        pruned_tree_children = pruned_tree.get_all_nodes()
+
         if detached_node.is_learning_unit():
             to_remove = [detached_node] if detached_node.has_prerequisite else []
         else:
             to_remove = ProgramTree(root_node=detached_node).get_nodes_that_have_prerequisites()
-        for n in to_remove:
-            n.remove_all_prerequisite_items()
 
-    def clean_detach_node(
+        for n in to_remove:
+            if n not in pruned_tree_children:
+                n.remove_all_prerequisite_items()
+
+    def get_relative_credits_values(self, child_node: 'NodeIdentity'):
+        distinct_credits_repr = []
+        node = self.get_node_by_code_and_year(child_node.code, child_node.year)
+
+        for link_obj in self.get_links_using_node(node):
+            if link_obj.relative_credits_repr not in distinct_credits_repr:
+                distinct_credits_repr.append(link_obj.relative_credits_repr)
+        return " ; ".join(
+            set(["{}".format(credits) for credits in distinct_credits_repr])
+        )
+
+    def get_blocks_values(self, child_node: 'NodeIdentity'):
+        node = self.get_node_by_code_and_year(child_node.code, child_node.year)
+        return " ; ".join(
+            [str(grp.block) for grp in self.get_links_using_node(node) if grp.block]
+        )
+
+    def update_link(
             self,
-            node_to_detach: 'Node',
-            path_to_parent: Path
-    ) -> Tuple[bool, List['BusinessValidationMessage']]:
-        validator = DetachNodeValidatorList(self, node_to_detach, path_to_parent)
-        return validator.is_valid(), validator.messages
+            parent_path: Path,
+            child_id: 'NodeIdentity',
+            relative_credits: int,
+            access_condition: bool,
+            is_mandatory: bool,
+            block: int,
+            link_type: str,
+            comment: str,
+            comment_english: str
+    ) -> 'Link':
+        """
+        Update link's attributes between parent_path and child_node
+        :param parent_path: The parent path node
+        :param child_id: The identity of child node
+        :param relative_credits: The link's relative credits
+        :param access_condition: The link's access_condition
+        :param is_mandatory: The link's is_mandatory
+        :param block: The block of link
+        :param link_type: The type of link
+        :param comment: The comment of link
+        :param comment_english: The comment english of link
+        :return: Updated link
+        """
+        parent_node = self.get_node(parent_path)
+        child_node = parent_node.get_direct_child_as_node(child_id)
+
+        link_updated = parent_node.update_link_of_direct_child_node(
+            child_id,
+            relative_credits=relative_credits,
+            access_condition=access_condition,
+            is_mandatory=is_mandatory,
+            block=block,
+            link_type=link_type,
+            comment=comment,
+            comment_english=comment_english
+        )
+
+        validators_by_business_action.UpdateLinkValidatorList(
+            parent_node,
+            child_node,
+            link_updated
+        ).validate()
+        return link_updated
 
 
 def _nodes_from_root(root: 'Node') -> List['Node']:
@@ -409,13 +499,13 @@ def build_path(*nodes):
 
 
 def _copy(root: 'Node', ignore_children_from: Set[EducationGroupTypesEnum] = None):
-    new_node = NodeFactory().deepcopy_node_without_copy_children_recursively(root)
+    new_node = node_factory.deepcopy_node_without_copy_children_recursively(root)
     new_children = []
     for link in root.children:
         if ignore_children_from and link.parent.node_type in ignore_children_from:
             continue
         new_child = _copy(link.child, ignore_children_from=ignore_children_from)
-        new_link = LinkFactory().deepcopy_link_without_copy_children_recursively(link)
+        new_link = link_factory.deepcopy_link_without_copy_children_recursively(link)
         new_link.child = new_child
         new_children.append(new_link)
     new_node.children = new_children

@@ -4,11 +4,21 @@ from django.urls import reverse
 from django.utils.functional import cached_property
 from django.views.generic import RedirectView
 
-from program_management.ddd.business_types import *
+from base.business.education_groups.general_information_sections import SECTIONS_PER_OFFER_TYPE
 from education_group.ddd.domain.training import TrainingIdentity
+from program_management.ddd.business_types import *
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
 from program_management.ddd.repositories.node import NodeRepository
+
+SUFFIX_IDENTIFICATION = 'identification'
+SUFFIX_DIPLOMAS_CERTIFICATES = 'diplomas'
+SUFFIX_ADMINISTRATIVE_DATA = 'administrative_data'
+SUFFIX_CONTENT = 'content'
+SUFFIX_UTILIZATION = 'utilization'
+SUFFIX_GENERAL_INFO = 'general_information'
+SUFFIX_SKILLS_ACHIEVEMENTS = 'skills_achievements'
+SUFFIX_ADMISSION_CONDITION = 'admission_condition'
 
 
 class Tab(IntEnum):
@@ -45,8 +55,12 @@ class ReadEducationGroupRedirectView(RedirectView):
         except ValueError:
             return Tab.IDENTIFICATION
 
+    def _get_current_path(self) -> str:
+        return self.request.GET.get('path')
+
     def get_redirect_url(self, *args, **kwargs):
         url = get_tab_urls(
+            path=self._get_current_path(),
             tab=self._get_current_tab(),
             node=self.node,
         )
@@ -60,15 +74,16 @@ def _get_view_name_from_tab(node: 'Node', tab: Tab):
         prefix = 'training'
     elif node.is_mini_training():
         prefix = 'mini_training'
+
     return {
-        Tab.IDENTIFICATION: '{prefix}_identification'.format(prefix=prefix),
-        Tab.DIPLOMAS_CERTIFICATES: '{prefix}_diplomas'.format(prefix=prefix),
-        Tab.ADMINISTRATIVE_DATA: '{prefix}_administrative_data'.format(prefix=prefix),
-        Tab.CONTENT: '{prefix}_content'.format(prefix=prefix),
-        Tab.UTILIZATION: '{prefix}_utilization'.format(prefix=prefix),
-        Tab.GENERAL_INFO: '{prefix}_general_information'.format(prefix=prefix),
-        Tab.SKILLS_ACHIEVEMENTS: '{prefix}_skills_achievements'.format(prefix=prefix),
-        Tab.ADMISSION_CONDITION: '{prefix}_admission_condition'.format(prefix=prefix),
+        Tab.IDENTIFICATION: '{prefix}_{suffix}'.format(prefix=prefix, suffix=SUFFIX_IDENTIFICATION),
+        Tab.DIPLOMAS_CERTIFICATES: '{prefix}_{suffix}'.format(prefix=prefix, suffix=SUFFIX_DIPLOMAS_CERTIFICATES),
+        Tab.ADMINISTRATIVE_DATA: '{prefix}_{suffix}'.format(prefix=prefix, suffix=SUFFIX_ADMINISTRATIVE_DATA),
+        Tab.CONTENT: '{prefix}_{suffix}'.format(prefix=prefix, suffix=SUFFIX_CONTENT),
+        Tab.UTILIZATION: '{prefix}_{suffix}'.format(prefix=prefix, suffix=SUFFIX_UTILIZATION),
+        Tab.GENERAL_INFO: '{prefix}_{suffix}'.format(prefix=prefix, suffix=SUFFIX_GENERAL_INFO),
+        Tab.SKILLS_ACHIEVEMENTS: '{prefix}_{suffix}'.format(prefix=prefix, suffix=SUFFIX_SKILLS_ACHIEVEMENTS),
+        Tab.ADMISSION_CONDITION: '{prefix}_{suffix}'.format(prefix=prefix, suffix=SUFFIX_ADMISSION_CONDITION),
     }[tab]
 
 
@@ -76,5 +91,56 @@ def get_tab_urls(tab: Tab, node: 'Node', path: 'Path' = None) -> str:
     path = path or ""
     url = reverse(_get_view_name_from_tab(node, tab), args=[node.year, node.code])
     if path:
-        url += "?path={}".format(path)
+        url += "?path={}&tab={}#achievement_".format(path, tab)
     return url
+
+
+def get_tab_from_referer(node: 'Node', referer: str):
+    if referer:
+        tabs = get_group_available_tabs(node)
+
+        if node.is_training():
+            tabs = get_training_available_tabs()
+
+        if node.is_mini_training():
+            tabs = get_mini_training_available_tabs()
+
+        return next((tab for key, tab in tabs.items() if key in referer), Tab.IDENTIFICATION)
+    return Tab.IDENTIFICATION
+
+
+def get_group_available_tabs(node: 'Node'):
+    tabs = {
+        SUFFIX_IDENTIFICATION: Tab.IDENTIFICATION,
+        SUFFIX_CONTENT: Tab.CONTENT,
+        SUFFIX_UTILIZATION: Tab.UTILIZATION,
+    }
+    if node.node_type.name in SECTIONS_PER_OFFER_TYPE.keys():
+        tabs.update({
+            SUFFIX_GENERAL_INFO: Tab.GENERAL_INFO,
+        })
+    return tabs
+
+
+def get_training_available_tabs():
+    return {
+        SUFFIX_IDENTIFICATION: Tab.IDENTIFICATION,
+        SUFFIX_DIPLOMAS_CERTIFICATES: Tab.DIPLOMAS_CERTIFICATES,
+        SUFFIX_ADMINISTRATIVE_DATA: Tab.ADMINISTRATIVE_DATA,
+        SUFFIX_CONTENT: Tab.CONTENT,
+        SUFFIX_UTILIZATION: Tab.UTILIZATION,
+        SUFFIX_GENERAL_INFO: Tab.GENERAL_INFO,
+        SUFFIX_SKILLS_ACHIEVEMENTS: Tab.SKILLS_ACHIEVEMENTS,
+        SUFFIX_ADMISSION_CONDITION: Tab.ADMISSION_CONDITION
+    }
+
+
+def get_mini_training_available_tabs():
+    return {
+        SUFFIX_IDENTIFICATION: Tab.IDENTIFICATION,
+        SUFFIX_CONTENT: Tab.CONTENT,
+        SUFFIX_UTILIZATION: Tab.UTILIZATION,
+        SUFFIX_GENERAL_INFO: Tab.GENERAL_INFO,
+        SUFFIX_SKILLS_ACHIEVEMENTS: Tab.SKILLS_ACHIEVEMENTS,
+        SUFFIX_ADMISSION_CONDITION: Tab.ADMISSION_CONDITION
+    }

@@ -30,12 +30,14 @@ from django.test import TestCase
 
 from base.models.group_element_year import GroupElementYear
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.group_element_year import GroupElementYearFactory
+from base.tests.factories.group_element_year import GroupElementYearFactory, GroupElementYearChildLeafFactory
 from program_management.ddd.domain.node import NodeEducationGroupYear, NodeLearningUnitYear, NodeGroupYear
 from program_management.ddd.repositories import persist_tree, load_tree
 from program_management.ddd.validators._authorized_relationship import DetachAuthorizedRelationshipValidator
+from program_management.ddd.validators.validators_by_business_action import DetachNodeValidatorList
 from program_management.tests.ddd.factories.link import LinkFactory
-from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory
+from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory, NodeGroupYearFactory, \
+    NodeEducationGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory, ElementLearningUnitYearFactory
@@ -53,9 +55,21 @@ class TestPersistTree(TestCase):
             learning_unit_year__academic_year=academic_year
         )
 
-        self.root_node = NodeGroupYear(node_id=self.root_group.pk)
-        self.common_core_node = NodeEducationGroupYear(node_id=self.common_core_element.pk)
-        self.learning_unit_year_node = NodeLearningUnitYear(node_id=self.learning_unit_year_element.pk)
+        self.root_node = NodeGroupYearFactory(
+            node_id=self.root_group.pk,
+            code=self.root_group.group_year.partial_acronym,
+            year=self.root_group.group_year.academic_year.year
+        )
+        self.common_core_node = NodeGroupYearFactory(
+            node_id=self.common_core_element.pk,
+            code=self.common_core_element.group_year.partial_acronym,
+            year=self.common_core_element.group_year.academic_year.year
+        )
+        self.learning_unit_year_node = NodeLearningUnitYearFactory(
+            node_id=self.learning_unit_year_element.pk,
+            code=self.learning_unit_year_element.learning_unit_year.acronym,
+            year=self.learning_unit_year_element.learning_unit_year.academic_year.year
+        )
 
     def test_persist_tree_from_scratch(self):
         self.common_core_node.add_child(self.learning_unit_year_node)
@@ -111,8 +125,9 @@ class TestPersistTree(TestCase):
         """
         self.assertTrue(mock.called, assertion_msg)
 
-    @patch.object(DetachAuthorizedRelationshipValidator, 'validate')
-    def test_delete_when_1_link_has_been_deleted(self, mock):
+    @patch.object(DetachNodeValidatorList, 'validate')
+    def test_delete_when_1_link_has_been_deleted(self, mock_detach):
+        mock_detach.return_value = None
         GroupElementYearFactory(parent_element=self.root_group, child_element=self.common_core_element)
         node_to_detach = self.common_core_node
         qs_link_will_be_detached = GroupElementYear.objects.filter(child_element_id=node_to_detach.pk)
@@ -121,7 +136,7 @@ class TestPersistTree(TestCase):
         tree = load_tree.load(self.root_node.node_id)
 
         path_to_detach = "|".join([str(self.root_node.pk), str(node_to_detach.pk)])
-        tree.detach_node(path_to_detach)
+        tree.detach_node(path_to_detach, mock.Mock())
         persist_tree.persist(tree)
         self.assertEqual(qs_link_will_be_detached.count(), 0)
 
@@ -135,7 +150,7 @@ class TestPersistTree(TestCase):
 
 
 class TestPersistPrerequisites(TestCase):
-    @mock.patch("program_management.ddd.repositories._persist_prerequisite.persist")
+    @patch("program_management.ddd.repositories._persist_prerequisite.persist")
     def test_call_persist_(self, mock_persist_prerequisite):
         tree = ProgramTreeFactory()
         LinkFactory(parent=tree.root_node, child=NodeLearningUnitYearFactory())
@@ -143,3 +158,25 @@ class TestPersistPrerequisites(TestCase):
         persist_tree.persist(tree)
 
         mock_persist_prerequisite.assert_called_once_with(tree)
+
+    @patch("program_management.ddd.repositories._persist_prerequisite._persist")
+    @patch("program_management.ddd.repositories.persist_tree.__delete_group_element_year")
+    def test_should_call_persist_prerequisites_on_all_children_when_link_deleted(
+            self,
+            mock_delete_group_element_year,
+            mock_persist_prerequisite):
+        root_version = EducationGroupVersionFactory()
+        link_1 = GroupElementYearFactory(parent_element__group_year=root_version.root_group)
+        link_2_1 = GroupElementYearChildLeafFactory(parent_element=link_1.child_element)
+        link_2_2 = GroupElementYearChildLeafFactory(parent_element=link_1.child_element)
+
+        tree = load_tree.load(link_1.parent_element.id)
+        root_node_child = tree.root_node.children_as_nodes[0]
+        tree.root_node.detach_child(root_node_child)
+
+        persist_tree.persist(tree)
+        number_learning_unit_removed = 2
+        self.assertEqual(
+            mock_persist_prerequisite.call_count,
+            number_learning_unit_removed
+        )

@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Union
 
 from django.db.models import F
 
@@ -32,6 +33,8 @@ from osis_common.ddd import interface
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
+from education_group.ddd.domain.service.identity_search import TrainingIdentitySearch \
+    as EducationGroupTrainingIdentitySearch
 
 
 class ProgramTreeVersionIdentitySearch(interface.DomainService):
@@ -63,3 +66,37 @@ class NodeIdentitySearch(interface.DomainService):
         )
         if values:
             return NodeIdentity(code=values[0]['partial_acronym'], year=training_identity.year)
+
+    @classmethod
+    def get_from_element_id(cls, element_id: int) -> Union['NodeIdentity', None]:
+        try:
+            group_year = GroupYear.objects.values(
+                'partial_acronym', 'academic_year__year'
+            ).get(element__pk=element_id)
+            return NodeIdentity(code=group_year['partial_acronym'], year=group_year['academic_year__year'])
+        except GroupYear.DoesNotExist:
+            return None
+
+
+class ProgramTreeIdentitySearch(interface.DomainService):
+    def get_from_node_identity(self, node_identity: 'NodeIdentity') -> 'ProgramTreeIdentity':
+        return ProgramTreeIdentity(code=node_identity.code, year=node_identity.year)
+
+
+class TrainingIdentitySearch(interface.DomainService):
+
+    @classmethod
+    def get_from_program_tree_version_identity(
+            cls,
+            version_identity: 'ProgramTreeVersionIdentity'
+    ) -> 'TrainingIdentity':
+        return TrainingIdentity(acronym=version_identity.offer_acronym, year=version_identity.year)
+
+    @classmethod
+    def get_from_program_tree_identity(
+            cls,
+            identity: 'ProgramTreeIdentity'
+    ) -> 'TrainingIdentity':
+        return EducationGroupTrainingIdentitySearch().get_from_node_identity(
+            node_identity=NodeIdentitySearch().get_from_program_tree_identity(tree_identity=identity)
+        )
