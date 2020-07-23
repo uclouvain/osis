@@ -35,12 +35,28 @@ from program_management.ddd.service.write import create_program_tree_version_ser
 
 
 class SpecificVersionForm(forms.Form):
-    version_name = forms.CharField(max_length=15, required=True, label=_('Acronym of version'), widget=TextInput(attrs={
-        'onchange': 'validate_version_name()'
-    }))
-    title = forms.CharField(max_length=100, required=False, label=_('Full title of the french version'))
-    title_english = forms.CharField(max_length=100, required=False, label=_('Full title of the english version'))
-    end_year = forms.ChoiceField(required=False, label=_('This version exists until'))
+    version_name = forms.CharField(
+        max_length=15,
+        required=True,
+        label=_('Acronym of version'),
+        widget=TextInput(
+            attrs={'onchange': 'validate_version_name()'}
+        ),
+    )
+    title = forms.CharField(
+        max_length=100,
+        required=False,
+        label=_('Full title of the french version'),
+    )
+    title_english = forms.CharField(
+        max_length=100,
+        required=False,
+        label=_('Full title of the english version'),
+    )
+    end_year = forms.ChoiceField(
+        required=False,
+        label=_('This version exists until'),
+    )
 
     def __init__(self, *args, **kwargs):
         self.save_type = kwargs.pop('save_type')
