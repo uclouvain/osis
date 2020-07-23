@@ -61,7 +61,7 @@ def __get_elements_by_node_identity(links_has_changed: List['Link']) -> Dict['No
     nodes = {link.parent for link in links_has_changed} | {link.child for link in links_has_changed}
 
     group_elements = __get_elements_as_group(nodes)
-    learning_unit_elements = __get_elements_as_learning_unit
+    learning_unit_elements = __get_elements_as_learning_unit(nodes)
 
     result = {}
     for node in nodes:

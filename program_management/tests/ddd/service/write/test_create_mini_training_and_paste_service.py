@@ -26,7 +26,7 @@ from django.test import SimpleTestCase
 
 from education_group.ddd.domain import mini_training
 from program_management.ddd import command
-from program_management.ddd.service.write import create_mini_training_and_paste_service
+from program_management.ddd.service.write import create_and_attach_mini_training_service
 
 
 class TestCreateMiniTrainingAndAttach(SimpleTestCase):
@@ -62,7 +62,7 @@ class TestCreateMiniTrainingAndAttach(SimpleTestCase):
             mock_paste_element):
         mini_training_identity = mini_training.MiniTrainingIdentity(code="CODE", year=2020)
         mock_create_service.return_value = mini_training_identity
-        resulting_identity = create_mini_training_and_paste_service.create_mini_training_and_paste(self.command)
+        resulting_identity = create_and_attach_mini_training_service.create_mini_training_and_paste(self.command)
 
         self.assertTrue(mock_create_service.called)
         self.assertTrue(mock_paste_element.called)
