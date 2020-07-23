@@ -38,6 +38,7 @@ from base.models.enums.funding_codes import FundingCodes
 from base.models.enums.internship_presence import InternshipPresence
 from base.models.enums.rate_code import RateCode
 from base.models.enums.schedule_type import ScheduleTypeEnum
+from base.models.utils import utils
 from education_group.ddd.business_types import *
 from education_group.ddd.domain._campus import Campus
 from education_group.ddd.domain._co_graduation import CoGraduation
@@ -76,12 +77,12 @@ class TrainingBuilder:
             # TODO :: Case update training next year - to implement in OSIS-4809
         except TrainingNotFoundException:
             # Case create training next year
+            CopyTrainingValidatorList(training_from).validate()
             training_next_year = attr.evolve(  # Copy to new object
                 training_from,
                 entity_identity=identity_next_year,
                 entity_id=identity_next_year,
             )
-            CopyTrainingValidatorList(training_next_year).validate()
         return training_next_year
 
     def create_training(self, command: 'CreateTrainingCommand') -> 'Training':
@@ -108,11 +109,11 @@ class TrainingBuilder:
         training = Training(
             entity_identity=training_identity,
             entity_id=training_identity,
-            type=self._get_enum_from_str(command.type, TrainingType),
+            type=utils.get_enum_from_str(command.type, TrainingType),
             credits=command.credits,
-            schedule_type=self._get_enum_from_str(command.schedule_type, ScheduleTypeEnum),
+            schedule_type=utils.get_enum_from_str(command.schedule_type, ScheduleTypeEnum),
             duration=command.duration,
-            duration_unit=self._get_enum_from_str(command.duration_unit, DurationUnitsEnum),
+            duration_unit=utils.get_enum_from_str(command.duration_unit, DurationUnitsEnum),
             start_year=command.start_year,
             titles=Titles(
                 title_fr=command.title_fr,
@@ -120,20 +121,22 @@ class TrainingBuilder:
                 title_en=command.title_en,
                 partial_title_en=command.partial_title_en,
             ),
-            status=self._get_enum_from_str(command.status, ActiveStatusEnum),
+            status=utils.get_enum_from_str(command.status, ActiveStatusEnum),
             keywords=command.keywords,
-            internship=self._get_enum_from_str(command.internship, InternshipPresence),
+            internship_presence=utils.get_enum_from_str(command.internship_presence, InternshipPresence),
             is_enrollment_enabled=command.is_enrollment_enabled,
             has_online_re_registration=command.has_online_re_registration,
             has_partial_deliberation=command.has_partial_deliberation,
             has_admission_exam=command.has_admission_exam,
             has_dissertation=command.has_dissertation,
             produce_university_certificate=command.produce_university_certificate,
-            decree_category=self._get_enum_from_str(command.decree_category, DecreeCategories),
-            rate_code=self._get_enum_from_str(command.rate_code, RateCode),
+            decree_category=utils.get_enum_from_str(command.decree_category, DecreeCategories),
+            rate_code=utils.get_enum_from_str(command.rate_code, RateCode),
             main_language=Language(command.main_language) if command.main_language else None,
-            english_activities=self._get_enum_from_str(command.english_activities, ActivityPresence),
-            other_language_activities=self._get_enum_from_str(command.other_language_activities, ActivityPresence),
+            english_activities=utils.get_enum_from_str(command.english_activities, ActivityPresence),
+            other_language_activities=utils.get_enum_from_str(
+                command.other_language_activities, ActivityPresence
+            ),
             internal_comment=command.internal_comment,
             main_domain=StudyDomain(
                 entity_id=StudyDomainIdentity(decree_name=command.main_domain_decree, code=command.main_domain_code),
@@ -156,7 +159,7 @@ class TrainingBuilder:
                 name=command.enrollment_campus_name,
                 university_name=command.enrollment_campus_organization_name,
             ),
-            other_campus_activities=self._get_enum_from_str(command.other_campus_activities, ActivityPresence),
+            other_campus_activities=utils.get_enum_from_str(command.other_campus_activities, ActivityPresence),
             funding=Funding(
                 can_be_funded=command.can_be_funded,
                 funding_orientation=FundingCodes[
@@ -176,7 +179,7 @@ class TrainingBuilder:
                 code_inter_cfb=command.code_inter_cfb,
                 coefficient=command.coefficient,
             ),
-            academic_type=self._get_enum_from_str(command.academic_type, AcademicTypes),
+            academic_type=utils.get_enum_from_str(command.academic_type, AcademicTypes),
             diploma=Diploma(
                 leads_to_diploma=command.leads_to_diploma,
                 printing_title=command.printing_title,
@@ -204,7 +207,7 @@ class Training(interface.RootEntity):
     # FIXME :: split fields into separate ValueObjects (to discuss with business people)
     entity_id = entity_identity = attr.ib(type=TrainingIdentity)
     type = attr.ib(type=TrainingType)
-    credits = attr.ib(type=Decimal)
+    credits = attr.ib(type=int)
     start_year = attr.ib(type=int)
     titles = attr.ib(type=Titles)
     status = attr.ib(type=ActiveStatusEnum, default=ActiveStatusEnum.ACTIVE)
@@ -213,7 +216,7 @@ class Training(interface.RootEntity):
     duration = attr.ib(type=int, default=1)
     duration_unit = attr.ib(type=DurationUnitsEnum, default=DurationUnitsEnum.QUADRIMESTER)
     keywords = attr.ib(type=str, default="")
-    internship = attr.ib(type=InternshipPresence, default=InternshipPresence.NO)
+    internship_presence = attr.ib(type=InternshipPresence, default=InternshipPresence.NO)
     is_enrollment_enabled = attr.ib(type=bool, default=True)
     has_online_re_registration = attr.ib(type=bool, default=True)
     has_partial_deliberation = attr.ib(type=bool, default=False)

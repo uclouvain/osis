@@ -668,4 +668,4 @@ def find_by_acronym_and_year(acronym: str, year: int):
     return EntityVersion.objects.filter(
         Q(acronym=acronym, start_date__year__lte=year),
         Q(end_date__isnull=True) | Q(end_date__year__gt=year)
-    ).last()
+    ).order_by('start_date').last()

@@ -59,6 +59,7 @@ class TestPostponeProgramTree(TestCase):
             )
         ]
         mock_copy_program_to_next_year.side_effect = program_tree_version_identities
+        mock_calculate_end_year_of_postponement.return_value = 2021
 
         cmd = command.PostponeProgramTreeVersionCommand(
             from_year=2018,

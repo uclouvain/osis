@@ -12,12 +12,12 @@ from base.models.campus import Campus
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import GroupType, TrainingType
 from base.utils.cache import RequestCache
-from base.views.common import display_success_messages
+from base.views.common import display_success_messages, display_error_messages
 from education_group.ddd import command
 from program_management.ddd import command as program_management_command
 from education_group.ddd.domain.exception import GroupCodeAlreadyExistException, ContentConstraintTypeMissing, \
     ContentConstraintMinimumMaximumMissing, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum, \
-    TrainingAcronymAlreadyExist, StartYearGreaterThanEndYear
+    TrainingAcronymAlreadyExist, StartYearGreaterThanEndYear, MaximumCertificateAimType2Reached
 from education_group.ddd.domain.training import TrainingIdentity
 from program_management.ddd.service.write import create_training_with_program_tree, create_and_attach_training_service
 from education_group.forms.training import CreateTrainingForm
@@ -45,7 +45,7 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         return render(request, self.template_name, {
             "training_form": training_form,
             "tabs": self.get_tabs(),
-            "type_text": TrainingType.get_value(self.kwargs['type'])
+            "type_text": str(TrainingType.get_value(self.kwargs['type']))
         })
 
     def _get_initial_form(self) -> Dict:
@@ -81,13 +81,16 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 training_form.add_error('acronym', e.message)
             except ContentConstraintTypeMissing as e:
                 training_form.add_error('constraint_type', e.message)
-            except StartYearGreaterThanEndYear as e:
-                training_form.add_error('end_year', e.message)
-                training_form.add_error('academic_year', '')
             except (ContentConstraintMinimumMaximumMissing, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum)\
                     as e:
                 training_form.add_error('min_constraint', e.message)
                 training_form.add_error('max_constraint', '')
+            except StartYearGreaterThanEndYear as e:
+                training_form.add_error('end_year', e.message)
+                training_form.add_error('academic_year', '')
+            except MaximumCertificateAimType2Reached as e:
+                training_form.add_error('certificate_aims', e.message)
+                training_form.add_error('section', '')
 
             if not training_form.errors:
                 success_messages = [
@@ -95,6 +98,9 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 ]
                 display_success_messages(request, success_messages, extra_tags='safe')
                 return HttpResponseRedirect(self.get_success_url(training_ids[0]))
+            else:
+                msg = _("Error(s) in form: The modifications are not saved")
+                display_error_messages(request, msg)
 
         return render(request, self.template_name, {
             "training_form": training_form,
@@ -175,7 +181,7 @@ def _convert_training_form_to_data_for_service(training_form: CreateTrainingForm
         'title_en': training_form.cleaned_data['title_en'],
         'partial_title_en': training_form.cleaned_data['partial_title_en'],
         'keywords': training_form.cleaned_data['keywords'],
-        'internship': training_form.cleaned_data['internship'],
+        'internship_presence': training_form.cleaned_data['internship_presence'],
         'is_enrollment_enabled': training_form.cleaned_data['is_enrollment_enabled'],
         'has_online_re_registration': training_form.cleaned_data['has_online_re_registration'],
         'has_partial_deliberation': training_form.cleaned_data['has_partial_deliberation'],

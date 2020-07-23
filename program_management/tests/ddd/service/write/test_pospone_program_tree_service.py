@@ -44,6 +44,7 @@ class TestPostponeProgramTree(TestCase):
             program_tree.ProgramTreeIdentity("CODE", year=2020)
         ]
         mock_copy_program_to_next_year.side_effect = program_tree_identities
+        mock_calculate_end_year_of_postponement.return_value = 2021
 
         cmd = command.PostponeProgramTreeCommand(
             from_year=2018,

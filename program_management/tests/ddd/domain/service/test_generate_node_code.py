@@ -26,7 +26,7 @@ from django.test import TestCase
 
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType
 from education_group.tests.factories.group_year import GroupYearFactory
-from program_management.ddd.domain.service import generate_node_code
+from program_management.ddd.domain.service.generate_node_code import GenerateNodeCode
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 
 
@@ -38,10 +38,10 @@ class TestGenerateCodeFromParentNode(TestCase):
     def test_should_return_empty_string_when_parent_has_no_code(self):
         parent_node = NodeGroupYearFactory(code="")
         child_node_type = TrainingType.BACHELOR
-        result = generate_node_code.generate_code_from_parent_node(parent_node, child_node_type)
+        result = GenerateNodeCode.generate_from_parent_node(parent_node, child_node_type)
         self.assertEqual("", result)
 
-    @mock.patch("program_management.ddd.domain.service.validation_rule.get_validation_rule_for_field")
+    @mock.patch("program_management.ddd.domain.service.validation_rule.FieldValidationRule.get")
     def test_should_return_new_code_when_parent_has_a_code(self, mock_get_rule):
         mock_get_rule.return_value = mock.Mock()
         mock_get_rule.return_value.initial_value = '200E'
@@ -49,10 +49,10 @@ class TestGenerateCodeFromParentNode(TestCase):
         parent_node = NodeGroupYearFactory(code="LDROI100B")
         child_node_type = MiniTrainingType.DEEPENING
 
-        result = generate_node_code.generate_code_from_parent_node(parent_node, child_node_type)
+        result = GenerateNodeCode.generate_from_parent_node(parent_node, child_node_type)
         self.assertEqual("LDROI200E", result)
 
-    @mock.patch("program_management.ddd.domain.service.validation_rule.get_validation_rule_for_field")
+    @mock.patch("program_management.ddd.domain.service.validation_rule.FieldValidationRule.get")
     def test_should_increment_cnum_number_when_generated_code_already_exists(self, mock_get_rule):
         mock_get_rule.return_value = mock.Mock()
         mock_get_rule.return_value.initial_value = '200E'
@@ -61,5 +61,5 @@ class TestGenerateCodeFromParentNode(TestCase):
         parent_node = NodeGroupYearFactory(code="LDROI100B")
         child_node_type = MiniTrainingType.DEEPENING
 
-        result = generate_node_code.generate_code_from_parent_node(parent_node, child_node_type)
+        result = GenerateNodeCode.generate_from_parent_node(parent_node, child_node_type)
         self.assertEqual("LDROI201E", result)

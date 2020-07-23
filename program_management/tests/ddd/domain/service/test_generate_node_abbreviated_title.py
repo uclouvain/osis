@@ -25,12 +25,12 @@ import mock
 from django.test import SimpleTestCase
 
 from base.models.enums.education_group_types import MiniTrainingType
-from program_management.ddd.domain.service import generate_node_abbreviated_title
+from program_management.ddd.domain.service.generate_node_abbreviated_title import GenerateNodeAbbreviatedTitle
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 
 
 class TestGenerateFromParentNode(SimpleTestCase):
-    @mock.patch("program_management.ddd.domain.service.validation_rule.get_validation_rule_for_field")
+    @mock.patch("program_management.ddd.domain.service.validation_rule.FieldValidationRule.get")
     def test_should_generate_title_by_concatening_child_type_default_value_with_parent_title(
             self,
             mock_get_field):
@@ -38,7 +38,7 @@ class TestGenerateFromParentNode(SimpleTestCase):
 
         parent_node = NodeGroupYearFactory(title="Title")
         child_type = MiniTrainingType.DEEPENING
-        result = generate_node_abbreviated_title.generate_from_parent_node(parent_node, child_type)
+        result = GenerateNodeAbbreviatedTitle.generate(parent_node, child_type)
 
         self.assertEqual("INITIALVALUETitle", result)
 

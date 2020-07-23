@@ -24,15 +24,18 @@
 
 from base.ddd.utils import business_validator
 from education_group.ddd.business_types import *
-from education_group.ddd.domain.exception import TrainingAcronymAlreadyExist
-from education_group.ddd.domain.service.abbreviated_title_exist import CheckAcronymExist
+from education_group.ddd.domain import exception
+
+MAX_NUMBER_CERTIFICATE_TYPE_2 = 1
 
 
-class AcronymAlreadyExistValidator(business_validator.BusinessValidator):
+class CertificateAimType2Validator(business_validator.BusinessValidator):
     def __init__(self, training: 'Training'):
         super().__init__()
-        self.acronym = training.acronym
+        self.training = training
 
     def validate(self, *args, **kwargs):
-        if CheckAcronymExist.exists(self.acronym):
-            raise TrainingAcronymAlreadyExist(self.acronym)
+        if self.training.diploma:
+            certificate_aims_type_2 = [ca for ca in self.training.diploma.aims if ca.section == 2]
+            if len(certificate_aims_type_2) > MAX_NUMBER_CERTIFICATE_TYPE_2:
+                raise exception.MaximumCertificateAimType2Reached()

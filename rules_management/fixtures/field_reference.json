@@ -989,7 +989,7 @@
     {
         "pk": 67,
         "fields": {
-            "field_name": "internship",
+            "field_name": "internship_presence",
             "context": "TRAINING_DAILY_MANAGEMENT",
             "content_type": [
                 "base",
@@ -1006,7 +1006,7 @@
     {
         "pk": 68,
         "fields": {
-            "field_name": "internship",
+            "field_name": "internship_presence",
             "context": "TRAINING_PROPOSAL_MANAGEMENT",
             "content_type": [
                 "base",
@@ -1019,7 +1019,7 @@
     {
         "pk": 69,
         "fields": {
-            "field_name": "internship",
+            "field_name": "internship_presence",
             "context": "TRAINING_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",

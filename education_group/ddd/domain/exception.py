@@ -89,14 +89,14 @@ class TrainingAcronymAlreadyExist(BusinessException):
 
 
 class CannotCopyDueToEndDate(BusinessException):
-    def __init__(self, training_next_year: 'Training', *args, **kwargs):
+    def __init__(self, training: 'Training', *args, **kwargs):
         message = _(
             "You can't copy the training '{acronym}' from {from_year} to {to_year} because it ends in {end_year}"
         ).format(
-            acronym=training_next_year.acronym,
-            from_year=training_next_year.year - 1,
-            to_year=training_next_year.year,
-            end_year=training_next_year.end_year,
+            acronym=training.acronym,
+            from_year=training.year,
+            to_year=training.year + 1,
+            end_year=training.end_year,
         )
         super().__init__(message, **kwargs)
 
@@ -104,4 +104,10 @@ class CannotCopyDueToEndDate(BusinessException):
 class StartYearGreaterThanEndYear(BusinessException):
     def __init__(self, *args, **kwargs):
         message = _('End year must be greater than the start year, or equal')
+        super().__init__(message, **kwargs)
+
+
+class MaximumCertificateAimType2Reached(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _("There can only be one type 2 expectation")
         super().__init__(message, **kwargs)

@@ -50,7 +50,7 @@ from base.models.enums.academic_type import AcademicTypes
 from base.models.enums.activity_presence import ActivityPresence
 from base.models.enums.decree_category import DecreeCategories
 from base.models.enums.diploma_coorganization import DiplomaCoorganizationTypes
-from base.models.enums.duration_unit import DurationUnits, DurationUnitsEnum
+from base.models.enums.duration_unit import DurationUnitsEnum
 from base.models.enums.education_group_types import TrainingType
 from base.models.enums.funding_codes import FundingCodes
 from base.models.enums.internship_presence import InternshipPresence
@@ -136,7 +136,7 @@ def _convert_education_group_year_to_training(
         ),
         status=ActiveStatusEnum[obj.active],
         keywords=obj.keywords,
-        internship=InternshipPresence[obj.internship] if obj.internship else None,
+        internship_presence=InternshipPresence[obj.internship] if obj.internship else None,
         is_enrollment_enabled=obj.enrollment_enabled,
         has_online_re_registration=obj.web_re_registration,
         has_partial_deliberation=obj.partial_deliberation,
@@ -355,7 +355,7 @@ def _save_education_group_year(
         title_english=training.titles.title_en,
         partial_title_english=training.titles.partial_title_en,
         keywords=training.keywords,
-        internship=training.internship.name if training.internship else None,
+        internship=training.internship_presence.name if training.internship_presence else None,
         enrollment_enabled=training.is_enrollment_enabled,
         web_re_registration=training.has_online_re_registration,
         partial_deliberation=training.has_partial_deliberation,
@@ -384,7 +384,7 @@ def _save_education_group_year(
         administration_entity_id=entity_version.find_by_acronym_and_year(
             acronym=training.administration_entity.acronym,
             year=training.year,
-        ).entity_id if training.management_entity else None,
+        ).entity_id if training.administration_entity else None,
         main_teaching_campus=CampusModelDb.objects.get(
             name=training.teaching_campus.name,
             organization__name=training.teaching_campus.university_name,

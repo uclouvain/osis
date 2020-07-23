@@ -39,21 +39,18 @@ def copy_group(cmd: command.CopyGroupCommand) -> List['GroupIdentity']:
     """
     group_ids = []
 
-    # GIVEN
     from_year = cmd.from_year
     while from_year < cmd.to_year:
         cmd_get_group = command.GetGroupCommand(code=cmd.from_code, year=from_year)
         grp = group_service_read.get_group(cmd_get_group)
 
-        # WHEN
         group_next_year = group.builder.build_next_year_group(from_group=grp)
 
-        # THEN
-        cmd_create_group = __convert_group_to_command(group_next_year)
-        group_next_year_id = create_orphan_group(cmd_create_group)
+        group_next_year_id = create_orphan_group(__convert_group_to_command(group_next_year))
 
         group_ids.append(group_next_year_id)
         from_year += 1
+
     return group_ids
 
 

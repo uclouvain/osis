@@ -28,10 +28,10 @@ from education_group.ddd.domain.exception import CannotCopyDueToEndDate
 
 
 class CheckEndDateValidator(business_validator.BusinessValidator):
-    def __init__(self, training_next_year: 'Training'):
+    def __init__(self, training: 'Training'):
         super().__init__()
-        self.training_next_year = training_next_year
+        self.training = training
 
     def validate(self, *args, **kwargs):
-        if self.training_next_year.end_year and self.training_next_year.year > self.training_next_year.end_year:
-            raise CannotCopyDueToEndDate(training_next_year=self.training_next_year)
+        if self.training.end_year and self.training.year > self.training.end_year:
+            raise CannotCopyDueToEndDate(training=self.training)

@@ -117,7 +117,7 @@ class TestTrainingRepositoryCreateMethod(TestCase):
         self.assertEqual(education_group_year.partial_title, self.training.titles.partial_title_fr)
         self.assertEqual(education_group_year.partial_title_english, self.training.titles.partial_title_en)
         self.assertEqual(education_group_year.keywords, self.training.keywords)
-        self.assertEqual(education_group_year.internship, self.training.internship.name)
+        self.assertEqual(education_group_year.internship, self.training.internship_presence.name)
         self.assertEqual(education_group_year.enrollment_enabled, self.training.is_enrollment_enabled)
         self.assertEqual(education_group_year.web_re_registration, self.training.has_online_re_registration)
         self.assertEqual(education_group_year.partial_deliberation, self.training.has_partial_deliberation)

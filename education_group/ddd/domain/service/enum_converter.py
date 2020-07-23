@@ -29,11 +29,14 @@ from base.models.enums.education_group_types import TrainingType, MiniTrainingTy
 from osis_common.ddd import interface
 
 
-def convert_type_str_to_enum(type: str) -> Union[TrainingType, MiniTrainingType, GroupType]:
-    if type in GroupType.get_names():
-        return GroupType[type]
-    elif type in TrainingType.get_names():
-        return TrainingType[type]
-    elif type in MiniTrainingType.get_names():
-        return MiniTrainingType[type]
-    raise interface.BusinessException('Unsupported group type')
+class EducationGroupTypeConverter(interface.DomainService):
+
+    @classmethod
+    def convert_type_str_to_enum(cls, type: str) -> Union[TrainingType, MiniTrainingType, GroupType]:
+        if type in GroupType.get_names():
+            return GroupType[type]
+        elif type in TrainingType.get_names():
+            return TrainingType[type]
+        elif type in MiniTrainingType.get_names():
+            return MiniTrainingType[type]
+        raise interface.BusinessException('Unsupported group type')

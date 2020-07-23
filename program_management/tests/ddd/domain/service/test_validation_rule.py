@@ -26,7 +26,7 @@ from django.test import TestCase
 from base.models import validation_rule
 from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.validation_rule import ValidationRuleFactory
-from program_management.ddd.domain.service import validation_rule as validation_rule_service
+from program_management.ddd.domain.service.validation_rule import FieldValidationRule
 
 
 class TestGetValidationRuleForField(TestCase):
@@ -41,9 +41,9 @@ class TestGetValidationRuleForField(TestCase):
 
     def test_should_raise_object_does_not_exist_when_no_matching_validation_rule(self):
         with self.assertRaises(validation_rule.ValidationRule.DoesNotExist):
-            validation_rule_service.get_validation_rule_for_field(self.education_group_type, "another_field")
+            FieldValidationRule.get(self.education_group_type, "another_field")
 
     def test_should_return_validation_rule_when_matching_rule_exists(self):
-        result = validation_rule_service.get_validation_rule_for_field(self.education_group_type, "field")
+        result = FieldValidationRule.get(self.education_group_type, "field")
 
         self.assertEqual(self.rule, result)

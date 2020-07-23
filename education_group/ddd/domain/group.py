@@ -33,8 +33,8 @@ from education_group.ddd.domain._content_constraint import ContentConstraint
 from education_group.ddd.domain._entity import Entity
 from education_group.ddd.domain._remark import Remark
 from education_group.ddd.domain._titles import Titles
+from education_group.ddd.domain.service.enum_converter import EducationGroupTypeConverter
 from education_group.ddd.validators.validators_by_business_action import UpdateGroupValidatorList
-from education_group.ddd.domain.service import enum_converter
 from osis_common.ddd import interface
 
 
@@ -57,7 +57,7 @@ class GroupBuilder:
 
         return Group(
             entity_identity=group_id,
-            type=enum_converter.convert_type_str_to_enum(cmd.type),
+            type=EducationGroupTypeConverter.convert_type_str_to_enum(cmd.type),
             abbreviated_title=cmd.abbreviated_title,
             titles=titles,
             credits=cmd.credits,

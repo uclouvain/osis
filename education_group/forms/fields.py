@@ -38,7 +38,7 @@ class ManagementEntitiesChoiceField(EntityRoleChoiceField):
     def clean(self, value):
         value = super(ModelChoiceField, self).clean(value)
         if value:
-            return EntityVersion.objects.get(pk=value).acronym
+            return value.acronym
         return None
 
 
