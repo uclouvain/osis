@@ -71,7 +71,7 @@ class EducationGroupAchievementAction(EducationGroupAchievementMixin, FormView):
         return self.get_object().education_group_year
 
     def get_success_url(self):
-        prefix = 'training_' if self.education_group_year.is_training else 'mini_training_'
+        prefix = 'training_' if self.education_group_year.is_training() else 'mini_training_'
         return reverse(
             prefix + 'skills_achievements', args=[self.kwargs['year'], self.kwargs['code']]
         ) + '?path={}&tab={}#achievement_{}'.format(
@@ -85,17 +85,15 @@ class UpdateEducationGroupAchievement(PermissionRequiredMixin, AjaxTemplateMixin
     form_class = EducationGroupAchievementForm
     permission_required = 'base.change_educationgroupachievement'
     raise_exception = True
+    force_reload = True
 
     def get_permission_object(self):
         return self.get_object().education_group_year
 
-    def get_success_url(self):
-        # Simply reload the page
-        return
-
 
 class UpdateEducationGroupDetailedAchievement(EducationGroupDetailedAchievementMixin, UpdateEducationGroupAchievement):
     form_class = EducationGroupDetailedAchievementForm
+    force_reload = True
 
     def get_permission_object(self):
         return self.education_group_achievement.education_group_year
@@ -106,7 +104,7 @@ class EducationGroupDetailedAchievementAction(EducationGroupDetailedAchievementM
         return self.education_group_achievement.education_group_year
 
     def get_success_url(self):
-        prefix = 'training_' if self.education_group_year.is_training else 'mini_training_'
+        prefix = 'training_' if self.education_group_year.is_training() else 'mini_training_'
         return reverse(
             prefix + 'skills_achievements', args=[self.kwargs['year'], self.kwargs['code']]
         ) + '?path={}&tab={}#detail_achievements_{}'.format(
@@ -143,7 +141,7 @@ class EducationGroupAchievementCMS(PermissionRequiredMixin, SuccessMessageMixin,
         return reverse(
             'education_group_read_proxy',
             args=[training_identity.year, training_identity.acronym]
-        ) + '?tab={}'.format(Tab.SKILLS_ACHIEVEMENTS)
+        ) + '?path={}&tab={}#achievement_'.format(self.request.GET['path'], Tab.SKILLS_ACHIEVEMENTS)
 
     def get_initial(self):
         initial = super().get_initial()
@@ -176,6 +174,10 @@ class EducationGroupAchievementProgramAim(EducationGroupAchievementCMS):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["translated_label"] = _('the program aims')
+        context["url_action"] = reverse(
+            'education_group_achievement_program_aim',
+            args=[self.kwargs["offer_id"], self.kwargs["offer_id"]]
+        ) + '?path={}&tab={}#achievement_'.format(self.request.GET['path'], Tab.SKILLS_ACHIEVEMENTS)
         return context
 
     # SuccessMessageMixin
@@ -195,6 +197,10 @@ class EducationGroupAchievementAdditionalInformation(EducationGroupAchievementCM
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["translated_label"] = _('additional informations')
+        context["url_action"] = reverse(
+            'education_group_achievement_additional_information',
+            args=[self.kwargs["offer_id"], self.kwargs["offer_id"]]
+        ) + '?path={}&tab={}#achievement_'.format(self.request.GET['path'], Tab.SKILLS_ACHIEVEMENTS)
         return context
 
     # SuccessMessageMixin
