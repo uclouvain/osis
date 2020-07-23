@@ -181,6 +181,13 @@ class ProgramTreeVersion(interface.RootEntity):
     def is_standard_version(self):
         return self.entity_id.version_name == STANDARD and not self.entity_id.is_transition
 
+    @property
+    def version_label(self):  # TODO :: to remove
+        if self.is_standard:
+            return '[Transition]' if self.is_transition else ''
+        else:
+            return '[{}-Transition]'.format(self.version_name) if self.is_transition else '[{}]'.format(self.version_name)
+
 
 class ProgramTreeVersionNotFoundException(Exception):
     def __init__(self, *args, **kwargs):

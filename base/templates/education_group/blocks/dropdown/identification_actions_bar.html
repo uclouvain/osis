@@ -54,7 +54,6 @@
                 {% a_tag_has_perm update_group_url _('Modify') 'base.change_educationgroup' user %}
             </li>
         {% endif %}
-        <li class="divider"></li>
         {# Create ProgramTreeVersion #}
         <li>
             {% url 'create_education_group_version' education_group_year.entity_id.year education_group_year.entity_id.acronym as create_version_url %}
