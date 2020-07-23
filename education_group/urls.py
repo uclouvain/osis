@@ -76,8 +76,6 @@ urlpatterns = [
     path('trainings/', include([
         path('<training_type:type>/create/', training.TrainingCreateView.as_view(), name='training_create'),
         path('<int:year>/<str:code>/', include([
-            path('create_education_group_version/', create.CreateProgramTreeVersion.as_view(),
-                 name="create_education_group_version"),
             path('create/', CreateEducationGroupAchievement.as_view(), name='training_achievement_create'),
             path('<int:education_group_achievement_pk>/', include([
                 path('actions/', EducationGroupAchievementAction.as_view(), name='training_achievement_actions'),

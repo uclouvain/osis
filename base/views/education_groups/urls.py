@@ -119,9 +119,4 @@ urlpatterns = [
            education_group.education_group_year_admission_condition_tab_lang_edit,
            name='tab_lang_edit'),
     ])),
-    url(
-        r'^check_version_name/(?P<education_group_year_id>[0-9]+)$',
-        create.check_version_name,
-        name="check_version_name"
-    ),
 ] + education_group_urls.urlpatterns

@@ -108,5 +108,18 @@ urlpatterns = [
         ]))
     ])),
 
-    path('<int:year>/<str:code>/', IdentificationRedirectView.as_view(), name='element_identification'),
+    path('<int:year>/<str:code>/', include([
+        path('', IdentificationRedirectView.as_view(), name='element_identification'),
+        path(
+            'create_education_group_version/',
+            program_management.views.tree_version.create.CreateProgramTreeVersion.as_view(),
+            name="create_education_group_version"
+        ),
+    ])),
+
+    path(
+        'check_version_name/<int:education_group_year_id>/',
+        program_management.views.tree_version.create.check_version_name,
+        name="check_version_name"
+    ),
 ]
