@@ -150,7 +150,7 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
                                               args=[self.get_education_group_version().root_group.academic_year.year,
                                                     self.get_education_group_version().root_group.partial_acronym]
                                               ),
-            "generate_pdf": reverse("group_content",
+            "generate_pdf_url": reverse("group_content",
                                     args=[self.get_education_group_version().root_group.academic_year.year,
                                           self.get_education_group_version().root_group.partial_acronym]
                                     ),

@@ -132,7 +132,7 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
                                               args=[self.get_group_year().academic_year.year,
                                                     self.get_group_year().partial_acronym]
                                               ),
-            "generate_pdf": reverse("group_content",
+            "generate_pdf_url": reverse("group_content",
                                     args=[
                                         self.get_group_year().academic_year.year,
                                         self.get_group_year().partial_acronym,
