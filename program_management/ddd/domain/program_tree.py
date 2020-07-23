@@ -36,11 +36,18 @@ from osis_common.ddd import interface
 from osis_common.decorators.deprecated import deprecated
 from program_management.ddd import command
 from program_management.ddd.business_types import *
-from program_management.ddd.domain import prerequisite
+from program_management.ddd.domain.node import factory as node_factory, NodeIdentity, Node
+from program_management.ddd.domain.link import factory as link_factory
+from program_management.ddd.domain import prerequisite, exception
+from program_management.ddd.domain.service.generate_node_abbreviated_title import GenerateNodeAbbreviatedTitle
+from program_management.ddd.domain.service.generate_node_code import GenerateNodeCode
+from program_management.ddd.domain.service.validation_rule import FieldValidationRule
+from program_management.ddd.repositories import load_authorized_relationship
 from program_management.ddd.validators import validators_by_business_action
 from program_management.ddd.validators._path_validator import PathValidator
 from program_management.models.enums import node_type
 from program_management.models.enums.node_type import NodeType
+from education_group.ddd.business_types import *
 
 PATH_SEPARATOR = '|'
 Path = str  # Example : "root|node1|node2|child_leaf"
@@ -52,19 +59,88 @@ class ProgramTreeIdentity(interface.EntityIdentity):
     year = attr.ib(type=int)
 
 
+class ProgramTreeBuilder:
+
+    def copy_to_next_year(self, copy_from: 'ProgramTree', repository: 'ProgramTreeRepository') -> 'ProgramTree':
+        identity_next_year = attr.evolve(copy_from.entity_id, year=copy_from.entity_id.year + 1)
+        try:
+            program_tree_next_year = repository.get(identity_next_year)
+            # Case update program tree to next year
+            # TODO :: To implement in OSIS-4809
+            pass
+        except exception.ProgramTreeNotFoundException:
+            # Case create program tree to next year
+            program_tree_next_year = attr.evolve(  # Copy to new object
+                copy_from,
+                root_node=self._copy_node_and_children_to_next_year(copy_from.root_node),
+                entity_id=identity_next_year,
+            )
+        return program_tree_next_year
+
+    def _copy_node_and_children_to_next_year(self, copy_from_node: 'Node') -> 'Node':
+        parent_next_year = node_factory.copy_to_next_year(copy_from_node)
+        links_next_year = []
+        for copy_from_link in copy_from_node.children:
+            child_node = copy_from_link.child
+            child_next_year = self._copy_node_and_children_to_next_year(child_node)
+            link_next_year = link_factory.copy_to_next_year(copy_from_link, parent_next_year, child_next_year)
+            parent_next_year.children.append(link_next_year)
+            links_next_year.append(link_next_year)
+        return parent_next_year
+
+    def build_from_orphan_group_as_root(
+            self,
+            orphan_group_as_root: 'Group',
+            node_repository: 'NodeRepository'
+    ) -> 'ProgramTree':
+        root_node = node_repository.get(NodeIdentity(code=orphan_group_as_root.code, year=orphan_group_as_root.year))
+        program_tree = ProgramTree(root_node=root_node, authorized_relationships=load_authorized_relationship.load())
+        self._generate_mandatory_direct_children(program_tree=program_tree)
+        return program_tree
+
+    def _generate_mandatory_direct_children(
+            self,
+            program_tree: 'ProgramTree'
+    ) -> List['Node']:
+        root_node = program_tree.root_node
+        children = []
+        for child_type in program_tree.get_mandatory_children_types(program_tree.root_node):
+            generated_child_title = FieldValidationRule.get(
+                child_type,
+                'title_fr'
+            ).initial_value.replace(" ", "").upper()
+            child = node_factory.get_node(
+                type=NodeType.GROUP,
+                node_type=child_type,
+                code=GenerateNodeCode.generate_from_parent_node(root_node, child_type),
+                title=GenerateNodeAbbreviatedTitle.generate(
+                    parent_node=root_node,
+                    child_node_type=child_type,
+                ),
+                year=root_node.year,
+                teaching_campus=root_node.teaching_campus,
+                management_entity_acronym=root_node.management_entity_acronym,
+                group_title_fr="{child_title} {parent_abbreviated_title}".format(
+                    child_title=generated_child_title,
+                    parent_abbreviated_title=root_node.title
+                ),
+            )
+            child._has_changed = True
+            root_node.add_child(child)
+            children.append(child)
+        return children
+
+
+@attr.s(slots=True)
 class ProgramTree(interface.RootEntity):
 
-    root_node = None
-    authorized_relationships = None
+    root_node = attr.ib(type=Node)
+    authorized_relationships = attr.ib(type=AuthorizedRelationshipList, factory=list)
+    entity_id = attr.ib(type=ProgramTreeIdentity)  # FIXME :: pass entity_id as mandatory param !
 
-    def __init__(self, root_node: 'Node', authorized_relationships: AuthorizedRelationshipList = None):
-        self.root_node = root_node
-        self.authorized_relationships = authorized_relationships
-        # FIXME :: pass entity_id into the __init__ param !
-        super(ProgramTree, self).__init__(entity_id=ProgramTreeIdentity(self.root_node.code, self.root_node.year))
-
-    def __eq__(self, other: 'ProgramTree'):
-        return self.root_node == other.root_node
+    @entity_id.default
+    def _entity_id(self) -> 'ProgramTreeIdentity':
+        return ProgramTreeIdentity(self.root_node.code, self.root_node.year)
 
     def is_master_2m(self):
         return self.root_node.is_master_2m()
@@ -235,6 +311,13 @@ class ProgramTree(interface.RootEntity):
     def prune(self, ignore_children_from: Set[EducationGroupTypesEnum] = None) -> 'ProgramTree':
         copied_root_node = _copy(self.root_node, ignore_children_from=ignore_children_from)
         return ProgramTree(root_node=copied_root_node, authorized_relationships=self.authorized_relationships)
+
+    def get_mandatory_children_types(self, parent_node: 'Node') -> Set[EducationGroupTypesEnum]:
+        return set(
+            authorized_type
+            for authorized_type in self.authorized_relationships.get_authorized_children_types(parent_node.node_type)
+            if isinstance(authorized_type, EducationGroupTypesEnum)
+        )
 
     def paste_node(
             self,

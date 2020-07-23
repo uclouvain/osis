@@ -28,10 +28,12 @@ from typing import Optional, List, Callable
 from django.db import transaction
 
 from base.models.group_element_year import GroupElementYear
-from education_group.ddd import command
+from education_group.ddd import command as command_education_group
+from education_group.ddd.command import CreateOrphanGroupCommand
 from osis_common.ddd import interface
 from osis_common.ddd.interface import Entity
 from program_management.ddd.business_types import *
+from program_management.ddd.domain import exception
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories import persist_tree, load_tree, node
 from program_management.models.education_group_version import EducationGroupVersion
@@ -67,11 +69,11 @@ class ProgramTreeRepository(interface.AbstractRepository):
 
             for node in nodes:
                 if node.is_group():
-                    cmd = command.DeleteOrphanGroupCommand(code=node.code, year=node.year)
+                    cmd = command_education_group.DeleteOrphanGroupCommand(code=node.code, year=node.year)
                     delete_orphan_group_service(cmd)
                 elif node.is_training():
                     tree_version_id = ProgramTreeVersionIdentitySearch().get_from_node_identity(node.entity_id)
-                    cmd = command.DeleteOrphanTrainingCommand(
+                    cmd = command_education_group.DeleteOrphanTrainingCommand(
                         acronym=tree_version_id.offer_acronym,
                         year=tree_version_id.year
                     )
@@ -79,7 +81,7 @@ class ProgramTreeRepository(interface.AbstractRepository):
                     delete_orphan_training_service(cmd)
                 elif node.is_mini_training():
                     tree_version_id = ProgramTreeVersionIdentitySearch().get_from_node_identity(node.entity_id)
-                    cmd = command.DeleteOrphanMiniTrainingCommand(
+                    cmd = command_education_group.DeleteOrphanMiniTrainingCommand(
                         acronym=tree_version_id.offer_acronym,
                         year=tree_version_id.year
                     )
@@ -87,22 +89,51 @@ class ProgramTreeRepository(interface.AbstractRepository):
                     delete_orphan_minitraining_service(cmd)
 
     @classmethod
-    def create(cls, program_tree: 'ProgramTree') -> 'ProgramTreeIdentity':
+    def create(
+            cls,
+            program_tree: 'ProgramTree',
+            create_group_service: interface.ApplicationService = None
+    ) -> 'ProgramTreeIdentity':
+        for child_node in [n for n in program_tree.get_all_nodes() if n._has_changed is True]:
+            create_group_service(
+                CreateOrphanGroupCommand(
+                    code=child_node.code,
+                    year=child_node.year,
+                    type=child_node.node_type.name,
+                    abbreviated_title=child_node.title,
+                    title_fr=child_node.group_title_fr,
+                    title_en=child_node.group_title_en,
+                    credits=int(child_node.credits) if child_node.credits else None,
+                    constraint_type=child_node.constraint_type.name if child_node.constraint_type else None,
+                    min_constraint=child_node.min_constraint,
+                    max_constraint=child_node.max_constraint,
+                    management_entity_acronym=child_node.management_entity_acronym,
+                    teaching_campus_name=child_node.teaching_campus.name,
+                    organization_name=child_node.teaching_campus.university_name,
+                    remark_fr=child_node.remark_fr,
+                    remark_en=child_node.remark_en,
+                    start_year=child_node.start_year,
+                    end_year=child_node.end_date,
+                )
+            )
         persist_tree.persist(program_tree)
         return program_tree.entity_id
 
     @classmethod
-    def update(cls, program_tree: 'ProgramTree') -> 'ProgramTreeIdentity':
+    def update(cls, program_tree: 'ProgramTree', **_) -> 'ProgramTreeIdentity':
         persist_tree.persist(program_tree)
         return program_tree.entity_id
 
     @classmethod
     def get(cls, entity_id: 'ProgramTreeIdentity') -> 'ProgramTree':
-        tree_root_id = Element.objects.get(
-            group_year__partial_acronym=entity_id.code,
-            group_year__academic_year__year=entity_id.year
-        ).pk
-        return load_tree.load(tree_root_id)
+        try:
+            tree_root_id = Element.objects.get(
+                group_year__partial_acronym=entity_id.code,
+                group_year__academic_year__year=entity_id.year
+            ).pk
+            return load_tree.load(tree_root_id)
+        except Element.DoesNotExist:
+            raise exception.ProgramTreeNotFoundException()
 
 
 def _delete_standard_version(node_id: 'NodeIdentity'):

@@ -32,21 +32,18 @@ from education_group.ddd.domain.training import TrainingIdentity
 
 class TestEnrollmentCounter(SimpleTestCase):
     @mock.patch('education_group.ddd.domain.service.enrollment_counter.EnrollmentCounter.'
-                '_get_training_enrollments_count')
-    def test_assert_training_called_when_instance_of_training_identity(self, mock_training_count):
+                '_get_count_queryset')
+    def test_assert_qs_count_called_when_training(self, mock_qs_count):
         training_id = TrainingIdentity(acronym="DROI2M", year=2000)
-        EnrollmentCounter().get_enrollments_count(training_id)
+        EnrollmentCounter().get_training_enrollments_count(training_id)
 
-        self.assertTrue(mock_training_count.called)
+        self.assertTrue(mock_qs_count.called)
 
     # @mock.patch('education_group.ddd.domain.service.enrollment_counter.EnrollmentCounter.'
-    #             '_get_mini_training_enrollments_count')
+    #            '_get_count_queryset')
     # def test_assert_mini_training_called_when_instance_of_mini_training_identity(self, mock_mini_training_count):
     #     mini_training_id = MiniTrainingIdentity(acronym="DROI2M", year=2000)
-    #     EnrollmentCounter().get_enrollments_count(mini_training_id)
+    #     EnrollmentCounter().get_mini_training_enrollments_count(mini_training_id)
     #
     #     self.assertTrue(mock_mini_training_count.called)
 
-    def test_assert_raise_exception_when_entity_id_type_not_supported(self):
-        with self.assertRaises(Exception):
-            EnrollmentCounter().get_enrollments_count(None)

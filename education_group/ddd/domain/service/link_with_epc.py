@@ -23,30 +23,21 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Union
-
-from base.models.offer_enrollment import OfferEnrollment
+from base.models.education_group_year import EducationGroupYear
 from education_group.ddd.business_types import *
-from education_group.ddd.domain.training import TrainingIdentity
 from osis_common.ddd import interface
 
 
 class LinkWithEPC(interface.DomainService):
-    def have_link_with_epc(self, entity_id: Union['TrainingIdentity',  'MiniTrainingIdentity']):
-        if isinstance(entity_id, TrainingIdentity):
-            return self._training_have_link_with_epc(entity_id)
-        # elif isinstance(entity_id, MiniTrainingIdentity):
-        #    return self._mini_training_have_link_with_epc(entity_id)
-        raise Exception("entity_id instance type not supported")
+    def training_have_link_with_epc(self, training_id: 'TrainingIdentity') -> bool:
+        return self._qs_have_link_with_epc(training_id.acronym, training_id.year)
 
-    def _training_have_link_with_epc(self, training_id: 'TrainingIdentity') -> bool:
-        return OfferEnrollment.objects.filter(
-            education_group_year__acronym=training_id.acronym,
-            education_group_year__academic_year__year=training_id.year
-        ).count()
+    def mini_training_have_link_with_epc(self, mini_training_id: 'MiniTrainingIdentity') -> bool:
+        return self._qs_have_link_with_epc(mini_training_id.acronym, mini_training_id.year)
 
-    def _mini_training_have_link_with_epc(self, mini_training_id: 'MiniTrainingIdentity') -> bool:
-        return OfferEnrollment.objects.filter(
-            education_group_year__acronym=mini_training_id.acronym,
-            education_group_year__academic_year__year=mini_training_id.year
-        ).count()
+    def _qs_have_link_with_epc(self, acronym: str, year: int) -> bool:
+        return EducationGroupYear.objects.filter(
+            acronym=acronym,
+            academic_year__year=acronym,
+            linked_with_epc=True
+        ).exists()

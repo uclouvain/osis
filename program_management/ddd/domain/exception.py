@@ -33,7 +33,12 @@ class RelativeCreditShouldBeGreaterOrEqualsThanZero(BusinessException):
         super().__init__(message, **kwargs)
 
 
+class ProgramTreeNotFoundException(Exception):
+    pass
+
+
 class ProgramTreeNonEmpty(BusinessException):
     def __init__(self, *args, **kwargs):
         message = _("The content of the program is not empty.")
         super().__init__(message, **kwargs)
+

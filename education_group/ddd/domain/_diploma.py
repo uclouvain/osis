@@ -28,23 +28,36 @@ from typing import List
 from osis_common.ddd import interface
 
 
-class DiplomaAim(interface.ValueObject):
+class DiplomaAimIdentity(interface.EntityIdentity):
 
-    def __init__(self, section: int, code: int, description: str):
+    def __init__(self, section: int, code: int):
         self.section = section
         self.code = code
-        self.description = description
 
     def __eq__(self, other):
         return self.section == other.section \
-               and self.code == other.code \
-               and self.description == other.description
+               and self.code == other.code
 
     def __hash__(self):
-        return hash(str(self.section) + str(self.code) + self.description)
+        return hash(str(self.section) + str(self.code))
 
 
-# FIXME :: should be an Entity in another Domain, and Training should have just an EntityIdentity to get this object.
+class DiplomaAim(interface.Entity):
+
+    def __init__(self, entity_id: DiplomaAimIdentity, description: str):
+        super(DiplomaAim, self).__init__(entity_id=entity_id)
+        self.entity_id = entity_id
+        self.description = description
+
+    @property
+    def section(self) -> int:
+        return self.entity_id.section
+
+    @property
+    def code(self) -> int:
+        return self.entity_id.code
+
+
 class Diploma(interface.ValueObject):
     def __init__(self, leads_to_diploma: bool, printing_title: str, professional_title: str, aims: List['DiplomaAim']):
         self.leads_to_diploma = leads_to_diploma or False
@@ -55,7 +68,8 @@ class Diploma(interface.ValueObject):
     def __eq__(self, other):
         return self.leads_to_diploma == other.leads_to_diploma \
                and self.printing_title == other.printing_title \
-               and self.professional_title == other.professional_title
+               and self.professional_title == other.professional_title \
+               and self.aims == other.aims
 
     def __hash__(self):
-        return hash(str(self.leads_to_diploma) + self.printing_title + self.professional_title)
+        return hash(str(self.leads_to_diploma) + self.printing_title + self.professional_title + str(self.aims))

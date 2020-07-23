@@ -32,21 +32,17 @@ from education_group.ddd.domain.training import TrainingIdentity
 
 class TestLinkWithEPC(SimpleTestCase):
     @mock.patch('education_group.ddd.domain.service.link_with_epc.LinkWithEPC.'
-                '_training_have_link_with_epc')
-    def test_assert_training_called_when_instance_of_training_identity(self, mock_training_link):
+                '_qs_have_link_with_epc')
+    def test_assert_qs_exist_called_when_training(self, mock_qs_exists):
         training_id = TrainingIdentity(acronym="DROI2M", year=2000)
-        LinkWithEPC().have_link_with_epc(training_id)
+        LinkWithEPC().training_have_link_with_epc(training_id)
 
-        self.assertTrue(mock_training_link.called)
+        self.assertTrue(mock_qs_exists.called)
 
     # @mock.patch('education_group.ddd.domain.service.link_with_epc.LinkWithEPC.'
-    #             '_training_have_link_with_epc')
-    # def test_assert_mini_training_called_when_instance_of_mini_training_identity(self, mock_mini_training):
-    #     mini_training_id = MiniTrainingIdentity(acronym="DROI2M", year=2000)
-    #     LinkWithEPC().have_link_with_epc(mini_training_id)
+    #             '_qs_have_link_with_epc')
+    # def test_assert_qs_exist_called_when_mini_training(self, mock_qs_exists):
+    #     mini_training_id = MiniTrainingIdentity(acronym="OPT200M", year=2000)
+    #     LinkWithEPC().mini_training_have_link_with_epc(mini_training_id)
     #
-    #     self.assertTrue(mock_mini_training.called)
-
-    def test_assert_raise_exception_when_entity_id_type_not_supported(self):
-        with self.assertRaises(Exception):
-            LinkWithEPC().have_link_with_epc(None)
+    #     self.assertTrue(mock_qs_exists.called)

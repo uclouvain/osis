@@ -33,7 +33,7 @@ class TrainingEnrollmentsValidator(business_validator.BusinessValidator):
         self.training_id = training_id
 
     def validate(self, *args, **kwargs):
-        enrollments_count = EnrollmentCounter().get_enrollments_count(self.training_id)
+        enrollments_count = EnrollmentCounter().get_training_enrollments_count(self.training_id)
         if enrollments_count > 0:
             raise TrainingHaveEnrollments(enrollment_count=enrollments_count)
 
@@ -44,6 +44,6 @@ class MiniTrainingEnrollmentsValidator(business_validator.BusinessValidator):
         self.mini_training_id = mini_training_id
 
     def validate(self, *args, **kwargs):
-        enrollments_count = EnrollmentCounter().get_enrollments_count(self.mini_training_id)
+        enrollments_count = EnrollmentCounter().get_mini_training_enrollments_count(self.mini_training_id)
         if enrollments_count > 0:
             raise MiniTrainingHaveEnrollments(enrollment_count=enrollments_count)

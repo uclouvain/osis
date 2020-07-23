@@ -36,7 +36,7 @@ class TestTrainingEnrollmentsValidator(SimpleTestCase):
         self.training_id = TrainingIdentity(acronym="AGRO2M", year=2014)
 
     @mock.patch(
-        'education_group.ddd.validators._enrollments.EnrollmentCounter.get_enrollments_count',
+        'education_group.ddd.validators._enrollments.EnrollmentCounter.get_training_enrollments_count',
         return_value=3
     )
     def test_assert_raise_exception_case_training_have_enrollments(self, mock_get_enrollments_count):
@@ -45,7 +45,7 @@ class TestTrainingEnrollmentsValidator(SimpleTestCase):
             validator.is_valid()
 
     @mock.patch(
-        'education_group.ddd.validators._enrollments.EnrollmentCounter.get_enrollments_count',
+        'education_group.ddd.validators._enrollments.EnrollmentCounter.get_training_enrollments_count',
         return_value=0
     )
     def test_assert_not_raise_exception_when_training_have_no_enrollment(self, mock_get_enrollments_count):
@@ -58,7 +58,7 @@ class TestTrainingEnrollmentsValidator(SimpleTestCase):
 #         self.mini_training_id = MiniTrainingIdentity(acronym="OPTIO500M", year=2014)
 #
 #     @mock.patch(
-#         'education_group.ddd.validators._enrollments.EnrollmentCounter.get_enrollments_count',
+#         'education_group.ddd.validators._enrollments.EnrollmentCounter.get_mini_training_enrollments_count',
 #         return_value=3
 #     )
 #     def test_assert_raise_exception_case_mini_training_have_enrollments(self, mock_get_enrollments_count):
@@ -67,7 +67,7 @@ class TestTrainingEnrollmentsValidator(SimpleTestCase):
 #             validator.is_valid()
 #
 #     @mock.patch(
-#         'education_group.ddd.validators._enrollments.EnrollmentCounter.get_enrollments_count',
+#         'education_group.ddd.validators._enrollments.EnrollmentCounter.get_training_enrollments_count',
 #         return_value=0
 #     )
 #     def test_assert_not_raise_exception_when_mini_training_have_no_enrollment(self, mock_get_enrollments_count):

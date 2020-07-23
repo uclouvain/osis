@@ -38,15 +38,15 @@ from program_management.models.element import Element
 class NodeRepository(interface.AbstractRepository):
 
     @classmethod
-    def create(cls, entity: 'Node') -> EntityIdentity:
+    def create(cls, entity: 'Node', **_) -> EntityIdentity:
         raise NotImplementedError
 
     @classmethod
-    def update(cls, entity: 'Node') -> EntityIdentity:
+    def update(cls, entity: 'Node', **_) -> EntityIdentity:
         raise NotImplementedError
 
     @classmethod
-    def delete(cls, entity_id: 'NodeIdentity') -> None:
+    def delete(cls, entity_id: 'NodeIdentity', **_) -> None:
         raise NotImplementedError
 
     @classmethod

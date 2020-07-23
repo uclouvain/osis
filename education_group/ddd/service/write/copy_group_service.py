@@ -27,6 +27,7 @@ from django.db import transaction
 
 from education_group.ddd import command
 from education_group.ddd.domain import group
+from education_group.ddd.business_types import *
 from education_group.ddd.service.read import get_group_service as group_service_read
 from education_group.ddd.service.write.create_group_service import create_orphan_group
 
@@ -34,34 +35,43 @@ from education_group.ddd.service.write.create_group_service import create_orphan
 @transaction.atomic()
 def copy_group(cmd: command.CopyGroupCommand) -> List['GroupIdentity']:
     """
-    Copy a group from a year (=excluded) to a specific year (=included)
+    Copy an existing group from the year of this group (=excluded) to a specific year (=included)
     """
     group_ids = []
-    for to_year in range(start=cmd.from_year + 1, stop=cmd.to_year):
-        cmd_get_group = command.GetGroupCommand(code=cmd.from_code, year=to_year - 1)
+
+    from_year = cmd.from_year
+    while from_year < cmd.to_year:
+        cmd_get_group = command.GetGroupCommand(code=cmd.from_code, year=from_year)
         grp = group_service_read.get_group(cmd_get_group)
 
         group_next_year = group.builder.build_next_year_group(from_group=grp)
-        cmd_create_group = command.CreateOrphanGroupCommand(
-            code=group_next_year.code,
-            year=group_next_year.year,
-            type=group_next_year.type.name,
-            abbreviated_title=group_next_year.abbreviated_title,
-            title_fr=group_next_year.titles.title_fr,
-            title_en=group_next_year.titles.title_en,
-            credits=group_next_year.credits,
-            constraint_type=group_next_year.content_constraint.type.name,
-            min_constraint=group_next_year.content_constraint.minimum,
-            max_constraint=group_next_year.content_constraint.maximum,
-            management_entity_acronym=group_next_year.management_entity.acronym,
-            teaching_campus_name=group_next_year.teaching_campus.name,
-            organization_name=group_next_year.teaching_campus.university_name,
-            remark_fr=group_next_year.remark.text_fr,
-            remark_en=group_next_year.remark.text_en,
-            start_year=group_next_year.start_year,
-            end_year=group_next_year.end_year
-        )
-        # TODO: Be carefull to keep same entity_id_through_years property
-        group_next_year_id = create_orphan_group(cmd_create_group)
+
+        group_next_year_id = create_orphan_group(__convert_group_to_command(group_next_year))
+
         group_ids.append(group_next_year_id)
+        from_year += 1
+
     return group_ids
+
+
+def __convert_group_to_command(group_next_year: 'Group') -> command.CreateOrphanGroupCommand:
+    return command.CreateOrphanGroupCommand(
+        code=group_next_year.code,
+        year=group_next_year.year,
+        type=group_next_year.type.name,
+        abbreviated_title=group_next_year.abbreviated_title,
+        title_fr=group_next_year.titles.title_fr,
+        title_en=group_next_year.titles.title_en,
+        credits=group_next_year.credits,
+        constraint_type=group_next_year.content_constraint.type.name
+        if group_next_year.content_constraint.type else None,
+        min_constraint=group_next_year.content_constraint.minimum,
+        max_constraint=group_next_year.content_constraint.maximum,
+        management_entity_acronym=group_next_year.management_entity.acronym,
+        teaching_campus_name=group_next_year.teaching_campus.name,
+        organization_name=group_next_year.teaching_campus.university_name,
+        remark_fr=group_next_year.remark.text_fr,
+        remark_en=group_next_year.remark.text_en,
+        start_year=group_next_year.start_year,
+        end_year=group_next_year.end_year
+    )

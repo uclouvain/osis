@@ -36,13 +36,14 @@ from base.models.authorized_relationship import AuthorizedRelationshipList
 from base.models.enums import prerequisite_operator
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
 from base.models.enums.link_type import LinkTypes
-from program_management.ddd.domain import node
+from program_management.ddd.domain import node, exception
 from program_management.ddd.domain import prerequisite
 from program_management.ddd.domain import program_tree
 from program_management.ddd.domain.link import Link
 from program_management.ddd.domain.prerequisite import PrerequisiteItem
 from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.ddd.domain.program_tree import build_path
+from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 from program_management.ddd.validators.validators_by_business_action import DetachNodeValidatorList
 from program_management.ddd.validators.validators_by_business_action import PasteNodeValidatorList, \
     UpdatePrerequisiteValidatorList
@@ -55,6 +56,37 @@ from program_management.tests.ddd.factories.node import NodeGroupYearFactory, No
 from program_management.tests.ddd.factories.prerequisite import cast_to_prerequisite
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 from program_management.tests.ddd.service.mixins import ValidatorPatcherMixin
+
+
+class TestProgramTreeBuilderCopyToNextYear(SimpleTestCase):
+    def setUp(self) -> None:
+        self.copy_from_program_tree = ProgramTreeFactory()
+        self.mock_repository = mock.create_autospec(ProgramTreeRepository)
+
+    def test_should_create_new_program_tree_when_does_not_exist_for_next_year(self):
+        self.mock_repository.get.side_effect = exception.ProgramTreeNotFoundException
+
+        resulted_tree = program_tree.ProgramTreeBuilder().copy_to_next_year(
+            self.copy_from_program_tree,
+            self.mock_repository
+        )
+
+        expected_identity = program_tree.ProgramTreeIdentity(
+            code=self.copy_from_program_tree.entity_id.code,
+            year=self.copy_from_program_tree.entity_id.year+1
+        )
+        self.assertEqual(expected_identity, resulted_tree.entity_id)
+
+    def test_should_return_existing_tree_when_exists_for_next_year(self):
+        program_tree_next_year = ProgramTreeFactory()
+        self.mock_repository.get.return_value = program_tree_next_year
+
+        resulted_tree = program_tree.ProgramTreeBuilder().copy_to_next_year(
+            self.copy_from_program_tree,
+            self.mock_repository
+        )
+
+        self.assertEqual(program_tree_next_year, resulted_tree)
 
 
 class TestGetNodeProgramTree(SimpleTestCase):
@@ -419,7 +451,7 @@ class TestCopyAndPrune(SimpleTestCase):
         self.assertNotEqual(original_link.block, 123456)
 
     def test_when_change_tree_signature(self):
-        original_signature = ['self', 'root_node', 'authorized_relationships']
+        original_signature = ['self', 'root_node', 'authorized_relationships', 'entity_id']
         current_signature = list(inspect.signature(ProgramTree.__init__).parameters.keys())
         error_msg = "Please update the {} function to fit with new object signature.".format(ProgramTree.prune)
         self.assertEqual(original_signature, current_signature, error_msg)
@@ -796,8 +828,8 @@ class TestIsEmpty(SimpleTestCase):
         self.assertTrue(program_tree.is_empty())
 
     def test_assert_is_empty_case_contains_only_mandatory_child(self):
-        root_node = NodeEducationGroupYearFactory()
-        child_node = NodeEducationGroupYearFactory()
+        root_node = NodeGroupYearFactory()
+        child_node = NodeGroupYearFactory()
         LinkFactory(parent=root_node, child=child_node)
 
         auth_relation = AuthorizedRelationshipObjectFactory(
@@ -818,11 +850,11 @@ class TestIsEmpty(SimpleTestCase):
         |---child_node (Mandatory)
         |--- child_node_2
         """
-        root_node = NodeEducationGroupYearFactory()
-        child_node = NodeEducationGroupYearFactory()
+        root_node = NodeGroupYearFactory()
+        child_node = NodeGroupYearFactory()
         LinkFactory(parent=root_node, child=child_node)
 
-        child_node_2 = NodeEducationGroupYearFactory()
+        child_node_2 = NodeGroupYearFactory()
         LinkFactory(parent=root_node, child=child_node_2)
 
         auth_relation_child = AuthorizedRelationshipObjectFactory(
