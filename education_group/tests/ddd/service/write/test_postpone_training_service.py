@@ -24,6 +24,7 @@
 import mock
 from django.test import TestCase
 
+from base.tests.factories.academic_year import AcademicYearFactory
 from education_group.ddd import command
 from education_group.ddd.domain import training
 from education_group.ddd.service.write import postpone_training_service
