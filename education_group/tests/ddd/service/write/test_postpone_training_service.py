@@ -24,6 +24,7 @@
 import mock
 from django.test import TestCase
 
+from base.tests.factories.academic_year import AcademicYearFactory
 from education_group.ddd import command
 from education_group.ddd.domain import training
 from education_group.ddd.service.write import postpone_training_service
@@ -31,6 +32,13 @@ from education_group.tests.ddd.factories.training import TrainingFactory
 
 
 class TestPostponeTraining(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        AcademicYearFactory(year=2018)
+        AcademicYearFactory(year=2019)
+        AcademicYearFactory(year=2020)
+
     @mock.patch("education_group.ddd.repository.training.TrainingRepository.get")
     @mock.patch("education_group.ddd.service.write.copy_training_service.copy_training_to_next_year")
     def test_should_return_a_number_of_identities_equal_to_difference_of_from_year_and_until_year(
