@@ -28,6 +28,7 @@ from typing import List
 from django.db import transaction
 
 from education_group.ddd.domain.training import TrainingIdentity
+from education_group.ddd.repository.group import GroupRepository
 from education_group.ddd.repository.training import TrainingRepository
 from program_management.ddd.command import PostponeProgramTreeVersionCommand, CopyTreeVersionToNextYearCommand
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
@@ -44,9 +45,15 @@ def postpone_program_tree_version(
 
     # GIVEN
     from_year = postpone_cmd.from_year
-    end_postponement_year = CalculateEndPostponement.calculate_year_of_end_postponement(
-        training_identity=TrainingIdentity(acronym=postpone_cmd.from_offer_acronym, year=postpone_cmd.from_year),
-        training_repository=TrainingRepository()
+    tree_version_identity = ProgramTreeVersionIdentity(
+        offer_acronym=postpone_cmd.from_offer_acronym,
+        year=postpone_cmd.from_year,
+        is_transition=postpone_cmd.from_is_transition,
+        version_name=postpone_cmd.from_version_name
+    )
+    end_postponement_year = CalculateEndPostponement.calculate_tree_version_end_postponement_year(
+        tree_version_identity=tree_version_identity,
+        group_repository=GroupRepository(),
     )
 
     # WHEN

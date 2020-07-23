@@ -24,14 +24,17 @@
 #
 ##############################################################################
 from base.models import academic_year
+from education_group.ddd.repository.group import GroupRepository
 from osis_common.ddd import interface
 from education_group.ddd.business_types import *
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
+from program_management.ddd.domain.service.identity_search import GroupIdentitySearch
 
 
 class CalculateEndPostponement(interface.DomainService):
 
     @classmethod
-    def calculate_year_of_end_postponement(
+    def calculate_program_tree_end_postponement_year(
             cls,
             training_identity: 'TrainingIdentity',
             training_repository: 'TrainingRepository'
@@ -42,3 +45,15 @@ class CalculateEndPostponement(interface.DomainService):
         if training.end_year:
             default_years_to_postpone = training.end_year - training.year
         return current_year + default_years_to_postpone
+
+    @classmethod
+    def calculate_tree_version_end_postponement_year(  # TODO :: review : is this at the correct place?
+            cls,
+            tree_version_identity: 'ProgramTreeVersionIdentity',
+            group_repository: 'GroupRepository',
+    ) -> int:
+        default_years_to_postpone = 6
+        group = group_repository.get(GroupIdentitySearch().get_from_tree_version_identity(tree_version_identity))
+        if group.end_year:
+            default_years_to_postpone = group.end_year - group.year
+        return academic_year.starting_academic_year().year + default_years_to_postpone
