@@ -49,24 +49,15 @@ class OrderLinkCommand(interface.CommandRequest):
     pass
 
 
+@attr.s(frozen=True, slots=True)
 class CreateProgramTreeVersionCommand(interface.CommandRequest):
-    def __init__(
-            self,
-            end_postponement: int,  # FIXME : to rename into end_year
-            offer_acronym: str,
-            version_name: str,
-            year: int,
-            is_transition: bool,
-            title_en: str = "",
-            title_fr: str = ""
-    ):
-        self.end_postponement = end_postponement
-        self.offer_acronym = offer_acronym
-        self.version_name = version_name
-        self.year = year
-        self.is_transition = is_transition
-        self.title_en = title_en
-        self.title_fr = title_fr
+    end_year = attr.ib(type=int)
+    offer_acronym = attr.ib(type=str)
+    version_name = attr.ib(type=str)
+    year = attr.ib(type=int)
+    is_transition = attr.ib(type=bool)
+    title_en = attr.ib(type=str)
+    title_fr = attr.ib(type=str)
 
 
 class CopyElementCommand(interface.CommandRequest):
