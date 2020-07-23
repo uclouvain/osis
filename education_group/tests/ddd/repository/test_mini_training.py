@@ -66,34 +66,11 @@ class TestMiniTrainingRepositoryCreateMethod(TestCase):
     def test_should_create_db_data_with_correct_values_taken_from_domain_object(self):
         mini_training_identity = mini_training.MiniTrainingRepository.create(self.mini_training)
 
-        version = education_group_version.EducationGroupVersion.objects.get(
-            root_group__partial_acronym=mini_training_identity.code,
-            root_group__academic_year__year=mini_training_identity.year
-        )
-        group_year_created = group_year.GroupYear.objects.get(
+        education_group_year_db_obj = education_group_year.EducationGroupYear.objects.get(
             partial_acronym=mini_training_identity.code,
             academic_year__year=mini_training_identity.year
         )
-        self.assert_education_group_version_equal_to_domain(version, self.mini_training)
-        self.assert_education_group_year_equal_to_domain(version.offer, self.mini_training)
-        self.assert_group_equal_to_domain(version.root_group.group, self.mini_training)
-        self.assert_group_year_equal_to_domain(version.root_group, self.mini_training)
-
-    def assert_education_group_version_equal_to_domain(
-            self,
-            db_version: education_group_version.EducationGroupVersion,
-            domain_obj: MiniTraining):
-        expected_values = {
-            "title_fr": domain_obj.titles.title_fr,
-            "title_en": domain_obj.titles.title_en,
-            "is_transition": False,
-            "version_name": ""
-        }
-        actual_values = model_to_dict(
-            db_version,
-            fields=("title_fr", "title_en", "is_transition", "version_name")
-        )
-        self.assertDictEqual(expected_values, actual_values)
+        self.assert_education_group_year_equal_to_domain(education_group_year_db_obj, self.mini_training)
 
     def assert_education_group_year_equal_to_domain(
             self,
@@ -118,43 +95,6 @@ class TestMiniTrainingRepositoryCreateMethod(TestCase):
             db_education_group_year,
             fields=(
                 "academic_year", "partial_acronym", "education_group_type", "acronym", "title", "title_english",
-                "credits", "constraint_type", "min_constraint", "max_constraint", "management_entity",
-                "main_teaching_campus"
-            )
-        )
-        self.assertDictEqual(expected_values, actual_values)
-
-    def assert_group_equal_to_domain(self, db_obj: group.Group, domain_obj: MiniTraining):
-        expected_values = {
-            "start_year": self.academic_year.id,
-            "end_year": domain_obj.end_year
-        }
-        actual_values = model_to_dict(
-            db_obj,
-            fields=("start_year", "end_year")
-        )
-        self.assertDictEqual(expected_values, actual_values)
-
-    def assert_group_year_equal_to_domain(self, db_obj: group_year.GroupYear, domain_obj: MiniTraining):
-        expected_values = {
-            "academic_year": self.academic_year.id,
-            "partial_acronym": domain_obj.code,
-            "education_group_type": self.education_group_type.id,
-            "acronym": domain_obj.abbreviated_title,
-            "title_fr": domain_obj.titles.title_fr,
-            "title_en": domain_obj.titles.title_en,
-            "credits": domain_obj.credits,
-            "constraint_type": domain_obj.content_constraint.type.name,
-            "min_constraint": domain_obj.content_constraint.minimum,
-            "max_constraint": domain_obj.content_constraint.maximum,
-            "management_entity": self.management_entity_version.entity.id,
-            "main_teaching_campus": self.campus.id,
-        }
-
-        actual_values = model_to_dict(
-            db_obj,
-            fields=(
-                "academic_year", "partial_acronym", "education_group_type", "acronym", "title_fr", "title_en",
                 "credits", "constraint_type", "min_constraint", "max_constraint", "management_entity",
                 "main_teaching_campus"
             )
