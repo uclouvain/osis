@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-25 13:18+0200\n"
+"POT-Creation-Date: 2020-07-23 08:57+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -68,9 +68,6 @@ msgstr "Valeur acceptée: %(justification_label_authorized)s "
 
 msgid "Acronym"
 msgstr "Acronyme"
-
-msgid "Acronym enrollment header"
-msgstr "Sigle"
 
 msgid "Add"
 msgstr "Ajouter"
@@ -212,7 +209,7 @@ msgid "Evaluations"
 msgstr "Evaluations"
 
 msgid "Extra time (33% generally)"
-msgstr "Tiers-Temps"
+msgstr "Extra temps (33% généralement)"
 
 msgid "Fax"
 msgstr "Fax"
@@ -429,9 +426,6 @@ msgstr "Le noma ne corresond pas à l'adresse de messagerie"
 msgid "Registration number"
 msgstr "Noma"
 
-msgid "Registration number header"
-msgstr "Noma"
-
 msgid "Remove"
 msgstr "Retirer"
 
@@ -522,9 +516,6 @@ msgid "Selected"
 msgstr "Sélectionné"
 
 msgid "Session"
-msgstr "Session"
-
-msgid "Session enrollment header"
 msgstr "Session"
 
 msgid "Session number"
@@ -650,6 +641,9 @@ msgstr ""
 msgid "Without attribution"
 msgstr "Sans attribution"
 
+msgid "Yes"
+msgstr "Oui"
+
 msgid "You can't encode a 'score' and a 'justification' together"
 msgstr "Vous ne pouvez pas encoder une note et une justification ensemble"
 
@@ -703,3 +697,12 @@ msgstr "programme(s)"
 
 msgid "score(s) saved"
 msgstr "note(s) sauvées"
+
+#~ msgid "Acronym enrollment header"
+#~ msgstr "Sigle"
+
+#~ msgid "Registration number header"
+#~ msgstr "Noma"
+
+#~ msgid "Session enrollment header"
+#~ msgstr "Session"
