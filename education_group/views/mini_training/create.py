@@ -66,15 +66,15 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
     def form_valid(self, form: mini_training_form.MiniTrainingForm) -> response.HttpResponseBase:
         try:
             if self.get_attach_path():
-                mini_training_identity = create_and_attach_mini_training_service.create_mini_training_and_paste(
+                mini_training_identities = create_and_attach_mini_training_service.create_mini_training_and_paste(
                     self._generate_create_and_paste_command_from_valid_form(form)
                 )
             else:
-                mini_training_identity = create_orphan_mini_training_service.create_and_postpone_orphan_mini_training(
+                mini_training_identities = create_orphan_mini_training_service.create_and_postpone_orphan_mini_training(
                     self._generate_create_command_from_valid_form(form)
                 )
-            self.set_success_url(mini_training_identity)
-            display_success_messages(self.request, self.get_success_msg(mini_training_identity), extra_tags='safe')
+            self.set_success_url(mini_training_identities[0])
+            display_success_messages(self.request, self.get_success_msg(mini_training_identities), extra_tags='safe')
             return super().form_valid(form)
 
         except exception.MiniTrainingCodeAlreadyExistException as e:
@@ -104,7 +104,10 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
     def set_success_url(self, mini_training_identity: mini_training.MiniTrainingIdentity) -> None:
         self.success_url = self._generate_success_url(mini_training_identity)
 
-    def get_success_msg(self, mini_training_identity: mini_training.MiniTrainingIdentity) -> str:
+    def get_success_msg(self, mini_training_identities: List[mini_training.MiniTrainingIdentity]) -> List[str]:
+        return [self._get_success_msg(mini_training_identity) for mini_training_identity in mini_training_identities]
+
+    def _get_success_msg(self, mini_training_identity: mini_training.MiniTrainingIdentity) -> str:
         return _("Mini-training <a href='%(link)s'> %(code)s (%(academic_year)s) </a> successfully created.") % {
             "link": self.success_url,
             "code": mini_training_identity.code,
