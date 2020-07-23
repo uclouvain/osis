@@ -25,8 +25,7 @@
 ##############################################################################
 from typing import List
 
-from program_management.ddd.business_types import *
-from program_management.ddd.command import PostponeProgramTreeVersionCommand
+from program_management.ddd.command import PostponeProgramTreeVersionCommand, CreateProgramTreeVersionCommand
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionBuilder, ProgramTreeVersionIdentity, \
     STANDARD
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
