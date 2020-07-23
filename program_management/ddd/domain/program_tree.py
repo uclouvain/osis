@@ -104,7 +104,7 @@ class ProgramTreeBuilder:
     ) -> List['Node']:
         children = []
         root_node = program_tree.root_node
-        for child_type in program_tree.get_ordered_mandatory_children_types(program_tree.root_node.node_type):
+        for child_type in program_tree.get_ordered_mandatory_children_types(program_tree.root_node):
             generated_child_title = FieldValidationRule.get(
                 child_type,
                 'title_fr'
