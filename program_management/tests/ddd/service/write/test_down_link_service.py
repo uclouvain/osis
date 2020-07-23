@@ -23,7 +23,7 @@
 # ############################################################################
 from unittest import mock
 
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, TestCase
 
 from program_management.ddd.domain import program_tree, link, node
 from program_management.ddd.service.write import down_link_service
@@ -33,7 +33,7 @@ from program_management.tests.ddd.factories.node import NodeGroupYearFactory, No
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
 
-class TestDownLink(SimpleTestCase):
+class TestDownLink(TestCase):
 
     def setUp(self):
         self.tree = ProgramTreeFactory()

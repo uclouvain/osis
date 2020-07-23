@@ -37,15 +37,15 @@ class AttributionRepository(interface.AbstractRepository):
         return load_attributions(learning_unit_year_ids=kwargs.pop('learning_unit_year_ids'))
 
     @classmethod
-    def delete(cls, entity_id: 'AttributionIdentity') -> None:
+    def delete(cls, entity_id: 'AttributionIdentity', **_) -> None:
         raise NotImplementedError
 
     @classmethod
-    def create(cls, program_tree: 'AttributionIdentity') -> 'AttributionIdentity':
+    def create(cls, program_tree: 'AttributionIdentity', **_) -> 'AttributionIdentity':
         raise NotImplementedError
 
     @classmethod
-    def update(cls, program_tree: 'AttributionIdentity') -> 'AttributionIdentity':
+    def update(cls, program_tree: 'AttributionIdentity', **_) -> 'AttributionIdentity':
         raise NotImplementedError
 
     @classmethod

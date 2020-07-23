@@ -35,9 +35,9 @@ class Titles(interface.ValueObject):
             partial_title_en: str = None
     ):
         self.title_fr = title_fr
-        self.partial_title_fr = partial_title_fr
-        self.title_en = title_en
-        self.partial_title_en = partial_title_en
+        self.partial_title_fr = partial_title_fr or ""
+        self.title_en = title_en or ""
+        self.partial_title_en = partial_title_en or ""
 
     def __eq__(self, other):
         return self.title_fr == other.title_fr and \

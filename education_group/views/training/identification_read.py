@@ -78,6 +78,7 @@ class TrainingReadIdentification(TrainingRead):
 
     def get_training(self):
         try:
+            # FIXME :: create a service to return the TrainingIdentity
             return TrainingRepository.get(
                 self.training_identity
             )
