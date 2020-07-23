@@ -150,6 +150,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             "create_group_url": self.get_create_group_url(),
             "create_training_url": self.get_create_training_url(),
             "create_mini_training_url": self.get_create_mini_training_url(),
+            "delete_training_url": self.get_delete_training_url(),
             "xls_ue_prerequisites": reverse("education_group_learning_units_prerequisites",
                                             args=[self.education_group_version.root_group.academic_year.year,
                                                   self.education_group_version.root_group.partial_acronym]
@@ -174,6 +175,10 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
     def get_create_training_url(self):
         return reverse('create_element_select_type', kwargs={'category': Categories.TRAINING.name}) + \
                "?path_to={}".format(self.get_path())
+
+    def get_delete_training_url(self):
+        return reverse('training_delete', kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}) + \
+               "?path={}".format(self.get_path())
 
     def get_tab_urls(self):
         node_identity = self.get_object().entity_id
