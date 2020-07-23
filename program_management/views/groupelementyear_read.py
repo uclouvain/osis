@@ -50,7 +50,6 @@ USUAL_NUMBER_OF_BLOCKS = 3
 @login_required
 @waffle_switch('education_group_year_generate_pdf')
 def pdf_content(request, year, code, language):
-    print('qsqsdfqsf')
     node_id = NodeIdentity(code=code, year=year)
     try:
         program_tree_id = ProgramTreeVersionIdentitySearch().get_from_node_identity(node_id)

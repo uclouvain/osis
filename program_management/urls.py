@@ -43,8 +43,8 @@ urlpatterns = [
             ]))
         ])),
     ])),
-    url(r'^group_content/(?P<year>[0-9]+)/(?P<code>[A-Za-z0-9]+)/',
-        groupelementyear_read.ReadEducationGroupTypeView.as_view(), name="group_content"),
+    url(r'^group_pdf_content/(?P<year>[0-9]+)/(?P<code>[A-Za-z0-9]+)/',
+        groupelementyear_read.ReadEducationGroupTypeView.as_view(), name="group_pdf_content"),
     url(r'^pdf_content/(?P<year>[0-9]+)/(?P<code>[A-Za-z0-9]+)/(?P<language>[a-z\-]+)',
         groupelementyear_read.pdf_content, name="pdf_content"),
     url(
