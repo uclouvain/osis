@@ -41,7 +41,7 @@ from education_group.ddd.domain._titles import Titles
 from education_group.ddd.domain._entity import Entity as EntityValueObject
 from education_group.ddd.domain.exception import AcademicYearNotFound, TypeNotFound, ManagementEntityNotFound, \
     TeachingCampusNotFound, GroupCodeAlreadyExistException
-from education_group.ddd.domain.group import GroupIdentity, Group, GroupUnannualizedIdentity
+from education_group.ddd.domain.group import GroupIdentity, Group
 from education_group.ddd.factories.group import GroupFactory
 from education_group.ddd.repository.group import GroupRepository
 from education_group.tests.factories.group_year import GroupYearFactory
@@ -120,14 +120,6 @@ class TestGroupRepositoryGetMethod(TestCase):
             Remark(
                 text_fr=self.group_year_db.remark_fr,
                 text_en=self.group_year_db.remark_en
-            )
-        )
-
-        self.assertIsInstance(group.unannualized_identity, GroupUnannualizedIdentity)
-        self.assertEqual(
-            group.unannualized_identity,
-            GroupUnannualizedIdentity(
-                uuid=self.group_year_db.group_id
             )
         )
 
@@ -210,17 +202,6 @@ class TestGroupRepositoryCreateMethod(TestCase):
         )
         self.assertEqual(group_inserted.group.start_year.year, 2017)
         self.assertIsNone(group_inserted.group.end_year)
-
-    def test_assert_unannualized_identity_same_if_provided(self):
-        group_db = GroupModelDbFactory()
-        self.group.unannualized_identity = GroupUnannualizedIdentity(uuid=group_db.pk)
-        group_identity = GroupRepository.create(self.group)
-
-        group_inserted = GroupYearModelDb.objects.get(
-            partial_acronym=group_identity.code,
-            academic_year__year=group_identity.year
-        )
-        self.assertEqual(group_inserted.group.pk, group_db.pk)
 
     def test_assert_raise_group_code_already_exist_exception(self):
         GroupRepository.create(self.group)
