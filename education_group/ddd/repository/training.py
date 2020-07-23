@@ -368,7 +368,8 @@ def _save_education_group_year(
             name=training.main_language.name
         ) if training.main_language else None,
         english_activities=training.english_activities.name if training.english_activities else None,
-        other_language_activities=training.other_language_activities.name if training.other_language_activities else None,
+        other_language_activities=training.other_language_activities.name
+        if training.other_language_activities else None,
         internal_comment=training.internal_comment,
         main_domain=DomainModelDb.objects.get(
             code=training.main_domain.entity_id.code,
