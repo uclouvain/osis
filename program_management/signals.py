@@ -38,13 +38,3 @@ def create_element_of_group(sender, group_identity, **kwargs):
             academic_year__year=group_identity.year
         ).pk
     )
-
-
-@receiver(publisher.mini_training_created)
-def create_element_of_mini_training(sender, mini_training_identity, **kwargs):
-    Element.objects.get_or_create(
-        group_year_id=GroupYear.objects.get(
-            partial_acronym=mini_training_identity.code,
-            academic_year__year=mini_training_identity.year
-        ).pk
-    )

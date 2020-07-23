@@ -23,6 +23,35 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.dispatch import Signal
+from decimal import Decimal
 
-group_created = Signal(providing_args=['group_identity'])
+import factory.fuzzy
+
+from base.models.enums.schedule_type import ScheduleTypeEnum
+from education_group.ddd import command
+
+
+class CreateMiniTrainingCommandFactory(factory.Factory):
+    class Meta:
+        model = command.CreateMiniTrainingCommand
+        abstract = False
+
+    abbreviated_title = "Title "
+    status = " Status "
+    code = " Code "
+    year = 2019
+    type = " Type "
+    credits = 23
+    schedule_type = ScheduleTypeEnum.DAILY.name
+    start_year = 2019
+    end_year = None
+    title_fr = "fr  title "
+    title_en = "title  en "
+    teaching_campus_name = None
+    management_entity_acronym = None
+    organization_name = None
+    constraint_type = None
+    min_constraint = None
+    max_constraint = None
+    remark_fr = None
+    remark_en = None

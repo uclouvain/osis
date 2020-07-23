@@ -40,6 +40,7 @@ from education_group.ddd.domain._content_constraint import ContentConstraint
 from education_group.ddd.domain._entity import Entity
 from education_group.ddd.domain._remark import Remark
 from education_group.ddd.domain._titles import Titles
+from education_group.ddd.validators import validators_by_business_action
 from osis_common.ddd import interface
 
 
@@ -79,7 +80,7 @@ class MiniTrainingBuilder:
         )
         remark = Remark(text_fr=cmd.remark_fr, text_en=cmd.remark_en)
 
-        return MiniTraining(
+        mini_training_domain_obj = MiniTraining(
             entity_identity=mini_training_id,
             entity_id=mini_training_id,
             type=MiniTrainingType[cmd.type],
@@ -95,6 +96,10 @@ class MiniTrainingBuilder:
             start_year=cmd.start_year,
             end_year=cmd.end_year
         )
+
+        validators_by_business_action.CreateMiniTrainingValidatorList(mini_training_domain_obj).validate()
+
+        return mini_training_domain_obj
 
 
 builder = MiniTrainingBuilder()

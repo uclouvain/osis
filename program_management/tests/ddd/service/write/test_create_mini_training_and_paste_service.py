@@ -55,7 +55,7 @@ class TestCreateMiniTrainingAndAttach(SimpleTestCase):
         )
 
     @mock.patch("program_management.ddd.service.write.paste_element_service.paste_element")
-    @mock.patch("education_group.ddd.service.write.create_orphan_mini_training_service.create_orphan_mini_training")
+    @mock.patch("education_group.ddd.service.write.create_orphan_mini_training_service.create_and_postpone_orphan_mini_training")
     def test_should_call_create_orphan_service_and_paste_element_service_when_called(
             self,
             mock_create_service,

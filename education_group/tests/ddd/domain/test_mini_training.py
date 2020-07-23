@@ -34,9 +34,13 @@ class TestMiniTrainingBuilder(SimpleTestCase):
     def setUp(self):
         self.command = CreateOrphanMiniTrainingCommandFactory()
 
-    def test_should_derive_values_from_command_when_build_from_command(self):
+    @mock.patch("education_group.ddd.validators.validators_by_business_action.CreateMiniTrainingValidatorList.validate")
+    def test_should_derive_values_from_command_when_build_from_command(self, mock_validator):
+        mock_validator.return_value = None
+
         result = mini_training.MiniTrainingBuilder.build_from_create_cmd(self.command)
         self.assertIsInstance(result, mini_training.MiniTraining)
+        self.assertTrue(mock_validator.called)
 
 
 class TestMiniTrainingBuilderCopyToNextYear(SimpleTestCase):

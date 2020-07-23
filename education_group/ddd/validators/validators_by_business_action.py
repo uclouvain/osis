@@ -25,7 +25,6 @@
 ##############################################################################
 from base.ddd.utils import business_validator
 from education_group.ddd.business_types import *
-from education_group.ddd.domain import mini_training
 from education_group.ddd.validators._abbreviated_title_already_exist import AcronymAlreadyExistValidator
 from education_group.ddd.validators._acronym_required import AcronymRequiredValidator
 from education_group.ddd.validators._certificate_aim_type_2 import CertificateAimType2Validator
@@ -63,7 +62,7 @@ class UpdateGroupValidatorList(business_validator.BusinessListValidator):
 
 
 class CreateMiniTrainingValidatorList(business_validator.BusinessListValidator):
-    def __init__(self, mini_training_domain_obj: mini_training.MiniTraining):
+    def __init__(self, mini_training_domain_obj: 'MiniTraining'):
         self.validators = [
             ContentConstraintValidator(mini_training_domain_obj.content_constraint),
             StartAndEndYearValidator(mini_training_domain_obj.start_year, mini_training_domain_obj.end_year)

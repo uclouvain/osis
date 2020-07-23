@@ -21,23 +21,29 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+from typing import List
 
 from django.db import transaction
 
-from education_group import publisher
 from education_group.ddd import command
 from education_group.ddd.domain import mini_training
+from education_group.ddd.domain.mini_training import MiniTrainingBuilder
 from education_group.ddd.repository.mini_training import MiniTrainingRepository
-from education_group.ddd.validators import validators_by_business_action
+from education_group.ddd.service.write import postpone_mini_training_service
 
 
 @transaction.atomic()
-def create_orphan_mini_training(cmd: command.CreateMiniTrainingCommand) -> 'mini_training.MiniTrainingIdentity':
-    mini_training_object = mini_training.MiniTrainingBuilder.build_from_create_cmd(cmd)
-
-    validators_by_business_action.CreateMiniTrainingValidatorList(mini_training_object).validate()
+def create_and_postpone_orphan_mini_training(
+        cmd: command.CreateMiniTrainingCommand) -> List['mini_training.MiniTrainingIdentity']:
+    mini_training_object = MiniTrainingBuilder().build_from_create_cmd(cmd)
 
     mini_training_identity = MiniTrainingRepository.create(mini_training_object)
 
-    publisher.mini_training_created.send(None, mini_training_identity=mini_training_identity)
-    return mini_training_identity
+    mini_training_identities = postpone_mini_training_service.postpone_mini_training(
+        command.PostponeMiniTrainingCommand(
+            code=cmd.code,
+            postpone_from_year=cmd.year
+        )
+    )
+
+    return [mini_training_identity] + mini_training_identities

@@ -70,7 +70,7 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
                     self._generate_create_and_paste_command_from_valid_form(form)
                 )
             else:
-                mini_training_identity = create_orphan_mini_training_service.create_orphan_mini_training(
+                mini_training_identity = create_orphan_mini_training_service.create_and_postpone_orphan_mini_training(
                     self._generate_create_command_from_valid_form(form)
                 )
             self.set_success_url(mini_training_identity)
