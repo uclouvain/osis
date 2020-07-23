@@ -199,7 +199,7 @@ def validate_field(request, category, education_group_year_pk=None):
     return JsonResponse(response)
 
 
-class CreateEducationGroupSpecificVersion(AjaxPermissionRequiredMixin, SuccessMessageMixin, AjaxTemplateMixin, CreateView):
+class CreateProgramTreeVersion(AjaxPermissionRequiredMixin, SuccessMessageMixin, AjaxTemplateMixin, CreateView):
     template_name = "education_group/create_specific_version_inner.html"
     form_class = SpecificVersionForm
     permission_required = 'base.create_specific_version'
@@ -210,7 +210,11 @@ class CreateEducationGroupSpecificVersion(AjaxPermissionRequiredMixin, SuccessMe
 
     @cached_property
     def education_group_year(self):
-        return get_object_or_404(EducationGroupYear, academic_year__year=self.kwargs['year'], acronym=self.kwargs['code'])
+        return get_object_or_404(
+            EducationGroupYear,
+            academic_year__year=self.kwargs['year'],
+            acronym=self.kwargs['code'],
+        )
 
     def _call_rule(self, rule):
         return rule(self.person, self.education_group_year)
@@ -224,7 +228,7 @@ class CreateEducationGroupSpecificVersion(AjaxPermissionRequiredMixin, SuccessMe
         return form_kwargs
 
     def get_context_data(self, **kwargs):
-        context = super(CreateEducationGroupSpecificVersion, self).get_context_data(**kwargs)
+        context = super(CreateProgramTreeVersion, self).get_context_data(**kwargs)
         context['education_group_year'] = self.education_group_year
         context['form'] = self.get_form()
         return context
@@ -237,8 +241,13 @@ class CreateEducationGroupSpecificVersion(AjaxPermissionRequiredMixin, SuccessMe
         display_success_messages(self.request, cleaned_data["messages"])
 
     def get_success_url(self):
-        return reverse("training_identification", args=[self.education_group_year.academic_year.year,
-                                                        self.education_group_year.partial_acronym])
+        return reverse(
+            "training_identification",
+            args=[
+                self.education_group_year.academic_year.year,
+                self.education_group_year.partial_acronym,
+            ]
+        )
 
 
 @login_required
@@ -263,12 +272,17 @@ def check_version_name(request, education_group_year_id):
 
 
 def check_existing_version(version_name: str, education_group_year_id: int) -> bool:
-    return EducationGroupVersion.objects.filter(version_name=version_name,
-                                                offer__id=education_group_year_id).exists()
+    return EducationGroupVersion.objects.filter(
+        version_name=version_name,
+        offer__id=education_group_year_id,
+    ).exists()
 
 
 def find_last_existed_version(education_group_year, version_name):
     return EducationGroupVersion.objects.filter(
-        version_name=version_name, offer__education_group=education_group_year.education_group,
-        offer__academic_year__year__lt=education_group_year.academic_year.year).order_by(
-        'offer__academic_year').last()
+        version_name=version_name,
+        offer__education_group=education_group_year.education_group,
+        offer__academic_year__year__lt=education_group_year.academic_year.year,
+    ).order_by(
+        'offer__academic_year'
+    ).last()
