@@ -26,7 +26,6 @@
 import functools
 import json
 from collections import OrderedDict
-from enum import Enum
 
 from django.http import Http404
 from django.urls import reverse
@@ -40,22 +39,26 @@ from base.business.education_groups import general_information_sections
 from base.business.education_groups.general_information_sections import \
     MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION
 from base.models import academic_year
+from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import MiniTrainingType
 from base.views.common import display_warning_messages
 from education_group.forms.academic_year_choices import get_academic_year_choices
+from education_group.views.mixin import ElementSelectedClipBoardMixin
 from education_group.views.proxy import read
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd.domain.node import NodeIdentity, NodeNotFoundException
 from program_management.ddd.repositories import load_tree
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.models.element import Element
-from program_management.serializers.program_tree_view import program_tree_view_serializer
-
+from program_management.serializers.program_tree_version_view import program_tree_version_view_serializer
+from education_group.forms.tree_version_choices import get_tree_versions_choices
+from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
+from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 
 Tab = read.Tab  # FIXME :: fix imports (and remove this line)
 
 
-class MiniTrainingRead(PermissionRequiredMixin, TemplateView):
+class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, TemplateView):
     # PermissionRequiredMixin
     permission_required = 'base.view_educationgroup'
     raise_exception = True
@@ -76,6 +79,14 @@ class MiniTrainingRead(PermissionRequiredMixin, TemplateView):
     def node_identity(self) -> 'NodeIdentity':
         return NodeIdentity(code=self.kwargs['code'], year=self.kwargs['year'])
 
+    @cached_property
+    def program_tree_version_identity(self) -> 'ProgramTreeVersionIdentity':
+        return ProgramTreeVersionIdentitySearch().get_from_node_identity(self.node_identity)
+
+    @cached_property
+    def current_version(self) -> 'ProgramTreeVersion':
+        return ProgramTreeVersionRepository.get(self.program_tree_version_identity)
+
     @functools.lru_cache()
     def get_current_academic_year(self):
         return academic_year.starting_academic_year()
@@ -83,7 +94,7 @@ class MiniTrainingRead(PermissionRequiredMixin, TemplateView):
     @functools.lru_cache()
     def get_education_group_version(self):
         try:
-            root_element_id = self.get_path().split("|")[0]
+            root_element_id = self.get_path().split("|")[-1]
             return EducationGroupVersion.objects.select_related(
                 'offer', 'root_group'
             ).get(root_group__element__pk=root_element_id)
@@ -110,25 +121,58 @@ class MiniTrainingRead(PermissionRequiredMixin, TemplateView):
             return root_node
 
     def get_context_data(self, **kwargs):
+        if not self.active_tab:
+            self.active_tab = read.get_tab_from_referer(self.get_object(), self.request.META.get('HTTP_REFERER'))
+
+        is_root_node = self.node_identity == self.get_tree().root_node.entity_id
         return {
             **super().get_context_data(**kwargs),
             "person": self.request.user.person,
             "enums": mdl.enums.education_group_categories,
             "node": self.get_object(),
+            "node_path": self.get_path(),
             "tab_urls": self.get_tab_urls(),
-            "tree": json.dumps(program_tree_view_serializer(self.get_tree())),
+            "tree": json.dumps(program_tree_version_view_serializer(self.current_version)),
             "education_group_version": self.get_education_group_version(),
             "academic_year_choices": get_academic_year_choices(
                 self.node_identity,
                 self.get_path(),
                 _get_view_name_from_tab(self.active_tab),
-            ),
+            ) if is_root_node else None,
+            "selected_element_clipboard": self.get_selected_element_clipboard_message(),
+            "current_version": self.current_version,
+            "versions_choices": get_tree_versions_choices(self.node_identity, _get_view_name_from_tab(self.active_tab)),
+            "xls_ue_prerequisites": reverse("education_group_learning_units_prerequisites",
+                                            args=[self.get_education_group_version().root_group.academic_year.year,
+                                                  self.get_education_group_version().root_group.partial_acronym]
+                                            ),
+            "xls_ue_is_prerequisite": reverse("education_group_learning_units_is_prerequisite_for",
+                                              args=[self.get_education_group_version().root_group.academic_year.year,
+                                                    self.get_education_group_version().root_group.partial_acronym]
+                                              ),
             # TODO: Remove when finished reoganized tempalate
-            "group_year": self.get_education_group_version().root_group
+            "group_year": self.get_education_group_version().root_group,
+
+            "create_group_url": self.get_create_group_url(),
+            "create_training_url": self.get_create_training_url(),
+            "create_mini_training_url": self.get_create_mini_training_url(),
+            "is_root_node": is_root_node,
         }
 
     def get_permission_object(self):
         return self.get_education_group_version().offer
+
+    def get_create_group_url(self):
+        return reverse('create_element_select_type', kwargs={'category': Categories.GROUP.name}) + \
+               "?path_to={}".format(self.get_path())
+
+    def get_create_mini_training_url(self):
+        return reverse('create_element_select_type', kwargs={'category': Categories.MINI_TRAINING.name}) + \
+               "?path_to={}".format(self.get_path())
+
+    def get_create_training_url(self):
+        return reverse('create_element_select_type', kwargs={'category': Categories.TRAINING.name}) + \
+               "?path_to={}".format(self.get_path())
 
     def get_tab_urls(self):
         return OrderedDict({
@@ -172,17 +216,20 @@ class MiniTrainingRead(PermissionRequiredMixin, TemplateView):
 
     def have_general_information_tab(self):
         node_category = self.get_object().category
-        return node_category.name in general_information_sections.SECTIONS_PER_OFFER_TYPE and \
+        return self.current_version.is_standard_version and \
+            node_category.name in general_information_sections.SECTIONS_PER_OFFER_TYPE and \
             self._is_general_info_and_condition_admission_in_display_range
 
     def have_skills_and_achievements_tab(self):
         node_category = self.get_object().category
-        return node_category.name in MiniTrainingType.with_skills_achievements() and \
+        return self.current_version.is_standard_version and \
+            node_category.name in MiniTrainingType.with_skills_achievements() and \
             self._is_general_info_and_condition_admission_in_display_range
 
     def have_admission_condition_tab(self):
         node_category = self.get_object().category
-        return node_category.name in MiniTrainingType.with_admission_condition() and \
+        return self.current_version.is_standard_version and \
+            node_category.name in MiniTrainingType.with_admission_condition() and \
             self._is_general_info_and_condition_admission_in_display_range
 
     def _is_general_info_and_condition_admission_in_display_range(self):
@@ -203,7 +250,10 @@ def _get_view_name_from_tab(tab: Tab):
 
 def get_tab_urls(tab: Tab, node_identity: 'NodeIdentity', path: 'Path' = None) -> str:
     path = path or ""
+    url_parameters = \
+        "?path={}&tab={}#achievement_".format(path, tab) if tab == Tab.SKILLS_ACHIEVEMENTS else "?path={}".format(path)
+
     return reverse(
         _get_view_name_from_tab(tab),
         args=[node_identity.year, node_identity.code]
-    ) + "?path={}".format(path)
+    ) + url_parameters

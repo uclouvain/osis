@@ -23,30 +23,74 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import attr
+
 from osis_common.ddd import interface
 from program_management.ddd.business_types import *
+from program_management.ddd.command import CreateStandardVersionCommand
+from program_management.ddd.domain.program_tree import ProgramTreeIdentity, ProgramTree
 from program_management.ddd.domain.program_tree import ProgramTreeBuilder
 from program_management.ddd.validators.program_tree_version import CreateProgramTreeVersionValidatorList
 
 STANDARD = ""
 
 
-class ProgramTreeVersionNotAnnualizedIdentity(interface.ValueObject):
-    """
-    This ID is necessary to find a Node through years because code can be different through years.
-    """
-    def __init__(self, uuid: int):
-        self.uuid = uuid
-
-    def __hash__(self):
-        return hash(str(self.uuid))
-
-    def __eq__(self, other):
-        return self.uuid == other.uuid
+@attr.s(frozen=True, slots=True)
+class ProgramTreeVersionIdentity(interface.EntityIdentity):
+    offer_acronym = attr.ib(type=str)
+    year = attr.ib(type=int)
+    version_name = attr.ib(type=str)
+    is_transition = attr.ib(type=bool)
 
 
 class ProgramTreeVersionBuilder:
+
     _tree_version = None
+
+    def copy_to_next_year(
+            self,
+            copy_from: 'ProgramTreeVersion',
+            tree_version_repository: 'ProgramTreeVersionRepository'
+    ) -> 'ProgramTreeVersion':
+        identity_next_year = attr.evolve(copy_from.entity_id, year=copy_from.entity_id.year + 1)
+        tree_version_next_year = tree_version_repository.get(identity_next_year)
+        if tree_version_next_year:
+            # Case update program tree version to next year
+            # TODO :: To implement in OSIS-4386
+            pass
+        else:
+            # Case create program tree version to next year
+            tree_version_next_year = attr.evolve(  # Copy to new object
+                copy_from,
+                entity_identity=identity_next_year,
+                entity_id=identity_next_year,
+                program_tree_identity=attr.evolve(
+                    copy_from.program_tree_identity,
+                    year=copy_from.program_tree_identity.year + 1
+                ),
+            )
+        return tree_version_next_year
+
+    def build_standard_version(
+            self,
+            cmd: CreateStandardVersionCommand,
+            tree_repository: 'ProgramTreeRepository'
+    ) -> 'ProgramTreeVersion':
+        tree_version_identity = ProgramTreeVersionIdentity(
+            offer_acronym=cmd.offer_acronym,
+            year=cmd.year,
+            version_name=STANDARD,
+            is_transition=False,
+        )
+        tree_identity = ProgramTreeIdentity(code=cmd.code, year=cmd.year)
+        return ProgramTreeVersion(
+            entity_identity=tree_version_identity,
+            entity_id=tree_version_identity,
+            program_tree_identity=tree_identity,
+            program_tree_repository=tree_repository,
+            title_fr=None,
+            title_en=None,
+        )
 
     def build_from(  # TODO  :: rename to creat_from
             self,
@@ -104,28 +148,17 @@ class ProgramTreeVersionBuilder:
 
 
 # FIXME :: should be in a separate DDD domain
+@attr.s(slots=True)
 class ProgramTreeVersion(interface.RootEntity):
 
-    def __init__(
-            self,
-            entity_identity: 'ProgramTreeVersionIdentity',
-            program_tree_identity: 'ProgramTreeIdentity',
-            program_tree_repository: 'ProgramTreeRepository',
-            title_fr: str = None,
-            title_en: str = None,
-            tree: 'ProgramTree' = None,
-            identity_trough_year: int = None
-    ):
-        super(ProgramTreeVersion, self).__init__(entity_id=entity_identity)
-        self.entity_id = entity_identity
-        self.program_tree_identity = program_tree_identity
-        self.program_tree_repository = program_tree_repository
-        self.title_fr = title_fr
-        self.title_en = title_en
-        self._tree = tree
-        self.identity_trough_year = ProgramTreeVersionNotAnnualizedIdentity(
-            uuid=identity_trough_year
-        ) if identity_trough_year else None
+    entity_identity = entity_id = attr.ib(type=ProgramTreeVersionIdentity)
+    program_tree_identity = attr.ib(type=ProgramTreeIdentity)
+    program_tree_repository = attr.ib(type=interface.AbstractRepository)
+    title_fr = attr.ib(type=str, default=None)
+    title_en = attr.ib(type=str, default=None)
+    tree = attr.ib(type=ProgramTree, default=None)
+
+    _tree = None
 
     def get_tree(self) -> 'ProgramTree':
         if not self._tree:
@@ -144,22 +177,9 @@ class ProgramTreeVersion(interface.RootEntity):
     def version_name(self) -> str:
         return self.entity_id.version_name
 
-
-class ProgramTreeVersionIdentity(interface.EntityIdentity):
-    def __init__(self, offer_acronym: str, year: int, version_name: str, is_transition: bool):
-        self.offer_acronym = offer_acronym
-        self.year = year
-        self.version_name = version_name
-        self.is_transition = is_transition
-
-    def __hash__(self):
-        return hash(str(self.offer_acronym) + str(self.year) + str(self.version_name) + str(self.is_transition))
-
-    def __eq__(self, other):
-        return self.offer_acronym == other.offer_acronym \
-               and self.year == other.year \
-               and self.version_name == other.version_name \
-               and self.is_transition == other.is_transition
+    @property
+    def is_standard_version(self):
+        return self.entity_id.version_name == STANDARD and not self.entity_id.is_transition
 
 
 class ProgramTreeVersionNotFoundException(Exception):

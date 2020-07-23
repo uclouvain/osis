@@ -95,14 +95,15 @@ from base.views.learning_unit import learning_unit_specifications_edit
 from base.views.learning_units.create import create_partim_form
 from base.views.learning_units.detail import SEARCH_URL_PART
 from base.views.learning_units.pedagogy.read import learning_unit_pedagogy
-from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
-from cms.tests.factories.text_label import TextLabelFactory
-from cms.tests.factories.translated_text import TranslatedTextFactory
+from cms.tests.factories.text_label import LearningUnitYearTextLabelFactory
+from cms.tests.factories.translated_text import LearningUnitYearTranslatedTextFactory
 from cms.tests.factories.translated_text_label import TranslatedTextLabelFactory
 from learning_unit.api.views.learning_unit import LearningUnitFilter
 from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
 from osis_common.document import xls_build
+from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
+from program_management.tests.factories.element import ElementFactory
 from reference.tests.factories.country import CountryFactory
 from reference.tests.factories.language import LanguageFactory, FrenchLanguageFactory, EnglishLanguageFactory
 
@@ -615,22 +616,50 @@ class LearningUnitViewTestCase(TestCase):
     def test_learning_unit_formation(self):
         learning_unit_year = LearningUnitYearFactory(academic_year=self.current_academic_year,
                                                      learning_container_year=self.learning_container_yr)
+        learning_unit_year_element = ElementFactory(learning_unit_year=learning_unit_year)
         educ_group_type_matching_filters = EducationGroupTypeFactory(category=education_group_categories.TRAINING)
+
+        parent_1 = EducationGroupYearFactory(partial_acronym='LMATH600R', academic_year=self.current_academic_year,
+                                             education_group_type=educ_group_type_matching_filters)
+        parent_1_version = StandardEducationGroupVersionFactory(
+            offer=parent_1,
+            root_group__academic_year=self.current_academic_year,
+            root_group__education_group_type=parent_1.education_group_type,
+            root_group__partial_acronym=parent_1.partial_acronym
+        )
         group_element1 = GroupElementYearFactory(
-            child_leaf=learning_unit_year,
+            child_element=learning_unit_year_element,
+            parent_element=ElementFactory(group_year=parent_1_version.root_group),
             child_branch=None,
-            parent=EducationGroupYearFactory(partial_acronym='LMATH600R', academic_year=self.current_academic_year,
-                                             education_group_type=educ_group_type_matching_filters))
+            parent=None)
+
+        parent_2 = EducationGroupYearFactory(partial_acronym='LBIOL601R', academic_year=self.current_academic_year,
+                                             education_group_type=educ_group_type_matching_filters)
+        parent_2_version = StandardEducationGroupVersionFactory(
+            offer=parent_2,
+            root_group__academic_year=self.current_academic_year,
+            root_group__education_group_type=parent_2.education_group_type,
+            root_group__partial_acronym=parent_2.partial_acronym
+        )
         group_element2 = GroupElementYearFactory(
-            child_leaf=learning_unit_year,
+            child_element=learning_unit_year_element,
+            parent_element=ElementFactory(group_year=parent_2_version.root_group),
             child_branch=None,
-            parent=EducationGroupYearFactory(partial_acronym='LBIOL601R', academic_year=self.current_academic_year,
-                                             education_group_type=educ_group_type_matching_filters))
+            parent=None)
+
+        parent_3 = EducationGroupYearFactory(partial_acronym='LBIOL608R', academic_year=self.current_academic_year,
+                                             education_group_type=educ_group_type_matching_filters)
+        parent_3_version = StandardEducationGroupVersionFactory(
+            offer=parent_3,
+            root_group__academic_year=self.current_academic_year,
+            root_group__education_group_type=parent_3.education_group_type,
+            root_group__partial_acronym=parent_3.partial_acronym
+        )
         group_element3 = GroupElementYearFactory(
-            child_leaf=learning_unit_year,
+            child_element=learning_unit_year_element,
+            parent_element=ElementFactory(group_year=parent_3_version.root_group),
             child_branch=None,
-            parent=EducationGroupYearFactory(partial_acronym='TMATH600R', academic_year=self.current_academic_year,
-                                             education_group_type=educ_group_type_matching_filters))
+            parent=None)
 
         response = self.client.get(reverse('learning_unit_formations', args=[learning_unit_year.id]))
         context = response.context
@@ -638,7 +667,7 @@ class LearningUnitViewTestCase(TestCase):
         self.assertTemplateUsed(response, 'learning_unit/formations.html')
         self.assertEqual(context['current_academic_year'], self.current_academic_year)
         self.assertEqual(context['learning_unit_year'], learning_unit_year)
-        expected_order = [group_element2, group_element1, group_element3]
+        expected_order = [group_element2, group_element3, group_element1]
         self._assert_group_elements_ordered_by_partial_acronym(context, expected_order)
         self.assertIn('root_formations', context)
 
@@ -850,8 +879,8 @@ class LearningUnitViewTestCase(TestCase):
     def test_learning_unit_specifications_edit(self):
         a_label = 'label'
         learning_unit_year = LearningUnitYearFactory()
-        text_label_lu = TextLabelFactory(order=1, label=a_label, entity=entity_name.LEARNING_UNIT_YEAR)
-        TranslatedTextFactory(text_label=text_label_lu, entity=entity_name.LEARNING_UNIT_YEAR)
+        text_label_lu = LearningUnitYearTextLabelFactory(order=1, label=a_label)
+        LearningUnitYearTranslatedTextFactory(text_label=text_label_lu)
 
         response = self.client.get(
             reverse(learning_unit_specifications_edit,
@@ -949,17 +978,15 @@ class LearningUnitViewTestCase(TestCase):
                 academic_year__year__lte=proposal.learning_unit_year.academic_year.year - 1
             )
         expected_postponed_luys_ids = luys.values_list('id', flat=True)
-        label = TextLabelFactory(label='label', entity=entity_name.LEARNING_UNIT_YEAR)
+        label = LearningUnitYearTextLabelFactory(label='label')
         for language in ['fr-be', 'en']:
             TranslatedTextLabelFactory(text_label=label, language=language)
-        trans_fr_be = [TranslatedTextFactory(
-            entity=entity_name.LEARNING_UNIT_YEAR,
+        trans_fr_be = [LearningUnitYearTranslatedTextFactory(
             reference=luy.id,
             language='fr-be',
             text_label=label
         ) for luy in learning_unit_years]
-        trans_en = [TranslatedTextFactory(
-            entity=entity_name.LEARNING_UNIT_YEAR,
+        trans_en = [LearningUnitYearTranslatedTextFactory(
             reference=luy.id,
             language='en',
             text_label=label
@@ -997,6 +1024,7 @@ class LearningUnitViewTestCase(TestCase):
 
     def test_learning_unit(self):
         learning_unit_year = LearningUnitYearFactory()
+        ElementFactory(learning_unit_year=learning_unit_year)
         education_group_year_1 = EducationGroupYearFactory()
         education_group_year_2 = EducationGroupYearFactory()
         LearningUnitEnrollmentFactory(offer_enrollment__education_group_year=education_group_year_1,
@@ -1062,7 +1090,7 @@ def _generate_xls_build_parameter(xls_data, user):
             xls_build.HEADER_TITLES_KEY: titles,
             xls_build.WORKSHEET_TITLE_KEY: _(base.business.learning_unit_xls.WORKSHEET_TITLE),
             xls_build.STYLED_CELLS: None,
-            xls_build.COLORED_ROWS: None,
+            xls_build.FONT_ROWS: None,
             xls_build.ROW_HEIGHT: None,
         }]
     }

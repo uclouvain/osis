@@ -23,12 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.test import RequestFactory, SimpleTestCase
+from django.test import RequestFactory
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from base.models.enums.education_group_categories import GROUP, MINI_TRAINING, TRAINING
+from base.models.enums.education_group_categories import GROUP, TRAINING
 from base.models.enums.education_group_types import GroupType, TrainingType
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import TrainingFactory, MiniTrainingFactory
@@ -41,7 +41,7 @@ from education_group.tests.factories.group_year import GroupYearFactory
 from program_management.ddd.domain.link import Link
 from program_management.ddd.repositories import load_tree
 from program_management.models.element import Element
-from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
+from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementFactory
 
 
@@ -62,13 +62,13 @@ class TrainingTreeViewTestCase(APITestCase):
             academic_year=cls.academic_year,
             education_group_type__name=TrainingType.PGRM_MASTER_120.name
         )
-        training_version = EducationGroupVersionFactory(
+        cls.training_version = StandardEducationGroupVersionFactory(
             offer=cls.training,
             root_group__academic_year=cls.academic_year,
             root_group__education_group_type__category=TRAINING,
             root_group__partial_acronym='LBROI200M',
         )
-        element_training = ElementFactory(group_year=training_version.root_group)
+        element_training = ElementFactory(group_year=cls.training_version.root_group)
         cls.common_core = GroupYearFactory(
             education_group_type__category=GROUP,
             education_group_type__name=GroupType.COMMON_CORE.name,
@@ -105,7 +105,7 @@ class TrainingTreeViewTestCase(APITestCase):
             academic_year=cls.academic_year,
             education_group_type__name=TrainingType.MASTER_MS_120.name
         )
-        training_ms_version = EducationGroupVersionFactory(
+        training_ms_version = StandardEducationGroupVersionFactory(
             offer=cls.training_ms,
             root_group__academic_year=cls.academic_year,
             root_group__education_group_type__category=TRAINING,
@@ -166,6 +166,9 @@ class TrainingTreeViewTestCase(APITestCase):
             Link(parent=None, child=load_tree.load(training_element.id).root_node),
             context={
                 'request': RequestFactory().get(self.url),
+                'version_name': self.training_version.version_name,
+                'version_title_fr': self.training_version.title_fr,
+                'version_title_en': self.training_version.title_en
             }
         )
         self.assertEqual(response.data, serializer.data)
@@ -193,11 +196,12 @@ class MiniTrainingTreeViewTestCase(APITestCase):
             acronym="CCHOIXM60",
             academic_year=cls.academic_year
         )
-        cls.mini_training_version = EducationGroupVersionFactory(
+        cls.mini_training_version = StandardEducationGroupVersionFactory(
             offer=cls.mini_training,
-            root_group__education_group_type__category=MINI_TRAINING,
-            root_group__partial_acronym='LBIOL212O',
+            root_group__education_group_type=cls.mini_training.education_group_type,
+            root_group__partial_acronym=cls.mini_training.partial_acronym,
             root_group__academic_year=cls.academic_year,
+            is_transition=False
         )
         cls.mini_training_element = ElementFactory(group_year=cls.mini_training_version.root_group)
         cls.common_core = GroupYearFactory(
@@ -216,8 +220,8 @@ class MiniTrainingTreeViewTestCase(APITestCase):
 
         cls.person = PersonFactory()
         url_kwargs = {
-            'partial_acronym': cls.mini_training_version.root_group.partial_acronym,
-            'year': cls.mini_training.academic_year.year
+            'official_partial_acronym': cls.mini_training_version.root_group.partial_acronym,
+            'year': cls.mini_training_version.root_group.academic_year.year
         }
         cls.url = reverse('education_group_api_v1:' + MiniTrainingTreeView.name, kwargs=url_kwargs)
 
@@ -240,7 +244,7 @@ class MiniTrainingTreeViewTestCase(APITestCase):
     def test_get_mini_training_not_found(self):
         invalid_url = reverse(
             'education_group_api_v1:' + MiniTrainingTreeView.name,
-            kwargs={'partial_acronym': 'LDROI100O', 'year': 2018}
+            kwargs={'official_partial_acronym': 'LDROI100O', 'year': 2018}
         )
         response = self.client.get(invalid_url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
@@ -259,7 +263,7 @@ class MiniTrainingTreeViewTestCase(APITestCase):
 
     def test_get_result_with_lowercase_acronym(self):
         url_kwargs = {
-            'partial_acronym': self.mini_training_version.root_group.partial_acronym.lower(),
+            'official_partial_acronym': self.mini_training_version.root_group.partial_acronym.lower(),
             'year': self.mini_training.academic_year.year
         }
         url = reverse('education_group_api_v1:' + MiniTrainingTreeView.name, kwargs=url_kwargs)

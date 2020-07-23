@@ -31,7 +31,9 @@ from backoffice.settings.rest_framework.common_views import LanguageContextSeria
 from base.models.enums.education_group_categories import Categories
 from education_group.api.serializers.group_element_year import EducationGroupRootNodeTreeSerializer
 from program_management.ddd.domain import link
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 from program_management.ddd.repositories import load_tree
+from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.models.element import Element
 
 
@@ -42,16 +44,41 @@ class EducationGroupTreeView(LanguageContextSerializerMixin, generics.RetrieveAP
 
     def get_object(self):
         queryset = self.filter_queryset(self.get_queryset())
-
+        version_name = self.kwargs.pop('version_name', '')
         filter_kwargs = {
             lookup_field: self.kwargs[lookup_url_kwarg]
             for lookup_field, lookup_url_kwarg in zip(self.lookup_fields, self.lookup_url_kwargs)
         }
-        element = get_object_or_404(queryset, **filter_kwargs)
+
+        element = get_object_or_404(
+            queryset,
+            **filter_kwargs,
+            group_year__educationgroupversion__version_name=version_name
+        )
         self.check_object_permissions(self.request, element.education_group_year_obj)
 
+        tree_version_identity = ProgramTreeVersionIdentity(
+            offer_acronym=self.kwargs.get('acronym') or self.kwargs.get('partial_acronym'),
+            year=self.kwargs['year'],
+            version_name=version_name,
+            is_transition=False
+        )
+
+        self.tree_version = ProgramTreeVersionRepository.get(tree_version_identity)
         tree = load_tree.load(element.id)
         return link.factory.get_link(parent=None, child=tree.root_node)
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        if hasattr(self, 'tree_version') and self.tree_version:
+            context.update(
+                {
+                    'version_name': self.tree_version.version_name,
+                    'version_title_fr': self.tree_version.title_fr,
+                    'version_title_en': self.tree_version.title_en,
+                }
+            )
+        return context
 
 
 class TrainingTreeView(EducationGroupTreeView):
@@ -59,10 +86,13 @@ class TrainingTreeView(EducationGroupTreeView):
         Return the tree of the training
     """
     name = 'trainings_tree'
-    lookup_fields = ('group_year__academic_year__year', 'group_year__educationgroupversion__offer__acronym__iexact',)
-    lookup_url_kwargs = ('year', 'acronym',)
+    lookup_fields = (
+        'group_year__academic_year__year', 'group_year__educationgroupversion__offer__acronym__iexact',
+    )
+    lookup_url_kwargs = ('year', 'acronym')
     queryset = Element.objects.filter(
-        group_year__education_group_type__category=Categories.TRAINING.name
+        group_year__education_group_type__category=Categories.TRAINING.name,
+        group_year__educationgroupversion__is_transition=False
     ).annotate(
         education_group_year_obj=F('group_year__educationgroupversion__offer')
     ).select_related('education_group_year')
@@ -73,13 +103,52 @@ class MiniTrainingTreeView(EducationGroupTreeView):
         Return the tree of the mini-training
     """
     name = 'minitrainings_tree'
-    lookup_fields = ('group_year__academic_year__year', 'group_year__partial_acronym__iexact',)
-    lookup_url_kwargs = ('year', 'partial_acronym',)
+    lookup_fields = (
+        'group_year__academic_year__year', 'group_year__educationgroupversion__offer__partial_acronym__iexact',
+    )
+    lookup_url_kwargs = ('year', 'official_partial_acronym',)
     queryset = Element.objects.filter(
-        group_year__education_group_type__category=Categories.MINI_TRAINING.name
+        group_year__education_group_type__category=Categories.MINI_TRAINING.name,
+        group_year__educationgroupversion__is_transition=False
     ).annotate(
         education_group_year_obj=F('group_year__educationgroupversion__offer')
     ).select_related('education_group_year')
+
+    def get_object(self):
+        version = self.get_mini_training_version()
+
+        element = get_object_or_404(
+            Element.objects.annotate(
+                education_group_year_obj=F('group_year__educationgroupversion__offer')
+            ).select_related('education_group_year'),
+            group_year__educationgroupversion=version
+        )
+
+        self.check_object_permissions(self.request, element.education_group_year_obj)
+
+        tree = load_tree.load(element.id)
+        return link.factory.get_link(parent=None, child=tree.root_node)
+
+    def get_element_standard(self):
+        queryset = self.filter_queryset(self.get_queryset())
+        filter_kwargs = {
+            lookup_field: self.kwargs[lookup_url_kwarg]
+            for lookup_field, lookup_url_kwarg in zip(self.lookup_fields, self.lookup_url_kwargs)
+        }
+        return get_object_or_404(
+            queryset,
+            **filter_kwargs,
+            group_year__educationgroupversion__version_name=''
+        )
+
+    def get_mini_training_version(self):
+        element_standard = self.get_element_standard()
+        version_name = self.kwargs.pop('version_name', '')
+        main_offer = element_standard.group_year.educationgroupversion.offer
+        return get_object_or_404(
+            main_offer.educationgroupversion_set,
+            version_name=version_name
+        )
 
 
 class GroupTreeView(EducationGroupTreeView):
@@ -94,3 +163,19 @@ class GroupTreeView(EducationGroupTreeView):
     ).annotate(
         education_group_year_obj=F('group_year__educationgroupversion__offer')
     ).select_related('education_group_year')
+
+    def get_object(self):
+        queryset = self.filter_queryset(self.get_queryset())
+        filter_kwargs = {
+            lookup_field: self.kwargs[lookup_url_kwarg]
+            for lookup_field, lookup_url_kwarg in zip(self.lookup_fields, self.lookup_url_kwargs)
+        }
+
+        element = get_object_or_404(
+            queryset,
+            **filter_kwargs,
+        )
+        self.check_object_permissions(self.request, element.education_group_year_obj)
+
+        tree = load_tree.load(element.id)
+        return link.factory.get_link(parent=None, child=tree.root_node)

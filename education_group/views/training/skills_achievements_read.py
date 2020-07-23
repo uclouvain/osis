@@ -48,17 +48,26 @@ class TrainingReadSkillsAchievements(TrainingRead):
         edition_perm_name = "base.change_admissioncondition"
         return {
             **super().get_context_data(**kwargs),
-            "achievements": achievement.get_achievements(self.get_object()),
+            "year": kwargs['year'],
+            "code": kwargs['code'],
+            "achievements": achievement.get_achievements(self.get_object(), self.request.GET['path']),
             "can_edit_information": self.request.user.has_perm(edition_perm_name, self.get_permission_object()),
             "program_aims_label": self.get_program_aims_label(),
             "program_aims_update_url": self.get_program_aims_update_url(),
             "additional_information_skills_label": self.get_additional_information_skills_label(),
-            "additional_information_skills_update_url": self.get_additional_information_skills_update_url()
+            "additional_information_skills_update_url": self.get_additional_information_skills_update_url(),
+            "url_create": reverse(
+                'training_achievement_create',
+                args=[kwargs['year'], kwargs['code']]
+            ) + '?path={}&tab={}'.format(self.request.GET['path'], Tab.SKILLS_ACHIEVEMENTS),
         }
 
     def get_program_aims_update_url(self):
         training_id = self.education_group_version.offer_id
-        return reverse('education_group_achievement_program_aim', args=[training_id, training_id])
+        return reverse(
+            'education_group_achievement_program_aim',
+            args=[training_id, training_id]
+        ) + '?path={}&tab={}#achievement_'.format(self.request.GET['path'], Tab.SKILLS_ACHIEVEMENTS)
 
     def get_program_aims_label(self):
         return next(
@@ -68,7 +77,10 @@ class TrainingReadSkillsAchievements(TrainingRead):
 
     def get_additional_information_skills_update_url(self):
         training_id = self.education_group_version.offer_id
-        return reverse('education_group_achievement_additional_information', args=[training_id, training_id])
+        return reverse(
+            'education_group_achievement_additional_information',
+            args=[training_id, training_id]
+        ) + '?path={}&tab={}#achievement_'.format(self.request.GET['path'], Tab.SKILLS_ACHIEVEMENTS)
 
     def get_additional_information_skills_label(self):
         return next(

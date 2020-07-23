@@ -42,11 +42,14 @@ class TestGroupYear(TestCase):
                          "{} ({})".format(group_yr.acronym,
                                           group_yr.academic_year))
 
+    def test_complete_title(self):
+        group_year = GroupYearFactory()
+        self.assertEqual(group_year.complete_title, group_year.title_fr)
+
 
 class TestGroupYearSave(TestCase):
     @classmethod
     def setUpTestData(cls):
-
         cls.academic_year_2019 = AcademicYearFactory(year=2019)
         cls.academic_year_2023 = AcademicYearFactory(year=2023)
 
@@ -59,7 +62,6 @@ class TestGroupYearSave(TestCase):
                                                   end_year=None)
 
     def test_save_case_academic_year_less_than_start_year_error(self):
-
         with self.assertRaisesMessage(
                 AttributeError,
                 _('Please enter an academic year greater or equal to group start year.')):
@@ -73,7 +75,6 @@ class TestGroupYearSave(TestCase):
             )
 
     def test_save_case_academic_year_greater_than_end_year_error(self):
-
         with self.assertRaisesMessage(
                 AttributeError,
                 _('Please enter an academic year less or equal to group end year.')):

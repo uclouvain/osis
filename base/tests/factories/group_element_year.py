@@ -56,7 +56,7 @@ def _generate_block_value():
 class GroupElementYearFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = "base.GroupElementYear"
-        django_get_or_create = ('parent', 'child_branch', 'child_leaf')
+        django_get_or_create = ('parent_element', 'child_element')
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1), datetime.datetime(2017, 3, 1))
@@ -76,6 +76,24 @@ class GroupElementYearFactory(factory.django.DjangoModelFactory):
         academic_year=factory.SelfAttribute("..parent.academic_year")
     )
     child_leaf = None
+
+    @factory.post_generation
+    def generate_element(obj, create, extracted, **kwargs):
+        if not extracted:
+            return
+        if obj.parent:
+            obj.parent_element = ElementGroupYearFactory(
+                group_year__group__start_year=obj.parent.academic_year,
+                group_year__academic_year=obj.parent.academic_year,
+                group_year__partial_acronym=obj.parent.partial_acronym
+            )
+        if obj.child_branch:
+            obj.child_element = ElementGroupYearFactory(
+                group_year__group__start_year=obj.child_branch.academic_year,
+                group_year__academic_year=obj.child_branch.academic_year,
+                group_year__partial_acronym=obj.child_branch.partial_acronym
+            )
+            obj.save()
 
 
 class GroupElementYearChildLeafFactory(GroupElementYearFactory):

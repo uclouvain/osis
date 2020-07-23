@@ -7,7 +7,7 @@
     * The core business involves the administration of students, teachers,
     * courses, programs and so on.
     *
-    * Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+    * Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
     *
     * This program is free software: you can redistribute it and/or modify
     * it under the terms of the GNU General Public License as published by
@@ -32,7 +32,9 @@
                     <div class="row">
                         <div class="col-md-6">
                             {% bootstrap_label _("Acronym/Short title") label_class='d-block'%}
-                            <p>{{ node.title }}</p>
+                            <p>
+                                {{ node.title }}
+                            </p>
                         </div>
                         <div class="col-md-6">
                             {% bootstrap_label _("Code") label_class='d-block'%}
@@ -56,7 +58,7 @@
                            {% with label=_("credits") %}
                             {% bootstrap_label label|capfirst label_class='d-block'%}
                            {% endwith %}
-                           <p>{{ node.credits|default_if_none:"-" }}</p>
+                           <p>{{ node.credits|default_if_none:"" }}</p>
                         </div>
                         <div class="col-md-6">
                             {% bootstrap_label _("Type of constraint") label_class='d-block'%}
@@ -108,7 +110,7 @@
                     <div class="row">
                         <div class="col-md-12">
                             {% bootstrap_label _("Learning location") label_class='d-block'%}
-                            <p>{{ node.teaching_campus }} </p>
+                            <p>{{ node.teaching_campus.name }} - {{ node.teaching_campus.university_name }}</p>
                         </div>
                     </div>
                 </div>
@@ -130,7 +132,7 @@
                     {% with label=_("remark in english") %}
                         {% bootstrap_label label|capfirst label_class='d-block' %}
                     {% endwith %}
-                    <p>{{ node.remark_fr }} </p>
+                    <p>{{ node.remark_en }} </p>
                 </div>
             </div>
         </div>

@@ -125,7 +125,7 @@ class GroupFilter(FilterSet):
             ('acronym', 'acronym'),
             ('partial_acronym', 'code'),
             ('academic_year__year', 'academic_year'),
-            ('title_fr', 'title_fr'),
+            ('title', 'title'),
             ('type_ordering', 'type'),
             ('entity_management_version', 'management_entity')
         ),
@@ -165,7 +165,8 @@ class GroupFilter(FilterSet):
     def filter_education_group_year_field(queryset, name, value):
         return filter_field_by_regex(queryset, name, value)
 
-    def filter_by_transition(self, queryset, name, value):
+    @staticmethod
+    def filter_by_transition(queryset, name, value):
         if not value:
             return queryset.exclude(educationgroupversion__is_transition=True)
         return queryset
@@ -173,7 +174,7 @@ class GroupFilter(FilterSet):
     def get_queryset(self):
         # Need this close so as to return empty query by default when form is unbound
         if not self.data:
-            return GroupYear.objects_version.none()
+            return GroupYear.objects.none()
 
         management_entity = entity_version.EntityVersion.objects.filter(
             entity=OuterRef('management_entity'),
@@ -181,7 +182,7 @@ class GroupFilter(FilterSet):
             OuterRef('academic_year__start_date')
         ).values('acronym')[:1]
 
-        return GroupYear.objects_version.all().select_related('element', 'academic_year').annotate(
+        return GroupYear.objects.all().select_related('element', 'academic_year').annotate(
             type_ordering=Case(
                 *[When(education_group_type__name=key, then=Value(str(_(val))))
                   for i, (key, val) in enumerate(education_group_types.ALL_TYPES)],
@@ -223,4 +224,3 @@ class GroupFilter(FilterSet):
         qs = super().filter_queryset(queryset)
         order_fields = qs.query.order_by + ('id', )
         return qs.order_by(*order_fields)
-

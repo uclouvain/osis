@@ -24,34 +24,68 @@
 #
 ##############################################################################
 import inspect
+from unittest import mock
 from unittest.mock import patch
 
 from django.test import SimpleTestCase
-from django.utils.translation import gettext_lazy as _
 
+import osis_common.ddd.interface
+from base.ddd.utils import business_validator
 from base.ddd.utils.validation_message import MessageLevel, BusinessValidationMessage
 from base.models.enums import prerequisite_operator
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
 from base.models.enums.link_type import LinkTypes
-from program_management.ddd.domain import node
+from program_management.ddd.domain import node, exception
 from program_management.ddd.domain import prerequisite
 from program_management.ddd.domain import program_tree
+from program_management.ddd.domain.link import Link
 from program_management.ddd.domain.prerequisite import PrerequisiteItem
 from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.ddd.domain.program_tree import build_path
-from program_management.ddd.service import command
-from program_management.ddd.validators._authorized_relationship import DetachAuthorizedRelationshipValidator
-from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList, \
-    UpdatePrerequisiteValidatorList
+from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 from program_management.ddd.validators.validators_by_business_action import DetachNodeValidatorList
+from program_management.ddd.validators.validators_by_business_action import PasteNodeValidatorList, \
+    UpdatePrerequisiteValidatorList
 from program_management.models.enums import node_type
 from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipObjectFactory
+from program_management.tests.ddd.factories.commands.paste_element_command import PasteElementCommandFactory
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 from program_management.tests.ddd.factories.prerequisite import cast_to_prerequisite
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 from program_management.tests.ddd.service.mixins import ValidatorPatcherMixin
+
+
+class TestProgramTreeBuilderCopyToNextYear(SimpleTestCase):
+    def setUp(self) -> None:
+        self.copy_from_program_tree = ProgramTreeFactory()
+        self.mock_repository = mock.create_autospec(ProgramTreeRepository)
+
+    def test_should_create_new_program_tree_when_does_not_exist_for_next_year(self):
+        self.mock_repository.get.side_effect = exception.ProgramTreeNotFoundException
+
+        resulted_tree = program_tree.ProgramTreeBuilder().copy_to_next_year(
+            self.copy_from_program_tree,
+            self.mock_repository
+        )
+
+        expected_identity = program_tree.ProgramTreeIdentity(
+            code=self.copy_from_program_tree.entity_id.code,
+            year=self.copy_from_program_tree.entity_id.year+1
+        )
+        self.assertEqual(expected_identity, resulted_tree.entity_id)
+
+    def test_should_return_existing_tree_when_exists_for_next_year(self):
+        program_tree_next_year = ProgramTreeFactory()
+        self.mock_repository.get.return_value = program_tree_next_year
+
+        resulted_tree = program_tree.ProgramTreeBuilder().copy_to_next_year(
+            self.copy_from_program_tree,
+            self.mock_repository
+        )
+
+        self.assertEqual(program_tree_next_year, resulted_tree)
 
 
 class TestGetNodeProgramTree(SimpleTestCase):
@@ -193,80 +227,30 @@ class TestGetCodesPermittedAsPrerequisite(SimpleTestCase):
         )
 
 
-class TestAttachNodeProgramTree(SimpleTestCase, ValidatorPatcherMixin):
+class TestPasteNodeProgramTree(ValidatorPatcherMixin, SimpleTestCase):
     def setUp(self):
         root_node = NodeGroupYearFactory(node_id=0)
         self.tree = ProgramTreeFactory(root_node=root_node)
-        self.request = command.AttachNodeCommand(
-            None, None, None, None, None, None, None, None, None, None, None, None,
+        self.child_to_paste = NodeGroupYearFactory()
+        self.request = PasteElementCommandFactory(
+            node_to_paste_code=self.child_to_paste.code,
+            node_to_paste_year=self.child_to_paste.year,
+            path_where_to_paste=str(self.tree.root_node.node_id)
         )
 
-    def test_attach_node_case_no_path_specified(self):
-        self.mock_validator(AttachNodeValidatorList, ['Success msg'], level=MessageLevel.SUCCESS)
-        subgroup_node = NodeGroupYearFactory()
-        self.tree.attach_node(subgroup_node, None, self.request)
-        self.assertIn(subgroup_node, self.tree.root_node.get_direct_children_as_nodes())
+    def test_should_paste_node_to_position_indicated_by_path_when_validator_do_not_raise_exception(self):
+        self.mock_validator_validate_to_not_raise_exception(PasteNodeValidatorList)
 
-    def test_attach_node_case_path_specified_found(self):
-        self.mock_validator(AttachNodeValidatorList, ['Success msg'], level=MessageLevel.SUCCESS)
-        subgroup_node = NodeGroupYearFactory()
-        self.tree.attach_node(subgroup_node, None, self.request)
+        link_created = self.tree.paste_node(self.child_to_paste, self.request, mock.Mock())
+        self.assertIn(link_created, self.tree.root_node.children)
 
-        node_to_attach = NodeGroupYearFactory()
-        path = "|".join([str(self.tree.root_node.pk), str(subgroup_node.pk)])
-        self.tree.attach_node(node_to_attach, path, self.request)
+    def test_should_propagate_exception_and_not_paste_node_when_validator_raises_exception(self):
+        self.mock_validator_validate_to_raise_exception(PasteNodeValidatorList, ["error message text"])
 
-        self.assertIn(node_to_attach, self.tree.get_node(path).get_direct_children_as_nodes())
+        with self.assertRaises(osis_common.ddd.interface.BusinessExceptions):
+            self.tree.paste_node(self.child_to_paste, self.request, mock.Mock())
 
-    def test_when_validator_list_is_valid(self):
-        self.mock_validator(AttachNodeValidatorList, ['Success message text'], level=MessageLevel.SUCCESS)
-        path = str(self.tree.root_node.node_id)
-        child_to_attach = NodeGroupYearFactory()
-        result = self.tree.attach_node(child_to_attach, path, self.request)
-        self.assertEqual(result[0], 'Success message text')
-        self.assertEqual(1, len(result))
-        self.assertIn(child_to_attach, self.tree.root_node.get_direct_children_as_nodes())
-
-    def test_when_validator_list_is_not_valid(self):
-        self.mock_validator(AttachNodeValidatorList, ['error message text'], level=MessageLevel.ERROR)
-        path = str(self.tree.root_node.node_id)
-        child_to_attach = NodeGroupYearFactory()
-        result = self.tree.attach_node(child_to_attach, path, self.request)
-        self.assertEqual(result[0], 'error message text')
-        self.assertEqual(1, len(result))
-        self.assertNotIn(child_to_attach, self.tree.root_node.get_direct_children_as_nodes())
-
-
-class TestDetachNodeProgramTree(SimpleTestCase):
-    def setUp(self):
-        self.link1 = LinkFactory()
-        self.link2 = LinkFactory(parent=self.link1.child)
-        self.tree = ProgramTreeFactory(root_node=self.link1.parent)
-
-    def test_detach_node_case_invalid_path(self):
-        is_valid, messages = self.tree.detach_node("dummy_path")
-        self.assertFalse(is_valid)
-        self.assertListEqual(messages, [BusinessValidationMessage('Invalid tree path', level=MessageLevel.ERROR)])
-
-    @patch.object(DetachAuthorizedRelationshipValidator, 'validate')
-    def test_detach_node_case_valid_path(self, mock):
-        path_to_detach = "|".join([
-            str(self.link1.parent.pk),
-            str(self.link1.child.pk),
-            str(self.link2.child.pk),
-        ])
-
-        self.tree.detach_node(path_to_detach)
-        self.assertListEqual(
-            self.tree.root_node.children[0].child.children,  # root_node/common_core
-            []
-        )
-
-    def test_detach_node_case_try_to_detach_root_node(self):
-        is_valid, messages = self.tree.detach_node(str(self.link1.parent.pk))
-        self.assertFalse(is_valid)
-        expected_error = BusinessValidationMessage(_("Cannot perform detach action on root."), level=MessageLevel.ERROR)
-        self.assertListEqual(messages, [expected_error])
+        self.assertNotIn(self.child_to_paste, self.tree.root_node.children_as_nodes)
 
 
 class TestGetParentsUsingNodeAsReference(SimpleTestCase):
@@ -463,10 +447,10 @@ class TestCopyAndPrune(SimpleTestCase):
 
         copied_link.block = 123456
         self.assertEqual(copied_link.block, 123456)
-        self.assertNotEqual(original_link, 123456)
+        self.assertNotEqual(original_link.block, 123456)
 
     def test_when_change_tree_signature(self):
-        original_signature = ['self', 'root_node', 'authorized_relationships']
+        original_signature = ['self', 'root_node', 'authorized_relationships', 'entity_id']
         current_signature = list(inspect.signature(ProgramTree.__init__).parameters.keys())
         error_msg = "Please update the {} function to fit with new object signature.".format(ProgramTree.prune)
         self.assertEqual(original_signature, current_signature, error_msg)
@@ -722,50 +706,19 @@ class TestDetachNode(SimpleTestCase):
         self.success_message = BusinessValidationMessage("Success message", MessageLevel.SUCCESS)
         self.error_message = BusinessValidationMessage("Error message", MessageLevel.ERROR)
 
-    def test_when_path_is_not_valid(self):
+    def test_should_raise_exception_when_path_is_not_valid(self):
         tree = ProgramTreeFactory()
         LinkFactory(parent=tree.root_node)
         path_to_detach = "Invalid path"
-        result_is_valid, result_messages = tree.detach_node(path_to_detach)
-        self.assertFalse(result_is_valid)
-        expected_result = [
-            BusinessValidationMessage(_("Invalid tree path"), MessageLevel.ERROR)
-        ]
-        self.assertListEqual(result_messages, expected_result)
+        with self.assertRaises(osis_common.ddd.interface.BusinessExceptions):
+            tree.detach_node(path_to_detach, mock.Mock())
 
-    def test_when_path_to_detach_is_root_node(self):
-        tree = ProgramTreeFactory()
-        LinkFactory(parent=tree.root_node)
-        path_to_detach = str(tree.root_node.pk)
-        result_is_valid, result_messages = tree.detach_node(path_to_detach)
-        self.assertFalse(result_is_valid)
-        expected_result = [
-            BusinessValidationMessage(_("Cannot perform detach action on root."), MessageLevel.ERROR)
-        ]
-        self.assertListEqual(result_messages, expected_result)
-
-    @patch.object(DetachNodeValidatorList, 'messages')
-    @patch.object(DetachNodeValidatorList, 'is_valid')
-    def test_when_validator_list_is_valid(self, mock_is_valid, mock_messages):
-        mock_is_valid.return_value = True
-        mock_messages.return_value = [self.success_message]
-        tree = ProgramTreeFactory()
-        link = LinkFactory(parent=tree.root_node)
-        path_to_detach = build_path(link.parent, link.child)
-        result_is_valid, result_messages = tree.detach_node(path_to_detach)
-        self.assertTrue(result_is_valid)
-        self.assertListEqual(result_messages.return_value, [self.success_message])
-        self.assertNotIn(link, tree.root_node.children)
-
-    @patch.object(DetachNodeValidatorList, 'messages')
-    @patch.object(DetachNodeValidatorList, 'is_valid')
-    def test_when_validator_list_is_valid_and_node_contains_node_that_has_prerequisites(
+    @patch.object(DetachNodeValidatorList, 'validate')
+    def test_should_remove_prerequisites_and_delete_link_when_validator_do_not_raise_exception(
             self,
-            mock_is_valid,
-            mock_messages
+            mock_validate,
     ):
-        mock_is_valid.return_value = True
-        mock_messages.return_value = [self.success_message]
+        mock_validate.return_value = True
 
         node_that_has_prerequisite = NodeLearningUnitYearFactory()
         node_that_is_prerequisite = NodeLearningUnitYearFactory(is_prerequisite_of=[node_that_has_prerequisite])
@@ -780,24 +733,26 @@ class TestDetachNode(SimpleTestCase):
         LinkFactory(parent=tree.root_node, child=node_that_is_prerequisite)
         link = LinkFactory(parent=tree.root_node, child=node_that_has_prerequisite)
         path_to_detach = build_path(link.parent, link.child)
-        result_is_valid, result_messages = tree.detach_node(path_to_detach)
-        self.assertTrue(result_is_valid)
-        self.assertListEqual(result_messages.return_value, [self.success_message])
-        self.assertNotIn(link, tree.root_node.children)
+        deleted_link = tree.detach_node(path_to_detach, mock.Mock())
+
+        self.assertNotIn(deleted_link, tree.root_node.children)
         self.assertListEqual(node_that_has_prerequisite.prerequisite.get_all_prerequisite_items(), [])
 
-    @patch.object(DetachNodeValidatorList, 'messages')
-    @patch.object(DetachNodeValidatorList, 'is_valid')
-    def test_when_validator_list_is_not_valid(self, mock_is_valid, mock_messages):
-        mock_is_valid.return_value = False
-        mock_messages.return_value = [self.error_message]
+    @patch.object(DetachNodeValidatorList, 'validate')
+    def test_should_propagate_exception_when_validator_raises_exception(self, mock_validate):
+        mock_validate.side_effect = osis_common.ddd.interface.BusinessExceptions(["error occured", "an other error"])
+
         tree = ProgramTreeFactory()
         link = LinkFactory(parent=tree.root_node)
         path_to_detach = build_path(link.parent, link.child)
-        result_is_valid, result_messages = tree.detach_node(path_to_detach)
-        self.assertFalse(result_is_valid)
-        self.assertListEqual(result_messages.return_value, [self.error_message])
-        self.assertIn(link, tree.root_node.children)
+
+        with self.assertRaises(osis_common.ddd.interface.BusinessExceptions) as exception_context:
+            tree.detach_node(path_to_detach, mock.Mock())
+
+        self.assertListEqual(
+            exception_context.exception.messages,
+            ["error occured", "an other error"]
+        )
 
 
 class TestGet2mOptionList(SimpleTestCase):
@@ -842,3 +797,25 @@ class TestSetPrerequisite(SimpleTestCase, ValidatorPatcherMixin):
         self.mock_validator(UpdatePrerequisiteValidatorList, ["success_message_text"], level=MessageLevel.SUCCESS)
         self.tree.set_prerequisite("LOSIS1452 OU MARC2589", self.link1.child)
         self.assertTrue(self.link1.child.prerequisite)
+
+
+class TestUpdateLink(SimpleTestCase):
+    def setUp(self) -> None:
+        self.tree = ProgramTreeFactory()
+        self.link1 = LinkFactory(parent=self.tree.root_node, child=NodeLearningUnitYearFactory())
+
+    @mock.patch('program_management.ddd.domain.program_tree.validators_by_business_action.UpdateLinkValidatorList')
+    def test_assert_validator_called(self, mock_update_link_validator_list):
+        result = self.tree.update_link(
+            str(self.tree.root_node.pk),
+            child_id=self.link1.child.entity_id,
+            relative_credits=1,
+            access_condition=False,
+            is_mandatory=True,
+            block=123,
+            link_type=None,
+            comment="Comment",
+            comment_english="Comment english"
+        )
+        self.assertTrue(mock_update_link_validator_list.called)
+        self.assertIsInstance(result, Link)

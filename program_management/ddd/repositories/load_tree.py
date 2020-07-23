@@ -31,19 +31,17 @@ from base.models.enums.link_type import LinkTypes
 from base.models.enums.quadrimesters import DerogationQuadrimester
 from education_group.models.group_year import GroupYear
 from osis_common.decorators.deprecated import deprecated
+from program_management.ddd.domain.link import factory as link_factory, LinkIdentity
+from program_management.ddd.business_types import *
+from program_management.ddd.domain import program_tree
 from program_management.ddd.domain.education_group_version_academic_year import EducationGroupVersionAcademicYear
-from program_management.ddd.domain.link import factory as link_factory
 from program_management.ddd.domain.prerequisite import NullPrerequisite, Prerequisite
-from program_management.ddd.domain.program_tree import ProgramTree, ProgramTreeIdentity
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersion, ProgramTreeVersionNotFoundException, \
-    ProgramTreeVersionIdentity
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionNotFoundException
 from program_management.ddd.repositories import load_node, load_prerequisite, \
     load_authorized_relationship
 # Typing
 from program_management.ddd.repositories.load_prerequisite import TreeRootId, NodeId
 from program_management.models.education_group_version import EducationGroupVersion
-
-from program_management.ddd.business_types import *
 
 GroupElementYearColumnName = str
 LinkKey = str  # <parent_id>_<child_id>  Example : "123_124"
@@ -146,6 +144,7 @@ def __load_tree_links(tree_structure: TreeStructure) -> Dict[LinkKey, 'Link']:
         'relative_credits',
         'min_credits',
         'max_credits',
+        'access_condition',
         'is_mandatory',
         'block',
         'comment',
@@ -193,7 +192,7 @@ def __build_tree(
             parent_path = '|'.join(s_dict['path'].split('|')[:-1])
             structure_by_parent.setdefault(parent_path, []).append(s_dict)
     root_node.children = __build_children(str(root_node.pk), structure_by_parent, nodes, links, prerequisites)
-    tree = ProgramTree(root_node, authorized_relationships=load_authorized_relationship.load())
+    tree = program_tree.ProgramTree(root_node, authorized_relationships=load_authorized_relationship.load())
     return tree
 
 
@@ -225,6 +224,12 @@ def __build_children(
         link_node = links['_'.join([str(parent_id), str(child_node.pk)])]
         link_node.parent = nodes[parent_id]
         link_node.child = child_node
+        link_node.entity_id = LinkIdentity(
+            parent_code=link_node.parent.code,
+            child_code=link_node.child.code,
+            parent_year=link_node.parent.year,
+            child_year=link_node.child.year
+        )
         children.append(link_node)
     return children
 
@@ -275,10 +280,3 @@ def find_all_versions_academic_year(acronym: str,
     for elem in qs:
         results.append(EducationGroupVersionAcademicYear(elem.educationgroupversion))
     return results
-
-
-def load_from_year_and_code(year: int, code: str) -> 'ProgramTree':
-    obj = GroupYear.objects.get(academic_year__year=year,
-                                partial_acronym=code)
-
-    return load(obj.element.pk) if obj else None
