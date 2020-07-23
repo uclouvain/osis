@@ -98,7 +98,7 @@ class MaximumCertificateAimType2Reached(BusinessException):
 
 
 class TrainingHaveEnrollments(BusinessException):
-    def __init__(self, *args, enrollment_count=None, **kwargs):
+    def __init__(self, enrollment_count: int, **kwargs):
         message = ngettext_lazy(
             "%(count_enrollment)d student is enrolled in the training.",
             "%(count_enrollment)d students are enrolled in the training.",
@@ -114,7 +114,7 @@ class TrainingHaveLinkWithEPC(BusinessException):
 
 
 class MiniTrainingHaveEnrollments(BusinessException):
-    def __init__(self, *args, enrollment_count=None, **kwargs):
+    def __init__(self, enrollment_count: int, **kwargs):
         message = ngettext_lazy(
             "%(count_enrollment)d student is enrolled in the mini-training.",
             "%(count_enrollment)d students are enrolled in the mini-training.",
