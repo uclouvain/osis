@@ -37,15 +37,26 @@ from base.forms.education_group.version import SpecificVersionForm
 from base.models.education_group_year import EducationGroupYear
 from base.views.common import display_success_messages
 from base.views.mixins import AjaxTemplateMixin
+from education_group.ddd.domain.service.identity_search import TrainingIdentitySearch
+from education_group.ddd.domain.training import TrainingIdentity
 from osis_common.decorators.ajax import ajax_required
 from osis_role.contrib.views import AjaxPermissionRequiredMixin
+from program_management.ddd.domain.node import NodeIdentity
 from program_management.models.education_group_version import EducationGroupVersion
 
 
 class CreateProgramTreeVersion(AjaxPermissionRequiredMixin, SuccessMessageMixin, AjaxTemplateMixin, CreateView):
-    template_name = "education_group/../../templates/tree_version/create_specific_version_inner.html"
+    template_name = "tree_version/create_specific_version_inner.html"
     form_class = SpecificVersionForm
     permission_required = 'base.create_specific_version'
+
+    @cached_property
+    def node_identity(self) -> 'NodeIdentity':
+        return NodeIdentity(code=self.kwargs['code'], year=self.kwargs['year'])
+
+    @cached_property
+    def training_identity(self) -> 'TrainingIdentity':
+        return TrainingIdentitySearch().get_from_node_identity(self.node_identity)
 
     @cached_property
     def person(self):
@@ -66,13 +77,13 @@ class CreateProgramTreeVersion(AjaxPermissionRequiredMixin, SuccessMessageMixin,
         form_kwargs = super().get_form_kwargs()
         form_kwargs["save_type"] = self.request.POST.get("save_type")
         form_kwargs['education_group_year'] = self.education_group_year
-        form_kwargs['person'] = self.person
         form_kwargs.pop('instance')
         return form_kwargs
 
     def get_context_data(self, **kwargs):
         context = super(CreateProgramTreeVersion, self).get_context_data(**kwargs)
-        context['education_group_year'] = self.education_group_year
+        context['training_identity'] = self.training_identity
+        context['node_identity'] = self.node_identity
         context['form'] = self.get_form()
         return context
 
