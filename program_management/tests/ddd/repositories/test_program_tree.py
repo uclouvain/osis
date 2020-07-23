@@ -33,6 +33,7 @@ from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 from program_management.ddd.repositories import program_tree
 from program_management.ddd.repositories.program_tree import ProgramTreeRepository
+from program_management.models.education_group_version import EducationGroupVersion
 from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory
 
@@ -158,6 +159,16 @@ class TestDeleteProgramTree(TestCase):
         )
 
         self.assertEqual(GroupElementYear.objects.all().count(), 0)
+
+    def test_assert_all_version_are_removed(self):
+        ProgramTreeRepository.delete(
+            self.program_tree_id,
+            delete_orphan_group_service=Mock(),
+            delete_orphan_training_service=Mock(),
+            delete_orphan_minitraining_service=Mock()
+        )
+
+        self.assertEqual(EducationGroupVersion.objects.all().count(), 0)
 
     def test_assert_called_right_service_according_to_node_type(self):
         mock_delete_training_service = Mock()

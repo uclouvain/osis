@@ -34,6 +34,7 @@ from osis_common.ddd.interface import Entity
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories import persist_tree, load_tree, node
+from program_management.models.education_group_version import EducationGroupVersion
 from program_management.models.element import Element
 
 
@@ -63,6 +64,7 @@ class ProgramTreeRepository(interface.AbstractRepository):
 
         with transaction.atomic():
             GroupElementYear.objects.filter(pk__in=(link.pk for link in links)).delete()
+
             for node in nodes:
                 if node.is_group():
                     cmd = command.DeleteOrphanGroupCommand(code=node.code, year=node.year)
@@ -73,6 +75,7 @@ class ProgramTreeRepository(interface.AbstractRepository):
                         acronym=tree_version_id.offer_acronym,
                         year=tree_version_id.year
                     )
+                    _delete_standard_version(node.entity_id)
                     delete_orphan_training_service(cmd)
                 elif node.is_mini_training():
                     tree_version_id = ProgramTreeVersionIdentitySearch().get_from_node_identity(node.entity_id)
@@ -80,6 +83,7 @@ class ProgramTreeRepository(interface.AbstractRepository):
                         acronym=tree_version_id.offer_acronym,
                         year=tree_version_id.year
                     )
+                    _delete_standard_version(node.entity_id)
                     delete_orphan_minitraining_service(cmd)
 
     @classmethod
@@ -99,3 +103,11 @@ class ProgramTreeRepository(interface.AbstractRepository):
             group_year__academic_year__year=entity_id.year
         ).pk
         return load_tree.load(tree_root_id)
+
+
+def _delete_standard_version(node_id: 'NodeIdentity'):
+    EducationGroupVersion.standard.filter(
+        root_group__partial_acronym=node_id.code,
+        root_group__academic_year__year=node_id.year,
+        is_transition=False
+    ).delete()
