@@ -55,8 +55,8 @@ class TestCreate(TestCase):
         self.assertTrue(context["mini_training_form"])
 
     @mock.patch('education_group.views.mini_training.create.MiniTrainingCreateView.get_form')
-    @mock.patch("education_group.ddd.service.write.create_orphan_mini_training_service."
-                "create_and_postpone_orphan_mini_training")
+    @mock.patch("program_management.ddd.service.write.create_mini_training_with_program_tree."
+                "create_and_report_mini_training_with_program_tree")
     def test_should_call_create_mini_training_service_when_request_is_post(self, mock_service_orphan, mock_form):
         mini_training_identity = mini_training.MiniTrainingIdentity(code="CODE", year=2020)
         mock_service_orphan.return_value = [mini_training_identity]

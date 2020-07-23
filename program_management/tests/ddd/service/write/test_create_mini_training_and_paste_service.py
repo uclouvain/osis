@@ -22,14 +22,14 @@
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
 import mock
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, TestCase
 
 from education_group.ddd.domain import mini_training
 from program_management.ddd import command
 from program_management.ddd.service.write import create_and_attach_mini_training_service
 
 
-class TestCreateMiniTrainingAndAttach(SimpleTestCase):
+class TestCreateMiniTrainingAndAttach(TestCase):
     def setUp(self) -> None:
         self.command = command.CreateMiniTrainingAndPasteCommand(
             code="CODE",
@@ -55,13 +55,14 @@ class TestCreateMiniTrainingAndAttach(SimpleTestCase):
         )
 
     @mock.patch("program_management.ddd.service.write.paste_element_service.paste_element")
-    @mock.patch("education_group.ddd.service.write.create_orphan_mini_training_service.create_and_postpone_orphan_mini_training")
+    @mock.patch("program_management.ddd.service.write.create_mini_training_with_program_tree."
+                "create_and_report_mini_training_with_program_tree")
     def test_should_call_create_orphan_service_and_paste_element_service_when_called(
             self,
             mock_create_service,
             mock_paste_element):
         mini_training_identity = mini_training.MiniTrainingIdentity(code="CODE", year=2020)
-        mock_create_service.return_value = mini_training_identity
+        mock_create_service.return_value = [mini_training_identity]
         resulting_identity = create_and_attach_mini_training_service.create_mini_training_and_paste(self.command)
 
         self.assertTrue(mock_create_service.called)

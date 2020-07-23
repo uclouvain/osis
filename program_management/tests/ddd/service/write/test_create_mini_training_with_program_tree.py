@@ -33,14 +33,17 @@ from program_management.ddd.service.write import create_training_with_program_tr
 
 
 class TestCreateAndReportMiniTrainingWithProgramTree(TestCase):
-    @mock.patch("program_management.ddd.service.write.postpone_tree_version_service.postpone_program_tree_version")
+    @mock.patch("program_management.ddd.service.write.postpone_tree_version_service_mini_training"
+                ".postpone_program_tree_version")
     @mock.patch("program_management.ddd.service.write.create_standard_version_service.create_standard_program_version")
-    @mock.patch("program_management.ddd.service.write.postpone_program_tree_service.postpone_program_tree")
-    @mock.patch("program_management.ddd.service.write.create_standard_program_tree_service.create_standard_program_tree")
+    @mock.patch("program_management.ddd.service.write.postpone_program_tree_service_mini_training."
+                "postpone_program_tree")
+    @mock.patch("program_management.ddd.service.write.create_standard_program_tree_service."
+                "create_standard_program_tree")
     @mock.patch("education_group.ddd.service.write.create_group_service.create_orphan_group")
     @mock.patch("education_group.ddd.service.write.create_orphan_mini_training_service."
                 "create_and_postpone_orphan_mini_training")
-    def test_should_create_trainings_until_postponement_limit(
+    def test_should_create_mini_trainings_until_postponement_limit(
             self,
             mock_create_and_postpone_orphan_mini_training,
             mock_create_orphan_group,

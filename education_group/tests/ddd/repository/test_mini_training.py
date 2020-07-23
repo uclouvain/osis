@@ -29,6 +29,7 @@ from base.models.enums import education_group_types
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.education_group_type import MiniTrainingEducationGroupTypeFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from education_group.ddd.domain import exception
 from education_group.ddd.domain._campus import Campus
@@ -105,7 +106,7 @@ class TestMiniTrainingRepositoryCreateMethod(TestCase):
 class TestMiniTrainingRepositoryGetMethod(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.version = EducationGroupVersionFactory(root_group__education_group_type__minitraining=True)
+        cls.education_group_year_db = EducationGroupYearFactory(education_group_type__minitraining=True)
 
     def test_should_raise_mini_training_not_found_exception_when_matching_mini_training_does_not_exist(self):
         inexistent_mini_training_identity = MiniTrainingIdentity(code="INEXISTENT", year=2025)
@@ -114,8 +115,8 @@ class TestMiniTrainingRepositoryGetMethod(TestCase):
 
     def test_should_return_domain_object_when_matching_mini_training_found(self):
         existing_mini_training_identity = MiniTrainingIdentity(
-            code=self.version.root_group.partial_acronym,
-            year=self.version.root_group.academic_year.year
+            code=self.education_group_year_db.partial_acronym,
+            year=self.education_group_year_db.academic_year.year
         )
         result = mini_training.MiniTrainingRepository.get(existing_mini_training_identity)
         self.assertEqual(
