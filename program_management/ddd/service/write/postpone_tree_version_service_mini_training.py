@@ -27,35 +27,39 @@ from typing import List
 
 from django.db import transaction
 
-from education_group.ddd import command
 from education_group.ddd.domain.mini_training import MiniTrainingIdentity
-from education_group.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
+from education_group.ddd.domain.training import TrainingIdentity
 from education_group.ddd.repository.mini_training import MiniTrainingRepository
-from education_group.ddd.service.write import copy_mini_training_service
+from education_group.ddd.repository.training import TrainingRepository
+from program_management.ddd.command import PostponeProgramTreeVersionCommand, CopyTreeVersionToNextYearCommand
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
+from program_management.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
+from program_management.ddd.service.write import copy_program_version_service
 
 
 @transaction.atomic()
-def postpone_mini_training(postpone_cmd: command.PostponeMiniTrainingCommand) -> List['MiniTrainingIdentity']:
+def postpone_program_tree_version(
+        postpone_cmd: 'PostponeProgramTreeVersionCommand'
+) -> List['ProgramTreeVersionIdentity']:
+
     identities_created = []
 
     # GIVEN
-    from_year = postpone_cmd.postpone_from_year
-    copy_from_mini_training = MiniTrainingRepository().get(
-        entity_id=MiniTrainingIdentity(code=postpone_cmd.code, year=from_year)
-    )
-    end_postponement_year = CalculateEndPostponement.calculate_year_of_end_postponement_for_mini(
-        copy_from_mini_training
+    from_year = postpone_cmd.from_year
+    end_postponement_year = CalculateEndPostponement.calculate_year_of_end_postponement_mini_training(
+        mini_training_identity=MiniTrainingIdentity(code=postpone_cmd.from_code, year=postpone_cmd.from_year),
+        mini_training_repository=MiniTrainingRepository()
     )
 
     # WHEN
     while from_year < end_postponement_year:
-
-        identity_next_year = copy_mini_training_service.copy_mini_training_to_next_year(
-            copy_cmd=command.CopyMiniTrainingToNextYearCommand(
-                code=postpone_cmd.code,
-                postpone_from_year=from_year
-            )
+        cmd_copy_from = CopyTreeVersionToNextYearCommand(
+            from_offer_acronym=postpone_cmd.from_offer_acronym,
+            from_year=from_year,
+            from_version_name=postpone_cmd.from_version_name,
+            from_is_transition=postpone_cmd.from_is_transition,
         )
+        identity_next_year = copy_program_version_service.copy_tree_version_to_next_year(cmd_copy_from)
 
         # THEN
         identities_created.append(identity_next_year)

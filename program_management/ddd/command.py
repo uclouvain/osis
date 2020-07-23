@@ -315,6 +315,7 @@ class PostponeProgramTreeVersionCommand(interface.CommandRequest):
     from_version_name = attr.ib(type=str)
     from_year = attr.ib(type=int)
     from_is_transition = attr.ib(type=bool)
+    from_code = attr.ib(type=str, default=None)
 
 
 @attr.s(frozen=True, slots=True)

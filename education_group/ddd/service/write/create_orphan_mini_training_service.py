@@ -38,7 +38,6 @@ def create_and_postpone_orphan_mini_training(
     mini_training_object = MiniTrainingBuilder().build_from_create_cmd(cmd)
 
     mini_training_identity = MiniTrainingRepository.create(mini_training_object)
-
     mini_training_identities = postpone_mini_training_service.postpone_mini_training(
         command.PostponeMiniTrainingCommand(
             code=cmd.code,

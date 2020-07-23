@@ -91,7 +91,7 @@ msgid "Block"
 msgstr "Bloc"
 
 msgid "Category"
-msgstr "Bachelier de la Communauté flamande de Belgique"
+msgstr "Catégorie"
 
 msgid "Central admission manager"
 msgstr "Gestionnaire central d'admission"
@@ -364,6 +364,9 @@ msgstr ""
 
 msgid "New Mini-Training"
 msgstr "Nouvelle Mini-Formation"
+
+msgid "New training"
+msgstr "Nouvelle Formation"
 
 #, python-format
 msgctxt "female"

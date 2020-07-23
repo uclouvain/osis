@@ -361,6 +361,9 @@ msgstr ""
 msgid "New Mini-Training"
 msgstr ""
 
+msgid "New training"
+msgstr ""
+
 #, python-format
 msgctxt "female"
 msgid ""

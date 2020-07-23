@@ -27,33 +27,35 @@ from typing import List
 
 from django.db import transaction
 
-from education_group.ddd import command
 from education_group.ddd.domain.mini_training import MiniTrainingIdentity
-from education_group.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
 from education_group.ddd.repository.mini_training import MiniTrainingRepository
-from education_group.ddd.service.write import copy_mini_training_service
+from program_management.ddd.command import PostponeProgramTreeCommand, CopyProgramTreeToNextYearCommand
+from program_management.ddd.domain.program_tree import ProgramTreeIdentity
+from program_management.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
+from program_management.ddd.service.write import copy_program_tree_service
 
 
 @transaction.atomic()
-def postpone_mini_training(postpone_cmd: command.PostponeMiniTrainingCommand) -> List['MiniTrainingIdentity']:
+def postpone_program_tree(
+        postpone_cmd: 'PostponeProgramTreeCommand'
+) -> List['ProgramTreeIdentity']:
+
     identities_created = []
 
     # GIVEN
-    from_year = postpone_cmd.postpone_from_year
-    copy_from_mini_training = MiniTrainingRepository().get(
-        entity_id=MiniTrainingIdentity(code=postpone_cmd.code, year=from_year)
-    )
-    end_postponement_year = CalculateEndPostponement.calculate_year_of_end_postponement_for_mini(
-        copy_from_mini_training
+    from_year = postpone_cmd.from_year
+    end_postponement_year = CalculateEndPostponement.calculate_year_of_end_postponement_mini_training(
+        mini_training_identity=MiniTrainingIdentity(code=postpone_cmd.from_code, year=postpone_cmd.from_year),
+        mini_training_repository=MiniTrainingRepository()
     )
 
     # WHEN
     while from_year < end_postponement_year:
 
-        identity_next_year = copy_mini_training_service.copy_mini_training_to_next_year(
-            copy_cmd=command.CopyMiniTrainingToNextYearCommand(
-                code=postpone_cmd.code,
-                postpone_from_year=from_year
+        identity_next_year = copy_program_tree_service.copy_program_tree_to_next_year(
+            copy_cmd=CopyProgramTreeToNextYearCommand(
+                code=postpone_cmd.from_code,
+                year=from_year,
             )
         )
 

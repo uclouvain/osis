@@ -29,12 +29,12 @@ from django.db import transaction
 
 from education_group.ddd import command
 from education_group.ddd.business_types import *
-from education_group.ddd.service.write import create_group_service, create_orphan_training_service, \
-    create_orphan_mini_training_service
+from education_group.ddd.service.write import create_group_service, create_orphan_mini_training_service
 from program_management.ddd.command import CreateStandardVersionCommand, PostponeProgramTreeVersionCommand, \
     PostponeProgramTreeCommand
-from program_management.ddd.service.write import create_standard_version_service, postpone_tree_version_service, \
-    create_standard_program_tree_service, postpone_program_tree_service
+from program_management.ddd.service.write import create_standard_version_service, create_standard_program_tree_service, \
+    postpone_program_tree_service_mini_training, \
+    postpone_tree_version_service_mini_training
 
 
 @transaction.atomic()
@@ -65,7 +65,7 @@ def create_and_report_mini_training_with_program_tree(
     )
 
     # 3. Postpone Program tree
-    postpone_program_tree_service.postpone_program_tree(
+    postpone_program_tree_service_mini_training.postpone_program_tree(
         PostponeProgramTreeCommand(
             from_code=program_tree_identity.code,
             from_year=program_tree_identity.year,
@@ -83,12 +83,13 @@ def create_and_report_mini_training_with_program_tree(
     )
 
     # 5. Postpone standard version of program tree
-    postpone_tree_version_service.postpone_program_tree_version(
+    postpone_tree_version_service_mini_training.postpone_program_tree_version(
         PostponeProgramTreeVersionCommand(
             from_offer_acronym=program_tree_version_identity.offer_acronym,
             from_version_name=program_tree_version_identity.version_name,
             from_year=program_tree_version_identity.year,
             from_is_transition=program_tree_version_identity.is_transition,
+            from_code=create_training_cmd.code
         )
     )
 
@@ -113,6 +114,6 @@ def __convert_to_group_command(
         organization_name=mini_training_cmd.organization_name,
         remark_fr=mini_training_cmd.remark_fr,
         remark_en=mini_training_cmd.remark_en,
-        start_year=mini_training_cmd.year,
+        start_year=mini_training_cmd.start_year,
         end_year=mini_training_cmd.end_year,
     )

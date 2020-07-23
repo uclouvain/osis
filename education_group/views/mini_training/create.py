@@ -36,14 +36,14 @@ from base.views.common import display_success_messages
 from education_group.ddd import command
 from education_group.ddd.domain import mini_training, exception
 from education_group.ddd.service.read import get_group_service
-from education_group.ddd.service.write import create_orphan_mini_training_service
 from education_group.forms import mini_training as mini_training_form
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command as command_pgrm
 from program_management.ddd.business_types import *
 from program_management.ddd.service.read import node_identity_service
-from program_management.ddd.service.write import create_and_attach_mini_training_service
+from program_management.ddd.service.write import create_and_attach_mini_training_service, \
+    create_mini_training_with_program_tree
 
 FormTab = collections.namedtuple("FormTab", "text active display include_html")
 
@@ -70,9 +70,10 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
                     self._generate_create_and_paste_command_from_valid_form(form)
                 )
             else:
-                mini_training_identities = create_orphan_mini_training_service.create_and_postpone_orphan_mini_training(
-                    self._generate_create_command_from_valid_form(form)
-                )
+                mini_training_identities = create_mini_training_with_program_tree.\
+                    create_and_report_mini_training_with_program_tree(
+                        self._generate_create_command_from_valid_form(form)
+                    )
             self.set_success_url(mini_training_identities[0])
             display_success_messages(self.request, self.get_success_msg(mini_training_identities), extra_tags='safe')
             return super().form_valid(form)
