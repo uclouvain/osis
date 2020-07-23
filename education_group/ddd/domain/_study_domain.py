@@ -26,17 +26,31 @@
 from osis_common.ddd import interface
 
 
-class StudyDomain(interface.ValueObject):
-    def __init__(self, decree_name: str, code: str, name: str):
+class StudyDomainIdentity(interface.EntityIdentity):
+    def __init__(self, decree_name: str, code: str):
         self.decree_name = decree_name
         self.code = code
-        self.name = name
+
+    def __eq__(self, other):
+        return self.decree_name == other.decree_name and self.code == other.code
+
+    def __hash__(self):
+        return hash(self.decree_name + self.code)
+
+
+class StudyDomain(interface.Entity):
+    def __init__(self, entity_id: StudyDomainIdentity, domain_name: str):
+        super(StudyDomain, self).__init__(entity_id=entity_id)
+        self.name = domain_name
+        self.entity_id = entity_id
+
+    @property
+    def code(self) -> str:
+        return self.entity_id.code
+
+    @property
+    def decree_name(self) -> str:
+        return self.entity_id.decree_name
 
     def __str__(self):
         return "{obj.decree_name} : {obj.code} {obj.name}".format(obj=self)
-
-    def __eq__(self, other):
-        return self.decree_name == other.decree_name and self.code == other.code and self.name == other.name
-
-    def __hash__(self):
-        return hash(self.decree_name + self.code + self.name)

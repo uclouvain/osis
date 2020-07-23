@@ -36,11 +36,10 @@ from base.models.education_group_type import EducationGroupType as EducationGrou
 from base.models.entity import Entity as EntityModelDb
 from base.models.entity_version import EntityVersion as EntityVersionModelDb
 from base.models.campus import Campus as CampusModelDb
-from education_group.ddd.domain.group import GroupUnannualizedIdentity
+from education_group.ddd.domain.service.enum_converter import EducationGroupTypeConverter
 from education_group.models.group_year import GroupYear as GroupYearModelDb
 from education_group.models.group import Group as GroupModelDb
 from base.models.enums.constraint_type import ConstraintTypeEnum
-from base.models.enums.education_group_types import GroupType, TrainingType, MiniTrainingType
 from education_group.ddd.domain import exception, group
 from education_group.ddd.domain.group import GroupIdentity
 from education_group.ddd.domain._campus import Campus
@@ -55,7 +54,7 @@ from osis_common.ddd import interface
 
 class GroupRepository(interface.AbstractRepository):
     @classmethod
-    def create(cls, group: 'Group') -> 'GroupIdentity':
+    def create(cls, group: 'Group', **_) -> 'GroupIdentity':
         try:
             academic_year = AcademicYearModelDb.objects.only('id').get(year=group.year)
             education_group_type = EducationGroupTypeModelDb.objects.only('id').get(name=group.type.name)
@@ -79,8 +78,13 @@ class GroupRepository(interface.AbstractRepository):
         except CampusModelDb.DoesNotExist:
             raise TeachingCampusNotFound
 
-        group_upserted, _ = GroupModelDb.objects.update_or_create(
-            pk=getattr(group.unannualized_identity, 'uuid', None),
+        group_qs = GroupModelDb.objects.filter(
+            groupyear__partial_acronym=group.code
+        ).order_by('groupyear__academic_year__year')
+        group_pk = group_qs.only('pk').last().pk if group_qs else None
+
+        group_upserted, created = GroupModelDb.objects.update_or_create(
+            pk=group_pk,
             defaults={'start_year': academic_year, 'end_year': end_year}
         )
         try:
@@ -108,7 +112,7 @@ class GroupRepository(interface.AbstractRepository):
         )
 
     @classmethod
-    def update(cls, group: 'Group') -> 'GroupIdentity':
+    def update(cls, group: 'Group', **_) -> 'GroupIdentity':
         try:
             management_entity = EntityVersionModelDb.objects.current(timezone.now()).only('entity_id').get(
                 acronym=group.management_entity.acronym,
@@ -182,7 +186,7 @@ class GroupRepository(interface.AbstractRepository):
         return []
 
     @classmethod
-    def delete(cls, entity_id: 'GroupIdentity') -> None:
+    def delete(cls, entity_id: 'GroupIdentity', **_) -> None:
         raise NotImplementedError
 
 
@@ -190,9 +194,7 @@ def _convert_db_model_to_ddd_model(obj: GroupYearModelDb) -> 'Group':
     entity_id = GroupIdentity(code=obj.partial_acronym, year=obj.academic_year.year)
     return group.Group(
         entity_identity=entity_id,
-        # TODO: Create UUID field on group model and use it insteaf of group_id
-        unannualized_identity=GroupUnannualizedIdentity(uuid=obj.group_id),
-        type=_convert_type(obj.education_group_type),
+        type=EducationGroupTypeConverter.convert_type_str_to_enum(obj.education_group_type.name),
         abbreviated_title=obj.acronym,
         titles=Titles(
             title_fr=obj.title_fr,
@@ -218,13 +220,3 @@ def _convert_db_model_to_ddd_model(obj: GroupYearModelDb) -> 'Group':
         start_year=obj.group.start_year.year,
         end_year=obj.group.end_year.year if obj.group.end_year else None,
     )
-
-
-def _convert_type(education_group_type):
-    if education_group_type.name in GroupType.get_names():
-        return GroupType[education_group_type.name]
-    elif education_group_type.name in TrainingType.get_names():
-        return TrainingType[education_group_type.name]
-    elif education_group_type.name in MiniTrainingType.get_names():
-        return MiniTrainingType[education_group_type.name]
-    raise Exception('Unsupported group type')

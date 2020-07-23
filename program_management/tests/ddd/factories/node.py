@@ -27,11 +27,17 @@ import factory.fuzzy
 
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType, GroupType
 from base.models.enums.learning_container_year_types import LearningContainerYearType
-from program_management.ddd.domain.node import NodeEducationGroupYear, NodeLearningUnitYear, NodeGroupYear, Node
+from program_management.ddd.domain.node import NodeEducationGroupYear, NodeLearningUnitYear, NodeGroupYear, Node, \
+    NodeIdentity
+from program_management.models.enums.node_type import NodeType
 
 
 def generate_end_date(node):
     return node.year + 10
+
+
+def generate_node_identity(node: Node) -> NodeIdentity:
+    return NodeIdentity(code=node.code, year=node.year)
 
 
 class NodeFactory(factory.Factory):
@@ -41,6 +47,7 @@ class NodeFactory(factory.Factory):
     title = factory.Sequence(lambda n: 'Acronym%02d' % n)
     year = factory.fuzzy.FuzzyInteger(low=1999, high=2099)
     end_date = factory.LazyAttribute(generate_end_date)
+    entity_id = factory.LazyAttribute(generate_node_identity)
 
 
 class NodeEducationGroupYearFactory(NodeFactory):
@@ -53,7 +60,7 @@ class NodeEducationGroupYearFactory(NodeFactory):
     offer_title_en = factory.fuzzy.FuzzyText(length=240)
     offer_partial_title_fr = factory.fuzzy.FuzzyText(length=240)
     offer_partial_title_en = factory.fuzzy.FuzzyText(length=240)
-    children = None
+    children = factory.LazyFunction(list)
 
 
 class NodeGroupYearFactory(NodeFactory):
@@ -68,7 +75,7 @@ class NodeGroupYearFactory(NodeFactory):
     offer_partial_title_fr = factory.fuzzy.FuzzyText(length=240)
     offer_partial_title_en = factory.fuzzy.FuzzyText(length=240)
     end_year = factory.SelfAttribute('.end_date')
-    children = None
+    children = factory.LazyFunction(list)
 
     class Params:
         minitraining = factory.Trait(
@@ -85,8 +92,8 @@ class NodeLearningUnitYearFactory(NodeFactory):
         model = NodeLearningUnitYear
         abstract = False
 
-    node_type = None
-    is_prerequisite_of = []
+    node_type = NodeType.LEARNING_UNIT
+    is_prerequisite_of = factory.LazyFunction(list)
     credits = factory.fuzzy.FuzzyDecimal(0, 10, precision=1)
     specific_title_en = factory.fuzzy.FuzzyText(length=240)
     common_title_en = factory.fuzzy.FuzzyText(length=240)

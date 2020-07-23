@@ -41,46 +41,33 @@ class LinkIdentity(interface.EntityIdentity):
     child_year = attr.ib(type=int)
 
 
+@attr.s(slots=True, str=False, hash=False, eq=False)
 class Link(interface.Entity):
 
-    def __init__(
-        self,
-        parent: 'Node',
-        child: 'Node',
-        pk: int = None,
-        relative_credits: int = None,
-        min_credits: int = None,
-        max_credits: int = None,
-        is_mandatory: bool = False,
-        block: str = None,
-        access_condition: bool = False,
-        comment: str = None,
-        comment_english: str = None,
-        own_comment: str = None,
-        quadrimester_derogation: DerogationQuadrimester = None,
-        link_type: LinkTypes = None,
-        order: int = None
-    ):
-        self.pk = pk
-        self.parent = parent
-        self.child = child
-        self.relative_credits = relative_credits
-        self.min_credits = min_credits
-        self.max_credits = max_credits
-        self.is_mandatory = is_mandatory
-        self.block = block
-        self.access_condition = access_condition
-        self.comment = comment
-        self.comment_english = comment_english
-        self.own_comment = own_comment
-        self.quadrimester_derogation = quadrimester_derogation
-        self.link_type = link_type
-        self.order = order
-        self._has_changed = False
-        if parent and child:
-            super().__init__(
-                entity_id=LinkIdentity(self.parent.code, self.child.code, self.parent.year, self.child.year)
-            )
+    parent = attr.ib(type='Node')
+    child = attr.ib(type='Node')
+    pk = attr.ib(type=int, default=None)
+    relative_credits = attr.ib(type=int, default=None)
+    min_credits = attr.ib(type=int, default=None)
+    max_credits = attr.ib(type=int, default=None)
+    is_mandatory = attr.ib(type=bool, default=False)
+    block = attr.ib(type=str, default=None)
+    access_condition = attr.ib(type=bool, default=False)
+    comment = attr.ib(type=str, default=None)
+    comment_english = attr.ib(type=str, default=None)
+    own_comment = attr.ib(type=str, default=None)
+    quadrimester_derogation = attr.ib(type=DerogationQuadrimester, default=None)
+    link_type = attr.ib(type=LinkTypes, default=None)
+    order = attr.ib(type=int, default=None)
+
+    entity_id = attr.ib(type=LinkIdentity)
+
+    _has_changed = False
+
+    @entity_id.default
+    def _link_identity(self) -> LinkIdentity:
+        if self.parent and self.child:
+            return LinkIdentity(self.parent.code, self.child.code, self.parent.year, self.child.year)
 
     @property
     def has_changed(self):
@@ -88,6 +75,14 @@ class Link(interface.Entity):
 
     def __str__(self):
         return "%(parent)s - %(child)s" % {'parent': self.parent, 'child': self.child}
+
+    def __eq__(self, other):
+        if isinstance(other, Link):
+            return self.entity_id == other.entity_id
+        return False
+
+    def __hash__(self):
+        return hash(self.entity_id)
 
     def is_reference(self):
         return self.link_type == LinkTypes.REFERENCE
@@ -135,6 +130,15 @@ class LinkWithChildBranch(Link):
 
 
 class LinkFactory:
+
+    def copy_to_next_year(self, copy_from_link: 'Link', parent_next_year: 'Node', child_next_year: 'Node') -> 'Link':
+        link_next_year = attr.evolve(
+            copy_from_link,
+            parent=parent_next_year,
+            child=child_next_year,
+        )  # TODO :: to move into LinkBuilder
+        link_next_year._has_changed = True
+        return link_next_year
 
     def get_link(self, parent: 'Node', child: 'Node', **kwargs) -> Link:
         if parent and parent.node_type == NodeType.LEARNING_UNIT.name:
