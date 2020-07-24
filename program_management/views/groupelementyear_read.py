@@ -24,20 +24,16 @@
 import datetime
 
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils import translation
-from django.utils.translation import gettext as _
 from django.views.generic import FormView
 from waffle.decorators import waffle_switch
 
 from base.forms.education_group.common import SelectLanguage
 from base.models.enums.education_group_types import GroupType
-from base.views.common import display_warning_messages
 from base.views.mixins import FlagMixin, AjaxTemplateMixin
 from osis_common.document.pdf_build import render_pdf
 from program_management.ddd.domain.node import NodeIdentity
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionNotFoundException
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch, \
     ProgramTreeIdentitySearch
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
@@ -55,13 +51,9 @@ USUAL_NUMBER_OF_BLOCKS = 3
 @waffle_switch('education_group_year_generate_pdf')
 def pdf_content(request, year, code, language):
     node_id = NodeIdentity(code=code, year=year)
-    try:
-        program_tree_id = ProgramTreeVersionIdentitySearch().get_from_node_identity(node_id)
-        program_tree_version = ProgramTreeVersionRepository.get(program_tree_id)
-    except ProgramTreeVersionNotFoundException:
-        message = _("Program tree version not found for node {} {}").format(code, year)
-        display_warning_messages(request, message)
-        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+    program_tree_id = ProgramTreeVersionIdentitySearch().get_from_node_identity(node_id)
+    program_tree_version = ProgramTreeVersionRepository.get(program_tree_id)
     if program_tree_version:
         tree = program_tree_version.get_tree()
     else:
