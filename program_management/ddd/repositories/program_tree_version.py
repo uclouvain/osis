@@ -118,17 +118,16 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
     ) -> None:
         program_tree_version = cls.get(entity_id)
 
-        with transaction.atomic():
-            EducationGroupVersion.objects.filter(
-                version_name=entity_id.version_name,
-                offer__acronym=entity_id.offer_acronym,
-                offer__academic_year__year=entity_id.year,
-                is_transition=entity_id.is_transition,
-            ).delete()
+        EducationGroupVersion.objects.filter(
+            version_name=entity_id.version_name,
+            offer__acronym=entity_id.offer_acronym,
+            offer__academic_year__year=entity_id.year,
+            is_transition=entity_id.is_transition,
+        ).delete()
 
-            root_node = program_tree_version.tree.root_node
-            cmd = command.DeleteProgramTreeCommand(code=root_node.code, year=root_node.year)
-            delete_program_tree_service(cmd)
+        root_node = program_tree_version.tree.root_node
+        cmd = command.DeleteProgramTreeCommand(code=root_node.code, year=root_node.year)
+        delete_program_tree_service(cmd)
 
     @classmethod
     def search_all_versions_from_root_node(cls, root_node_identity: 'NodeIdentity') -> List['ProgramTreeVersion']:

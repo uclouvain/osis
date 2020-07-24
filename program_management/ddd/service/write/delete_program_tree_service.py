@@ -21,6 +21,8 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+from django.db import transaction
+
 from education_group.ddd.service.write import delete_orphan_group_service, delete_orphan_training_service, \
     delete_orphan_mini_training_service
 from program_management.ddd import command
@@ -29,6 +31,7 @@ from program_management.ddd.repositories.program_tree import ProgramTreeReposito
 from program_management.ddd.validators.validators_by_business_action import DeleteProgramTreeValidatorList
 
 
+@transaction.atomic()
 def delete_program_tree(cmd: command.DeleteProgramTreeCommand) -> ProgramTreeIdentity:
     program_tree_id = ProgramTreeIdentity(code=cmd.code, year=cmd.year)
     program_tree = ProgramTreeRepository.get(program_tree_id)

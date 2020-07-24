@@ -21,6 +21,8 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+from django.db import transaction
+
 from program_management.ddd import command
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, STANDARD
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
@@ -28,6 +30,7 @@ from program_management.ddd.service.write import delete_program_tree_service
 from program_management.ddd.validators.validators_by_business_action import DeleteStandardVersionValidatorList
 
 
+@transaction.atomic()
 def delete_standard_version(cmd: command.DeleteStandardVersionCommand) -> ProgramTreeVersionIdentity:
     program_tree_version_id = ProgramTreeVersionIdentity(
         offer_acronym=cmd.acronym,
