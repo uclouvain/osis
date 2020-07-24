@@ -23,21 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from base.models.education_group_year import EducationGroupYear
+from base.models import education_group_year
 from education_group.ddd.business_types import *
 from osis_common.ddd import interface
 
 
 class LinkWithEPC(interface.DomainService):
-    def training_have_link_with_epc(self, training_id: 'TrainingIdentity') -> bool:
-        return self._qs_have_link_with_epc(training_id.acronym, training_id.year)
+    def is_training_have_link_with_epc(self, training_id: 'TrainingIdentity') -> bool:
+        return education_group_year.have_link_with_epc(training_id.acronym, training_id.year)
 
-    def mini_training_have_link_with_epc(self, mini_training_id: 'MiniTrainingIdentity') -> bool:
-        return self._qs_have_link_with_epc(mini_training_id.acronym, mini_training_id.year)
-
-    def _qs_have_link_with_epc(self, acronym: str, year: int) -> bool:
-        return EducationGroupYear.objects.filter(
-            acronym=acronym,
-            academic_year__year=acronym,
-            linked_with_epc=True
-        ).exists()
+    def is_mini_training_have_link_with_epc(self, mini_training_id: 'MiniTrainingIdentity') -> bool:
+        return education_group_year.have_link_with_epc(mini_training_id.acronym, mini_training_id.year)
