@@ -130,7 +130,10 @@ def _get_node_view_serializer(
         'text': '%(code)s - %(title)s%(version)s' %
                 {'code': link.child.code,
                  'title': link.child.title,
-                 'version': __get_program_tree_version_name(link, mini_training_tree_versions)
+                 'version': get_program_tree_version_name(
+                     NodeIdentity(code=link.child.code, year=link.child.year),
+                     mini_training_tree_versions
+                 )
                  },
         'children': serialize_children(
             children=link.child.children,
@@ -175,13 +178,12 @@ def __get_learning_unit_node_text(link: 'Link', context=None):
     return text
 
 
-def __get_program_tree_version_name(link, mini_training_tree_versions: List['ProgramTreeVersion']):
-    if mini_training_tree_versions:
-        program_tree_identity = ProgramTreeIdentitySearch().get_from_node_identity(NodeIdentity(link.child.code,
-                                                                                                link.child.year))
+def get_program_tree_version_name(node_identity: 'NodeIdentity', tree_versions: List['ProgramTreeVersion']):
+    if tree_versions:
+        program_tree_identity = ProgramTreeIdentitySearch().get_from_node_identity(node_identity)
         return next(
             (
-                program_tree_version.version_label for program_tree_version in mini_training_tree_versions
+                program_tree_version.version_label for program_tree_version in tree_versions
                 if program_tree_version.program_tree_identity == program_tree_identity
             ),
             ''

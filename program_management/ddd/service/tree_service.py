@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
 
 from program_management.ddd.business_types import *
 from program_management.ddd.repositories import load_tree
@@ -30,3 +31,7 @@ from program_management.ddd.repositories import load_tree
 
 def search_trees_using_node(node: 'Node'):
     return load_tree.load_trees_from_children(child_element_ids=[node.pk])
+
+
+def search_tree_versions_using_node(node: 'Node') -> List['ProgramTreeVersion']:
+    return load_tree.load_tree_versions_from_children(child_element_ids=[node.pk])
