@@ -106,15 +106,11 @@ class TrainingRepository(interface.AbstractRepository):
         raise NotImplementedError
 
     @classmethod
-    def delete(cls, entity_id: 'TrainingIdentity') -> None:
-        try:
-            edy_db = EducationGroupYear.objects.get(
-                acronym=entity_id.acronym,
-                academic_year__year=entity_id.year
-            )
-            edy_db.delete()
-        except EducationGroupYear.DoesNotExist:
-            raise TrainingNotFoundException
+    def delete(cls, entity_id: 'TrainingIdentity', **_) -> None:
+        EducationGroupYear.objects.filter(
+            acronym=entity_id.acronym,
+            academic_year__year=entity_id.year
+        ).delete()
 
 
 def _convert_education_group_year_to_training(
