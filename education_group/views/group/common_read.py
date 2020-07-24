@@ -108,6 +108,7 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
             self.get_permission_object()
         )
         is_root_node = self.node_identity == self.get_tree().root_node.entity_id
+
         return {
             **super().get_context_data(**kwargs),
             "person": self.request.user.person,
