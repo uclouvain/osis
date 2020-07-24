@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from _decimal import Decimal
 from typing import List
 
 import attr

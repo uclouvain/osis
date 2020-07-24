@@ -23,22 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from osis_common.ddd.interface import BusinessException
-from django.utils.translation import gettext_lazy as _
+from base.models import education_group_year
+from education_group.ddd.business_types import *
+from osis_common.ddd import interface
 
 
-class RelativeCreditShouldBeGreaterOrEqualsThanZero(BusinessException):
-    def __init__(self, *args, **kwargs):
-        message = _("Relative credits must be greater or equals than 0")
-        super().__init__(message, **kwargs)
+class LinkWithEPC(interface.DomainService):
+    def is_training_have_link_with_epc(self, training_id: 'TrainingIdentity') -> bool:
+        return education_group_year.have_link_with_epc(training_id.acronym, training_id.year)
 
-
-class ProgramTreeNotFoundException(Exception):
-    pass
-
-
-class ProgramTreeNonEmpty(BusinessException):
-    def __init__(self, *args, **kwargs):
-        message = _("The content of the program is not empty.")
-        super().__init__(message, **kwargs)
-
+    def is_mini_training_have_link_with_epc(self, mini_training_id: 'MiniTrainingIdentity') -> bool:
+        return education_group_year.have_link_with_epc(mini_training_id.acronym, mini_training_id.year)

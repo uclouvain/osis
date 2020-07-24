@@ -23,22 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from osis_common.ddd.interface import BusinessException
-from django.utils.translation import gettext_lazy as _
+import mock
+from django.test import SimpleTestCase
+
+from education_group.ddd.domain.service.enrollment_counter import EnrollmentCounter
+from education_group.ddd.domain.training import TrainingIdentity
 
 
-class RelativeCreditShouldBeGreaterOrEqualsThanZero(BusinessException):
-    def __init__(self, *args, **kwargs):
-        message = _("Relative credits must be greater or equals than 0")
-        super().__init__(message, **kwargs)
+class TestEnrollmentCounter(SimpleTestCase):
+    @mock.patch('education_group.ddd.domain.service.enrollment_counter.offer_enrollment.count_enrollments')
+    def test_assert_qs_count_called_when_training(self, mock_count_enrollments):
+        training_id = TrainingIdentity(acronym="DROI2M", year=2000)
+        EnrollmentCounter().get_training_enrollments_count(training_id)
 
+        self.assertTrue(mock_count_enrollments.called)
 
-class ProgramTreeNotFoundException(Exception):
-    pass
-
-
-class ProgramTreeNonEmpty(BusinessException):
-    def __init__(self, *args, **kwargs):
-        message = _("The content of the program is not empty.")
-        super().__init__(message, **kwargs)
+    # @mock.patch('education_group.ddd.domain.service.enrollment_counter.offer_enrollment.count_enrollments')
+    # def test_assert_mini_training_called_when_instance_of_mini_training_identity(self, mock_count_enrollments):
+    #     mini_training_id = MiniTrainingIdentity(acronym="DROI2M", year=2000)
+    #     EnrollmentCounter().get_mini_training_enrollments_count(mini_training_id)
+    #
+    #     self.assertTrue(mock_count_enrollments.called)
 

@@ -23,22 +23,24 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from osis_common.ddd.interface import BusinessException
-from django.utils.translation import gettext_lazy as _
+import mock
+from django.test import SimpleTestCase
+
+from education_group.ddd.domain.service.link_with_epc import LinkWithEPC
+from education_group.ddd.domain.training import TrainingIdentity
 
 
-class RelativeCreditShouldBeGreaterOrEqualsThanZero(BusinessException):
-    def __init__(self, *args, **kwargs):
-        message = _("Relative credits must be greater or equals than 0")
-        super().__init__(message, **kwargs)
+class TestLinkWithEPC(SimpleTestCase):
+    @mock.patch('education_group.ddd.domain.service.link_with_epc.education_group_year.have_link_with_epc')
+    def test_assert_qs_exist_called_when_training(self, mock_have_link):
+        training_id = TrainingIdentity(acronym="DROI2M", year=2000)
+        LinkWithEPC().is_training_have_link_with_epc(training_id)
 
+        self.assertTrue(mock_have_link.called)
 
-class ProgramTreeNotFoundException(Exception):
-    pass
-
-
-class ProgramTreeNonEmpty(BusinessException):
-    def __init__(self, *args, **kwargs):
-        message = _("The content of the program is not empty.")
-        super().__init__(message, **kwargs)
-
+    # @mock.patch('education_group.ddd.domain.service.link_with_epc.education_group_year.have_link_with_epc')
+    # def test_assert_qs_exist_called_when_mini_training(self, mock_have_link):
+    #     mini_training_id = MiniTrainingIdentity(acronym="OPT200M", year=2000)
+    #     LinkWithEPC().mini_training_have_link_with_epc(mini_training_id)
+    #
+    #     self.assertTrue(mock_have_link.called)

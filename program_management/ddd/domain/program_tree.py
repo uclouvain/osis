@@ -428,6 +428,25 @@ class ProgramTree(interface.RootEntity):
             [str(grp.block) for grp in self.get_links_using_node(node) if grp.block]
         )
 
+    def is_empty(self):
+        """
+        Check if tree is empty.
+        An empty tree is defined as a tree with other link than mandatory groups
+        """
+        nodes = self.get_all_nodes()
+        for node in nodes:
+            counter = Counter(node.get_children_types(include_nodes_used_as_reference=True))
+            have_only_mandatory = all([
+                self.authorized_relationships.get_authorized_relationship(
+                    node.node_type, child_node_type
+                ).min_count_authorized >= count
+                for child_node_type, count in counter.items()
+                if self.authorized_relationships.get_authorized_relationship(node.node_type, child_node_type)
+            ])
+            if not have_only_mandatory:
+                return False
+        return True
+
     def update_link(
             self,
             parent_path: Path,

@@ -36,7 +36,7 @@ from base.models.education_group_certificate_aim \
     import EducationGroupCertificateAim as EducationGroupCertificateAimModelDb
 from base.models.education_group_organization import EducationGroupOrganization as EducationGroupOrganizationModelDb
 from base.models.education_group_type import EducationGroupType as EducationGroupTypeModelDb
-from base.models.education_group_year import EducationGroupYear as EducationGroupYearModelDb
+from base.models.education_group_year import EducationGroupYear as EducationGroupYearModelDb, EducationGroupYear
 from base.models.education_group_year_domain import EducationGroupYearDomain as EducationGroupYearDomainModelDb
 from base.models.enums.active_status import ActiveStatusEnum
 from base.models.hops import Hops as HopsModelDb
@@ -72,6 +72,7 @@ from education_group.ddd.domain._isced_domain import IscedDomain, IscedDomainIde
 from education_group.ddd.domain._language import Language
 from education_group.ddd.domain._study_domain import StudyDomain, StudyDomainIdentity
 from education_group.ddd.domain._titles import Titles
+from education_group.ddd.domain.exception import TrainingNotFoundException
 from osis_common.ddd import interface
 
 
@@ -106,7 +107,10 @@ class TrainingRepository(interface.AbstractRepository):
 
     @classmethod
     def delete(cls, entity_id: 'TrainingIdentity', **_) -> None:
-        raise NotImplementedError
+        EducationGroupYear.objects.filter(
+            acronym=entity_id.acronym,
+            academic_year__year=entity_id.year
+        ).delete()
 
 
 def _convert_education_group_year_to_training(
