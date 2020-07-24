@@ -23,21 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from base.models import offer_enrollment
 from osis_common.ddd import interface
 
 from education_group.ddd.business_types import *
-from base.models.offer_enrollment import OfferEnrollment
 
 
 class EnrollmentCounter(interface.DomainService):
     def get_training_enrollments_count(self, training_id: 'TrainingIdentity') -> int:
-        return self._get_count_queryset(training_id.acronym, training_id.year)
+        return offer_enrollment.count_enrollments(training_id.acronym, training_id.year)
 
     def get_mini_training_enrollments_count(self, mini_training_id: 'MiniTrainingIdentity') -> int:
-        return self._get_count_queryset(mini_training_id.acronym, mini_training_id.year)
-
-    def _get_count_queryset(self, acronym: str, year: int):
-        return OfferEnrollment.objects.filter(
-            education_group_year__acronym=acronym,
-            education_group_year__academic_year__year=year
-        ).count()
+        return offer_enrollment.count_enrollments(mini_training_id.acronym, mini_training_id.year)
