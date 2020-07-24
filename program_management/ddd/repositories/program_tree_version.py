@@ -27,6 +27,7 @@ from typing import Optional, List
 
 from django.db.models import F
 
+from base.models.education_group_year import EducationGroupYear
 from education_group.models.group_year import GroupYear
 from osis_common.ddd import interface
 from program_management.ddd.business_types import *
@@ -41,11 +42,37 @@ from django.db.models import Q
 class ProgramTreeVersionRepository(interface.AbstractRepository):
 
     @classmethod
-    def create(cls, entity: 'ProgramTreeVersion') -> 'ProgramTreeVersionIdentity':
-        raise NotImplementedError
+    def create(
+            cls,
+            program_tree_version: 'ProgramTreeVersion',
+            **_
+    ) -> 'ProgramTreeVersionIdentity':
+        education_group_year_id = EducationGroupYear.objects.filter(
+            acronym=program_tree_version.entity_id.offer_acronym,
+            academic_year__year=program_tree_version.entity_id.year,
+        ).values_list(
+            'pk', flat=True
+        )[0]
+
+        group_year_id = GroupYear.objects.filter(
+            partial_acronym=program_tree_version.program_tree_identity.code,
+            academic_year__year=program_tree_version.program_tree_identity.year,
+        ).values_list(
+            'pk', flat=True
+        )[0]
+
+        EducationGroupVersion(
+            version_name=program_tree_version.version_name,
+            title_fr=program_tree_version.title_fr,
+            title_en=program_tree_version.title_en,
+            offer_id=education_group_year_id,
+            is_transition=False,
+            root_group_id=group_year_id
+        ).save()
+        return program_tree_version.entity_id
 
     @classmethod
-    def update(cls, entity: 'ProgramTreeVersion') -> 'ProgramTreeVersionIdentity':
+    def update(cls, entity: 'ProgramTreeVersion', **_) -> 'ProgramTreeVersionIdentity':
         raise NotImplementedError
 
     @classmethod
@@ -107,7 +134,7 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
         return results
 
     @classmethod
-    def delete(cls, entity_id: 'ProgramTreeVersionIdentity') -> None:
+    def delete(cls, entity_id: 'ProgramTreeVersionIdentity', **_) -> None:
         raise NotImplementedError
 
     @classmethod
@@ -126,13 +153,15 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
 
 
 def _instanciate_tree_version(record_dict: dict) -> 'ProgramTreeVersion':
+    identity = ProgramTreeVersionIdentity(
+        record_dict['offer_acronym'],
+        record_dict['offer_year'],
+        record_dict['version_name'],
+        record_dict['is_transition'],
+    )
     return ProgramTreeVersion(
-        entity_identity=ProgramTreeVersionIdentity(
-            record_dict['offer_acronym'],
-            record_dict['offer_year'],
-            record_dict['version_name'],
-            record_dict['is_transition'],
-        ),
+        entity_identity=identity,
+        entity_id=identity,
         program_tree_identity=ProgramTreeIdentity(record_dict['code'], record_dict['offer_year']),
         program_tree_repository=ProgramTreeRepository(),
         title_fr=record_dict['version_title_fr'],

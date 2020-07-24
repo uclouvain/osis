@@ -26,14 +26,24 @@
 from osis_common.ddd import interface
 
 
-class IscedDomain(interface.ValueObject):
-    def __init__(self, code: str, title_fr: str, title_en: str):
+class IscedDomainIdentity(interface.EntityIdentity):
+    def __init__(self, code: str):
         self.code = code
+
+    def __eq__(self, other):
+        return self.code == other.code
+
+    def __hash__(self):
+        return hash(self.code)
+
+
+class IscedDomain(interface.Entity):
+    def __init__(self, entity_id: IscedDomainIdentity, title_fr: str, title_en: str):
+        super(IscedDomain, self).__init__(entity_id=entity_id)
+        self.entity_id = entity_id
         self.title_fr = title_fr
         self.title_en = title_en
 
-    def __eq__(self, other):
-        return self.code == other.code and self.title_fr == other.title_fr and self.title_en == other.title_en
-
-    def __hash__(self):
-        return hash(self.code + self.title_fr + self.title_en)
+    @property
+    def code(self) -> str:
+        return self.entity_id.code

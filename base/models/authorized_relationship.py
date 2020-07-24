@@ -35,7 +35,7 @@ from program_management.models.enums.node_type import NodeType
 
 
 class AuthorizedRelationshipAdmin(OsisModelAdmin):
-    list_display = ('parent_type', 'child_type', 'changed')
+    list_display = ('parent_type', 'child_type', 'min_count_authorized', 'max_count_authorized', 'changed')
     search_fields = ['parent_type__name', 'child_type__name']
 
 
