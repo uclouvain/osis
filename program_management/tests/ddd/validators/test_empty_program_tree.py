@@ -21,29 +21,26 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from django.test import TestCase
+import mock
+from django.test import SimpleTestCase
 
-from base.models import validation_rule
-from base.models.enums.education_group_types import TrainingType
-from base.tests.factories.validation_rule import ValidationRuleFactory
-from program_management.ddd.domain.service.validation_rule import FieldValidationRule
+from program_management.ddd.domain.exception import ProgramTreeNonEmpty
+from program_management.ddd.validators._empty_program_tree import EmptyProgramTreeValidator
+from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
 
-class TestGetValidationRuleForField(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.education_group_type = TrainingType.BACHELOR
-        field_reference = 'TrainingForm.{type}.field'.format(type=cls.education_group_type.name)
-        cls.rule = ValidationRuleFactory(
-            field_reference=field_reference,
-            initial_value='initial'
-        )
+class TestEmptyProgramTree(SimpleTestCase):
+    def setUp(self) -> None:
+        self.tree = ProgramTreeFactory()
 
-    def test_should_raise_object_does_not_exist_when_no_matching_validation_rule(self):
-        with self.assertRaises(validation_rule.ValidationRule.DoesNotExist):
-            FieldValidationRule.get(self.education_group_type, "another_field")
+    @mock.patch('program_management.ddd.domain.program_tree.ProgramTree.is_empty', return_value=False)
+    def test_should_raise_exception_when_tree_is_not_empty(self, mock_is_empty):
+        validator = EmptyProgramTreeValidator(self.tree)
+        with self.assertRaises(ProgramTreeNonEmpty):
+            validator.validate()
 
-    def test_should_return_validation_rule_when_matching_rule_exists(self):
-        result = FieldValidationRule.get(self.education_group_type, "field")
-
-        self.assertEqual(self.rule, result)
+    @mock.patch('program_management.ddd.domain.program_tree.ProgramTree.is_empty', return_value=True)
+    def test_should_not_raise_exception_when_tree_is_empty(self, mock_is_empty):
+        validator = EmptyProgramTreeValidator(self.tree)
+        validator.validate()
+        self.assertTrue(mock_is_empty.called)

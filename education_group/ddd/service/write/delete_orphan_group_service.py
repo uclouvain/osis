@@ -21,29 +21,18 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from django.test import TestCase
+from education_group.ddd import command
 
-from base.models import validation_rule
-from base.models.enums.education_group_types import TrainingType
-from base.tests.factories.validation_rule import ValidationRuleFactory
-from program_management.ddd.domain.service.validation_rule import FieldValidationRule
+from education_group.ddd.domain.group import GroupIdentity
+from education_group.ddd.repository.group import GroupRepository
+from education_group.ddd.validators.validators_by_business_action import DeleteOrphanGroupValidatorList
 
 
-class TestGetValidationRuleForField(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.education_group_type = TrainingType.BACHELOR
-        field_reference = 'TrainingForm.{type}.field'.format(type=cls.education_group_type.name)
-        cls.rule = ValidationRuleFactory(
-            field_reference=field_reference,
-            initial_value='initial'
-        )
+def delete_orphan_group(cmd: command.DeleteOrphanGroupCommand) -> 'GroupIdentity':
+    group_id = GroupIdentity(code=cmd.code, year=cmd.year)
+    grp = GroupRepository.get(group_id)
 
-    def test_should_raise_object_does_not_exist_when_no_matching_validation_rule(self):
-        with self.assertRaises(validation_rule.ValidationRule.DoesNotExist):
-            FieldValidationRule.get(self.education_group_type, "another_field")
+    DeleteOrphanGroupValidatorList(grp).validate()
 
-    def test_should_return_validation_rule_when_matching_rule_exists(self):
-        result = FieldValidationRule.get(self.education_group_type, "field")
-
-        self.assertEqual(self.rule, result)
+    GroupRepository.delete(group_id)
+    return group_id

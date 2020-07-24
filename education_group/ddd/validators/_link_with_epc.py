@@ -21,29 +21,27 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from django.test import TestCase
-
-from base.models import validation_rule
-from base.models.enums.education_group_types import TrainingType
-from base.tests.factories.validation_rule import ValidationRuleFactory
-from program_management.ddd.domain.service.validation_rule import FieldValidationRule
+from base.ddd.utils import business_validator
+from education_group.ddd.business_types import *
+from education_group.ddd.domain.exception import TrainingHaveLinkWithEPC, MiniTrainingHaveLinkWithEPC
+from education_group.ddd.domain.service.link_with_epc import LinkWithEPC
 
 
-class TestGetValidationRuleForField(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.education_group_type = TrainingType.BACHELOR
-        field_reference = 'TrainingForm.{type}.field'.format(type=cls.education_group_type.name)
-        cls.rule = ValidationRuleFactory(
-            field_reference=field_reference,
-            initial_value='initial'
-        )
+class TrainingLinkWithEPCValidator(business_validator.BusinessValidator):
+    def __init__(self, training_id: 'TrainingIdentity'):
+        super().__init__()
+        self.training_id = training_id
 
-    def test_should_raise_object_does_not_exist_when_no_matching_validation_rule(self):
-        with self.assertRaises(validation_rule.ValidationRule.DoesNotExist):
-            FieldValidationRule.get(self.education_group_type, "another_field")
+    def validate(self, *args, **kwargs):
+        if LinkWithEPC().is_training_have_link_with_epc(self.training_id):
+            raise TrainingHaveLinkWithEPC
 
-    def test_should_return_validation_rule_when_matching_rule_exists(self):
-        result = FieldValidationRule.get(self.education_group_type, "field")
 
-        self.assertEqual(self.rule, result)
+class MiniTrainingLinkWithEPCValidator(business_validator.BusinessValidator):
+    def __init__(self, mini_training_id: 'MiniTrainingIdentity'):
+        super().__init__()
+        self.mini_training_id = mini_training_id
+
+    def validate(self, *args, **kwargs):
+        if LinkWithEPC().is_mini_training_have_link_with_epc(self.mini_training_id):
+            raise MiniTrainingHaveLinkWithEPC

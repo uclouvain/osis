@@ -21,29 +21,26 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from django.test import TestCase
+from django.db import transaction
 
-from base.models import validation_rule
-from base.models.enums.education_group_types import TrainingType
-from base.tests.factories.validation_rule import ValidationRuleFactory
-from program_management.ddd.domain.service.validation_rule import FieldValidationRule
+from program_management.ddd import command
+from program_management.ddd.domain.program_tree import ProgramTreeIdentity
+from program_management.ddd.repositories.program_tree import ProgramTreeRepository
+from program_management.ddd.service.write import delete_node_service
+from program_management.ddd.validators.validators_by_business_action import DeleteProgramTreeValidatorList
 
 
-class TestGetValidationRuleForField(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.education_group_type = TrainingType.BACHELOR
-        field_reference = 'TrainingForm.{type}.field'.format(type=cls.education_group_type.name)
-        cls.rule = ValidationRuleFactory(
-            field_reference=field_reference,
-            initial_value='initial'
-        )
+@transaction.atomic()
+def delete_program_tree(cmd: command.DeleteProgramTreeCommand) -> ProgramTreeIdentity:
+    program_tree_id = ProgramTreeIdentity(code=cmd.code, year=cmd.year)
+    program_tree = ProgramTreeRepository.get(program_tree_id)
 
-    def test_should_raise_object_does_not_exist_when_no_matching_validation_rule(self):
-        with self.assertRaises(validation_rule.ValidationRule.DoesNotExist):
-            FieldValidationRule.get(self.education_group_type, "another_field")
+    DeleteProgramTreeValidatorList(program_tree).validate()
 
-    def test_should_return_validation_rule_when_matching_rule_exists(self):
-        result = FieldValidationRule.get(self.education_group_type, "field")
+    ProgramTreeRepository.delete(
+        program_tree_id,
 
-        self.assertEqual(self.rule, result)
+        # Service Dependancy injection
+        delete_node_service=delete_node_service.delete_node
+    )
+    return program_tree_id

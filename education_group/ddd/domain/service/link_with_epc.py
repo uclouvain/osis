@@ -23,15 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
-
-from program_management.ddd.business_types import *
-from program_management.ddd.repositories import load_tree
-
-
-def search_trees_using_node(node: 'Node'):
-    return load_tree.load_trees_from_children(child_element_ids=[node.pk])
+from base.models import education_group_year
+from education_group.ddd.business_types import *
+from osis_common.ddd import interface
 
 
-def search_tree_versions_using_node(node: 'Node') -> List['ProgramTreeVersion']:
-    return load_tree.load_tree_versions_from_children(child_element_ids=[node.pk])
+class LinkWithEPC(interface.DomainService):
+    def is_training_have_link_with_epc(self, training_id: 'TrainingIdentity') -> bool:
+        return education_group_year.have_link_with_epc(training_id.acronym, training_id.year)
+
+    def is_mini_training_have_link_with_epc(self, mini_training_id: 'MiniTrainingIdentity') -> bool:
+        return education_group_year.have_link_with_epc(mini_training_id.acronym, mini_training_id.year)

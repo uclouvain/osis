@@ -23,15 +23,24 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+import mock
+from django.test import SimpleTestCase
 
-from program_management.ddd.business_types import *
-from program_management.ddd.repositories import load_tree
-
-
-def search_trees_using_node(node: 'Node'):
-    return load_tree.load_trees_from_children(child_element_ids=[node.pk])
+from education_group.ddd.domain.service.link_with_epc import LinkWithEPC
+from education_group.ddd.domain.training import TrainingIdentity
 
 
-def search_tree_versions_using_node(node: 'Node') -> List['ProgramTreeVersion']:
-    return load_tree.load_tree_versions_from_children(child_element_ids=[node.pk])
+class TestLinkWithEPC(SimpleTestCase):
+    @mock.patch('education_group.ddd.domain.service.link_with_epc.education_group_year.have_link_with_epc')
+    def test_assert_qs_exist_called_when_training(self, mock_have_link):
+        training_id = TrainingIdentity(acronym="DROI2M", year=2000)
+        LinkWithEPC().is_training_have_link_with_epc(training_id)
+
+        self.assertTrue(mock_have_link.called)
+
+    # @mock.patch('education_group.ddd.domain.service.link_with_epc.education_group_year.have_link_with_epc')
+    # def test_assert_qs_exist_called_when_mini_training(self, mock_have_link):
+    #     mini_training_id = MiniTrainingIdentity(acronym="OPT200M", year=2000)
+    #     LinkWithEPC().mini_training_have_link_with_epc(mini_training_id)
+    #
+    #     self.assertTrue(mock_have_link.called)

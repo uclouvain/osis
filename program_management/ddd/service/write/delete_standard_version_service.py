@@ -21,29 +21,31 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from django.test import TestCase
+from django.db import transaction
 
-from base.models import validation_rule
-from base.models.enums.education_group_types import TrainingType
-from base.tests.factories.validation_rule import ValidationRuleFactory
-from program_management.ddd.domain.service.validation_rule import FieldValidationRule
+from program_management.ddd import command
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, STANDARD
+from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
+from program_management.ddd.service.write import delete_program_tree_service
+from program_management.ddd.validators.validators_by_business_action import DeleteStandardVersionValidatorList
 
 
-class TestGetValidationRuleForField(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.education_group_type = TrainingType.BACHELOR
-        field_reference = 'TrainingForm.{type}.field'.format(type=cls.education_group_type.name)
-        cls.rule = ValidationRuleFactory(
-            field_reference=field_reference,
-            initial_value='initial'
-        )
+@transaction.atomic()
+def delete_standard_version(cmd: command.DeleteStandardVersionCommand) -> ProgramTreeVersionIdentity:
+    program_tree_version_id = ProgramTreeVersionIdentity(
+        offer_acronym=cmd.acronym,
+        year=cmd.year,
+        version_name=STANDARD,
+        is_transition=False
+    )
+    program_tree_version = ProgramTreeVersionRepository.get(program_tree_version_id)
 
-    def test_should_raise_object_does_not_exist_when_no_matching_validation_rule(self):
-        with self.assertRaises(validation_rule.ValidationRule.DoesNotExist):
-            FieldValidationRule.get(self.education_group_type, "another_field")
+    DeleteStandardVersionValidatorList(program_tree_version).validate()
 
-    def test_should_return_validation_rule_when_matching_rule_exists(self):
-        result = FieldValidationRule.get(self.education_group_type, "field")
+    ProgramTreeVersionRepository.delete(
+        program_tree_version_id,
 
-        self.assertEqual(self.rule, result)
+        # Service Dependancy injection
+        delete_program_tree_service=delete_program_tree_service.delete_program_tree
+    )
+    return program_tree_version_id

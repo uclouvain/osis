@@ -21,29 +21,28 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+from unittest.mock import patch
+
 from django.test import TestCase
 
-from base.models import validation_rule
-from base.models.enums.education_group_types import TrainingType
-from base.tests.factories.validation_rule import ValidationRuleFactory
-from program_management.ddd.domain.service.validation_rule import FieldValidationRule
+from education_group.ddd import command
+from education_group.ddd.service.write import delete_orphan_group_service
 
 
-class TestGetValidationRuleForField(TestCase):
+class TestDeleteOrphanGroup(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.education_group_type = TrainingType.BACHELOR
-        field_reference = 'TrainingForm.{type}.field'.format(type=cls.education_group_type.name)
-        cls.rule = ValidationRuleFactory(
-            field_reference=field_reference,
-            initial_value='initial'
+        cls.cmd = command.DeleteOrphanGroupCommand(
+            year=2018,
+            code="LTRONC1"
         )
 
-    def test_should_raise_object_does_not_exist_when_no_matching_validation_rule(self):
-        with self.assertRaises(validation_rule.ValidationRule.DoesNotExist):
-            FieldValidationRule.get(self.education_group_type, "another_field")
+    @patch('education_group.ddd.service.write.delete_orphan_group_service.GroupRepository.get')
+    @patch('education_group.ddd.service.write.delete_orphan_group_service.DeleteOrphanGroupValidatorList.validate')
+    @patch('education_group.ddd.service.write.delete_orphan_group_service.GroupRepository.delete')
+    def test_assert_repository_called(self, mock_delete_repo, mock_delete_validator, mock_get_repo):
+        delete_orphan_group_service.delete_orphan_group(self.cmd)
 
-    def test_should_return_validation_rule_when_matching_rule_exists(self):
-        result = FieldValidationRule.get(self.education_group_type, "field")
-
-        self.assertEqual(self.rule, result)
+        self.assertTrue(mock_get_repo.called)
+        self.assertTrue(mock_delete_validator.called)
+        self.assertTrue(mock_delete_repo.called)

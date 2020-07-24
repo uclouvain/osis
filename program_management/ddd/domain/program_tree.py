@@ -102,13 +102,13 @@ class ProgramTreeBuilder:
             self,
             program_tree: 'ProgramTree'
     ) -> List['Node']:
-        root_node = program_tree.root_node
         children = []
-        for child_type in program_tree.get_mandatory_children_types(program_tree.root_node):
+        root_node = program_tree.root_node
+        for child_type in program_tree.get_ordered_mandatory_children_types(program_tree.root_node):
             generated_child_title = FieldValidationRule.get(
                 child_type,
                 'title_fr'
-            ).initial_value.replace(" ", "").upper()
+            ).initial_value
             child = node_factory.get_node(
                 type=NodeType.GROUP,
                 node_type=child_type,
@@ -312,12 +312,8 @@ class ProgramTree(interface.RootEntity):
         copied_root_node = _copy(self.root_node, ignore_children_from=ignore_children_from)
         return ProgramTree(root_node=copied_root_node, authorized_relationships=self.authorized_relationships)
 
-    def get_mandatory_children_types(self, parent_node: 'Node') -> Set[EducationGroupTypesEnum]:
-        return set(
-            authorized_type
-            for authorized_type in self.authorized_relationships.get_authorized_children_types(parent_node.node_type)
-            if isinstance(authorized_type, EducationGroupTypesEnum)
-        )
+    def get_ordered_mandatory_children_types(self, parent_node: 'Node') -> List[EducationGroupTypesEnum]:
+        return self.authorized_relationships.get_ordered_mandatory_children_types(parent_node.node_type)
 
     def paste_node(
             self,
@@ -431,6 +427,25 @@ class ProgramTree(interface.RootEntity):
         return " ; ".join(
             [str(grp.block) for grp in self.get_links_using_node(node) if grp.block]
         )
+
+    def is_empty(self):
+        """
+        Check if tree is empty.
+        An empty tree is defined as a tree with other link than mandatory groups
+        """
+        nodes = self.get_all_nodes()
+        for node in nodes:
+            counter = Counter(node.get_children_types(include_nodes_used_as_reference=True))
+            have_only_mandatory = all([
+                self.authorized_relationships.get_authorized_relationship(
+                    node.node_type, child_node_type
+                ).min_count_authorized >= count
+                for child_node_type, count in counter.items()
+                if self.authorized_relationships.get_authorized_relationship(node.node_type, child_node_type)
+            ])
+            if not have_only_mandatory:
+                return False
+        return True
 
     def update_link(
             self,
