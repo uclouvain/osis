@@ -35,6 +35,8 @@ from base.views.mixins import AjaxTemplateMixin
 from education_group.ddd.business_types import *
 
 from education_group.ddd import command
+from education_group.ddd.domain.exception import TrainingNotFoundException
+from education_group.ddd.service.read import get_training_service
 from education_group.models.group_year import GroupYear
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd.business_types import *
