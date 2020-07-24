@@ -23,64 +23,132 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Optional
+from _decimal import Decimal
+from typing import List, Tuple, Optional
 
 import attr
 
 from osis_common.ddd import interface
 
+DecreeName = str
+DomainCode = str
+CampusName = str
+UniversityName = str
+PartnerName = str
+AimCode = int
+AimSection = int
 
+
+@attr.s(frozen=True, slots=True)
+class CreateTrainingCommand(interface.CommandRequest):
+
+    abbreviated_title = attr.ib(type=str)
+    status = attr.ib(type=str)
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)
+    type = attr.ib(type=str)
+    credits = attr.ib(type=int)
+    schedule_type = attr.ib(type=str)
+    duration = attr.ib(type=int)
+    start_year = attr.ib(type=int)
+
+    title_fr = attr.ib(type=str)
+    partial_title_fr = attr.ib(type=Optional[str])
+    title_en = attr.ib(type=Optional[str])
+    partial_title_en = attr.ib(type=Optional[str])
+
+    keywords = attr.ib(type=Optional[str])
+    internship_presence = attr.ib(type=Optional[str])
+    is_enrollment_enabled = attr.ib(type=Optional[bool])
+    has_online_re_registration = attr.ib(type=Optional[bool])
+    has_partial_deliberation = attr.ib(type=Optional[bool])
+    has_admission_exam = attr.ib(type=Optional[bool])
+    has_dissertation = attr.ib(type=Optional[bool])
+    produce_university_certificate = attr.ib(type=Optional[bool])
+    decree_category = attr.ib(type=Optional[str])
+    rate_code = attr.ib(type=Optional[str])
+    main_language = attr.ib(type=Optional[str])
+    english_activities = attr.ib(type=Optional[str])
+    other_language_activities = attr.ib(type=Optional[str])
+    internal_comment = attr.ib(type=Optional[str])
+    main_domain_code = attr.ib(type=Optional[str])
+    main_domain_decree = attr.ib(type=Optional[str])
+
+    secondary_domains = attr.ib(type=Optional[List[Tuple[DecreeName, DomainCode]]])
+
+    isced_domain_code = attr.ib(type=Optional[str])
+    management_entity_acronym = attr.ib(type=Optional[str])
+    administration_entity_acronym = attr.ib(type=Optional[str])
+    end_year = attr.ib(type=Optional[int])
+
+    teaching_campus_name = attr.ib(type=Optional[str])
+    teaching_campus_organization_name = attr.ib(type=Optional[str])
+
+    enrollment_campus_name = attr.ib(type=Optional[str])
+    enrollment_campus_organization_name = attr.ib(type=Optional[str])
+
+    other_campus_activities = attr.ib(type=Optional[str])
+
+    can_be_funded = attr.ib(type=Optional[bool])
+    funding_orientation = attr.ib(type=Optional[str])
+    can_be_international_funded = attr.ib(type=Optional[bool])
+    international_funding_orientation = attr.ib(type=Optional[str])
+
+    ares_code = attr.ib(type=Optional[int])
+    ares_graca = attr.ib(type=Optional[int])
+    ares_authorization = attr.ib(type=Optional[int])
+
+    code_inter_cfb = attr.ib(type=Optional[str])
+    coefficient = attr.ib(type=Optional[Decimal])
+
+    academic_type = attr.ib(type=Optional[str])
+    duration_unit = attr.ib(type=Optional[str])
+
+    leads_to_diploma = attr.ib(type=Optional[bool])
+    printing_title = attr.ib(type=Optional[str])
+    professional_title = attr.ib(type=Optional[str])
+    aims = attr.ib(type=Optional[List[Tuple[AimCode, AimSection]]])
+
+    constraint_type = attr.ib(type=Optional[str])
+    min_constraint = attr.ib(type=Optional[int])
+    max_constraint = attr.ib(type=Optional[int])
+    remark_fr = attr.ib(type=Optional[str])
+    remark_en = attr.ib(type=Optional[str])
+
+
+@attr.s(frozen=True, slots=True)
 class GetGroupCommand(interface.CommandRequest):
-    def __init__(self, code: str, year: int):
-        self.code = code
-        self.year = year
+
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)
 
 
+@attr.s(frozen=True, slots=True)
 class CreateOrphanGroupCommand(interface.CommandRequest):
-    def __init__(
-            self,
-            code: str,
-            year: int,
-            type: str,
-            abbreviated_title: str,
-            title_fr: str,
-            title_en: str,
-            credits: int,
-            constraint_type: str,
-            min_constraint: int,
-            max_constraint: int,
-            management_entity_acronym: str,
-            teaching_campus_name: str,
-            organization_name: str,
-            remark_fr: str,
-            remark_en: str,
-            start_year: int,
-            end_year: Optional[int] = None
-    ):
-        self.code = code
-        self.year = year
-        self.type = type
-        self.abbreviated_title = abbreviated_title
-        self.title_fr = title_fr
-        self.title_en = title_en
-        self.credits = credits
-        self.constraint_type = constraint_type
-        self.min_constraint = min_constraint
-        self.max_constraint = max_constraint
-        self.management_entity_acronym = management_entity_acronym
-        self.teaching_campus_name = teaching_campus_name
-        self.organization_name = organization_name
-        self.remark_fr = remark_fr
-        self.remark_en = remark_en
-        self.start_year = start_year
-        self.end_year = end_year
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)
+    type = attr.ib(type=str)
+    abbreviated_title = attr.ib(type=str)
+    title_fr = attr.ib(type=str)
+    title_en = attr.ib(type=str)
+    credits = attr.ib(type=int)
+    constraint_type = attr.ib(type=str)
+    min_constraint = attr.ib(type=int)
+    max_constraint = attr.ib(type=int)
+    management_entity_acronym = attr.ib(type=str)
+    teaching_campus_name = attr.ib(type=str)
+    organization_name = attr.ib(type=str)
+    remark_fr = attr.ib(type=str)
+    remark_en = attr.ib(type=str)
+    start_year = attr.ib(type=int)
+    end_year = attr.ib(type=Optional[int])
 
 
+@attr.s(frozen=True, slots=True)
 class CopyGroupCommand(interface.CommandRequest):
-    def __init__(self, from_code: str, from_year: int, to_year: int):
-        self.from_code = from_code
-        self.from_year = from_year
-        self.to_year = to_year
+    from_code = attr.ib(type=str)
+    from_year = attr.ib(type=int)
+    to_year = attr.ib(type=int)
 
 
 @attr.s(frozen=True, slots=True)
@@ -99,3 +167,15 @@ class UpdateGroupCommand(interface.CommandRequest):
     organization_name = attr.ib(type=str)
     remark_fr = attr.ib(type=str)
     remark_en = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class PostponeTrainingCommand(interface.CommandRequest):
+    acronym = attr.ib(type=str)
+    postpone_from_year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class CopyTrainingToNextYearCommand(interface.CommandRequest):
+    acronym = attr.ib(type=str)
+    postpone_from_year = attr.ib(type=int)

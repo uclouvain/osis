@@ -106,6 +106,7 @@ class GroupCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                         **common_data,
                         year=group_form.cleaned_data['academic_year'],
                         start_year=group_form.cleaned_data['academic_year'],
+                        end_year=None
                     )
                     group_id = create_group_service.create_orphan_group(cmd_create)
             except GroupCodeAlreadyExistException as e:
