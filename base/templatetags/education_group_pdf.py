@@ -192,15 +192,15 @@ def get_verbose_constraint(node: 'NodeEducationGroupYear'):
     }
 
 
-def get_verbose_title_group(node: 'NodeEducationGroupYear'):
+def get_verbose_title_group(node: 'NodeGroupYear'):
     if node.is_finality():
         if node.offer_partial_title_en and translation.get_language() == LANGUAGE_CODE_EN:
             return node.offer_partial_title_en
         return node.offer_partial_title_fr
     else:
-        if node.offer_title_en and translation.get_language() == LANGUAGE_CODE_EN:
-            return node.offer_title_en
-        return node.offer_title_fr
+        if node.group_title_en and translation.get_language() == LANGUAGE_CODE_EN:
+            return node.group_title_en
+        return node.group_title_fr
 
 
 def get_verbose_credits(link: 'Link'):

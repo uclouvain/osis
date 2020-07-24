@@ -34,12 +34,12 @@ from base.models.enums.education_group_types import GroupType
 from base.views.mixins import FlagMixin, AjaxTemplateMixin
 from osis_common.document.pdf_build import render_pdf
 from program_management.ddd.domain.node import NodeIdentity
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionNotFoundException
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch, \
     ProgramTreeIdentitySearch
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 from backoffice.settings.base import LANGUAGE_CODE_EN
+
 
 CURRENT_SIZE_FOR_ANNUAL_COLUMN = 15
 MAIN_PART_INIT_SIZE = 650
@@ -51,15 +51,15 @@ USUAL_NUMBER_OF_BLOCKS = 3
 @waffle_switch('education_group_year_generate_pdf')
 def pdf_content(request, year, code, language):
     node_id = NodeIdentity(code=code, year=year)
-    try:
-        program_tree_id = ProgramTreeVersionIdentitySearch().get_from_node_identity(node_id)
-        program_tree_version = ProgramTreeVersionRepository.get(program_tree_id)
+
+    program_tree_id = ProgramTreeVersionIdentitySearch().get_from_node_identity(node_id)
+    program_tree_version = ProgramTreeVersionRepository.get(program_tree_id)
+    if program_tree_version:
         tree = program_tree_version.get_tree()
-    except ProgramTreeVersionNotFoundException:
+    else:
         tree = ProgramTreeRepository.get(
             ProgramTreeIdentitySearch().get_from_node_identity(node_id)
         )
-
     tree = tree.prune(ignore_children_from={GroupType.MINOR_LIST_CHOICE})
 
     if language == LANGUAGE_CODE_EN:
