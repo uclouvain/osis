@@ -38,15 +38,10 @@ from base.models.education_group_organization import EducationGroupOrganization 
 from base.models.education_group_type import EducationGroupType as EducationGroupTypeModelDb
 from base.models.education_group_year import EducationGroupYear as EducationGroupYearModelDb
 from base.models.education_group_year_domain import EducationGroupYearDomain as EducationGroupYearDomainModelDb
-from base.models.enums.active_status import ActiveStatusEnum
-from base.models.hops import Hops as HopsModelDb
-from education_group.ddd.domain.training import TrainingIdentityThroughYears
-from reference.models.language import Language as LanguageModelDb
-from reference.models.domain import Domain as DomainModelDb
-from reference.models.domain_isced import DomainIsced as DomainIscedModelDb
 from base.models.entity import Entity
 from base.models.entity_version import EntityVersion
 from base.models.enums.academic_type import AcademicTypes
+from base.models.enums.active_status import ActiveStatusEnum
 from base.models.enums.activity_presence import ActivityPresence
 from base.models.enums.decree_category import DecreeCategories
 from base.models.enums.diploma_coorganization import DiplomaCoorganizationTypes
@@ -56,6 +51,7 @@ from base.models.enums.funding_codes import FundingCodes
 from base.models.enums.internship_presence import InternshipPresence
 from base.models.enums.rate_code import RateCode
 from base.models.enums.schedule_type import ScheduleTypeEnum
+from base.models.hops import Hops as HopsModelDb
 from base.models.organization_address import OrganizationAddress
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import training, exception
@@ -72,7 +68,11 @@ from education_group.ddd.domain._isced_domain import IscedDomain, IscedDomainIde
 from education_group.ddd.domain._language import Language
 from education_group.ddd.domain._study_domain import StudyDomain, StudyDomainIdentity
 from education_group.ddd.domain._titles import Titles
+from education_group.ddd.domain.training import TrainingIdentityThroughYears
 from osis_common.ddd import interface
+from reference.models.domain import Domain as DomainModelDb
+from reference.models.domain_isced import DomainIsced as DomainIscedModelDb
+from reference.models.language import Language as LanguageModelDb
 
 
 class TrainingRepository(interface.AbstractRepository):
@@ -122,6 +122,7 @@ def _convert_education_group_year_to_training(
     return training.Training(
         entity_identity=entity_id,
         entity_id=entity_id,
+        code=obj.partial_acronym,
         identity_through_years=TrainingIdentityThroughYears(uuid=obj.education_group_id),
         type=TrainingType[obj.education_group_type.name],
         credits=obj.credits,

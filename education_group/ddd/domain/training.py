@@ -43,12 +43,14 @@ from education_group.ddd.business_types import *
 from education_group.ddd.domain._campus import Campus
 from education_group.ddd.domain._co_graduation import CoGraduation
 from education_group.ddd.domain._co_organization import Coorganization
+from education_group.ddd.domain._content_constraint import ContentConstraint
 from education_group.ddd.domain._diploma import Diploma, DiplomaAim, DiplomaAimIdentity
 from education_group.ddd.domain._entity import Entity
 from education_group.ddd.domain._funding import Funding
 from education_group.ddd.domain._hops import HOPS
 from education_group.ddd.domain._isced_domain import IscedDomain, IscedDomainIdentity
 from education_group.ddd.domain._language import Language
+from education_group.ddd.domain._remark import Remark
 from education_group.ddd.domain._study_domain import StudyDomain, StudyDomainIdentity
 from education_group.ddd.domain._titles import Titles
 from education_group.ddd.domain.exception import TrainingNotFoundException
@@ -109,6 +111,7 @@ class TrainingBuilder:
         training = Training(
             entity_identity=training_identity,
             entity_id=training_identity,
+            code=command.code,
             type=utils.get_enum_from_str(command.type, TrainingType),
             credits=command.credits,
             schedule_type=utils.get_enum_from_str(command.schedule_type, ScheduleTypeEnum),
@@ -206,6 +209,7 @@ class Training(interface.RootEntity):
 
     # FIXME :: split fields into separate ValueObjects (to discuss with business people)
     entity_id = entity_identity = attr.ib(type=TrainingIdentity)
+    code = attr.ib(type=str)  # to remove
     type = attr.ib(type=TrainingType)
     credits = attr.ib(type=int)
     start_year = attr.ib(type=int)

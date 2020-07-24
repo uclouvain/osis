@@ -310,7 +310,10 @@ class CertificateAimAutocomplete(autocomplete.Select2QuerySetView):
 
         return qs
 
-    def get_result_label(self, result):
+    def get_result_value(self, result: CertificateAim):
+        return result.code
+
+    def get_result_label(self, result: CertificateAim):
         return format_html('{} - {} {}', result.section, result.code, result.description)
 
 

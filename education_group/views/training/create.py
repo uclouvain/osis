@@ -14,17 +14,17 @@ from base.models.enums.education_group_types import GroupType, TrainingType
 from base.utils.cache import RequestCache
 from base.views.common import display_success_messages, display_error_messages
 from education_group.ddd import command
-from program_management.ddd import command as program_management_command
 from education_group.ddd.domain.exception import GroupCodeAlreadyExistException, ContentConstraintTypeMissing, \
     ContentConstraintMinimumMaximumMissing, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum, \
     TrainingAcronymAlreadyExist, StartYearGreaterThanEndYear, MaximumCertificateAimType2Reached
 from education_group.ddd.domain.training import TrainingIdentity
-from program_management.ddd.service.write import create_training_with_program_tree, create_and_attach_training_service
 from education_group.forms.training import CreateTrainingForm
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from education_group.views.proxy.read import Tab
 from osis_role.contrib.views import PermissionRequiredMixin
+from program_management.ddd import command as program_management_command
 from program_management.ddd.domain.program_tree import Path
+from program_management.ddd.service.write import create_and_attach_training_service
 from program_management.ddd.service.write.create_training_with_program_tree import \
     create_and_report_training_with_program_tree
 

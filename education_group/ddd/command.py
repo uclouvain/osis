@@ -124,6 +124,13 @@ class GetGroupCommand(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True)
+class GetTrainingCommand(interface.CommandRequest):
+
+    acronym = attr.ib(type=str)
+    year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
 class CreateOrphanGroupCommand(interface.CommandRequest):
     code = attr.ib(type=str)
     year = attr.ib(type=int)

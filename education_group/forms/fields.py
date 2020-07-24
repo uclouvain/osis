@@ -25,6 +25,7 @@ class ManagementEntitiesChoiceField(EntityRoleChoiceField):
             person=person,
             group_names=group_names,
             label=_('Management entity'),
+            to_field_name="acronym",
             **kwargs,
         )
 

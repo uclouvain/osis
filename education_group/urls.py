@@ -9,6 +9,7 @@ from base.views.education_groups.achievement.update import EducationGroupAchieve
 from education_group.converters import GroupTypeConverter, TrainingTypeConverter
 from education_group.views import group, training, mini_training, general_information
 from education_group.views.proxy.read import ReadEducationGroupRedirectView
+from education_group.views.training.update import TrainingUpdateView
 
 register_converter(GroupTypeConverter, 'group_type')
 register_converter(TrainingTypeConverter, 'training_type')
@@ -75,6 +76,7 @@ urlpatterns = [
     path('trainings/', include([
         path('<training_type:type>/create/', training.TrainingCreateView.as_view(), name='training_create'),
         path('<int:year>/<str:code>/', include([
+            path('<str:title>/update/', TrainingUpdateView.as_view(), name='training_update'),
             path('create/', CreateEducationGroupAchievement.as_view(), name='training_achievement_create'),
             path('<int:education_group_achievement_pk>/', include([
                 path('actions/', EducationGroupAchievementAction.as_view(), name='training_achievement_actions'),
