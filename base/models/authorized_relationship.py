@@ -29,7 +29,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from base.models.education_group_type import EducationGroupType
-from base.models.enums.education_group_types import EducationGroupTypesEnum
+from base.models.enums.education_group_types import EducationGroupTypesEnum, GroupType
 from osis_common.models.osis_model_admin import OsisModelAdmin
 from program_management.models.enums.node_type import NodeType
 
@@ -110,4 +110,28 @@ class AuthorizedRelationshipList:
         return set(
             auth_rel.child_type for auth_rel in self.authorized_relationships
             if auth_rel.parent_type == parent_type
+        )
+
+    def get_ordered_mandatory_children_types(
+            self,
+            parent_type: EducationGroupTypesEnum
+    ) -> List[EducationGroupTypesEnum]:
+        ordered_group_types = {group_type: order for order, group_type in enumerate(GroupType.ordered())}
+        mandatory_children_types = self._get_mandatory_children_types(parent_type)
+        types_with_order_value = [
+            (child_type, ordered_group_types.get(child_type.name, 999))
+            for child_type in mandatory_children_types
+        ]
+        return [child_type for child_type, order in sorted(types_with_order_value, key=lambda tuple: tuple[1])]
+
+    def _get_mandatory_children_types(
+            self,
+            parent_type: EducationGroupTypesEnum
+    ) -> Set[EducationGroupTypesEnum]:
+        return set(
+            authorized_type.child_type
+            for authorized_type in self.authorized_relationships
+            if isinstance(authorized_type.child_type, EducationGroupTypesEnum)
+            and authorized_type.parent_type == parent_type
+            and authorized_type.min_count_authorized > 0
         )
