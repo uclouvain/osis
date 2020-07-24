@@ -85,9 +85,6 @@ class TestMiniTrainingRepositoryCreateMethod(TestCase):
             "title": domain_obj.titles.title_fr,
             "title_english": domain_obj.titles.title_en,
             "credits": domain_obj.credits,
-            "constraint_type": domain_obj.content_constraint.type.name,
-            "min_constraint": domain_obj.content_constraint.minimum,
-            "max_constraint": domain_obj.content_constraint.maximum,
             "management_entity": self.management_entity_version.entity.id,
             "main_teaching_campus": self.campus.id,
         }
@@ -96,7 +93,7 @@ class TestMiniTrainingRepositoryCreateMethod(TestCase):
             db_education_group_year,
             fields=(
                 "academic_year", "partial_acronym", "education_group_type", "acronym", "title", "title_english",
-                "credits", "constraint_type", "min_constraint", "max_constraint", "management_entity",
+                "credits", "management_entity",
                 "main_teaching_campus"
             )
         )

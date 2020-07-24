@@ -64,7 +64,6 @@ class UpdateGroupValidatorList(business_validator.BusinessListValidator):
 class CreateMiniTrainingValidatorList(business_validator.BusinessListValidator):
     def __init__(self, mini_training_domain_obj: 'MiniTraining'):
         self.validators = [
-            ContentConstraintValidator(mini_training_domain_obj.content_constraint),
             StartAndEndYearValidator(mini_training_domain_obj.start_year, mini_training_domain_obj.end_year)
         ]
         super().__init__()

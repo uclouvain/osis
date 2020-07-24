@@ -68,17 +68,11 @@ class MiniTrainingBuilder:
     def build_from_create_cmd(self, cmd: command.CreateMiniTrainingCommand):
         mini_training_id = MiniTrainingIdentity(code=cmd.code, year=cmd.year)
         titles = Titles(title_fr=cmd.title_fr, title_en=cmd.title_en)
-        content_constraint = ContentConstraint(
-            type=ConstraintTypeEnum[cmd.constraint_type] if cmd.constraint_type else None,
-            minimum=cmd.min_constraint,
-            maximum=cmd.max_constraint
-        )
         management_entity = Entity(acronym=cmd.management_entity_acronym)
         teaching_campus = Campus(
             name=cmd.teaching_campus_name,
             university_name=cmd.organization_name,
         )
-        remark = Remark(text_fr=cmd.remark_fr, text_en=cmd.remark_en)
 
         mini_training_domain_obj = MiniTraining(
             entity_identity=mini_training_id,
@@ -89,10 +83,8 @@ class MiniTrainingBuilder:
             status=ActiveStatusEnum[cmd.status],
             schedule_type=ScheduleTypeEnum[cmd.schedule_type],
             credits=cmd.credits,
-            content_constraint=content_constraint,
             management_entity=management_entity,
             teaching_campus=teaching_campus,
-            remark=remark,
             start_year=cmd.start_year,
             end_year=cmd.end_year
         )
@@ -120,10 +112,8 @@ class MiniTraining(interface.RootEntity):
     status = attr.ib(type=ActiveStatusEnum)
     schedule_type = attr.ib(type=ScheduleTypeEnum)
     credits = attr.ib(type=int)
-    content_constraint = attr.ib(type=ContentConstraint)
     management_entity = attr.ib(type=Entity)
     teaching_campus = attr.ib(type=Campus)
-    remark = attr.ib(type=Remark)
     start_year = attr.ib(type=int)
     end_year = attr.ib(type=Optional[int], default=None)
 

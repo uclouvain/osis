@@ -93,16 +93,10 @@ class MiniTrainingRepository(interface.AbstractRepository):
                 title=mini_training_obj.titles.title_fr,
                 title_english=mini_training_obj.titles.title_en,
                 credits=mini_training_obj.credits,
-                constraint_type=mini_training_obj.content_constraint.type.name
-                if mini_training_obj.content_constraint.type else None,
-                min_constraint=mini_training_obj.content_constraint.minimum,
-                max_constraint=mini_training_obj.content_constraint.maximum,
                 management_entity_id=management_entity.entity_id,
                 main_teaching_campus=teaching_campus,
                 schedule_type=mini_training_obj.schedule_type.name,
-                active=mini_training_obj.status.name,
-                remark=mini_training_obj.remark.text_fr,
-                remark_english=mini_training_obj.remark.text_en
+                active=mini_training_obj.status.name
             )
 
         except IntegrityError:
@@ -154,22 +148,12 @@ class MiniTrainingRepository(interface.AbstractRepository):
             schedule_type=ScheduleTypeEnum[education_group_year_db.schedule_type]
             if education_group_year_db.schedule_type else None,
             credits=education_group_year_db.credits,
-            content_constraint=ContentConstraint(
-                type=ConstraintTypeEnum[education_group_year_db.constraint_type]
-                if education_group_year_db.constraint_type else None,
-                minimum=education_group_year_db.min_constraint,
-                maximum=education_group_year_db.max_constraint,
-            ),
             management_entity=EntityValueObject(
                 acronym=education_group_year_db.management_entity.most_recent_acronym,
             ),
             teaching_campus=Campus(
                 name=education_group_year_db.main_teaching_campus.name,
                 university_name=education_group_year_db.main_teaching_campus.organization.name,
-            ),
-            remark=Remark(
-                text_fr=education_group_year_db.remark,
-                text_en=education_group_year_db.remark_english
             ),
             start_year=education_group_year_db.education_group.start_year.year,
             end_year=education_group_year_db.education_group.end_year.year

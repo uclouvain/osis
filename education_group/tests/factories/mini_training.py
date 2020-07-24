@@ -98,9 +98,7 @@ class MiniTrainingFactory(factory.Factory):
     status = factory.Iterator(active_status.ActiveStatusEnum)
     schedule_type = factory.Iterator(schedule_type_enum.ScheduleTypeEnum)
     credits = factory.fuzzy.FuzzyInteger(60, 180)
-    content_constraint = factory.LazyAttribute(generate_content_constraint)
     management_entity = factory.LazyAttribute(generate_management_entity)
     teaching_campus = factory.LazyAttribute(generate_teaching_campus)
-    remark = factory.LazyAttribute(generate_remark)
     start_year = factory.fuzzy.FuzzyInteger(low=1999, high=2099)
     end_year = None
