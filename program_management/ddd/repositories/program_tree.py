@@ -72,8 +72,8 @@ class ProgramTreeRepository(interface.AbstractRepository):
                     management_entity_acronym=child_node.management_entity_acronym,
                     teaching_campus_name=child_node.teaching_campus.name,
                     organization_name=child_node.teaching_campus.university_name,
-                    remark_fr=child_node.remark_fr,
-                    remark_en=child_node.remark_en,
+                    remark_fr=child_node.remark_fr or "",
+                    remark_en=child_node.remark_en or "",
                     start_year=child_node.start_year,
                     end_year=child_node.end_year,
                 )
