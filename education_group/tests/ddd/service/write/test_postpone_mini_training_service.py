@@ -24,33 +24,32 @@
 import mock
 from django.test import TestCase
 
-from base.tests.factories.academic_year import AcademicYearFactory
 from education_group.ddd import command
-from education_group.ddd.domain import training
-from education_group.ddd.service.write import postpone_training_service
+from education_group.ddd.domain import training, mini_training
+from education_group.ddd.service.write import postpone_training_service, postpone_mini_training_service
 from education_group.tests.ddd.factories.training import TrainingFactory
 from testing import mocks
 
 
-class TestPostponeTraining(TestCase):
-    @mock.patch("education_group.ddd.service.write.postpone_training_service.TrainingRepository",
+class TestPostponeMiniTraining(TestCase):
+    @mock.patch("education_group.ddd.service.write.postpone_mini_training_service.MiniTrainingRepository",
                 new_callable=mocks.MockRepository)
     @mock.patch("education_group.ddd.domain.service.calculate_end_postponement."
-                "CalculateEndPostponement.calculate_year_of_end_postponement", return_value=2021)
-    @mock.patch("education_group.ddd.service.write.copy_training_service.copy_training_to_next_year")
+                "CalculateEndPostponement.calculate_year_of_end_postponement_for_mini", return_value=2021)
+    @mock.patch("education_group.ddd.service.write.copy_mini_training_service.copy_mini_training_to_next_year")
     def test_should_return_a_number_of_identities_equal_to_difference_of_from_year_and_until_year(
             self,
-            mock_copy_training_to_next_year_service,
+            mock_copy_mini_training_to_next_year_service,
             mock_calculate_end_year_of_postponement,
             mock_repostirory):
-        training_identities = [
-            training.TrainingIdentity(acronym="ACRO", year=2018),
-            training.TrainingIdentity(acronym="ACRO", year=2019),
-            training.TrainingIdentity(acronym="ACRO", year=2020)
+        mini_training_identities = [
+            mini_training.MiniTrainingIdentity(code="CODE", year=2018),
+            mini_training.MiniTrainingIdentity(code="CODE", year=2019),
+            mini_training.MiniTrainingIdentity(code="CODE", year=2020)
         ]
-        mock_copy_training_to_next_year_service.side_effect = training_identities
+        mock_copy_mini_training_to_next_year_service.side_effect = mini_training_identities
         mock_repostirory.return_value.get.return_value = TrainingFactory()
 
-        cmd = command.PostponeTrainingCommand(acronym="ACRO", postpone_from_year=2018)
-        result = postpone_training_service.postpone_training(cmd)
-        self.assertListEqual(training_identities, result)
+        cmd = command.PostponeMiniTrainingCommand(code="CODE", postpone_from_year=2018)
+        result = postpone_mini_training_service.postpone_mini_training(cmd)
+        self.assertListEqual(mini_training_identities, result)

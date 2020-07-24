@@ -124,6 +124,7 @@ class ProgramTreeBuilder:
                     child_title=generated_child_title,
                     parent_abbreviated_title=root_node.title
                 ),
+                start_year=root_node.year,
             )
             child._has_changed = True
             root_node.add_child(child)

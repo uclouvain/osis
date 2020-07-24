@@ -27,6 +27,8 @@ from typing import Optional, Set
 
 import attr
 
+import attr
+
 from base.models.enums.link_type import LinkTypes
 from education_group.ddd import command as education_group_command
 from osis_common.ddd import interface
@@ -216,6 +218,30 @@ class CreateGroupAndAttachCommand(interface.CommandRequest):
         return "CreateGroupAndAttachCommand({parameters})".format(parameters=parameters)
 
 
+@attr.s(frozen=True, slots=True)
+class CreateMiniTrainingAndPasteCommand(interface.CommandRequest):
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)
+    type = attr.ib(type=str)
+    abbreviated_title = attr.ib(type=str)
+    title_fr = attr.ib(type=str)
+    title_en = attr.ib(type=str)
+    status = attr.ib(type=str)
+    schedule_type = attr.ib(type=str)
+    credits = attr.ib(type=int)
+    constraint_type = attr.ib(type=str)
+    min_constraint = attr.ib(type=int)
+    max_constraint = attr.ib(type=int)
+    management_entity_acronym = attr.ib(type=str)
+    teaching_campus_name = attr.ib(type=str)
+    organization_name = attr.ib(type=str)
+    remark_fr = attr.ib(type=str)
+    remark_en = attr.ib(type=str)
+    start_year = attr.ib(type=int)
+    end_year = attr.ib(type=Optional[int])
+    path_to_paste = attr.ib(type=str)
+
+
 class GetNodeIdentityFromElementId(interface.CommandRequest):
     def __init__(self, element_id: int):
         self.element_id = element_id
@@ -289,6 +315,7 @@ class PostponeProgramTreeVersionCommand(interface.CommandRequest):
     from_version_name = attr.ib(type=str)
     from_year = attr.ib(type=int)
     from_is_transition = attr.ib(type=bool)
+    from_code = attr.ib(type=str, default=None)
 
 
 @attr.s(frozen=True, slots=True)

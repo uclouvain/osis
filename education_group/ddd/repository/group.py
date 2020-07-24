@@ -57,6 +57,7 @@ class GroupRepository(interface.AbstractRepository):
     def create(cls, group: 'Group', **_) -> 'GroupIdentity':
         try:
             academic_year = AcademicYearModelDb.objects.only('id').get(year=group.year)
+            start_year = AcademicYearModelDb.objects.only('id').get(year=group.start_year)
             education_group_type = EducationGroupTypeModelDb.objects.only('id').get(name=group.type.name)
             management_entity = EntityVersionModelDb.objects.current(timezone.now()).only('entity_id').get(
                 acronym=group.management_entity.acronym,
@@ -85,7 +86,7 @@ class GroupRepository(interface.AbstractRepository):
 
         group_upserted, created = GroupModelDb.objects.update_or_create(
             pk=group_pk,
-            defaults={'start_year': academic_year, 'end_year': end_year}
+            defaults={'start_year': start_year, 'end_year': end_year}
         )
         try:
             group_year_created = GroupYearModelDb.objects.create(

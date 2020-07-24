@@ -23,25 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from base.models import academic_year
-from education_group.ddd.business_types import *
-from osis_common.ddd import interface
+from django.db import transaction
+
+from education_group.ddd import command
+from education_group.ddd.domain.mini_training import MiniTrainingIdentity, MiniTrainingBuilder
+from education_group.ddd.repository.mini_training import MiniTrainingRepository
 
 
-class CalculateEndPostponement(interface.DomainService):
+@transaction.atomic()
+def copy_mini_training_to_next_year(copy_cmd: command.CopyMiniTrainingToNextYearCommand) -> 'MiniTrainingIdentity':
+    # GIVEN
+    repository = MiniTrainingRepository()
+    existing_mini_training = repository.get(
+        entity_id=MiniTrainingIdentity(code=copy_cmd.code, year=copy_cmd.postpone_from_year)
+    )
 
-    @classmethod
-    def calculate_year_of_end_postponement(cls, training: 'Training') -> int:
-        default_years_to_postpone = 6
-        current_year = academic_year.starting_academic_year().year
-        if training.end_year:
-            default_years_to_postpone = training.end_year - training.year
-        return current_year + default_years_to_postpone
+    # WHEN
+    mini_training_next_year = MiniTrainingBuilder().copy_to_next_year(existing_mini_training, repository)
 
-    @classmethod
-    def calculate_year_of_end_postponement_for_mini(cls, mini_training: 'MiniTraining') -> int:
-        default_years_to_postpone = 6
-        current_year = academic_year.starting_academic_year().year
-        if mini_training.end_year:
-            default_years_to_postpone = mini_training.end_year - mini_training.year
-        return current_year + default_years_to_postpone
+    # THEN
+    identity = repository.create(mini_training_next_year)
+
+    return identity

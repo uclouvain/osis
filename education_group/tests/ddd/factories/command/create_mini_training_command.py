@@ -23,25 +23,35 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from base.models import academic_year
-from education_group.ddd.business_types import *
-from osis_common.ddd import interface
+from decimal import Decimal
+
+import factory.fuzzy
+
+from base.models.enums.schedule_type import ScheduleTypeEnum
+from education_group.ddd import command
 
 
-class CalculateEndPostponement(interface.DomainService):
+class CreateMiniTrainingCommandFactory(factory.Factory):
+    class Meta:
+        model = command.CreateMiniTrainingCommand
+        abstract = False
 
-    @classmethod
-    def calculate_year_of_end_postponement(cls, training: 'Training') -> int:
-        default_years_to_postpone = 6
-        current_year = academic_year.starting_academic_year().year
-        if training.end_year:
-            default_years_to_postpone = training.end_year - training.year
-        return current_year + default_years_to_postpone
-
-    @classmethod
-    def calculate_year_of_end_postponement_for_mini(cls, mini_training: 'MiniTraining') -> int:
-        default_years_to_postpone = 6
-        current_year = academic_year.starting_academic_year().year
-        if mini_training.end_year:
-            default_years_to_postpone = mini_training.end_year - mini_training.year
-        return current_year + default_years_to_postpone
+    abbreviated_title = "Title "
+    status = " Status "
+    code = " Code "
+    year = 2019
+    type = " Type "
+    credits = 23
+    schedule_type = ScheduleTypeEnum.DAILY.name
+    start_year = 2019
+    end_year = None
+    title_fr = "fr  title "
+    title_en = "title  en "
+    teaching_campus_name = None
+    management_entity_acronym = None
+    organization_name = None
+    constraint_type = None
+    min_constraint = None
+    max_constraint = None
+    remark_fr = None
+    remark_en = None

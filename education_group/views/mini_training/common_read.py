@@ -94,10 +94,9 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
     @functools.lru_cache()
     def get_education_group_version(self):
         try:
-            root_element_id = self.get_path().split("|")[-1]
             return EducationGroupVersion.objects.select_related(
                 'offer', 'root_group'
-            ).get(root_group__element__pk=root_element_id)
+            ).get(root_group__partial_acronym=self.kwargs["code"], root_group__academic_year__year=self.kwargs["year"])
         except (EducationGroupVersion.DoesNotExist, Element.DoesNotExist):
             raise Http404
 

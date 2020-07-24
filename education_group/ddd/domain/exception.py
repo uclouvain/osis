@@ -7,11 +7,21 @@ class TrainingNotFoundException(Exception):
     pass
 
 
+class MiniTrainingNotFoundException(Exception):
+    pass
+
+
 class GroupNotFoundException(Exception):
     pass
 
 
 class GroupCodeAlreadyExistException(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _("Code already exists")
+        super().__init__(message, **kwargs)
+
+
+class MiniTrainingCodeAlreadyExistException(BusinessException):
     def __init__(self, *args, **kwargs):
         message = _("Code already exists")
         super().__init__(message, **kwargs)
@@ -51,6 +61,12 @@ class ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum(BusinessExcepti
                     "max": _("maximum constraint").title(),
                     "min": _("minimum constraint").title(),
                  }
+        super().__init__(message, **kwargs)
+
+
+class StartYearGreaterThanEndYearException(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _("Validity cannot be greater than last year of organization")
         super().__init__(message, **kwargs)
 
 

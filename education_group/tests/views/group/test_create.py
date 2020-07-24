@@ -233,6 +233,3 @@ class TestCreateNonOrphanGroupPostMethod(TestCase):
             reverse('group_identification', kwargs={'code': 'LTRONC1000', 'year': 2018}) + \
             "?path={}".format(str(self.parent_element.pk))
         self.assertRedirects(response, expected_redirect, fetch_redirect_response=False)
-
-
-

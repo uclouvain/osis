@@ -346,10 +346,22 @@ msgstr ""
 msgid "Mini-Training"
 msgstr ""
 
+#, python-format
+msgid ""
+"Mini-training <a href='%(link)s'> %(code)s (%(academic_year)s) </a> "
+"successfully created."
+msgstr ""
+
 msgid "Modification"
 msgstr ""
 
 msgid "New Education Group"
+msgstr ""
+
+msgid "New Mini-Training"
+msgstr ""
+
+msgid "New training"
 msgstr ""
 
 #, python-format
@@ -558,6 +570,9 @@ msgid "Utilizations"
 msgstr ""
 
 msgid "Validity"
+msgstr ""
+
+msgid "Validity cannot be greater than last year of organization"
 msgstr ""
 
 msgid "Web re-registration"

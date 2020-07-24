@@ -23,16 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from base.ddd.utils import business_validator
+from education_group.ddd.business_types import *
 from education_group.ddd.validators._abbreviated_title_already_exist import AcronymAlreadyExistValidator
 from education_group.ddd.validators._acronym_required import AcronymRequiredValidator
 from education_group.ddd.validators._certificate_aim_type_2 import CertificateAimType2Validator
+from education_group.ddd.validators._content_constraint import ContentConstraintValidator
 from education_group.ddd.validators._copy_check_end_date import CheckEndDateValidator
 from education_group.ddd.validators._credits import CreditsValidator
-from education_group.ddd.business_types import *
-
-from base.ddd.utils import business_validator
-from education_group.ddd.validators._content_constraint import ContentConstraintValidator
 from education_group.ddd.validators._start_year_end_year import StartYearEndYearValidator
+from education_group.ddd.validators.start_and_end_year_validator import StartAndEndYearValidator
 
 
 class CreateGroupValidatorList(business_validator.BusinessListValidator):
@@ -57,6 +57,14 @@ class UpdateGroupValidatorList(business_validator.BusinessListValidator):
         self.validators = [
             ContentConstraintValidator(group.content_constraint),
             CreditsValidator(group.credits),
+        ]
+        super().__init__()
+
+
+class CreateMiniTrainingValidatorList(business_validator.BusinessListValidator):
+    def __init__(self, mini_training_domain_obj: 'MiniTraining'):
+        self.validators = [
+            StartAndEndYearValidator(mini_training_domain_obj.start_year, mini_training_domain_obj.end_year)
         ]
         super().__init__()
 

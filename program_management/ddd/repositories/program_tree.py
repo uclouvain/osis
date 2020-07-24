@@ -75,7 +75,7 @@ class ProgramTreeRepository(interface.AbstractRepository):
                     remark_fr=child_node.remark_fr,
                     remark_en=child_node.remark_en,
                     start_year=child_node.start_year,
-                    end_year=child_node.end_date,
+                    end_year=child_node.end_year,
                 )
             )
         persist_tree.persist(program_tree)
