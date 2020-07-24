@@ -24,7 +24,7 @@
 #
 ##############################################################################
 
-from base.models.enums.education_group_types import EducationGroupTypesEnum
+from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, MiniTrainingType
 from base.models.validation_rule import ValidationRule
 from osis_common.ddd import interface
 
@@ -33,5 +33,14 @@ class FieldValidationRule(interface.DomainService):
 
     @classmethod
     def get(cls, node_type: EducationGroupTypesEnum, field_name: str) -> ValidationRule:
-        field_reference_value = 'GroupForm.{type}.{field_name}'.format(type=node_type.name, field_name=field_name)
+        prefix = 'GroupForm'
+        if isinstance(node_type, TrainingType):
+            prefix = 'TrainingForm'
+        elif isinstance(node_type, MiniTrainingType):
+            prefix = 'MiniTrainingForm'
+        field_reference_value = '{prefix}.{type}.{field_name}'.format(
+            prefix=prefix,
+            type=node_type.name,
+            field_name=field_name,
+        )
         return ValidationRule.objects.get(field_reference=field_reference_value)
