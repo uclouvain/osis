@@ -53,6 +53,10 @@
                             {% url 'create_element_select_type' enums.GROUP as create_group_url %}
                             {% a_tag_modal_has_perm create_group_url _('New Education Group') 'base.add_group' user %}
                          </li>
+                        <li>
+                            {% url 'create_element_select_type' enums.TRAINING as create_training_url %}
+                            {% a_tag_modal_has_perm create_training_url _('New training') 'base.add_training' user %}
+                        </li>
                     </ul>
                  </div>
             </div>

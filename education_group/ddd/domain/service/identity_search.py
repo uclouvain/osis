@@ -34,13 +34,15 @@ from program_management.ddd.business_types import *
 
 
 class TrainingIdentitySearch(interface.DomainService):
-    def get_from_node_identity(self, node_identity: 'NodeIdentity') -> 'TrainingIdentity':
+
+    @classmethod
+    def get_from_node_identity(cls, node_identity: 'NodeIdentity') -> 'TrainingIdentity':
         values = GroupYear.objects.filter(
             partial_acronym=node_identity.code,
             academic_year__year=node_identity.year
         ).annotate(
-            offer_acronym=F('education_group_version__education_group_year__acronym'),
-            year=F('education_group_version__education_group_year__academic_year__year'),
+            offer_acronym=F('educationgroupversion__offer__acronym'),
+            year=F('educationgroupversion__offer__academic_year__year'),
         ).values('offer_acronym', 'year')
         if values:
             return TrainingIdentity(acronym=values[0]['offer_acronym'], year=values[0]['year'])

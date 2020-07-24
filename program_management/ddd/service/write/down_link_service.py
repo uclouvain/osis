@@ -21,12 +21,14 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+from django.db import transaction
 
 from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.repositories import persist_tree, load_tree, load_node
 
 
+@transaction.atomic()
 def down_link(command_up: command.OrderDownLinkCommand) -> 'NodeIdentity':
     root_id = int(command_up.path.split("|")[0])
     *_, parent_id, child_id = [int(element_id) for element_id in command_up.path.split("|")]

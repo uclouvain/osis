@@ -24,7 +24,9 @@
 #
 ##############################################################################
 from enum import Enum
-from typing import List, Dict
+from typing import List, Dict, Type
+
+from osis_common.ddd import interface
 
 
 class ChoiceEnum(Enum):
@@ -65,3 +67,19 @@ def filter_with_list_or_object(fk_name, model, **kwargs):
         fk_name + ('__in' if isinstance(kwargs[fk_name], list) else ''):
             kwargs[fk_name]
     })
+
+
+def get_enum_from_str(value: str, enum_class: Type[ChoiceEnum]):
+    """
+    :param value: The string value of the enumeration key.
+    :param enum_class: The class of an enumeration (inheriting from ChoiceEnum)
+    :return: An instance of enum_class given in parameter. Return None if the value is not a valid enumeration choice.
+    """
+    if not value:
+        return None
+    try:
+        return enum_class[value]
+    except ValueError:
+        raise interface.BusinessException(
+            "Invalid enum choice (value={}, enumeration_class={})".format(value, enum_class)
+        )
