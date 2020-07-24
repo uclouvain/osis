@@ -106,7 +106,32 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
             entity_ids: Optional[List['ProgramTreeVersionIdentity']] = None,
             **kwargs
     ) -> List[ProgramTreeVersion]:
-        raise NotImplementedError
+        qs = GroupYear.objects.all().order_by(
+            'educationgroupversion__version_name'
+        ).annotate(
+            code=F('partial_acronym'),
+            offer_acronym=F('educationgroupversion__offer__acronym'),
+            offer_year=F('educationgroupversion__offer__academic_year__year'),
+            version_name=F('educationgroupversion__version_name'),
+            version_title_fr=F('educationgroupversion__title_fr'),
+            version_title_en=F('educationgroupversion__title_en'),
+            is_transition=F('educationgroupversion__is_transition'),
+        ).values(
+            'code',
+            'offer_acronym',
+            'offer_year',
+            'version_name',
+            'version_title_fr',
+            'version_title_en',
+            'is_transition',
+        )
+        if "element_ids" in kwargs:
+            qs = qs.filter(element__in=kwargs['element_ids'])
+
+        results = []
+        for record_dict in qs:
+            results.append(_instanciate_tree_version(record_dict))
+        return results
 
     @classmethod
     def delete(cls, entity_id: 'ProgramTreeVersionIdentity', **_) -> None:
