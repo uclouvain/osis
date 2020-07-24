@@ -54,10 +54,6 @@ from program_management.ddd.repositories import load_tree
 from program_management.forms.custom_xls import CustomXlsForm
 from program_management.models.element import Element
 from program_management.serializers.program_tree_view import program_tree_view_serializer
-from program_management.serializers.program_tree_version_view import program_tree_version_view_serializer
-
-from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
-from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 
 Tab = read.Tab  # FIXME :: fix imports (and remove this line)
 
@@ -88,15 +84,6 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
     def node_identity(self) -> 'NodeIdentity':
         return NodeIdentity(code=self.kwargs['code'], year=self.kwargs['year'])
 
-    @cached_property
-    def program_tree_version_identity(self) -> 'ProgramTreeVersionIdentity':
-        return ProgramTreeVersionIdentitySearch().get_from_node_identity(
-            NodeIdentity(code=self.get_tree().root_node.code, year=self.get_tree().root_node.year))
-
-    @cached_property
-    def current_version(self) -> 'ProgramTreeVersion':
-        return ProgramTreeVersionRepository.get(self.program_tree_version_identity)
-
     @functools.lru_cache()
     def get_object(self) -> 'Node':
         try:
@@ -126,8 +113,7 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
             "enums": mdl.enums.education_group_categories,
             "can_change_education_group": can_change_education_group,
             "form_xls_custom": CustomXlsForm(),
-            "tree":  json.dumps(program_tree_version_view_serializer(self.current_version))
-            if self.current_version else json.dumps(program_tree_view_serializer(self.get_tree())),
+            "tree":  json.dumps(program_tree_view_serializer(self.get_tree())),
             "group": self.get_group(),
             "node": self.get_object(),
             "node_path": self.get_path(),

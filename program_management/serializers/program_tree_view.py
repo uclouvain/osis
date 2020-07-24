@@ -34,12 +34,22 @@ from program_management.serializers.node_view import serialize_children
 import program_management.ddd.command
 from program_management.ddd.service.read.search_all_versions_from_root_nodes import search_all_versions_from_root_nodes
 
+from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
+from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
+
 
 def program_tree_view_serializer(tree: 'ProgramTree') -> dict:
     path = str(tree.root_node.pk)
-
+    program_tree_version_id = ProgramTreeVersionIdentitySearch().get_from_node_identity(
+        NodeIdentity(code=tree.root_node.code, year=tree.root_node.year))
+    tree_version = ProgramTreeVersionRepository.get(program_tree_version_id)
+    version_label = tree_version.version_label if tree_version else ''
     return {
-        'text': '%(code)s - %(title)s' % {'code': tree.root_node.code, 'title': tree.root_node.title},
+        'text': '%(code)s - %(title)s%(version_label)s' % {
+            'code': tree.root_node.code,
+            'title': tree.root_node.title,
+            'version_label': version_label,
+        },
         'id': path,
         'icon': None,
         'children': serialize_children(
@@ -70,4 +80,3 @@ def _get_program_tree_version_for_all_mini_training(mini_trainings: Set['Node'])
                                                                              year=node.year) for node in mini_trainings
     ]
     return search_all_versions_from_root_nodes(commands)
-
