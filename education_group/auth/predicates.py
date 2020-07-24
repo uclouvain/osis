@@ -28,8 +28,8 @@ def are_all_minitrainings_removable(self, user, education_group_year):
 
 
 @predicate(bind=True)
-def are_all_groups_removable(self, user, education_group_year):
-    groups = education_group_year.education_group.educationgroupyear_set.all()
+def are_all_groups_removable(self, user, group_year):
+    groups = group_year.group.groupyear_set.all()
     return _are_all_removable(self, user, groups, 'base.delete_group')
 
 

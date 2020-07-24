@@ -23,28 +23,38 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, Http404
+from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import DeleteView
 
+from base.views.common import display_success_messages
 from base.views.mixins import AjaxTemplateMixin
+from education_group.ddd.business_types import *
 from education_group.ddd import command
+from education_group.ddd.domain.exception import GroupNotFoundException
 from education_group.ddd.service.read import get_group_service
+from education_group.models.group_year import GroupYear
+from osis_role.contrib.views import PermissionRequiredMixin
 
 
-class GroupDeleteView(LoginRequiredMixin, AjaxTemplateMixin, DeleteView):
+class GroupDeleteView(PermissionRequiredMixin, AjaxTemplateMixin, DeleteView):
     template_name = "education_group_app/group/delete_inner.html"
+    permission_required = 'base.delete_all_group'
 
     def get_object(self, queryset=None) -> 'Group':
-        cmd = command.GetGroupCommand(code=self.kwargs['code'], year=self.kwargs['year'])
-        return get_group_service.get_group(cmd)
+        try:
+            cmd = command.GetGroupCommand(code=self.kwargs['code'], year=self.kwargs['year'])
+            return get_group_service.get_group(cmd)
+        except GroupNotFoundException:
+            raise Http404
 
     def delete(self, request, *args, **kwargs):
         # Call delete program_tree service ()
-        return HttpResponseRedirect(self.get_success_url())
+        display_success_messages(request, _("MESSAGE DE SUPPRESSION"))
+        return self._ajax_response() or HttpResponseRedirect(self.get_success_url())
 
     def get_context_data(self, **kwargs):
         return {
@@ -60,3 +70,10 @@ class GroupDeleteView(LoginRequiredMixin, AjaxTemplateMixin, DeleteView):
 
     def get_success_url(self) -> str:
         return reverse('version_program')
+
+    def get_permission_object(self):
+        return get_object_or_404(
+            GroupYear.objects.select_related('education_group_type', 'academic_year', 'management_entity'),
+            academic_year__year=self.kwargs['year'],
+            partial_acronym=self.kwargs['code']
+        )
