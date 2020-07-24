@@ -24,13 +24,16 @@
 import datetime
 
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils import translation
+from django.utils.translation import gettext as _
 from django.views.generic import FormView
 from waffle.decorators import waffle_switch
 
 from base.forms.education_group.common import SelectLanguage
 from base.models.enums.education_group_types import GroupType
+from base.views.common import display_warning_messages
 from base.views.mixins import FlagMixin, AjaxTemplateMixin
 from osis_common.document.pdf_build import render_pdf
 from program_management.ddd.domain.node import NodeIdentity
@@ -40,6 +43,7 @@ from program_management.ddd.domain.service.identity_search import ProgramTreeVer
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 from backoffice.settings.base import LANGUAGE_CODE_EN
+
 
 CURRENT_SIZE_FOR_ANNUAL_COLUMN = 15
 MAIN_PART_INIT_SIZE = 650
@@ -54,12 +58,16 @@ def pdf_content(request, year, code, language):
     try:
         program_tree_id = ProgramTreeVersionIdentitySearch().get_from_node_identity(node_id)
         program_tree_version = ProgramTreeVersionRepository.get(program_tree_id)
-        tree = program_tree_version.get_tree()
     except ProgramTreeVersionNotFoundException:
+        message = _("Program tree version not found for node {} {}").format(code, year)
+        display_warning_messages(request, message)
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+    if program_tree_version:
+        tree = program_tree_version.get_tree()
+    else:
         tree = ProgramTreeRepository.get(
             ProgramTreeIdentitySearch().get_from_node_identity(node_id)
         )
-
     tree = tree.prune(ignore_children_from={GroupType.MINOR_LIST_CHOICE})
 
     if language == LANGUAGE_CODE_EN:
