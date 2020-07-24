@@ -23,17 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Optional, List, Callable
+from typing import Optional, List
 
 from base.models.group_element_year import GroupElementYear
-from education_group.ddd import command as command_education_group
 from education_group.ddd.command import CreateOrphanGroupCommand
-from education_group.ddd.domain.service.identity_search import TrainingIdentitySearch
 from osis_common.ddd import interface
 from osis_common.ddd.interface import Entity
+from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception
-from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories import persist_tree, load_tree, node
 from program_management.models.element import Element
 
@@ -54,9 +52,7 @@ class ProgramTreeRepository(interface.AbstractRepository):
     def delete(
             cls,
             entity_id: 'ProgramTreeIdentity',
-            delete_orphan_group_service: interface.ApplicationService = None,
-            delete_orphan_training_service: interface.ApplicationService = None,
-            delete_orphan_minitraining_service: interface.ApplicationService = None
+            delete_node_service: interface.ApplicationService = None,
     ) -> None:
         program_tree = cls.get(entity_id)
         links = program_tree.get_all_links()
@@ -65,24 +61,8 @@ class ProgramTreeRepository(interface.AbstractRepository):
         GroupElementYear.objects.filter(pk__in=(link.pk for link in links)).delete()
 
         for node in nodes:
-            if node.is_group():
-                cmd = command_education_group.DeleteOrphanGroupCommand(code=node.code, year=node.year)
-                delete_orphan_group_service(cmd)
-            elif node.is_training():
-                training_id = TrainingIdentitySearch().get_from_node_identity(node.entity_id)
-                cmd = command_education_group.DeleteOrphanTrainingCommand(
-                    acronym=training_id.acronym,
-                    year=training_id.year
-                )
-                delete_orphan_training_service(cmd)
-            elif node.is_mini_training():
-                # TODO: change With MiniTrainingIdentitySearch()
-                tree_version_id = ProgramTreeVersionIdentitySearch().get_from_node_identity(node.entity_id)
-                cmd = command_education_group.DeleteOrphanMiniTrainingCommand(
-                    acronym=tree_version_id.offer_acronym,
-                    year=tree_version_id.year
-                )
-                delete_orphan_minitraining_service(cmd)
+            cmd = command.DeleteNodeCommand(code=node.code, year=node.year, node_type=node.node_type.name)
+            delete_node_service(cmd)
 
     @classmethod
     def create(

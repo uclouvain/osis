@@ -28,12 +28,11 @@ from base.models.enums.education_group_types import TrainingType, GroupType, Min
 from base.models.group_element_year import GroupElementYear
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
-from education_group.ddd import command
+from program_management.ddd import command
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 from program_management.ddd.repositories import program_tree
 from program_management.ddd.repositories.program_tree import ProgramTreeRepository
-from program_management.models.education_group_version import EducationGroupVersion
 from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory
 
@@ -153,39 +152,36 @@ class TestDeleteProgramTree(TestCase):
     def test_assert_all_linked_are_removed(self):
         ProgramTreeRepository.delete(
             self.program_tree_id,
-            delete_orphan_group_service=Mock(),
-            delete_orphan_training_service=Mock(),
-            delete_orphan_minitraining_service=Mock()
+            delete_node_service=Mock(),
         )
 
         self.assertEqual(GroupElementYear.objects.all().count(), 0)
 
-    def test_assert_called_right_service_according_to_node_type(self):
-        mock_delete_training_service = Mock()
-        mock_delete_mini_training_service = Mock()
-        mock_delete_group_service = Mock()
+    def test_assert_called_right_cmd_service_according_to_node_type(self):
+        mock_delete_node_service = Mock()
 
         ProgramTreeRepository.delete(
             self.program_tree_id,
-            delete_orphan_group_service=mock_delete_group_service,
-            delete_orphan_training_service=mock_delete_training_service,
-            delete_orphan_minitraining_service=mock_delete_mini_training_service
+            delete_node_service=mock_delete_node_service,
         )
 
-        cmd_delete_group = command.DeleteOrphanGroupCommand(
+        cmd_delete_group = command.DeleteNodeCommand(
             code=self.subgroup.group_year.partial_acronym,
-            year=self.subgroup.group_year.academic_year.year
+            year=self.subgroup.group_year.academic_year.year,
+            node_type=GroupType.SUB_GROUP.name
         )
-        mock_delete_group_service.assert_called_once_with(cmd_delete_group)
+        mock_delete_node_service.assert_any_call(cmd_delete_group)
 
-        cmd_delete_training = command.DeleteOrphanTrainingCommand(
-            acronym=self.training_version.offer.acronym,
-            year=self.training_version.offer.academic_year.year
+        cmd_delete_training = command.DeleteNodeCommand(
+            code=self.training_version.root_group.partial_acronym,
+            year=self.training_version.root_group.academic_year.year,
+            node_type=TrainingType.BACHELOR.name
         )
-        mock_delete_training_service.assert_called_once_with(cmd_delete_training)
+        mock_delete_node_service.assert_any_call(cmd_delete_training)
 
-        cmd_delete_mini_training = command.DeleteOrphanMiniTrainingCommand(
-            acronym=self.mini_training_version.offer.acronym,
-            year=self.mini_training_version.offer.academic_year.year
+        cmd_delete_mini_training = command.DeleteNodeCommand(
+            code=self.mini_training_version.root_group.partial_acronym,
+            year=self.mini_training_version.root_group.academic_year.year,
+            node_type=MiniTrainingType.OPTION.name
         )
-        mock_delete_mini_training_service.assert_called_once_with(cmd_delete_mini_training)
+        mock_delete_node_service.assert_any_call(cmd_delete_mini_training)

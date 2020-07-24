@@ -23,7 +23,7 @@
 # ############################################################################
 from unittest import mock
 
-from django.test import SimpleTestCase
+from django.test import TestCase
 
 from program_management.ddd import command
 from program_management.ddd.service.write import delete_standard_version_service
@@ -32,7 +32,7 @@ from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
 
 
-class TestDeleteStandardVersionService(SimpleTestCase):
+class TestDeleteStandardVersionService(TestCase):
     def setUp(self):
         self.tree_version = ProgramTreeVersionFactory()
         self.parent = self.tree_version.tree.root_node

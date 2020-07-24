@@ -23,11 +23,10 @@
 # ############################################################################
 from django.db import transaction
 
-from education_group.ddd.service.write import delete_orphan_group_service, delete_orphan_training_service, \
-    delete_orphan_mini_training_service
 from program_management.ddd import command
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 from program_management.ddd.repositories.program_tree import ProgramTreeRepository
+from program_management.ddd.service.write import delete_node_service
 from program_management.ddd.validators.validators_by_business_action import DeleteProgramTreeValidatorList
 
 
@@ -42,8 +41,6 @@ def delete_program_tree(cmd: command.DeleteProgramTreeCommand) -> ProgramTreeIde
         program_tree_id,
 
         # Service Dependancy injection
-        delete_orphan_group_service=delete_orphan_group_service.delete_orphan_group,
-        delete_orphan_training_service=delete_orphan_training_service.delete_orphan_training,
-        delete_orphan_minitraining_service=delete_orphan_mini_training_service.delete_orphan_mini_training,
+        delete_node_service=delete_node_service.delete_node
     )
     return program_tree_id

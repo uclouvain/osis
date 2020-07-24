@@ -23,7 +23,7 @@
 # ############################################################################
 from unittest import mock
 
-from django.test import SimpleTestCase
+from django.test import TestCase
 
 from program_management.ddd import command
 from program_management.ddd.service.write import delete_program_tree_service
@@ -32,7 +32,7 @@ from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
 
-class TestDeleteProgramTreeService(SimpleTestCase):
+class TestDeleteProgramTreeService(TestCase):
     def setUp(self):
         self.tree = ProgramTreeFactory()
         self.parent = self.tree.root_node
