@@ -169,8 +169,6 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     secondary_domains = AutoCompleteSelectMultipleField(
         'university_domains',
         required=False,
-        help_text=_('Enter text to search'),
-        show_help_text=True,
         label=_('secondary domains').title(),
     )
     isced_domain = forms.ModelChoiceField(
@@ -280,6 +278,7 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         self.__init_diploma_fields()
         self.__init_main_language()
         self.__init_campuses()
+        self.__init_secondary_domains()
 
     def __init_academic_year_field(self):
         if not self.fields['academic_year'].disabled and self.user.person.is_faculty_manager:
@@ -326,6 +325,9 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
             self.fields['teaching_campus'].initial = default_campus
         if 'enrollment_campus' in self.fields:
             self.fields['enrollment_campus'].initial = default_campus
+
+    def __init_secondary_domains(self):
+        self.fields["secondary_domains"].widget.attrs['placeholder'] = _('Enter text to search')
 
     def is_valid(self):
         valid = super().is_valid()
