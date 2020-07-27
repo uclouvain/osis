@@ -100,9 +100,9 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 ]
                 display_success_messages(request, success_messages, extra_tags='safe')
                 return HttpResponseRedirect(self.get_success_url(training_ids[0]))
-            else:
-                msg = _("Error(s) in form: The modifications are not saved")
-                display_error_messages(request, msg)
+
+        msg = _("Error(s) in form: The modifications are not saved")
+        display_error_messages(request, msg)
 
         return render(request, self.template_name, {
             "training_form": training_form,
