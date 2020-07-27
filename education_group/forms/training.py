@@ -25,12 +25,14 @@
 ##############################################################################
 from typing import Dict
 
+from ajax_select import register, LookupChannel
 from ajax_select.fields import AutoCompleteSelectMultipleField
 from dal import autocomplete
 from django import forms
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator
+from django.db.models import Q
 from django.utils.functional import lazy
 from django.utils.translation import gettext_lazy as _
 
@@ -57,6 +59,7 @@ from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.forms import fields
 from reference.models.domain import Domain
 from reference.models.domain_isced import DomainIsced
+from reference.models.enums import domain_type
 from reference.models.enums.domain_type import UNIVERSITY
 from reference.models.language import Language, FR_CODE_LANGUAGE
 from rules_management.enums import TRAINING_PGRM_ENCODING_PERIOD, \
@@ -361,3 +364,29 @@ class UpdateTrainingForm(CreateTrainingForm):
     def __init__(self, *args, **kwargs):
         super(UpdateTrainingForm, self).__init__(*args, **kwargs)
         self.fields['academic_year'].label = _('Validity')
+
+
+@register('university_domains')
+class UniversityDomainsLookup(LookupChannel):
+
+    model = Domain
+
+    def check_auth(self, request):
+        # override the default behaviour
+        pass
+
+    def get_query(self, q, request):
+        return self.model.objects.filter(type=domain_type.UNIVERSITY)\
+                                 .filter(Q(name__icontains=q) | Q(code__icontains=q) |
+                                         Q(decree__name__icontains=q))\
+                                 .select_related('decree')\
+                                 .order_by('-decree__name', 'name')
+
+    def format_item_display(self, item):
+        return "<span class='tag'>{}</span>".format(self.format_match(item))
+
+    def get_result(self, item):
+        return self.format_match(item)
+
+    def format_match(self, item):
+        return "{}:{} {}".format(item.decree.name, item.code, item.name)
