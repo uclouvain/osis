@@ -25,25 +25,30 @@ import functools
 from typing import List, Dict, Union
 
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import Http404
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 
+from base.utils.urls import reverse_with_get
+from base.views.common import display_success_messages
 from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import exception, group
 from education_group.ddd.service.read import get_training_service, get_group_service, get_multiple_groups_service
+from education_group.ddd.service.write import update_training_service, update_group_service
 from education_group.enums.node_type import NodeType
 from education_group.forms import training as training_forms, content as content_forms
+from education_group.templatetags.academic_year_display import display_as_academic_year
 from learning_unit.ddd import command as command_learning_unit_year
-from learning_unit.ddd.domain import learning_unit_year
 from learning_unit.ddd.business_types import *
+from learning_unit.ddd.domain import learning_unit_year
 from learning_unit.ddd.service.read import get_multiple_learning_unit_years_service
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command as command_program_management
 from program_management.ddd.business_types import *
 from program_management.ddd.service.read import get_program_tree_service
+from program_management.ddd.service.write import update_link_service
 
 
 class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
@@ -55,25 +60,94 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
     form_class = training_forms.UpdateTrainingForm
 
     def get(self, request, *args, **kwargs):
-        training_form = training_forms.UpdateTrainingForm(
-            user=request.user,
+        context = {
+            "tabs": self.get_tabs(),
+            "training_form": self.get_training_form(),
+            "content_formset": self.get_content_formset()
+        }
+        return render(request, self.template_name, context)
+
+    def post(self, request, *args, **kwargs):
+        training_form = self.get_training_form()
+        content_formset = self.get_content_formset()
+
+        if training_form.is_valid() and content_formset.is_valid():
+            update_training_command = self.convert_training_form_to_update_training_command(training_form)
+            update_training_service.update_training(update_training_command)
+            update_group_command = self.convert_training_form_to_update_group_command(training_form)
+            update_group_service.update_group(update_group_command)
+            self._send_multiple_update_link_cmd(content_formset)
+            display_success_messages(request, self.get_success_msg(), extra_tags='safe')
+            return HttpResponseRedirect(self.get_success_url())
+
+        context = {
+            "tabs": self.get_tabs(),
+            "training_form": training_form,
+            "content_formset": self.get_content_formset()
+        }
+        return render(request, self.template_name, context)
+
+    def get_success_msg(self) -> str:
+        return _("Training <a href='%(link)s'> %(code)s (%(academic_year)s) </a> successfully updated.") % {
+            "link": self.get_success_url(),
+            "code": self.kwargs["code"],
+            "academic_year": display_as_academic_year(self.kwargs["year"]),
+        }
+
+    def _send_multiple_update_link_cmd(self, content_formset: content_forms.ContentFormSet) -> List['Link']:
+        forms_changed = [form for form in content_formset.forms if form.has_changed()]
+        if not forms_changed:
+            return []
+
+        update_link_cmds = []
+        for form in forms_changed:
+            cmd_update_link = command_program_management.UpdateLinkCommand(
+                child_node_code=form.child_obj.code if isinstance(form.child_obj, Group) else form.child_obj.acronym,
+                child_node_year=form.child_obj.year,
+
+                access_condition=form.cleaned_data.get('access_condition', False),
+                is_mandatory=form.cleaned_data.get('is_mandatory', True),
+                block=form.cleaned_data.get('block'),
+                link_type=form.cleaned_data.get('link_type'),
+                comment=form.cleaned_data.get('comment_fr'),
+                comment_english=form.cleaned_data.get('comment_en'),
+                relative_credits=form.cleaned_data.get('relative_credits'),
+            )
+            update_link_cmds.append(cmd_update_link)
+
+        cmd_bulk = command_program_management.BulkUpdateLinkCommand(
+            parent_node_code=self.kwargs['code'],
+            parent_node_year=self.kwargs['year'],
+            update_link_cmds=update_link_cmds
+        )
+        return update_link_service.bulk_update_links(cmd_bulk)
+
+    def get_success_url(self) -> str:
+        get_data = {'path': self.request.GET['path_to']} if self.request.GET.get('path_to') else {}
+        url = reverse_with_get(
+            'element_identification',
+            kwargs={'code': self.kwargs['code'], 'year': self.kwargs['year']},
+            get=get_data
+        )
+        return url
+
+    def get_training_form(self) -> 'training_forms.UpdateTrainingForm':
+        return training_forms.UpdateTrainingForm(
+            self.request.POST or None,
+            user=self.request.user,
             training_type=self.get_training_obj().type.name,
             initial=self._get_training_form_initial_values()
         )
-        content_formset = content_forms.ContentFormSet(
+
+    def get_content_formset(self) -> 'content_forms.ContentFormSet':
+        return content_forms.ContentFormSet(
+            self.request.POST or None,
             initial=self._get_content_formset_initial_values(),
             form_kwargs=[
                 {'parent_obj': self.get_group_obj(), 'child_obj': child}
                 for child in self.get_children_objs()
             ]
         )
-
-        context = {
-            "tabs": self.get_tabs(),
-            "training_form": training_form,
-            "content_formset": content_formset
-        }
-        return render(request, self.template_name, context)
 
     def _get_training_form_initial_values(self) -> Dict:
         training_obj = self.get_training_obj()
@@ -239,3 +313,89 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 "include_html": "education_group_app/training/upsert/content_form.html"
             }
         ]
+
+    def convert_training_form_to_update_training_command(
+            self,
+            form: training_forms.UpdateTrainingForm) -> command.UpdateTrainingCommand:
+        cleaned_data = form.cleaned_data
+        return command.UpdateTrainingCommand(
+            abbreviated_title=cleaned_data['abbreviated_title'],
+            code=cleaned_data['code'],
+            year=cleaned_data['year'],
+            status=cleaned_data['status'],
+            credits=cleaned_data['credits'],
+            duration=cleaned_data['duration'],
+            title_fr=cleaned_data['title_fr'],
+            partial_title_fr=cleaned_data['partial_title_fr'],
+            title_en=cleaned_data['title_en'],
+            partial_title_en=cleaned_data['partial_title_en'],
+            keywords=cleaned_data['keywords'],
+            internship_presence=cleaned_data['internship_presence'],
+            is_enrollment_enabled=cleaned_data['is_enrollment_enabled'],
+            has_online_re_registration=cleaned_data['has_online_re_registration'],
+            has_partial_deliberation=cleaned_data['has_partial_deliberation'],
+            has_admission_exam=cleaned_data['has_admission_exam'],
+            has_dissertation=cleaned_data['has_dissertation'],
+            produce_university_certificate=cleaned_data['produce_university_certificate'],
+            main_language=cleaned_data['main_language'],
+            english_activities=cleaned_data['english_activities'],
+            other_language_activities=cleaned_data['other_language_activities'],
+            internal_comment=cleaned_data['internal_comment'],
+            main_domain_code=cleaned_data['main_domain_code'].code if cleaned_data.get('main_domain_code') else None,
+            main_domain_decree=cleaned_data['main_domain_decree'].decree.name
+            if cleaned_data.get('main_domain_decree') else None,
+            secondary_domains=[
+                (obj.decree.name, obj.code) for obj in cleaned_data.get('secondary_domains', list())
+            ],
+            isced_domain_code=cleaned_data['isced_domain_code'].code if cleaned_data.get('isced_domain_code') else None,
+            management_entity_acronym=cleaned_data['management_entity_acronym'],
+            administration_entity_acronym=cleaned_data['administration_entity_acronym'],
+            end_year=cleaned_data['end_year'].year if cleaned_data["end_year"] else None,
+            teaching_campus_name=cleaned_data['teaching_campus_name'],
+            teaching_campus_organization_name=cleaned_data['teaching_campus_organization_name'],
+            enrollment_campus_name=cleaned_data['enrollment_campus_name'],
+            enrollment_campus_organization_name=cleaned_data['enrollment_campus_organization_name'],
+            other_campus_activities=cleaned_data['other_campus_activities'],
+            can_be_funded=cleaned_data['can_be_funded'],
+            funding_orientation=cleaned_data['funding_orientation'],
+            can_be_international_funded=cleaned_data['can_be_international_funded'],
+            international_funding_orientation=cleaned_data['international_funding_orientation'],
+            ares_code=cleaned_data['ares_code'],
+            ares_graca=cleaned_data['ares_graca'],
+            ares_authorization=cleaned_data['ares_authorization'],
+            code_inter_cfb=cleaned_data['code_inter_cfb'],
+            coefficient=cleaned_data['coefficient'],
+            duration_unit=cleaned_data['duration_unit'],
+            leads_to_diploma=cleaned_data['leads_to_diploma'],
+            printing_title=cleaned_data['printing_title'],
+            professional_title=cleaned_data['professional_title'],
+            aims=[
+                (aim.code, aim.section) for aim in (cleaned_data['certificate_aims'] or [])
+            ],
+            constraint_type=cleaned_data['constraint_type'],
+            min_constraint=cleaned_data['min_constraint'],
+            max_constraint=cleaned_data['max_constraint'],
+            remark_fr=cleaned_data['remark_fr'],
+            remark_en=cleaned_data['remark_en'],
+        )
+
+    def convert_training_form_to_update_group_command(
+            self,
+            training_form: training_forms.UpdateTrainingForm) -> command.UpdateGroupCommand:
+        cleaned_data = training_form.cleaned_data
+        return command.UpdateGroupCommand(
+            code=cleaned_data['code'],
+            year=cleaned_data['year'],
+            abbreviated_title=cleaned_data['abbreviated_title'],
+            title_fr=cleaned_data['title_fr'],
+            title_en=cleaned_data['title_en'],
+            credits=cleaned_data['credits'],
+            constraint_type=cleaned_data['constraint_type'],
+            min_constraint=cleaned_data['min_constraint'],
+            max_constraint=cleaned_data['max_constraint'],
+            management_entity_acronym=cleaned_data['management_entity_acronym'],
+            teaching_campus_name=cleaned_data['teaching_campus_name'],
+            organization_name=cleaned_data['organization_name'],
+            remark_fr=cleaned_data['remark_fr'],
+            remark_en=cleaned_data['remark_en'],
+        )

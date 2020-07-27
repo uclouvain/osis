@@ -86,8 +86,8 @@ class TrainingRepository(interface.AbstractRepository):
         return training.entity_id
 
     @classmethod
-    def update(cls, entity: 'Training', **_) -> 'TrainingIdentity':
-        raise NotImplementedError
+    def update(cls, training: 'Training', **_) -> 'TrainingIdentity':
+        return cls.create(training)
 
     @classmethod
     def get(cls, entity_id: 'TrainingIdentity') -> 'Training':
@@ -342,75 +342,76 @@ def _save_education_group_year(
         training: 'Training',
         education_group_db_obj: EducationGroupModelDb
 ) -> EducationGroupYearModelDb:
-    obj = EducationGroupYearModelDb(
+    obj, _created = EducationGroupYearModelDb.objects.update_or_create(
         academic_year=AcademicYearModelDb.objects.get(year=training.entity_id.year),
         acronym=training.entity_id.acronym,
-        education_group_type=EducationGroupTypeModelDb.objects.get(name=training.type.name),
-        active=training.status.name,
-        credits=training.credits,
-        schedule_type=training.schedule_type.name if training.schedule_type else None,
-        duration=training.duration,
-        education_group=education_group_db_obj,
-        title=training.titles.title_fr,
-        partial_title=training.titles.partial_title_fr,
-        title_english=training.titles.title_en,
-        partial_title_english=training.titles.partial_title_en,
-        keywords=training.keywords,
-        internship=training.internship_presence.name if training.internship_presence else None,
-        enrollment_enabled=training.is_enrollment_enabled,
-        web_re_registration=training.has_online_re_registration,
-        partial_deliberation=training.has_partial_deliberation,
-        admission_exam=training.has_admission_exam,
-        dissertation=training.has_dissertation,
-        university_certificate=training.produce_university_certificate,
-        decree_category=training.decree_category.name if training.decree_category else None,
-        rate_code=training.rate_code.name if training.rate_code else None,
-        primary_language=LanguageModelDb.objects.get(
-            name=training.main_language.name
-        ) if training.main_language else None,
-        english_activities=training.english_activities.name if training.english_activities else None,
-        other_language_activities=training.other_language_activities.name
-        if training.other_language_activities else None,
-        internal_comment=training.internal_comment,
-        main_domain=DomainModelDb.objects.get(
-            code=training.main_domain.entity_id.code,
-            decree__name=training.main_domain.entity_id.decree_name,
-        ) if training.main_domain else None,
-        isced_domain=DomainIscedModelDb.objects.get(
-            code=training.isced_domain.entity_id.code
-        ) if training.isced_domain else None,
-        management_entity_id=entity_version.find_by_acronym_and_year(
-            acronym=training.management_entity.acronym,
-            year=training.year,
-        ).entity_id if training.management_entity else None,
-        administration_entity_id=entity_version.find_by_acronym_and_year(
-            acronym=training.administration_entity.acronym,
-            year=training.year,
-        ).entity_id if training.administration_entity else None,
-        main_teaching_campus=CampusModelDb.objects.get(
-            name=training.teaching_campus.name,
-            organization__name=training.teaching_campus.university_name,
-        ) if training.teaching_campus else None,
-        enrollment_campus=CampusModelDb.objects.get(
-            name=training.enrollment_campus.name,
-            organization__name=training.enrollment_campus.university_name,
-        ) if training.teaching_campus else None,
-        other_campus_activities=training.other_campus_activities.name if training.other_campus_activities else None,
-        funding=training.funding.can_be_funded,
-        funding_direction=training.funding.funding_orientation.name
-        if training.funding and training.funding.funding_orientation else '',
-        funding_cud=training.funding.can_be_international_funded,
-        funding_direction_cud=training.funding.international_funding_orientation.name
-        if training.funding and training.funding.international_funding_orientation else '',
-        co_graduation=training.co_graduation.code_inter_cfb,
-        co_graduation_coefficient=training.co_graduation.coefficient,
-        academic_type=training.academic_type.name if training.academic_type else None,
-        duration_unit=training.duration_unit.name if training.duration_unit else None,
-        joint_diploma=training.diploma.leads_to_diploma,
-        diploma_printing_title=training.diploma.printing_title,
-        professional_title=training.diploma.professional_title,
+        defaults={
+            'education_group_type': EducationGroupTypeModelDb.objects.get(name=training.type.name),
+            'active': training.status.name,
+            'credits': training.credits,
+            'schedule_type': training.schedule_type.name if training.schedule_type else None,
+            'duration': training.duration,
+            'education_group': education_group_db_obj,
+            'title': training.titles.title_fr,
+            'partial_title': training.titles.partial_title_fr,
+            'title_english': training.titles.title_en,
+            'partial_title_english': training.titles.partial_title_en,
+            'keywords': training.keywords,
+            'internship': training.internship_presence.name if training.internship_presence else None,
+            'enrollment_enabled': training.is_enrollment_enabled,
+            'web_re_registration': training.has_online_re_registration,
+            'partial_deliberation': training.has_partial_deliberation,
+            'admission_exam': training.has_admission_exam,
+            'dissertation': training.has_dissertation,
+            'university_certificate': training.produce_university_certificate,
+            'decree_category': training.decree_category.name if training.decree_category else None,
+            'rate_code': training.rate_code.name if training.rate_code else None,
+            'primary_language': LanguageModelDb.objects.get(
+                name=training.main_language.name
+            ) if training.main_language else None,
+            'english_activities': training.english_activities.name if training.english_activities else None,
+            'other_language_activities': training.other_language_activities.name
+            if training.other_language_activities else None,
+            'internal_comment': training.internal_comment,
+            'main_domain': DomainModelDb.objects.get(
+                code=training.main_domain.entity_id.code,
+                decree__name=training.main_domain.entity_id.decree_name,
+            ) if training.main_domain else None,
+            'isced_domain': DomainIscedModelDb.objects.get(
+                code=training.isced_domain.entity_id.code
+            ) if training.isced_domain else None,
+            'management_entity_id': entity_version.find_by_acronym_and_year(
+                acronym=training.management_entity.acronym,
+                year=training.year,
+            ).entity_id if training.management_entity else None,
+            'administration_entity_id': entity_version.find_by_acronym_and_year(
+                acronym=training.administration_entity.acronym,
+                year=training.year,
+            ).entity_id if training.administration_entity else None,
+            'main_teaching_campus': CampusModelDb.objects.get(
+                name=training.teaching_campus.name,
+                organization__name=training.teaching_campus.university_name,
+            ) if training.teaching_campus else None,
+            'enrollment_campus': CampusModelDb.objects.get(
+                name=training.enrollment_campus.name,
+                organization__name=training.enrollment_campus.university_name,
+            ) if training.teaching_campus else None,
+            'other_campus_activities': training.other_campus_activities.name if training.other_campus_activities else None,
+            'funding': training.funding.can_be_funded,
+            'funding_direction': training.funding.funding_orientation.name
+            if training.funding and training.funding.funding_orientation else '',
+            'funding_cud': training.funding.can_be_international_funded,
+            'funding_direction_cud': training.funding.international_funding_orientation.name
+            if training.funding and training.funding.international_funding_orientation else '',
+            'co_graduation': training.co_graduation.code_inter_cfb,
+            'co_graduation_coefficient': training.co_graduation.coefficient,
+            'academic_type': training.academic_type.name if training.academic_type else None,
+            'duration_unit': training.duration_unit.name if training.duration_unit else None,
+            'joint_diploma': training.diploma.leads_to_diploma,
+            'diploma_printing_title': training.diploma.printing_title,
+            'professional_title': training.diploma.professional_title,
+        }
     )
-    obj.save()
     return obj
 
 
@@ -418,6 +419,7 @@ def _save_secondary_domains(
         training: 'Training',
         education_group_year_db_obj: EducationGroupYearModelDb
 ) -> List[EducationGroupYearDomainModelDb]:
+    _delete_secondary_domains(education_group_year_db_obj)
     saved_objs = []
     for dom in training.secondary_domains:
         obj = EducationGroupYearDomainModelDb(
@@ -434,12 +436,14 @@ def _save_hops(
 ) -> List[HopsModelDb]:
     saved_objs = []
     if training.hops:
-        obj = HopsModelDb(
+        obj, created = HopsModelDb.objects.update_or_create(
             education_group_year=education_group_year_db_obj,
-            ares_study=training.hops.ares_code,
-            ares_graca=training.hops.ares_graca,
-            ares_ability=training.hops.ares_authorization,
-        ).save()
+            defaults={
+                'ares_study': training.hops.ares_code,
+                'ares_graca': training.hops.ares_graca,
+                'ares_ability': training.hops.ares_authorization
+            }
+        )
         saved_objs.append(obj)
     return saved_objs
 
@@ -448,6 +452,7 @@ def _save_certificate_aims(
         training: 'Training',
         education_group_year_db_obj: EducationGroupYearModelDb
 ) -> List[EducationGroupCertificateAimModelDb]:
+    _delete_certificate_aims(education_group_year_db_obj)
     saved_objs = []
     if training.diploma:
         for aim in training.diploma.aims:
@@ -457,3 +462,19 @@ def _save_certificate_aims(
             ).save()
             saved_objs.append(obj)
     return saved_objs
+
+
+def _delete_secondary_domains(education_group_year_db_obj: EducationGroupYearModelDb) -> None:
+    secondary_domains_qs = EducationGroupYearDomainModelDb.objects.filter(
+        education_group_year=education_group_year_db_obj
+    )
+    for secondary_domain_obj in secondary_domains_qs:
+        secondary_domain_obj.delete()
+
+
+def _delete_certificate_aims(education_group_year_db_obj: EducationGroupYearModelDb) -> None:
+    certificate_aims_qs = EducationGroupCertificateAimModelDb.objects.filter(
+        education_group_year=education_group_year_db_obj
+    )
+    for aim in certificate_aims_qs:
+        aim.delete()

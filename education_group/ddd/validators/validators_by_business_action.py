@@ -76,6 +76,18 @@ class CreateTrainingValidatorList(business_validator.BusinessListValidator):
         super().__init__()
 
 
+class UpdateTrainingValidatorList(business_validator.BusinessListValidator):
+
+    def __init__(
+            self,
+            training: 'Training'
+    ):
+        self.validators = [
+            CertificateAimType2Validator(training)
+        ]
+        super().__init__()
+
+
 class CopyTrainingValidatorList(business_validator.BusinessListValidator):
 
     def __init__(

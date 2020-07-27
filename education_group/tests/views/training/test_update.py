@@ -25,10 +25,12 @@ import mock
 from django.test import TestCase
 
 from base.utils.urls import reverse_with_get
+from education_group.ddd.domain import training, group
 from education_group.ddd.factories.group import GroupFactory
 from education_group.tests.ddd.factories.training import TrainingFactory
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from reference.tests.factories.language import FrenchLanguageFactory
+from testing import mocks
 
 
 class TestTrainingUpdateView(TestCase):
@@ -45,15 +47,52 @@ class TestTrainingUpdateView(TestCase):
     def setUp(self):
         self.client.force_login(self.central_manager.person.user)
 
+    @mock.patch("education_group.views.training.update.TrainingUpdateView.get_content_formset")
     @mock.patch("education_group.ddd.service.read.get_training_service.get_training")
     @mock.patch("education_group.ddd.service.read.get_group_service.get_group")
-    def test_should_display_forms_when_good_get_request(self, mock_get_group, mock_get_training):
+    def test_should_display_forms_when_good_get_request(
+            self,
+            mock_get_group,
+            mock_get_training,
+            mock_get_content_formset):
         mock_get_training.return_value = TrainingFactory()
         mock_get_group.return_value = GroupFactory()
+        mock_get_content_formset.return_value = []
 
         response = self.client.get(self.url)
 
         context = response.context
-        self.assertTrue(context["training_form"])
-        self.assertTrue(context["content_formset"])
+        self.assertTrue("training_form" in context)
+        self.assertTrue("content_formset" in context)
         self.assertTemplateUsed(response, "education_group_app/training/upsert/update.html")
+
+    @mock.patch("education_group.views.training.update.TrainingUpdateView._send_multiple_update_link_cmd")
+    @mock.patch("education_group.views.training.update.TrainingUpdateView.get_content_formset")
+    @mock.patch("education_group.ddd.service.write.update_training_service.update_training")
+    @mock.patch("education_group.ddd.service.write.update_group_service.update_group")
+    @mock.patch("education_group.views.training.update.TrainingUpdateView.get_training_form")
+    def test_should_call_training_and_link_services_when_forms_are_valid(
+            self,
+            get_training_form_mock,
+            update_group_service_mock,
+            update_training_service_mock,
+            mock_get_content_formset,
+            mock_update_links):
+        mock_update_links.return_value = list()
+        mock_get_content_formset.return_value = mocks.MockFormValid()
+        get_training_form_mock.return_value = mocks.MockFormValid()
+        update_training_service_mock.return_value = training.TrainingIdentity(acronym="ACRONYM", year=2020)
+        update_group_service_mock.return_value = group.GroupIdentity(code="CODE", year=2020)
+        response = self.client.post(self.url, data={})
+
+        self.assertTrue(update_training_service_mock.called)
+        self.assertTrue(update_group_service_mock.called)
+        self.assertTrue(mock_update_links.called)
+
+        expected_redirec_url = reverse_with_get(
+            'element_identification',
+            kwargs={"code": "CODE", "year": 2020},
+            get={"path": "1|2|3"}
+        )
+        self.assertRedirects(response, expected_redirec_url, fetch_redirect_response=False)
+

@@ -54,6 +54,7 @@ from education_group.ddd.domain._remark import Remark
 from education_group.ddd.domain._study_domain import StudyDomain, StudyDomainIdentity
 from education_group.ddd.domain._titles import Titles
 from education_group.ddd.domain.exception import TrainingNotFoundException
+from education_group.ddd.validators import validators_by_business_action
 from education_group.ddd.validators.validators_by_business_action import CreateTrainingValidatorList, \
     CopyTrainingValidatorList
 from osis_common.ddd import interface
@@ -277,3 +278,44 @@ class Training(interface.RootEntity):
 
     def is_master_180_240_credits(self):
         return self.type == TrainingType.PGRM_MASTER_180_240
+
+    def update(self, data: 'UpdateTrainingData'):
+        data_as_dict = attr.asdict(data)
+        for field, new_value in data_as_dict.items():
+            setattr(self, field, new_value)
+        validators_by_business_action.UpdateTrainingValidatorList(self)
+        return self
+
+
+@attr.s(frozen=True, slots=True, kw_only=True)
+class UpdateTrainingData:
+    credits = attr.ib(type=int)
+    titles = attr.ib(type=Titles)
+    status = attr.ib(type=ActiveStatusEnum, default=ActiveStatusEnum.ACTIVE)
+    duration = attr.ib(type=int, default=1)
+    duration_unit = attr.ib(type=DurationUnitsEnum, default=DurationUnitsEnum.QUADRIMESTER)
+    keywords = attr.ib(type=str, default="")
+    internship_presence = attr.ib(type=InternshipPresence, default=InternshipPresence.NO)
+    is_enrollment_enabled = attr.ib(type=bool, default=True)
+    has_online_re_registration = attr.ib(type=bool, default=True)
+    has_partial_deliberation = attr.ib(type=bool, default=False)
+    has_admission_exam = attr.ib(type=bool, default=False)
+    has_dissertation = attr.ib(type=bool, default=False)
+    produce_university_certificate = attr.ib(type=bool, default=False)
+    main_language = attr.ib(type=Language, default=None)
+    english_activities = attr.ib(type=ActivityPresence, default=None)
+    other_language_activities = attr.ib(type=ActivityPresence, default=None)
+    internal_comment = attr.ib(type=str, default=None)
+    main_domain = attr.ib(type=StudyDomain, default=None)
+    secondary_domains = attr.ib(type=List[StudyDomain], default=[])
+    isced_domain = attr.ib(type=IscedDomain, default=None)
+    management_entity = attr.ib(type=Entity, default=None)
+    administration_entity = attr.ib(type=Entity, default=None)
+    end_year = attr.ib(type=int, default=None)
+    teaching_campus = attr.ib(type=Campus, default=None)
+    enrollment_campus = attr.ib(type=Campus, default=None)
+    other_campus_activities = attr.ib(type=ActivityPresence, default=None)
+    funding = attr.ib(type=Funding, default=None)
+    hops = attr.ib(type=HOPS, default=None)
+    co_graduation = attr.ib(type=CoGraduation, default=None)
+    diploma = attr.ib(type=Diploma, default=None)
