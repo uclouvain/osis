@@ -207,6 +207,7 @@ class TestPublicationContactDeleteView(PublicationContactViewSetupTest):
             'training_general_information',
             kwargs={'year': self.training.academic_year.year, 'code': self.training.partial_acronym}
         )
+        redirect_expected = "{}?anchor=True".format(redirect_expected)
         response = self.client.post(self.url_delete, follow=True)
         self.assertRedirects(response, redirect_expected)
         with self.assertRaises(EducationGroupPublicationContact.DoesNotExist):
