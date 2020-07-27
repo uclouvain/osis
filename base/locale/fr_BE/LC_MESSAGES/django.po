@@ -3228,6 +3228,7 @@ msgstr "Semaine"
 msgid "Weighting"
 msgstr "Pondération par crédit"
 
+msgctxt "section title"
 msgid "Welcome"
 msgstr "Accueil"
 
