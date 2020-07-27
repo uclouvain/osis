@@ -95,8 +95,9 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             if not training_form.errors:
                 self._display_success_messages(training_ids)
                 return HttpResponseRedirect(self.get_success_url(training_ids[0]))
-            else:
-                self._display_default_error_message()
+
+        if training_form.errors and not training_form.confirmed:
+            self._display_default_error_message()
 
         return render(request, self.template_name, self.get_context(training_form))
 
