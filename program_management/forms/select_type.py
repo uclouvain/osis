@@ -26,6 +26,7 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
+from base.forms.utils import choice_field
 from base.models.enums.education_group_categories import Categories
 from program_management.ddd import command
 from program_management.ddd.service.read import allowed_children_types_service
@@ -49,3 +50,4 @@ class SelectTypeForm(forms.Form):
             tuple((allowed_type.name, allowed_type.value) for allowed_type in allowed_child_types),
             key=lambda type: type[1]
         )
+        self.fields["name"].choices = choice_field.add_blank(self.fields["name"].choices)

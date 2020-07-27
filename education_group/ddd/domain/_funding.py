@@ -35,10 +35,10 @@ class Funding(interface.ValueObject):
             can_be_international_funded: bool = False,
             international_funding_orientation: FundingCodes = None
     ):
-        self.can_be_funded = can_be_funded
-        self.funding_orientation = funding_orientation
-        self.can_be_international_funded = can_be_international_funded
-        self.international_funding_orientation = international_funding_orientation
+        self.can_be_funded = can_be_funded or False
+        self.funding_orientation = funding_orientation or ""
+        self.can_be_international_funded = can_be_international_funded or False
+        self.international_funding_orientation = international_funding_orientation or ""
 
     def __eq__(self, other):
         return self.can_be_funded == other.can_be_funded \

@@ -36,7 +36,8 @@ from program_management.ddd.repositories import persist_tree, load_tree
 from program_management.ddd.validators._authorized_relationship import DetachAuthorizedRelationshipValidator
 from program_management.ddd.validators.validators_by_business_action import DetachNodeValidatorList
 from program_management.tests.ddd.factories.link import LinkFactory
-from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory
+from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory, NodeGroupYearFactory, \
+    NodeEducationGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory, ElementLearningUnitYearFactory
@@ -54,9 +55,21 @@ class TestPersistTree(TestCase):
             learning_unit_year__academic_year=academic_year
         )
 
-        self.root_node = NodeGroupYear(node_id=self.root_group.pk)
-        self.common_core_node = NodeEducationGroupYear(node_id=self.common_core_element.pk)
-        self.learning_unit_year_node = NodeLearningUnitYear(node_id=self.learning_unit_year_element.pk)
+        self.root_node = NodeGroupYearFactory(
+            node_id=self.root_group.pk,
+            code=self.root_group.group_year.partial_acronym,
+            year=self.root_group.group_year.academic_year.year
+        )
+        self.common_core_node = NodeGroupYearFactory(
+            node_id=self.common_core_element.pk,
+            code=self.common_core_element.group_year.partial_acronym,
+            year=self.common_core_element.group_year.academic_year.year
+        )
+        self.learning_unit_year_node = NodeLearningUnitYearFactory(
+            node_id=self.learning_unit_year_element.pk,
+            code=self.learning_unit_year_element.learning_unit_year.acronym,
+            year=self.learning_unit_year_element.learning_unit_year.academic_year.year
+        )
 
     def test_persist_tree_from_scratch(self):
         self.common_core_node.add_child(self.learning_unit_year_node)
@@ -167,4 +180,3 @@ class TestPersistPrerequisites(TestCase):
             mock_persist_prerequisite.call_count,
             number_learning_unit_removed
         )
-

@@ -32,6 +32,7 @@ from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory, GroupElementYearChildLeafFactory
 from base.tests.factories.person import PersonFactory
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
+from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory, ElementLearningUnitYearFactory
 
 
@@ -66,6 +67,8 @@ class TestLearningUnitUtilization(TestCase):
         GroupElementYearFactory(parent_element=cls.common_core_element, child_element=cls.subgroup_element)
         GroupElementYearChildLeafFactory(parent_element=cls.common_core_element, child_element=cls.element_luy1)
         GroupElementYearChildLeafFactory(parent_element=cls.subgroup_element, child_element=cls.element_luy2)
+        cls.education_group_version = EducationGroupVersionFactory(offer__academic_year=cls.academic_year,
+                                                                   root_group=cls.root_element.group_year)
 
         cls.central_manager = CentralManagerFactory()
         cls.url = reverse(

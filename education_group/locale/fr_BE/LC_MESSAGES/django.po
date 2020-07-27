@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-29 14:39+0200\n"
+"POT-Creation-Date: 2020-07-15 11:07+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -44,6 +44,9 @@ msgstr "Année académique"
 
 msgid "Access"
 msgstr ""
+
+msgid "Access condition"
+msgstr "Condition d'accès"
 
 msgid "Acronym/Short title"
 msgstr ""
@@ -150,6 +153,9 @@ msgstr ""
 
 msgid "Credits"
 msgstr ""
+
+msgid "Credits must be greater or equals than 0"
+msgstr "Credits doit être plus grand ou égal à 0"
 
 msgid "Cut element"
 msgstr ""
@@ -273,6 +279,14 @@ msgstr ""
 "Le groupement <a href='%(link)s'> %(code)s (%(academic_year)s) </a> a été "
 "créé avec succès"
 
+#, python-format
+msgid ""
+"Group <a href='%(link)s'> %(code)s (%(academic_year)s) </a> successfully "
+"updated."
+msgstr ""
+"Le groupement <a href='%(link)s'> %(code)s (%(academic_year)s) </a> a été "
+"mis à jour avec succès"
+
 msgid "Holders of a 2nd cycle University degree"
 msgstr ""
 
@@ -338,6 +352,9 @@ msgstr ""
 
 msgid "Mini-Training"
 msgstr ""
+
+msgid "Modification"
+msgstr "Modification"
 
 msgid "New Education Group"
 msgstr ""
@@ -466,11 +483,9 @@ msgstr ""
 msgid "The field can contain only one value."
 msgstr ""
 
-#, fuzzy, python-brace-format
-#| msgid ""
-#| "The formation you work with doesn't exist (or is not at the same "
-#| "position) in the tree {root.title} in {root.year}.You've been redirected "
-#| "to the root {root.code} ({root.year})"
+msgid "The following links has been updated"
+msgstr "Les liens suivants ont été mis à jour"
+
 msgid ""
 "The formation you work with doesn't exist (or is not at the same position) "
 "in the tree {root.title} in {root.year}.You've been redirected to the root "
@@ -490,16 +505,12 @@ msgstr ""
 "La portée de l'utilisateur est limitée et empêche la réalisation de cette "
 "action"
 
-#, fuzzy, python-format
-#| msgctxt "female"
-#| msgid "The user does not have permission to delete a %(category)s."
+#, python-format
 msgctxt "female"
 msgid "The user does not have permission to create a %(category)s."
 msgstr "L'utilisateur n'a pas la permission de supprimer une %(category)s."
 
-#, fuzzy, python-format
-#| msgctxt "female"
-#| msgid "The user does not have permission to delete a %(category)s."
+#, python-format
 msgctxt "male"
 msgid "The user does not have permission to create a %(category)s."
 msgstr "L'utilisateur n'a pas la permission de supprimer une %(category)s."

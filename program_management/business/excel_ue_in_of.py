@@ -32,7 +32,7 @@ from django.template.defaultfilters import yesno
 from django.utils import translation
 from django.utils.translation import gettext as _
 from openpyxl import Workbook
-from openpyxl.styles import Style, Font
+from openpyxl.styles import Font
 from openpyxl.writer.excel import save_virtual_workbook
 
 from attribution.ddd.domain.teacher import Teacher
@@ -44,23 +44,24 @@ from base.business.learning_units.xls_generator import hyperlinks_to_string
 from base.models.enums.education_group_types import GroupType
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
+from base.models.learning_unit_year import LearningUnitYear
 from learning_unit.ddd.domain.achievement import Achievement
 from learning_unit.ddd.domain.description_fiche import DescriptionFiche
 from learning_unit.ddd.domain.learning_unit_year import LearningUnitYear as DddLearningUnitYear
+from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYearIdentity
 from learning_unit.ddd.domain.specifications import Specifications
 from learning_unit.ddd.domain.teaching_material import TeachingMaterial
 from learning_unit.ddd.repository.load_learning_unit_year import load_multiple_by_identity
 from osis_common.document.xls_build import _build_worksheet, CONTENT_KEY, HEADER_TITLES_KEY, WORKSHEET_TITLE_KEY, \
-    STYLED_CELLS, COLORED_ROWS, ROW_HEIGHT
+    STYLED_CELLS, ROW_HEIGHT, FONT_ROWS
 from program_management.business.excel import clean_worksheet_title
 from program_management.business.utils import html2text
-from program_management.ddd.repositories import load_tree
-from program_management.forms.custom_xls import CustomXlsForm
-from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYearIdentity
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.node import NodeLearningUnitYear
-from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
+from program_management.ddd.repositories import load_tree
+from program_management.ddd.repositories.program_tree import ProgramTreeRepository
+from program_management.forms.custom_xls import CustomXlsForm
 
 ILLEGAL_CHARACTERS_RE = re.compile(r'[\000-\010]|[\013-\014]|[\016-\037]')
 
@@ -158,24 +159,24 @@ class EducationGroupYearLearningUnitsContainedToExcel:
 def generate_ue_contained_for_workbook(custom_xls_form: CustomXlsForm, hierarchy: 'ProgramTree'):
     data = _build_excel_lines_ues(custom_xls_form,  hierarchy)
     need_proposal_legend = custom_xls_form.is_valid() and custom_xls_form.cleaned_data['proposition']
-
     return _get_workbook_for_custom_xls(data.get('content'),
                                         need_proposal_legend,
-                                        data.get('colored_cells'),
+                                        data.get('font_rows'),
                                         data.get('row_height'))
 
 
 def _build_excel_lines_ues(custom_xls_form: CustomXlsForm, tree: 'ProgramTree'):
     content = _get_headers(custom_xls_form)
-
     optional_data_needed = _optional_data(custom_xls_form)
-    colored_cells = defaultdict(list)
+    font_rows = defaultdict(list)
     idx = 1
 
     for path, child_node in tree.root_node.descendents.items():
         if isinstance(child_node, NodeLearningUnitYear):
-            learning_unit_years = load_multiple_by_identity([LearningUnitYearIdentity(code=child_node.code,
-                                                                                      year=child_node.year)])
+            learning_unit_years = load_multiple_by_identity([LearningUnitYearIdentity(
+                code=child_node.code,
+                year=child_node.year
+            )])
 
             if learning_unit_years:
                 luy = learning_unit_years[0]
@@ -184,18 +185,19 @@ def _build_excel_lines_ues(custom_xls_form: CustomXlsForm, tree: 'ProgramTree'):
                 parents_data = get_explore_parents(tree.get_parents(path))
 
                 if not parents_data[EXCLUDE_UE_KEY]:
-                    content.append(_get_optional_data(_fix_data(link, luy, parents_data),
-                                                      luy,
-                                                      optional_data_needed,
-                                                      link))
+                    content.append(_get_optional_data(
+                        _fix_data(link, luy, parents_data),
+                        luy,
+                        optional_data_needed,
+                        link
+                    ))
                     if luy.proposal and luy.proposal.type:
-                        colored_cells[PROPOSAL_LINE_STYLES.get(luy.proposal.type)].append(idx)
+                        font_rows[PROPOSAL_LINE_STYLES.get(luy.proposal.type)].append(idx)
                     idx += 1
-
-    colored_cells[Style(font=BOLD_FONT)].append(0)
+    font_rows[BOLD_FONT].append(0)
     return {
         'content': content,
-        'colored_cells': colored_cells,
+        'font_rows': font_rows,
         'row_height':
             {'height': 30,
              'start': 2,
@@ -246,7 +248,7 @@ def _fix_data(link: 'Link',  luy: 'LearningUnitYear', gathering: Dict[str, 'Node
     return data
 
 
-def _get_workbook_for_custom_xls(excel_lines: List, need_proposal_legend: bool, colored_cells: dict, row_height=dict()):
+def _get_workbook_for_custom_xls(excel_lines: List, need_proposal_legend: bool, font_rows: dict, row_height=dict()):
     workbook = Workbook()
     worksheet_title = clean_worksheet_title(_("List UE"))
     header, *content = [tuple(line) for line in excel_lines]
@@ -256,7 +258,7 @@ def _get_workbook_for_custom_xls(excel_lines: List, need_proposal_legend: bool, 
         HEADER_TITLES_KEY: header,
         CONTENT_KEY: content,
         STYLED_CELLS: {},
-        COLORED_ROWS: colored_cells,
+        FONT_ROWS: font_rows,
         ROW_HEIGHT: row_height,
 
     }
@@ -352,7 +354,6 @@ def _get_optional_data(data: List, luy: DddLearningUnitYear, optional_data_neede
 
 
 def _build_validate_html_list_to_string(value_param, method):
-
     if method is None or method not in (hyperlinks_to_string, html2text):
         return value_param.strip()
 

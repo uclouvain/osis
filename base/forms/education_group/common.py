@@ -32,14 +32,13 @@ from django.utils.translation import gettext_lazy as _
 from base.business.education_groups import create
 from base.business.event_perms import EventPermEducationGroupEdition
 from base.forms.common import ValidationRuleMixin
-from base.forms.learning_unit.entity_form import EntitiesVersionChoiceField
 from base.models import campus, group_element_year
 from base.models.academic_year import current_academic_year
 from base.models.campus import Campus
 from base.models.education_group import EducationGroup
 from base.models.education_group_type import find_authorized_types
 from base.models.education_group_year import EducationGroupYear
-from base.models.entity_version import find_pedagogical_entities_version, get_last_version, EntityVersion
+from base.models.entity_version import get_last_version, EntityVersion
 from base.models.enums import education_group_categories, groups
 from base.models.enums.education_group_categories import TRAINING
 from base.models.enums.education_group_types import MiniTrainingType, GroupType
@@ -63,12 +62,6 @@ class MainCampusChoiceField(forms.ModelChoiceField):
     def __init__(self, queryset, *args, **kwargs):
         queryset = campus.find_main_campuses()
         super().__init__(queryset, *args, **kwargs)
-
-
-class MainEntitiesVersionChoiceField(EntitiesVersionChoiceField):
-    def __init__(self, queryset, *args, **kwargs):
-        queryset = find_pedagogical_entities_version()
-        super(MainEntitiesVersionChoiceField, self).__init__(queryset, *args, **kwargs)
 
 
 class ManagementEntitiesVersionChoiceField(EntityRoleChoiceField):
