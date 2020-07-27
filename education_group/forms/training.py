@@ -31,7 +31,7 @@ from dal import autocomplete
 from django import forms
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db.models import Q
 from django.utils.functional import lazy
 from django.utils.translation import gettext_lazy as _
@@ -235,9 +235,12 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     ares_authorization = forms.CharField(label=_('ARES ability'), widget=forms.TextInput(), required=False)
     code_inter_cfb = forms.CharField(max_length=8, label=_('Code co-graduation inter CfB'), required=False)
     coefficient = forms.DecimalField(
+        max_digits=5,
+        decimal_places=2,
         label=_('Co-graduation total coefficient'),
         widget=forms.TextInput(),
         required=False,
+        validators=[MinValueValidator(1), MaxValueValidator(9999)],
     )
 
     # Diploma tab
