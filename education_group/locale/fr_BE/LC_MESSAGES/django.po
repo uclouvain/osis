@@ -535,12 +535,12 @@ msgstr ""
 #, python-format
 msgctxt "female"
 msgid "The user does not have permission to create a %(category)s."
-msgstr "L'utilisateur n'a pas la permission de supprimer une %(category)s."
+msgstr "L'utilisateur n'a pas la permission de créer un %(category)s."
 
 #, python-format
 msgctxt "male"
 msgid "The user does not have permission to create a %(category)s."
-msgstr "L'utilisateur n'a pas la permission de supprimer une %(category)s."
+msgstr "L'utilisateur n'a pas la permission de créer un %(category)s."
 
 #, python-format
 msgctxt "female"
