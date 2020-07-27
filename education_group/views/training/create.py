@@ -97,7 +97,7 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         return render(request, self.template_name, {
             "training_form": training_form,
             "tabs": self.get_tabs(),
-            "type_text": GroupType.get_value(self.kwargs['type'])
+            "type_text": TrainingType.get_value(self.kwargs['type'])
         })
 
     def _display_success_messages(self, training_ids: List['TrainingIdentity']):
