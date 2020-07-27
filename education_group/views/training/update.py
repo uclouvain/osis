@@ -74,8 +74,10 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         if training_form.is_valid() and content_formset.is_valid():
             update_training_command = self.convert_training_form_to_update_training_command(training_form)
             update_training_service.update_training(update_training_command)
+
             update_group_command = self.convert_training_form_to_update_group_command(training_form)
             update_group_service.update_group(update_group_command)
+
             self._send_multiple_update_link_cmd(content_formset)
             display_success_messages(request, self.get_success_msg(), extra_tags='safe')
             return HttpResponseRedirect(self.get_success_url())
@@ -188,7 +190,7 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "english_activities": training_obj.english_activities.name,
             "other_language_activities": training_obj.other_language_activities.name,
 
-            "main_domain": training_obj.main_domain.code,
+            "main_domain": "{} - {}".format(training_obj.main_domain.decree_name, training_obj.main_domain.code),
             "secondary_domains": training_obj.secondary_domains,
             "isced_domain": training_obj.isced_domain.entity_id.code,
             "internal_comment": training_obj.internal_comment,
@@ -319,10 +321,10 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             form: training_forms.UpdateTrainingForm) -> command.UpdateTrainingCommand:
         cleaned_data = form.cleaned_data
         return command.UpdateTrainingCommand(
-            abbreviated_title=cleaned_data['abbreviated_title'],
+            abbreviated_title=cleaned_data['acronym'],
             code=cleaned_data['code'],
-            year=cleaned_data['year'],
-            status=cleaned_data['status'],
+            year=cleaned_data['academic_year'].year,
+            status=cleaned_data['active'],
             credits=cleaned_data['credits'],
             duration=cleaned_data['duration'],
             title_fr=cleaned_data['title_fr'],
@@ -341,23 +343,23 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             english_activities=cleaned_data['english_activities'],
             other_language_activities=cleaned_data['other_language_activities'],
             internal_comment=cleaned_data['internal_comment'],
-            main_domain_code=cleaned_data['main_domain_code'].code if cleaned_data.get('main_domain_code') else None,
-            main_domain_decree=cleaned_data['main_domain_decree'].decree.name
-            if cleaned_data.get('main_domain_decree') else None,
+            main_domain_code=cleaned_data['main_domain'].code if cleaned_data.get('main_domain') else None,
+            main_domain_decree=cleaned_data['main_domain'].decree.name
+            if cleaned_data.get('main_domain') else None,
             secondary_domains=[
                 (obj.decree.name, obj.code) for obj in cleaned_data.get('secondary_domains', list())
             ],
-            isced_domain_code=cleaned_data['isced_domain_code'].code if cleaned_data.get('isced_domain_code') else None,
-            management_entity_acronym=cleaned_data['management_entity_acronym'],
-            administration_entity_acronym=cleaned_data['administration_entity_acronym'],
+            isced_domain_code=cleaned_data['isced_domain'].code if cleaned_data.get('isced_domain') else None,
+            management_entity_acronym=cleaned_data['management_entity'],
+            administration_entity_acronym=cleaned_data['administration_entity'],
             end_year=cleaned_data['end_year'].year if cleaned_data["end_year"] else None,
-            teaching_campus_name=cleaned_data['teaching_campus_name'],
-            teaching_campus_organization_name=cleaned_data['teaching_campus_organization_name'],
-            enrollment_campus_name=cleaned_data['enrollment_campus_name'],
-            enrollment_campus_organization_name=cleaned_data['enrollment_campus_organization_name'],
+            teaching_campus_name=cleaned_data['teaching_campus'].name,
+            teaching_campus_organization_name=cleaned_data['teaching_campus'].organization.name,
+            enrollment_campus_name=cleaned_data['enrollment_campus'].name,
+            enrollment_campus_organization_name=cleaned_data['enrollment_campus'].organization.name,
             other_campus_activities=cleaned_data['other_campus_activities'],
             can_be_funded=cleaned_data['can_be_funded'],
-            funding_orientation=cleaned_data['funding_orientation'],
+            funding_orientation=cleaned_data['funding_direction'],
             can_be_international_funded=cleaned_data['can_be_international_funded'],
             international_funding_orientation=cleaned_data['international_funding_orientation'],
             ares_code=cleaned_data['ares_code'],
@@ -367,7 +369,7 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             coefficient=cleaned_data['coefficient'],
             duration_unit=cleaned_data['duration_unit'],
             leads_to_diploma=cleaned_data['leads_to_diploma'],
-            printing_title=cleaned_data['printing_title'],
+            printing_title=cleaned_data['diploma_printing_title'],
             professional_title=cleaned_data['professional_title'],
             aims=[
                 (aim.code, aim.section) for aim in (cleaned_data['certificate_aims'] or [])
@@ -376,7 +378,7 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             min_constraint=cleaned_data['min_constraint'],
             max_constraint=cleaned_data['max_constraint'],
             remark_fr=cleaned_data['remark_fr'],
-            remark_en=cleaned_data['remark_en'],
+            remark_en=cleaned_data['remark_english'],
         )
 
     def convert_training_form_to_update_group_command(
@@ -385,17 +387,17 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         cleaned_data = training_form.cleaned_data
         return command.UpdateGroupCommand(
             code=cleaned_data['code'],
-            year=cleaned_data['year'],
-            abbreviated_title=cleaned_data['abbreviated_title'],
+            year=cleaned_data['academic_year'].year,
+            abbreviated_title=cleaned_data['acronym'],
             title_fr=cleaned_data['title_fr'],
             title_en=cleaned_data['title_en'],
             credits=cleaned_data['credits'],
             constraint_type=cleaned_data['constraint_type'],
             min_constraint=cleaned_data['min_constraint'],
             max_constraint=cleaned_data['max_constraint'],
-            management_entity_acronym=cleaned_data['management_entity_acronym'],
-            teaching_campus_name=cleaned_data['teaching_campus_name'],
-            organization_name=cleaned_data['organization_name'],
+            management_entity_acronym=cleaned_data['management_entity'],
+            teaching_campus_name=cleaned_data['teaching_campus'].name,
+            organization_name=cleaned_data['teaching_campus'].organization.name,
             remark_fr=cleaned_data['remark_fr'],
-            remark_en=cleaned_data['remark_en'],
+            remark_en=cleaned_data['remark_english'],
         )

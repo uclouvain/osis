@@ -30,6 +30,8 @@ from django import forms
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator
+from django.db.models import Value, CharField
+from django.db.models.functions import Concat
 from django.utils.functional import lazy
 from django.utils.translation import gettext_lazy as _
 
@@ -368,9 +370,18 @@ class UpdateTrainingForm(CreateTrainingForm):
     )
 
     main_domain = forms.ModelChoiceField(
-        queryset=Domain.objects.filter(type=UNIVERSITY).select_related('decree'),
+        queryset=Domain.objects.filter(
+            type=UNIVERSITY
+        ).select_related(
+            'decree'
+        ).annotate(
+            form_key=Concat(
+                "decree__name", Value(" - "), "code",
+                output_field=CharField()
+            )
+        ),
         required=False,
-        to_field_name="code"
+        to_field_name="form_key"
     )
     isced_domain = forms.ModelChoiceField(
         queryset=DomainIsced.objects.all(),

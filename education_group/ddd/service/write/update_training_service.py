@@ -23,12 +23,17 @@
 # ############################################################################
 from django.db import transaction
 
+from base.models.enums.active_status import ActiveStatusEnum
+from base.models.enums.activity_presence import ActivityPresence
+from base.models.enums.duration_unit import DurationUnitsEnum
+from base.models.enums.funding_codes import FundingCodes
+from base.models.enums.internship_presence import InternshipPresence
 from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import training
 from education_group.ddd.domain._campus import Campus
 from education_group.ddd.domain._co_graduation import CoGraduation
-from education_group.ddd.domain._diploma import Diploma
+from education_group.ddd.domain._diploma import Diploma, DiplomaAim, DiplomaAimIdentity
 from education_group.ddd.domain._entity import Entity
 from education_group.ddd.domain._funding import Funding
 from education_group.ddd.domain._hops import HOPS
@@ -63,11 +68,11 @@ def convert_command_to_update_training_data(cmd: command.UpdateTrainingCommand) 
             title_en=cmd.title_en,
             partial_title_en=cmd.partial_title_en
         ),
-        status=cmd.status,
+        status=ActiveStatusEnum[cmd.status],
         duration=cmd.duration,
-        duration_unit=cmd.duration_unit,
+        duration_unit=DurationUnitsEnum[cmd.duration_unit],
         keywords=cmd.keywords,
-        internship_presence=cmd.internship_presence,
+        internship_presence=InternshipPresence[cmd.internship_presence],
         is_enrollment_enabled=cmd.is_enrollment_enabled,
         has_online_re_registration=cmd.has_online_re_registration,
         has_partial_deliberation=cmd.has_partial_deliberation,
@@ -75,8 +80,8 @@ def convert_command_to_update_training_data(cmd: command.UpdateTrainingCommand) 
         has_dissertation=cmd.has_dissertation,
         produce_university_certificate=cmd.produce_university_certificate,
         main_language=cmd.main_language,
-        english_activities=cmd.english_activities,
-        other_language_activities=cmd.other_language_activities,
+        english_activities=ActivityPresence[cmd.english_activities],
+        other_language_activities=ActivityPresence[cmd.other_language_activities],
         internal_comment=cmd.internal_comment,
         main_domain=StudyDomain(
             entity_id=StudyDomainIdentity(decree_name=cmd.main_domain_decree, code=cmd.main_domain_code),
@@ -96,12 +101,12 @@ def convert_command_to_update_training_data(cmd: command.UpdateTrainingCommand) 
             name=cmd.enrollment_campus_name,
             university_name=cmd.enrollment_campus_organization_name
         ),
-        other_campus_activities=cmd.other_campus_activities,
+        other_campus_activities=ActivityPresence[cmd.other_campus_activities],
         funding=Funding(
             can_be_funded=cmd.can_be_funded,
-            funding_orientation=cmd.funding_orientation,
+            funding_orientation=FundingCodes[cmd.funding_orientation],
             can_be_international_funded=cmd.can_be_international_funded,
-            international_funding_orientation=cmd.international_funding_orientation
+            international_funding_orientation=FundingCodes[cmd.international_funding_orientation]
         ),
         hops=HOPS(
             ares_code=cmd.ares_code,
@@ -116,6 +121,7 @@ def convert_command_to_update_training_data(cmd: command.UpdateTrainingCommand) 
             leads_to_diploma=cmd.leads_to_diploma,
             printing_title=cmd.printing_title,
             professional_title=cmd.professional_title,
-            aims=cmd.aims
+            aims=[DiplomaAim(entity_id=DiplomaAimIdentity(section, code), description="")
+                  for code, section in cmd.aims]
         ),
     )
