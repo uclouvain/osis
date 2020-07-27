@@ -83,6 +83,8 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         label=_("Schedule type"),
     )
     credits = forms.IntegerField(
+        min_value=0,
+        max_value=999,
         label=_("Credits"),
         widget=forms.TextInput,
     )
