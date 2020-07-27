@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-15 11:07+0200\n"
+"POT-Creation-Date: 2020-07-27 09:45+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -50,6 +50,12 @@ msgstr ""
 
 msgctxt "abbreviation"
 msgid "Acronym/Short title"
+msgstr ""
+
+msgid "Acronym/Short title '{}' already exists"
+msgstr ""
+
+msgid "Acronym/Short title is required"
 msgstr ""
 
 msgid "Actions"
@@ -211,7 +217,13 @@ msgstr ""
 msgid "Enrollment enabled"
 msgstr ""
 
+msgid "Enter text to search"
+msgstr ""
+
 msgid "Entity"
+msgstr ""
+
+msgid "Error(s) in form: The modifications are not saved"
 msgstr ""
 
 msgid "Exams Enrollments"
@@ -295,6 +307,9 @@ msgstr ""
 msgid "Institution"
 msgstr ""
 
+msgid "Internship"
+msgstr ""
+
 msgid "Jury"
 msgstr ""
 
@@ -350,6 +365,9 @@ msgid "Modification"
 msgstr ""
 
 msgid "New Education Group"
+msgstr ""
+
+msgid "New Training"
 msgstr ""
 
 #, python-format
@@ -443,6 +461,9 @@ msgstr ""
 msgid "Scores diffusion"
 msgstr ""
 
+msgid "Search..."
+msgstr ""
+
 msgid "Session"
 msgstr ""
 
@@ -474,6 +495,9 @@ msgid "Status"
 msgstr ""
 
 msgid "The field can contain only one value."
+msgstr ""
+
+msgid "The fields concerning ARES have to be ALL filled-in or none of them"
 msgstr ""
 
 msgid "The following links has been updated"
@@ -518,6 +542,9 @@ msgstr ""
 msgid "The value of this attribute is inherited from the standard OF"
 msgstr ""
 
+msgid "There can only be one type 2 expectation"
+msgstr ""
+
 msgid "Title"
 msgstr ""
 
@@ -528,6 +555,12 @@ msgid "Title in French"
 msgstr ""
 
 msgid "Training"
+msgstr ""
+
+#, python-format
+msgid ""
+"Training <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> "
+"successfully created."
 msgstr ""
 
 msgid "Trainings"
@@ -566,6 +599,12 @@ msgstr ""
 msgid "Weighting"
 msgstr ""
 
+#, python-brace-format
+msgid ""
+"You can't copy the training '{acronym}' from {from_year} to {to_year} "
+"because it ends in {end_year}"
+msgstr ""
+
 #, python-format
 msgid ""
 "You cannot change/delete a education group existing before %(limit_year)s"
@@ -602,6 +641,15 @@ msgid "comment (internal)"
 msgstr ""
 
 msgid "credits"
+msgstr ""
+
+msgid "dissertation"
+msgstr ""
+
+msgid "duration unit"
+msgstr ""
+
+msgid "filter by section"
 msgstr ""
 
 msgid "is using in"
