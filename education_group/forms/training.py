@@ -161,6 +161,7 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         required=False,
     )
     main_domain = forms.ModelChoiceField(
+        label=_('main domain'),
         queryset=Domain.objects.filter(type=UNIVERSITY).select_related('decree'),
         required=False,
     )
@@ -171,7 +172,11 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         show_help_text=True,
         label=_('secondary domains').title(),
     )
-    isced_domain = forms.ModelChoiceField(queryset=DomainIsced.objects.all(), required=False)
+    isced_domain = forms.ModelChoiceField(
+        label=_('ISCED domain'),
+        queryset=DomainIsced.objects.all(),
+        required=False,
+    )
     internal_comment = forms.CharField(
         max_length=500,
         label=_("comment (internal)").capitalize(),
@@ -181,7 +186,7 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
 
     # panel_entities_form.html
     management_entity = forms.CharField()
-    administration_entity = MainEntitiesVersionChoiceField(queryset=None)
+    administration_entity = MainEntitiesVersionChoiceField(queryset=None, label=_("Administration entity"))
     academic_year = forms.ModelChoiceField(
         queryset=AcademicYear.objects.all(),
         label=_("Start"),
@@ -223,11 +228,15 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
 
     # HOPS panel
     hops_fields = ('ares_code', 'ares_graca', 'ares_authorization')
-    ares_code = forms.CharField(widget=forms.TextInput(), required=False)
-    ares_graca = forms.CharField(widget=forms.TextInput(), required=False)
-    ares_authorization = forms.CharField(widget=forms.TextInput(), required=False)
+    ares_code = forms.CharField(label=_('ARES study code'), widget=forms.TextInput(), required=False)
+    ares_graca = forms.CharField(label=_('ARES-GRACA'), widget=forms.TextInput(), required=False)
+    ares_authorization = forms.CharField(label=_('ARES ability'), widget=forms.TextInput(), required=False)
     code_inter_cfb = forms.CharField(max_length=8, label=_('Code co-graduation inter CfB'), required=False)
-    coefficient = forms.DecimalField(widget=forms.TextInput(), required=False)
+    coefficient = forms.DecimalField(
+        label=_('Co-graduation total coefficient'),
+        widget=forms.TextInput(),
+        required=False,
+    )
 
     # Diploma tab
     section = forms.ChoiceField(
