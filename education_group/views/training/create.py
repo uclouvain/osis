@@ -36,6 +36,15 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
     template_name = "education_group_app/training/upsert/create.html"
 
+    def get_context(self, training_form: CreateTrainingForm):
+        training_type = self.kwargs['type']
+        return {
+            "training_form": training_form,
+            "tabs": self.get_tabs(),
+            "type_text": str(TrainingType.get_value(training_type)),
+            "is_finality_types": training_type in TrainingType.finality_types(),
+        }
+
     def get(self, request, *args, **kwargs):
         training_type = self.kwargs['type']
         training_form = CreateTrainingForm(
@@ -43,12 +52,7 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             training_type=training_type,
             initial=self._get_initial_form(),
         )
-        return render(request, self.template_name, {
-            "training_form": training_form,
-            "tabs": self.get_tabs(),
-            "type_text": str(TrainingType.get_value(training_type)),
-            "is_finality_types": training_type in TrainingType.finality_types(),
-        })
+        return render(request, self.template_name, self.get_context(training_form))
 
     def _get_initial_form(self) -> Dict:
         default_campus = Campus.objects.filter(name='Louvain-la-Neuve').first()
@@ -94,11 +98,7 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             else:
                 self._display_default_error_message()
 
-        return render(request, self.template_name, {
-            "training_form": training_form,
-            "tabs": self.get_tabs(),
-            "type_text": TrainingType.get_value(self.kwargs['type'])
-        })
+        return render(request, self.template_name, self.get_context(training_form))
 
     def _display_success_messages(self, training_ids: List['TrainingIdentity']):
         success_messages = [
