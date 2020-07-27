@@ -37,6 +37,7 @@ from django.utils.translation import gettext_lazy as _
 from base.business.event_perms import EventPermEducationGroupEdition
 from base.forms.common import ValidationRuleMixin
 from base.forms.education_group.common import MainCampusChoiceField
+from base.models.campus import Campus
 from education_group.forms.fields import MainEntitiesVersionChoiceField
 from base.forms.education_group.training import _get_section_choices
 from base.forms.utils.choice_field import BLANK_CHOICE
@@ -278,6 +279,7 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         self.__init_certificate_aims_field()
         self.__init_diploma_fields()
         self.__init_main_language()
+        self.__init_campuses()
 
     def __init_academic_year_field(self):
         if not self.fields['academic_year'].disabled and self.user.person.is_faculty_manager:
@@ -317,6 +319,13 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
 
     def __init_main_language(self):
         self.fields["main_language"].initial = Language.objects.all().get(code=FR_CODE_LANGUAGE)
+
+    def __init_campuses(self):
+        default_campus = Campus.objects.filter(name='Louvain-la-Neuve').first()
+        if 'teaching_campus' in self.fields:
+            self.fields['teaching_campus'].initial = default_campus
+        if 'enrollment_campus' in self.fields:
+            self.fields['enrollment_campus'].initial = default_campus
 
     def is_valid(self):
         valid = super().is_valid()
