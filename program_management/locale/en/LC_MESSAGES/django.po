@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-13 16:09+0200\n"
+"POT-Creation-Date: 2020-07-27 09:47+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -341,6 +341,9 @@ msgid "Name of the teacher responsible"
 msgstr ""
 
 msgid "New Education Group"
+msgstr ""
+
+msgid "New training"
 msgstr ""
 
 msgid "No"
