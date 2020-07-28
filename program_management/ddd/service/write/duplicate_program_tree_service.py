@@ -42,8 +42,8 @@ def duplicate_program_tree(
     existing_tree = ProgramTreeRepository().get(entity_id=program_tree_identity)
 
     # WHEN
-    program_tree = ProgramTreeBuilder().create_new_program_with_same_attributes(
-        copy_from=existing_tree,
+    program_tree = ProgramTreeBuilder().duplicate(
+        duplicate_from=existing_tree,
     )
 
     # THEN

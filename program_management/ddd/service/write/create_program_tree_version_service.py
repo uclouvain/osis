@@ -25,16 +25,18 @@
 ##############################################################################
 from typing import List
 
-from program_management.ddd.command import PostponeProgramTreeVersionCommand, CreateProgramTreeVersionCommand
+from program_management.ddd.command import PostponeProgramTreeVersionCommand, CreateProgramTreeVersionCommand, \
+    DuplicateProgramTree, PostponeProgramTreeCommand
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionBuilder, ProgramTreeVersionIdentity, \
     STANDARD
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
+from program_management.ddd.service.write import postpone_tree_version_service, duplicate_program_tree_service, \
+    postpone_program_tree_service
 
 
 def create_program_tree_version(
         command: 'CreateProgramTreeVersionCommand',
-        identity_trough_year: int = None,
-) -> ProgramTreeVersionIdentity:
+) -> List[ProgramTreeVersionIdentity]:
 
     # GIVEN
     identity_standard = ProgramTreeVersionIdentity(
@@ -46,16 +48,41 @@ def create_program_tree_version(
     program_tree_version_standard = ProgramTreeVersionRepository().get(entity_id=identity_standard)
 
     # WHEN
-    new_program_tree_version = ProgramTreeVersionBuilder().build_from(
+    new_program_tree_identity = duplicate_program_tree_service.duplicate_program_tree(
+        DuplicateProgramTree(
+            from_root_code=program_tree_version_standard.program_tree_identity.code,
+            from_root_year=program_tree_version_standard.program_tree_identity.year,
+        )
+    )
+    new_program_tree_version = ProgramTreeVersionBuilder().create_from_standard_version(
         program_tree_version_standard,
+        new_program_tree_identity,
         command,
-        identity_trough_year=identity_trough_year,
     )
 
     # THEN
-    identity = ProgramTreeVersionRepository.create(program_tree_version=new_program_tree_version)
+    identity = ProgramTreeVersionRepository.create(
+        program_tree_version=new_program_tree_version,
+    )
 
-    return identity
+    postpone_program_tree_service.postpone_program_tree(
+        PostponeProgramTreeCommand(
+            from_code=new_program_tree_identity.code,
+            from_year=new_program_tree_identity.year,
+            offer_acronym=identity.offer_acronym,
+        )
+    )
+
+    created_identities = postpone_tree_version_service.postpone_program_tree_version(
+        PostponeProgramTreeVersionCommand(
+            from_offer_acronym=identity.offer_acronym,
+            from_year=identity.year,
+            from_is_transition=identity.is_transition,
+            from_version_name=identity.version_name,
+        )
+    )
+
+    return [identity] + created_identities
 
 
 def postpone_program_tree_version(command: 'PostponeProgramTreeVersionCommand') -> List[ProgramTreeVersionIdentity]:
@@ -107,9 +134,8 @@ def create_and_postpone_from_past_version(command: 'CreateProgramTreeVersionComm
     last_existing_tree_version = ProgramTreeVersionRepository().get_last_in_past(identity_to_create)
 
     # WHEN
-    created_identities_in_past = postpone_program_tree_version(
+    created_identities_in_past = postpone_tree_version_service.postpone_program_tree_version(
         PostponeProgramTreeVersionCommand(
-            end_postponement=creation_year,
             from_offer_acronym=last_existing_tree_version.entity_id.offer_acronym,
             from_version_name=last_existing_tree_version.entity_id.version_name,
             from_year=last_existing_tree_version.entity_id.year,
@@ -120,9 +146,8 @@ def create_and_postpone_from_past_version(command: 'CreateProgramTreeVersionComm
     # THEN
     created_identity = create_program_tree_version(command)
 
-    created_identities_in_future = postpone_program_tree_version(
+    created_identities_in_future = postpone_tree_version_service.postpone_program_tree_version(
         PostponeProgramTreeVersionCommand(
-            end_postponement=command.end_postponement,
             from_offer_acronym=created_identity.offer_acronym,
             from_version_name=created_identity.version_name,
             from_year=created_identity.year,
