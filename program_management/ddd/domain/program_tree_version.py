@@ -27,9 +27,8 @@ import attr
 
 from osis_common.ddd import interface
 from program_management.ddd.business_types import *
-from program_management.ddd.command import CreateStandardVersionCommand
+from program_management.ddd.command import CreateStandardVersionCommand, CreateProgramTreeVersionCommand
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity, ProgramTree
-from program_management.ddd.domain.program_tree import ProgramTreeBuilder
 from program_management.ddd.validators.program_tree_version import CreateProgramTreeVersionValidatorList
 
 STANDARD = ""
@@ -92,23 +91,23 @@ class ProgramTreeVersionBuilder:
             title_en=None,
         )
 
-    def build_from(  # TODO  :: rename to creat_from
+    def create_from_standard_version(
             self,
-            from_tree: 'ProgramTreeVersion',
+            from_standard_version: 'ProgramTreeVersion',
+            new_tree_identity: 'ProgramTreeIdentity',
             command: 'CreateProgramTreeVersionCommand',
-            identity_trough_year: int = None,
     ) -> 'ProgramTreeVersion':
         validator = CreateProgramTreeVersionValidatorList(command.year, command.version_name)
         if validator.is_valid():
-            assert isinstance(from_tree, ProgramTreeVersion)
-            assert from_tree.is_standard, "Forbidden to copy from a non Standard version"
-            if from_tree.is_transition:
-                self._tree_version = self._build_from_transition(from_tree, command)
+            assert isinstance(from_standard_version, ProgramTreeVersion)
+            assert from_standard_version.is_standard, "Forbidden to copy from a non Standard version"
+            if from_standard_version.is_transition:
+                self._tree_version = self._build_from_transition(from_standard_version, command)
             else:
                 self._tree_version = self._build_from_standard(
-                    from_tree,
+                    from_standard_version,
+                    new_tree_identity,
                     command,
-                    identity_trough_year=identity_trough_year
                 )
             return self.program_tree_version
 
@@ -126,24 +125,22 @@ class ProgramTreeVersionBuilder:
     def _build_from_standard(
             self,
             from_tree_version: 'ProgramTreeVersion',
+            new_tree_identity: 'ProgramTreeIdentity',
             command: 'CreateProgramTreeVersionCommand',
-            identity_trough_year: int = None,
     ) -> 'ProgramTreeVersion':
-        from_tree = from_tree_version.get_tree()
-        new_program_tree = ProgramTreeBuilder().build_from(from_tree=from_tree)
+        tree_version_identity = ProgramTreeVersionIdentity(
+            offer_acronym=from_tree_version.entity_id.offer_acronym,
+            version_name=command.version_name,
+            year=from_tree_version.entity_id.year,
+            is_transition=command.is_transition
+        )
         return ProgramTreeVersion(
-            program_tree_identity=new_program_tree.entity_id,
+            program_tree_identity=new_tree_identity,
             program_tree_repository=from_tree_version.program_tree_repository,
-            entity_identity=ProgramTreeVersionIdentity(
-                offer_acronym=from_tree_version.entity_id.offer_acronym,
-                version_name=command.version_name,
-                year=from_tree_version.entity_id.year,
-                is_transition=command.is_transition
-            ),
+            entity_identity=tree_version_identity,
+            entity_id=tree_version_identity,
             title_en=command.title_en,
             title_fr=command.title_fr,
-            tree=new_program_tree,
-            identity_trough_year=identity_trough_year,
         )
 
 
@@ -158,12 +155,10 @@ class ProgramTreeVersion(interface.RootEntity):
     title_en = attr.ib(type=str, default=None)
     tree = attr.ib(type=ProgramTree, default=None)
 
-    _tree = None
-
     def get_tree(self) -> 'ProgramTree':
-        if not self._tree:
-            self._tree = self.program_tree_repository.get(self.program_tree_identity)
-        return self._tree
+        if not self.tree:
+            self.tree = self.program_tree_repository.get(self.program_tree_identity)
+        return self.tree
 
     @property
     def is_standard(self):
