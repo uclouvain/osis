@@ -75,7 +75,18 @@ class MiniTrainingFilter(filters.FilterSet):
         ]
 
     @staticmethod
-    def filter_version_type(queryset, name, value):
+    def filter_version_type(queryset, _, value):
+        queryset = EducationGroupVersion.objects.filter(
+            offer__education_group_type__category=education_group_categories.MINI_TRAINING
+        ).select_related(
+            'offer__education_group_type',
+            'offer__academic_year',
+            'root_group'
+        ).prefetch_related(
+            'offer__management_entity__entityversion_set'
+        ).exclude(
+            offer__acronym__icontains='common',
+        )
         return utils.filter_version_type(queryset, value)
 
 
@@ -84,8 +95,9 @@ class MiniTrainingList(LanguageContextSerializerMixin, generics.ListAPIView):
        Return a list of all the mini_trainings with optional filtering.
     """
     name = 'minitraining_list'
-    queryset = EducationGroupVersion.objects.filter(
-        offer__education_group_type__category=education_group_categories.MINI_TRAINING
+    queryset = EducationGroupVersion.standard.filter(
+        offer__education_group_type__category=education_group_categories.MINI_TRAINING,
+        is_transition=False,
     ).select_related(
         'offer__education_group_type',
         'offer__academic_year',
