@@ -24,23 +24,21 @@
 #
 ##############################################################################
 from django.contrib.messages.views import SuccessMessageMixin
+from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import UpdateView, CreateView, DeleteView
-
-from education_group.ddd.domain.service.identity_search import TrainingIdentitySearch
-from education_group.views.proxy.read import Tab
-from osis_role.contrib.views import PermissionRequiredMixin
 
 from base.forms.education_group.publication_contact import EducationGroupPublicationContactForm, \
     EducationGroupEntityPublicationContactForm
 from base.models.education_group_publication_contact import EducationGroupPublicationContact
 from base.models.education_group_year import EducationGroupYear
 from base.views.mixins import AjaxTemplateMixin
+from education_group.ddd.domain.service.identity_search import TrainingIdentitySearch
+from education_group.views.proxy.read import Tab
+from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd.domain.node import NodeIdentity
-from django.core.exceptions import ObjectDoesNotExist
-from django.http import Http404
 
 
 class CommonEducationGroupPublicationContactView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageMixin):
@@ -56,13 +54,10 @@ class CommonEducationGroupPublicationContactView(PermissionRequiredMixin, AjaxTe
 
     @cached_property
     def education_group_year(self):
-        try:
-            return EducationGroupYear.objects.get(
-                partial_acronym=self.kwargs['code'],
-                academic_year__year=self.kwargs['year']
-            )
-        except ObjectDoesNotExist:
-            raise Http404
+        return get_object_or_404(EducationGroupYear,
+                                 partial_acronym=self.kwargs['code'],
+                                 academic_year__year=self.kwargs['year']
+                                 )
 
     def get_success_url(self):
         training_identity = TrainingIdentitySearch().get_from_node_identity(
