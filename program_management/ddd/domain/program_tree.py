@@ -435,15 +435,10 @@ class ProgramTree(interface.RootEntity):
         """
         nodes = self.get_all_nodes()
         for node in nodes:
-            counter = Counter(node.get_children_types(include_nodes_used_as_reference=True))
-            have_only_mandatory = all([
-                self.authorized_relationships.get_authorized_relationship(
-                    node.node_type, child_node_type
-                ).min_count_authorized >= count
-                for child_node_type, count in counter.items()
-                if self.authorized_relationships.get_authorized_relationship(node.node_type, child_node_type)
-            ])
-            if not have_only_mandatory:
+            counter_direct_children = Counter(node.get_children_types(include_nodes_used_as_reference=True))
+            counter_mandatory_direct_children = Counter(self.get_ordered_mandatory_children_types(node))
+
+            if counter_direct_children - counter_mandatory_direct_children:
                 return False
         return True
 

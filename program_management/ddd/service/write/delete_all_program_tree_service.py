@@ -21,26 +21,23 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+from typing import List
+
 from django.db import transaction
 
 from program_management.ddd import command
-from program_management.ddd.repositories.program_tree import ProgramTreeRepository
-from program_management.ddd.service.read import get_program_tree_service
-from program_management.ddd.service.write import delete_node_service
-from program_management.ddd.validators.validators_by_business_action import DeleteProgramTreeValidatorList
+from program_management.ddd.domain.service.academic_year_search import ExistingAcademicYearSearch
+from program_management.ddd.service.write import delete_program_tree_service
+from program_management.ddd.business_types import *
 
 
 @transaction.atomic()
-def delete_program_tree(cmd: command.DeleteProgramTreeCommand) -> 'ProgramTreeIdentity':
-    cmd = command.GetProgramTree(code=cmd.code, year=cmd.year)
-    program_tree = get_program_tree_service.get_program_tree(cmd)
+def delete_all_program_tree(cmd: command.DeleteAllProgramTreeCommand) -> List['ProgramTreeIdentity']:
+    node_ids = ExistingAcademicYearSearch().search_from_code(group_code=cmd.code)
 
-    DeleteProgramTreeValidatorList(program_tree).validate()
-
-    ProgramTreeRepository.delete(
-        program_tree.entity_id,
-
-        # Service Dependancy injection
-        delete_node_service=delete_node_service.delete_node
-    )
-    return program_tree.entity_id
+    program_ids = []
+    for node_id in node_ids:
+        cmd_delete_program_tree = command.DeleteProgramTreeCommand(code=node_id.code, year=node_id.year)
+        program_id_deleted = delete_program_tree_service.delete_program_tree(cmd_delete_program_tree)
+        program_ids.append(program_id_deleted)
+    return program_ids

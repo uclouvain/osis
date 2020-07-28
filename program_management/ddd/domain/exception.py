@@ -42,3 +42,8 @@ class ProgramTreeNonEmpty(BusinessException):
         message = _("The content of the program is not empty.")
         super().__init__(message, **kwargs)
 
+
+class NodeHaveLinkException(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _("The group has links to another training / mini-training / group")
+        super().__init__(message, **kwargs)

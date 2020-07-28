@@ -824,7 +824,11 @@ class TestUpdateLink(SimpleTestCase):
 
 class TestIsEmpty(SimpleTestCase):
     def test_assert_is_empty_case_contains_nothing(self):
-        program_tree = ProgramTreeFactory()
+        program_tree = ProgramTreeFactory(
+            authorized_relationships=AuthorizedRelationshipList([
+                AuthorizedRelationshipObjectFactory()
+            ])
+        )
         self.assertTrue(program_tree.is_empty())
 
     def test_assert_is_empty_case_contains_only_mandatory_child(self):

@@ -21,6 +21,7 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+from education_group import publisher
 from education_group.ddd import command
 
 from education_group.ddd.domain.group import GroupIdentity
@@ -33,6 +34,7 @@ def delete_orphan_group(cmd: command.DeleteOrphanGroupCommand) -> 'GroupIdentity
     grp = GroupRepository.get(group_id)
 
     DeleteOrphanGroupValidatorList(grp).validate()
-
+    # Emit group_deleted event
+    publisher.group_deleted.send(None, group_identity=group_id)
     GroupRepository.delete(group_id)
     return group_id

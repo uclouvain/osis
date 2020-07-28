@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import functools
+
 from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
@@ -30,7 +32,7 @@ from django.utils.translation import gettext_lazy as _
 
 from django.views.generic import DeleteView
 
-from base.views.common import display_success_messages
+from base.views.common import display_success_messages, display_error_messages
 from base.views.mixins import AjaxTemplateMixin
 from education_group.ddd.business_types import *
 
@@ -40,9 +42,11 @@ from education_group.ddd.service.read import get_training_service
 from education_group.models.group_year import GroupYear
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd.business_types import *
+from program_management.ddd import command as command_program_management
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
+from program_management.ddd.service.write import delete_standard_version_service
 
 
 class TrainingDeleteView(PermissionRequiredMixin, AjaxTemplateMixin, DeleteView):
@@ -50,13 +54,11 @@ class TrainingDeleteView(PermissionRequiredMixin, AjaxTemplateMixin, DeleteView)
     permission_required = 'base.delete_all_training'
 
     def get_object(self, queryset=None) -> 'ProgramTreeVersion':
-        try:
-            node_identity = NodeIdentity(code=self.kwargs['code'], year=self.kwargs['year'])
-            program_tree_version_identity = ProgramTreeVersionIdentitySearch().get_from_node_identity(node_identity)
-            return ProgramTreeVersionRepository.get(program_tree_version_identity)
-        except ProgramTreeVersionNotFound:
-            raise Http404
+        node_identity = NodeIdentity(code=self.kwargs['code'], year=self.kwargs['year'])
+        program_tree_version_identity = ProgramTreeVersionIdentitySearch().get_from_node_identity(node_identity)
+        return ProgramTreeVersionRepository.get(program_tree_version_identity)
 
+    @functools.lru_cache()
     def get_training(self) -> 'Training':
         try:
             cmd = command.GetTrainingCommand(
@@ -68,9 +70,16 @@ class TrainingDeleteView(PermissionRequiredMixin, AjaxTemplateMixin, DeleteView)
             raise Http404
 
     def delete(self, request, *args, **kwargs):
-        # Call delete program_tree_version service ()
-        display_success_messages(request, _("MESSAGE DE SUPPRESSION"))
-        return self._ajax_response() or HttpResponseRedirect(self.get_success_url())
+        cmd_delete = command_program_management.DeleteStandardVersionCommand(
+            self.get_training().acronym,
+            self.get_training().year
+        )
+        try:
+            delete_standard_version_service.delete_standard_version(cmd_delete)
+            display_success_messages(request, _("MESSAGE DE SUPPRESSION"))
+            return self._ajax_response() or HttpResponseRedirect(self.get_success_url())
+        except Exception:
+            display_error_messages(request, _("An error occured"))
 
     def get_context_data(self, **kwargs):
         return {
@@ -79,8 +88,8 @@ class TrainingDeleteView(PermissionRequiredMixin, AjaxTemplateMixin, DeleteView)
         }
 
     def get_confirmation_message(self) -> str:
-        return _("Are you sure you want to delete %(code)s - %(title)s ?") % {
-            'code': self.kwargs['code'],
+        return _("Are you sure you want to delete %(acronym)s - %(title)s ?") % {
+            'acronym': self.get_training().acronym,
             'title': self.get_training().titles.title_fr
         }
 

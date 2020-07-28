@@ -57,7 +57,7 @@ class TestDeleteGroupGetMethod(TestCase):
 
     def setUp(self) -> None:
         self.get_group_patcher = mock.patch(
-            "education_group.views.group.update.get_group_service.get_group",
+            "education_group.views.group.delete.get_group_service.get_group",
             return_value=self.group
         )
         self.mocked_get_group = self.get_group_patcher.start()
@@ -97,3 +97,55 @@ class TestDeleteGroupGetMethod(TestCase):
             response.context['confirmation_message'],
             expected_confirmation_msg
         )
+
+
+class TestDeleteGroupPostMethod(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.group = GroupFactory()
+        cls.program_tree = ProgramTreeFactory()
+
+        cls.group.entity_identity = GroupIdentity(year=2018, code='LBIR100M')
+        cls.central_manager = CentralManagerFactory()
+        cls.url = reverse('group_delete', kwargs={'year': cls.group.year, 'code': cls.group.code})
+
+        cls.group_year_db = GroupYearDBFactory(
+            management_entity=cls.central_manager.entity,
+            partial_acronym=cls.group.code,
+            academic_year__year=cls.group.year
+        )
+
+    def setUp(self) -> None:
+        self.get_group_patcher = mock.patch(
+            "education_group.views.group.delete.get_group_service.get_group",
+            return_value=self.group
+        )
+        self.mocked_get_group = self.get_group_patcher.start()
+        self.addCleanup(self.get_group_patcher.stop)
+
+        self.delete_all_pgrm_tree_patcher = mock.patch(
+            "education_group.views.group.delete.delete_all_program_tree_service.delete_all_program_tree",
+            return_value=self.group
+        )
+        self.mocked_delete_all_pgrm_tree = self.delete_all_pgrm_tree_patcher.start()
+        self.addCleanup(self.delete_all_pgrm_tree_patcher.stop)
+
+        self.client.force_login(self.central_manager.person.user)
+
+    def test_case_when_user_not_logged(self):
+        self.client.logout()
+        response = self.client.post(self.url)
+        self.assertRedirects(response, "/login/?next={}".format(self.url))
+
+    def test_when_user_has_no_permission(self):
+        a_person_without_permission = PersonFactory()
+        self.client.force_login(a_person_without_permission.user)
+
+        response = self.client.post(self.url)
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+
+    def test_ensure_post_call_delete_all_group_service(self):
+        response = self.client.post(self.url)
+
+        self.assertTrue(self.mocked_delete_all_pgrm_tree.called)
+        self.assertRedirects(response, reverse('version_program'), fetch_redirect_response=False)

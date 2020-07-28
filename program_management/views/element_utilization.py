@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from osis_role.contrib.views import PermissionRequiredMixin
-from program_management.ddd.service import tree_service
+from program_management.ddd.service.read import search_tree_versions_using_node_service
 from program_management.views.generic import LearningUnitGeneric
 from program_management.serializers.node_view import get_program_tree_version_name
 from program_management.ddd.domain.node import NodeIdentity
@@ -39,7 +39,7 @@ class LearningUnitUtilization(PermissionRequiredMixin, LearningUnitGeneric):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        program_trees_versions = tree_service.search_tree_versions_using_node(self.node)
+        program_trees_versions = search_tree_versions_using_node_service.search_tree_versions_using_node(self.node)
 
         context['utilization_rows'] = []
         for program_tree_version in program_trees_versions:

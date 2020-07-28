@@ -21,26 +21,12 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from django.db import transaction
+from typing import List
 
-from program_management.ddd import command
-from program_management.ddd.repositories.program_tree import ProgramTreeRepository
-from program_management.ddd.service.read import get_program_tree_service
-from program_management.ddd.service.write import delete_node_service
-from program_management.ddd.validators.validators_by_business_action import DeleteProgramTreeValidatorList
+from program_management.ddd.business_types import *
+from program_management.ddd.repositories import load_tree_version
 
 
-@transaction.atomic()
-def delete_program_tree(cmd: command.DeleteProgramTreeCommand) -> 'ProgramTreeIdentity':
-    cmd = command.GetProgramTree(code=cmd.code, year=cmd.year)
-    program_tree = get_program_tree_service.get_program_tree(cmd)
-
-    DeleteProgramTreeValidatorList(program_tree).validate()
-
-    ProgramTreeRepository.delete(
-        program_tree.entity_id,
-
-        # Service Dependancy injection
-        delete_node_service=delete_node_service.delete_node
-    )
-    return program_tree.entity_id
+# TODO: Convert args to command type
+def search_tree_versions_using_node(node: 'Node') -> List['ProgramTreeVersion']:
+    return load_tree_version.load_tree_versions_from_children(child_element_ids=[node.pk])

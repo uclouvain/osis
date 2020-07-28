@@ -21,26 +21,21 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from django.db import transaction
-
+from base.ddd.utils import business_validator
 from program_management.ddd import command
-from program_management.ddd.repositories.program_tree import ProgramTreeRepository
-from program_management.ddd.service.read import get_program_tree_service
-from program_management.ddd.service.write import delete_node_service
-from program_management.ddd.validators.validators_by_business_action import DeleteProgramTreeValidatorList
+from program_management.ddd.business_types import *
+from program_management.ddd.domain.exception import NodeHaveLinkException
 
 
-@transaction.atomic()
-def delete_program_tree(cmd: command.DeleteProgramTreeCommand) -> 'ProgramTreeIdentity':
-    cmd = command.GetProgramTree(code=cmd.code, year=cmd.year)
-    program_tree = get_program_tree_service.get_program_tree(cmd)
+class NodeHaveLinkValidator(business_validator.BusinessValidator):
+    def __init__(self, node: 'Node'):
+        super().__init__()
+        self.node = node
 
-    DeleteProgramTreeValidatorList(program_tree).validate()
+    def validate(self, *args, **kwargs):
+        from program_management.ddd.service.read import search_program_trees_using_node_service
 
-    ProgramTreeRepository.delete(
-        program_tree.entity_id,
-
-        # Service Dependancy injection
-        delete_node_service=delete_node_service.delete_node
-    )
-    return program_tree.entity_id
+        cmd = command.GetProgramTreesFromNodeCommand(code=self.node.code, year=self.node.year)
+        program_trees = search_program_trees_using_node_service.search_program_trees_using_node(cmd)
+        if len(program_trees) > 0:
+            raise NodeHaveLinkException
