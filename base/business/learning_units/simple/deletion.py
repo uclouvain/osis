@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.db.models.signals import pre_delete
 from django.utils.translation import gettext_lazy as _
 
 from assistant.models import tutoring_learning_unit_year
@@ -36,8 +37,9 @@ from base.models import proposal_learning_unit
 from base.models.enums import proposal_type, proposal_state
 from cms.enums import entity_name
 from cms.models import translated_text
+from education_group import publisher
 from learning_unit.models.learning_class_year import LearningClassYear
-from program_management.models import element
+from program_management.models.element import Element
 
 
 def check_learning_unit_deletion(learning_unit, check_proposal=True):
@@ -83,7 +85,7 @@ def _check_group_element_year_deletion(group_element_year):
             'group': group_element_year.parent_element.group_year.partial_acronym,
             'year': group_element_year.child_element.learning_unit_year.academic_year
         }
-        }
+    }
 
 
 def _check_attribution_deletion(learning_unit_year):
@@ -164,11 +166,11 @@ def delete_from_given_learning_unit_year(learning_unit_year):
     msg = []
 
     next_year = learning_unit_year.get_learning_unit_next_year()
+    publisher.learning_unit_year_deleted.send(None, learning_unit_year_id=learning_unit_year.id)
     if next_year:
         msg.extend(delete_from_given_learning_unit_year(next_year))
 
     if learning_unit_year.learning_container_year and learning_unit_year.is_full():
-        element.find_by_learning_unit_year(learning_unit_year).delete()
         msg.extend(_delete_learning_container_year(learning_unit_year.learning_container_year))
 
     for component in learning_unit_year.learningcomponentyear_set.all():

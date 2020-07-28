@@ -37,6 +37,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
+from education_group import publisher
 from program_management.ddd import repositories
 from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.business.learning_container_year import get_learning_container_year_warnings
@@ -259,6 +260,10 @@ class LearningUnitYear(SerializableModel):
 
     def __str__(self):
         return u"%s - %s" % (self.academic_year, self.acronym)
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        publisher.learning_unit_year_created.send(None, learning_unit_year_id=self.id)
 
     @property
     def subdivision(self):
