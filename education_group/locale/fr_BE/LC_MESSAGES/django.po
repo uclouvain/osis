@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-28 17:20+0200\n"
+"POT-Creation-Date: 2020-07-27 10:51+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,29 +17,17 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #, python-format
-msgid "%(count_enrollment)d student is enrolled in the mini-training."
-msgid_plural "%(count_enrollment)d students are enrolled in the mini-training."
-msgstr[0] "%(count_enrollment)d étudiant est inscrit à la mini-formation."
-msgstr[1] "%(count_enrollment)d étudiants sont inscrits à la mini-formation."
-
-#, python-format
-msgid "%(count_enrollment)d student is enrolled in the training."
-msgid_plural "%(count_enrollment)d students are enrolled in the training."
-msgstr[0] "%(count_enrollment)d étudiant est inscrit à la formation."
-msgstr[1] "%(count_enrollment)d étudiants sont inscrits à la formation."
-
-#, python-format
 msgid "%(max)s must be greater or equals than %(min)s"
 msgstr "%(max)s doit être plus grand ou égal à %(min)s"
 
 msgid "ARES ability"
-msgstr ""
+msgstr "Habilitation ARES"
 
 msgid "ARES study code"
-msgstr ""
+msgstr "Code étude ARES"
 
 msgid "ARES-GRACA"
-msgstr ""
+msgstr "ARES-GRACA"
 
 #, fuzzy
 #| msgid "Academic year"
@@ -89,10 +77,10 @@ msgid "Additional info"
 msgstr ""
 
 msgid "Administration entity"
-msgstr ""
+msgstr "Entité d'administration"
 
 msgid "Administrative data"
-msgstr ""
+msgstr "Données administratives"
 
 msgid "Admission and Enrolment Procedures for general registration"
 msgstr ""
@@ -106,25 +94,11 @@ msgstr ""
 msgid "Alert Message"
 msgstr ""
 
-msgid "An error occured"
-msgstr ""
-
-#, python-format
-msgid "Are you sure you want to delete %(acronym)s - %(title)s ?"
-msgstr "Êtes-vous sûr·e de vouloir supprimer %(acronym)s - %(title)s ?"
-
-#, python-format
-msgid "Are you sure you want to delete %(code)s - %(title)s ?"
-msgstr "Êtes-vous sûr·e de vouloir supprimer %(code)s - %(title)s ?"
-
 msgid "Bachelors of the Dutch speaking Community of Belgium"
 msgstr ""
 
 msgid "Block"
 msgstr ""
-
-msgid "Cancel"
-msgstr "Annuler"
 
 msgid "Category"
 msgstr ""
@@ -145,7 +119,7 @@ msgid "Clear clipboard"
 msgstr ""
 
 msgid "Co-graduation total coefficient"
-msgstr ""
+msgstr "Coefficient total de co-diplômation"
 
 msgid "Code"
 msgstr ""
@@ -247,13 +221,14 @@ msgid "Enrollment enabled"
 msgstr ""
 
 msgid "Enter text to search"
-msgstr ""
+msgstr "Entrez le texte à rechercher"
 
 msgid "Entity"
 msgstr ""
 
 msgid "Error(s) in form: The modifications are not saved"
-msgstr "Erreur(s) dans le formulaire: Les modifications n'ont pas été enregistrées"
+msgstr ""
+"Erreur(s) dans le formulaire: Les modifications n'ont pas été enregistrées"
 
 msgid "Exams Enrollments"
 msgstr ""
@@ -332,7 +307,7 @@ msgid "Holders of a non-University 2nd cycle degree"
 msgstr ""
 
 msgid "ISCED domain"
-msgstr ""
+msgstr "Domaine ISCED/CITE"
 
 msgid "Identification"
 msgstr ""
@@ -341,7 +316,7 @@ msgid "Institution"
 msgstr ""
 
 msgid "Internship"
-msgstr ""
+msgstr "Stage"
 
 msgid "Jury"
 msgstr ""
@@ -373,9 +348,6 @@ msgstr ""
 msgid "Link type"
 msgstr ""
 
-msgid "Linked with EPC"
-msgstr "Liens existants dans l'application EPC."
-
 msgid "Main"
 msgstr ""
 
@@ -404,7 +376,7 @@ msgid "New Education Group"
 msgstr ""
 
 msgid "New Training"
-msgstr "Nouvelle formation"
+msgstr "Nouvelle Formation"
 
 #, python-format
 msgctxt "female"
@@ -535,15 +507,12 @@ msgstr ""
 
 msgid "The fields concerning ARES have to be ALL filled-in or none of them"
 msgstr ""
+"Les champs concernant les données de l'ARES doivent être soit tous remplis "
+"soit tous vides"
 
 msgid "The following links has been updated"
 msgstr "Les liens suivants ont été mis à jour"
 
-#, fuzzy, python-brace-format
-#| msgid ""
-#| "The formation you work with doesn't exist (or is not at the same "
-#| "position) in the tree {root.title} in {root.year}.You've been redirected "
-#| "to the root {root.code} ({root.year})"
 msgid ""
 "The formation you work with doesn't exist (or is not at the same position) "
 "in the tree {root.title} in {root.year}.You've been redirected to the root "
@@ -552,10 +521,6 @@ msgstr ""
 "La formation avec laquelle vous travaillez n'existe pas (ou n'est pas à la "
 "même position) dans le programme de {root.title} en {root.year}.Vous avez "
 "été redirigé vers la racine du programme : {root.title} ({root.year})."
-
-#, python-format
-msgid "The group %(code)s has been deleted."
-msgstr "Le groupement %(code)s a été supprimé."
 
 #, python-format
 msgid "The program %(acronym)s will be published soon"
@@ -570,12 +535,12 @@ msgstr ""
 #, python-format
 msgctxt "female"
 msgid "The user does not have permission to create a %(category)s."
-msgstr "L'utilisateur n'a pas la permission de supprimer une %(category)s."
+msgstr "L'utilisateur n'a pas la permission de créer un %(category)s."
 
 #, python-format
 msgctxt "male"
 msgid "The user does not have permission to create a %(category)s."
-msgstr "L'utilisateur n'a pas la permission de supprimer une %(category)s."
+msgstr "L'utilisateur n'a pas la permission de créer un %(category)s."
 
 #, python-format
 msgctxt "female"
@@ -592,7 +557,7 @@ msgid "The value of this attribute is inherited from the standard OF"
 msgstr ""
 
 msgid "There can only be one type 2 expectation"
-msgstr ""
+msgstr "Il ne peut y avoir qu'un seul attendu de type 2"
 
 msgid "Title"
 msgstr ""
@@ -606,15 +571,12 @@ msgstr ""
 msgid "Training"
 msgstr ""
 
-#, fuzzy, python-format
-#| msgid ""
-#| "Group <a href='%(link)s'> %(code)s (%(academic_year)s) </a> successfully "
-#| "created."
+#, python-format
 msgid ""
 "Training <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> "
 "successfully created."
 msgstr ""
-"Le groupement <a href='%(link)s'> %(code)s (%(academic_year)s) </a> a été "
+"La formation <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> a été "
 "créé avec succès"
 
 msgid "Trainings"
@@ -653,14 +615,13 @@ msgstr ""
 msgid "Weighting"
 msgstr ""
 
-msgid "Yes, I confirm."
-msgstr "Oui, je confirme."
-
 #, python-brace-format
 msgid ""
 "You can't copy the training '{acronym}' from {from_year} to {to_year} "
 "because it ends in {end_year}"
 msgstr ""
+"Vous ne pouvez pas recopier la formation '{acronym}' de {from_year} vers "
+"{to_year} car elle se termine en {end_year}"
 
 #, python-format
 msgid ""
@@ -703,19 +664,19 @@ msgid "credits"
 msgstr ""
 
 msgid "dissertation"
-msgstr ""
+msgstr "mémoire"
 
 msgid "duration unit"
-msgstr ""
+msgstr "type durée"
 
 msgid "filter by section"
-msgstr ""
+msgstr "préfiltrer par rubrique"
 
 msgid "is using in"
 msgstr ""
 
 msgid "main domain"
-msgstr ""
+msgstr "Domaine principal"
 
 msgid "maximum constraint"
 msgstr ""

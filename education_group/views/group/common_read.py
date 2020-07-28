@@ -39,7 +39,6 @@ from base.business.education_groups.general_information_sections import \
     MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION
 from base.models import academic_year
 from base.models.enums.education_group_categories import Categories
-from base.models.enums.education_group_types import GroupType
 from base.views.common import display_warning_messages
 from education_group.ddd.business_types import *
 from education_group.ddd import command
@@ -115,7 +114,7 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
             "enums": mdl.enums.education_group_categories,
             "can_change_education_group": can_change_education_group,
             "form_xls_custom": CustomXlsForm(),
-            "tree": json.dumps(program_tree_view_serializer(self.get_tree())),
+            "tree":  json.dumps(program_tree_view_serializer(self.get_tree())),
             "group": self.get_group(),
             "node": self.get_object(),
             "node_path": self.get_path(),

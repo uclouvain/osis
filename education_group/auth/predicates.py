@@ -110,43 +110,6 @@ def is_continuing_education_group_year(self, user, education_group_year=None):
 
 
 @predicate(bind=True)
-def is_maximum_child_not_reached_for_training_category(self, user, education_group_year=None):
-    if education_group_year:
-        return _is_maximum_child_not_reached_for_category(self, user, education_group_year, Categories.TRAINING.name)
-    return None
-
-
-@predicate(bind=True)
-def is_maximum_child_not_reached_for_mini_training_category(self, user, education_group_year=None):
-    if education_group_year:
-        return _is_maximum_child_not_reached_for_category(self, user, education_group_year,
-                                                          Categories.MINI_TRAINING.name)
-    return None
-
-
-def _is_maximum_child_not_reached_for_category(self, user, education_group_year, category):
-    result = EducationGroupType.objects.filter(
-        category=category,
-        authorized_child_type__parent_type__educationgroupyear=education_group_year
-    ).exists()
-
-    if not result:
-        message = pgettext(
-            "female" if education_group_year.education_group_type.category in [
-                Categories.TRAINING,
-                Categories.MINI_TRAINING
-            ] else "male",
-            "No type of %(child_category)s can be created as child of %(category)s of type %(type)s"
-        ) % {
-            "child_category": Categories[category].name,
-            "category": education_group_year.education_group_type.get_category_display(),
-            "type": education_group_year.education_group_type.get_name_display(),
-        }
-        errors.set_permission_error(user, self.context['perm_name'], message)
-    return result
-
-
-@predicate(bind=True)
 @predicate_failed_msg(message=_("The scope of the user is limited and prevents this action to be performed"))
 def is_user_linked_to_all_scopes_of_management_entity(self, user, education_group_year):
     if education_group_year:
