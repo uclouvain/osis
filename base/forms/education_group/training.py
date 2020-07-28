@@ -23,11 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ajax_select import register, LookupChannel
 from ajax_select.fields import AutoCompleteSelectMultipleField
 from dal import autocomplete
 from django import forms
-from django.db.models import Q
 from django.utils.functional import lazy
 from django.utils.translation import gettext_lazy as _
 
@@ -43,13 +41,9 @@ from base.models.education_group_certificate_aim import EducationGroupCertificat
 from base.models.education_group_year import EducationGroupYear
 from base.models.education_group_year_domain import EducationGroupYearDomain
 from base.models.entity_version import get_last_version
-from base.models.enums import education_group_categories, rate_code, decree_category
+from base.models.enums import education_group_categories
 from base.models.enums.education_group_categories import Categories
-from base.models.enums.education_group_types import TrainingType
 from base.models.hops import Hops
-from reference.models.domain import Domain
-from reference.models.enums import domain_type
-from reference.models.language import Language
 
 
 def _get_section_choices():
@@ -344,29 +338,3 @@ class TrainingForm(PostponementEducationGroupYearMixin, CommonBaseForm):
             not field.disabled for field_name, field
             in self.forms[forms.ModelForm].fields.items() if field_name in self.diploma_tab_fields
         )
-
-
-@register('university_domains')
-class UniversityDomainsLookup(LookupChannel):
-
-    model = Domain
-
-    def check_auth(self, request):
-        # override the default behaviour
-        pass
-
-    def get_query(self, q, request):
-        return self.model.objects.filter(type=domain_type.UNIVERSITY)\
-                                 .filter(Q(name__icontains=q) | Q(code__icontains=q) |
-                                         Q(decree__name__icontains=q))\
-                                 .select_related('decree')\
-                                 .order_by('-decree__name', 'name')
-
-    def format_item_display(self, item):
-        return "<span class='tag'>{}</span>".format(self.format_match(item))
-
-    def get_result(self, item):
-        return self.format_match(item)
-
-    def format_match(self, item):
-        return "{}:{} {}".format(item.decree.name, item.code, item.name)
