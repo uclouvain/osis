@@ -25,9 +25,10 @@
 ##############################################################################
 from typing import Type
 
+import attr
+
 from base.models import academic_year
 from education_group.ddd.business_types import *
-from education_group.ddd.domain.training import TrainingIdentity
 from osis_common.ddd import interface
 
 DEFAULT_YEARS_TO_POSTPONE = 6
@@ -58,7 +59,7 @@ class CalculateEndPostponement(interface.DomainService):
             training: 'Training',
             max_year_to_postpone, repository: Type['TrainingRepository']) -> int:
         training_identities = [
-            TrainingIdentity(acronym=training.acronym, year=year)
+            attr.evolve(training.entity_identity, year=year)
             for year in range(training.year+1, max_year_to_postpone+1)
         ]
         next_year_trainings = repository.search(entity_ids=training_identities)

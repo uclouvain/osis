@@ -194,6 +194,7 @@ def _convert_db_model_to_ddd_model(obj: GroupYearModelDb) -> 'Group':
     entity_id = GroupIdentity(code=obj.partial_acronym, year=obj.academic_year.year)
     return group.Group(
         entity_identity=entity_id,
+        entity_id=entity_id,
         type=EducationGroupTypeConverter.convert_type_str_to_enum(obj.education_group_type.name),
         abbreviated_title=obj.acronym,
         titles=Titles(

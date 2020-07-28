@@ -192,7 +192,7 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
             "main_domain": "{} - {}".format(training_obj.main_domain.decree_name, training_obj.main_domain.code),
             "secondary_domains": training_obj.secondary_domains,
-            "isced_domain": training_obj.isced_domain.entity_id.code,
+            "isced_domain": training_obj.isced_domain.entity_id.code if training_obj.isced_domain else None,
             "internal_comment": training_obj.internal_comment,
 
             "management_entity": training_obj.management_entity.acronym,
@@ -211,9 +211,9 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "remark_fr": group_obj.remark.text_fr,
             "remark_english": group_obj.remark.text_en,
 
-            "ares_code": training_obj.hops.ares_code,
-            "ares_graca": training_obj.hops.ares_graca,
-            "ares_authorization": training_obj.hops.ares_authorization,
+            "ares_code": training_obj.hops.ares_code if training_obj.hops else None,
+            "ares_graca": training_obj.hops.ares_graca if training_obj.hops else None,
+            "ares_authorization": training_obj.hops.ares_authorization if training_obj.hops else None,
             "code_inter_cfb": training_obj.co_graduation.code_inter_cfb,
             "coefficient": training_obj.co_graduation.coefficient,
 

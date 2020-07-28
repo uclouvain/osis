@@ -26,12 +26,13 @@ from django.test import TestCase
 
 from base.tests.factories.academic_year import AcademicYearFactory
 from education_group.ddd import command
-from education_group.ddd.domain import training
-from education_group.ddd.service.write import postpone_training_service
+from education_group.ddd.domain import training, group
+from education_group.ddd.service.write import postpone_training_service, postpone_group_service
+from education_group.tests.ddd.factories.group import GroupFactory
 from education_group.tests.ddd.factories.training import TrainingFactory
 
 
-class TestPostponeTraining(TestCase):
+class TestPostponeGroup(TestCase):
 
     @classmethod
     def setUpTestData(cls):
@@ -39,23 +40,23 @@ class TestPostponeTraining(TestCase):
         AcademicYearFactory(year=2019)
         AcademicYearFactory(year=2020)
 
-    @mock.patch("education_group.ddd.service.write.copy_training_service.copy_training_to_next_year")
+    @mock.patch("education_group.ddd.service.write.copy_group_service.copy_group")
     def test_should_return_a_number_of_identities_equal_to_difference_of_from_year_and_until_year(
             self,
-            mock_copy_training_to_next_year_service,
+            mock_copy_group_to_next_year_service,
     ):
-        existing_training = TrainingFactory(
-            entity_identity=training.TrainingIdentity(acronym="ACRO", year=2018),
+        existing_group = GroupFactory(
+            entity_identity=group.GroupIdentity(code="CODE", year=2018),
             end_year=2020
         )
-        training_identities = [
-            existing_training.entity_identity,
-            training.TrainingIdentity(acronym="ACRO", year=2019),
-            training.TrainingIdentity(acronym="ACRO", year=2020)
+        group_identities = [
+            existing_group.entity_id,
+            group.GroupIdentity(code="CODE", year=2019),
+            group.GroupIdentity(code="CODE", year=2020)
         ]
-        mock_copy_training_to_next_year_service.side_effect = training_identities
+        mock_copy_group_to_next_year_service.return_value = group_identities
 
-        cmd = command.PostponeTrainingCommand(acronym="ACRO", postpone_from_year=2018, postpone_until_year=2020)
-        result = postpone_training_service.postpone_training(cmd)
+        cmd = command.PostponeGroupCommand(code="CODE", postpone_from_year=2018, postpone_until_year=2020)
+        result = postpone_group_service.postpone_group(cmd)
 
-        self.assertListEqual(training_identities, result)
+        self.assertListEqual(group_identities, result)

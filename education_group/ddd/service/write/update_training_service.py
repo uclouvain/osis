@@ -102,7 +102,7 @@ def convert_command_to_update_training_data(cmd: command.UpdateTrainingCommand) 
             entity_id=IscedDomainIdentity(code=cmd.isced_domain_code),
             title_fr=None,
             title_en=None
-        ),
+        ) if cmd.isced_domain_code else None,
         management_entity=Entity(acronym=cmd.management_entity_acronym),
         administration_entity=Entity(cmd.administration_entity_acronym),
         end_year=cmd.end_year,

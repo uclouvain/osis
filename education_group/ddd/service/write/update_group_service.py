@@ -33,14 +33,23 @@ from education_group.ddd.domain._remark import Remark
 from education_group.ddd.domain._titles import Titles
 
 from education_group.ddd.domain.group import GroupIdentity
+from education_group.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
 from education_group.ddd.repository.group import GroupRepository
 
 
 # TODO : Implement Validator (Actually in GroupFrom via ValidationRules)
+from education_group.ddd.service.write import postpone_group_service
+
+
 @transaction.atomic()
 def update_group(cmd: command.UpdateGroupCommand) -> 'GroupIdentity':
     group_identity = GroupIdentity(code=cmd.code, year=cmd.year)
     grp = GroupRepository.get(group_identity)
+
+    end_postponement_year = CalculateEndPostponement.calculate_year_of_end_postponement(
+        grp,
+        GroupRepository
+    )
 
     grp.update(
         abbreviated_title=cmd.abbreviated_title,
@@ -58,4 +67,14 @@ def update_group(cmd: command.UpdateGroupCommand) -> 'GroupIdentity':
         ),
         remark=Remark(text_fr=cmd.remark_fr, text_en=cmd.remark_en)
     )
-    return GroupRepository.update(grp)
+    GroupRepository.update(grp)
+
+    postpone_group_service.postpone_group(
+        command.PostponeGroupCommand(
+            code=group_identity.code,
+            postpone_from_year=group_identity.year,
+            postpone_until_year=end_postponement_year
+        )
+    )
+
+    return group_identity

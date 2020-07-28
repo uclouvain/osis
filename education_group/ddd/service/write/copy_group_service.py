@@ -30,6 +30,7 @@ from education_group.ddd.domain import group
 from education_group.ddd.business_types import *
 from education_group.ddd.service.read import get_group_service as group_service_read
 from education_group.ddd.service.write.create_group_service import create_orphan_group
+from education_group.ddd.service.write.upsert_group_service import upsert_orphan_group
 
 
 @transaction.atomic()
@@ -46,7 +47,7 @@ def copy_group(cmd: command.CopyGroupCommand) -> List['GroupIdentity']:
 
         group_next_year = group.builder.build_next_year_group(from_group=grp)
 
-        group_next_year_id = create_orphan_group(__convert_group_to_command(group_next_year))
+        group_next_year_id = upsert_orphan_group(__convert_group_to_command(group_next_year))
 
         group_ids.append(group_next_year_id)
         from_year += 1
