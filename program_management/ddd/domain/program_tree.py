@@ -60,6 +60,33 @@ class ProgramTreeIdentity(interface.EntityIdentity):
 
 class ProgramTreeBuilder:
 
+    def duplicate(self, duplicate_from: 'ProgramTree', end_year: int = None) -> 'ProgramTree':
+        """
+        Generates a new program tree based on attributes from 'copy_from' program tree but with new nodes identities and
+        new link identities.
+        :param end_year: end year of existence
+        :param duplicate_from: The program tree from which are copied attributes in the new one.
+        :return:
+        """
+        copied_root = self._duplicate_root_and_direct_children(duplicate_from, end_year=end_year)
+        copied_tree = attr.evolve(  # Copy to new object
+            duplicate_from,
+            root_node=copied_root,
+            entity_id=ProgramTreeIdentity(code=copied_root.code, year=copied_root.year),
+        )
+        return copied_tree
+
+    def _duplicate_root_and_direct_children(self, program_tree: 'ProgramTree', end_year: int = None) -> 'Node':
+        copy_from_node = program_tree.root_node
+        new_parent = node_factory.duplicate(copy_from_node, end_year=end_year)
+        mandatory_children_types = program_tree.get_mandatory_children_types(program_tree.root_node)
+        for copy_from_link in [n for n in copy_from_node.children if n.child.node_type in mandatory_children_types]:
+            child_node = copy_from_link.child
+            new_child = node_factory.duplicate(child_node)
+            copied_link = link_factory.duplicate(copy_from_link, new_parent, new_child)
+            new_parent.children.append(copied_link)
+        return new_parent
+
     def copy_to_next_year(self, copy_from: 'ProgramTree', repository: 'ProgramTreeRepository') -> 'ProgramTree':
         identity_next_year = attr.evolve(copy_from.entity_id, year=copy_from.entity_id.year + 1)
         try:
@@ -78,13 +105,11 @@ class ProgramTreeBuilder:
 
     def _copy_node_and_children_to_next_year(self, copy_from_node: 'Node') -> 'Node':
         parent_next_year = node_factory.copy_to_next_year(copy_from_node)
-        links_next_year = []
         for copy_from_link in copy_from_node.children:
             child_node = copy_from_link.child
             child_next_year = self._copy_node_and_children_to_next_year(child_node)
             link_next_year = link_factory.copy_to_next_year(copy_from_link, parent_next_year, child_next_year)
             parent_next_year.children.append(link_next_year)
-            links_next_year.append(link_next_year)
         return parent_next_year
 
     def build_from_orphan_group_as_root(
@@ -104,6 +129,7 @@ class ProgramTreeBuilder:
         root_node = program_tree.root_node
         children = []
         for child_type in program_tree.get_mandatory_children_types(program_tree.root_node):
+            # TODO :: move this below into NodeBuilder
             generated_child_title = FieldValidationRule.get(
                 child_type,
                 'title_fr'
