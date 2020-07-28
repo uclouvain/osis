@@ -31,6 +31,7 @@ from dal import autocomplete
 from django import forms
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.exceptions import PermissionDenied
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db.models import Q
 from django.utils.functional import lazy
@@ -377,8 +378,8 @@ class UniversityDomainsLookup(LookupChannel):
     model = Domain
 
     def check_auth(self, request):
-        # override the default behaviour
-        pass
+        if not request.user.is_authenticated:
+            raise PermissionDenied
 
     def get_query(self, q, request):
         return self.model.objects.filter(type=domain_type.UNIVERSITY)\
