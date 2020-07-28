@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -39,6 +39,7 @@ from base.forms.education_group.publication_contact import EducationGroupPublica
 from base.models.education_group_publication_contact import EducationGroupPublicationContact
 from base.models.education_group_year import EducationGroupYear
 from base.views.mixins import AjaxTemplateMixin
+from program_management.ddd.domain.node import NodeIdentity
 
 
 class CommonEducationGroupPublicationContactView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageMixin):
@@ -57,7 +58,9 @@ class CommonEducationGroupPublicationContactView(PermissionRequiredMixin, AjaxTe
         return get_object_or_404(EducationGroupYear, pk=self.kwargs['education_group_year_id'])
 
     def get_success_url(self):
-        training_identity = TrainingIdentitySearch().get_from_education_group_year_id(self.kwargs['offer_id'])
+        training_identity = TrainingIdentitySearch().get_from_node_identity(
+            node_identity=NodeIdentity(code=self.kwargs['code'], year=self.kwargs['year'])
+        )
         return reverse(
             'education_group_read_proxy',
             args=[training_identity.year, training_identity.acronym]
