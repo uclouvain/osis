@@ -187,7 +187,10 @@ class GroupRepository(interface.AbstractRepository):
 
     @classmethod
     def delete(cls, entity_id: 'GroupIdentity', **_) -> None:
-        raise NotImplementedError
+        try:
+            GroupYearModelDb.objects.get(partial_acronym=entity_id.code, academic_year__year=entity_id.year).delete()
+        except GroupYearModelDb.DoesNotExist:
+            raise exception.GroupNotFoundException
 
 
 def _convert_db_model_to_ddd_model(obj: GroupYearModelDb) -> 'Group':

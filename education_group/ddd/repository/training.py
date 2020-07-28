@@ -110,7 +110,13 @@ class TrainingRepository(interface.AbstractRepository):
 
     @classmethod
     def delete(cls, entity_id: 'TrainingIdentity', **_) -> None:
-        raise NotImplementedError
+        qs = _get_queryset_to_fetch_data_for_training([entity_id])
+        try:
+            education_group_year_db = qs.get()
+        except EducationGroupYearModelDb.DoesNotExist:
+            raise exception.TrainingNotFoundException
+
+        education_group_year_db.delete()
 
 
 def _convert_education_group_year_to_training(

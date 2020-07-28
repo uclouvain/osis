@@ -36,7 +36,8 @@ from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import exception, group
 from education_group.ddd.service.read import get_training_service, get_group_service, get_multiple_groups_service
-from education_group.ddd.service.write import update_training_service, update_group_service
+from education_group.ddd.service.write import update_training_service, update_group_service, delete_training_service, \
+    delete_group_service
 from education_group.enums.node_type import NodeType
 from education_group.forms import training as training_forms, content as content_forms
 from education_group.templatetags.academic_year_display import display_as_academic_year
@@ -72,11 +73,19 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         content_formset = self.get_content_formset()
 
         if training_form.is_valid() and content_formset.is_valid():
+            #  FIXME define postponement end date here and display warning messages
             update_training_command = self.convert_training_form_to_update_training_command(training_form)
             update_training_service.update_training(update_training_command)
 
             update_group_command = self.convert_training_form_to_update_group_command(training_form)
             update_group_service.update_group(update_group_command)
+
+            if training_form.cleaned_data["end_year"]:
+                delete_training_command = self.convert_training_form_to_delete_training_command(training_form)
+                delete_training_service.delete_training(delete_training_command)
+
+                delete_group_command = self.convert_training_form_to_delete_group_command(training_form)
+                delete_group_service.delete_group(delete_group_command)
 
             self._send_multiple_update_link_cmd(content_formset)
             display_success_messages(request, self.get_success_msg(), extra_tags='safe')
@@ -400,4 +409,22 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             organization_name=cleaned_data['teaching_campus'].organization.name,
             remark_fr=cleaned_data['remark_fr'],
             remark_en=cleaned_data['remark_english'],
+        )
+
+    def convert_training_form_to_delete_training_command(
+            self,
+            training_form: training_forms.UpdateTrainingForm) -> command.DeleteTrainingCommand:
+        cleaned_data = training_form.cleaned_data
+        return command.DeleteTrainingCommand(
+            acronym=cleaned_data["acronym"],
+            from_year=cleaned_data["end_year"].year
+        )
+
+    def convert_training_form_to_delete_group_command(
+            self,
+            training_form: training_forms.UpdateTrainingForm) -> command.DeleteGroupCommand:
+        cleaned_data = training_form.cleaned_data
+        return command.DeleteGroupCommand(
+            code=cleaned_data["code"],
+            from_year=cleaned_data["end_year"].year
         )

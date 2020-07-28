@@ -36,17 +36,17 @@ from base.tests.factories.entity_version import EntityVersionFactory
 from education_group.ddd.domain import exception
 from education_group.ddd.domain._campus import Campus
 from education_group.ddd.domain._content_constraint import ContentConstraint
+from education_group.ddd.domain._entity import Entity as EntityValueObject
 from education_group.ddd.domain._remark import Remark
 from education_group.ddd.domain._titles import Titles
-from education_group.ddd.domain._entity import Entity as EntityValueObject
 from education_group.ddd.domain.exception import AcademicYearNotFound, TypeNotFound, ManagementEntityNotFound, \
     TeachingCampusNotFound, GroupCodeAlreadyExistException
 from education_group.ddd.domain.group import GroupIdentity, Group
 from education_group.ddd.factories.group import GroupFactory
 from education_group.ddd.repository.group import GroupRepository
-from education_group.tests.factories.group_year import GroupYearFactory
-from education_group.tests.factories.group import GroupFactory as GroupModelDbFactory
+from education_group.models.group import Group as GroupModelDb
 from education_group.models.group_year import GroupYear as GroupYearModelDb
+from education_group.tests.factories.group_year import GroupYearFactory
 
 
 class TestGroupRepositoryGetMethod(TestCase):
@@ -309,3 +309,43 @@ class TestGroupRepositoryUpdateMethod(TestCase):
         self.assertEqual(group.content_constraint.maximum, self.group_year_db.max_constraint)
         self.assertEqual(group.remark.text_fr, self.group_year_db.remark_fr)
         self.assertEqual(group.remark.text_en, self.group_year_db.remark_en)
+
+
+class TestGroupDeleteMethod(TestCase):
+    def test_should_raise_exception_when_no_matching_group_to_delete(self):
+        group_identity_with_no_match = GroupIdentity(code="NO MATCH", year=2019)
+
+        with self.assertRaises(exception.GroupNotFoundException):
+            GroupRepository.delete(group_identity_with_no_match)
+
+    def test_should_delete_education_group_year_when_matching_group_to_delete(self):
+        group_year_db = GroupYearFactory(partial_acronym="LOSIS5897", academic_year__year=2017)
+        GroupYearFactory(
+            partial_acronym="LOSIS5897",
+            academic_year__year=2018,
+            group=group_year_db.group
+        )
+        group_identity = generate_group_identity_from_group_year(group_year_db)
+
+        GroupRepository.delete(group_identity)
+
+        with self.assertRaises(GroupYearModelDb.DoesNotExist):
+            GroupYearModelDb.objects.get(pk=group_year_db.pk)
+
+    def test_should_delete_group_when_last_group_year_deleted(self):
+        group_year_db = GroupYearFactory(partial_acronym="LOSIS5897", academic_year__year=2017)
+
+        group_identity = generate_group_identity_from_group_year(group_year_db)
+
+        GroupRepository.delete(group_identity)
+
+        with self.assertRaises(GroupModelDb.DoesNotExist):
+            GroupModelDb.objects.get(pk=group_year_db.group.pk)
+
+
+def generate_group_identity_from_group_year(
+        group_year_obj: 'GroupYearModelDb') -> 'GroupIdentity':
+    return GroupIdentity(
+        code=group_year_obj.partial_acronym,
+        year=group_year_obj.academic_year.year
+    )

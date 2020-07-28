@@ -183,6 +183,14 @@ class GroupYear(models.Model):
 
         super().save(*args, **kwargs)
 
+    def delete(self, using=None, keep_parents=False):
+        result = super().delete(using, keep_parents)
+
+        has_group_anymore_children = self.group.groupyear_set.all().exists()
+        if not has_group_anymore_children:
+            result = self.group.delete()
+        return result
+
     @property
     def complete_title(self):
         return self.title_fr
