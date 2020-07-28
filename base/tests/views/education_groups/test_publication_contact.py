@@ -87,7 +87,8 @@ class TestPublicationContactCreateView(PublicationContactViewSetupTest):
         cls.url_create = reverse(
             CREATE_URL_NAME,
             args=[
-                cls.training.pk,
+                cls.training.academic_year.year,
+                cls.training.acronym,
                 cls.training.pk,
             ]
         )
@@ -142,7 +143,8 @@ class TestPublicationContactUpdateView(PublicationContactViewSetupTest):
         cls.url_edit = reverse(
             EDIT_URL_NAME,
             args=[
-                cls.training.pk,
+                cls.training.academic_year.year,
+                cls.training.acronym,
                 cls.training.pk,
                 cls.publication_contact.pk
             ]
@@ -175,8 +177,9 @@ class TestPublicationContactDeleteView(PublicationContactViewSetupTest):
         cls.url_delete = reverse(
             DELETE_URL_NAME,
             args=[
-                cls.training.id,
-                cls.training.id,
+                cls.training.academic_year.year,
+                cls.training.acronym,
+                cls.training.pk,
                 cls.publication_contact.pk
             ]
         )
@@ -229,8 +232,9 @@ class TestEntityPublicationContactUpdateView(PublicationContactViewSetupTest):
         cls.url_update = reverse(
             EDIT_ENTITY_URL_NAME,
             args=[
-                cls.training.id,
-                cls.training.id,
+                cls.training.academic_year.year,
+                cls.training.acronym,
+                cls.training.id
             ]
         )
 
