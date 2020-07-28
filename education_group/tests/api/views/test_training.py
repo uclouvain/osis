@@ -44,6 +44,7 @@ from education_group.tests.factories.group_year import GroupYearFactory
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory, \
     StandardTransitionEducationGroupVersionFactory
+from reference.tests.factories.domain import DomainFactory
 
 
 class TrainingTitleTestCase(APITestCase):
@@ -365,7 +366,13 @@ class GetTrainingTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(year=2018)
-        cls.training = TrainingFactory(acronym='BIR1BA', partial_acronym='LBIR1000I', academic_year=cls.academic_year)
+        domain = DomainFactory()
+        cls.training = TrainingFactory(
+            acronym='BIR1BA',
+            partial_acronym='LBIR1000I',
+            academic_year=cls.academic_year,
+            main_domain=domain
+        )
         cls.version = StandardEducationGroupVersionFactory(offer=cls.training)
         cls.user = UserFactory()
         cls.url = reverse('education_group_api_v1:training_read', kwargs={
