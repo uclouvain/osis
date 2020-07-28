@@ -26,17 +26,16 @@
 from typing import List
 
 from program_management.ddd.command import PostponeProgramTreeVersionCommand, CreateProgramTreeVersionCommand, \
-    DuplicateProgramTree, PostponeProgramTreeCommand
+    DuplicateProgramTree
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionBuilder, ProgramTreeVersionIdentity, \
     STANDARD
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
-from program_management.ddd.service.write import postpone_tree_version_service, duplicate_program_tree_service, \
-    postpone_program_tree_service
+from program_management.ddd.service.write import postpone_tree_version_service, duplicate_program_tree_service
 
 
 def create_program_tree_version(
         command: 'CreateProgramTreeVersionCommand',
-) -> List[ProgramTreeVersionIdentity]:
+) -> ProgramTreeVersionIdentity:
 
     # GIVEN
     identity_standard = ProgramTreeVersionIdentity(
@@ -65,61 +64,7 @@ def create_program_tree_version(
         program_tree_version=new_program_tree_version,
     )
 
-    postpone_program_tree_service.postpone_program_tree(
-        PostponeProgramTreeCommand(
-            from_code=new_program_tree_identity.code,
-            from_year=new_program_tree_identity.year,
-            offer_acronym=identity.offer_acronym,
-        )
-    )
-
-    created_identities = postpone_tree_version_service.postpone_program_tree_version(
-        PostponeProgramTreeVersionCommand(
-            from_offer_acronym=identity.offer_acronym,
-            from_year=identity.year,
-            from_is_transition=identity.is_transition,
-            from_version_name=identity.version_name,
-        )
-    )
-
-    return [identity] + created_identities
-
-
-def postpone_program_tree_version(command: 'PostponeProgramTreeVersionCommand') -> List[ProgramTreeVersionIdentity]:
-    # GIVEN
-    identity = ProgramTreeVersionIdentity(
-        offer_acronym=command.from_offer_acronym,
-        year=command.from_year,
-        version_name=command.from_version_name,
-        is_transition=command.from_is_transition,
-    )
-    existing_program_tree_version = ProgramTreeVersionRepository().get(entity_id=identity)
-
-    identities_created = []
-
-    # WHEN
-    from_year = existing_program_tree_version.entity_id.year
-    while from_year < command.end_postponement:
-        from_year += 1
-
-        # THEN
-        command = CreateProgramTreeVersionCommand(
-            end_postponement=command.end_postponement,
-            offer_acronym=existing_program_tree_version.entity_id.offer_acronym,
-            version_name=existing_program_tree_version.entity_id.version_name,
-            year=existing_program_tree_version.entity_id.year,
-            is_transition=existing_program_tree_version.entity_id.is_transition,
-            title_en=existing_program_tree_version.title_en,
-            title_fr=existing_program_tree_version.title_fr,
-        )
-        identities_created.append(
-            create_program_tree_version(
-                command,
-                identity_trough_year=existing_program_tree_version.identity_trough_year,
-            )
-        )
-
-    return identities_created
+    return identity
 
 
 def create_and_postpone_from_past_version(command: 'CreateProgramTreeVersionCommand') -> List[ProgramTreeVersionIdentity]:
