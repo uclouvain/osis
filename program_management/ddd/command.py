@@ -308,3 +308,9 @@ class CopyTreeVersionToNextYearCommand(interface.CommandRequest):
 @attr.s(frozen=True, slots=True)
 class CreateAndAttachTrainingCommand(education_group_command.CreateTrainingCommand):
     path_to_paste = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class DuplicateProgramTree(interface.CommandRequest):
+    from_root_code = attr.ib(type=str)
+    from_root_year = attr.ib(type=int)
