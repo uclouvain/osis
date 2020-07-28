@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from collections import OrderedDict
 from typing import List
 
 from django.conf import settings
@@ -45,7 +46,7 @@ def get_sections_of_common(year: int, language_code: str):
     labels = general_information_sections.SECTIONS_PER_OFFER_TYPE['common']['specific']
     empty_group_node = NodeGroupYear(node_type=GroupType.COMMON_CORE)
     translated_labels = __get_translated_labels(reference_pk, labels, language_code, empty_group_node)
-    sections = {}
+    sections = OrderedDict()
     for section in general_information_sections.SECTION_LIST:
         for label in filter(lambda l: l in labels, section.labels):
             translated_label = translated_labels.get(label)
@@ -58,7 +59,7 @@ def get_sections(node: NodeGroupYear, language_code: str):
     common_translated_labels = __get_common_translated_labels(node, language_code)
     labels = set(__get_common_labels(node) + __get_specific_labels(node))
 
-    sections = {}
+    sections = OrderedDict()
     for section in general_information_sections.SECTION_LIST:
         for label in filter(lambda l: l in labels, section.labels):
             common_translated_label = common_translated_labels.get(label)

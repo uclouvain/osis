@@ -30,6 +30,7 @@ from django.utils.translation import gettext_lazy as _
 # This all text_label which are related to "general information" for education group year
 # The key MUST be in french because it depend on Webservice (filtering)
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType, GroupType
+from django.utils.translation import pgettext
 
 SKILLS_AND_ACHIEVEMENTS = 'comp_acquis'
 PEDAGOGY = 'pedagogie'
@@ -70,7 +71,7 @@ CMS_LABEL_ADDITIONAL_INFORMATION = 'skills_and_achievements_additional_text'
 Section = namedtuple('Section', 'title labels')
 
 SECTION_LIST = [
-    Section(title=_('Welcome'),
+    Section(title=pgettext('section title', 'Welcome'),
             labels=[
                 WELCOME_INTRODUCTION,
                 WELCOME_PROFIL,
