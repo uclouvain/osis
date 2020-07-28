@@ -126,7 +126,7 @@ class TrainingDetailSerializer(TrainingListSerializer):
     rate_code_text = serializers.CharField(source='get_rate_code_display', read_only=True)
     active_text = serializers.CharField(source='get_active_display', read_only=True)
     remark = serializers.SerializerMethodField()
-    domain_name = serializers.CharField(source='main_domain.parent.name', read_only=True)
+    domain_name = serializers.SerializerMethodField(read_only=True)
     domain_code = serializers.CharField(source='main_domain.code', read_only=True)
 
     class Meta(TrainingListSerializer.Meta):
@@ -197,3 +197,8 @@ class TrainingDetailSerializer(TrainingListSerializer):
             training,
             'remark' + ('_english' if language and language not in settings.LANGUAGE_CODE_FR else '')
         )
+
+    @staticmethod
+    def get_domain_name(training):
+        main_domain = training.main_domain
+        return main_domain.parent.name if main_domain.parent else main_domain.name
