@@ -61,6 +61,8 @@ class NodeIdentitySearch(interface.DomainService):
         values = GroupYear.objects.filter(
             educationgroupversion__offer__acronym=training_identity.acronym,
             educationgroupversion__offer__academic_year__year=training_identity.year,
+            educationgroupversion__version_name='',
+            educationgroupversion__is_transition=False
         ).values(
             'partial_acronym'
         )
