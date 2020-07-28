@@ -77,7 +77,7 @@ class TrainingBuilder:
         identity_next_year = TrainingIdentity(acronym=training_from.acronym, year=training_from.year + 1)
         try:
             training_next_year = training_repository.get(identity_next_year)
-            # TODO :: Case update training next year - to implement in OSIS-4809
+            training_next_year.update_from_other_training(training_from)
         except TrainingNotFoundException:
             # Case create training next year
             CopyTrainingValidatorList(training_from).validate()
@@ -280,11 +280,29 @@ class Training(interface.RootEntity):
         return self.type == TrainingType.PGRM_MASTER_180_240
 
     def update(self, data: 'UpdateTrainingData'):
-        data_as_dict = attr.asdict(data)
+        data_as_dict = attr.asdict(data, recurse=False)
         for field, new_value in data_as_dict.items():
             setattr(self, field, new_value)
         validators_by_business_action.UpdateTrainingValidatorList(self)
         return self
+
+    def update_from_other_training(self, other_training: 'Training'):
+        fields_not_to_update = ("year", "acronym", "entity_id", "entity_identity", "identity_through_years")
+        for field in other_training.__slots__:
+            if field in fields_not_to_update:
+                continue
+            value = getattr(other_training, field)
+            setattr(self, field, value)
+
+    # TODO rename method
+    def has_same_values_as(self, other_training: 'Training') -> bool:
+        fields_not_to_compare = ("year", "entity_id", "entity_identity", "identity_through_years")
+        for field in other_training.__slots__:
+            if field in fields_not_to_compare:
+                continue
+            if getattr(self, field) != getattr(other_training, field):
+                return False
+        return True
 
 
 @attr.s(frozen=True, slots=True, kw_only=True)

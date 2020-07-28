@@ -31,12 +31,15 @@ from education_group.tests.ddd.factories.training import TrainingFactory
 
 
 class TestUpdateTraining(TestCase):
+    @mock.patch("education_group.ddd.service.write.update_training_service.CalculateEndPostponement."
+                "calculate_year_of_end_postponement", return_value=2020)
     @mock.patch("education_group.ddd.service.write.postpone_training_service.postpone_training")
     @mock.patch("education_group.ddd.repository.training.TrainingRepository", autospec=True)
     def test_should_update_and_save_training_when_training_exists(
             self,
             mock_repository,
-            mock_postpone_training):
+            mock_postpone_training,
+            mock_end_year_of_postponement):
         mock_repository.get.return_value = TrainingFactory()
         mock_postpone_training.return_value = None
 

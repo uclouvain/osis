@@ -26,7 +26,6 @@
 from django.test import TestCase
 
 from base.models.certificate_aim import CertificateAim
-from base.models.education_group import EducationGroup
 from base.models.education_group_certificate_aim import EducationGroupCertificateAim
 from base.models.education_group_year import EducationGroupYear as EducationGroupYearModelDb
 from base.models.education_group_year_domain import EducationGroupYearDomain
@@ -37,6 +36,7 @@ from base.tests.factories.certificate_aim import CertificateAimFactory as Certif
 from base.tests.factories.education_group_type import TrainingEducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory as EntityVersionModelDbFactory
+from education_group.ddd.domain import exception
 from education_group.ddd.domain.training import Training
 from education_group.ddd.repository.training import TrainingRepository
 from education_group.tests.ddd.factories.campus import CampusIdentityFactory
@@ -263,3 +263,47 @@ def assert_training_model_equals_training_domain(
     self.assertEqual(education_group_year.joint_diploma, training_domain_obj.diploma.leads_to_diploma)
     self.assertEqual(education_group_year.diploma_printing_title, training_domain_obj.diploma.printing_title)
     self.assertEqual(education_group_year.active, training_domain_obj.status.name)
+
+
+class TestTrainingRepositoryGetMethod(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.education_group_year = EducationGroupYearFactory(acronym="LOSIS4587")
+
+    def test_should_raise_exception_when_no_matching_training(self):
+        training_identity_with_no_match = TrainingIdentityFactory(acronym="NO MATCH")
+        with self.assertRaises(exception.TrainingNotFoundException):
+            TrainingRepository.get(training_identity_with_no_match)
+
+    def test_should_return_a_training_when_matching_training_exists(self):
+        training_identity = TrainingIdentityFactory(
+            acronym=self.education_group_year.acronym,
+            year=self.education_group_year.academic_year.year
+        )
+
+        result = TrainingRepository.get(training_identity)
+        self.assertIsInstance(result, Training)
+
+
+class TestTrainingRepositorySearchMethod(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.education_group_years = [
+            EducationGroupYearFactory(acronym="LOSIS5897", academic_year__year=2015),
+            EducationGroupYearFactory(acronym="MEDE8523", academic_year__year=2018)
+        ]
+
+    def test_should_return_empty_list_when_no_matching_trainings(self):
+        training_identity_with_no_match = TrainingIdentityFactory(acronym="NO MATCH")
+
+        result = TrainingRepository.search([training_identity_with_no_match])
+        self.assertListEqual([], result)
+
+    def test_should_return_list_of_trainings_when_matching_trainings(self):
+        training_identities = [
+            TrainingIdentityFactory(acronym=egy.acronym, year=egy.academic_year.year)
+            for egy in self.education_group_years
+        ]
+
+        result = TrainingRepository.search(training_identities)
+        self.assertEqual(len(training_identities), len(result))

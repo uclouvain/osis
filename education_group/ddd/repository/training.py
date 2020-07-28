@@ -23,9 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import functools
+import itertools
+import operator
 from typing import Optional, List
 
-from django.db.models import Subquery, OuterRef, Prefetch, QuerySet
+from django.db.models import Subquery, OuterRef, Prefetch, QuerySet, Q
 
 from base.models import entity_version
 from base.models.academic_year import AcademicYear as AcademicYearModelDb
@@ -91,18 +94,19 @@ class TrainingRepository(interface.AbstractRepository):
 
     @classmethod
     def get(cls, entity_id: 'TrainingIdentity') -> 'Training':
-        qs = _get_queryset_to_fetch_data_for_training(entity_id)
+        qs = _get_queryset_to_fetch_data_for_training([entity_id])
 
         try:
             education_group_year_db = qs.get()
         except EducationGroupYearModelDb.DoesNotExist:
             raise exception.TrainingNotFoundException
 
-        return _convert_education_group_year_to_training(entity_id, education_group_year_db)
+        return _convert_education_group_year_to_training(education_group_year_db)
 
     @classmethod
     def search(cls, entity_ids: Optional[List['TrainingIdentity']] = None, **kwargs) -> List['Training']:
-        raise NotImplementedError
+        qs = _get_queryset_to_fetch_data_for_training(entity_ids)
+        return [_convert_education_group_year_to_training(education_group_year_db) for education_group_year_db in qs]
 
     @classmethod
     def delete(cls, entity_id: 'TrainingIdentity', **_) -> None:
@@ -110,9 +114,10 @@ class TrainingRepository(interface.AbstractRepository):
 
 
 def _convert_education_group_year_to_training(
-        entity_id: 'TrainingIdentity',
         obj: EducationGroupYearModelDb
 ) -> 'Training':
+    entity_id = training.TrainingIdentity(acronym=obj.acronym, year=obj.academic_year.year)
+
     secondary_domains = __convert_study_domains_from_db(obj)
 
     coorganizations = __convert_coorganizations_from_db(entity_id, obj)
@@ -270,10 +275,13 @@ def __convert_coorganizations_from_db(
     return coorganizations
 
 
-def _get_queryset_to_fetch_data_for_training(entity_id: 'TrainingIdentity') -> QuerySet:
+def _get_queryset_to_fetch_data_for_training(entity_ids: List['TrainingIdentity']) -> QuerySet:
+    filter_clause = functools.reduce(
+        operator.or_,
+        ((Q(acronym=entity_id.acronym) & Q(academic_year__year=entity_id.year)) for entity_id in entity_ids)
+    )
     return EducationGroupYearModelDb.objects.filter(
-        acronym=entity_id.acronym,
-        academic_year__year=entity_id.year
+        filter_clause
     ).select_related(
         'education_group_type',
         'hops',

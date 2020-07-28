@@ -23,17 +23,50 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Type
+
 from base.models import academic_year
 from education_group.ddd.business_types import *
+from education_group.ddd.domain.training import TrainingIdentity
 from osis_common.ddd import interface
+
+DEFAULT_YEARS_TO_POSTPONE = 6
 
 
 class CalculateEndPostponement(interface.DomainService):
 
     @classmethod
-    def calculate_year_of_end_postponement(cls, training: 'Training') -> int:
-        default_years_to_postpone = 6
+    def calculate_year_of_end_postponement(cls, training: 'Training', repository: Type['TrainingRepository']) -> int:
+        max_year_to_postpone = cls._compute_max_year_to_postpone(training)
+
+        return cls._compute_postponement_end_year(training, max_year_to_postpone, repository)
+
+    @classmethod
+    def _compute_max_year_to_postpone(cls, training: 'Training') -> int:
         current_year = academic_year.starting_academic_year().year
-        if training.end_year:
-            default_years_to_postpone = training.end_year - training.year
-        return current_year + default_years_to_postpone
+        max_year_to_postpone = current_year + DEFAULT_YEARS_TO_POSTPONE
+
+        is_end_year_inferior_to_max_year_to_postpone = training.end_year and training.end_year < max_year_to_postpone
+        if is_end_year_inferior_to_max_year_to_postpone:
+            return training.end_year
+
+        return max_year_to_postpone
+
+    @classmethod
+    def _compute_postponement_end_year(
+            cls,
+            training: 'Training',
+            max_year_to_postpone, repository: Type['TrainingRepository']) -> int:
+        training_identities = [
+            TrainingIdentity(acronym=training.acronym, year=year)
+            for year in range(training.year+1, max_year_to_postpone+1)
+        ]
+        next_year_trainings = repository.search(entity_ids=training_identities)
+        next_year_trainings_ordered_by_year = sorted(next_year_trainings, key=lambda obj: obj.year)
+
+        current_training = training
+        for training_obj in next_year_trainings_ordered_by_year:
+            if not current_training.has_same_values_as(training_obj):
+                return current_training.year
+            current_training = training_obj
+        return max_year_to_postpone

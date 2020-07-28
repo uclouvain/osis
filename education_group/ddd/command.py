@@ -250,6 +250,7 @@ class UpdateGroupCommand(interface.CommandRequest):
 class PostponeTrainingCommand(interface.CommandRequest):
     acronym = attr.ib(type=str)
     postpone_from_year = attr.ib(type=int)
+    postpone_until_year = attr.ib(type=int)
 
 
 @attr.s(frozen=True, slots=True)

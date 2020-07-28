@@ -21,26 +21,3 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from collections import defaultdict
-
-import mock
-
-from osis_common.ddd import interface
-
-
-class MockFormValid(mock.Mock):
-    @property
-    def errors(self):
-        return []
-
-    def is_valid(self):
-        return True
-
-    @property
-    def cleaned_data(self):
-        return mock.MagicMock()
-
-
-class MockRepository(mock.MagicMock):
-    def __int__(self, *args, **kwargs):
-        return super().__init__(*args, spec=interface.AbstractRepository, **kwargs)

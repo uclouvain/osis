@@ -21,6 +21,8 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+from copy import copy
+
 import mock
 from django.test import SimpleTestCase
 
@@ -51,3 +53,17 @@ class TestTrainingBuilderCopyToNextYear(SimpleTestCase):
 
         self.assertEqual(training_source.entity_id.year + 1, result.entity_id.year)
         self.assertEqual(training_source.identity_through_years, result.identity_through_years)
+
+
+class TestTrainingHasSameValuesAs(SimpleTestCase):
+    def test_should_return_false_when_values_are_different(self):
+        training_source = TrainingFactory()
+        other_training = TrainingFactory()
+
+        self.assertFalse(training_source.has_same_values_as(other_training))
+
+    def test_should_return_true_when_values_are_equal(self):
+        training_source = TrainingFactory()
+        other_training = copy(training_source)
+
+        self.assertTrue(training_source, other_training)

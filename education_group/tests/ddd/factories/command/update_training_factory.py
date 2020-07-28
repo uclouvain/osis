@@ -50,6 +50,7 @@ from decimal import Decimal
 
 import factory.fuzzy
 
+from base.models.enums.active_status import ActiveStatusEnum
 from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.ddd import command
 
@@ -60,7 +61,7 @@ class UpdateTrainingCommandFactory(factory.Factory):
         abstract = False
 
     abbreviated_title = "Title "
-    status = " Status "
+    status = ActiveStatusEnum.ACTIVE.name
     code = " Code "
     year = 2019
     credits = 23

@@ -40,6 +40,7 @@ from education_group.ddd.domain._hops import HOPS
 from education_group.ddd.domain._isced_domain import IscedDomain, IscedDomainIdentity
 from education_group.ddd.domain._study_domain import StudyDomain, StudyDomainIdentity
 from education_group.ddd.domain._titles import Titles
+from education_group.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
 from education_group.ddd.repository import training as training_repository
 from education_group.ddd.service.write import postpone_training_service
 
@@ -48,14 +49,22 @@ from education_group.ddd.service.write import postpone_training_service
 def update_training(cmd: command.UpdateTrainingCommand) -> 'TrainingIdentity':
     training_identity = training.TrainingIdentity(acronym=cmd.abbreviated_title, year=cmd.year)
     training_domain_obj = training_repository.TrainingRepository.get(training_identity)
-    training_domain_obj.update(
-        convert_command_to_update_training_data(cmd)
+    end_postponement_year = CalculateEndPostponement.calculate_year_of_end_postponement(
+        training_domain_obj,
+        training_repository.TrainingRepository
     )
+
+    training_domain_obj.update(convert_command_to_update_training_data(cmd))
     training_repository.TrainingRepository.update(training_domain_obj)
 
     postpone_training_service.postpone_training(
-        command.PostponeTrainingCommand(acronym=cmd.abbreviated_title, postpone_from_year=cmd.year)
+        command.PostponeTrainingCommand(
+            acronym=cmd.abbreviated_title,
+            postpone_from_year=cmd.year,
+            postpone_until_year=end_postponement_year
+        )
     )
+
     return training_identity
 
 
@@ -70,9 +79,9 @@ def convert_command_to_update_training_data(cmd: command.UpdateTrainingCommand) 
         ),
         status=ActiveStatusEnum[cmd.status],
         duration=cmd.duration,
-        duration_unit=DurationUnitsEnum[cmd.duration_unit],
+        duration_unit=DurationUnitsEnum[cmd.duration_unit] if cmd.duration_unit else None,
         keywords=cmd.keywords,
-        internship_presence=InternshipPresence[cmd.internship_presence],
+        internship_presence=InternshipPresence[cmd.internship_presence] if cmd.internship_presence else None,
         is_enrollment_enabled=cmd.is_enrollment_enabled,
         has_online_re_registration=cmd.has_online_re_registration,
         has_partial_deliberation=cmd.has_partial_deliberation,
@@ -80,8 +89,9 @@ def convert_command_to_update_training_data(cmd: command.UpdateTrainingCommand) 
         has_dissertation=cmd.has_dissertation,
         produce_university_certificate=cmd.produce_university_certificate,
         main_language=cmd.main_language,
-        english_activities=ActivityPresence[cmd.english_activities],
-        other_language_activities=ActivityPresence[cmd.other_language_activities],
+        english_activities=ActivityPresence[cmd.english_activities] if cmd.english_activities else None,
+        other_language_activities=ActivityPresence[cmd.other_language_activities]
+        if cmd.other_language_activities else None,
         internal_comment=cmd.internal_comment,
         main_domain=StudyDomain(
             entity_id=StudyDomainIdentity(decree_name=cmd.main_domain_decree, code=cmd.main_domain_code),
@@ -101,12 +111,14 @@ def convert_command_to_update_training_data(cmd: command.UpdateTrainingCommand) 
             name=cmd.enrollment_campus_name,
             university_name=cmd.enrollment_campus_organization_name
         ),
-        other_campus_activities=ActivityPresence[cmd.other_campus_activities],
+        other_campus_activities=ActivityPresence[cmd.other_campus_activities]
+        if cmd.other_campus_activities else None,
         funding=Funding(
             can_be_funded=cmd.can_be_funded,
-            funding_orientation=FundingCodes[cmd.funding_orientation],
+            funding_orientation=FundingCodes[cmd.funding_orientation] if cmd.funding_orientation else None,
             can_be_international_funded=cmd.can_be_international_funded,
             international_funding_orientation=FundingCodes[cmd.international_funding_orientation]
+            if cmd.international_funding_orientation else None
         ),
         hops=HOPS(
             ares_code=cmd.ares_code,
@@ -122,6 +134,6 @@ def convert_command_to_update_training_data(cmd: command.UpdateTrainingCommand) 
             printing_title=cmd.printing_title,
             professional_title=cmd.professional_title,
             aims=[DiplomaAim(entity_id=DiplomaAimIdentity(section, code), description="")
-                  for code, section in cmd.aims]
+                  for code, section in (cmd.aims or [])]
         ),
     )
