@@ -37,6 +37,7 @@ from base.models.enums import proposal_type, proposal_state
 from cms.enums import entity_name
 from cms.models import translated_text
 from learning_unit.models.learning_class_year import LearningClassYear
+from program_management.models.element import find_by_learning_unit_year
 
 
 def check_learning_unit_deletion(learning_unit, check_proposal=True):
@@ -167,6 +168,7 @@ def delete_from_given_learning_unit_year(learning_unit_year):
         msg.extend(delete_from_given_learning_unit_year(next_year))
 
     if learning_unit_year.learning_container_year and learning_unit_year.is_full():
+        find_by_learning_unit_year(learning_unit_year).delete()
         msg.extend(_delete_learning_container_year(learning_unit_year.learning_container_year))
 
     for component in learning_unit_year.learningcomponentyear_set.all():

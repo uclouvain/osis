@@ -123,3 +123,7 @@ class Element(models.Model):
             return NodeType.LEARNING_UNIT
         elif self.learning_class_year:
             return NodeType.LEARNING_CLASS
+
+
+def find_by_learning_unit_year(learning_unit_year):
+    return Element.objects.get(learning_unit_year=learning_unit_year)
