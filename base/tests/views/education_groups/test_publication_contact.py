@@ -89,7 +89,6 @@ class TestPublicationContactCreateView(PublicationContactViewSetupTest):
             args=[
                 cls.training.academic_year.year,
                 cls.training.acronym,
-                cls.training.pk,
             ]
         )
 
@@ -145,7 +144,6 @@ class TestPublicationContactUpdateView(PublicationContactViewSetupTest):
             args=[
                 cls.training.academic_year.year,
                 cls.training.acronym,
-                cls.training.pk,
                 cls.publication_contact.pk
             ]
         )
@@ -179,7 +177,6 @@ class TestPublicationContactDeleteView(PublicationContactViewSetupTest):
             args=[
                 cls.training.academic_year.year,
                 cls.training.acronym,
-                cls.training.pk,
                 cls.publication_contact.pk
             ]
         )

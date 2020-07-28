@@ -103,10 +103,14 @@ urlpatterns = [
            r'^admission_conditions/lang/edit/(?P<language>[A-Za-z-]+)/$',
            education_group.education_group_year_admission_condition_tab_lang_edit,
            name='tab_lang_edit'),
-        url(r'^publication_contact/(?P<education_group_year_id>[0-9]+)/', include([
-            url(r'^edit_entity/$',
-                UpdateEducationGroupEntityPublicationContactView.as_view(),
-                name='publication_contact_entity_edit'),
+       url(
+          r'^publication_contact/(?P<education_group_year_id>[0-9]+)/',
+          include([
+              url(r'^edit_entity/$',
+                  UpdateEducationGroupEntityPublicationContactView.as_view(),
+                  name='publication_contact_entity_edit'),
+          ])),
+       url(r'^publication_contact/', include([
             url(r'^create/$',
                 CreateEducationGroupPublicationContactView.as_view(),
                 name="publication_contact_create"),

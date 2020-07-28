@@ -24,7 +24,6 @@
 #
 ##############################################################################
 from django.contrib.messages.views import SuccessMessageMixin
-from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
@@ -40,6 +39,8 @@ from base.models.education_group_publication_contact import EducationGroupPublic
 from base.models.education_group_year import EducationGroupYear
 from base.views.mixins import AjaxTemplateMixin
 from program_management.ddd.domain.node import NodeIdentity
+from django.core.exceptions import ObjectDoesNotExist
+from django.http import Http404
 
 
 class CommonEducationGroupPublicationContactView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageMixin):
@@ -55,7 +56,13 @@ class CommonEducationGroupPublicationContactView(PermissionRequiredMixin, AjaxTe
 
     @cached_property
     def education_group_year(self):
-        return get_object_or_404(EducationGroupYear, pk=self.kwargs['education_group_year_id'])
+        try:
+            return EducationGroupYear.objects.get(
+                partial_acronym=self.kwargs['code'],
+                academic_year__year=self.kwargs['year']
+            )
+        except ObjectDoesNotExist:
+            raise Http404
 
     def get_success_url(self):
         training_identity = TrainingIdentitySearch().get_from_node_identity(
