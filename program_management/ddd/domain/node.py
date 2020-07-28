@@ -46,6 +46,7 @@ from program_management.ddd.domain._campus import Campus
 from program_management.ddd.domain.academic_year import AcademicYear
 from program_management.ddd.domain.link import factory as link_factory
 from program_management.ddd.domain.prerequisite import Prerequisite, NullPrerequisite
+from program_management.ddd.domain.service.generate_node_code import GenerateNodeCode
 from program_management.models.enums.node_type import NodeType
 
 
@@ -78,8 +79,18 @@ class NodeFactory:
             )
         return node_cls(**node_attrs)
 
-    def build_from(self, node: 'Node') -> 'Node':  # TODO :: unit tests
-        copied_node = self.deepcopy_node_without_copy_children_recursively(node)
+    def duplicate(self, duplicate_from: 'Node', end_year: int = None) -> 'Node':
+        new_code = GenerateNodeCode().generate_next_code_from_existing(
+            existing_code=duplicate_from.entity_id.code,
+            year=duplicate_from.entity_id.year,
+        )
+        copied_node = attr.evolve(
+            duplicate_from,
+            entity_id=NodeIdentity(code=new_code, year=duplicate_from.entity_id.year),
+            code=new_code,
+            end_date=end_year,
+            children=[],
+        )
         copied_node._has_changed = True
         return copied_node
 
