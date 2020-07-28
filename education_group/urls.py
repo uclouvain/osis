@@ -1,4 +1,4 @@
-from django.urls import include, path, register_converter
+from django.urls import include, path, register_converter, re_path
 
 from base.views.education_groups.achievement.create import CreateEducationGroupDetailedAchievement, \
     CreateEducationGroupAchievement
@@ -14,11 +14,6 @@ register_converter(GroupTypeConverter, 'group_type')
 register_converter(TrainingTypeConverter, 'training_type')
 
 urlpatterns = [
-    path(
-        '<int:year>/<str:acronym>/',
-        ReadEducationGroupRedirectView.as_view(),
-        name='education_group_read_proxy'
-    ),
     path('groups/', include([
         path('<group_type:type>/create', group.GroupCreateView.as_view(), name='group_create'),
         path('<int:year>/<str:code>/', include([
@@ -140,5 +135,10 @@ urlpatterns = [
             name="common_master_specialized_admission_condition"
         ),
     ])),
-    path('<int:year>/<str:code>/publish', general_information.publish, name='publish_general_information')
+    path('<int:year>/<str:code>/publish', general_information.publish, name='publish_general_information'),
+    re_path(
+        r'^(?P<year>[\d]{4})/(?P<acronym>[\w]+(?:[/ ]?[a-zA-Z]{1,2}){0,2})/$',
+        ReadEducationGroupRedirectView.as_view(),
+        name='education_group_read_proxy'
+    ),
 ]
