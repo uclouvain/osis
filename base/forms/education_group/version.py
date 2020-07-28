@@ -30,8 +30,9 @@ from django.utils.translation import gettext_lazy as _
 from base.forms.utils.choice_field import BLANK_CHOICE
 from base.models import academic_year
 from base.models.academic_year import compute_max_academic_year_adjournment
-from program_management.ddd.command import CreateProgramTreeVersionCommand, PostponeProgramTreeVersionCommand
-from program_management.ddd.service.write import create_program_tree_version_service
+from program_management.ddd.command import CreateProgramTreeVersionCommand
+from program_management.ddd.service.write import create_program_tree_version_service, \
+    create_and_postpone_tree_version_service
 
 
 class SpecificVersionForm(forms.Form):
@@ -61,7 +62,6 @@ class SpecificVersionForm(forms.Form):
     def __init__(self, *args, **kwargs):
         self.save_type = kwargs.pop('save_type')
         self.education_group_years_list = []
-        self.person = kwargs.pop('person')
         self.education_group_year = kwargs.pop('education_group_year')
         self.max_year = academic_year.find_academic_year_by_year(compute_max_academic_year_adjournment() + 1).year
         choices_years = [(x, x) for x in range(self.education_group_year.academic_year.year, self.max_year)]
@@ -69,8 +69,6 @@ class SpecificVersionForm(forms.Form):
         self.fields["end_year"].choices = BLANK_CHOICE + choices_years
 
     def save(self):
-        end_postponement = self.education_group_year.academic_year.year \
-            if not self.cleaned_data['end_year'] else int(self.cleaned_data['end_year'])
         command = CreateProgramTreeVersionCommand(
             offer_acronym=self.education_group_year.acronym,
             version_name=self.cleaned_data.get("version_name").upper(),
@@ -78,27 +76,16 @@ class SpecificVersionForm(forms.Form):
             is_transition=False,
             title_en=self.cleaned_data.get("title_english"),
             title_fr=self.cleaned_data.get("title"),
-            end_postponement=end_postponement,
+            end_year=self.cleaned_data.get("end_year"),
         )
         if self.save_type == "new_version":
-            identity = create_program_tree_version_service.create_program_tree_version(command=command)
-            command_postpone = PostponeProgramTreeVersionCommand(
-                end_postponement=end_postponement,
-                from_offer_acronym=identity.offer_acronym,
-                from_version_name=identity.version_name,
-                from_year=identity.year,
-                from_is_transition=identity.is_transition,
-            )
-            identities_postpone = create_program_tree_version_service.postpone_program_tree_version(
-                command=command_postpone
-            )
-            identities = [identity] + identities_postpone
-        if self.save_type == "extend":
+            identities = create_and_postpone_tree_version_service.create_and_postpone(command=command)
+        elif self.save_type == "extend":
             identities = create_program_tree_version_service.create_and_postpone_from_past_version(command=command)
         messages = []
-        for identity in identities:
+        for created_identity in identities:
             messages.append(
                 _("Specific version for education group year %(acronym)s (%(academic_year)s) successfully created.") % {
-                    "acronym": identity.version_name,
-                    "academic_year": academic_year.find_academic_year_by_year(identity.year)})
+                    "acronym": created_identity.version_name,
+                    "academic_year": academic_year.find_academic_year_by_year(created_identity.year)})
         self.cleaned_data["messages"] = messages
