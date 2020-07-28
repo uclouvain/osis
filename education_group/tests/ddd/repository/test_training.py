@@ -26,6 +26,7 @@
 from django.test import TestCase
 
 from base.models.certificate_aim import CertificateAim
+from base.models.education_group import EducationGroup
 from base.models.education_group_certificate_aim import EducationGroupCertificateAim
 from base.models.education_group_year import EducationGroupYear as EducationGroupYearModelDb
 from base.models.education_group_year_domain import EducationGroupYearDomain
@@ -37,7 +38,7 @@ from base.tests.factories.education_group_type import TrainingEducationGroupType
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory as EntityVersionModelDbFactory
 from education_group.ddd.domain import exception
-from education_group.ddd.domain.training import Training
+from education_group.ddd.domain.training import Training, TrainingIdentity
 from education_group.ddd.repository.training import TrainingRepository
 from education_group.tests.ddd.factories.campus import CampusIdentityFactory
 from education_group.tests.ddd.factories.diploma import DiplomaAimFactory, DiplomaAimIdentityFactory
@@ -276,10 +277,7 @@ class TestTrainingRepositoryGetMethod(TestCase):
             TrainingRepository.get(training_identity_with_no_match)
 
     def test_should_return_a_training_when_matching_training_exists(self):
-        training_identity = TrainingIdentityFactory(
-            acronym=self.education_group_year.acronym,
-            year=self.education_group_year.academic_year.year
-        )
+        training_identity = generate_training_identity_from_education_group_year(self.education_group_year)
 
         result = TrainingRepository.get(training_identity)
         self.assertIsInstance(result, Training)
@@ -301,9 +299,49 @@ class TestTrainingRepositorySearchMethod(TestCase):
 
     def test_should_return_list_of_trainings_when_matching_trainings(self):
         training_identities = [
-            TrainingIdentityFactory(acronym=egy.acronym, year=egy.academic_year.year)
+            generate_training_identity_from_education_group_year(egy)
             for egy in self.education_group_years
         ]
 
         result = TrainingRepository.search(training_identities)
         self.assertEqual(len(training_identities), len(result))
+
+
+class TestTrainingDeleteMethod(TestCase):
+    def test_should_raise_exception_when_no_matching_training_to_delete(self):
+        training_identity_with_no_match = TrainingIdentityFactory(acronym="NO MATCH")
+
+        with self.assertRaises(exception.TrainingNotFoundException):
+            TrainingRepository.delete(training_identity_with_no_match)
+
+    def test_should_delete_education_group_year_when_matching_training_to_delete(self):
+        education_group_year_db = EducationGroupYearFactory(acronym="LOSIS5897", academic_year__year=2017)
+        EducationGroupYearFactory(
+            acronym="LOSIS5897",
+            academic_year__year=2016,
+            education_group=education_group_year_db.education_group
+        )
+        training_identity = generate_training_identity_from_education_group_year(education_group_year_db)
+
+        TrainingRepository.delete(training_identity)
+
+        with self.assertRaises(EducationGroupYearModelDb.DoesNotExist):
+            EducationGroupYearModelDb.objects.get(pk=education_group_year_db.pk)
+
+    def test_should_delete_education_group_when_last_training_deleted(self):
+        education_group_year_db = EducationGroupYearFactory(acronym="LOSIS5897", academic_year__year=2017)
+
+        training_identity = generate_training_identity_from_education_group_year(education_group_year_db)
+
+        TrainingRepository.delete(training_identity)
+
+        with self.assertRaises(EducationGroup.DoesNotExist):
+            EducationGroup.objects.get(pk=education_group_year_db.education_group.pk)
+
+
+def generate_training_identity_from_education_group_year(
+        education_group_year_obj: 'EducationGroupYearModelDb') -> 'TrainingIdentity':
+    return TrainingIdentityFactory(
+        acronym=education_group_year_obj.acronym,
+        year=education_group_year_obj.academic_year.year
+    )
