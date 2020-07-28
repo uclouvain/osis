@@ -25,18 +25,22 @@
 ##############################################################################
 from typing import Dict
 
+from ajax_select import register, LookupChannel
 from ajax_select.fields import AutoCompleteSelectMultipleField
 from dal import autocomplete
 from django import forms
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.validators import MinValueValidator
+from django.core.exceptions import PermissionDenied
+from django.core.validators import MinValueValidator, MaxValueValidator
+from django.db.models import Q
 from django.utils.functional import lazy
 from django.utils.translation import gettext_lazy as _
 
 from base.business.event_perms import EventPermEducationGroupEdition
 from base.forms.common import ValidationRuleMixin
 from base.forms.education_group.common import MainCampusChoiceField
+from base.models.campus import Campus
 from education_group.forms.fields import MainEntitiesVersionChoiceField
 from base.forms.education_group.training import _get_section_choices
 from base.forms.utils.choice_field import BLANK_CHOICE
@@ -56,6 +60,7 @@ from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.forms import fields
 from reference.models.domain import Domain
 from reference.models.domain_isced import DomainIsced
+from reference.models.enums import domain_type
 from reference.models.enums.domain_type import UNIVERSITY
 from reference.models.language import Language, FR_CODE_LANGUAGE
 from rules_management.enums import TRAINING_PGRM_ENCODING_PERIOD, \
@@ -79,6 +84,8 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         label=_("Schedule type"),
     )
     credits = forms.IntegerField(
+        min_value=0,
+        max_value=999,
         label=_("Credits"),
         widget=forms.TextInput,
     )
@@ -161,17 +168,20 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         required=False,
     )
     main_domain = forms.ModelChoiceField(
+        label=_('main domain'),
         queryset=Domain.objects.filter(type=UNIVERSITY).select_related('decree'),
         required=False,
     )
     secondary_domains = AutoCompleteSelectMultipleField(
         'university_domains',
         required=False,
-        help_text=_('Enter text to search'),
-        show_help_text=True,
         label=_('secondary domains').title(),
     )
-    isced_domain = forms.ModelChoiceField(queryset=DomainIsced.objects.all(), required=False)
+    isced_domain = forms.ModelChoiceField(
+        label=_('ISCED domain'),
+        queryset=DomainIsced.objects.all(),
+        required=False,
+    )
     internal_comment = forms.CharField(
         max_length=500,
         label=_("comment (internal)").capitalize(),
@@ -181,7 +191,7 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
 
     # panel_entities_form.html
     management_entity = forms.CharField()
-    administration_entity = MainEntitiesVersionChoiceField(queryset=None)
+    administration_entity = MainEntitiesVersionChoiceField(queryset=None, label=_("Administration entity"))
     academic_year = forms.ModelChoiceField(
         queryset=AcademicYear.objects.all(),
         label=_("Start"),
@@ -223,11 +233,18 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
 
     # HOPS panel
     hops_fields = ('ares_code', 'ares_graca', 'ares_authorization')
-    ares_code = forms.CharField(widget=forms.TextInput(), required=False)
-    ares_graca = forms.CharField(widget=forms.TextInput(), required=False)
-    ares_authorization = forms.CharField(widget=forms.TextInput(), required=False)
+    ares_code = forms.CharField(label=_('ARES study code'), widget=forms.TextInput(), required=False)
+    ares_graca = forms.CharField(label=_('ARES-GRACA'), widget=forms.TextInput(), required=False)
+    ares_authorization = forms.CharField(label=_('ARES ability'), widget=forms.TextInput(), required=False)
     code_inter_cfb = forms.CharField(max_length=8, label=_('Code co-graduation inter CfB'), required=False)
-    coefficient = forms.DecimalField(widget=forms.TextInput(), required=False)
+    coefficient = forms.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        label=_('Co-graduation total coefficient'),
+        widget=forms.TextInput(),
+        required=False,
+        validators=[MinValueValidator(1), MaxValueValidator(9999)],
+    )
 
     # Diploma tab
     section = forms.ChoiceField(
@@ -269,6 +286,8 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         self.__init_certificate_aims_field()
         self.__init_diploma_fields()
         self.__init_main_language()
+        self.__init_campuses()
+        self.__init_secondary_domains()
 
     def __init_academic_year_field(self):
         if not self.fields['academic_year'].disabled and self.user.person.is_faculty_manager:
@@ -309,6 +328,16 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     def __init_main_language(self):
         self.fields["main_language"].initial = Language.objects.all().get(code=FR_CODE_LANGUAGE)
 
+    def __init_campuses(self):
+        default_campus = Campus.objects.filter(name='Louvain-la-Neuve').first()
+        if 'teaching_campus' in self.fields:
+            self.fields['teaching_campus'].initial = default_campus
+        if 'enrollment_campus' in self.fields:
+            self.fields['enrollment_campus'].initial = default_campus
+
+    def __init_secondary_domains(self):
+        self.fields["secondary_domains"].widget.attrs['placeholder'] = _('Enter text to search')
+
     def is_valid(self):
         valid = super().is_valid()
 
@@ -341,3 +370,29 @@ class UpdateTrainingForm(CreateTrainingForm):
     def __init__(self, *args, **kwargs):
         super(UpdateTrainingForm, self).__init__(*args, **kwargs)
         self.fields['academic_year'].label = _('Validity')
+
+
+@register('university_domains')
+class UniversityDomainsLookup(LookupChannel):
+
+    model = Domain
+
+    def check_auth(self, request):
+        if not request.user.is_authenticated:
+            raise PermissionDenied
+
+    def get_query(self, q, request):
+        return self.model.objects.filter(type=domain_type.UNIVERSITY)\
+                                 .filter(Q(name__icontains=q) | Q(code__icontains=q) |
+                                         Q(decree__name__icontains=q))\
+                                 .select_related('decree')\
+                                 .order_by('-decree__name', 'name')
+
+    def format_item_display(self, item):
+        return "<span class='tag'>{}</span>".format(self.format_match(item))
+
+    def get_result(self, item):
+        return self.format_match(item)
+
+    def format_match(self, item):
+        return "{}:{} {}".format(item.decree.name, item.code, item.name)

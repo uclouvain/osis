@@ -32,8 +32,8 @@ class Remark(interface.ValueObject):
             text_fr: str,
             text_en: str,
     ):
-        self.text_fr = text_fr
-        self.text_en = text_en
+        self.text_fr = text_fr or ""
+        self.text_en = text_en or ""
 
     def __eq__(self, other):
         return self.text_fr == other.text_fr and \
