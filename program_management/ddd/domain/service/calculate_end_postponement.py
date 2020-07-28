@@ -39,7 +39,7 @@ class CalculateEndPostponement(interface.DomainService):
             training_identity: 'TrainingIdentity',
             training_repository: 'TrainingRepository'
     ) -> int:
-        default_years_to_postpone = 6
+        default_years_to_postpone = 5
         current_year = academic_year.starting_academic_year().year
         training = training_repository.get(training_identity)
         if training.end_year:
@@ -52,7 +52,7 @@ class CalculateEndPostponement(interface.DomainService):
             tree_version_identity: 'ProgramTreeVersionIdentity',
             group_repository: 'GroupRepository',
     ) -> int:
-        default_years_to_postpone = 6
+        default_years_to_postpone = 5
         group = group_repository.get(GroupIdentitySearch().get_from_tree_version_identity(tree_version_identity))
         if group.end_year:
             default_years_to_postpone = group.end_year - group.year
