@@ -32,11 +32,9 @@ class CentralManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
             'base.can_access_catalog': rules.always_allow,  # Perms Backward compibility
             'base.view_educationgroup': rules.always_allow,
             'base.add_training':
-                predicates.is_user_attached_to_management_entity &
-                predicates.is_maximum_child_not_reached_for_training_category,
+                predicates.is_user_attached_to_management_entity,
             'base.add_minitraining':
-                predicates.is_user_attached_to_management_entity &
-                predicates.is_maximum_child_not_reached_for_mini_training_category,
+                predicates.is_user_attached_to_management_entity,
             'base.add_group':
                 predicates.is_user_attached_to_management_entity,
             # TODO : split in training, minitraining, group
