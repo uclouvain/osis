@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List, Dict
+from typing import List, Dict, Union
 
 from django.db.models import F
 
@@ -76,7 +76,7 @@ class ElementIdByYearSearch(interface.DomainService):
 
 class ElementIdSearch(interface.DomainService):
 
-    def get_from_training_identity(self, training_identity: 'TrainingIdentity') -> ElementId:
+    def get_from_training_identity(self, training_identity: 'TrainingIdentity') -> Union[None, ElementId]:
         STANDARD = ''
         values = Element.objects.filter(
             group_year__educationgroupversion__version_name=STANDARD,

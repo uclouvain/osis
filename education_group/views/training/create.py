@@ -42,7 +42,7 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
     template_name = "education_group_app/training/upsert/create.html"
 
     @cached_property
-    def parent_node_identity(self) -> 'NodeIdentity':
+    def parent_node_identity(self) -> Union[None, 'NodeIdentity']:
         if self.get_attach_path():
             return NodeIdentitySearch().get_from_element_id(int(self.get_attach_path().split('|')[-1]))
 
