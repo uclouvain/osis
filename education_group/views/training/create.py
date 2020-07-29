@@ -54,6 +54,7 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             user=self.request.user,
             training_type=training_type,
             initial=self._get_initial_form(),
+            attach_path=self.get_attach_path(),
         )
         return render(request, self.template_name, self.get_context(training_form))
 
@@ -72,6 +73,7 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             data=request.POST,
             user=self.request.user,
             training_type=self.kwargs['type'],
+            attach_path=self.get_attach_path(),
         )
         if training_form.is_valid():
             create_training_data = _convert_training_form_to_data_for_service(training_form)

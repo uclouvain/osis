@@ -58,6 +58,7 @@ from base.models.enums.internship_presence import InternshipPresence
 from base.models.enums.rate_code import RateCode
 from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.forms import fields
+from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
 from reference.models.domain import Domain
 from reference.models.domain_isced import DomainIsced
 from reference.models.enums import domain_type
@@ -275,13 +276,17 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         )
     )
 
-    def __init__(self, *args, user: User, training_type: str, **kwargs):
+    def __init__(self, *args, user: User, training_type: str, attach_path: str = '', **kwargs):
         self.user = user
         self.training_type = training_type
+        self.attach_path = attach_path
 
         super().__init__(*args, **kwargs)
 
-        self.__init_academic_year_field()
+        if self.attach_path:
+            self.__disable_and_fix_academic_year_field()
+        else:
+            self.__init_academic_year_field()
         self.__init_management_entity_field()
         self.__init_certificate_aims_field()
         self.__init_diploma_fields()
@@ -305,6 +310,11 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
             )
 
             self.fields['academic_year'].label = _('Start')
+
+    def __disable_and_fix_academic_year_field(self):
+        fixed_year = NodeIdentitySearch().get_from_element_id(int(self.attach_path.split('|')[-1])).year
+        self.fields['academic_year'].initial = AcademicYear.objects.get(year=fixed_year)
+        self.fields['academic_year'].disabled = True
 
     def __init_management_entity_field(self):
         self.fields['management_entity'] = fields.ManagementEntitiesChoiceField(
