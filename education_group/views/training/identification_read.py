@@ -51,9 +51,9 @@ class TrainingReadIdentification(TrainingRead):
         }
 
     def get_related_history(self):
-        education_group_year = self.education_group_version.offer
+        group_year = self.education_group_version.root_group
         versions = Version.objects.get_for_object(
-            education_group_year
+            self.education_group_version
         ).select_related('revision__user__person')
 
         related_models = [
@@ -71,7 +71,7 @@ class TrainingReadIdentification(TrainingRead):
             subversion |= Version.objects.get_for_model(model).select_related('revision__user__person')
 
         versions |= subversion.filter(
-            serialized_data__contains="\"education_group_year\": {}".format(education_group_year.pk)
+            serialized_data__contains="\"pk\": {}".format(group_year.pk)
         )
 
         return versions.order_by('-revision__date_created').distinct('revision__date_created')
