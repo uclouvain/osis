@@ -25,6 +25,7 @@
 ##############################################################################
 from osis_common.ddd.interface import BusinessException
 from django.utils.translation import gettext_lazy as _
+from program_management.ddd.business_types import *
 
 
 class RelativeCreditShouldBeGreaterOrEqualsThanZero(BusinessException):
@@ -33,5 +34,18 @@ class RelativeCreditShouldBeGreaterOrEqualsThanZero(BusinessException):
         super().__init__(message, **kwargs)
 
 
+class ProgramTreeNotEmptyException(BusinessException):
+    def __init__(self, program_tree: 'ProgramTree', *args, **kwargs):
+        message = _("Program %(acronym)s (%(academic_year)s) is not empty.") % {
+            "acronym": program_tree.root_node.title,
+            "academic_year": str(program_tree.root_node.academic_year)
+        }
+        super().__init__(message, **kwargs)
+
+
 class ProgramTreeNotFoundException(Exception):
+    pass
+
+
+class ProgramTreeVersionNotFoundException(Exception):
     pass

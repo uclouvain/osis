@@ -21,29 +21,18 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-import itertools
-from typing import List
-
-from education_group.ddd import command
+from base.ddd.utils import business_validator
+from education_group.ddd.domain import exception
 from education_group.ddd.business_types import *
-from education_group.ddd.domain import training, exception
-from education_group.ddd.repository import training as training_repository
-from education_group.ddd.validators.validators_by_business_action import DeleteTrainingValidatorList
+from education_group.ddd.domain.service.has_inscriptions import TrainingHasInscriptions
 
 
-def delete_training(delete_command: command.DeleteTrainingCommand) -> List['TrainingIdentity']:
-    from_year = delete_command.from_year
+class HasInscriptionsValidator(business_validator.BusinessValidator):
+    def __init__(self, training: 'Training'):
+        super().__init__()
+        self.training = training
 
-    deleted_trainings = []
-    for year in itertools.count(from_year):
-        training_identity_to_delete = training.TrainingIdentity(acronym=delete_command.acronym, year=year)
-        try:
-            training_obj = training.TrainingRepository.get(training_identity_to_delete)
-            DeleteTrainingValidatorList(training_obj)
-
-            training_repository.TrainingRepository.delete(training_identity_to_delete)
-            deleted_trainings.append(training_identity_to_delete)
-        except exception.TrainingNotFoundException:
-            break
-
-    return deleted_trainings
+    def validate(self, *args, **kwargs):
+        has_inscriptions = TrainingHasInscriptions.has_inscriptions(self.training)
+        if has_inscriptions:
+            raise exception.HasInscriptionsException(self.training)

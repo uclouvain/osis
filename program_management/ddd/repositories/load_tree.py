@@ -41,7 +41,7 @@ from program_management.ddd.repositories import load_node, load_prerequisite, \
     load_authorized_relationship
 # Typing
 from program_management.ddd.repositories.load_prerequisite import TreeRootId, NodeId
-from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
+from program_management.ddd.repositories import program_tree_version as program_tree_version_repository
 from program_management.models.education_group_version import EducationGroupVersion
 
 GroupElementYearColumnName = str
@@ -278,4 +278,4 @@ def load_tree_versions_from_children(
         link_type: LinkTypes = None
 ) -> List['ProgramTreeVersion']:
     root_ids = _get_root_ids(child_element_ids, link_type)
-    return ProgramTreeVersionRepository.search(element_ids=list(root_ids))
+    return program_tree_version_repository.ProgramTreeVersionRepository.search(element_ids=list(root_ids))

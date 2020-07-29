@@ -25,6 +25,7 @@
 ##############################################################################
 from typing import Optional, List
 
+from base.models.group_element_year import GroupElementYear
 from education_group.ddd.command import CreateOrphanGroupCommand
 from osis_common.ddd import interface
 from osis_common.ddd.interface import Entity
@@ -48,7 +49,21 @@ class ProgramTreeRepository(interface.AbstractRepository):
 
     @classmethod
     def delete(cls, entity_id: 'ProgramTreeIdentity') -> None:
-        raise NotImplementedError
+        try:
+            group_elements = GroupElementYear.objects.filter(
+                parent_element__group_year__partial_acronym=entity_id.code,
+                parent_element__group_year__academic_year__year=entity_id.year
+            )
+            for group_element in group_elements:
+                group_element.delete()
+
+            tree_root = Element.objects.get(
+                group_year__partial_acronym=entity_id.code,
+                group_year__academic_year__year=entity_id.year
+            )
+            tree_root.delete()
+        except Element.DoesNotExist:
+            raise exception.ProgramTreeNotFoundException()
 
     @classmethod
     def create(

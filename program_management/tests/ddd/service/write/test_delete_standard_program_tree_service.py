@@ -21,29 +21,27 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-import itertools
-from typing import List
+import mock
+from django.test import TestCase
 
-from education_group.ddd import command
-from education_group.ddd.business_types import *
-from education_group.ddd.domain import training, exception
-from education_group.ddd.repository import training as training_repository
-from education_group.ddd.validators.validators_by_business_action import DeleteTrainingValidatorList
+from program_management.ddd import command
+from program_management.ddd.domain import exception, program_tree
+from program_management.ddd.service.write import delete_standard_program_tree_service
 
 
-def delete_training(delete_command: command.DeleteTrainingCommand) -> List['TrainingIdentity']:
-    from_year = delete_command.from_year
+class TestDeleteStandardProgramTree(TestCase):
+    @mock.patch("program_management.ddd.repositories.program_tree.ProgramTreeRepository", autospec=True)
+    def test_delete_program_trees(self, mock_program_tree_repository):
+        mock_program_tree_repository.delete.side_effect = [None, None, exception.ProgramTreeNotFoundException]
 
-    deleted_trainings = []
-    for year in itertools.count(from_year):
-        training_identity_to_delete = training.TrainingIdentity(acronym=delete_command.acronym, year=year)
-        try:
-            training_obj = training.TrainingRepository.get(training_identity_to_delete)
-            DeleteTrainingValidatorList(training_obj)
+        delete_command = command.DeleteStandardProgramTreeCommand(code='Code', from_year=2018)
+        result = delete_standard_program_tree_service.delete_standard_program_tree(delete_command)
 
-            training_repository.TrainingRepository.delete(training_identity_to_delete)
-            deleted_trainings.append(training_identity_to_delete)
-        except exception.TrainingNotFoundException:
-            break
-
-    return deleted_trainings
+        self.assertListEqual(
+            [
+                program_tree.ProgramTreeIdentity(code='Code', year=2018),
+                program_tree.ProgramTreeIdentity(code='Code', year=2019)
+            ],
+            result
+        )
+        self.assertEqual(3, mock_program_tree_repository.delete.call_count)

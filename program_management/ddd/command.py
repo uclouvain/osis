@@ -302,3 +302,26 @@ class CopyTreeVersionToNextYearCommand(interface.CommandRequest):
 @attr.s(frozen=True, slots=True)
 class CreateAndAttachTrainingCommand(education_group_command.CreateTrainingCommand):
     path_to_paste = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class DeleteStandardProgramTreeCommand(interface.CommandRequest):
+    code = attr.ib(type=str)
+    from_year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class DeleteProgramTreeVersionCommand(interface.CommandRequest):
+    offer_acronym = attr.ib(type=str)
+    version_name = attr.ib(type=str)
+    is_transition = attr.ib(type=bool)
+    from_year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class DeleteTrainingWithProgramTreeCommand(interface.CommandRequest):
+    code = attr.ib(type=str)
+    offer_acronym = attr.ib(type=str)
+    version_name = attr.ib(type=str)
+    is_transition = attr.ib(type=bool)
+    from_year = attr.ib(type=int)

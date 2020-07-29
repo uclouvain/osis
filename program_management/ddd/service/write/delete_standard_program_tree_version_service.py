@@ -24,26 +24,31 @@
 import itertools
 from typing import List
 
-from education_group.ddd import command
-from education_group.ddd.business_types import *
-from education_group.ddd.domain import training, exception
-from education_group.ddd.repository import training as training_repository
-from education_group.ddd.validators.validators_by_business_action import DeleteTrainingValidatorList
+from django.db import transaction
+
+from program_management.ddd import command
+from program_management.ddd.business_types import *
+from program_management.ddd.domain import exception, program_tree_version
+from program_management.ddd.repositories import program_tree_version as program_tree_version_repository
 
 
-def delete_training(delete_command: command.DeleteTrainingCommand) -> List['TrainingIdentity']:
+@transaction.atomic()
+def delete_standard_program_tree_version(
+        delete_command: command.DeleteProgramTreeVersionCommand) -> List['ProgramTreeVersionIdentity']:
     from_year = delete_command.from_year
 
-    deleted_trainings = []
+    deleted_program_tree_versions = []
     for year in itertools.count(from_year):
-        training_identity_to_delete = training.TrainingIdentity(acronym=delete_command.acronym, year=year)
+        program_tree_version_identity_to_delete = program_tree_version.ProgramTreeVersionIdentity(
+            offer_acronym=delete_command.offer_acronym,
+            year=year,
+            version_name=delete_command.version_name,
+            is_transition=delete_command.is_transition
+        )
         try:
-            training_obj = training.TrainingRepository.get(training_identity_to_delete)
-            DeleteTrainingValidatorList(training_obj)
-
-            training_repository.TrainingRepository.delete(training_identity_to_delete)
-            deleted_trainings.append(training_identity_to_delete)
-        except exception.TrainingNotFoundException:
+            program_tree_version_repository.ProgramTreeVersionRepository.delete(program_tree_version_identity_to_delete)
+            deleted_program_tree_versions.append(program_tree_version_identity_to_delete)
+        except exception.ProgramTreeVersionNotFoundException:
             break
 
-    return deleted_trainings
+    return deleted_program_tree_versions

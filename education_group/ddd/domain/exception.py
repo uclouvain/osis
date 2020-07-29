@@ -95,3 +95,15 @@ class MaximumCertificateAimType2Reached(BusinessException):
     def __init__(self, *args, **kwargs):
         message = _("There can only be one type 2 expectation")
         super().__init__(message, **kwargs)
+
+
+class HasInscriptionsException(BusinessException):
+    def __init__(self, training: 'Training', *args, **kwargs):
+        message = _("The training has inscriptions")
+        super().__init__(message, **kwargs)
+
+
+class IsLinkedToEpcException(BusinessException):
+    def __init__(self, training: 'Training', *args, **kwargs):
+        message = _("The training is linked to epd")
+        super().__init__(message, **kwargs)

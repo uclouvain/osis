@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from _decimal import Decimal
 from typing import List
 
 import attr
@@ -43,14 +42,12 @@ from education_group.ddd.business_types import *
 from education_group.ddd.domain._campus import Campus
 from education_group.ddd.domain._co_graduation import CoGraduation
 from education_group.ddd.domain._co_organization import Coorganization
-from education_group.ddd.domain._content_constraint import ContentConstraint
 from education_group.ddd.domain._diploma import Diploma, DiplomaAim, DiplomaAimIdentity
 from education_group.ddd.domain._entity import Entity
 from education_group.ddd.domain._funding import Funding
 from education_group.ddd.domain._hops import HOPS
 from education_group.ddd.domain._isced_domain import IscedDomain, IscedDomainIdentity
 from education_group.ddd.domain._language import Language
-from education_group.ddd.domain._remark import Remark
 from education_group.ddd.domain._study_domain import StudyDomain, StudyDomainIdentity
 from education_group.ddd.domain._titles import Titles
 from education_group.ddd.domain.exception import TrainingNotFoundException

@@ -32,15 +32,14 @@ from education_group.ddd.business_types import *
 
 from base.ddd.utils import business_validator
 from education_group.ddd.validators._content_constraint import ContentConstraintValidator
+from education_group.ddd.validators._has_inscriptions import HasInscriptionsValidator
+from education_group.ddd.validators._is_linked_to_epc import IsLinkedToEpcValidator
 from education_group.ddd.validators._start_year_end_year import StartYearEndYearValidator
 
 
 class CreateGroupValidatorList(business_validator.BusinessListValidator):
 
-    def __init__(
-            self,
-            group: 'Group'
-    ):
+    def __init__(self, group: 'Group'):
         self.validators = [
             ContentConstraintValidator(group.content_constraint),
             CreditsValidator(group.credits),
@@ -50,10 +49,7 @@ class CreateGroupValidatorList(business_validator.BusinessListValidator):
 
 class UpdateGroupValidatorList(business_validator.BusinessListValidator):
 
-    def __init__(
-            self,
-            group: 'Group'
-    ):
+    def __init__(self, group: 'Group'):
         self.validators = [
             ContentConstraintValidator(group.content_constraint),
             CreditsValidator(group.credits),
@@ -63,10 +59,7 @@ class UpdateGroupValidatorList(business_validator.BusinessListValidator):
 
 class CreateTrainingValidatorList(business_validator.BusinessListValidator):
 
-    def __init__(
-            self,
-            training: 'Training'
-    ):
+    def __init__(self, training: 'Training'):
         self.validators = [
             AcronymRequiredValidator(training),
             AcronymAlreadyExistValidator(training),
@@ -78,10 +71,7 @@ class CreateTrainingValidatorList(business_validator.BusinessListValidator):
 
 class UpdateTrainingValidatorList(business_validator.BusinessListValidator):
 
-    def __init__(
-            self,
-            training: 'Training'
-    ):
+    def __init__(self, training: 'Training'):
         self.validators = [
             CertificateAimType2Validator(training)
         ]
@@ -90,11 +80,18 @@ class UpdateTrainingValidatorList(business_validator.BusinessListValidator):
 
 class CopyTrainingValidatorList(business_validator.BusinessListValidator):
 
-    def __init__(
-            self,
-            training_from: 'Training'
-    ):
+    def __init__(self, training_from: 'Training'):
         self.validators = [
             CheckEndDateValidator(training_from),
+        ]
+        super().__init__()
+
+
+class DeleteTrainingValidatorList(business_validator.BusinessListValidator):
+
+    def __init__(self, training: 'Training'):
+        self.validators = [
+            IsLinkedToEpcValidator(training),
+            HasInscriptionsValidator(training)
         ]
         super().__init__()

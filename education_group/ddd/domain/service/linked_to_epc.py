@@ -21,29 +21,15 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-import itertools
-from typing import List
-
-from education_group.ddd import command
+from base.models.education_group_year import EducationGroupYear
 from education_group.ddd.business_types import *
-from education_group.ddd.domain import training, exception
-from education_group.ddd.repository import training as training_repository
-from education_group.ddd.validators.validators_by_business_action import DeleteTrainingValidatorList
+from osis_common.ddd import interface
 
 
-def delete_training(delete_command: command.DeleteTrainingCommand) -> List['TrainingIdentity']:
-    from_year = delete_command.from_year
-
-    deleted_trainings = []
-    for year in itertools.count(from_year):
-        training_identity_to_delete = training.TrainingIdentity(acronym=delete_command.acronym, year=year)
-        try:
-            training_obj = training.TrainingRepository.get(training_identity_to_delete)
-            DeleteTrainingValidatorList(training_obj)
-
-            training_repository.TrainingRepository.delete(training_identity_to_delete)
-            deleted_trainings.append(training_identity_to_delete)
-        except exception.TrainingNotFoundException:
-            break
-
-    return deleted_trainings
+class TrainingIsLinkedToEpc(interface.DomainService):
+    @classmethod
+    def is_linked_to_epc(cls, training: 'Training') -> bool:
+        return EducationGroupYear.objects.get(
+            acronym=training.acronym,
+            academic_year__year=training.year
+        ).linked_with_epc

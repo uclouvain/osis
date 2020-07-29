@@ -35,7 +35,6 @@ from education_group.ddd.repository.group import GroupRepository
 from education_group.ddd.validators.validators_by_business_action import CreateGroupValidatorList
 
 
-# TODO : Implement Validator (Actually in GroupFrom via ValidationRules)
 @transaction.atomic()
 def upsert_orphan_group(cmd: command.CreateOrphanGroupCommand) -> 'GroupIdentity':
     grp = group.builder.build_from_create_cmd(cmd)

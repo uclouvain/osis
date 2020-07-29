@@ -138,6 +138,17 @@ class ProgramTree(interface.RootEntity):
     authorized_relationships = attr.ib(type=AuthorizedRelationshipList, factory=list)
     entity_id = attr.ib(type=ProgramTreeIdentity)  # FIXME :: pass entity_id as mandatory param !
 
+    def is_empty(self, parent_node=None):
+        parent_node = parent_node or self.root_node
+        for child_node in parent_node.children_as_nodes:
+            if not self.is_empty(parent_node=child_node):
+                return False
+            is_mandatory_children = child_node.node_type in self.authorized_relationships.\
+                get_ordered_mandatory_children_types(parent_node.node_type) if self.authorized_relationships else []
+            if not is_mandatory_children:
+                return False
+        return True
+
     @entity_id.default
     def _entity_id(self) -> 'ProgramTreeIdentity':
         return ProgramTreeIdentity(self.root_node.code, self.root_node.year)

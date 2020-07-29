@@ -21,29 +21,17 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-import itertools
-from typing import List
-
-from education_group.ddd import command
-from education_group.ddd.business_types import *
-from education_group.ddd.domain import training, exception
-from education_group.ddd.repository import training as training_repository
-from education_group.ddd.validators.validators_by_business_action import DeleteTrainingValidatorList
+from base.ddd.utils import business_validator
+from program_management.ddd.business_types import *
+from program_management.ddd.domain import exception
 
 
-def delete_training(delete_command: command.DeleteTrainingCommand) -> List['TrainingIdentity']:
-    from_year = delete_command.from_year
+class ProgramTreeEmptyValidator(business_validator.BusinessValidator):
 
-    deleted_trainings = []
-    for year in itertools.count(from_year):
-        training_identity_to_delete = training.TrainingIdentity(acronym=delete_command.acronym, year=year)
-        try:
-            training_obj = training.TrainingRepository.get(training_identity_to_delete)
-            DeleteTrainingValidatorList(training_obj)
+    def __init__(self, program_tree: 'ProgramTree'):
+        super().__init__()
+        self.program_tree = program_tree
 
-            training_repository.TrainingRepository.delete(training_identity_to_delete)
-            deleted_trainings.append(training_identity_to_delete)
-        except exception.TrainingNotFoundException:
-            break
-
-    return deleted_trainings
+    def validate(self):
+        if not self.program_tree.is_empty():
+            raise exception.ProgramTreeNotEmptyException(self.program_tree)

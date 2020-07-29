@@ -24,26 +24,30 @@
 import itertools
 from typing import List
 
-from education_group.ddd import command
-from education_group.ddd.business_types import *
-from education_group.ddd.domain import training, exception
-from education_group.ddd.repository import training as training_repository
-from education_group.ddd.validators.validators_by_business_action import DeleteTrainingValidatorList
+from django.db import transaction
+
+from program_management.ddd import command
+from program_management.ddd.business_types import *
+from program_management.ddd.domain import program_tree, exception
+from program_management.ddd.repositories import program_tree as program_tree_repository
+from program_management.ddd.validators import validators_by_business_action
 
 
-def delete_training(delete_command: command.DeleteTrainingCommand) -> List['TrainingIdentity']:
+@transaction.atomic()
+def delete_standard_program_tree(
+        delete_command: command.DeleteStandardProgramTreeCommand) -> List['ProgramTreeIdentity']:
     from_year = delete_command.from_year
 
-    deleted_trainings = []
+    deleted_program_trees = []
     for year in itertools.count(from_year):
-        training_identity_to_delete = training.TrainingIdentity(acronym=delete_command.acronym, year=year)
+        program_tree_identity_to_delete = program_tree.ProgramTreeIdentity(code=delete_command.code, year=year)
         try:
-            training_obj = training.TrainingRepository.get(training_identity_to_delete)
-            DeleteTrainingValidatorList(training_obj)
+            tree_obj = program_tree_repository.ProgramTreeRepository.get(entity_id=program_tree_identity_to_delete)
+            validators_by_business_action.DeleteProgramTreeValidatorList(tree_obj).validate()
 
-            training_repository.TrainingRepository.delete(training_identity_to_delete)
-            deleted_trainings.append(training_identity_to_delete)
-        except exception.TrainingNotFoundException:
+            program_tree_repository.ProgramTreeRepository.delete(program_tree_identity_to_delete)
+            deleted_program_trees.append(program_tree_identity_to_delete)
+        except exception.ProgramTreeNotFoundException:
             break
 
-    return deleted_trainings
+    return deleted_program_trees

@@ -353,8 +353,10 @@ class UpdateTrainingForm(CreateTrainingForm):
 
     academic_year = forms.ModelChoiceField(
         queryset=AcademicYear.objects.all(),
-        label=_("Start"),
-        to_field_name="year"
+        label=_('Validity'),
+        to_field_name="year",
+        disabled=True,
+        required=False
     )
     end_year = forms.ModelChoiceField(
         queryset=AcademicYear.objects.all(),
@@ -391,4 +393,9 @@ class UpdateTrainingForm(CreateTrainingForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['academic_year'].label = _('Validity')
+        self.__init_end_year_field()
+
+    def __init_end_year_field(self):
+        initial_academic_year_value = self.initial.get("academic_year", None)
+        if initial_academic_year_value:
+            self.fields["end_year"].queryset = AcademicYear.objects.filter(year__gte=initial_academic_year_value)

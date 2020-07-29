@@ -31,10 +31,11 @@ from base.models.education_group_year import EducationGroupYear
 from education_group.models.group_year import GroupYear
 from osis_common.ddd import interface
 from program_management.ddd.business_types import *
+from program_management.ddd.domain import exception
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
-from program_management.ddd.repositories.program_tree import ProgramTreeRepository
+from program_management.ddd.repositories import program_tree as program_tree_repository
 from program_management.models.education_group_version import EducationGroupVersion
 from django.db.models import Q
 
@@ -135,7 +136,16 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
 
     @classmethod
     def delete(cls, entity_id: 'ProgramTreeVersionIdentity', **_) -> None:
-        raise NotImplementedError
+        try:
+            education_group_version_db_obj = EducationGroupVersion.objects.get(
+                version_name=entity_id.version_name,
+                offer__acronym=entity_id.offer_acronym,
+                offer__academic_year__year=entity_id.year,
+                is_transition=entity_id.is_transition,
+            )
+            education_group_version_db_obj.delete()
+        except EducationGroupVersion.DoesNotExist:
+            raise exception.ProgramTreeVersionNotFoundException
 
     @classmethod
     def search_all_versions_from_root_node(cls, root_node_identity: 'NodeIdentity') -> List['ProgramTreeVersion']:
@@ -163,7 +173,7 @@ def _instanciate_tree_version(record_dict: dict) -> 'ProgramTreeVersion':
         entity_identity=identity,
         entity_id=identity,
         program_tree_identity=ProgramTreeIdentity(record_dict['code'], record_dict['offer_year']),
-        program_tree_repository=ProgramTreeRepository(),
+        program_tree_repository=program_tree_repository.ProgramTreeRepository(),
         title_fr=record_dict['version_title_fr'],
         title_en=record_dict['version_title_en'],
     )

@@ -25,9 +25,12 @@ from django.test import TestCase
 
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
+from program_management.ddd.domain import exception
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 from program_management.ddd.repositories import program_tree
+from program_management.models.element import Element
+from program_management.tests.factories.element import ElementFactory, ElementGroupYearFactory
 
 
 class TestSearchTreesFromChildren(TestCase):
@@ -102,3 +105,23 @@ class TestSearchTreesFromChildren(TestCase):
             [tree.entity_id for tree in result],
             expected_tree_identities
         )
+
+
+class TestProgramTreeDelete(TestCase):
+    def test_should_raise_exception_when_no_matching_program_tree_found_to_delete(self):
+        program_tree_identity = ProgramTreeIdentity(code='Code', year=2018)
+
+        with self.assertRaises(exception.ProgramTreeNotFoundException):
+            program_tree.ProgramTreeRepository.delete(program_tree_identity)
+
+    def test_should_delete_element_when_matching_program_tree_found(self):
+        element_db_obj = ElementGroupYearFactory()
+        program_tree_identity = ProgramTreeIdentity(
+            code=element_db_obj.group_year.partial_acronym,
+            year=element_db_obj.group_year.academic_year.year
+        )
+
+        program_tree.ProgramTreeRepository.delete(program_tree_identity)
+
+        with self.assertRaises(Element.DoesNotExist):
+            Element.objects.get(pk=element_db_obj.pk)

@@ -105,10 +105,13 @@ class TestTrainingRepositoryCreateMethod(TestCase):
             acronym=entity_id.acronym,
             academic_year__year=entity_id.year,
         )
-        assert_training_model_equals_training_domain(self, education_group_year, self.training)
-        self.assertEqual(education_group_year.management_entity_id, self.entity_version.entity_id)
-        self.assertEqual(education_group_year.administration_entity_id, self.entity_version.entity_id)
-
+        assert_training_model_equals_training_domain(
+            self,
+            education_group_year,
+            self.training,
+            self.entity_version.entity_id
+        )
+        
         # Secondary domains
         qs = EducationGroupYearDomain.objects.filter(education_group_year=education_group_year)
         self.assertEqual(1, qs.count())
@@ -201,69 +204,9 @@ class TestTrainingRepositoryUpdateMethod(TestCase):
         assert_training_model_equals_training_domain(
             self,
             self.education_group_year,
-            updated_training
+            updated_training,
+            self.entity_version.entity.id
         )
-
-
-def assert_training_model_equals_training_domain(
-        self,
-        education_group_year: EducationGroupYearModelDb,
-        training_domain_obj: Training):
-    # TODO assert entities
-    self.assertEqual(education_group_year.education_group.start_year.year, training_domain_obj.start_year)
-    self.assertEqual(
-        education_group_year.education_group.end_year.year
-        if education_group_year.education_group.end_year else None,
-        training_domain_obj.end_year
-    )
-
-    self.assertEqual(education_group_year.acronym, training_domain_obj.entity_id.acronym)
-    self.assertEqual(education_group_year.academic_year.year, training_domain_obj.entity_id.year)
-    self.assertEqual(education_group_year.education_group_type.name, self.training.type.name)
-    self.assertEqual(education_group_year.credits, int(training_domain_obj.credits))
-    self.assertEqual(education_group_year.schedule_type, training_domain_obj.schedule_type.name)
-    self.assertEqual(education_group_year.duration, training_domain_obj.duration)
-    self.assertEqual(education_group_year.title, training_domain_obj.titles.title_fr)
-    self.assertEqual(education_group_year.title_english, training_domain_obj.titles.title_en)
-    self.assertEqual(education_group_year.partial_title, training_domain_obj.titles.partial_title_fr)
-    self.assertEqual(education_group_year.partial_title_english, training_domain_obj.titles.partial_title_en)
-    self.assertEqual(education_group_year.keywords, training_domain_obj.keywords)
-    self.assertEqual(education_group_year.internship, training_domain_obj.internship_presence.name)
-    self.assertEqual(education_group_year.enrollment_enabled, training_domain_obj.is_enrollment_enabled)
-    self.assertEqual(education_group_year.web_re_registration, training_domain_obj.has_online_re_registration)
-    self.assertEqual(education_group_year.partial_deliberation, training_domain_obj.has_partial_deliberation)
-    self.assertEqual(education_group_year.admission_exam, training_domain_obj.has_admission_exam)
-    self.assertEqual(education_group_year.dissertation, training_domain_obj.has_dissertation)
-    self.assertEqual(education_group_year.university_certificate, training_domain_obj.produce_university_certificate)
-    self.assertEqual(education_group_year.decree_category, training_domain_obj.decree_category.name)
-    self.assertEqual(education_group_year.rate_code, training_domain_obj.rate_code.name)
-    self.assertEqual(education_group_year.primary_language.name, training_domain_obj.main_language.name)
-    self.assertEqual(education_group_year.english_activities, training_domain_obj.english_activities.name)
-    self.assertEqual(education_group_year.other_language_activities, training_domain_obj.other_language_activities.name)
-    self.assertEqual(education_group_year.internal_comment, training_domain_obj.internal_comment)
-    self.assertEqual(education_group_year.main_domain.code, training_domain_obj.main_domain.entity_id.code)
-    self.assertEqual(education_group_year.isced_domain.code, training_domain_obj.isced_domain.entity_id.code)
-    self.assertEqual(education_group_year.main_teaching_campus.name, training_domain_obj.teaching_campus.name)
-    self.assertEqual(education_group_year.enrollment_campus.name, training_domain_obj.enrollment_campus.name)
-    self.assertEqual(education_group_year.other_campus_activities, training_domain_obj.other_campus_activities.name)
-    self.assertEqual(education_group_year.funding, training_domain_obj.funding.can_be_funded)
-    self.assertEqual(education_group_year.funding_direction, training_domain_obj.funding.funding_orientation.name)
-    self.assertEqual(education_group_year.funding_cud, training_domain_obj.funding.can_be_international_funded)
-    self.assertEqual(
-        education_group_year.funding_direction_cud,
-        training_domain_obj.funding.international_funding_orientation.name
-    )
-    self.assertEqual(education_group_year.hops.ares_study, training_domain_obj.hops.ares_code)
-    self.assertEqual(education_group_year.hops.ares_graca, training_domain_obj.hops.ares_graca)
-    self.assertEqual(education_group_year.hops.ares_ability, training_domain_obj.hops.ares_authorization)
-    self.assertEqual(education_group_year.co_graduation, training_domain_obj.co_graduation.code_inter_cfb)
-    self.assertEqual(education_group_year.co_graduation_coefficient, training_domain_obj.co_graduation.coefficient)
-    self.assertEqual(education_group_year.academic_type, training_domain_obj.academic_type.name)
-    self.assertEqual(education_group_year.duration_unit, training_domain_obj.duration_unit.name)
-    self.assertEqual(education_group_year.professional_title, training_domain_obj.diploma.professional_title)
-    self.assertEqual(education_group_year.joint_diploma, training_domain_obj.diploma.leads_to_diploma)
-    self.assertEqual(education_group_year.diploma_printing_title, training_domain_obj.diploma.printing_title)
-    self.assertEqual(education_group_year.active, training_domain_obj.status.name)
 
 
 class TestTrainingRepositoryGetMethod(TestCase):
@@ -345,3 +288,82 @@ def generate_training_identity_from_education_group_year(
         acronym=education_group_year_obj.acronym,
         year=education_group_year_obj.academic_year.year
     )
+
+
+def assert_training_model_equals_training_domain(
+        test_instance: 'TestCase',
+        education_group_year: EducationGroupYearModelDb,
+        training_domain_obj: Training,
+        entity_version_id: int):
+    # TODO assert entities
+    test_instance.assertEqual(education_group_year.education_group.start_year.year, training_domain_obj.start_year)
+    test_instance.assertEqual(
+        education_group_year.education_group.end_year.year
+        if education_group_year.education_group.end_year else None,
+        training_domain_obj.end_year
+    )
+
+    test_instance.assertEqual(education_group_year.acronym, training_domain_obj.entity_id.acronym)
+    test_instance.assertEqual(education_group_year.academic_year.year, training_domain_obj.entity_id.year)
+    test_instance.assertEqual(education_group_year.education_group_type.name, training_domain_obj.type.name)
+    test_instance.assertEqual(education_group_year.management_entity_id, entity_version_id)
+    test_instance.assertEqual(education_group_year.administration_entity_id, entity_version_id)
+    test_instance.assertEqual(education_group_year.credits, int(training_domain_obj.credits))
+    test_instance.assertEqual(education_group_year.schedule_type, training_domain_obj.schedule_type.name)
+    test_instance.assertEqual(education_group_year.duration, training_domain_obj.duration)
+    test_instance.assertEqual(education_group_year.title, training_domain_obj.titles.title_fr)
+    test_instance.assertEqual(education_group_year.title_english, training_domain_obj.titles.title_en)
+    test_instance.assertEqual(education_group_year.partial_title, training_domain_obj.titles.partial_title_fr)
+    test_instance.assertEqual(education_group_year.partial_title_english, training_domain_obj.titles.partial_title_en)
+    test_instance.assertEqual(education_group_year.keywords, training_domain_obj.keywords)
+    test_instance.assertEqual(education_group_year.internship, training_domain_obj.internship_presence.name)
+    test_instance.assertEqual(education_group_year.enrollment_enabled, training_domain_obj.is_enrollment_enabled)
+    test_instance.assertEqual(education_group_year.web_re_registration, training_domain_obj.has_online_re_registration)
+    test_instance.assertEqual(education_group_year.partial_deliberation, training_domain_obj.has_partial_deliberation)
+    test_instance.assertEqual(education_group_year.admission_exam, training_domain_obj.has_admission_exam)
+    test_instance.assertEqual(education_group_year.dissertation, training_domain_obj.has_dissertation)
+    test_instance.assertEqual(
+        education_group_year.university_certificate,
+        training_domain_obj.produce_university_certificate
+    )
+    test_instance.assertEqual(education_group_year.decree_category, training_domain_obj.decree_category.name)
+    test_instance.assertEqual(education_group_year.rate_code, training_domain_obj.rate_code.name)
+    test_instance.assertEqual(education_group_year.primary_language.name, training_domain_obj.main_language.name)
+    test_instance.assertEqual(education_group_year.english_activities, training_domain_obj.english_activities.name)
+    test_instance.assertEqual(
+        education_group_year.other_language_activities,
+        training_domain_obj.other_language_activities.name
+    )
+    test_instance.assertEqual(education_group_year.internal_comment, training_domain_obj.internal_comment)
+    test_instance.assertEqual(education_group_year.main_domain.code, training_domain_obj.main_domain.entity_id.code)
+    test_instance.assertEqual(education_group_year.isced_domain.code, training_domain_obj.isced_domain.entity_id.code)
+    test_instance.assertEqual(education_group_year.main_teaching_campus.name, training_domain_obj.teaching_campus.name)
+    test_instance.assertEqual(education_group_year.enrollment_campus.name, training_domain_obj.enrollment_campus.name)
+    test_instance.assertEqual(
+        education_group_year.other_campus_activities,
+        training_domain_obj.other_campus_activities.name
+    )
+    test_instance.assertEqual(education_group_year.funding, training_domain_obj.funding.can_be_funded)
+    test_instance.assertEqual(
+        education_group_year.funding_direction,
+        training_domain_obj.funding.funding_orientation.name
+    )
+    test_instance.assertEqual(education_group_year.funding_cud, training_domain_obj.funding.can_be_international_funded)
+    test_instance.assertEqual(
+        education_group_year.funding_direction_cud,
+        training_domain_obj.funding.international_funding_orientation.name
+    )
+    test_instance.assertEqual(education_group_year.hops.ares_study, training_domain_obj.hops.ares_code)
+    test_instance.assertEqual(education_group_year.hops.ares_graca, training_domain_obj.hops.ares_graca)
+    test_instance.assertEqual(education_group_year.hops.ares_ability, training_domain_obj.hops.ares_authorization)
+    test_instance.assertEqual(education_group_year.co_graduation, training_domain_obj.co_graduation.code_inter_cfb)
+    test_instance.assertEqual(
+        education_group_year.co_graduation_coefficient,
+        training_domain_obj.co_graduation.coefficient
+    )
+    test_instance.assertEqual(education_group_year.academic_type, training_domain_obj.academic_type.name)
+    test_instance.assertEqual(education_group_year.duration_unit, training_domain_obj.duration_unit.name)
+    test_instance.assertEqual(education_group_year.professional_title, training_domain_obj.diploma.professional_title)
+    test_instance.assertEqual(education_group_year.joint_diploma, training_domain_obj.diploma.leads_to_diploma)
+    test_instance.assertEqual(education_group_year.diploma_printing_title, training_domain_obj.diploma.printing_title)
+    test_instance.assertEqual(education_group_year.active, training_domain_obj.status.name)
