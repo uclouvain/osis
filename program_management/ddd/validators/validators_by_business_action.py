@@ -44,6 +44,7 @@ from program_management.ddd.validators._has_or_is_prerequisite import IsPrerequi
 from program_management.ddd.validators._infinite_recursivity import InfiniteRecursivityTreeValidator
 from program_management.ddd.validators._minimum_editable_year import \
     MinimumEditableYearValidator
+from program_management.ddd.validators._node_have_link import NodeHaveLinkValidator
 from program_management.ddd.validators._prerequisite_expression_syntax import PrerequisiteExpressionSyntaxValidator
 from program_management.ddd.validators._prerequisites_items import PrerequisiteItemsValidator
 from program_management.ddd.validators._relative_credits import RelativeCreditsValidator
@@ -224,6 +225,7 @@ class DeleteProgramTreeValidatorList(business_validator.BusinessListValidator):
     ):
         self.validators = [
             EmptyProgramTreeValidator(program_tree),
+            NodeHaveLinkValidator(program_tree.root_node)
         ]
         super().__init__()
 

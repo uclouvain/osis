@@ -21,26 +21,13 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from django.db import transaction
+from education_group.ddd import command
+from education_group.ddd.business_types import *
 
-from program_management.ddd import command
-from program_management.ddd.repositories.program_tree import ProgramTreeRepository
-from program_management.ddd.service.read import get_program_tree_service
-from program_management.ddd.service.write import delete_node_service
-from program_management.ddd.validators.validators_by_business_action import DeleteProgramTreeValidatorList
+from education_group.ddd.domain.training import TrainingIdentity
+from education_group.ddd.repository.training import TrainingRepository
 
 
-@transaction.atomic()
-def delete_program_tree(cmd: command.DeleteProgramTreeCommand) -> 'ProgramTreeIdentity':
-    cmd = command.GetProgramTree(code=cmd.code, year=cmd.year)
-    program_tree = get_program_tree_service.get_program_tree(cmd)
-
-    DeleteProgramTreeValidatorList(program_tree).validate()
-
-    ProgramTreeRepository.delete(
-        program_tree.entity_id,
-
-        # Service Dependancy injection
-        delete_node_service=delete_node_service.delete_node
-    )
-    return program_tree.entity_id
+def get_training(cmd: command.GetTrainingCommand) -> 'Training':
+    training_id = TrainingIdentity(acronym=cmd.acronym, year=cmd.year)
+    return TrainingRepository.get(training_id)

@@ -311,6 +311,11 @@ class DeleteProgramTreeCommand(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True)
+class DeleteAllProgramTreeCommand(interface.CommandRequest):
+    code = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
 class DeleteStandardVersionCommand(interface.CommandRequest):
     acronym = attr.ib(type=str)
     year = attr.ib(type=int)
@@ -321,3 +326,15 @@ class DeleteNodeCommand(interface.CommandRequest):
     code = attr.ib(type=str)
     year = attr.ib(type=int)
     node_type = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class GetProgramTreesFromNodeCommand(interface.CommandRequest):
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class GetProgramTreesVersionFromNodeCommand(interface.CommandRequest):
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)
