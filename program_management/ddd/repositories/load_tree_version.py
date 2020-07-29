@@ -5,7 +5,7 @@ from base.models.enums.link_type import LinkTypes
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 
 
-# TODO: Rethink call method !
+# TODO : remove import of '_get_root_ids' (to avoid cyclic import) and re-implement function using domains identities
 def load_tree_versions_from_children(
         child_element_ids: list,
         link_type: LinkTypes = None

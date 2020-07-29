@@ -23,10 +23,14 @@
 # ############################################################################
 from typing import List
 
+from program_management.ddd import command
 from program_management.ddd.business_types import *
+from program_management.ddd.domain.node import NodeIdentity
+from program_management.ddd.repositories.node import NodeRepository
 from program_management.ddd.repositories import load_tree_version
 
 
-# TODO: Convert args to command type
-def search_tree_versions_using_node(node: 'Node') -> List['ProgramTreeVersion']:
+def search_tree_versions_using_node(cmd: command.GetProgramTreesVersionFromNodeCommand) -> List['ProgramTreeVersion']:
+    node_id = NodeIdentity(code=cmd.code, year=cmd.year)
+    node = NodeRepository.get(node_id)
     return load_tree_version.load_tree_versions_from_children(child_element_ids=[node.pk])
