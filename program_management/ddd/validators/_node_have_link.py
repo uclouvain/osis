@@ -25,6 +25,7 @@ from base.ddd.utils import business_validator
 from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.exception import NodeHaveLinkException
+from program_management.ddd.service.read import search_program_trees_using_node_service
 
 
 class NodeHaveLinkValidator(business_validator.BusinessValidator):
@@ -33,8 +34,6 @@ class NodeHaveLinkValidator(business_validator.BusinessValidator):
         self.node = node
 
     def validate(self, *args, **kwargs):
-        from program_management.ddd.service.read import search_program_trees_using_node_service
-
         cmd = command.GetProgramTreesFromNodeCommand(code=self.node.code, year=self.node.year)
         program_trees = search_program_trees_using_node_service.search_program_trees_using_node(cmd)
         if len(program_trees) > 0:
