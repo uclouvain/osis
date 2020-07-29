@@ -262,9 +262,10 @@ class FilterTrainingTestCase(APITestCase):
         response = self.client.get(self.url, data=query_string)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        versions = EducationGroupVersion.objects.filter(
+        versions = EducationGroupVersion.standard.filter(
             offer__education_group_type__category=education_group_categories.TRAINING,
-            offer__academic_year__year__lte=query_string['to_year']
+            offer__academic_year__year__lte=query_string['to_year'],
+            is_transition=False
         ).order_by('-offer__academic_year__year', 'offer__acronym')
 
         serializer = TrainingListSerializer(
