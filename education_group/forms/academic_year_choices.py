@@ -34,6 +34,7 @@ from program_management.ddd.domain.service.academic_year_search import ExistingA
 from program_management.ddd.domain.service.element_id_search import ElementIdByYearSearch, ElementId, Year
 
 
+# FIXME :: Create a service to return List['NodeIdentity']
 def get_academic_year_choices(
         node_identity: 'NodeIdentity',
         path: 'Path',

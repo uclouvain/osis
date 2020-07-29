@@ -21,13 +21,26 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from education_group.ddd import command
-from education_group.ddd.business_types import *
+from collections import defaultdict
 
-from education_group.ddd.domain.group import GroupIdentity
-from education_group.ddd.repository.group import GroupRepository
+import mock
+
+from osis_common.ddd import interface
 
 
-def get_group(cmd: command.GetGroupCommand) -> 'Group':
-    group_id = GroupIdentity(code=cmd.code, year=cmd.year)
-    return GroupRepository.get(group_id)
+class MockFormValid(mock.Mock):
+    @property
+    def errors(self):
+        return []
+
+    def is_valid(self):
+        return True
+
+    @property
+    def cleaned_data(self):
+        return defaultdict(lambda: None)
+
+
+class MockRepository(mock.MagicMock):
+    def __int__(self, *args, **kwargs):
+        return super().__init__(*args, spec=interface.AbstractRepository, **kwargs)

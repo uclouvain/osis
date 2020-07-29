@@ -26,19 +26,21 @@
 import copy
 
 from base.models.enums.constraint_type import ConstraintTypeEnum
-from base.models.enums.education_group_types import GroupType, EducationGroupTypesEnum
+from base.models.enums.education_group_types import EducationGroupTypesEnum, GroupType
 from education_group.ddd import command
 from education_group.ddd.domain._campus import Campus
 from education_group.ddd.domain._content_constraint import ContentConstraint
 from education_group.ddd.domain._entity import Entity
 from education_group.ddd.domain._remark import Remark
 from education_group.ddd.domain._titles import Titles
+from education_group.ddd.domain.service.enum_converter import EducationGroupTypeConverter
+from education_group.ddd.validators.validators_by_business_action import UpdateGroupValidatorList
 from osis_common.ddd import interface
 
 
 class GroupBuilder:
     @classmethod
-    def build_from_create_cmd(self, cmd: command.CreateOrphanGroupCommand):
+    def build_from_create_cmd(cls, cmd: command.CreateOrphanGroupCommand):
         group_id = GroupIdentity(code=cmd.code, year=cmd.year)
         titles = Titles(title_fr=cmd.title_fr, title_en=cmd.title_en)
         content_constraint = ContentConstraint(
@@ -55,7 +57,7 @@ class GroupBuilder:
 
         return Group(
             entity_identity=group_id,
-            type=GroupType[cmd.type],
+            type=EducationGroupTypeConverter.convert_type_str_to_enum(cmd.type),
             abbreviated_title=cmd.abbreviated_title,
             titles=titles,
             credits=cmd.credits,
@@ -64,7 +66,6 @@ class GroupBuilder:
             teaching_campus=teaching_campus,
             remark=remark,
             start_year=cmd.start_year,
-            unannualized_identity=None,
             end_year=cmd.end_year
         )
 
@@ -90,20 +91,6 @@ class GroupIdentity(interface.EntityIdentity):
         return self.code == other.code and self.year == other.year
 
 
-class GroupUnannualizedIdentity(interface.ValueObject):
-    """
-    This ID is necessary to find a GROUP through years because code can be different through years
-    """
-    def __init__(self, uuid: int):
-        self.uuid = uuid
-
-    def __hash__(self):
-        return hash(self.uuid)
-
-    def __eq__(self, other):
-        return self.uuid == other.uuid
-
-
 class Group(interface.RootEntity):
     def __init__(
         self,
@@ -117,7 +104,6 @@ class Group(interface.RootEntity):
         teaching_campus: Campus,
         remark: Remark,
         start_year: int,
-        unannualized_identity: 'GroupUnannualizedIdentity' = None,
         end_year: int = None,
     ):
         super(Group, self).__init__(entity_id=entity_identity)
@@ -131,7 +117,6 @@ class Group(interface.RootEntity):
         self.teaching_campus = teaching_campus
         self.remark = remark
         self.start_year = start_year
-        self.unannualized_identity = unannualized_identity
         self.end_year = end_year
 
     @property
@@ -141,3 +126,26 @@ class Group(interface.RootEntity):
     @property
     def year(self) -> int:
         return self.entity_id.year
+
+    def is_minor_major_option_list_choice(self):
+        return self.type.name in GroupType.minor_major_option_list_choice()
+
+    def update(
+            self,
+            abbreviated_title: str,
+            titles: Titles,
+            credits: int,
+            content_constraint: ContentConstraint,
+            management_entity: Entity,
+            teaching_campus: Campus,
+            remark: Remark
+    ):
+        self.abbreviated_title = abbreviated_title.upper()
+        self.titles = titles
+        self.credits = credits
+        self.content_constraint = content_constraint
+        self.management_entity = management_entity
+        self.teaching_campus = teaching_campus
+        self.remark = remark
+        UpdateGroupValidatorList(self).validate()
+        return self

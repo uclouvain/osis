@@ -29,7 +29,7 @@ from django.urls import reverse
 from django.views.generic import FormView
 
 from base.models.enums.education_group_categories import Categories
-from base.models.enums.education_group_types import GroupType
+from base.models.enums.education_group_types import GroupType, TrainingType
 from base.views.mixins import AjaxTemplateMixin
 from program_management.forms.select_type import SelectTypeForm
 
@@ -63,6 +63,9 @@ class SelectTypeCreateElementView(LoginRequiredMixin, AjaxTemplateMixin, FormVie
         url = ""
         if self.kwargs["type"] in GroupType.get_names():
             url = reverse('group_create', kwargs={'type': self.kwargs['type']})
+
+        if self.kwargs["type"] in TrainingType.get_names():
+            url = reverse('training_create', kwargs={'type': self.kwargs['type']})
 
         if "path_to" in self.request.GET:
             url += "?path_to={}".format(self.request.GET['path_to'])

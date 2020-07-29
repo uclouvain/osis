@@ -23,18 +23,24 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import factory
 
-from program_management.ddd.business_types import *
-from program_management.serializers.program_tree_view import program_tree_view_serializer
+from education_group.ddd.domain._study_domain import StudyDomainIdentity, StudyDomain
 
 
-def program_tree_version_view_serializer(program_tree_version: 'ProgramTreeVersion') -> dict:
-    tree_dict = program_tree_view_serializer(program_tree_version.get_tree())
+class StudyDomainIdentityFactory(factory.Factory):
+    class Meta:
+        model = StudyDomainIdentity
+        abstract = False
 
-    if program_tree_version.version_label:
-        tree_dict.update({'text': '%(text)s%(version_label)s' % {
-            'text': tree_dict['text'],
-            'version_label': '%(label)s' % {'label': program_tree_version.version_label} if program_tree_version.version_label else ''
-        }})
+    decree_name = factory.Faker('text', max_nb_chars=10)
+    code = factory.Faker('text', max_nb_chars=10)
 
-    return tree_dict
+
+class StudyDomainFactory(factory.Factory):
+    class Meta:
+        model = StudyDomain
+        abstract = False
+
+    entity_id = factory.SubFactory(StudyDomainIdentityFactory)
+    domain_name = factory.Sequence(lambda n: 'Study Domain %02d' % n)

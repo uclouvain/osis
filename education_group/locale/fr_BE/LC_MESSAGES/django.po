@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-29 14:39+0200\n"
+"POT-Creation-Date: 2020-07-27 10:51+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,13 +21,13 @@ msgid "%(max)s must be greater or equals than %(min)s"
 msgstr "%(max)s doit être plus grand ou égal à %(min)s"
 
 msgid "ARES ability"
-msgstr ""
+msgstr "Habilitation ARES"
 
 msgid "ARES study code"
-msgstr ""
+msgstr "Code étude ARES"
 
 msgid "ARES-GRACA"
-msgstr ""
+msgstr "ARES-GRACA"
 
 #, fuzzy
 #| msgid "Academic year"
@@ -45,11 +45,20 @@ msgstr "Année académique"
 msgid "Access"
 msgstr ""
 
+msgid "Access condition"
+msgstr "Condition d'accès"
+
 msgid "Acronym/Short title"
 msgstr ""
 
 msgctxt "abbreviation"
 msgid "Acronym/Short title"
+msgstr ""
+
+msgid "Acronym/Short title '{}' already exists"
+msgstr ""
+
+msgid "Acronym/Short title is required"
 msgstr ""
 
 msgid "Actions"
@@ -68,10 +77,10 @@ msgid "Additional info"
 msgstr ""
 
 msgid "Administration entity"
-msgstr ""
+msgstr "Entité d'administration"
 
 msgid "Administrative data"
-msgstr ""
+msgstr "Données administratives"
 
 msgid "Admission and Enrolment Procedures for general registration"
 msgstr ""
@@ -110,7 +119,7 @@ msgid "Clear clipboard"
 msgstr ""
 
 msgid "Co-graduation total coefficient"
-msgstr ""
+msgstr "Coefficient total de co-diplômation"
 
 msgid "Code"
 msgstr ""
@@ -150,6 +159,9 @@ msgstr ""
 
 msgid "Credits"
 msgstr ""
+
+msgid "Credits must be greater or equals than 0"
+msgstr "Credits doit être plus grand ou égal à 0"
 
 msgid "Cut element"
 msgstr ""
@@ -208,8 +220,15 @@ msgstr ""
 msgid "Enrollment enabled"
 msgstr ""
 
+msgid "Enter text to search"
+msgstr "Entrez le texte à rechercher"
+
 msgid "Entity"
 msgstr ""
+
+msgid "Error(s) in form: The modifications are not saved"
+msgstr ""
+"Erreur(s) dans le formulaire: Les modifications n'ont pas été enregistrées"
 
 msgid "Exams Enrollments"
 msgstr ""
@@ -273,6 +292,14 @@ msgstr ""
 "Le groupement <a href='%(link)s'> %(code)s (%(academic_year)s) </a> a été "
 "créé avec succès"
 
+#, python-format
+msgid ""
+"Group <a href='%(link)s'> %(code)s (%(academic_year)s) </a> successfully "
+"updated."
+msgstr ""
+"Le groupement <a href='%(link)s'> %(code)s (%(academic_year)s) </a> a été "
+"mis à jour avec succès"
+
 msgid "Holders of a 2nd cycle University degree"
 msgstr ""
 
@@ -280,13 +307,16 @@ msgid "Holders of a non-University 2nd cycle degree"
 msgstr ""
 
 msgid "ISCED domain"
-msgstr ""
+msgstr "Domaine ISCED/CITE"
 
 msgid "Identification"
 msgstr ""
 
 msgid "Institution"
 msgstr ""
+
+msgid "Internship"
+msgstr "Stage"
 
 msgid "Jury"
 msgstr ""
@@ -339,8 +369,14 @@ msgstr ""
 msgid "Mini-Training"
 msgstr ""
 
+msgid "Modification"
+msgstr "Modification"
+
 msgid "New Education Group"
 msgstr ""
+
+msgid "New Training"
+msgstr "Nouvelle Formation"
 
 #, python-format
 msgctxt "female"
@@ -433,6 +469,9 @@ msgstr ""
 msgid "Scores diffusion"
 msgstr ""
 
+msgid "Search..."
+msgstr "Recherche..."
+
 msgid "Session"
 msgstr ""
 
@@ -466,11 +505,14 @@ msgstr ""
 msgid "The field can contain only one value."
 msgstr ""
 
-#, fuzzy, python-brace-format
-#| msgid ""
-#| "The formation you work with doesn't exist (or is not at the same "
-#| "position) in the tree {root.title} in {root.year}.You've been redirected "
-#| "to the root {root.code} ({root.year})"
+msgid "The fields concerning ARES have to be ALL filled-in or none of them"
+msgstr ""
+"Les champs concernant les données de l'ARES doivent être soit tous remplis "
+"soit tous vides"
+
+msgid "The following links has been updated"
+msgstr "Les liens suivants ont été mis à jour"
+
 msgid ""
 "The formation you work with doesn't exist (or is not at the same position) "
 "in the tree {root.title} in {root.year}.You've been redirected to the root "
@@ -490,19 +532,15 @@ msgstr ""
 "La portée de l'utilisateur est limitée et empêche la réalisation de cette "
 "action"
 
-#, fuzzy, python-format
-#| msgctxt "female"
-#| msgid "The user does not have permission to delete a %(category)s."
+#, python-format
 msgctxt "female"
 msgid "The user does not have permission to create a %(category)s."
-msgstr "L'utilisateur n'a pas la permission de supprimer une %(category)s."
+msgstr "L'utilisateur n'a pas la permission de créer un %(category)s."
 
-#, fuzzy, python-format
-#| msgctxt "female"
-#| msgid "The user does not have permission to delete a %(category)s."
+#, python-format
 msgctxt "male"
 msgid "The user does not have permission to create a %(category)s."
-msgstr "L'utilisateur n'a pas la permission de supprimer une %(category)s."
+msgstr "L'utilisateur n'a pas la permission de créer un %(category)s."
 
 #, python-format
 msgctxt "female"
@@ -518,6 +556,9 @@ msgstr ""
 msgid "The value of this attribute is inherited from the standard OF"
 msgstr ""
 
+msgid "There can only be one type 2 expectation"
+msgstr "Il ne peut y avoir qu'un seul attendu de type 2"
+
 msgid "Title"
 msgstr ""
 
@@ -529,6 +570,14 @@ msgstr ""
 
 msgid "Training"
 msgstr ""
+
+#, python-format
+msgid ""
+"Training <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> "
+"successfully created."
+msgstr ""
+"La formation <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> a été "
+"créé avec succès"
 
 msgid "Trainings"
 msgstr ""
@@ -565,6 +614,14 @@ msgstr ""
 
 msgid "Weighting"
 msgstr ""
+
+#, python-brace-format
+msgid ""
+"You can't copy the training '{acronym}' from {from_year} to {to_year} "
+"because it ends in {end_year}"
+msgstr ""
+"Vous ne pouvez pas recopier la formation '{acronym}' de {from_year} vers "
+"{to_year} car elle se termine en {end_year}"
 
 #, python-format
 msgid ""
@@ -606,11 +663,20 @@ msgstr ""
 msgid "credits"
 msgstr ""
 
+msgid "dissertation"
+msgstr "mémoire"
+
+msgid "duration unit"
+msgstr "type durée"
+
+msgid "filter by section"
+msgstr "préfiltrer par rubrique"
+
 msgid "is using in"
 msgstr ""
 
 msgid "main domain"
-msgstr ""
+msgstr "Domaine principal"
 
 msgid "maximum constraint"
 msgstr ""

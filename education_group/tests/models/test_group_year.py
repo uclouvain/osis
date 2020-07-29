@@ -42,6 +42,10 @@ class TestGroupYear(TestCase):
                          "{} ({})".format(group_yr.acronym,
                                           group_yr.academic_year))
 
+    def test_complete_title(self):
+        group_year = GroupYearFactory()
+        self.assertEqual(group_year.complete_title, group_year.title_fr)
+
 
 class TestGroupYearSave(TestCase):
     @classmethod
