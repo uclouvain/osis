@@ -34,7 +34,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db.models import Q
-from django.utils.functional import lazy
+from django.utils.functional import lazy, cached_property
 from django.utils.translation import gettext_lazy as _
 
 from base.business.event_perms import EventPermEducationGroupEdition
@@ -276,7 +276,7 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         )
     )
 
-    def __init__(self, *args, user: User, training_type: str, attach_path: str = '', **kwargs):
+    def __init__(self, *args, user: User, training_type: str, attach_path: str, **kwargs):
         self.user = user
         self.training_type = training_type
         self.attach_path = attach_path
@@ -284,9 +284,9 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         super().__init__(*args, **kwargs)
 
         if self.attach_path:
-            self.__disable_and_fix_academic_year_field()
-        else:
-            self.__init_academic_year_field()
+            self.fields['academic_year'].disabled = True
+
+        self.__init_academic_year_field()
         self.__init_management_entity_field()
         self.__init_certificate_aims_field()
         self.__init_diploma_fields()
@@ -310,11 +310,6 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
             )
 
             self.fields['academic_year'].label = _('Start')
-
-    def __disable_and_fix_academic_year_field(self):
-        fixed_year = NodeIdentitySearch().get_from_element_id(int(self.attach_path.split('|')[-1])).year
-        self.fields['academic_year'].initial = AcademicYear.objects.get(year=fixed_year)
-        self.fields['academic_year'].disabled = True
 
     def __init_management_entity_field(self):
         self.fields['management_entity'] = fields.ManagementEntitiesChoiceField(

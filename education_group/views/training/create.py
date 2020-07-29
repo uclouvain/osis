@@ -7,7 +7,7 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.base import View
 
-from base.models.academic_year import starting_academic_year
+from base.models.academic_year import starting_academic_year, AcademicYear
 from base.models.campus import Campus
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import GroupType, TrainingType
@@ -62,7 +62,12 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         default_campus = Campus.objects.filter(name='Louvain-la-Neuve').first()
 
         request_cache = RequestCache(self.request.user, reverse('version_program'))
-        default_academic_year = request_cache.get_value_cached('academic_year') or starting_academic_year()
+        if self.get_attach_path():
+            default_academic_year = AcademicYear.objects.get(
+                year=NodeIdentitySearch().get_from_element_id(int(self.get_attach_path().split('|')[-1])).year
+            )
+        else:
+            default_academic_year = request_cache.get_value_cached('academic_year') or starting_academic_year()
         return {
             'teaching_campus': default_campus,
             'academic_year': default_academic_year
