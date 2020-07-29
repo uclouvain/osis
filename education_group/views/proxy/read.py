@@ -63,6 +63,7 @@ class ReadEducationGroupRedirectView(RedirectView):
             path=self._get_current_path(),
             tab=self._get_current_tab(),
             node=self.node,
+            anchor=self.request.GET.get('anchor')
         )
         self.url = url
         return super().get_redirect_url(*args, **kwargs)
@@ -87,16 +88,23 @@ def _get_view_name_from_tab(node: 'Node', tab: Tab):
     }[tab]
 
 
-def get_tab_urls(tab: Tab, node: 'Node', path: 'Path' = None) -> str:
+def get_tab_urls(tab: Tab, node: 'Node', path: 'Path' = None, anchor: 'str' = None) -> str:
     path = path or ""
     url = reverse(_get_view_name_from_tab(node, tab), args=[node.year, node.code])
+
+    anchor_concat = "?"
     if path:
         url += "?path={}&tab={}#achievement_".format(path, tab)
+        anchor_concat = "&"
+
+    if anchor == 'True':
+        url = "{}{}anchor=True".format(url, anchor_concat)
+
     return url
 
 
-def get_tab_from_referer(node: 'Node', referer: str):
-    if referer:
+def get_tab_from_path_info(node: 'Node', path_info: str):
+    if path_info:
         tabs = get_group_available_tabs(node)
 
         if node.is_training():
@@ -105,7 +113,7 @@ def get_tab_from_referer(node: 'Node', referer: str):
         if node.is_mini_training():
             tabs = get_mini_training_available_tabs()
 
-        return next((tab for key, tab in tabs.items() if key in referer), Tab.IDENTIFICATION)
+        return next((tab for key, tab in tabs.items() if key in path_info), Tab.IDENTIFICATION)
     return Tab.IDENTIFICATION
 
 
