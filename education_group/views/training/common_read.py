@@ -178,8 +178,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
     def get_tab_urls(self):
         node_identity = self.get_object().entity_id
 
-        if not self.active_tab:
-            self.active_tab = read.get_tab_from_referer(self.get_object(), self.request.META.get('HTTP_REFERER'))
+        self.active_tab = read.get_tab_from_path_info(self.get_object(), self.request.META.get('PATH_INFO'))
 
         return OrderedDict({
             Tab.IDENTIFICATION: {
