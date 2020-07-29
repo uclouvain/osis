@@ -35,6 +35,8 @@ from base.models.enums import vacant_declaration_type
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY, ALLOCATION_ENTITY, \
     ADDITIONAL_REQUIREMENT_ENTITY_1, ADDITIONAL_REQUIREMENT_ENTITY_2
 from base.models.enums.learning_container_year_types import LearningContainerYearType
+from base.models.learning_unit_year import LearningUnitYear
+from education_group import publisher
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
 FIELDS_FOR_COMPARISON = ['team', 'is_vacant', 'type_declaration_vacant']
@@ -99,6 +101,11 @@ class LearningContainerYear(SerializableModel):
 
     def __str__(self):
         return u"%s - %s" % (self.acronym, self.common_title)
+
+    def delete(self, *args, **kwargs):
+        learning_unit_year = LearningUnitYear.objects.get(learning_container_year_id=self.id)
+        publisher.learning_unit_year_deleted.send(None, learning_unit_year_id=learning_unit_year.id)
+        super(LearningContainerYear, self).delete(*args, **kwargs)
 
     class Meta:
         unique_together = ("learning_container", "academic_year",)

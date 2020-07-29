@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db.models.signals import pre_delete
 from django.utils.translation import gettext_lazy as _
 
 from assistant.models import tutoring_learning_unit_year
@@ -37,9 +36,7 @@ from base.models import proposal_learning_unit
 from base.models.enums import proposal_type, proposal_state
 from cms.enums import entity_name
 from cms.models import translated_text
-from education_group import publisher
 from learning_unit.models.learning_class_year import LearningClassYear
-from program_management.models.element import Element
 
 
 def check_learning_unit_deletion(learning_unit, check_proposal=True):
@@ -166,7 +163,6 @@ def delete_from_given_learning_unit_year(learning_unit_year):
     msg = []
 
     next_year = learning_unit_year.get_learning_unit_next_year()
-    publisher.learning_unit_year_deleted.send(None, learning_unit_year_id=learning_unit_year.id)
     if next_year:
         msg.extend(delete_from_given_learning_unit_year(next_year))
 

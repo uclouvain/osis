@@ -37,8 +37,6 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
-from education_group import publisher
-from program_management.ddd import repositories
 from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.business.learning_container_year import get_learning_container_year_warnings
 from base.models import entity_version
@@ -54,8 +52,10 @@ from base.models.learning_unit import LEARNING_UNIT_ACRONYM_REGEX_MODEL
 from base.models.prerequisite_item import PrerequisiteItem
 from cms.enums.entity_name import LEARNING_UNIT_YEAR
 from cms.models.translated_text import TranslatedText
+from education_group import publisher
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin, SerializableModelManager, \
     SerializableQuerySet
+from program_management.ddd import repositories
 
 AUTHORIZED_REGEX_CHARS = "$*+.^"
 REGEX_ACRONYM_CHARSET = "[A-Z0-9" + AUTHORIZED_REGEX_CHARS + "]+"
@@ -264,6 +264,10 @@ class LearningUnitYear(SerializableModel):
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         publisher.learning_unit_year_created.send(None, learning_unit_year_id=self.id)
+
+    def delete(self, *args, **kwargs):
+        publisher.learning_unit_year_deleted.send(None, learning_unit_year_id=self.id)
+        super(LearningUnitYear, self).delete(*args, **kwargs)
 
     @property
     def subdivision(self):

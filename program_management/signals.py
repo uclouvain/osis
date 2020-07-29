@@ -49,6 +49,4 @@ def create_element_of_learning_unit_year(sender, learning_unit_year_id, **kwargs
 
 @receiver(publisher.learning_unit_year_deleted)
 def delete_element_of_learning_unit_year(sender, learning_unit_year_id, **kwargs):
-    element = get_object_or_none(Element, learning_unit_year_id=learning_unit_year_id)
-    if element:
-        element.delete()
+    Element.objects.filter(learning_unit_year_id=learning_unit_year_id).delete()
