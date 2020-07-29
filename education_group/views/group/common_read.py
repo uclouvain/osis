@@ -99,8 +99,7 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
             return root_node
 
     def get_context_data(self, **kwargs):
-        if not self.active_tab:
-            self.active_tab = read.get_tab_from_referer(self.get_object(), self.request.META.get('HTTP_REFERER'))
+        self.active_tab = read.get_tab_from_path_info(self.get_object(), self.request.META.get('PATH_INFO'))
 
         can_change_education_group = self.request.user.has_perm(
             'base.change_educationgroup',

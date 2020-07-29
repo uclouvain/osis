@@ -87,8 +87,8 @@ class TestPublicationContactCreateView(PublicationContactViewSetupTest):
         cls.url_create = reverse(
             CREATE_URL_NAME,
             args=[
-                cls.training.pk,
-                cls.training.pk,
+                cls.training.academic_year.year,
+                cls.training.acronym,
             ]
         )
 
@@ -142,8 +142,8 @@ class TestPublicationContactUpdateView(PublicationContactViewSetupTest):
         cls.url_edit = reverse(
             EDIT_URL_NAME,
             args=[
-                cls.training.pk,
-                cls.training.pk,
+                cls.training.academic_year.year,
+                cls.training.acronym,
                 cls.publication_contact.pk
             ]
         )
@@ -175,8 +175,8 @@ class TestPublicationContactDeleteView(PublicationContactViewSetupTest):
         cls.url_delete = reverse(
             DELETE_URL_NAME,
             args=[
-                cls.training.id,
-                cls.training.id,
+                cls.training.academic_year.year,
+                cls.training.acronym,
                 cls.publication_contact.pk
             ]
         )
@@ -207,6 +207,7 @@ class TestPublicationContactDeleteView(PublicationContactViewSetupTest):
             'training_general_information',
             kwargs={'year': self.training.academic_year.year, 'code': self.training.partial_acronym}
         )
+        redirect_expected = "{}?anchor=True".format(redirect_expected)
         response = self.client.post(self.url_delete, follow=True)
         self.assertRedirects(response, redirect_expected)
         with self.assertRaises(EducationGroupPublicationContact.DoesNotExist):
@@ -228,8 +229,9 @@ class TestEntityPublicationContactUpdateView(PublicationContactViewSetupTest):
         cls.url_update = reverse(
             EDIT_ENTITY_URL_NAME,
             args=[
-                cls.training.id,
-                cls.training.id,
+                cls.training.academic_year.year,
+                cls.training.acronym,
+                cls.training.id
             ]
         )
 
