@@ -4,6 +4,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.base import View
 
@@ -20,6 +21,7 @@ from education_group.ddd.domain.exception import GroupCodeAlreadyExistException,
     ContentConstraintMinimumMaximumMissing, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum, \
     TrainingAcronymAlreadyExist, StartYearGreaterThanEndYear, MaximumCertificateAimType2Reached
 from education_group.ddd.domain.training import TrainingIdentity
+from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.service.element_id_search import ElementIdSearch
 from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
 from program_management.ddd.service.write import create_training_with_program_tree, create_and_attach_training_service
@@ -39,6 +41,11 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
     template_name = "education_group_app/training/upsert/create.html"
 
+    @cached_property
+    def parent_node_identity(self) -> 'NodeIdentity':
+        if self.get_attach_path():
+            return NodeIdentitySearch().get_from_element_id(int(self.get_attach_path().split('|')[-1]))
+
     def get_context(self, training_form: CreateTrainingForm):
         training_type = self.kwargs['type']
         return {
@@ -46,6 +53,7 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "tabs": self.get_tabs(),
             "type_text": str(TrainingType.get_value(training_type)),
             "is_finality_types": training_type in TrainingType.finality_types(),
+            "cancel_url": self.get_cancel_url(),
         }
 
     def get(self, request, *args, **kwargs):
@@ -58,13 +66,22 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         )
         return render(request, self.template_name, self.get_context(training_form))
 
+    def get_cancel_url(self) -> str:
+        if self.get_attach_path():
+            return reverse_with_get(
+                'element_identification',
+                kwargs={'code': self.parent_node_identity.code, 'year': self.parent_node_identity.year},
+                get={'path': self.get_attach_path()}
+            )
+        return reverse('version_program')
+
     def _get_initial_form(self) -> Dict:
         default_campus = Campus.objects.filter(name='Louvain-la-Neuve').first()
 
         request_cache = RequestCache(self.request.user, reverse('version_program'))
         if self.get_attach_path():
             default_academic_year = AcademicYear.objects.get(
-                year=NodeIdentitySearch().get_from_element_id(int(self.get_attach_path().split('|')[-1])).year
+                year=self.parent_node_identity.year
             )
         else:
             default_academic_year = request_cache.get_value_cached('academic_year') or starting_academic_year()
