@@ -62,7 +62,7 @@ class TrainingFilter(filters.FilterSet):
     @staticmethod
     def filter_version_type(queryset, _, value):
         queryset = EducationGroupVersion.objects.filter(
-            offer__education_group_type__category=education_group_categories.TRAINING
+            offer__education_group_type__category=education_group_categories.TRAINING,
         ).select_related(
             'offer__education_group_type',
             'offer__academic_year'
@@ -80,7 +80,7 @@ class TrainingList(LanguageContextSerializerMixin, generics.ListAPIView):
        Return a list of all the training with optional filtering.
     """
     name = 'training-list'
-    queryset = EducationGroupVersion.standard.filter(
+    queryset = EducationGroupVersion.objects.filter(
         offer__education_group_type__category=education_group_categories.TRAINING,
         is_transition=False,
     ).select_related(
