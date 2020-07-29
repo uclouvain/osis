@@ -27,6 +27,9 @@
 
 {% block breadcrumb %}
     {{ block.super }}
+    <li>
+        {{ training_obj.acronym }}
+    </li>
     <li class="active">
         {% trans 'Update Training' %}
     </li>

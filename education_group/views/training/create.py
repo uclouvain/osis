@@ -36,17 +36,23 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
     template_name = "education_group_app/training/upsert/create.html"
 
-    def get(self, request, *args, **kwargs):
-        training_form = CreateTrainingForm(
-            user=self.request.user,
-            training_type=self.kwargs['type'],
-            initial=self._get_initial_form(),
-        )
-        return render(request, self.template_name, {
+    def get_context(self, training_form: CreateTrainingForm):
+        training_type = self.kwargs['type']
+        return {
             "training_form": training_form,
             "tabs": self.get_tabs(),
-            "type_text": str(TrainingType.get_value(self.kwargs['type']))
-        })
+            "type_text": str(TrainingType.get_value(training_type)),
+            "is_finality_types": training_type in TrainingType.finality_types(),
+        }
+
+    def get(self, request, *args, **kwargs):
+        training_type = self.kwargs['type']
+        training_form = CreateTrainingForm(
+            user=self.request.user,
+            training_type=training_type,
+            initial=self._get_initial_form(),
+        )
+        return render(request, self.template_name, self.get_context(training_form))
 
     def _get_initial_form(self) -> Dict:
         default_campus = Campus.objects.filter(name='Louvain-la-Neuve').first()
@@ -59,22 +65,16 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         }
 
     def post(self, request, *args, **kwargs):
-        training_form = CreateTrainingForm(data=request.POST, user=self.request.user, training_type=self.kwargs['type'])
+        training_form = CreateTrainingForm(
+            data=request.POST,
+            user=self.request.user,
+            training_type=self.kwargs['type'],
+        )
         if training_form.is_valid():
             create_training_data = _convert_training_form_to_data_for_service(training_form)
+            training_ids = []
             try:
-                if self.get_attach_path():
-                    training_ids = None
-                    cmd = program_management_command.CreateAndAttachTrainingCommand(
-                        **create_training_data,
-                        path_to_paste=self.get_attach_path(),
-                    )
-                    training_ids = create_and_attach_training_service.create_and_attach_training(cmd)
-                else:
-                    training_ids = create_and_report_training_with_program_tree(
-                        command.CreateTrainingCommand(**create_training_data)
-                    )
-
+                training_ids = self._call_service(create_training_data)
             except GroupCodeAlreadyExistException as e:
                 training_form.add_error('code', e.message)
             except TrainingAcronymAlreadyExist as e:
@@ -93,20 +93,36 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 training_form.add_error('section', '')
 
             if not training_form.errors:
-                success_messages = [
-                    self.get_success_msg(training_id) for training_id in training_ids
-                ]
-                display_success_messages(request, success_messages, extra_tags='safe')
+                self._display_success_messages(training_ids)
                 return HttpResponseRedirect(self.get_success_url(training_ids[0]))
-            else:
-                msg = _("Error(s) in form: The modifications are not saved")
-                display_error_messages(request, msg)
 
-        return render(request, self.template_name, {
-            "training_form": training_form,
-            "tabs": self.get_tabs(),
-            "type_text": GroupType.get_value(self.kwargs['type'])
-        })
+        if training_form.errors and not training_form.confirmed:
+            self._display_default_error_message()
+
+        return render(request, self.template_name, self.get_context(training_form))
+
+    def _display_success_messages(self, training_ids: List['TrainingIdentity']):
+        success_messages = [
+            self.get_success_msg(training_id) for training_id in training_ids
+        ]
+        display_success_messages(self.request, success_messages, extra_tags='safe')
+
+    def _display_default_error_message(self):
+        msg = _("Error(s) in form: The modifications are not saved")
+        display_error_messages(self.request, msg)
+
+    def _call_service(self, create_training_data: dict) -> List['TrainingIdentity']:
+        if self.get_attach_path():
+            cmd = program_management_command.CreateAndAttachTrainingCommand(
+                **create_training_data,
+                path_to_paste=self.get_attach_path(),
+            )
+            training_ids = create_and_attach_training_service.create_and_attach_training(cmd)
+        else:
+            training_ids = create_and_report_training_with_program_tree(
+                command.CreateTrainingCommand(**create_training_data)
+            )
+        return training_ids
 
     def get_success_url(self, training_id: TrainingIdentity):
         url = reverse(

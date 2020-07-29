@@ -38,8 +38,8 @@ def delete_training(delete_command: command.DeleteTrainingCommand) -> List['Trai
     for year in itertools.count(from_year):
         training_identity_to_delete = training.TrainingIdentity(acronym=delete_command.acronym, year=year)
         try:
-            training_obj = training.TrainingRepository.get(training_identity_to_delete)
-            DeleteTrainingValidatorList(training_obj)
+            training_obj = training_repository.TrainingRepository.get(training_identity_to_delete)
+            DeleteTrainingValidatorList(training_obj).validate()
 
             training_repository.TrainingRepository.delete(training_identity_to_delete)
             deleted_trainings.append(training_identity_to_delete)

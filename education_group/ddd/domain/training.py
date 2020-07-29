@@ -55,6 +55,7 @@ from education_group.ddd.validators import validators_by_business_action
 from education_group.ddd.validators.validators_by_business_action import CreateTrainingValidatorList, \
     CopyTrainingValidatorList
 from osis_common.ddd import interface
+from program_management.ddd.domain.academic_year import AcademicYear
 
 
 @attr.s(frozen=True, slots=True)
@@ -255,6 +256,10 @@ class Training(interface.RootEntity):
     def year(self) -> int:
         return self.entity_id.year
 
+    @property
+    def academic_year(self) -> AcademicYear:
+        return AcademicYear(self.year)
+
     def is_finality(self) -> bool:
         return self.type in set(TrainingType.finality_types_enum())
 
@@ -284,7 +289,9 @@ class Training(interface.RootEntity):
         return self
 
     def update_from_other_training(self, other_training: 'Training'):
-        fields_not_to_update = ("year", "acronym", "entity_id", "entity_identity", "identity_through_years")
+        fields_not_to_update = (
+            "year", "acronym", "academic_year", "entity_id", "entity_identity", "identity_through_years"
+        )
         for field in other_training.__slots__:
             if field in fields_not_to_update:
                 continue

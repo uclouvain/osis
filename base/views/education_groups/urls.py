@@ -78,21 +78,6 @@ urlpatterns = [
         url(r'^update/$', update.update_education_group, name="update_education_group"),
         url(r'^skills_achievements/', include(urlpatterns_achievement)),
         url(r'^delete/$', delete.DeleteGroupEducationView.as_view(), name="delete_education_group"),
-
-        url(r'^publication_contact/', include([
-            url(r'^edit_entity/$',
-                UpdateEducationGroupEntityPublicationContactView.as_view(),
-                name='publication_contact_entity_edit'),
-            url(r'^create/$',
-                CreateEducationGroupPublicationContactView.as_view(),
-                name="publication_contact_create"),
-            url(r'^edit/(?P<publication_contact_id>[0-9]+)/$',
-                UpdateEducationGroupPublicationContactView.as_view(),
-                name="publication_contact_edit"),
-            url(r'^delete/(?P<publication_contact_id>[0-9]+)$',
-                EducationGroupPublicationContactDeleteView.as_view(),
-                name="publication_contact_delete"),
-        ])),
     ])),
     url(r'^(?P<year>[0-9]+)/(?P<code>[A-Za-z0-9]+)/', include([
        url(
@@ -118,5 +103,23 @@ urlpatterns = [
            r'^admission_conditions/lang/edit/(?P<language>[A-Za-z-]+)/$',
            education_group.education_group_year_admission_condition_tab_lang_edit,
            name='tab_lang_edit'),
+       url(
+          r'^publication_contact/(?P<education_group_year_id>[0-9]+)/',
+          include([
+              url(r'^edit_entity/$',
+                  UpdateEducationGroupEntityPublicationContactView.as_view(),
+                  name='publication_contact_entity_edit'),
+          ])),
+       url(r'^publication_contact/', include([
+            url(r'^create/$',
+                CreateEducationGroupPublicationContactView.as_view(),
+                name="publication_contact_create"),
+            url(r'^edit/(?P<publication_contact_id>[0-9]+)/$',
+                UpdateEducationGroupPublicationContactView.as_view(),
+                name="publication_contact_edit"),
+            url(r'^delete/(?P<publication_contact_id>[0-9]+)$',
+                EducationGroupPublicationContactDeleteView.as_view(),
+                name="publication_contact_delete"),
+        ])),
     ])),
 ] + education_group_urls.urlpatterns

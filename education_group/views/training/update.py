@@ -63,7 +63,9 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         context = {
             "tabs": self.get_tabs(),
             "training_form": self.get_training_form(),
-            "content_formset": self.get_content_formset()
+            "content_formset": self.get_content_formset(),
+            "training_obj": self.get_training_obj(),
+            "cancel_url": self.get_cancel_url()
         }
         return render(request, self.template_name, context)
 
@@ -80,7 +82,6 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             # update_group_command = self.convert_training_form_to_update_group_command(training_form)
             # update_group_service.update_group(update_group_command)
 
-            # TODO check inscriptions and linked to epc
             if training_form.cleaned_data["end_year"]:
                 try:
                     delete_command = self.convert_training_form_to_delete_command(training_form)
@@ -89,6 +90,10 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                     )
                     success_messages = self.get_success_msg_deleted_trainings(trainings_deleted)
                 except program_management_exception.ProgramTreeNotEmptyException as e:
+                    training_form.add_error("end_year", e.message)
+                except exception.IsLinkedToEpcException as e:
+                    training_form.add_error("end_year", e.message)
+                except exception.HasInscriptionsException as e:
                     training_form.add_error("end_year", e.message)
 
             if not training_form.errors:
@@ -99,7 +104,9 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         context = {
             "tabs": self.get_tabs(),
             "training_form": training_form,
-            "content_formset": self.get_content_formset()
+            "content_formset": self.get_content_formset(),
+            "training_obj": self.get_training_obj(),
+            "cancel_url": self.get_cancel_url()
         }
         return render(request, self.template_name, context)
 
@@ -156,6 +163,9 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             get=get_data
         )
         return url
+
+    def get_cancel_url(self) -> str:
+        return self.get_success_url()
 
     def get_training_form(self) -> 'training_forms.UpdateTrainingForm':
         return training_forms.UpdateTrainingForm(

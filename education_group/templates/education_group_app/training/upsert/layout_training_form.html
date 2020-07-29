@@ -29,7 +29,7 @@
     {% csrf_token %}
     <div class="panel panel-default">
         <div class="panel-heading">
-            {% include "education_group/blocks/form/create_cancel_buttons.html" %}
+            {% include "blocks/forms/create_cancel_buttons.html" %}
         </div>
 
         <div class="panel-body">
@@ -54,7 +54,7 @@
             {% include "education_group/blocks/form/create_cancel_buttons.html" %}
         </div>
     </div>
-    {% include "blocks/modal/confirmation_modal.html" %}
+    {% include "blocks/forms/create_cancel_buttons.html" %}
 </form>
 
 {{ training_form.media }}

@@ -99,11 +99,17 @@ class MaximumCertificateAimType2Reached(BusinessException):
 
 class HasInscriptionsException(BusinessException):
     def __init__(self, training: 'Training', *args, **kwargs):
-        message = _("The training has inscriptions")
+        message = _("The training {acronym} ({academic_year}) has inscriptions").format(
+            acronym=training.acronym,
+            academic_year=training.academic_year
+        )
         super().__init__(message, **kwargs)
 
 
 class IsLinkedToEpcException(BusinessException):
     def __init__(self, training: 'Training', *args, **kwargs):
-        message = _("The training is linked to epd")
+        message = _("The training {acronym} ({academic_year}) is linked to epc").format(
+            acronym=training.acronym,
+            academic_year=training.academic_year
+        )
         super().__init__(message, **kwargs)
