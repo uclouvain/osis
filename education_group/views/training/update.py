@@ -27,6 +27,7 @@ from typing import List, Dict, Union
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 
@@ -62,16 +63,16 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         context = {
             "tabs": self.get_tabs(),
-            "training_form": self.get_training_form(),
-            "content_formset": self.get_content_formset(),
+            "training_form": self.training_form,
+            "content_formset": self.content_formset,
             "training_obj": self.get_training_obj(),
             "cancel_url": self.get_cancel_url()
         }
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
-        training_form = self.get_training_form()
-        content_formset = self.get_content_formset()
+        training_form = self.training_form
+        content_formset = self.content_formset
         success_messages = []
 
         if training_form.is_valid() and content_formset.is_valid():
@@ -101,14 +102,7 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 display_success_messages(request, success_messages, extra_tags='safe')
                 return HttpResponseRedirect(self.get_success_url())
 
-        context = {
-            "tabs": self.get_tabs(),
-            "training_form": training_form,
-            "content_formset": self.get_content_formset(),
-            "training_obj": self.get_training_obj(),
-            "cancel_url": self.get_cancel_url()
-        }
-        return render(request, self.template_name, context)
+        return self.get(request, *args, **kwargs)
 
     def get_success_msg(self) -> str:
         return _("Training <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> successfully updated.") % {
@@ -167,7 +161,8 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
     def get_cancel_url(self) -> str:
         return self.get_success_url()
 
-    def get_training_form(self) -> 'training_forms.UpdateTrainingForm':
+    @cached_property
+    def training_form(self) -> 'training_forms.UpdateTrainingForm':
         return training_forms.UpdateTrainingForm(
             self.request.POST or None,
             user=self.request.user,
@@ -175,7 +170,8 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             initial=self._get_training_form_initial_values()
         )
 
-    def get_content_formset(self) -> 'content_forms.ContentFormSet':
+    @cached_property
+    def content_formset(self) -> 'content_forms.ContentFormSet':
         return content_forms.ContentFormSet(
             self.request.POST or None,
             initial=self._get_content_formset_initial_values(),
