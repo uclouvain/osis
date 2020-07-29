@@ -23,12 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List, Dict
+from typing import List, Dict, Union
 
 from django.db.models import F
 
+from education_group.ddd.domain.training import TrainingIdentity
 from education_group.models.group_year import GroupYear
 from osis_common.ddd import interface
+from program_management.models.element import Element
 
 ElementId = int
 Year = int
@@ -70,3 +72,17 @@ class ElementIdByYearSearch(interface.DomainService):
                     rec['year']: rec['element_id'] for rec in records
                 }
         return result
+
+
+class ElementIdSearch(interface.DomainService):
+
+    def get_from_training_identity(self, training_identity: 'TrainingIdentity') -> Union[None, ElementId]:
+        STANDARD = ''
+        values = Element.objects.filter(
+            group_year__educationgroupversion__version_name=STANDARD,
+            group_year__educationgroupversion__is_transition=False,
+            group_year__educationgroupversion__offer__acronym=training_identity.acronym,
+            group_year__educationgroupversion__offer__academic_year__year=training_identity.year,
+        ).values('pk')
+        if values:
+            return values[0]['pk']
