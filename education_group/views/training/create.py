@@ -82,7 +82,7 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         if self.get_attach_path():
             default_academic_year = AcademicYear.objects.get(
                 year=self.parent_node_identity.year
-            )
+            ).pk
         else:
             default_academic_year = request_cache.get_value_cached('academic_year') or starting_academic_year()
         return {
@@ -93,6 +93,7 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         training_form = CreateTrainingForm(
             data=request.POST,
+            initial=self._get_initial_form(),
             user=self.request.user,
             training_type=self.kwargs['type'],
             attach_path=self.get_attach_path(),
