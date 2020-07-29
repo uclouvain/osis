@@ -26,7 +26,7 @@
 import functools
 
 from django.http import HttpResponseRedirect, Http404
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
@@ -43,6 +43,7 @@ from education_group.models.group_year import GroupYear
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd.business_types import *
 from program_management.ddd import command as command_program_management
+from program_management.ddd.domain.exception import ProgramTreeNonEmpty, NodeHaveLinkException
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
@@ -76,10 +77,11 @@ class TrainingDeleteView(PermissionRequiredMixin, AjaxTemplateMixin, DeleteView)
         )
         try:
             delete_standard_version_service.delete_standard_version(cmd_delete)
-            display_success_messages(request, _("MESSAGE DE SUPPRESSION"))
+            display_success_messages(request, self.get_success_message())
             return self._ajax_response() or HttpResponseRedirect(self.get_success_url())
-        except Exception:
-            display_error_messages(request, _("An error occured"))
+        except (ProgramTreeNonEmpty, NodeHaveLinkException,) as e:
+            display_error_messages(request, e.message)
+            return render(request, self.template_name, {})
 
     def get_context_data(self, **kwargs):
         return {
@@ -92,6 +94,9 @@ class TrainingDeleteView(PermissionRequiredMixin, AjaxTemplateMixin, DeleteView)
             'acronym': self.get_training().acronym,
             'title': self.get_training().titles.title_fr
         }
+
+    def get_success_message(self):
+        return _("The training %(code)s has been deleted.") % {'code': self.kwargs['code']}
 
     def get_success_url(self) -> str:
         return reverse('version_program')

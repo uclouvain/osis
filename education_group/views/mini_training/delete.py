@@ -66,7 +66,7 @@ class MiniTrainingDeleteView(PermissionRequiredMixin, AjaxTemplateMixin, DeleteV
 
     def delete(self, request, *args, **kwargs):
         # Call delete program_tree_version service ()
-        display_success_messages(request, _("MESSAGE DE SUPPRESSION"))
+        display_success_messages(request, self.get_success_message())
         return self._ajax_response() or HttpResponseRedirect(self.get_success_url())
 
     def get_context_data(self, **kwargs):
@@ -80,6 +80,9 @@ class MiniTrainingDeleteView(PermissionRequiredMixin, AjaxTemplateMixin, DeleteV
             'code': self.kwargs['code'],
             'title': self.get_mini_training().titles.title_fr
         }
+
+    def get_success_message(self):
+        return _("The mini-training %(code)s has been deleted.") % {'code': self.kwargs['code']}
 
     def get_success_url(self) -> str:
         return reverse('version_program')
