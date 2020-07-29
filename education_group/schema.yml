@@ -541,6 +541,11 @@ paths:
             description: To which mini-training year we want to display
             type: integer
         - in: query
+          name: year
+          schema:
+            description: ''
+            type: integer
+        - in: query
           name: education_group_type
           schema:
             description: Filter result by specified mini-training types
