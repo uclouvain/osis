@@ -141,6 +141,7 @@ class EducationGroupYearModelForm(ValidationRuleEducationGroupTypeMixin, Permiss
             "education_group_type": EducationGroupTypeModelChoiceField,
         }
         fields = []
+        localized_fields = ('co_graduation_coefficient',)
 
     def __init__(self, *args, education_group_type=None, user=None, **kwargs):
         self.user = user
