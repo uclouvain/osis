@@ -4,14 +4,16 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.base import View
 
-from base.models.academic_year import starting_academic_year
+from base.models.academic_year import starting_academic_year, AcademicYear
 from base.models.campus import Campus
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import GroupType, TrainingType
 from base.utils.cache import RequestCache
+from base.utils.urls import reverse_with_get
 from base.views.common import display_success_messages, display_error_messages
 from education_group.ddd import command
 from program_management.ddd import command as program_management_command
@@ -19,6 +21,9 @@ from education_group.ddd.domain.exception import GroupCodeAlreadyExistException,
     ContentConstraintMinimumMaximumMissing, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum, \
     TrainingAcronymAlreadyExist, StartYearGreaterThanEndYear, MaximumCertificateAimType2Reached
 from education_group.ddd.domain.training import TrainingIdentity
+from program_management.ddd.domain.node import NodeIdentity
+from program_management.ddd.domain.service.element_id_search import ElementIdSearch
+from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
 from program_management.ddd.service.write import create_training_with_program_tree, create_and_attach_training_service
 from education_group.forms.training import CreateTrainingForm
 from education_group.templatetags.academic_year_display import display_as_academic_year
@@ -36,6 +41,11 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
     template_name = "education_group_app/training/upsert/create.html"
 
+    @cached_property
+    def parent_node_identity(self) -> Union[None, 'NodeIdentity']:
+        if self.get_attach_path():
+            return NodeIdentitySearch().get_from_element_id(int(self.get_attach_path().split('|')[-1]))
+
     def get_context(self, training_form: CreateTrainingForm):
         training_type = self.kwargs['type']
         return {
@@ -43,6 +53,7 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "tabs": self.get_tabs(),
             "type_text": str(TrainingType.get_value(training_type)),
             "is_finality_types": training_type in TrainingType.finality_types(),
+            "cancel_url": self.get_cancel_url(),
         }
 
     def get(self, request, *args, **kwargs):
@@ -51,14 +62,29 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             user=self.request.user,
             training_type=training_type,
             initial=self._get_initial_form(),
+            attach_path=self.get_attach_path(),
         )
         return render(request, self.template_name, self.get_context(training_form))
+
+    def get_cancel_url(self) -> str:
+        if self.get_attach_path():
+            return reverse_with_get(
+                'element_identification',
+                kwargs={'code': self.parent_node_identity.code, 'year': self.parent_node_identity.year},
+                get={'path': self.get_attach_path()}
+            )
+        return reverse('version_program')
 
     def _get_initial_form(self) -> Dict:
         default_campus = Campus.objects.filter(name='Louvain-la-Neuve').first()
 
         request_cache = RequestCache(self.request.user, reverse('version_program'))
-        default_academic_year = request_cache.get_value_cached('academic_year') or starting_academic_year()
+        if self.get_attach_path():
+            default_academic_year = AcademicYear.objects.get(
+                year=self.parent_node_identity.year
+            )
+        else:
+            default_academic_year = request_cache.get_value_cached('academic_year') or starting_academic_year()
         return {
             'teaching_campus': default_campus,
             'academic_year': default_academic_year
@@ -69,6 +95,7 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             data=request.POST,
             user=self.request.user,
             training_type=self.kwargs['type'],
+            attach_path=self.get_attach_path(),
         )
         if training_form.is_valid():
             create_training_data = _convert_training_form_to_data_for_service(training_form)
@@ -125,13 +152,20 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         return training_ids
 
     def get_success_url(self, training_id: TrainingIdentity):
-        url = reverse(
-            'education_group_read_proxy',
-            kwargs={'acronym': training_id.acronym, 'year': training_id.year}
-        ) + '?tab={}'.format(Tab.IDENTIFICATION)
         path = self.get_attach_path()
         if path:
-            url += "?path={}".format(path)
+            path += '|' + str(ElementIdSearch().get_from_training_identity(training_id))
+            node_identity = NodeIdentitySearch().get_from_element_id(int(path.split('|')[0]))
+            url = reverse_with_get(
+                'element_identification',
+                args=[node_identity.year, node_identity.code],
+                get={"path": path}
+            )
+        else:
+            url = reverse(
+                'education_group_read_proxy',
+                kwargs={'acronym': training_id.acronym, 'year': training_id.year}
+            ) + '?tab={}'.format(Tab.IDENTIFICATION)
         return url
 
     def get_success_msg(self, training_id: TrainingIdentity):
