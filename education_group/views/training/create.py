@@ -12,6 +12,7 @@ from base.models.campus import Campus
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import GroupType, TrainingType
 from base.utils.cache import RequestCache
+from base.utils.urls import reverse_with_get
 from base.views.common import display_success_messages, display_error_messages
 from education_group.ddd import command
 from program_management.ddd import command as program_management_command
@@ -19,6 +20,8 @@ from education_group.ddd.domain.exception import GroupCodeAlreadyExistException,
     ContentConstraintMinimumMaximumMissing, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum, \
     TrainingAcronymAlreadyExist, StartYearGreaterThanEndYear, MaximumCertificateAimType2Reached
 from education_group.ddd.domain.training import TrainingIdentity
+from program_management.ddd.domain.service.element_id_search import ElementIdSearch
+from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
 from program_management.ddd.service.write import create_training_with_program_tree, create_and_attach_training_service
 from education_group.forms.training import CreateTrainingForm
 from education_group.templatetags.academic_year_display import display_as_academic_year
@@ -125,13 +128,20 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         return training_ids
 
     def get_success_url(self, training_id: TrainingIdentity):
-        url = reverse(
-            'education_group_read_proxy',
-            kwargs={'acronym': training_id.acronym, 'year': training_id.year}
-        ) + '?tab={}'.format(Tab.IDENTIFICATION)
         path = self.get_attach_path()
         if path:
-            url += "?path={}".format(path)
+            path += '|' + str(ElementIdSearch().get_from_training_identity(training_id))
+            node_identity = NodeIdentitySearch().get_from_element_id(int(path.split('|')[0]))
+            url = reverse_with_get(
+                'element_identification',
+                args=[node_identity.year, node_identity.code],
+                get={"path": path}
+            )
+        else:
+            url = reverse(
+                'education_group_read_proxy',
+                kwargs={'acronym': training_id.acronym, 'year': training_id.year}
+            ) + '?tab={}'.format(Tab.IDENTIFICATION)
         return url
 
     def get_success_msg(self, training_id: TrainingIdentity):
