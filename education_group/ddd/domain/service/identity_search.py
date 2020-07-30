@@ -30,6 +30,7 @@ from education_group.ddd.domain.training import TrainingIdentity
 from education_group.models.group_year import GroupYear
 from osis_common.ddd import interface
 from osis_common.ddd.interface import BusinessException
+
 from program_management.ddd.business_types import *
 
 

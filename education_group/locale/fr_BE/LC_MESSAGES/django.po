@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-27 10:51+0200\n"
+"POT-Creation-Date: 2020-07-29 08:59+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -15,6 +15,18 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#, python-format
+msgid "%(count_enrollment)d student is enrolled in the mini-training."
+msgid_plural "%(count_enrollment)d students are enrolled in the mini-training."
+msgstr[0] "%(count_enrollment)d étudiant est inscrit à la mini-formation."
+msgstr[1] "%(count_enrollment)d étudiants sont inscrits à la mini-formation."
+
+#, python-format
+msgid "%(count_enrollment)d student is enrolled in the training."
+msgid_plural "%(count_enrollment)d students are enrolled in the training."
+msgstr[0] "%(count_enrollment)d étudiant est inscrit à la formation."
+msgstr[1] "%(count_enrollment)d étudiants sont inscrits à la formation."
 
 #, python-format
 msgid "%(max)s must be greater or equals than %(min)s"
@@ -94,11 +106,22 @@ msgstr ""
 msgid "Alert Message"
 msgstr ""
 
+#, python-format
+msgid "Are you sure you want to delete %(acronym)s - %(title)s ?"
+msgstr "Êtes-vous sûr·e de vouloir supprimer %(acronym)s - %(title)s ?"
+
+#, python-format
+msgid "Are you sure you want to delete %(code)s - %(title)s ?"
+msgstr "Êtes-vous sûr·e de vouloir supprimer %(code)s - %(title)s ?"
+
 msgid "Bachelors of the Dutch speaking Community of Belgium"
 msgstr ""
 
 msgid "Block"
 msgstr ""
+
+msgid "Cancel"
+msgstr "Annuler"
 
 msgid "Category"
 msgstr ""
@@ -348,6 +371,9 @@ msgstr ""
 msgid "Link type"
 msgstr ""
 
+msgid "Linked with EPC"
+msgstr "Liens existants dans l'application EPC."
+
 msgid "Main"
 msgstr ""
 
@@ -377,13 +403,6 @@ msgstr ""
 
 msgid "New Training"
 msgstr "Nouvelle Formation"
-
-#, python-format
-msgctxt "female"
-msgid ""
-"No type of %(child_category)s can be created as child of %(category)s of "
-"type %(type)s"
-msgstr ""
 
 msgid "Non university Bachelors"
 msgstr ""
@@ -513,6 +532,7 @@ msgstr ""
 msgid "The following links has been updated"
 msgstr "Les liens suivants ont été mis à jour"
 
+#, python-brace-format
 msgid ""
 "The formation you work with doesn't exist (or is not at the same position) "
 "in the tree {root.title} in {root.year}.You've been redirected to the root "
@@ -520,7 +540,15 @@ msgid ""
 msgstr ""
 "La formation avec laquelle vous travaillez n'existe pas (ou n'est pas à la "
 "même position) dans le programme de {root.title} en {root.year}.Vous avez "
-"été redirigé vers la racine du programme : {root.title} ({root.year})."
+"été redirigé vers la racine du programme : {root.code} ({root.year})."
+
+#, python-format
+msgid "The group %(code)s has been deleted."
+msgstr "Le groupement %(code)s a été supprimé."
+
+#, python-format
+msgid "The mini-training %(code)s has been deleted."
+msgstr "La mini-formation %(code)s a été supprimée."
 
 #, python-format
 msgid "The program %(acronym)s will be published soon"
@@ -531,6 +559,10 @@ msgid ""
 msgstr ""
 "La portée de l'utilisateur est limitée et empêche la réalisation de cette "
 "action"
+
+#, python-format
+msgid "The training %(code)s has been deleted."
+msgstr "La formation %(code)s a été supprimée."
 
 #, python-format
 msgctxt "female"
@@ -614,6 +646,9 @@ msgstr ""
 
 msgid "Weighting"
 msgstr ""
+
+msgid "Yes, I confirm."
+msgstr "Oui, je confirme."
 
 #, python-brace-format
 msgid ""
