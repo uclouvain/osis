@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from education_group.templatetags.academic_year_display import display_as_academic_year
 from program_management.ddd.business_types import *
 from osis_common.ddd.interface import BusinessException
 from django.utils.translation import gettext_lazy as _
@@ -42,7 +41,7 @@ class ProgramTreeNotFoundException(Exception):
 class ProgramTreeNonEmpty(BusinessException):
     def __init__(self, program_tree: 'ProgramTree', **kwargs):
         message = _("[%(academic_year)s] The content of the program is not empty.") % {
-                    'academic_year': display_as_academic_year(program_tree.root_node.year),
+                    'academic_year': program_tree.root_node.academic_year,
                 }
         super().__init__(message, **kwargs)
 
@@ -50,7 +49,7 @@ class ProgramTreeNonEmpty(BusinessException):
 class NodeHaveLinkException(BusinessException):
     def __init__(self, node: 'Node', **kwargs):
         message = _("[%(academic_year)s] %(code)s has links to another training / mini-training / group") % {
-                    'academic_year': display_as_academic_year(node.year),
+                    'academic_year': node.academic_year,
                     'code': node.code
                 }
         super().__init__(message, **kwargs)
