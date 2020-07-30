@@ -60,11 +60,13 @@ class MiniTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     category = forms.ChoiceField(
         choices=education_group_categories.Categories.choices(),
         initial=education_group_categories.Categories.MINI_TRAINING.name,
+        label=_('Category'),
         required=False,
         disabled=True
     )
     type = forms.ChoiceField(
         choices=education_group_types.MiniTrainingType.choices(),
+        label=_('Type of training'),
         required=False,
         disabled=True
     )
