@@ -105,9 +105,10 @@ class MiniTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     remark_fr = forms.CharField(widget=forms.Textarea, label=_("Remark"), required=False)
     remark_en = forms.CharField(widget=forms.Textarea, label=_("remark in english"), required=False)
 
-    def __init__(self, *args, user: User, mini_training_type: str, **kwargs):
+    def __init__(self, *args, user: User, mini_training_type: str, attach_path: str, **kwargs):
         self.user = user
         self.group_type = mini_training_type
+        self.attach_path = attach_path
 
         super().__init__(*args, **kwargs)
 
@@ -117,6 +118,9 @@ class MiniTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         self.__init_teaching_campus()
 
     def __init_academic_year_field(self):
+        if self.attach_path:
+            self.fields['academic_year'].disabled = True
+
         if not self.fields['academic_year'].disabled and self.user.person.is_faculty_manager:
             academic_years = EventPermEducationGroupEdition.get_academic_years().filter(
                 year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION

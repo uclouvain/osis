@@ -60,6 +60,7 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
         form_kwargs = super().get_form_kwargs()
         form_kwargs["user"] = self.request.user
         form_kwargs["mini_training_type"] = self.kwargs['type']
+        form_kwargs["attach_path"] = self.get_attach_path()
         form_kwargs["initial"] = self._get_initial_form()
         return form_kwargs
 
