@@ -25,7 +25,7 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-<form id="UpsertMiniTrainingForm" class="education_group_form" method="POST">
+<form id="UpsertMiniTrainingForm" class="education_group_form" method="POST" novalidate>
     {% csrf_token %}
     <div class="panel panel-default">
         <div class="panel-heading">
@@ -36,7 +36,7 @@
             <ul class="nav nav-tabs" role="tablist">
                 {% for tab in tabs %}
                     {% if tab.display %}
-                        <li role="presentation" {% if tab.active %} class="active" {% endif %}>
+                        <li role="presentation" class="form-tab {% if tab.active %}active{% endif %}">
                             <a href="tab-{{ forloop.counter }}" role="tab">
                                 {{ tab.text }}
                             </a>
@@ -57,3 +57,4 @@
         </div>
     </div>
 </form>
+<script type="text/javascript" src="{% static 'js/education_group/update_training_errors.js' %}"></script>

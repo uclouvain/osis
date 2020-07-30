@@ -32,7 +32,7 @@ from rules.contrib.views import LoginRequiredMixin
 
 from base.models.academic_year import starting_academic_year
 from base.utils.cache import RequestCache
-from base.views.common import display_success_messages
+from base.views.common import display_success_messages, display_error_messages
 from education_group.ddd import command
 from education_group.ddd.domain import mini_training, exception
 from education_group.ddd.service.read import get_group_service
@@ -91,6 +91,12 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
             form.add_error('end_year', '')
 
         return self.form_invalid(form)
+
+    def form_invalid(self, form):
+        msg = _("Error(s) in form: The modifications are not saved")
+        display_error_messages(self.request, msg)
+
+        return super().form_invalid(form)
 
     def get_context_data(self, **kwargs) -> Dict:
         context = super().get_context_data(**kwargs)
