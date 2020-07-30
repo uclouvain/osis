@@ -322,6 +322,7 @@ class PostponeProgramTreeVersionCommand(interface.CommandRequest):
 class CopyTreeVersionToNextYearCommand(interface.CommandRequest):
     from_year = attr.ib(type=int)
     from_offer_acronym = attr.ib(type=str)
+    from_offer_code = attr.ib(type=str)
     from_version_name = attr.ib(type=str)
     from_is_transition = attr.ib(type=bool)
 

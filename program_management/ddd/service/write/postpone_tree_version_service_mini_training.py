@@ -55,6 +55,7 @@ def postpone_program_tree_version(
     while from_year < end_postponement_year:
         cmd_copy_from = CopyTreeVersionToNextYearCommand(
             from_offer_acronym=postpone_cmd.from_offer_acronym,
+            from_offer_code=postpone_cmd.from_code,
             from_year=from_year,
             from_version_name=postpone_cmd.from_version_name,
             from_is_transition=postpone_cmd.from_is_transition,

@@ -39,10 +39,10 @@ from program_management.ddd.service.write import create_standard_version_service
 
 @transaction.atomic()
 def create_and_report_mini_training_with_program_tree(
-        create_training_cmd: command.CreateMiniTrainingCommand
+        create_mini_training_cmd: command.CreateMiniTrainingCommand
 ) -> List['MiniTrainingIdentity']:
     # GIVEN
-    cmd = create_training_cmd
+    cmd = create_mini_training_cmd
 
     # WHEN
     mini_training_identities = create_orphan_mini_training_service.create_and_postpone_orphan_mini_training(cmd)
@@ -51,16 +51,16 @@ def create_and_report_mini_training_with_program_tree(
 
     # 1. Create orphan root group
     create_group_service.create_orphan_group(
-        cmd=__convert_to_group_command(mini_training_cmd=create_training_cmd)
+        cmd=__convert_to_group_command(mini_training_cmd=create_mini_training_cmd)
     )
 
     # 2. Create Program tree
 
     program_tree_identity = create_standard_program_tree_service.create_standard_program_tree(
         CreateStandardVersionCommand(
-            offer_acronym=create_training_cmd.abbreviated_title,
-            code=create_training_cmd.code,
-            year=create_training_cmd.year,
+            offer_acronym=create_mini_training_cmd.abbreviated_title,
+            code=create_mini_training_cmd.code,
+            year=create_mini_training_cmd.year,
         )
     )
 
@@ -69,16 +69,16 @@ def create_and_report_mini_training_with_program_tree(
         PostponeProgramTreeCommand(
             from_code=program_tree_identity.code,
             from_year=program_tree_identity.year,
-            offer_acronym=create_training_cmd.abbreviated_title,
+            offer_acronym=create_mini_training_cmd.abbreviated_title,
         )
     )
 
     # 4. Create standard version of program tree
     program_tree_version_identity = create_standard_version_service.create_standard_program_version(
         CreateStandardVersionCommand(
-            offer_acronym=create_training_cmd.abbreviated_title,
-            code=create_training_cmd.code,
-            year=create_training_cmd.year,
+            offer_acronym=create_mini_training_cmd.abbreviated_title,
+            code=create_mini_training_cmd.code,
+            year=create_mini_training_cmd.year,
         )
     )
 
@@ -89,7 +89,7 @@ def create_and_report_mini_training_with_program_tree(
             from_version_name=program_tree_version_identity.version_name,
             from_year=program_tree_version_identity.year,
             from_is_transition=program_tree_version_identity.is_transition,
-            from_code=create_training_cmd.code
+            from_code=create_mini_training_cmd.code
         )
     )
 

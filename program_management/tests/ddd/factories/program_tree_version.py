@@ -42,6 +42,7 @@ class ProgramTreeVersionFactory(factory.Factory):
     program_tree_repository = None
     entity_id = ProgramTreeVersionIdentity(
         offer_acronym="OFFER",
+        offer_code="Code",
         year=2020,
         version_name="",
         is_transition=False

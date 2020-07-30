@@ -40,6 +40,7 @@ class ProgramTreeVersionIdentity(interface.EntityIdentity):
     year = attr.ib(type=int)
     version_name = attr.ib(type=str)
     is_transition = attr.ib(type=bool)
+    offer_code = attr.ib(type=str)  # Need this for mini training
 
 
 class ProgramTreeVersionBuilder:

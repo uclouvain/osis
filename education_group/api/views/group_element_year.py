@@ -56,12 +56,12 @@ class EducationGroupTreeView(LanguageContextSerializerMixin, generics.RetrieveAP
             group_year__educationgroupversion__version_name=version_name
         )
         self.check_object_permissions(self.request, element.education_group_year_obj)
-
         tree_version_identity = ProgramTreeVersionIdentity(
             offer_acronym=self.kwargs.get('acronym') or self.kwargs.get('partial_acronym'),
             year=self.kwargs['year'],
             version_name=version_name,
-            is_transition=False
+            is_transition=False,
+            offer_code=element.group_year.partial_acronym
         )
 
         self.tree_version = ProgramTreeVersionRepository.get(tree_version_identity)

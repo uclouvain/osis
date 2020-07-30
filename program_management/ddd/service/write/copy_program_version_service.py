@@ -40,6 +40,7 @@ def copy_tree_version_to_next_year(copy_cmd: CopyTreeVersionToNextYearCommand) -
             year=copy_cmd.from_year,
             version_name=copy_cmd.from_version_name,
             is_transition=copy_cmd.from_is_transition,
+            offer_code=copy_cmd.from_offer_code
         )
     )
 

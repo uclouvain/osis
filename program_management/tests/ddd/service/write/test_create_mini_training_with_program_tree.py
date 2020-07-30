@@ -66,7 +66,8 @@ class TestCreateAndReportMiniTrainingWithProgramTree(TestCase):
             offer_acronym="Offer",
             year=2020,
             version_name="",
-            is_transition=False
+            is_transition=False,
+            offer_code='code'
         )
         mock_postpone_program_tree_version.return_value = None
 
