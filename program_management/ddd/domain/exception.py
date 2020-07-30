@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from program_management.ddd.business_types import *
 from osis_common.ddd.interface import BusinessException
 from django.utils.translation import gettext_lazy as _
 
@@ -38,12 +39,17 @@ class ProgramTreeNotFoundException(Exception):
 
 
 class ProgramTreeNonEmpty(BusinessException):
-    def __init__(self, *args, **kwargs):
-        message = _("The content of the program is not empty.")
+    def __init__(self, program_tree: 'ProgramTree', **kwargs):
+        message = _("[%(academic_year)s] The content of the program is not empty.") % {
+                    'academic_year': program_tree.root_node.year,
+                }
         super().__init__(message, **kwargs)
 
 
 class NodeHaveLinkException(BusinessException):
-    def __init__(self, *args, **kwargs):
-        message = _("The group has links to another training / mini-training / group")
+    def __init__(self, node: 'Node', **kwargs):
+        message = _("[%(academic_year)s] %(code)s has links to another training / mini-training / group") % {
+                    'academic_year': node.year,
+                    'code': node.code
+                }
         super().__init__(message, **kwargs)

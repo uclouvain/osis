@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-29 15:39+0200\n"
+"POT-Creation-Date: 2020-07-30 10:55+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -565,12 +565,6 @@ msgstr ""
 "L'élément %(child)s que vous voulez attachez est déjà un parent de l'élément "
 "auquel vous voulez rattachez."
 
-msgid "The content of the program is not empty."
-msgstr "Le contenu du programme n'est pas vide."
-
-msgid "The group has links to another training / mini-training / group"
-msgstr "Le groupement a des liaisons avec une autre formation / mini-formation / groupement"
-
 #, python-format
 msgid "The learning unit %(acronym)s is not contained inside the formation"
 msgstr ""
@@ -737,6 +731,18 @@ msgid ""
 msgstr ""
 "Vous devez être dans le contexte d'une formation pour modifier les prérequis "
 "d'une unité d'enseignement (contexte actuel: %(title)s"
+
+#, python-format
+msgid ""
+"[%(academic_year)s] %(code)s has links to another training / mini-training / "
+"group"
+msgstr ""
+"[%(academic_year)s] %(code)s a des liaisons avec une autre formation / mini-formation / "
+"groupement"
+
+#, python-format
+msgid "[%(academic_year)s] The content of the program is not empty."
+msgstr "[%(academic_year)s] Le contenu du programme n'est pas vide."
 
 msgid "bibliography"
 msgstr ""
