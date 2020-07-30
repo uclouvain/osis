@@ -27,14 +27,11 @@ import re
 
 from django.core.exceptions import ValidationError
 from django.db import models, connection
-from django.db.models import Q
-from django.utils import translation
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from ordered_model.models import OrderedModel
 from reversion.admin import VersionAdmin
 
-from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import quadrimesters
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType
@@ -384,7 +381,7 @@ class GroupElementYear(OrderedModel):
     objects = GroupElementYearManager()
 
     class Meta:
-        unique_together = (('parent', 'child_branch'), ('parent', 'child_leaf'))
+        unique_together = (('parent', 'child_branch'), ('parent', 'child_leaf'), ('parent_element', 'child_element'),)
         ordering = ('order',)
         constraints = [
             models.CheckConstraint(
