@@ -288,11 +288,15 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         )
     )
 
-    def __init__(self, *args, user: User, training_type: str, **kwargs):
+    def __init__(self, *args, user: User, training_type: str, attach_path: str, **kwargs):
         self.user = user
         self.training_type = training_type
+        self.attach_path = attach_path
 
         super().__init__(*args, **kwargs)
+
+        if self.attach_path:
+            self.fields['academic_year'].disabled = True
 
         self.__init_academic_year_field()
         self.__init_management_entity_field()
