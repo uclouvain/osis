@@ -99,20 +99,24 @@
             {% bootstrap_field training_form.title_fr form_group_class="col-md-12" %}
         </div>
 
-        <br>
-        <div class="row">
-            {% bootstrap_field training_form.partial_title_fr form_group_class="col-md-12" %}
-        </div>
+        {% if is_finality_types %}
+            <br>
+            <div class="row">
+                {% bootstrap_field training_form.partial_title_fr form_group_class="col-md-12" %}
+            </div>
+        {% endif %}
 
         <br>
         <div class="row">
             {% bootstrap_field training_form.title_en form_group_class="col-md-12" %}
         </div>
 
-        <br>
-        <div class="row">
-            {% bootstrap_field training_form.partial_title_en form_group_class="col-md-12" %}
-        </div>
+        {% if is_finality_types %}
+            <br>
+            <div class="row">
+                {% bootstrap_field training_form.partial_title_en form_group_class="col-md-12" %}
+            </div>
+        {% endif %}
 
         <br>
         <div class="row">

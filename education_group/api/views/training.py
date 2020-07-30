@@ -60,7 +60,18 @@ class TrainingFilter(filters.FilterSet):
         ]
 
     @staticmethod
-    def filter_version_type(queryset, name, value):
+    def filter_version_type(queryset, _, value):
+        queryset = EducationGroupVersion.objects.filter(
+            offer__education_group_type__category=education_group_categories.TRAINING,
+        ).select_related(
+            'offer__education_group_type',
+            'offer__academic_year'
+        ).prefetch_related(
+            'offer__administration_entity__entityversion_set',
+            'offer__management_entity__entityversion_set'
+        ).exclude(
+            offer__acronym__icontains='common'
+        )
         return utils.filter_version_type(queryset, value)
 
 
@@ -70,7 +81,8 @@ class TrainingList(LanguageContextSerializerMixin, generics.ListAPIView):
     """
     name = 'training-list'
     queryset = EducationGroupVersion.objects.filter(
-        offer__education_group_type__category=education_group_categories.TRAINING
+        offer__education_group_type__category=education_group_categories.TRAINING,
+        is_transition=False,
     ).select_related(
         'offer__education_group_type',
         'offer__academic_year'

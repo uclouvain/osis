@@ -127,7 +127,7 @@ class ProgramTreeBuilder:
                 start_year=root_node.year,
             )
             child._has_changed = True
-            root_node.add_child(child)
+            root_node.add_child(child, is_mandatory=True)
             children.append(child)
         return children
 

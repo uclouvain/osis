@@ -180,7 +180,7 @@ class TrainingDetailSerializer(TrainingListSerializer):
     rate_code_text = serializers.CharField(source='offer.get_rate_code_display', read_only=True)
     active_text = serializers.CharField(source='offer.get_active_display', read_only=True)
     remark = serializers.SerializerMethodField()
-    domain_name = serializers.CharField(source='offer.main_domain.parent.name', read_only=True)
+    domain_name = serializers.SerializerMethodField(read_only=True)
     domain_code = serializers.CharField(source='offer.main_domain.code', read_only=True)
     ares_study = serializers.IntegerField(source='offer.hops.ares_study', read_only=True)
     ares_graca = serializers.IntegerField(source='offer.hops.ares_graca', read_only=True)
@@ -257,3 +257,8 @@ class TrainingDetailSerializer(TrainingListSerializer):
             version.root_group,
             'remark_' + ('en' if language and language not in settings.LANGUAGE_CODE_FR else 'fr')
         )
+
+    @staticmethod
+    def get_domain_name(version):
+        main_domain = version.offer.main_domain
+        return main_domain.parent.name if main_domain.parent else main_domain.name
