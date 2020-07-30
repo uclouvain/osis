@@ -118,6 +118,7 @@ class TrainingRepository(interface.AbstractRepository):
         qs = _get_queryset_to_fetch_data_for_training([entity_id])
         try:
             education_group_year_db = qs.get()
+            #  FIXME remove that part as it already done in program tree repository
             group_element_years = GroupElementYear.objects.filter(
                 Q(parent=education_group_year_db) | Q(child_branch=education_group_year_db)
             )

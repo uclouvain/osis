@@ -31,6 +31,7 @@ from education_group.ddd.repository import training as training_repository
 from education_group.ddd.validators.validators_by_business_action import DeleteTrainingValidatorList
 
 
+#  FIXME split in delete training and delete multiple trainings
 def delete_training(delete_command: command.DeleteTrainingCommand) -> List['TrainingIdentity']:
     from_year = delete_command.from_year
 

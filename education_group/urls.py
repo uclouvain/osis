@@ -70,7 +70,7 @@ urlpatterns = [
     ])),
     path('trainings/', include([
         path('<training_type:type>/create/', training.TrainingCreateView.as_view(), name='training_create'),
-        path('<int:year>/<str:code>/', include([
+        path('<int:year>/<str:code>/', include([  # FIXME use acronym
             path('<str:title>/update/', TrainingUpdateView.as_view(), name='training_update'),
             path('create/', CreateEducationGroupAchievement.as_view(), name='training_achievement_create'),
             path('<int:education_group_achievement_pk>/', include([

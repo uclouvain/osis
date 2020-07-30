@@ -53,6 +53,7 @@ class CalculateEndPostponement(interface.DomainService):
 
         return max_year_to_postpone
 
+    #  FIXME inject group and talk about it with Alessandro
     @classmethod
     def _compute_postponement_end_year(
             cls,

@@ -73,6 +73,7 @@ class GroupBuilder:
             end_year=cmd.end_year
         )
 
+    #  FIXME verify if group already exists
     @classmethod
     def build_next_year_group(cls, from_group: 'Group'):
         group = copy.deepcopy(from_group)
