@@ -37,4 +37,4 @@ class NodeHaveLinkValidator(business_validator.BusinessValidator):
         cmd = command.GetProgramTreesFromNodeCommand(code=self.node.code, year=self.node.year)
         program_trees = search_program_trees_using_node_service.search_program_trees_using_node(cmd)
         if len(program_trees) > 0:
-            raise NodeHaveLinkException
+            raise NodeHaveLinkException(node=self.node)
