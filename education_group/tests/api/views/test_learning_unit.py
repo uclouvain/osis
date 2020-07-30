@@ -97,7 +97,8 @@ class FilterEducationGroupRootsTestCase(APITestCase):
             many=True,
             context={
                 'request': RequestFactory().get(self.url),
-                'language': settings.LANGUAGE_CODE_FR
+                'language': settings.LANGUAGE_CODE_FR,
+                'learning_unit_year': self.learning_unit_year
             }
         )
 
@@ -123,7 +124,8 @@ class FilterEducationGroupRootsTestCase(APITestCase):
             many=True,
             context={
                 'request': RequestFactory().get(self.url),
-                'language': settings.LANGUAGE_CODE_FR
+                'language': settings.LANGUAGE_CODE_FR,
+                'learning_unit_year': self.learning_unit_year
             }
         )
 
@@ -194,7 +196,8 @@ class EducationGroupRootsListTestCase(APITestCase):
             many=True,
             context={
                 'request': RequestFactory().get(self.url),
-                'language': settings.LANGUAGE_CODE_EN
+                'language': settings.LANGUAGE_CODE_EN,
+                'learning_unit_year': self.learning_unit_year
             }
         )
         self.assertEqual(response.data, serializer.data)

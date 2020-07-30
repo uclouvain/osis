@@ -86,12 +86,12 @@ class EducationGroupRootsListSerializer(EducationGroupRootsTitleSerializer, seri
         )
 
     def get_learning_unit_credits(self, obj):
-        learning_unit_year = self.context['learning_unit_year']
+        learning_unit_year = self.context.get('learning_unit_year')
         gey = GroupElementYear.objects.get(
             child_leaf=learning_unit_year,
             id__in=[element.id for element in EducationGroupHierarchy(root=obj).to_list(flat=True)]
         )
-        return gey.relative_credits or learning_unit_year.credits
+        return gey.relative_credits or (learning_unit_year and learning_unit_year.credits)
 
 
 class LearningUnitYearPrerequisitesListSerializer(serializers.ModelSerializer):

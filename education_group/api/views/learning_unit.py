@@ -32,12 +32,10 @@ from backoffice.settings.rest_framework.common_views import LanguageContextSeria
 from base.models import group_element_year
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import GroupType, TrainingType
-from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.prerequisite import Prerequisite
 from education_group.api.serializers.learning_unit import EducationGroupRootsListSerializer, \
     LearningUnitYearPrerequisitesListSerializer
-from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
 
 
 class EducationGroupRootsFilter(filters.FilterSet):
@@ -101,9 +99,9 @@ class LearningUnitPrerequisitesList(LanguageContextSerializerMixin, generics.Lis
             acronym=self.kwargs['acronym'].upper(),
             academic_year__year=self.kwargs['year']
         )
-        return Prerequisite.objects.filter(learning_unit_year=learning_unit_year)\
-                                   .select_related(
-                                        'education_group_year__academic_year',
-                                        'education_group_year__education_group_type',
-                                        'learning_unit_year__academic_year',
-                                   ).prefetch_related('prerequisiteitem_set')
+        return Prerequisite.objects.filter(learning_unit_year=learning_unit_year) \
+            .select_related(
+            'education_group_year__academic_year',
+            'education_group_year__education_group_type',
+            'learning_unit_year__academic_year',
+        ).prefetch_related('prerequisiteitem_set')
