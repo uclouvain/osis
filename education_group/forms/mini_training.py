@@ -78,10 +78,7 @@ class MiniTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         initial=schedule_type_enum.DAILY,
         label=_('Schedule type')
     )
-    credits = forms.IntegerField(
-        label=_("Credits"),
-        widget=forms.TextInput
-    )
+    credits = fields.CreditField()
     constraint_type = forms.ChoiceField(
         choices=choice_field.add_blank(ConstraintTypeEnum.choices()),
         label=_("Type of constraint"),

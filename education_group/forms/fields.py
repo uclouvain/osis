@@ -36,7 +36,7 @@ class ManagementEntitiesChoiceField(EntityRoleChoiceField):
         return qs
 
     def clean(self, value):
-        value = super(ModelChoiceField, self).clean(value)
+        value = super(forms.ModelChoiceField, self).clean(value)
         if value:
             return value.acronym
         return None
@@ -46,3 +46,14 @@ class MainEntitiesVersionChoiceField(EntitiesVersionChoiceField):
     def __init__(self, queryset, *args, **kwargs):
         queryset = find_pedagogical_entities_version()
         super(MainEntitiesVersionChoiceField, self).__init__(queryset, *args, **kwargs)
+
+
+class CreditField(forms.IntegerField):
+    def __init__(self, *args, **kwargs):
+        super().__init__(
+            min_value=0,
+            max_value=999,
+            label=_("Credits"),
+            widget=forms.TextInput,
+            **kwargs
+        )
