@@ -81,6 +81,7 @@ class ProgramTreeVersionBuilder:
             year=cmd.year,
             version_name=STANDARD,
             is_transition=False,
+            offer_code=cmd.code
         )
         tree_identity = ProgramTreeIdentity(code=cmd.code, year=cmd.year)
         return ProgramTreeVersion(

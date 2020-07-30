@@ -49,7 +49,6 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
     ) -> 'ProgramTreeVersionIdentity':
         education_group_year_id = EducationGroupYear.objects.filter(
             acronym=program_tree_version.entity_id.offer_acronym,
-            partial_acronym=program_tree_version.program_tree_identity.code,
             academic_year__year=program_tree_version.entity_id.year,
         ).values_list(
             'pk', flat=True
@@ -81,7 +80,6 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
         qs = EducationGroupVersion.objects.filter(
             version_name=entity_id.version_name,
             offer__acronym=entity_id.offer_acronym,
-            offer__partial_acronym=entity_id.offer_code,
             offer__academic_year__year=entity_id.year,
             is_transition=entity_id.is_transition,
         ).annotate(
