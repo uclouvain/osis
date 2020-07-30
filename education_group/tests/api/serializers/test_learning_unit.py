@@ -145,4 +145,3 @@ class LearningUnitYearPrerequisitesListSerializerTestCase(TestCase):
             self.serializer.data['education_group_type'],
             self.prerequisite.education_group_year.education_group_type.name
         )
-
