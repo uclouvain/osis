@@ -42,10 +42,10 @@ class TestElementSave(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.egy = EducationGroupYearFactory()
-        academic_year = cls.egy.academic_year
-        cls.luy = LearningUnitYearFactory(academic_year=academic_year)
+        cls.academic_year = cls.egy.academic_year
+        cls.luy = LearningUnitYearFactory(academic_year=cls.academic_year)
         cls.lcy = LearningClassYearFactory()
-        cls.gy = GroupYearFactory(academic_year=academic_year, group=GroupFactory(start_year=academic_year))
+        cls.gy = GroupYearFactory(academic_year=cls.academic_year, group=GroupFactory(start_year=cls.academic_year))
 
     def test_save_no_foreign_key_set(self):
 
@@ -71,11 +71,9 @@ class TestElementSave(TestCase):
         )
 
     def test_save_one_learning_unit_year_fk(self):
-        element = ElementLearningUnitYearFactory.build(learning_unit_year=self.luy)
-        element.save()
-
+        learning_unit_year = LearningUnitYearFactory(academic_year=self.academic_year)
         self.assertTrue(
-            Element.objects.filter(learning_unit_year=self.luy).exists()
+            Element.objects.filter(learning_unit_year=learning_unit_year).exists()
         )
 
     def test_save_one_learning_class_year_fk(self):
