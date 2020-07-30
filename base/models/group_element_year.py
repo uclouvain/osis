@@ -45,16 +45,22 @@ DEFAULT_ROOT_TYPES = TrainingType.get_names() + MiniTrainingType.get_names()
 
 
 class GroupElementYearAdmin(VersionAdmin, OsisModelAdmin):
-    list_display = ('parent', 'child_branch', 'child_leaf',)
+    list_display = ('parent_element', 'child_element',)
     readonly_fields = ('order',)
     search_fields = [
         'child_branch__acronym',
         'child_branch__partial_acronym',
         'child_leaf__acronym',
         'parent__acronym',
-        'parent__partial_acronym'
+        'parent__partial_acronym',
+        'child_element__group_year__acronym',
+        'child_element__group_year__partial_acronym',
+        'parent_element__group_year__acronym',
+        'parent_element__group_year__partial_acronym',
+        'child_element__learning_unit_year__acronym',
+        'parent_element__learning_unit_year__acronym',
     ]
-    list_filter = ('is_mandatory', 'access_condition', 'parent__academic_year')
+    list_filter = ('is_mandatory', 'access_condition', 'parent_element__group_year__academic_year')
 
 
 #  FIXME Kept around as a migration reference this function.
@@ -299,7 +305,7 @@ class GroupElementYear(OrderedModel):
 
     parent = models.ForeignKey(
         EducationGroupYear,
-        null=True,  # TODO: can not be null, dirty data
+        null=True, blank=True,  # TODO: can not be null, dirty data
         on_delete=models.PROTECT,
     )
 
