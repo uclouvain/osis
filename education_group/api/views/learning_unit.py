@@ -32,10 +32,12 @@ from backoffice.settings.rest_framework.common_views import LanguageContextSeria
 from base.models import group_element_year
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import GroupType, TrainingType
+from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.prerequisite import Prerequisite
 from education_group.api.serializers.learning_unit import EducationGroupRootsListSerializer, \
     LearningUnitYearPrerequisitesListSerializer
+from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
 
 
 class EducationGroupRootsFilter(filters.FilterSet):
@@ -58,23 +60,30 @@ class EducationGroupRootsList(LanguageContextSerializerMixin, generics.ListAPIVi
     paginator = None
 
     def get_queryset(self):
-        learning_unit_year = get_object_or_404(
+        self.learning_unit_year = get_object_or_404(
             LearningUnitYear.objects.all().select_related('academic_year'),
             acronym=self.kwargs['acronym'].upper(),
             academic_year__year=self.kwargs['year']
         )
         education_group_root_ids = group_element_year.find_learning_unit_roots(
-            [learning_unit_year],
-            luy=learning_unit_year,
+            [self.learning_unit_year],
+            luy=self.learning_unit_year,
             recursive_conditions={
                 'stop': [GroupType.COMPLEMENTARY_MODULE.name],
                 'continue': TrainingType.finality_types()
             }
-        ).get(learning_unit_year.id, [])
+        ).get(self.learning_unit_year.id, [])
 
         return EducationGroupYear.objects.filter(
             pk__in=education_group_root_ids
         ).select_related('education_group_type', 'academic_year')
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context.update({
+            'learning_unit_year': self.learning_unit_year
+        })
+        return context
 
 
 class LearningUnitPrerequisitesList(LanguageContextSerializerMixin, generics.ListAPIView):
