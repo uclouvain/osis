@@ -58,23 +58,30 @@ class EducationGroupRootsList(LanguageContextSerializerMixin, generics.ListAPIVi
     paginator = None
 
     def get_queryset(self):
-        learning_unit_year = get_object_or_404(
+        self.learning_unit_year = get_object_or_404(
             LearningUnitYear.objects.all().select_related('academic_year'),
             acronym=self.kwargs['acronym'].upper(),
             academic_year__year=self.kwargs['year']
         )
         education_group_root_ids = group_element_year.find_learning_unit_roots(
-            [learning_unit_year],
-            luy=learning_unit_year,
+            [self.learning_unit_year],
+            luy=self.learning_unit_year,
             recursive_conditions={
                 'stop': [GroupType.COMPLEMENTARY_MODULE.name],
                 'continue': TrainingType.finality_types()
             }
-        ).get(learning_unit_year.id, [])
+        ).get(self.learning_unit_year.id, [])
 
         return EducationGroupYear.objects.filter(
             pk__in=education_group_root_ids
         ).select_related('education_group_type', 'academic_year')
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context.update({
+            'learning_unit_year': self.learning_unit_year
+        })
+        return context
 
 
 class LearningUnitPrerequisitesList(LanguageContextSerializerMixin, generics.ListAPIView):
@@ -92,9 +99,9 @@ class LearningUnitPrerequisitesList(LanguageContextSerializerMixin, generics.Lis
             acronym=self.kwargs['acronym'].upper(),
             academic_year__year=self.kwargs['year']
         )
-        return Prerequisite.objects.filter(learning_unit_year=learning_unit_year)\
-                                   .select_related(
-                                        'education_group_year__academic_year',
-                                        'education_group_year__education_group_type',
-                                        'learning_unit_year__academic_year',
-                                   ).prefetch_related('prerequisiteitem_set')
+        return Prerequisite.objects.filter(learning_unit_year=learning_unit_year) \
+            .select_related(
+            'education_group_year__academic_year',
+            'education_group_year__education_group_type',
+            'learning_unit_year__academic_year',
+        ).prefetch_related('prerequisiteitem_set')
