@@ -50,7 +50,9 @@ class EducationGroupRootsListSerializerTestCase(TestCase):
         group = GroupFactory(academic_year=cls.academic_year)
         cls.luy = LearningUnitYearFactory(academic_year=cls.academic_year)
         GroupElementYearFactory(parent=cls.training, child_branch=group, child_leaf=None)
-        GroupElementYearFactory(parent=group, child_leaf=cls.luy, child_branch=None)
+        cls.group_element_year = GroupElementYearFactory(
+            parent=group, child_leaf=cls.luy, child_branch=None, relative_credits=15
+        )
 
         url = reverse('learning_unit_api_v1:' + EducationGroupRootsList.name, kwargs={
             'acronym': cls.luy.acronym,
@@ -91,6 +93,12 @@ class EducationGroupRootsListSerializerTestCase(TestCase):
         self.assertEqual(
             self.serializer.data['education_group_type'],
             self.training.education_group_type.name
+        )
+
+    def test_get_appropriate_learning_unit_credits(self):
+        self.assertEqual(
+            self.serializer.data['learning_unit_credits'],
+            self.group_element_year.relative_credits
         )
 
 
@@ -137,3 +145,4 @@ class LearningUnitYearPrerequisitesListSerializerTestCase(TestCase):
             self.serializer.data['education_group_type'],
             self.prerequisite.education_group_year.education_group_type.name
         )
+
