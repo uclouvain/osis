@@ -103,8 +103,8 @@ class GroupRepository(interface.AbstractRepository):
                 management_entity_id=management_entity.entity_id,
                 main_teaching_campus=teaching_campus,
                 group=group_upserted,
+                remark_fr=group.remark.text_fr,
                 remark_en=group.remark.text_en,
-                remark_fr=group.remark.text_fr
             )
         except IntegrityError:
             raise exception.GroupCodeAlreadyExistException

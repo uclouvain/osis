@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-13 16:09+0200\n"
+"POT-Creation-Date: 2020-07-27 09:47+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -366,6 +366,9 @@ msgstr "Nom du professeur responsable de programme"
 msgid "New Education Group"
 msgstr "Nouveau Groupement"
 
+msgid "New training"
+msgstr "Nouvelle Formation"
+
 msgid "No"
 msgstr "Non"
 
@@ -474,7 +477,8 @@ msgid "Prerequisites saved."
 msgstr "Prérequis enregistrés."
 
 msgid "Produce xls of trainings with administrative data"
-msgstr "Produire un fichier Excel avec la liste des formations et données "
+msgstr ""
+"Produire un fichier Excel avec la liste des formations et données "
 "administratives"
 
 msgid "Produce xls with a list of trainings"
