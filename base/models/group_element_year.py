@@ -58,7 +58,6 @@ class GroupElementYearAdmin(VersionAdmin, OsisModelAdmin):
         'parent_element__group_year__acronym',
         'parent_element__group_year__partial_acronym',
         'child_element__learning_unit_year__acronym',
-        'parent_element__learning_unit_year__acronym',
     ]
     list_filter = ('is_mandatory', 'access_condition', 'parent_element__group_year__academic_year')
 
