@@ -54,6 +54,7 @@ class MiniTrainingFilter(filters.FilterSet):
     acronym = filters.CharFilter(field_name="offer__acronym", lookup_expr='icontains')
     title = filters.CharFilter(field_name="root_group__title_fr", lookup_expr='icontains')
     title_english = filters.CharFilter(field_name="root_group__title_en", lookup_expr='icontains')
+    year = filters.NumberFilter(field_name="offer__academic_year__year")
 
     order_by_field = 'ordering'
     ordering = OrderingFilterWithDefault(
@@ -75,7 +76,18 @@ class MiniTrainingFilter(filters.FilterSet):
         ]
 
     @staticmethod
-    def filter_version_type(queryset, name, value):
+    def filter_version_type(queryset, _, value):
+        queryset = EducationGroupVersion.objects.filter(
+            offer__education_group_type__category=education_group_categories.MINI_TRAINING,
+        ).select_related(
+            'offer__education_group_type',
+            'offer__academic_year',
+            'root_group'
+        ).prefetch_related(
+            'offer__management_entity__entityversion_set'
+        ).exclude(
+            offer__acronym__icontains='common',
+        )
         return utils.filter_version_type(queryset, value)
 
 
@@ -85,7 +97,8 @@ class MiniTrainingList(LanguageContextSerializerMixin, generics.ListAPIView):
     """
     name = 'minitraining_list'
     queryset = EducationGroupVersion.objects.filter(
-        offer__education_group_type__category=education_group_categories.MINI_TRAINING
+        offer__education_group_type__category=education_group_categories.MINI_TRAINING,
+        is_transition=False
     ).select_related(
         'offer__education_group_type',
         'offer__academic_year',
@@ -130,7 +143,8 @@ class MiniTrainingDetail(LanguageContextSerializerMixin, generics.RetrieveAPIVie
             ),
             offer__partial_acronym__iexact=partial_acronym,
             offer__academic_year__year=year,
-            version_name=version_name
+            version_name=version_name,
+            is_transition=False
         )
         return egv
 

@@ -32,22 +32,20 @@ class FacultyManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
         return rules.RuleSet({
             'base.can_access_catalog': rules.always_allow,  # Perms Backward compibility
             'base.view_educationgroup': rules.always_allow,
-            'base.add_training': osis_role_predicates.always_deny(
-                message=pgettext("female", "The user does not have permission to create a %(category)s.") %
-                {"category": Categories.TRAINING.value}
-            ),
+            'base.add_training':
+                osis_role_predicates.always_deny(
+                    message=pgettext("female", "The user does not have permission to create a %(category)s.") %
+                    {"category": Categories.TRAINING.value}
+                ),
             'base.add_minitraining':
                 predicates.is_user_attached_to_management_entity &
                 predicates.is_user_linked_to_all_scopes_of_management_entity &
-                predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
-                predicates.is_program_edition_period_open &
-                predicates.is_maximum_child_not_reached_for_mini_training_category,
+                predicates.is_program_edition_period_open,
             'base.add_group':
                 predicates.is_user_attached_to_management_entity &
-                predicates.is_not_orphan_group &
                 predicates.is_user_linked_to_all_scopes_of_management_entity &
-                predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
-                predicates.is_program_edition_period_open,
+                predicates.is_program_edition_period_open &
+                predicates.is_not_orphan_group,
             # TODO : split in training, minitraining, group
             'base.change_educationgroup':
                 predicates.is_user_attached_to_management_entity &
