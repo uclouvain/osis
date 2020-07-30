@@ -102,11 +102,6 @@ class LearningContainerYear(SerializableModel):
     def __str__(self):
         return u"%s - %s" % (self.acronym, self.common_title)
 
-    def delete(self, *args, **kwargs):
-        learning_unit_year = LearningUnitYear.objects.get(learning_container_year_id=self.id)
-        publisher.learning_unit_year_deleted.send(None, learning_unit_year_id=learning_unit_year.id)
-        super(LearningContainerYear, self).delete(*args, **kwargs)
-
     class Meta:
         unique_together = ("learning_container", "academic_year",)
         permissions = (
