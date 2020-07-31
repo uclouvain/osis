@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-29 08:59+0200\n"
+"POT-Creation-Date: 2020-07-31 11:03+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -64,10 +64,10 @@ msgid "Acronym/Short title"
 msgstr "Sigle/Int. abr."
 
 msgid "Acronym/Short title '{}' already exists"
-msgstr ""
+msgstr "Sigle/Intitulé abrége '{}' existe déjà"
 
 msgid "Acronym/Short title is required"
-msgstr ""
+msgstr "Sigle/Intitulé abrége est requis"
 
 msgid "Actions"
 msgstr "Actions"
@@ -398,15 +398,6 @@ msgstr "Modification"
 
 msgid "New Education Group"
 msgstr "Nouveau Groupement"
-
-#, python-format
-msgctxt "female"
-msgid ""
-"No type of %(child_category)s can be created as child of %(category)s of "
-"type %(type)s"
-msgstr ""
-"Aucun type de %(child_category)s ne peut être créé comme enfant d'une "
-"%(category)s de type %(type)s"
 
 msgid "New Training"
 msgstr "Nouvelle Formation"
