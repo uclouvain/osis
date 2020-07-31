@@ -139,7 +139,7 @@ class MiniTrainingRepository(interface.AbstractRepository):
         return mini_training.MiniTraining(
             entity_id=entity_id,
             entity_identity=entity_id,
-            code=education_group_year_db.acronym,
+            code=education_group_year_db.partial_acronym,
             type=_convert_type(education_group_year_db.education_group_type),
             abbreviated_title=education_group_year_db.acronym,
             titles=Titles(
