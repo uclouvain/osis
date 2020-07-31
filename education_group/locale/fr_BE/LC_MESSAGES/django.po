@@ -52,10 +52,10 @@ msgid "Acronym/Short title"
 msgstr "Sigle/Int. abr."
 
 msgid "Acronym/Short title '{}' already exists"
-msgstr ""
+msgstr "Sigle/Intitulé abrégé '{}' existe déjà"
 
 msgid "Acronym/Short title is required"
-msgstr ""
+msgstr "Sigle/Intitulé abrégé est requis"
 
 msgid "Actions"
 msgstr "Actions"

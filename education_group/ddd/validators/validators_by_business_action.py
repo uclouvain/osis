@@ -65,6 +65,8 @@ class UpdateGroupValidatorList(business_validator.BusinessListValidator):
 class CreateMiniTrainingValidatorList(business_validator.BusinessListValidator):
     def __init__(self, mini_training_domain_obj: 'MiniTraining'):
         self.validators = [
+            AcronymRequiredValidator(mini_training_domain_obj.acronym),
+            AcronymAlreadyExistValidator(mini_training_domain_obj.acronym),
             StartAndEndYearValidator(mini_training_domain_obj.start_year, mini_training_domain_obj.end_year)
         ]
         super().__init__()
@@ -77,8 +79,8 @@ class CreateTrainingValidatorList(business_validator.BusinessListValidator):
             training: 'Training'
     ):
         self.validators = [
-            AcronymRequiredValidator(training),
-            AcronymAlreadyExistValidator(training),
+            AcronymRequiredValidator(training.acronym),
+            AcronymAlreadyExistValidator(training.acronym),
             StartYearEndYearValidator(training),
             CertificateAimType2Validator(training),
         ]

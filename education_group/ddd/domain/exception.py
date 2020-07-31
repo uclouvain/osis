@@ -82,7 +82,7 @@ class AcronymRequired(BusinessException):
         super().__init__(message, **kwargs)
 
 
-class TrainingAcronymAlreadyExist(BusinessException):
+class AcronymAlreadyExist(BusinessException):
     def __init__(self, abbreviated_title: str, *args, **kwargs):
         message = _("Acronym/Short title '{}' already exists").format(abbreviated_title)
         super().__init__(message, **kwargs)

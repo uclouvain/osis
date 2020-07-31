@@ -19,7 +19,7 @@ from education_group.ddd import command
 from program_management.ddd import command as program_management_command
 from education_group.ddd.domain.exception import GroupCodeAlreadyExistException, ContentConstraintTypeMissing, \
     ContentConstraintMinimumMaximumMissing, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum, \
-    TrainingAcronymAlreadyExist, StartYearGreaterThanEndYear, MaximumCertificateAimType2Reached
+    AcronymAlreadyExist, StartYearGreaterThanEndYear, MaximumCertificateAimType2Reached
 from education_group.ddd.domain.training import TrainingIdentity
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.service.element_id_search import ElementIdSearch
@@ -105,7 +105,7 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 training_ids = self._call_service(create_training_data)
             except GroupCodeAlreadyExistException as e:
                 training_form.add_error('code', e.message)
-            except TrainingAcronymAlreadyExist as e:
+            except AcronymAlreadyExist as e:
                 training_form.add_error('acronym', e.message)
             except ContentConstraintTypeMissing as e:
                 training_form.add_error('constraint_type', e.message)
