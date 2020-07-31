@@ -25,7 +25,10 @@
 ##############################################################################
 from typing import Optional, Set
 
+import attr
+
 from base.models.enums.link_type import LinkTypes
+from education_group.ddd import command as education_group_command
 from osis_common.ddd import interface
 from program_management.ddd.business_types import *
 
@@ -226,3 +229,112 @@ class SearchAllVersionsFromRootNodesCommand(interface.CommandRequest):
     def __init__(self, code: str, year: int):
         self.code = code
         self.year = year
+
+
+class GetProgramTree(interface.CommandRequest):
+    def __init__(self, code: str, year: int):
+        self.code = code
+        self.year = year
+
+    def __repr__(self) -> str:
+        parameters = ", ".join([str(self.code), str(self.year)])
+        return "GetProgramTree({parameters})".format(parameters=parameters)
+
+
+@attr.s(frozen=True, slots=True)
+class UpdateLinkCommand(interface.CommandRequest):
+    child_node_code = attr.ib(type=str)
+    child_node_year = attr.ib(type=int)
+
+    access_condition = attr.ib(type=bool)
+    is_mandatory = attr.ib(type=bool)
+    block = attr.ib(type=str)
+    link_type = attr.ib(type=str)
+    comment = attr.ib(type=str)
+    comment_english = attr.ib(type=str)
+    relative_credits = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class BulkUpdateLinkCommand(interface.CommandRequest):
+    parent_node_code = attr.ib(type=str)
+    parent_node_year = attr.ib(type=int)
+
+    update_link_cmds = attr.ib(factory=list, type=UpdateLinkCommand)
+
+
+@attr.s(frozen=True, slots=True)
+class CreateStandardVersionCommand(interface.CommandRequest):
+    offer_acronym = attr.ib(type=str)
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class PostponeProgramTreeCommand(interface.CommandRequest):
+    from_code = attr.ib(type=str)
+    from_year = attr.ib(type=int)
+    offer_acronym = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class CopyProgramTreeToNextYearCommand(interface.CommandRequest):
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class PostponeProgramTreeVersionCommand(interface.CommandRequest):
+    from_offer_acronym = attr.ib(type=str)
+    from_version_name = attr.ib(type=str)
+    from_year = attr.ib(type=int)
+    from_is_transition = attr.ib(type=bool)
+
+
+@attr.s(frozen=True, slots=True)
+class CopyTreeVersionToNextYearCommand(interface.CommandRequest):
+    from_year = attr.ib(type=int)
+    from_offer_acronym = attr.ib(type=str)
+    from_version_name = attr.ib(type=str)
+    from_is_transition = attr.ib(type=bool)
+
+
+@attr.s(frozen=True, slots=True)
+class CreateAndAttachTrainingCommand(education_group_command.CreateTrainingCommand):
+    path_to_paste = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class DeleteProgramTreeCommand(interface.CommandRequest):
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class DeleteAllProgramTreeCommand(interface.CommandRequest):
+    code = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class DeleteStandardVersionCommand(interface.CommandRequest):
+    acronym = attr.ib(type=str)
+    year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class DeleteNodeCommand(interface.CommandRequest):
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)
+    node_type = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class GetProgramTreesFromNodeCommand(interface.CommandRequest):
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class GetProgramTreesVersionFromNodeCommand(interface.CommandRequest):
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)

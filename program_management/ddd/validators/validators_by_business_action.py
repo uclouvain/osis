@@ -39,12 +39,15 @@ from program_management.ddd.validators._authorized_root_type_for_prerequisite im
 from program_management.ddd.validators._block_validator import BlockValidator
 from program_management.ddd.validators._detach_option_2M import DetachOptionValidator
 from program_management.ddd.validators._detach_root import DetachRootValidator
+from program_management.ddd.validators._empty_program_tree import EmptyProgramTreeValidator
 from program_management.ddd.validators._has_or_is_prerequisite import IsPrerequisiteValidator
 from program_management.ddd.validators._infinite_recursivity import InfiniteRecursivityTreeValidator
 from program_management.ddd.validators._minimum_editable_year import \
     MinimumEditableYearValidator
+from program_management.ddd.validators._node_have_link import NodeHaveLinkValidator
 from program_management.ddd.validators._prerequisite_expression_syntax import PrerequisiteExpressionSyntaxValidator
 from program_management.ddd.validators._prerequisites_items import PrerequisiteItemsValidator
+from program_management.ddd.validators._relative_credits import RelativeCreditsValidator
 from program_management.ddd.validators.link import CreateLinkValidatorList
 
 
@@ -197,4 +200,40 @@ class UpdatePrerequisiteValidatorList(business_validator.BusinessListValidator):
             PrerequisiteExpressionSyntaxValidator(prerequisite_string),
             PrerequisiteItemsValidator(prerequisite_string, node, program_tree)
         ]
+        super().__init__()
+
+
+class UpdateLinkValidatorList(business_validator.BusinessListValidator):
+    def __init__(
+            self,
+            parent_node: 'Node',
+            child_node: 'Node',
+            link: 'Link',
+    ):
+        self.validators = [
+            AuthorizedLinkTypeValidator(parent_node, child_node, link.link_type),
+            BlockValidator(link.block),
+            RelativeCreditsValidator(link.relative_credits)
+        ]
+        super().__init__()
+
+
+class DeleteProgramTreeValidatorList(business_validator.BusinessListValidator):
+    def __init__(
+            self,
+            program_tree: 'ProgramTree',
+    ):
+        self.validators = [
+            EmptyProgramTreeValidator(program_tree),
+            NodeHaveLinkValidator(program_tree.root_node)
+        ]
+        super().__init__()
+
+
+class DeleteStandardVersionValidatorList(business_validator.BusinessListValidator):
+    def __init__(
+            self,
+            program_tree_version: 'ProgramTreeVersion',
+    ):
+        self.validators = []
         super().__init__()

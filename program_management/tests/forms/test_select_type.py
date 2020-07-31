@@ -27,6 +27,7 @@ import mock
 from django.test import SimpleTestCase
 from django.utils.translation import gettext as _
 
+from base.forms.utils import choice_field
 from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import GroupType
 from program_management.forms.select_type import SelectTypeForm
@@ -50,6 +51,7 @@ class TestSelectTypeForm(SimpleTestCase):
         self.assertListEqual(
             form.fields['name'].choices,
             [
+                (None, choice_field.BLANK_CHOICE_DISPLAY),
                 (GroupType.COMMON_CORE.name, GroupType.COMMON_CORE.value),
                 (GroupType.SUB_GROUP.name, GroupType.SUB_GROUP.value)
             ]

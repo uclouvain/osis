@@ -27,7 +27,7 @@ import html
 
 from django.test import TestCase
 from django.utils.translation import gettext_lazy as _
-from openpyxl.styles import Style, Font
+from openpyxl.styles import Font
 
 from attribution.ddd.domain.attribution import Attribution
 from attribution.tests.ddd.factories.teacher import TeacherFactory
@@ -76,7 +76,7 @@ CMS_TXT_WITH_LIST = '<ol> ' \
                     '<li>Les diff&eacute;rentes structures mol&eacute;culaires</li> ' \
                     '</ol>'
 CMS_TXT_WITH_LIST_AFTER_FORMATTING = 'La structure atomique de la matière\n' \
-                                    'Les différentes structures moléculaires'
+                                     'Les différentes structures moléculaires'
 
 CMS_TXT_WITH_LINK = '<a href="https://moodleucl.uclouvain.be">moodle</a>'
 CMS_TXT_WITH_LINK_AFTER_FORMATTING = 'moodle - [https://moodleucl.uclouvain.be] \n'
@@ -123,7 +123,7 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
         )
 
         expected_headers = \
-            FIX_TITLES + optional_header_for_required_entity + optional_header_for_allocation_entity +  \
+            FIX_TITLES + optional_header_for_required_entity + optional_header_for_allocation_entity + \
             optional_header_for_credits + optional_header_for_periodicity + optional_header_for_active + \
             optional_header_for_quadrimester + optional_header_for_session_derogation + optional_header_for_volume + \
             optional_header_for_teacher_list + optional_header_for_proposition + optional_header_for_english_title + \
@@ -241,13 +241,13 @@ class TestContent(TestCase):
 
     def test_legend_workbook_style(self):
         data = _build_legend_sheet()
-        self.assertListEqual(data.get(LEGEND_WB_STYLE).get(Style(font=Font(color=CREATION_COLOR))), [1])
-        self.assertListEqual(data.get(LEGEND_WB_STYLE).get(Style(font=Font(color=MODIFICATION_COLOR))), [2])
-        self.assertListEqual(data.get(LEGEND_WB_STYLE).get(Style(font=Font(color=TRANSFORMATION_COLOR))), [3])
+        self.assertListEqual(data.get(LEGEND_WB_STYLE).get(Font(color=CREATION_COLOR)), [1])
+        self.assertListEqual(data.get(LEGEND_WB_STYLE).get(Font(color=MODIFICATION_COLOR)), [2])
+        self.assertListEqual(data.get(LEGEND_WB_STYLE).get(Font(color=TRANSFORMATION_COLOR)), [3])
         self.assertListEqual(
-            data.get(LEGEND_WB_STYLE).get(Style(font=Font(color=TRANSFORMATION_AND_MODIFICATION_COLOR))),
+            data.get(LEGEND_WB_STYLE).get(Font(color=TRANSFORMATION_AND_MODIFICATION_COLOR)),
             [4])
-        self.assertListEqual(data.get(LEGEND_WB_STYLE).get(Style(font=Font(color=SUPPRESSION_COLOR))), [5])
+        self.assertListEqual(data.get(LEGEND_WB_STYLE).get(Font(color=SUPPRESSION_COLOR)), [5])
 
     def test_no_optional_data_to_add(self):
         form = CustomXlsForm({})
@@ -413,7 +413,6 @@ class TestContent(TestCase):
                                                    teaching_material_2.title))
 
     def test_build_specifications_cols(self):
-
         # lang_fr = FrenchLanguageFactory()
         # lang_en = EnglishLanguageFactory()
 
@@ -623,48 +622,47 @@ class TestRowHeight(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-
         cls.root_node = NodeGroupYearFactory(node_id=1, code='c1', node_type=TrainingType.PGRM_MASTER_120)
         cls.academic_year = AcademicYearFactory(year=cls.root_node.year)
         cls.group_level_1 = NodeGroupYearFactory(node_id=2, code='c2', year=cls.academic_year.year)
-        link = LinkFactory(parent=cls.root_node,
-                           child=cls.group_level_1)
+        LinkFactory(parent=cls.root_node,
+                    child=cls.group_level_1)
 
         cls.group_level_1_1 = NodeGroupYearFactory(node_id=3, code='c3', year=cls.academic_year.year)
-        link = LinkFactory(parent=cls.group_level_1,
-                           child=cls.group_level_1_1)
+        LinkFactory(parent=cls.group_level_1,
+                    child=cls.group_level_1_1)
 
         cls.ue_level_group_level_1_1 = NodeLearningUnitYearFactory(node_id=4, code='ue1', year=cls.academic_year.year)
-        link = LinkFactory(parent=cls.group_level_1_1,
-                           child=cls.ue_level_group_level_1_1)
+        LinkFactory(parent=cls.group_level_1_1,
+                    child=cls.ue_level_group_level_1_1)
         second_ue_level_group_level_1_1 = NodeLearningUnitYearFactory(node_id=5,
                                                                       code='ue2',
                                                                       year=cls.academic_year.year)
-        link = LinkFactory(parent=cls.group_level_1_1,
-                           child=second_ue_level_group_level_1_1)
+        LinkFactory(parent=cls.group_level_1_1,
+                    child=second_ue_level_group_level_1_1)
 
         cls.group_level_2 = NodeGroupYearFactory(node_id=6,
                                                  node_type=TrainingType.MASTER_MS_120,
                                                  year=cls.academic_year.year)
-        link = LinkFactory(parent=cls.root_node,
-                           child=cls.group_level_2)
+        LinkFactory(parent=cls.root_node,
+                    child=cls.group_level_2)
 
         cls.group_level_2_1 = NodeGroupYearFactory(node_id=7,
                                                    node_type=GroupType.COMMON_CORE,
                                                    year=cls.academic_year.year)
-        link = LinkFactory(parent=cls.group_level_2,
-                           child=cls.group_level_2_1)
+        LinkFactory(parent=cls.group_level_2,
+                    child=cls.group_level_2_1)
         cls.ue_level_group_level_2_1 = NodeLearningUnitYearFactory(node_id=9, code='ue3', year=cls.academic_year.year)
-        link = LinkFactory(parent=cls.group_level_2_1,
-                           child=cls.ue_level_group_level_2_1)
+        LinkFactory(parent=cls.group_level_2_1,
+                    child=cls.ue_level_group_level_2_1)
         cls.group_level_2_2 = NodeGroupYearFactory(node_id=8,
                                                    node_type=GroupType.OPTION_LIST_CHOICE,
                                                    year=cls.academic_year.year)
-        link = LinkFactory(parent=cls.group_level_2,
-                           child=cls.group_level_2_2)
+        LinkFactory(parent=cls.group_level_2,
+                    child=cls.group_level_2_2)
         cls.ue_level_group_level_2_2 = NodeLearningUnitYearFactory(node_id=10, year=cls.academic_year.year)
-        link = LinkFactory(parent=cls.group_level_2_2,
-                           child=cls.ue_level_group_level_2_2)
+        LinkFactory(parent=cls.group_level_2_2,
+                    child=cls.ue_level_group_level_2_2)
 
         cls.tree = ProgramTreeFactory(root_node=cls.root_node)
 
@@ -690,7 +688,6 @@ class TestRowHeight(TestCase):
         cls.luy_count = len(cls.learning_units)
 
     def test_row_height_not_populated(self):
-
         custom_form = CustomXlsForm({})
         data = _build_excel_lines_ues(custom_form, self.tree)
         self.assertDictEqual(data.get('row_height'), {})
@@ -709,7 +706,7 @@ class TestRowHeight(TestCase):
         custom_form = CustomXlsForm({})
         data = _build_excel_lines_ues(custom_form, self.tree)
         # First line (Header line) is always bold
-        self.assertListEqual(data.get('colored_cells')[Style(font=BOLD_FONT)], [0])
+        self.assertListEqual(data.get('font_rows')[BOLD_FONT], [0])
 
     def test_exclude_options_list_for_2M(self):
         self._assert_correct_ue_present_in_xls2(self.tree, ['ue1', 'ue2', 'ue3'])

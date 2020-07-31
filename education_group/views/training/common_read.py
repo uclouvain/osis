@@ -57,7 +57,7 @@ from program_management.ddd.repositories.program_tree_version import ProgramTree
 from program_management.forms.custom_xls import CustomXlsForm
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.models.element import Element
-from program_management.serializers.program_tree_version_view import program_tree_version_view_serializer
+from program_management.serializers.program_tree_view import program_tree_view_serializer
 
 Tab = read.Tab  # FIXME :: fix imports (and remove this line)
 
@@ -133,7 +133,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             "tab_urls": self.get_tab_urls(),
             "node": self.get_object(),
             "node_path": self.get_path(),
-            "tree": json.dumps(program_tree_version_view_serializer(self.current_version)),
+            "tree": json.dumps(program_tree_view_serializer(self.get_tree())),
             "form_xls_custom": CustomXlsForm(path=self.get_path()),
             "academic_year_choices": get_academic_year_choices(
                 self.node_identity,
@@ -150,6 +150,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             "create_group_url": self.get_create_group_url(),
             "create_training_url": self.get_create_training_url(),
             "create_mini_training_url": self.get_create_mini_training_url(),
+            "delete_training_url": self.get_delete_training_url(),
             "xls_ue_prerequisites": reverse("education_group_learning_units_prerequisites",
                                             args=[self.education_group_version.root_group.academic_year.year,
                                                   self.education_group_version.root_group.partial_acronym]
@@ -175,11 +176,14 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
         return reverse('create_element_select_type', kwargs={'category': Categories.TRAINING.name}) + \
                "?path_to={}".format(self.get_path())
 
+    def get_delete_training_url(self):
+        return reverse('training_delete', kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}) + \
+               "?path={}".format(self.get_path())
+
     def get_tab_urls(self):
         node_identity = self.get_object().entity_id
 
-        if not self.active_tab:
-            self.active_tab = read.get_tab_from_referer(self.get_object(), self.request.META.get('HTTP_REFERER'))
+        self.active_tab = read.get_tab_from_path_info(self.get_object(), self.request.META.get('PATH_INFO'))
 
         return OrderedDict({
             Tab.IDENTIFICATION: {
@@ -277,7 +281,10 @@ def _get_view_name_from_tab(tab: Tab):
 
 def get_tab_urls(tab: Tab, node_identity: 'NodeIdentity', path: 'Path' = None) -> str:
     path = path or ""
+    url_parameters = \
+        "?path={}&tab={}#achievement_".format(path, tab) if tab == Tab.SKILLS_ACHIEVEMENTS else "?path={}".format(path)
+
     return reverse(
         _get_view_name_from_tab(tab),
         args=[node_identity.year, node_identity.code]
-    ) + "?path={}".format(path)
+    ) + url_parameters

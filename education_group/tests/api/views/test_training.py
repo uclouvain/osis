@@ -44,6 +44,7 @@ from education_group.tests.factories.group_year import GroupYearFactory
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory, \
     StandardTransitionEducationGroupVersionFactory
+from reference.tests.factories.domain import DomainFactory
 
 
 class TrainingTitleTestCase(APITestCase):
@@ -261,9 +262,10 @@ class FilterTrainingTestCase(APITestCase):
         response = self.client.get(self.url, data=query_string)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        versions = EducationGroupVersion.objects.filter(
+        versions = EducationGroupVersion.standard.filter(
             offer__education_group_type__category=education_group_categories.TRAINING,
-            offer__academic_year__year__lte=query_string['to_year']
+            offer__academic_year__year__lte=query_string['to_year'],
+            is_transition=False
         ).order_by('-offer__academic_year__year', 'offer__acronym')
 
         serializer = TrainingListSerializer(
@@ -365,7 +367,13 @@ class GetTrainingTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(year=2018)
-        cls.training = TrainingFactory(acronym='BIR1BA', partial_acronym='LBIR1000I', academic_year=cls.academic_year)
+        domain = DomainFactory()
+        cls.training = TrainingFactory(
+            acronym='BIR1BA',
+            partial_acronym='LBIR1000I',
+            academic_year=cls.academic_year,
+            main_domain=domain
+        )
         cls.version = StandardEducationGroupVersionFactory(offer=cls.training)
         cls.user = UserFactory()
         cls.url = reverse('education_group_api_v1:training_read', kwargs={

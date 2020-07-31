@@ -21,19 +21,18 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from unittest.mock import patch
-
-from django.test import SimpleTestCase
-
 from education_group.ddd import command
-from education_group.ddd.service.read import group_service
+from education_group.ddd.domain.training import TrainingIdentity
+
+from education_group.ddd.repository.training import TrainingRepository
+from education_group.ddd.validators.validators_by_business_action import DeleteOrphanTrainingValidatorList
 
 
-class TestGetGroup(SimpleTestCase):
-    def setUp(self):
-        self.cmd = command.GetGroupCommand(year=2018, code="LTRONC1")
+def delete_orphan_training(cmd: command.DeleteOrphanTrainingCommand) -> 'TrainingIdentity':
+    training_id = TrainingIdentity(acronym=cmd.acronym, year=cmd.year)
+    training = TrainingRepository.get(training_id)
 
-    def test_assert_repository_called(self):
-        with patch('education_group.ddd.service.read.group_service.GroupRepository.get') as mock_grp_repo_get:
-            group_service.get_group(self.cmd)
-            self.assertTrue(mock_grp_repo_get.called)
+    DeleteOrphanTrainingValidatorList(training).validate()
+
+    TrainingRepository.delete(training_id)
+    return training_id

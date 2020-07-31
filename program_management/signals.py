@@ -38,3 +38,11 @@ def create_element_of_group(sender, group_identity, **kwargs):
             academic_year__year=group_identity.year
         ).pk
     )
+
+
+@receiver(publisher.group_deleted)
+def delete_element_of_group(sender, group_identity, **kwargs):
+    Element.objects.filter(
+        group_year__partial_acronym=group_identity.code,
+        group_year__academic_year__year=group_identity.year
+    ).delete()

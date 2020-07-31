@@ -27,15 +27,24 @@ from education_group.ddd.domain._address import Address
 from osis_common.ddd import interface
 
 
-# FIXME :: should be an Entity in another Domain, and Training should have just an EntityIdentity to get this object.
-class AcademicPartner(interface.ValueObject):
-    def __init__(self, name: str, address: Address, logo_url: str = None):
+class AcademicPartnerIdentity(interface.EntityIdentity):
+    def __init__(self, name: str):
         self.name = name
+
+    def __eq__(self, other):
+        return self.name == other.name
+
+    def __hash__(self):
+        return hash(self.name)
+
+
+class AcademicPartner(interface.Entity):
+    def __init__(self, entity_id: 'AcademicPartnerIdentity', address: Address, logo_url: str = None):
+        super(AcademicPartner, self).__init__(entity_id=entity_id)
+        self.entity_id = entity_id
         self.address = address
         self.logo_url = logo_url
 
-    def __eq__(self, other):
-        return self.name == other.name and self.address == other.address and self.logo_url == other.logo_url
-
-    def __hash__(self):
-        return hash(self.name + str(self.address) + self.logo_url)
+    @property
+    def name(self) -> str:
+        return self.entity_id.name

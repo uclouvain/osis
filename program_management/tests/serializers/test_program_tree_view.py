@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.test import SimpleTestCase
+from django.test import TestCase
 from mock import patch
 
 from program_management.ddd.domain.program_tree import ProgramTree
@@ -32,7 +32,7 @@ from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 
 
-class TestProgramTreeViewSerializer(SimpleTestCase):
+class TestProgramTreeViewSerializer(TestCase):
     def setUp(self):
         """
         root_node
@@ -108,3 +108,14 @@ class TestProgramTreeViewSerializer(SimpleTestCase):
         a_attr = serialized_data['children'][0]['a_attr']
         self.assertIsInstance(a_attr, dict)
         self.assertSetEqual(set(a_attr.keys()), set(expected_keys))
+
+    def test_serialize_program_tree_text(self):
+        serialized_data = program_tree_view_serializer(self.tree)
+        self.assertEqual(serialized_data['text'],
+                         "{} - {}".format(self.root_node.code, self.root_node.title))
+
+    @patch("program_management.serializers.program_tree_view.__get_tree_version_label", return_value='[CEMS]')
+    def test_serialize_program_tree_for_version_text(self, mock):
+        serialized_data = program_tree_view_serializer(self.tree)
+        self.assertEqual(serialized_data['text'],
+                         "{} - {}{}".format(self.root_node.code, self.root_node.title, "[CEMS]"))

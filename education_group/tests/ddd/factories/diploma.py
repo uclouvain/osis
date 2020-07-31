@@ -23,10 +23,35 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import factory.fuzzy
 
-from program_management.ddd.business_types import *
-from program_management.ddd.repositories import load_tree
+from education_group.ddd.domain._diploma import Diploma, DiplomaAim, DiplomaAimIdentity
 
 
-def search_trees_using_node(node: 'Node'):
-    return load_tree.load_trees_from_children(child_element_ids=[node.pk])
+class DiplomaFactory(factory.Factory):
+    class Meta:
+        model = Diploma
+        abstract = False
+
+    leads_to_diploma = True
+    printing_title = factory.Sequence(lambda n: 'Printing title %02d' % n)
+    professional_title = factory.Sequence(lambda n: 'Professionnal title %02d' % n)
+    aims = []
+
+
+class DiplomaAimIdentityFactory(factory.Factory):
+    class Meta:
+        model = DiplomaAimIdentity
+        abstract = False
+
+    section = factory.Sequence(lambda n: 'Aim section %02d' % n)
+    code = factory.Sequence(lambda n: 'Aim code %02d' % n)
+
+
+class DiplomaAimFactory(factory.Factory):
+    class Meta:
+        model = DiplomaAim
+        abstract = False
+
+    entity_id = factory.SubFactory(DiplomaAimIdentityFactory)
+    description = factory.fuzzy.FuzzyText()

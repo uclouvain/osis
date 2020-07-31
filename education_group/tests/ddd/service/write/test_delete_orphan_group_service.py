@@ -25,40 +25,24 @@ from unittest.mock import patch
 
 from django.test import TestCase
 
-from base.models.enums.constraint_type import ConstraintTypeEnum
-from base.models.enums.education_group_types import GroupType
 from education_group.ddd import command
-from education_group.ddd.service.write import create_group_service
+from education_group.ddd.service.write import delete_orphan_group_service
 
 
-class TestCreateGroup(TestCase):
+class TestDeleteOrphanGroup(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.cmd = command.CreateOrphanGroupCommand(
+        cls.cmd = command.DeleteOrphanGroupCommand(
             year=2018,
-            code="LTRONC1",
-            type=GroupType.COMMON_CORE.name,
-            abbreviated_title="Tronc-commun",
-            title_fr="Tronc commun",
-            title_en="Common core",
-            credits=20,
-            constraint_type=ConstraintTypeEnum.CREDITS.name,
-            min_constraint=0,
-            max_constraint=10,
-            management_entity_acronym="DRT",
-            teaching_campus_name="Mons Fucam",
-            organization_name="UCLouvain",
-            remark_fr="Remarque en français",
-            remark_en="Remarque en anglais",
-            start_year=2018,
-            end_year=None,
+            code="LTRONC1"
         )
 
-    @patch('education_group.publisher.group_created', autospec=True)
-    @patch('education_group.ddd.service.read.group_service.GroupRepository.create')
-    def test_assert_repository_called_and_signal_dispatched(self, mock_create_repo, mock_publisher):
-        create_group_service.create_orphan_group(self.cmd)
+    @patch('education_group.ddd.service.write.delete_orphan_group_service.GroupRepository.get')
+    @patch('education_group.ddd.service.write.delete_orphan_group_service.DeleteOrphanGroupValidatorList.validate')
+    @patch('education_group.ddd.service.write.delete_orphan_group_service.GroupRepository.delete')
+    def test_assert_repository_called(self, mock_delete_repo, mock_delete_validator, mock_get_repo):
+        delete_orphan_group_service.delete_orphan_group(self.cmd)
 
-        self.assertTrue(mock_create_repo.called)
-        # Ensure event is emited
-        self.assertTrue(mock_publisher.send.called)
+        self.assertTrue(mock_get_repo.called)
+        self.assertTrue(mock_delete_validator.called)
+        self.assertTrue(mock_delete_repo.called)
