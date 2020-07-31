@@ -26,6 +26,7 @@ from typing import List
 from education_group.ddd import command as command_education_group
 from education_group.ddd.domain.mini_training import MiniTrainingIdentity
 from program_management.ddd import command as command_program_management
+from program_management.ddd.service.read import get_default_link_type_service
 from program_management.ddd.service.write import paste_element_service, create_mini_training_with_program_tree
 
 
@@ -72,8 +73,15 @@ def _get_create_orphan_mini_training_command_from_create_mini_training_and_attac
 def _get_paste_element_command_from_create_mini_training_and_paste_command(
         cmd: command_program_management.CreateMiniTrainingAndPasteCommand
 ) -> command_program_management.PasteElementCommand:
+    get_default_link_type_command = command_program_management.GetDefaultLinkType(
+        path_to_paste=cmd.path_to_paste,
+        child_year=cmd.year,
+        child_code=cmd.code
+    )
+    default_link_type = get_default_link_type_service.get_default_link_type(get_default_link_type_command)
     return command_program_management.PasteElementCommand(
         node_to_paste_code=cmd.code,
         node_to_paste_year=cmd.year,
-        path_where_to_paste=cmd.path_to_paste
+        path_where_to_paste=cmd.path_to_paste,
+        link_type=default_link_type
     )

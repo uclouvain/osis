@@ -177,6 +177,10 @@ class MiniTrainingType(EducationGroupTypesEnum):
         ]
 
     @classmethod
+    def minors_and_deepening(cls) -> List['MiniTrainingType']:
+        return cls.minors_enum() + [cls.DEEPENING]
+
+    @classmethod
     def minors_enum(cls):
         return [
             MiniTrainingType.ACCESS_MINOR,
