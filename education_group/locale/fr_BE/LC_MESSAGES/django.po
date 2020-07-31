@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-27 10:51+0200\n"
+"POT-Creation-Date: 2020-07-31 09:52+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -109,7 +109,9 @@ msgid "Central managers"
 msgstr "Gestionnaire centraux"
 
 msgid "Certificate aim can only be edited by program manager"
-msgstr "Attendus du diplôme peuvent seulement être modifiés par un gestionnaire de programme"
+msgstr ""
+"Attendus du diplôme peuvent seulement être modifiés par un gestionnaire de "
+"programme"
 
 msgid "Clear clipboard"
 msgstr "Vider le presse-papier"
@@ -365,12 +367,13 @@ msgstr ""
 msgid "Mini-Training"
 msgstr ""
 
+#, python-format
 msgid ""
 "Mini-training <a href='%(link)s'> %(code)s (%(academic_year)s) </a> "
 "successfully created."
 msgstr ""
-"La mini-formation <a href='%(link)s'> %(code)s (%(academic_year)s) </a> a été "
-"créé avec succès"
+"La mini-formation <a href='%(link)s'> %(code)s (%(academic_year)s) </a> a "
+"été créé avec succès"
 
 msgid "Modification"
 msgstr "Modification"
@@ -383,13 +386,6 @@ msgstr "Nouvelle Mini-Formation"
 
 msgid "New Training"
 msgstr "Nouvelle Formation"
-
-#, python-format
-msgctxt "female"
-msgid ""
-"No type of %(child_category)s can be created as child of %(category)s of "
-"type %(type)s"
-msgstr ""
 
 msgid "Non university Bachelors"
 msgstr ""
@@ -616,13 +612,21 @@ msgid "Validity"
 msgstr ""
 
 msgid "Validity cannot be greater than last year of organization"
-msgstr "Validité ne peut pas être supérieure à la dernière année d'organisation"
+msgstr ""
+"Validité ne peut pas être supérieure à la dernière année d'organisation"
 
 msgid "Web re-registration"
 msgstr ""
 
 msgid "Weighting"
 msgstr ""
+
+msgid ""
+"You can't copy the mini-training '{code}' from {from_year} to {to_year} "
+"because it ends in {end_year}"
+msgstr ""
+"Vous ne pouvez pas recopier la mini-formation '{code}' de {from_year} vers "
+"{to_year} car elle se termine en {end_year}"
 
 #, python-brace-format
 msgid ""
