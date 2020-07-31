@@ -248,9 +248,6 @@ msgid "Entity"
 msgstr "Entité"
 
 msgid "Error(s) in form: The modifications are not saved"
-msgstr "Erreurs dans le formulaire: Les modifications n'ont pas été sauvegardées"
-
-msgid "Error(s) in form: The modifications are not saved"
 msgstr ""
 "Erreur(s) dans le formulaire: Les modifications n'ont pas été enregistrées"
 
