@@ -321,7 +321,7 @@ class TestContent(TestCase):
 
         self.assertCountEqual(
             _get_optional_data([], self.luy, optional_data, self.link_1_1),
-            [self.link_1_1.relative_credits or '-', self.luy.credits.to_integral_value()]
+            [self.link_1_1.relative_credits or '-', self.luy.credits.to_integral_value() or '-']
         )
 
     def test_get_optional_has_periodicity(self):
