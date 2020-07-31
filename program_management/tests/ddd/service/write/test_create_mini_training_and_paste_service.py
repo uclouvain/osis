@@ -51,7 +51,8 @@ class TestCreateMiniTrainingAndAttach(TestCase):
             remark_en="en",
             start_year=2020,
             end_year=None,
-            path_to_paste="1|15"
+            path_to_paste="1|15",
+            keywords=''
         )
 
     @mock.patch("program_management.ddd.service.write.paste_element_service.paste_element")
