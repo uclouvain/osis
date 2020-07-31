@@ -32,7 +32,8 @@ from education_group.ddd.business_types import *
 from education_group.ddd.service.write import create_group_service, create_orphan_mini_training_service
 from program_management.ddd.command import CreateStandardVersionCommand, PostponeProgramTreeVersionCommand, \
     PostponeProgramTreeCommand
-from program_management.ddd.service.write import create_standard_version_service, create_standard_program_tree_service, \
+from program_management.ddd.service.write import create_standard_version_service, \
+    create_standard_program_tree_service, \
     postpone_program_tree_service_mini_training, \
     postpone_tree_version_service_mini_training
 

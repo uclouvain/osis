@@ -96,7 +96,8 @@ class MiniTrainingRepository(interface.AbstractRepository):
                 management_entity_id=management_entity.entity_id,
                 main_teaching_campus=teaching_campus,
                 schedule_type=mini_training_obj.schedule_type.name,
-                active=mini_training_obj.status.name
+                active=mini_training_obj.status.name,
+                keywords=mini_training_obj.keywords
             )
 
         except IntegrityError:

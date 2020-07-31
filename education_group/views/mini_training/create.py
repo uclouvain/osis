@@ -32,15 +32,19 @@ from rules.contrib.views import LoginRequiredMixin
 
 from base.models.academic_year import starting_academic_year
 from base.utils.cache import RequestCache
+from base.utils.urls import reverse_with_get
 from base.views.common import display_success_messages, display_error_messages
 from education_group.ddd import command
 from education_group.ddd.domain import mini_training, exception
 from education_group.ddd.service.read import get_group_service
 from education_group.forms import mini_training as mini_training_form
 from education_group.templatetags.academic_year_display import display_as_academic_year
+from education_group.views.proxy.read import Tab
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command as command_pgrm
 from program_management.ddd.business_types import *
+from program_management.ddd.domain.service.element_id_search import ElementIdSearch
+from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
 from program_management.ddd.service.read import node_identity_service
 from program_management.ddd.service.write import create_and_attach_mini_training_service, \
     create_mini_training_with_program_tree
@@ -76,7 +80,7 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
                         self._generate_create_command_from_valid_form(form)
                     )
             code = form.cleaned_data["code"]
-            self.set_success_url(mini_training_identities[0], code)
+            self.set_success_url(mini_training_identities[0])
             display_success_messages(
                 self.request,
                 self.get_success_msg(mini_training_identities, code),
@@ -117,10 +121,24 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
 
     def set_success_url(
             self,
-            mini_training_identity: mini_training.MiniTrainingIdentity,
-            code: str
+            mini_training_identity: mini_training.MiniTrainingIdentity
     ) -> None:
-        self.success_url = self._generate_success_url(mini_training_identity, code)
+        path = self.get_attach_path()
+        if path:
+            node_identity = NodeIdentitySearch().get_from_element_id(int(path.split('|')[-1]))
+            path += '|' + str(ElementIdSearch().get_from_mini_training_identity(mini_training_identity))
+            url = reverse_with_get(
+                'element_identification',
+                args=[node_identity.year, node_identity.code],
+                get={"path": path}
+            )
+        else:
+            url = reverse(
+                'education_group_read_proxy',
+                kwargs={'acronym': mini_training_identity.acronym, 'year': mini_training_identity.year}
+            ) + '?tab={}'.format(Tab.IDENTIFICATION)
+
+        self.success_url = url
 
     def get_success_msg(
             self,
@@ -134,7 +152,7 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
 
     def _get_success_msg(self, mini_training_identity: mini_training.MiniTrainingIdentity, code: str) -> str:
         return _("Mini-training <a href='%(link)s'> %(code)s (%(academic_year)s) </a> successfully created.") % {
-            "link": self.success_url,
+            "link": self._generate_success_url(mini_training_identity, code),
             "code": code,
             "academic_year": display_as_academic_year(mini_training_identity.year),
         }
@@ -195,6 +213,7 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
             abbreviated_title=form.cleaned_data['abbreviated_title'],
             title_fr=form.cleaned_data['title_fr'],
             title_en=form.cleaned_data['title_en'],
+            keywords=form.cleaned_data['keywords'],
             status=form.cleaned_data['status'],
             schedule_type=form.cleaned_data['schedule_type'],
             credits=form.cleaned_data['credits'],
@@ -220,6 +239,7 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
             abbreviated_title=form.cleaned_data['abbreviated_title'],
             title_fr=form.cleaned_data['title_fr'],
             title_en=form.cleaned_data['title_en'],
+            keywords=form.cleaned_data['keywords'],
             status=form.cleaned_data['status'],
             schedule_type=form.cleaned_data['schedule_type'],
             credits=form.cleaned_data['credits'],

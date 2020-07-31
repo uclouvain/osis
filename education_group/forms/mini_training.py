@@ -57,6 +57,7 @@ class MiniTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     abbreviated_title = forms.CharField(max_length=40, label=_("Acronym/Short title"), required=False)
     title_fr = forms.CharField(max_length=240, label=_("Title in French"))
     title_en = forms.CharField(max_length=240, label=_("Title in English"), required=False)
+    keywords = forms.CharField(max_length=320, label=_('Keywords'), required=False)
     category = forms.ChoiceField(
         choices=education_group_categories.Categories.choices(),
         initial=education_group_categories.Categories.MINI_TRAINING.name,

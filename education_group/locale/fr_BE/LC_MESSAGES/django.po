@@ -728,4 +728,4 @@ msgid "undefined"
 msgstr ""
 
 msgid "unspecified"
-msgstr ""
+msgstr "indéterminé"

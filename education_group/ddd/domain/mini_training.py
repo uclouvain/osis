@@ -79,6 +79,7 @@ class MiniTrainingBuilder:
             entity_id=mini_training_id,
             code=cmd.code,
             type=MiniTrainingType[cmd.type],
+            keywords=cmd.keywords,
             abbreviated_title=cmd.abbreviated_title,
             titles=titles,
             status=ActiveStatusEnum[cmd.status],
@@ -87,7 +88,8 @@ class MiniTrainingBuilder:
             management_entity=management_entity,
             teaching_campus=teaching_campus,
             start_year=cmd.start_year,
-            end_year=cmd.end_year
+            end_year=cmd.end_year,
+
         )
 
         validators_by_business_action.CreateMiniTrainingValidatorList(mini_training_domain_obj).validate()
@@ -118,6 +120,7 @@ class MiniTraining(interface.RootEntity):
     teaching_campus = attr.ib(type=Campus)
     start_year = attr.ib(type=int)
     end_year = attr.ib(type=Optional[int], default=None)
+    keywords = attr.ib(type=str, default="")
 
     @property
     def acronym(self) -> str:
