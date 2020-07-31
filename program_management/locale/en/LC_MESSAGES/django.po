@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-27 09:47+0200\n"
+"POT-Creation-Date: 2020-07-30 10:55+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -676,6 +676,16 @@ msgstr ""
 msgid ""
 "You must be in the context of a training to modify the prerequisites of a "
 "learning unit (current context: %(title)s)"
+msgstr ""
+
+#, python-format
+msgid ""
+"[%(academic_year)s] %(code)s has links to another training / mini-training / "
+"group"
+msgstr ""
+
+#, python-format
+msgid "[%(academic_year)s] The content of the program is not empty."
 msgstr ""
 
 msgid "bibliography"

@@ -28,14 +28,16 @@ from django.test import TestCase
 from base.models.certificate_aim import CertificateAim
 from base.models.education_group import EducationGroup
 from base.models.education_group_certificate_aim import EducationGroupCertificateAim
-from base.models.education_group_year import EducationGroupYear as EducationGroupYearModelDb
+from base.models.education_group_year import EducationGroupYear as EducationGroupYearModelDb, EducationGroupYear
 from base.models.education_group_year_domain import EducationGroupYearDomain
 from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.campus import CampusFactory as CampusModelDbFactory
 from base.tests.factories.certificate_aim import CertificateAimFactory as CertificateAimModelDbFactory
 from base.tests.factories.education_group_type import TrainingEducationGroupTypeFactory
+from base.tests.factories.education_group_year import TrainingFactory as TrainingDBFactory
 from base.tests.factories.entity_version import EntityVersionFactory as EntityVersionModelDbFactory
+from education_group.ddd.domain.training import TrainingIdentity
 from education_group.ddd.repository.training import TrainingRepository
 from education_group.tests.ddd.factories.campus import CampusIdentityFactory
 from education_group.tests.ddd.factories.diploma import DiplomaAimFactory, DiplomaAimIdentityFactory
@@ -170,3 +172,15 @@ class TestTrainingRepositoryCreateMethod(TestCase):
         self.assertEqual(1, qs_aims.count())
         educ_group_certificate_aim = qs_aims.get()
         self.assertEqual(educ_group_certificate_aim.certificate_aim, CertificateAim.objects.get(code=self.training.diploma.aims[0].entity_id.code))
+
+
+class TestTrainingRepositoryDeleteMethod(TestCase):
+    def setUp(self) -> None:
+        self.training_db = TrainingDBFactory()
+
+    def test_assert_delete_in_database(self):
+        training_id = TrainingIdentity(acronym=self.training_db.acronym, year=self.training_db.academic_year.year)
+        TrainingRepository.delete(training_id)
+
+        with self.assertRaises(EducationGroupYear.DoesNotExist):
+            EducationGroupYear.objects.get(acronym=training_id.acronym, academic_year__year=training_id.year)

@@ -23,15 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+import mock
+from django.test import SimpleTestCase
 
-from program_management.ddd.business_types import *
-from program_management.ddd.repositories import load_tree
-
-
-def search_trees_using_node(node: 'Node'):
-    return load_tree.load_trees_from_children(child_element_ids=[node.pk])
+from education_group.ddd.domain.service.enrollment_counter import EnrollmentCounter
+from education_group.ddd.domain.training import TrainingIdentity
 
 
-def search_tree_versions_using_node(node: 'Node') -> List['ProgramTreeVersion']:
-    return load_tree.load_tree_versions_from_children(child_element_ids=[node.pk])
+class TestEnrollmentCounter(SimpleTestCase):
+    @mock.patch('education_group.ddd.domain.service.enrollment_counter.offer_enrollment.count_enrollments')
+    def test_assert_qs_count_called_when_training(self, mock_count_enrollments):
+        training_id = TrainingIdentity(acronym="DROI2M", year=2000)
+        EnrollmentCounter().get_training_enrollments_count(training_id)
+
+        self.assertTrue(mock_count_enrollments.called)
+
+    # @mock.patch('education_group.ddd.domain.service.enrollment_counter.offer_enrollment.count_enrollments')
+    # def test_assert_mini_training_called_when_instance_of_mini_training_identity(self, mock_count_enrollments):
+    #     mini_training_id = MiniTrainingIdentity(acronym="DROI2M", year=2000)
+    #     EnrollmentCounter().get_mini_training_enrollments_count(mini_training_id)
+    #
+    #     self.assertTrue(mock_count_enrollments.called)
+

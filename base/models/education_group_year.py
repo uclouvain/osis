@@ -980,6 +980,14 @@ def search(**kwargs):
     return qs.select_related('education_group_type', 'academic_year')
 
 
+def have_link_with_epc(acronym: str, year: int) -> bool:
+    return EducationGroupYear.objects.filter(
+        acronym=acronym,
+        academic_year__year=year,
+        linked_with_epc=True
+    ).exists()
+
+
 # TODO :: Annotate/Count() in only 1 query instead of 2
 # TODO :: Count() on category_type == MINI_TRAINING will be in the future in another field FK (or other table).
 def find_with_enrollments_count(learning_unit_year):
