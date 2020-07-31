@@ -33,7 +33,7 @@ class TestGetValidationRuleForField(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.education_group_type = TrainingType.BACHELOR
-        field_reference = 'GroupForm.{type}.field'.format(type=cls.education_group_type.name)
+        field_reference = 'TrainingForm.{type}.field'.format(type=cls.education_group_type.name)
         cls.rule = ValidationRuleFactory(
             field_reference=field_reference,
             initial_value='initial'

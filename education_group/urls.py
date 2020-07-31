@@ -1,4 +1,4 @@
-from django.urls import include, path, register_converter
+from django.urls import include, path, register_converter, re_path
 
 from base.views.education_groups.achievement.create import CreateEducationGroupDetailedAchievement, \
     CreateEducationGroupAchievement
@@ -8,17 +8,14 @@ from base.views.education_groups.achievement.update import EducationGroupAchieve
     UpdateEducationGroupAchievement, EducationGroupDetailedAchievementAction, UpdateEducationGroupDetailedAchievement
 from education_group.converters import GroupTypeConverter, TrainingTypeConverter
 from education_group.views import group, training, mini_training, general_information
+from education_group.views.mini_training.delete import MiniTrainingDeleteView
 from education_group.views.proxy.read import ReadEducationGroupRedirectView
+from education_group.views.training.delete import TrainingDeleteView
 
 register_converter(GroupTypeConverter, 'group_type')
 register_converter(TrainingTypeConverter, 'training_type')
 
 urlpatterns = [
-    path(
-        '<int:year>/<str:acronym>/',
-        ReadEducationGroupRedirectView.as_view(),
-        name='education_group_read_proxy'
-    ),
     path('groups/', include([
         path('<group_type:type>/create', group.GroupCreateView.as_view(), name='group_create'),
         path('<int:year>/<str:code>/', include([
@@ -29,11 +26,13 @@ urlpatterns = [
             path('general_information/', include([
                 path('read/', group.GroupReadGeneralInformation.as_view(), name='group_general_information'),
                 path('update/', group.GroupUpdateGeneralInformation.as_view(), name='group_general_information_update'),
-            ]))
+            ])),
+            path('delete/', group.GroupDeleteView.as_view(), name='group_delete')
         ]))
     ])),
     path('mini_trainings/<int:year>/<str:code>/', include([
         path('create/', CreateEducationGroupAchievement.as_view(), name='minitraining_achievement_create'),
+        path('delete/', MiniTrainingDeleteView.as_view(), name='mini_training_delete'),
         path('<int:education_group_achievement_pk>/', include([
             path('actions/', EducationGroupAchievementAction.as_view(), name='minitraining_achievement_actions'),
             path('create/', CreateEducationGroupDetailedAchievement.as_view(),
@@ -76,6 +75,7 @@ urlpatterns = [
         path('<training_type:type>/create/', training.TrainingCreateView.as_view(), name='training_create'),
         path('<int:year>/<str:code>/', include([
             path('create/', CreateEducationGroupAchievement.as_view(), name='training_achievement_create'),
+            path('delete/', TrainingDeleteView.as_view(), name='training_delete'),
             path('<int:education_group_achievement_pk>/', include([
                 path('actions/', EducationGroupAchievementAction.as_view(), name='training_achievement_actions'),
                 path('create/', CreateEducationGroupDetailedAchievement.as_view(),
@@ -140,5 +140,10 @@ urlpatterns = [
             name="common_master_specialized_admission_condition"
         ),
     ])),
-    path('<int:year>/<str:code>/publish', general_information.publish, name='publish_general_information')
+    path('<int:year>/<str:code>/publish', general_information.publish, name='publish_general_information'),
+    re_path(
+        r'^(?P<year>[\d]{4})/(?P<acronym>[\w]+(?:[/ ]?[a-zA-Z]{1,2}){0,2})/$',
+        ReadEducationGroupRedirectView.as_view(),
+        name='education_group_read_proxy'
+    ),
 ]

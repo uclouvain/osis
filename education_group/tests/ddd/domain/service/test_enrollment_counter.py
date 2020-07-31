@@ -23,18 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import mock
+from django.test import SimpleTestCase
 
-from program_management.ddd.business_types import *
-from program_management.serializers.program_tree_view import program_tree_view_serializer
+from education_group.ddd.domain.service.enrollment_counter import EnrollmentCounter
+from education_group.ddd.domain.training import TrainingIdentity
 
 
-def program_tree_version_view_serializer(program_tree_version: 'ProgramTreeVersion') -> dict:
-    tree_dict = program_tree_view_serializer(program_tree_version.get_tree())
+class TestEnrollmentCounter(SimpleTestCase):
+    @mock.patch('education_group.ddd.domain.service.enrollment_counter.offer_enrollment.count_enrollments')
+    def test_assert_qs_count_called_when_training(self, mock_count_enrollments):
+        training_id = TrainingIdentity(acronym="DROI2M", year=2000)
+        EnrollmentCounter().get_training_enrollments_count(training_id)
 
-    if program_tree_version.version_label:
-        tree_dict.update({'text': '%(text)s%(version_label)s' % {
-            'text': tree_dict['text'],
-            'version_label': '%(label)s' % {'label': program_tree_version.version_label} if program_tree_version.version_label else ''
-        }})
+        self.assertTrue(mock_count_enrollments.called)
 
-    return tree_dict
+    # @mock.patch('education_group.ddd.domain.service.enrollment_counter.offer_enrollment.count_enrollments')
+    # def test_assert_mini_training_called_when_instance_of_mini_training_identity(self, mock_count_enrollments):
+    #     mini_training_id = MiniTrainingIdentity(acronym="DROI2M", year=2000)
+    #     EnrollmentCounter().get_mini_training_enrollments_count(mini_training_id)
+    #
+    #     self.assertTrue(mock_count_enrollments.called)
+

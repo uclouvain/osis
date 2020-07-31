@@ -101,7 +101,9 @@ class GroupRepository(interface.AbstractRepository):
                 max_constraint=group.content_constraint.maximum,
                 management_entity_id=management_entity.entity_id,
                 main_teaching_campus=teaching_campus,
-                group=group_upserted
+                group=group_upserted,
+                remark_fr=group.remark.text_fr,
+                remark_en=group.remark.text_en,
             )
         except IntegrityError:
             raise exception.GroupCodeAlreadyExistException
@@ -187,7 +189,10 @@ class GroupRepository(interface.AbstractRepository):
 
     @classmethod
     def delete(cls, entity_id: 'GroupIdentity', **_) -> None:
-        raise NotImplementedError
+        GroupYearModelDb.objects.filter(
+            partial_acronym=entity_id.code,
+            academic_year__year=entity_id.year
+        ).delete()
 
 
 def _convert_db_model_to_ddd_model(obj: GroupYearModelDb) -> 'Group':

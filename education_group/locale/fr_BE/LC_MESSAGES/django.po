@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-23 08:54+0200\n"
+"POT-Creation-Date: 2020-07-29 08:59+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -15,6 +15,18 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#, python-format
+msgid "%(count_enrollment)d student is enrolled in the mini-training."
+msgid_plural "%(count_enrollment)d students are enrolled in the mini-training."
+msgstr[0] "%(count_enrollment)d étudiant est inscrit à la mini-formation."
+msgstr[1] "%(count_enrollment)d étudiants sont inscrits à la mini-formation."
+
+#, python-format
+msgid "%(count_enrollment)d student is enrolled in the training."
+msgid_plural "%(count_enrollment)d students are enrolled in the training."
+msgstr[0] "%(count_enrollment)d étudiant est inscrit à la formation."
+msgstr[1] "%(count_enrollment)d étudiants sont inscrits à la formation."
 
 #, python-format
 msgid "%(max)s must be greater or equals than %(min)s"
@@ -51,6 +63,12 @@ msgctxt "abbreviation"
 msgid "Acronym/Short title"
 msgstr "Sigle/Int. abr."
 
+msgid "Acronym/Short title '{}' already exists"
+msgstr ""
+
+msgid "Acronym/Short title is required"
+msgstr ""
+
 msgid "Actions"
 msgstr "Actions"
 
@@ -84,11 +102,22 @@ msgstr "Adultes en reprise d'études"
 msgid "Alert Message"
 msgstr "Message d'alerte"
 
+#, python-format
+msgid "Are you sure you want to delete %(acronym)s - %(title)s ?"
+msgstr "Êtes-vous sûr·e de vouloir supprimer %(acronym)s - %(title)s ?"
+
+#, python-format
+msgid "Are you sure you want to delete %(code)s - %(title)s ?"
+msgstr "Êtes-vous sûr·e de vouloir supprimer %(code)s - %(title)s ?"
+
 msgid "Bachelors of the Dutch speaking Community of Belgium"
 msgstr "Bachelier de la Communauté flamande de Belgique"
 
 msgid "Block"
 msgstr "Bloc"
+
+msgid "Cancel"
+msgstr "Annuler"
 
 msgid "Category"
 msgstr "Catégorie"
@@ -212,11 +241,18 @@ msgstr "Lieu d'inscription"
 msgid "Enrollment enabled"
 msgstr "Inscriptible"
 
+msgid "Enter text to search"
+msgstr "Entrez le texte à rechercher"
+
 msgid "Entity"
 msgstr "Entité"
 
 msgid "Error(s) in form: The modifications are not saved"
 msgstr "Erreurs dans le formulaire: Les modifications n'ont pas été sauvegardées"
+
+msgid "Error(s) in form: The modifications are not saved"
+msgstr ""
+"Erreur(s) dans le formulaire: Les modifications n'ont pas été enregistrées"
 
 msgid "Exams Enrollments"
 msgstr "Inscription aux examens"
@@ -303,6 +339,9 @@ msgstr "Identification"
 msgid "Institution"
 msgstr "Institution"
 
+msgid "Internship"
+msgstr "Stage"
+
 msgid "Jury"
 msgstr "Jury"
 
@@ -332,6 +371,9 @@ msgstr "Unité d'enseignement"
 
 msgid "Link type"
 msgstr "Type de lien"
+
+msgid "Linked with EPC"
+msgstr "Liens existants dans l'application EPC."
 
 msgid "Main"
 msgstr "Principale"
@@ -368,6 +410,9 @@ msgid ""
 msgstr ""
 "Aucun type de %(child_category)s ne peut être créé comme enfant d'une "
 "%(category)s de type %(type)s"
+
+msgid "New Training"
+msgstr "Nouvelle Formation"
 
 msgid "Non university Bachelors"
 msgstr "Bacheliers non universitaires"
@@ -455,6 +500,9 @@ msgstr "Type horaire"
 msgid "Scores diffusion"
 msgstr "Diffusion des notes"
 
+msgid "Search..."
+msgstr "Recherche..."
+
 msgid "Session"
 msgstr "Session"
 
@@ -488,9 +536,15 @@ msgstr "Statut"
 msgid "The field can contain only one value."
 msgstr "Ce champ ne peut contenir qu'une seule valeur."
 
+msgid "The fields concerning ARES have to be ALL filled-in or none of them"
+msgstr ""
+"Les champs concernant les données de l'ARES doivent être soit tous remplis "
+"soit tous vides"
+
 msgid "The following links has been updated"
 msgstr "Les liens suivants ont été mis à jour"
 
+#, python-brace-format
 msgid ""
 "The formation you work with doesn't exist (or is not at the same position) "
 "in the tree {root.title} in {root.year}.You've been redirected to the root "
@@ -498,7 +552,15 @@ msgid ""
 msgstr ""
 "La formation avec laquelle vous travaillez n'existe pas (ou n'est pas à la "
 "même position) dans le programme de {root.title} en {root.year}.Vous avez "
-"été redirigé vers la racine du programme : {root.title} ({root.year})."
+"été redirigé vers la racine du programme : {root.code} ({root.year})."
+
+#, python-format
+msgid "The group %(code)s has been deleted."
+msgstr "Le groupement %(code)s a été supprimé."
+
+#, python-format
+msgid "The mini-training %(code)s has been deleted."
+msgstr "La mini-formation %(code)s a été supprimée."
 
 #, python-format
 msgid "The program %(acronym)s will be published soon"
@@ -509,6 +571,10 @@ msgid ""
 msgstr ""
 "La portée de l'utilisateur est limitée et empêche la réalisation de cette "
 "action"
+
+#, python-format
+msgid "The training %(code)s has been deleted."
+msgstr "La formation %(code)s a été supprimée."
 
 #, python-format
 msgctxt "female"
@@ -534,6 +600,9 @@ msgstr "L’utilisateur n’est pas attaché à l’entité de gestion"
 msgid "The value of this attribute is inherited from the standard OF"
 msgstr "La valeur de ce champ est hérité de la version standard"
 
+msgid "There can only be one type 2 expectation"
+msgstr "Il ne peut y avoir qu'un seul attendu de type 2"
+
 msgid "Title"
 msgstr "Intitulé"
 
@@ -545,6 +614,14 @@ msgstr "Intitulé en français"
 
 msgid "Training"
 msgstr "Formation"
+
+#, python-format
+msgid ""
+"Training <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> "
+"successfully created."
+msgstr ""
+"La formation <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> a été "
+"créé avec succès"
 
 msgid "Trainings"
 msgstr "Formations"
@@ -581,6 +658,17 @@ msgstr "Ré-inscription par internet"
 
 msgid "Weighting"
 msgstr "Pondération par crédit"
+
+msgid "Yes, I confirm."
+msgstr "Oui, je confirme."
+
+#, python-brace-format
+msgid ""
+"You can't copy the training '{acronym}' from {from_year} to {to_year} "
+"because it ends in {end_year}"
+msgstr ""
+"Vous ne pouvez pas recopier la formation '{acronym}' de {from_year} vers "
+"{to_year} car elle se termine en {end_year}"
 
 #, python-format
 msgid ""
@@ -621,6 +709,15 @@ msgstr "commentaire (interne)"
 
 msgid "credits"
 msgstr "crédits"
+
+msgid "dissertation"
+msgstr "mémoire"
+
+msgid "duration unit"
+msgstr "type durée"
+
+msgid "filter by section"
+msgstr "préfiltrer par rubrique"
 
 msgid "is using in"
 msgstr "est utilisée dans"

@@ -2830,6 +2830,7 @@ msgstr ""
 msgid "Weighting"
 msgstr ""
 
+msgctxt "section title"
 msgid "Welcome"
 msgstr ""
 
