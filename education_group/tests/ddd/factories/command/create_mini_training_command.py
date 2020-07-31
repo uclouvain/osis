@@ -55,3 +55,4 @@ class CreateMiniTrainingCommandFactory(factory.Factory):
     max_constraint = None
     remark_fr = None
     remark_en = None
+    keywords = ""

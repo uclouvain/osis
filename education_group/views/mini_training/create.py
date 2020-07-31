@@ -123,6 +123,9 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
             self,
             mini_training_identity: mini_training.MiniTrainingIdentity
     ) -> None:
+        self.success_url = self._get_success_redirect_url(mini_training_identity)
+
+    def _get_success_redirect_url(self, mini_training_identity: mini_training.MiniTrainingIdentity):
         path = self.get_attach_path()
         if path:
             node_identity = NodeIdentitySearch().get_from_element_id(int(path.split('|')[-1]))
@@ -137,8 +140,6 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
                 'education_group_read_proxy',
                 kwargs={'acronym': mini_training_identity.acronym, 'year': mini_training_identity.year}
             ) + '?tab={}'.format(Tab.IDENTIFICATION)
-
-        self.success_url = url
 
     def get_success_msg(
             self,

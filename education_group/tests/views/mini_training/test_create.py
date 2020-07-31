@@ -54,11 +54,21 @@ class TestCreate(TestCase):
         context = response.context
         self.assertTrue(context["mini_training_form"])
 
+    @mock.patch("education_group.views.mini_training.create.MiniTrainingCreateView._get_success_redirect_url")
     @mock.patch('education_group.views.mini_training.create.MiniTrainingCreateView.get_form')
     @mock.patch("program_management.ddd.service.write.create_mini_training_with_program_tree."
                 "create_and_report_mini_training_with_program_tree")
-    def test_should_call_create_mini_training_service_when_request_is_post(self, mock_service_orphan, mock_form):
+    def test_should_call_create_mini_training_service_when_request_is_post(
+            self,
+            mock_service_orphan,
+            mock_form,
+            mock_get_success_url):
         mini_training_identity = mini_training.MiniTrainingIdentity(acronym="ACRO", year=2020)
+        expected_reverse_url = reverse(
+            "mini_training_identification",
+            kwargs={"code": "CODE", "year": mini_training_identity.year}
+        )
+        mock_get_success_url.return_value = expected_reverse_url
         mock_service_orphan.return_value = [mini_training_identity]
         mock_form.return_value = self._get_mock_form_valid()
 
@@ -69,23 +79,29 @@ class TestCreate(TestCase):
 
         self.assertRedirects(
             response,
-            reverse(
-                "mini_training_identification",
-                kwargs={"code": "CODE", "year": mini_training_identity.year}
-            ),
+            expected_reverse_url,
             fetch_redirect_response=False
         )
 
+    @mock.patch("education_group.views.mini_training.create.MiniTrainingCreateView._get_success_redirect_url")
     @mock.patch('education_group.views.mini_training.create.MiniTrainingCreateView.get_form')
     @mock.patch("program_management.ddd.service.write."
                 "create_and_attach_mini_training_service.create_mini_training_and_paste")
     def test_should_call_create_mini_training_and_paste_service_when_request_is_post_and_path_as_parameter(
             self,
             mock_service,
-            mock_form):
+            mock_form,
+            mock_get_success_url):
         mini_training_identity = mini_training.MiniTrainingIdentity(acronym="ACRO", year=2020)
+        expected_reverse = reverse_with_get(
+            "mini_training_identification",
+            kwargs={"code": "CODE", "year": mini_training_identity.year},
+            get={"path": "10|25"}
+
+        )
         mock_service.return_value = [mini_training_identity]
         mock_form.return_value = self._get_mock_form_valid()
+        mock_get_success_url.return_value = expected_reverse
 
         url_with_path = reverse_with_get(
             "mini_training_create",
@@ -97,12 +113,6 @@ class TestCreate(TestCase):
         self.assertTrue(mock_form.called)
         self.assertTrue(mock_service.called)
 
-        expected_reverse = reverse_with_get(
-            "mini_training_identification",
-            kwargs={"code": "CODE", "year": mini_training_identity.year},
-            get={"path": "10|25"}
-
-        )
         self.assertRedirects(response, expected_reverse, fetch_redirect_response=False)
 
     def _get_mock_form_valid(self):

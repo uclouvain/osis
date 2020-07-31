@@ -53,3 +53,4 @@ class CreateOrphanMiniTrainingCommandFactory(factory.Factory):
     remark_en = ""
     start_year = 2018
     end_year = None
+    keywords = ""
