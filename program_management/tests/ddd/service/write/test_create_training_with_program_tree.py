@@ -61,7 +61,6 @@ class TestCreateAndReportTrainingWithProgramTree(TestCase):
             year=2020,
             version_name="",
             is_transition=False,
-            offer_code='code'
         )
         mock_postpone_program_tree_version.return_value = None
 

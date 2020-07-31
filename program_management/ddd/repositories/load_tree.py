@@ -223,7 +223,6 @@ def __instanciate_from_education_group_version(educ_group_version: EducationGrou
         year=educ_group_version.offer.academic_year.year,
         version_name=educ_group_version.version_name,
         is_transition=educ_group_version.is_transition,
-        offer_code=educ_group_version.offer.partial_acronym
     )
     tree_identity = ProgramTreeIdentity(
         educ_group_version.root_group.partial_acronym,

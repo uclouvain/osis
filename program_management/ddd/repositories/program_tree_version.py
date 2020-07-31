@@ -158,7 +158,6 @@ def _instanciate_tree_version(record_dict: dict) -> 'ProgramTreeVersion':
         year=record_dict['offer_year'],
         version_name=record_dict['version_name'],
         is_transition=record_dict['is_transition'],
-        offer_code=record_dict['code']
     )
     return ProgramTreeVersion(
         entity_identity=identity,
