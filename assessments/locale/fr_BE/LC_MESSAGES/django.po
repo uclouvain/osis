@@ -697,12 +697,3 @@ msgstr "programme(s)"
 
 msgid "score(s) saved"
 msgstr "note(s) sauvées"
-
-#~ msgid "Acronym enrollment header"
-#~ msgstr "Sigle"
-
-#~ msgid "Registration number header"
-#~ msgstr "Noma"
-
-#~ msgid "Session enrollment header"
-#~ msgstr "Session"

@@ -650,12 +650,3 @@ msgstr ""
 
 msgid "score(s) saved"
 msgstr ""
-
-#~ msgid "Acronym enrollment header"
-#~ msgstr "Program"
-
-#~ msgid "Registration number header"
-#~ msgstr "Registration number"
-
-#~ msgid "Session enrollment header"
-#~ msgstr "Session number"
