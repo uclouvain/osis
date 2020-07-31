@@ -88,7 +88,7 @@ class TrainingAcronymAlreadyExist(BusinessException):
         super().__init__(message, **kwargs)
 
 
-class CannotCopyDueToEndDate(BusinessException):
+class CannotCopyTrainingDueToEndDate(BusinessException):
     def __init__(self, training: 'Training', *args, **kwargs):
         message = _(
             "You can't copy the training '{acronym}' from {from_year} to {to_year} because it ends in {end_year}"
@@ -97,6 +97,19 @@ class CannotCopyDueToEndDate(BusinessException):
             from_year=training.year,
             to_year=training.year + 1,
             end_year=training.end_year,
+        )
+        super().__init__(message, **kwargs)
+
+
+class CannotCopyMiniTrainingDueToEndDate(BusinessException):
+    def __init__(self, mini_training: 'MiniTraining', *args, **kwargs):
+        message = _(
+            "You can't copy the mini-training '{code}' from {from_year} to {to_year} because it ends in {end_year}"
+        ).format(
+            code=mini_training.code,
+            from_year=mini_training.year,
+            to_year=mini_training.year + 1,
+            end_year=mini_training.end_year,
         )
         super().__init__(message, **kwargs)
 

@@ -61,7 +61,7 @@ class MiniTrainingBuilder:
                 entity_identity=identity_next_year,
                 entity_id=identity_next_year,
             )
-            # TODO important check end date still valid
+            validators_by_business_action.CopyMiniTrainingValidatorList(mini_training_next_year)
         return mini_training_next_year
 
     @classmethod
