@@ -109,7 +109,7 @@ class MiniTraining(interface.RootEntity):
     entity_id = entity_identity = attr.ib(type=MiniTrainingIdentity)
     code = attr.ib(type=str)
     type = attr.ib(type=EducationGroupTypesEnum)
-    abbreviated_title = attr.ib(type=str)  #  SUPRRES THIS FIELD
+    abbreviated_title = attr.ib(type=str)
     titles = attr.ib(type=Titles)
     status = attr.ib(type=ActiveStatusEnum)
     schedule_type = attr.ib(type=ScheduleTypeEnum)
