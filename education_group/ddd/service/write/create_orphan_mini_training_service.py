@@ -40,7 +40,7 @@ def create_and_postpone_orphan_mini_training(
     mini_training_identity = MiniTrainingRepository.create(mini_training_object)
     mini_training_identities = postpone_mini_training_service.postpone_mini_training(
         command.PostponeMiniTrainingCommand(
-            code=cmd.code,
+            acronym=cmd.abbreviated_title,
             postpone_from_year=cmd.year
         )
     )

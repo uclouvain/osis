@@ -47,7 +47,7 @@ class TestMiniTrainingRepositoryCreateMethod(TestCase):
     def setUpTestData(cls):
         cls._create_foreign_key_database_data()
         cls.mini_training = MiniTrainingFactory(
-            entity_identity=MiniTrainingIdentity(code="LOIS58", year=cls.academic_year.year),
+            entity_identity=MiniTrainingIdentity(acronym="LOIS58", year=cls.academic_year.year),
             start_year=cls.academic_year.year,
             type=education_group_types.MiniTrainingType[cls.education_group_type.name],
             management_entity=EntityValueObject(acronym='DRT'),
@@ -68,7 +68,7 @@ class TestMiniTrainingRepositoryCreateMethod(TestCase):
         mini_training_identity = mini_training.MiniTrainingRepository.create(self.mini_training)
 
         education_group_year_db_obj = education_group_year.EducationGroupYear.objects.get(
-            partial_acronym=mini_training_identity.code,
+            acronym=mini_training_identity.acronym,
             academic_year__year=mini_training_identity.year
         )
         self.assert_education_group_year_equal_to_domain(education_group_year_db_obj, self.mini_training)
@@ -81,7 +81,7 @@ class TestMiniTrainingRepositoryCreateMethod(TestCase):
             "academic_year": self.academic_year.id,
             "partial_acronym": domain_obj.code,
             "education_group_type": self.education_group_type.id,
-            "acronym": domain_obj.abbreviated_title,
+            "acronym": domain_obj.acronym,
             "title": domain_obj.titles.title_fr,
             "title_english": domain_obj.titles.title_en,
             "credits": domain_obj.credits,
@@ -106,13 +106,13 @@ class TestMiniTrainingRepositoryGetMethod(TestCase):
         cls.education_group_year_db = EducationGroupYearFactory(education_group_type__minitraining=True)
 
     def test_should_raise_mini_training_not_found_exception_when_matching_mini_training_does_not_exist(self):
-        inexistent_mini_training_identity = MiniTrainingIdentity(code="INEXISTENT", year=2025)
+        inexistent_mini_training_identity = MiniTrainingIdentity(acronym="INEXISTENT", year=2025)
         with self.assertRaises(exception.MiniTrainingNotFoundException):
             mini_training.MiniTrainingRepository.get(inexistent_mini_training_identity)
 
     def test_should_return_domain_object_when_matching_mini_training_found(self):
         existing_mini_training_identity = MiniTrainingIdentity(
-            code=self.education_group_year_db.partial_acronym,
+            acronym=self.education_group_year_db.acronym,
             year=self.education_group_year_db.academic_year.year
         )
         result = mini_training.MiniTrainingRepository.get(existing_mini_training_identity)

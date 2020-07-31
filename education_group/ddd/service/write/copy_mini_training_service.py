@@ -35,7 +35,7 @@ def copy_mini_training_to_next_year(copy_cmd: command.CopyMiniTrainingToNextYear
     # GIVEN
     repository = MiniTrainingRepository()
     existing_mini_training = repository.get(
-        entity_id=MiniTrainingIdentity(code=copy_cmd.code, year=copy_cmd.postpone_from_year)
+        entity_id=MiniTrainingIdentity(acronym=copy_cmd.acronym, year=copy_cmd.postpone_from_year)
     )
 
     # WHEN

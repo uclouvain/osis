@@ -125,7 +125,7 @@ class GetGroupCommand(interface.CommandRequest):
 
 @attr.s(frozen=True, slots=True)
 class GetMiniTrainingCommand(interface.CommandRequest):
-    code = attr.ib(type=str)
+    acronym = attr.ib(type=str)
     year = attr.ib(type=int)
 
 
@@ -206,7 +206,7 @@ class PostponeTrainingCommand(interface.CommandRequest):
 
 @attr.s(frozen=True, slots=True)
 class PostponeMiniTrainingCommand(interface.CommandRequest):
-    code = attr.ib(type=str)
+    acronym = attr.ib(type=str)
     postpone_from_year = attr.ib(type=int)
 
 
@@ -218,5 +218,5 @@ class CopyTrainingToNextYearCommand(interface.CommandRequest):
 
 @attr.s(frozen=True, slots=True)
 class CopyMiniTrainingToNextYearCommand(interface.CommandRequest):
-    code = attr.ib(type=str)
+    acronym = attr.ib(type=str)
     postpone_from_year = attr.ib(type=int)

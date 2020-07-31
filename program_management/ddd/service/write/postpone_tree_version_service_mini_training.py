@@ -47,7 +47,10 @@ def postpone_program_tree_version(
     # GIVEN
     from_year = postpone_cmd.from_year
     end_postponement_year = CalculateEndPostponement.calculate_year_of_end_postponement_mini_training(
-        mini_training_identity=MiniTrainingIdentity(code=postpone_cmd.from_code, year=postpone_cmd.from_year),
+        mini_training_identity=MiniTrainingIdentity(
+            acronym=postpone_cmd.from_offer_acronym,
+            year=postpone_cmd.from_year
+        ),
         mini_training_repository=MiniTrainingRepository()
     )
 

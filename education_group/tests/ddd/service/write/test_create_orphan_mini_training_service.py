@@ -41,8 +41,8 @@ class TestCreateAndPostponeOrphanTraining(TestCase):
             mock_postpone_mini_training_service):
         source_training = MiniTrainingFactory()
         postponed_mini_trainings_identities = [
-            mini_training.MiniTrainingIdentity(code="CODE", year=2020),
-            mini_training.MiniTrainingIdentity(code="CODE", year=2021)
+            mini_training.MiniTrainingIdentity(acronym="Acron", year=2020),
+            mini_training.MiniTrainingIdentity(acronym="Acron", year=2021)
         ]
         mock_builder.return_value.build_from_create_cmd.return_value = source_training
         mock_repository.create.return_value = source_training.entity_id

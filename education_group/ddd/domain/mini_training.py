@@ -51,7 +51,7 @@ class MiniTrainingBuilder:
             mini_training_from: 'MiniTraining',
             mini_training_repository: 'MiniTrainingRepository') -> 'MiniTraining':
 
-        identity_next_year = MiniTrainingIdentity(code=mini_training_from.code, year=mini_training_from.year + 1)
+        identity_next_year = attr.evolve(mini_training_from.entity_identity, year=mini_training_from.year + 1)
         try:
             mini_training_next_year = mini_training_repository.get(identity_next_year)
         except exception.MiniTrainingNotFoundException:
@@ -66,7 +66,7 @@ class MiniTrainingBuilder:
 
     @classmethod
     def build_from_create_cmd(self, cmd: command.CreateMiniTrainingCommand):
-        mini_training_id = MiniTrainingIdentity(code=cmd.code, year=cmd.year)
+        mini_training_id = MiniTrainingIdentity(acronym=cmd.abbreviated_title, year=cmd.year)
         titles = Titles(title_fr=cmd.title_fr, title_en=cmd.title_en)
         management_entity = Entity(acronym=cmd.management_entity_acronym)
         teaching_campus = Campus(
@@ -77,6 +77,7 @@ class MiniTrainingBuilder:
         mini_training_domain_obj = MiniTraining(
             entity_identity=mini_training_id,
             entity_id=mini_training_id,
+            code=cmd.code,
             type=MiniTrainingType[cmd.type],
             abbreviated_title=cmd.abbreviated_title,
             titles=titles,
@@ -99,15 +100,16 @@ builder = MiniTrainingBuilder()
 
 @attr.s(frozen=True, slots=True)
 class MiniTrainingIdentity(interface.EntityIdentity):
-    code = attr.ib(type=str, converter=lambda code: code.upper())
+    acronym = attr.ib(type=str, converter=lambda code: code.upper())
     year = attr.ib(type=int)
 
 
 @attr.s(slots=True, eq=False, hash=False)
 class MiniTraining(interface.RootEntity):
     entity_id = entity_identity = attr.ib(type=MiniTrainingIdentity)
+    code = attr.ib(type=str)
     type = attr.ib(type=EducationGroupTypesEnum)
-    abbreviated_title = attr.ib(type=str)
+    abbreviated_title = attr.ib(type=str)  #  SUPRRES THIS FIELD
     titles = attr.ib(type=Titles)
     status = attr.ib(type=ActiveStatusEnum)
     schedule_type = attr.ib(type=ScheduleTypeEnum)
@@ -118,8 +120,8 @@ class MiniTraining(interface.RootEntity):
     end_year = attr.ib(type=Optional[int], default=None)
 
     @property
-    def code(self) -> str:
-        return self.entity_id.code
+    def acronym(self) -> str:
+        return self.entity_id.acronym
 
     @property
     def year(self) -> int:

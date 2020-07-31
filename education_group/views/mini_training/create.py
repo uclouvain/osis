@@ -75,8 +75,12 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
                     create_and_report_mini_training_with_program_tree(
                         self._generate_create_command_from_valid_form(form)
                     )
-            self.set_success_url(mini_training_identities[0])
-            display_success_messages(self.request, self.get_success_msg(mini_training_identities), extra_tags='safe')
+            code = form.cleaned_data["code"]
+            self.set_success_url(mini_training_identities[0], code)
+            display_success_messages(
+                self.request,
+                self.get_success_msg(mini_training_identities, code),
+                extra_tags='safe')
             return super().form_valid(form)
 
         except exception.MiniTrainingCodeAlreadyExistException as e:
@@ -109,16 +113,27 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
     def get_attach_path(self) -> Optional['Path']:
         return self.request.GET.get('path_to') or None
 
-    def set_success_url(self, mini_training_identity: mini_training.MiniTrainingIdentity) -> None:
-        self.success_url = self._generate_success_url(mini_training_identity)
+    def set_success_url(
+            self,
+            mini_training_identity: mini_training.MiniTrainingIdentity,
+            code: str
+    ) -> None:
+        self.success_url = self._generate_success_url(mini_training_identity, code)
 
-    def get_success_msg(self, mini_training_identities: List[mini_training.MiniTrainingIdentity]) -> List[str]:
-        return [self._get_success_msg(mini_training_identity) for mini_training_identity in mini_training_identities]
+    def get_success_msg(
+            self,
+            mini_training_identities: List[mini_training.MiniTrainingIdentity],
+            code: str
+    ) -> List[str]:
+        return [
+            self._get_success_msg(mini_training_identity, code)
+            for mini_training_identity in mini_training_identities
+        ]
 
-    def _get_success_msg(self, mini_training_identity: mini_training.MiniTrainingIdentity) -> str:
+    def _get_success_msg(self, mini_training_identity: mini_training.MiniTrainingIdentity, code: str) -> str:
         return _("Mini-training <a href='%(link)s'> %(code)s (%(academic_year)s) </a> successfully created.") % {
             "link": self.success_url,
-            "code": mini_training_identity.code,
+            "code": code,
             "academic_year": display_as_academic_year(mini_training_identity.year),
         }
 
@@ -219,10 +234,14 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
             path_to_paste=self.get_attach_path()
         )
 
-    def _generate_success_url(self, mini_training_identity: mini_training.MiniTrainingIdentity) -> str:
+    def _generate_success_url(
+            self,
+            mini_training_identity: mini_training.MiniTrainingIdentity,
+            code: str
+    ) -> str:
         success_url = reverse(
             "mini_training_identification",
-            kwargs={"code": mini_training_identity.code, "year": mini_training_identity.year}
+            kwargs={"code": code, "year": mini_training_identity.year}
         )
         path = self.get_attach_path()
         if path:

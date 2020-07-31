@@ -40,6 +40,11 @@ from education_group.ddd.domain.mini_training import MiniTraining, MiniTrainingI
 
 
 def generate_mini_training_identity(mini_training: 'MiniTraining') -> 'MiniTrainingIdentity':
+    acronym = "".join(random.sample(string.ascii_uppercase, k=8))
+    return MiniTrainingIdentity(acronym=acronym, year=mini_training.start_year)
+
+
+def generate_mini_training_code() -> str:
     sigle_ele = "".join(random.sample(string.ascii_uppercase, k=5))
     cnum = "".join(random.sample(string.digits, k=3))
     subdivision = random.choice(string.ascii_uppercase)
@@ -48,7 +53,7 @@ def generate_mini_training_identity(mini_training: 'MiniTraining') -> 'MiniTrain
         cnum=cnum,
         subdivision=subdivision
     )
-    return MiniTrainingIdentity(code=code, year=mini_training.start_year)
+    return code
 
 
 def generate_titles(mini_training: 'MiniTraining') -> 'Titles':
@@ -93,6 +98,7 @@ class MiniTrainingFactory(factory.Factory):
     entity_identity = factory.LazyAttribute(generate_mini_training_identity)
     entity_id = factory.LazyAttribute(lambda o: o.entity_identity)
     type = factory.Iterator(MiniTrainingType)
+    code = factory.LazyFunction(generate_mini_training_code)
     abbreviated_title = factory.fuzzy.FuzzyText(length=20, chars=string.ascii_uppercase)
     titles = factory.LazyAttribute(generate_titles)
     status = factory.Iterator(active_status.ActiveStatusEnum)
