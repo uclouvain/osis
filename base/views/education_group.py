@@ -122,7 +122,9 @@ def education_group_year_pedagogy_edit_get(request, node: Node):
 @require_http_methods(['GET', 'POST'])
 @can_change_general_information
 def education_group_year_pedagogy_edit(request, education_group_year_id: int):
-    tree = load_tree.load(education_group_year_id)
+    offer = EducationGroupYear.objects.get(id=education_group_year_id)
+    standard_version = offer.educationgroupversion_set.get(version_name='', is_transition=False)
+    tree = load_tree.load(standard_version.root_group.element.pk)
     node = tree.root_node
     if request.method == 'POST':
         return education_group_year_pedagogy_edit_post(request, node)

@@ -42,7 +42,9 @@ def can_change_education_group(user, education_group):
 
 def can_change_general_information(view_func):
     def f_can_change_general_information(request, *args, **kwargs):
-        tree = load_tree.load(kwargs['education_group_year_id'])
+        offer = EducationGroupYear.objects.get(id=kwargs['education_group_year_id'])
+        standard_version = offer.educationgroupversion_set.get(version_name='', is_transition=False)
+        tree = load_tree.load(standard_version.root_group.element.pk)
         node = tree.root_node
         obj = translated_text.get_groups_or_offers_cms_reference_object(node)
         perm_name = 'base.change_commonpedagogyinformation' \
