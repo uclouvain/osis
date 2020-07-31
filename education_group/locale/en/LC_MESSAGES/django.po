@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-27 10:51+0200\n"
+"POT-Creation-Date: 2020-07-31 09:52+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -379,13 +379,6 @@ msgstr ""
 msgid "New Training"
 msgstr ""
 
-#, python-format
-msgctxt "female"
-msgid ""
-"No type of %(child_category)s can be created as child of %(category)s of "
-"type %(type)s"
-msgstr ""
-
 msgid "Non university Bachelors"
 msgstr ""
 
@@ -609,6 +602,12 @@ msgid "Web re-registration"
 msgstr ""
 
 msgid "Weighting"
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"You can't copy the mini-training '{code}' from {from_year} to {to_year} "
+"because it ends in {end_year}"
 msgstr ""
 
 #, python-brace-format

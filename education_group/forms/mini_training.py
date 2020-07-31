@@ -60,11 +60,13 @@ class MiniTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     category = forms.ChoiceField(
         choices=education_group_categories.Categories.choices(),
         initial=education_group_categories.Categories.MINI_TRAINING.name,
+        label=_('Category'),
         required=False,
         disabled=True
     )
     type = forms.ChoiceField(
         choices=education_group_types.MiniTrainingType.choices(),
+        label=_('Type of training'),
         required=False,
         disabled=True
     )
@@ -78,10 +80,7 @@ class MiniTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         initial=schedule_type_enum.DAILY,
         label=_('Schedule type')
     )
-    credits = forms.IntegerField(
-        label=_("Credits"),
-        widget=forms.TextInput
-    )
+    credits = fields.CreditField()
     constraint_type = forms.ChoiceField(
         choices=choice_field.add_blank(ConstraintTypeEnum.choices()),
         label=_("Type of constraint"),
@@ -106,9 +105,10 @@ class MiniTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     remark_fr = forms.CharField(widget=forms.Textarea, label=_("Remark"), required=False)
     remark_en = forms.CharField(widget=forms.Textarea, label=_("remark in english"), required=False)
 
-    def __init__(self, *args, user: User, mini_training_type: str, **kwargs):
+    def __init__(self, *args, user: User, mini_training_type: str, attach_path: str, **kwargs):
         self.user = user
         self.group_type = mini_training_type
+        self.attach_path = attach_path
 
         super().__init__(*args, **kwargs)
 
@@ -118,15 +118,24 @@ class MiniTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         self.__init_teaching_campus()
 
     def __init_academic_year_field(self):
-        if self.user.person.is_faculty_manager:
-            academic_year_qs = EventPermEducationGroupEdition.get_academic_years() \
-                .filter(year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION)
-        else:
-            academic_year_qs = self.fields['academic_year'].queryset.filter(
+        if self.attach_path:
+            self.fields['academic_year'].disabled = True
+
+        if not self.fields['academic_year'].disabled and self.user.person.is_faculty_manager:
+            academic_years = EventPermEducationGroupEdition.get_academic_years().filter(
                 year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION
             )
-        self.fields['academic_year'].queryset = academic_year_qs
-        self.fields["end_year"].queryset = academic_year_qs
+            self.fields['academic_year'].queryset = academic_years
+            self.fields['end_year'].queryset = academic_years
+        else:
+            self.fields['academic_year'].queryset = self.fields['academic_year'].queryset.filter(
+                year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION
+            )
+            self.fields['end_year'].queryset = self.fields['end_year'].queryset.filter(
+                year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION
+            )
+
+            self.fields['academic_year'].label = _('Start')
 
     def __init_management_entity_field(self):
         self.fields['management_entity'] = fields.ManagementEntitiesChoiceField(

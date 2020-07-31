@@ -56,6 +56,7 @@ def postpone_program_tree_version(
             from_year=from_year,
             from_version_name=postpone_cmd.from_version_name,
             from_is_transition=postpone_cmd.from_is_transition,
+            from_offer_code=postpone_cmd.from_code
         )
         identity_next_year = copy_program_version_service.copy_tree_version_to_next_year(cmd_copy_from)
 

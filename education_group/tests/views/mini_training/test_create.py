@@ -58,7 +58,7 @@ class TestCreate(TestCase):
     @mock.patch("program_management.ddd.service.write.create_mini_training_with_program_tree."
                 "create_and_report_mini_training_with_program_tree")
     def test_should_call_create_mini_training_service_when_request_is_post(self, mock_service_orphan, mock_form):
-        mini_training_identity = mini_training.MiniTrainingIdentity(code="CODE", year=2020)
+        mini_training_identity = mini_training.MiniTrainingIdentity(acronym="ACRO", year=2020)
         mock_service_orphan.return_value = [mini_training_identity]
         mock_form.return_value = self._get_mock_form_valid()
 
@@ -71,7 +71,7 @@ class TestCreate(TestCase):
             response,
             reverse(
                 "mini_training_identification",
-                kwargs={"code": mini_training_identity.code, "year": mini_training_identity.year}
+                kwargs={"code": "CODE", "year": mini_training_identity.year}
             ),
             fetch_redirect_response=False
         )
@@ -83,7 +83,7 @@ class TestCreate(TestCase):
             self,
             mock_service,
             mock_form):
-        mini_training_identity = mini_training.MiniTrainingIdentity(code="CODE", year=2020)
+        mini_training_identity = mini_training.MiniTrainingIdentity(acronym="ACRO", year=2020)
         mock_service.return_value = [mini_training_identity]
         mock_form.return_value = self._get_mock_form_valid()
 
@@ -99,7 +99,7 @@ class TestCreate(TestCase):
 
         expected_reverse = reverse_with_get(
             "mini_training_identification",
-            kwargs={"code": mini_training_identity.code, "year": mini_training_identity.year},
+            kwargs={"code": "CODE", "year": mini_training_identity.year},
             get={"path": "10|25"}
 
         )
@@ -108,6 +108,7 @@ class TestCreate(TestCase):
     def _get_mock_form_valid(self):
         cleaned_data = collections.defaultdict(lambda: None)
         cleaned_data["teaching_campus"] = {"name": "", "organization_name": ""}
+        cleaned_data["acronym"] = "ACRO"
         cleaned_data["code"] = "CODE"
         cleaned_data["academic_year"] = 2020
         return mock.MagicMock(is_valid=lambda: True, cleaned_data=cleaned_data)

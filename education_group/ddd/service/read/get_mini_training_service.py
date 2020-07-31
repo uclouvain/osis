@@ -27,5 +27,5 @@ from education_group.ddd.repository import mini_training as mini_training_reposi
 
 
 def get_mini_training(cmd: command.GetMiniTrainingCommand) -> mini_training.MiniTraining:
-    mini_training_id = mini_training.MiniTrainingIdentity(code=cmd.code, year=cmd.year)
+    mini_training_id = mini_training.MiniTrainingIdentity(acronym=cmd.acronym, year=cmd.year)
     return mini_training_repositoty.MiniTrainingRepository.get(mini_training_id)

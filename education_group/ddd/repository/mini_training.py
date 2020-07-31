@@ -76,7 +76,7 @@ class MiniTrainingRepository(interface.AbstractRepository):
         try:
             try:
                 education_group_db_obj = EducationGroupModelDb.objects.filter(
-                    educationgroupyear__partial_acronym=mini_training_obj.code
+                    educationgroupyear__acronym=mini_training_obj.acronym
                 ).distinct().get()
             except EducationGroupModelDb.DoesNotExist:
                 education_group_db_obj = EducationGroupModelDb.objects.create(
@@ -89,7 +89,7 @@ class MiniTrainingRepository(interface.AbstractRepository):
                 academic_year=academic_year,
                 partial_acronym=mini_training_obj.code,
                 education_group_type=education_group_type,
-                acronym=mini_training_obj.abbreviated_title,
+                acronym=mini_training_obj.acronym,
                 title=mini_training_obj.titles.title_fr,
                 title_english=mini_training_obj.titles.title_en,
                 credits=mini_training_obj.credits,
@@ -112,7 +112,7 @@ class MiniTrainingRepository(interface.AbstractRepository):
     def get(cls, entity_id: mini_training.MiniTrainingIdentity) -> mini_training.MiniTraining:
         try:
             education_group_year_db = EducationGroupYearModelDb.objects.filter(
-                partial_acronym=entity_id.code,
+                acronym=entity_id.acronym,
                 academic_year__year=entity_id.year
             ).select_related(
                 "education_group",
@@ -139,8 +139,10 @@ class MiniTrainingRepository(interface.AbstractRepository):
         return mini_training.MiniTraining(
             entity_id=entity_id,
             entity_identity=entity_id,
+            code=education_group_year_db.partial_acronym,
             type=_convert_type(education_group_year_db.education_group_type),
-            abbreviated_title=education_group_year_db.acronym, titles=Titles(
+            abbreviated_title=education_group_year_db.acronym,
+            titles=Titles(
                 title_fr=education_group_year_db.title,
                 title_en=education_group_year_db.title_english,
             ),

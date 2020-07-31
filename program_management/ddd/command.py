@@ -83,32 +83,19 @@ class CutElementCommand(interface.CommandRequest):
         return False
 
 
+@attr.s(frozen=True, slots=True)
 class PasteElementCommand(interface.CommandRequest):
-    def __init__(
-            self,
-            node_to_paste_code: str,
-            node_to_paste_year: int,
-            path_where_to_paste: 'Path',
-            access_condition: bool = None,
-            is_mandatory: bool = None,
-            block: int = None,
-            link_type: LinkTypes = None,
-            comment: str = None,
-            comment_english: str = None,
-            relative_credits: int = None,
-            path_where_to_detach: 'Path' = None
-    ) -> None:
-        self.node_to_paste_code = node_to_paste_code
-        self.node_to_paste_year = node_to_paste_year
-        self.path_where_to_paste = path_where_to_paste
-        self.access_condition = access_condition if access_condition is not None else False
-        self.is_mandatory = is_mandatory if is_mandatory is not None else True
-        self.block = block
-        self.link_type = link_type
-        self.comment = comment or ''
-        self.comment_english = comment_english or ''
-        self.relative_credits = relative_credits
-        self.path_where_to_detach = path_where_to_detach
+    node_to_paste_code = attr.ib(type=str)
+    node_to_paste_year = attr.ib(type=int)
+    path_where_to_paste = attr.ib(type='Path')
+    access_condition = attr.ib(type=bool, default=False)
+    is_mandatory = attr.ib(type=bool, default=True)
+    block = attr.ib(type=Optional[int], default=None)
+    link_type = attr.ib(type=Optional[LinkTypes], default=None)
+    comment = attr.ib(type=str, factory=str)
+    comment_english = attr.ib(type=str, factory=str)
+    relative_credits = attr.ib(type=Optional[int], default=None)
+    path_where_to_detach = attr.ib(type=Optional['Path'], default=None)
 
 
 class CheckPasteNodeCommand(interface.CommandRequest):
@@ -172,6 +159,13 @@ class GetAllowedChildTypeCommand(interface.CommandRequest):
     def __repr__(self) -> str:
         parameters = ", ".join([str(self.category), str(self.path_to_paste)])
         return "GetAllowedChildTypeCommand({parameters})".format(parameters=parameters)
+
+
+@attr.s(frozen=True, slots=True)
+class GetDefaultLinkType(interface.CommandRequest):
+    path_to_paste = attr.ib(type=str)
+    child_code = attr.ib(type=str)
+    child_year = attr.ib(type=int)
 
 
 class CreateGroupAndAttachCommand(interface.CommandRequest):
@@ -322,6 +316,7 @@ class PostponeProgramTreeVersionCommand(interface.CommandRequest):
 class CopyTreeVersionToNextYearCommand(interface.CommandRequest):
     from_year = attr.ib(type=int)
     from_offer_acronym = attr.ib(type=str)
+    from_offer_code = attr.ib(type=str)
     from_version_name = attr.ib(type=str)
     from_is_transition = attr.ib(type=bool)
 

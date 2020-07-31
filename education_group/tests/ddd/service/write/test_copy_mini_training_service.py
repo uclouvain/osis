@@ -42,7 +42,7 @@ class TestCopyMiniTrainingToNextYear(TestCase):
         mock_repository.return_value.create.return_value = next_year_mini_training.entity_id
         mock_builder.return_value.copy_to_next_year.return_value = next_year_mini_training
 
-        cmd = command.CopyMiniTrainingToNextYearCommand(code="CODE", postpone_from_year=2018)
+        cmd = command.CopyMiniTrainingToNextYearCommand(acronym="ACRO", postpone_from_year=2018)
         result = copy_mini_training_service.copy_mini_training_to_next_year(cmd)
 
         self.assertEqual(next_year_mini_training.entity_id, result)

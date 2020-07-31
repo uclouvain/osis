@@ -1531,7 +1531,7 @@ base.validationrule,MiniTrainingForm.FSA_SPECIALITY.title_fr,REQUIRED,Majeure en
 base.validationrule,MiniTrainingForm.OPTION.title_fr,REQUIRED,,,,,,
 base.validationrule,MiniTrainingForm.MOBILITY_PARTNERSHIP.title_fr,REQUIRED,,,,,,
 base.validationrule,MiniTrainingForm.DEEPENING.credits,REQUIRED,30,,,,,
-base.validationrule,MiniTrainingForm.SOCIETY_MINOR.credits.osis,REQUIRED,30,,,,,
+base.validationrule,MiniTrainingForm.SOCIETY_MINOR.credits,REQUIRED,30,,,,,
 base.validationrule,MiniTrainingForm.ACCESS_MINOR.credits,REQUIRED,30,,,,,
 base.validationrule,MiniTrainingForm.OPEN_MINOR.credits,REQUIRED,30,,,,,
 base.validationrule,MiniTrainingForm.DISCIPLINARY_COMPLEMENT_MINOR.credits,REQUIRED,30,,,,,

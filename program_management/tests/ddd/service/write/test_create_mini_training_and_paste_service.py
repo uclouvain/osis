@@ -61,7 +61,7 @@ class TestCreateMiniTrainingAndAttach(TestCase):
             self,
             mock_create_service,
             mock_paste_element):
-        mini_training_identity = mini_training.MiniTrainingIdentity(code="CODE", year=2020)
+        mini_training_identity = mini_training.MiniTrainingIdentity(acronym="ACRO", year=2020)
         mock_create_service.return_value = [mini_training_identity]
         resulting_identity = create_and_attach_mini_training_service.create_mini_training_and_paste(self.command)
 

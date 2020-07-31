@@ -219,10 +219,10 @@ def __build_children(
 
 def __instanciate_from_education_group_version(educ_group_version: EducationGroupVersion) -> 'ProgramTreeVersion':
     identity = ProgramTreeVersionIdentity(
-        educ_group_version.offer.acronym,
-        educ_group_version.offer.academic_year.year,
-        educ_group_version.version_name,
-        educ_group_version.is_transition
+        offer_acronym=educ_group_version.offer.acronym,
+        year=educ_group_version.offer.academic_year.year,
+        version_name=educ_group_version.version_name,
+        is_transition=educ_group_version.is_transition,
     )
     tree_identity = ProgramTreeIdentity(
         educ_group_version.root_group.partial_acronym,

@@ -41,7 +41,7 @@ def postpone_mini_training(postpone_cmd: command.PostponeMiniTrainingCommand) ->
     # GIVEN
     from_year = postpone_cmd.postpone_from_year
     copy_from_mini_training = MiniTrainingRepository().get(
-        entity_id=MiniTrainingIdentity(code=postpone_cmd.code, year=from_year)
+        entity_id=MiniTrainingIdentity(acronym=postpone_cmd.acronym, year=from_year)
     )
     end_postponement_year = CalculateEndPostponement.calculate_year_of_end_postponement_for_mini(
         copy_from_mini_training
@@ -52,7 +52,7 @@ def postpone_mini_training(postpone_cmd: command.PostponeMiniTrainingCommand) ->
 
         identity_next_year = copy_mini_training_service.copy_mini_training_to_next_year(
             copy_cmd=command.CopyMiniTrainingToNextYearCommand(
-                code=postpone_cmd.code,
+                acronym=postpone_cmd.acronym,
                 postpone_from_year=from_year
             )
         )

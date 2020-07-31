@@ -21,28 +21,26 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from typing import List
+from typing import Optional
 
-from django.db import transaction
-
-from education_group.ddd import command
-from education_group.ddd.domain import mini_training
-from education_group.ddd.domain.mini_training import MiniTrainingBuilder
-from education_group.ddd.repository.mini_training import MiniTrainingRepository
-from education_group.ddd.service.write import postpone_mini_training_service
+from base.models.enums.link_type import LinkTypes
+from program_management.ddd import command
+from program_management.ddd.domain import node
+from program_management.ddd.service.read import node_identity_service
+from program_management.ddd.repositories import node as node_repository
 
 
-@transaction.atomic()
-def create_and_postpone_orphan_mini_training(
-        cmd: command.CreateMiniTrainingCommand) -> List['mini_training.MiniTrainingIdentity']:
-    mini_training_object = MiniTrainingBuilder().build_from_create_cmd(cmd)
+def get_default_link_type(get_command: command.GetDefaultLinkType) -> Optional[LinkTypes]:
+    parent_id = get_command.path_to_paste.split("|")[-1]
+    get_node_identity_command = command.GetNodeIdentityFromElementId(element_id=parent_id)
+    parent_node_identity = node_identity_service.get_node_identity_from_element_id(get_node_identity_command)
+    if not parent_node_identity:
+        return None
+    child_node_identity = node.NodeIdentity(code=get_command.child_code, year=get_command.child_year)
 
-    mini_training_identity = MiniTrainingRepository.create(mini_training_object)
-    mini_training_identities = postpone_mini_training_service.postpone_mini_training(
-        command.PostponeMiniTrainingCommand(
-            acronym=cmd.abbreviated_title,
-            postpone_from_year=cmd.year
-        )
-    )
+    parent_node = node_repository.NodeRepository.get(parent_node_identity)
+    child_node = node_repository.NodeRepository.get(child_node_identity)
 
-    return [mini_training_identity] + mini_training_identities
+    if parent_node.is_minor_major_list_choice() and child_node.is_minor_or_deepening():
+        return LinkTypes.REFERENCE
+    return None

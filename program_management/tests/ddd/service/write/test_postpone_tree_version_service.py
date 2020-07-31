@@ -43,19 +43,19 @@ class TestPostponeProgramTree(TestCase):
                 offer_acronym="offer",
                 version_name="",
                 is_transition=False,
-                year=2018
+                year=2018,
             ),
             program_tree_version.ProgramTreeVersionIdentity(
                 offer_acronym="offer",
                 version_name="",
                 is_transition=False,
-                year=2019
+                year=2019,
             ),
             program_tree_version.ProgramTreeVersionIdentity(
                 offer_acronym="offer",
                 version_name="",
                 is_transition=False,
-                year=2020
+                year=2020,
             )
         ]
         mock_copy_program_to_next_year.side_effect = program_tree_version_identities

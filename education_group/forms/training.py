@@ -34,17 +34,16 @@ from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db.models import Q
-from django.utils.functional import lazy, cached_property
+from django.utils.functional import lazy
 from django.utils.translation import gettext_lazy as _
 
 from base.business.event_perms import EventPermEducationGroupEdition
 from base.forms.common import ValidationRuleMixin
 from base.forms.education_group.common import MainCampusChoiceField
-from base.models.campus import Campus
-from education_group.forms.fields import MainEntitiesVersionChoiceField
 from base.forms.education_group.training import _get_section_choices
 from base.forms.utils.choice_field import BLANK_CHOICE
 from base.models.academic_year import AcademicYear
+from base.models.campus import Campus
 from base.models.certificate_aim import CertificateAim
 from base.models.enums.academic_type import AcademicTypes
 from base.models.enums.active_status import ActiveStatusEnum
@@ -58,7 +57,7 @@ from base.models.enums.internship_presence import InternshipPresence
 from base.models.enums.rate_code import RateCode
 from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.forms import fields
-from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
+from education_group.forms.fields import MainEntitiesVersionChoiceField
 from reference.models.domain import Domain
 from reference.models.domain_isced import DomainIsced
 from reference.models.enums import domain_type
@@ -84,12 +83,7 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         choices=BLANK_CHOICE + list(ScheduleTypeEnum.choices()),
         label=_("Schedule type"),
     )
-    credits = forms.IntegerField(
-        min_value=0,
-        max_value=999,
-        label=_("Credits"),
-        widget=forms.TextInput,
-    )
+    credits = fields.CreditField()
     constraint_type = forms.ChoiceField(
         choices=BLANK_CHOICE + list(ConstraintTypeEnum.choices()),
         label=_("Type of constraint"),

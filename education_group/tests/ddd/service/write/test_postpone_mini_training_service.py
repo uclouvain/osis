@@ -43,13 +43,13 @@ class TestPostponeMiniTraining(TestCase):
             mock_calculate_end_year_of_postponement,
             mock_repostirory):
         mini_training_identities = [
-            mini_training.MiniTrainingIdentity(code="CODE", year=2018),
-            mini_training.MiniTrainingIdentity(code="CODE", year=2019),
-            mini_training.MiniTrainingIdentity(code="CODE", year=2020)
+            mini_training.MiniTrainingIdentity(acronym="Acron", year=2018),
+            mini_training.MiniTrainingIdentity(acronym="Acron", year=2019),
+            mini_training.MiniTrainingIdentity(acronym="Acron", year=2020)
         ]
         mock_copy_mini_training_to_next_year_service.side_effect = mini_training_identities
         mock_repostirory.return_value.get.return_value = TrainingFactory()
 
-        cmd = command.PostponeMiniTrainingCommand(code="CODE", postpone_from_year=2018)
+        cmd = command.PostponeMiniTrainingCommand(acronym="Acron", postpone_from_year=2018)
         result = postpone_mini_training_service.postpone_mini_training(cmd)
         self.assertListEqual(mini_training_identities, result)

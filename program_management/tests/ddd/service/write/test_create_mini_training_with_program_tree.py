@@ -53,9 +53,9 @@ class TestCreateAndReportMiniTrainingWithProgramTree(TestCase):
             mock_postpone_program_tree_version):
 
         mini_training_identities = [
-            mini_training.MiniTrainingIdentity(code="CODE", year=2020),
-            mini_training.MiniTrainingIdentity(code="CODE", year=2021),
-            mini_training.MiniTrainingIdentity(code="CODE", year=2022)
+            mini_training.MiniTrainingIdentity(acronym="ACRO", year=2020),
+            mini_training.MiniTrainingIdentity(acronym="ACRO", year=2021),
+            mini_training.MiniTrainingIdentity(acronym="ACRO", year=2022)
         ]
 
         mock_create_and_postpone_orphan_mini_training.return_value = mini_training_identities
@@ -66,7 +66,7 @@ class TestCreateAndReportMiniTrainingWithProgramTree(TestCase):
             offer_acronym="Offer",
             year=2020,
             version_name="",
-            is_transition=False
+            is_transition=False,
         )
         mock_postpone_program_tree_version.return_value = None
 
