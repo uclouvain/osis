@@ -384,8 +384,8 @@ class TestContent(TestCase):
                                  self.teacher_2.email))
 
     def test_build_description_fiche_cols(self):
-        teaching_material_1 = DddTeachingMaterialFactory(title='Title mandatory', mandatory=True)
-        teaching_material_2 = DddTeachingMaterialFactory(title='Title non-mandatory', mandatory=False)
+        teaching_material_1 = DddTeachingMaterialFactory(title='Title mandatory', is_mandatory=True)
+        teaching_material_2 = DddTeachingMaterialFactory(title='Title non-mandatory', is_mandatory=False)
 
         ue_description_fiche = _initialize_cms_data_description_fiche()
 
