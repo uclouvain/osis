@@ -53,16 +53,15 @@ JUSTIFICATION_ALIASES = {
 FIRST_COL_LEGEND_ENROLLMENT_STATUS = 7
 FIRST_ROW_LEGEND_ENROLLMENT_STATUS = 7
 
-FIRST_COL_PEPS = 'K'
+FIRST_COL_PEPS = 'L'
 FIRST_ROW_PEPS = 12
+LAST_COLUMN_NUMBER = 18
 
-STYLE_BORDER_RIGHT = Style(
-    border=Border(
-        right=Side(border_style=BORDER_MEDIUM,
-                    color=Color('FF000000')
-                    ),
+BORDER_LEFT = Border(
+        left=Side(border_style=BORDER_MEDIUM,
+                  color=Color('FF000000'),
+                  ),
     )
-)
 
 
 def export_xls(exam_enrollments):
@@ -190,7 +189,7 @@ def __coloring_non_editable(ws, row_number, score, justification):
     """
     pattern_fill_grey = PatternFill(patternType='solid', fgColor=Color('C1C1C1'))
     column_number = 1
-    while column_number < 18:
+    while column_number < LAST_COLUMN_NUMBER:
         if column_number < 9 or column_number > 10:
             ws.cell(row=row_number, column=column_number).fill = pattern_fill_grey
         else:
@@ -276,7 +275,7 @@ def _coloring_enrollment_state(ws, row_number, exam_enroll):
         pattern_fill_enrollment_state = PatternFill(patternType='solid',
                                                     fgColor=enrollment_state_color.lstrip("#"))
         column_number = 1
-        while column_number < 12:
+        while column_number < LAST_COLUMN_NUMBER:
             ws.cell(row=row_number, column=column_number).fill = pattern_fill_enrollment_state
             column_number += 1
 
@@ -302,7 +301,7 @@ def _set_peps_border(ws, last_row_number):
     cpt = FIRST_ROW_PEPS
     while cpt <= last_row_number:
         cell = ws["{}{}".format(FIRST_COL_PEPS, cpt)]
-        cell.style = STYLE_BORDER_RIGHT
+        _update_border_for_first_peps_column(cell)
         cpt += 1
 
 
@@ -319,3 +318,10 @@ def _get_type_peps(student_specific_profile: StudentSpecificProfile) -> str:
         )
 
     return str(_(student_specific_profile.get_type_display())) or "-"
+
+
+def _update_border_for_first_peps_column(cell):
+    if cell.has_style:
+        c = cell.style
+        c.border = BORDER_LEFT
+        cell.style = c

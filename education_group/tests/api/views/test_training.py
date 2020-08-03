@@ -39,6 +39,7 @@ from base.tests.factories.person import PersonFactory
 from base.tests.factories.user import UserFactory
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
 from education_group.api.serializers.training import TrainingListSerializer, TrainingDetailSerializer
+from reference.tests.factories.domain import DomainFactory
 
 
 class TrainingTitleTestCase(APITestCase):
@@ -274,8 +275,13 @@ class GetTrainingTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(year=2018)
-        cls.training = TrainingFactory(acronym='BIR1BA', partial_acronym='LBIR1000I', academic_year=cls.academic_year)
-
+        domain = DomainFactory()
+        cls.training = TrainingFactory(
+            acronym='BIR1BA',
+            partial_acronym='LBIR1000I',
+            academic_year=cls.academic_year,
+            main_domain=domain
+        )
         cls.user = UserFactory()
         cls.url = reverse('education_group_api_v1:training_read', kwargs={
             'acronym': cls.training.acronym,
