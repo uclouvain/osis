@@ -349,3 +349,15 @@ def generate_group_identity_from_group_year(
         code=group_year_obj.partial_acronym,
         year=group_year_obj.academic_year.year
     )
+
+
+class TestGroupRepositoryDeleteMethod(TestCase):
+    def setUp(self) -> None:
+        self.group_year_db = GroupYearFactory()
+
+    def test_assert_delete_in_database(self):
+        group_id = GroupIdentity(code=self.group_year_db.partial_acronym, year=self.group_year_db.academic_year.year)
+        GroupRepository.delete(group_id)
+
+        with self.assertRaises(GroupYearModelDb.DoesNotExist):
+            GroupYearModelDb.objects.get(partial_acronym=group_id.code, academic_year__year=group_id.year)

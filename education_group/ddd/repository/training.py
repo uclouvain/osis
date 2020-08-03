@@ -38,7 +38,7 @@ from base.models.education_group_certificate_aim \
     import EducationGroupCertificateAim as EducationGroupCertificateAimModelDb
 from base.models.education_group_organization import EducationGroupOrganization as EducationGroupOrganizationModelDb
 from base.models.education_group_type import EducationGroupType as EducationGroupTypeModelDb
-from base.models.education_group_year import EducationGroupYear as EducationGroupYearModelDb
+from base.models.education_group_year import EducationGroupYear as EducationGroupYearModelDb, EducationGroupYear
 from base.models.education_group_year_domain import EducationGroupYearDomain as EducationGroupYearDomainModelDb
 from base.models.entity import Entity
 from base.models.entity_version import EntityVersion
@@ -72,6 +72,7 @@ from education_group.ddd.domain._language import Language
 from education_group.ddd.domain._study_domain import StudyDomain, StudyDomainIdentity
 from education_group.ddd.domain._titles import Titles
 from education_group.ddd.domain.training import TrainingIdentityThroughYears
+from education_group.ddd.domain.exception import TrainingNotFoundException
 from osis_common.ddd import interface
 from reference.models.domain import Domain as DomainModelDb
 from reference.models.domain_isced import DomainIsced as DomainIscedModelDb
@@ -115,19 +116,23 @@ class TrainingRepository(interface.AbstractRepository):
 
     @classmethod
     def delete(cls, entity_id: 'TrainingIdentity', **_) -> None:
-        qs = _get_queryset_to_fetch_data_for_training([entity_id])
-        try:
-            education_group_year_db = qs.get()
-            #  FIXME remove that part as it already done in program tree repository
-            group_element_years = GroupElementYear.objects.filter(
-                Q(parent=education_group_year_db) | Q(child_branch=education_group_year_db)
-            )
-            for group_element in group_element_years:
-                group_element.delete()
-        except EducationGroupYearModelDb.DoesNotExist:
-            raise exception.TrainingNotFoundException
-
-        education_group_year_db.delete()
+        # qs = _get_queryset_to_fetch_data_for_training([entity_id])
+        # try:
+        #     education_group_year_db = qs.get()
+        #     #  FIXME remove that part as it already done in program tree repository
+        #     group_element_years = GroupElementYear.objects.filter(
+        #         Q(parent=education_group_year_db) | Q(child_branch=education_group_year_db)
+        #     )
+        #     for group_element in group_element_years:
+        #         group_element.delete()
+        # except EducationGroupYearModelDb.DoesNotExist:
+        #     raise exception.TrainingNotFoundException
+        #
+        # education_group_year_db.delete()
+        EducationGroupYear.objects.filter(
+            acronym=entity_id.acronym,
+            academic_year__year=entity_id.year
+        ).delete()
 
 
 def _convert_education_group_year_to_training(

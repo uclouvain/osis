@@ -25,11 +25,13 @@
 ##############################################################################
 from typing import Optional, List
 
+from django.db import transaction
 from django.db.models import F
 
 from base.models.education_group_year import EducationGroupYear
 from education_group.models.group_year import GroupYear
 from osis_common.ddd import interface
+from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
@@ -135,17 +137,35 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
         return results
 
     @classmethod
-    def delete(cls, entity_id: 'ProgramTreeVersionIdentity', **_) -> None:
-        try:
-            education_group_version_db_obj = EducationGroupVersion.objects.get(
-                version_name=entity_id.version_name,
-                offer__acronym=entity_id.offer_acronym,
-                offer__academic_year__year=entity_id.year,
-                is_transition=entity_id.is_transition,
-            )
-            education_group_version_db_obj.delete()
-        except EducationGroupVersion.DoesNotExist:
-            raise exception.ProgramTreeVersionNotFoundException
+    # def delete(cls, entity_id: 'ProgramTreeVersionIdentity', **_) -> None:
+    #     try:
+    #         education_group_version_db_obj = EducationGroupVersion.objects.get(
+    #             version_name=entity_id.version_name,
+    #             offer__acronym=entity_id.offer_acronym,
+    #             offer__academic_year__year=entity_id.year,
+    #             is_transition=entity_id.is_transition,
+    #         )
+    #         education_group_version_db_obj.delete()
+    #     except EducationGroupVersion.DoesNotExist:
+    #         raise exception.ProgramTreeVersionNotFoundException
+    #
+    def delete(
+           cls,
+           entity_id: 'ProgramTreeVersionIdentity',
+           delete_program_tree_service: interface.ApplicationService = None
+    ) -> None:
+        program_tree_version = cls.get(entity_id)
+
+        EducationGroupVersion.objects.filter(
+            version_name=entity_id.version_name,
+            offer__acronym=entity_id.offer_acronym,
+            offer__academic_year__year=entity_id.year,
+            is_transition=entity_id.is_transition,
+        ).delete()
+
+        root_node = program_tree_version.tree.root_node
+        cmd = command.DeleteProgramTreeCommand(code=root_node.code, year=root_node.year)
+        delete_program_tree_service(cmd)
 
     @classmethod
     def search_all_versions_from_root_node(cls, root_node_identity: 'NodeIdentity') -> List['ProgramTreeVersion']:

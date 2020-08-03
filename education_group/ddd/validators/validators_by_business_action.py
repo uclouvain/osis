@@ -28,13 +28,16 @@ from education_group.ddd.validators._acronym_required import AcronymRequiredVali
 from education_group.ddd.validators._certificate_aim_type_2 import CertificateAimType2Validator
 from education_group.ddd.validators._copy_check_end_date import CheckEndDateValidator
 from education_group.ddd.validators._credits import CreditsValidator
-from education_group.ddd.business_types import *
 
 from base.ddd.utils import business_validator
 from education_group.ddd.validators._content_constraint import ContentConstraintValidator
 from education_group.ddd.validators._has_inscriptions import HasInscriptionsValidator
 from education_group.ddd.validators._is_linked_to_epc import IsLinkedToEpcValidator
 from education_group.ddd.validators._start_year_end_year import StartYearEndYearValidator
+from education_group.ddd.validators._enrollments import TrainingEnrollmentsValidator, MiniTrainingEnrollmentsValidator
+from education_group.ddd.validators._link_with_epc import TrainingLinkWithEPCValidator, MiniTrainingLinkWithEPCValidator
+
+from education_group.ddd.business_types import *
 
 
 class CreateGroupValidatorList(business_validator.BusinessListValidator):
@@ -93,5 +96,41 @@ class DeleteTrainingValidatorList(business_validator.BusinessListValidator):
         self.validators = [
             IsLinkedToEpcValidator(training),
             HasInscriptionsValidator(training)
+        ]
+        super().__init__()
+
+
+class DeleteOrphanGroupValidatorList(business_validator.BusinessListValidator):
+
+    def __init__(
+            self,
+            group: 'Group',
+    ):
+        self.validators = []
+        super().__init__()
+
+
+class DeleteOrphanTrainingValidatorList(business_validator.BusinessListValidator):
+
+    def __init__(
+            self,
+            training: 'Training',
+    ):
+        self.validators = [
+            TrainingEnrollmentsValidator(training.entity_id),
+            TrainingLinkWithEPCValidator(training.entity_id)
+        ]
+        super().__init__()
+
+
+class DeleteOrphanMiniTrainingValidatorList(business_validator.BusinessListValidator):
+
+    def __init__(
+            self,
+            mini_training: 'MiniTraining',
+    ):
+        self.validators = [
+            MiniTrainingEnrollmentsValidator(mini_training.entity_id),
+            MiniTrainingLinkWithEPCValidator(mini_training.entity_id)
         ]
         super().__init__()

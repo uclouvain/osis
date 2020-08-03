@@ -29,6 +29,7 @@ from base.models.group_element_year import GroupElementYear
 from education_group.ddd.command import CreateOrphanGroupCommand
 from osis_common.ddd import interface
 from osis_common.ddd.interface import Entity
+from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception
 from program_management.ddd.repositories import persist_tree, load_tree, node
@@ -48,22 +49,37 @@ class ProgramTreeRepository(interface.AbstractRepository):
         return load_tree.load_trees_from_children(node_db_ids, **kwargs)
 
     @classmethod
-    def delete(cls, entity_id: 'ProgramTreeIdentity') -> None:
-        try:
-            group_elements = GroupElementYear.objects.filter(
-                parent_element__group_year__partial_acronym=entity_id.code,
-                parent_element__group_year__academic_year__year=entity_id.year
-            )
-            for group_element in group_elements:
-                group_element.delete()
+    # def delete(cls, entity_id: 'ProgramTreeIdentity') -> None:
+    #     try:
+    #         group_elements = GroupElementYear.objects.filter(
+    #             parent_element__group_year__partial_acronym=entity_id.code,
+    #             parent_element__group_year__academic_year__year=entity_id.year
+    #         )
+    #         for group_element in group_elements:
+    #             group_element.delete()
+    #
+    #         tree_root = Element.objects.get(
+    #             group_year__partial_acronym=entity_id.code,
+    #             group_year__academic_year__year=entity_id.year
+    #         )
+    #         tree_root.delete()
+    #     except Element.DoesNotExist:
+    #         raise exception.ProgramTreeNotFoundException()
+    #
+    def delete(
+            cls,
+            entity_id: 'ProgramTreeIdentity',
+            delete_node_service: interface.ApplicationService = None,
+    ) -> None:
+        program_tree = cls.get(entity_id)
+        links = program_tree.get_all_links()
+        nodes = program_tree.get_all_nodes()
 
-            tree_root = Element.objects.get(
-                group_year__partial_acronym=entity_id.code,
-                group_year__academic_year__year=entity_id.year
-            )
-            tree_root.delete()
-        except Element.DoesNotExist:
-            raise exception.ProgramTreeNotFoundException()
+        GroupElementYear.objects.filter(pk__in=(link.pk for link in links)).delete()
+
+        for node in nodes:
+            cmd = command.DeleteNodeCommand(code=node.code, year=node.year, node_type=node.node_type.name)
+            delete_node_service(cmd)
 
     @classmethod
     def create(

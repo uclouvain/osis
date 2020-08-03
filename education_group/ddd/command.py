@@ -276,3 +276,33 @@ class DeleteTrainingCommand(interface.CommandRequest):
 class DeleteGroupCommand(interface.CommandRequest):
     code = attr.ib(type=str)
     from_year = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class DeleteOrphanGroupCommand(interface.CommandRequest):
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class DeleteOrphanTrainingCommand(interface.CommandRequest):
+    acronym = attr.ib(type=str)
+    year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class DeleteOrphanMiniTrainingCommand(interface.CommandRequest):
+    acronym = attr.ib(type=str)
+    year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class GetTrainingCommand(interface.CommandRequest):
+    acronym = attr.ib(type=str)
+    year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class GetMiniTrainingCommand(interface.CommandRequest):
+    acronym = attr.ib(type=str)
+    year = attr.ib(type=int)
