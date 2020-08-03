@@ -84,12 +84,13 @@ class LearningUnitPrerequisitesList(LanguageContextSerializerMixin, generics.Lis
     paginator = None
 
     def get_queryset(self):
+        print("COUOU")
         learning_unit_year = get_object_or_404(
             LearningUnitYear.objects.all(),
             acronym=self.kwargs['acronym'].upper(),
             academic_year__year=self.kwargs['year']
         )
-
+        print(learning_unit_year)
         return Prerequisite.objects.filter(learning_unit_year=learning_unit_year).select_related(
             'learning_unit_year__academic_year',
             'education_group_version__offer__academic_year',
