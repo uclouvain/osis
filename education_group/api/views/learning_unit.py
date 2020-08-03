@@ -63,23 +63,29 @@ class EducationGroupRootsList(LanguageContextSerializerMixin, generics.ListAPIVi
             acronym=self.kwargs['acronym'].upper(),
             academic_year__year=self.kwargs['year']
         )
-        education_group_root_ids = group_element_year.find_learning_unit_roots(
-            [self.learning_unit_year],
+        parent_egys = EducationGroupYear.objects.filter(groupelementyear__child_leaf=self.learning_unit_year)
+
+        self.education_group_root_ids = group_element_year.find_learning_unit_roots(
+            parent_egys,
             luy=self.learning_unit_year,
             recursive_conditions={
                 'stop': [GroupType.COMPLEMENTARY_MODULE.name],
                 'continue': TrainingType.finality_types()
-            }
-        ).get(self.learning_unit_year.id, [])
+            },
+        )
+        offer_ids = [
+            offer for parent_id, offer_list in self.education_group_root_ids.items() for offer in offer_list
+        ]
 
         return EducationGroupYear.objects.filter(
-            pk__in=education_group_root_ids
+            pk__in=offer_ids
         ).select_related('education_group_type', 'academic_year')
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
         context.update({
-            'learning_unit_year': self.learning_unit_year
+            'learning_unit_year': self.learning_unit_year,
+            'education_group_root_ids': self.education_group_root_ids
         })
         return context
 

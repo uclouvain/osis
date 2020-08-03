@@ -61,7 +61,8 @@ class EducationGroupRootsListSerializerTestCase(TestCase):
         cls.serializer = EducationGroupRootsListSerializer(cls.training, context={
             'request': RequestFactory().get(url),
             'language': settings.LANGUAGE_CODE_EN,
-            'learning_unit_year': cls.luy
+            'learning_unit_year': cls.luy,
+            'education_group_root_ids': {group.id: [cls.training.id]}
         })
 
     def test_contains_expected_fields(self):
