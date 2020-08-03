@@ -163,8 +163,8 @@ class Node(interface.Entity):
     def is_minor_major_list_choice(self) -> bool:
         return self.node_type in GroupType.minor_major_list_choice_enums()
 
-    def is_minor_major_list_choice(self) -> bool:
-        return self.node_type in GroupType.minor_major_list_choice_enums()
+    def is_minor_or_deepening(self) -> bool:
+        return self.node_type in MiniTrainingType.minors_and_deepening()
 
     def get_direct_child_as_node(self, node_id: 'NodeIdentity') -> 'Node':
         return next(node for node in self.get_direct_children_as_nodes() if node.entity_id == node_id)

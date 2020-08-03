@@ -601,6 +601,10 @@ table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:after, 
     align-items: center;
 }
 
+.glyphicon.medium {
+    font-size: 1.1em;
+}
+
 .form-tab.has-error > a::after{
     content: '';
     display: inline-block;

@@ -33,6 +33,7 @@ from django.utils.translation import gettext_lazy as _
 from base.business.event_perms import EventPermEducationGroupEdition
 from base.forms.common import ValidationRuleMixin
 from base.forms.utils.choice_field import BLANK_CHOICE
+from base.models import campus
 from base.models.academic_year import AcademicYear
 from base.models.enums.constraint_type import ConstraintTypeEnum
 from education_group.forms import fields
@@ -67,7 +68,12 @@ class GroupForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         widget=forms.TextInput
     )
     management_entity = forms.CharField(required=False)  # TODO: Replace with select2 widget
-    teaching_campus = fields.MainCampusChoiceField(queryset=None, label=_("Learning location"), required=False)
+    teaching_campus = fields.MainCampusChoiceField(
+        queryset=None,
+        label=_("Learning location"),
+        required=False,
+        to_field_name='name',
+    )
     remark_fr = forms.CharField(widget=forms.Textarea, label=_("Remark"), required=False)
     remark_en = forms.CharField(widget=forms.Textarea, label=_("remark in english"), required=False)
 
@@ -79,6 +85,7 @@ class GroupForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
 
         self.__init_academic_year_field()
         self.__init_management_entity_field()
+        self.__init_teaching_campus()
 
     def __init_academic_year_field(self):
         if self.user.person.is_faculty_manager:
@@ -95,6 +102,9 @@ class GroupForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
             initial=self.initial['management_entity'].pk if self.initial.get('management_entity') else None,
             disabled=self.fields['management_entity'].disabled,
         )
+
+    def __init_teaching_campus(self):
+        self.fields["teaching_campus"].initial = campus.LOUVAIN_LA_NEUVE_CAMPUS_NAME
 
     # ValidationRuleMixin
     def field_reference(self, field_name: str) -> str:
