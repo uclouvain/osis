@@ -63,10 +63,8 @@ class EducationGroupRootsList(LanguageContextSerializerMixin, generics.ListAPIVi
             acronym=self.kwargs['acronym'].upper(),
             academic_year__year=self.kwargs['year']
         )
-        group_elements_years = self.learning_unit_year.child_leaf.select_related(
-            "parent", "child_leaf", "parent__education_group_type"
-        ).order_by('parent__partial_acronym')
-        parent_egys = [gey.parent for gey in group_elements_years]
+        parent_egys = EducationGroupYear.objects.filter(groupelementyear__child_leaf=self.learning_unit_year)
+
         self.education_group_root_ids = group_element_year.find_learning_unit_roots(
             parent_egys,
             luy=self.learning_unit_year,
