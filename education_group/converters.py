@@ -2,7 +2,7 @@ from base.models.enums.education_group_types import GroupType, TrainingType
 
 
 class GroupTypeConverter:
-    regex = '\w+'
+    regex = r'\w+'
 
     def to_python(self, value):
         if value not in GroupType.get_names():
@@ -14,7 +14,7 @@ class GroupTypeConverter:
 
 
 class TrainingTypeConverter:
-    regex = '\w+'
+    regex = r'\w+'
 
     def to_python(self, value):
         if value not in TrainingType.get_names():
