@@ -129,7 +129,6 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
         path = self.get_attach_path()
         if path:
             node_identity = NodeIdentitySearch().get_from_element_id(int(path.split('|')[-1]))
-            path += '|' + str(ElementIdSearch().get_from_mini_training_identity(mini_training_identity))
             url = reverse_with_get(
                 'element_identification',
                 args=[node_identity.year, node_identity.code],
@@ -140,6 +139,7 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
                 'education_group_read_proxy',
                 kwargs={'acronym': mini_training_identity.acronym, 'year': mini_training_identity.year}
             ) + '?tab={}'.format(Tab.IDENTIFICATION)
+        return url
 
     def get_success_msg(
             self,
