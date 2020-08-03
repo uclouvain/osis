@@ -54,6 +54,21 @@
                 {% a_tag_has_perm update_group_url _('Modify') 'base.change_educationgroup' user %}
             </li>
         {% endif %}
+        {% if delete_group_url %}
+            <li>
+                {% a_tag_modal_has_perm delete_group_url _('Delete permanently') 'base.delete_all_group' user group_year %}
+            </li>
+        {% endif %}
+        {% if delete_training_url %}
+            <li>
+                {% a_tag_modal_has_perm delete_training_url _('Delete permanently') 'base.delete_all_training' user education_group_version.offer %}
+            </li>
+        {% endif %}
+        {% if delete_mini_training_url %}
+            <li>
+                {% a_tag_modal_has_perm delete_mini_training_url _('Delete permanently') 'base.delete_all_minitraining' user education_group_version.offer %}
+            </li>
+        {% endif %}
         <li class="divider"></li>
 	    <li>
             <a href="{{ xls_ue_prerequisites }}"

@@ -32,6 +32,8 @@ from education_group.ddd.validators._content_constraint import ContentConstraint
 from education_group.ddd.validators._copy_check_mini_training_end_date import CheckMiniTrainingEndDateValidator
 from education_group.ddd.validators._copy_check_training_end_date import CheckTrainingEndDateValidator
 from education_group.ddd.validators._credits import CreditsValidator
+from education_group.ddd.validators._enrollments import TrainingEnrollmentsValidator, MiniTrainingEnrollmentsValidator
+from education_group.ddd.validators._link_with_epc import TrainingLinkWithEPCValidator, MiniTrainingLinkWithEPCValidator
 from education_group.ddd.validators._start_year_end_year import StartYearEndYearValidator
 from education_group.ddd.validators.start_and_end_year_validator import StartAndEndYearValidator
 
@@ -107,5 +109,41 @@ class CopyMiniTrainingValidatorList(business_validator.BusinessListValidator):
     ):
         self.validators = [
             CheckMiniTrainingEndDateValidator(mini_training_from),
+        ]
+        super().__init__()
+
+
+class DeleteOrphanGroupValidatorList(business_validator.BusinessListValidator):
+
+    def __init__(
+            self,
+            group: 'Group',
+    ):
+        self.validators = []
+        super().__init__()
+
+
+class DeleteOrphanTrainingValidatorList(business_validator.BusinessListValidator):
+
+    def __init__(
+            self,
+            training: 'Training',
+    ):
+        self.validators = [
+            TrainingEnrollmentsValidator(training.entity_id),
+            TrainingLinkWithEPCValidator(training.entity_id)
+        ]
+        super().__init__()
+
+
+class DeleteOrphanMiniTrainingValidatorList(business_validator.BusinessListValidator):
+
+    def __init__(
+            self,
+            mini_training: 'MiniTraining',
+    ):
+        self.validators = [
+            MiniTrainingEnrollmentsValidator(mini_training.entity_id),
+            MiniTrainingLinkWithEPCValidator(mini_training.entity_id)
         ]
         super().__init__()

@@ -27,14 +27,11 @@ import re
 
 from django.core.exceptions import ValidationError
 from django.db import models, connection
-from django.db.models import Q
-from django.utils import translation
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from ordered_model.models import OrderedModel
 from reversion.admin import VersionAdmin
 
-from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import quadrimesters
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType
@@ -48,16 +45,21 @@ DEFAULT_ROOT_TYPES = TrainingType.get_names() + MiniTrainingType.get_names()
 
 
 class GroupElementYearAdmin(VersionAdmin, OsisModelAdmin):
-    list_display = ('parent', 'child_branch', 'child_leaf',)
+    list_display = ('parent_element', 'child_element',)
     readonly_fields = ('order',)
     search_fields = [
         'child_branch__acronym',
         'child_branch__partial_acronym',
         'child_leaf__acronym',
         'parent__acronym',
-        'parent__partial_acronym'
+        'parent__partial_acronym',
+        'child_element__group_year__acronym',
+        'child_element__group_year__partial_acronym',
+        'parent_element__group_year__acronym',
+        'parent_element__group_year__partial_acronym',
+        'child_element__learning_unit_year__acronym',
     ]
-    list_filter = ('is_mandatory', 'access_condition', 'parent__academic_year')
+    list_filter = ('is_mandatory', 'access_condition', 'parent_element__group_year__academic_year')
 
 
 #  FIXME Kept around as a migration reference this function.
@@ -302,7 +304,7 @@ class GroupElementYear(OrderedModel):
 
     parent = models.ForeignKey(
         EducationGroupYear,
-        null=True,  # TODO: can not be null, dirty data
+        null=True, blank=True,  # TODO: can not be null, dirty data
         on_delete=models.PROTECT,
     )
 
@@ -384,7 +386,7 @@ class GroupElementYear(OrderedModel):
     objects = GroupElementYearManager()
 
     class Meta:
-        unique_together = (('parent', 'child_branch'), ('parent', 'child_leaf'))
+        unique_together = (('parent', 'child_branch'), ('parent', 'child_leaf'), ('parent_element', 'child_element'),)
         ordering = ('order',)
         constraints = [
             models.CheckConstraint(

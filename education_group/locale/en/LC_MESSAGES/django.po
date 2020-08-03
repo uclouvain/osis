@@ -18,6 +18,18 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #, python-format
+msgid "%(count_enrollment)d student is enrolled in the mini-training."
+msgid_plural "%(count_enrollment)d students are enrolled in the mini-training."
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid "%(count_enrollment)d student is enrolled in the training."
+msgid_plural "%(count_enrollment)d students are enrolled in the training."
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
 msgid "%(max)s must be greater or equals than %(min)s"
 msgstr ""
 
@@ -91,10 +103,21 @@ msgstr ""
 msgid "Alert Message"
 msgstr ""
 
+#, python-format
+msgid "Are you sure you want to delete %(acronym)s - %(title)s ?"
+msgstr ""
+
+#, python-format
+msgid "Are you sure you want to delete %(code)s - %(title)s ?"
+msgstr ""
+
 msgid "Bachelors of the Dutch speaking Community of Belgium"
 msgstr ""
 
 msgid "Block"
+msgstr ""
+
+msgid "Cancel"
 msgstr ""
 
 msgid "Category"
@@ -340,6 +363,9 @@ msgstr ""
 msgid "Link type"
 msgstr ""
 
+msgid "Linked with EPC"
+msgstr ""
+
 msgid "Main"
 msgstr ""
 
@@ -513,11 +539,23 @@ msgid ""
 msgstr ""
 
 #, python-format
+msgid "The group %(code)s has been deleted."
+msgstr ""
+
+#, python-format
+msgid "The mini-training %(code)s has been deleted."
+msgstr ""
+
+#, python-format
 msgid "The program %(acronym)s will be published soon"
 msgstr ""
 
 msgid ""
 "The scope of the user is limited and prevents this action to be performed"
+msgstr ""
+
+#, python-format
+msgid "The training %(code)s has been deleted."
 msgstr ""
 
 #, python-format
@@ -602,6 +640,9 @@ msgid "Web re-registration"
 msgstr ""
 
 msgid "Weighting"
+msgstr ""
+
+msgid "Yes, I confirm."
 msgstr ""
 
 #, python-brace-format

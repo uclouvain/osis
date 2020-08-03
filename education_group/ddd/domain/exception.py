@@ -1,5 +1,5 @@
 from osis_common.ddd.interface import BusinessException
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, ngettext_lazy
 from education_group.ddd.business_types import *
 
 
@@ -123,4 +123,36 @@ class StartYearGreaterThanEndYear(BusinessException):
 class MaximumCertificateAimType2Reached(BusinessException):
     def __init__(self, *args, **kwargs):
         message = _("There can only be one type 2 expectation")
+        super().__init__(message, **kwargs)
+
+
+class TrainingHaveEnrollments(BusinessException):
+    def __init__(self, enrollment_count: int, **kwargs):
+        message = ngettext_lazy(
+            "%(count_enrollment)d student is enrolled in the training.",
+            "%(count_enrollment)d students are enrolled in the training.",
+            enrollment_count
+        ) % {"count_enrollment": enrollment_count}
+        super().__init__(message, **kwargs)
+
+
+class TrainingHaveLinkWithEPC(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _("Linked with EPC")
+        super().__init__(message, **kwargs)
+
+
+class MiniTrainingHaveEnrollments(BusinessException):
+    def __init__(self, enrollment_count: int, **kwargs):
+        message = ngettext_lazy(
+            "%(count_enrollment)d student is enrolled in the mini-training.",
+            "%(count_enrollment)d students are enrolled in the mini-training.",
+            enrollment_count
+        ) % {"count_enrollment": enrollment_count}
+        super().__init__(message, **kwargs)
+
+
+class MiniTrainingHaveLinkWithEPC(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _("Linked with EPC")
         super().__init__(message, **kwargs)
