@@ -59,6 +59,7 @@ class TrainingTreeViewTestCase(APITestCase):
         cls.academic_year = AcademicYearFactory(year=2018)
         cls.training = TrainingFactory(
             acronym='DROI2M',
+            partial_acronym='LBROI200M',
             academic_year=cls.academic_year,
             education_group_type__name=TrainingType.PGRM_MASTER_120.name
         )

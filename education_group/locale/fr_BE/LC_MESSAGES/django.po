@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-29 08:59+0200\n"
+"POT-Creation-Date: 2020-07-31 09:52+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -41,52 +41,48 @@ msgstr "Code étude ARES"
 msgid "ARES-GRACA"
 msgstr "ARES-GRACA"
 
-#, fuzzy
-#| msgid "Academic year"
 msgid "Academic responsible"
-msgstr "Année académique"
+msgstr "Responsable académique"
 
-#, fuzzy
-#| msgid "Academic year"
 msgid "Academic type"
-msgstr "Année académique"
+msgstr "Nature"
 
 msgid "Academic year"
 msgstr "Année académique"
 
 msgid "Access"
-msgstr ""
+msgstr "Accès"
 
 msgid "Access condition"
 msgstr "Condition d'accès"
 
 msgid "Acronym/Short title"
-msgstr ""
+msgstr "Sigle/Intitulé abrégé"
 
 msgctxt "abbreviation"
 msgid "Acronym/Short title"
-msgstr ""
+msgstr "Sigle/Int. abr."
 
 msgid "Acronym/Short title '{}' already exists"
-msgstr ""
+msgstr "Sigle/Intitulé abrégé '{}' existe déjà"
 
 msgid "Acronym/Short title is required"
-msgstr ""
+msgstr "Sigle/Intitulé abrégé est requis"
 
 msgid "Actions"
-msgstr ""
+msgstr "Actions"
 
 msgid "Activities on other campus"
-msgstr ""
+msgstr "Activités sur d'autres sites"
 
 msgid "Add the English content of this paragraph"
-msgstr ""
+msgstr "Ajouter le contenu Anglais de ce paragraphe"
 
 msgid "Add the French content of this paragraph"
-msgstr ""
+msgstr "Ajouter le contenu Français de ce paragraphe"
 
 msgid "Additional info"
-msgstr ""
+msgstr "Infos complémentaires"
 
 msgid "Administration entity"
 msgstr "Entité d'administration"
@@ -95,16 +91,16 @@ msgid "Administrative data"
 msgstr "Données administratives"
 
 msgid "Admission and Enrolment Procedures for general registration"
-msgstr ""
+msgstr "Procédures d'admission et d'inscription"
 
 msgid "Admission exam"
-msgstr ""
+msgstr "Concours"
 
 msgid "Adults taking up their university training"
-msgstr ""
+msgstr "Adultes en reprise d'études"
 
 msgid "Alert Message"
-msgstr ""
+msgstr "Message d'alerte"
 
 #, python-format
 msgid "Are you sure you want to delete %(acronym)s - %(title)s ?"
@@ -115,118 +111,120 @@ msgid "Are you sure you want to delete %(code)s - %(title)s ?"
 msgstr "Êtes-vous sûr·e de vouloir supprimer %(code)s - %(title)s ?"
 
 msgid "Bachelors of the Dutch speaking Community of Belgium"
-msgstr ""
+msgstr "Bachelier de la Communauté flamande de Belgique"
 
 msgid "Block"
-msgstr ""
+msgstr "Bloc"
 
 msgid "Cancel"
 msgstr "Annuler"
 
 msgid "Category"
-msgstr ""
+msgstr "Catégorie"
 
 msgid "Central admission manager"
-msgstr ""
+msgstr "Gestionnaire central d'admission"
 
 msgid "Central manager"
-msgstr ""
+msgstr "Gestionnaire central"
 
 msgid "Central managers"
-msgstr ""
+msgstr "Gestionnaire centraux"
 
 msgid "Certificate aim can only be edited by program manager"
 msgstr ""
+"Attendus du diplôme peuvent seulement être modifiés par un gestionnaire de "
+"programme"
 
 msgid "Clear clipboard"
-msgstr ""
+msgstr "Vider le presse-papier"
 
 msgid "Co-graduation total coefficient"
 msgstr "Coefficient total de co-diplômation"
 
 msgid "Code"
-msgstr ""
+msgstr "Code"
 
 msgid "Code already exists"
 msgstr "Le code existe déjà"
 
 msgid "Code co-graduation inter CfB"
-msgstr ""
+msgstr "Code co-diplômation intra CfB"
 
 msgid "Comment"
-msgstr ""
+msgstr "Commentaire"
 
 msgid "Conditions"
-msgstr ""
+msgstr "Conditions"
 
 msgid "Contacts"
-msgstr ""
+msgstr "Contacts"
 
 msgid "Content"
-msgstr ""
+msgstr "Contenu"
 
 msgid "Coorganization can only be changed by central manager"
 msgstr ""
 
 msgid "Copied element"
-msgstr ""
+msgstr "Élément copié"
 
 msgid "Course enrollment"
-msgstr ""
+msgstr "Inscription aux cours"
 
 msgid "Create"
-msgstr ""
+msgstr "Créer"
 
 msgid "Cred. rel./abs."
-msgstr ""
+msgstr "Créd. rel./abs."
 
 msgid "Credits"
-msgstr ""
+msgstr "Crédits"
 
 msgid "Credits must be greater or equals than 0"
 msgstr "Credits doit être plus grand ou égal à 0"
 
 msgid "Cut element"
-msgstr ""
+msgstr "Élément coupé"
 
 msgid "Datetime"
-msgstr ""
+msgstr "Date/heure"
 
 msgid "Decree category"
-msgstr ""
+msgstr "Catégorie décret"
 
 msgid "Default learning unit enrollment"
-msgstr ""
+msgstr "Inscription par défaut aux cours"
 
 msgid "Delete"
-msgstr ""
+msgstr "Supprimer"
 
 msgid "Deliberation"
-msgstr ""
+msgstr "Délibération"
 
 msgid "Detach"
-msgstr ""
+msgstr "Retirer"
 
 msgid "Diploma"
-msgstr ""
+msgstr "Diplôme"
 
 msgid "Diploma title"
-msgstr ""
+msgstr "Intitulé du diplôme/du certificat"
 
 msgid "Diplomas /  Certificates"
-msgstr ""
+msgstr "Diplômes /  Certificats"
 
 msgid "Dissertation"
-msgstr ""
+msgstr "Mémoire"
 
 msgid "Dissertation submission"
-msgstr ""
+msgstr "Remise du mémoire"
 
 msgid "Duration"
-msgstr ""
+msgstr "Durée"
 
 msgid "Edit"
-msgstr ""
+msgstr "Modifier"
 
 msgid "End academic year"
 msgstr "Année académique de fin"
@@ -235,59 +233,59 @@ msgid "End year must be greater than the start year, or equal"
 msgstr "L'année de fin doit être supérieure ou égale à l'année de début "
 
 msgid "English comment"
-msgstr ""
+msgstr "Commentaire en anglais"
 
 msgid "Enrollment campus"
-msgstr ""
+msgstr "Lieu d'inscription"
 
 msgid "Enrollment enabled"
-msgstr ""
+msgstr "Inscriptible"
 
 msgid "Enter text to search"
 msgstr "Entrez le texte à rechercher"
 
 msgid "Entity"
-msgstr ""
+msgstr "Entité"
 
 msgid "Error(s) in form: The modifications are not saved"
 msgstr ""
 "Erreur(s) dans le formulaire: Les modifications n'ont pas été enregistrées"
 
 msgid "Exams Enrollments"
-msgstr ""
+msgstr "Inscription aux examens"
 
 msgid "Faculty manager"
-msgstr ""
+msgstr "Gestionnaire facultaire"
 
 msgid "Faculty managers"
-msgstr ""
+msgstr "Gestionnaires facultaires"
 
 msgid "For all students"
-msgstr ""
+msgstr "Pour tous les étudiants"
 
 msgid "Foreign Bachelors"
-msgstr ""
+msgstr "Bacheliers étrangers"
 
 msgid "Formation catalogue"
-msgstr ""
+msgstr "Catalogue des formations"
 
 msgid "French language proficiency examination"
-msgstr ""
+msgstr "Maîtrise de la langue française"
 
 msgid "From"
-msgstr ""
+msgstr "De"
 
 msgid "Funding"
-msgstr ""
+msgstr "Finançable"
 
 msgid "Funding direction"
-msgstr ""
+msgstr "Orientation de financement"
 
 msgid "Funding international cooperation CCD/CUD"
-msgstr ""
+msgstr "Financement coopération internationale CCD/CUD"
 
 msgid "Funding international cooperation CCD/CUD direction"
-msgstr ""
+msgstr "Orientation coopération internationale CCD/CUD"
 
 msgid "General Conditions"
 msgstr ""
@@ -395,11 +393,22 @@ msgstr ""
 msgid "Mini-Training"
 msgstr ""
 
+#, python-format
+msgid ""
+"Mini-training <a href='%(link)s'> %(code)s (%(academic_year)s) </a> "
+"successfully created."
+msgstr ""
+"La mini-formation <a href='%(link)s'> %(code)s (%(academic_year)s) </a> a "
+"été créé avec succès"
+
 msgid "Modification"
 msgstr "Modification"
 
 msgid "New Education Group"
 msgstr ""
+
+msgid "New Mini-Training"
+msgstr "Nouvelle Mini-Formation"
 
 msgid "New Training"
 msgstr "Nouvelle Formation"
@@ -567,7 +576,7 @@ msgstr "La formation %(code)s a été supprimée."
 #, python-format
 msgctxt "female"
 msgid "The user does not have permission to create a %(category)s."
-msgstr "L'utilisateur n'a pas la permission de créer un %(category)s."
+msgstr "L'utilisateur n'a pas la permission de créer une %(category)s."
 
 #, python-format
 msgctxt "male"
@@ -641,11 +650,22 @@ msgstr ""
 msgid "Validity"
 msgstr ""
 
+msgid "Validity cannot be greater than last year of organization"
+msgstr ""
+"Validité ne peut pas être supérieure à la dernière année d'organisation"
+
 msgid "Web re-registration"
 msgstr ""
 
 msgid "Weighting"
 msgstr ""
+
+msgid ""
+"You can't copy the mini-training '{code}' from {from_year} to {to_year} "
+"because it ends in {end_year}"
+msgstr ""
+"Vous ne pouvez pas recopier la mini-formation '{code}' de {from_year} vers "
+"{to_year} car elle se termine en {end_year}"
 
 msgid "Yes, I confirm."
 msgstr "Oui, je confirme."
@@ -750,4 +770,4 @@ msgid "undefined"
 msgstr ""
 
 msgid "unspecified"
-msgstr ""
+msgstr "indéterminé"
