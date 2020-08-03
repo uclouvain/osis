@@ -77,7 +77,7 @@ class MiniTrainingFilter(filters.FilterSet):
 
     @staticmethod
     def filter_version_type(queryset, _, value):
-        queryset = EducationGroupVersion.objects.filter(
+        qs = EducationGroupVersion.objects.filter(
             offer__education_group_type__category=education_group_categories.MINI_TRAINING,
         ).select_related(
             'offer__education_group_type',
@@ -88,7 +88,7 @@ class MiniTrainingFilter(filters.FilterSet):
         ).exclude(
             offer__acronym__icontains='common',
         )
-        return utils.filter_version_type(queryset, value)
+        return utils.filter_version_type(qs, value)
 
 
 class MiniTrainingList(LanguageContextSerializerMixin, generics.ListAPIView):
@@ -126,7 +126,7 @@ class MiniTrainingDetail(LanguageContextSerializerMixin, generics.RetrieveAPIVie
     serializer_class = MiniTrainingDetailSerializer
 
     def get_object(self):
-        partial_acronym = self.kwargs['official_partial_acronym']
+        acronym = self.kwargs['acronym']
         year = self.kwargs['year']
         version_name = self.kwargs.get('version_name', '')
 
@@ -141,7 +141,7 @@ class MiniTrainingDetail(LanguageContextSerializerMixin, generics.RetrieveAPIVie
             ).prefetch_related(
                 'offer__management_entity__entityversion_set',
             ),
-            offer__partial_acronym__iexact=partial_acronym,
+            offer__acronym__iexact=acronym,
             offer__academic_year__year=year,
             version_name=version_name,
             is_transition=False
@@ -157,7 +157,7 @@ class MiniTrainingTitle(LanguageContextSerializerMixin, generics.RetrieveAPIView
     serializer_class = EducationGroupTitleSerializer
 
     def get_object(self):
-        acronym = self.kwargs['official_partial_acronym']
+        acronym = self.kwargs['acronym']
         year = self.kwargs['year']
         version_name = self.kwargs.get('version_name', '')
 
@@ -167,7 +167,7 @@ class MiniTrainingTitle(LanguageContextSerializerMixin, generics.RetrieveAPIView
                 'offer__academic_year',
                 'root_group'
             ),
-            offer__partial_acronym__iexact=acronym,
+            offer__acronym__iexact=acronym,
             root_group__academic_year__year=year,
             version_name=version_name
         )
@@ -182,14 +182,16 @@ class OfferRoots(LanguageContextSerializerMixin, generics.ListAPIView):
     serializer_class = TrainingListSerializer
 
     def get_queryset(self):
-        acronym = self.kwargs['official_partial_acronym']
+        acronym = self.kwargs['acronym']
         year = self.kwargs['year']
+
         element = get_object_or_404(
             Element.objects.all().select_related(
                 'group_year__academic_year',
             ),
-            group_year__partial_acronym__iexact=acronym,
-            group_year__academic_year__year=year
+            group_year__educationgroupversion__offer__acronym__iexact=acronym,
+            group_year__academic_year__year=year,
+            group_year__educationgroupversion__version_name=''
         )
         root_elements = program_management.ddd.repositories.find_roots.find_roots(
             [element],
