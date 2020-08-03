@@ -23,21 +23,53 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import functools
+import operator
+from typing import List, Iterable, Dict
 
-from typing import List
+from django.db.models import Prefetch, Q
 
-from base.models import teaching_material
+from base.models import teaching_material, learning_unit_year
+from learning_unit.ddd.business_types import *
+from learning_unit.ddd.domain import learning_unit_year_identity
 from learning_unit.ddd.domain.teaching_material import TeachingMaterial
 
 
-def load_teaching_materials(acronym: str, year: int) -> List['TeachingMaterial']:
+def bulk_load_teaching_materials(
+        learning_unit_identities: Iterable['LearningUnitYearIdentity']
+) -> Dict['LearningUnitYearIdentity', List['TeachingMaterial']]:
+    result = dict()
+    if not learning_unit_identities:
+        return result
 
-    qs = teaching_material.TeachingMaterial.objects.filter(learning_unit_year__acronym=acronym,
-                                                           learning_unit_year__academic_year__year=year)\
-        .values('title', 'mandatory')\
-        .order_by('order')
+    identity_clauses = [_build_identity_clause(identity) for identity in learning_unit_identities]
+    identity_filter_clause = functools.reduce(operator.or_, identity_clauses)
 
-    return [
-            TeachingMaterial(**data)
-            for data in qs
+    prefetch_material_qs = teaching_material.TeachingMaterial.objects.only(
+        'title',
+        'mandatory',
+        'learning_unit_year'
+    ).order_by('order')
+    qs = learning_unit_year.LearningUnitYear.objects.filter(
+        identity_filter_clause
+    ).prefetch_related(
+        Prefetch("teachingmaterial_set", queryset=prefetch_material_qs, to_attr="materials")
+    ).select_related("academic_year").only("academic_year", "acronym")
+    for row in qs:
+        lu_identity = learning_unit_year_identity.LearningUnitYearIdentity(
+            code=row.acronym,
+            year=row.academic_year.year
+        )
+        result[lu_identity] = [
+            convert_teaching_material_db_row_to_domain_object(material) for material in row.materials
         ]
+    return result
+
+
+def convert_teaching_material_db_row_to_domain_object(
+        db_object: teaching_material.TeachingMaterial) -> TeachingMaterial:
+    return TeachingMaterial(title=db_object.title, is_mandatory=db_object.mandatory)
+
+
+def _build_identity_clause(learning_unit_identity: 'LearningUnitYearIdentity') -> Q:
+    return Q(acronym=learning_unit_identity.code, academic_year__year=learning_unit_identity.year)

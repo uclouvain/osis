@@ -32,6 +32,7 @@ from django.test import SimpleTestCase
 import osis_common.ddd.interface
 from base.ddd.utils import business_validator
 from base.ddd.utils.validation_message import MessageLevel, BusinessValidationMessage
+from base.models.authorized_relationship import AuthorizedRelationshipList
 from base.models.enums import prerequisite_operator
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
 from base.models.enums.link_type import LinkTypes
@@ -819,3 +820,61 @@ class TestUpdateLink(SimpleTestCase):
         )
         self.assertTrue(mock_update_link_validator_list.called)
         self.assertIsInstance(result, Link)
+
+
+class TestIsEmpty(SimpleTestCase):
+    def test_assert_is_empty_case_contains_nothing(self):
+        program_tree = ProgramTreeFactory(
+            authorized_relationships=AuthorizedRelationshipList([
+                AuthorizedRelationshipObjectFactory()
+            ])
+        )
+        self.assertTrue(program_tree.is_empty())
+
+    def test_assert_is_empty_case_contains_only_mandatory_child(self):
+        root_node = NodeGroupYearFactory()
+        child_node = NodeGroupYearFactory()
+        LinkFactory(parent=root_node, child=child_node)
+
+        auth_relation = AuthorizedRelationshipObjectFactory(
+            parent_type=root_node.node_type,
+            child_type=child_node.node_type,
+            min_constraint=1,
+            max_constraint=1
+        )
+        program_tree = ProgramTreeFactory(
+            root_node=root_node,
+            authorized_relationships=AuthorizedRelationshipList([auth_relation])
+        )
+        self.assertTrue(program_tree.is_empty())
+
+    def test_assert_is_not_empty_case_contain_more_than_mandatory(self):
+        """
+        root_node
+        |---child_node (Mandatory)
+        |--- child_node_2
+        """
+        root_node = NodeGroupYearFactory()
+        child_node = NodeGroupYearFactory()
+        LinkFactory(parent=root_node, child=child_node)
+
+        child_node_2 = NodeGroupYearFactory()
+        LinkFactory(parent=root_node, child=child_node_2)
+
+        auth_relation_child = AuthorizedRelationshipObjectFactory(
+            parent_type=root_node.node_type,
+            child_type=child_node.node_type,
+            min_constraint=1,
+            max_constraint=1
+        )
+        auth_relation_child_2 = AuthorizedRelationshipObjectFactory(
+            parent_type=root_node.node_type,
+            child_type=child_node_2.node_type,
+            min_constraint=0,
+            max_constraint=1
+        )
+        program_tree = ProgramTreeFactory(
+            root_node=root_node,
+            authorized_relationships=AuthorizedRelationshipList([auth_relation_child, auth_relation_child_2])
+        )
+        self.assertFalse(program_tree.is_empty())

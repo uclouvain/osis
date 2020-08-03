@@ -309,3 +309,15 @@ class TestGroupRepositoryUpdateMethod(TestCase):
         self.assertEqual(group.content_constraint.maximum, self.group_year_db.max_constraint)
         self.assertEqual(group.remark.text_fr, self.group_year_db.remark_fr)
         self.assertEqual(group.remark.text_en, self.group_year_db.remark_en)
+
+
+class TestGroupRepositoryDeleteMethod(TestCase):
+    def setUp(self) -> None:
+        self.group_year_db = GroupYearFactory()
+
+    def test_assert_delete_in_database(self):
+        group_id = GroupIdentity(code=self.group_year_db.partial_acronym, year=self.group_year_db.academic_year.year)
+        GroupRepository.delete(group_id)
+
+        with self.assertRaises(GroupYearModelDb.DoesNotExist):
+            GroupYearModelDb.objects.get(partial_acronym=group_id.code, academic_year__year=group_id.year)

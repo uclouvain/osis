@@ -50,3 +50,11 @@ def create_element_of_learning_unit_year(sender, learning_unit_year_id, **kwargs
 @receiver(publisher.learning_unit_year_deleted)
 def delete_element_of_learning_unit_year(sender, learning_unit_year_id, **kwargs):
     Element.objects.filter(learning_unit_year_id=learning_unit_year_id).delete()
+
+
+@receiver(publisher.group_deleted)
+def delete_element_of_group(sender, group_identity, **kwargs):
+    Element.objects.filter(
+        group_year__partial_acronym=group_identity.code,
+        group_year__academic_year__year=group_identity.year
+    ).delete()
