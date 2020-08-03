@@ -25,10 +25,10 @@
 ##############################################################################
 from education_group.views.training.common_read import TrainingRead, Tab
 from program_management.ddd import command
-from program_management.ddd.service.read import search_tree_versions_using_node_service
-from program_management.serializers.node_view import get_program_tree_version_name
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
+from program_management.ddd.service.read import search_tree_versions_using_node_service
+from program_management.serializers.node_view import get_program_tree_version_name
 
 
 class TrainingReadUtilization(TrainingRead):
@@ -58,5 +58,4 @@ class TrainingReadUtilization(TrainingRead):
                      )}
                 )
         context['utilization_rows'] = sorted(context['utilization_rows'], key=lambda row: row['link'].parent.code)
-        print(context['utilization_rows'])
         return context
