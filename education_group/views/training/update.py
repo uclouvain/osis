@@ -22,7 +22,7 @@
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
 import functools
-from typing import List, Dict, Union
+from typing import List, Dict, Union, Optional
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404, HttpResponseRedirect
@@ -167,6 +167,7 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             self.request.POST or None,
             user=self.request.user,
             training_type=self.get_training_obj().type.name,
+            attach_path=self.get_attach_path(),
             initial=self._get_training_form_initial_values()
         )
 
@@ -180,6 +181,9 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 for child in self.get_children_objs()
             ]
         )
+
+    def get_attach_path(self) -> Optional['Path']:
+        return self.request.GET.get('path_to') or None
 
     def _get_training_form_initial_values(self) -> Dict:
         training_obj = self.get_training_obj()
@@ -228,6 +232,7 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "management_entity": training_obj.management_entity.acronym,
             "administration_entity": training_obj.administration_entity.acronym,
             "academic_year": training_obj.year,
+            "start_year": training_obj.start_year,
             "end_year": training_obj.end_year,
             "teaching_campus": training_obj.teaching_campus.name,
             "enrollment_campus": training_obj.enrollment_campus.name,

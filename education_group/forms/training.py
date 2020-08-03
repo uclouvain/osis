@@ -395,6 +395,13 @@ class UpdateTrainingForm(CreateTrainingForm):
         disabled=True,
         required=False
     )
+    start_year = forms.ModelChoiceField(
+        queryset=AcademicYear.objects.all(),
+        label=_('Start academic year'),
+        to_field_name="year",
+        disabled=True,
+        required=False
+    )
     end_year = forms.ModelChoiceField(
         queryset=AcademicYear.objects.all(),
         label=_('Last year of organization'),
@@ -419,17 +426,20 @@ class UpdateTrainingForm(CreateTrainingForm):
                 output_field=CharField()
             )
         ),
+        label=_('main domain'),
         required=False,
         to_field_name="form_key"
     )
     isced_domain = forms.ModelChoiceField(
         queryset=DomainIsced.objects.all(),
         required=False,
-        to_field_name="code"
+        to_field_name="code",
+        label=_('ISCED domain'),
     )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields["academic_year"].label = _('Validity')
         self.__init_end_year_field()
 
     def __init_end_year_field(self):
