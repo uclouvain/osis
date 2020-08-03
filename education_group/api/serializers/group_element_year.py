@@ -66,7 +66,7 @@ class CommonNodeHyperlinkedRelatedField(serializers.HyperlinkedIdentityField):
                 view_name = 'education_group_api_v1:' + MiniTrainingDetail.name
                 url_kwargs = {
                     'year': obj.child.year,
-                    'acronym': obj.child.code,
+                    'acronym': obj.child.title,
                 }
 
         return reverse(view_name, kwargs=url_kwargs, request=request, format=format)
