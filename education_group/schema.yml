@@ -582,7 +582,7 @@ paths:
           $ref: '#/components/responses/Unauthorized'
       tags:
         - mini_trainings
-  /mini_trainings/{year}/{official_partial_acronym}/offer_roots:
+  /mini_trainings/{year}/{acronym}/offer_roots:
     get:
       description: Return the list of offer roots for a mini training.
       operationId: minitrainings_offer_roots
@@ -594,7 +594,7 @@ paths:
             description: ''
             type: string
         - in: path
-          name: official_partial_acronym
+          name: acronym
           required: true
           schema:
             description: ''
@@ -612,7 +612,7 @@ paths:
           $ref: '#/components/responses/Unauthorized'
       tags:
         - mini_trainings
-  /mini_trainings/{year}/{official_partial_acronym}:
+  /mini_trainings/{year}/{acronym}:
     get:
       description: Return the detail of the mini-training
       operationId: minitrainings_read
@@ -624,7 +624,7 @@ paths:
             description: ''
             type: string
         - in: path
-          name: official_partial_acronym
+          name: acronym
           required: true
           schema:
             description: ''
@@ -644,7 +644,7 @@ paths:
           $ref: '#/components/responses/NotFound'
       tags:
         - mini_trainings
-  /mini_trainings/{year}/{official_partial_acronym}/tree:
+  /mini_trainings/{year}/{acronym}/tree:
     get:
       description: Return the tree of the mini-training
       operationId: minitraining_tree
@@ -656,7 +656,7 @@ paths:
             description: ''
             type: string
         - in: path
-          name: official_partial_acronym
+          name: acronym
           required: true
           schema:
             description: ''
@@ -676,7 +676,7 @@ paths:
           $ref: '#/components/responses/NotFound'
       tags:
         - mini_trainings
-  /mini_trainings/{year}/{official_partial_acronym}/title:
+  /mini_trainings/{year}/{acronym}/title:
     get:
       description: Return the title of the mini training
       operationId: minitrainingstitle_read
@@ -688,7 +688,7 @@ paths:
             description: ''
             type: integer
         - in: path
-          name: official_partial_acronym
+          name: acronym
           required: true
           schema:
             description: ''
@@ -715,7 +715,7 @@ paths:
           $ref: '#/components/responses/NotFound'
       tags:
         - mini_trainings
-  /mini_trainings/{year}/{official_partial_acronym}/versions:
+  /mini_trainings/{year}/{acronym}/versions:
     get:
       description: Return the versions list of the mini training
       operationId: minitrainings_versions_list
@@ -727,7 +727,7 @@ paths:
             description: ''
             type: string
         - in: path
-          name: official_partial_acronym
+          name: acronym
           required: true
           schema:
             description: ''
@@ -751,7 +751,7 @@ paths:
           $ref: '#/components/responses/Unauthorized'
       tags:
         - mini_trainings
-  /mini_trainings/{year}/{official_partial_acronym}/versions/{version_name}:
+  /mini_trainings/{year}/{acronym}/versions/{version_name}:
     get:
       description: Return the detail of the mini training version
       operationId: mini_training_version
@@ -763,7 +763,7 @@ paths:
             description: ''
             type: string
         - in: path
-          name: official_partial_acronym
+          name: acronym
           required: true
           schema:
             description: ''
@@ -789,7 +789,7 @@ paths:
           $ref: '#/components/responses/NotFound'
       tags:
         - mini_trainings
-  /mini_trainings/{year}/{official_partial_acronym}/versions/{version_name}/tree:
+  /mini_trainings/{year}/{acronym}/versions/{version_name}/tree:
     get:
       description: Return the tree of the version
       operationId: minitraining_version_tree
@@ -801,7 +801,7 @@ paths:
             description: ''
             type: string
         - in: path
-          name: official_partial_acronym
+          name: acronym
           required: true
           schema:
             description: ''
@@ -827,7 +827,7 @@ paths:
           $ref: '#/components/responses/NotFound'
       tags:
         - mini_trainings
-  /mini_trainings/{year}/{official_partial_acronym}/versions/{version_name}/title:
+  /mini_trainings/{year}/{acronym}/versions/{version_name}/title:
     get:
       description: Return the title of the mini training
       operationId: minitrainings_title_version_read
@@ -839,7 +839,7 @@ paths:
             description: ''
             type: integer
         - in: path
-          name: official_partial_acronym
+          name: acronym
           required: true
           schema:
             description: ''
