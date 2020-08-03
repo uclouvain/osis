@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-29 08:59+0200\n"
+"POT-Creation-Date: 2020-07-31 09:52+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -387,10 +387,19 @@ msgstr ""
 msgid "Mini-Training"
 msgstr ""
 
+#, python-format
+msgid ""
+"Mini-training <a href='%(link)s'> %(code)s (%(academic_year)s) </a> "
+"successfully created."
+msgstr ""
+
 msgid "Modification"
 msgstr ""
 
 msgid "New Education Group"
+msgstr ""
+
+msgid "New Mini-Training"
 msgstr ""
 
 msgid "New Training"
@@ -624,6 +633,9 @@ msgstr ""
 msgid "Validity"
 msgstr ""
 
+msgid "Validity cannot be greater than last year of organization"
+msgstr ""
+
 msgid "Web re-registration"
 msgstr ""
 
@@ -631,6 +643,12 @@ msgid "Weighting"
 msgstr ""
 
 msgid "Yes, I confirm."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"You can't copy the mini-training '{code}' from {from_year} to {to_year} "
+"because it ends in {end_year}"
 msgstr ""
 
 #, python-brace-format
