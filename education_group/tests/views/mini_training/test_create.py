@@ -32,6 +32,8 @@ from base.tests.factories.education_group_type import MiniTrainingEducationGroup
 from base.utils.urls import reverse_with_get
 from education_group.ddd.domain import mini_training
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
+from education_group.views.proxy.read import Tab
+from program_management.ddd.domain import node
 
 
 class TestCreate(TestCase):
@@ -57,7 +59,10 @@ class TestCreate(TestCase):
     @mock.patch('education_group.views.mini_training.create.MiniTrainingCreateView.get_form')
     @mock.patch("program_management.ddd.service.write.create_mini_training_with_program_tree."
                 "create_and_report_mini_training_with_program_tree")
-    def test_should_call_create_mini_training_service_when_request_is_post(self, mock_service_orphan, mock_form):
+    def test_should_call_create_mini_training_service_when_request_is_post(
+            self,
+            mock_service_orphan,
+            mock_form,):
         mini_training_identity = mini_training.MiniTrainingIdentity(acronym="ACRO", year=2020)
         mock_service_orphan.return_value = [mini_training_identity]
         mock_form.return_value = self._get_mock_form_valid()
@@ -67,23 +72,31 @@ class TestCreate(TestCase):
         self.assertTrue(mock_form.called)
         self.assertTrue(mock_service_orphan.called)
 
+        expected_reverse_url = reverse(
+            "education_group_read_proxy",
+            kwargs={"acronym": mini_training_identity.acronym, "year": mini_training_identity.year}
+        ) + '?tab={}'.format(Tab.IDENTIFICATION)
+
         self.assertRedirects(
             response,
-            reverse(
-                "mini_training_identification",
-                kwargs={"code": "CODE", "year": mini_training_identity.year}
-            ),
+            expected_reverse_url,
             fetch_redirect_response=False
         )
 
+    @mock.patch("education_group.views.mini_training.create.NodeIdentitySearch")
     @mock.patch('education_group.views.mini_training.create.MiniTrainingCreateView.get_form')
     @mock.patch("program_management.ddd.service.write."
                 "create_and_attach_mini_training_service.create_mini_training_and_paste")
     def test_should_call_create_mini_training_and_paste_service_when_request_is_post_and_path_as_parameter(
             self,
             mock_service,
-            mock_form):
+            mock_form,
+            mock_node_identity_search):
         mini_training_identity = mini_training.MiniTrainingIdentity(acronym="ACRO", year=2020)
+        mock_node_identity_search.return_value.get_from_element_id.return_value = node.NodeIdentity(
+            code='Cocode',
+            year=2020
+        )
         mock_service.return_value = [mini_training_identity]
         mock_form.return_value = self._get_mock_form_valid()
 
@@ -98,8 +111,8 @@ class TestCreate(TestCase):
         self.assertTrue(mock_service.called)
 
         expected_reverse = reverse_with_get(
-            "mini_training_identification",
-            kwargs={"code": "CODE", "year": mini_training_identity.year},
+            "element_identification",
+            kwargs={"code": "Cocode", "year": 2020},
             get={"path": "10|25"}
 
         )

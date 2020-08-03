@@ -54,6 +54,7 @@ def _get_create_orphan_mini_training_command_from_create_mini_training_and_attac
         abbreviated_title=cmd.abbreviated_title,
         title_fr=cmd.title_fr,
         title_en=cmd.title_en,
+        keywords=cmd.keywords,
         status=cmd.status,
         schedule_type=cmd.schedule_type,
         credits=cmd.credits,

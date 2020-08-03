@@ -220,6 +220,7 @@ class CreateMiniTrainingAndPasteCommand(interface.CommandRequest):
     abbreviated_title = attr.ib(type=str)
     title_fr = attr.ib(type=str)
     title_en = attr.ib(type=str)
+    keywords = attr.ib(type=str)
     status = attr.ib(type=str)
     schedule_type = attr.ib(type=str)
     credits = attr.ib(type=int)
