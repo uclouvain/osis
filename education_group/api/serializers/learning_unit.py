@@ -88,7 +88,11 @@ class EducationGroupRootsListSerializer(EducationGroupRootsTitleSerializer, seri
     def get_learning_unit_credits(self, obj):
         learning_unit_year = self.context.get('learning_unit_year')
         education_group_root_ids = self.context.get('education_group_root_ids')
-        parent_offers = [parent_id for parent_id, [offer_id] in education_group_root_ids.items() if offer_id == obj.id]
+        parent_offers = [
+            parent_id for parent_id, offer_ids in education_group_root_ids.items()
+            for offer_id in offer_ids if offer_id == obj.id
+        ]
+
         gey = GroupElementYear.objects.filter(
             child_leaf=learning_unit_year,
             id__in=[element.id for element in EducationGroupHierarchy(root=obj).to_list(flat=True)],
