@@ -21,7 +21,7 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from collections import defaultdict
+from typing import Any
 
 import mock
 
@@ -44,3 +44,11 @@ class MockFormValid(mock.Mock):
 class MockRepository(mock.MagicMock):
     def __int__(self, *args, **kwargs):
         return super().__init__(*args, spec=interface.AbstractRepository, **kwargs)
+
+
+class MockPatcherMixin:
+    def mock_service(self, service_path: str, return_value: Any = None) -> mock.Mock:
+        service_patcher = mock.patch(service_path, return_value=return_value)
+        self.addCleanup(service_patcher.stop)
+
+        return service_patcher.start()

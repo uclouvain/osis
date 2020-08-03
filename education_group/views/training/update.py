@@ -37,9 +37,11 @@ from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import exception, group
 from education_group.ddd.service.read import get_training_service, get_group_service, get_multiple_groups_service
+from education_group.ddd.service.write import update_training_with_group_service
 from education_group.enums.node_type import NodeType
 from education_group.forms import training as training_forms, content as content_forms
 from education_group.templatetags.academic_year_display import display_as_academic_year
+from education_group.views.proxy.read import Tab
 from learning_unit.ddd import command as command_learning_unit_year
 from learning_unit.ddd.business_types import *
 from learning_unit.ddd.domain import learning_unit_year
@@ -49,7 +51,8 @@ from program_management.ddd import command as command_program_management
 from program_management.ddd.domain import exception as program_management_exception
 from program_management.ddd.business_types import *
 from program_management.ddd.service.read import get_program_tree_service
-from program_management.ddd.service.write import update_link_service, delete_training_with_program_tree_service
+from program_management.ddd.service.write import update_link_service, delete_training_with_program_tree_service, \
+    update_training_with_program_tree_service
 
 
 class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
@@ -66,7 +69,8 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "training_form": self.training_form,
             "content_formset": self.content_formset,
             "training_obj": self.get_training_obj(),
-            "cancel_url": self.get_cancel_url()
+            "cancel_url": self.get_cancel_url(),
+            "type_text": self.get_training_obj().type.value
         }
         return render(request, self.template_name, context)
 
@@ -76,33 +80,56 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         success_messages = []
 
         if training_form.is_valid() and content_formset.is_valid():
-            #  FIXME define postponement end date here and display warning messages
-            # update_training_command = self.convert_training_form_to_update_training_command(training_form)
-            # update_training_service.update_training(update_training_command)
-            #
-            # update_group_command = self.convert_training_form_to_update_group_command(training_form)
-            # update_group_service.update_group(update_group_command)
+            update_trainings = self.update_training()
+            success_messages += self.get_success_msg_update_trainings(update_trainings)
 
-            if training_form.cleaned_data["end_year"]:
-                try:
-                    delete_command = self.convert_training_form_to_delete_command(training_form)
-                    trainings_deleted = delete_training_with_program_tree_service.delete_training_with_program_tree(
-                        delete_command
-                    )
-                    success_messages = self.get_success_msg_deleted_trainings(trainings_deleted)
-                except program_management_exception.ProgramTreeNotEmptyException as e:
-                    training_form.add_error("end_year", e.message)
-                except exception.IsLinkedToEpcException as e:
-                    training_form.add_error("end_year", e.message)
-                except exception.HasInscriptionsException as e:
-                    training_form.add_error("end_year", e.message)
-
+            # deleted_trainings = self.delete_training()
+            # success_messages = self.get_success_msg_deleted_trainings(deleted_trainings)
             if not training_form.errors:
                 self._send_multiple_update_link_cmd(content_formset)
                 display_success_messages(request, success_messages, extra_tags='safe')
                 return HttpResponseRedirect(self.get_success_url())
 
         return self.get(request, *args, **kwargs)
+
+    def update_training(self) -> List['TrainingIdentity']:
+        update_training_with_group_command = self.convert_training_form_to_update_training_command(
+            self.training_form
+        )
+        return update_training_with_program_tree_service.update_and_report_training_with_program_tree(
+            update_training_with_group_command
+        )
+
+    def delete_training(self) -> List['TrainingIdentity']:
+        if self.training_form.cleaned_data["end_year"]:
+            try:
+                delete_command = self.convert_training_form_to_delete_command(self.training_form)
+                trainings_deleted = delete_training_with_program_tree_service.delete_training_with_program_tree(
+                    delete_command
+                )
+                return trainings_deleted
+            except program_management_exception.ProgramTreeNotEmptyException as e:
+                self.training_form.add_error("end_year", e.message)
+            except exception.IsLinkedToEpcException as e:
+                self.training_form.add_error("end_year", e.message)
+            except exception.HasInscriptionsException as e:
+                self.training_form.add_error("end_year", e.message)
+        return []
+
+    def get_success_msg_update_trainings(self, training_identites: List["TrainingIdentity"]) -> List[str]:
+        return [self._get_success_msg_update_training(identity) for identity in training_identites]
+
+    def _get_success_msg_update_training(self, training_identity: 'TrainingIdentity') -> str:
+        link = reverse_with_get(
+            'education_group_read_proxy',
+            kwargs={'acronym': training_identity.acronym, 'year': training_identity.year},
+            get={"tab": Tab.IDENTIFICATION.value}
+        )
+        return _("Training <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> successfully updated.") % {
+            "link": link,
+            "acronym": training_identity.acronym,
+            "academic_year": display_as_academic_year(training_identity.year),
+        }
 
     def get_success_msg(self) -> str:
         return _("Training <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> successfully updated.") % {
@@ -414,27 +441,7 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             max_constraint=cleaned_data['max_constraint'],
             remark_fr=cleaned_data['remark_fr'],
             remark_en=cleaned_data['remark_english'],
-        )
-
-    def convert_training_form_to_update_group_command(
-            self,
-            training_form: training_forms.UpdateTrainingForm) -> command.UpdateGroupCommand:
-        cleaned_data = training_form.cleaned_data
-        return command.UpdateGroupCommand(
-            code=cleaned_data['code'],
-            year=cleaned_data['academic_year'].year,
-            abbreviated_title=cleaned_data['acronym'],
-            title_fr=cleaned_data['title_fr'],
-            title_en=cleaned_data['title_en'],
-            credits=cleaned_data['credits'],
-            constraint_type=cleaned_data['constraint_type'],
-            min_constraint=cleaned_data['min_constraint'],
-            max_constraint=cleaned_data['max_constraint'],
-            management_entity_acronym=cleaned_data['management_entity'],
-            teaching_campus_name=cleaned_data['teaching_campus'].name,
             organization_name=cleaned_data['teaching_campus'].organization.name,
-            remark_fr=cleaned_data['remark_fr'],
-            remark_en=cleaned_data['remark_english'],
         )
 
     def convert_training_form_to_delete_command(

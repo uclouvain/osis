@@ -25,7 +25,7 @@
 ##############################################################################
 from typing import Optional, List
 
-from django.db import transaction
+from django.db import transaction, IntegrityError
 from django.db.models import F
 
 from base.models.education_group_year import EducationGroupYear
@@ -64,19 +64,22 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
             'pk', flat=True
         )[0]
 
-        EducationGroupVersion(
-            version_name=program_tree_version.version_name,
-            title_fr=program_tree_version.title_fr,
-            title_en=program_tree_version.title_en,
-            offer_id=education_group_year_id,
-            is_transition=False,
-            root_group_id=group_year_id
-        ).save()
+        try:
+            EducationGroupVersion(
+                version_name=program_tree_version.version_name,
+                title_fr=program_tree_version.title_fr,
+                title_en=program_tree_version.title_en,
+                offer_id=education_group_year_id,
+                is_transition=False,
+                root_group_id=group_year_id
+            ).save()
+        except IntegrityError:
+            raise exception.ProgramTreeAlreadyExistsException
         return program_tree_version.entity_id
 
     @classmethod
-    def update(cls, entity: 'ProgramTreeVersion', **_) -> 'ProgramTreeVersionIdentity':
-        raise NotImplementedError
+    def update(cls, program_tree_version: 'ProgramTreeVersion', **_) -> 'ProgramTreeVersionIdentity':
+        return program_tree_version.entity_id
 
     @classmethod
     def get(cls, entity_id: ProgramTreeVersionIdentity) -> 'ProgramTreeVersion':

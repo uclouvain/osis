@@ -55,7 +55,7 @@ from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.ddd import command
 
 
-class UpdateTrainingWithGroupCommandFactory(factory.Factory):
+class UpdateTrainingCommandFactory(factory.Factory):
     class Meta:
         model = command.UpdateTrainingWithGroupCommand
         abstract = False
@@ -113,4 +113,3 @@ class UpdateTrainingWithGroupCommandFactory(factory.Factory):
     remark_fr = None
     remark_en = None
     can_be_funded = None
-    organization_name = "ORG"

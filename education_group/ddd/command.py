@@ -184,6 +184,15 @@ class UpdateTrainingCommand(interface.CommandRequest):
     max_constraint = attr.ib(type=Optional[int])
     remark_fr = attr.ib(type=Optional[str])
     remark_en = attr.ib(type=Optional[str])
+    organization_name = attr.ib(type=str)
+    postpone_until_year = attr.ib(type=Optional[int], default=None)
+
+
+@attr.s(frozen=True, slots=True)
+class UpdateTrainingWithGroupCommand(UpdateTrainingCommand):
+    teaching_campus_name = attr.ib(type=str, default=None)
+    organization_name = attr.ib(type=str, default=None)
+
 
 
 @attr.s(frozen=True, slots=True)
@@ -244,6 +253,7 @@ class UpdateGroupCommand(interface.CommandRequest):
     organization_name = attr.ib(type=str)
     remark_fr = attr.ib(type=str)
     remark_en = attr.ib(type=str)
+    postpone_until_year = attr.ib(type=int)
 
 
 @attr.s(frozen=True, slots=True)

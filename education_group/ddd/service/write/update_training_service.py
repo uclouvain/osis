@@ -21,6 +21,8 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+from typing import List
+
 from django.db import transaction
 
 from base.models.enums.active_status import ActiveStatusEnum
@@ -46,18 +48,15 @@ from education_group.ddd.service.write import postpone_training_service
 
 
 @transaction.atomic()
-def update_training(cmd: command.UpdateTrainingCommand) -> 'TrainingIdentity':
+def update_training(cmd: command.UpdateTrainingCommand) -> List['TrainingIdentity']:
     training_identity = training.TrainingIdentity(acronym=cmd.abbreviated_title, year=cmd.year)
     training_domain_obj = training_repository.TrainingRepository.get(training_identity)
-    end_postponement_year = CalculateEndPostponement.calculate_year_of_end_postponement(
-        training_domain_obj,
-        training_repository.TrainingRepository
-    )
+    end_postponement_year = cmd.postpone_until_year
 
     training_domain_obj.update(convert_command_to_update_training_data(cmd))
     training_repository.TrainingRepository.update(training_domain_obj)
 
-    postpone_training_service.postpone_training(
+    result = postpone_training_service.postpone_training(
         command.PostponeTrainingCommand(
             acronym=cmd.abbreviated_title,
             postpone_from_year=cmd.year,
@@ -65,7 +64,7 @@ def update_training(cmd: command.UpdateTrainingCommand) -> 'TrainingIdentity':
         )
     )
 
-    return training_identity
+    return [training_identity] + result
 
 
 def convert_command_to_update_training_data(cmd: command.UpdateTrainingCommand) -> 'training.UpdateTrainingData':

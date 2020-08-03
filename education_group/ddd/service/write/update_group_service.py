@@ -46,10 +46,7 @@ def update_group(cmd: command.UpdateGroupCommand) -> 'GroupIdentity':
     group_identity = GroupIdentity(code=cmd.code, year=cmd.year)
     grp = GroupRepository.get(group_identity)
 
-    end_postponement_year = CalculateEndPostponement.calculate_year_of_end_postponement(
-        grp,
-        GroupRepository
-    )
+    end_postponement_year = cmd.postpone_until_year
 
     grp.update(
         abbreviated_title=cmd.abbreviated_title,

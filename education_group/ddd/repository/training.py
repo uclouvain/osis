@@ -27,6 +27,7 @@ import functools
 import operator
 from typing import Optional, List
 
+from django.db import IntegrityError
 from django.db.models import Subquery, OuterRef, Prefetch, QuerySet, Q
 
 from base.models import entity_version
@@ -441,7 +442,10 @@ def _create_education_group_year(
         diploma_printing_title=training.diploma.printing_title,
         professional_title=training.diploma.professional_title,
     )
-    obj.save()
+    try:
+        obj.save()
+    except IntegrityError:
+        raise exception.TrainingAcronymAlreadyExist(training.acronym)
     return obj
 
 

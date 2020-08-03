@@ -52,6 +52,9 @@ class ProgramTreeVersionNotFoundException(Exception):
     pass
 
 
+class ProgramTreeAlreadyExistsException(Exception):
+    pass
+
 class ProgramTreeNonEmpty(BusinessException):
     def __init__(self, program_tree: 'ProgramTree', **kwargs):
         message = _("[%(academic_year)s] The content of the program is not empty.") % {
