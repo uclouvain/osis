@@ -233,7 +233,6 @@ class CreateOrphanGroupCommand(interface.CommandRequest):
 class CopyGroupCommand(interface.CommandRequest):
     from_code = attr.ib(type=str)
     from_year = attr.ib(type=int)
-    to_year = attr.ib(type=int)
 
 
 @attr.s(frozen=True, slots=True)

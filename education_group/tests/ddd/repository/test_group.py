@@ -138,6 +138,7 @@ class TestGroupRepositoryCreateMethod(TestCase):
         self.group_identity = GroupIdentity(code="LTRONC1200", year=2017)
         self.group = GroupFactory(
             entity_identity=self.group_identity,
+            entity_id=self.group_identity,
             type=self.education_group_type,
             management_entity=EntityValueObject(acronym='DRT'),
             teaching_campus=Campus(
@@ -149,7 +150,7 @@ class TestGroupRepositoryCreateMethod(TestCase):
         )
 
     def test_assert_raise_academic_year_not_found(self):
-        self.group.entity_id.year = 2000
+        self.group.entity_id = GroupIdentity(code="LTRONC1200", year=2000)
         with self.assertRaises(AcademicYearNotFound):
             GroupRepository.create(self.group)
 
@@ -276,6 +277,7 @@ class TestGroupRepositoryUpdateMethod(TestCase):
         dummy_group_identity = GroupIdentity(code="dummy-code", year=1966)
         group = GroupFactory(
             entity_identity=dummy_group_identity,
+            entity_id=dummy_group_identity,
             management_entity=EntityValueObject(acronym='DRT'),
             teaching_campus=Campus(
                 name=self.group_year_db.main_teaching_campus.name,
@@ -290,6 +292,7 @@ class TestGroupRepositoryUpdateMethod(TestCase):
 
         group = GroupFactory(
             entity_identity=self.group_identity,
+            entity_id=self.group_identity,
             management_entity=EntityValueObject(acronym=new_entity.acronym),
             teaching_campus=Campus(
                 name=self.group_year_db.main_teaching_campus.name,
@@ -311,36 +314,16 @@ class TestGroupRepositoryUpdateMethod(TestCase):
         self.assertEqual(group.remark.text_en, self.group_year_db.remark_en)
 
 
-class TestGroupDeleteMethod(TestCase):
-    def test_should_raise_exception_when_no_matching_group_to_delete(self):
-        group_identity_with_no_match = GroupIdentity(code="NO MATCH", year=2019)
+class TestGroupRepositoryDeleteMethod(TestCase):
+    def setUp(self) -> None:
+        self.group_year_db = GroupYearFactory()
 
-        with self.assertRaises(exception.GroupNotFoundException):
-            GroupRepository.delete(group_identity_with_no_match)
-
-    def test_should_delete_education_group_year_when_matching_group_to_delete(self):
-        group_year_db = GroupYearFactory(partial_acronym="LOSIS5897", academic_year__year=2017)
-        GroupYearFactory(
-            partial_acronym="LOSIS5897",
-            academic_year__year=2018,
-            group=group_year_db.group
-        )
-        group_identity = generate_group_identity_from_group_year(group_year_db)
-
-        GroupRepository.delete(group_identity)
+    def test_assert_delete_in_database(self):
+        group_id = generate_group_identity_from_group_year(self.group_year_db)
+        GroupRepository.delete(group_id)
 
         with self.assertRaises(GroupYearModelDb.DoesNotExist):
-            GroupYearModelDb.objects.get(pk=group_year_db.pk)
-
-    def test_should_delete_group_when_last_group_year_deleted(self):
-        group_year_db = GroupYearFactory(partial_acronym="LOSIS5897", academic_year__year=2017)
-
-        group_identity = generate_group_identity_from_group_year(group_year_db)
-
-        GroupRepository.delete(group_identity)
-
-        with self.assertRaises(GroupModelDb.DoesNotExist):
-            GroupModelDb.objects.get(pk=group_year_db.group.pk)
+            GroupYearModelDb.objects.get(partial_acronym=group_id.code, academic_year__year=group_id.year)
 
 
 def generate_group_identity_from_group_year(
@@ -349,15 +332,3 @@ def generate_group_identity_from_group_year(
         code=group_year_obj.partial_acronym,
         year=group_year_obj.academic_year.year
     )
-
-
-class TestGroupRepositoryDeleteMethod(TestCase):
-    def setUp(self) -> None:
-        self.group_year_db = GroupYearFactory()
-
-    def test_assert_delete_in_database(self):
-        group_id = GroupIdentity(code=self.group_year_db.partial_acronym, year=self.group_year_db.academic_year.year)
-        GroupRepository.delete(group_id)
-
-        with self.assertRaises(GroupYearModelDb.DoesNotExist):
-            GroupYearModelDb.objects.get(partial_acronym=group_id.code, academic_year__year=group_id.year)

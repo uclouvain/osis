@@ -34,15 +34,18 @@ from education_group.ddd.service.write import copy_group_service
 
 @transaction.atomic()
 def postpone_group(postpone_cmd: command.PostponeGroupCommand) -> List['GroupIdentity']:
+    identities_created = [
+
+    ]
     from_year = postpone_cmd.postpone_from_year
     end_postponement_year = postpone_cmd.postpone_until_year
 
-    identities_created = copy_group_service.copy_group(
-        cmd=command.CopyGroupCommand(
-            from_code=postpone_cmd.code,
-            from_year=from_year,
-            to_year=end_postponement_year
+    for year in range(from_year, end_postponement_year):
+
+        identity_next_year = copy_group_service.copy_group(
+            cmd=command.CopyGroupCommand(from_code=postpone_cmd.code, from_year=year)
         )
-    )
+
+        identities_created.append(identity_next_year)
 
     return identities_created

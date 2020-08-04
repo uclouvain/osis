@@ -252,46 +252,6 @@ class TestTrainingRepositorySearchMethod(TestCase):
         self.assertEqual(len(training_identities), len(result))
 
 
-class TestTrainingDeleteMethod(TestCase):
-    def test_should_raise_exception_when_no_matching_training_to_delete(self):
-        training_identity_with_no_match = TrainingIdentityFactory(acronym="NO MATCH")
-
-        with self.assertRaises(exception.TrainingNotFoundException):
-            TrainingRepository.delete(training_identity_with_no_match)
-
-    def test_should_delete_education_group_year_when_matching_training_to_delete(self):
-        education_group_year_db = EducationGroupYearFactory(acronym="LOSIS5897", academic_year__year=2017)
-        EducationGroupYearFactory(
-            acronym="LOSIS5897",
-            academic_year__year=2016,
-            education_group=education_group_year_db.education_group
-        )
-        training_identity = generate_training_identity_from_education_group_year(education_group_year_db)
-
-        TrainingRepository.delete(training_identity)
-
-        with self.assertRaises(EducationGroupYearModelDb.DoesNotExist):
-            EducationGroupYearModelDb.objects.get(pk=education_group_year_db.pk)
-
-    def test_should_delete_education_group_when_last_training_deleted(self):
-        education_group_year_db = EducationGroupYearFactory(acronym="LOSIS5897", academic_year__year=2017)
-
-        training_identity = generate_training_identity_from_education_group_year(education_group_year_db)
-
-        TrainingRepository.delete(training_identity)
-
-        with self.assertRaises(EducationGroup.DoesNotExist):
-            EducationGroup.objects.get(pk=education_group_year_db.education_group.pk)
-
-
-def generate_training_identity_from_education_group_year(
-        education_group_year_obj: 'EducationGroupYearModelDb') -> 'TrainingIdentity':
-    return TrainingIdentityFactory(
-        acronym=education_group_year_obj.acronym,
-        year=education_group_year_obj.academic_year.year
-    )
-
-
 def assert_training_model_equals_training_domain(
         test_instance: 'TestCase',
         education_group_year: EducationGroupYearModelDb,
@@ -376,8 +336,16 @@ class TestTrainingRepositoryDeleteMethod(TestCase):
         self.training_db = TrainingDBFactory()
 
     def test_assert_delete_in_database(self):
-        training_id = TrainingIdentity(acronym=self.training_db.acronym, year=self.training_db.academic_year.year)
+        training_id = generate_training_identity_from_education_group_year(self.training_db)
         TrainingRepository.delete(training_id)
 
         with self.assertRaises(EducationGroupYear.DoesNotExist):
             EducationGroupYear.objects.get(acronym=training_id.acronym, academic_year__year=training_id.year)
+
+
+def generate_training_identity_from_education_group_year(
+        education_group_year_obj: 'EducationGroupYearModelDb') -> 'TrainingIdentity':
+    return TrainingIdentityFactory(
+        acronym=education_group_year_obj.acronym,
+        year=education_group_year_obj.academic_year.year
+    )

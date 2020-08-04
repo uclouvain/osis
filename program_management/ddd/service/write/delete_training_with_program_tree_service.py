@@ -25,13 +25,10 @@ from typing import List
 
 from django.db import transaction
 
-from education_group.ddd.domain import training
-from education_group.ddd.service.write import delete_training_service, delete_group_service
-from program_management.ddd import command
-from program_management.ddd.service.write import delete_standard_program_tree_version_service, \
-    delete_standard_program_tree_service
-from education_group.ddd import command as education_group_command
 from education_group.ddd.business_types import *
+from education_group.ddd.domain import training
+from program_management.ddd import command
+from program_management.ddd.service.write import delete_standard_program_tree_version_service
 
 
 @transaction.atomic()
