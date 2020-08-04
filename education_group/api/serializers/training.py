@@ -259,6 +259,9 @@ class TrainingDetailSerializer(TrainingListSerializer):
         )
 
     @staticmethod
-    def get_domain_name(version):
-        main_domain = version.offer.main_domain
-        return main_domain.parent.name if main_domain.parent else main_domain.name
+    def get_domain_name(training):
+        main_domain = training.main_domain
+        if main_domain:
+            parent = main_domain.parent
+            return parent.name if parent else main_domain.name
+        return None
