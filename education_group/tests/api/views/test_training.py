@@ -425,8 +425,9 @@ class GetTrainingTestCase(APITestCase):
     def test_get_none_if_no_domain(self):
         training = TrainingFactory(
             academic_year=self.academic_year,
-            main_domain=None
+            main_domain=None,
         )
+        StandardEducationGroupVersionFactory(offer=training)
         url = reverse('education_group_api_v1:training_read', kwargs={
             'acronym': training.acronym,
             'year': self.academic_year.year
@@ -441,6 +442,7 @@ class GetTrainingTestCase(APITestCase):
             academic_year=self.academic_year,
             main_domain=domain
         )
+        StandardEducationGroupVersionFactory(offer=training)
         url = reverse('education_group_api_v1:training_read', kwargs={
             'acronym': training.acronym,
             'year': self.academic_year.year
