@@ -50,7 +50,9 @@ def update_and_report_training_with_program_tree(
     )
     training_domain_obj = training_repository.TrainingRepository.get(training_identity)
     group_identity = group.GroupIdentity(code=update_training_cmd.code, year=update_training_cmd.year)
+    training_domain_obj.end_year = update_training_cmd.end_year
     grp = group_repository.GroupRepository.get(group_identity)
+    grp.end_year = update_training_cmd.end_year
     end_postponement_year = CalculateEndPostponement.calculate_year_of_end_postponement(
         training_domain_obj,
         training_repository.TrainingRepository,

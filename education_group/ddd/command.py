@@ -194,7 +194,6 @@ class UpdateTrainingWithGroupCommand(UpdateTrainingCommand):
     organization_name = attr.ib(type=str, default=None)
 
 
-
 @attr.s(frozen=True, slots=True)
 class GetGroupCommand(interface.CommandRequest):
 

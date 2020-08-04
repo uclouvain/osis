@@ -106,7 +106,7 @@ class TrainingRepository(interface.AbstractRepository):
         try:
             education_group_year_db = qs.get()
         except EducationGroupYearModelDb.DoesNotExist:
-            raise exception.TrainingNotFoundException
+            raise exception.TrainingNotFoundException()
 
         return _convert_education_group_year_to_training(education_group_year_db)
 
@@ -117,19 +117,6 @@ class TrainingRepository(interface.AbstractRepository):
 
     @classmethod
     def delete(cls, entity_id: 'TrainingIdentity', **_) -> None:
-        # qs = _get_queryset_to_fetch_data_for_training([entity_id])
-        # try:
-        #     education_group_year_db = qs.get()
-        #     #  FIXME remove that part as it already done in program tree repository
-        #     group_element_years = GroupElementYear.objects.filter(
-        #         Q(parent=education_group_year_db) | Q(child_branch=education_group_year_db)
-        #     )
-        #     for group_element in group_element_years:
-        #         group_element.delete()
-        # except EducationGroupYearModelDb.DoesNotExist:
-        #     raise exception.TrainingNotFoundException
-        #
-        # education_group_year_db.delete()
         EducationGroupYear.objects.filter(
             acronym=entity_id.acronym,
             academic_year__year=entity_id.year

@@ -25,6 +25,7 @@ from typing import List
 
 from django.db import transaction
 
+from education_group.ddd.domain import training
 from education_group.ddd.service.write import delete_training_service, delete_group_service
 from program_management.ddd import command
 from program_management.ddd.service.write import delete_standard_program_tree_version_service, \
@@ -42,26 +43,9 @@ def delete_training_with_program_tree(
         is_transition=delete_command.is_transition,
         from_year=delete_command.from_year
     )
-    delete_standard_program_tree_version_service.delete_standard_program_tree_version(
+    delete_versions_identities = delete_standard_program_tree_version_service.delete_standard_program_tree_version(
         delete_program_tree_version_command
     )
 
-    delete_program_tree_command = command.DeleteStandardProgramTreeCommand(
-        code=delete_command.code,
-        from_year=delete_command.from_year
-    )
-    delete_standard_program_tree_service.delete_standard_program_tree(delete_program_tree_command)
-
-    delete_training_command = education_group_command.DeleteTrainingCommand(
-        acronym=delete_command.offer_acronym,
-        from_year=delete_command.from_year
-    )
-    training_identities = delete_training_service.delete_training(delete_training_command)
-
-    delete_group_command = education_group_command.DeleteGroupCommand(
-        code=delete_command.code,
-        from_year=delete_command.from_year
-    )
-    delete_group_service.delete_group(delete_group_command)
-
-    return training_identities
+    return [training.TrainingIdentity(acronym=identity.offer_acronym, year=identity.year)
+            for identity in delete_versions_identities]

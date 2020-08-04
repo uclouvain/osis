@@ -83,8 +83,9 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             update_trainings = self.update_training()
             success_messages += self.get_success_msg_update_trainings(update_trainings)
 
-            # deleted_trainings = self.delete_training()
-            # success_messages = self.get_success_msg_deleted_trainings(deleted_trainings)
+            deleted_trainings = self.delete_training()
+            success_messages = self.get_success_msg_deleted_trainings(deleted_trainings)
+
             if not training_form.errors:
                 self._send_multiple_update_link_cmd(content_formset)
                 display_success_messages(request, success_messages, extra_tags='safe')

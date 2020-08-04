@@ -26,6 +26,7 @@
 from base.models import academic_year
 from osis_common.ddd import interface
 from education_group.ddd.business_types import *
+from program_management.ddd.business_types import *
 
 
 class CalculateEndPostponement(interface.DomainService):
@@ -42,3 +43,9 @@ class CalculateEndPostponement(interface.DomainService):
         if training.end_year:
             default_years_to_postpone = training.end_year - training.year
         return current_year + default_years_to_postpone
+
+    @classmethod
+    def calculate_max_year_of_end_postponement(cls) -> int:
+        default_years_to_postpone = 6
+        current_year = academic_year.starting_academic_year().year
+        return default_years_to_postpone + current_year
