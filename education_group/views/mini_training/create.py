@@ -178,10 +178,11 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
 
     def get_initial(self) -> Dict:
         request_cache = RequestCache(self.request.user, reverse('version_program'))
-        if request_cache.get_value_cached('academic_year'):
-            default_academic_year = AcademicYear.objects.get(id=request_cache.get_value_cached('academic_year')[0]).year
+        academic_year_cached_value = request_cache.get_value_cached('academic_year')
+        if academic_year_cached_value:
+            default_academic_year = AcademicYear.objects.get(id=academic_year_cached_value[0]).year
         else:
-            default_academic_year = starting_academic_year().year
+            default_academic_year = starting_academic_year()
 
         default_management_entity = None
 
