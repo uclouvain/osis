@@ -37,7 +37,6 @@ from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import exception, group
 from education_group.ddd.service.read import get_training_service, get_group_service, get_multiple_groups_service
-from education_group.ddd.service.write import update_training_with_group_service
 from education_group.enums.node_type import NodeType
 from education_group.forms import training as training_forms, content as content_forms
 from education_group.templatetags.academic_year_display import display_as_academic_year
@@ -48,8 +47,8 @@ from learning_unit.ddd.domain import learning_unit_year
 from learning_unit.ddd.service.read import get_multiple_learning_unit_years_service
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command as command_program_management
-from program_management.ddd.domain import exception as program_management_exception
 from program_management.ddd.business_types import *
+from program_management.ddd.domain import exception as program_management_exception
 from program_management.ddd.service.read import get_program_tree_service
 from program_management.ddd.service.write import update_link_service, delete_training_with_program_tree_service, \
     update_training_with_program_tree_service
@@ -60,8 +59,6 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
     raise_exception = True
 
     template_name = "education_group_app/training/upsert/update.html"
-
-    form_class = training_forms.UpdateTrainingForm
 
     def get(self, request, *args, **kwargs):
         context = {
@@ -75,119 +72,95 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
-        training_form = self.training_form
-        content_formset = self.content_formset
-        success_messages = []
-
-        if training_form.is_valid() and content_formset.is_valid():
+        if self.training_form.is_valid() and self.content_formset.is_valid():
             update_trainings = self.update_training()
-            success_messages += self.get_success_msg_update_trainings(update_trainings)
-
             deleted_trainings = self.delete_training()
-            success_messages = self.get_success_msg_deleted_trainings(deleted_trainings)
 
-            if not training_form.errors:
-                self._send_multiple_update_link_cmd(content_formset)
+            if not self.training_form.errors:
+                self.update_links()
+
+                success_messages = self.get_success_msg_updated_trainings(update_trainings)
+                success_messages += self.get_success_msg_deleted_trainings(deleted_trainings)
                 display_success_messages(request, success_messages, extra_tags='safe')
                 return HttpResponseRedirect(self.get_success_url())
 
         return self.get(request, *args, **kwargs)
 
-    def update_training(self) -> List['TrainingIdentity']:
-        update_training_with_group_command = self.convert_training_form_to_update_training_command(
-            self.training_form
-        )
-        return update_training_with_program_tree_service.update_and_report_training_with_program_tree(
-            update_training_with_group_command
-        )
-
-    def delete_training(self) -> List['TrainingIdentity']:
-        if self.training_form.cleaned_data["end_year"]:
-            try:
-                delete_command = self.convert_training_form_to_delete_command(self.training_form)
-                trainings_deleted = delete_training_with_program_tree_service.delete_training_with_program_tree(
-                    delete_command
-                )
-                return trainings_deleted
-            except program_management_exception.ProgramTreeNotEmptyException as e:
-                self.training_form.add_error("end_year", e.message)
-            except exception.IsLinkedToEpcException as e:
-                self.training_form.add_error("end_year", e.message)
-            except exception.HasInscriptionsException as e:
-                self.training_form.add_error("end_year", e.message)
-        return []
-
-    def get_success_msg_update_trainings(self, training_identites: List["TrainingIdentity"]) -> List[str]:
-        return [self._get_success_msg_update_training(identity) for identity in training_identites]
-
-    def _get_success_msg_update_training(self, training_identity: 'TrainingIdentity') -> str:
-        link = reverse_with_get(
-            'education_group_read_proxy',
-            kwargs={'acronym': training_identity.acronym, 'year': training_identity.year},
-            get={"tab": Tab.IDENTIFICATION.value}
-        )
-        return _("Training <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> successfully updated.") % {
-            "link": link,
-            "acronym": training_identity.acronym,
-            "academic_year": display_as_academic_year(training_identity.year),
-        }
-
-    def get_success_msg(self) -> str:
-        return _("Training <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> successfully updated.") % {
-            "link": self.get_success_url(),
-            "acronym": self.get_training_obj().acronym,
-            "academic_year": display_as_academic_year(self.kwargs["year"]),
-        }
-
-    def get_success_msg_deleted_trainings(self, trainings_identities: List['TrainingIdentity']) -> List[str]:
-        return [self._get_success_msg_delete_training(identity) for identity in trainings_identities]
-
-    def _get_success_msg_delete_training(self, training_identity: 'TrainingIdentity') -> str:
-        deleted_message_format = "Training %(acronym)s (%(academic_year)s) successfully deleted."
-        return _(deleted_message_format) % {
-            "acronym": training_identity.acronym,
-            "academic_year": display_as_academic_year(training_identity.year)
-        }
-
-    def _send_multiple_update_link_cmd(self, content_formset: content_forms.ContentFormSet) -> List['Link']:
-        forms_changed = [form for form in content_formset.forms if form.has_changed()]
-        if not forms_changed:
-            return []
-
-        update_link_cmds = []
-        for form in forms_changed:
-            cmd_update_link = command_program_management.UpdateLinkCommand(
-                child_node_code=form.child_obj.code if isinstance(form.child_obj, Group) else form.child_obj.acronym,
-                child_node_year=form.child_obj.year,
-
-                access_condition=form.cleaned_data.get('access_condition', False),
-                is_mandatory=form.cleaned_data.get('is_mandatory', True),
-                block=form.cleaned_data.get('block'),
-                link_type=form.cleaned_data.get('link_type'),
-                comment=form.cleaned_data.get('comment_fr'),
-                comment_english=form.cleaned_data.get('comment_en'),
-                relative_credits=form.cleaned_data.get('relative_credits'),
-            )
-            update_link_cmds.append(cmd_update_link)
-
-        cmd_bulk = command_program_management.BulkUpdateLinkCommand(
-            parent_node_code=self.kwargs['code'],
-            parent_node_year=self.kwargs['year'],
-            update_link_cmds=update_link_cmds
-        )
-        return update_link_service.bulk_update_links(cmd_bulk)
+    def get_tabs(self) -> List:
+        return [
+            {
+                "text": _("Identification"),
+                "active": True,
+                "display": True,
+                "include_html": "education_group_app/training/upsert/training_identification_form.html"
+            },
+            {
+                "text": _("Diplomas /  Certificates"),
+                "active": False,
+                "display": True,
+                "include_html": "education_group_app/training/upsert/blocks/panel_diplomas_certificates_form.html"
+            },
+            {
+                "id": "content",
+                "text": _("Content"),
+                "active": False,
+                "display": True,
+                "include_html": "education_group_app/training/upsert/content_form.html"
+            }
+        ]
 
     def get_success_url(self) -> str:
         get_data = {'path': self.request.GET['path_to']} if self.request.GET.get('path_to') else {}
-        url = reverse_with_get(
+        return reverse_with_get(
             'element_identification',
             kwargs={'code': self.kwargs['code'], 'year': self.kwargs['year']},
             get=get_data
         )
-        return url
 
     def get_cancel_url(self) -> str:
         return self.get_success_url()
+
+    def update_training(self) -> List['TrainingIdentity']:
+        update_command = self._convert_form_to_update_training_command(self.training_form)
+        return update_training_with_program_tree_service.update_and_report_training_with_program_tree(update_command)
+
+    def delete_training(self) -> List['TrainingIdentity']:
+        if not self.training_form.cleaned_data["end_year"]:
+            return []
+
+        try:
+
+            delete_command = self._convert_form_to_delete_trainings_command(self.training_form)
+            return delete_training_with_program_tree_service.delete_training_with_program_tree(delete_command)
+
+        except program_management_exception.ProgramTreeNotEmptyException as e:
+            self.training_form.add_error("end_year", e.message)
+
+        except exception.IsLinkedToEpcException as e:
+            self.training_form.add_error("end_year", e.message)
+
+        except exception.HasInscriptionsException as e:
+            self.training_form.add_error("end_year", e.message)
+
+        return []
+
+    def update_links(self) -> List['Link']:
+        update_link_commands = [
+            self._convert_form_to_update_link_command(form) for form in self.content_formset.forms if form.has_changed
+        ]
+
+        if not update_link_commands:
+            return []
+
+        cmd_bulk = command_program_management.BulkUpdateLinkCommand(
+            parent_node_code=self.kwargs['code'],
+            parent_node_year=self.kwargs['year'],
+            update_link_cmds=update_link_commands
+        )
+        return update_link_service.bulk_update_links(cmd_bulk)
+
+    def get_attach_path(self) -> Optional['Path']:
+        return self.request.GET.get('path_to') or None
 
     @cached_property
     def training_form(self) -> 'training_forms.UpdateTrainingForm':
@@ -210,8 +183,86 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             ]
         )
 
-    def get_attach_path(self) -> Optional['Path']:
-        return self.request.GET.get('path_to') or None
+    @functools.lru_cache()
+    def get_training_obj(self) -> 'Training':
+        try:
+            get_cmd = command.GetTrainingCommand(acronym=self.kwargs["title"], year=int(self.kwargs["year"]))
+            return get_training_service.get_training(get_cmd)
+        except exception.TrainingNotFoundException:
+            raise Http404
+
+    @functools.lru_cache()
+    def get_group_obj(self) -> 'Group':
+        try:
+            get_cmd = command.GetGroupCommand(code=self.kwargs["code"], year=int(self.kwargs["year"]))
+            return get_group_service.get_group(get_cmd)
+        except exception.TrainingNotFoundException:
+            raise Http404
+
+    @functools.lru_cache()
+    def get_program_tree_obj(self) -> 'ProgramTree':
+        get_cmd = command_program_management.GetProgramTree(code=self.kwargs['code'], year=self.kwargs['year'])
+        return get_program_tree_service.get_program_tree(get_cmd)
+
+    @functools.lru_cache()
+    def get_children_objs(self) -> List[Union['Group', 'LearningUnitYear']]:
+        children_objs = self.__get_children_group_objs() + self.__get_children_learning_unit_year_objs()
+        return sorted(
+            children_objs,
+            key=lambda child_obj: next(
+                order for order, node in enumerate(self.get_program_tree_obj().root_node.get_direct_children_as_nodes())
+                if (isinstance(child_obj, group.Group) and node.code == child_obj.code) or
+                (isinstance(child_obj, learning_unit_year.LearningUnitYear) and node.code == child_obj.acronym)
+            )
+        )
+
+    def __get_children_group_objs(self) -> List['Group']:
+        get_group_cmds = [
+            command.GetGroupCommand(code=node.code, year=node.year)
+            for node
+            in self.get_program_tree_obj().root_node.get_direct_children_as_nodes(
+                ignore_children_from={NodeType.LEARNING_UNIT}
+            )
+        ]
+        if get_group_cmds:
+            return get_multiple_groups_service.get_multiple_groups(get_group_cmds)
+        return []
+
+    def __get_children_learning_unit_year_objs(self) -> List['LearningUnitYear']:
+        get_learning_unit_cmds = [
+            command_learning_unit_year.GetLearningUnitYearCommand(code=node.code, year=node.year)
+            for node in self.get_program_tree_obj().root_node.get_direct_children_as_nodes(
+                take_only={NodeType.LEARNING_UNIT}
+            )
+        ]
+        if get_learning_unit_cmds:
+            return get_multiple_learning_unit_years_service.get_multiple_learning_unit_years(get_learning_unit_cmds)
+        return []
+
+    def get_success_msg_updated_trainings(self, training_identites: List["TrainingIdentity"]) -> List[str]:
+        return [self._get_success_msg_updated_training(identity) for identity in training_identites]
+
+    def get_success_msg_deleted_trainings(self, trainings_identities: List['TrainingIdentity']) -> List[str]:
+        return [self._get_success_msg_deleted_training(identity) for identity in trainings_identities]
+
+    def _get_success_msg_updated_training(self, training_identity: 'TrainingIdentity') -> str:
+        link = reverse_with_get(
+            'education_group_read_proxy',
+            kwargs={'acronym': training_identity.acronym, 'year': training_identity.year},
+            get={"tab": Tab.IDENTIFICATION.value}
+        )
+        return _("Training <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> successfully updated.") % {
+            "link": link,
+            "acronym": training_identity.acronym,
+            "academic_year": display_as_academic_year(training_identity.year),
+        }
+
+    def _get_success_msg_deleted_training(self, training_identity: 'TrainingIdentity') -> str:
+        deleted_message_format = "Training %(acronym)s (%(academic_year)s) successfully deleted."
+        return _(deleted_message_format) % {
+            "acronym": training_identity.acronym,
+            "academic_year": display_as_academic_year(training_identity.year)
+        }
 
     def _get_training_form_initial_values(self) -> Dict:
         training_obj = self.get_training_obj()
@@ -300,86 +351,7 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             'comment_en': link.comment_english
         } for link in children_links]
 
-    @functools.lru_cache()
-    def get_training_obj(self) -> 'Training':
-        try:
-            get_cmd = command.GetTrainingCommand(acronym=self.kwargs["title"], year=int(self.kwargs["year"]))
-            return get_training_service.get_training(get_cmd)
-        except exception.TrainingNotFoundException:
-            raise Http404
-
-    @functools.lru_cache()
-    def get_group_obj(self) -> 'Group':
-        try:
-            get_cmd = command.GetGroupCommand(code=self.kwargs["code"], year=int(self.kwargs["year"]))
-            return get_group_service.get_group(get_cmd)
-        except exception.TrainingNotFoundException:
-            raise Http404
-
-    @functools.lru_cache()
-    def get_program_tree_obj(self) -> 'ProgramTree':
-        get_cmd = command_program_management.GetProgramTree(code=self.kwargs['code'], year=self.kwargs['year'])
-        return get_program_tree_service.get_program_tree(get_cmd)
-
-    @functools.lru_cache()
-    def get_children_objs(self) -> List[Union['Group', 'LearningUnitYear']]:
-        children_objs = self.__get_children_group_objs() + self.__get_children_learning_unit_year_objs()
-        return sorted(
-            children_objs,
-            key=lambda child_obj: next(
-                order for order, node in enumerate(self.get_program_tree_obj().root_node.get_direct_children_as_nodes())
-                if (isinstance(child_obj, group.Group) and node.code == child_obj.code) or
-                (isinstance(child_obj, learning_unit_year.LearningUnitYear) and node.code == child_obj.acronym)
-            )
-        )
-
-    def __get_children_group_objs(self) -> List['Group']:
-        get_group_cmds = [
-            command.GetGroupCommand(code=node.code, year=node.year)
-            for node
-            in self.get_program_tree_obj().root_node.get_direct_children_as_nodes(
-                ignore_children_from={NodeType.LEARNING_UNIT}
-            )
-        ]
-        if get_group_cmds:
-            return get_multiple_groups_service.get_multiple_groups(get_group_cmds)
-        return []
-
-    def __get_children_learning_unit_year_objs(self) -> List['LearningUnitYear']:
-        get_learning_unit_cmds = [
-            command_learning_unit_year.GetLearningUnitYearCommand(code=node.code, year=node.year)
-            for node in self.get_program_tree_obj().root_node.get_direct_children_as_nodes(
-                take_only={NodeType.LEARNING_UNIT}
-            )
-        ]
-        if get_learning_unit_cmds:
-            return get_multiple_learning_unit_years_service.get_multiple_learning_unit_years(get_learning_unit_cmds)
-        return []
-
-    def get_tabs(self) -> List:
-        return [
-            {
-                "text": _("Identification"),
-                "active": True,
-                "display": True,
-                "include_html": "education_group_app/training/upsert/training_identification_form.html"
-            },
-            {
-                "text": _("Diplomas /  Certificates"),
-                "active": False,
-                "display": True,
-                "include_html": "education_group_app/training/upsert/blocks/panel_diplomas_certificates_form.html"
-            },
-            {
-                "id": "content",
-                "text": _("Content"),
-                "active": False,
-                "display": True,
-                "include_html": "education_group_app/training/upsert/content_form.html"
-            }
-        ]
-
-    def convert_training_form_to_update_training_command(
+    def _convert_form_to_update_training_command(
             self,
             form: training_forms.UpdateTrainingForm) -> command.UpdateTrainingCommand:
         cleaned_data = form.cleaned_data
@@ -445,7 +417,7 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             organization_name=cleaned_data['teaching_campus'].organization.name,
         )
 
-    def convert_training_form_to_delete_command(
+    def _convert_form_to_delete_trainings_command(
             self,
             training_form: training_forms.UpdateTrainingForm
     ) -> command_program_management.DeleteTrainingWithProgramTreeCommand:
@@ -456,4 +428,19 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             version_name='',
             is_transition=False,
             from_year=cleaned_data["end_year"].year+1
+        )
+
+    def _convert_form_to_update_link_command(
+            self,
+            form: 'content_forms.LinkForm') -> command_program_management.UpdateLinkCommand:
+        return command_program_management.UpdateLinkCommand(
+            child_node_code=form.child_obj.code if isinstance(form.child_obj, Group) else form.child_obj.acronym,
+            child_node_year=form.child_obj.year,
+            access_condition=form.cleaned_data.get('access_condition', False),
+            is_mandatory=form.cleaned_data.get('is_mandatory', True),
+            block=form.cleaned_data.get('block'),
+            link_type=form.cleaned_data.get('link_type'),
+            comment=form.cleaned_data.get('comment_fr'),
+            comment_english=form.cleaned_data.get('comment_en'),
+            relative_credits=form.cleaned_data.get('relative_credits'),
         )
