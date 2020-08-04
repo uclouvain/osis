@@ -46,7 +46,6 @@ class MiniTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     academic_year = forms.ModelChoiceField(
         queryset=AcademicYear.objects.all(),
         label=_("Validity"),
-        empty_label=None,
         to_field_name="year"
     )
     end_year = forms.ModelChoiceField(
