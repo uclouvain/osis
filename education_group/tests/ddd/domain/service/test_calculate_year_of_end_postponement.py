@@ -21,76 +21,114 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+import copy
+from typing import List
+
+import attr
 import mock
 from django.test import SimpleTestCase
 
-from education_group.ddd.domain import training, exception
+from education_group.ddd.domain import training, group, exception
 from education_group.ddd.domain.service import calculate_end_postponement
+from education_group.tests.ddd.factories.group import GroupFactory
 from education_group.tests.ddd.factories.training import TrainingFactory
+from testing.mocks import MockPatcherMixin
 
 
-class TestCalculateEndPostponement(SimpleTestCase):
+class TestCalculateMaxYearOfEndPostponement(SimpleTestCase, MockPatcherMixin):
     def setUp(self):
         self.starting_academic_year_year = 2020
-        self.mock_starting_academic_year = self._mock_starting_academic_year()
-        self.mock_training_repository = self._mock_training_repository()
-
-    def _mock_starting_academic_year(self) -> mock.Mock:
-        starting_academic_year = mock.Mock(year=self.starting_academic_year_year)
-        patcher = mock.patch("base.models.academic_year.starting_academic_year", return_value=starting_academic_year)
-        mock_starting_academic_year = patcher.start()
-        self.addCleanup(patcher.stop)
-        return mock_starting_academic_year
-
-    def _mock_training_repository(self):
-        patcher = mock.patch("education_group.ddd.repository.training.TrainingRepository", autospec=True)
-        mock_training_repository = patcher.start()
-        mock_training_repository.search.return_value = []
-        mock_training_repository.get.side_effect = exception.TrainingNotFoundException
-        self.addCleanup(patcher.stop)
-        return mock_training_repository
-
-    def test_should_return_starting_academic_year_plus_default_postponement_years_when_training_end_year_is_none(self):
-        training_with_none_end_year = TrainingFactory(end_year=None)
-
-        result = calculate_end_postponement.CalculateEndPostponement.calculate_year_of_end_postponement(
-            training_with_none_end_year,
-            self.mock_training_repository
+        self.mock_starting_academic_year = self.mock_service(
+            "base.models.academic_year.starting_academic_year",
+            return_value=mock.Mock(year=self.starting_academic_year_year)
         )
+
+    def test_should_return_starting_academic_year_plus_years_to_postpone(self):
+        result = calculate_end_postponement.CalculateEndPostponement.calculate_max_year_of_end_postponement()
         self.assertEqual(
-            self.starting_academic_year_year + calculate_end_postponement.DEFAULT_YEARS_TO_POSTPONE,
+            2026,
             result
         )
 
-    def test_should_return_end_year_when_inferior_to_starting_academic_year_plus_default_postponement_years(self):
-        training_with_inferior_end_year = TrainingFactory(
-            end_year=self.starting_academic_year_year + calculate_end_postponement.DEFAULT_YEARS_TO_POSTPONE - 2,
-            entity_identity__year=2018
+
+class TestCalculateYearOfPostponementConflict(SimpleTestCase, MockPatcherMixin):
+    def setUp(self) -> None:
+        self.training_identity = training.TrainingIdentity(acronym="ACRO", year=2019)
+        self.group_identity = group.GroupIdentity(code="CODE", year=2019)
+
+        self.fake_training_repo = self.mock_repository("education_group.ddd.repository.training.TrainingRepository")
+        self.fake_training_repo.exception_class = exception.TrainingNotFoundException
+
+        self.fake_group_repo = self.mock_repository("education_group.ddd.repository.group.GroupRepository")
+        self.fake_group_repo.exception_class = exception.GroupNotFoundException
+
+    def test_should_return_max_int_if_no_conflicts(self):
+        self.fake_training_repo.root_entities = self._generate_trainings_with_no_conflicts()
+        self.fake_group_repo.root_entities = self._generate_groups_with_no_conflicts()
+
+        result = calculate_end_postponement.CalculateEndPostponement.calculate_year_of_postponement_conflict(
+            self.training_identity,
+            self.group_identity,
+            self.fake_training_repo,
+            self.fake_group_repo
         )
 
-        result = calculate_end_postponement.CalculateEndPostponement.calculate_year_of_end_postponement(
-            training_with_inferior_end_year,
-            self.mock_training_repository
-        )
-        self.assertEqual(
-            training_with_inferior_end_year.end_year,
-            result
+        self.assertEqual(calculate_end_postponement.MAX_YEAR, result)
+
+    def test_should_return_year_of_conflict_if_conflicts_present_for_trainings(self):
+        self.fake_training_repo.root_entities = self._generate_trainings_with_conflicts()
+        self.fake_group_repo.root_entities = self._generate_groups_with_no_conflicts()
+
+        result = calculate_end_postponement.CalculateEndPostponement.calculate_year_of_postponement_conflict(
+            self.training_identity,
+            self.group_identity,
+            self.fake_training_repo,
+            self.fake_group_repo
         )
 
-    def test_should_return_year_of_last_training_equals_when_posterior_trainings_exists(self):
-        training_2019 = TrainingFactory(end_year=None, entity_identity__year=2019)
-        training_2020 = training.TrainingBuilder().copy_to_next_year(
-            training_2019,
-            self.mock_training_repository
-        )
-        training_2021 = TrainingFactory(
-            entity_identity__acronym=training_2019.entity_id.acronym,
-            entity_identity__year=2021
-        )
-        self.mock_training_repository.search.return_value = [training_2020, training_2021]
+        self.assertEqual(2020, result)
 
-        result = calculate_end_postponement.CalculateEndPostponement.calculate_year_of_end_postponement(
-            training_2019,
-            self.mock_training_repository
+    def test_should_return_year_of_conflict_if_conflicts_present_for_groups(self):
+        self.fake_training_repo.root_entities = self._generate_trainings_with_no_conflicts()
+        self.fake_group_repo.root_entities = self._generate_groups_with_conflicts()
+
+        result = calculate_end_postponement.CalculateEndPostponement.calculate_year_of_postponement_conflict(
+            self.training_identity,
+            self.group_identity,
+            self.fake_training_repo,
+            self.fake_group_repo
         )
-        self.assertEqual(training_2020.entity_id.year, result)
+
+        self.assertEqual(2020, result)
+
+    def _generate_trainings_with_no_conflicts(self) -> List['training.Training']:
+        initial_training = TrainingFactory(entity_identity=self.training_identity)
+        next_training = copy.copy(initial_training)
+        next_training.entity_id = attr.evolve(initial_training.entity_id, year=initial_training.entity_id.year+1)
+        next_training.entity_identity = next_training.entity_id
+
+        return [initial_training, next_training]
+
+    def _generate_trainings_with_conflicts(self) -> List['training.Training']:
+        initial_training = TrainingFactory(entity_identity=self.training_identity)
+        next_training = TrainingFactory()
+        next_training.entity_id = attr.evolve(initial_training.entity_id, year=initial_training.entity_id.year+1)
+        next_training.entity_identity = next_training.entity_id
+
+        return [initial_training, next_training]
+
+    def _generate_groups_with_no_conflicts(self) -> List['group.Group']:
+        initial_group = GroupFactory(entity_identity=self.group_identity)
+        next_group = copy.copy(initial_group)
+        next_group.entity_id = attr.evolve(initial_group.entity_id, year=initial_group.entity_id.year+1)
+        next_group.entity_identity = next_group.entity_id
+
+        return [initial_group, next_group]
+
+    def _generate_groups_with_conflicts(self) -> List['group.Group']:
+        initial_group = GroupFactory(entity_identity=self.group_identity)
+        next_group = GroupFactory()
+        next_group.entity_id = attr.evolve(initial_group.entity_id, year=initial_group.entity_id.year+1)
+        next_group.entity_identity = next_group.entity_id
+
+        return [initial_group, next_group]

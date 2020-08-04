@@ -31,18 +31,11 @@ from program_management.ddd.service.write import delete_training_with_program_tr
 
 
 class TesteDeleteTrainingWithProgramTree(TestCase):
-    @mock.patch("education_group.ddd.service.write.delete_group_service.delete_group")
-    @mock.patch("education_group.ddd.service.write.delete_training_service.delete_training")
-    @mock.patch("program_management.ddd.service.write.delete_standard_program_tree_service."
-                "delete_standard_program_tree")
     @mock.patch("program_management.ddd.service.write.delete_standard_program_tree_version_service."
                 "delete_standard_program_tree_version")
     def test_should_call_appropriate_delete_services(
             self,
-            mock_delete_program_tree_version,
-            mock_delete_program_tree,
-            mock_delete_training,
-            mock_delete_group):
+            mock_delete_program_tree_version):
 
         mock_delete_program_tree_version.return_value = [
             program_tree_version.ProgramTreeVersionIdentity(
@@ -52,16 +45,6 @@ class TesteDeleteTrainingWithProgramTree(TestCase):
                 year=2019
             )
         ]
-        mock_delete_program_tree.return_value = [
-            program_tree.ProgramTreeIdentity(code='Code', year=2019)
-        ]
-        mock_delete_training.return_value = [
-            training.TrainingIdentity(acronym='Acronym', year=2019)
-        ]
-        mock_delete_group.return_value = [
-            group.GroupIdentity(code='Code', year=2019)
-        ]
-
         delete_command = command.DeleteTrainingWithProgramTreeCommand(
             code='Code',
             offer_acronym='Acronym',
@@ -72,11 +55,3 @@ class TesteDeleteTrainingWithProgramTree(TestCase):
         result = delete_training_with_program_tree_service.delete_training_with_program_tree(delete_command)
 
         self.assertTrue(mock_delete_program_tree_version.called)
-        self.assertTrue(mock_delete_program_tree.called)
-        self.assertTrue(mock_delete_training.called)
-        self.assertTrue(mock_delete_group.called)
-
-        self.assertListEqual(
-            mock_delete_training.return_value,
-            result
-        )

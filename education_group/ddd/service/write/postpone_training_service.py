@@ -28,6 +28,8 @@ from typing import List
 from django.db import transaction
 
 from education_group.ddd import command
+from education_group.ddd.domain import exception
+from education_group.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
 from education_group.ddd.domain.training import TrainingIdentity
 from education_group.ddd.service.write import copy_training_service
 
@@ -38,20 +40,22 @@ def postpone_training(postpone_cmd: command.PostponeTrainingCommand) -> List['Tr
 
     # GIVEN
     from_year = postpone_cmd.postpone_from_year
-    end_postponement_year = postpone_cmd.postpone_until_year
+    until_year = postpone_cmd.postpone_until_year
 
     # WHEN
-    while from_year < end_postponement_year:
+    for year in range(from_year, until_year):
 
-        identity_next_year = copy_training_service.copy_training_to_next_year(
-            copy_cmd=command.CopyTrainingToNextYearCommand(
-                acronym=postpone_cmd.acronym,
-                postpone_from_year=from_year
+        try:
+            identity_next_year = copy_training_service.copy_training_to_next_year(
+                copy_cmd=command.CopyTrainingToNextYearCommand(
+                    acronym=postpone_cmd.acronym,
+                    postpone_from_year=year
+                )
             )
-        )
 
-        # THEN
-        identities_created.append(identity_next_year)
-        from_year += 1
+            # THEN
+            identities_created.append(identity_next_year)
+        except exception.CannotCopyTrainingDueToEndDate:
+            break
 
     return identities_created

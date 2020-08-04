@@ -25,7 +25,7 @@ import attr
 import mock
 from django.test import SimpleTestCase
 
-from program_management.ddd.domain import program_tree_version
+from program_management.ddd.domain import program_tree_version, exception
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
 
@@ -36,7 +36,7 @@ class TestProgramTreeVersionBuilderCopyToNextYear(SimpleTestCase):
         self.mock_repository = mock.create_autospec(ProgramTreeVersionRepository)
 
     def test_should_create_new_tree_version_when_does_not_exist_for_next_year(self):
-        self.mock_repository.get.return_value = None
+        self.mock_repository.get.side_effect = exception.ProgramTreeVersionNotFoundException
 
         result_tree_version = program_tree_version.ProgramTreeVersionBuilder().copy_to_next_year(
             self.copy_from_program_tree_version,

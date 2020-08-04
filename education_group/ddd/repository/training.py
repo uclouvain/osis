@@ -430,7 +430,7 @@ def _create_education_group_year(
     try:
         obj.save()
     except IntegrityError:
-        raise exception.TrainingAcronymAlreadyExist(training.acronym)
+        raise exception.TrainingAcronymAlreadyExistException(training.acronym)
     return obj
 
 

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-31 09:52+0200\n"
+"POT-Creation-Date: 2020-08-06 09:09+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -55,6 +55,9 @@ msgid "Access"
 msgstr ""
 
 msgid "Access condition"
+msgstr ""
+
+msgid "Acronym already exists"
 msgstr ""
 
 msgid "Acronym/Short title"
@@ -156,10 +159,18 @@ msgstr ""
 msgid "Conditions"
 msgstr ""
 
+#, python-format
+msgid ""
+"Consistency error in %(academic_year)s: %(field)s has already been modified"
+msgstr ""
+
 msgid "Contacts"
 msgstr ""
 
 msgid "Content"
+msgstr ""
+
+msgid "Content constraint"
 msgstr ""
 
 msgid "Coorganization can only be changed by central manager"
@@ -558,6 +569,14 @@ msgstr ""
 msgid "The training %(code)s has been deleted."
 msgstr ""
 
+#, python-brace-format
+msgid "The training {acronym} ({academic_year}) has inscriptions"
+msgstr ""
+
+#, python-brace-format
+msgid "The training {acronym} ({academic_year}) is linked to epc"
+msgstr ""
+
 #, python-format
 msgctxt "female"
 msgid "The user does not have permission to create a %(category)s."
@@ -594,6 +613,9 @@ msgstr ""
 msgid "Title in French"
 msgstr ""
 
+msgid "Titles"
+msgstr ""
+
 msgid "Training"
 msgstr ""
 
@@ -601,6 +623,12 @@ msgstr ""
 msgid ""
 "Training <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> "
 "successfully created."
+msgstr ""
+
+#, python-format
+msgid ""
+"Training <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> "
+"successfully updated."
 msgstr ""
 
 msgid "Trainings"
@@ -624,6 +652,9 @@ msgstr ""
 msgid "University certificate"
 msgstr ""
 
+msgid "Update Training"
+msgstr ""
+
 msgid "User"
 msgstr ""
 
@@ -643,6 +674,12 @@ msgid "Weighting"
 msgstr ""
 
 msgid "Yes, I confirm."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"You can't copy the group '{code}' from {from_year} to {to_year} because it "
+"ends in {end_year}"
 msgstr ""
 
 #, python-brace-format
@@ -686,6 +723,9 @@ msgstr ""
 msgid "certificate aims"
 msgstr ""
 
+msgid "co-graduation"
+msgstr ""
+
 msgid "code"
 msgstr ""
 
@@ -702,6 +742,9 @@ msgid "duration unit"
 msgstr ""
 
 msgid "filter by section"
+msgstr ""
+
+msgid "hops"
 msgstr ""
 
 msgid "is using in"

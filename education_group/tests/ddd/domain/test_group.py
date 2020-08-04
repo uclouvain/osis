@@ -75,6 +75,7 @@ class TestGroup(SimpleTestCase):
     def test_assert_abbreviated_title_is_upperized(self):
         group = Group(
             entity_identity=GroupIdentity(code="LTONC1000", year=2010),
+            entity_id=GroupIdentity(code="LTONC1000", year=2010),
             type=GroupType.COMMON_CORE,
             abbreviated_title='titletobeupper',
             titles=Titles(title_fr='', title_en=''),

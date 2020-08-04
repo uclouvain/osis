@@ -46,7 +46,7 @@ def copy_training_to_next_year(copy_cmd: command.CopyTrainingToNextYearCommand) 
     try:
         with transaction.atomic():
             identity = repository.create(training_next_year)
-    except exception.TrainingAcronymAlreadyExist:
+    except exception.TrainingAcronymAlreadyExistException:
         identity = repository.update(training_next_year)
 
     return identity

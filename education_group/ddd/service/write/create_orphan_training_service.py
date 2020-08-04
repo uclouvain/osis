@@ -42,7 +42,6 @@ def create_and_postpone_orphan_training(create_training_cmd: command.CreateTrain
 
     # WHEN
     training = TrainingBuilder().create_training(cmd)
-    end_postponement_year = CalculateEndPostponement.calculate_year_of_end_postponement(training, TrainingRepository)
 
     # THEN
     training_id = TrainingRepository.create(training)
@@ -50,7 +49,7 @@ def create_and_postpone_orphan_training(create_training_cmd: command.CreateTrain
         command.PostponeTrainingCommand(
             acronym=training_id.acronym,
             postpone_from_year=training_id.year,
-            postpone_until_year=end_postponement_year
+            postpone_until_year=CalculateEndPostponement.calculate_max_year_of_end_postponement()
         )
     )
 

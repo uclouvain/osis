@@ -26,7 +26,6 @@
 from django.test import TestCase
 
 from base.models.certificate_aim import CertificateAim
-from base.models.education_group import EducationGroup
 from base.models.education_group_certificate_aim import EducationGroupCertificateAim
 from base.models.education_group_year import EducationGroupYear as EducationGroupYearModelDb, EducationGroupYear
 from base.models.education_group_year_domain import EducationGroupYearDomain
@@ -39,12 +38,7 @@ from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.education_group_year import TrainingFactory as TrainingDBFactory
 from base.tests.factories.entity_version import EntityVersionFactory as EntityVersionModelDbFactory
 from education_group.ddd.domain import exception
-<<<<<<< HEAD
-from education_group.ddd.domain.training import Training
-from education_group.ddd.domain.training import TrainingIdentity
-=======
 from education_group.ddd.domain.training import Training, TrainingIdentity
->>>>>>> cd1a335460d6f2a95a88f5a4cee320bf58285f21
 from education_group.ddd.repository.training import TrainingRepository
 from education_group.tests.ddd.factories.campus import CampusIdentityFactory
 from education_group.tests.ddd.factories.diploma import DiplomaAimFactory, DiplomaAimIdentityFactory

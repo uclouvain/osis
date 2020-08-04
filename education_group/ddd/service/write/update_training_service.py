@@ -30,9 +30,10 @@ from base.models.enums.activity_presence import ActivityPresence
 from base.models.enums.duration_unit import DurationUnitsEnum
 from base.models.enums.funding_codes import FundingCodes
 from base.models.enums.internship_presence import InternshipPresence
+from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.ddd import command
 from education_group.ddd.business_types import *
-from education_group.ddd.domain import training
+from education_group.ddd.domain import training, group
 from education_group.ddd.domain._campus import Campus
 from education_group.ddd.domain._co_graduation import CoGraduation
 from education_group.ddd.domain._diploma import Diploma, DiplomaAim, DiplomaAimIdentity
@@ -43,15 +44,23 @@ from education_group.ddd.domain._isced_domain import IscedDomain, IscedDomainIde
 from education_group.ddd.domain._study_domain import StudyDomain, StudyDomainIdentity
 from education_group.ddd.domain._titles import Titles
 from education_group.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
-from education_group.ddd.repository import training as training_repository
+from education_group.ddd.repository import training as training_repository, group as group_repository
 from education_group.ddd.service.write import postpone_training_service
 
 
 @transaction.atomic()
 def update_training(cmd: command.UpdateTrainingCommand) -> List['TrainingIdentity']:
     training_identity = training.TrainingIdentity(acronym=cmd.abbreviated_title, year=cmd.year)
+    group_identity = group.GroupIdentity(code=cmd.code, year=cmd.year)
+
+    postpone_until_year = CalculateEndPostponement.calculate_year_of_postponement(
+        training_identity,
+        group_identity,
+        training_repository.TrainingRepository,
+        group_repository.GroupRepository
+    )
+
     training_domain_obj = training_repository.TrainingRepository.get(training_identity)
-    end_postponement_year = cmd.postpone_until_year
 
     training_domain_obj.update(convert_command_to_update_training_data(cmd))
     training_repository.TrainingRepository.update(training_domain_obj)
@@ -60,7 +69,7 @@ def update_training(cmd: command.UpdateTrainingCommand) -> List['TrainingIdentit
         command.PostponeTrainingCommand(
             acronym=cmd.abbreviated_title,
             postpone_from_year=cmd.year,
-            postpone_until_year=end_postponement_year
+            postpone_until_year=postpone_until_year
         )
     )
 
@@ -135,4 +144,5 @@ def convert_command_to_update_training_data(cmd: command.UpdateTrainingCommand) 
             aims=[DiplomaAim(entity_id=DiplomaAimIdentity(section, code), description="")
                   for code, section in (cmd.aims or [])]
         ),
+        schedule_type=ScheduleTypeEnum[cmd.schedule_type]
     )

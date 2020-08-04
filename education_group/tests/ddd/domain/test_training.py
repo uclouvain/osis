@@ -32,7 +32,7 @@ from testing import mocks
 
 
 class TestTrainingBuilderCopyToNextYear(SimpleTestCase):
-    @mock.patch("education_group.ddd.repository.training.TrainingRepository", new_callable=mocks.MockRepository)
+    @mock.patch("education_group.ddd.repository.training.TrainingRepository", autospec=True)
     def test_should_return_existing_training_when_training_exists_for_next_year(self, mock_repository):
         training_source = TrainingFactory()
         training_next_year = TrainingFactory()
@@ -43,7 +43,7 @@ class TestTrainingBuilderCopyToNextYear(SimpleTestCase):
 
         self.assertEqual(training_next_year, result)
 
-    @mock.patch("education_group.ddd.repository.training.TrainingRepository", new_callable=mocks.MockRepository)
+    @mock.patch("education_group.ddd.repository.training.TrainingRepository", autospec=True)
     def test_should_copy_with_increment_year_when_training_does_not_exists_for_next_year(self, mock_repository):
         training_source = TrainingFactory()
 

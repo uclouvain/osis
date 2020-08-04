@@ -23,107 +23,75 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import itertools
+import sys
 from typing import Type
 
 import attr
 
 from base.models import academic_year
 from education_group.ddd.business_types import *
+from education_group.ddd.domain import exception
 from osis_common.ddd import interface
 
 DEFAULT_YEARS_TO_POSTPONE = 6
+MAX_YEAR = sys.maxsize
 
 
 class CalculateEndPostponement(interface.DomainService):
     @classmethod
-    def calculate_year_of_end_postponement_from_identities(
+    def calculate_year_of_postponement(
             cls,
             training_identity: 'TrainingIdentity',
             group_identity: 'GroupIdentity',
             training_repository: Type['TrainingRepository'],
             group_repository: Type['GroupRepository']) -> int:
-        training_domain_obj = training_repository.get(training_identity)
-        grp = group_repository.get(group_identity)
-        return cls.calculate_year_of_end_postponement(
-            training_domain_obj,
-            training_repository,
-            grp,
-            group_repository
+        return min(
+            cls.calculate_max_year_of_end_postponement(),
+            cls.calculate_year_of_postponement_conflict(
+                training_identity,
+                group_identity,
+                training_repository,
+                group_repository
+            )
         )
 
     @classmethod
-    def calculate_year_of_end_postponement(
+    def calculate_max_year_of_end_postponement(cls) -> int:
+        return academic_year.starting_academic_year().year + DEFAULT_YEARS_TO_POSTPONE
+
+    @classmethod
+    def calculate_year_of_postponement_conflict(
             cls,
-            training: 'Training',
+            training_identity: 'TrainingIdentity',
+            group_identity: 'GroupIdentity',
             training_repository: Type['TrainingRepository'],
-            group: 'Group',
-            group_repository: Type['GroupRepository']
-    ) -> int:
-        max_year_to_postpone = cls._compute_max_year_to_postpone(training)
+            group_repository: Type['GroupRepository']) -> int:
+        year_training_conflict = MAX_YEAR
+        current_training = training_repository.get(training_identity)
+        for year in itertools.count(training_identity.year + 1):
+            nex_year_identity = attr.evolve(training_identity, year=year)
+            try:
+                next_training = training_repository.get(nex_year_identity)
+            except exception.TrainingNotFoundException:
+                break
+            if not current_training.has_same_values_as(next_training):
+                year_training_conflict = year
+                break
+            current_training = next_training
 
-        max_year_to_postpone_for_training = cls._compute_postponement_end_year_training(
-            training,
-            max_year_to_postpone,
-            training_repository
-        )
-        max_year_to_postpone_for_group = cls._compute_postponement_end_year_group(
-            group,
-            max_year_to_postpone,
-            group_repository
-        )
-        return min(max_year_to_postpone_for_group, max_year_to_postpone_for_training)
+        year_group_conflict = MAX_YEAR
+        current_group = group_repository.get(group_identity)
+        for year in itertools.count(group_identity.year + 1):
+            nex_year_identity = attr.evolve(group_identity, year=year)
+            try:
+                next_group = group_repository.get(nex_year_identity)
+            except exception.GroupNotFoundException:
+                break
+            if not current_group.has_same_values_as(next_group):
+                year_group_conflict = year
+                break
+            current_group = next_group
 
-    @classmethod
-    def _compute_max_year_to_postpone(cls, training: 'Training') -> int:
-        current_year = academic_year.starting_academic_year().year
-        max_year_to_postpone = current_year + DEFAULT_YEARS_TO_POSTPONE
+        return min(year_training_conflict, year_group_conflict)
 
-        return max_year_to_postpone
-
-    @classmethod
-    def _compute_postponement_end_year_training(
-            cls,
-            training: 'Training',
-            max_year_to_postpone,
-            repository: Type['TrainingRepository']) -> int:
-        training_identities = [
-            attr.evolve(training.entity_identity, year=year)
-            for year in range(training.year+1, max_year_to_postpone+1)
-        ]
-        next_year_trainings = repository.search(entity_ids=training_identities)
-        next_year_trainings_ordered_by_year = sorted(next_year_trainings, key=lambda obj: obj.year)
-
-        current_training = training
-        for training_obj in next_year_trainings_ordered_by_year:
-            if not current_training.has_same_values_as(training_obj):
-                return current_training.year
-            current_training = training_obj
-        return max_year_to_postpone
-
-    @classmethod
-    def _compute_postponement_end_year_group(
-            cls,
-            group: 'Group',
-            max_year_to_postpone,
-            repository: Type['GroupRepository']) -> int:
-        group_identities = [
-            attr.evolve(group.entity_identity, year=year)
-            for year in range(group.year + 1, max_year_to_postpone + 1)
-        ]
-        next_year_groups = repository.search(entity_ids=group_identities)
-        next_year_groups_ordered_by_year = sorted(next_year_groups, key=lambda obj: obj.year)
-
-        current_group = group
-        for group_obj in next_year_groups_ordered_by_year:
-            if not current_group.has_same_values_as(group_obj):
-                return current_group.year
-            current_group = group_obj
-        return max_year_to_postpone
-
-    @classmethod
-    def calculate_year_of_end_postponement_for_mini(cls, mini_training: 'MiniTraining') -> int:
-        default_years_to_postpone = 6
-        current_year = academic_year.starting_academic_year().year
-        if mini_training.end_year:
-            default_years_to_postpone = mini_training.end_year - mini_training.year
-        return current_year + default_years_to_postpone

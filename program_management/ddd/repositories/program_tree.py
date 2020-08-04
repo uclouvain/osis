@@ -49,23 +49,6 @@ class ProgramTreeRepository(interface.AbstractRepository):
         return load_tree.load_trees_from_children(node_db_ids, **kwargs)
 
     @classmethod
-    # def delete(cls, entity_id: 'ProgramTreeIdentity') -> None:
-    #     try:
-    #         group_elements = GroupElementYear.objects.filter(
-    #             parent_element__group_year__partial_acronym=entity_id.code,
-    #             parent_element__group_year__academic_year__year=entity_id.year
-    #         )
-    #         for group_element in group_elements:
-    #             group_element.delete()
-    #
-    #         tree_root = Element.objects.get(
-    #             group_year__partial_acronym=entity_id.code,
-    #             group_year__academic_year__year=entity_id.year
-    #         )
-    #         tree_root.delete()
-    #     except Element.DoesNotExist:
-    #         raise exception.ProgramTreeNotFoundException()
-    #
     def delete(
             cls,
             entity_id: 'ProgramTreeIdentity',

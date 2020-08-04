@@ -54,9 +54,9 @@ class TestPostponeGroup(TestCase):
             group.GroupIdentity(code="CODE", year=2019),
             group.GroupIdentity(code="CODE", year=2020)
         ]
-        mock_copy_group_to_next_year_service.return_value = group_identities
+        mock_copy_group_to_next_year_service.side_effect = group_identities
 
-        cmd = command.PostponeGroupCommand(code="CODE", postpone_from_year=2018, postpone_until_year=2020)
+        cmd = command.PostponeGroupCommand(code="CODE", postpone_from_year=2018, postpone_until_year=2021)
         result = postpone_group_service.postpone_group(cmd)
 
         self.assertListEqual(group_identities, result)

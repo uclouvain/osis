@@ -53,6 +53,7 @@ class GroupFactory(factory.Factory):
         abstract = False
 
     entity_identity = factory.SubFactory(GroupIdentityFactory)
+    entity_id = factory.LazyAttribute(lambda o: o.entity_identity)
     type = factory.fuzzy.FuzzyChoice(GroupType)
     abbreviated_title = factory.Sequence(lambda n: "Acronym%02d" % n)
     titles = factory.SubFactory(TitlesFactory)

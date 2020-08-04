@@ -42,6 +42,6 @@ class TestPostponeTraining(TestCase):
         ]
         mock_copy_training_to_next_year_service.side_effect = training_identities
 
-        cmd = command.PostponeTrainingCommand(acronym="ACRO", postpone_from_year=2018, postpone_until_year=2020)
+        cmd = command.PostponeTrainingCommand(acronym="ACRO", postpone_from_year=2018, postpone_until_year=2021)
         result = postpone_training_service.postpone_training(cmd)
         self.assertListEqual(training_identities, result)

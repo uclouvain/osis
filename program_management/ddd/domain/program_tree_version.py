@@ -29,6 +29,7 @@ from osis_common.ddd import interface
 from program_management.ddd.business_types import *
 import attr
 from program_management.ddd.command import CreateStandardVersionCommand
+from program_management.ddd.domain import exception
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity, ProgramTree
 
 STANDARD = ""
@@ -52,12 +53,11 @@ class ProgramTreeVersionBuilder:
             tree_version_repository: 'ProgramTreeVersionRepository'
     ) -> 'ProgramTreeVersion':
         identity_next_year = attr.evolve(copy_from.entity_id, year=copy_from.entity_id.year + 1)
-        tree_version_next_year = tree_version_repository.get(identity_next_year)
-        if tree_version_next_year:
+        try:
+            tree_version_next_year = tree_version_repository.get(identity_next_year)
             # Case update program tree version to next year
             # TODO :: To implement in OSIS-4386
-            pass
-        else:
+        except exception.ProgramTreeVersionNotFoundException:
             # Case create program tree version to next year
             tree_version_next_year = attr.evolve(  # Copy to new object
                 copy_from,

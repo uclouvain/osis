@@ -103,8 +103,10 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
             'version_title_en',
             'is_transition',
         )
-        if qs:
-            return _instanciate_tree_version(qs[0])
+        try:
+            return _instanciate_tree_version(qs.get())
+        except EducationGroupVersion.DoesNotExist:
+            raise exception.ProgramTreeVersionNotFoundException()
 
     @classmethod
     def search(

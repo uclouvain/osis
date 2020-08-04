@@ -32,7 +32,7 @@ from education_group.tests.ddd.factories.training import TrainingFactory
 
 class TestCreateAndPostponeOrphanTraining(TestCase):
     @mock.patch("education_group.ddd.service.write.create_orphan_training_service.CalculateEndPostponement."
-                "calculate_year_of_end_postponement", return_value=2021)
+                "calculate_max_year_of_end_postponement", return_value=2021)
     @mock.patch("education_group.ddd.service.write.postpone_training_service.postpone_training")
     @mock.patch("education_group.ddd.service.write.create_orphan_training_service.TrainingBuilder")
     @mock.patch("education_group.ddd.service.write.create_orphan_training_service.TrainingRepository")

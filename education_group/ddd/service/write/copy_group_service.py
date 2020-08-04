@@ -38,7 +38,7 @@ def copy_group(cmd: command.CopyGroupCommand) -> 'GroupIdentity':
         entity_id=group.GroupIdentity(code=cmd.from_code, year=cmd.from_year)
     )
 
-    group_next_year = group.GroupBuilder().build_next_year_group(existing_group)
+    group_next_year = group.GroupBuilder().copy_to_next_year(existing_group, repository)
 
     try:
         with transaction.atomic():

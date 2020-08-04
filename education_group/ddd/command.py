@@ -117,6 +117,13 @@ class CreateTrainingCommand(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True)
+class PostponeTrainingWithProgramTreeCommand(interface.CommandRequest):
+    abbreviated_title = attr.ib(type=str)
+    code = attr.ib(type=str)
+    from_year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
 class UpdateTrainingCommand(interface.CommandRequest):
     abbreviated_title = attr.ib(type=str)
     code = attr.ib(type=str)
@@ -185,7 +192,8 @@ class UpdateTrainingCommand(interface.CommandRequest):
     remark_fr = attr.ib(type=Optional[str])
     remark_en = attr.ib(type=Optional[str])
     organization_name = attr.ib(type=str)
-    postpone_until_year = attr.ib(type=Optional[int], default=None)
+
+    schedule_type = attr.ib(type=str)
 
 
 @attr.s(frozen=True, slots=True)
@@ -280,7 +288,7 @@ class UpdateGroupCommand(interface.CommandRequest):
     organization_name = attr.ib(type=str)
     remark_fr = attr.ib(type=str)
     remark_en = attr.ib(type=str)
-    postpone_until_year = attr.ib(type=int)
+    end_year = attr.ib(type=Optional[int])
 
 
 @attr.s(frozen=True, slots=True)
@@ -354,4 +362,11 @@ class GetTrainingCommand(interface.CommandRequest):
 @attr.s(frozen=True, slots=True)
 class GetMiniTrainingCommand(interface.CommandRequest):
     acronym = attr.ib(type=str)
+    year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class GetUpdateTrainingWarningMessages(interface.CommandRequest):
+    acronym = attr.ib(type=str)
+    code = attr.ib(type=str)
     year = attr.ib(type=int)

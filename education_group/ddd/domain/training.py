@@ -73,13 +73,12 @@ class TrainingBuilder:
 
     def copy_to_next_year(self, training_from: 'Training', training_repository: 'TrainingRepository') -> 'Training':
         identity_next_year = TrainingIdentity(acronym=training_from.acronym, year=training_from.year + 1)
+        CopyTrainingValidatorList(training_from).validate()
         try:
             training_next_year = training_repository.get(identity_next_year)
             training_next_year.update_from_other_training(training_from)
         except TrainingNotFoundException:
-            # Case create training next year
-            CopyTrainingValidatorList(training_from).validate()
-            training_next_year = attr.evolve(  # Copy to new object
+            training_next_year = attr.evolve(
                 training_from,
                 entity_identity=identity_next_year,
                 entity_id=identity_next_year,
@@ -298,15 +297,18 @@ class Training(interface.RootEntity):
             value = getattr(other_training, field)
             setattr(self, field, value)
 
-    # TODO rename method
     def has_same_values_as(self, other_training: 'Training') -> bool:
+        return not bool(self.get_conflicted_fields(other_training))
+
+    def get_conflicted_fields(self, other_training: 'Training') -> List[str]:
         fields_not_to_compare = ("year", "entity_id", "entity_identity", "identity_through_years")
-        for field in other_training.__slots__:
-            if field in fields_not_to_compare:
+        conflicted_fields = []
+        for field_name in other_training.__slots__:
+            if field_name in fields_not_to_compare:
                 continue
-            if getattr(self, field) != getattr(other_training, field):
-                return False
-        return True
+            if getattr(self, field_name) != getattr(other_training, field_name):
+                conflicted_fields.append(field_name)
+        return conflicted_fields
 
 
 @attr.s(frozen=True, slots=True, kw_only=True)
@@ -318,6 +320,7 @@ class UpdateTrainingData:
     duration_unit = attr.ib(type=DurationUnitsEnum, default=DurationUnitsEnum.QUADRIMESTER)
     keywords = attr.ib(type=str, default="")
     internship_presence = attr.ib(type=InternshipPresence, default=InternshipPresence.NO)
+    schedule_type = attr.ib(type=ScheduleTypeEnum, default=ScheduleTypeEnum.DAILY)
     is_enrollment_enabled = attr.ib(type=bool, default=True)
     has_online_re_registration = attr.ib(type=bool, default=True)
     has_partial_deliberation = attr.ib(type=bool, default=False)

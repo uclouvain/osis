@@ -29,6 +29,7 @@ from education_group.ddd.validators._abbreviated_title_already_exist import Acro
 from education_group.ddd.validators._acronym_required import AcronymRequiredValidator
 from education_group.ddd.validators._certificate_aim_type_2 import CertificateAimType2Validator
 from education_group.ddd.validators._content_constraint import ContentConstraintValidator
+from education_group.ddd.validators._copy_check_group_end_date import CheckGroupEndDateValidator
 from education_group.ddd.validators._copy_check_mini_training_end_date import CheckMiniTrainingEndDateValidator
 from education_group.ddd.validators._copy_check_training_end_date import CheckTrainingEndDateValidator
 from education_group.ddd.validators._credits import CreditsValidator
@@ -96,6 +97,15 @@ class CopyTrainingValidatorList(business_validator.BusinessListValidator):
     def __init__(self, training_from: 'Training'):
         self.validators = [
             CheckTrainingEndDateValidator(training_from),
+        ]
+        super().__init__()
+
+
+class CopyGroupValidatorList(business_validator.BusinessListValidator):
+
+    def __init__(self, group_from: 'Group'):
+        self.validators = [
+            CheckGroupEndDateValidator(group_from),
         ]
         super().__init__()
 

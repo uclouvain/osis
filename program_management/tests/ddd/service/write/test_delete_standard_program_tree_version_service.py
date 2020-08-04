@@ -30,13 +30,25 @@ from program_management.ddd.service.write import delete_standard_program_tree_ve
 
 
 class TestDeleteStandardProgramTreeVersion(TestCase):
-    @mock.patch("program_management.ddd.repositories.program_tree_version.ProgramTreeVersionRepository", autospec=True)
-    def test_delete_program_tree_versions(self, mock_program_tree_version_repository):
-        mock_program_tree_version_repository.delete.side_effect = [
-            None,
-            None,
-            exception.ProgramTreeVersionNotFoundException
+    @mock.patch("program_management.ddd.domain.service.calculate_end_postponement.CalculateEndPostponement."
+                "calculate_max_year_of_end_postponement", return_value=2020)
+    @mock.patch("program_management.ddd.service.write.delete_standard_version_service.delete_standard_version")
+    def test_delete_program_tree_versions(self, mock_delete_tree_version, mock_end_postponement):
+        tree_versions_identity = [
+            program_tree_version.ProgramTreeVersionIdentity(
+                offer_acronym='Acronym',
+                year=2018,
+                version_name='',
+                is_transition=False
+            ),
+            program_tree_version.ProgramTreeVersionIdentity(
+                offer_acronym='Acronym',
+                year=2019,
+                version_name='',
+                is_transition=False
+            )
         ]
+        mock_delete_tree_version.side_effect = tree_versions_identity
 
         delete_command = command.DeleteProgramTreeVersionCommand(
             offer_acronym='Acronym',
@@ -44,22 +56,4 @@ class TestDeleteStandardProgramTreeVersion(TestCase):
             is_transition=False,
             from_year=2018)
         result = delete_standard_program_tree_version_service.delete_standard_program_tree_version(delete_command)
-
-        self.assertListEqual(
-            [
-                program_tree_version.ProgramTreeVersionIdentity(
-                    offer_acronym='Acronym',
-                    year=2018,
-                    version_name='',
-                    is_transition=False
-                ),
-                program_tree_version.ProgramTreeVersionIdentity(
-                    offer_acronym='Acronym',
-                    year=2019,
-                    version_name='',
-                    is_transition=False
-                )
-            ],
-            result
-        )
-        self.assertEqual(3, mock_program_tree_version_repository.delete.call_count)
+        self.assertListEqual(tree_versions_identity, result)

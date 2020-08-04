@@ -54,6 +54,11 @@ def delete_node(cmd: command.DeleteNodeCommand) -> None:
             delete_orphan_training_service.delete_orphan_training(cmd)
         except exception.TrainingNotFoundException:
             pass
+        cmd = command_education_group.DeleteOrphanGroupCommand(code=node_id.code, year=node_id.year)
+        try:
+            delete_orphan_group_service.delete_orphan_group(cmd)
+        except exception.GroupNotFoundException:
+            pass
     elif cmd.node_type in MiniTrainingType.get_names():
         # TODO: change With MiniTrainingIdentitySearch()
         tree_version_id = ProgramTreeVersionIdentitySearch().get_from_node_identity(node_id)

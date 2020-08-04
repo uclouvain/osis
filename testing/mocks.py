@@ -21,7 +21,7 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from typing import Any
+from typing import Any, Callable, List
 
 import mock
 
@@ -41,9 +41,28 @@ class MockFormValid(mock.Mock):
         return mock.MagicMock()
 
 
-class MockRepository(mock.MagicMock):
-    def __int__(self, *args, **kwargs):
-        return super().__init__(*args, spec=interface.AbstractRepository, **kwargs)
+class MockRepository:
+    root_entities = list()  # type: List['interface.RootEntity']
+    exception_class = None
+
+    @classmethod
+    def create(cls, domain_obj: interface.RootEntity, **_) -> interface.EntityIdentity:
+        return domain_obj.entity_id
+
+    @classmethod
+    def update(cls, domain_obj: interface.RootEntity, **_) -> interface.EntityIdentity:
+        return domain_obj.entity_id
+
+    @classmethod
+    def get(cls, entity_id: interface.EntityIdentity) -> interface.RootEntity:
+        try:
+            return next((root_entity for root_entity in cls.root_entities if root_entity.entity_id == entity_id))
+        except StopIteration:
+            raise cls.exception_class()
+
+    @classmethod
+    def delete(cls, entity_id: interface.EntityIdentity, **_) -> None:
+        pass
 
 
 class MockPatcherMixin:
@@ -52,3 +71,17 @@ class MockPatcherMixin:
         self.addCleanup(service_patcher.stop)
 
         return service_patcher.start()
+
+    def mock_repository(
+            self,
+            repository_path: str,
+            root_entities: List['interface.RootEntity'] = None) -> 'MockRepository':
+        class_name = "Fake" + repository_path.split('.')[-1]
+        fake_repo = type(class_name, (MockRepository,), {
+            "root_entities": root_entities or list()
+        })
+
+        repo_patcher = mock.patch(repository_path, new=fake_repo)
+        self.addCleanup(repo_patcher.stop)
+
+        return repo_patcher.start()

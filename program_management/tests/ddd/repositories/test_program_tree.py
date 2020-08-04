@@ -113,26 +113,6 @@ class TestSearchTreesFromChildren(TestCase):
         )
 
 
-class TestProgramTreeDelete(TestCase):
-    def test_should_raise_exception_when_no_matching_program_tree_found_to_delete(self):
-        program_tree_identity = ProgramTreeIdentity(code='Code', year=2018)
-
-        with self.assertRaises(exception.ProgramTreeNotFoundException):
-            program_tree.ProgramTreeRepository.delete(program_tree_identity)
-
-    def test_should_delete_element_when_matching_program_tree_found(self):
-        element_db_obj = ElementGroupYearFactory()
-        program_tree_identity = ProgramTreeIdentity(
-            code=element_db_obj.group_year.partial_acronym,
-            year=element_db_obj.group_year.academic_year.year
-        )
-
-        program_tree.ProgramTreeRepository.delete(program_tree_identity)
-
-        with self.assertRaises(Element.DoesNotExist):
-            Element.objects.get(pk=element_db_obj.pk)
-
-
 class TestDeleteProgramTree(TestCase):
     @classmethod
     def setUpTestData(cls):

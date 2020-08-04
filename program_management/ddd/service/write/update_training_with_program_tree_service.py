@@ -25,7 +25,6 @@
 ##############################################################################
 from typing import List
 
-import attr
 from django.db import transaction
 
 from education_group.ddd import command
@@ -42,55 +41,42 @@ from program_management.ddd.service.write import postpone_tree_version_service, 
 
 @transaction.atomic()
 def update_and_report_training_with_program_tree(
-        update_training_cmd: command.UpdateTrainingCommand
+        update_command: command.UpdateTrainingCommand
 ) -> List['TrainingIdentity']:
-    training_identity = training.TrainingIdentity(
-        acronym=update_training_cmd.abbreviated_title,
-        year=update_training_cmd.year
-    )
-    group_identity = group.GroupIdentity(code=update_training_cmd.code, year=update_training_cmd.year)
-    end_postponement_year = CalculateEndPostponement.calculate_year_of_end_postponement_from_identities(
-        training_identity,
-        group_identity,
+    postpone_until_year = CalculateEndPostponement.calculate_year_of_postponement(
+        training.TrainingIdentity(acronym=update_command.abbreviated_title, year=update_command.year),
+        group.GroupIdentity(code=update_command.code, year=update_command.year),
         training_repository.TrainingRepository,
         group_repository.GroupRepository
     )
 
-    if update_training_cmd.end_year:
-        end_postponement_year = min(end_postponement_year, update_training_cmd.end_year)
+    training_identities = update_training_service.update_training(update_command)
 
-    new_cmd = attr.evolve(update_training_cmd, postpone_until_year=end_postponement_year)
-
-    training_identities = update_training_service.update_training(new_cmd)
-
-    update_group_service.update_group(
-        _convert_to_update_group_command(update_training_cmd, end_postponement_year)
-    )
+    update_group_service.update_group(_convert_to_update_group_command(update_command))
 
     postpone_program_tree_service.postpone_program_tree(
         PostponeProgramTreeCommand(
-            from_code=update_training_cmd.code,
-            from_year=update_training_cmd.year,
-            offer_acronym=update_training_cmd.abbreviated_title,
+            from_code=update_command.code,
+            from_year=update_command.year,
+            offer_acronym=update_command.abbreviated_title,
+            until_year=postpone_until_year
         )
     )
 
     postpone_tree_version_service.postpone_program_tree_version(
         PostponeProgramTreeVersionCommand(
-            from_offer_acronym=update_training_cmd.abbreviated_title,
+            from_offer_acronym=update_command.abbreviated_title,
             from_version_name="",
-            from_year=update_training_cmd.year,
+            from_year=update_command.year,
             from_is_transition=False,
+            until_year=postpone_until_year
         )
     )
 
     return training_identities
 
 
-def _convert_to_update_group_command(
-        training_cmd: command.UpdateTrainingCommand,
-        end_postponement_year: int
-) -> command.UpdateGroupCommand:
+def _convert_to_update_group_command(training_cmd: command.UpdateTrainingCommand) -> command.UpdateGroupCommand:
     return command.UpdateGroupCommand(
         code=training_cmd.code,
         year=training_cmd.year,
@@ -106,5 +92,5 @@ def _convert_to_update_group_command(
         organization_name=training_cmd.teaching_campus_organization_name,
         remark_fr=training_cmd.remark_fr,
         remark_en=training_cmd.remark_en,
-        postpone_until_year=end_postponement_year
+        end_year=training_cmd.end_year
     )

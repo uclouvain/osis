@@ -27,6 +27,12 @@ class MiniTrainingCodeAlreadyExistException(BusinessException):
         super().__init__(message, **kwargs)
 
 
+class TrainingAcronymAlreadyExistException(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _("Acronym already exists")
+        super().__init__(message, **kwargs)
+
+
 class AcademicYearNotFound(Exception):
     pass
 
@@ -85,6 +91,19 @@ class AcronymRequired(BusinessException):
 class AcronymAlreadyExist(BusinessException):
     def __init__(self, abbreviated_title: str, *args, **kwargs):
         message = _("Acronym/Short title '{}' already exists").format(abbreviated_title)
+        super().__init__(message, **kwargs)
+
+
+class CannotCopyGroupDueToEndDate(BusinessException):
+    def __init__(self, group: 'Group', *args, **kwargs):
+        message = _(
+            "You can't copy the group '{code}' from {from_year} to {to_year} because it ends in {end_year}"
+        ).format(
+            code=group.code,
+            from_year=group.year,
+            to_year=group.year + 1,
+            end_year=group.end_year,
+        )
         super().__init__(message, **kwargs)
 
 

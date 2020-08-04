@@ -45,10 +45,7 @@ def postpone_program_tree(
 
     # GIVEN
     from_year = postpone_cmd.from_year
-    end_postponement_year = CalculateEndPostponement.calculate_year_of_end_postponement(
-        training_identity=TrainingIdentity(acronym=postpone_cmd.offer_acronym, year=postpone_cmd.from_year),
-        training_repository=TrainingRepository()
-    )
+    end_postponement_year = postpone_cmd.until_year
 
     # WHEN
     while from_year < end_postponement_year:

@@ -31,12 +31,14 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 
+import program_management.ddd.service.write.report_training_with_program_tree
 from base.utils.urls import reverse_with_get
-from base.views.common import display_success_messages
+from base.views.common import display_success_messages, display_warning_messages
 from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import exception, group
-from education_group.ddd.service.read import get_training_service, get_group_service, get_multiple_groups_service
+from education_group.ddd.service.read import get_training_service, get_group_service, get_multiple_groups_service, \
+    get_update_training_warning_messages
 from education_group.enums.node_type import NodeType
 from education_group.forms import training as training_forms, content as content_forms
 from education_group.templatetags.academic_year_display import display_as_academic_year
@@ -51,7 +53,7 @@ from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception as program_management_exception
 from program_management.ddd.service.read import get_program_tree_service
 from program_management.ddd.service.write import update_link_service, delete_training_with_program_tree_service, \
-    update_training_with_program_tree_service
+    update_training_with_program_tree_service, report_training_with_program_tree
 
 
 class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
@@ -74,13 +76,23 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         if self.training_form.is_valid() and self.content_formset.is_valid():
             update_trainings = self.update_training()
+            created_trainings = self.report_training()
             deleted_trainings = self.delete_training()
-
             if not self.training_form.errors:
                 self.update_links()
                 success_messages = self.get_success_msg_updated_trainings(update_trainings)
+                success_messages += self.get_success_msg_updated_trainings(created_trainings)
                 success_messages += self.get_success_msg_deleted_trainings(deleted_trainings)
                 display_success_messages(request, success_messages, extra_tags='safe')
+
+                warning_messages = get_update_training_warning_messages.get_conflicted_fields(
+                    command.GetUpdateTrainingWarningMessages(
+                        acronym=self.get_training_obj().acronym,
+                        code=self.get_training_obj().code,
+                        year=self.get_training_obj().year
+                    )
+                )
+                display_warning_messages(request, warning_messages, extra_tags='safe')
                 return HttpResponseRedirect(self.get_success_url())
 
         return self.get(request, *args, **kwargs)
@@ -122,6 +134,18 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
     def update_training(self) -> List['TrainingIdentity']:
         update_command = self._convert_form_to_update_training_command(self.training_form)
         return update_training_with_program_tree_service.update_and_report_training_with_program_tree(update_command)
+
+    def report_training(self) -> List['TrainingIdentity']:
+        if self.get_training_obj().end_year:
+            return report_training_with_program_tree.report_training_with_program_tree(
+                command.PostponeTrainingWithProgramTreeCommand(
+                    abbreviated_title=self.get_training_obj().acronym,
+                    code=self.get_training_obj().code,
+                    from_year=self.get_training_obj().end_year
+                )
+            )
+
+        return []
 
     def delete_training(self) -> List['TrainingIdentity']:
         if not self.training_form.cleaned_data["end_year"]:
@@ -414,6 +438,7 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             remark_fr=cleaned_data['remark_fr'],
             remark_en=cleaned_data['remark_english'],
             organization_name=cleaned_data['teaching_campus'].organization.name,
+            schedule_type=cleaned_data["schedule_type"],
         )
 
     def _convert_form_to_delete_trainings_command(
@@ -433,7 +458,7 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             self,
             form: 'content_forms.LinkForm') -> command_program_management.UpdateLinkCommand:
         return command_program_management.UpdateLinkCommand(
-            child_node_code=form.child_obj.code if isinstance(form.child_obj, Group) else form.child_obj.acronym,
+            child_node_code=form.child_obj.code if isinstance(form.child_obj, group.Group) else form.child_obj.acronym,
             child_node_year=form.child_obj.year,
             access_condition=form.cleaned_data.get('access_condition', False),
             is_mandatory=form.cleaned_data.get('is_mandatory', True),

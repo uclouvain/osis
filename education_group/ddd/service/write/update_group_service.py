@@ -26,29 +26,48 @@ from django.db import transaction
 
 from base.models.enums.constraint_type import ConstraintTypeEnum
 from education_group.ddd import command
+from education_group.ddd.domain import training
 from education_group.ddd.domain._campus import Campus
 from education_group.ddd.domain._content_constraint import ContentConstraint
 from education_group.ddd.domain._entity import Entity
 from education_group.ddd.domain._remark import Remark
 from education_group.ddd.domain._titles import Titles
-
-from education_group.ddd.domain.group import GroupIdentity
+from education_group.ddd.domain.group import GroupIdentity, Group
 from education_group.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
-from education_group.ddd.repository.group import GroupRepository
-
-
-# TODO : Implement Validator (Actually in GroupFrom via ValidationRules)
+from education_group.ddd.repository import group as group_repository, training as training_repository
 from education_group.ddd.service.write import postpone_group_service
 
 
 @transaction.atomic()
 def update_group(cmd: command.UpdateGroupCommand) -> 'GroupIdentity':
     group_identity = GroupIdentity(code=cmd.code, year=cmd.year)
-    grp = GroupRepository.get(group_identity)
+    training_identity = training.TrainingIdentity(acronym=cmd.abbreviated_title, year=cmd.year)
 
-    end_postponement_year = cmd.postpone_until_year
+    postpone_until_year = CalculateEndPostponement.calculate_year_of_postponement(
+        training_identity,
+        group_identity,
+        training_repository.TrainingRepository,
+        group_repository.GroupRepository
+    )
 
-    grp.update(
+    grp = group_repository.GroupRepository.get(group_identity)
+
+    _update_group(grp, cmd)
+    group_repository.GroupRepository.update(grp)
+
+    postpone_group_service.postpone_group(
+        command.PostponeGroupCommand(
+            code=group_identity.code,
+            postpone_from_year=cmd.year,
+            postpone_until_year=postpone_until_year
+        )
+    )
+
+    return group_identity
+
+
+def _update_group(group_obj: 'Group', cmd: command.UpdateGroupCommand) -> 'Group':
+    group_obj.update(
         abbreviated_title=cmd.abbreviated_title,
         titles=Titles(title_fr=cmd.title_fr, title_en=cmd.title_en),
         credits=cmd.credits,
@@ -62,16 +81,7 @@ def update_group(cmd: command.UpdateGroupCommand) -> 'GroupIdentity':
             name=cmd.teaching_campus_name,
             university_name=cmd.organization_name
         ),
-        remark=Remark(text_fr=cmd.remark_fr, text_en=cmd.remark_en)
+        remark=Remark(text_fr=cmd.remark_fr, text_en=cmd.remark_en),
+        end_year=cmd.end_year
     )
-    GroupRepository.update(grp)
-
-    postpone_group_service.postpone_group(
-        command.PostponeGroupCommand(
-            code=group_identity.code,
-            postpone_from_year=group_identity.year,
-            postpone_until_year=end_postponement_year
-        )
-    )
-
-    return group_identity
+    return group_obj
