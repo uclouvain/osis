@@ -88,6 +88,7 @@ def create_and_report_training_with_program_tree(
             from_version_name=program_tree_version_identity.version_name,
             from_year=program_tree_version_identity.year,
             from_is_transition=program_tree_version_identity.is_transition,
+            from_code=create_training_cmd.code
         )
     )
 

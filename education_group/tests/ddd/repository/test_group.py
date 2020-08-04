@@ -189,6 +189,9 @@ class TestGroupRepositoryCreateMethod(TestCase):
         self.assertEqual(group_inserted.min_constraint, self.group.content_constraint.minimum)
         self.assertEqual(group_inserted.max_constraint, self.group.content_constraint.maximum)
 
+        self.assertEqual(group_inserted.remark_en, self.group.remark.text_en)
+        self.assertEqual(group_inserted.remark_fr, self.group.remark.text_fr)
+
         self.assertEqual(group_inserted.management_entity_id, self.management_entity_version.entity_id)
         self.assertEqual(group_inserted.academic_year_id, self.academic_year.pk)
         self.assertEqual(group_inserted.education_group_type_id, self.education_group_type.pk)

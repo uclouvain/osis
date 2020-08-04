@@ -24,14 +24,14 @@
 
 from base.ddd.utils import business_validator
 from education_group.ddd.business_types import *
-from education_group.ddd.domain.exception import CannotCopyDueToEndDate
+from education_group.ddd.domain.exception import CannotCopyMiniTrainingDueToEndDate
 
 
-class CheckEndDateValidator(business_validator.BusinessValidator):
-    def __init__(self, training: 'Training'):
+class CheckMiniTrainingEndDateValidator(business_validator.BusinessValidator):
+    def __init__(self, mini_training: 'MiniTraining'):
         super().__init__()
-        self.training = training
+        self.mini_training = mini_training
 
     def validate(self, *args, **kwargs):
-        if self.training.end_year and self.training.year > self.training.end_year:
-            raise CannotCopyDueToEndDate(training=self.training)
+        if self.mini_training.end_year and self.mini_training.year > self.mini_training.end_year:
+            raise CannotCopyMiniTrainingDueToEndDate(mini_training=self.mini_training)

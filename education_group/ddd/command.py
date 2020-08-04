@@ -203,9 +203,38 @@ class GetGroupCommand(interface.CommandRequest):
 
 @attr.s(frozen=True, slots=True)
 class GetTrainingCommand(interface.CommandRequest):
-
     acronym = attr.ib(type=str)
     year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class GetMiniTrainingCommand(interface.CommandRequest):
+    acronym = attr.ib(type=str)
+    year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class CreateMiniTrainingCommand(interface.CommandRequest):
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)
+    type = attr.ib(type=str)
+    abbreviated_title = attr.ib(type=str)
+    title_fr = attr.ib(type=str)
+    title_en = attr.ib(type=str)
+    keywords = attr.ib(type=str)
+    status = attr.ib(type=str)
+    schedule_type = attr.ib(type=str)
+    credits = attr.ib(type=int)
+    constraint_type = attr.ib(type=str)
+    min_constraint = attr.ib(type=int)
+    max_constraint = attr.ib(type=int)
+    management_entity_acronym = attr.ib(type=str)
+    teaching_campus_name = attr.ib(type=str)
+    organization_name = attr.ib(type=str)
+    remark_fr = attr.ib(type=str)
+    remark_en = attr.ib(type=str)
+    start_year = attr.ib(type=int)
+    end_year = attr.ib(type=Optional[int])
 
 
 @attr.s(frozen=True, slots=True)
@@ -269,6 +298,12 @@ class PostponeGroupCommand(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True)
+class PostponeMiniTrainingCommand(interface.CommandRequest):
+    acronym = attr.ib(type=str)
+    postpone_from_year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
 class CopyTrainingToNextYearCommand(interface.CommandRequest):
     acronym = attr.ib(type=str)
     postpone_from_year = attr.ib(type=int)
@@ -284,6 +319,12 @@ class DeleteTrainingCommand(interface.CommandRequest):
 class DeleteGroupCommand(interface.CommandRequest):
     code = attr.ib(type=str)
     from_year = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class CopyMiniTrainingToNextYearCommand(interface.CommandRequest):
+    acronym = attr.ib(type=str)
+    postpone_from_year = attr.ib(type=int)
 
 
 @attr.s(frozen=True, slots=True)

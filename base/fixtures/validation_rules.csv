@@ -1394,7 +1394,7 @@ base.validationrule,GroupForm.SUB_GROUP.title_fr,REQUIRED,,,,,,
 base.validationrule,GroupForm.SUB_GROUP.teaching_campus,REQUIRED,,,,,,
 base.validationrule,GroupForm.SUB_GROUP.academic_year,REQUIRED,,,,,,
 base.validationrule,GroupForm.SUB_GROUP.management_entity,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_deepening,REQUIRED,100P,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Pp])$",,"Code of Deepening is composed of:
+base.validationrule,MiniTrainingForm.DEEPENING.code,REQUIRED,100P,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Pp])$",,"Code of Deepening is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
@@ -1409,7 +1409,7 @@ Examples: <i>LBIOL100P, WFARM100P, LSINF110P</i>","Code d’un Approfondissement
 <li><b>P</b></li>
 </ul>
 Exemples: <i>LBIOL100P, WFARM100P, LSINF110P</i>",Ex: LBIOL100P
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_sociatyminor,REQUIRED,100I,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Ii])$",,"Code of Society minor is composed of:
+base.validationrule,MiniTrainingForm.SOCIETY_MINOR.code,REQUIRED,100I,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Ii])$",,"Code of Society minor is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
@@ -1424,7 +1424,7 @@ Examples: <i>LCUCR100I, LDVLD100I, LGENR100I</i>","Code d’une Mineure de soci�
 <li><b>I</b></li>
 </ul>
 Exemples: <i>LCUCR100I, LDVLD100I, LGENR100I</i>",Ex: LCUCR100I
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_accessminor,REQUIRED,100I,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Ii])$",,"Code of Access minor is composed of:
+base.validationrule,MiniTrainingForm.ACCESS_MINOR.code,REQUIRED,100I,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Ii])$",,"Code of Access minor is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
@@ -1439,7 +1439,7 @@ Examples: <i>LECON100I, LISP100I, LLING100I</i>","Code d’une Mineure d’accè
 <li><b>I</b></li>
 </ul>
 Exemples: <i>LECON100I, LISP100I, LLING100I</i>",Ex: LECON100I
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_openminor,REQUIRED,100I,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Ii])$",,"Code of Open minor is composed of:
+base.validationrule,MiniTrainingForm.OPEN_MINOR.code,REQUIRED,100I,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Ii])$",,"Code of Open minor is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
@@ -1454,7 +1454,7 @@ Examples: <i>LANTI100I, WSBIM100I, LMPME100I</i>","Code d’une Mineure d’ouve
 <li><b>I</b></li>
 </ul>
 Exemples: <i>LANTI100I, WSBIM100I, LMPME100I</i>",Ex: LANTI100I
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_disciplinarycomplementminor,REQUIRED,100I,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Ii])$",,"Code of Disciplinary complement minor is composed of:
+base.validationrule,MiniTrainingForm.DISCIPLINARY_COMPLEMENT_MINOR.code,REQUIRED,100I,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Ii])$",,"Code of Disciplinary complement minor is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
@@ -1469,7 +1469,7 @@ Examples: <i>LALLE100I, LCHIM100I, LITA100I</i>","Code d’une Mineure compléme
 <li><b>I</b></li>
 </ul>
 Exemples: <i>LALLE100I, LCHIM100I, LITA100I</i>",Ex: LALLE100I
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_fsaspeciality,REQUIRED,100J,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Jj])$",,"Code of FSA speciality is composed of:
+base.validationrule,MiniTrainingForm.FSA_SPECIALITY.code,REQUIRED,100J,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Jj])$",,"Code of FSA speciality is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
@@ -1484,7 +1484,7 @@ Examples: <i>LMAJ103J, LMAJ102J, LPSP100J</i>","Code d’une Spécialité FSA (m
 <li><b>J</b></li>
 </ul>
 Exemples: <i>LMAJ103J, LMAJ102J, LPSP100J</i>",Ex: LPSP100J
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_option,REQUIRED,100O,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Oo])$",,"Code of Option is composed of:
+base.validationrule,MiniTrainingForm.OPTION.code,REQUIRED,100O,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Oo])$",,"Code of Option is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
@@ -1499,7 +1499,7 @@ Examples: <i>LFYAP132O, MCOMM110O, LENVI103O</i>","Code d’une Option est compo
 <li><b>O</b></li>
 </ul>
 Exemples: <i>LFYAP132O, MCOMM110O, LENVI103O</i>",Ex: LFYAP100O
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_mobilitypartnership,REQUIRED,100V,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Vv])$",,"Code of Mobility partnership is composed of:
+base.validationrule,MiniTrainingForm.MOBILITY_PARTNERSHIP.code,REQUIRED,100V,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Vv])$",,"Code of Mobility partnership is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
@@ -1514,46 +1514,46 @@ Examples: <i>LAGRO114V, LDRT100V, LFIAL100V</i>","Code d’un Parternariat de mo
 <li><b>V</b></li>
 </ul>
 Exemples: <i>LAGRO114V, LDRT100V, LFIAL100V</i>",Ex: LAGRO100V
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_deepening,REQUIRED,,,,,,Ex: APPBIOL
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_sociatyminor,REQUIRED,,,,,,Ex: MINDD
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_accessminor,REQUIRED,,,,,,Ex: MINECON
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_openminor,REQUIRED,,,,,,Ex: MINCULTS
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_disciplinarycomplementminor,REQUIRED,,,,,,Ex: MINANGL
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_fsaspeciality,REQUIRED,,,,,,Ex: MAJPSY
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_option,REQUIRED,,,,,,Ex: OPTLAFR2M1/LA
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_mobilitypartnership,REQUIRED,,,,,,Ex: PSP - CH GENEVE01
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_deepening,REQUIRED,Approfondissement en,^(.*)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_sociatyminor,REQUIRED,Mineure,^(Mineure)(.*)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_accessminor,REQUIRED,Mineure,^(Mineure)(.*)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_openminor,REQUIRED,Mineure,^(Mineure)(.*)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_disciplinarycomplementminor,REQUIRED,Mineure,^(Mineure)(.*)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_fsaspeciality,REQUIRED,Majeure en,^(Majeure en)(.*)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_option,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_mobilitypartnership,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.credits.osis.education_group_type_deepening,REQUIRED,30,,,,,
-base.validationrule,base_educationgroupyear.credits.osis.education_group_type_sociatyminor,REQUIRED,30,,,,,
-base.validationrule,base_educationgroupyear.credits.osis.education_group_type_accessminor,REQUIRED,30,,,,,
-base.validationrule,base_educationgroupyear.credits.osis.education_group_type_openminor,REQUIRED,30,,,,,
-base.validationrule,base_educationgroupyear.credits.osis.education_group_type_disciplinarycomplementminor,REQUIRED,30,,,,,
-base.validationrule,base_educationgroupyear.credits.osis.education_group_type_fsaspeciality,NOT_REQUIRED,40,,,,,
-base.validationrule,base_educationgroupyear.credits.osis.education_group_type_option,NOT_REQUIRED,15,,,,,
-base.validationrule,base_educationgroupyear.credits.osis.education_group_type_mobilitypartnership,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.schedule_type.osis.education_group_type_deepening,REQUIRED,DAILY,,,,,
-base.validationrule,base_educationgroupyear.schedule_type.osis.education_group_type_sociatyminor,REQUIRED,DAILY,,,,,
-base.validationrule,base_educationgroupyear.schedule_type.osis.education_group_type_accessminor,REQUIRED,DAILY,,,,,
-base.validationrule,base_educationgroupyear.schedule_type.osis.education_group_type_openminor,REQUIRED,DAILY,,,,,
-base.validationrule,base_educationgroupyear.schedule_type.osis.education_group_type_disciplinarycomplementminor,REQUIRED,DAILY,,,,,
-base.validationrule,base_educationgroupyear.schedule_type.osis.education_group_type_fsaspeciality,REQUIRED,DAILY,,,,,
-base.validationrule,base_educationgroupyear.schedule_type.osis.education_group_type_option,REQUIRED,DAILY,,,,,
-base.validationrule,base_educationgroupyear.schedule_type.osis.education_group_type_mobilitypartnership,REQUIRED,DAILY,,,,,
-base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_deepening,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_sociatyminor,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_accessminor,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_openminor,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_disciplinarycomplementminor,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_fsaspeciality,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_option,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_mobilitypartnership,REQUIRED,,,,,,
+base.validationrule,MiniTrainingForm.DEEPENING.abbreviated_title,REQUIRED,,,,,,Ex: APPBIOL
+base.validationrule,MiniTrainingForm.SOCIETY_MINOR.abbreviated_title,REQUIRED,,,,,,Ex: MINDD
+base.validationrule,MiniTrainingForm.ACCESS_MINOR.abbreviated_title,REQUIRED,,,,,,Ex: MINECON
+base.validationrule,MiniTrainingForm.OPEN_MINOR.abbreviated_title,REQUIRED,,,,,,Ex: MINCULTS
+base.validationrule,MiniTrainingForm.DISCIPLINARY_COMPLEMENT_MINOR.abbreviated_title,REQUIRED,,,,,,Ex: MINANGL
+base.validationrule,MiniTrainingForm.FSA_SPECIALITY.abbreviated_title,REQUIRED,,,,,,Ex: MAJPSY
+base.validationrule,MiniTrainingForm.OPTION.abbreviated_title,REQUIRED,,,,,,Ex: OPTLAFR2M1/LA
+base.validationrule,MiniTrainingForm.MOBILITY_PARTNERSHIP.abbreviated_title,REQUIRED,,,,,,Ex: PSP - CH GENEVE01
+base.validationrule,MiniTrainingForm.DEEPENING.title_fr,REQUIRED,Approfondissement en,^(.*)$,,,,
+base.validationrule,MiniTrainingForm.SOCIETY_MINOR.title_fr,REQUIRED,Mineure,^(Mineure)(.*)$,,,,
+base.validationrule,MiniTrainingForm.ACCESS_MINOR.title_fr,REQUIRED,Mineure,^(Mineure)(.*)$,,,,
+base.validationrule,MiniTrainingForm.OPEN_MINOR.title_fr,REQUIRED,Mineure,^(Mineure)(.*)$,,,,
+base.validationrule,MiniTrainingForm.DISCIPLINARY_COMPLEMENT_MINOR.title_fr,REQUIRED,Mineure,^(Mineure)(.*)$,,,,
+base.validationrule,MiniTrainingForm.FSA_SPECIALITY.title_fr,REQUIRED,Majeure en,^(Majeure en)(.*)$,,,,
+base.validationrule,MiniTrainingForm.OPTION.title_fr,REQUIRED,,,,,,
+base.validationrule,MiniTrainingForm.MOBILITY_PARTNERSHIP.title_fr,REQUIRED,,,,,,
+base.validationrule,MiniTrainingForm.DEEPENING.credits,REQUIRED,30,,,,,
+base.validationrule,MiniTrainingForm.SOCIETY_MINOR.credits,REQUIRED,30,,,,,
+base.validationrule,MiniTrainingForm.ACCESS_MINOR.credits,REQUIRED,30,,,,,
+base.validationrule,MiniTrainingForm.OPEN_MINOR.credits,REQUIRED,30,,,,,
+base.validationrule,MiniTrainingForm.DISCIPLINARY_COMPLEMENT_MINOR.credits,REQUIRED,30,,,,,
+base.validationrule,MiniTrainingForm.FSA_SPECIALITY.credits,NOT_REQUIRED,40,,,,,
+base.validationrule,MiniTrainingForm.OPTION.credits,NOT_REQUIRED,15,,,,,
+base.validationrule,MiniTrainingForm.MOBILITY_PARTNERSHIP.credits,NOT_REQUIRED,,,,,,
+base.validationrule,MiniTrainingForm.DEEPENING.schedule_type,REQUIRED,DAILY,,,,,
+base.validationrule,MiniTrainingForm.SOCIETY_MINOR.schedule_type,REQUIRED,DAILY,,,,,
+base.validationrule,MiniTrainingForm.ACCESS_MINOR.schedule_type,REQUIRED,DAILY,,,,,
+base.validationrule,MiniTrainingForm.OPEN_MINOR.schedule_type,REQUIRED,DAILY,,,,,
+base.validationrule,MiniTrainingForm.DISCIPLINARY_COMPLEMENT_MINOR.schedule_type,REQUIRED,DAILY,,,,,
+base.validationrule,MiniTrainingForm.FSA_SPECIALITY.schedule_type,REQUIRED,DAILY,,,,,
+base.validationrule,MiniTrainingForm.OPTION.schedule_type,REQUIRED,DAILY,,,,,
+base.validationrule,MiniTrainingForm.MOBILITY_PARTNERSHIP.schedule_type,REQUIRED,DAILY,,,,,
+base.validationrule,MiniTrainingForm.DEEPENING.teaching_campus,REQUIRED,,,,,,
+base.validationrule,MiniTrainingForm.SOCIETY_MINOR.teaching_campus,REQUIRED,,,,,,
+base.validationrule,MiniTrainingForm.ACCESS_MINOR.teaching_campus,REQUIRED,,,,,,
+base.validationrule,MiniTrainingForm.OPEN_MINOR.teaching_campus,REQUIRED,,,,,,
+base.validationrule,MiniTrainingForm.DISCIPLINARY_COMPLEMENT_MINOR.teaching_campus,REQUIRED,,,,,,
+base.validationrule,MiniTrainingForm.FSA_SPECIALITY.teaching_campus,REQUIRED,,,,,,
+base.validationrule,MiniTrainingForm.OPTION.teaching_campus,REQUIRED,,,,,,
+base.validationrule,MiniTrainingForm.MOBILITY_PARTNERSHIP.teaching_campus,REQUIRED,,,,,,
 base.validationrule,TrainingForm.AGGREGATION.title_en,REQUIRED,,,,,,
 base.validationrule,TrainingForm.CERTIFICATE_OF_PARTICIPATION.title_en,REQUIRED,,,,,,
 base.validationrule,TrainingForm.CERTIFICATE_OF_SUCCESS.title_en,REQUIRED,,,,,,
@@ -1581,14 +1581,14 @@ base.validationrule,TrainingForm.MASTER_MS_180_240.title_en,REQUIRED,,,,,,
 base.validationrule,TrainingForm.MASTER_M1.title_en,REQUIRED,,,,,,
 base.validationrule,TrainingForm.MASTER_MC.title_en,REQUIRED,,,,,,
 base.validationrule,TrainingForm.INTERNSHIP.title_en,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_deepening,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_sociatyminor,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_accessminor,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_openminor,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_disciplinarycomplementminor,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_fsaspeciality,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_option,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_mobilitypartnership,REQUIRED,,,,,,
+base.validationrule,MiniTrainingForm.DEEPENING.title_en,REQUIRED,,,,,,
+base.validationrule,MiniTrainingForm.SOCIETY_MINOR.title_en,REQUIRED,,,,,,
+base.validationrule,MiniTrainingForm.ACCESS_MINOR.title_en,REQUIRED,,,,,,
+base.validationrule,MiniTrainingForm.OPEN_MINOR.title_en,REQUIRED,,,,,,
+base.validationrule,MiniTrainingForm.DISCIPLINARY_COMPLEMENT_MINOR.title_en,REQUIRED,,,,,,
+base.validationrule,MiniTrainingForm.FSA_SPECIALITY.title_en,REQUIRED,,,,,,
+base.validationrule,MiniTrainingForm.OPTION.title_en,REQUIRED,,,,,,
+base.validationrule,MiniTrainingForm.MOBILITY_PARTNERSHIP.title_en,REQUIRED,,,,,,
 base.validationrule,TrainingForm.AGGREGATION.partial_title_fr,NOT_REQUIRED,,,,,,
 base.validationrule,TrainingForm.CERTIFICATE_OF_PARTICIPATION.partial_title_fr,NOT_REQUIRED,,,,,,
 base.validationrule,TrainingForm.CERTIFICATE_OF_SUCCESS.partial_title_fr,NOT_REQUIRED,,,,,,
@@ -1633,13 +1633,13 @@ base.validationrule,TrainingForm.PHD.partial_title_en,NOT_REQUIRED,,,,,,
 base.validationrule,TrainingForm.FORMATION_PHD.partial_title_en,NOT_REQUIRED,,,,,,
 base.validationrule,TrainingForm.JUNIOR_YEAR.partial_title_en,NOT_REQUIRED,,,,,,
 base.validationrule,TrainingForm.PGRM_MASTER_120.partial_title_en,NOT_REQUIRED,,,,,,
-base.validationrule,TrainingForm.MASTER_MA_120.partial_title_en,REQUIRED,Research Focus ,^(Research Focus)(.*)$,,,,
-base.validationrule,TrainingForm.MASTER_MD_120.partial_title_en,REQUIRED,Teaching Focus ,^(Teaching Focus)(.*)$,,,,
-base.validationrule,TrainingForm.MASTER_MS_120.partial_title_en,REQUIRED,Professional Focus ,^(Professional Focus)(.*)$,,,,
+base.validationrule,TrainingForm.MASTER_MA_120.partial_title_en,REQUIRED,Research Focus,^(Research Focus)(.*)$,,,,
+base.validationrule,TrainingForm.MASTER_MD_120.partial_title_en,REQUIRED,Teaching Focus,^(Teaching Focus)(.*)$,,,,
+base.validationrule,TrainingForm.MASTER_MS_120.partial_title_en,REQUIRED,Professional Focus,^(Professional Focus)(.*)$,,,,
 base.validationrule,TrainingForm.PGRM_MASTER_180_240.partial_title_en,NOT_REQUIRED,,,,,,
-base.validationrule,TrainingForm.MASTER_MA_180_240.partial_title_en,REQUIRED,Research Focus ,^(Research Focus)(.*)$,,,,
-base.validationrule,TrainingForm.MASTER_MD_180_240.partial_title_en,REQUIRED,Teaching Focus ,^(Teaching Focus)(.*)$,,,,
-base.validationrule,TrainingForm.MASTER_MS_180_240.partial_title_en,REQUIRED,Professional Focus ,^(Professional Focus)(.*)$,,,,
+base.validationrule,TrainingForm.MASTER_MA_180_240.partial_title_en,REQUIRED,Research Focus,^(Research Focus)(.*)$,,,,
+base.validationrule,TrainingForm.MASTER_MD_180_240.partial_title_en,REQUIRED,Teaching Focus,^(Teaching Focus)(.*)$,,,,
+base.validationrule,TrainingForm.MASTER_MS_180_240.partial_title_en,REQUIRED,Professional Focus,^(Professional Focus)(.*)$,,,,
 base.validationrule,TrainingForm.MASTER_M1.partial_title_en,NOT_REQUIRED,,,,,,
 base.validationrule,TrainingForm.MASTER_MC.partial_title_en,NOT_REQUIRED,,,,,,
 base.validationrule,TrainingForm.INTERNSHIP.partial_title_en,NOT_REQUIRED,,,,,,

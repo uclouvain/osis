@@ -66,7 +66,7 @@ class TestGetAllowedChildTypes(SimpleTestCase):
 
         self.assertSetEqual(
             result,
-            {child_type for child_type in MiniTrainingType}
+            {child_type for child_type in MiniTrainingType.get_eligible_to_be_created()}
         )
 
     @mock.patch('program_management.ddd.service.read.allowed_children_types_service.NodeIdentitySearch.'

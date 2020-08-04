@@ -30,6 +30,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from education_group.ddd.domain.training import Training, TrainingIdentity
     from education_group.ddd.domain.group import Group, GroupIdentity
+    from education_group.ddd.domain.mini_training import MiniTraining, MiniTrainingIdentity
     from education_group.ddd.command import CreateTrainingCommand
     from education_group.ddd.domain._study_domain import StudyDomainIdentity
     from education_group.ddd.domain._campus import Campus
@@ -37,3 +38,4 @@ if TYPE_CHECKING:
     from education_group.ddd.domain._diploma import DiplomaAimIdentity
     from education_group.ddd.repository.training import TrainingRepository
     from education_group.ddd.repository.group import GroupRepository
+    from education_group.ddd.repository.mini_training import MiniTrainingRepository

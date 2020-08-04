@@ -85,12 +85,7 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         choices=BLANK_CHOICE + list(ScheduleTypeEnum.choices()),
         label=_("Schedule type"),
     )
-    credits = forms.IntegerField(
-        min_value=0,
-        max_value=999,
-        label=_("Credits"),
-        widget=forms.TextInput,
-    )
+    credits = fields.CreditField()
     constraint_type = forms.ChoiceField(
         choices=BLANK_CHOICE + list(ConstraintTypeEnum.choices()),
         label=_("Type of constraint"),

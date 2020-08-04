@@ -23,16 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import attr
+
 from osis_common.ddd import interface
 
 
+@attr.s(frozen=True, slots=True, str=False)
 class Campus(interface.ValueObject):
-    def __init__(self, name: str, university_name: str):
-        self.name = name
-        self.university_name = university_name
+    name = attr.ib(type=str)
+    university_name = attr.ib(type=str)
 
-    def __eq__(self, other):
-        return self.name == other.name and self.university_name == other.university_name
-
-    def __hash__(self):
-        return hash(self.name + self.university_name)
+    def __str__(self):
+        return "{name} - {university_name}".format(name=self.name, university_name=self.university_name)

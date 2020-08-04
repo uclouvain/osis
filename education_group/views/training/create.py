@@ -18,7 +18,7 @@ from base.views.common import display_success_messages, display_error_messages
 from education_group.ddd import command
 from education_group.ddd.domain.exception import GroupCodeAlreadyExistException, ContentConstraintTypeMissing, \
     ContentConstraintMinimumMaximumMissing, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum, \
-    TrainingAcronymAlreadyExist, StartYearGreaterThanEndYear, MaximumCertificateAimType2Reached
+    AcronymAlreadyExist, StartYearGreaterThanEndYear, MaximumCertificateAimType2Reached
 from education_group.ddd.domain.training import TrainingIdentity
 from education_group.forms.training import CreateTrainingForm
 from education_group.templatetags.academic_year_display import display_as_academic_year
@@ -105,7 +105,7 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 training_ids = self._call_service(create_training_data)
             except GroupCodeAlreadyExistException as e:
                 training_form.add_error('code', e.message)
-            except TrainingAcronymAlreadyExist as e:
+            except AcronymAlreadyExist as e:
                 training_form.add_error('acronym', e.message)
             except ContentConstraintTypeMissing as e:
                 training_form.add_error('constraint_type', e.message)

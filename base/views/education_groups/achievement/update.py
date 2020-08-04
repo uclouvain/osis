@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ############################################################################
+import functools
+
 from django.conf import settings
 from django.contrib.messages.views import SuccessMessageMixin
 from django.db.models import Prefetch
@@ -48,6 +50,7 @@ from cms.models.text_label import TextLabel
 from education_group.ddd.domain.service.identity_search import TrainingIdentitySearch
 from education_group.views.proxy.read import Tab
 from osis_role.contrib.views import PermissionRequiredMixin
+from program_management.models.element import Element
 
 
 class EducationGroupAchievementAction(EducationGroupAchievementMixin, FormView):
@@ -120,6 +123,14 @@ class EducationGroupAchievementCMS(PermissionRequiredMixin, SuccessMessageMixin,
     permission_required = 'base.change_educationgroupachievement'
     raise_exception = True
 
+    @functools.lru_cache()
+    def get_path(self) -> str:
+        path = self.request.GET.get('path')
+        if path is None:
+            root_element = Element.objects.get(group_year__educationgroupversion__offer_id=self.kwargs['offer_id'])
+            path = str(root_element.pk)
+        return path
+
     @cached_property
     def education_group_year(self):
         return get_object_or_404(EducationGroupYear, pk=self.kwargs['education_group_year_id'])
@@ -141,7 +152,7 @@ class EducationGroupAchievementCMS(PermissionRequiredMixin, SuccessMessageMixin,
         return reverse(
             'education_group_read_proxy',
             args=[training_identity.year, training_identity.acronym]
-        ) + '?path={}&tab={}#achievement_'.format(self.request.GET['path'], Tab.SKILLS_ACHIEVEMENTS)
+        ) + '?path={}&tab={}#achievement_'.format(self.get_path(), Tab.SKILLS_ACHIEVEMENTS)
 
     def get_initial(self):
         initial = super().get_initial()

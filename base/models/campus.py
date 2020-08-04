@@ -29,6 +29,9 @@ from base.models.enums.organization_type import MAIN
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
 
+LOUVAIN_LA_NEUVE_CAMPUS_NAME = "Louvain-la-Neuve"
+
+
 class CampusAdmin(SerializableModelAdmin):
     list_display = ('name', 'organization', 'is_administration', 'changed')
     list_filter = ('organization', 'is_administration')
