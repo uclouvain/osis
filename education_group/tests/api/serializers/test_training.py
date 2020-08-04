@@ -24,9 +24,11 @@
 #
 ##############################################################################
 from django.conf import settings
+from django.db.models import F
 from django.test import TestCase, RequestFactory
 from django.urls import reverse
 
+from base.models.education_group_year import EducationGroupYear
 from base.models.enums import organization_type, education_group_types
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import TrainingFactory, EducationGroupYearBachelorFactory
@@ -151,11 +153,15 @@ class TrainingDetailSerializerTestCase(TestCase):
             administration_entity=cls.entity_version.entity,
             main_domain=DomainFactory(parent=DomainFactory())
         )
+        annotated_training = EducationGroupYear.objects.annotate(
+            domain_code=F('main_domain__code'),
+            domain_name=F('main_domain__parent__name'),
+        ).get(id=cls.training.id)
         url = reverse('education_group_api_v1:training_read', kwargs={
             'acronym': cls.training.acronym,
             'year': cls.academic_year.year
         })
-        cls.serializer = TrainingDetailSerializer(cls.training, context={
+        cls.serializer = TrainingDetailSerializer(annotated_training, context={
             'request': RequestFactory().get(url),
             'language': settings.LANGUAGE_CODE_EN
         })
@@ -263,11 +269,15 @@ class TrainingDetailSerializerForMasterWithFinalityTestCase(TestCase):
             administration_entity=cls.entity_version.entity,
             main_domain=DomainFactory(parent=DomainFactory())
         )
+        annotated_training = EducationGroupYear.objects.annotate(
+            domain_code=F('main_domain__code'),
+            domain_name=F('main_domain__parent__name'),
+        ).get(id=cls.training.id)
         url = reverse('education_group_api_v1:training_read', kwargs={
             'acronym': cls.training.acronym,
             'year': cls.academic_year.year
         })
-        cls.serializer = TrainingDetailSerializer(cls.training, context={
+        cls.serializer = TrainingDetailSerializer(annotated_training, context={
             'request': RequestFactory().get(url),
             'language': settings.LANGUAGE_CODE_EN
         })
