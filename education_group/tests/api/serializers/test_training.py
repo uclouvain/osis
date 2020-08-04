@@ -24,14 +24,17 @@
 #
 ##############################################################################
 from django.conf import settings
+from django.db.models import F
 from django.test import TestCase, RequestFactory
 from django.urls import reverse
 
+from base.models.education_group_year import EducationGroupYear
 from base.models.enums import organization_type, education_group_types
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import TrainingFactory, EducationGroupYearBachelorFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from education_group.api.serializers.training import TrainingListSerializer, TrainingDetailSerializer
+from program_management.models.education_group_version import EducationGroupVersion
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 from reference.tests.factories.domain import DomainFactory
 
@@ -156,11 +159,15 @@ class TrainingDetailSerializerTestCase(TestCase):
             main_domain=DomainFactory(parent=DomainFactory())
         )
         cls.version = EducationGroupVersionFactory(offer=cls.training)
+        annotated_version = EducationGroupVersion.objects.annotate(
+            domain_code=F('offer__main_domain__code'),
+            domain_name=F('offer__main_domain__parent__name'),
+        ).get(id=cls.version.id)
         url = reverse('education_group_api_v1:training_read', kwargs={
             'acronym': cls.training.acronym,
             'year': cls.academic_year.year
         })
-        cls.serializer = TrainingDetailSerializer(cls.version, context={
+        cls.serializer = TrainingDetailSerializer(annotated_version, context={
             'request': RequestFactory().get(url),
             'language': settings.LANGUAGE_CODE_EN
         })
@@ -255,25 +262,6 @@ class TrainingDetailSerializerTestCase(TestCase):
             self.training.education_group_type.name
         )
 
-    def test_get_none_if_no_domain(self):
-        training = EducationGroupYearBachelorFactory(
-            acronym='DROI1BA',
-            partial_acronym='LDROI100I',
-            academic_year=self.academic_year,
-            management_entity=self.entity_version.entity,
-            administration_entity=self.entity_version.entity,
-            main_domain=None
-        )
-        url = reverse('education_group_api_v1:training_read', kwargs={
-            'acronym': training.acronym,
-            'year': self.academic_year.year
-        })
-        serializer = TrainingDetailSerializer(training, context={
-            'request': RequestFactory().get(url),
-            'language': settings.LANGUAGE_CODE_EN
-        })
-        self.assertIsNone(serializer.data['domain_name'])
-
 
 class TrainingDetailSerializerForMasterWithFinalityTestCase(TestCase):
     @classmethod
@@ -292,11 +280,15 @@ class TrainingDetailSerializerForMasterWithFinalityTestCase(TestCase):
             main_domain=DomainFactory(parent=DomainFactory())
         )
         cls.version = EducationGroupVersionFactory(offer=cls.training)
+        annotated_version = EducationGroupVersion.objects.annotate(
+            domain_code=F('offer__main_domain__code'),
+            domain_name=F('offer__main_domain__parent__name'),
+        ).get(id=cls.version.id)
         url = reverse('education_group_api_v1:training_read', kwargs={
             'acronym': cls.training.acronym,
             'year': cls.academic_year.year
         })
-        cls.serializer = TrainingDetailSerializer(cls.version, context={
+        cls.serializer = TrainingDetailSerializer(annotated_version, context={
             'request': RequestFactory().get(url),
             'language': settings.LANGUAGE_CODE_EN
         })

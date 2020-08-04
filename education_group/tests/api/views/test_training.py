@@ -417,3 +417,30 @@ class GetTrainingTestCase(APITestCase):
         })
         response = self.client.get(invalid_url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_get_none_if_no_domain(self):
+        training = TrainingFactory(
+            academic_year=self.academic_year,
+            main_domain=None
+        )
+        url = reverse('education_group_api_v1:training_read', kwargs={
+            'acronym': training.acronym,
+            'year': self.academic_year.year
+        })
+        response = self.client.get(url)
+        self.assertIsNone(response.data['domain_name'])
+        self.assertIsNone(response.data['domain_code'])
+
+    def test_get_parent_domain_name_if_has_parent(self):
+        domain = DomainFactory(parent=DomainFactory())
+        training = TrainingFactory(
+            academic_year=self.academic_year,
+            main_domain=domain
+        )
+        url = reverse('education_group_api_v1:training_read', kwargs={
+            'acronym': training.acronym,
+            'year': self.academic_year.year
+        })
+        response = self.client.get(url)
+        self.assertEqual(response.data['domain_name'], domain.parent.name)
+        self.assertEqual(response.data['domain_code'], domain.code)
