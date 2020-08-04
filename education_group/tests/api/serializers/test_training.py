@@ -246,6 +246,25 @@ class TrainingDetailSerializerTestCase(TestCase):
             self.training.education_group_type.name
         )
 
+    def test_get_none_if_no_domain(self):
+        training = EducationGroupYearBachelorFactory(
+            acronym='DROI1BA',
+            partial_acronym='LDROI100I',
+            academic_year=self.academic_year,
+            management_entity=self.entity_version.entity,
+            administration_entity=self.entity_version.entity,
+            main_domain=None
+        )
+        url = reverse('education_group_api_v1:training_read', kwargs={
+            'acronym': training.acronym,
+            'year': self.academic_year.year
+        })
+        serializer = TrainingDetailSerializer(training, context={
+            'request': RequestFactory().get(url),
+            'language': settings.LANGUAGE_CODE_EN
+        })
+        self.assertIsNone(serializer.data['domain_name'])
+
 
 class TrainingDetailSerializerForMasterWithFinalityTestCase(TestCase):
     @classmethod
