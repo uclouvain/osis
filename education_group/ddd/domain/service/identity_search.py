@@ -38,7 +38,7 @@ class TrainingIdentitySearch(interface.DomainService):
     @classmethod
     def get_from_node_identity(cls, node_identity: 'NodeIdentity') -> 'TrainingIdentity':
         values = GroupYear.objects.filter(
-            partial_acronym=node_identity.code,
+            acronym=node_identity.code,
             academic_year__year=node_identity.year
         ).annotate(
             offer_acronym=F('educationgroupversion__offer__acronym'),
