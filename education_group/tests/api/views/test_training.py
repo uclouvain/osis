@@ -25,6 +25,7 @@
 ##############################################################################
 
 from django.conf import settings
+from django.db.models import F
 from django.test import RequestFactory
 from django.urls import reverse
 from rest_framework import status
@@ -400,9 +401,12 @@ class GetTrainingTestCase(APITestCase):
     def test_get_valid_training(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-
+        annotated_version = EducationGroupVersion.objects.annotate(
+            domain_code=F('offer__main_domain__code'),
+            domain_name=F('offer__main_domain__name'),
+        ).get(id=self.version.id)
         serializer = TrainingDetailSerializer(
-            self.version,
+            annotated_version,
             context={
                 'request': RequestFactory().get(self.url),
                 'language': settings.LANGUAGE_CODE_FR
