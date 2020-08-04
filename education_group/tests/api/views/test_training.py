@@ -25,6 +25,7 @@
 ##############################################################################
 
 from django.conf import settings
+from django.db.models import F
 from django.test import RequestFactory
 from django.urls import reverse
 from rest_framework import status
@@ -307,9 +308,12 @@ class GetTrainingTestCase(APITestCase):
     def test_get_valid_training(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-
+        annotated_training = EducationGroupYear.objects.annotate(
+            domain_code=F('main_domain__code'),
+            domain_name=F('main_domain__name'),
+        ).get(id=self.training.id)
         serializer = TrainingDetailSerializer(
-            self.training,
+            annotated_training,
             context={
                 'request': RequestFactory().get(self.url),
                 'language': settings.LANGUAGE_CODE_FR
@@ -324,3 +328,30 @@ class GetTrainingTestCase(APITestCase):
         })
         response = self.client.get(invalid_url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_get_none_if_no_domain(self):
+        training = TrainingFactory(
+            academic_year=self.academic_year,
+            main_domain=None
+        )
+        url = reverse('education_group_api_v1:training_read', kwargs={
+            'acronym': training.acronym,
+            'year': self.academic_year.year
+        })
+        response = self.client.get(url)
+        self.assertIsNone(response.data['domain_name'])
+        self.assertIsNone(response.data['domain_code'])
+
+    def test_get_parent_domain_name_if_has_parent(self):
+        domain = DomainFactory(parent=DomainFactory())
+        training = TrainingFactory(
+            academic_year=self.academic_year,
+            main_domain=domain
+        )
+        url = reverse('education_group_api_v1:training_read', kwargs={
+            'acronym': training.acronym,
+            'year': self.academic_year.year
+        })
+        response = self.client.get(url)
+        self.assertEqual(response.data['domain_name'], domain.parent.name)
+        self.assertEqual(response.data['domain_code'], domain.code)
