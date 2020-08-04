@@ -30,7 +30,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 from rules.contrib.views import LoginRequiredMixin
 
-from base.models.academic_year import starting_academic_year
+from base.models.academic_year import starting_academic_year, AcademicYear
 from base.utils.cache import RequestCache
 from base.utils.urls import reverse_with_get
 from base.views.common import display_success_messages, display_error_messages
@@ -65,7 +65,6 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
         form_kwargs["user"] = self.request.user
         form_kwargs["mini_training_type"] = self.kwargs['type']
         form_kwargs["attach_path"] = self.get_attach_path()
-        form_kwargs["initial"] = self._get_initial_form()
         return form_kwargs
 
     def form_valid(self, form: mini_training_form.MiniTrainingForm) -> response.HttpResponseBase:
@@ -177,9 +176,14 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
             ) + "?path={}".format(self.get_attach_path())
         return reverse('version_program')
 
-    def _get_initial_form(self) -> Dict:
+    def get_initial(self) -> Dict:
         request_cache = RequestCache(self.request.user, reverse('version_program'))
-        default_academic_year = request_cache.get_value_cached('academic_year') or starting_academic_year()
+        academic_year_cached_value = request_cache.get_value_cached('academic_year')
+        if academic_year_cached_value:
+            default_academic_year = AcademicYear.objects.get(id=academic_year_cached_value[0]).year
+        else:
+            default_academic_year = starting_academic_year()
+
         default_management_entity = None
 
         parent_identity = self.get_parent_identity()
