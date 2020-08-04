@@ -23,10 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.db.models.signals import pre_delete
 from django.dispatch import receiver
 
 from education_group import publisher
 from education_group.models.group_year import GroupYear
+from osis_common.utils.models import get_object_or_none
 from program_management.models.element import Element
 
 
@@ -38,6 +40,16 @@ def create_element_of_group(sender, group_identity, **kwargs):
             academic_year__year=group_identity.year
         ).pk
     )
+
+
+@receiver(publisher.learning_unit_year_created)
+def create_element_of_learning_unit_year(sender, learning_unit_year_id, **kwargs):
+    Element.objects.get_or_create(learning_unit_year_id=learning_unit_year_id)
+
+
+@receiver(publisher.learning_unit_year_deleted)
+def delete_element_of_learning_unit_year(sender, learning_unit_year_id, **kwargs):
+    Element.objects.filter(learning_unit_year_id=learning_unit_year_id).delete()
 
 
 @receiver(publisher.group_deleted)
