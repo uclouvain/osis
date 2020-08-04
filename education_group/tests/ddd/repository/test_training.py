@@ -39,8 +39,12 @@ from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.education_group_year import TrainingFactory as TrainingDBFactory
 from base.tests.factories.entity_version import EntityVersionFactory as EntityVersionModelDbFactory
 from education_group.ddd.domain import exception
+<<<<<<< HEAD
 from education_group.ddd.domain.training import Training
 from education_group.ddd.domain.training import TrainingIdentity
+=======
+from education_group.ddd.domain.training import Training, TrainingIdentity
+>>>>>>> cd1a335460d6f2a95a88f5a4cee320bf58285f21
 from education_group.ddd.repository.training import TrainingRepository
 from education_group.tests.ddd.factories.campus import CampusIdentityFactory
 from education_group.tests.ddd.factories.diploma import DiplomaAimFactory, DiplomaAimIdentityFactory

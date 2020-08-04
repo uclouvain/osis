@@ -54,7 +54,6 @@ from base.models.enums.funding_codes import FundingCodes
 from base.models.enums.internship_presence import InternshipPresence
 from base.models.enums.rate_code import RateCode
 from base.models.enums.schedule_type import ScheduleTypeEnum
-from base.models.group_element_year import GroupElementYear
 from base.models.hops import Hops as HopsModelDb
 from base.models.organization_address import OrganizationAddress
 from education_group.ddd.business_types import *
@@ -73,7 +72,6 @@ from education_group.ddd.domain._language import Language
 from education_group.ddd.domain._study_domain import StudyDomain, StudyDomainIdentity
 from education_group.ddd.domain._titles import Titles
 from education_group.ddd.domain.training import TrainingIdentityThroughYears
-from education_group.ddd.domain.exception import TrainingNotFoundException
 from osis_common.ddd import interface
 from reference.models.domain import Domain as DomainModelDb
 from reference.models.domain_isced import DomainIsced as DomainIscedModelDb

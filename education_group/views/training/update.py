@@ -78,7 +78,6 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
             if not self.training_form.errors:
                 self.update_links()
-
                 success_messages = self.get_success_msg_updated_trainings(update_trainings)
                 success_messages += self.get_success_msg_deleted_trainings(deleted_trainings)
                 display_success_messages(request, success_messages, extra_tags='safe')
@@ -443,4 +442,22 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             comment=form.cleaned_data.get('comment_fr'),
             comment_english=form.cleaned_data.get('comment_en'),
             relative_credits=form.cleaned_data.get('relative_credits'),
+        )
+
+    def convert_training_form_to_delete_training_command(
+            self,
+            training_form: training_forms.UpdateTrainingForm) -> command.DeleteTrainingCommand:
+        cleaned_data = training_form.cleaned_data
+        return command.DeleteTrainingCommand(
+            acronym=cleaned_data["acronym"],
+            from_year=cleaned_data["end_year"].year
+        )
+
+    def convert_training_form_to_delete_group_command(
+            self,
+            training_form: training_forms.UpdateTrainingForm) -> command.DeleteGroupCommand:
+        cleaned_data = training_form.cleaned_data
+        return command.DeleteGroupCommand(
+            code=cleaned_data["code"],
+            from_year=cleaned_data["end_year"].year
         )
