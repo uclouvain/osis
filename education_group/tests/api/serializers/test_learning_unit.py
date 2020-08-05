@@ -63,7 +63,7 @@ class EducationGroupRootsListSerializerTestCase(TestCase):
 
         cls.group_element_year = GroupElementYearFactory(
             parent_element=group_element, child_element=luy_element, relative_credits=15)
-        url = reverse('education_group_api_v1:' + EducationGroupRootsList.name, kwargs={
+        url = reverse('learning_unit_api_v1:' + EducationGroupRootsList.name, kwargs={
             'acronym': cls.luy.acronym,
             'year': cls.academic_year.year
         })
