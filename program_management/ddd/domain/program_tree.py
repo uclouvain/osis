@@ -79,7 +79,7 @@ class ProgramTreeBuilder:
     def _duplicate_root_and_direct_children(self, program_tree: 'ProgramTree', end_year: int = None) -> 'Node':
         copy_from_node = program_tree.root_node
         new_parent = node_factory.duplicate(copy_from_node, end_year=end_year)
-        mandatory_children_types = program_tree.get_mandatory_children_types(program_tree.root_node)
+        mandatory_children_types = program_tree.get_ordered_mandatory_children_types(program_tree.root_node)
         for copy_from_link in [n for n in copy_from_node.children if n.child.node_type in mandatory_children_types]:
             child_node = copy_from_link.child
             new_child = node_factory.duplicate(child_node)

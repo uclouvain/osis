@@ -29,7 +29,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from base.models.education_group_type import EducationGroupType
-from base.models.enums.education_group_types import EducationGroupTypesEnum
+from base.models.enums.education_group_types import EducationGroupTypesEnum, GroupType
 from osis_common.models.osis_model_admin import OsisModelAdmin
 from program_management.models.enums.node_type import NodeType
 

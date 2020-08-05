@@ -39,6 +39,7 @@ from base.views.common import display_success_messages
 from base.views.mixins import AjaxTemplateMixin
 from education_group.ddd.domain.service.identity_search import TrainingIdentitySearch
 from education_group.ddd.domain.training import TrainingIdentity
+from education_group.models.group_year import GroupYear
 from osis_common.decorators.ajax import ajax_required
 from osis_role.contrib.views import AjaxPermissionRequiredMixin
 from program_management.ddd.domain.node import NodeIdentity
@@ -106,16 +107,16 @@ class CreateProgramTreeVersion(AjaxPermissionRequiredMixin, SuccessMessageMixin,
 
 @login_required
 @ajax_required
-def check_version_name(request, education_group_year_id):
-    education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
-    version_name = education_group_year.acronym + request.GET['version_name']
+def check_version_name(request, year, code):
+    version_name = request.GET['version_name']
     existed_version_name = False
-    existing_version_name = check_existing_version(version_name, education_group_year_id)
+    existing_version_name = check_existing_version(version_name, year, code)
     last_using = None
-    old_specific_versions = find_last_existed_version(education_group_year, version_name)
-    if old_specific_versions:
-        last_using = str(old_specific_versions.offer.academic_year)
-        existed_version_name = True
+    if existing_version_name:
+        old_specific_versions = find_last_existed_version(version_name, year, code)
+        if old_specific_versions:
+            last_using = str(old_specific_versions.offer.academic_year)
+            existed_version_name = True
     valid = bool(re.match("^[A-Z]{0,15}$", request.GET['version_name'].upper()))
     return JsonResponse({
         "existed_version_name": existed_version_name,
@@ -125,18 +126,19 @@ def check_version_name(request, education_group_year_id):
         "version_name": request.GET['version_name']}, safe=False)
 
 
-def check_existing_version(version_name: str, education_group_year_id: int) -> bool:
+def check_existing_version(version_name: str, year: int, code: str) -> bool:
     return EducationGroupVersion.objects.filter(
         version_name=version_name,
-        offer__id=education_group_year_id,
+        root_group__academic_year__year=year,
+        root_group__acronym=code
     ).exists()
 
 
-def find_last_existed_version(education_group_year, version_name):
+def find_last_existed_version(version_name, year, code):
     return EducationGroupVersion.objects.filter(
         version_name=version_name,
-        offer__education_group=education_group_year.education_group,
-        offer__academic_year__year__lt=education_group_year.academic_year.year,
+        root_group__academic_year__year=year,
+        root_group__acronym=code,
     ).order_by(
         'offer__academic_year'
     ).last()
