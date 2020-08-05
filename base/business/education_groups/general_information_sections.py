@@ -154,6 +154,7 @@ SECTIONS_PER_OFFER_TYPE = {
             SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION,
             EVALUATION,
+            VERSIONS
         ]
     },
     TrainingType.CERTIFICATE_OF_PARTICIPATION.name: {
@@ -177,6 +178,7 @@ SECTIONS_PER_OFFER_TYPE = {
             SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION,
             STRUCTURE,
+            VERSIONS
         ]
     },
     TrainingType.CERTIFICATE_OF_SUCCESS.name: {
@@ -200,6 +202,7 @@ SECTIONS_PER_OFFER_TYPE = {
             SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION,
             STRUCTURE,
+            VERSIONS
         ]
     },
     TrainingType.CERTIFICATE_OF_HOLDING_CREDITS.name: {
@@ -223,6 +226,7 @@ SECTIONS_PER_OFFER_TYPE = {
             SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION,
             STRUCTURE,
+            VERSIONS
         ]
     },
     TrainingType.BACHELOR.name: {
@@ -246,6 +250,7 @@ SECTIONS_PER_OFFER_TYPE = {
             SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION,
             EVALUATION,
+            VERSIONS
         ]
     },
     TrainingType.CERTIFICATE.name: {
@@ -264,11 +269,12 @@ SECTIONS_PER_OFFER_TYPE = {
             PREREQUISITE,
             ADMISSION_CONDITION,
             EVALUATION,
+            VERSIONS
         ]
     },
     TrainingType.CAPAES.name: {
         'common': [],
-        'specific': [WELCOME_INTRODUCTION, ADMISSION_CONDITION, ]
+        'specific': [WELCOME_INTRODUCTION, ADMISSION_CONDITION, VERSIONS]
     },
     TrainingType.RESEARCH_CERTIFICATE.name: {
         'common': [CAAP, EVALUATION, PREREQUISITE, ],
@@ -279,6 +285,7 @@ SECTIONS_PER_OFFER_TYPE = {
             DETAILED_PROGRAM,
             STRUCTURE,
             ADMISSION_CONDITION,
+            VERSIONS
         ]
     },
     TrainingType.UNIVERSITY_FIRST_CYCLE_CERTIFICATE.name: {
@@ -303,6 +310,7 @@ SECTIONS_PER_OFFER_TYPE = {
             SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION,
             STRUCTURE,
+            VERSIONS
         ]
     },
     TrainingType.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.name: {
@@ -327,6 +335,7 @@ SECTIONS_PER_OFFER_TYPE = {
             SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION,
             STRUCTURE,
+            VERSIONS
         ]
     },
     TrainingType.PGRM_MASTER_120.name: {
@@ -357,15 +366,15 @@ SECTIONS_PER_OFFER_TYPE = {
     },
     TrainingType.MASTER_MA_120.name: {
         'common': [],
-        'specific': [INTRODUCTION, ]
+        'specific': [INTRODUCTION, VERSIONS]
     },
     TrainingType.MASTER_MD_120.name: {
         'common': [COMMON_DIDACTIC_PURPOSES, ],
-        'specific': [INTRODUCTION, ]
+        'specific': [INTRODUCTION, VERSIONS]
     },
     TrainingType.MASTER_MS_120.name: {
         'common': [],
-        'specific': [INTRODUCTION, ]
+        'specific': [INTRODUCTION, VERSIONS]
     },
     TrainingType.PGRM_MASTER_180_240.name: {
         'common': [CAAP, EVALUATION, COMPLEMENTARY_MODULE, PREREQUISITE, ],
@@ -395,15 +404,15 @@ SECTIONS_PER_OFFER_TYPE = {
     },
     TrainingType.MASTER_MA_180_240.name: {
         'common': [],
-        'specific': [INTRODUCTION, ]
+        'specific': [INTRODUCTION, VERSIONS]
     },
     TrainingType.MASTER_MD_180_240.name: {
         'common': [COMMON_DIDACTIC_PURPOSES, ],
-        'specific': [INTRODUCTION, ]
+        'specific': [INTRODUCTION, VERSIONS]
     },
     TrainingType.MASTER_MS_180_240.name: {
         'common': [],
-        'specific': [INTRODUCTION, ]
+        'specific': [INTRODUCTION, VERSIONS]
     },
     TrainingType.MASTER_M1.name: {
         'common': [CAAP, EVALUATION, COMPLEMENTARY_MODULE, ],
@@ -452,7 +461,6 @@ SECTIONS_PER_OFFER_TYPE = {
             VERSIONS
         ]
     },
-
     MiniTrainingType.DEEPENING.name: {
         'common': [EVALUATION, ],
         'specific': [
@@ -472,6 +480,7 @@ SECTIONS_PER_OFFER_TYPE = {
             SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION,
             EVALUATION,
+            VERSIONS
         ]
     },
     MiniTrainingType.SOCIETY_MINOR.name: {
@@ -493,6 +502,7 @@ SECTIONS_PER_OFFER_TYPE = {
             SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION,
             EVALUATION,
+            VERSIONS
         ]
     },
     MiniTrainingType.ACCESS_MINOR.name: {
@@ -514,6 +524,7 @@ SECTIONS_PER_OFFER_TYPE = {
             SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION,
             EVALUATION,
+            VERSIONS
         ]
     },
     MiniTrainingType.OPEN_MINOR.name: {
@@ -535,6 +546,7 @@ SECTIONS_PER_OFFER_TYPE = {
             SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION,
             EVALUATION,
+            VERSIONS
         ]
     },
     MiniTrainingType.DISCIPLINARY_COMPLEMENT_MINOR.name: {
@@ -556,6 +568,7 @@ SECTIONS_PER_OFFER_TYPE = {
             SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION,
             EVALUATION,
+            VERSIONS
         ]
     },
     MiniTrainingType.FSA_SPECIALITY.name: {
@@ -576,12 +589,13 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PROGRAM,
             SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION,
-            EVALUATION
+            EVALUATION,
+            VERSIONS
         ]
     },
     MiniTrainingType.OPTION.name: {
         'common': [],
-        'specific': [INTRODUCTION, ]
+        'specific': [INTRODUCTION, VERSIONS]
     },
     MiniTrainingType.MOBILITY_PARTNERSHIP.name: {
         'common': [],
