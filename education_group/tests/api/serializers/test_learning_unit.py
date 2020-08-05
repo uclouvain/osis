@@ -35,7 +35,7 @@ from base.tests.factories.prerequisite import PrerequisiteFactory
 from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
 from education_group.api.serializers.learning_unit import EducationGroupRootsListSerializer
 from education_group.api.serializers.learning_unit import LearningUnitYearPrerequisitesListSerializer
-from education_group.api.views.learning_unit import LearningUnitPrerequisitesList
+from education_group.api.views.learning_unit import LearningUnitPrerequisitesList, EducationGroupRootsList
 from education_group.tests.factories.group_year import GroupYearFactory
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 from program_management.tests.factories.element import ElementFactory
@@ -63,7 +63,7 @@ class EducationGroupRootsListSerializerTestCase(TestCase):
 
         cls.group_element_year = GroupElementYearFactory(
             parent_element=group_element, child_element=luy_element, relative_credits=15)
-        url = reverse('education_group_api_v1:training_read', kwargs={
+        url = reverse('education_group_api_v1:' + EducationGroupRootsList.name, kwargs={
             'acronym': cls.luy.acronym,
             'year': cls.academic_year.year
         })
