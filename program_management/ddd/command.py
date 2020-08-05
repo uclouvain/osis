@@ -281,6 +281,7 @@ class PostponeProgramTreeCommand(interface.CommandRequest):
     from_code = attr.ib(type=str)
     from_year = attr.ib(type=int)
     offer_acronym = attr.ib(type=str)
+    end_year = attr.ib(type=int)
 
 
 @attr.s(frozen=True, slots=True)
@@ -295,6 +296,7 @@ class PostponeProgramTreeVersionCommand(interface.CommandRequest):
     from_version_name = attr.ib(type=str)
     from_year = attr.ib(type=int)
     from_is_transition = attr.ib(type=bool)
+    end_year = attr.ib(type=int)
 
 
 @attr.s(frozen=True, slots=True)

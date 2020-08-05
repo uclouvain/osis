@@ -40,7 +40,6 @@ from program_management.ddd.service.write import copy_program_version_service
 def postpone_program_tree_version(
         postpone_cmd: 'PostponeProgramTreeVersionCommand'
 ) -> List['ProgramTreeVersionIdentity']:
-
     identities_created = []
 
     # GIVEN
@@ -51,10 +50,13 @@ def postpone_program_tree_version(
         is_transition=postpone_cmd.from_is_transition,
         version_name=postpone_cmd.from_version_name
     )
-    end_postponement_year = CalculateEndPostponement.calculate_tree_version_end_postponement_year(
-        tree_version_identity=tree_version_identity,
-        group_repository=GroupRepository(),
-    )
+    if postpone_cmd.end_year:
+        end_postponement_year = postpone_cmd.end_year
+    else:
+        end_postponement_year = CalculateEndPostponement.calculate_tree_version_end_postponement_year(
+            tree_version_identity=tree_version_identity,
+            group_repository=GroupRepository(),
+        )
 
     # WHEN
     while from_year < end_postponement_year:
