@@ -31,6 +31,8 @@ from base.models.prerequisite import Prerequisite
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
 from education_group.api.serializers.training import TrainingHyperlinkedIdentityField
 from education_group.api.serializers.utils import TrainingHyperlinkedRelatedField
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
+from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 
 
 class EducationGroupRootsListSerializer(EducationGroupTitleSerializer, serializers.HyperlinkedModelSerializer):
@@ -53,6 +55,7 @@ class EducationGroupRootsListSerializer(EducationGroupTitleSerializer, serialize
                                                       read_only=True)
     decree_category_text = serializers.CharField(source='offer.get_decree_category_display', read_only=True)
     duration_unit_text = serializers.CharField(source='offer.get_duration_unit_display', read_only=True)
+    learning_unit_credits = serializers.SerializerMethodField(read_only=True)
 
     class Meta(EducationGroupTitleSerializer.Meta):
         fields = EducationGroupTitleSerializer.Meta.fields + (
@@ -68,7 +71,25 @@ class EducationGroupRootsListSerializer(EducationGroupTitleSerializer, serialize
             'education_group_type',
             'education_group_type_text',
             'academic_year',
+            'learning_unit_credits',
         )
+
+    def get_learning_unit_credits(self, obj):
+        learning_unit_year = self.context['learning_unit_year']
+        identity = ProgramTreeVersionIdentity(
+            offer_acronym=obj.offer.acronym,
+            year=obj.offer.academic_year.year,
+            version_name=obj.version_name,
+            is_transition=obj.is_transition
+        )
+
+        tree = ProgramTreeVersionRepository().get(entity_id=identity).get_tree()
+        node = tree.get_node_by_code_and_year(
+            code=learning_unit_year.acronym, year=learning_unit_year.academic_year.year
+        )
+        link = tree.get_links_using_node(node)[0]
+
+        return link.relative_credits or (learning_unit_year and learning_unit_year.credits)
 
 
 # TODO :: OSIS-4735
