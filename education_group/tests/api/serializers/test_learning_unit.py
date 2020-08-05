@@ -29,12 +29,16 @@ from rest_framework.reverse import reverse
 
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import TrainingFactory
+from base.tests.factories.group_element_year import GroupElementYearFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.prerequisite import PrerequisiteFactory
 from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
 from education_group.api.serializers.learning_unit import EducationGroupRootsListSerializer
 from education_group.api.serializers.learning_unit import LearningUnitYearPrerequisitesListSerializer
-from education_group.api.views.learning_unit import LearningUnitPrerequisitesList
+from education_group.api.views.learning_unit import LearningUnitPrerequisitesList, EducationGroupRootsList
+from education_group.tests.factories.group_year import GroupYearFactory
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
+from program_management.tests.factories.element import ElementFactory
 
 
 class EducationGroupRootsListSerializerTestCase(TestCase):
@@ -46,14 +50,27 @@ class EducationGroupRootsListSerializerTestCase(TestCase):
             partial_acronym='LBIR1000I',
             academic_year=cls.academic_year,
         )
-        cls.version = EducationGroupVersionFactory(offer=cls.training)
-        url = reverse('education_group_api_v1:training_read', kwargs={
-            'acronym': cls.training.acronym,
+        cls.version = EducationGroupVersionFactory(
+            offer=cls.training,
+            root_group__academic_year=cls.training.academic_year
+        )
+        root_element = ElementFactory(group_year=cls.version.root_group)
+        group = GroupYearFactory(academic_year=cls.academic_year)
+        group_element = ElementFactory(group_year=group)
+        cls.luy = LearningUnitYearFactory(academic_year=cls.academic_year)
+        luy_element = ElementFactory(learning_unit_year=cls.luy)
+        GroupElementYearFactory(parent_element=root_element, child_element=group_element)
+
+        cls.group_element_year = GroupElementYearFactory(
+            parent_element=group_element, child_element=luy_element, relative_credits=15)
+        url = reverse('learning_unit_api_v1:' + EducationGroupRootsList.name, kwargs={
+            'acronym': cls.luy.acronym,
             'year': cls.academic_year.year
         })
         cls.serializer = EducationGroupRootsListSerializer(cls.version, context={
             'request': RequestFactory().get(url),
-            'language': settings.LANGUAGE_CODE_EN
+            'language': settings.LANGUAGE_CODE_EN,
+            'learning_unit_year': cls.luy
         })
 
     def test_contains_expected_fields(self):
@@ -71,6 +88,7 @@ class EducationGroupRootsListSerializerTestCase(TestCase):
             'education_group_type',
             'education_group_type_text',
             'academic_year',
+            'learning_unit_credits'
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 
