@@ -53,7 +53,7 @@ class EducationGroupTreeView(LanguageContextSerializerMixin, generics.RetrieveAP
         element = get_object_or_404(
             queryset,
             **filter_kwargs,
-            group_year__educationgroupversion__version_name=version_name
+            group_year__educationgroupversion__version_name__iexact=version_name
         )
         self.check_object_permissions(self.request, element.education_group_year_obj)
         tree_version_identity = ProgramTreeVersionIdentity(

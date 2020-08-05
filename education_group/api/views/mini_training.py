@@ -143,7 +143,7 @@ class MiniTrainingDetail(LanguageContextSerializerMixin, generics.RetrieveAPIVie
             ),
             offer__acronym__iexact=acronym,
             offer__academic_year__year=year,
-            version_name=version_name,
+            version_name__iexact=version_name,
             is_transition=False
         )
         return egv
@@ -169,7 +169,7 @@ class MiniTrainingTitle(LanguageContextSerializerMixin, generics.RetrieveAPIView
             ),
             offer__acronym__iexact=acronym,
             root_group__academic_year__year=year,
-            version_name=version_name
+            version_name__iexact=version_name
         )
         return egv
 
