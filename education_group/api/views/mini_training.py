@@ -162,14 +162,16 @@ class MiniTrainingTitle(LanguageContextSerializerMixin, generics.RetrieveAPIView
         version_name = self.kwargs.get('version_name', '')
 
         egv = get_object_or_404(
-            EducationGroupVersion.objects.all(
+            EducationGroupVersion.objects.filter(
+                offer__education_group_type__category=education_group_categories.MINI_TRAINING,
             ).select_related(
                 'offer__academic_year',
                 'root_group'
             ),
             offer__acronym__iexact=acronym,
             root_group__academic_year__year=year,
-            version_name__iexact=version_name
+            version_name__iexact=version_name,
+            is_transition=False
         )
         return egv
 
