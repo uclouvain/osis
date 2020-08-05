@@ -134,7 +134,8 @@ class LearningUnitListTestCase(APITestCase):
         self.assertEqual(response.data['results'], serializer.data)
 
     def test_get_no_external_mobility_learning_unit(self):
-        LearningUnitYearFactory(externallearningunityear__mobility=True)
+        luy = LearningUnitYearFactory()
+        ExternalLearningUnitYearFactory(learning_unit_year=luy, mobility=True)
         response = self.client.get(self.url, {'lang': 'fr'})
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
