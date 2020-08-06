@@ -70,6 +70,7 @@ urlpatterns = [
         include([
             url(r'^tree$', MiniTrainingTreeView.as_view(), name=MiniTrainingTreeView.name),
             url(r'^title$', MiniTrainingTitle.as_view(), name=MiniTrainingTitle.name),
+            url(r'^offer_roots$', OfferRoots.as_view(), name=OfferRoots.name),
         ])
     ),
     url(r'^mini_trainings$', MiniTrainingList.as_view(), name=MiniTrainingList.name),
