@@ -65,7 +65,8 @@ class TestPostponeProgramTree(TestCase):
             from_year=2018,
             from_offer_acronym="offer",
             from_is_transition=False,
-            from_version_name=""
+            from_version_name="",
+            end_year=None
         )
         result = postpone_tree_version_service.postpone_program_tree_version(cmd)
 

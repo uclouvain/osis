@@ -112,11 +112,10 @@ def check_version_name(request, year, code):
     existed_version_name = False
     existing_version_name = check_existing_version(version_name, year, code)
     last_using = None
-    if existing_version_name:
-        old_specific_versions = find_last_existed_version(version_name, year, code)
-        if old_specific_versions:
-            last_using = str(old_specific_versions.offer.academic_year)
-            existed_version_name = True
+    old_specific_versions = find_last_existed_version(version_name, year, code)
+    if old_specific_versions:
+        last_using = str(old_specific_versions.offer.academic_year)
+        existed_version_name = True
     valid = bool(re.match("^[A-Z]{0,15}$", request.GET['version_name'].upper()))
     return JsonResponse({
         "existed_version_name": existed_version_name,
@@ -137,7 +136,7 @@ def check_existing_version(version_name: str, year: int, code: str) -> bool:
 def find_last_existed_version(version_name, year, code):
     return EducationGroupVersion.objects.filter(
         version_name=version_name,
-        root_group__academic_year__year=year,
+        root_group__academic_year__year__lt=year,
         root_group__acronym=code,
     ).order_by(
         'offer__academic_year'

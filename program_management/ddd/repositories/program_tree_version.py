@@ -113,7 +113,7 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
             flat=True,
         )
         if qs:
-            last_past_year = qs[-1]
+            last_past_year = qs.last()
             last_identity = ProgramTreeVersionIdentity(
                 offer_acronym=entity_id.offer_acronym,
                 year=last_past_year,

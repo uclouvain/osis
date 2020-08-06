@@ -85,6 +85,7 @@ def create_and_postpone_from_past_version(command: 'CreateProgramTreeVersionComm
             from_version_name=last_existing_tree_version.entity_id.version_name,
             from_year=last_existing_tree_version.entity_id.year,
             from_is_transition=last_existing_tree_version.entity_id.is_transition,
+            end_year=command.end_year
         )
     )
 
@@ -97,6 +98,7 @@ def create_and_postpone_from_past_version(command: 'CreateProgramTreeVersionComm
             from_version_name=created_identity.version_name,
             from_year=created_identity.year,
             from_is_transition=created_identity.is_transition,
+            end_year=command.end_year
         )
     )
 
