@@ -50,7 +50,7 @@
                                 </thead>
                                 <tbody>
                                 {% for group_element_year in group_elements_years %}
-                                    {% url 'group_identification' group_element_year.parent_element.academic_year.year group_element_year.parent_element.partial_acronym as url_education_group_year %}
+                                    {% url 'group_identification' group_element_year.parent_element.group_year.academic_year.year group_element_year.parent_element.group_year.partial_acronym as url_education_group_year %}
                                     <tr>
                                         <td>
                                             <a href="{{ url_education_group_year }}">
