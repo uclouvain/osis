@@ -186,6 +186,7 @@ class OfferRoots(LanguageContextSerializerMixin, generics.ListAPIView):
     def get_queryset(self):
         acronym = self.kwargs['acronym']
         year = self.kwargs['year']
+        version_name = self.kwargs.get('version_name', '')
 
         element = get_object_or_404(
             Element.objects.all().select_related(
@@ -193,7 +194,7 @@ class OfferRoots(LanguageContextSerializerMixin, generics.ListAPIView):
             ),
             group_year__educationgroupversion__offer__acronym__iexact=acronym,
             group_year__academic_year__year=year,
-            group_year__educationgroupversion__version_name=''
+            group_year__educationgroupversion__version_name__iexact=version_name
         )
         root_elements = program_management.ddd.repositories.find_roots.find_roots(
             [element],
