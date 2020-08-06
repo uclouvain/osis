@@ -29,8 +29,8 @@ from program_management.ddd.validators._version_name_exists import VersionNameEx
 
 class CreateProgramTreeVersionValidatorList(BusinessListValidator):
 
-    def __init__(self, year: int, version_name: str):
+    def __init__(self, year: int, offer_acronym: str, version_name: str):
         self.validators = [
-            VersionNameExistsValidator(year, version_name),
+            VersionNameExistsValidator(year, offer_acronym, version_name),
         ]
         super().__init__()

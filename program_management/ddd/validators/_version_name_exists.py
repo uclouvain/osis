@@ -29,11 +29,12 @@ from program_management.ddd.repositories.check_version_name_exists import check_
 
 class VersionNameExistsValidator(BusinessValidator):
 
-    def __init__(self, working_year: int, version_name: str):
+    def __init__(self, working_year: int, offer_acronym: str, version_name: str):
         super(VersionNameExistsValidator, self).__init__()
         self.working_year = working_year
         self.version_name = version_name
+        self.offer_acronym = offer_acronym
 
     def validate(self, *args, **kwargs):
-        if check_version_name_exists(self.working_year, self.version_name):
+        if check_version_name_exists(self.working_year, self.offer_acronym, self.version_name):
             self.add_error_message("Acronym {} already exists".format(self.version_name))
