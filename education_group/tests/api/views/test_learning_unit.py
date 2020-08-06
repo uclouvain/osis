@@ -239,7 +239,8 @@ class EducationGroupRootsListTestCase(APITestCase):
             many=True,
             context={
                 'request': RequestFactory().get(self.url),
-                'language': settings.LANGUAGE_CODE_EN,
+
+                'language': settings.LANGUAGE_CODE_FR,
                 'learning_unit_year': self.learning_unit_year
             }
         )

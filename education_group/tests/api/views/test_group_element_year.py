@@ -202,8 +202,11 @@ class MiniTrainingTreeViewTestCase(APITestCase):
             root_group__education_group_type=cls.mini_training.education_group_type,
             root_group__partial_acronym=cls.mini_training.partial_acronym,
             root_group__academic_year=cls.academic_year,
-            is_transition=False
+            is_transition=False,
+            title_fr='',
+            title_en=''
         )
+
         cls.mini_training_element = ElementFactory(group_year=cls.mini_training_version.root_group)
         cls.common_core = GroupYearFactory(
             education_group_type__category=GROUP,
@@ -221,7 +224,7 @@ class MiniTrainingTreeViewTestCase(APITestCase):
 
         cls.person = PersonFactory()
         url_kwargs = {
-            'official_partial_acronym': cls.mini_training_version.root_group.partial_acronym,
+            'acronym': cls.mini_training.acronym,
             'year': cls.mini_training_version.root_group.academic_year.year
         }
         cls.url = reverse('education_group_api_v1:' + MiniTrainingTreeView.name, kwargs=url_kwargs)
@@ -245,7 +248,7 @@ class MiniTrainingTreeViewTestCase(APITestCase):
     def test_get_mini_training_not_found(self):
         invalid_url = reverse(
             'education_group_api_v1:' + MiniTrainingTreeView.name,
-            kwargs={'official_partial_acronym': 'LDROI100O', 'year': 2018}
+            kwargs={'acronym': 'DROI4M', 'year': 2018}
         )
         response = self.client.get(invalid_url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
@@ -264,7 +267,7 @@ class MiniTrainingTreeViewTestCase(APITestCase):
 
     def test_get_result_with_lowercase_acronym(self):
         url_kwargs = {
-            'official_partial_acronym': self.mini_training_version.root_group.partial_acronym.lower(),
+            'acronym': self.mini_training.acronym.lower(),
             'year': self.mini_training.academic_year.year
         }
         url = reverse('education_group_api_v1:' + MiniTrainingTreeView.name, kwargs=url_kwargs)
