@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-06 09:09+0200\n"
+"POT-Creation-Date: 2020-08-06 14:46+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,11 +22,16 @@ msgid_plural "%(count_enrollment)d students are enrolled in the mini-training."
 msgstr[0] "%(count_enrollment)d étudiant est inscrit à la mini-formation."
 msgstr[1] "%(count_enrollment)d étudiants sont inscrits à la mini-formation."
 
-#, python-format
-msgid "%(count_enrollment)d student is enrolled in the training."
-msgid_plural "%(count_enrollment)d students are enrolled in the training."
-msgstr[0] "%(count_enrollment)d étudiant est inscrit à la formation."
-msgstr[1] "%(count_enrollment)d étudiants sont inscrits à la formation."
+msgid ""
+"%(count_enrollment)d student is enrolled in the training {acronym} "
+"({academic_year})."
+msgid_plural ""
+"%(count_enrollment)d students are enrolled in the training {acronym} "
+"({academic_year})."
+msgstr[0] "%(count_enrollment)d étudiant est inscrit à la formation {acronym} "
+"({academic_year})."
+msgstr[1] "%(count_enrollment)d étudiants sont inscrits à la formation {acronym} "
+"({academic_year})."
 
 #, python-format
 msgid "%(max)s must be greater or equals than %(min)s"
@@ -163,7 +168,8 @@ msgstr "Conditions"
 #, python-format
 msgid ""
 "Consistency error in %(academic_year)s: %(field)s has already been modified"
-msgstr "Erreur de consistance en %(academic_year)s: %(field)s a déjà été modifié"
+msgstr ""
+"Erreur de consistance en %(academic_year)s: %(field)s a déjà été modifié"
 
 msgid "Contacts"
 msgstr "Contacts"
@@ -343,6 +349,10 @@ msgstr "Domaine ISCED/CITE"
 
 msgid "Identification"
 msgstr ""
+
+#, python-format
+msgid "Imposible to put end date to %(end_year)s: %(msg)s"
+msgstr "Impossible de mettre la fin à %(end_year)s: %(msg)s"
 
 msgid "Institution"
 msgstr ""
@@ -633,6 +643,11 @@ msgstr "Intitulés"
 
 msgid "Training"
 msgstr ""
+
+#, python-format
+msgid "Training %(acronym)s (%(academic_year)s) successfully deleted."
+msgstr ""
+"La formation %(acronym)s (%(academic_year)s) </a> a été supprimée avec succès"
 
 #, python-format
 msgid ""

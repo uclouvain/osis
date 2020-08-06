@@ -21,27 +21,18 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+
 from base.ddd.utils import business_validator
-from education_group.ddd.business_types import *
-from education_group.ddd.domain.exception import TrainingHaveLinkWithEPC, MiniTrainingHaveLinkWithEPC
-from education_group.ddd.domain.service.link_with_epc import LinkWithEPC
+from program_management.ddd.business_types import *
+from program_management.ddd.domain import exception
 
 
-class TrainingLinkWithEPCValidator(business_validator.BusinessValidator):
-    def __init__(self, training_id: 'TrainingIdentity'):
+class CheckProgramTreeEndDateValidator(business_validator.BusinessValidator):
+    def __init__(self, tree: 'ProgramTree'):
         super().__init__()
-        self.training_id = training_id
+        self.tree = tree
 
     def validate(self, *args, **kwargs):
-        if LinkWithEPC().is_training_have_link_with_epc(self.training_id):
-            raise TrainingHaveLinkWithEPC(self.training_id.acronym, self.training_id.year)
-
-
-class MiniTrainingLinkWithEPCValidator(business_validator.BusinessValidator):
-    def __init__(self, mini_training_id: 'MiniTrainingIdentity'):
-        super().__init__()
-        self.mini_training_id = mini_training_id
-
-    def validate(self, *args, **kwargs):
-        if LinkWithEPC().is_mini_training_have_link_with_epc(self.mini_training_id):
-            raise MiniTrainingHaveLinkWithEPC
+        root_node = self.tree.root_node
+        if root_node.end_year and root_node.year >= root_node.end_year:
+            raise exception.CannotCopyTreeDueToEndDate(self.tree)

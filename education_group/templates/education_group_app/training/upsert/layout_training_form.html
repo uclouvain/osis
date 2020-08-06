@@ -27,6 +27,7 @@
 
 <form id="UpsertTrainingForm" class="education_group_form" method="POST" novalidate>
     {% csrf_token %}
+    {% bootstrap_form_errors training_form %}
     <div class="panel panel-default">
         <div class="panel-heading">
             {% include "blocks/forms/create_cancel_buttons.html" %}

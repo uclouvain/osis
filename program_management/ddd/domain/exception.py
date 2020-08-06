@@ -55,6 +55,7 @@ class ProgramTreeVersionNotFoundException(Exception):
 class ProgramTreeAlreadyExistsException(Exception):
     pass
 
+
 class ProgramTreeNonEmpty(BusinessException):
     def __init__(self, program_tree: 'ProgramTree', **kwargs):
         message = _("[%(academic_year)s] The content of the program is not empty.") % {
@@ -69,4 +70,32 @@ class NodeHaveLinkException(BusinessException):
                     'academic_year': node.academic_year,
                     'code': node.code
                 }
+        super().__init__(message, **kwargs)
+
+
+class CannotCopyTreeVersionDueToEndDate(BusinessException):
+    def __init__(self, tree_version: 'ProgramTreeVersion', *args, **kwargs):
+        message = _(
+            "You can't copy the program tree version '{acronym}' "
+            "from {from_year} to {to_year} because it ends in {end_year}"
+        ).format(
+            acronym=tree_version.entity_id.offer_acronym,
+            from_year=tree_version.get_tree().root_node.year,
+            to_year=tree_version.get_tree().root_node.year + 1,
+            end_year=tree_version.get_tree().root_node.end_year,
+        )
+        super().__init__(message, **kwargs)
+
+
+class CannotCopyTreeDueToEndDate(BusinessException):
+    def __init__(self, tree: 'ProgramTree', *args, **kwargs):
+        message = _(
+            "You can't copy the program tree '{code}' "
+            "from {from_year} to {to_year} because it ends in {end_year}"
+        ).format(
+            code=tree.entity_id.code,
+            from_year=tree.root_node.year,
+            to_year=tree.root_node.year + 1,
+            end_year=tree.root_node.end_year,
+        )
         super().__init__(message, **kwargs)

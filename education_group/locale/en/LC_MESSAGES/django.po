@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-06 09:09+0200\n"
+"POT-Creation-Date: 2020-08-06 14:46+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -23,9 +23,13 @@ msgid_plural "%(count_enrollment)d students are enrolled in the mini-training."
 msgstr[0] ""
 msgstr[1] ""
 
-#, python-format
-msgid "%(count_enrollment)d student is enrolled in the training."
-msgid_plural "%(count_enrollment)d students are enrolled in the training."
+#, python-format, python-brace-format
+msgid ""
+"%(count_enrollment)d student is enrolled in the training {acronym} "
+"({academic_year})."
+msgid_plural ""
+"%(count_enrollment)d students are enrolled in the training {acronym} "
+"({academic_year})."
 msgstr[0] ""
 msgstr[1] ""
 
@@ -338,6 +342,10 @@ msgstr ""
 msgid "Identification"
 msgstr ""
 
+#, python-format
+msgid "Imposible to put end date to %(end_year)s: %(msg)s"
+msgstr ""
+
 msgid "Institution"
 msgstr ""
 
@@ -617,6 +625,10 @@ msgid "Titles"
 msgstr ""
 
 msgid "Training"
+msgstr ""
+
+#, python-format
+msgid "Training %(acronym)s (%(academic_year)s) successfully deleted."
 msgstr ""
 
 #, python-format

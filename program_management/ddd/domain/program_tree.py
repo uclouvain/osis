@@ -45,6 +45,8 @@ from program_management.ddd.domain.service.validation_rule import FieldValidatio
 from program_management.ddd.repositories import load_authorized_relationship
 from program_management.ddd.validators import validators_by_business_action
 from program_management.ddd.validators._path_validator import PathValidator
+from program_management.ddd.validators.validators_by_business_action import CopyProgramTreeVersionValidatorList, \
+    CopyProgramTreeValidatorList
 from program_management.models.enums import node_type
 from program_management.models.enums.node_type import NodeType
 from education_group.ddd.business_types import *
@@ -62,6 +64,7 @@ class ProgramTreeIdentity(interface.EntityIdentity):
 class ProgramTreeBuilder:
 
     def copy_to_next_year(self, copy_from: 'ProgramTree', repository: 'ProgramTreeRepository') -> 'ProgramTree':
+        CopyProgramTreeValidatorList(copy_from).validate()
         identity_next_year = attr.evolve(copy_from.entity_id, year=copy_from.entity_id.year + 1)
         try:
             program_tree_next_year = repository.get(identity_next_year)

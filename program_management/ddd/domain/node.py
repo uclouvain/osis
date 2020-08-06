@@ -54,26 +54,25 @@ class NodeFactory:
     @classmethod
     def copy_to_next_year(cls, copy_from_node: 'Node') -> 'Node':
         next_year = copy_from_node.entity_id.year + 1
-        end_date = cls._get_end_date(copy_from_node)
+        end_year = cls._get_next_end_year(copy_from_node)
         node_next_year = attr.evolve(
             copy_from_node,
             entity_id=NodeIdentity(copy_from_node.entity_id.code, next_year),
             year=next_year,
-            end_date=end_date,
-            end_year=end_date,
+            end_year=end_year,
             children=[],
         )
         node_next_year._has_changed = True
         return node_next_year
 
     @classmethod
-    def _get_end_date(cls, copy_from_node: 'Node') -> Optional[int]:
-        if not copy_from_node.end_date:
-            return copy_from_node.end_date
+    def _get_next_end_year(cls, copy_from_node: 'Node') -> Optional[int]:
+        if not copy_from_node.end_year:
+            return copy_from_node.end_year
         next_year = copy_from_node.entity_id.year + 1
-        if copy_from_node.end_date < next_year:
+        if copy_from_node.end_year < next_year:
             return next_year
-        return copy_from_node.end_date
+        return copy_from_node.end_year
 
     def get_node(self, type: NodeType, **node_attrs):
         node_cls = {
@@ -83,11 +82,14 @@ class NodeFactory:
             NodeType.LEARNING_UNIT: NodeLearningUnitYear,
             NodeType.LEARNING_CLASS: NodeLearningClassYear
         }[type]
-        if node_attrs.get('teaching_campus_name'):
+        teaching_campus_name = node_attrs.pop('teaching_campus_name', None)
+        teaching_campus_university_name = node_attrs.pop('teaching_campus_university_name', None)
+        if teaching_campus_name:
             node_attrs['teaching_campus'] = Campus(
-                name=node_attrs.pop('teaching_campus_name'),
-                university_name=node_attrs.pop('teaching_campus_university_name'),
+                name=teaching_campus_name,
+                university_name=teaching_campus_university_name,
             )
+
         return node_cls(**node_attrs)
 
 

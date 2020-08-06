@@ -37,7 +37,8 @@
 
 {% block header_content %}
     <div class="page-header">
-        <h2>{% trans 'Update Training' %}</h2>
+        <h2>{{ training_obj.acronym }} - {{ training_obj.academic_year }}</h2>
+        <h3>{{ training_obj.titles.title_fr }}</h3>
     </div>
 {% endblock header_content %}
 

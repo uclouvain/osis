@@ -33,7 +33,7 @@ from django.views import View
 
 import program_management.ddd.service.write.report_training_with_program_tree
 from base.utils.urls import reverse_with_get
-from base.views.common import display_success_messages, display_warning_messages
+from base.views.common import display_success_messages, display_warning_messages, display_error_messages
 from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import exception, group
@@ -95,6 +95,7 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 display_warning_messages(request, warning_messages, extra_tags='safe')
                 return HttpResponseRedirect(self.get_success_url())
 
+        display_error_messages(self.request, self._get_default_error_messages())
         return self.get(request, *args, **kwargs)
 
     def get_tabs(self) -> List:
@@ -148,7 +149,8 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         return []
 
     def delete_training(self) -> List['TrainingIdentity']:
-        if not self.training_form.cleaned_data["end_year"]:
+        end_year = self.training_form.cleaned_data["end_year"]
+        if not end_year:
             return []
 
         try:
@@ -157,13 +159,31 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             return delete_training_with_program_tree_service.delete_training_with_program_tree(delete_command)
 
         except program_management_exception.ProgramTreeNotEmptyException as e:
-            self.training_form.add_error("end_year", e.message)
+            self.training_form.add_error("end_year", "")
+            self.training_form.add_error(
+                None,
+                _("Imposible to put end date to %(end_year)s: %(msg)s") % {
+                    "msg": e.message,
+                    "end_year": end_year}
+            )
 
-        except exception.IsLinkedToEpcException as e:
-            self.training_form.add_error("end_year", e.message)
+        except exception.TrainingHaveLinkWithEPC as e:
+            self.training_form.add_error("end_year", "")
+            self.training_form.add_error(
+                None,
+                _("Imposible to put end date to %(end_year)s: %(msg)s") % {
+                    "msg": e.message,
+                    "end_year": end_year}
+            )
 
-        except exception.HasInscriptionsException as e:
-            self.training_form.add_error("end_year", e.message)
+        except exception.TrainingHaveEnrollments as e:
+            self.training_form.add_error("end_year", "")
+            self.training_form.add_error(
+                None,
+                _("Imposible to put end date to %(end_year)s: %(msg)s") % {
+                    "msg": e.message,
+                    "end_year": end_year}
+            )
 
         return []
 
@@ -281,11 +301,13 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         }
 
     def _get_success_msg_deleted_training(self, training_identity: 'TrainingIdentity') -> str:
-        deleted_message_format = "Training %(acronym)s (%(academic_year)s) successfully deleted."
-        return _(deleted_message_format) % {
+        return _("Training %(acronym)s (%(academic_year)s) successfully deleted.") % {
             "acronym": training_identity.acronym,
             "academic_year": display_as_academic_year(training_identity.year)
         }
+
+    def _get_default_error_messages(self) -> str:
+        return _("Error(s) in form: The modifications are not saved")
 
     def _get_training_form_initial_values(self) -> Dict:
         training_obj = self.get_training_obj()

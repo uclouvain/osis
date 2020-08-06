@@ -37,6 +37,8 @@ from program_management.ddd.validators._authorized_relationship_for_all_trees im
     ValidateAuthorizedRelationshipForAllTrees
 from program_management.ddd.validators._authorized_root_type_for_prerequisite import AuthorizedRootTypeForPrerequisite
 from program_management.ddd.validators._block_validator import BlockValidator
+from program_management.ddd.validators._copy_check_end_date_program_tree import CheckProgramTreeEndDateValidator
+from program_management.ddd.validators._copy_check_end_date_tree_version import CheckTreeVersionEndDateValidator
 from program_management.ddd.validators._detach_option_2M import DetachOptionValidator
 from program_management.ddd.validators._detach_root import DetachRootValidator
 from program_management.ddd.validators._empty_program_tree import EmptyProgramTreeValidator
@@ -235,4 +237,20 @@ class DeleteStandardVersionValidatorList(business_validator.BusinessListValidato
             program_tree_version: 'ProgramTreeVersion',
     ):
         self.validators = []
+        super().__init__()
+
+
+class CopyProgramTreeVersionValidatorList(business_validator.BusinessListValidator):
+    def __init__(self, copy_from: 'ProgramTreeVersion'):
+        self.validators = [
+            CheckTreeVersionEndDateValidator(copy_from)
+        ]
+        super().__init__()
+
+
+class CopyProgramTreeValidatorList(business_validator.BusinessListValidator):
+    def __init__(self, copy_from: 'ProgramTree'):
+        self.validators = [
+            CheckProgramTreeEndDateValidator(copy_from)
+        ]
         super().__init__()

@@ -1,3 +1,4 @@
+from education_group.templatetags.academic_year_display import display_as_academic_year
 from osis_common.ddd.interface import BusinessException
 from django.utils.translation import gettext_lazy as _, ngettext_lazy
 from education_group.ddd.business_types import *
@@ -164,18 +165,21 @@ class IsLinkedToEpcException(BusinessException):
 
 
 class TrainingHaveEnrollments(BusinessException):
-    def __init__(self, enrollment_count: int, **kwargs):
+    def __init__(self, acronym, year, enrollment_count: int, **kwargs):
         message = ngettext_lazy(
-            "%(count_enrollment)d student is enrolled in the training.",
-            "%(count_enrollment)d students are enrolled in the training.",
+            "%(count_enrollment)d student is enrolled in the training {acronym} ({academic_year}).",
+            "%(count_enrollment)d students are enrolled in the training {acronym} ({academic_year}).",
             enrollment_count
-        ) % {"count_enrollment": enrollment_count}
+        ) % {"count_enrollment": enrollment_count, "acronym": acronym, "year": display_as_academic_year(year)}
         super().__init__(message, **kwargs)
 
 
 class TrainingHaveLinkWithEPC(BusinessException):
-    def __init__(self, *args, **kwargs):
-        message = _("Linked with EPC")
+    def __init__(self, acronym, year, **kwargs):
+        message = _("The training {acronym} ({academic_year}) is linked to epc").format(
+            acronym=acronym,
+            academic_year=display_as_academic_year(year)
+        )
         super().__init__(message, **kwargs)
 
 
