@@ -58,20 +58,28 @@ class EducationGroupRootsList(LanguageContextSerializerMixin, generics.ListAPIVi
     paginator = None
 
     def get_queryset(self):
-        element = get_object_or_404(
+        self.element = get_object_or_404(
             Element.objects.all().select_related('learning_unit_year__academic_year'),
             learning_unit_year__acronym=self.kwargs['acronym'].upper(),
             learning_unit_year__academic_year__year=self.kwargs['year']
         )
         root_elements = program_management.ddd.repositories.find_roots.find_roots(
-            [element],
+            [self.element],
             additional_root_categories=[GroupType.COMPLEMENTARY_MODULE],
             exclude_root_categories=TrainingType.finality_types_enum(),
             as_instances=True
-        ).get(element.id, [])
+        ).get(self.element.id, [])
+
         return EducationGroupVersion.objects.filter(
             root_group__element__in=root_elements
         ).select_related('offer__academic_year', 'offer__education_group_type')
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context.update({
+            'learning_unit_year': self.element.learning_unit_year
+        })
+        return context
 
 
 class LearningUnitPrerequisitesList(LanguageContextSerializerMixin, generics.ListAPIView):
