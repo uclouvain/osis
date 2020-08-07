@@ -27,9 +27,12 @@ from typing import List
 
 from django.db import transaction
 
+from education_group.ddd.domain.training import TrainingIdentity
+from education_group.ddd.repository.training import TrainingRepository
 from program_management.ddd.command import PostponeProgramTreeVersionCommand, CopyTreeVersionToNextYearCommand
 from program_management.ddd.domain import exception
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
+from program_management.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
 from program_management.ddd.service.write import copy_program_version_service
 
 
@@ -42,6 +45,12 @@ def postpone_program_tree_version(
     # GIVEN
     from_year = postpone_cmd.from_year
     end_postponement_year = postpone_cmd.until_year
+
+    if not end_postponement_year:
+        end_postponement_year = CalculateEndPostponement.calculate_program_tree_end_postponement_year(
+            training_identity=TrainingIdentity(acronym=postpone_cmd.from_offer_acronym, year=postpone_cmd.from_year),
+            training_repository=TrainingRepository()
+        )
 
     # WHEN
     while from_year < end_postponement_year:
