@@ -26,11 +26,12 @@
 from typing import List
 
 from program_management.ddd.command import PostponeProgramTreeVersionCommand, CreateProgramTreeVersionCommand, \
-    DuplicateProgramTree
+    DuplicateProgramTree, PostponeProgramTreeCommand
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionBuilder, ProgramTreeVersionIdentity, \
     STANDARD
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
-from program_management.ddd.service.write import postpone_tree_version_service, duplicate_program_tree_service
+from program_management.ddd.service.write import postpone_tree_version_service, duplicate_program_tree_service, \
+    postpone_program_tree_service
 
 
 def create_program_tree_version(
@@ -78,28 +79,22 @@ def create_and_postpone_from_past_version(command: 'CreateProgramTreeVersionComm
     )
     last_existing_tree_version = ProgramTreeVersionRepository().get_last_in_past(identity_to_create)
 
-    # WHEN
-    created_identities_in_past = postpone_tree_version_service.postpone_program_tree_version(
+    postpone_program_tree_service.postpone_program_tree(
+        PostponeProgramTreeCommand(
+            from_code=last_existing_tree_version.program_tree_identity.code,
+            from_year=last_existing_tree_version.program_tree_identity.year,
+            offer_acronym=identity_to_create.offer_acronym,
+            until_year=int(command.end_year) if command.end_year else None
+        )
+    )
+
+    created_identities_from_past = postpone_tree_version_service.postpone_program_tree_version(
         PostponeProgramTreeVersionCommand(
             from_offer_acronym=last_existing_tree_version.entity_id.offer_acronym,
             from_version_name=last_existing_tree_version.entity_id.version_name,
             from_year=last_existing_tree_version.entity_id.year,
             from_is_transition=last_existing_tree_version.entity_id.is_transition,
-            until_year=command.end_year
+            until_year=int(command.end_year)
         )
     )
-
-    # THEN
-    created_identity = create_program_tree_version(command)
-
-    created_identities_in_future = postpone_tree_version_service.postpone_program_tree_version(
-        PostponeProgramTreeVersionCommand(
-            from_offer_acronym=created_identity.offer_acronym,
-            from_version_name=created_identity.version_name,
-            from_year=created_identity.year,
-            from_is_transition=created_identity.is_transition,
-            end_year=command.end_year
-        )
-    )
-
-    return created_identities_in_past + [created_identity] + created_identities_in_future
+    return created_identities_from_past
