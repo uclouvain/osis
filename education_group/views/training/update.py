@@ -74,23 +74,24 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
         if self.training_form.is_valid() and self.content_formset.is_valid():
-            update_trainings = self.update_training()
-            created_trainings = self.report_training()
+            warning_messages = get_update_training_warning_messages.get_conflicted_fields(
+                command.GetUpdateTrainingWarningMessages(
+                    acronym=self.get_training_obj().acronym,
+                    code=self.get_training_obj().code,
+                    year=self.get_training_obj().year
+                )
+            )
+            updated_trainings = self.update_training()
+            created_trainings = []
+            if warning_messages:
+                created_trainings = self.report_training()
             deleted_trainings = self.delete_training()
             if not self.training_form.errors:
                 self.update_links()
-                success_messages = self.get_success_msg_updated_trainings(update_trainings)
+                success_messages = self.get_success_msg_updated_trainings(updated_trainings)
                 success_messages += self.get_success_msg_updated_trainings(created_trainings)
                 success_messages += self.get_success_msg_deleted_trainings(deleted_trainings)
                 display_success_messages(request, success_messages, extra_tags='safe')
-
-                warning_messages = get_update_training_warning_messages.get_conflicted_fields(
-                    command.GetUpdateTrainingWarningMessages(
-                        acronym=self.get_training_obj().acronym,
-                        code=self.get_training_obj().code,
-                        year=self.get_training_obj().year
-                    )
-                )
                 display_warning_messages(request, warning_messages, extra_tags='safe')
                 return HttpResponseRedirect(self.get_success_url())
 
