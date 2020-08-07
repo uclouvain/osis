@@ -107,7 +107,7 @@ urlpatterns = [
             path('<str:title>/update/', TrainingUpdateView.as_view(), name='training_update'),
             path('create/', CreateEducationGroupAchievement.as_view(), name='training_achievement_create'),
             path('delete/', TrainingDeleteView.as_view(), name='training_delete'),
-            path('<int:education_group_achievement_pk>/', include([
+            path('achievement/<int:education_group_achievement_pk>/', include([
                 path('actions/', EducationGroupAchievementAction.as_view(), name='training_achievement_actions'),
                 path('create/', CreateEducationGroupDetailedAchievement.as_view(),
                      name='training_detailed_achievement_create'),

@@ -801,7 +801,7 @@ class TestCertificateAimAutocomplete(TestCase):
         json_response = str(response.content, encoding='utf8')
         results = json.loads(json_response)['results']
         self.assertEqual(len(results), 1)
-        self.assertEqual(results[0]['id'], str(self.certificate_aim.id))
+        self.assertEqual(results[0]['id'], self.certificate_aim.code)
 
 
 @override_flag('education_group_update', active=True)

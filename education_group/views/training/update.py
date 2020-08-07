@@ -31,7 +31,6 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 
-import program_management.ddd.service.write.report_training_with_program_tree
 from base.utils.urls import reverse_with_get
 from base.views.common import display_success_messages, display_warning_messages, display_error_messages
 from education_group.ddd import command
