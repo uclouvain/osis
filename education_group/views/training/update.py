@@ -74,6 +74,9 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
         if self.training_form.is_valid() and self.content_formset.is_valid():
+
+            updated_trainings = self.update_training()
+            deleted_trainings = self.delete_training()
             warning_messages = get_update_training_warning_messages.get_conflicted_fields(
                 command.GetUpdateTrainingWarningMessages(
                     acronym=self.get_training_obj().acronym,
@@ -81,11 +84,10 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                     year=self.get_training_obj().year
                 )
             )
-            updated_trainings = self.update_training()
             created_trainings = []
             if warning_messages:
                 created_trainings = self.report_training()
-            deleted_trainings = self.delete_training()
+
             if not self.training_form.errors:
                 self.update_links()
                 success_messages = self.get_success_msg_updated_trainings(updated_trainings)
