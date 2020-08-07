@@ -180,3 +180,7 @@ class MiniTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
                 'organization_name': self.cleaned_data['teaching_campus'].organization.name,
             }
         return None
+
+
+class UpdateMiniTrainingForm(MiniTrainingForm):
+    pass

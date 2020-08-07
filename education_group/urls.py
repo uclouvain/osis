@@ -41,6 +41,7 @@ urlpatterns = [
                 mini_training.MiniTrainingReadIdentification.as_view(),
                 name='mini_training_identification'
             ),
+            path('<str:acronym>/update/', mini_training.MiniTrainingUpdateView.as_view(), name='mini_training_update'),
             path('content/', mini_training.MiniTrainingReadContent.as_view(), name='mini_training_content'),
             path('utilization/', mini_training.MiniTrainingReadUtilization.as_view(), name='mini_training_utilization'),
             path(
