@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-27 09:47+0200\n"
+"POT-Creation-Date: 2020-08-06 14:46+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -366,6 +366,9 @@ msgstr "Nom du professeur responsable de programme"
 msgid "New Education Group"
 msgstr "Nouveau Groupement"
 
+msgid "New Mini-Training"
+msgstr "Nouvelle Mini-Formation"
+
 msgid "New training"
 msgstr "Nouvelle Formation"
 
@@ -483,6 +486,10 @@ msgstr ""
 
 msgid "Produce xls with a list of trainings"
 msgstr "Produire un fichier Excel avec la liste des formations"
+
+#, python-format
+msgid "Program %(acronym)s (%(academic_year)s) is not empty."
+msgstr "Le contenu du program %(acronym)s (%(academic_year)s) n'est pas vide."
 
 msgid "Proposal status"
 msgstr "Légende proposition"
@@ -708,6 +715,22 @@ msgstr ""
 "Vous ne pouvez pas ajouter une unité d'enseignement comme %(node)s à "
 "l'élément %(parent)s de type %(type)s."
 
+#, python-brace-format
+msgid ""
+"You can't copy the program tree '{code}' from {from_year} to {to_year} "
+"because it ends in {end_year}"
+msgstr ""
+"Vous ne pouvez pas copier le programme '{code}' de {from_year} à {to_year} "
+"parce qu'il finit en {end_year}"
+
+#, python-brace-format
+msgid ""
+"You can't copy the program tree version '{acronym}' from {from_year} to "
+"{to_year} because it ends in {end_year}"
+msgstr ""
+"Vous ne pouvez pas copier la version de  programme '{acronym}' de "
+"{from_year} à {to_year} parce qu'elle finit en {end_year}"
+
 #, python-format
 msgid ""
 "You cannot add \"%(child)s\" of type \"%(child_types)s\" to \"%(parent)s\" "
@@ -731,6 +754,18 @@ msgid ""
 msgstr ""
 "Vous devez être dans le contexte d'une formation pour modifier les prérequis "
 "d'une unité d'enseignement (contexte actuel: %(title)s"
+
+#, python-format
+msgid ""
+"[%(academic_year)s] %(code)s has links to another training / mini-training / "
+"group"
+msgstr ""
+"[%(academic_year)s] %(code)s a des liaisons avec une autre formation / mini-"
+"formation / groupement"
+
+#, python-format
+msgid "[%(academic_year)s] The content of the program is not empty."
+msgstr "[%(academic_year)s] Le contenu du programme n'est pas vide."
 
 msgid "bibliography"
 msgstr ""

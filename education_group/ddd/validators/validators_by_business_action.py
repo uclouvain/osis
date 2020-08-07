@@ -23,24 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from base.ddd.utils import business_validator
+from education_group.ddd.business_types import *
 from education_group.ddd.validators._abbreviated_title_already_exist import AcronymAlreadyExistValidator
 from education_group.ddd.validators._acronym_required import AcronymRequiredValidator
 from education_group.ddd.validators._certificate_aim_type_2 import CertificateAimType2Validator
-from education_group.ddd.validators._copy_check_end_date import CheckEndDateValidator
-from education_group.ddd.validators._credits import CreditsValidator
-from education_group.ddd.business_types import *
-
-from base.ddd.utils import business_validator
 from education_group.ddd.validators._content_constraint import ContentConstraintValidator
+from education_group.ddd.validators._copy_check_group_end_date import CheckGroupEndDateValidator
+from education_group.ddd.validators._copy_check_mini_training_end_date import CheckMiniTrainingEndDateValidator
+from education_group.ddd.validators._copy_check_training_end_date import CheckTrainingEndDateValidator
+from education_group.ddd.validators._credits import CreditsValidator
+from education_group.ddd.validators._enrollments import TrainingEnrollmentsValidator, MiniTrainingEnrollmentsValidator
+from education_group.ddd.validators._link_with_epc import TrainingLinkWithEPCValidator, MiniTrainingLinkWithEPCValidator
 from education_group.ddd.validators._start_year_end_year import StartYearEndYearValidator
+from education_group.ddd.validators.start_and_end_year_validator import StartAndEndYearValidator
 
 
 class CreateGroupValidatorList(business_validator.BusinessListValidator):
 
-    def __init__(
-            self,
-            group: 'Group'
-    ):
+    def __init__(self, group: 'Group'):
         self.validators = [
             ContentConstraintValidator(group.content_constraint),
             CreditsValidator(group.credits),
@@ -50,10 +51,7 @@ class CreateGroupValidatorList(business_validator.BusinessListValidator):
 
 class UpdateGroupValidatorList(business_validator.BusinessListValidator):
 
-    def __init__(
-            self,
-            group: 'Group'
-    ):
+    def __init__(self, group: 'Group'):
         self.validators = [
             ContentConstraintValidator(group.content_constraint),
             CreditsValidator(group.credits),
@@ -61,28 +59,98 @@ class UpdateGroupValidatorList(business_validator.BusinessListValidator):
         super().__init__()
 
 
+class CreateMiniTrainingValidatorList(business_validator.BusinessListValidator):
+    def __init__(self, mini_training_domain_obj: 'MiniTraining'):
+        self.validators = [
+            AcronymRequiredValidator(mini_training_domain_obj.acronym),
+            AcronymAlreadyExistValidator(mini_training_domain_obj.acronym),
+            StartAndEndYearValidator(mini_training_domain_obj.start_year, mini_training_domain_obj.end_year)
+        ]
+        super().__init__()
+
+
 class CreateTrainingValidatorList(business_validator.BusinessListValidator):
 
-    def __init__(
-            self,
-            training: 'Training'
-    ):
+    def __init__(self, training: 'Training'):
         self.validators = [
-            AcronymRequiredValidator(training),
-            AcronymAlreadyExistValidator(training),
+            AcronymRequiredValidator(training.acronym),
+            AcronymAlreadyExistValidator(training.acronym),
             StartYearEndYearValidator(training),
             CertificateAimType2Validator(training),
         ]
         super().__init__()
 
 
+class UpdateTrainingValidatorList(business_validator.BusinessListValidator):
+
+    def __init__(self, training: 'Training'):
+        self.validators = [
+            CertificateAimType2Validator(training)
+        ]
+        super().__init__()
+
+
 class CopyTrainingValidatorList(business_validator.BusinessListValidator):
+
+    def __init__(self, training_from: 'Training'):
+        self.validators = [
+            CheckTrainingEndDateValidator(training_from),
+        ]
+        super().__init__()
+
+
+class CopyGroupValidatorList(business_validator.BusinessListValidator):
+
+    def __init__(self, group_from: 'Group'):
+        self.validators = [
+            CheckGroupEndDateValidator(group_from),
+        ]
+        super().__init__()
+
+
+class CopyMiniTrainingValidatorList(business_validator.BusinessListValidator):
 
     def __init__(
             self,
-            training_from: 'Training'
+            mini_training_from: 'MiniTraining'
     ):
         self.validators = [
-            CheckEndDateValidator(training_from),
+            CheckMiniTrainingEndDateValidator(mini_training_from),
+        ]
+        super().__init__()
+
+
+class DeleteOrphanGroupValidatorList(business_validator.BusinessListValidator):
+
+    def __init__(
+            self,
+            group: 'Group',
+    ):
+        self.validators = []
+        super().__init__()
+
+
+class DeleteOrphanTrainingValidatorList(business_validator.BusinessListValidator):
+
+    def __init__(
+            self,
+            training: 'Training',
+    ):
+        self.validators = [
+            TrainingEnrollmentsValidator(training.entity_id),
+            TrainingLinkWithEPCValidator(training.entity_id)
+        ]
+        super().__init__()
+
+
+class DeleteOrphanMiniTrainingValidatorList(business_validator.BusinessListValidator):
+
+    def __init__(
+            self,
+            mini_training: 'MiniTraining',
+    ):
+        self.validators = [
+            MiniTrainingEnrollmentsValidator(mini_training.entity_id),
+            MiniTrainingLinkWithEPCValidator(mini_training.entity_id)
         ]
         super().__init__()

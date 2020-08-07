@@ -153,7 +153,7 @@
                     <div class="row">
                         <div class="col-md-12">
                             {% bootstrap_label _("Last year of organization") label_class='d-block'%}
-                            <p>{% if node.end_year %}{{ node.end_year|format_to_academic_year }}{% else %}{% trans _("unspecified") %}{% endif %}</p>
+                            <p>{% if node.end_year %}{{ node.end_year|format_to_academic_year }}{% else %}{% trans 'unspecified' %}{% endif %}</p>
                         </div>
                     </div>
                     <br>
@@ -182,7 +182,7 @@
                     {% with label=_("remark in english") %}
                         {% bootstrap_label label|capfirst label_class='d-block' %}
                     {% endwith %}
-                    <p>{{ node.remark_fr }} </p>
+                    <p>{{ node.remark_en }} </p>
                 </div>
             </div>
         </div>

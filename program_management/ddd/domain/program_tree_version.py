@@ -28,9 +28,12 @@ import attr
 
 from osis_common.ddd import interface
 from program_management.ddd.business_types import *
-from program_management.ddd.command import CreateStandardVersionCommand, CreateProgramTreeVersionCommand
+from program_management.ddd.command import CreateProgramTreeVersionCommand
+from program_management.ddd.command import CreateStandardVersionCommand
+from program_management.ddd.domain import exception
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity, ProgramTree
 from program_management.ddd.validators.program_tree_version import CreateProgramTreeVersionValidatorList
+from program_management.ddd.validators.validators_by_business_action import CopyProgramTreeVersionValidatorList
 
 STANDARD = ""
 
@@ -52,13 +55,13 @@ class ProgramTreeVersionBuilder:
             copy_from: 'ProgramTreeVersion',
             tree_version_repository: 'ProgramTreeVersionRepository'
     ) -> 'ProgramTreeVersion':
+        CopyProgramTreeVersionValidatorList(copy_from).validate()
         identity_next_year = attr.evolve(copy_from.entity_id, year=copy_from.entity_id.year + 1)
-        tree_version_next_year = tree_version_repository.get(identity_next_year)
-        if tree_version_next_year:
+        try:
+            tree_version_next_year = tree_version_repository.get(identity_next_year)
             # Case update program tree version to next year
             # TODO :: To implement in OSIS-4386
-            pass
-        else:
+        except exception.ProgramTreeVersionNotFoundException:
             # Case create program tree version to next year
             tree_version_next_year = attr.evolve(  # Copy to new object
                 copy_from,

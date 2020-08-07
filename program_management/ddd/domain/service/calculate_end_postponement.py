@@ -24,11 +24,8 @@
 #
 ##############################################################################
 from base.models import academic_year
-from education_group.ddd.repository.group import GroupRepository
-from osis_common.ddd import interface
 from education_group.ddd.business_types import *
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
-from program_management.ddd.domain.service.identity_search import GroupIdentitySearch
+from osis_common.ddd import interface
 
 
 class CalculateEndPostponement(interface.DomainService):
@@ -47,13 +44,20 @@ class CalculateEndPostponement(interface.DomainService):
         return current_year + default_years_to_postpone
 
     @classmethod
-    def calculate_tree_version_end_postponement_year(  # TODO :: review : is this at the correct place?
+    def calculate_max_year_of_end_postponement(cls) -> int:
+        default_years_to_postpone = 6
+        current_year = academic_year.starting_academic_year().year
+        return default_years_to_postpone + current_year
+
+    @classmethod
+    def calculate_year_of_end_postponement_mini_training(
             cls,
-            tree_version_identity: 'ProgramTreeVersionIdentity',
-            group_repository: 'GroupRepository',
+            mini_training_identity: 'MiniTrainingIdentity',
+            mini_training_repository: 'MiniTrainingRepository'
     ) -> int:
-        default_years_to_postpone = 5
-        group = group_repository.get(GroupIdentitySearch().get_from_tree_version_identity(tree_version_identity))
-        if group.end_year:
-            default_years_to_postpone = group.end_year - group.year
-        return academic_year.starting_academic_year().year + default_years_to_postpone
+        default_years_to_postpone = 6
+        current_year = academic_year.starting_academic_year().year
+        mini_training = mini_training_repository.get(mini_training_identity)
+        if mini_training.end_year:
+            default_years_to_postpone = mini_training.end_year - mini_training.year
+        return current_year + default_years_to_postpone

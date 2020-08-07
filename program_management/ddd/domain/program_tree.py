@@ -30,23 +30,23 @@ import attr
 
 from base.models.authorized_relationship import AuthorizedRelationshipList
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, GroupType, MiniTrainingType
-from base.models.enums.link_type import LinkTypes
+from education_group.ddd.business_types import *
 from osis_common.ddd import interface
 from osis_common.decorators.deprecated import deprecated
 from program_management.ddd import command
 from program_management.ddd.business_types import *
-from program_management.ddd.domain.node import factory as node_factory, NodeIdentity, Node
-from program_management.ddd.domain.link import factory as link_factory
 from program_management.ddd.domain import prerequisite, exception
+from program_management.ddd.domain.link import factory as link_factory
+from program_management.ddd.domain.node import factory as node_factory, NodeIdentity, Node
 from program_management.ddd.domain.service.generate_node_abbreviated_title import GenerateNodeAbbreviatedTitle
 from program_management.ddd.domain.service.generate_node_code import GenerateNodeCode
 from program_management.ddd.domain.service.validation_rule import FieldValidationRule
 from program_management.ddd.repositories import load_authorized_relationship
 from program_management.ddd.validators import validators_by_business_action
 from program_management.ddd.validators._path_validator import PathValidator
+from program_management.ddd.validators.validators_by_business_action import CopyProgramTreeValidatorList
 from program_management.models.enums import node_type
 from program_management.models.enums.node_type import NodeType
-from education_group.ddd.business_types import *
 
 PATH_SEPARATOR = '|'
 Path = str  # Example : "root|node1|node2|child_leaf"
@@ -88,6 +88,7 @@ class ProgramTreeBuilder:
         return new_parent
 
     def copy_to_next_year(self, copy_from: 'ProgramTree', repository: 'ProgramTreeRepository') -> 'ProgramTree':
+        CopyProgramTreeValidatorList(copy_from).validate()
         identity_next_year = attr.evolve(copy_from.entity_id, year=copy_from.entity_id.year + 1)
         try:
             program_tree_next_year = repository.get(identity_next_year)
@@ -149,6 +150,7 @@ class ProgramTreeBuilder:
                     child_title=generated_child_title,
                     parent_abbreviated_title=root_node.title
                 ),
+                start_year=root_node.year,
             )
             child._has_changed = True
             root_node.add_child(child, is_mandatory=True)
@@ -162,6 +164,17 @@ class ProgramTree(interface.RootEntity):
     root_node = attr.ib(type=Node)
     authorized_relationships = attr.ib(type=AuthorizedRelationshipList, factory=list)
     entity_id = attr.ib(type=ProgramTreeIdentity)  # FIXME :: pass entity_id as mandatory param !
+
+    def is_empty(self, parent_node=None):
+        parent_node = parent_node or self.root_node
+        for child_node in parent_node.children_as_nodes:
+            if not self.is_empty(parent_node=child_node):
+                return False
+            is_mandatory_children = child_node.node_type in self.authorized_relationships.\
+                get_ordered_mandatory_children_types(parent_node.node_type) if self.authorized_relationships else []
+            if not is_mandatory_children:
+                return False
+        return True
 
     @entity_id.default
     def _entity_id(self) -> 'ProgramTreeIdentity':
@@ -452,6 +465,20 @@ class ProgramTree(interface.RootEntity):
         return " ; ".join(
             [str(grp.block) for grp in self.get_links_using_node(node) if grp.block]
         )
+
+    def is_empty(self):
+        """
+        Check if tree is empty.
+        An empty tree is defined as a tree with other link than mandatory groups
+        """
+        nodes = self.get_all_nodes()
+        for node in nodes:
+            counter_direct_children = Counter(node.get_children_types(include_nodes_used_as_reference=True))
+            counter_mandatory_direct_children = Counter(self.get_ordered_mandatory_children_types(node))
+
+            if counter_direct_children - counter_mandatory_direct_children:
+                return False
+        return True
 
     def update_link(
             self,

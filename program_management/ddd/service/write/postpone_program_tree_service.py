@@ -27,12 +27,9 @@ from typing import List
 
 from django.db import transaction
 
-from education_group.ddd.domain.training import TrainingIdentity
-from education_group.ddd.repository.training import TrainingRepository
 from program_management.ddd.command import PostponeProgramTreeCommand, CopyProgramTreeToNextYearCommand
+from program_management.ddd.domain import exception
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
-from program_management.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
-from program_management.ddd.domain.service.identity_search import TrainingIdentitySearch
 from program_management.ddd.service.write import copy_program_tree_service
 
 
@@ -45,26 +42,22 @@ def postpone_program_tree(
 
     # GIVEN
     from_year = postpone_cmd.from_year
-    if postpone_cmd.end_year:
-        end_postponement_year = postpone_cmd.end_year
-    else:
-        end_postponement_year = CalculateEndPostponement.calculate_program_tree_end_postponement_year(
-            training_identity=TrainingIdentity(acronym=postpone_cmd.offer_acronym, year=postpone_cmd.from_year),
-            training_repository=TrainingRepository()
-        )
+    end_postponement_year = postpone_cmd.until_year
 
     # WHEN
     while from_year < end_postponement_year:
-
-        identity_next_year = copy_program_tree_service.copy_program_tree_to_next_year(
-            copy_cmd=CopyProgramTreeToNextYearCommand(
-                code=postpone_cmd.from_code,
-                year=from_year,
+        try:
+            identity_next_year = copy_program_tree_service.copy_program_tree_to_next_year(
+                copy_cmd=CopyProgramTreeToNextYearCommand(
+                    code=postpone_cmd.from_code,
+                    year=from_year,
+                )
             )
-        )
 
-        # THEN
-        identities_created.append(identity_next_year)
-        from_year += 1
+            # THEN
+            identities_created.append(identity_next_year)
+            from_year += 1
+        except exception.CannotCopyTreeDueToEndDate:
+            break
 
     return identities_created

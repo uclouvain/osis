@@ -21,17 +21,18 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+from education_group.ddd import command
+from education_group.ddd.domain.training import TrainingIdentity
 
-from base.ddd.utils import business_validator
-from education_group.ddd.business_types import *
-from education_group.ddd.domain.exception import CannotCopyDueToEndDate
+from education_group.ddd.repository.training import TrainingRepository
+from education_group.ddd.validators.validators_by_business_action import DeleteOrphanTrainingValidatorList
 
 
-class CheckEndDateValidator(business_validator.BusinessValidator):
-    def __init__(self, training: 'Training'):
-        super().__init__()
-        self.training = training
+def delete_orphan_training(cmd: command.DeleteOrphanTrainingCommand) -> 'TrainingIdentity':
+    training_id = TrainingIdentity(acronym=cmd.acronym, year=cmd.year)
+    training = TrainingRepository.get(training_id)
 
-    def validate(self, *args, **kwargs):
-        if self.training.end_year and self.training.year > self.training.end_year:
-            raise CannotCopyDueToEndDate(training=self.training)
+    DeleteOrphanTrainingValidatorList(training).validate()
+
+    TrainingRepository.delete(training_id)
+    return training_id

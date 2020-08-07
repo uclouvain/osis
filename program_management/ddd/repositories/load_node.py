@@ -183,7 +183,7 @@ def __load_multiple_node_group_year(node_group_year_ids: List[int]) -> QuerySet:
         offer_partial_title_en=F('educationgroupversion__offer__partial_title_english'),
         offer_title_fr=F('educationgroupversion__offer__title'),
         offer_title_en=F('educationgroupversion__offer__title_english'),
-        offer_status=F('educationgroupversion__root_group__active'),
+        offer_status=F('educationgroupversion__offer__active'),
         schedule_type=F('educationgroupversion__offer__schedule_type'),
         keywords=F('educationgroupversion__offer__keywords'),
         group_title_fr=F('title_fr'),

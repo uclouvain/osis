@@ -24,11 +24,11 @@
 #
 ##############################################################################
 import copy
-from _decimal import Decimal
 from collections import OrderedDict
-from typing import List, Set, Dict
+from typing import List, Set, Dict, Optional
 
 import attr
+from _decimal import Decimal
 
 from base.models.enums.active_status import ActiveStatusEnum
 from base.models.enums.education_group_categories import Categories
@@ -55,14 +55,25 @@ class NodeFactory:
     @classmethod
     def copy_to_next_year(cls, copy_from_node: 'Node') -> 'Node':
         next_year = copy_from_node.entity_id.year + 1
+        end_year = cls._get_next_end_year(copy_from_node)
         node_next_year = attr.evolve(
             copy_from_node,
             entity_id=NodeIdentity(copy_from_node.entity_id.code, next_year),
             year=next_year,
+            end_year=end_year,
             children=[],
         )
         node_next_year._has_changed = True
         return node_next_year
+
+    @classmethod
+    def _get_next_end_year(cls, copy_from_node: 'Node') -> Optional[int]:
+        if not copy_from_node.end_year:
+            return copy_from_node.end_year
+        next_year = copy_from_node.entity_id.year + 1
+        if copy_from_node.end_year < next_year:
+            return next_year
+        return copy_from_node.end_year
 
     def get_node(self, type: NodeType, **node_attrs) -> 'Node':
         node_cls = {
@@ -72,11 +83,14 @@ class NodeFactory:
             NodeType.LEARNING_UNIT: NodeLearningUnitYear,
             NodeType.LEARNING_CLASS: NodeLearningClassYear
         }[type]
-        if node_attrs.get('teaching_campus_name'):
+        teaching_campus_name = node_attrs.pop('teaching_campus_name', None)
+        teaching_campus_university_name = node_attrs.pop('teaching_campus_university_name', None)
+        if teaching_campus_name:
             node_attrs['teaching_campus'] = Campus(
-                name=node_attrs.pop('teaching_campus_name'),
-                university_name=node_attrs.pop('teaching_campus_university_name'),
+                name=teaching_campus_name,
+                university_name=teaching_campus_university_name,
             )
+
         return node_cls(**node_attrs)
 
     def duplicate(self, duplicate_from: 'Node', end_year: int = None) -> 'Node':
@@ -140,14 +154,6 @@ class Node(interface.Entity):
     def __str__(self):
         return '%(code)s (%(year)s)' % {'code': self.code, 'year': self.year}
 
-    def __eq__(self, other):
-        if isinstance(other, self.__class__):
-            return self.entity_id == other.entity_id
-        return False
-
-    def __hash__(self):
-        return hash(self.entity_id)
-
     @property
     def pk(self):
         return self.node_id
@@ -194,8 +200,8 @@ class Node(interface.Entity):
     def is_minor_major_list_choice(self) -> bool:
         return self.node_type in GroupType.minor_major_list_choice_enums()
 
-    def is_minor_major_list_choice(self) -> bool:
-        return self.node_type in GroupType.minor_major_list_choice_enums()
+    def is_minor_or_deepening(self) -> bool:
+        return self.node_type in MiniTrainingType.minors_and_deepening()
 
     def get_direct_child_as_node(self, node_id: 'NodeIdentity') -> 'Node':
         return next(node for node in self.get_direct_children_as_nodes() if node.entity_id == node_id)
@@ -378,7 +384,7 @@ def _get_descendents(root_node: Node, current_path: 'Path' = None) -> Dict['Path
     return _descendents
 
 
-# TODO: Remove this class because unused when migration is done
+# TODO: Remove this class because unused when migration is done.
 @attr.s(slots=True, hash=False)
 class NodeEducationGroupYear(Node):
 
