@@ -132,7 +132,7 @@ def convert_command_to_update_training_data(cmd: command.UpdateTrainingCommand) 
             ares_code=cmd.ares_code,
             ares_graca=cmd.ares_graca,
             ares_authorization=cmd.ares_authorization
-        ),
+        ) if cmd.ares_code and cmd.ares_graca and cmd.ares_authorization else None,
         co_graduation=CoGraduation(
             code_inter_cfb=cmd.code_inter_cfb,
             coefficient=cmd.coefficient
