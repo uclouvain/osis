@@ -35,7 +35,7 @@ class TrainingEnrollmentsValidator(business_validator.BusinessValidator):
     def validate(self, *args, **kwargs):
         enrollments_count = EnrollmentCounter().get_training_enrollments_count(self.training_id)
         if enrollments_count > 0:
-            raise TrainingHaveEnrollments(enrollments_count)
+            raise TrainingHaveEnrollments(self.training_id.acronym, self.training_id.year, enrollments_count)
 
 
 class MiniTrainingEnrollmentsValidator(business_validator.BusinessValidator):

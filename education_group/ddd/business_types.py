@@ -37,4 +37,5 @@ if TYPE_CHECKING:
     from education_group.ddd.domain._co_organization import CoorganizationIdentity
     from education_group.ddd.domain._diploma import DiplomaAimIdentity
     from education_group.ddd.repository.training import TrainingRepository
+    from education_group.ddd.repository.group import GroupRepository
     from education_group.ddd.repository.mini_training import MiniTrainingRepository

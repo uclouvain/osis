@@ -30,7 +30,7 @@ from rest_framework.generics import get_object_or_404
 from backoffice.settings.rest_framework.common_views import LanguageContextSerializerMixin
 from base.models.enums.education_group_categories import Categories
 from education_group.api.serializers.group_element_year import EducationGroupRootNodeTreeSerializer
-from program_management.ddd.domain import link
+from program_management.ddd.domain import link, exception
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 from program_management.ddd.repositories import load_tree
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
@@ -64,7 +64,10 @@ class EducationGroupTreeView(LanguageContextSerializerMixin, generics.RetrieveAP
             is_transition=False,
         )
 
-        self.tree_version = ProgramTreeVersionRepository.get(tree_version_identity)
+        try:
+            self.tree_version = ProgramTreeVersionRepository.get(tree_version_identity)
+        except exception.ProgramTreeVersionNotFoundException:
+            self.tree_version = None
 
         tree = load_tree.load(element.id)
         return link.factory.get_link(parent=None, child=tree.root_node)

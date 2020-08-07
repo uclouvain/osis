@@ -30,7 +30,6 @@ from django.db import transaction
 from education_group.ddd import command
 from education_group.ddd.domain.mini_training import MiniTrainingIdentity
 from education_group.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
-from education_group.ddd.repository.mini_training import MiniTrainingRepository
 from education_group.ddd.service.write import copy_mini_training_service
 
 
@@ -40,25 +39,19 @@ def postpone_mini_training(postpone_cmd: command.PostponeMiniTrainingCommand) ->
 
     # GIVEN
     from_year = postpone_cmd.postpone_from_year
-    copy_from_mini_training = MiniTrainingRepository().get(
-        entity_id=MiniTrainingIdentity(acronym=postpone_cmd.acronym, year=from_year)
-    )
-    end_postponement_year = CalculateEndPostponement.calculate_year_of_end_postponement_for_mini(
-        copy_from_mini_training
-    )
+    end_postponement_year = CalculateEndPostponement.calculate_max_year_of_end_postponement()
 
     # WHEN
-    while from_year < end_postponement_year:
+    for year in range(from_year, end_postponement_year):
 
         identity_next_year = copy_mini_training_service.copy_mini_training_to_next_year(
             copy_cmd=command.CopyMiniTrainingToNextYearCommand(
                 acronym=postpone_cmd.acronym,
-                postpone_from_year=from_year
+                postpone_from_year=year
             )
         )
 
         # THEN
         identities_created.append(identity_next_year)
-        from_year += 1
 
     return identities_created

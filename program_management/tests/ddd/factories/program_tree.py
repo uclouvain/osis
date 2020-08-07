@@ -25,6 +25,7 @@
 ##############################################################################
 import factory.fuzzy
 
+from base.models.authorized_relationship import AuthorizedRelationshipList
 from program_management.ddd.domain import program_tree
 from program_management.tests.ddd.factories import node
 
@@ -36,4 +37,4 @@ class ProgramTreeFactory(factory.Factory):
         abstract = False
 
     root_node = factory.SubFactory(node.NodeGroupYearFactory)
-    authorized_relationships = None
+    authorized_relationships = AuthorizedRelationshipList([])

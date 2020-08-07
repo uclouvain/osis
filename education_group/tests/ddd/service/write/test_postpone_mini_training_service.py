@@ -32,23 +32,19 @@ from testing import mocks
 
 
 class TestPostponeMiniTraining(TestCase):
-    @mock.patch("education_group.ddd.service.write.postpone_mini_training_service.MiniTrainingRepository",
-                new_callable=mocks.MockRepository)
     @mock.patch("education_group.ddd.domain.service.calculate_end_postponement."
-                "CalculateEndPostponement.calculate_year_of_end_postponement_for_mini", return_value=2021)
+                "CalculateEndPostponement.calculate_max_year_of_end_postponement", return_value=2021)
     @mock.patch("education_group.ddd.service.write.copy_mini_training_service.copy_mini_training_to_next_year")
     def test_should_return_a_number_of_identities_equal_to_difference_of_from_year_and_until_year(
             self,
             mock_copy_mini_training_to_next_year_service,
-            mock_calculate_end_year_of_postponement,
-            mock_repostirory):
+            mock_calculate_end_year_of_postponement):
         mini_training_identities = [
             mini_training.MiniTrainingIdentity(acronym="Acron", year=2018),
             mini_training.MiniTrainingIdentity(acronym="Acron", year=2019),
             mini_training.MiniTrainingIdentity(acronym="Acron", year=2020)
         ]
         mock_copy_mini_training_to_next_year_service.side_effect = mini_training_identities
-        mock_repostirory.return_value.get.return_value = TrainingFactory()
 
         cmd = command.PostponeMiniTrainingCommand(acronym="Acron", postpone_from_year=2018)
         result = postpone_mini_training_service.postpone_mini_training(cmd)

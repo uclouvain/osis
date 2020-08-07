@@ -44,8 +44,7 @@ class TestMiniTrainingBuilder(SimpleTestCase):
 
 
 class TestMiniTrainingBuilderCopyToNextYear(SimpleTestCase):
-    @mock.patch("education_group.ddd.repository.mini_training.MiniTrainingRepository",
-                new_callable=mocks.MockRepository)
+    @mock.patch("education_group.ddd.repository.mini_training.MiniTrainingRepository", autospec=True)
     def test_should_return_existing_training_when_training_exists_for_next_year(self, mock_repository):
         mini_training_source = MiniTrainingFactory()
         mini_training_next_year = MiniTrainingFactory()
@@ -56,7 +55,7 @@ class TestMiniTrainingBuilderCopyToNextYear(SimpleTestCase):
 
         self.assertEqual(mini_training_next_year, result)
 
-    @mock.patch("education_group.ddd.repository.mini_training.MiniTrainingRepository", new_callable=mocks.MockRepository)
+    @mock.patch("education_group.ddd.repository.mini_training.MiniTrainingRepository", autospec=True)
     def test_should_copy_with_increment_year_when_training_does_not_exists_for_next_year(self, mock_repository):
         mini_training_source = MiniTrainingFactory()
 
