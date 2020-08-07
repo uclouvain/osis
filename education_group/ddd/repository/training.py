@@ -361,6 +361,7 @@ def _create_education_group_year(
     obj = EducationGroupYearModelDb(
         academic_year=AcademicYearModelDb.objects.get(year=training.entity_id.year),
         acronym=training.entity_id.acronym,
+        partial_acronym=training.code,
         education_group_type=EducationGroupTypeModelDb.objects.get(name=training.type.name),
         active=training.status.name,
         credits=training.credits,

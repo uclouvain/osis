@@ -73,7 +73,7 @@ class TestCalculateYearOfPostponementConflict(SimpleTestCase, MockPatcherMixin):
             self.fake_group_repo
         )
 
-        self.assertEqual(calculate_end_postponement.MAX_YEAR, result)
+        self.assertEqual(calculate_end_postponement.MAX_YEAR - 1, result)
 
     def test_should_return_year_of_conflict_if_conflicts_present_for_trainings(self):
         self.fake_training_repo.root_entities = self._generate_trainings_with_conflicts()
@@ -86,7 +86,7 @@ class TestCalculateYearOfPostponementConflict(SimpleTestCase, MockPatcherMixin):
             self.fake_group_repo
         )
 
-        self.assertEqual(2020, result)
+        self.assertEqual(2020 - 1, result)
 
     def test_should_return_year_of_conflict_if_conflicts_present_for_groups(self):
         self.fake_training_repo.root_entities = self._generate_trainings_with_no_conflicts()
@@ -99,7 +99,7 @@ class TestCalculateYearOfPostponementConflict(SimpleTestCase, MockPatcherMixin):
             self.fake_group_repo
         )
 
-        self.assertEqual(2020, result)
+        self.assertEqual(2020 - 1, result)
 
     def _generate_trainings_with_no_conflicts(self) -> List['training.Training']:
         initial_training = TrainingFactory(entity_identity=self.training_identity)

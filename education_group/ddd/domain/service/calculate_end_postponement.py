@@ -110,7 +110,7 @@ class CalculateEndPostponement(interface.DomainService):
                 break
             current_group = next_group
 
-        return min(year_training_conflict, year_group_conflict)
+        return min(year_training_conflict, year_group_conflict) - 1
 
     @classmethod
     def calculate_year_of_postponement_conflict_for_mini_training(
