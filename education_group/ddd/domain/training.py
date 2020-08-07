@@ -289,7 +289,7 @@ class Training(interface.RootEntity):
 
     def update_from_other_training(self, other_training: 'Training'):
         fields_not_to_update = (
-            "year", "acronym", "academic_year", "entity_id", "entity_identity", "identity_through_years", "code"
+            "year", "acronym", "academic_year", "entity_id", "entity_identity", "identity_through_years",
         )
         for field in other_training.__slots__:
             if field in fields_not_to_update:
