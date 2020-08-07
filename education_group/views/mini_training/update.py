@@ -386,10 +386,10 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         cleaned_data = mini_training_form.cleaned_data
         return command_program_management.DeleteMiniTrainingWithProgramTreeCommand(
             code=cleaned_data["code"],
-            offer_acronym=cleaned_data["acronym"],
+            offer_acronym=cleaned_data["abbreviated_title"],
             version_name='',
             is_transition=False,
-            from_year=cleaned_data["end_year"].year+1
+            from_year=cleaned_data["end_year"]+1
         )
 
     def _convert_form_to_update_link_command(
