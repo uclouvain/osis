@@ -26,6 +26,7 @@
 from django.db import transaction
 
 from education_group.ddd import command
+from education_group.ddd.domain import exception
 from education_group.ddd.domain.mini_training import MiniTrainingIdentity, MiniTrainingBuilder
 from education_group.ddd.repository.mini_training import MiniTrainingRepository
 
@@ -41,7 +42,10 @@ def copy_mini_training_to_next_year(copy_cmd: command.CopyMiniTrainingToNextYear
     # WHEN
     mini_training_next_year = MiniTrainingBuilder().copy_to_next_year(existing_mini_training, repository)
 
-    # THEN
-    identity = repository.create(mini_training_next_year)
+    try:
+        with transaction.atomic():
+            identity = repository.create(mini_training_next_year)
+    except exception.MiniTrainingCodeAlreadyExistException:
+        identity = repository.update(mini_training_next_year)
 
     return identity

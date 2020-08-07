@@ -37,7 +37,7 @@ from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import exception, group
 from education_group.ddd.service.read import get_group_service, get_multiple_groups_service, \
-    get_update_training_warning_messages, get_mini_training_service
+    get_mini_training_service, get_update_mini_training_warning_messages
 from education_group.enums.node_type import NodeType
 from education_group.forms import mini_training as mini_training_forms, content as content_forms
 from education_group.templatetags.academic_year_display import display_as_academic_year
@@ -51,8 +51,9 @@ from program_management.ddd import command as command_program_management
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception as program_management_exception
 from program_management.ddd.service.read import get_program_tree_service
-from program_management.ddd.service.write import update_link_service, delete_training_with_program_tree_service, \
-    update_training_with_program_tree_service, report_training_with_program_tree
+from program_management.ddd.service.write import update_link_service, update_mini_training_with_program_tree_service, \
+    report_mini_training_with_program_tree, \
+    delete_mini_training_with_program_tree_service
 
 
 class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
@@ -84,8 +85,8 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 success_messages += self.get_success_msg_deleted_mini_trainings(deleted_trainings)
                 display_success_messages(request, success_messages, extra_tags='safe')
 
-                warning_messages = get_update_training_warning_messages.get_conflicted_fields(
-                    command.GetUpdateTrainingWarningMessages(
+                warning_messages = get_update_mini_training_warning_messages.get_conflicted_fields(
+                    command.GetUpdateMiniTrainingWarningMessages(
                         acronym=self.get_mini_training_obj().acronym,
                         code=self.get_mini_training_obj().code,
                         year=self.get_mini_training_obj().year
@@ -127,12 +128,14 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
     def update_mini_training(self) -> List['MiniTrainingIdentity']:
         update_command = self._convert_form_to_update_mini_training_command(self.mini_training_form)
-        return update_training_with_program_tree_service.update_and_report_training_with_program_tree(update_command)
+        return update_mini_training_with_program_tree_service.update_and_report_mini_training_with_program_tree(
+            update_command
+        )
 
     def report_mini_training(self) -> List['MiniTrainingIdentity']:
         if self.get_mini_training_obj().end_year:
-            return report_training_with_program_tree.report_training_with_program_tree(
-                command.PostponeTrainingWithProgramTreeCommand(
+            return report_mini_training_with_program_tree.report_mini_training_with_program_tree(
+                command.PostponeMiniTrainingWithProgramTreeCommand(
                     abbreviated_title=self.get_mini_training_obj().acronym,
                     code=self.get_mini_training_obj().code,
                     from_year=self.get_mini_training_obj().end_year
@@ -149,7 +152,7 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         try:
 
             delete_command = self._convert_form_to_delete_mini_trainings_command(self.mini_training_form)
-            return delete_training_with_program_tree_service.delete_training_with_program_tree(delete_command)
+            return delete_mini_training_with_program_tree_service.delete_mini_training_with_program_tree(delete_command)
 
         except program_management_exception.ProgramTreeNotEmptyException as e:
             self.mini_training_form.add_error("end_year", "")
@@ -355,24 +358,24 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             form: mini_training_forms.UpdateMiniTrainingForm) -> command.UpdateMiniTrainingCommand:
         cleaned_data = form.cleaned_data
         return command.UpdateMiniTrainingCommand(
-            abbreviated_title=cleaned_data['acronym'],
+            abbreviated_title=cleaned_data['abbreviated_title'],
             code=cleaned_data['code'],
-            year=cleaned_data['academic_year'].year,
-            status=cleaned_data['active'],
+            year=cleaned_data['academic_year'],
+            status=cleaned_data['status'],
             credits=cleaned_data['credits'],
             title_fr=cleaned_data['title_fr'],
             title_en=cleaned_data['title_en'],
             keywords=cleaned_data['keywords'],
             management_entity_acronym=cleaned_data['management_entity'],
-            end_year=cleaned_data['end_year'].year if cleaned_data["end_year"] else None,
-            teaching_campus_name=cleaned_data['teaching_campus'].name,
-            teaching_campus_organization_name=cleaned_data['teaching_campus'].organization.name,
+            end_year=cleaned_data['end_year'],
+            teaching_campus_name=cleaned_data['teaching_campus']['name'],
+            teaching_campus_organization_name=cleaned_data['teaching_campus']['organization_name'],
             constraint_type=cleaned_data['constraint_type'],
             min_constraint=cleaned_data['min_constraint'],
             max_constraint=cleaned_data['max_constraint'],
             remark_fr=cleaned_data['remark_fr'],
-            remark_en=cleaned_data['remark_english'],
-            organization_name=cleaned_data['teaching_campus'].organization.name,
+            remark_en=cleaned_data['remark_en'],
+            organization_name=cleaned_data['teaching_campus']['organization_name'],
             schedule_type=cleaned_data["schedule_type"],
         )
 

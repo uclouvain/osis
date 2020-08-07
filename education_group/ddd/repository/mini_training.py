@@ -107,7 +107,7 @@ class MiniTrainingRepository(interface.AbstractRepository):
 
     @classmethod
     def update(cls, entity: Entity) -> EntityIdentity:
-        pass
+        return entity.entity_id
 
     @classmethod
     def get(cls, entity_id: mini_training.MiniTrainingIdentity) -> mini_training.MiniTraining:
