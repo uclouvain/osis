@@ -29,10 +29,12 @@ from base.models.group_element_year import GroupElementYear
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from program_management.ddd import command
+from program_management.ddd.domain import exception
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 from program_management.ddd.repositories import program_tree
 from program_management.ddd.repositories.program_tree import ProgramTreeRepository
+from program_management.models.element import Element
 from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory
 

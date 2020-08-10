@@ -37,6 +37,8 @@ from program_management.ddd.validators._authorized_relationship_for_all_trees im
     ValidateAuthorizedRelationshipForAllTrees
 from program_management.ddd.validators._authorized_root_type_for_prerequisite import AuthorizedRootTypeForPrerequisite
 from program_management.ddd.validators._block_validator import BlockValidator
+from program_management.ddd.validators._copy_check_end_date_program_tree import CheckProgramTreeEndDateValidator
+from program_management.ddd.validators._copy_check_end_date_tree_version import CheckTreeVersionEndDateValidator
 from program_management.ddd.validators._detach_option_2M import DetachOptionValidator
 from program_management.ddd.validators._detach_root import DetachRootValidator
 from program_management.ddd.validators._empty_program_tree import EmptyProgramTreeValidator
@@ -47,6 +49,7 @@ from program_management.ddd.validators._minimum_editable_year import \
 from program_management.ddd.validators._node_have_link import NodeHaveLinkValidator
 from program_management.ddd.validators._prerequisite_expression_syntax import PrerequisiteExpressionSyntaxValidator
 from program_management.ddd.validators._prerequisites_items import PrerequisiteItemsValidator
+from program_management.ddd.validators._program_tree_empty import ProgramTreeEmptyValidator
 from program_management.ddd.validators._relative_credits import RelativeCreditsValidator
 from program_management.ddd.validators.link import CreateLinkValidatorList
 
@@ -219,11 +222,9 @@ class UpdateLinkValidatorList(business_validator.BusinessListValidator):
 
 
 class DeleteProgramTreeValidatorList(business_validator.BusinessListValidator):
-    def __init__(
-            self,
-            program_tree: 'ProgramTree',
-    ):
+    def __init__(self, program_tree: 'ProgramTree'):
         self.validators = [
+            ProgramTreeEmptyValidator(program_tree),
             EmptyProgramTreeValidator(program_tree),
             NodeHaveLinkValidator(program_tree.root_node)
         ]
@@ -236,4 +237,20 @@ class DeleteStandardVersionValidatorList(business_validator.BusinessListValidato
             program_tree_version: 'ProgramTreeVersion',
     ):
         self.validators = []
+        super().__init__()
+
+
+class CopyProgramTreeVersionValidatorList(business_validator.BusinessListValidator):
+    def __init__(self, copy_from: 'ProgramTreeVersion'):
+        self.validators = [
+            CheckTreeVersionEndDateValidator(copy_from)
+        ]
+        super().__init__()
+
+
+class CopyProgramTreeValidatorList(business_validator.BusinessListValidator):
+    def __init__(self, copy_from: 'ProgramTree'):
+        self.validators = [
+            CheckProgramTreeEndDateValidator(copy_from)
+        ]
         super().__init__()

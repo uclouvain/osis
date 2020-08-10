@@ -27,13 +27,14 @@ from typing import Dict
 
 from ajax_select import register, LookupChannel
 from ajax_select.fields import AutoCompleteSelectMultipleField
-from dal import autocomplete
 from django import forms
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db.models import Q
+from django.db.models import Value, CharField
+from django.db.models.functions import Concat
 from django.utils.functional import lazy
 from django.utils.translation import gettext_lazy as _
 
@@ -58,6 +59,7 @@ from base.models.enums.rate_code import RateCode
 from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.forms import fields
 from education_group.forms.fields import MainEntitiesVersionChoiceField
+from education_group.forms.widgets import CertificateAimsWidget
 from reference.models.domain import Domain
 from reference.models.domain_isced import DomainIsced
 from reference.models.enums import domain_type
@@ -148,9 +150,11 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         label=_("Rate code"),
         required=False,
     )
-    main_language = forms.ModelChoiceField(  # FIXME :: to replace by choice field (to prevent link to DB model)
+    main_language = forms.ModelChoiceField(
         queryset=Language.objects.all().order_by('name'),
         label=_('Primary language'),
+        to_field_name="code",
+        initial=FR_CODE_LANGUAGE
     )
     english_activities = forms.ChoiceField(
         choices=BLANK_CHOICE + list(ActivityPresence.choices()),
@@ -196,8 +200,16 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         label=_('Last year of organization'),
         required=False,
     )
-    teaching_campus = MainCampusChoiceField(queryset=None, label=_("Learning location"))
-    enrollment_campus = MainCampusChoiceField(queryset=None, label=_("Enrollment campus"))
+    teaching_campus = MainCampusChoiceField(
+        queryset=None,
+        label=_("Learning location"),
+        to_field_name="name"
+    )
+    enrollment_campus = MainCampusChoiceField(
+        queryset=None,
+        label=_("Enrollment campus"),
+        to_field_name="name"
+    )
     other_campus_activities = forms.ChoiceField(
         choices=BLANK_CHOICE + list(ActivityPresence.choices()),
         label=_("Activities on other campus"),
@@ -259,7 +271,8 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         label=_('certificate aims').capitalize(),
         queryset=CertificateAim.objects.all(),
         required=False,
-        widget=autocomplete.ModelSelect2Multiple(
+        to_field_name="code",
+        widget=CertificateAimsWidget(
             url='certificate_aim_autocomplete',
             attrs={
                 'data-html': True,
@@ -365,10 +378,69 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
 
 
 class UpdateTrainingForm(CreateTrainingForm):
+    administration_entity = MainEntitiesVersionChoiceField(
+        queryset=None,
+        to_field_name="acronym"
+    )
+
+    academic_year = forms.ModelChoiceField(
+        queryset=AcademicYear.objects.all(),
+        label=_('Validity'),
+        to_field_name="year",
+        disabled=True,
+        required=False
+    )
+    start_year = forms.ModelChoiceField(
+        queryset=AcademicYear.objects.all(),
+        label=_('Start academic year'),
+        to_field_name="year",
+        disabled=True,
+        required=False
+    )
+    end_year = forms.ModelChoiceField(
+        queryset=AcademicYear.objects.all(),
+        label=_('Last year of organization'),
+        required=False,
+        to_field_name="year"
+    )
+
+    main_language = forms.ModelChoiceField(
+        queryset=Language.objects.all().order_by('name'),
+        label=_('Primary language'),
+        to_field_name="name"
+    )
+
+    main_domain = forms.ModelChoiceField(
+        queryset=Domain.objects.filter(
+            type=UNIVERSITY
+        ).select_related(
+            'decree'
+        ).annotate(
+            form_key=Concat(
+                "decree__name", Value(" - "), "code",
+                output_field=CharField()
+            )
+        ),
+        label=_('main domain'),
+        required=False,
+        to_field_name="form_key"
+    )
+    isced_domain = forms.ModelChoiceField(
+        queryset=DomainIsced.objects.all(),
+        required=False,
+        to_field_name="code",
+        label=_('ISCED domain'),
+    )
 
     def __init__(self, *args, **kwargs):
-        super(UpdateTrainingForm, self).__init__(*args, **kwargs)
-        self.fields['academic_year'].label = _('Validity')
+        super().__init__(*args, **kwargs)
+        self.fields["academic_year"].label = _('Validity')
+        self.__init_end_year_field()
+
+    def __init_end_year_field(self):
+        initial_academic_year_value = self.initial.get("academic_year", None)
+        if initial_academic_year_value:
+            self.fields["end_year"].queryset = AcademicYear.objects.filter(year__gte=initial_academic_year_value)
 
 
 @register('university_domains')

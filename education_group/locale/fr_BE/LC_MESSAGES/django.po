@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-31 09:52+0200\n"
+"POT-Creation-Date: 2020-08-06 14:46+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,11 +22,16 @@ msgid_plural "%(count_enrollment)d students are enrolled in the mini-training."
 msgstr[0] "%(count_enrollment)d étudiant est inscrit à la mini-formation."
 msgstr[1] "%(count_enrollment)d étudiants sont inscrits à la mini-formation."
 
-#, python-format
-msgid "%(count_enrollment)d student is enrolled in the training."
-msgid_plural "%(count_enrollment)d students are enrolled in the training."
-msgstr[0] "%(count_enrollment)d étudiant est inscrit à la formation."
-msgstr[1] "%(count_enrollment)d étudiants sont inscrits à la formation."
+msgid ""
+"%(count_enrollment)d student is enrolled in the training {acronym} "
+"({academic_year})."
+msgid_plural ""
+"%(count_enrollment)d students are enrolled in the training {acronym} "
+"({academic_year})."
+msgstr[0] "%(count_enrollment)d étudiant est inscrit à la formation {acronym} "
+"({academic_year})."
+msgstr[1] "%(count_enrollment)d étudiants sont inscrits à la formation {acronym} "
+"({academic_year})."
 
 #, python-format
 msgid "%(max)s must be greater or equals than %(min)s"
@@ -55,6 +60,9 @@ msgstr "Accès"
 
 msgid "Access condition"
 msgstr "Condition d'accès"
+
+msgid "Acronym already exists"
+msgstr "Le sigle existe déjà"
 
 msgid "Acronym/Short title"
 msgstr "Sigle/Intitulé abrégé"
@@ -157,11 +165,20 @@ msgstr "Commentaire"
 msgid "Conditions"
 msgstr "Conditions"
 
+#, python-format
+msgid ""
+"Consistency error in %(academic_year)s: %(field)s has already been modified"
+msgstr ""
+"Erreur de consistance en %(academic_year)s: %(field)s a déjà été modifié"
+
 msgid "Contacts"
 msgstr "Contacts"
 
 msgid "Content"
 msgstr "Contenu"
+
+msgid "Content constraint"
+msgstr "Contrainte"
 
 msgid "Coorganization can only be changed by central manager"
 msgstr ""
@@ -333,6 +350,10 @@ msgstr "Domaine ISCED/CITE"
 msgid "Identification"
 msgstr ""
 
+#, python-format
+msgid "Imposible to put end date to %(end_year)s: %(msg)s"
+msgstr "Impossible de mettre la fin à %(end_year)s: %(msg)s"
+
 msgid "Institution"
 msgstr ""
 
@@ -429,7 +450,7 @@ msgid "Other contacts"
 msgstr ""
 
 msgid "Other languages activities"
-msgstr ""
+msgstr "Activités dans d'autres langues"
 
 msgid "Others Bachelors of the French speaking Community of Belgium"
 msgstr ""
@@ -573,6 +594,14 @@ msgstr ""
 msgid "The training %(code)s has been deleted."
 msgstr "La formation %(code)s a été supprimée."
 
+#, python-brace-format
+msgid "The training {acronym} ({academic_year}) has inscriptions"
+msgstr "La formation {acronym} ({academic_year}) dispose d'inscriptions"
+
+#, python-brace-format
+msgid "The training {acronym} ({academic_year}) is linked to epc"
+msgstr "La formation {acronym} ({academic_year}) est liée à epc"
+
 #, python-format
 msgctxt "female"
 msgid "The user does not have permission to create a %(category)s."
@@ -609,8 +638,16 @@ msgstr ""
 msgid "Title in French"
 msgstr ""
 
+msgid "Titles"
+msgstr "Intitulés"
+
 msgid "Training"
 msgstr ""
+
+#, python-format
+msgid "Training %(acronym)s (%(academic_year)s) successfully deleted."
+msgstr ""
+"La formation %(acronym)s (%(academic_year)s) </a> a été supprimée avec succès"
 
 #, python-format
 msgid ""
@@ -619,6 +656,14 @@ msgid ""
 msgstr ""
 "La formation <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> a été "
 "créé avec succès"
+
+#, python-format
+msgid ""
+"Training <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> "
+"successfully updated."
+msgstr ""
+"La formation <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> a été "
+"modifiée avec succès"
 
 msgid "Trainings"
 msgstr ""
@@ -641,6 +686,9 @@ msgstr ""
 msgid "University certificate"
 msgstr ""
 
+msgid "Update Training"
+msgstr "Modifier Formation"
+
 msgid "User"
 msgstr ""
 
@@ -660,15 +708,24 @@ msgstr ""
 msgid "Weighting"
 msgstr ""
 
+msgid "Yes, I confirm."
+msgstr "Oui, je confirme."
+
+#, python-brace-format
+msgid ""
+"You can't copy the group '{code}' from {from_year} to {to_year} because it "
+"ends in {end_year}"
+msgstr ""
+"Vous ne pouvez pas recopier le groupe '{code}' de {from_year} vers {to_year} "
+"car il se termine en {end_year}"
+
+#, python-brace-format
 msgid ""
 "You can't copy the mini-training '{code}' from {from_year} to {to_year} "
 "because it ends in {end_year}"
 msgstr ""
 "Vous ne pouvez pas recopier la mini-formation '{code}' de {from_year} vers "
 "{to_year} car elle se termine en {end_year}"
-
-msgid "Yes, I confirm."
-msgstr "Oui, je confirme."
 
 #, python-brace-format
 msgid ""
@@ -709,6 +766,9 @@ msgstr ""
 msgid "certificate aims"
 msgstr ""
 
+msgid "co-graduation"
+msgstr "co-diplômation"
+
 msgid "code"
 msgstr ""
 
@@ -726,6 +786,9 @@ msgstr "type durée"
 
 msgid "filter by section"
 msgstr "préfiltrer par rubrique"
+
+msgid "hops"
+msgstr "hops"
 
 msgid "is using in"
 msgstr ""

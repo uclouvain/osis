@@ -21,6 +21,7 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+
 from education_group.ddd import command
 from education_group.ddd.business_types import *
 
