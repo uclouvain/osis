@@ -33,6 +33,7 @@
                     );
 
                     // We do not need to display the modal if there is some errors
+                    console.log($(".has-error").length)
                     if ($(".has-error").length === 0) {
                         $('#confirm-modal').modal('toggle');
                     }
