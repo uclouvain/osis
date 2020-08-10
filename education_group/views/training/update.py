@@ -73,7 +73,12 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
+        deleted_trainings = []
+        updated_trainings = []
+        created_trainings = []
+
         if self.training_form.is_valid() and self.content_formset.is_valid():
+            deleted_trainings = self.delete_training()
             warning_messages = get_update_training_warning_messages.get_conflicted_fields(
                 command.GetUpdateTrainingWarningMessages(
                     acronym=self.get_training_obj().acronym,
@@ -81,11 +86,13 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                     year=self.get_training_obj().year
                 )
             )
-            updated_trainings = self.update_training()
-            created_trainings = []
-            if warning_messages:
+
+            if not self.training_form.errors:
+                updated_trainings = self.update_training()
+
+            if warning_messages and not self.training_form.errors:
                 created_trainings = self.report_training()
-            deleted_trainings = self.delete_training()
+
             if not self.training_form.errors:
                 self.update_links()
                 success_messages = self.get_success_msg_updated_trainings(updated_trainings)
@@ -94,7 +101,6 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 display_success_messages(request, success_messages, extra_tags='safe')
                 display_warning_messages(request, warning_messages, extra_tags='safe')
                 return HttpResponseRedirect(self.get_success_url())
-
         display_error_messages(self.request, self._get_default_error_messages())
         return self.get(request, *args, **kwargs)
 
@@ -316,7 +322,7 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
             "academic_type": training_obj.academic_type.name,
             "duration": training_obj.duration,
-            "duration_unit": training_obj.duration_unit.name,
+            "duration_unit": training_obj.duration_unit.name if training_obj.duration_unit else None,
             "internship_presence": training_obj.internship_presence.name if training_obj.internship_presence else None,
             "is_enrollment_enabled": training_obj.is_enrollment_enabled,
             "has_online_re_registration": training_obj.has_online_re_registration,
@@ -324,12 +330,13 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "has_admission_exam": training_obj.has_admission_exam,
             "has_dissertation": training_obj.has_dissertation,
             "produce_university_certificate": training_obj.produce_university_certificate,
-            "decree_category": training_obj.decree_category.name,
-            "rate_code": training_obj.rate_code.name,
+            "decree_category": training_obj.decree_category.name if training_obj.decree_category else None,
+            "rate_code": training_obj.rate_code.name if training_obj.rate_code else None,
 
             "main_language": training_obj.main_language.name,
-            "english_activities": training_obj.english_activities.name,
-            "other_language_activities": training_obj.other_language_activities.name,
+            "english_activities": training_obj.english_activities.name if training_obj.english_activities else None,
+            "other_language_activities": training_obj.other_language_activities.name
+            if training_obj.other_language_activities else None,
 
             "main_domain": "{} - {}".format(training_obj.main_domain.decree_name, training_obj.main_domain.code),
             "secondary_domains": training_obj.secondary_domains,
@@ -343,12 +350,15 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "end_year": training_obj.end_year,
             "teaching_campus": training_obj.teaching_campus.name,
             "enrollment_campus": training_obj.enrollment_campus.name,
-            "other_campus_activities": training_obj.other_campus_activities.name,
+            "other_campus_activities": training_obj.other_campus_activities.name
+            if training_obj.other_language_activities else None,
 
             "can_be_funded": training_obj.funding.can_be_funded,
-            "funding_direction": training_obj.funding.funding_orientation.name,
+            "funding_direction": training_obj.funding.funding_orientation.name
+            if training_obj.funding.funding_orientation else None,
             "can_be_international_funded": training_obj.funding.can_be_international_funded,
-            "international_funding_orientation": training_obj.funding.international_funding_orientation.name,
+            "international_funding_orientation": training_obj.funding.international_funding_orientation.name
+            if training_obj.funding.international_funding_orientation else None,
 
             "remark_fr": group_obj.remark.text_fr,
             "remark_english": group_obj.remark.text_en,
@@ -416,10 +426,13 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             management_entity_acronym=cleaned_data['management_entity'],
             administration_entity_acronym=cleaned_data['administration_entity'],
             end_year=cleaned_data['end_year'].year if cleaned_data["end_year"] else None,
-            teaching_campus_name=cleaned_data['teaching_campus'].name,
-            teaching_campus_organization_name=cleaned_data['teaching_campus'].organization.name,
-            enrollment_campus_name=cleaned_data['enrollment_campus'].name,
-            enrollment_campus_organization_name=cleaned_data['enrollment_campus'].organization.name,
+            teaching_campus_name=cleaned_data['teaching_campus'].name if cleaned_data["teaching_campus"] else None,
+            teaching_campus_organization_name=cleaned_data['teaching_campus'].organization.name
+            if cleaned_data["teaching_campus"] else None,
+            enrollment_campus_name=cleaned_data['enrollment_campus'].name
+            if cleaned_data["enrollment_campus"] else None,
+            enrollment_campus_organization_name=cleaned_data['enrollment_campus'].organization.name
+            if cleaned_data["enrollment_campus"] else None,
             other_campus_activities=cleaned_data['other_campus_activities'],
             can_be_funded=cleaned_data['can_be_funded'],
             funding_orientation=cleaned_data['funding_direction'],
@@ -442,7 +455,8 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             max_constraint=cleaned_data['max_constraint'],
             remark_fr=cleaned_data['remark_fr'],
             remark_en=cleaned_data['remark_english'],
-            organization_name=cleaned_data['teaching_campus'].organization.name,
+            organization_name=cleaned_data['teaching_campus'].organization.name
+            if cleaned_data["teaching_campus"] else None,
             schedule_type=cleaned_data["schedule_type"],
         )
 
