@@ -21,28 +21,16 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+from typing import List, Type
 
-from django.db import transaction
-
-from education_group.ddd import command
 from education_group.ddd.business_types import *
-from education_group.ddd.domain import group, exception
-from education_group.ddd.repository import group as group_repository
+from education_group.ddd.domain import exception
+from testing.mocks import FakeRepository
 
 
-@transaction.atomic()
-def copy_group(cmd: command.CopyGroupCommand) -> 'GroupIdentity':
-    repository = group_repository.GroupRepository()
-    existing_group = repository.get(
-        entity_id=group.GroupIdentity(code=cmd.from_code, year=cmd.from_year)
-    )
-
-    group_next_year = group.GroupBuilder().copy_to_next_year(existing_group, repository)
-
-    try:
-        with transaction.atomic():
-            group_id = repository.create(group_next_year)
-    except exception.GroupCodeAlreadyExistException:
-        group_id = repository.update(group_next_year)
-
-    return group_id
+def get_fake_group_repository(root_entities: List['Group']) -> Type['FakeRepository']:
+    class_name = "FakeGroupRepository"
+    return type(class_name, (FakeRepository,), {
+        "root_entities": root_entities,
+        "not_found_exception_class": exception.GroupNotFoundException
+    })
