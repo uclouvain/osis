@@ -28,13 +28,13 @@ from django.db import transaction
 from education_group.ddd import command
 from education_group.ddd.domain import exception
 from education_group.ddd.domain.mini_training import MiniTrainingIdentity, MiniTrainingBuilder
-from education_group.ddd.repository.mini_training import MiniTrainingRepository
+from education_group.ddd.repository import mini_training as mini_training_repository
 
 
 @transaction.atomic()
 def copy_mini_training_to_next_year(copy_cmd: command.CopyMiniTrainingToNextYearCommand) -> 'MiniTrainingIdentity':
     # GIVEN
-    repository = MiniTrainingRepository()
+    repository = mini_training_repository.MiniTrainingRepository()
     existing_mini_training = repository.get(
         entity_id=MiniTrainingIdentity(acronym=copy_cmd.acronym, year=copy_cmd.postpone_from_year)
     )
