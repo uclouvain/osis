@@ -94,4 +94,3 @@ class CalculateEndPostponement(interface.DomainService):
             current_group = next_group
 
         return min(year_training_conflict, year_group_conflict) - 1
-
