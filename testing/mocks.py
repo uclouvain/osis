@@ -45,7 +45,6 @@ class FakeRepository:
     root_entities = list()  # type: List['interface.RootEntity']
     not_found_exception_class = None
 
-
     @classmethod
     def create(cls, domain_obj: interface.RootEntity, **_) -> interface.EntityIdentity:
         cls.root_entities.append(domain_obj)

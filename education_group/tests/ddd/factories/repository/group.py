@@ -34,3 +34,5 @@ def get_fake_group_repository(root_entities: List['Group']) -> Type['FakeReposit
         "root_entities": root_entities,
         "not_found_exception_class": exception.GroupNotFoundException
     })
+
+
