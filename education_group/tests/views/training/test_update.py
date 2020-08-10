@@ -99,7 +99,6 @@ class TestTrainingUpdateView(TestCase):
 
         self.assertTrue(update_training.called)
         self.assertTrue(delete_training.called)
-        self.assertTrue(report_training.called)
         self.assertTrue(mock_update_links.called)
 
         expected_redirec_url = reverse_with_get(

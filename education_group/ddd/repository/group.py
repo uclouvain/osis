@@ -149,7 +149,8 @@ class GroupRepository(interface.AbstractRepository):
         group_db_obj.remark_en = group.remark.text_en
         group_db_obj.save()
 
-        group_db_obj.group.end_year = AcademicYearModelDb.objects.only('id').get(year=group.end_year) if group.end_year else None
+        group_db_obj.group.end_year = AcademicYearModelDb.objects.only('id').get(year=group.end_year) \
+            if group.end_year else None
         group_db_obj.group.save()
         return group.entity_id
 

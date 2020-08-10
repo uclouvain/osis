@@ -48,7 +48,7 @@ class TestDeleteStandardProgramTreeVersion(TestCase):
                 is_transition=False
             )
         ]
-        mock_delete_tree_version.side_effect = tree_versions_identity
+        mock_delete_tree_version.side_effect = tree_versions_identity + [exception.ProgramTreeVersionNotFoundException]
 
         delete_command = command.DeleteProgramTreeVersionCommand(
             offer_acronym='Acronym',

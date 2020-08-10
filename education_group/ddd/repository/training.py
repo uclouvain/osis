@@ -361,6 +361,7 @@ def _create_education_group_year(
     obj = EducationGroupYearModelDb(
         academic_year=AcademicYearModelDb.objects.get(year=training.entity_id.year),
         acronym=training.entity_id.acronym,
+        partial_acronym=training.code,
         education_group_type=EducationGroupTypeModelDb.objects.get(name=training.type.name),
         active=training.status.name,
         credits=training.credits,
@@ -539,6 +540,7 @@ def _save_hops(
         training: 'Training',
         education_group_year_db_obj: EducationGroupYearModelDb
 ) -> List[HopsModelDb]:
+    _delete_hops(education_group_year_db_obj)
     saved_objs = []
     if training.hops:
         obj, created = HopsModelDb.objects.update_or_create(
@@ -551,6 +553,13 @@ def _save_hops(
         )
         saved_objs.append(obj)
     return saved_objs
+
+
+def _delete_hops(education_group_year_db_obj: EducationGroupYearModelDb) -> None:
+    try:
+        HopsModelDb.objects.get(education_group_year=education_group_year_db_obj).delete()
+    except HopsModelDb.DoesNotExist:
+        pass
 
 
 def _save_certificate_aims(
