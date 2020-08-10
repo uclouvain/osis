@@ -101,7 +101,6 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 display_success_messages(request, success_messages, extra_tags='safe')
                 display_warning_messages(request, warning_messages, extra_tags='safe')
                 return HttpResponseRedirect(self.get_success_url())
-
         display_error_messages(self.request, self._get_default_error_messages())
         return self.get(request, *args, **kwargs)
 

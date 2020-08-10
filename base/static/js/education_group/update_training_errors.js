@@ -33,9 +33,9 @@ function getTabContentElementFromTabUl(tabUlElement){
 }
 
 function doesTabContainsErrors(tabContentElement){
-    return tabContentElement.getElementsByClassName('has-error').length > 0
+    return tabContentElement.getElementsByClassName('contain-error').length > 0
 }
 
 function highlightTabUl(tabUlElement){
-    tabUlElement.classList.add("has-error")
+    tabUlElement.classList.add("contain-error")
 }
