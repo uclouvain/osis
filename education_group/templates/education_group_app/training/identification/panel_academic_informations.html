@@ -36,7 +36,11 @@
         <div class="row">
             <div id="duration" class="col-md-6">
                 {% bootstrap_label _("Duration") label_class='d-block'%}
+                {% if education_group.duration and education_group_year.duration_unit.value %}
                 <p>{{ education_group_year.duration }} {{ education_group_year.duration_unit.value }}</p>
+                {% else %}
+                <p></p>
+                {% endif %}
             </div>
             <div id="internship" class="col-md-6">
                 {% bootstrap_label _("Stage") label_class='d-block'%}

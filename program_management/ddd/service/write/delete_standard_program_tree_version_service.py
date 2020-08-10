@@ -39,7 +39,7 @@ def delete_standard_program_tree_version(
     until_year = calculate_end_postponement.CalculateEndPostponement.calculate_max_year_of_end_postponement()
 
     deleted_program_tree_versions = []
-    for year in range(from_year, until_year):
+    for year in range(from_year, until_year+1):
         try:
             new_delete_command = command.DeleteStandardVersionCommand(
                 acronym=delete_command.offer_acronym,

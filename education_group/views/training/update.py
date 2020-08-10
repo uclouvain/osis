@@ -339,7 +339,7 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
             "academic_type": training_obj.academic_type.name,
             "duration": training_obj.duration,
-            "duration_unit": training_obj.duration_unit.name,
+            "duration_unit": training_obj.duration_unit.name if training_obj.duration_unit else None,
             "internship_presence": training_obj.internship_presence.name if training_obj.internship_presence else None,
             "is_enrollment_enabled": training_obj.is_enrollment_enabled,
             "has_online_re_registration": training_obj.has_online_re_registration,
@@ -367,7 +367,8 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "end_year": training_obj.end_year,
             "teaching_campus": training_obj.teaching_campus.name,
             "enrollment_campus": training_obj.enrollment_campus.name,
-            "other_campus_activities": training_obj.other_campus_activities.name,
+            "other_campus_activities": training_obj.other_campus_activities.name
+            if training_obj.other_language_activities else None,
 
             "can_be_funded": training_obj.funding.can_be_funded,
             "funding_direction": training_obj.funding.funding_orientation.name
