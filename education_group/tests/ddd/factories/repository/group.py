@@ -44,3 +44,9 @@ def get_fake_mini_training_repository(root_entities: List['MiniTraining']) -> Ty
     })
 
 
+def get_fake_training_repository(root_entities: List['Training']) -> Type['FakeRepository']:
+    class_name = "FakeTrainingRepository"
+    return type(class_name, (FakeRepository,), {
+        "root_entities": root_entities,
+        "not_found_exception_class": exception.TrainingNotFoundException
+    })
