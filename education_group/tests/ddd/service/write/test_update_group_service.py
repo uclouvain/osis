@@ -77,7 +77,7 @@ class TestUpdateGroup(TestCase, MockPatcherMixin):
         self.assert_has_same_value_as_update_command(group_updated)
 
     def test_should_postpone_update(self, mock_end_year_postponement):
-        identities = [group.GroupIdentity(code=self.cmd.code, year=year) for year in range(2018, 2021)]
+        identities = [group.GroupIdentity(code=self.cmd.code, year=year) for year in range(2018, 2022)]
 
         update_group_service.update_group(self.cmd)
 

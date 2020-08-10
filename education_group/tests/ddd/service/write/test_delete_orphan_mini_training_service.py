@@ -35,7 +35,7 @@ from education_group.tests.factories.mini_training import MiniTrainingFactory
 from testing.mocks import MockPatcherMixin
 
 
-class TestDeleteOrphanMiniTrainig(TestCase, MockPatcherMixin):
+class TestDeleteOrphanMiniTraining(TestCase, MockPatcherMixin):
     @classmethod
     def setUpTestData(cls):
         cls.cmd = command.DeleteOrphanMiniTrainingCommand(

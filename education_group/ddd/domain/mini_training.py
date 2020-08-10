@@ -54,6 +54,7 @@ class MiniTrainingBuilder:
         identity_next_year = attr.evolve(mini_training_from.entity_identity, year=mini_training_from.year + 1)
         try:
             mini_training_next_year = mini_training_repository.get(identity_next_year)
+            mini_training_next_year.update_from_other_training(mini_training_from)
         except exception.MiniTrainingNotFoundException:
             # Case create training next year
             mini_training_next_year = attr.evolve(  # Copy to new object
