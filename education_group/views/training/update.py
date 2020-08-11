@@ -94,10 +94,12 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 created_trainings = self.report_training()
 
             if not self.training_form.errors:
-                self.update_links()
+                updated_links = self.update_links()
+
                 success_messages = self.get_success_msg_updated_trainings(updated_trainings)
                 success_messages += self.get_success_msg_updated_trainings(created_trainings)
                 success_messages += self.get_success_msg_deleted_trainings(deleted_trainings)
+                success_messages += self.get_success_msg_updated_links(updated_links)
                 display_success_messages(request, success_messages, extra_tags='safe')
                 display_warning_messages(request, warning_messages, extra_tags='safe')
                 return HttpResponseRedirect(self.get_success_url())
@@ -325,6 +327,19 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "acronym": training_identity.acronym,
             "academic_year": display_as_academic_year(training_identity.year)
         }
+
+    def get_success_msg_updated_links(self, links: List['Link']) -> List[str]:
+        messages = []
+
+        for link in links:
+            msg = _("The link of %(code)s - %(acronym)s - %(year)s has been updated.") % {
+                "acronym": link.child.title,
+                "code": link.entity_id.child_code,
+                "year": display_as_academic_year(link.entity_id.child_year)
+            }
+            messages.append(msg)
+
+        return messages
 
     def _get_default_error_messages(self) -> str:
         return _("Error(s) in form: The modifications are not saved")

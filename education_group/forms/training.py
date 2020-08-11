@@ -25,7 +25,7 @@
 ##############################################################################
 import functools
 import operator
-from typing import Dict, List
+from typing import Dict, List, Union
 
 from ajax_select import register, LookupChannel
 from django import forms
@@ -470,7 +470,13 @@ class UniversityDomainsLookup(LookupChannel):
     def format_match(self, item):
         return "{}:{} {}".format(item.decree.name, item.code, item.name)
 
-    def get_objects(self, study_domains: List['StudyDomain']):
+    def get_objects(self, study_domains: Union[List['StudyDomain'], List[str]]):
+        if not study_domains:
+            return self.model.objects.none()
+
+        if type(study_domains[0]) == str:
+            return self.model.objects.filter(pk__in=study_domains)
+
         clauses = [Q(decree__name=study_domain.entity_id.decree_name, code=study_domain.entity_id.code)
                    for study_domain in study_domains]
         if not clauses:
