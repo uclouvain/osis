@@ -1,3 +1,4 @@
+from ajax_select.fields import AutoCompleteSelectMultipleField
 from django import forms
 from django.forms import ModelChoiceField
 from django.utils.translation import gettext_lazy as _
@@ -9,6 +10,7 @@ from osis_role.contrib.forms.fields import EntityRoleChoiceField
 from base.models.entity_version import EntityVersion, find_pedagogical_entities_version
 from education_group.auth.roles.central_manager import CentralManager
 from education_group.auth.roles.faculty_manager import FacultyManager
+from reference.models import domain
 
 
 class MainCampusChoiceField(forms.ModelChoiceField):
@@ -57,3 +59,9 @@ class CreditField(forms.IntegerField):
             widget=forms.TextInput,
             **kwargs
         )
+
+
+class SecondaryDomainsField(AutoCompleteSelectMultipleField):
+    def clean(self, value):
+        value = super().clean(value)
+        return domain.Domain.objects.filter(pk__in=value)
