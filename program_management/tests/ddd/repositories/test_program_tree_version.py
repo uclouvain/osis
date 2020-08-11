@@ -27,18 +27,15 @@ from unittest.mock import patch
 
 from django.test import TestCase
 
-from base.models.education_group_type import EducationGroupType as EducationGroupTypeModelDb
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_type import EducationGroupTypeFactory, TrainingEducationGroupTypeFactory
+from base.tests.factories.education_group_type import TrainingEducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from education_group.models.group_year import GroupYear
 from education_group.tests.factories.group_year import GroupYearFactory
-from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.models.education_group_version import EducationGroupVersion
-from program_management.models.element import Element
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory, \
     ProgramTreeVersionIdentityFactory
