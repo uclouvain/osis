@@ -68,7 +68,7 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "content_formset": self.content_formset,
             "training_obj": self.get_training_obj(),
             "cancel_url": self.get_cancel_url(),
-            "type_text": self.get_training_obj().type.value
+            "type_text": self.get_training_obj().type.value,
         }
         return render(request, self.template_name, context)
 
@@ -105,23 +105,27 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         return self.get(request, *args, **kwargs)
 
     def get_tabs(self) -> List:
+        tab_to_display = self.request.GET.get('tab', Tab.IDENTIFICATION.name)
+        is_content_active = tab_to_display == Tab.CONTENT.name
+        is_diploma_active = tab_to_display == Tab.DIPLOMAS_CERTIFICATES.name
+        is_identification_active = not (is_content_active or is_diploma_active)
         return [
             {
                 "text": _("Identification"),
-                "active": True,
+                "active": is_identification_active,
                 "display": True,
                 "include_html": "education_group_app/training/upsert/training_identification_form.html"
             },
             {
                 "text": _("Diplomas /  Certificates"),
-                "active": False,
+                "active": is_diploma_active,
                 "display": True,
                 "include_html": "education_group_app/training/upsert/blocks/panel_diplomas_certificates_form.html"
             },
             {
                 "id": "content",
                 "text": _("Content"),
-                "active": False,
+                "active": is_content_active,
                 "display": True,
                 "include_html": "education_group_app/training/upsert/content_form.html"
             }
