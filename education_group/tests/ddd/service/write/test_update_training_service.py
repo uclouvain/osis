@@ -27,7 +27,7 @@ from django.test import TestCase
 from education_group.ddd.domain import training
 from education_group.ddd.service.write import update_training_service
 from education_group.tests.ddd.factories.command.update_training_factory import UpdateTrainingCommandFactory
-from education_group.tests.ddd.factories.repository.group import get_fake_training_repository
+from education_group.tests.ddd.factories.repository.fake import get_fake_training_repository
 from education_group.tests.ddd.factories.training import TrainingFactory
 from testing.mocks import MockPatcherMixin
 

@@ -21,26 +21,24 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-import mock
-from django.test import TestCase
+from typing import List, Type
 
-from program_management.ddd import command
-from program_management.ddd.service.write import copy_program_tree_service
-from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
+from program_management.ddd.business_types import *
+from program_management.ddd.domain import exception
+from testing.mocks import FakeRepository
 
 
-class TestCopyProgramTreeToNextYear(TestCase):
-    @mock.patch("program_management.ddd.service.write.copy_program_tree_service.ProgramTreeRepository")
-    @mock.patch("program_management.ddd.domain.program_tree.ProgramTreeBuilder.copy_to_next_year")
-    def test_should_create_next_year_program_tree_and_persist_it(self, mock_copy_to_next_year, mock_repository):
-        program_tree = ProgramTreeFactory()
-        next_year_program_tree = ProgramTreeFactory()
+def get_fake_program_tree_repository(root_entities: List['ProgramTree']) -> Type['FakeRepository']:
+    class_name = "FakeProgramTreeRepository"
+    return type(class_name, (FakeRepository,), {
+        "root_entities": root_entities,
+        "not_found_exception_class": exception.ProgramTreeNotFoundException
+    })
 
-        mock_copy_to_next_year.return_value = next_year_program_tree
-        mock_repository.get.return_value = program_tree
-        mock_repository.return_value.create.return_value = next_year_program_tree.entity_id
 
-        cmd = command.CopyProgramTreeToNextYearCommand(code="Code", year=2020)
-        result = copy_program_tree_service.copy_program_tree_to_next_year(cmd)
-
-        self.assertEqual(next_year_program_tree.entity_id, result)
+def get_fake_program_tree_version_repository(root_entities: List['ProgramTreeVersion']) -> Type['FakeRepository']:
+    class_name = "FakeProgramTreeVersionRepository"
+    return type(class_name, (FakeRepository,), {
+        "root_entities": root_entities,
+        "not_found_exception_class": exception.ProgramTreeVersionNotFoundException
+    })

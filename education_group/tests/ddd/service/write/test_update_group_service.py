@@ -30,7 +30,7 @@ from education_group.ddd import command
 from education_group.ddd.domain import group
 from education_group.ddd.service.write import update_group_service
 from education_group.tests.ddd.factories.group import GroupFactory
-from education_group.tests.ddd.factories.repository.group import get_fake_group_repository
+from education_group.tests.ddd.factories.repository.fake import get_fake_group_repository
 from testing.mocks import MockPatcherMixin
 
 

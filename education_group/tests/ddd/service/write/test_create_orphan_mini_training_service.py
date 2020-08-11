@@ -27,7 +27,7 @@ from django.test import TestCase
 from education_group.ddd.domain import mini_training
 from education_group.ddd.service.write import create_orphan_mini_training_service
 from education_group.tests.ddd.factories.command.create_mini_training_command import CreateMiniTrainingCommandFactory
-from education_group.tests.ddd.factories.repository.group import get_fake_mini_training_repository
+from education_group.tests.ddd.factories.repository.fake import get_fake_mini_training_repository
 from testing.mocks import MockPatcherMixin
 
 
