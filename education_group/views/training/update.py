@@ -355,7 +355,8 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "other_language_activities": training_obj.other_language_activities.name
             if training_obj.other_language_activities else None,
 
-            "main_domain": "{} - {}".format(training_obj.main_domain.decree_name, training_obj.main_domain.code),
+            "main_domain": "{} - {}".format(training_obj.main_domain.decree_name, training_obj.main_domain.code)
+            if training_obj.main_domain else None,
             "secondary_domains": training_obj.secondary_domains,
             "isced_domain": training_obj.isced_domain.entity_id.code if training_obj.isced_domain else None,
             "internal_comment": training_obj.internal_comment,

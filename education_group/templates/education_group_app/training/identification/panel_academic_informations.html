@@ -122,7 +122,7 @@
         <div class="row">
             <div id="main_domain" class="col-md-12">
                 {% bootstrap_label _("main domain") label_class='d-block'%}
-                <p>{{ education_group_year.main_domain }}</p>
+                <p>{{ education_group_year.main_domain|default_if_none:"" }}</p>
             </div>
         </div>
         <br>
