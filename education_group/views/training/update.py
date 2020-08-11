@@ -141,13 +141,16 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
     def update_training(self) -> List['TrainingIdentity']:
         try:
             update_command = self._convert_form_to_update_training_command(self.training_form)
-            return update_training_with_program_tree_service.update_and_report_training_with_program_tree(update_command)
+            return update_training_with_program_tree_service.update_and_report_training_with_program_tree(
+                update_command
+            )
         except exception.ContentConstraintTypeMissing as e:
             self.training_form.add_error("constraint_type", e.message)
         except (exception.ContentConstraintMinimumMaximumMissing,
                 exception.ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum) as e:
             self.training_form.add_error("min_constraint", e.message)
             self.training_form.add_error("max_constraint", "")
+        return []
 
     def report_training(self) -> List['TrainingIdentity']:
         if self.get_training_obj().end_year:
@@ -392,7 +395,8 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "ares_graca": training_obj.hops.ares_graca if training_obj.hops else None,
             "ares_authorization": training_obj.hops.ares_authorization if training_obj.hops else None,
             "code_inter_cfb": training_obj.co_graduation.code_inter_cfb,
-            "coefficient": training_obj.co_graduation.coefficient.normalize(),
+            "coefficient": training_obj.co_graduation.coefficient.normalize()
+            if training_obj.co_graduation.coefficient else None,
 
             "leads_to_diploma": training_obj.diploma.leads_to_diploma,
             "diploma_printing_title": training_obj.diploma.printing_title,
