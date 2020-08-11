@@ -69,6 +69,7 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "training_obj": self.get_training_obj(),
             "cancel_url": self.get_cancel_url(),
             "type_text": self.get_training_obj().type.value,
+            "is_finality_types": self.get_training_obj().is_finality()
         }
         return render(request, self.template_name, context)
 
