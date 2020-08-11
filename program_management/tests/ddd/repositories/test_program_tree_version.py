@@ -35,7 +35,7 @@ from base.tests.factories.education_group_type import EducationGroupTypeFactory,
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from education_group.models.group_year import GroupYear
 from education_group.tests.factories.group_year import GroupYearFactory
-from program_management.ddd.domain.node import Node
+from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.models.element import Element
@@ -132,5 +132,3 @@ class TestProgramTreeVersionRepositoryGetMethod(TestCase):
         self.assertEqual(version_tree_domain_obj.entity_id.year, education_group_version_model_obj.offer.academic_year.year)
         self.assertEqual(version_tree_domain_obj.entity_id.version_name, education_group_version_model_obj.version_name)
         self.assertEqual(version_tree_domain_obj.entity_id.is_transition, education_group_version_model_obj.is_transition)
-        self.assertEqual(version_tree_domain_obj.get_tree().entity_id.code, education_group_version_model_obj.root_group.partial_acronym)
-        self.assertEqual(version_tree_domain_obj.get_tree().entity_id.year, education_group_version_model_obj.root_group.academic_year.year)
