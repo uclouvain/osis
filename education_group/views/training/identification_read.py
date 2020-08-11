@@ -32,10 +32,9 @@ from base.models.education_group_detailed_achievement import EducationGroupDetai
 from base.models.education_group_organization import EducationGroupOrganization
 from base.models.education_group_year_domain import EducationGroupYearDomain
 from education_group.ddd.domain.exception import TrainingNotFoundException
-from education_group.ddd.domain.training import TrainingIdentity
 from education_group.ddd.repository.training import TrainingRepository
 from education_group.models.group_year import GroupYear
-from education_group.views.training.common_read import TrainingRead, Tab
+from education_group.views.training.common_read import TrainingRead
 from program_management.models.education_group_version import EducationGroupVersion
 
 
