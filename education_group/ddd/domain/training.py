@@ -301,7 +301,7 @@ class Training(interface.RootEntity):
         return not bool(self.get_conflicted_fields(other_training))
 
     def get_conflicted_fields(self, other_training: 'Training') -> List[str]:
-        fields_not_to_compare = ("year", "entity_id", "entity_identity", "identity_through_years")
+        fields_not_to_compare = ("year", "entity_id", "entity_identity", "identity_through_years", "diploma")
         conflicted_fields = []
         for field_name in other_training.__slots__:
             if field_name in fields_not_to_compare:

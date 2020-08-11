@@ -105,7 +105,7 @@ def map_field_to_label(field_name: str) -> str:
         "enrollment_campus": _("Enrollment campus"),
         "other_campus_activities": _("Activities on other campus"),
         "funding": _("Funding"),
-        "hops": _("hops"),
+        "hops": _("ARES"),
         "co_graduation": _("co-graduation"),
         "academic_type": _("Academic type"),
         "diploma": _("Diploma"),
