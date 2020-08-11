@@ -139,8 +139,15 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         return self.get_success_url()
 
     def update_training(self) -> List['TrainingIdentity']:
-        update_command = self._convert_form_to_update_training_command(self.training_form)
-        return update_training_with_program_tree_service.update_and_report_training_with_program_tree(update_command)
+        try:
+            update_command = self._convert_form_to_update_training_command(self.training_form)
+            return update_training_with_program_tree_service.update_and_report_training_with_program_tree(update_command)
+        except exception.ContentConstraintTypeMissing as e:
+            self.training_form.add_error("constraint_type", e.message)
+        except (exception.ContentConstraintMinimumMaximumMissing,
+                exception.ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum) as e:
+            self.training_form.add_error("min_constraint", e.message)
+            self.training_form.add_error("max_constraint", "")
 
     def report_training(self) -> List['TrainingIdentity']:
         if self.get_training_obj().end_year:
