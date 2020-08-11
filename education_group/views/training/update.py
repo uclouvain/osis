@@ -392,7 +392,7 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "ares_graca": training_obj.hops.ares_graca if training_obj.hops else None,
             "ares_authorization": training_obj.hops.ares_authorization if training_obj.hops else None,
             "code_inter_cfb": training_obj.co_graduation.code_inter_cfb,
-            "coefficient": training_obj.co_graduation.coefficient,
+            "coefficient": training_obj.co_graduation.coefficient.normalize(),
 
             "leads_to_diploma": training_obj.diploma.leads_to_diploma,
             "diploma_printing_title": training_obj.diploma.printing_title,
