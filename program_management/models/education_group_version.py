@@ -33,8 +33,8 @@ from osis_common.models.osis_model_admin import OsisModelAdmin
 
 class EducationGroupVersionAdmin(VersionAdmin, OsisModelAdmin):
     list_display = ('offer', 'version_name', 'root_group', 'is_transition')
-    list_filter = ('version_name', 'is_transition')
-    search_fields = ('offer__acronym', 'root_group__acronym')
+    list_filter = ('is_transition', 'offer__academic_year')
+    search_fields = ('offer__acronym', 'root_group__partial_acronym', 'version_name')
 
 
 class StandardEducationGroupVersionManager(models.Manager):
