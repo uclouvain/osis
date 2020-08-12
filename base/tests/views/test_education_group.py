@@ -62,7 +62,10 @@ class EducationGroupPedagogyUpdateViewTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.current_academic_year = create_current_academic_year()
-        cls.training = TrainingFactory(academic_year=cls.current_academic_year)
+        cls.training = TrainingFactory(
+            academic_year=cls.current_academic_year,
+            education_group_type__name=TrainingType.PGRM_MASTER_120.name
+        )
         version = StandardEducationGroupVersionFactory(
             offer=cls.training,
             root_group__academic_year=cls.current_academic_year,
