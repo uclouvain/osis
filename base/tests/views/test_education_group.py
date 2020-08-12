@@ -149,7 +149,7 @@ class EducationGroupPedagogyUpdateViewTestCase(TestCase):
 
         self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
         anchor_expected = '#section_welcome_introduction'
-        self.assertTrue(anchor_expected in response.url)
+        self.assertIn(anchor_expected, response.url)
 
 
 class EducationGroupPublishViewTestCase(TestCase):
