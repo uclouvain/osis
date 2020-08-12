@@ -276,6 +276,10 @@ class EducationGroupYearTest(TestCase):
 
 
 class EducationGroupYearCleanTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory(year=2019)
+
     def test_clean_constraint_both_value_set_case_no_errors(self):
         e = EducationGroupYearFactory(
             min_constraint=12,
