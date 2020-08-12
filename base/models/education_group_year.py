@@ -587,7 +587,8 @@ class EducationGroupYear(SerializableModel):
         verbose_name = _("Education group year")
         unique_together = (
             ('education_group', 'academic_year'),
-            ('partial_acronym', 'academic_year')
+            ('partial_acronym', 'academic_year'),
+            ('acronym', 'academic_year'),
         )
 
     def __str__(self):
