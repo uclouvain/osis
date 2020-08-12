@@ -1,4 +1,5 @@
 from base.models.enums.education_group_types import GroupType, TrainingType, MiniTrainingType
+import urllib.parse
 
 
 class GroupTypeConverter:
@@ -35,3 +36,13 @@ class TrainingTypeConverter:
 
     def to_url(self, value):
         return value
+
+
+class AcronymConverter:
+    regex = r'[\w%]+'
+
+    def to_python(self, value):
+        return urllib.parse.unquote_plus(value)
+
+    def to_url(self, value):
+        return urllib.parse.quote_plus(value)

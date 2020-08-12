@@ -110,6 +110,10 @@ def map_field_to_label(field_name: str) -> str:
         "academic_type": _("Academic type"),
         "diploma": _("Diploma"),
         "content_constraint": _("Content constraint"),
-        "remark": _("Remark")
+        "remark": _("Remark"),
+        "professional_title": _("Professionnal title"),
+        "printing_title": _('Diploma title'),
+        "leads_to_diploma": _('Leads to diploma/certificate')
+
     }
     return _mapping.get(field_name, field_name)
