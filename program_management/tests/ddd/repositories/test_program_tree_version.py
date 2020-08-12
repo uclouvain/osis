@@ -41,6 +41,7 @@ from program_management.tests.ddd.factories.program_tree_version import ProgramT
     ProgramTreeVersionIdentityFactory
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 from program_management.tests.factories.element import ElementFactory
+from program_management.ddd.domain.node import Node
 
 
 class TestVersionRepositoryCreateMethod(TestCase):
