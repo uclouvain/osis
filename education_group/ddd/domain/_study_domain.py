@@ -48,5 +48,10 @@ class StudyDomain(interface.Entity):
     def decree_name(self) -> str:
         return self.entity_id.decree_name
 
+    def __eq__(self, other):
+        if type(other) == self.__class__:
+            return self.entity_id == other.entity_id
+        return False
+
     def __str__(self):
         return "{obj.decree_name} : {obj.code} {obj.name}".format(obj=self)

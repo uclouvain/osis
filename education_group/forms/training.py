@@ -23,10 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Dict
+import functools
+import operator
+from typing import Dict, List, Union
 
 from ajax_select import register, LookupChannel
-from ajax_select.fields import AutoCompleteSelectMultipleField
 from django import forms
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -37,6 +38,7 @@ from django.db.models import Value, CharField
 from django.db.models.functions import Concat
 from django.utils.functional import lazy
 from django.utils.translation import gettext_lazy as _
+from education_group.ddd.business_types import *
 
 from base.business.event_perms import EventPermEducationGroupEdition
 from base.forms.common import ValidationRuleMixin
@@ -171,7 +173,7 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         queryset=Domain.objects.filter(type=UNIVERSITY).select_related('decree'),
         required=False,
     )
-    secondary_domains = AutoCompleteSelectMultipleField(
+    secondary_domains = fields.SecondaryDomainsField(
         'university_domains',
         required=False,
         label=_('secondary domains').title(),
@@ -467,3 +469,17 @@ class UniversityDomainsLookup(LookupChannel):
 
     def format_match(self, item):
         return "{}:{} {}".format(item.decree.name, item.code, item.name)
+
+    def get_objects(self, study_domains: Union[List['StudyDomain'], List[str]]):
+        if not study_domains:
+            return self.model.objects.none()
+
+        if type(study_domains[0]) == str:
+            return self.model.objects.filter(pk__in=study_domains)
+
+        clauses = [Q(decree__name=study_domain.entity_id.decree_name, code=study_domain.entity_id.code)
+                   for study_domain in study_domains]
+        if not clauses:
+            return self.model.objects.none()
+        filter_clause = functools.reduce(operator.or_, clauses[1:], clauses[0])
+        return self.model.objects.filter(filter_clause)

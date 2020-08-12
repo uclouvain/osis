@@ -68,7 +68,8 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "content_formset": self.content_formset,
             "training_obj": self.get_training_obj(),
             "cancel_url": self.get_cancel_url(),
-            "type_text": self.get_training_obj().type.value
+            "type_text": self.get_training_obj().type.value,
+            "is_finality_types": self.get_training_obj().is_finality()
         }
         return render(request, self.template_name, context)
 
@@ -94,10 +95,12 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 created_trainings = self.report_training()
 
             if not self.training_form.errors:
-                self.update_links()
+                updated_links = self.update_links()
+
                 success_messages = self.get_success_msg_updated_trainings(updated_trainings)
                 success_messages += self.get_success_msg_updated_trainings(created_trainings)
                 success_messages += self.get_success_msg_deleted_trainings(deleted_trainings)
+                success_messages += self.get_success_msg_updated_links(updated_links)
                 display_success_messages(request, success_messages, extra_tags='safe')
                 display_warning_messages(request, warning_messages, extra_tags='safe')
                 return HttpResponseRedirect(self.get_success_url())
@@ -105,23 +108,27 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         return self.get(request, *args, **kwargs)
 
     def get_tabs(self) -> List:
+        tab_to_display = self.request.GET.get('tab', Tab.IDENTIFICATION.name)
+        is_content_active = tab_to_display == Tab.CONTENT.name
+        is_diploma_active = tab_to_display == Tab.DIPLOMAS_CERTIFICATES.name
+        is_identification_active = not (is_content_active or is_diploma_active)
         return [
             {
                 "text": _("Identification"),
-                "active": True,
+                "active": is_identification_active,
                 "display": True,
                 "include_html": "education_group_app/training/upsert/training_identification_form.html"
             },
             {
                 "text": _("Diplomas /  Certificates"),
-                "active": False,
+                "active": is_diploma_active,
                 "display": True,
                 "include_html": "education_group_app/training/upsert/blocks/panel_diplomas_certificates_form.html"
             },
             {
                 "id": "content",
                 "text": _("Content"),
-                "active": False,
+                "active": is_content_active,
                 "display": True,
                 "include_html": "education_group_app/training/upsert/content_form.html"
             }
@@ -139,8 +146,18 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         return self.get_success_url()
 
     def update_training(self) -> List['TrainingIdentity']:
-        update_command = self._convert_form_to_update_training_command(self.training_form)
-        return update_training_with_program_tree_service.update_and_report_training_with_program_tree(update_command)
+        try:
+            update_command = self._convert_form_to_update_training_command(self.training_form)
+            return update_training_with_program_tree_service.update_and_report_training_with_program_tree(
+                update_command
+            )
+        except exception.ContentConstraintTypeMissing as e:
+            self.training_form.add_error("constraint_type", e.message)
+        except (exception.ContentConstraintMinimumMaximumMissing,
+                exception.ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum) as e:
+            self.training_form.add_error("min_constraint", e.message)
+            self.training_form.add_error("max_constraint", "")
+        return []
 
     def report_training(self) -> List['TrainingIdentity']:
         if self.get_training_obj().end_year:
@@ -312,6 +329,19 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "academic_year": display_as_academic_year(training_identity.year)
         }
 
+    def get_success_msg_updated_links(self, links: List['Link']) -> List[str]:
+        messages = []
+
+        for link in links:
+            msg = _("The link of %(code)s - %(acronym)s - %(year)s has been updated.") % {
+                "acronym": link.child.title,
+                "code": link.entity_id.child_code,
+                "year": display_as_academic_year(link.entity_id.child_year)
+            }
+            messages.append(msg)
+
+        return messages
+
     def _get_default_error_messages(self) -> str:
         return _("Error(s) in form: The modifications are not saved")
 
@@ -355,7 +385,8 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "other_language_activities": training_obj.other_language_activities.name
             if training_obj.other_language_activities else None,
 
-            "main_domain": "{} - {}".format(training_obj.main_domain.decree_name, training_obj.main_domain.code),
+            "main_domain": "{} - {}".format(training_obj.main_domain.decree_name, training_obj.main_domain.code)
+            if training_obj.main_domain else None,
             "secondary_domains": training_obj.secondary_domains,
             "isced_domain": training_obj.isced_domain.entity_id.code if training_obj.isced_domain else None,
             "internal_comment": training_obj.internal_comment,
@@ -384,7 +415,8 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "ares_graca": training_obj.hops.ares_graca if training_obj.hops else None,
             "ares_authorization": training_obj.hops.ares_authorization if training_obj.hops else None,
             "code_inter_cfb": training_obj.co_graduation.code_inter_cfb,
-            "coefficient": training_obj.co_graduation.coefficient,
+            "coefficient": training_obj.co_graduation.coefficient.normalize()
+            if training_obj.co_graduation.coefficient else None,
 
             "leads_to_diploma": training_obj.diploma.leads_to_diploma,
             "diploma_printing_title": training_obj.diploma.printing_title,
