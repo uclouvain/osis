@@ -31,7 +31,7 @@ from testing.mocks import FakeRepository
 def get_fake_group_repository(root_entities: List['Group']) -> Type['FakeRepository']:
     class_name = "FakeGroupRepository"
     return type(class_name, (FakeRepository,), {
-        "root_entities": root_entities,
+        "root_entities": root_entities.copy(),
         "not_found_exception_class": exception.GroupNotFoundException
     })
 
@@ -39,7 +39,7 @@ def get_fake_group_repository(root_entities: List['Group']) -> Type['FakeReposit
 def get_fake_mini_training_repository(root_entities: List['MiniTraining']) -> Type['FakeRepository']:
     class_name = "FakeMiniTrainingRepository"
     return type(class_name, (FakeRepository,), {
-        "root_entities": root_entities,
+        "root_entities": root_entities.copy(),
         "not_found_exception_class": exception.MiniTrainingNotFoundException
     })
 
@@ -47,6 +47,6 @@ def get_fake_mini_training_repository(root_entities: List['MiniTraining']) -> Ty
 def get_fake_training_repository(root_entities: List['Training']) -> Type['FakeRepository']:
     class_name = "FakeTrainingRepository"
     return type(class_name, (FakeRepository,), {
-        "root_entities": root_entities,
+        "root_entities": root_entities.copy(),
         "not_found_exception_class": exception.TrainingNotFoundException
     })

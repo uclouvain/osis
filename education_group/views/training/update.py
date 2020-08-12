@@ -164,7 +164,7 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             delete_command = self._convert_form_to_delete_trainings_command(self.training_form)
             return delete_training_with_program_tree_service.delete_training_with_program_tree(delete_command)
 
-        except (program_management_exception.ProgramTreeNotEmptyException, exception.TrainingHaveLinkWithEPC,
+        except (program_management_exception.ProgramTreeNonEmpty, exception.TrainingHaveLinkWithEPC,
                 exception.TrainingHaveEnrollments) as e:
             self.training_form.add_error("end_year", "")
             self.training_form.add_error(

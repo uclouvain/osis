@@ -391,6 +391,7 @@ class DeleteStandardVersionCommand(interface.CommandRequest):
 class DeleteNodeCommand(interface.CommandRequest):
     code = attr.ib(type=str)
     year = attr.ib(type=int)
+    acronym = attr.ib(type=str)
     node_type = attr.ib(type=str)
 
 
