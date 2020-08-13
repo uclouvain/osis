@@ -23,8 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from program_management.ddd.business_types import *
 from osis_common.ddd.interface import BusinessException
 from django.utils.translation import gettext_lazy as _
+from program_management.ddd.business_types import *
 
 
 class RelativeCreditShouldBeGreaterOrEqualsThanZero(BusinessException):
@@ -33,5 +35,67 @@ class RelativeCreditShouldBeGreaterOrEqualsThanZero(BusinessException):
         super().__init__(message, **kwargs)
 
 
+class ProgramTreeNotEmptyException(BusinessException):
+    def __init__(self, program_tree: 'ProgramTree', *args, **kwargs):
+        message = _("Program %(acronym)s (%(academic_year)s) is not empty.") % {
+            "acronym": program_tree.root_node.title,
+            "academic_year": str(program_tree.root_node.academic_year)
+        }
+        super().__init__(message, **kwargs)
+
+
 class ProgramTreeNotFoundException(Exception):
     pass
+
+
+class ProgramTreeVersionNotFoundException(Exception):
+    pass
+
+
+class ProgramTreeAlreadyExistsException(Exception):
+    pass
+
+
+class ProgramTreeNonEmpty(BusinessException):
+    def __init__(self, program_tree: 'ProgramTree', **kwargs):
+        message = _("[%(academic_year)s] The content of the program is not empty.") % {
+                    'academic_year': program_tree.root_node.academic_year,
+                }
+        super().__init__(message, **kwargs)
+
+
+class NodeHaveLinkException(BusinessException):
+    def __init__(self, node: 'Node', **kwargs):
+        message = _("[%(academic_year)s] %(code)s has links to another training / mini-training / group") % {
+                    'academic_year': node.academic_year,
+                    'code': node.code
+                }
+        super().__init__(message, **kwargs)
+
+
+class CannotCopyTreeVersionDueToEndDate(BusinessException):
+    def __init__(self, tree_version: 'ProgramTreeVersion', *args, **kwargs):
+        message = _(
+            "You can't copy the program tree version '{acronym}' "
+            "from {from_year} to {to_year} because it ends in {end_year}"
+        ).format(
+            acronym=tree_version.entity_id.offer_acronym,
+            from_year=tree_version.get_tree().root_node.year,
+            to_year=tree_version.get_tree().root_node.year + 1,
+            end_year=tree_version.get_tree().root_node.end_year,
+        )
+        super().__init__(message, **kwargs)
+
+
+class CannotCopyTreeDueToEndDate(BusinessException):
+    def __init__(self, tree: 'ProgramTree', *args, **kwargs):
+        message = _(
+            "You can't copy the program tree '{code}' "
+            "from {from_year} to {to_year} because it ends in {end_year}"
+        ).format(
+            code=tree.entity_id.code,
+            from_year=tree.root_node.year,
+            to_year=tree.root_node.year + 1,
+            end_year=tree.root_node.end_year,
+        )
+        super().__init__(message, **kwargs)

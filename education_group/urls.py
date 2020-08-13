@@ -6,12 +6,18 @@ from base.views.education_groups.achievement.delete import DeleteEducationGroupA
     DeleteEducationGroupDetailedAchievement
 from base.views.education_groups.achievement.update import EducationGroupAchievementAction, \
     UpdateEducationGroupAchievement, EducationGroupDetailedAchievementAction, UpdateEducationGroupDetailedAchievement
-from education_group.converters import GroupTypeConverter, TrainingTypeConverter
+from education_group.converters import GroupTypeConverter, TrainingTypeConverter, MiniTrainingTypeConverter, \
+    AcronymConverter
 from education_group.views import group, training, mini_training, general_information
+from education_group.views.mini_training.delete import MiniTrainingDeleteView
 from education_group.views.proxy.read import ReadEducationGroupRedirectView
+from education_group.views.training.delete import TrainingDeleteView
+from education_group.views.training.update import TrainingUpdateView
 
 register_converter(GroupTypeConverter, 'group_type')
+register_converter(MiniTrainingTypeConverter, 'mini_training_type')
 register_converter(TrainingTypeConverter, 'training_type')
+register_converter(AcronymConverter, 'acronym')
 
 urlpatterns = [
     path('groups/', include([
@@ -24,11 +30,41 @@ urlpatterns = [
             path('general_information/', include([
                 path('read/', group.GroupReadGeneralInformation.as_view(), name='group_general_information'),
                 path('update/', group.GroupUpdateGeneralInformation.as_view(), name='group_general_information_update'),
-            ]))
+            ])),
+            path('delete/', group.GroupDeleteView.as_view(), name='group_delete')
         ]))
+    ])),
+    path('mini_trainings/', include([
+        path('<mini_training_type:type>/create', mini_training.MiniTrainingCreateView.as_view(),
+             name='mini_training_create'),
+        path('<int:year>/<str:code>/', include([
+            path(
+                'identification/',
+                mini_training.MiniTrainingReadIdentification.as_view(),
+                name='mini_training_identification'
+            ),
+            path('content/', mini_training.MiniTrainingReadContent.as_view(), name='mini_training_content'),
+            path('utilization/', mini_training.MiniTrainingReadUtilization.as_view(), name='mini_training_utilization'),
+            path(
+                'general_information/',
+                mini_training.MiniTrainingReadGeneralInformation.as_view(),
+                name='mini_training_general_information'
+            ),
+            path(
+                'skills_achievements/',
+                mini_training.MiniTrainingReadSkillsAchievements.as_view(),
+                name='mini_training_skills_achievements'
+            ),
+            path(
+                'admission_conditions/',
+                mini_training.MiniTrainingReadAdmissionCondition.as_view(),
+                name='mini_training_admission_condition'
+            ),
+        ])),
     ])),
     path('mini_trainings/<int:year>/<str:code>/', include([
         path('create/', CreateEducationGroupAchievement.as_view(), name='minitraining_achievement_create'),
+        path('delete/', MiniTrainingDeleteView.as_view(), name='mini_training_delete'),
         path('<int:education_group_achievement_pk>/', include([
             path('actions/', EducationGroupAchievementAction.as_view(), name='minitraining_achievement_actions'),
             path('create/', CreateEducationGroupDetailedAchievement.as_view(),
@@ -69,9 +105,11 @@ urlpatterns = [
     ])),
     path('trainings/', include([
         path('<training_type:type>/create/', training.TrainingCreateView.as_view(), name='training_create'),
-        path('<int:year>/<str:code>/', include([
+        path('<int:year>/<str:code>/', include([  # FIXME use acronym
+            path('<acronym:title>/update/', TrainingUpdateView.as_view(), name='training_update'),
             path('create/', CreateEducationGroupAchievement.as_view(), name='training_achievement_create'),
-            path('<int:education_group_achievement_pk>/', include([
+            path('delete/', TrainingDeleteView.as_view(), name='training_delete'),
+            path('achievement/<int:education_group_achievement_pk>/', include([
                 path('actions/', EducationGroupAchievementAction.as_view(), name='training_achievement_actions'),
                 path('create/', CreateEducationGroupDetailedAchievement.as_view(),
                      name='training_detailed_achievement_create'),

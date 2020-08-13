@@ -32,30 +32,6 @@ from program_management.tests.ddd.factories.authorized_relationship import Autho
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 
 
-class TestInit(SimpleTestCase):
-    def test_normal_usage(self):
-        auth_relations = [AuthorizedRelationshipObjectFactory()]
-        result = AuthorizedRelationshipList(auth_relations)
-        self.assertEqual(auth_relations, result.authorized_relationships)
-
-    def test_when_authorized_relationships_arg_is_none(self):
-        with self.assertRaises(AssertionError):
-            AuthorizedRelationshipList(None)
-
-    def test_when_authorized_relationships_arg_is_not_a_list(self):
-        with self.assertRaises(AssertionError):
-            AuthorizedRelationshipList("I'm not a list")
-
-    def test_when_authorized_relationships_arg_is_empty(self):
-        with self.assertRaises(AssertionError):
-            AuthorizedRelationshipList([])
-
-    def test_when_authorized_relationships_arg_is_wrong_instance(self):
-        with self.assertRaises(AssertionError):
-            wrong_instance = NodeGroupYearFactory()
-            AuthorizedRelationshipList([wrong_instance])
-
-
 class TestGetAuthorizedRelationship(SimpleTestCase):
 
     def setUp(self):

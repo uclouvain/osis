@@ -3468,7 +3468,7 @@ msgid "blocked update for tutor"
 msgstr "mise à jour bloquée pour l'enseignant"
 
 msgid "cannot be canceled"
-msgstr "ne peut pas être annulé"
+msgstr "ne peut pas être annulée"
 
 msgid "cannot be changed state"
 msgstr "ne peut pas changer d'état"

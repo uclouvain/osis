@@ -29,8 +29,6 @@ from program_management.ddd import command
 from program_management.ddd.domain import link
 from program_management.ddd.domain.program_tree import PATH_SEPARATOR
 from program_management.ddd.repositories import load_tree, persist_tree, program_tree
-from program_management.ddd.service import tree_service
-from program_management.ddd.validators._detach_option_2M import DetachOptionValidator
 
 
 @transaction.atomic()

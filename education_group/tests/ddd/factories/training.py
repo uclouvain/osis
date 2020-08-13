@@ -73,6 +73,7 @@ class TrainingFactory(factory.Factory):
         abstract = False
 
     entity_identity = factory.SubFactory(TrainingIdentityFactory)
+    code = factory.Sequence(lambda n: 'Code%02d' % n)
     entity_id = factory.LazyAttribute(lambda o: o.entity_identity)
     identity_through_years = factory.SubFactory(TrainingIdentityThroughYearsFactory)
     type = factory.fuzzy.FuzzyChoice(TrainingType)

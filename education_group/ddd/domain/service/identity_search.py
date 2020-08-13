@@ -30,7 +30,9 @@ from education_group.ddd.domain.training import TrainingIdentity
 from education_group.models.group_year import GroupYear
 from osis_common.ddd import interface
 from osis_common.ddd.interface import BusinessException
+
 from program_management.ddd.business_types import *
+from program_management.models.education_group_version import EducationGroupVersion
 
 
 class TrainingIdentitySearch(interface.DomainService):
@@ -41,8 +43,8 @@ class TrainingIdentitySearch(interface.DomainService):
             partial_acronym=node_identity.code,
             academic_year__year=node_identity.year
         ).annotate(
-            offer_acronym=F('educationgroupversion__offer__acronym'),
-            year=F('educationgroupversion__offer__academic_year__year'),
+            offer_acronym=F('acronym'),
+            year=F('academic_year__year'),
         ).values('offer_acronym', 'year')
         if values:
             return TrainingIdentity(acronym=values[0]['offer_acronym'], year=values[0]['year'])

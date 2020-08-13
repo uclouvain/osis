@@ -23,10 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List, Dict, Union
+from typing import List, Dict, Union, Optional
 
 from django.db.models import F
 
+from education_group.ddd.domain.mini_training import MiniTrainingIdentity
 from education_group.ddd.domain.training import TrainingIdentity
 from education_group.models.group_year import GroupYear
 from osis_common.ddd import interface
@@ -34,7 +35,7 @@ from program_management.models.element import Element
 
 ElementId = int
 Year = int
-
+STANDARD = ''
 
 class ElementIdByYearSearch(interface.DomainService):
 
@@ -77,12 +78,21 @@ class ElementIdByYearSearch(interface.DomainService):
 class ElementIdSearch(interface.DomainService):
 
     def get_from_training_identity(self, training_identity: 'TrainingIdentity') -> Union[None, ElementId]:
-        STANDARD = ''
         values = Element.objects.filter(
             group_year__educationgroupversion__version_name=STANDARD,
             group_year__educationgroupversion__is_transition=False,
             group_year__educationgroupversion__offer__acronym=training_identity.acronym,
             group_year__educationgroupversion__offer__academic_year__year=training_identity.year,
+        ).values('pk')
+        if values:
+            return values[0]['pk']
+
+    def get_from_mini_training_identity(self, mini_training_identity: 'MiniTrainingIdentity') -> Optional[ElementId]:
+        values = Element.objects.filter(
+            group_year__educationgroupversion__version_name=STANDARD,
+            group_year__educationgroupversion__is_transition=False,
+            group_year__educationgroupversion__offer__acronym=mini_training_identity.acronym,
+            group_year__educationgroupversion__offer__academic_year__year=mini_training_identity.year,
         ).values('pk')
         if values:
             return values[0]['pk']
