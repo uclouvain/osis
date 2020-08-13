@@ -99,17 +99,20 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         return self.get(request, *args, **kwargs)
 
     def get_tabs(self) -> List:
+        tab_to_display = self.request.GET.get("tab", Tab.IDENTIFICATION.name)
+        is_content_active = tab_to_display == Tab.CONTENT.name
+        is_identification_active = not is_content_active
         return [
             {
                 "text": _("Identification"),
-                "active": True,
+                "active": is_identification_active,
                 "display": True,
                 "include_html": "education_group_app/mini_training/upsert/identification_form.html"
             },
             {
                 "id": "content",
                 "text": _("Content"),
-                "active": False,
+                "active": is_content_active,
                 "display": True,
                 "include_html": "education_group_app/mini_training/upsert/content_form.html"
             }

@@ -180,7 +180,7 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             'mini_training_update',
             kwargs={'year': self.node_identity.year, 'code': self.node_identity.code,
                     'acronym': self.get_object().title},
-            get={"path": self.get_path()}
+            get={"path": self.get_path(), "tab": self.active_tab.name}
         )
 
     def get_delete_mini_training_url(self):
