@@ -42,6 +42,7 @@ from education_group.ddd.domain._remark import Remark
 from education_group.ddd.domain._titles import Titles
 from education_group.ddd.validators import validators_by_business_action
 from osis_common.ddd import interface
+from program_management.ddd.domain.academic_year import AcademicYear
 
 
 class MiniTrainingBuilder:
@@ -130,6 +131,10 @@ class MiniTraining(interface.RootEntity):
     @property
     def year(self) -> int:
         return self.entity_id.year
+
+    @property
+    def academic_year(self) -> AcademicYear:
+        return AcademicYear(self.year)
 
     def has_same_values_as(self, other: 'MiniTraining') -> bool:
         return not bool(self.get_conflicted_fields(other))

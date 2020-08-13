@@ -67,7 +67,7 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "tabs": self.get_tabs(),
             "mini_training_form": self.mini_training_form,
             "content_formset": self.content_formset,
-            "training_obj": self.get_mini_training_obj(),
+            "mini_training_obj": self.get_mini_training_obj(),
             "cancel_url": self.get_cancel_url(),
             "type_text": self.get_mini_training_obj().type.value
         }
