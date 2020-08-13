@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import copy
+from _decimal import Decimal
 from collections import OrderedDict
 from typing import List, Set, Dict, Optional
 
@@ -432,7 +433,7 @@ class NodeGroupYear(Node):
 class NodeLearningUnitYear(Node):
 
     type = NodeType.LEARNING_UNIT
-    node_type = NodeType.LEARNING_UNIT
+    node_type = attr.ib(type=NodeType, default=NodeType.LEARNING_UNIT)
 
     is_prerequisite_of = attr.ib(type=List, factory=list)
     status = attr.ib(type=bool, default=None)
