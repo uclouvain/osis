@@ -70,7 +70,6 @@ class GroupElementYearFactory(factory.django.DjangoModelFactory):
     # FIXME :: DEPRECATED - Use parent_element instead
     parent = factory.SubFactory(EducationGroupYearFactory)
     quadrimester_derogation = factory.Iterator(DerogationQuadrimester.choices(), getter=operator.itemgetter(0))
-    # quadrimester_derogation = factory.fuzzy.FuzzyChoice(DerogationQuadrimester.choices())
     child_branch = factory.SubFactory(
         EducationGroupYearFactory,
         academic_year=factory.SelfAttribute("..parent.academic_year")

@@ -32,8 +32,8 @@ from program_management.ddd.command import CreateProgramTreeVersionCommand
 from program_management.ddd.command import CreateStandardVersionCommand
 from program_management.ddd.domain import exception
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity, ProgramTree
-from program_management.ddd.validators.program_tree_version import CreateProgramTreeVersionValidatorList
-from program_management.ddd.validators.validators_by_business_action import CopyProgramTreeVersionValidatorList
+from program_management.ddd.validators.validators_by_business_action import CopyProgramTreeVersionValidatorList, \
+    CreateProgramTreeVersionValidatorList
 
 STANDARD = ""
 

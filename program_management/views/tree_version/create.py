@@ -49,7 +49,7 @@ from program_management.models.education_group_version import EducationGroupVers
 class CreateProgramTreeVersion(AjaxPermissionRequiredMixin, SuccessMessageMixin, AjaxTemplateMixin, CreateView):
     template_name = "tree_version/create_specific_version_inner.html"
     form_class = SpecificVersionForm
-    permission_required = 'base.create_specific_version'
+    permission_required = 'base.add_programtreeversion'
 
     @cached_property
     def node_identity(self) -> 'NodeIdentity':

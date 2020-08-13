@@ -73,10 +73,9 @@
                 {% a_tag_modal_has_perm delete_mini_training_url _('Delete permanently') 'base.delete_all_minitraining' user education_group_version.offer %}
             </li>
         {% endif %}
-        {# Create ProgramTreeVersion #}
         <li>
             {% url 'create_education_group_version' education_group_year.entity_id.year education_group_year.entity_id.acronym as create_version_url %}
-            {% a_tag_modal_has_perm create_version_url _('Create specific version') 'base.create_specific_version' user education_group_year %}
+            {% a_tag_modal_has_perm create_version_url _('Create specific version') 'base.add_programtreeversion' user education_group_year %}
         </li>
         <li class="divider"></li>
 	    <li>

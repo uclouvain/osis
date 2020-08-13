@@ -23,27 +23,20 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import re
 
 from django import forms
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import ValidationError, PermissionDenied
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import CreateView
-from django.views.generic import FormView
 
-from base.business.education_groups import perms
 from base.forms.education_group.common import EducationGroupModelForm
 from base.forms.education_group.group import GroupForm
 from base.forms.education_group.mini_training import MiniTrainingForm
 from base.forms.education_group.training import TrainingForm
-from base.forms.education_group.version import SpecificVersionForm
 from base.models.academic_year import starting_academic_year, AcademicYear
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
@@ -52,12 +45,9 @@ from base.models.enums.education_group_types import TrainingType
 from base.models.exceptions import ValidationWarning
 from base.utils.cache import RequestCache
 from base.views.common import display_success_messages, show_error_message_for_form_invalid
-from base.views.mixins import AjaxTemplateMixin
 from osis_common.decorators.ajax import ajax_required
 from osis_common.utils.models import get_object_or_none
 from osis_role import errors
-from osis_role.contrib.views import AjaxPermissionRequiredMixin
-from program_management.models.education_group_version import EducationGroupVersion
 
 FORMS_BY_CATEGORY = {
     education_group_categories.GROUP: GroupForm,
