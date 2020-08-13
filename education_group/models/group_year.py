@@ -58,6 +58,9 @@ class GroupYearAdmin(VersionAdmin, OsisModelAdmin):
                     'changed')
     list_filter = ('education_group_type', 'academic_year')
     search_fields = ['acronym', 'partial_acronym', 'title_fr', 'group__pk', 'id']
+    raw_id_fields = (
+        'education_group_type', 'academic_year', 'group', 'main_teaching_campus',
+    )
 
 
 class GroupYear(models.Model):

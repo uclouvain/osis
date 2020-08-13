@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-06 14:46+0200\n"
+"POT-Creation-Date: 2020-08-11 11:30+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -35,6 +35,9 @@ msgstr[1] ""
 
 #, python-format
 msgid "%(max)s must be greater or equals than %(min)s"
+msgstr ""
+
+msgid "ARES"
 msgstr ""
 
 msgid "ARES ability"
@@ -562,6 +565,10 @@ msgid "The group %(code)s has been deleted."
 msgstr ""
 
 #, python-format
+msgid "The link of %(code)s - %(acronym)s - %(year)s has been updated."
+msgstr ""
+
+#, python-format
 msgid "The mini-training %(code)s has been deleted."
 msgstr ""
 
@@ -754,9 +761,6 @@ msgid "duration unit"
 msgstr ""
 
 msgid "filter by section"
-msgstr ""
-
-msgid "hops"
 msgstr ""
 
 msgid "is using in"

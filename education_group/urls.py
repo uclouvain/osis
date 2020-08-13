@@ -6,7 +6,8 @@ from base.views.education_groups.achievement.delete import DeleteEducationGroupA
     DeleteEducationGroupDetailedAchievement
 from base.views.education_groups.achievement.update import EducationGroupAchievementAction, \
     UpdateEducationGroupAchievement, EducationGroupDetailedAchievementAction, UpdateEducationGroupDetailedAchievement
-from education_group.converters import GroupTypeConverter, TrainingTypeConverter, MiniTrainingTypeConverter
+from education_group.converters import GroupTypeConverter, TrainingTypeConverter, MiniTrainingTypeConverter, \
+    AcronymConverter
 from education_group.views import group, training, mini_training, general_information
 from education_group.views.mini_training.delete import MiniTrainingDeleteView
 from education_group.views.proxy.read import ReadEducationGroupRedirectView
@@ -16,6 +17,7 @@ from education_group.views.training.update import TrainingUpdateView
 register_converter(GroupTypeConverter, 'group_type')
 register_converter(MiniTrainingTypeConverter, 'mini_training_type')
 register_converter(TrainingTypeConverter, 'training_type')
+register_converter(AcronymConverter, 'acronym')
 
 urlpatterns = [
     path('groups/', include([
@@ -105,7 +107,7 @@ urlpatterns = [
     path('trainings/', include([
         path('<training_type:type>/create/', training.TrainingCreateView.as_view(), name='training_create'),
         path('<int:year>/<str:code>/', include([  # FIXME use acronym
-            path('<str:title>/update/', TrainingUpdateView.as_view(), name='training_update'),
+            path('<acronym:title>/update/', TrainingUpdateView.as_view(), name='training_update'),
             path('create/', CreateEducationGroupAchievement.as_view(), name='training_achievement_create'),
             path('delete/', TrainingDeleteView.as_view(), name='training_delete'),
             path('achievement/<int:education_group_achievement_pk>/', include([

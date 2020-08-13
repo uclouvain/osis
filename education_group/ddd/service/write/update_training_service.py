@@ -104,8 +104,12 @@ def convert_command_to_update_training_data(cmd: command.UpdateTrainingCommand) 
         main_domain=StudyDomain(
             entity_id=StudyDomainIdentity(decree_name=cmd.main_domain_decree, code=cmd.main_domain_code),
             domain_name=None
-        ),
-        secondary_domains=cmd.secondary_domains,
+        ) if cmd.main_domain_decree and cmd.main_domain_code else None,
+        secondary_domains=[
+            StudyDomain(
+                entity_id=StudyDomainIdentity(decree_name=secondary_domain[0], code=secondary_domain[1]),
+                domain_name=None
+            ) for secondary_domain in (cmd.secondary_domains or [])],
         isced_domain=IscedDomain(
             entity_id=IscedDomainIdentity(code=cmd.isced_domain_code),
             title_fr=None,

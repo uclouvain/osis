@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+from typing import List, Optional
 
 import attr
 
@@ -288,6 +288,7 @@ class Training(interface.RootEntity):
         return self
 
     def update_from_other_training(self, other_training: 'Training'):
+        old_diploma = self.diploma
         fields_not_to_update = (
             "year", "acronym", "academic_year", "entity_id", "entity_identity", "identity_through_years",
         )
@@ -297,17 +298,38 @@ class Training(interface.RootEntity):
             value = getattr(other_training, field)
             setattr(self, field, value)
 
+        if self.diploma and old_diploma:
+            self.diploma = attr.evolve(self.diploma, aims=old_diploma.aims)
+        elif self.diploma and not old_diploma:
+            self.diploma = attr.evolve(self.diploma, aims=[])
+
     def has_same_values_as(self, other_training: 'Training') -> bool:
         return not bool(self.get_conflicted_fields(other_training))
 
     def get_conflicted_fields(self, other_training: 'Training') -> List[str]:
-        fields_not_to_compare = ("year", "entity_id", "entity_identity", "identity_through_years")
+        fields_not_to_compare = ("year", "entity_id", "entity_identity", "identity_through_years", "diploma")
         conflicted_fields = []
         for field_name in other_training.__slots__:
             if field_name in fields_not_to_compare:
                 continue
             if getattr(self, field_name) != getattr(other_training, field_name):
                 conflicted_fields.append(field_name)
+        conflicted_fields.extend(self._get_diploma_conflicted_fields(other_training))
+        return conflicted_fields
+
+    def _get_diploma_conflicted_fields(self, other: 'Training'):
+        self_diploma = self.diploma or Diploma()
+        other_diploma = other.diploma or Diploma()
+
+        conflicted_fields = list()
+
+        if self_diploma.printing_title != other_diploma.printing_title:
+            conflicted_fields.append("printing_title")
+        if self_diploma.leads_to_diploma != other_diploma.leads_to_diploma:
+            conflicted_fields.append("leads_to_diploma")
+        if self_diploma.professional_title != other_diploma.professional_title:
+            conflicted_fields.append("professional_title")
+
         return conflicted_fields
 
 

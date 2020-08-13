@@ -182,7 +182,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
         return reverse_with_get(
             'training_update',
             kwargs={'code': self.kwargs['code'], 'year': self.kwargs['year'], 'title': self.get_object().title},
-            get={"path_to": self.get_path()}
+            get={"path_to": self.get_path(), "tab": self.active_tab.name}
         )
 
     def get_delete_training_url(self):
