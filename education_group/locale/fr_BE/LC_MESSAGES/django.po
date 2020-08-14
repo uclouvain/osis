@@ -809,7 +809,7 @@ msgid "filter by section"
 msgstr "préfiltrer par rubrique"
 
 msgid "hops"
-msgstr ""
+msgstr "arese"
 
 msgid "is using in"
 msgstr ""

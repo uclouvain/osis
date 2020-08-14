@@ -269,7 +269,7 @@ msgid "Formations"
 msgstr "Formations"
 
 msgid "Group"
-msgstr ""
+msgstr "Groupement"
 
 msgid "IMPOSSIBLE TO DISPLAY BECAUSE OF AN ILLEGAL CHARACTER IN STRING"
 msgstr ""
