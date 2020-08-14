@@ -2657,7 +2657,7 @@ msgid "This process helps tutors while scores encoding."
 msgstr ""
 
 msgid "This version exists until"
-msgstr ""
+msgstr "Cette version existe jusqu'en"
 
 msgid "Title"
 msgstr ""

@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from base.ddd.utils.business_validator import BusinessValidator
+from education_group.ddd.domain.exception import VersionNameAlreadyExist
 from program_management.ddd.repositories.check_version_name_exists import check_version_name_exists
 
 
@@ -37,4 +38,4 @@ class VersionNameExistsValidator(BusinessValidator):
 
     def validate(self, *args, **kwargs):
         if check_version_name_exists(self.working_year, self.offer_acronym, self.version_name):
-            self.add_error_message("Acronym {} already exists".format(self.version_name))
+            raise VersionNameAlreadyExist(self.version_name)

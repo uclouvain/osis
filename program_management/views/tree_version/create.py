@@ -23,11 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import re
 
-from django.contrib.auth.decorators import login_required
 from django.contrib.messages.views import SuccessMessageMixin
-from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils.functional import cached_property
@@ -39,11 +36,8 @@ from base.views.common import display_success_messages
 from base.views.mixins import AjaxTemplateMixin
 from education_group.ddd.domain.service.identity_search import TrainingIdentitySearch
 from education_group.ddd.domain.training import TrainingIdentity
-from education_group.models.group_year import GroupYear
-from osis_common.decorators.ajax import ajax_required
 from osis_role.contrib.views import AjaxPermissionRequiredMixin
 from program_management.ddd.domain.node import NodeIdentity
-from program_management.models.education_group_version import EducationGroupVersion
 
 
 class CreateProgramTreeVersion(AjaxPermissionRequiredMixin, SuccessMessageMixin, AjaxTemplateMixin, CreateView):
@@ -103,41 +97,3 @@ class CreateProgramTreeVersion(AjaxPermissionRequiredMixin, SuccessMessageMixin,
                 self.education_group_year.partial_acronym,
             ]
         )
-
-
-@login_required
-@ajax_required
-def check_version_name(request, year, code):
-    version_name = request.GET['version_name']
-    existed_version_name = False
-    existing_version_name = check_existing_version(version_name, year, code)
-    last_using = None
-    old_specific_versions = find_last_existed_version(version_name, year, code)
-    if old_specific_versions:
-        last_using = str(old_specific_versions.offer.academic_year)
-        existed_version_name = True
-    valid = bool(re.match("^[A-Z]{0,15}$", request.GET['version_name'].upper()))
-    return JsonResponse({
-        "existed_version_name": existed_version_name,
-        "existing_version_name": existing_version_name,
-        "last_using": last_using,
-        "valid": valid,
-        "version_name": request.GET['version_name']}, safe=False)
-
-
-def check_existing_version(version_name: str, year: int, code: str) -> bool:
-    return EducationGroupVersion.objects.filter(
-        version_name=version_name,
-        root_group__academic_year__year=year,
-        root_group__acronym=code
-    ).exists()
-
-
-def find_last_existed_version(version_name, year, code):
-    return EducationGroupVersion.objects.filter(
-        version_name=version_name,
-        root_group__academic_year__year__lt=year,
-        root_group__acronym=code,
-    ).order_by(
-        'offer__academic_year'
-    ).last()

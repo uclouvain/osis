@@ -197,3 +197,9 @@ class MiniTrainingHaveLinkWithEPC(BusinessException):
     def __init__(self, *args, **kwargs):
         message = _("Linked with EPC")
         super().__init__(message, **kwargs)
+
+
+class VersionNameAlreadyExist(BusinessException):
+    def __init__(self, version_name: str, *args, **kwargs):
+        message = _("Version name {} already exists").format(version_name)
+        super().__init__(message, **kwargs)
