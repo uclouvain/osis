@@ -47,8 +47,6 @@ from program_management.tests.ddd.factories.repository.fake import get_fake_prog
 from testing.mocks import MockPatcherMixin
 
 
-@mock.patch("program_management.ddd.domain.service.calculate_end_postponement."
-            "CalculateEndPostponement.calculate_max_year_of_end_postponement", return_value=2022)
 class TestDeleteStandardVersionService(TestCase, MockPatcherMixin):
     @classmethod
     def setUpTestData(cls):
@@ -144,13 +142,13 @@ class TestDeleteStandardVersionService(TestCase, MockPatcherMixin):
         )
         return tree
 
-    def test_should_return_program_tree_version_identities(self, mock_end_year_postponement):
+    def test_should_return_program_tree_version_identities(self):
         result = delete_standard_program_tree_version_service.delete_standard_program_tree_version(self.cmd)
         expected_result = [tree_version.entity_id for tree_version in self.program_tree_versions]
 
         self.assertListEqual(expected_result, result)
 
-    def test_should_delete_program_tree_versions(self, mock_end_year_postponement):
+    def test_should_delete_program_tree_versions(self):
         tree_version_identities = delete_standard_program_tree_version_service.delete_standard_program_tree_version(
             self.cmd
         )
@@ -158,7 +156,7 @@ class TestDeleteStandardVersionService(TestCase, MockPatcherMixin):
             with self.assertRaises(exception.ProgramTreeVersionNotFoundException):
                 self.fake_program_tree_version_repo.get(identity)
 
-    def test_should_delete_program_trees(self, mock_end_year_postponement):
+    def test_should_delete_program_trees(self):
         delete_standard_program_tree_version_service.delete_standard_program_tree_version(self.cmd)
 
         program_tree_identities = [tree.entity_id for tree in self.program_trees]
@@ -166,7 +164,7 @@ class TestDeleteStandardVersionService(TestCase, MockPatcherMixin):
             with self.assertRaises(exception.ProgramTreeNotFoundException):
                 self.fake_program_tree_repo.get(identity)
 
-    def test_should_delete_trainings(self, mock_end_year_postponement):
+    def test_should_delete_trainings(self):
         delete_standard_program_tree_version_service.delete_standard_program_tree_version(self.cmd)
 
         training_identities = [obj.entity_id for obj in self.trainings]
@@ -174,7 +172,7 @@ class TestDeleteStandardVersionService(TestCase, MockPatcherMixin):
             with self.assertRaises(education_group_exception.TrainingNotFoundException):
                 self.fake_training_repo.get(identity)
 
-    def test_should_delete_mini_trainings(self, mock_end_year_postponement):
+    def test_should_delete_mini_trainings(self):
         delete_standard_program_tree_version_service.delete_standard_program_tree_version(self.cmd)
 
         mini_training_identities = [obj.entity_id for obj in self.mini_trainings]
@@ -182,7 +180,7 @@ class TestDeleteStandardVersionService(TestCase, MockPatcherMixin):
             with self.assertRaises(education_group_exception.MiniTrainingNotFoundException):
                 self.fake_mini_training_repo.get(identity)
 
-    def test_should_delete_groups(self, mock_end_year_postponement):
+    def test_should_delete_groups(self):
         delete_standard_program_tree_version_service.delete_standard_program_tree_version(self.cmd)
 
         group_identities = [obj.entity_id for obj in self.groups]

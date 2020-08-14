@@ -75,9 +75,9 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
         if self.mini_training_form.is_valid() and self.content_formset.is_valid():
+            deleted_trainings = self.delete_mini_training()
             update_trainings = self.update_mini_training()
             created_trainings = self.report_mini_training()
-            deleted_trainings = self.delete_mini_training()
             if not self.mini_training_form.errors:
                 self.update_links()
                 success_messages = self.get_success_msg_updated_mini_trainings(update_trainings)

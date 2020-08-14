@@ -78,6 +78,7 @@ def format_warning_message(year: int, field_name: str) -> str:
     }
 
 
+#  FIXME should be moved to a common file with training
 def map_field_to_label(field_name: str) -> str:
     _mapping = {
         "credits": _("Credits"),

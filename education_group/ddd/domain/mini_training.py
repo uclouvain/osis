@@ -23,22 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import copy
 from typing import Optional, List
 
 import attr
 
-from education_group.ddd.business_types import *
 from base.models.enums.active_status import ActiveStatusEnum
-from base.models.enums.constraint_type import ConstraintTypeEnum
 from base.models.enums.education_group_types import EducationGroupTypesEnum, MiniTrainingType
 from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.ddd import command
+from education_group.ddd.business_types import *
 from education_group.ddd.domain import exception
 from education_group.ddd.domain._campus import Campus
-from education_group.ddd.domain._content_constraint import ContentConstraint
 from education_group.ddd.domain._entity import Entity
-from education_group.ddd.domain._remark import Remark
 from education_group.ddd.domain._titles import Titles
 from education_group.ddd.validators import validators_by_business_action
 from osis_common.ddd import interface
@@ -57,8 +53,7 @@ class MiniTrainingBuilder:
             mini_training_next_year = mini_training_repository.get(identity_next_year)
             mini_training_next_year.update_from_other_training(mini_training_from)
         except exception.MiniTrainingNotFoundException:
-            # Case create training next year
-            mini_training_next_year = attr.evolve(  # Copy to new object
+            mini_training_next_year = attr.evolve(
                 mini_training_from,
                 entity_identity=identity_next_year,
                 entity_id=identity_next_year,

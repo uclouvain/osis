@@ -79,5 +79,5 @@ def convert_command_to_update_mini_training_data(
         management_entity=Entity(acronym=cmd.management_entity_acronym),
         end_year=cmd.end_year,
         teaching_campus=Campus(name=cmd.teaching_campus_name, university_name=cmd.teaching_campus_organization_name),
-        schedule_type=ScheduleTypeEnum[cmd.schedule_type]
+        schedule_type=ScheduleTypeEnum[cmd.schedule_type],
     )

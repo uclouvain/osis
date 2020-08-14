@@ -197,11 +197,11 @@ class GroupRepository(interface.AbstractRepository):
 
     @classmethod
     def delete(cls, entity_id: 'GroupIdentity', **_) -> None:
+        publisher.group_deleted.send(None, group_identity=entity_id)
         GroupYearModelDb.objects.filter(
             partial_acronym=entity_id.code,
             academic_year__year=entity_id.year
         ).delete()
-        publisher.group_deleted.send(None, group_identity=entity_id)
 
 
 def _convert_db_model_to_ddd_model(obj: GroupYearModelDb) -> 'Group':

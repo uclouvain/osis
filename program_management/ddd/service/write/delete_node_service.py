@@ -61,4 +61,12 @@ def delete_node(cmd: command.DeleteNodeCommand) -> None:
             acronym=cmd.acronym,
             year=cmd.year
         )
-        delete_orphan_mini_training_service.delete_orphan_mini_training(cmd)
+        try:
+            delete_orphan_mini_training_service.delete_orphan_mini_training(cmd)
+        except exception.MiniTrainingNotFoundException:
+            pass
+        cmd = command_education_group.DeleteOrphanGroupCommand(code=node_id.code, year=node_id.year)
+        try:
+            delete_orphan_group_service.delete_orphan_group(cmd)
+        except exception.GroupNotFoundException:
+            pass
