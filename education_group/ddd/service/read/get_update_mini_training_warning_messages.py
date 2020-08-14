@@ -33,7 +33,7 @@ from education_group.templatetags.academic_year_display import display_as_academ
 
 
 def get_conflicted_fields(cmd: command.GetUpdateMiniTrainingWarningMessages) -> List[str]:
-    conflicted_fields = []
+    conflicted_fields = set()
     mini_training_identity = mini_training.MiniTrainingIdentity(acronym=cmd.acronym, year=cmd.year)
     group_identity = group.GroupIdentity(code=cmd.code, year=cmd.year)
 
@@ -48,14 +48,14 @@ def get_conflicted_fields(cmd: command.GetUpdateMiniTrainingWarningMessages) -> 
                 next_year_mini_training_identity
             )
 
-            conflicted_fields.extend(
+            conflicted_fields.update(
                 current_mini_training.get_conflicted_fields(next_year_mini_training)
             )
 
             next_year_group_identity = group.GroupIdentity(code=cmd.code, year=year)
             next_year_group = group_repository.GroupRepository.get(next_year_group_identity)
 
-            conflicted_fields.extend(
+            conflicted_fields.update(
                 current_group.get_conflicted_fields(next_year_group)
             )
         except exception.MiniTrainingNotFoundException:

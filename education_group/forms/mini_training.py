@@ -188,6 +188,12 @@ class UpdateMiniTrainingForm(MiniTrainingForm):
         disabled=True,
         required=False
     )
+    end_year = forms.ModelChoiceField(
+        queryset=AcademicYear.objects.all(),
+        label=_('Last year of organization'),
+        required=False,
+        to_field_name="year"
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

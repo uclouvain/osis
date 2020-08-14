@@ -76,12 +76,12 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         if self.mini_training_form.is_valid() and self.content_formset.is_valid():
             deleted_trainings = self.delete_mini_training()
-            update_trainings = self.update_mini_training()
-            created_trainings = self.report_mini_training()
+            update_trainings = list(set(self.update_mini_training() + self.report_mini_training()))
+            update_trainings.sort(key=lambda identity: identity.year)
+
             if not self.mini_training_form.errors:
                 self.update_links()
                 success_messages = self.get_success_msg_updated_mini_trainings(update_trainings)
-                success_messages += self.get_success_msg_updated_mini_trainings(created_trainings)
                 success_messages += self.get_success_msg_deleted_mini_trainings(deleted_trainings)
                 display_success_messages(request, success_messages, extra_tags='safe')
 
@@ -324,7 +324,6 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "remark_fr": group_obj.remark.text_fr,
             "remark_english": group_obj.remark.text_en,
         }
-
         return form_initial_values
 
     def _get_content_formset_initial_values(self) -> List[Dict]:
