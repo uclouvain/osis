@@ -61,7 +61,8 @@ class ProgramTreeRepository(interface.AbstractRepository):
         GroupElementYear.objects.filter(pk__in=(link.pk for link in links)).delete()
 
         for node in nodes:
-            cmd = command.DeleteNodeCommand(code=node.code, year=node.year, node_type=node.node_type.name)
+            cmd = command.DeleteNodeCommand(code=node.code, year=node.year, node_type=node.node_type.name,
+                                            acronym=node.title)
             delete_node_service(cmd)
 
     @classmethod

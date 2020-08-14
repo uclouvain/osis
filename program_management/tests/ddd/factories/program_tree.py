@@ -30,6 +30,16 @@ from program_management.ddd.domain import program_tree
 from program_management.tests.ddd.factories import node
 
 
+class ProgramTreeIdentityFactory(factory.Factory):
+
+    class Meta:
+        model = program_tree.ProgramTreeIdentity
+        abstract = False
+
+    code = factory.Sequence(lambda n: 'Code%02d' % n)
+    year = factory.fuzzy.FuzzyInteger(low=1999, high=2099)
+
+
 class ProgramTreeFactory(factory.Factory):
 
     class Meta:
@@ -38,3 +48,8 @@ class ProgramTreeFactory(factory.Factory):
 
     root_node = factory.SubFactory(node.NodeGroupYearFactory)
     authorized_relationships = AuthorizedRelationshipList([])
+    entity_id = factory.SubFactory(
+        ProgramTreeIdentityFactory,
+        code=factory.SelfAttribute("..root_node.code"),
+        year=factory.SelfAttribute("..root_node.year")
+    )

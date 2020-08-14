@@ -29,6 +29,7 @@ from django.db import IntegrityError
 from django.db.models import Prefetch, Subquery, OuterRef, Q
 from django.utils import timezone
 
+from education_group import publisher
 from education_group.ddd.business_types import *
 
 from base.models.academic_year import AcademicYear as AcademicYearModelDb
@@ -109,10 +110,12 @@ class GroupRepository(interface.AbstractRepository):
         except IntegrityError:
             raise exception.GroupCodeAlreadyExistException
 
-        return GroupIdentity(
+        group_id = GroupIdentity(
             code=group_year_created.partial_acronym,
             year=group_year_created.academic_year.year
         )
+        publisher.group_created.send(None, group_identity=group_id)
+        return group_id
 
     @classmethod
     def update(cls, group: 'Group', **_) -> 'GroupIdentity':
@@ -194,6 +197,7 @@ class GroupRepository(interface.AbstractRepository):
 
     @classmethod
     def delete(cls, entity_id: 'GroupIdentity', **_) -> None:
+        publisher.group_deleted.send(None, group_identity=entity_id)
         GroupYearModelDb.objects.filter(
             partial_acronym=entity_id.code,
             academic_year__year=entity_id.year

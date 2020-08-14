@@ -23,10 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import operator
 from decimal import Decimal
 
 import factory.fuzzy
 
+from base.models.enums import education_group_types
+from base.models.enums.active_status import ActiveStatusEnum
 from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.ddd import command
 
@@ -37,10 +40,10 @@ class CreateTrainingCommandFactory(factory.Factory):
         abstract = False
 
     abbreviated_title = "Title "
-    status = " Status "
+    status = factory.Iterator(ActiveStatusEnum.choices(), getter=operator.itemgetter(0))
     code = " Code "
     year = 2019
-    type = " Type "
+    type = factory.Iterator(education_group_types.TrainingType.choices(), getter=operator.itemgetter(0))
     credits = 23
     schedule_type = ScheduleTypeEnum.DAILY.name
     duration = 3
@@ -65,7 +68,7 @@ class CreateTrainingCommandFactory(factory.Factory):
     internal_comment = None
     main_domain_code = None
     main_domain_decree = None
-    secondary_domains = None
+    secondary_domains = factory.LazyFunction(lambda: list())
     isced_domain_code = None
     management_entity_acronym = None
     administration_entity_acronym = None
@@ -88,7 +91,7 @@ class CreateTrainingCommandFactory(factory.Factory):
     leads_to_diploma = None
     printing_title = None
     professional_title = None
-    aims = None
+    aims = factory.LazyFunction(lambda: list())
     constraint_type = None
     min_constraint = None
     max_constraint = None

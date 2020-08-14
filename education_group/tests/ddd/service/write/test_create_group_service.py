@@ -28,10 +28,13 @@ from django.test import TestCase
 from base.models.enums.constraint_type import ConstraintTypeEnum
 from base.models.enums.education_group_types import GroupType
 from education_group.ddd import command
+from education_group.ddd.domain import group
 from education_group.ddd.service.write import create_group_service
+from education_group.tests.ddd.factories.repository.fake import get_fake_group_repository
+from testing.mocks import MockPatcherMixin
 
 
-class TestCreateGroup(TestCase):
+class TestCreateGroup(TestCase, MockPatcherMixin):
     @classmethod
     def setUpTestData(cls):
         cls.cmd = command.CreateOrphanGroupCommand(
@@ -54,11 +57,17 @@ class TestCreateGroup(TestCase):
             end_year=None,
         )
 
-    @patch('education_group.publisher.group_created', autospec=True)
-    @patch('education_group.ddd.service.write.create_group_service.GroupRepository.create')
-    def test_assert_repository_called_and_signal_dispatched(self, mock_create_repo, mock_publisher):
-        create_group_service.create_orphan_group(self.cmd)
+    def setUp(self) -> None:
+        self.fake_group_repo = get_fake_group_repository([])
+        self.mock_repo("education_group.ddd.repository.group.GroupRepository", self.fake_group_repo)
 
-        self.assertTrue(mock_create_repo.called)
-        # Ensure event is emited
-        self.assertTrue(mock_publisher.send.called)
+    def test_should_return_identity_of_group_created(self):
+        result = create_group_service.create_orphan_group(self.cmd)
+
+        expected_result = group.GroupIdentity(code=self.cmd.code, year=self.cmd.year)
+        self.assertEqual(expected_result, result)
+
+    def test_should_save_created_group_to_repository(self):
+        entity_id_of_created_group = create_group_service.create_orphan_group(self.cmd)
+
+        self.assertTrue(self.fake_group_repo.get(entity_id_of_created_group))

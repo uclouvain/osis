@@ -58,6 +58,10 @@
             <li>
                 {% a_tag_has_perm update_training_url _('Modify') 'base.change_educationgroup' user %}
         {% endif %}
+        {% if update_mini_training_url %}
+            <li>
+            {% a_tag_has_perm update_mini_training_url _('Modify') 'base.change_educationgroup' user %}
+        {% endif %}
         {% if delete_group_url %}
             <li>
                 {% a_tag_modal_has_perm delete_group_url _('Delete permanently') 'base.delete_all_group' user group_year %}

@@ -27,6 +27,7 @@
 
 <form id="UpsertMiniTrainingForm" class="education_group_form" method="POST" novalidate>
     {% csrf_token %}
+    {% bootstrap_form_errors mini_training_form %}
     <div class="panel panel-default">
         <div class="panel-heading">
             {% include "blocks/forms/create_cancel_buttons.html" %}
@@ -37,9 +38,7 @@
                 {% for tab in tabs %}
                     {% if tab.display %}
                         <li role="presentation" class="form-tab {% if tab.active %}active{% endif %}">
-                            <a href="tab-{{ forloop.counter }}" role="tab">
-                                {{ tab.text }}
-                            </a>
+                            <a data-toggle="tab" href="#tab-{{ forloop.counter }}" role="tab">{{ tab.text }}</a>
                         </li>
                     {% endif %}
                 {% endfor %}

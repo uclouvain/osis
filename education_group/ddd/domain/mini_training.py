@@ -23,25 +23,22 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import copy
-from typing import Optional
+from typing import Optional, List
 
 import attr
 
-from education_group.ddd.business_types import *
 from base.models.enums.active_status import ActiveStatusEnum
-from base.models.enums.constraint_type import ConstraintTypeEnum
 from base.models.enums.education_group_types import EducationGroupTypesEnum, MiniTrainingType
 from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.ddd import command
+from education_group.ddd.business_types import *
 from education_group.ddd.domain import exception
 from education_group.ddd.domain._campus import Campus
-from education_group.ddd.domain._content_constraint import ContentConstraint
 from education_group.ddd.domain._entity import Entity
-from education_group.ddd.domain._remark import Remark
 from education_group.ddd.domain._titles import Titles
 from education_group.ddd.validators import validators_by_business_action
 from osis_common.ddd import interface
+from program_management.ddd.domain.academic_year import AcademicYear
 
 
 class MiniTrainingBuilder:
@@ -50,18 +47,17 @@ class MiniTrainingBuilder:
             self,
             mini_training_from: 'MiniTraining',
             mini_training_repository: 'MiniTrainingRepository') -> 'MiniTraining':
-
+        validators_by_business_action.CopyMiniTrainingValidatorList(mini_training_from).validate()
         identity_next_year = attr.evolve(mini_training_from.entity_identity, year=mini_training_from.year + 1)
         try:
             mini_training_next_year = mini_training_repository.get(identity_next_year)
+            mini_training_next_year.update_from_other_training(mini_training_from)
         except exception.MiniTrainingNotFoundException:
-            # Case create training next year
-            mini_training_next_year = attr.evolve(  # Copy to new object
+            mini_training_next_year = attr.evolve(
                 mini_training_from,
                 entity_identity=identity_next_year,
                 entity_id=identity_next_year,
             )
-            validators_by_business_action.CopyMiniTrainingValidatorList(mini_training_next_year)
         return mini_training_next_year
 
     @classmethod
@@ -129,3 +125,49 @@ class MiniTraining(interface.RootEntity):
     @property
     def year(self) -> int:
         return self.entity_id.year
+
+    @property
+    def academic_year(self) -> AcademicYear:
+        return AcademicYear(self.year)
+
+    def has_same_values_as(self, other: 'MiniTraining') -> bool:
+        return not bool(self.get_conflicted_fields(other))
+
+    def get_conflicted_fields(self, other: 'MiniTraining') -> List[str]:
+        fields_not_to_compare = ("year", "entity_id", "entity_identity", 'acronym')
+        conflicted_fields = []
+        for field_name in other.__slots__:
+            if field_name in fields_not_to_compare:
+                continue
+            if getattr(self, field_name) != getattr(other, field_name):
+                conflicted_fields.append(field_name)
+        return conflicted_fields
+
+    def update(self, data: 'UpdateMiniTrainingData'):
+        data_as_dict = attr.asdict(data, recurse=False)
+        for field, new_value in data_as_dict.items():
+            setattr(self, field, new_value)
+        validators_by_business_action.UpdateTrainingValidatorList(self)
+        return self
+
+    def update_from_other_training(self, other: 'MiniTraining'):
+        fields_not_to_update = (
+            "year", "acronym", "entity_id", "entity_identity", "identity_through_years"
+        )
+        for field in other.__slots__:
+            if field in fields_not_to_update:
+                continue
+            value = getattr(other, field)
+            setattr(self, field, value)
+
+
+@attr.s(frozen=True, slots=True, kw_only=True)
+class UpdateMiniTrainingData:
+    credits = attr.ib(type=int)
+    titles = attr.ib(type=Titles)
+    status = attr.ib(type=ActiveStatusEnum, default=ActiveStatusEnum.ACTIVE)
+    keywords = attr.ib(type=str, default="")
+    schedule_type = attr.ib(type=ScheduleTypeEnum, default=ScheduleTypeEnum.DAILY)
+    management_entity = attr.ib(type=Entity, default=None)
+    end_year = attr.ib(type=int, default=None)
+    teaching_campus = attr.ib(type=Campus, default=None)
