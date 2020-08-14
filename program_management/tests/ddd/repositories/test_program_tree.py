@@ -170,20 +170,23 @@ class TestDeleteProgramTree(TestCase):
         cmd_delete_group = command.DeleteNodeCommand(
             code=self.subgroup.group_year.partial_acronym,
             year=self.subgroup.group_year.academic_year.year,
-            node_type=GroupType.SUB_GROUP.name
+            node_type=GroupType.SUB_GROUP.name,
+            acronym=self.subgroup.group_year.acronym
         )
         mock_delete_node_service.assert_any_call(cmd_delete_group)
 
         cmd_delete_training = command.DeleteNodeCommand(
             code=self.training_version.root_group.partial_acronym,
             year=self.training_version.root_group.academic_year.year,
-            node_type=TrainingType.BACHELOR.name
+            node_type=TrainingType.BACHELOR.name,
+            acronym=self.training_version.root_group.acronym
         )
         mock_delete_node_service.assert_any_call(cmd_delete_training)
 
         cmd_delete_mini_training = command.DeleteNodeCommand(
             code=self.mini_training_version.root_group.partial_acronym,
             year=self.mini_training_version.root_group.academic_year.year,
-            node_type=MiniTrainingType.OPTION.name
+            node_type=MiniTrainingType.OPTION.name,
+            acronym=self.mini_training_version.root_group.acronym
         )
         mock_delete_node_service.assert_any_call(cmd_delete_mini_training)
