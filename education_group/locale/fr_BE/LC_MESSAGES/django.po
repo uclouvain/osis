@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-11 11:30+0200\n"
+"POT-Creation-Date: 2020-08-14 14:57+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -420,6 +420,17 @@ msgstr ""
 msgid "Mini-Training"
 msgstr ""
 
+msgid "Mini-Training %(acronym)s (%(academic_year)s) successfully deleted."
+msgstr ""
+"La mini-formation %(acronym)s (%(academic_year)s) </a> a été supprimée avec succès"
+
+msgid ""
+"Mini-Training <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> "
+"successfully updated."
+msgstr ""
+"La mini-formation <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> a été "
+"modifiée avec succès"
+
 #, python-format
 msgid ""
 "Mini-training <a href='%(link)s'> %(code)s (%(academic_year)s) </a> "
@@ -796,6 +807,9 @@ msgstr "type durée"
 
 msgid "filter by section"
 msgstr "préfiltrer par rubrique"
+
+msgid "hops"
+msgstr ""
 
 msgid "is using in"
 msgstr ""

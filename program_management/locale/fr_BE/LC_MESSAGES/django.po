@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-06 14:46+0200\n"
+"POT-Creation-Date: 2020-08-14 14:57+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -268,6 +268,9 @@ msgstr "Catalogue des formations"
 msgid "Formations"
 msgstr "Formations"
 
+msgid "Group"
+msgstr ""
+
 msgid "IMPOSSIBLE TO DISPLAY BECAUSE OF AN ILLEGAL CHARACTER IN STRING"
 msgstr ""
 
@@ -292,6 +295,12 @@ msgid "Language"
 msgstr "Langue"
 
 msgid "Learning achievements"
+msgstr "Unités d'enseignement"
+
+msgid "Learning class year"
+msgstr "Classe"
+
+msgid "Learning unit year"
 msgstr "Unités d'enseignement"
 
 msgid "Learning units"
@@ -486,10 +495,6 @@ msgstr ""
 
 msgid "Produce xls with a list of trainings"
 msgstr "Produire un fichier Excel avec la liste des formations"
-
-#, python-format
-msgid "Program %(acronym)s (%(academic_year)s) is not empty."
-msgstr "Le contenu du program %(acronym)s (%(academic_year)s) n'est pas vide."
 
 msgid "Proposal status"
 msgstr "Légende proposition"
