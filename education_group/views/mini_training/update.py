@@ -76,13 +76,16 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         if self.mini_training_form.is_valid() and self.content_formset.is_valid():
             deleted_trainings = self.delete_mini_training()
-            update_trainings = list(set(self.update_mini_training() + self.report_mini_training()))
-            update_trainings.sort(key=lambda identity: identity.year)
 
             if not self.mini_training_form.errors:
-                self.update_links()
+                update_trainings = list(set(self.update_mini_training() + self.report_mini_training()))
+                update_trainings.sort(key=lambda identity: identity.year)
+
+            if not self.mini_training_form.errors:
+                update_links = self.update_links()
                 success_messages = self.get_success_msg_updated_mini_trainings(update_trainings)
                 success_messages += self.get_success_msg_deleted_mini_trainings(deleted_trainings)
+                success_messages += self.get_success_msg_updated_links(update_links)
                 display_success_messages(request, success_messages, extra_tags='safe')
 
                 warning_messages = get_update_mini_training_warning_messages.get_conflicted_fields(
@@ -130,10 +133,18 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         return self.get_success_url()
 
     def update_mini_training(self) -> List['MiniTrainingIdentity']:
-        update_command = self._convert_form_to_update_mini_training_command(self.mini_training_form)
-        return update_mini_training_with_program_tree_service.update_and_report_mini_training_with_program_tree(
-            update_command
-        )
+        try:
+            update_command = self._convert_form_to_update_mini_training_command(self.mini_training_form)
+            return update_mini_training_with_program_tree_service.update_and_report_mini_training_with_program_tree(
+                update_command
+            )
+        except exception.ContentConstraintTypeMissing as e:
+            self.mini_training_form.add_error("constraint_type", e.message)
+        except (exception.ContentConstraintMinimumMaximumMissing,
+                exception.ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum) as e:
+            self.mini_training_form.add_error("min_constraint", e.message)
+            self.mini_training_form.add_error("max_constraint", "")
+        return []
 
     def report_mini_training(self) -> List['MiniTrainingIdentity']:
         if self.get_mini_training_obj().end_year:
@@ -157,14 +168,12 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             delete_command = self._convert_form_to_delete_mini_trainings_command(self.mini_training_form)
             return delete_mini_training_with_program_tree_service.delete_mini_training_with_program_tree(delete_command)
 
-        except (program_management_exception.ProgramTreeNonEmpty, exception.TrainingHaveLinkWithEPC,
-                exception.TrainingHaveEnrollments) as e:
+        except (program_management_exception.ProgramTreeNonEmpty, exception.MiniTrainingHaveLinkWithEPC,
+                exception.MiniTrainingHaveEnrollments, program_management_exception.NodeHaveLinkException) as e:
             self.mini_training_form.add_error("end_year", "")
             self.mini_training_form.add_error(
                 None,
-                _("Imposible to put end date to %(end_year)s: %(msg)s") % {
-                    "msg": e.message,
-                    "end_year": end_year}
+                _("Imposible to put end date to %(end_year)s: %(msg)s") % {"msg": e.message, "end_year": end_year}
             )
 
         return []
@@ -291,6 +300,19 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "acronym": mini_training_identity.acronym,
             "academic_year": display_as_academic_year(mini_training_identity.year)
         }
+
+    def get_success_msg_updated_links(self, links: List['Link']) -> List[str]:
+        messages = []
+
+        for link in links:
+            msg = _("The link of %(code)s - %(acronym)s - %(year)s has been updated.") % {
+                "acronym": link.child.title,
+                "code": link.entity_id.child_code,
+                "year": display_as_academic_year(link.entity_id.child_year)
+            }
+            messages.append(msg)
+
+        return messages
 
     def _get_default_error_messages(self) -> str:
         return _("Error(s) in form: The modifications are not saved")
