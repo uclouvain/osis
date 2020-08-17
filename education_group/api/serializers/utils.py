@@ -77,8 +77,9 @@ class MiniTrainingGetUrlMixin:
 
     def get_url(self, obj, view_name, request, format):
         url_kwargs = {
-            'partial_acronym': obj.root_group.partial_acronym,
+            'acronym': obj.offer.acronym,
             'year': obj.offer.academic_year.year,
+            'version_name': obj.version_name
         }
         return reverse(view_name, kwargs=url_kwargs, request=request, format=format)
 

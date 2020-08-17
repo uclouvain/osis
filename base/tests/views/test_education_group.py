@@ -62,7 +62,10 @@ class EducationGroupPedagogyUpdateViewTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.current_academic_year = create_current_academic_year()
-        cls.training = TrainingFactory(academic_year=cls.current_academic_year)
+        cls.training = TrainingFactory(
+            academic_year=cls.current_academic_year,
+            education_group_type__name=TrainingType.PGRM_MASTER_120.name
+        )
         version = StandardEducationGroupVersionFactory(
             offer=cls.training,
             root_group__academic_year=cls.current_academic_year,
@@ -149,7 +152,7 @@ class EducationGroupPedagogyUpdateViewTestCase(TestCase):
 
         self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
         anchor_expected = '#section_welcome_introduction'
-        self.assertTrue(anchor_expected in response.url)
+        self.assertIn(anchor_expected, response.url)
 
 
 class EducationGroupPublishViewTestCase(TestCase):

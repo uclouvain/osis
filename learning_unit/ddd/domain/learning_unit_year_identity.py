@@ -23,23 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import attr
 
 
+@attr.s(frozen=True, slots=True, )
 class LearningUnitYearIdentity:
-
-    def __init__(
-            self,
-            code: str = None,
-            year: int = None
-    ):
-        self.code = code
-        self.year = year
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)
 
     def __str__(self) -> str:
         return "{} - {}".format(self.code, self.year)
-
-    def __eq__(self, other):
-        return (self.code, self.year) == (other.code, other.year)
-
-    def __hash__(self):
-        return hash((self.code, self.year))

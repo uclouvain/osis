@@ -21,6 +21,7 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+from django.db import transaction
 
 from program_management.ddd import command
 from program_management.ddd.business_types import *
@@ -29,6 +30,7 @@ from program_management.ddd.domain.program_tree import PATH_SEPARATOR
 from program_management.ddd.repositories import load_tree, persist_tree, node as node_repository, program_tree
 
 
+@transaction.atomic()
 def paste_element(paste_command: command.PasteElementCommand) -> 'LinkIdentity':
     node_identity = node.NodeIdentity(code=paste_command.node_to_paste_code, year=paste_command.node_to_paste_year)
     path_to_detach = paste_command.path_where_to_detach

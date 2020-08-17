@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-13 16:09+0200\n"
+"POT-Creation-Date: 2020-08-06 14:46+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -343,6 +343,12 @@ msgstr ""
 msgid "New Education Group"
 msgstr ""
 
+msgid "New Mini-Training"
+msgstr ""
+
+msgid "New training"
+msgstr ""
+
 msgid "No"
 msgstr ""
 
@@ -449,6 +455,10 @@ msgid "Produce xls of trainings with administrative data"
 msgstr ""
 
 msgid "Produce xls with a list of trainings"
+msgstr ""
+
+#, python-format
+msgid "Program %(acronym)s (%(academic_year)s) is not empty."
 msgstr ""
 
 msgid "Proposal status"
@@ -657,6 +667,18 @@ msgid ""
 "type %(type)s."
 msgstr ""
 
+#, python-brace-format
+msgid ""
+"You can't copy the program tree '{code}' from {from_year} to {to_year} "
+"because it ends in {end_year}"
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"You can't copy the program tree version '{acronym}' from {from_year} to "
+"{to_year} because it ends in {end_year}"
+msgstr ""
+
 #, python-format
 msgid ""
 "You cannot add \"%(child)s\" of type \"%(child_types)s\" to \"%(parent)s\" "
@@ -673,6 +695,16 @@ msgstr ""
 msgid ""
 "You must be in the context of a training to modify the prerequisites of a "
 "learning unit (current context: %(title)s)"
+msgstr ""
+
+#, python-format
+msgid ""
+"[%(academic_year)s] %(code)s has links to another training / mini-training / "
+"group"
+msgstr ""
+
+#, python-format
+msgid "[%(academic_year)s] The content of the program is not empty."
 msgstr ""
 
 msgid "bibliography"

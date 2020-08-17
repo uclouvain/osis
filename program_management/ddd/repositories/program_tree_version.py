@@ -25,15 +25,19 @@
 ##############################################################################
 from typing import Optional, List
 
+from django.db import transaction, IntegrityError
 from django.db.models import F
 
+from base.models.education_group_year import EducationGroupYear
 from education_group.models.group_year import GroupYear
 from osis_common.ddd import interface
+from program_management.ddd import command
 from program_management.ddd.business_types import *
+from program_management.ddd.domain import exception
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
-from program_management.ddd.repositories.program_tree import ProgramTreeRepository
+from program_management.ddd.repositories import program_tree as program_tree_repository
 from program_management.models.education_group_version import EducationGroupVersion
 from django.db.models import Q
 
@@ -41,12 +45,41 @@ from django.db.models import Q
 class ProgramTreeVersionRepository(interface.AbstractRepository):
 
     @classmethod
-    def create(cls, entity: 'ProgramTreeVersion') -> 'ProgramTreeVersionIdentity':
-        raise NotImplementedError
+    def create(
+            cls,
+            program_tree_version: 'ProgramTreeVersion',
+            **_
+    ) -> 'ProgramTreeVersionIdentity':
+        education_group_year_id = EducationGroupYear.objects.filter(
+            acronym=program_tree_version.entity_id.offer_acronym,
+            academic_year__year=program_tree_version.entity_id.year,
+        ).values_list(
+            'pk', flat=True
+        )[0]
+
+        group_year_id = GroupYear.objects.filter(
+            partial_acronym=program_tree_version.program_tree_identity.code,
+            academic_year__year=program_tree_version.program_tree_identity.year,
+        ).values_list(
+            'pk', flat=True
+        )[0]
+
+        try:
+            EducationGroupVersion(
+                version_name=program_tree_version.version_name,
+                title_fr=program_tree_version.title_fr,
+                title_en=program_tree_version.title_en,
+                offer_id=education_group_year_id,
+                is_transition=False,
+                root_group_id=group_year_id
+            ).save()
+        except IntegrityError:
+            raise exception.ProgramTreeAlreadyExistsException
+        return program_tree_version.entity_id
 
     @classmethod
-    def update(cls, entity: 'ProgramTreeVersion') -> 'ProgramTreeVersionIdentity':
-        raise NotImplementedError
+    def update(cls, program_tree_version: 'ProgramTreeVersion', **_) -> 'ProgramTreeVersionIdentity':
+        return program_tree_version.entity_id
 
     @classmethod
     def get(cls, entity_id: ProgramTreeVersionIdentity) -> 'ProgramTreeVersion':
@@ -70,8 +103,10 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
             'version_title_en',
             'is_transition',
         )
-        if qs:
-            return _instanciate_tree_version(qs[0])
+        try:
+            return _instanciate_tree_version(qs.get())
+        except EducationGroupVersion.DoesNotExist:
+            raise exception.ProgramTreeVersionNotFoundException()
 
     @classmethod
     def search(
@@ -79,11 +114,51 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
             entity_ids: Optional[List['ProgramTreeVersionIdentity']] = None,
             **kwargs
     ) -> List[ProgramTreeVersion]:
-        raise NotImplementedError
+        qs = GroupYear.objects.all().order_by(
+            'educationgroupversion__version_name'
+        ).annotate(
+            code=F('partial_acronym'),
+            offer_acronym=F('educationgroupversion__offer__acronym'),
+            offer_year=F('educationgroupversion__offer__academic_year__year'),
+            version_name=F('educationgroupversion__version_name'),
+            version_title_fr=F('educationgroupversion__title_fr'),
+            version_title_en=F('educationgroupversion__title_en'),
+            is_transition=F('educationgroupversion__is_transition'),
+        ).values(
+            'code',
+            'offer_acronym',
+            'offer_year',
+            'version_name',
+            'version_title_fr',
+            'version_title_en',
+            'is_transition',
+        )
+        if "element_ids" in kwargs:
+            qs = qs.filter(element__in=kwargs['element_ids'])
+
+        results = []
+        for record_dict in qs:
+            results.append(_instanciate_tree_version(record_dict))
+        return results
 
     @classmethod
-    def delete(cls, entity_id: 'ProgramTreeVersionIdentity') -> None:
-        raise NotImplementedError
+    def delete(
+           cls,
+           entity_id: 'ProgramTreeVersionIdentity',
+           delete_program_tree_service: interface.ApplicationService = None
+    ) -> None:
+        program_tree_version = cls.get(entity_id)
+
+        EducationGroupVersion.objects.filter(
+            version_name=entity_id.version_name,
+            offer__acronym=entity_id.offer_acronym,
+            offer__academic_year__year=entity_id.year,
+            is_transition=entity_id.is_transition,
+        ).delete()
+
+        root_node = program_tree_version.get_tree().root_node
+        cmd = command.DeleteProgramTreeCommand(code=root_node.code, year=root_node.year)
+        delete_program_tree_service(cmd)
 
     @classmethod
     def search_all_versions_from_root_node(cls, root_node_identity: 'NodeIdentity') -> List['ProgramTreeVersion']:
@@ -101,15 +176,17 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
 
 
 def _instanciate_tree_version(record_dict: dict) -> 'ProgramTreeVersion':
+    identity = ProgramTreeVersionIdentity(
+        offer_acronym=record_dict['offer_acronym'],
+        year=record_dict['offer_year'],
+        version_name=record_dict['version_name'],
+        is_transition=record_dict['is_transition'],
+    )
     return ProgramTreeVersion(
-        entity_identity=ProgramTreeVersionIdentity(
-            record_dict['offer_acronym'],
-            record_dict['offer_year'],
-            record_dict['version_name'],
-            record_dict['is_transition'],
-        ),
+        entity_identity=identity,
+        entity_id=identity,
         program_tree_identity=ProgramTreeIdentity(record_dict['code'], record_dict['offer_year']),
-        program_tree_repository=ProgramTreeRepository(),
+        program_tree_repository=program_tree_repository.ProgramTreeRepository(),
         title_fr=record_dict['version_title_fr'],
         title_en=record_dict['version_title_en'],
     )

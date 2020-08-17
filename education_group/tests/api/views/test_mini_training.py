@@ -44,8 +44,7 @@ from education_group.api.serializers.mini_training import MiniTrainingDetailSeri
 from education_group.api.views.mini_training import MiniTrainingList
 from education_group.api.views.mini_training import OfferRoots
 from education_group.tests.factories.group_year import GroupYearFactory
-from program_management.tests.factories.education_group_version import EducationGroupVersionFactory, \
-    StandardEducationGroupVersionFactory
+from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementFactory
 
 
@@ -55,11 +54,12 @@ class MiniTrainingTitleTestCase(APITestCase):
         anac = AcademicYearFactory()
 
         cls.egy = MiniTrainingFactory(academic_year=anac)
-        cls.version = EducationGroupVersionFactory(offer=cls.egy)
+        cls.version = StandardEducationGroupVersionFactory(offer=cls.egy, is_transition=False)
+        ElementFactory(group_year=cls.version.root_group)
         cls.person = PersonFactory()
         cls.url = reverse('education_group_api_v1:minitrainingstitle_read', kwargs={
-            'partial_acronym': cls.version.root_group.partial_acronym,
-            'year': cls.egy.academic_year.year
+            'acronym': cls.egy.acronym,
+            'year': cls.version.root_group.academic_year.year
         })
 
     def setUp(self):
@@ -80,7 +80,7 @@ class MiniTrainingTitleTestCase(APITestCase):
 
     def test_get_results_case_education_group_year_not_found(self):
         invalid_url = reverse('education_group_api_v1:minitrainingstitle_read', kwargs={
-            'partial_acronym': 'ACRO',
+            'acronym': 'ACRO',
             'year': 2019
         })
         response = self.client.get(invalid_url)
@@ -117,7 +117,7 @@ class MiniTrainingListTestCase(APITestCase):
             )
 
             cls.mini_trainings.append(mini_training)
-            cls.versions.append(EducationGroupVersionFactory(
+            cls.versions.append(StandardEducationGroupVersionFactory(
                 root_group=mini_training,
                 offer=offer
             ))
@@ -236,7 +236,7 @@ class GetMiniTrainingTestCase(APITestCase):
         )
         cls.user = UserFactory()
         cls.url = reverse('education_group_api_v1:mini_training_read', kwargs={
-            'partial_acronym': cls.version.root_group.partial_acronym,
+            'acronym': cls.mini_training.acronym,
             'year': cls.academic_year.year
         })
 
@@ -271,7 +271,7 @@ class GetMiniTrainingTestCase(APITestCase):
 
     def test_get_invalid_mini_training_case_not_found(self):
         invalid_url = reverse('education_group_api_v1:mini_training_read', kwargs={
-            'partial_acronym': 'ACRO',
+            'acronym': 'ACRO',
             'year': 2033
         })
         response = self.client.get(invalid_url)
@@ -284,11 +284,17 @@ class OfferRootsTestCase(APITestCase):
         cls.academic_year = AcademicYearFactory(year=2018)
         cls.entity_version = EntityVersionFactory(entity__organization__type=organization_type.MAIN)
 
-        cls.minor = GroupYearFactory(
+        cls.minor = MiniTrainingFactory(
             academic_year=cls.academic_year,
             education_group_type__name=MiniTrainingType.OPEN_MINOR.name
         )
-        minor_element = ElementFactory(group_year=cls.minor)
+        version = StandardEducationGroupVersionFactory(
+            offer=cls.minor,
+            root_group__academic_year=cls.academic_year,
+            root_group__education_group_type=cls.minor.education_group_type,
+            root_group__partial_acronym=cls.minor.partial_acronym
+        )
+        minor_element = ElementFactory(group_year=version.root_group)
         for _ in range(0, 3):
             offer = TrainingFactory(academic_year=cls.academic_year)
             group = GroupYearFactory(
@@ -302,7 +308,7 @@ class OfferRootsTestCase(APITestCase):
 
         cls.user = UserFactory()
         cls.url = reverse('education_group_api_v1:' + OfferRoots.name, kwargs={
-            'partial_acronym': cls.minor.partial_acronym,
+            'acronym': cls.minor.acronym,
             'year': cls.academic_year.year
         })
 

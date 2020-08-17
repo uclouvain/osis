@@ -1,12 +1,16 @@
+from ajax_select.fields import AutoCompleteSelectMultipleField
 from django import forms
+from django.forms import ModelChoiceField
 from django.utils.translation import gettext_lazy as _
 
+from base.forms.learning_unit.entity_form import EntitiesVersionChoiceField
 from base.models import campus
 from osis_role.contrib.forms.fields import EntityRoleChoiceField
 
-from base.models.entity_version import EntityVersion
+from base.models.entity_version import EntityVersion, find_pedagogical_entities_version
 from education_group.auth.roles.central_manager import CentralManager
 from education_group.auth.roles.faculty_manager import FacultyManager
+from reference.models import domain
 
 
 class MainCampusChoiceField(forms.ModelChoiceField):
@@ -23,6 +27,7 @@ class ManagementEntitiesChoiceField(EntityRoleChoiceField):
             person=person,
             group_names=group_names,
             label=_('Management entity'),
+            to_field_name="acronym",
             **kwargs,
         )
 
@@ -33,6 +38,30 @@ class ManagementEntitiesChoiceField(EntityRoleChoiceField):
         return qs
 
     def clean(self, value):
-        if value is not None:
-            return EntityVersion.objects.get(pk=value).acronym
-        return value
+        value = super(forms.ModelChoiceField, self).clean(value)
+        if value:
+            return value.acronym
+        return None
+
+
+class MainEntitiesVersionChoiceField(EntitiesVersionChoiceField):
+    def __init__(self, queryset, *args, **kwargs):
+        queryset = find_pedagogical_entities_version()
+        super(MainEntitiesVersionChoiceField, self).__init__(queryset, *args, **kwargs)
+
+
+class CreditField(forms.IntegerField):
+    def __init__(self, *args, **kwargs):
+        super().__init__(
+            min_value=0,
+            max_value=999,
+            label=_("Credits"),
+            widget=forms.TextInput,
+            **kwargs
+        )
+
+
+class SecondaryDomainsField(AutoCompleteSelectMultipleField):
+    def clean(self, value):
+        value = super().clean(value)
+        return domain.Domain.objects.filter(pk__in=value)

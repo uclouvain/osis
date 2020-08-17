@@ -556,8 +556,8 @@ class EducationGroupYear(SerializableModel):
     )
 
     co_graduation_coefficient = models.DecimalField(
-        max_digits=5,
-        decimal_places=2,
+        max_digits=7,
+        decimal_places=4,
         verbose_name=_('Co-graduation total coefficient'),
         blank=True,
         null=True,
@@ -587,7 +587,8 @@ class EducationGroupYear(SerializableModel):
         verbose_name = _("Education group year")
         unique_together = (
             ('education_group', 'academic_year'),
-            ('partial_acronym', 'academic_year')
+            ('partial_acronym', 'academic_year'),
+            ('acronym', 'academic_year'),
         )
 
     def __str__(self):
@@ -978,6 +979,14 @@ def search(**kwargs):
         qs = qs.filter(offerenrollment__enrollment_state__in=kwargs['enrollment_states'])
 
     return qs.select_related('education_group_type', 'academic_year')
+
+
+def have_link_with_epc(acronym: str, year: int) -> bool:
+    return EducationGroupYear.objects.filter(
+        acronym=acronym,
+        academic_year__year=year,
+        linked_with_epc=True
+    ).exists()
 
 
 # TODO :: Annotate/Count() in only 1 query instead of 2

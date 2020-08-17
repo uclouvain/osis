@@ -39,7 +39,6 @@ from base.business.education_groups.general_information_sections import \
     MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION
 from base.models import academic_year
 from base.models.enums.education_group_categories import Categories
-from base.models.enums.education_group_types import GroupType
 from base.views.common import display_warning_messages
 from education_group.ddd.business_types import *
 from education_group.ddd import command
@@ -100,21 +99,21 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
             return root_node
 
     def get_context_data(self, **kwargs):
-        if not self.active_tab:
-            self.active_tab = read.get_tab_from_referer(self.get_object(), self.request.META.get('HTTP_REFERER'))
+        self.active_tab = read.get_tab_from_path_info(self.get_object(), self.request.META.get('PATH_INFO'))
 
         can_change_education_group = self.request.user.has_perm(
             'base.change_educationgroup',
             self.get_permission_object()
         )
         is_root_node = self.node_identity == self.get_tree().root_node.entity_id
+
         return {
             **super().get_context_data(**kwargs),
             "person": self.request.user.person,
             "enums": mdl.enums.education_group_categories,
             "can_change_education_group": can_change_education_group,
             "form_xls_custom": CustomXlsForm(),
-            "tree": json.dumps(program_tree_view_serializer(self.get_tree())),
+            "tree":  json.dumps(program_tree_view_serializer(self.get_tree())),
             "group": self.get_group(),
             "node": self.get_object(),
             "node_path": self.get_path(),
@@ -136,6 +135,7 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
             "group_year": self.get_group_year(),  # TODO: Should be remove and use DDD object
             "create_group_url": self.get_create_group_url(),
             "update_group_url": self.get_update_group_url(),
+            "delete_group_url": self.get_delete_group_url(),
             "create_training_url": self.get_create_training_url(),
             "create_mini_training_url": self.get_create_mini_training_url(),
             "is_root_node": is_root_node,
@@ -176,6 +176,10 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
     def get_create_training_url(self):
         return reverse('create_element_select_type', kwargs={'category': Categories.TRAINING.name}) + \
                "?path_to={}".format(self.get_path())
+
+    def get_delete_group_url(self):
+        return reverse('group_delete', kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}) + \
+               "?path={}".format(self.get_path())
 
     def get_tab_urls(self):
         return OrderedDict({

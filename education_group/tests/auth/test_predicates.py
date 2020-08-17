@@ -8,7 +8,7 @@ from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group import EducationGroupFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory, ContinuingEducationTrainingFactory, \
-    TrainingFactory, MiniTrainingFactory, GroupFactory
+    TrainingFactory, MiniTrainingFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.person import PersonFactory
@@ -17,6 +17,7 @@ from education_group.auth import predicates
 from education_group.auth.roles.faculty_manager import FacultyManager
 from education_group.auth.scope import Scope
 from education_group.tests.factories.auth.faculty_manager import FacultyManagerFactory
+from education_group.tests.factories.group_year import GroupYearFactory
 
 
 class TestUserAttachedToManagementEntity(TestCase):
@@ -296,80 +297,6 @@ class TestIsNotOrphanGroup(TestCase):
         self.assertFalse(predicates.is_not_orphan_group(self.user))
 
 
-class TestIsMaximumChildNotReachedForMiniTrainingCategory(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.user = UserFactory.build()
-        cls.education_group_year = EducationGroupYearFactory()
-
-    def setUp(self):
-        self.predicate_context_mock = mock.patch(
-            "rules.Predicate.context",
-            new_callable=mock.PropertyMock,
-            return_value={
-                'perm_name': 'dummy-perm'
-            }
-        )
-        self.predicate_context_mock.start()
-        self.addCleanup(self.predicate_context_mock.stop)
-
-    def test_case_education_group_year_not_specified(self):
-        message = "Predicate must return 'None' because not evaluated by permission engine when return value is 'None'"
-        self.assertIsNone(
-            predicates.is_maximum_child_not_reached_for_mini_training_category(self.user),
-            msg=message
-        )
-
-    @mock.patch('django.db.models.QuerySet.exists', return_value=False)
-    def test_case_education_group_year_have_reach_limit_for_groups(self, mock_exist):
-        self.assertFalse(
-            predicates.is_maximum_child_not_reached_for_mini_training_category(self.user, self.education_group_year)
-        )
-
-    @mock.patch('django.db.models.QuerySet.exists', return_value=True)
-    def test_case_education_group_year_have_not_reach_limit_for_groups(self, mock_exist):
-        self.assertTrue(
-            predicates.is_maximum_child_not_reached_for_mini_training_category(self.user, self.education_group_year)
-        )
-
-
-class TestIsMaximumChildNotReachedForTrainingCategory(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.user = UserFactory.build()
-        cls.education_group_year = EducationGroupYearFactory()
-
-    def setUp(self):
-        self.predicate_context_mock = mock.patch(
-            "rules.Predicate.context",
-            new_callable=mock.PropertyMock,
-            return_value={
-                'perm_name': 'dummy-perm'
-            }
-        )
-        self.predicate_context_mock.start()
-        self.addCleanup(self.predicate_context_mock.stop)
-
-    def test_case_education_group_year_not_specified(self):
-        message = "Predicate must return 'None' because not evaluated by permission engine when return value is 'None'"
-        self.assertIsNone(
-            predicates.is_maximum_child_not_reached_for_training_category(self.user),
-            msg=message
-        )
-
-    @mock.patch('django.db.models.QuerySet.exists', return_value=False)
-    def test_case_education_group_year_have_reach_limit_for_groups(self, mock_exist):
-        self.assertFalse(
-            predicates.is_maximum_child_not_reached_for_training_category(self.user, self.education_group_year)
-        )
-
-    @mock.patch('django.db.models.QuerySet.exists', return_value=True)
-    def test_case_education_group_year_have_not_reach_limit_for_groups(self, mock_exist):
-        self.assertTrue(
-            predicates.is_maximum_child_not_reached_for_training_category(self.user, self.education_group_year)
-        )
-
-
 class TestIsUserLinkedToAllScopes(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -461,7 +388,7 @@ class TestAreAllEducationGroupRemovable(TestCase):
 
     @mock.patch('base.business.event_perms.EventPermEducationGroupEdition.is_open', return_value=True)
     def test_case_all_groups_are_not_removable(self, mock_open):
-        groups = [GroupFactory(education_group=self.education_group)]
+        groups = [GroupYearFactory()]
         person = FacultyManagerFactory(entity=groups[0].management_entity).person
         self.assertTrue(
             predicates.are_all_groups_removable(

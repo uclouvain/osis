@@ -662,3 +662,10 @@ def find_entity_version_according_academic_year(an_entity, an_academic_year):
         Q(entity=an_entity, start_date__lte=an_academic_year.end_date),
         Q(end_date__isnull=True) | Q(end_date__gt=an_academic_year.end_date)
     ).last()
+
+
+def find_by_acronym_and_year(acronym: str, year: int):
+    return EntityVersion.objects.filter(
+        Q(acronym=acronym, start_date__year__lte=year),
+        Q(end_date__isnull=True) | Q(end_date__year__gt=year)
+    ).order_by('start_date').last()

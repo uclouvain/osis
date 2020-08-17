@@ -167,14 +167,13 @@ def __load_multiple_node_group_year(node_group_year_ids: List[int]) -> QuerySet:
         start_year=F('group__start_year__year'),
         end_year=F('group__end_year__year'),
         management_entity_acronym=Subquery(subquery_management_entity),
-        teaching_campus=Concat(
-            F('main_teaching_campus__name'), Value(' - '), F('main_teaching_campus__organization__name')
-        ),
+        teaching_campus_name=F('main_teaching_campus__name'),
+        teaching_campus_university_name=F('main_teaching_campus__organization__name'),
         offer_partial_title_fr=F('educationgroupversion__offer__partial_title'),
         offer_partial_title_en=F('educationgroupversion__offer__partial_title_english'),
         offer_title_fr=F('educationgroupversion__offer__title'),
         offer_title_en=F('educationgroupversion__offer__title_english'),
-        offer_status=F('educationgroupversion__root_group__active'),
+        offer_status=F('educationgroupversion__offer__active'),
         schedule_type=F('educationgroupversion__offer__schedule_type'),
         keywords=F('educationgroupversion__offer__keywords'),
         group_title_fr=F('title_fr'),
@@ -206,7 +205,8 @@ def __load_multiple_node_group_year(node_group_year_ids: List[int]) -> QuerySet:
         'keywords',
         'category',
         'management_entity_acronym',
-        'teaching_campus'
+        'teaching_campus_name',
+        'teaching_campus_university_name',
     )
 
 

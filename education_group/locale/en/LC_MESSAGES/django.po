@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-15 11:07+0200\n"
+"POT-Creation-Date: 2020-08-11 11:30+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,7 +18,26 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #, python-format
+msgid "%(count_enrollment)d student is enrolled in the mini-training."
+msgid_plural "%(count_enrollment)d students are enrolled in the mini-training."
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format, python-brace-format
+msgid ""
+"%(count_enrollment)d student is enrolled in the training {acronym} "
+"({academic_year})."
+msgid_plural ""
+"%(count_enrollment)d students are enrolled in the training {acronym} "
+"({academic_year})."
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
 msgid "%(max)s must be greater or equals than %(min)s"
+msgstr ""
+
+msgid "ARES"
 msgstr ""
 
 msgid "ARES ability"
@@ -45,11 +64,20 @@ msgstr ""
 msgid "Access condition"
 msgstr ""
 
+msgid "Acronym already exists"
+msgstr ""
+
 msgid "Acronym/Short title"
 msgstr ""
 
 msgctxt "abbreviation"
 msgid "Acronym/Short title"
+msgstr ""
+
+msgid "Acronym/Short title '{}' already exists"
+msgstr ""
+
+msgid "Acronym/Short title is required"
 msgstr ""
 
 msgid "Actions"
@@ -85,10 +113,21 @@ msgstr ""
 msgid "Alert Message"
 msgstr ""
 
+#, python-format
+msgid "Are you sure you want to delete %(acronym)s - %(title)s ?"
+msgstr ""
+
+#, python-format
+msgid "Are you sure you want to delete %(code)s - %(title)s ?"
+msgstr ""
+
 msgid "Bachelors of the Dutch speaking Community of Belgium"
 msgstr ""
 
 msgid "Block"
+msgstr ""
+
+msgid "Cancel"
 msgstr ""
 
 msgid "Category"
@@ -127,10 +166,18 @@ msgstr ""
 msgid "Conditions"
 msgstr ""
 
+#, python-format
+msgid ""
+"Consistency error in %(academic_year)s: %(field)s has already been modified"
+msgstr ""
+
 msgid "Contacts"
 msgstr ""
 
 msgid "Content"
+msgstr ""
+
+msgid "Content constraint"
 msgstr ""
 
 msgid "Coorganization can only be changed by central manager"
@@ -211,7 +258,13 @@ msgstr ""
 msgid "Enrollment enabled"
 msgstr ""
 
+msgid "Enter text to search"
+msgstr ""
+
 msgid "Entity"
+msgstr ""
+
+msgid "Error(s) in form: The modifications are not saved"
 msgstr ""
 
 msgid "Exams Enrollments"
@@ -292,7 +345,14 @@ msgstr ""
 msgid "Identification"
 msgstr ""
 
+#, python-format
+msgid "Imposible to put end date to %(end_year)s: %(msg)s"
+msgstr ""
+
 msgid "Institution"
+msgstr ""
+
+msgid "Internship"
 msgstr ""
 
 msgid "Jury"
@@ -325,6 +385,9 @@ msgstr ""
 msgid "Link type"
 msgstr ""
 
+msgid "Linked with EPC"
+msgstr ""
+
 msgid "Main"
 msgstr ""
 
@@ -346,17 +409,22 @@ msgstr ""
 msgid "Mini-Training"
 msgstr ""
 
+#, python-format
+msgid ""
+"Mini-training <a href='%(link)s'> %(code)s (%(academic_year)s) </a> "
+"successfully created."
+msgstr ""
+
 msgid "Modification"
 msgstr ""
 
 msgid "New Education Group"
 msgstr ""
 
-#, python-format
-msgctxt "female"
-msgid ""
-"No type of %(child_category)s can be created as child of %(category)s of "
-"type %(type)s"
+msgid "New Mini-Training"
+msgstr ""
+
+msgid "New Training"
 msgstr ""
 
 msgid "Non university Bachelors"
@@ -443,6 +511,9 @@ msgstr ""
 msgid "Scores diffusion"
 msgstr ""
 
+msgid "Search..."
+msgstr ""
+
 msgid "Session"
 msgstr ""
 
@@ -476,6 +547,9 @@ msgstr ""
 msgid "The field can contain only one value."
 msgstr ""
 
+msgid "The fields concerning ARES have to be ALL filled-in or none of them"
+msgstr ""
+
 msgid "The following links has been updated"
 msgstr ""
 
@@ -487,11 +561,35 @@ msgid ""
 msgstr ""
 
 #, python-format
+msgid "The group %(code)s has been deleted."
+msgstr ""
+
+#, python-format
+msgid "The link of %(code)s - %(acronym)s - %(year)s has been updated."
+msgstr ""
+
+#, python-format
+msgid "The mini-training %(code)s has been deleted."
+msgstr ""
+
+#, python-format
 msgid "The program %(acronym)s will be published soon"
 msgstr ""
 
 msgid ""
 "The scope of the user is limited and prevents this action to be performed"
+msgstr ""
+
+#, python-format
+msgid "The training %(code)s has been deleted."
+msgstr ""
+
+#, python-brace-format
+msgid "The training {acronym} ({academic_year}) has inscriptions"
+msgstr ""
+
+#, python-brace-format
+msgid "The training {acronym} ({academic_year}) is linked to epc"
 msgstr ""
 
 #, python-format
@@ -518,6 +616,9 @@ msgstr ""
 msgid "The value of this attribute is inherited from the standard OF"
 msgstr ""
 
+msgid "There can only be one type 2 expectation"
+msgstr ""
+
 msgid "Title"
 msgstr ""
 
@@ -527,7 +628,26 @@ msgstr ""
 msgid "Title in French"
 msgstr ""
 
+msgid "Titles"
+msgstr ""
+
 msgid "Training"
+msgstr ""
+
+#, python-format
+msgid "Training %(acronym)s (%(academic_year)s) successfully deleted."
+msgstr ""
+
+#, python-format
+msgid ""
+"Training <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> "
+"successfully created."
+msgstr ""
+
+#, python-format
+msgid ""
+"Training <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> "
+"successfully updated."
 msgstr ""
 
 msgid "Trainings"
@@ -551,6 +671,9 @@ msgstr ""
 msgid "University certificate"
 msgstr ""
 
+msgid "Update Training"
+msgstr ""
+
 msgid "User"
 msgstr ""
 
@@ -560,10 +683,34 @@ msgstr ""
 msgid "Validity"
 msgstr ""
 
+msgid "Validity cannot be greater than last year of organization"
+msgstr ""
+
 msgid "Web re-registration"
 msgstr ""
 
 msgid "Weighting"
+msgstr ""
+
+msgid "Yes, I confirm."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"You can't copy the group '{code}' from {from_year} to {to_year} because it "
+"ends in {end_year}"
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"You can't copy the mini-training '{code}' from {from_year} to {to_year} "
+"because it ends in {end_year}"
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"You can't copy the training '{acronym}' from {from_year} to {to_year} "
+"because it ends in {end_year}"
 msgstr ""
 
 #, python-format
@@ -595,6 +742,9 @@ msgstr ""
 msgid "certificate aims"
 msgstr ""
 
+msgid "co-graduation"
+msgstr ""
+
 msgid "code"
 msgstr ""
 
@@ -602,6 +752,15 @@ msgid "comment (internal)"
 msgstr ""
 
 msgid "credits"
+msgstr ""
+
+msgid "dissertation"
+msgstr ""
+
+msgid "duration unit"
+msgstr ""
+
+msgid "filter by section"
 msgstr ""
 
 msgid "is using in"

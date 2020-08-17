@@ -67,7 +67,8 @@ def __get_orphan_group_cmd_from_create_group_and_attach_cmd(cmd: command_program
         organization_name=cmd.organization_name,
         remark_fr=cmd.remark_fr,
         remark_en=cmd.remark_en,
-        start_year=node_id.year
+        start_year=node_id.year,
+        end_year=None
     )
 
 
