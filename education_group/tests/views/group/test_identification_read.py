@@ -28,11 +28,13 @@ from django.http import HttpResponseForbidden, HttpResponse, HttpResponseNotFoun
 from django.test import TestCase
 from django.urls import reverse
 
+from base.models.enums.education_group_categories import Categories
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.factories.user import UserFactory
 from education_group.views.group.common_read import Tab
 from program_management.ddd.domain.node import NodeGroupYear
+from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory
 
 
@@ -45,6 +47,8 @@ class TestGroupReadIdentification(TestCase):
             group_year__partial_acronym="LTRONC100B",
             group_year__academic_year__year=2018
         )
+        EducationGroupVersionFactory(offer__academic_year=cls.element_group_year.group_year.academic_year,
+                                     root_group=cls.element_group_year.group_year)
         cls.url = reverse('group_identification', kwargs={'year': 2018, 'code': 'LTRONC100B'})
 
     def setUp(self) -> None:
@@ -90,3 +94,26 @@ class TestGroupReadIdentification(TestCase):
         self.assertFalse(response.context['tab_urls'][Tab.CONTENT]['active'])
         self.assertFalse(response.context['tab_urls'][Tab.UTILIZATION]['active'])
         self.assertFalse(response.context['tab_urls'][Tab.GENERAL_INFO]['active'])
+
+    def test_assert_create_urls_correctly_computed(self):
+        path = "{}".format(self.element_group_year.pk)
+        expected_create_group_url = reverse('create_element_select_type', kwargs={'category': Categories.GROUP.name}) + \
+            "?path_to={}".format(path)
+        expected_create_training_url = reverse('create_element_select_type', kwargs={'category': Categories.TRAINING.name}) + \
+            "?path_to={}".format(path)
+        expected_create_mini_training_url = reverse('create_element_select_type',
+                                                    kwargs={'category': Categories.MINI_TRAINING.name}) + \
+            "?path_to={}".format(path)
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.context['create_group_url'], expected_create_group_url)
+        self.assertEqual(response.context['create_training_url'], expected_create_training_url)
+        self.assertEqual(response.context['create_mini_training_url'], expected_create_mini_training_url)
+
+    def test_assert_delete_url_correctly_computed(self):
+        path = "{}".format(self.element_group_year.pk)
+        expected_delete_group_url = reverse('group_delete', kwargs={'code': "LTRONC100B", 'year': 2018}) + \
+            "?path={}".format(path)
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.context['delete_group_url'], expected_delete_group_url)

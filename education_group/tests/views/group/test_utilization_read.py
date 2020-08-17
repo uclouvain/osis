@@ -35,6 +35,7 @@ from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.factories.user import UserFactory
 from education_group.views.group.common_read import Tab
 from program_management.ddd.domain.node import NodeGroupYear
+from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory
 
 
@@ -47,6 +48,8 @@ class TestGroupReadUtilization(TestCase):
             group_year__partial_acronym="LTRONC100B",
             group_year__academic_year__year=2018
         )
+        EducationGroupVersionFactory(offer__academic_year=cls.element_group_year.group_year.academic_year,
+                                     root_group=cls.element_group_year.group_year)
         cls.url = reverse('group_utilization', kwargs={'year': 2018, 'code': 'LTRONC100B'})
 
     def setUp(self) -> None:
@@ -76,7 +79,8 @@ class TestGroupReadUtilization(TestCase):
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, "education_group_app/group/utilization_read.html")
 
-    @mock.patch('program_management.ddd.service.tree_service.search_trees_using_node', return_value=[])
+    @mock.patch('program_management.ddd.service.read.search_tree_versions_using_node_service'
+                '.search_tree_versions_using_node', return_value=[])
     def test_assert_context_data(self, mock_tree_service):
         response = self.client.get(self.url)
 

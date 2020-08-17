@@ -28,9 +28,25 @@ from education_group.ddd.domain._academic_partner import AcademicPartner
 from osis_common.ddd import interface
 
 
-class Coorganization(interface.ValueObject):
+class CoorganizationIdentity(interface.EntityIdentity):
+    def __init__(self, partner_name: str, training_acronym: str, training_year: int):
+        self.partner_name = partner_name
+        self.offer_acronym = training_acronym
+        self.training_year = training_year
+
+    def __eq__(self, other):
+        return self.partner_name == other.partner_name and \
+               self.offer_acronym == other.offer_acronym and \
+               self.training_year == other.training_year
+
+    def __hash__(self):
+        return hash(self.partner_name + self.offer_acronym + str(self.training_year))
+
+
+class Coorganization(interface.Entity):
     def __init__(
             self,
+            entity_id: CoorganizationIdentity,
             partner: AcademicPartner,
             is_for_all_students: bool = False,
             is_reference_institution: bool = False,
@@ -38,27 +54,11 @@ class Coorganization(interface.ValueObject):
             is_producing_certificate: bool = False,
             is_producing_certificate_annexes: bool = False
     ):
+        super(Coorganization, self).__init__(entity_id=entity_id)
+        self.entity_id = entity_id
         self.partner = partner
         self.is_for_all_students = is_for_all_students or False
         self.is_reference_institution = is_reference_institution or False
         self.certificate_type = certificate_type or DiplomaCoorganizationTypes.NOT_CONCERNED
         self.is_producing_certificate = is_producing_certificate or False
         self.is_producing_certificate_annexes = is_producing_certificate_annexes or False
-
-    def __eq__(self, other):
-        return self.partner == other.partner and \
-            self.is_for_all_students == other.is_for_all_students and \
-            self.is_reference_institution == other.is_reference_institution and \
-            self.certificate_type == other.certificate_type and \
-            self.is_producing_certificate == other.is_producing_certificate and \
-            self.is_producing_certificate_annexes == other.is_producing_certificate_annexes
-
-    def __hash__(self):
-        return hash(
-            str(self.partner) +
-            str(self.is_for_all_students) +
-            str(self.is_reference_institution) +
-            self.certificate_type.name +
-            str(self.is_producing_certificate) +
-            str(self.is_producing_certificate_annexes)
-        )

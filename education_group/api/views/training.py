@@ -23,12 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.db.models import Case, When, Value, F, CharField
 from django_filters import rest_framework as filters
 from rest_framework import generics
 from rest_framework.generics import get_object_or_404
 
 from backoffice.settings.rest_framework.common_views import LanguageContextSerializerMixin
 from base.models.enums import education_group_categories
+from base.models.enums.education_group_types import TrainingType
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
 from education_group.api.serializers.training import TrainingListSerializer, TrainingDetailSerializer
 from education_group.api.views import utils
@@ -39,6 +41,7 @@ class TrainingFilter(filters.FilterSet):
     from_year = filters.NumberFilter(field_name="offer__academic_year__year", lookup_expr='gte')
     to_year = filters.NumberFilter(field_name="offer__academic_year__year", lookup_expr='lte')
     in_type = filters.CharFilter(field_name="offer__education_group_type__name", lookup_expr='contains')
+    campus = filters.CharFilter(field_name='offer__main_teaching_campus__name', lookup_expr='icontains')
     version_type = filters.CharFilter(method='filter_version_type')
     acronym = filters.CharFilter(field_name="offer__acronym", lookup_expr="icontains")
     partial_acronym = filters.CharFilter(field_name="root_group__partial_acronym", lookup_expr='icontains')
@@ -46,13 +49,30 @@ class TrainingFilter(filters.FilterSet):
     title_english = filters.CharFilter(field_name="root_group__title_en", lookup_expr='icontains')
     ares_ability = filters.NumberFilter(field_name="offer__hops__ares_ability")
     year = filters.NumberFilter(field_name="offer__academic_year__year")
+    education_group_type = filters.MultipleChoiceFilter(
+        field_name='offer__education_group_type__name',
+        choices=TrainingType.choices()
+    )
 
     class Meta:
         model = EducationGroupVersion
-        fields = ['acronym', 'partial_acronym', 'title', 'title_english', 'from_year', 'to_year']
+        fields = [
+            'acronym', 'partial_acronym', 'title', 'title_english', 'from_year', 'to_year', 'education_group_type'
+        ]
 
     @staticmethod
-    def filter_version_type(queryset, name, value):
+    def filter_version_type(queryset, _, value):
+        queryset = EducationGroupVersion.objects.filter(
+            offer__education_group_type__category=education_group_categories.TRAINING,
+        ).select_related(
+            'offer__education_group_type',
+            'offer__academic_year'
+        ).prefetch_related(
+            'offer__administration_entity__entityversion_set',
+            'offer__management_entity__entityversion_set'
+        ).exclude(
+            offer__acronym__icontains='common'
+        )
         return utils.filter_version_type(queryset, value)
 
 
@@ -62,7 +82,8 @@ class TrainingList(LanguageContextSerializerMixin, generics.ListAPIView):
     """
     name = 'training-list'
     queryset = EducationGroupVersion.objects.filter(
-        offer__education_group_type__category=education_group_categories.TRAINING
+        offer__education_group_type__category=education_group_categories.TRAINING,
+        is_transition=False,
     ).select_related(
         'offer__education_group_type',
         'offer__academic_year'
@@ -117,6 +138,18 @@ class TrainingDetail(LanguageContextSerializerMixin, generics.RetrieveAPIView):
             ).prefetch_related(
                 'offer__administration_entity__entityversion_set',
                 'offer__management_entity__entityversion_set',
+            ).annotate(
+                domain_code=Case(
+                    When(offer__main_domain=None, then=Value(None)),
+                    default=F('offer__main_domain__code'),
+                    output_field=CharField()
+                ),
+                domain_name=Case(
+                    When(offer__main_domain=None, then=Value(None)),
+                    When(offer__main_domain__parent=None, then=F('offer__main_domain__name')),
+                    default=F('offer__main_domain__parent__name'),
+                    output_field=CharField()
+                )
             ),
             offer__acronym__iexact=acronym,
             offer__academic_year__year=year,

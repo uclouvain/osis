@@ -228,6 +228,14 @@ urlpatterns = [
             url(r'^consolidate/$', base.views.learning_units.proposal.consolidate.consolidate_proposal,
                 name="learning_unit_consolidate_proposal"),
         ])),
+        url(r'^(?P<code>[A-Za-z0-9]+)/(?P<year>[0-9]+)/', include([
+            url(r'^components/$', learning_unit.learning_unit_components, name="learning_unit_components"),
+            url(r'^specifications/$', learning_unit.learning_unit_specifications, name="learning_unit_specifications"),
+            url(r'^formations/$', learning_unit.learning_unit_formations, name="learning_unit_formations"),
+            url(r'^pedagogy/', include([
+                url(r'^$', learning_unit_pedagogy, name="learning_unit_pedagogy"),
+            ])),
+        ])),
         url(r'^check/(?P<subtype>[A-Z]+)$', base.views.learning_units.common.check_acronym, name="check_acronym"),
     ])),
     url(r'^proposals/search/$', base.views.learning_units.search.proposal.SearchLearningUnitProposal.as_view(),

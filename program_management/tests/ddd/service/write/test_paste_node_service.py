@@ -26,7 +26,7 @@
 from unittest import mock
 from unittest.mock import patch
 
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, TestCase
 from django.utils.translation import gettext as _
 
 import osis_common.ddd.interface
@@ -48,7 +48,7 @@ from program_management.tests.ddd.factories.program_tree import ProgramTreeFacto
 from program_management.tests.ddd.service.mixins import ValidatorPatcherMixin
 
 
-class TestPasteNode(SimpleTestCase, ValidatorPatcherMixin):
+class TestPasteNode(TestCase, ValidatorPatcherMixin):
 
     def setUp(self):
         self.root_node = NodeGroupYearFactory(node_type=TrainingType.BACHELOR)
@@ -103,7 +103,8 @@ class TestPasteNode(SimpleTestCase, ValidatorPatcherMixin):
             program_management.ddd.service.write.paste_element_service.paste_element(self.paste_command)
 
     @patch.object(program_tree.ProgramTree, 'detach_node')
-    @patch("program_management.ddd.service.tree_service.search_trees_using_node")
+    @mock.patch('program_management.ddd.service.read.search_program_trees_using_node_service'
+                '.search_program_trees_using_node')
     def test_when_path_to_detach_is_set_then_should_call_detach(self, mock_search_trees, mock_detach):
         other_tree = ProgramTreeFactory()
         LinkFactory(parent=other_tree.root_node, child=self.node_to_paste)

@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django_filters import rest_framework as filters
 from rest_framework import generics
@@ -36,6 +37,7 @@ from learning_unit.api.serializers.learning_unit import LearningUnitDetailedSeri
 class LearningUnitFilter(filters.FilterSet):
     acronym_like = filters.CharFilter(field_name="acronym", lookup_expr='icontains')
     year = filters.NumberFilter(field_name="academic_year__year")
+    campus = filters.CharFilter(field_name='campus__name', lookup_expr='icontains')
 
     class Meta:
         model = LearningUnitYear
@@ -47,7 +49,10 @@ class LearningUnitList(LanguageContextSerializerMixin, generics.ListAPIView):
        Return a list of all the learning unit with optional filtering.
     """
     name = 'learningunits_list'
-    queryset = LearningUnitYear.objects.filter(learning_container_year__isnull=False).select_related(
+    queryset = LearningUnitYear.objects.filter(
+        Q(learning_container_year__isnull=False) &
+        (Q(externallearningunityear__mobility=False) | Q(externallearningunityear__isnull=True))
+    ).select_related(
         'academic_year',
         'learning_container_year'
     ).prefetch_related(

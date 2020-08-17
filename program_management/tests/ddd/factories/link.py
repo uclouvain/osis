@@ -43,6 +43,8 @@ class LinkFactory(factory.Factory):
     is_mandatory = FuzzyBoolean()
     order = None
     block = factory.LazyFunction(_generate_block_value)
+    comment = factory.fuzzy.FuzzyText(length=50)
+    comment_english = factory.fuzzy.FuzzyText(length=50)
     link_type = None
 
     @factory.post_generation

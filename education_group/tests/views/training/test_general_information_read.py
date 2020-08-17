@@ -33,7 +33,7 @@ from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.factories.user import UserFactory
 from program_management.ddd.domain.node import NodeGroupYear
-from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
+from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory
 
 
@@ -41,7 +41,7 @@ class TestTrainingReadGeneralInformation(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.person = PersonWithPermissionsFactory('view_educationgroup')
-        cls.training_version = EducationGroupVersionFactory(
+        cls.training_version = StandardEducationGroupVersionFactory(
             offer__acronym="DROI2M",
             offer__partial_acronym="LDROI200M",
             offer__academic_year__year=2019,
@@ -107,8 +107,7 @@ class TestTrainingReadGeneralInformation(TestCase):
         self.assertEqual(response.context['group_year'], self.training_version.root_group)
         expected_update_label_url = reverse('education_group_pedagogy_edit', args=[
             self.training_version.offer_id,
-            self.training_version.offer_id,
-        ])
+        ]) + "?path=" + str(self.training_version.root_group.element.pk)
         self.assertEqual(response.context['update_label_url'], expected_update_label_url)
         expected_publish_url = reverse(
             'publish_general_information', args=["2019", "LDROI200M"]

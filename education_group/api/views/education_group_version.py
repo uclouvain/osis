@@ -29,7 +29,8 @@ from rest_framework.generics import get_object_or_404
 
 from backoffice.settings.rest_framework.common_views import LanguageContextSerializerMixin
 from base.models.education_group_year import EducationGroupYear
-from education_group.api.serializers.education_group_version import TrainingVersionListSerializer
+from education_group.api.serializers.education_group_version import TrainingVersionListSerializer, \
+    MiniTrainingVersionListSerializer
 from program_management.models.education_group_version import EducationGroupVersion
 
 
@@ -45,6 +46,26 @@ class TrainingVersionList(LanguageContextSerializerMixin, generics.ListAPIView):
     """
     name = 'training_versions_list'
     serializer_class = TrainingVersionListSerializer
+    filterset_class = VersionFilter
+    search_fields = (
+        'version_name',
+    )
+
+    def get_queryset(self):
+        education_group_year = get_object_or_404(
+            EducationGroupYear.objects.all(),
+            acronym=self.kwargs['acronym'].upper(),
+            academic_year__year=self.kwargs['year']
+        )
+        return EducationGroupVersion.objects.filter(offer=education_group_year, is_transition=False)
+
+
+class MiniTrainingVersionList(LanguageContextSerializerMixin, generics.ListAPIView):
+    """
+       Return a list of all version of the mini training.
+    """
+    name = 'mini_training_versions_list'
+    serializer_class = MiniTrainingVersionListSerializer
     filterset_class = VersionFilter
     search_fields = (
         'version_name',

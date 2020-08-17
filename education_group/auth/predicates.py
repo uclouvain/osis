@@ -28,8 +28,8 @@ def are_all_minitrainings_removable(self, user, education_group_year):
 
 
 @predicate(bind=True)
-def are_all_groups_removable(self, user, education_group_year):
-    groups = education_group_year.education_group.educationgroupyear_set.all()
+def are_all_groups_removable(self, user, group_year):
+    groups = group_year.group.groupyear_set.all()
     return _are_all_removable(self, user, groups, 'base.delete_group')
 
 
@@ -107,50 +107,6 @@ def is_program_edition_period_open(self, user, education_group_year=None):
 @predicate(bind=True)
 def is_continuing_education_group_year(self, user, education_group_year=None):
     return education_group_year and education_group_year.is_continuing_education_education_group_year
-
-
-@predicate(bind=True)
-def is_maximum_child_not_reached_for_group_category(self, user, education_group_year=None):
-    if education_group_year:
-        return _is_maximum_child_not_reached_for_category(self, user, education_group_year, Categories.GROUP.name)
-    return None
-
-
-@predicate(bind=True)
-def is_maximum_child_not_reached_for_training_category(self, user, education_group_year=None):
-    if education_group_year:
-        return _is_maximum_child_not_reached_for_category(self, user, education_group_year, Categories.TRAINING.name)
-    return None
-
-
-@predicate(bind=True)
-def is_maximum_child_not_reached_for_mini_training_category(self, user, education_group_year=None):
-    if education_group_year:
-        return _is_maximum_child_not_reached_for_category(self, user, education_group_year,
-                                                          Categories.MINI_TRAINING.name)
-    return None
-
-
-def _is_maximum_child_not_reached_for_category(self, user, education_group_year, category):
-    result = EducationGroupType.objects.filter(
-        category=category,
-        authorized_child_type__parent_type__educationgroupyear=education_group_year
-    ).exists()
-
-    if not result:
-        message = pgettext(
-            "female" if education_group_year.education_group_type.category in [
-                Categories.TRAINING,
-                Categories.MINI_TRAINING
-            ] else "male",
-            "No type of %(child_category)s can be created as child of %(category)s of type %(type)s"
-        ) % {
-            "child_category": Categories[category].name,
-            "category": education_group_year.education_group_type.get_category_display(),
-            "type": education_group_year.education_group_type.get_name_display(),
-        }
-        errors.set_permission_error(user, self.context['perm_name'], message)
-    return result
 
 
 @predicate(bind=True)

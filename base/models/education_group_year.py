@@ -30,8 +30,6 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models, connection
 from django.db.models import Count, Min, When, Case, Max
-from django.db.models.signals import post_delete
-from django.dispatch.dispatcher import receiver
 from django.urls import reverse
 from django.utils import translation
 from django.utils.functional import cached_property
@@ -51,8 +49,6 @@ from base.models.enums.funding_codes import FundingCodes
 from base.models.enums.offer_enrollment_state import SUBSCRIBED, PROVISORY
 from base.models.exceptions import MaximumOneParentAllowedException, ValidationWarning
 from base.models.validation_rule import ValidationRule
-from cms.enums.entity_name import OFFER_YEAR
-from cms.models.translated_text import TranslatedText
 from osis_common.models.serializable_model import SerializableModel, SerializableModelManager, SerializableModelAdmin, \
     SerializableQuerySet
 from osis_common.utils.models import get_object_or_none
@@ -560,8 +556,8 @@ class EducationGroupYear(SerializableModel):
     )
 
     co_graduation_coefficient = models.DecimalField(
-        max_digits=5,
-        decimal_places=2,
+        max_digits=7,
+        decimal_places=4,
         verbose_name=_('Co-graduation total coefficient'),
         blank=True,
         null=True,
@@ -591,7 +587,8 @@ class EducationGroupYear(SerializableModel):
         verbose_name = _("Education group year")
         unique_together = (
             ('education_group', 'academic_year'),
-            ('partial_acronym', 'academic_year')
+            ('partial_acronym', 'academic_year'),
+            ('acronym', 'academic_year'),
         )
 
     def __str__(self):
@@ -984,6 +981,14 @@ def search(**kwargs):
     return qs.select_related('education_group_type', 'academic_year')
 
 
+def have_link_with_epc(acronym: str, year: int) -> bool:
+    return EducationGroupYear.objects.filter(
+        acronym=acronym,
+        academic_year__year=year,
+        linked_with_epc=True
+    ).exists()
+
+
 # TODO :: Annotate/Count() in only 1 query instead of 2
 # TODO :: Count() on category_type == MINI_TRAINING will be in the future in another field FK (or other table).
 def find_with_enrollments_count(learning_unit_year):
@@ -1005,8 +1010,3 @@ def _find_with_learning_unit_enrollment_count(learning_unit_year):
     return EducationGroupYear.objects \
         .filter(offerenrollment__learningunitenrollment__learning_unit_year_id=learning_unit_year) \
         .annotate(count_learning_unit_enrollments=Count('offerenrollment__learningunitenrollment')).order_by('acronym')
-
-
-@receiver(post_delete, sender=EducationGroupYear)
-def _educationgroupyear_delete(sender, instance, **kwargs):
-    TranslatedText.objects.filter(entity=OFFER_YEAR, reference=instance.id).delete()

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -38,13 +38,15 @@ from django.utils.translation import gettext as _
 from waffle.testutils import override_flag
 
 from attribution.tests.factories.attribution import AttributionFactory
-from attribution.views.manage_my_courses import list_my_attributions_summary_editable, view_educational_information
+from attribution.views.manage_my_courses import list_my_attributions_summary_editable, view_educational_information, \
+    _fetch_achievements_by_language
 from base.models.enums import academic_calendar_type
 from base.models.enums.entity_type import FACULTY
 from base.models.enums.learning_unit_year_subtypes import FULL
 from base.tests.factories.academic_calendar import AcademicCalendarFactory, OpenAcademicCalendarFactory
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
+from base.tests.factories.learning_achievement import LearningAchievementFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
@@ -52,6 +54,7 @@ from base.tests.factories.teaching_material import TeachingMaterialFactory
 from base.tests.factories.tutor import TutorFactory
 from base.tests.factories.utils.get_messages import get_messages_from_response
 from osis_common.utils.perms import BasePerm
+from reference.tests.factories.language import FrenchLanguageFactory, EnglishLanguageFactory
 
 
 class ManageMyCoursesViewTestCase(TestCase):
@@ -221,6 +224,23 @@ class TestViewEducationalInformation(TestCase):
         self.assertEqual(context['update_teaching_material_urlname'], 'tutor_teaching_material_edit')
         self.assertEqual(context['delete_teaching_material_urlname'], 'tutor_teaching_material_delete')
         self.assertEqual(context['update_mobility_modality_urlname'], 'tutor_mobility_modality_update')
+
+
+class TestFetchAchievement(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        fr = FrenchLanguageFactory()
+        en = EnglishLanguageFactory()
+        cls.learning_unit_year = LearningUnitYearFactory()
+        cls.achievement_fr = LearningAchievementFactory(language=fr, learning_unit_year=cls.learning_unit_year)
+        cls.achievement_en = LearningAchievementFactory(language=en, learning_unit_year=cls.learning_unit_year)
+
+    def test_return_an_iterable_of_fr_and_en_achievements(self):
+        result = _fetch_achievements_by_language(self.learning_unit_year)
+        self.assertListEqual(
+            list(result),
+            list(zip([self.achievement_fr], [self.achievement_en]))
+        )
 
 
 class TestManageEducationalInformation(TestCase):

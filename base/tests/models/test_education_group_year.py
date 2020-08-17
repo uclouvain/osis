@@ -25,6 +25,7 @@
 ##############################################################################
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.db import IntegrityError
 from django.test import TestCase, override_settings
 from django.utils.translation import gettext_lazy as _
 
@@ -44,9 +45,8 @@ from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollment
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.offer_enrollment import OfferEnrollmentFactory
 from base.tests.factories.offer_year import OfferYearFactory
-from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
-from cms.tests.factories.translated_text import TranslatedTextFactory
+from cms.tests.factories.translated_text import OfferTranslatedTextFactory
 
 
 class EducationGroupYearTest(TestCase):
@@ -267,17 +267,38 @@ class EducationGroupYearTest(TestCase):
     def test_verbose_title_en_partial_title_empty(self):
         self.assertEqual(self.education_group_year_MD_no_partial_title.verbose_title, "")
 
+    def test_unique_on_acronym_academic_year(self):
+        EducationGroupYearFactory(acronym="BOR1BA",
+                                  academic_year=self.academic_year)
+        with self.assertRaises(IntegrityError):
+            EducationGroupYearFactory(acronym="BOR1BA",
+                                      academic_year=self.academic_year)
+
 
 class EducationGroupYearCleanTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory(year=2019)
+
     def test_clean_constraint_both_value_set_case_no_errors(self):
-        e = EducationGroupYearFactory(min_constraint=12, max_constraint=20, constraint_type=CREDITS)
+        e = EducationGroupYearFactory(
+            min_constraint=12,
+            max_constraint=20,
+            constraint_type=CREDITS,
+            academic_year=self.academic_year,
+        )
         try:
             e.clean()
         except ValidationError:
             self.fail()
 
     def test_clean_constraint_only_one_value_set_case_no_errors(self):
-        e = EducationGroupYearFactory(min_constraint=12, max_constraint=None, constraint_type=CREDITS)
+        e = EducationGroupYearFactory(
+            min_constraint=12,
+            max_constraint=None,
+            constraint_type=CREDITS,
+            academic_year=self.academic_year,
+        )
         try:
             e.clean()
         except ValidationError:
@@ -425,13 +446,15 @@ class TestCleanAcronym(TestCase):
             e.clean_acronym(raise_warnings=True)
 
     def test_raise_validation_acronym_invalid(self):
-        random_acronym = string_generator()
+        acronyms = []
+        for acronym in range(0, 3):
+            acronyms.append(string_generator())
         external_ids = ['osis.education_group_type_2M180',
                         'osis.education_group_type_2M1',
                         'osis.education_group_type_3DP']
-        for ext_id in external_ids:
+        for idx, ext_id in enumerate(external_ids):
             with self.subTest(type=ext_id):
-                e = TrainingFactory(acronym=random_acronym,
+                e = TrainingFactory(acronym=acronyms[idx],
                                     academic_year=self.current_acy,
                                     education_group_type__external_id=ext_id)
                 with self.assertRaises(ValidationError):
@@ -550,8 +573,7 @@ class EducationGroupYearDeleteCms(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.education_group_year = EducationGroupYearFactory()
-        cls.translated_text = TranslatedTextFactory(entity=entity_name.OFFER_YEAR,
-                                                    reference=cls.education_group_year.id)
+        cls.translated_text = OfferTranslatedTextFactory(reference=cls.education_group_year.id)
 
         cls.education_group_year_no_cms = EducationGroupYearFactory()
 

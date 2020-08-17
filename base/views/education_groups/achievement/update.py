@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ############################################################################
+import functools
+
 from django.conf import settings
 from django.contrib.messages.views import SuccessMessageMixin
 from django.db.models import Prefetch
@@ -35,10 +37,6 @@ from django.views.generic import FormView, UpdateView
 
 from base.business.education_groups.general_information_sections import CMS_LABEL_PROGRAM_AIM, \
     CMS_LABEL_ADDITIONAL_INFORMATION
-from education_group.ddd.domain.service.identity_search import TrainingIdentitySearch
-from education_group.views.proxy.read import Tab
-from osis_role.contrib.views import PermissionRequiredMixin
-
 from base.forms.education_group.achievement import ActionForm, EducationGroupAchievementForm, \
     EducationGroupDetailedAchievementForm, EducationGroupAchievementCMSForm
 from base.models.education_group_year import EducationGroupYear
@@ -49,6 +47,10 @@ from base.views.mixins import AjaxTemplateMixin
 from cms.enums import entity_name
 from cms.models import translated_text
 from cms.models.text_label import TextLabel
+from education_group.ddd.domain.service.identity_search import TrainingIdentitySearch
+from education_group.views.proxy.read import Tab
+from osis_role.contrib.views import PermissionRequiredMixin
+from program_management.models.element import Element
 
 
 class EducationGroupAchievementAction(EducationGroupAchievementMixin, FormView):
@@ -71,6 +73,14 @@ class EducationGroupAchievementAction(EducationGroupAchievementMixin, FormView):
     def get_permission_object(self):
         return self.get_object().education_group_year
 
+    def get_success_url(self):
+        prefix = 'training_' if self.education_group_year.is_training() else 'mini_training_'
+        return reverse(
+            prefix + 'skills_achievements', args=[self.kwargs['year'], self.kwargs['code']]
+        ) + '?path={}&tab={}#achievement_{}'.format(
+            self.request.GET['path'], Tab.SKILLS_ACHIEVEMENTS, self.kwargs['education_group_achievement_pk']
+        )
+
 
 class UpdateEducationGroupAchievement(PermissionRequiredMixin, AjaxTemplateMixin, EducationGroupAchievementMixin,
                                       UpdateView):
@@ -78,6 +88,7 @@ class UpdateEducationGroupAchievement(PermissionRequiredMixin, AjaxTemplateMixin
     form_class = EducationGroupAchievementForm
     permission_required = 'base.change_educationgroupachievement'
     raise_exception = True
+    force_reload = True
 
     def get_permission_object(self):
         return self.get_object().education_group_year
@@ -85,11 +96,23 @@ class UpdateEducationGroupAchievement(PermissionRequiredMixin, AjaxTemplateMixin
 
 class UpdateEducationGroupDetailedAchievement(EducationGroupDetailedAchievementMixin, UpdateEducationGroupAchievement):
     form_class = EducationGroupDetailedAchievementForm
+    force_reload = True
+
+    def get_permission_object(self):
+        return self.education_group_achievement.education_group_year
 
 
 class EducationGroupDetailedAchievementAction(EducationGroupDetailedAchievementMixin, EducationGroupAchievementAction):
     def get_permission_object(self):
         return self.education_group_achievement.education_group_year
+
+    def get_success_url(self):
+        prefix = 'training_' if self.education_group_year.is_training() else 'mini_training_'
+        return reverse(
+            prefix + 'skills_achievements', args=[self.kwargs['year'], self.kwargs['code']]
+        ) + '?path={}&tab={}#detail_achievements_{}'.format(
+            self.request.GET['path'], Tab.SKILLS_ACHIEVEMENTS, self.kwargs['education_group_detail_achievement_pk']
+        )
 
 
 class EducationGroupAchievementCMS(PermissionRequiredMixin, SuccessMessageMixin, AjaxTemplateMixin, FormView):
@@ -99,6 +122,14 @@ class EducationGroupAchievementCMS(PermissionRequiredMixin, SuccessMessageMixin,
     # PermissionRequiredMixin
     permission_required = 'base.change_educationgroupachievement'
     raise_exception = True
+
+    @functools.lru_cache()
+    def get_path(self) -> str:
+        path = self.request.GET.get('path')
+        if path is None:
+            root_element = Element.objects.get(group_year__educationgroupversion__offer_id=self.kwargs['offer_id'])
+            path = str(root_element.pk)
+        return path
 
     @cached_property
     def education_group_year(self):
@@ -121,7 +152,7 @@ class EducationGroupAchievementCMS(PermissionRequiredMixin, SuccessMessageMixin,
         return reverse(
             'education_group_read_proxy',
             args=[training_identity.year, training_identity.acronym]
-        ) + '?tab={}'.format(Tab.SKILLS_ACHIEVEMENTS)
+        ) + '?path={}&tab={}#achievement_'.format(self.get_path(), Tab.SKILLS_ACHIEVEMENTS)
 
     def get_initial(self):
         initial = super().get_initial()
@@ -154,6 +185,10 @@ class EducationGroupAchievementProgramAim(EducationGroupAchievementCMS):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["translated_label"] = _('the program aims')
+        context["url_action"] = reverse(
+            'education_group_achievement_program_aim',
+            args=[self.kwargs["offer_id"], self.kwargs["offer_id"]]
+        ) + '?path={}&tab={}#achievement_'.format(self.request.GET['path'], Tab.SKILLS_ACHIEVEMENTS)
         return context
 
     # SuccessMessageMixin
@@ -173,6 +208,10 @@ class EducationGroupAchievementAdditionalInformation(EducationGroupAchievementCM
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["translated_label"] = _('additional informations')
+        context["url_action"] = reverse(
+            'education_group_achievement_additional_information',
+            args=[self.kwargs["offer_id"], self.kwargs["offer_id"]]
+        ) + '?path={}&tab={}#achievement_'.format(self.request.GET['path'], Tab.SKILLS_ACHIEVEMENTS)
         return context
 
     # SuccessMessageMixin

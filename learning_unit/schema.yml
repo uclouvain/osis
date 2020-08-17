@@ -49,6 +49,11 @@ paths:
         name: lang
         schema:
           type: string
+      - in: query
+        name: campus
+        schema:
+          description: ''
+          type: string
       responses:
         '200':
           description: OK
@@ -592,6 +597,9 @@ components:
         academic_year:
           type: number
           example: 2014
+        learning_unit_credits:
+          type: number
+          multipleOf: 0.01
     LearningUnitAchievement:
       type: object
       properties:

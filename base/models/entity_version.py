@@ -42,7 +42,7 @@ from reversion.admin import VersionAdmin
 from base.models.entity import Entity
 from base.models.enums import entity_type
 from base.models.enums.entity_type import PEDAGOGICAL_ENTITY_TYPES
-from base.models.enums.organization_type import MAIN
+from base.models.enums.organization_type import ACADEMIC_PARTNER, MAIN
 from base.models.utils.func import ArrayConcat
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 from osis_common.utils.datetime import get_tzinfo
@@ -257,6 +257,19 @@ class EntityVersionQuerySet(CTEQuerySet):
             Q(entity_type__in=PEDAGOGICAL_ENTITY_TYPES) | Q(acronym__in=PEDAGOGICAL_ENTITY_ADDED_EXCEPTIONS),
         )
 
+    @property
+    def of_main_organization(self):
+        return self.filter(entity__organization__type=MAIN)
+
+    @property
+    def of_active_academic_partner(self):
+        return self.filter(
+            entity__organization__type=ACADEMIC_PARTNER,
+            # The two following check for active root entity
+            parent__isnull=True,
+            end_date__isnull=True,
+        )
+
 
 class EntityVersionManager(CTEManager.from_queryset(EntityVersionQuerySet)):
     use_in_migrations = True
@@ -448,15 +461,9 @@ def find(acronym, date=None):
     if date is None:
         date = timezone.now()
     try:
-        entity_version = EntityVersion.objects.get(
-            acronym=acronym,
-            start_date__lte=date,
-            end_date__gte=date
-        )
+        return EntityVersion.objects.current(date).get(acronym=acronym)
     except EntityVersion.DoesNotExist:
         return None
-
-    return entity_version
 
 
 def find_latest_version(date) -> EntityVersionQuerySet:
@@ -655,3 +662,10 @@ def find_entity_version_according_academic_year(an_entity, an_academic_year):
         Q(entity=an_entity, start_date__lte=an_academic_year.end_date),
         Q(end_date__isnull=True) | Q(end_date__gt=an_academic_year.end_date)
     ).last()
+
+
+def find_by_acronym_and_year(acronym: str, year: int):
+    return EntityVersion.objects.filter(
+        Q(acronym=acronym, start_date__year__lte=year),
+        Q(end_date__isnull=True) | Q(end_date__year__gt=year)
+    ).order_by('start_date').last()

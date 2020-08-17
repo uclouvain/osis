@@ -32,30 +32,6 @@ from program_management.tests.ddd.factories.authorized_relationship import Autho
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 
 
-class TestInit(SimpleTestCase):
-    def test_normal_usage(self):
-        auth_relations = [AuthorizedRelationshipObjectFactory()]
-        result = AuthorizedRelationshipList(auth_relations)
-        self.assertEqual(auth_relations, result.authorized_relationships)
-
-    def test_when_authorized_relationships_arg_is_none(self):
-        with self.assertRaises(AssertionError):
-            AuthorizedRelationshipList(None)
-
-    def test_when_authorized_relationships_arg_is_not_a_list(self):
-        with self.assertRaises(AssertionError):
-            AuthorizedRelationshipList("I'm not a list")
-
-    def test_when_authorized_relationships_arg_is_empty(self):
-        with self.assertRaises(AssertionError):
-            AuthorizedRelationshipList([])
-
-    def test_when_authorized_relationships_arg_is_wrong_instance(self):
-        with self.assertRaises(AssertionError):
-            wrong_instance = NodeGroupYearFactory()
-            AuthorizedRelationshipList([wrong_instance])
-
-
 class TestGetAuthorizedRelationship(SimpleTestCase):
 
     def setUp(self):
@@ -166,3 +142,45 @@ class TestGetAuthorizedChildrenTypes(SimpleTestCase):
             another_authorized_child.node_type
         }
         self.assertSetEqual(expected_result, result)
+
+
+class TestGetOrderedMandatoryChildrenTypes(SimpleTestCase):
+
+    def setUp(self):
+        self.parent_type = TrainingType.PGRM_MASTER_120
+        self.common_core_relation = AuthorizedRelationshipObjectFactory(
+            parent_type=self.parent_type, child_type=GroupType.COMMON_CORE, min_constraint=1
+        )
+        self.option_list_relation = AuthorizedRelationshipObjectFactory(
+            parent_type=self.parent_type, child_type=GroupType.OPTION_LIST_CHOICE, min_constraint=1
+        )
+        self.finality_list_relation = AuthorizedRelationshipObjectFactory(
+            parent_type=self.parent_type, child_type=GroupType.FINALITY_120_LIST_CHOICE, min_constraint=1
+        )
+
+    def test_ordering(self):
+
+        wrong_order = [self.option_list_relation, self.finality_list_relation, self.common_core_relation]
+        authorized_relations = AuthorizedRelationshipList(wrong_order)
+
+        result = authorized_relations.get_ordered_mandatory_children_types(self.parent_type)
+        expected_order = [
+            self.common_core_relation.child_type,
+            self.finality_list_relation.child_type,
+            self.option_list_relation.child_type
+        ]
+        self.assertListEqual(result, expected_order)
+
+    def test_when_relation_min_authorized_is_0(self):
+        other_relation = AuthorizedRelationshipObjectFactory(
+            parent_type=self.parent_type, child_type=GroupType.SUB_GROUP, min_constraint=0
+        )
+        authorized_relations = AuthorizedRelationshipList([other_relation])
+        self.assertListEqual([], authorized_relations.get_ordered_mandatory_children_types(self.parent_type))
+
+    def test_when_relation_is_with_learning_unit(self):
+        other_relation = AuthorizedRelationshipObjectFactory(
+            parent_type=self.parent_type, child_type=NodeType.LEARNING_UNIT, min_constraint=1
+        )
+        authorized_relations = AuthorizedRelationshipList([other_relation])
+        self.assertListEqual([], authorized_relations.get_ordered_mandatory_children_types(self.parent_type))
