@@ -30,9 +30,7 @@ from django.utils.translation import gettext_lazy as _
 from base.forms.utils.choice_field import BLANK_CHOICE
 from base.models import academic_year
 from base.models.academic_year import compute_max_academic_year_adjournment
-from program_management.ddd.command import CreateProgramTreeVersionCommand
-from program_management.ddd.service.write import create_program_tree_version_service, \
-    create_and_postpone_tree_version_service
+from education_group.ddd.business_types import *
 
 
 class SpecificVersionForm(forms.Form):
@@ -59,42 +57,17 @@ class SpecificVersionForm(forms.Form):
         label=_('This version exists until'),
     )
 
-    def __init__(self, *args, **kwargs):
-        self.save_type = kwargs.pop('save_type')
-        self.education_group_years_list = []
-        self.education_group_year = kwargs.pop('education_group_year')
-        self.max_year = academic_year.find_academic_year_by_year(compute_max_academic_year_adjournment() + 1).year
-        choices_years = [(x, x) for x in range(self.education_group_year.academic_year.year, self.max_year)]
+    def __init__(self, training_identity: 'TrainingIdentity', *args, **kwargs):
+        self.training_identity = training_identity
         super().__init__(*args, **kwargs)
+
+        self.__init_academic_year_choices()
+
+    def __init_academic_year_choices(self):
+        max_year = academic_year.find_academic_year_by_year(compute_max_academic_year_adjournment() + 1).year
+        choices_years = [(x, x) for x in range(self.training_identity.year, max_year)]
         self.fields["end_year"].choices = BLANK_CHOICE + choices_years
 
     def clean_end_year(self):
         end_year = self.cleaned_data["end_year"]
         return int(end_year) if end_year else None
-
-    def save(self):
-        command = CreateProgramTreeVersionCommand(
-            offer_acronym=self.education_group_year.acronym,
-            version_name=self.cleaned_data.get("version_name").upper(),
-            year=self.education_group_year.academic_year.year,
-            is_transition=False,
-            title_en=self.cleaned_data.get("title_english"),
-            title_fr=self.cleaned_data.get("title"),
-            end_year=self.cleaned_data.get("end_year"),
-        )
-        if self.save_type == "new_version":
-            identities = create_and_postpone_tree_version_service.create_and_postpone(command=command)
-        elif self.save_type == "extend":
-            identities = create_program_tree_version_service.create_and_postpone_from_past_version(command=command)
-        messages = []
-        for created_identity in identities:
-            messages.append(
-                _(
-                    "Specific version for education group year %(offer_acronym)s[%(acronym)s] (%(academic_year)s) "
-                    "successfully created."
-                ) % {
-                    "offer_acronym": self.education_group_year.acronym,
-                    "acronym": created_identity.version_name,
-                    "academic_year": academic_year.find_academic_year_by_year(created_identity.year)
-                })
-        self.cleaned_data["messages"] = messages

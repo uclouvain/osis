@@ -23,12 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
 
-from django.contrib.messages.views import SuccessMessageMixin
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils.functional import cached_property
-from django.views.generic import CreateView
+from django.utils.translation import gettext_lazy as _
+from django.views.generic.base import View
 
 from base.forms.education_group.version import SpecificVersionForm
 from base.models.education_group_year import EducationGroupYear
@@ -36,11 +37,16 @@ from base.views.common import display_success_messages
 from base.views.mixins import AjaxTemplateMixin
 from education_group.ddd.domain.service.identity_search import TrainingIdentitySearch
 from education_group.ddd.domain.training import TrainingIdentity
+from education_group.templatetags.academic_year_display import display_as_academic_year
 from osis_role.contrib.views import AjaxPermissionRequiredMixin
+from program_management.ddd.business_types import *
+from program_management.ddd.command import CreateProgramTreeVersionCommand
 from program_management.ddd.domain.node import NodeIdentity
+from program_management.ddd.service.write import create_and_postpone_tree_version_service, \
+    create_program_tree_version_service
 
 
-class CreateProgramTreeVersion(AjaxPermissionRequiredMixin, SuccessMessageMixin, AjaxTemplateMixin, CreateView):
+class CreateProgramTreeVersion(AjaxPermissionRequiredMixin, AjaxTemplateMixin, View):
     template_name = "tree_version/create_specific_version_inner.html"
     form_class = SpecificVersionForm
     permission_required = 'base.add_programtreeversion'
@@ -65,29 +71,40 @@ class CreateProgramTreeVersion(AjaxPermissionRequiredMixin, SuccessMessageMixin,
             acronym=self.kwargs['code'],
         )
 
+    def get(self, request, *args, **kwargs):
+        form = SpecificVersionForm(
+            training_identity=self.training_identity
+        )
+        return render(request, self.template_name, self.get_context_data(form))
+
+    def post(self, request, *args, **kwargs):
+        form = SpecificVersionForm(
+            data=request.POST,
+            training_identity=self.training_identity
+        )
+        if form.is_valid():
+            command = _convert_form_to_command(form)
+            save_type = self.request.POST.get("save_type")
+
+            identities = []
+            if save_type == "new_version":
+                identities = create_and_postpone_tree_version_service.create_and_postpone(command=command)
+            elif save_type == "extend":
+                identities = create_program_tree_version_service.create_and_postpone_from_past_version(command=command)
+
+            self._display_success_messages(identities)
+
+        return render(request, self.template_name, self.get_context_data(form))
+
     def _call_rule(self, rule):
         return rule(self.person, self.education_group_year)
 
-    def get_form_kwargs(self):
-        form_kwargs = super().get_form_kwargs()
-        form_kwargs["save_type"] = self.request.POST.get("save_type")
-        form_kwargs['education_group_year'] = self.education_group_year
-        form_kwargs.pop('instance')
-        return form_kwargs
-
-    def get_context_data(self, **kwargs):
-        context = super(CreateProgramTreeVersion, self).get_context_data(**kwargs)
-        context['training_identity'] = self.training_identity
-        context['node_identity'] = self.node_identity
-        context['form'] = self.get_form()
-        return context
-
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        return response
-
-    def get_success_message(self, cleaned_data):
-        display_success_messages(self.request, cleaned_data["messages"])
+    def get_context_data(self, form: SpecificVersionForm):
+        return {
+            'training_identity': self.training_identity,
+            'node_identity': self.node_identity,
+            'form': form,
+        }
 
     def get_success_url(self):
         return reverse(
@@ -97,3 +114,30 @@ class CreateProgramTreeVersion(AjaxPermissionRequiredMixin, SuccessMessageMixin,
                 self.education_group_year.partial_acronym,
             ]
         )
+
+    def _display_success_messages(self, identities: List['ProgramTreeVersionIdentity']):
+        success_messages = []
+        for created_identity in identities:
+            success_messages.append(
+                _(
+                    "Specific version for education group year %(offer_acronym)s[%(acronym)s] (%(academic_year)s) "
+                    "successfully created."
+                ) % {
+                    "offer_acronym": created_identity.offer_acronym,
+                    "acronym": created_identity.version_name,
+                    "academic_year": display_as_academic_year(created_identity.year)
+                }
+            )
+        display_success_messages(self.request, success_messages, extra_tags='safe')
+
+
+def _convert_form_to_command(form: SpecificVersionForm) -> CreateProgramTreeVersionCommand:
+    return CreateProgramTreeVersionCommand(
+        offer_acronym=form.training_identity.acronym,
+        version_name=form.cleaned_data.get("version_name").upper(),
+        year=form.training_identity.year,
+        is_transition=False,
+        title_en=form.cleaned_data.get("title_english"),
+        title_fr=form.cleaned_data.get("title"),
+        end_year=form.cleaned_data.get("end_year"),
+    )
