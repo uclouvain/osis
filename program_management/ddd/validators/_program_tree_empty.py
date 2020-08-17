@@ -34,4 +34,4 @@ class ProgramTreeEmptyValidator(business_validator.BusinessValidator):
 
     def validate(self):
         if not self.program_tree.is_empty():
-            raise exception.ProgramTreeNotEmptyException(self.program_tree)
+            raise exception.ProgramTreeNonEmpty(self.program_tree)
