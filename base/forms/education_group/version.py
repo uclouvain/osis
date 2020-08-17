@@ -89,7 +89,12 @@ class SpecificVersionForm(forms.Form):
         messages = []
         for created_identity in identities:
             messages.append(
-                _("Specific version for education group year %(acronym)s (%(academic_year)s) successfully created.") % {
+                _(
+                    "Specific version for education group year %(offer_acronym)s[%(acronym)s] (%(academic_year)s) "
+                    "successfully created."
+                ) % {
+                    "offer_acronym": self.education_group_year.acronym,
                     "acronym": created_identity.version_name,
-                    "academic_year": academic_year.find_academic_year_by_year(created_identity.year)})
+                    "academic_year": academic_year.find_academic_year_by_year(created_identity.year)
+                })
         self.cleaned_data["messages"] = messages

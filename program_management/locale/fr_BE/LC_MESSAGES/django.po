@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-06 14:46+0200\n"
+"POT-Creation-Date: 2020-08-17 15:58+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -268,6 +268,9 @@ msgstr "Catalogue des formations"
 msgid "Formations"
 msgstr "Formations"
 
+msgid "Group"
+msgstr ""
+
 msgid "IMPOSSIBLE TO DISPLAY BECAUSE OF AN ILLEGAL CHARACTER IN STRING"
 msgstr ""
 
@@ -292,6 +295,12 @@ msgid "Language"
 msgstr "Langue"
 
 msgid "Learning achievements"
+msgstr "Unités d'enseignement"
+
+msgid "Learning class year"
+msgstr "Unités d'enseignement"
+
+msgid "Learning unit year"
 msgstr "Unités d'enseignement"
 
 msgid "Learning units"
@@ -369,8 +378,14 @@ msgstr "Nouveau Groupement"
 msgid "New Mini-Training"
 msgstr "Nouvelle Mini-Formation"
 
+msgid "New specific version"
+msgstr "Nouvelle version particulière"
+
 msgid "New training"
 msgstr "Nouvelle Formation"
+
+msgid "New version"
+msgstr "Nouvelle version"
 
 msgid "No"
 msgstr "Non"
@@ -502,6 +517,9 @@ msgstr "Légende proposition"
 
 msgid "Quadrimester"
 msgstr "Quadrimestre"
+
+msgid "Rattached to"
+msgstr ""
 
 msgid "Registration ID"
 msgstr "NOMA"
