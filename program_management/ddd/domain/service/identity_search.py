@@ -60,7 +60,9 @@ class ProgramTreeVersionIdentitySearch(interface.DomainService):
     ) -> List['ProgramTreeVersionIdentity']:
         """
             Return all program tree version identity across year (ordered by year)
-            of a specific program tree version
+            of a specific program tree version.
+
+            Business rules: An acronym can be different across year
         """
         values = EducationGroupVersion.objects.filter(
             root_group__group_id=Subquery(
