@@ -2308,7 +2308,7 @@ msgid ""
 "successfully created."
 msgstr ""
 "La version particulière de formations %(acronym)s (%(academic_year)s) à été "
-"supprimée avec succès."
+"créée avec succès."
 
 msgid "Specifications"
 msgstr "Cahier des charges"
