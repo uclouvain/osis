@@ -44,6 +44,8 @@ def duplicate_program_tree(
     # WHEN
     program_tree = ProgramTreeBuilder().duplicate(
         duplicate_from=existing_tree,
+        override_end_year_to=cmd.override_end_year_to,
+        override_start_year_to=cmd.override_start_year_to
     )
 
     # THEN

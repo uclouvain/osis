@@ -391,7 +391,13 @@ class GetProgramTreesVersionFromNodeCommand(interface.CommandRequest):
     year = attr.ib(type=int)
 
 
+# Necessary because 'None' is a correct value that could be used to override the default end date
+DO_NOT_OVERRIDE = -1
+
+
 @attr.s(frozen=True, slots=True)
 class DuplicateProgramTree(interface.CommandRequest):
     from_root_code = attr.ib(type=str)
     from_root_year = attr.ib(type=int)
+    override_end_year_to = attr.ib(type=int, default=DO_NOT_OVERRIDE)
+    override_start_year_to = attr.ib(type=int, default=DO_NOT_OVERRIDE)

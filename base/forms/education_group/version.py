@@ -68,6 +68,10 @@ class SpecificVersionForm(forms.Form):
         super().__init__(*args, **kwargs)
         self.fields["end_year"].choices = BLANK_CHOICE + choices_years
 
+    def clean_end_year(self):
+        end_year = self.cleaned_data["end_year"]
+        return int(end_year) if end_year else None
+
     def save(self):
         command = CreateProgramTreeVersionCommand(
             offer_acronym=self.education_group_year.acronym,

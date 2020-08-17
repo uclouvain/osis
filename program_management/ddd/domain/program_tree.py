@@ -35,6 +35,7 @@ from osis_common.ddd import interface
 from osis_common.decorators.deprecated import deprecated
 from program_management.ddd import command
 from program_management.ddd.business_types import *
+from program_management.ddd.command import DO_NOT_OVERRIDE
 from program_management.ddd.domain import prerequisite, exception
 from program_management.ddd.domain.link import factory as link_factory
 from program_management.ddd.domain.node import factory as node_factory, NodeIdentity, Node
@@ -60,7 +61,12 @@ class ProgramTreeIdentity(interface.EntityIdentity):
 
 class ProgramTreeBuilder:
 
-    def duplicate(self, duplicate_from: 'ProgramTree', end_year: int = None) -> 'ProgramTree':
+    def duplicate(
+            self,
+            duplicate_from: 'ProgramTree',
+            override_end_year_to: int = DO_NOT_OVERRIDE,
+            override_start_year_to: int = None
+    ) -> 'ProgramTree':
         """
         Generates a new program tree based on attributes from 'copy_from' program tree but with new nodes identities and
         new link identities.
@@ -68,7 +74,11 @@ class ProgramTreeBuilder:
         :param duplicate_from: The program tree from which are copied attributes in the new one.
         :return:
         """
-        copied_root = self._duplicate_root_and_direct_children(duplicate_from, end_year=end_year)
+        copied_root = self._duplicate_root_and_direct_children(
+            duplicate_from,
+            override_end_year_to=override_end_year_to,
+            override_start_year_to=override_start_year_to
+        )
         copied_tree = attr.evolve(  # Copy to new object
             duplicate_from,
             root_node=copied_root,
@@ -76,13 +86,26 @@ class ProgramTreeBuilder:
         )
         return copied_tree
 
-    def _duplicate_root_and_direct_children(self, program_tree: 'ProgramTree', end_year: int = None) -> 'Node':
+    def _duplicate_root_and_direct_children(
+            self,
+            program_tree: 'ProgramTree',
+            override_end_year_to: int = DO_NOT_OVERRIDE,
+            override_start_year_to: int = DO_NOT_OVERRIDE
+    ) -> 'Node':
         copy_from_node = program_tree.root_node
-        new_parent = node_factory.duplicate(copy_from_node, end_year=end_year)
+        new_parent = node_factory.duplicate(
+            copy_from_node,
+            override_end_year_to=override_end_year_to,
+            override_start_year_to=override_start_year_to
+        )
         mandatory_children_types = program_tree.get_ordered_mandatory_children_types(program_tree.root_node)
         for copy_from_link in [n for n in copy_from_node.children if n.child.node_type in mandatory_children_types]:
             child_node = copy_from_link.child
-            new_child = node_factory.duplicate(child_node)
+            new_child = node_factory.duplicate(
+                child_node,
+                override_end_year_to=override_end_year_to,
+                override_start_year_to=override_start_year_to
+            )
             copied_link = link_factory.duplicate(copy_from_link, new_parent, new_child)
             new_parent.children.append(copied_link)
         return new_parent
