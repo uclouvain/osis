@@ -75,7 +75,7 @@
         {% endif %}
         {% if group_year.education_group_type.category != "GROUP" %}
             <li>
-                {% url 'create_education_group_version' education_group_year.entity_id.year education_group_year.entity_id.acronym as create_version_url %}
+                {% url 'create_education_group_version' node.entity_id.year node.entity_id.code as create_version_url %}
                 {% a_tag_modal_has_perm create_version_url _('Create specific version') 'base.add_programtreeversion' user education_group_year %}
             </li>
         {% endif %}
