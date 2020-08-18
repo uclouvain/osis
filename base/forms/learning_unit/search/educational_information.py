@@ -24,13 +24,18 @@
 #
 ##############################################################################
 from django import forms
-from django.db.models import OuterRef, Case, When, Value, Subquery, BooleanField
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.postgres.fields import JSONField
+from django.db.models import OuterRef, Case, When, Value, Subquery, BooleanField, Q, Prefetch, CharField, DateTimeField
+from django.db.models.functions import Cast
 from django_filters import filters
+from reversion.models import Version
 
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY
 from base.forms.learning_unit.search.simple import LearningUnitFilter
 from base.models import entity_calendar
 from base.models.enums.academic_calendar_type import SUMMARY_COURSE_SUBMISSION
+from base.models.teaching_material import TeachingMaterial
 from base.views.learning_units.search.common import SearchTypes
 from cms.enums.entity_name import LEARNING_UNIT_YEAR
 from cms.models.translated_text import TranslatedText
@@ -57,16 +62,7 @@ class LearningUnitDescriptionFicheFilter(LearningUnitFilter):
             "learningcomponentyear_set",
         )
 
-        translated_text_qs = TranslatedText.objects.filter(
-            entity=LEARNING_UNIT_YEAR,
-            text_label__label__in=CMS_LABEL_PEDAGOGY,
-            changed__isnull=False,
-            reference=OuterRef('pk')
-        ).order_by("-changed")
-
-        return queryset.annotate(
-            last_translated_text_changed=Subquery(translated_text_qs.values('changed')[:1]),
-        )
+        return queryset
 
     @property
     def qs(self):
@@ -76,6 +72,7 @@ class LearningUnitDescriptionFicheFilter(LearningUnitFilter):
             queryset = queryset.select_related('learning_container_year__academic_year', 'academic_year')
         return queryset
 
+    #  TODO OSIS-4871 use reversion to know date of modification
     def _compute_summary_status(self, queryset):
         """
         This function will compute the summary status. First, we will take the entity calendar
@@ -87,6 +84,33 @@ class LearningUnitDescriptionFicheFilter(LearningUnitFilter):
             SUMMARY_COURSE_SUBMISSION,
         )
         requirement_entities_ids = queryset.values_list('learning_container_year__requirement_entity', flat=True)
+
+        reversion_subquery = Version.objects.filter(
+            object_id=OuterRef('id_varchar'),
+            revision__user__person__isnull=False
+        ).select_related(
+            "revision",
+        ).order_by(
+            "-revision__date_created"
+        )
+        translated_text_qs = TranslatedText.objects.filter(
+            entity=LEARNING_UNIT_YEAR,
+            text_label__label__in=CMS_LABEL_PEDAGOGY,
+            changed__isnull=False,
+            reference=OuterRef('pk')
+        ).annotate(
+            id_varchar=Cast('id', output_field=CharField())
+        ).annotate(
+            last_changed=Subquery(reversion_subquery.values('revision__date_created')[:1], output_field=DateTimeField())
+        ).values(
+            'last_changed'
+        ).order_by(
+            "-last_changed"
+        )
+
+        queryset = queryset.annotate(
+            last_translated_text_changed=Subquery(translated_text_qs[:1], output_field=DateTimeField())
+        )
 
         summary_status_case_statment = [When(last_translated_text_changed__isnull=True, then=False)]
         for requirement_entity_id in set(requirement_entities_ids):
