@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.db.models import Case, When, Value, F, CharField
 from django_filters import rest_framework as filters
 from rest_framework import generics
 from rest_framework.generics import get_object_or_404
@@ -110,10 +111,23 @@ class TrainingDetail(LanguageContextSerializerMixin, generics.RetrieveAPIView):
             ).prefetch_related(
                 'administration_entity__entityversion_set',
                 'management_entity__entityversion_set',
+            ).annotate(
+                domain_code=Case(
+                    When(main_domain=None, then=Value(None)),
+                    default=F('main_domain__code'),
+                    output_field=CharField()
+                ),
+                domain_name=Case(
+                    When(main_domain=None, then=Value(None)),
+                    When(main_domain__parent=None, then=F('main_domain__name')),
+                    default=F('main_domain__parent__name'),
+                    output_field=CharField()
+                )
             ),
             acronym__iexact=acronym,
             academic_year__year=year
         )
+
         return egy
 
 
