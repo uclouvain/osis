@@ -386,3 +386,9 @@ class GetProgramTreesFromNodeCommand(interface.CommandRequest):
 class GetProgramTreesVersionFromNodeCommand(interface.CommandRequest):
     code = attr.ib(type=str)
     year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class DeleteAllStandardVersionCommand(interface.CommandRequest):
+    acronym = attr.ib(type=str)
+    year = attr.ib(type=int)
