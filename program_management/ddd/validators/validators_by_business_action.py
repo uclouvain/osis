@@ -44,6 +44,7 @@ from program_management.ddd.validators._detach_root import DetachRootValidator
 from program_management.ddd.validators._empty_program_tree import EmptyProgramTreeValidator
 from program_management.ddd.validators._has_or_is_prerequisite import IsPrerequisiteValidator
 from program_management.ddd.validators._infinite_recursivity import InfiniteRecursivityTreeValidator
+from program_management.ddd.validators._match_version_validator import MatchVersionValidator
 from program_management.ddd.validators._minimum_editable_year import \
     MinimumEditableYearValidator
 from program_management.ddd.validators._node_have_link import NodeHaveLinkValidator
@@ -122,6 +123,8 @@ class CheckPasteNodeValidatorList(business_validator.BusinessListValidator):
                 InfiniteRecursivityTreeValidator(tree, node_to_paste, path),
                 _validate_end_date_and_option_finality.ValidateEndDateAndOptionFinality(node_to_paste, tree_repository),
             ]
+            if node_to_paste.is_training():
+                self.validators.append(MatchVersionValidator(tree, node_to_paste))
 
         elif node_to_paste.is_learning_unit():
             self.validators = [
