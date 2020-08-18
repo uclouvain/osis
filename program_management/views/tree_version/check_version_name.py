@@ -3,6 +3,7 @@ import re
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 
+from education_group.models.group_year import GroupYear
 from osis_common.decorators.ajax import ajax_required
 from program_management.models.education_group_version import EducationGroupVersion
 
@@ -31,15 +32,19 @@ def check_existing_version(version_name: str, year: int, code: str) -> bool:
     return EducationGroupVersion.objects.filter(
         version_name=version_name,
         root_group__academic_year__year=year,
-        root_group__acronym=code
+        root_group__partial_acronym=code
     ).exists()
 
 
 def find_last_existed_version(version_name, year, code):
+    group_year = GroupYear.objects.get(
+        academic_year__year=year,
+        partial_acronym=code,
+    )
     return EducationGroupVersion.objects.filter(
         version_name=version_name,
         root_group__academic_year__year__lt=year,
-        root_group__acronym=code,
+        root_group__acronym=group_year.acronym,
     ).order_by(
         'offer__academic_year'
     ).last()
