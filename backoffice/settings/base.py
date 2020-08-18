@@ -487,3 +487,18 @@ LEARNING_UNIT_PORTAL_URL_WITH_UPDATED_CACHE = os.environ.get(
 
 # SITE_ID for Django "sites framework"
 SITE_ID = os.environ.get('SITE_ID', 1)
+
+# GIS-related
+MAPBOX = {
+    'ACCESS_TOKEN': os.environ.get("MAPBOX_ACCESS_TOKEN", ''),
+    'CSS_PATHS': os.environ.get(
+        "MAPBOX_CSS_PATHS",
+        'https://api.mapbox.com/mapbox-gl-js/v1.11.1/mapbox-gl.css',
+    ).split(' '),
+    'JS_PATHS': os.environ.get(
+        "MAPBOX_JS_PATHS",
+        'https://api.mapbox.com/mapbox-gl-js/v1.11.1/mapbox-gl.js',
+    ).split(' '),
+}
+GEOCODING_URL = os.environ.get("GEOCODING_URL", "")
+GEOCODING_TOKEN = os.environ.get("GEOCODING_TOKEN", "")
