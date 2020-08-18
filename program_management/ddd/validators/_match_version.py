@@ -27,25 +27,16 @@ from django.utils.translation import gettext as _
 
 import osis_common.ddd.interface
 from base.ddd.utils import business_validator
-from program_management.ddd.business_types import *
-from program_management.models.education_group_version import EducationGroupVersion
 
 
 class MatchVersionValidator(business_validator.BusinessValidator):
 
-    def __init__(self, tree: 'ProgramTree', node_to_add: 'Node'):
+    def __init__(self, root_node_version_name: str, node_to_add_version_name: str):
         super(MatchVersionValidator, self).__init__()
-        self.tree = tree
-        self.node_to_add = node_to_add
+        self.root_node_version_name = root_node_version_name
+        self.node_to_add_version_name = node_to_add_version_name
 
     def validate(self):
-        academic_year = self.node_to_add.academic_year
-        root_node_version = EducationGroupVersion.objects.get(
-            root_group__partial_acronym=self.tree.root_node.code, root_group__academic_year__year=academic_year.year
-        )
-        node_to_add_version = EducationGroupVersion.objects.get(
-            root_group__partial_acronym=self.node_to_add.code, root_group__academic_year__year=academic_year.year
-        )
-        if root_node_version.version_name != node_to_add_version.version_name:
+        if self.root_node_version_name != self.node_to_add_version_name:
             error_msg = _('The child version must be the same as the root node version')
             raise osis_common.ddd.interface.BusinessExceptions([error_msg])

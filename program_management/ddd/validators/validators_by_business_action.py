@@ -44,7 +44,7 @@ from program_management.ddd.validators._detach_root import DetachRootValidator
 from program_management.ddd.validators._empty_program_tree import EmptyProgramTreeValidator
 from program_management.ddd.validators._has_or_is_prerequisite import IsPrerequisiteValidator
 from program_management.ddd.validators._infinite_recursivity import InfiniteRecursivityTreeValidator
-from program_management.ddd.validators._match_version_validator import MatchVersionValidator
+from program_management.ddd.validators._match_version import MatchVersionValidator
 from program_management.ddd.validators._minimum_editable_year import \
     MinimumEditableYearValidator
 from program_management.ddd.validators._node_have_link import NodeHaveLinkValidator
@@ -53,6 +53,7 @@ from program_management.ddd.validators._prerequisites_items import PrerequisiteI
 from program_management.ddd.validators._program_tree_empty import ProgramTreeEmptyValidator
 from program_management.ddd.validators._relative_credits import RelativeCreditsValidator
 from program_management.ddd.validators.link import CreateLinkValidatorList
+from program_management.models.education_group_version import EducationGroupVersion
 
 
 class PasteNodeValidatorList(business_validator.BusinessListValidator):
@@ -124,7 +125,17 @@ class CheckPasteNodeValidatorList(business_validator.BusinessListValidator):
                 _validate_end_date_and_option_finality.ValidateEndDateAndOptionFinality(node_to_paste, tree_repository),
             ]
             if node_to_paste.is_training():
-                self.validators.append(MatchVersionValidator(tree, node_to_paste))
+                root_node_version = EducationGroupVersion.objects.get(
+                    root_group__partial_acronym=tree.root_node.code,
+                    root_group__academic_year__year=tree.root_node.academic_year.year
+                )
+                node_to_add_version = EducationGroupVersion.objects.get(
+                    root_group__partial_acronym=node_to_paste.code,
+                    root_group__academic_year__year=node_to_paste.academic_year.year
+                )
+                self.validators.append(MatchVersionValidator(
+                    root_node_version.version_name, node_to_add_version.version_name
+                ))
 
         elif node_to_paste.is_learning_unit():
             self.validators = [
