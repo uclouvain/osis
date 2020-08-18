@@ -57,6 +57,7 @@ class GroupRepository(interface.AbstractRepository):
     def create(cls, group: 'Group', **_) -> 'GroupIdentity':
         try:
             academic_year = AcademicYearModelDb.objects.only('id').get(year=group.year)
+            start_year = AcademicYearModelDb.objects.only('id').get(year=group.start_year)
             education_group_type = EducationGroupTypeModelDb.objects.only('id').get(name=group.type.name)
             management_entity = EntityVersionModelDb.objects.current(timezone.now()).only('entity_id').get(
                 acronym=group.management_entity.acronym,
@@ -85,7 +86,7 @@ class GroupRepository(interface.AbstractRepository):
 
         group_upserted, created = GroupModelDb.objects.update_or_create(
             pk=group_pk,
-            defaults={'start_year': academic_year, 'end_year': end_year}
+            defaults={'start_year': start_year, 'end_year': end_year}
         )
         try:
             group_year_created = GroupYearModelDb.objects.create(
@@ -148,6 +149,10 @@ class GroupRepository(interface.AbstractRepository):
         group_db_obj.remark_fr = group.remark.text_fr
         group_db_obj.remark_en = group.remark.text_en
         group_db_obj.save()
+
+        group_db_obj.group.end_year = AcademicYearModelDb.objects.only('id').get(year=group.end_year) \
+            if group.end_year else None
+        group_db_obj.group.save()
         return group.entity_id
 
     @classmethod
@@ -199,6 +204,7 @@ def _convert_db_model_to_ddd_model(obj: GroupYearModelDb) -> 'Group':
     entity_id = GroupIdentity(code=obj.partial_acronym, year=obj.academic_year.year)
     return group.Group(
         entity_identity=entity_id,
+        entity_id=entity_id,
         type=EducationGroupTypeConverter.convert_type_str_to_enum(obj.education_group_type.name),
         abbreviated_title=obj.acronym,
         titles=Titles(

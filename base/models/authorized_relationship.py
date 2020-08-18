@@ -77,9 +77,6 @@ class AuthorizedRelationshipObject:
 class AuthorizedRelationshipList:
 
     def __init__(self, authorized_relationships: List[AuthorizedRelationshipObject]):
-        assert authorized_relationships, "You must set at least 1 authorized relation (list can't be empty)"
-        assert isinstance(authorized_relationships, list)
-        assert isinstance(authorized_relationships[0], AuthorizedRelationshipObject)
         self.authorized_relationships = authorized_relationships
 
     def get_authorized_relationship(

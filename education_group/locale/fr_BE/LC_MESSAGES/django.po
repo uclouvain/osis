@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-31 11:03+0200\n"
+"POT-Creation-Date: 2020-08-11 11:30+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,15 +22,26 @@ msgid_plural "%(count_enrollment)d students are enrolled in the mini-training."
 msgstr[0] "%(count_enrollment)d étudiant est inscrit à la mini-formation."
 msgstr[1] "%(count_enrollment)d étudiants sont inscrits à la mini-formation."
 
-#, python-format
-msgid "%(count_enrollment)d student is enrolled in the training."
-msgid_plural "%(count_enrollment)d students are enrolled in the training."
-msgstr[0] "%(count_enrollment)d étudiant est inscrit à la formation."
-msgstr[1] "%(count_enrollment)d étudiants sont inscrits à la formation."
+#, python-format, python-brace-format
+msgid ""
+"%(count_enrollment)d student is enrolled in the training {acronym} "
+"({academic_year})."
+msgid_plural ""
+"%(count_enrollment)d students are enrolled in the training {acronym} "
+"({academic_year})."
+msgstr[0] ""
+"%(count_enrollment)d étudiant est inscrit à la formation {acronym} "
+"({academic_year})."
+msgstr[1] ""
+"%(count_enrollment)d étudiants sont inscrits à la formation {acronym} "
+"({academic_year})."
 
 #, python-format
 msgid "%(max)s must be greater or equals than %(min)s"
 msgstr "%(max)s doit être plus grand ou égal à %(min)s"
+
+msgid "ARES"
+msgstr "ARES"
 
 msgid "ARES ability"
 msgstr "Habilitation ARES"
@@ -45,7 +56,7 @@ msgid "Academic responsible"
 msgstr "Responsable académique"
 
 msgid "Academic type"
-msgstr "Type académique"
+msgstr "Nature"
 
 msgid "Academic year"
 msgstr "Année académique"
@@ -56,18 +67,21 @@ msgstr "Accès"
 msgid "Access condition"
 msgstr "Condition d'accès"
 
+msgid "Acronym already exists"
+msgstr "Le sigle existe déjà"
+
 msgid "Acronym/Short title"
-msgstr "Sigle/Int. abr."
+msgstr "Sigle/Intitulé abrégé"
 
 msgctxt "abbreviation"
 msgid "Acronym/Short title"
 msgstr "Sigle/Int. abr."
 
 msgid "Acronym/Short title '{}' already exists"
-msgstr "Sigle/Intitulé abrége '{}' existe déjà"
+msgstr "Sigle/Intitulé abrégé '{}' existe déjà"
 
 msgid "Acronym/Short title is required"
-msgstr "Sigle/Intitulé abrége est requis"
+msgstr "Sigle/Intitulé abrégé est requis"
 
 msgid "Actions"
 msgstr "Actions"
@@ -133,7 +147,8 @@ msgstr "Gestionnaire centraux"
 
 msgid "Certificate aim can only be edited by program manager"
 msgstr ""
-"Certificats peuvent seulement être édité par les gestionnaire de programme"
+"Attendus du diplôme peuvent seulement être modifiés par un gestionnaire de "
+"programme"
 
 msgid "Clear clipboard"
 msgstr "Vider le presse-papier"
@@ -156,11 +171,14 @@ msgstr "Commentaire"
 msgid "Conditions"
 msgstr "Conditions"
 
-msgid "Contacts"
-msgstr "Contacts"
+#, python-format
+msgid ""
+"Consistency error in %(academic_year)s: %(field)s has already been modified"
+msgstr ""
+"Erreur de consistance en %(academic_year)s: %(field)s a déjà été modifié"
 
-msgid "Content"
-msgstr "Contenu"
+msgid "Content constraint"
+msgstr "Contrainte"
 
 msgid "Coorganization can only be changed by central manager"
 msgstr ""
@@ -333,6 +351,10 @@ msgstr "Domaine ISCED/CITE"
 msgid "Identification"
 msgstr "Identification"
 
+#, python-format
+msgid "Imposible to put end date to %(end_year)s: %(msg)s"
+msgstr "Impossible de mettre la fin à %(end_year)s: %(msg)s"
+
 msgid "Institution"
 msgstr "Institution"
 
@@ -393,11 +415,22 @@ msgstr "Mini formation"
 msgid "Mini-Training"
 msgstr "Mini-Formation"
 
+#, python-format
+msgid ""
+"Mini-training <a href='%(link)s'> %(code)s (%(academic_year)s) </a> "
+"successfully created."
+msgstr ""
+"La mini-formation <a href='%(link)s'> %(code)s (%(academic_year)s) </a> a "
+"été créé avec succès"
+
 msgid "Modification"
 msgstr "Modification"
 
 msgid "New Education Group"
 msgstr "Nouveau Groupement"
+
+msgid "New Mini-Training"
+msgstr "Nouvelle Mini-Formation"
 
 msgid "New Training"
 msgstr "Nouvelle Formation"
@@ -547,6 +580,10 @@ msgid "The group %(code)s has been deleted."
 msgstr "Le groupement %(code)s a été supprimé."
 
 #, python-format
+msgid "The link of %(code)s - %(acronym)s - %(year)s has been updated."
+msgstr "Le lien de %(code)s - %(acronym)s - %(year)s a été mis à jour."
+
+#, python-format
 msgid "The mini-training %(code)s has been deleted."
 msgstr "La mini-formation %(code)s a été supprimée."
 
@@ -563,6 +600,14 @@ msgstr ""
 #, python-format
 msgid "The training %(code)s has been deleted."
 msgstr "La formation %(code)s a été supprimée."
+
+#, python-brace-format
+msgid "The training {acronym} ({academic_year}) has inscriptions"
+msgstr "La formation {acronym} ({academic_year}) dispose d'inscriptions"
+
+#, python-brace-format
+msgid "The training {acronym} ({academic_year}) is linked to epc"
+msgstr "La formation {acronym} ({academic_year}) est liée à epc"
 
 #, python-format
 msgctxt "female"
@@ -600,8 +645,16 @@ msgstr "Intitulé en anglais"
 msgid "Title in French"
 msgstr "Intitulé en français"
 
+msgid "Titles"
+msgstr "Intitulés"
+
 msgid "Training"
 msgstr "Formation"
+
+#, python-format
+msgid "Training %(acronym)s (%(academic_year)s) successfully deleted."
+msgstr ""
+"La formation %(acronym)s (%(academic_year)s) </a> a été supprimée avec succès"
 
 #, python-format
 msgid ""
@@ -610,6 +663,14 @@ msgid ""
 msgstr ""
 "La formation <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> a été "
 "créé avec succès"
+
+#, python-format
+msgid ""
+"Training <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> "
+"successfully updated."
+msgstr ""
+"La formation <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> a été "
+"modifiée avec succès"
 
 msgid "Trainings"
 msgstr "Formations"
@@ -632,6 +693,9 @@ msgstr "Bacheliers universitaires"
 msgid "University certificate"
 msgstr "Certificat universitaire"
 
+msgid "Update Training"
+msgstr "Modifier Formation"
+
 msgid "User"
 msgstr "Utilisateur"
 
@@ -641,6 +705,10 @@ msgstr "Utilisations"
 msgid "Validity"
 msgstr "Validité"
 
+msgid "Validity cannot be greater than last year of organization"
+msgstr ""
+"Validité ne peut pas être supérieure à la dernière année d'organisation"
+
 msgid "Web re-registration"
 msgstr "Ré-inscription par internet"
 
@@ -649,6 +717,22 @@ msgstr "Pondération par crédit"
 
 msgid "Yes, I confirm."
 msgstr "Oui, je confirme."
+
+#, python-brace-format
+msgid ""
+"You can't copy the group '{code}' from {from_year} to {to_year} because it "
+"ends in {end_year}"
+msgstr ""
+"Vous ne pouvez pas recopier le groupe '{code}' de {from_year} vers {to_year} "
+"car il se termine en {end_year}"
+
+#, python-brace-format
+msgid ""
+"You can't copy the mini-training '{code}' from {from_year} to {to_year} "
+"because it ends in {end_year}"
+msgstr ""
+"Vous ne pouvez pas recopier la mini-formation '{code}' de {from_year} vers "
+"{to_year} car elle se termine en {end_year}"
 
 #, python-brace-format
 msgid ""
@@ -688,6 +772,9 @@ msgstr "à"
 
 msgid "certificate aims"
 msgstr "attendus du diplôme"
+
+msgid "co-graduation"
+msgstr "co-diplômation"
 
 msgid "code"
 msgstr "code"
@@ -750,4 +837,4 @@ msgid "undefined"
 msgstr "indéfini"
 
 msgid "unspecified"
-msgstr "non spécifié"
+msgstr "indéterminé"

@@ -90,4 +90,4 @@ class TestDeleteNodeService(TestCase):
 
         self.assertTrue(self.mocked_delete_orphan_training.called)
         self.assertFalse(self.mocked_delete_orphan_mini_training.called)
-        self.assertFalse(self.mocked_delete_orphan_group.called)
+        self.assertTrue(self.mocked_delete_orphan_group.called)

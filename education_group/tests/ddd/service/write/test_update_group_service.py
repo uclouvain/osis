@@ -50,10 +50,14 @@ class TestUpdateGroup(TestCase):
             organization_name="UCLouvain",
             remark_fr="Remarque en français",
             remark_en="Remarque en anglais",
+            end_year=None
         )
 
-    @patch('education_group.ddd.service.write.update_group_service.GroupRepository', autospec=True)
-    def test_assert_repository_called(self, mock_group_repo):
+    @patch("education_group.ddd.service.write.postpone_group_service.postpone_group", return_value=None)
+    @patch('education_group.ddd.service.write.update_group_service.'
+           'CalculateEndPostponement.calculate_year_of_postponement', return_value=2021)
+    @patch('education_group.ddd.repository.group.GroupRepository', autospec=True)
+    def test_assert_repository_called(self, mock_group_repo, mock_calculate_end_year_postponement, mock_postpone):
         update_group_service.update_group(self.cmd)
 
         mock_group_repo.get.return_value = GroupFactory(

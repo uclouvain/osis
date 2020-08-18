@@ -822,6 +822,45 @@ class TestUpdateLink(SimpleTestCase):
         self.assertIsInstance(result, Link)
 
 
+class TestProgramTreeIsEmpty(SimpleTestCase):
+    def test_should_return_true_when_root_node_has_no_children(self):
+        empty_program_tree = ProgramTreeFactory()
+
+        self.assertTrue(empty_program_tree.is_empty())
+
+    def test_should_return_true_when_root_node_only_contains_mandatory_children(self):
+        program_tree_with_only_mandatory_children = self.create_program_tree_with_only_mandatory_children()
+
+        self.assertTrue(program_tree_with_only_mandatory_children.is_empty())
+
+    def test_should_return_false_when_root_node_contains_not_mandatory_children(self):
+        program_tree_with_non_mandatory_children = self.create_program_tree_with_non_mandatory_children()
+
+        self.assertFalse(program_tree_with_non_mandatory_children.is_empty())
+
+    def create_program_tree_with_non_mandatory_children(self):
+        root_node = NodeGroupYearFactory()
+        LinkFactory(parent=root_node)
+        return ProgramTreeFactory(root_node=root_node)
+
+    def create_program_tree_with_only_mandatory_children(self) -> 'ProgramTree':
+        root_node = NodeGroupYearFactory()
+        child_node = NodeGroupYearFactory()
+        LinkFactory(parent=root_node, child=child_node)
+        program_tree_with_only_mandatory_children = ProgramTreeFactory(
+            root_node=root_node,
+            authorized_relationships=AuthorizedRelationshipList([
+                AuthorizedRelationshipObjectFactory(
+                    parent_type=root_node.node_type,
+                    child_type=child_node.node_type,
+                    min_constraint=1,
+                    max_constraint=1
+                )
+            ])
+        )
+        return program_tree_with_only_mandatory_children
+
+
 class TestIsEmpty(SimpleTestCase):
     def test_assert_is_empty_case_contains_nothing(self):
         program_tree = ProgramTreeFactory(

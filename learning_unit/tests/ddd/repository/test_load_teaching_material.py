@@ -25,20 +25,32 @@
 ##############################################################################
 from django.test import TestCase
 
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.teaching_material import TeachingMaterialFactory
-from learning_unit.ddd.repository.load_teaching_material import load_teaching_materials
+from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYearIdentity
+from learning_unit.ddd.repository.load_teaching_material import bulk_load_teaching_materials, \
+    convert_teaching_material_db_row_to_domain_object
 
 
-class TestLoadTeachingMaterial(TestCase):
-
+class TestBulkLoadTeachingMaterial(TestCase):
     @classmethod
     def setUpTestData(cls):
+        cls.teaching_materials = TeachingMaterialFactory.create_batch(2)
 
-        cls.l_unit_1 = LearningUnitYearFactory()
-        cls.teaching_material = [TeachingMaterialFactory(title="Title {}".format(idx),
-                                                         learning_unit_year=cls.l_unit_1) for idx in range(5)]
+    def test_should_return_empty_dictionnary_when_no_identities_given(self):
+        result = bulk_load_teaching_materials([])
+        self.assertEqual(result, {})
 
-    def test_load_teaching_materials(self):
-        results = load_teaching_materials(self.l_unit_1.acronym, self.l_unit_1.academic_year.year)
-        self.assertEqual(len(results), 5)
+    def test_should_return_a_mapping_of_identity_and_teaching_materials_when_identities_given(self):
+        identities = [
+            LearningUnitYearIdentity(
+                code=material.learning_unit_year.acronym,
+                year=material.learning_unit_year.academic_year.year
+            )
+            for material in self.teaching_materials
+        ]
+        result = bulk_load_teaching_materials(identities)
+        expected_result = {
+            identities[0]: [convert_teaching_material_db_row_to_domain_object(self.teaching_materials[0])],
+            identities[1]: [convert_teaching_material_db_row_to_domain_object(self.teaching_materials[1])]
+        }
+        self.assertEqual(result, expected_result)

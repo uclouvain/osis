@@ -1,9 +1,14 @@
+from education_group.templatetags.academic_year_display import display_as_academic_year
 from osis_common.ddd.interface import BusinessException
 from django.utils.translation import gettext_lazy as _, ngettext_lazy
 from education_group.ddd.business_types import *
 
 
 class TrainingNotFoundException(Exception):
+    pass
+
+
+class MiniTrainingNotFoundException(Exception):
     pass
 
 
@@ -14,6 +19,18 @@ class GroupNotFoundException(Exception):
 class GroupCodeAlreadyExistException(BusinessException):
     def __init__(self, *args, **kwargs):
         message = _("Code already exists")
+        super().__init__(message, **kwargs)
+
+
+class MiniTrainingCodeAlreadyExistException(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _("Code already exists")
+        super().__init__(message, **kwargs)
+
+
+class TrainingAcronymAlreadyExistException(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _("Acronym already exists")
         super().__init__(message, **kwargs)
 
 
@@ -54,6 +71,12 @@ class ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum(BusinessExcepti
         super().__init__(message, **kwargs)
 
 
+class StartYearGreaterThanEndYearException(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _("Validity cannot be greater than last year of organization")
+        super().__init__(message, **kwargs)
+
+
 class CreditShouldBeGreaterOrEqualsThanZero(BusinessException):
     def __init__(self, *args, **kwargs):
         message = _("Credits must be greater or equals than 0")
@@ -66,13 +89,26 @@ class AcronymRequired(BusinessException):
         super().__init__(message, **kwargs)
 
 
-class TrainingAcronymAlreadyExist(BusinessException):
+class AcronymAlreadyExist(BusinessException):
     def __init__(self, abbreviated_title: str, *args, **kwargs):
         message = _("Acronym/Short title '{}' already exists").format(abbreviated_title)
         super().__init__(message, **kwargs)
 
 
-class CannotCopyDueToEndDate(BusinessException):
+class CannotCopyGroupDueToEndDate(BusinessException):
+    def __init__(self, group: 'Group', *args, **kwargs):
+        message = _(
+            "You can't copy the group '{code}' from {from_year} to {to_year} because it ends in {end_year}"
+        ).format(
+            code=group.code,
+            from_year=group.year,
+            to_year=group.year + 1,
+            end_year=group.end_year,
+        )
+        super().__init__(message, **kwargs)
+
+
+class CannotCopyTrainingDueToEndDate(BusinessException):
     def __init__(self, training: 'Training', *args, **kwargs):
         message = _(
             "You can't copy the training '{acronym}' from {from_year} to {to_year} because it ends in {end_year}"
@@ -81,6 +117,19 @@ class CannotCopyDueToEndDate(BusinessException):
             from_year=training.year,
             to_year=training.year + 1,
             end_year=training.end_year,
+        )
+        super().__init__(message, **kwargs)
+
+
+class CannotCopyMiniTrainingDueToEndDate(BusinessException):
+    def __init__(self, mini_training: 'MiniTraining', *args, **kwargs):
+        message = _(
+            "You can't copy the mini-training '{code}' from {from_year} to {to_year} because it ends in {end_year}"
+        ).format(
+            code=mini_training.code,
+            from_year=mini_training.year,
+            to_year=mini_training.year + 1,
+            end_year=mini_training.end_year,
         )
         super().__init__(message, **kwargs)
 
@@ -97,19 +146,40 @@ class MaximumCertificateAimType2Reached(BusinessException):
         super().__init__(message, **kwargs)
 
 
+class HasInscriptionsException(BusinessException):
+    def __init__(self, training: 'Training', *args, **kwargs):
+        message = _("The training {acronym} ({academic_year}) has inscriptions").format(
+            acronym=training.acronym,
+            academic_year=training.academic_year
+        )
+        super().__init__(message, **kwargs)
+
+
+class IsLinkedToEpcException(BusinessException):
+    def __init__(self, training: 'Training', *args, **kwargs):
+        message = _("The training {acronym} ({academic_year}) is linked to epc").format(
+            acronym=training.acronym,
+            academic_year=training.academic_year
+        )
+        super().__init__(message, **kwargs)
+
+
 class TrainingHaveEnrollments(BusinessException):
-    def __init__(self, enrollment_count: int, **kwargs):
+    def __init__(self, acronym, year, enrollment_count: int, **kwargs):
         message = ngettext_lazy(
-            "%(count_enrollment)d student is enrolled in the training.",
-            "%(count_enrollment)d students are enrolled in the training.",
+            "%(count_enrollment)d student is enrolled in the training {acronym} ({academic_year}).",
+            "%(count_enrollment)d students are enrolled in the training {acronym} ({academic_year}).",
             enrollment_count
-        ) % {"count_enrollment": enrollment_count}
+        ) % {"count_enrollment": enrollment_count, "acronym": acronym, "year": display_as_academic_year(year)}
         super().__init__(message, **kwargs)
 
 
 class TrainingHaveLinkWithEPC(BusinessException):
-    def __init__(self, *args, **kwargs):
-        message = _("Linked with EPC")
+    def __init__(self, acronym, year, **kwargs):
+        message = _("The training {acronym} ({academic_year}) is linked to epc").format(
+            acronym=acronym,
+            academic_year=display_as_academic_year(year)
+        )
         super().__init__(message, **kwargs)
 
 

@@ -54,9 +54,6 @@ class TestEducationGroupAchievementActionUpdateDelete(TestCase):
     def setUpTestData(cls):
         cls.education_group_year = EducationGroupYearFactory()
         StandardEducationGroupVersionFactory(offer=cls.education_group_year)
-        cls.achievement_0 = EducationGroupAchievementFactory(education_group_year=cls.education_group_year)
-        cls.achievement_1 = EducationGroupAchievementFactory(education_group_year=cls.education_group_year)
-        cls.achievement_2 = EducationGroupAchievementFactory(education_group_year=cls.education_group_year)
 
         cls.person = PersonFactory()
         CentralManagerFactory(person=cls.person, entity=cls.education_group_year.management_entity)
@@ -65,6 +62,10 @@ class TestEducationGroupAchievementActionUpdateDelete(TestCase):
             cls.person.user.user_permissions.add(perm)
 
     def setUp(self):
+        self.achievement_0 = EducationGroupAchievementFactory(education_group_year=self.education_group_year)
+        self.achievement_1 = EducationGroupAchievementFactory(education_group_year=self.education_group_year)
+        self.achievement_2 = EducationGroupAchievementFactory(education_group_year=self.education_group_year)
+
         self.client.force_login(self.person.user)
 
     def test_form_valid_up(self):

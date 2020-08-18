@@ -11,25 +11,25 @@ from django.views.generic.base import View
 from base.models.academic_year import starting_academic_year, AcademicYear
 from base.models.campus import Campus
 from base.models.education_group_year import EducationGroupYear
-from base.models.enums.education_group_types import GroupType, TrainingType
+from base.models.enums.education_group_types import TrainingType
 from base.utils.cache import RequestCache
 from base.utils.urls import reverse_with_get
 from base.views.common import display_success_messages, display_error_messages
 from education_group.ddd import command
-from program_management.ddd import command as program_management_command
 from education_group.ddd.domain.exception import GroupCodeAlreadyExistException, ContentConstraintTypeMissing, \
     ContentConstraintMinimumMaximumMissing, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum, \
-    TrainingAcronymAlreadyExist, StartYearGreaterThanEndYear, MaximumCertificateAimType2Reached
+    AcronymAlreadyExist, StartYearGreaterThanEndYear, MaximumCertificateAimType2Reached
 from education_group.ddd.domain.training import TrainingIdentity
-from program_management.ddd.domain.node import NodeIdentity
-from program_management.ddd.domain.service.element_id_search import ElementIdSearch
-from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
-from program_management.ddd.service.write import create_training_with_program_tree, create_and_attach_training_service
 from education_group.forms.training import CreateTrainingForm
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from education_group.views.proxy.read import Tab
 from osis_role.contrib.views import PermissionRequiredMixin
+from program_management.ddd import command as program_management_command
+from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.program_tree import Path
+from program_management.ddd.domain.service.element_id_search import ElementIdSearch
+from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
+from program_management.ddd.service.write import create_and_attach_training_service
 from program_management.ddd.service.write.create_training_with_program_tree import \
     create_and_report_training_with_program_tree
 
@@ -105,7 +105,7 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 training_ids = self._call_service(create_training_data)
             except GroupCodeAlreadyExistException as e:
                 training_form.add_error('code', e.message)
-            except TrainingAcronymAlreadyExist as e:
+            except AcronymAlreadyExist as e:
                 training_form.add_error('acronym', e.message)
             except ContentConstraintTypeMissing as e:
                 training_form.add_error('constraint_type', e.message)

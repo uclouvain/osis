@@ -32,7 +32,7 @@ from program_management.tests.ddd.factories.program_tree_version import ProgramT
 class TestCopyTreeVersionToNextYear(TestCase):
     @mock.patch("program_management.ddd.service.write.copy_program_version_service.ProgramTreeVersionRepository")
     @mock.patch("program_management.ddd.domain.program_tree_version.ProgramTreeVersionBuilder.copy_to_next_year")
-    def test_should_create_next_year_program_tree_version__and_persist_it(
+    def test_should_create_next_year_program_tree_version_and_persist_it(
             self,
             mock_copy_to_next_year,
             mock_repository):
@@ -47,7 +47,8 @@ class TestCopyTreeVersionToNextYear(TestCase):
             from_year=2020,
             from_offer_acronym="Offer",
             from_version_name="",
-            from_is_transition=False
+            from_is_transition=False,
+            from_offer_code='Code'
         )
         result = copy_program_version_service.copy_tree_version_to_next_year(cmd)
 

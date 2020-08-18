@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-31 11:03+0200\n"
+"POT-Creation-Date: 2020-08-11 11:30+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -23,14 +23,21 @@ msgid_plural "%(count_enrollment)d students are enrolled in the mini-training."
 msgstr[0] ""
 msgstr[1] ""
 
-#, python-format
-msgid "%(count_enrollment)d student is enrolled in the training."
-msgid_plural "%(count_enrollment)d students are enrolled in the training."
+#, python-format, python-brace-format
+msgid ""
+"%(count_enrollment)d student is enrolled in the training {acronym} "
+"({academic_year})."
+msgid_plural ""
+"%(count_enrollment)d students are enrolled in the training {acronym} "
+"({academic_year})."
 msgstr[0] ""
 msgstr[1] ""
 
 #, python-format
 msgid "%(max)s must be greater or equals than %(min)s"
+msgstr ""
+
+msgid "ARES"
 msgstr ""
 
 msgid "ARES ability"
@@ -55,6 +62,9 @@ msgid "Access"
 msgstr ""
 
 msgid "Access condition"
+msgstr ""
+
+msgid "Acronym already exists"
 msgstr ""
 
 msgid "Acronym/Short title"
@@ -156,10 +166,18 @@ msgstr ""
 msgid "Conditions"
 msgstr ""
 
+#, python-format
+msgid ""
+"Consistency error in %(academic_year)s: %(field)s has already been modified"
+msgstr ""
+
 msgid "Contacts"
 msgstr ""
 
 msgid "Content"
+msgstr ""
+
+msgid "Content constraint"
 msgstr ""
 
 msgid "Coorganization can only be changed by central manager"
@@ -327,6 +345,10 @@ msgstr ""
 msgid "Identification"
 msgstr ""
 
+#, python-format
+msgid "Imposible to put end date to %(end_year)s: %(msg)s"
+msgstr ""
+
 msgid "Institution"
 msgstr ""
 
@@ -387,10 +409,19 @@ msgstr ""
 msgid "Mini-Training"
 msgstr ""
 
+#, python-format
+msgid ""
+"Mini-training <a href='%(link)s'> %(code)s (%(academic_year)s) </a> "
+"successfully created."
+msgstr ""
+
 msgid "Modification"
 msgstr ""
 
 msgid "New Education Group"
+msgstr ""
+
+msgid "New Mini-Training"
 msgstr ""
 
 msgid "New Training"
@@ -534,6 +565,10 @@ msgid "The group %(code)s has been deleted."
 msgstr ""
 
 #, python-format
+msgid "The link of %(code)s - %(acronym)s - %(year)s has been updated."
+msgstr ""
+
+#, python-format
 msgid "The mini-training %(code)s has been deleted."
 msgstr ""
 
@@ -547,6 +582,14 @@ msgstr ""
 
 #, python-format
 msgid "The training %(code)s has been deleted."
+msgstr ""
+
+#, python-brace-format
+msgid "The training {acronym} ({academic_year}) has inscriptions"
+msgstr ""
+
+#, python-brace-format
+msgid "The training {acronym} ({academic_year}) is linked to epc"
 msgstr ""
 
 #, python-format
@@ -585,13 +628,26 @@ msgstr ""
 msgid "Title in French"
 msgstr ""
 
+msgid "Titles"
+msgstr ""
+
 msgid "Training"
+msgstr ""
+
+#, python-format
+msgid "Training %(acronym)s (%(academic_year)s) successfully deleted."
 msgstr ""
 
 #, python-format
 msgid ""
 "Training <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> "
 "successfully created."
+msgstr ""
+
+#, python-format
+msgid ""
+"Training <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> "
+"successfully updated."
 msgstr ""
 
 msgid "Trainings"
@@ -615,6 +671,9 @@ msgstr ""
 msgid "University certificate"
 msgstr ""
 
+msgid "Update Training"
+msgstr ""
+
 msgid "User"
 msgstr ""
 
@@ -624,6 +683,9 @@ msgstr ""
 msgid "Validity"
 msgstr ""
 
+msgid "Validity cannot be greater than last year of organization"
+msgstr ""
+
 msgid "Web re-registration"
 msgstr ""
 
@@ -631,6 +693,18 @@ msgid "Weighting"
 msgstr ""
 
 msgid "Yes, I confirm."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"You can't copy the group '{code}' from {from_year} to {to_year} because it "
+"ends in {end_year}"
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"You can't copy the mini-training '{code}' from {from_year} to {to_year} "
+"because it ends in {end_year}"
 msgstr ""
 
 #, python-brace-format
@@ -666,6 +740,9 @@ msgid "at"
 msgstr ""
 
 msgid "certificate aims"
+msgstr ""
+
+msgid "co-graduation"
 msgstr ""
 
 msgid "code"
