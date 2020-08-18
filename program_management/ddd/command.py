@@ -23,16 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Optional, Set
-
-import attr
+from typing import Optional
 
 import attr
 
 from base.models.enums.link_type import LinkTypes
 from education_group.ddd import command as education_group_command
 from osis_common.ddd import interface
-from program_management.ddd.business_types import *
 
 
 class DetachNodeCommand(interface.CommandRequest):
@@ -385,6 +382,7 @@ class DeleteAllProgramTreeCommand(interface.CommandRequest):
 class DeleteStandardVersionCommand(interface.CommandRequest):
     acronym = attr.ib(type=str)
     year = attr.ib(type=int)
+    version_name = attr.ib(type=str, default="")
 
 
 @attr.s(frozen=True, slots=True)

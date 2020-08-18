@@ -56,3 +56,12 @@ class ProgramTreeVersionFactory(factory.Factory):
         offer_acronym=factory.SelfAttribute("..tree.root_node.title"),
         year=factory.SelfAttribute("..tree.root_node.year")
     )
+
+
+class SpecificProgramTreeVersionFactory(ProgramTreeVersionFactory):
+    entity_id = factory.SubFactory(
+        ProgramTreeVersionIdentityFactory,
+        offer_acronym=factory.SelfAttribute("..tree.root_node.title"),
+        year=factory.SelfAttribute("..tree.root_node.year"),
+        version_name="SPECIFIC"
+    )

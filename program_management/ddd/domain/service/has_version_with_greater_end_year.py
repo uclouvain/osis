@@ -21,28 +21,28 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from typing import List
+from django.db.models import Q
 
-from django.db import transaction
-
-from education_group.ddd.business_types import *
-from education_group.ddd.domain import training
-from program_management.ddd import command
-from program_management.ddd.service.write import delete_program_tree_version_service
+from osis_common.ddd import interface
+from program_management.ddd.business_types import *
+from program_management.models.education_group_version import EducationGroupVersion
 
 
-@transaction.atomic()
-def delete_training_with_program_tree(
-        delete_command: command.DeleteTrainingWithProgramTreeCommand) -> List['TrainingIdentity']:
-    delete_program_tree_version_command = command.DeleteProgramTreeVersionCommand(
-        offer_acronym=delete_command.offer_acronym,
-        version_name=delete_command.version_name,
-        is_transition=delete_command.is_transition,
-        from_year=delete_command.from_year
-    )
-    delete_versions_identities = delete_program_tree_version_service.delete_program_tree_version(
-        delete_program_tree_version_command
-    )
+class HasVersionWithGreaterEndYear(interface.DomainService):
 
-    return [training.TrainingIdentity(acronym=identity.offer_acronym, year=identity.year)
-            for identity in delete_versions_identities]
+    @classmethod
+    def greater_than_standard_year(cls, standard_version: 'ProgramTreeVersion') -> bool:
+        return EducationGroupVersion.objects.filter(
+            Q(offer__education_group__end_year__isnull=True) |
+            Q(offer__education_group__end_year__year__gte=standard_version.entity_id.year),
+            offer__acronym=standard_version.entity_id.offer_acronym,
+        ).exclude(
+            version_name=standard_version.version_name
+        ).exists()
+
+    @classmethod
+    def inferior_than_version(cls, specific_version: 'ProgramTreeVersion') -> bool:
+        return EducationGroupVersion.standard.filter(
+            offer__education_group__end_year__year__lte=specific_version.entity_id.year,
+            offer__acronym=specific_version.entity_id.offer_acronym,
+        ).exists()

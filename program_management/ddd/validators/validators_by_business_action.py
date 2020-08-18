@@ -37,6 +37,7 @@ from program_management.ddd.validators._authorized_relationship_for_all_trees im
     ValidateAuthorizedRelationshipForAllTrees
 from program_management.ddd.validators._authorized_root_type_for_prerequisite import AuthorizedRootTypeForPrerequisite
 from program_management.ddd.validators._block_validator import BlockValidator
+from program_management.ddd.validators._check_exists_standard_version import CheckExistsStandardVersionValidator
 from program_management.ddd.validators._copy_check_end_date_program_tree import CheckProgramTreeEndDateValidator
 from program_management.ddd.validators._copy_check_end_date_tree_version import CheckTreeVersionEndDateValidator
 from program_management.ddd.validators._detach_option_2M import DetachOptionValidator
@@ -50,6 +51,7 @@ from program_management.ddd.validators._node_have_link import NodeHaveLinkValida
 from program_management.ddd.validators._prerequisite_expression_syntax import PrerequisiteExpressionSyntaxValidator
 from program_management.ddd.validators._prerequisites_items import PrerequisiteItemsValidator
 from program_management.ddd.validators._relative_credits import RelativeCreditsValidator
+from program_management.ddd.validators._delete_check_versions_end_date import CheckVersionsEndDateValidator
 from program_management.ddd.validators.link import CreateLinkValidatorList
 
 
@@ -234,14 +236,17 @@ class DeleteStandardVersionValidatorList(business_validator.BusinessListValidato
             self,
             program_tree_version: 'ProgramTreeVersion',
     ):
-        self.validators = []
+        self.validators = [
+            CheckVersionsEndDateValidator(program_tree_version)
+        ]
         super().__init__()
 
 
 class CopyProgramTreeVersionValidatorList(business_validator.BusinessListValidator):
     def __init__(self, copy_from: 'ProgramTreeVersion'):
         self.validators = [
-            CheckTreeVersionEndDateValidator(copy_from)
+            CheckTreeVersionEndDateValidator(copy_from),
+            CheckExistsStandardVersionValidator(copy_from)
         ]
         super().__init__()
 

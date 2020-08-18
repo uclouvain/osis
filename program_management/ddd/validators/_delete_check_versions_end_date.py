@@ -21,28 +21,23 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from typing import List
-
-from django.db import transaction
-
-from education_group.ddd.business_types import *
-from education_group.ddd.domain import training
-from program_management.ddd import command
-from program_management.ddd.service.write import delete_program_tree_version_service
+from base.ddd.utils import business_validator
+from program_management.ddd.business_types import *
+from program_management.ddd.domain import exception
+from program_management.ddd.domain.service import has_version_with_greater_end_year
 
 
-@transaction.atomic()
-def delete_training_with_program_tree(
-        delete_command: command.DeleteTrainingWithProgramTreeCommand) -> List['TrainingIdentity']:
-    delete_program_tree_version_command = command.DeleteProgramTreeVersionCommand(
-        offer_acronym=delete_command.offer_acronym,
-        version_name=delete_command.version_name,
-        is_transition=delete_command.is_transition,
-        from_year=delete_command.from_year
-    )
-    delete_versions_identities = delete_program_tree_version_service.delete_program_tree_version(
-        delete_program_tree_version_command
-    )
+class CheckVersionsEndDateValidator(business_validator.BusinessValidator):
+    def __init__(self, tree_version: 'ProgramTreeVersion'):
+        self.tree_version = tree_version
+        super().__init__()
 
-    return [training.TrainingIdentity(acronym=identity.offer_acronym, year=identity.year)
-            for identity in delete_versions_identities]
+    def validate(self, *args, **kwargs):
+        if not self.tree_version.is_standard:
+            return
+
+        exists = has_version_with_greater_end_year.HasVersionWithGreaterEndYear.greater_than_standard_year(
+            self.tree_version
+        )
+        if exists:
+            raise exception.CannotDeleteStandardDueToVersionEndDate(self.tree_version)

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-14 14:57+0200\n"
+"POT-Creation-Date: 2020-08-18 10:43+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -735,6 +735,14 @@ msgid ""
 msgstr ""
 "Vous ne pouvez pas copier la version de  programme '{acronym}' de "
 "{from_year} à {to_year} parce qu'elle finit en {end_year}"
+
+#, python-brace-format
+msgid ""
+"You can't delete the standard program tree '{code}' in {year} as specific "
+"versions exists during this year."
+msgstr ""
+"Vous ne pouvez pas supprimer le programme standard '{code}' en {year} parce "
+"qu'il existe une version particiulière durant cette année."
 
 #, python-format
 msgid ""

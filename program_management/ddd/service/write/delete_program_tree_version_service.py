@@ -21,28 +21,34 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+import itertools
 from typing import List
 
 from django.db import transaction
 
-from education_group.ddd.business_types import *
-from education_group.ddd.domain import training
 from program_management.ddd import command
-from program_management.ddd.service.write import delete_program_tree_version_service
+from program_management.ddd.business_types import *
+from program_management.ddd.domain import exception
+from program_management.ddd.service.write import delete_version_service
 
 
 @transaction.atomic()
-def delete_training_with_program_tree(
-        delete_command: command.DeleteTrainingWithProgramTreeCommand) -> List['TrainingIdentity']:
-    delete_program_tree_version_command = command.DeleteProgramTreeVersionCommand(
-        offer_acronym=delete_command.offer_acronym,
-        version_name=delete_command.version_name,
-        is_transition=delete_command.is_transition,
-        from_year=delete_command.from_year
-    )
-    delete_versions_identities = delete_program_tree_version_service.delete_program_tree_version(
-        delete_program_tree_version_command
-    )
+def delete_program_tree_version(
+        delete_command: command.DeleteProgramTreeVersionCommand) -> List['ProgramTreeVersionIdentity']:
+    from_year = delete_command.from_year
 
-    return [training.TrainingIdentity(acronym=identity.offer_acronym, year=identity.year)
-            for identity in delete_versions_identities]
+    deleted_program_tree_versions = []
+    for year in itertools.count(from_year):
+        try:
+            new_delete_command = command.DeleteStandardVersionCommand(
+                acronym=delete_command.offer_acronym,
+                year=year,
+                version_name=delete_command.version_name
+            )
+            deleted_program_tree_versions.append(
+                delete_version_service.delete_version(new_delete_command)
+            )
+        except exception.ProgramTreeVersionNotFoundException:
+            break
+
+    return deleted_program_tree_versions

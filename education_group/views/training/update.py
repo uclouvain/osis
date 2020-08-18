@@ -146,6 +146,7 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         return self.get_success_url()
 
     def update_training(self) -> List['TrainingIdentity']:
+        end_year = self.training_form.cleaned_data["end_year"]
         try:
             update_command = self._convert_form_to_update_training_command(self.training_form)
             return update_training_with_program_tree_service.update_and_report_training_with_program_tree(
@@ -157,6 +158,14 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 exception.ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum) as e:
             self.training_form.add_error("min_constraint", e.message)
             self.training_form.add_error("max_constraint", "")
+        except program_management_exception.CannotCopyTreeVersionDueToStandardNotExisting as e:
+            self.training_form.add_error("end_year", "")
+            self.training_form.add_error(
+                None,
+                _("Imposible to put end date to %(end_year)s: %(msg)s") % {
+                    "msg": e.message,
+                    "end_year": end_year}
+            )
         return []
 
     def report_training(self) -> List['TrainingIdentity']:
@@ -182,7 +191,8 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             return delete_training_with_program_tree_service.delete_training_with_program_tree(delete_command)
 
         except (program_management_exception.ProgramTreeNonEmpty, exception.TrainingHaveLinkWithEPC,
-                exception.TrainingHaveEnrollments) as e:
+                exception.TrainingHaveEnrollments,
+                program_management_exception.CannotDeleteStandardDueToVersionEndDate) as e:
             self.training_form.add_error("end_year", "")
             self.training_form.add_error(
                 None,

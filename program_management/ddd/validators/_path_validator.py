@@ -26,7 +26,6 @@
 from django.utils.translation import gettext as _
 
 import osis_common.ddd.interface
-from base.ddd.utils import business_validator
 from base.ddd.utils.business_validator import BusinessValidator
 from program_management.ddd.business_types import *
 

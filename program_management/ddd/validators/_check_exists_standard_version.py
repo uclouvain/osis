@@ -21,31 +21,29 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from django.db import transaction
+import attr
 
-from program_management.ddd import command
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, STANDARD
-from program_management.ddd.repositories import program_tree_version as program_tree_version_repository
-from program_management.ddd.service.write import delete_program_tree_service
-from program_management.ddd.validators.validators_by_business_action import DeleteStandardVersionValidatorList
+from base.ddd.utils import business_validator
+from program_management.ddd.business_types import *
+from program_management.ddd.domain import exception
 
 
-@transaction.atomic()
-def delete_standard_version(cmd: command.DeleteStandardVersionCommand) -> ProgramTreeVersionIdentity:
-    program_tree_version_id = ProgramTreeVersionIdentity(
-        offer_acronym=cmd.acronym,
-        year=cmd.year,
-        version_name=STANDARD,
-        is_transition=False
-    )
-    program_tree_version = program_tree_version_repository.ProgramTreeVersionRepository.get(program_tree_version_id)
+class CheckExistsStandardVersionValidator(business_validator.BusinessValidator):
+    def __init__(self, tree_version: 'ProgramTreeVersion', version_repository: 'ProgramTreeVersionRepository'):
+        self.tree_version = tree_version
+        self.version_repository = version_repository
+        super().__init__()
 
-    DeleteStandardVersionValidatorList(program_tree_version).validate()
+    def validate(self, *args, **kwargs):
+        if self.tree_version.is_standard:
+            return
 
-    program_tree_version_repository.ProgramTreeVersionRepository.delete(
-        program_tree_version_id,
-
-        # Service Dependancy injection
-        delete_program_tree_service=delete_program_tree_service.delete_program_tree
-    )
-    return program_tree_version_id
+        standard_identity_next_year = attr.evolve(
+            self.tree_version.entity_id,
+            year=self.tree_version.entity_id.year+1,
+            version_name=""
+        )
+        try:
+            self.version_repository.get(standard_identity_next_year)
+        except exception.ProgramTreeVersionNotFoundException:
+            raise exception.CannotCopyTreeVersionDueToStandardNotExisting(self.tree_version)

@@ -28,7 +28,7 @@ from django.db import transaction
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import training, mini_training
 from program_management.ddd import command
-from program_management.ddd.service.write import delete_standard_program_tree_version_service
+from program_management.ddd.service.write import delete_program_tree_version_service
 
 
 @transaction.atomic()
@@ -40,7 +40,7 @@ def delete_mini_training_with_program_tree(
         is_transition=delete_command.is_transition,
         from_year=delete_command.from_year
     )
-    delete_versions_identities = delete_standard_program_tree_version_service.delete_standard_program_tree_version(
+    delete_versions_identities = delete_program_tree_version_service.delete_program_tree_version(
         delete_program_tree_version_command
     )
 

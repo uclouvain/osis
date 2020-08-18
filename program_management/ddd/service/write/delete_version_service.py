@@ -21,33 +21,31 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-import itertools
-from typing import List
-
 from django.db import transaction
 
 from program_management.ddd import command
-from program_management.ddd.business_types import *
-from program_management.ddd.domain import exception
-from program_management.ddd.service.write import delete_standard_version_service
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
+from program_management.ddd.repositories import program_tree_version as program_tree_version_repository
+from program_management.ddd.service.write import delete_program_tree_service
+from program_management.ddd.validators.validators_by_business_action import DeleteStandardVersionValidatorList
 
 
 @transaction.atomic()
-def delete_standard_program_tree_version(
-        delete_command: command.DeleteProgramTreeVersionCommand) -> List['ProgramTreeVersionIdentity']:
-    from_year = delete_command.from_year
+def delete_version(cmd: command.DeleteStandardVersionCommand) -> ProgramTreeVersionIdentity:
+    program_tree_version_id = ProgramTreeVersionIdentity(
+        offer_acronym=cmd.acronym,
+        year=cmd.year,
+        version_name=cmd.version_name,
+        is_transition=False
+    )
+    program_tree_version = program_tree_version_repository.ProgramTreeVersionRepository.get(program_tree_version_id)
 
-    deleted_program_tree_versions = []
-    for year in itertools.count(from_year):
-        try:
-            new_delete_command = command.DeleteStandardVersionCommand(
-                acronym=delete_command.offer_acronym,
-                year=year
-            )
-            deleted_program_tree_versions.append(
-                delete_standard_version_service.delete_standard_version(new_delete_command)
-            )
-        except exception.ProgramTreeVersionNotFoundException:
-            break
+    DeleteStandardVersionValidatorList(program_tree_version).validate()
 
-    return deleted_program_tree_versions
+    program_tree_version_repository.ProgramTreeVersionRepository.delete(
+        program_tree_version_id,
+
+        # Service Dependancy injection
+        delete_program_tree_service=delete_program_tree_service.delete_program_tree
+    )
+    return program_tree_version_id
