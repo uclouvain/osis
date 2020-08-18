@@ -39,7 +39,7 @@ class SpecificVersionForm(forms.Form):
         required=True,
         label=_('Acronym of version'),
         widget=TextInput(
-            attrs={'onchange': 'validate_version_name()'}
+            attrs={'onchange': 'validate_version_name()', 'style': "text-transform: uppercase;"}
         ),
     )
     title = forms.CharField(
