@@ -21,27 +21,26 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from base.ddd.utils import business_validator
-from education_group.ddd.business_types import *
-from education_group.ddd.domain.exception import TrainingHaveLinkWithEPC, MiniTrainingHaveLinkWithEPC
-from education_group.ddd.domain.service.link_with_epc import LinkWithEPC
+from unittest.mock import patch
+
+from django.test import TestCase
+
+from education_group.ddd import command
+from education_group.ddd.service.write import delete_orphan_mini_training_service
 
 
-class TrainingLinkWithEPCValidator(business_validator.BusinessValidator):
-    def __init__(self, training_id: 'TrainingIdentity'):
-        super().__init__()
-        self.training_id = training_id
+class TestDeleteOrphanMiniTraining(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.cmd = command.DeleteOrphanMiniTrainingCommand(year=2018, abbreviated_title="MINIAPP")
 
-    def validate(self, *args, **kwargs):
-        if LinkWithEPC().is_training_have_link_with_epc(self.training_id):
-            raise TrainingHaveLinkWithEPC(self.training_id.acronym, self.training_id.year)
+    @patch('education_group.ddd.service.write.delete_orphan_mini_training_service.MiniTrainingRepository.get')
+    @patch('education_group.ddd.service.write.delete_orphan_mini_training_service.'
+           'DeleteOrphanMiniTrainingValidatorList.validate')
+    @patch('education_group.ddd.service.write.delete_orphan_mini_training_service.MiniTrainingRepository.delete')
+    def test_assert_repository_called(self, mock_delete_repo, mock_delete_validator, mock_get_repo):
+        delete_orphan_mini_training_service.delete_orphan_mini_training(self.cmd)
 
-
-class MiniTrainingLinkWithEPCValidator(business_validator.BusinessValidator):
-    def __init__(self, mini_training_id: 'MiniTrainingIdentity'):
-        super().__init__()
-        self.mini_training_id = mini_training_id
-
-    def validate(self, *args, **kwargs):
-        if LinkWithEPC().is_mini_training_have_link_with_epc(self.mini_training_id):
-            raise MiniTrainingHaveLinkWithEPC(self.mini_training_id.acronym, self.mini_training_id.year)
+        self.assertTrue(mock_get_repo.called)
+        self.assertTrue(mock_delete_validator.called)
+        self.assertTrue(mock_delete_repo.called)

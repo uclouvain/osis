@@ -27,22 +27,21 @@ from django.db import IntegrityError
 from django.db.models import Prefetch, Subquery, OuterRef
 from django.utils import timezone
 
+from base.models.enums.education_group_categories import Categories
+from education_group.ddd.business_types import *
 from base.models.academic_year import AcademicYear as AcademicYearModelDb
 from base.models.campus import Campus as CampusModelDb
 from base.models.education_group import EducationGroup as EducationGroupModelDb
 from base.models.education_group_type import EducationGroupType as EducationGroupTypeModelDb
-from base.models.education_group_year import EducationGroupYear as EducationGroupYearModelDb
+from base.models.education_group_year import EducationGroupYear as EducationGroupYearModelDb, EducationGroupYear
 from base.models.entity import Entity as EntityModelDb
 from base.models.entity_version import EntityVersion as EntityVersionModelDb
 from base.models.enums.active_status import ActiveStatusEnum
-from base.models.enums.constraint_type import ConstraintTypeEnum
 from base.models.enums.education_group_types import MiniTrainingType
 from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.ddd.domain import mini_training, exception
 from education_group.ddd.domain._campus import Campus
-from education_group.ddd.domain._content_constraint import ContentConstraint
 from education_group.ddd.domain._entity import Entity as EntityValueObject
-from education_group.ddd.domain._remark import Remark
 from education_group.ddd.domain._titles import Titles
 from osis_common.ddd import interface
 from osis_common.ddd.interface import Entity, EntityIdentity
@@ -168,8 +167,12 @@ class MiniTrainingRepository(interface.AbstractRepository):
         pass
 
     @classmethod
-    def delete(cls, entity_id: EntityIdentity) -> None:
-        pass
+    def delete(cls, entity_id: 'MiniTrainingIdentity', **_) -> None:
+        EducationGroupYear.objects.filter(
+            acronym=entity_id.acronym,
+            academic_year__year=entity_id.year,
+            education_group_type__category=Categories.MINI_TRAINING.name
+        ).delete()
 
 
 def _convert_type(education_group_type):

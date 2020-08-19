@@ -22,14 +22,16 @@
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
 from education_group.ddd import command
+from education_group.ddd.domain.mini_training import MiniTrainingIdentity
+from education_group.ddd.repository.mini_training import MiniTrainingRepository
+from education_group.ddd.validators.validators_by_business_action import DeleteOrphanMiniTrainingValidatorList
 
 
 def delete_orphan_mini_training(cmd: command.DeleteOrphanMiniTrainingCommand) -> 'MiniTrainingIdentity':
-    pass
-    # mini_training_id = MiniTrainingIdentity(acronym=cmd.acronym, year=cmd.year)
-    # mini_training = MiniTrainingRepository.get(mini_training_id)
-    #
-    # DeleteOrphanMiniTrainingValidatorList(mini_training).validate()
-    #
-    # MiniTrainingRepository.delete(mini_training_id)
-    # return mini_training_id
+    mini_training_id = MiniTrainingIdentity(acronym=cmd.abbreviated_title, year=cmd.year)
+    mini_training = MiniTrainingRepository.get(mini_training_id)
+
+    DeleteOrphanMiniTrainingValidatorList(mini_training).validate()
+
+    MiniTrainingRepository.delete(mini_training_id)
+    return mini_training_id

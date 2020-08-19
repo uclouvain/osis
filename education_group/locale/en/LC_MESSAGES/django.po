@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-17 15:21+0200\n"
+"POT-Creation-Date: 2020-08-19 12:38+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,8 +18,12 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #, python-format
-msgid "%(count_enrollment)d student is enrolled in the mini-training."
-msgid_plural "%(count_enrollment)d students are enrolled in the mini-training."
+msgid ""
+"%(count_enrollment)d student is enrolled in the mini-training "
+"%(abbreviated_title)s (%(academic_year)s)."
+msgid_plural ""
+"%(count_enrollment)d students are enrolled in the mini-training "
+"%(abbreviated_title)s (%(academic_year)s)."
 msgstr[0] ""
 msgstr[1] ""
 
@@ -385,9 +389,6 @@ msgstr ""
 msgid "Link type"
 msgstr ""
 
-msgid "Linked with EPC"
-msgstr ""
-
 msgid "Main"
 msgstr ""
 
@@ -569,7 +570,18 @@ msgid "The link of %(code)s - %(acronym)s - %(year)s has been updated."
 msgstr ""
 
 #, python-format
-msgid "The mini-training %(code)s has been deleted."
+msgid "The mini-training %(code)s - %(title)s has been deleted."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The mini-training {abbreviated_title} ({academic_year}) have links in EPC "
+"application"
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The mini-training {acronym} ({academic_year}) have links in EPC application"
 msgstr ""
 
 #, python-format

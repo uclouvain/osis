@@ -26,9 +26,9 @@ from unittest import mock
 from django.test import TestCase
 
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
+from education_group.ddd.domain.mini_training import MiniTrainingIdentity
 from education_group.ddd.domain.training import TrainingIdentity
 from program_management.ddd import command
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 from program_management.ddd.service.write import delete_node_service
 
 
@@ -65,20 +65,15 @@ class TestDeleteNodeService(TestCase):
         self.assertFalse(self.mocked_delete_orphan_training.called)
         self.assertFalse(self.mocked_delete_orphan_mini_training.called)
 
-    @mock.patch("program_management.ddd.service.write.delete_node_service.ProgramTreeVersionIdentitySearch"
+    @mock.patch("program_management.ddd.service.write.delete_node_service.MiniTrainingIdentitySearch"
                 ".get_from_node_identity")
     def test_assert_delete_node_of_type_mini_training_called_delete_orphan_mini_training(self, mock_search_id):
-        mock_search_id.return_value = ProgramTreeVersionIdentity(
-            offer_acronym="MINITRAINING",
-            year=2018,
-            version_name='',
-            is_transition=False
-        )
+        mock_search_id.return_value = MiniTrainingIdentity(acronym="MINITRAINING", year=2018)
         cmd = command.DeleteNodeCommand(code="OPT100M", year=2018, node_type=MiniTrainingType.OPTION.name)
         delete_node_service.delete_node(cmd)
 
         self.assertTrue(self.mocked_delete_orphan_mini_training.called)
-        self.assertFalse(self.mocked_delete_orphan_group.called)
+        self.assertTrue(self.mocked_delete_orphan_group.called)
         self.assertFalse(self.mocked_delete_orphan_training.called)
 
     @mock.patch("program_management.ddd.service.write.delete_node_service.TrainingIdentitySearch"

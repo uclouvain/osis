@@ -49,6 +49,7 @@ from base.models.enums.activity_presence import ActivityPresence
 from base.models.enums.decree_category import DecreeCategories
 from base.models.enums.diploma_coorganization import DiplomaCoorganizationTypes
 from base.models.enums.duration_unit import DurationUnitsEnum
+from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import TrainingType
 from base.models.enums.funding_codes import FundingCodes
 from base.models.enums.internship_presence import InternshipPresence
@@ -117,7 +118,8 @@ class TrainingRepository(interface.AbstractRepository):
     def delete(cls, entity_id: 'TrainingIdentity', **_) -> None:
         EducationGroupYear.objects.filter(
             acronym=entity_id.acronym,
-            academic_year__year=entity_id.year
+            academic_year__year=entity_id.year,
+            education_group_type__category=Categories.TRAINING.name
         ).delete()
 
 
