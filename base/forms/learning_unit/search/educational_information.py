@@ -29,6 +29,7 @@ from django.contrib.postgres.fields import JSONField
 from django.contrib.postgres.fields.jsonb import KeyTextTransform, KeyTransform
 from django.db.models import OuterRef, Case, When, Value, Subquery, BooleanField, Q, Prefetch, CharField, DateTimeField, \
     IntegerField, TextField
+from django.db.models.expressions import RawSQL
 from django.db.models.functions import Cast
 from django_filters import filters
 from reversion.models import Version
@@ -80,37 +81,24 @@ class LearningUnitDescriptionFicheFilter(LearningUnitFilter):
         (or entity calendar parent and so one) of the requirement entity. If not found, the summary status is
         computed with the general Academic Calendar Object
         """
-        ac_calendar = academic_calendar.get_by_reference_and_data_year(
-            SUMMARY_COURSE_SUBMISSION,
-            self.form.cleaned_data['academic_year'].past()
-        )
+
         entity_calendars_computed = entity_calendar.build_calendar_by_entities(
             self.form.cleaned_data['academic_year'].past(),
             SUMMARY_COURSE_SUBMISSION,
         )
         requirement_entities_ids = queryset.values_list('learning_container_year__requirement_entity', flat=True)
 
-        reversion_subquery = Version.objects.annotate(
-            json_data=Cast('serialized_data', JSONField())
-        ).annotate(
-            dict=KeyTransform('0', 'json_data')
-        ).annotate(
-            fields=KeyTransform('fields', 'dict')
-        ).annotate(
-            reference=Cast(KeyTransform('reference', 'fields'), IntegerField()),
-        ).filter(
-            revision__date_created__gte=ac_calendar.start_date,
-            content_type=ContentType.objects.get_for_model(TranslatedText),
-            revision__user__person__isnull=False,
-            reference=OuterRef('pk')
-        ).values(
-            'revision__date_created'
-        ).order_by(
-            '-revision__date_created'
-        )
+        extra_query = """
+            SELECT max(rr.date_created)
+            FROM reversion_version
+            JOIN reversion_revision rr on reversion_version.revision_id = rr.id
+            WHERE reversion_version.content_type_id=157 
+                and (serialized_data::jsonb -> 0 -> 'fields' -> 'reference')::int = base_learningunityear.id
+            GROUP BY reversion_version.object_id
+        """
 
         queryset = queryset.annotate(
-            last_translated_text_changed=Subquery(reversion_subquery[:1])
+            last_translated_text_changed=RawSQL(extra_query, ())
         )
 
         summary_status_case_statment = [When(last_translated_text_changed__isnull=True, then=False)]
