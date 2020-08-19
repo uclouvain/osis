@@ -93,8 +93,10 @@ class LearningUnitDescriptionFicheFilter(LearningUnitFilter):
         reversion_subquery = Version.objects.annotate(
             json_data=Cast('serialized_data', JSONField())
         ).annotate(
-            dict=KeyTransform('0', 'json_data'),
-            fields=KeyTransform('fields', 'dict'),
+            dict=KeyTransform('0', 'json_data')
+        ).annotate(
+            fields=KeyTransform('fields', 'dict')
+        ).annotate(
             reference=Cast(KeyTransform('reference', 'fields'), IntegerField()),
         ).filter(
             revision__date_created__gte=ac_calendar.start_date,
