@@ -26,26 +26,46 @@
 
 from django.test import SimpleTestCase
 from django.utils.translation import gettext as _
+from mock import patch
 
+from base.tests.factories.academic_year import AcademicYearFactory
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 from program_management.ddd.validators._match_version import MatchVersionValidator
+from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
 from program_management.tests.ddd.validators.mixins import TestValidatorValidateMixin
 
 
 class TestMatchVersionValidator(TestValidatorValidateMixin, SimpleTestCase):
 
     def setUp(self):
-        self.root_node_version_name = ''
-        self.node_to_add_version_name = ''
+        self.academic_year = AcademicYearFactory.build(current=True)
+        self.tree = ProgramTreeVersionFactory().tree
+        self.node_to_attach = ProgramTreeVersionFactory().tree.root_node
 
-    def test_should_not_raise_exception_when_versions_match(self):
-        self.assertValidatorNotRaises(MatchVersionValidator(self.root_node_version_name, self.node_to_add_version_name))
+    @patch(
+        'program_management.ddd.domain.service.identity_search.ProgramTreeVersionIdentitySearch.get_from_node_identity',
+    )
+    def test_should_not_raise_exception_when_versions_match(self, mock_node_identity):
+        identity_values = {'year': self.academic_year, 'version_name': '', 'is_transition': False}
+        mock_node_identity.side_effect = [
+            ProgramTreeVersionIdentity(offer_acronym=self.tree.root_node.code, **identity_values),
+            ProgramTreeVersionIdentity(offer_acronym=self.node_to_attach.code, **identity_values)
+        ]
+        self.assertValidatorNotRaises(MatchVersionValidator(self.tree, self.node_to_attach))
 
-    def test_should_raise_exception_when_versions_mismatch(self):
-        self.node_to_add_version_name = 'TEST'
+    @patch(
+        'program_management.ddd.domain.service.identity_search.ProgramTreeVersionIdentitySearch.get_from_node_identity',
+    )
+    def test_should_raise_exception_when_versions_mismatch(self, mock_node_identity):
+        identity_values = {'year': self.academic_year, 'is_transition': False}
+        mock_node_identity.side_effect = [
+            ProgramTreeVersionIdentity(offer_acronym=self.tree.root_node.code, version_name='A', **identity_values),
+            ProgramTreeVersionIdentity(offer_acronym=self.node_to_attach.code, version_name='B', **identity_values)
+        ]
         expected_message = _(
             'The child version must be the same as the root node version'
         )
         self.assertValidatorRaises(
-            MatchVersionValidator(self.root_node_version_name, self.node_to_add_version_name),
+            MatchVersionValidator(self.tree, self.node_to_attach),
             [expected_message]
         )
