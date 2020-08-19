@@ -85,6 +85,7 @@ class LearningUnitDescriptionFicheFilter(LearningUnitFilter):
         requirement_entities_ids = queryset.values_list('learning_container_year__requirement_entity', flat=True)
 
         reversion_subquery = Version.objects.filter(
+            content_type=ContentType.objects.get_for_model(TranslatedText),
             object_id=OuterRef('id_varchar'),
             revision__user__person__isnull=False
         ).select_related(
