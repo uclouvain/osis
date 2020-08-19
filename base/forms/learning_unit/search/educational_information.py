@@ -26,7 +26,9 @@
 from django import forms
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields import JSONField
-from django.db.models import OuterRef, Case, When, Value, Subquery, BooleanField, Q, Prefetch, CharField, DateTimeField
+from django.contrib.postgres.fields.jsonb import KeyTextTransform, KeyTransform
+from django.db.models import OuterRef, Case, When, Value, Subquery, BooleanField, Q, Prefetch, CharField, DateTimeField, \
+    IntegerField, TextField
 from django.db.models.functions import Cast
 from django_filters import filters
 from reversion.models import Version
@@ -88,33 +90,25 @@ class LearningUnitDescriptionFicheFilter(LearningUnitFilter):
         )
         requirement_entities_ids = queryset.values_list('learning_container_year__requirement_entity', flat=True)
 
-        reversion_subquery = Version.objects.filter(
+        reversion_subquery = Version.objects.annotate(
+            json_data=Cast('serialized_data', JSONField())
+        ).annotate(
+            dict=KeyTransform('0', 'json_data'),
+            fields=KeyTransform('fields', 'dict'),
+            reference=Cast(KeyTransform('reference', 'fields'), IntegerField()),
+        ).filter(
+            revision__date_created__gte=ac_calendar.start_date,
             content_type=ContentType.objects.get_for_model(TranslatedText),
-            object_id=OuterRef('id_varchar'),
             revision__user__person__isnull=False,
-            revision__date_created__gte=ac_calendar.start_date
-        ).select_related(
-            "revision",
-        ).order_by(
-            "-revision__date_created"
-        )
-        translated_text_qs = TranslatedText.objects.filter(
-            entity=LEARNING_UNIT_YEAR,
-            text_label__label__in=CMS_LABEL_PEDAGOGY,
-            changed__gte=ac_calendar.start_date,
             reference=OuterRef('pk')
-        ).annotate(
-            id_varchar=Cast('id', output_field=CharField())
-        ).annotate(
-            last_changed=Subquery(reversion_subquery.values('revision__date_created')[:1], output_field=DateTimeField())
         ).values(
-            'last_changed'
+            'revision__date_created'
         ).order_by(
-            "-last_changed"
+            '-revision__date_created'
         )
 
         queryset = queryset.annotate(
-            last_translated_text_changed=Subquery(translated_text_qs[:1], output_field=DateTimeField())
+            last_translated_text_changed=Subquery(reversion_subquery[:1])
         )
 
         summary_status_case_statment = [When(last_translated_text_changed__isnull=True, then=False)]
