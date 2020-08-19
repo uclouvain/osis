@@ -33,7 +33,7 @@ from reversion.models import Version
 
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY
 from base.forms.learning_unit.search.simple import LearningUnitFilter
-from base.models import entity_calendar
+from base.models import entity_calendar, academic_calendar
 from base.models.enums.academic_calendar_type import SUMMARY_COURSE_SUBMISSION
 from base.models.teaching_material import TeachingMaterial
 from base.views.learning_units.search.common import SearchTypes
@@ -78,6 +78,10 @@ class LearningUnitDescriptionFicheFilter(LearningUnitFilter):
         (or entity calendar parent and so one) of the requirement entity. If not found, the summary status is
         computed with the general Academic Calendar Object
         """
+        ac_calendar = academic_calendar.get_by_reference_and_data_year(
+            SUMMARY_COURSE_SUBMISSION,
+            self.form.cleaned_data['academic_year'].past()
+        )
         entity_calendars_computed = entity_calendar.build_calendar_by_entities(
             self.form.cleaned_data['academic_year'].past(),
             SUMMARY_COURSE_SUBMISSION,
@@ -87,7 +91,8 @@ class LearningUnitDescriptionFicheFilter(LearningUnitFilter):
         reversion_subquery = Version.objects.filter(
             content_type=ContentType.objects.get_for_model(TranslatedText),
             object_id=OuterRef('id_varchar'),
-            revision__user__person__isnull=False
+            revision__user__person__isnull=False,
+            revision__date_created__gte=ac_calendar.start_date
         ).select_related(
             "revision",
         ).order_by(
@@ -96,7 +101,7 @@ class LearningUnitDescriptionFicheFilter(LearningUnitFilter):
         translated_text_qs = TranslatedText.objects.filter(
             entity=LEARNING_UNIT_YEAR,
             text_label__label__in=CMS_LABEL_PEDAGOGY,
-            changed__isnull=False,
+            changed__gte=ac_calendar.start_date,
             reference=OuterRef('pk')
         ).annotate(
             id_varchar=Cast('id', output_field=CharField())
