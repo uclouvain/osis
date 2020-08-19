@@ -99,6 +99,7 @@ class PasteNodeValidatorList(business_validator.BusinessListValidator):
         for validator in self.validators:
             try:
                 validator.validate()
+            # TODO : gather multiple BusinessException instead of BusinessExceptions
             except osis_common.ddd.interface.BusinessExceptions as business_exception:
                 error_messages.extend(business_exception.messages)
 
@@ -113,7 +114,6 @@ class CheckPasteNodeValidatorList(business_validator.BusinessListValidator):
             node_to_paste: 'Node',
             check_paste_command: command.CheckPasteNodeCommand,
             tree_repository: 'ProgramTreeRepository',
-            tree_version_repository: 'ProgramTreeVersionRepository'
     ):
         path = check_paste_command.path_to_paste
 
@@ -123,11 +123,8 @@ class CheckPasteNodeValidatorList(business_validator.BusinessListValidator):
                 MinimumEditableYearValidator(tree),
                 InfiniteRecursivityTreeValidator(tree, node_to_paste, path),
                 _validate_end_date_and_option_finality.ValidateEndDateAndOptionFinality(node_to_paste, tree_repository),
+                MatchVersionValidator(tree, node_to_paste)
             ]
-            if node_to_paste.is_training():
-                root_version = tree_version_repository.search(element_ids=[tree.root_node.node_id])[0]
-                child_version = tree_version_repository.search(element_ids=[node_to_paste.node_id])[0]
-                self.validators.append(MatchVersionValidator(root_version.version_name, child_version.version_name))
 
         elif node_to_paste.is_learning_unit():
             self.validators = [
@@ -146,8 +143,9 @@ class CheckPasteNodeValidatorList(business_validator.BusinessListValidator):
         for validator in self.validators:
             try:
                 validator.validate()
-            except osis_common.ddd.interface.BusinessExceptions as business_exception:
-                error_messages.extend(business_exception.messages)
+            # TODO : gather multiple BusinessException instead of BusinessExceptions
+            except osis_common.ddd.interface.BusinessExceptions as business_exceptions:
+                error_messages.extend(business_exceptions.messages)
 
         if error_messages:
             raise osis_common.ddd.interface.BusinessExceptions(error_messages)
@@ -189,6 +187,7 @@ class DetachNodeValidatorList(business_validator.BusinessListValidator):
         for validator in self.validators:
             try:
                 validator.validate()
+            # TODO : gather multiple BusinessException instead of BusinessExceptions
             except osis_common.ddd.interface.BusinessExceptions as business_exception:
                 error_messages.extend(business_exception.messages)
 

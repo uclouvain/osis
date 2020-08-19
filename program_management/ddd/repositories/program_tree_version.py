@@ -25,8 +25,9 @@
 ##############################################################################
 from typing import Optional, List
 
-from django.db import transaction, IntegrityError
+from django.db import IntegrityError
 from django.db.models import F
+from django.db.models import Q
 
 from base.models.education_group_year import EducationGroupYear
 from education_group.models.group_year import GroupYear
@@ -39,7 +40,6 @@ from program_management.ddd.domain.program_tree_version import ProgramTreeVersio
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 from program_management.ddd.repositories import program_tree as program_tree_repository
 from program_management.models.education_group_version import EducationGroupVersion
-from django.db.models import Q
 
 
 class ProgramTreeVersionRepository(interface.AbstractRepository):

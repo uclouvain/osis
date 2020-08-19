@@ -23,20 +23,23 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.utils.translation import gettext as _
 
-import osis_common.ddd.interface
 from base.ddd.utils import business_validator
+from program_management.ddd.domain import exception
 
 
 class MatchVersionValidator(business_validator.BusinessValidator):
 
-    def __init__(self, root_node_version_name: str, node_to_add_version_name: str):
+    def __init__(self, tree: 'ProgramTree', node_to_add: 'Node'):
         super(MatchVersionValidator, self).__init__()
-        self.root_node_version_name = root_node_version_name
-        self.node_to_add_version_name = node_to_add_version_name
+        self.root_node = tree.root_node
+        self.node_to_add = node_to_add
+
+        from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
+        self.version_search = ProgramTreeVersionIdentitySearch()
 
     def validate(self):
-        if self.root_node_version_name != self.node_to_add_version_name:
-            error_msg = _('The child version must be the same as the root node version')
-            raise osis_common.ddd.interface.BusinessExceptions([error_msg])
+        self.root_node_version = self.version_search.get_from_node_identity(self.root_node.entity_id)
+        self.child_version = self.version_search.get_from_node_identity(self.node_to_add.entity_id)
+        if self.node_to_add.is_training() and self.root_node_version.version_name != self.child_version.version_name:
+            raise exception.ProgramTreeVersionMismatch()
