@@ -182,7 +182,7 @@ class TestDeleteMiniTrainingPostMethod(TestCase):
 
     def test_ensure_post_call_show_training_have_link_exception_when_raised(self):
         self.mocked_delete_all_standard_versions.side_effect = MiniTrainingHaveLinkWithEPC(
-            acronym=self.mini_training.acronym,
+            abbreviated_title=self.mini_training.acronym,
             year=self.mini_training.year
         )
 
@@ -192,8 +192,8 @@ class TestDeleteMiniTrainingPostMethod(TestCase):
         self.assertEqual(len(messages), 1)
         self.assertEqual(
             str(messages[0]),
-            _("The mini-training {acronym} ({academic_year}) have links in EPC application").format(
-                acronym=self.mini_training.acronym,
+            _("The mini-training {abbreviated_title} ({academic_year}) have links in EPC application").format(
+                abbreviated_title=self.mini_training.acronym,
                 academic_year=display_as_academic_year(self.mini_training.year)
             )
         )
