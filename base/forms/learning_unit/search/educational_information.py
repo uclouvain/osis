@@ -72,7 +72,6 @@ class LearningUnitDescriptionFicheFilter(LearningUnitFilter):
             queryset = queryset.select_related('learning_container_year__academic_year', 'academic_year')
         return queryset
 
-    #  TODO OSIS-4871 use reversion to know date of modification
     def _compute_summary_status(self, queryset):
         """
         This function will compute the summary status. First, we will take the entity calendar
