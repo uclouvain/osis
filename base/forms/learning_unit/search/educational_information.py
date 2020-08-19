@@ -93,7 +93,7 @@ class LearningUnitDescriptionFicheFilter(LearningUnitFilter):
             FROM reversion_version
             JOIN reversion_revision rr on reversion_version.revision_id = rr.id
             WHERE reversion_version.content_type_id=157 
-                and (serialized_data::jsonb -> 0 -> 'fields' -> 'reference')::int = base_learningunityear.id
+                and (serialized_data::jsonb -> 0 -> 'fields' ->> 'reference')::int = base_learningunityear.id
             GROUP BY reversion_version.object_id
         """
 
