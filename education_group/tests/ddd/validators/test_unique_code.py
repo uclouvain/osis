@@ -23,34 +23,21 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db import transaction
+import mock
+from django.test import SimpleTestCase
 
-from education_group.ddd.domain import exception
-from education_group.ddd.service.write.create_group_service import create_orphan_group
-from program_management.ddd.command import CopyProgramTreeToNextYearCommand
-from program_management.ddd.domain.program_tree import ProgramTreeIdentity, ProgramTreeBuilder
-from program_management.ddd.repositories.program_tree import ProgramTreeRepository
+from education_group.ddd.domain.exception import CodeAlreadyExistException
+from education_group.ddd.validators._unique_code import UniqueCodeValidator
 
 
-@transaction.atomic()
-def copy_program_tree_to_next_year(copy_cmd: CopyProgramTreeToNextYearCommand) -> 'ProgramTreeIdentity':
-    # GIVEN
-    repository = ProgramTreeRepository()
-    existing_program_tree = repository.get(
-        entity_id=ProgramTreeIdentity(
-            code=copy_cmd.code,
-            year=copy_cmd.year,
-        )
-    )
+class TestUniqueCodeValidator(SimpleTestCase):
+    @mock.patch('education_group.ddd.validators._unique_code.CheckCodeExist.get_existing_year', return_value=2020)
+    def test_assert_raise_exception_when_code_exist(self, mock_get_existing_year):
+        validator = UniqueCodeValidator("DUMMY")
+        with self.assertRaises(CodeAlreadyExistException):
+            validator.is_valid()
 
-    # WHEN
-    program_tree_next_year = ProgramTreeBuilder().copy_to_next_year(existing_program_tree, repository)
-
-    # THEN
-    try:
-        with transaction.atomic():
-            identity = repository.create(program_tree_next_year, create_group_service=create_orphan_group)
-    except exception.CodeAlreadyExistException:
-        identity = repository.update(program_tree_next_year)
-
-    return identity
+    @mock.patch('education_group.ddd.validators._unique_code.CheckCodeExist.get_existing_year', return_value=None)
+    def test_assert_not_raise_exception_when_code_not_exist(self, mock_get_existing_year):
+        validator = UniqueCodeValidator("DUMMY")
+        self.assertTrue(validator.is_valid())
