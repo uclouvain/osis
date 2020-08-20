@@ -148,6 +148,10 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
                                               args=[self.get_education_group_version().root_group.academic_year.year,
                                                     self.get_education_group_version().root_group.partial_acronym]
                                               ),
+            "generate_pdf_url": reverse("group_pdf_content",
+                                        args=[self.get_education_group_version().root_group.academic_year.year,
+                                              self.get_education_group_version().root_group.partial_acronym]
+                                        ),
             # TODO: Remove when finished reoganized tempalate
             "group_year": self.get_education_group_version().root_group,
 
