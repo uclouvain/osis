@@ -33,7 +33,8 @@ from django.views.decorators.http import require_http_methods
 from base import models as mdl
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY_FR_ONLY
 from base.business.learning_units.pedagogy import is_pedagogy_data_must_be_postponed
-from base.business.learning_units.perms import is_eligible_to_update_learning_unit_pedagogy
+from base.business.learning_units.perms import is_eligible_to_update_learning_unit_pedagogy, \
+    is_eligible_to_update_learning_unit_pedagogy_force_majeure_section
 from base.forms.learning_unit_pedagogy import LearningUnitPedagogyEditForm
 from base.models import learning_unit_year
 from base.models.learning_unit_year import LearningUnitYear
@@ -62,6 +63,15 @@ def toggle_summary_locked(request, learning_unit_year_id):
 @require_http_methods(["GET", "POST"])
 @PermissionDecorator(is_eligible_to_update_learning_unit_pedagogy, "learning_unit_year_id", LearningUnitYear)
 def learning_unit_pedagogy_edit(request, learning_unit_year_id):
+    redirect_url = reverse("learning_unit_pedagogy", kwargs={'learning_unit_year_id': learning_unit_year_id})
+    return edit_learning_unit_pedagogy(request, learning_unit_year_id, redirect_url)
+
+
+@login_required
+@require_http_methods(["GET", "POST"])
+@PermissionDecorator(is_eligible_to_update_learning_unit_pedagogy_force_majeure_section, "learning_unit_year_id",
+                     LearningUnitYear)
+def learning_unit_pedagogy_force_majeure_edit(request, learning_unit_year_id):
     redirect_url = reverse("learning_unit_pedagogy", kwargs={'learning_unit_year_id': learning_unit_year_id})
     return edit_learning_unit_pedagogy(request, learning_unit_year_id, redirect_url)
 

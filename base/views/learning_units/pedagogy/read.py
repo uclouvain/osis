@@ -37,7 +37,8 @@ from base import models as mdl
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY_FR_ONLY, \
     CMS_LABEL_PEDAGOGY
 from base.business.learning_units import perms
-from base.business.learning_units.perms import is_eligible_to_update_learning_unit_pedagogy
+from base.business.learning_units.perms import is_eligible_to_update_learning_unit_pedagogy, \
+    is_eligible_to_update_learning_unit_pedagogy_force_majeure_section
 from base.models.person import Person
 from base.models.teaching_material import TeachingMaterial
 from base.views.common import add_to_session
@@ -62,6 +63,10 @@ def read_learning_unit_pedagogy(request, learning_unit_year_id, context, templat
 
     learning_unit_year = context['learning_unit_year']
     perm_to_edit = is_eligible_to_update_learning_unit_pedagogy(learning_unit_year, person)
+    perm_to_edit_force_majeure = is_eligible_to_update_learning_unit_pedagogy_force_majeure_section(
+        learning_unit_year,
+        person
+    )
     user_language = mdl.person.get_user_interface_language(request.user)
 
     translated_labels_with_text = TranslatedTextLabel.objects.filter(
@@ -131,6 +136,7 @@ def read_learning_unit_pedagogy(request, learning_unit_year_id, context, templat
     context['cms_labels_translated'] = translated_labels_with_text
     context['teaching_materials'] = teaching_materials
     context['can_edit_information'] = perm_to_edit
+    context['can_edit_force_majeur_section'] = perm_to_edit_force_majeure
     context['can_edit_summary_locked_field'] = perms.can_edit_summary_locked_field(learning_unit_year, person)
     context['cms_label_pedagogy_fr_only'] = CMS_LABEL_PEDAGOGY_FR_ONLY
     context['attributions'] = attributions
