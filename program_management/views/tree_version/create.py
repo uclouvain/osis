@@ -25,6 +25,7 @@
 ##############################################################################
 from typing import List
 
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils.functional import cached_property
@@ -43,6 +44,7 @@ from program_management.ddd.business_types import *
 from program_management.ddd.command import CreateProgramTreeVersionCommand, ExtendProgramTreeVersionCommand, \
     UpdateProgramTreeVersionCommand, PostponeProgramTreeVersionCommand
 from program_management.ddd.domain.node import NodeIdentity
+from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
 from program_management.ddd.service.write import create_and_postpone_tree_version_service, \
     create_program_tree_version_service, extend_existing_tree_version_service, update_program_tree_version_service, \
     postpone_tree_version_service
@@ -101,9 +103,9 @@ class CreateProgramTreeVersion(AjaxPermissionRequiredMixin, AjaxTemplateMixin, V
                 postpone_tree_version_service.postpone_program_tree_version(
                     _convert_form_to_postpone_command(form, self.node_identity)
                 )
-                # identities = create_program_tree_version_service.create_and_postpone_from_past_version(command=command)
 
             self._display_success_messages(identities)
+            # return HttpResponseRedirect(self.get_success_url(identities[0]))
 
         return render(request, self.template_name, self.get_context_data(form))
 
@@ -117,13 +119,14 @@ class CreateProgramTreeVersion(AjaxPermissionRequiredMixin, AjaxTemplateMixin, V
             'form': form,
         }
 
-    def get_success_url(self):
+    def get_success_url(self, created_version_id: 'ProgramTreeVersionIdentity'):
+        node_identity = NodeIdentitySearch().get_from_tree_version_identity(created_version_id)
         return reverse(
-            "training_identification",
-            args=[
-                self.education_group_year.academic_year.year,
-                self.education_group_year.partial_acronym,
-            ]
+            "element_identification",
+            kwargs={
+                'year': node_identity.year,
+                'code': node_identity.code,
+            }
         )
 
     def _display_success_messages(self, identities: List['ProgramTreeVersionIdentity']):
@@ -131,9 +134,10 @@ class CreateProgramTreeVersion(AjaxPermissionRequiredMixin, AjaxTemplateMixin, V
         for created_identity in identities:
             success_messages.append(
                 _(
-                    "Specific version for education group year %(offer_acronym)s[%(acronym)s] (%(academic_year)s) "
-                    "successfully created."
+                    "Specific version for education group year "
+                    "<a href='%(link)s'> %(offer_acronym)s[%(acronym)s] (%(academic_year)s) </a> successfully created."
                 ) % {
+                    "link": self.get_success_url(created_identity),
                     "offer_acronym": created_identity.offer_acronym,
                     "acronym": created_identity.version_name,
                     "academic_year": display_as_academic_year(created_identity.year)
@@ -190,6 +194,5 @@ def _convert_form_to_postpone_command(
 
 
 # TODO :: rename bouton to prolonger
-# TODO :: Prolonger ne fonctionne pas
-# TODO :: enlever le case sensitive
 # TODO :: Ajouter lien dans le success message
+# TODO :: rename get_from_training_identity -> standard

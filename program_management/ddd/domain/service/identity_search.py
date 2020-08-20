@@ -71,6 +71,18 @@ class NodeIdentitySearch(interface.DomainService):
         if values:
             return NodeIdentity(code=values[0]['partial_acronym'], year=training_identity.year)
 
+    def get_from_tree_version_identity(self, tree_version_id: 'ProgramTreeVersionIdentity') -> 'NodeIdentity':
+        values = GroupYear.objects.filter(
+            educationgroupversion__offer__acronym=tree_version_id.offer_acronym,
+            educationgroupversion__offer__academic_year__year=tree_version_id.year,
+            educationgroupversion__version_name=tree_version_id.version_name,
+            educationgroupversion__is_transition=tree_version_id.is_transition,
+        ).values(
+            'partial_acronym',
+        )
+        if values:
+            return NodeIdentity(code=values[0]['partial_acronym'], year=tree_version_id.year)
+
     @classmethod
     def get_from_element_id(cls, element_id: int) -> Union['NodeIdentity', None]:
         try:

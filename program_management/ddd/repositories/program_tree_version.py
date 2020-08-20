@@ -230,7 +230,10 @@ def _update_end_year_of_existence(educ_group_version: EducationGroupVersion, end
     group = Group.objects.get(
         groupyear__educationgroupversion__pk=educ_group_version.pk
     )
-    group.end_year_id = AcademicYear.objects.only('pk').get(year=end_year_of_existence).pk
+    end_year_id = None
+    if end_year_of_existence:
+        end_year_id = AcademicYear.objects.only('pk').get(year=end_year_of_existence).pk
+    group.end_year_id = end_year_id
     group.save()
 
 
