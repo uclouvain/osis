@@ -23,34 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db import transaction
+from django.test import TestCase
 
-from education_group.ddd.domain import exception
-from education_group.ddd.service.write.create_group_service import create_orphan_group
-from program_management.ddd.command import CopyProgramTreeToNextYearCommand
-from program_management.ddd.domain.program_tree import ProgramTreeIdentity, ProgramTreeBuilder
-from program_management.ddd.repositories.program_tree import ProgramTreeRepository
+from education_group.ddd.domain.service.code_exist import CheckCodeExist
+from education_group.tests.factories.group_year import GroupYearFactory
 
 
-@transaction.atomic()
-def copy_program_tree_to_next_year(copy_cmd: CopyProgramTreeToNextYearCommand) -> 'ProgramTreeIdentity':
-    # GIVEN
-    repository = ProgramTreeRepository()
-    existing_program_tree = repository.get(
-        entity_id=ProgramTreeIdentity(
-            code=copy_cmd.code,
-            year=copy_cmd.year,
-        )
-    )
+class TestCheckCodeExist(TestCase):
+    def test_assert_existing_year(self):
+        group_db_obj = GroupYearFactory(academic_year__year=2020)
+        self.assertEqual(CheckCodeExist.get_existing_year(group_db_obj.partial_acronym), 2020)
 
-    # WHEN
-    program_tree_next_year = ProgramTreeBuilder().copy_to_next_year(existing_program_tree, repository)
-
-    # THEN
-    try:
-        with transaction.atomic():
-            identity = repository.create(program_tree_next_year, create_group_service=create_orphan_group)
-    except exception.CodeAlreadyExistException:
-        identity = repository.update(program_tree_next_year)
-
-    return identity
+    def test_assert_none_when_no_existing_year(self):
+        self.assertIsNone(CheckCodeExist.get_existing_year("DUMMY"))
