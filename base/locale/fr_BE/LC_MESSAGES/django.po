@@ -528,6 +528,9 @@ msgstr "Classes"
 msgid "Clear notifications"
 msgstr "Supprimer notifications"
 
+msgid "Click on the map to set the location"
+msgstr "Cliquez sur la carte pour définir l'emplacement"
+
 msgid "Click to reconnect"
 msgstr "Cliquez pour vous reconnecter"
 
@@ -1419,6 +1422,9 @@ msgstr "Entité logistique"
 msgid "Logout"
 msgstr "Logout"
 
+msgid "Look up the address"
+msgstr "Rechercher à partir de l'adresse"
+
 msgid "M."
 msgstr ""
 
@@ -1553,6 +1559,9 @@ msgstr "Nombre minimum de relations autorisées"
 
 msgid "Minor list choice"
 msgstr "Liste au choix Mineures"
+
+msgid "Missing search address"
+msgstr "Adresse de recherche manquante"
 
 msgid "Mobile phone"
 msgstr "Téléphone mobile (GSM)"

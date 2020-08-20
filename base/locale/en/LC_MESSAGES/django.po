@@ -511,6 +511,9 @@ msgstr ""
 msgid "Clear notifications"
 msgstr ""
 
+msgid "Click on the map to set the location"
+msgstr ""
+
 msgid "Click to reconnect"
 msgstr ""
 
@@ -1379,6 +1382,9 @@ msgstr ""
 msgid "Logout"
 msgstr ""
 
+msgid "Look up the address"
+msgstr ""
+
 msgid "M."
 msgstr ""
 
@@ -1505,6 +1511,9 @@ msgid "Minimum number of permitted relationships"
 msgstr ""
 
 msgid "Minor list choice"
+msgstr ""
+
+msgid "Missing search address"
 msgstr ""
 
 msgid "Mobile phone"

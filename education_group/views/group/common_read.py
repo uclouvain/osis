@@ -131,6 +131,12 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
                                               args=[self.get_group_year().academic_year.year,
                                                     self.get_group_year().partial_acronym]
                                               ),
+            "generate_pdf_url": reverse("group_pdf_content",
+                                        args=[
+                                            self.get_group_year().academic_year.year,
+                                            self.get_group_year().partial_acronym,
+                                        ],
+                                        ),
             "selected_element_clipboard": self.get_selected_element_clipboard_message(),
             "group_year": self.get_group_year(),  # TODO: Should be remove and use DDD object
             "create_group_url": self.get_create_group_url(),
