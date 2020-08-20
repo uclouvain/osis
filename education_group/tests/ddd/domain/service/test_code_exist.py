@@ -35,4 +35,4 @@ class TestCheckCodeExist(TestCase):
         self.assertEqual(CheckCodeExist.get_existing_year(group_db_obj.partial_acronym), 2020)
 
     def test_assert_none_when_no_existing_year(self):
-        self.assertIsNone(CheckCodeExist.get_existing_year("DUMMY"), 2020)
+        self.assertIsNone(CheckCodeExist.get_existing_year("DUMMY"))

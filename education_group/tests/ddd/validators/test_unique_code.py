@@ -32,12 +32,12 @@ from education_group.ddd.validators._unique_code import UniqueCodeValidator
 
 class TestUniqueCodeValidator(SimpleTestCase):
     @mock.patch('education_group.ddd.validators._unique_code.CheckCodeExist.get_existing_year', return_value=2020)
-    def test_assert_raise_exception_case_training_have_enrollments(self, mock_get_existing_year):
+    def test_assert_raise_exception_when_code_exist(self, mock_get_existing_year):
         validator = UniqueCodeValidator("DUMMY")
         with self.assertRaises(CodeAlreadyExistException):
             validator.is_valid()
 
     @mock.patch('education_group.ddd.validators._unique_code.CheckCodeExist.get_existing_year', return_value=None)
-    def test_assert_not_raise_exception_when_training_have_no_enrollment(self, mock_get_existing_year):
+    def test_assert_not_raise_exception_when_code_not_exist(self, mock_get_existing_year):
         validator = UniqueCodeValidator("DUMMY")
         self.assertTrue(validator.is_valid())
