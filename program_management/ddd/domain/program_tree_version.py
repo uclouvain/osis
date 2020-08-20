@@ -151,6 +151,7 @@ class ProgramTreeVersionBuilder:
             entity_id=tree_version_identity,
             title_en=command.title_en,
             title_fr=command.title_fr,
+            end_year_of_existence=command.end_year,
         )
 
 
