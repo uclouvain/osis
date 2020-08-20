@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-06 14:46+0200\n"
+"POT-Creation-Date: 2020-08-17 15:58+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -248,6 +248,9 @@ msgstr ""
 msgid "Formations"
 msgstr ""
 
+msgid "Group"
+msgstr ""
+
 msgid "IMPOSSIBLE TO DISPLAY BECAUSE OF AN ILLEGAL CHARACTER IN STRING"
 msgstr ""
 
@@ -270,6 +273,12 @@ msgid "Language"
 msgstr ""
 
 msgid "Learning achievements"
+msgstr ""
+
+msgid "Learning class year"
+msgstr ""
+
+msgid "Learning unit year"
 msgstr ""
 
 msgid "Learning units"
@@ -346,7 +355,13 @@ msgstr ""
 msgid "New Mini-Training"
 msgstr ""
 
+msgid "New specific version"
+msgstr ""
+
 msgid "New training"
+msgstr ""
+
+msgid "New version"
 msgstr ""
 
 msgid "No"
@@ -472,6 +487,9 @@ msgstr ""
 
 msgid "Quadrimester"
 msgstr ""
+
+msgid "Extend"
+msgstr "Prolong"
 
 msgid "Registration ID"
 msgstr ""

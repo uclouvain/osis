@@ -23,28 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import factory.fuzzy
-
-from base.models.authorized_relationship import AuthorizedRelationshipList
-from program_management.ddd.domain.program_tree import ProgramTree, ProgramTreeIdentity
-from program_management.tests.ddd.factories.node import NodeGroupYearFactory
+from program_management.models.education_group_version import EducationGroupVersion
 
 
-class ProgramTreeIdentityFactory(factory.Factory):
-
-    class Meta:
-        model = ProgramTreeIdentity
-        abstract = False
-
-    code = factory.Sequence(lambda n: 'Code%02d' % n)
-    year = factory.fuzzy.FuzzyInteger(low=1999, high=2099)
-
-
-class ProgramTreeFactory(factory.Factory):
-
-    class Meta:
-        model = ProgramTree
-        abstract = False
-
-    root_node = factory.SubFactory(NodeGroupYearFactory)
-    authorized_relationships = AuthorizedRelationshipList([])
+def check_version_name_exists(working_year: int, offer_acronym: str, version_name: str) -> bool:
+    return EducationGroupVersion.objects.filter(
+        version_name=version_name,
+        root_group__academic_year__year__gte=working_year,
+        root_group__acronym=offer_acronym
+    ).exists()

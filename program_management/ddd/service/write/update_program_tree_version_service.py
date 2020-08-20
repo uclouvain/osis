@@ -23,28 +23,36 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import factory.fuzzy
 
-from base.models.authorized_relationship import AuthorizedRelationshipList
-from program_management.ddd.domain.program_tree import ProgramTree, ProgramTreeIdentity
-from program_management.tests.ddd.factories.node import NodeGroupYearFactory
-
-
-class ProgramTreeIdentityFactory(factory.Factory):
-
-    class Meta:
-        model = ProgramTreeIdentity
-        abstract = False
-
-    code = factory.Sequence(lambda n: 'Code%02d' % n)
-    year = factory.fuzzy.FuzzyInteger(low=1999, high=2099)
+from program_management.ddd.command import UpdateProgramTreeVersionCommand
+from program_management.ddd.domain.program_tree_version import STANDARD, UpdateProgramTreeVersiongData, \
+    ProgramTreeVersionIdentity
+from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 
 
-class ProgramTreeFactory(factory.Factory):
+def update_program_tree_version(
+        command: 'UpdateProgramTreeVersionCommand',
+) -> 'ProgramTreeVersionIdentity':
+    identity = ProgramTreeVersionIdentity(
+        offer_acronym=command.offer_acronym,
+        year=command.year,
+        version_name=command.version_name,
+        is_transition=command.is_transition,
+    )
+    program_tree_version = ProgramTreeVersionRepository().get(entity_id=identity)
 
-    class Meta:
-        model = ProgramTree
-        abstract = False
+    program_tree_version.update(__convert_command_to_update_data(command))
 
-    root_node = factory.SubFactory(NodeGroupYearFactory)
-    authorized_relationships = AuthorizedRelationshipList([])
+    identity = ProgramTreeVersionRepository.update(
+        program_tree_version=program_tree_version,
+    )
+
+    return identity
+
+
+def __convert_command_to_update_data(cmd: UpdateProgramTreeVersionCommand) -> 'UpdateProgramTreeVersiongData':
+    return UpdateProgramTreeVersiongData(
+        title_fr=cmd.title_fr,
+        title_en=cmd.title_en,
+        end_year_of_existence=cmd.end_year,
+    )

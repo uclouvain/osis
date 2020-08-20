@@ -23,28 +23,35 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import factory.fuzzy
 
-from base.models.authorized_relationship import AuthorizedRelationshipList
-from program_management.ddd.domain.program_tree import ProgramTree, ProgramTreeIdentity
-from program_management.tests.ddd.factories.node import NodeGroupYearFactory
+from django.db import transaction
 
-
-class ProgramTreeIdentityFactory(factory.Factory):
-
-    class Meta:
-        model = ProgramTreeIdentity
-        abstract = False
-
-    code = factory.Sequence(lambda n: 'Code%02d' % n)
-    year = factory.fuzzy.FuzzyInteger(low=1999, high=2099)
+from education_group.ddd.service.write import create_group_service
+from program_management.ddd import command
+from program_management.ddd.domain.program_tree import ProgramTreeBuilder, ProgramTreeIdentity
+from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 
 
-class ProgramTreeFactory(factory.Factory):
+@transaction.atomic()
+def duplicate_program_tree(
+        cmd: command.DuplicateProgramTree
+) -> 'ProgramTreeIdentity':
 
-    class Meta:
-        model = ProgramTree
-        abstract = False
+    # GIVEN
+    program_tree_identity = ProgramTreeIdentity(code=cmd.from_root_code, year=cmd.from_root_year)
+    existing_tree = ProgramTreeRepository().get(entity_id=program_tree_identity)
 
-    root_node = factory.SubFactory(NodeGroupYearFactory)
-    authorized_relationships = AuthorizedRelationshipList([])
+    # WHEN
+    program_tree = ProgramTreeBuilder().duplicate(
+        duplicate_from=existing_tree,
+        override_end_year_to=cmd.override_end_year_to,
+        override_start_year_to=cmd.override_start_year_to
+    )
+
+    # THEN
+    program_tree_identity = ProgramTreeRepository().create(
+        program_tree=program_tree,
+        create_group_service=create_group_service.create_orphan_group
+    )
+
+    return program_tree_identity

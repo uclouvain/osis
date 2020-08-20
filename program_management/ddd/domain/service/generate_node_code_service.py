@@ -23,28 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import factory.fuzzy
-
-from base.models.authorized_relationship import AuthorizedRelationshipList
-from program_management.ddd.domain.program_tree import ProgramTree, ProgramTreeIdentity
-from program_management.tests.ddd.factories.node import NodeGroupYearFactory
+from education_group.models.group_year import GroupYear
 
 
-class ProgramTreeIdentityFactory(factory.Factory):
-
-    class Meta:
-        model = ProgramTreeIdentity
-        abstract = False
-
-    code = factory.Sequence(lambda n: 'Code%02d' % n)
-    year = factory.fuzzy.FuzzyInteger(low=1999, high=2099)
+def generate_node_code(code_from_standard_root_node: str, year: int) -> str:
+    last_partial_acronym = _get_last_partial_acronym_using(code_from_standard_root_node, year).partial_acronym
+    return last_partial_acronym[:-4] + str(int(last_partial_acronym[-4:][:-1]) + 1) + last_partial_acronym[-1:]
 
 
-class ProgramTreeFactory(factory.Factory):
-
-    class Meta:
-        model = ProgramTree
-        abstract = False
-
-    root_node = factory.SubFactory(NodeGroupYearFactory)
-    authorized_relationships = AuthorizedRelationshipList([])
+def _get_last_partial_acronym_using(code: str, year: int) -> bool:
+    return GroupYear.objects.filter(
+        partial_acronym__startswith=code[:-4],
+        partial_acronym__endswith=code[-1:],
+        academic_year__year=year
+    ).order_by("partial_acronym").last()

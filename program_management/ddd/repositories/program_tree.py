@@ -70,26 +70,26 @@ class ProgramTreeRepository(interface.AbstractRepository):
             program_tree: 'ProgramTree',
             create_group_service: interface.ApplicationService = None
     ) -> 'ProgramTreeIdentity':
-        for child_node in [n for n in program_tree.get_all_nodes() if n._has_changed is True]:
+        for node in [n for n in program_tree.get_all_nodes() if n._has_changed is True]:
             create_group_service(
                 CreateOrphanGroupCommand(
-                    code=child_node.code,
-                    year=child_node.year,
-                    type=child_node.node_type.name,
-                    abbreviated_title=child_node.title,
-                    title_fr=child_node.group_title_fr,
-                    title_en=child_node.group_title_en,
-                    credits=int(child_node.credits) if child_node.credits else None,
-                    constraint_type=child_node.constraint_type.name if child_node.constraint_type else None,
-                    min_constraint=child_node.min_constraint,
-                    max_constraint=child_node.max_constraint,
-                    management_entity_acronym=child_node.management_entity_acronym,
-                    teaching_campus_name=child_node.teaching_campus.name,
-                    organization_name=child_node.teaching_campus.university_name,
-                    remark_fr=child_node.remark_fr or "",
-                    remark_en=child_node.remark_en or "",
-                    start_year=child_node.start_year,
-                    end_year=child_node.end_year,
+                    code=node.code,
+                    year=node.year,
+                    type=node.node_type.name,
+                    abbreviated_title=node.title,
+                    title_fr=node.group_title_fr,
+                    title_en=node.group_title_en,
+                    credits=int(node.credits) if node.credits else None,
+                    constraint_type=node.constraint_type.name if node.constraint_type else None,
+                    min_constraint=node.min_constraint,
+                    max_constraint=node.max_constraint,
+                    management_entity_acronym=node.management_entity_acronym,
+                    teaching_campus_name=node.teaching_campus.name,
+                    organization_name=node.teaching_campus.university_name,
+                    remark_fr=node.remark_fr or "",
+                    remark_en=node.remark_en or "",
+                    start_year=node.start_year,
+                    end_year=node.end_year,
                 )
             )
         persist_tree.persist(program_tree)

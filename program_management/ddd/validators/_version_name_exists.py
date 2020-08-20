@@ -23,28 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import factory.fuzzy
-
-from base.models.authorized_relationship import AuthorizedRelationshipList
-from program_management.ddd.domain.program_tree import ProgramTree, ProgramTreeIdentity
-from program_management.tests.ddd.factories.node import NodeGroupYearFactory
+from base.ddd.utils.business_validator import BusinessValidator
+from education_group.ddd.domain.exception import VersionNameAlreadyExist
+from program_management.ddd.repositories.check_version_name_exists import check_version_name_exists
 
 
-class ProgramTreeIdentityFactory(factory.Factory):
+class VersionNameExistsValidator(BusinessValidator):
 
-    class Meta:
-        model = ProgramTreeIdentity
-        abstract = False
+    def __init__(self, working_year: int, offer_acronym: str, version_name: str):
+        super(VersionNameExistsValidator, self).__init__()
+        self.working_year = working_year
+        self.version_name = version_name
+        self.offer_acronym = offer_acronym
 
-    code = factory.Sequence(lambda n: 'Code%02d' % n)
-    year = factory.fuzzy.FuzzyInteger(low=1999, high=2099)
-
-
-class ProgramTreeFactory(factory.Factory):
-
-    class Meta:
-        model = ProgramTree
-        abstract = False
-
-    root_node = factory.SubFactory(NodeGroupYearFactory)
-    authorized_relationships = AuthorizedRelationshipList([])
+    def validate(self, *args, **kwargs):
+        if check_version_name_exists(self.working_year, self.offer_acronym, self.version_name):
+            raise VersionNameAlreadyExist(self.version_name)

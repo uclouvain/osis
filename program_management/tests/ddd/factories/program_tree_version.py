@@ -27,7 +27,19 @@ import factory.fuzzy
 
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersion, ProgramTreeVersionIdentity
-from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
+from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory, ProgramTreeIdentityFactory
+
+
+class ProgramTreeVersionIdentityFactory(factory.Factory):
+
+    class Meta:
+        model = ProgramTreeVersionIdentity
+        abstract = False
+
+    offer_acronym = factory.Sequence(lambda n: 'OfferAcronym%02d' % n)
+    year = factory.fuzzy.FuzzyInteger(low=1999, high=2099)
+    version_name = factory.Sequence(lambda n: 'Version%02d' % n)
+    is_transition = False
 
 
 class ProgramTreeVersionFactory(factory.Factory):
@@ -46,6 +58,3 @@ class ProgramTreeVersionFactory(factory.Factory):
         version_name="",
         is_transition=False
     )
-
-
-

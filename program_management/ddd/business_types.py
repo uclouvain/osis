@@ -10,14 +10,15 @@ if TYPE_CHECKING:
     from program_management.ddd.domain.program_tree_version import ProgramTreeVersion, ProgramTreeVersionIdentity
 
     from program_management.ddd.domain.link import Link, LinkIdentity
-    from base.ddd.utils.validation_message import BusinessValidationMessage
     from program_management.ddd.domain.prerequisite import PrerequisiteExpression
+
+    from program_management.ddd.repositories.load_tree import NodeKey
 
     from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
     from program_management.ddd.repositories.program_tree import ProgramTreeRepository
     from program_management.ddd.repositories.node import NodeRepository
 
-    from program_management.ddd.repositories.load_tree import NodeKey
+    from base.ddd.utils.validation_message import BusinessValidationMessage
 
 
 FieldValueRepresentation = str  # Type used to verbose a field value for its view representation
