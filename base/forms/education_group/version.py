@@ -71,3 +71,6 @@ class SpecificVersionForm(forms.Form):
     def clean_end_year(self):
         end_year = self.cleaned_data["end_year"]
         return int(end_year) if end_year else None
+
+    def clean_version_name(self):
+        return self.cleaned_data['version_name'].upper()

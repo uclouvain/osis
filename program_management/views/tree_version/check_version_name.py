@@ -30,7 +30,7 @@ def check_version_name(request, year, code):
 
 def check_existing_version(version_name: str, year: int, code: str) -> bool:
     return EducationGroupVersion.objects.filter(
-        version_name=version_name,
+        version_name=version_name.upper(),
         root_group__academic_year__year=year,
         root_group__partial_acronym=code
     ).exists()
@@ -42,7 +42,7 @@ def find_last_existed_version(version_name, year, code):
         partial_acronym=code,
     )
     return EducationGroupVersion.objects.filter(
-        version_name=version_name,
+        version_name=version_name.upper(),
         root_group__academic_year__year__lt=year,
         root_group__acronym=group_year.acronym,
     ).order_by(

@@ -68,35 +68,3 @@ def create_program_tree_version(
     )
 
     return identity
-
-
-def create_and_postpone_from_past_version(command: 'CreateProgramTreeVersionCommand') -> List[ProgramTreeVersionIdentity]:
-    # GIVEN
-    creation_year = command.year
-    identity_to_create = ProgramTreeVersionIdentity(
-        offer_acronym=command.offer_acronym,
-        year=creation_year,
-        version_name=command.version_name,
-        is_transition=command.is_transition,
-    )
-    last_existing_tree_version = ProgramTreeVersionRepository().get_last_in_past(identity_to_create)
-
-    postpone_program_tree_service.postpone_program_tree(
-        PostponeProgramTreeCommand(
-            from_code=last_existing_tree_version.program_tree_identity.code,
-            from_year=last_existing_tree_version.program_tree_identity.year,
-            offer_acronym=identity_to_create.offer_acronym,
-            until_year=int(command.end_year) if command.end_year else None
-        )
-    )
-
-    created_identities_from_past = postpone_tree_version_service.postpone_program_tree_version(
-        PostponeProgramTreeVersionCommand(
-            from_offer_acronym=last_existing_tree_version.entity_id.offer_acronym,
-            from_version_name=last_existing_tree_version.entity_id.version_name,
-            from_year=last_existing_tree_version.entity_id.year,
-            from_is_transition=last_existing_tree_version.entity_id.is_transition,
-            until_year=int(command.end_year) if command.end_year else None
-        )
-    )
-    return created_identities_from_past

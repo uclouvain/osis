@@ -32,6 +32,7 @@ from program_management.ddd.command import CreateProgramTreeVersionCommand
 from program_management.ddd.command import CreateStandardVersionCommand
 from program_management.ddd.domain import exception
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity, ProgramTree
+from program_management.ddd.validators import validators_by_business_action
 from program_management.ddd.validators.validators_by_business_action import CopyProgramTreeVersionValidatorList, \
     CreateProgramTreeVersionValidatorList
 
@@ -59,8 +60,13 @@ class ProgramTreeVersionBuilder:
         identity_next_year = attr.evolve(copy_from.entity_id, year=copy_from.entity_id.year + 1)
         try:
             tree_version_next_year = tree_version_repository.get(identity_next_year)
-            # Case update program tree version to next year
-            # TODO :: To implement in OSIS-4386
+            tree_version_next_year.update(
+                UpdateProgramTreeVersiongData(
+                    title_fr=copy_from.title_fr,
+                    title_en=copy_from.title_en,
+                    end_year_of_existence=copy_from.end_year_of_existence,
+                )
+            )
         except exception.ProgramTreeVersionNotFoundException:
             # Case create program tree version to next year
             tree_version_next_year = attr.evolve(  # Copy to new object
@@ -148,6 +154,13 @@ class ProgramTreeVersionBuilder:
         )
 
 
+@attr.s(frozen=True, slots=True, kw_only=True)
+class UpdateProgramTreeVersiongData:
+    title_fr = attr.ib(type=str, default="")
+    title_en = attr.ib(type=str, default="")
+    end_year_of_existence = attr.ib(type=int, default=None)
+
+
 # FIXME :: should be in a separate DDD domain
 @attr.s(slots=True)
 class ProgramTreeVersion(interface.RootEntity):
@@ -158,6 +171,7 @@ class ProgramTreeVersion(interface.RootEntity):
     title_fr = attr.ib(type=str, default=None)
     title_en = attr.ib(type=str, default=None)
     tree = attr.ib(type=ProgramTree, default=None)
+    end_year_of_existence = attr.ib(type=int, default=None)
 
     def get_tree(self) -> 'ProgramTree':
         if not self.tree:
@@ -188,6 +202,13 @@ class ProgramTreeVersion(interface.RootEntity):
             return '[{}-Transition]'.format(
                 self.version_name
             ) if self.is_transition else '[{}]'.format(self.version_name)
+
+    def update(self, data: UpdateProgramTreeVersiongData) -> 'ProgramTreeVersion':
+        data_as_dict = attr.asdict(data, recurse=False)
+        for field, new_value in data_as_dict.items():
+            setattr(self, field, new_value)
+        validators_by_business_action.UpdateProgramTreeVersionValidatorList(self)
+        return self
 
 
 class ProgramTreeVersionNotFoundException(Exception):

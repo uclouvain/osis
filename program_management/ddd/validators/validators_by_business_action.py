@@ -258,6 +258,12 @@ class CopyProgramTreeValidatorList(business_validator.BusinessListValidator):
         super().__init__()
 
 
+class UpdateProgramTreeVersionValidatorList(business_validator.BusinessListValidator):
+    def __init__(self, tree_version: 'ProgramTreeVersion'):
+        self.validators = []
+        super().__init__()
+
+
 class CreateProgramTreeVersionValidatorList(BusinessListValidator):
 
     def __init__(self, year: int, offer_acronym: str, version_name: str):

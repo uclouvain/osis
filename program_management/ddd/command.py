@@ -59,6 +59,26 @@ class CreateProgramTreeVersionCommand(interface.CommandRequest):
     title_fr = attr.ib(type=str)
 
 
+@attr.s(frozen=True, slots=True)
+class ExtendProgramTreeVersionCommand(interface.CommandRequest):
+    end_year_of_existence = attr.ib(type=int)
+    offer_acronym = attr.ib(type=str)
+    version_name = attr.ib(type=str)
+    year = attr.ib(type=int)
+    is_transition = attr.ib(type=bool)
+
+
+@attr.s(frozen=True, slots=True)
+class UpdateProgramTreeVersionCommand(interface.CommandRequest):
+    end_year = attr.ib(type=int)
+    offer_acronym = attr.ib(type=str)
+    version_name = attr.ib(type=str)
+    year = attr.ib(type=int)
+    is_transition = attr.ib(type=bool)
+    title_en = attr.ib(type=str)
+    title_fr = attr.ib(type=str)
+
+
 class CopyElementCommand(interface.CommandRequest):
     def __init__(self, user_id: int, element_code: str, element_year: int):
         self.user_id = user_id
@@ -315,6 +335,8 @@ class PostponeProgramTreeVersionCommand(interface.CommandRequest):
     from_year = attr.ib(type=int)
     from_is_transition = attr.ib(type=bool)
     until_year = attr.ib(type=Optional[int])
+
+    # FIXME :: to remove, the code can be found when converting ProgramTreeVersionIdentity to GroupIdentity
     from_code = attr.ib(type=str, default=None)
 
 
@@ -322,7 +344,9 @@ class PostponeProgramTreeVersionCommand(interface.CommandRequest):
 class CopyTreeVersionToNextYearCommand(interface.CommandRequest):
     from_year = attr.ib(type=int)
     from_offer_acronym = attr.ib(type=str)
+    # FIXME :: to remove, the code can be found when converting ProgramTreeVersionIdentity to GroupIdentity
     from_offer_code = attr.ib(type=str)
+
     from_version_name = attr.ib(type=str)
     from_is_transition = attr.ib(type=bool)
 

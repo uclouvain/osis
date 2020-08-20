@@ -40,10 +40,12 @@ from education_group.ddd.domain.training import TrainingIdentity
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from osis_role.contrib.views import AjaxPermissionRequiredMixin
 from program_management.ddd.business_types import *
-from program_management.ddd.command import CreateProgramTreeVersionCommand
+from program_management.ddd.command import CreateProgramTreeVersionCommand, ExtendProgramTreeVersionCommand, \
+    UpdateProgramTreeVersionCommand, PostponeProgramTreeVersionCommand
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.service.write import create_and_postpone_tree_version_service, \
-    create_program_tree_version_service
+    create_program_tree_version_service, extend_existing_tree_version_service, update_program_tree_version_service, \
+    postpone_tree_version_service
 
 
 class CreateProgramTreeVersion(AjaxPermissionRequiredMixin, AjaxTemplateMixin, View):
@@ -83,14 +85,23 @@ class CreateProgramTreeVersion(AjaxPermissionRequiredMixin, AjaxTemplateMixin, V
             training_identity=self.training_identity
         )
         if form.is_valid():
-            command = _convert_form_to_command(form)
+            command = _convert_form_to_create_command(form)
             save_type = self.request.POST.get("save_type")
 
             identities = []
             if save_type == "new_version":
                 identities = create_and_postpone_tree_version_service.create_and_postpone(command=command)
             elif save_type == "extend":
-                identities = create_program_tree_version_service.create_and_postpone_from_past_version(command=command)
+                identities = extend_existing_tree_version_service.extend_existing_past_version(
+                    _convert_form_to_extend_command(form)
+                )
+                update_program_tree_version_service.update_program_tree_version(
+                    _convert_form_to_update_command(form)
+                )
+                postpone_tree_version_service.postpone_program_tree_version(
+                    _convert_form_to_postpone_command(form, self.node_identity)
+                )
+                # identities = create_program_tree_version_service.create_and_postpone_from_past_version(command=command)
 
             self._display_success_messages(identities)
 
@@ -131,13 +142,54 @@ class CreateProgramTreeVersion(AjaxPermissionRequiredMixin, AjaxTemplateMixin, V
         display_success_messages(self.request, success_messages, extra_tags='safe')
 
 
-def _convert_form_to_command(form: SpecificVersionForm) -> CreateProgramTreeVersionCommand:
+def _convert_form_to_create_command(form: SpecificVersionForm) -> CreateProgramTreeVersionCommand:
     return CreateProgramTreeVersionCommand(
         offer_acronym=form.training_identity.acronym,
-        version_name=form.cleaned_data.get("version_name").upper(),
+        version_name=form.cleaned_data.get("version_name"),
         year=form.training_identity.year,
         is_transition=False,
         title_en=form.cleaned_data.get("title_english"),
         title_fr=form.cleaned_data.get("title"),
         end_year=form.cleaned_data.get("end_year"),
     )
+
+
+def _convert_form_to_extend_command(form: SpecificVersionForm) -> ExtendProgramTreeVersionCommand:
+    return ExtendProgramTreeVersionCommand(
+        end_year_of_existence=form.cleaned_data['end_year'],
+        offer_acronym=form.training_identity.acronym,
+        version_name=form.cleaned_data.get("version_name"),
+        year=form.training_identity.year,
+        is_transition=False,
+    )
+
+
+def _convert_form_to_update_command(form: SpecificVersionForm) -> UpdateProgramTreeVersionCommand:
+    return UpdateProgramTreeVersionCommand(
+        offer_acronym=form.training_identity.acronym,
+        version_name=form.cleaned_data.get("version_name"),
+        year=form.training_identity.year,
+        is_transition=False,
+        title_en=form.cleaned_data.get("title_english"),
+        title_fr=form.cleaned_data.get("title"),
+        end_year=form.cleaned_data.get("end_year"),
+    )
+
+
+def _convert_form_to_postpone_command(
+        form: SpecificVersionForm, node_id: 'NodeIdentity'
+) -> PostponeProgramTreeVersionCommand:
+    return PostponeProgramTreeVersionCommand(
+        from_offer_acronym=form.training_identity.acronym,
+        from_version_name=form.cleaned_data['version_name'],
+        from_year=form.training_identity.year,
+        from_is_transition=False,
+        until_year=form.cleaned_data['end_year'],
+        from_code=node_id.code,
+    )
+
+
+# TODO :: rename bouton to prolonger
+# TODO :: Prolonger ne fonctionne pas
+# TODO :: enlever le case sensitive
+# TODO :: Ajouter lien dans le success message
