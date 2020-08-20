@@ -23,15 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+from django.db import transaction
 
-from program_management.ddd.business_types import *
-from program_management.ddd.repositories import load_tree
-
-
-def search_trees_using_node(node: 'Node'):
-    return load_tree.load_trees_from_children(child_element_ids=[node.pk])
+from education_group.ddd import command
+from education_group.ddd.domain.mini_training import MiniTrainingIdentity, MiniTrainingBuilder
+from education_group.ddd.repository.mini_training import MiniTrainingRepository
 
 
-def search_tree_versions_using_node(node: 'Node') -> List['ProgramTreeVersion']:
-    return load_tree.load_tree_versions_from_children(child_element_ids=[node.pk])
+@transaction.atomic()
+def copy_mini_training_to_next_year(copy_cmd: command.CopyMiniTrainingToNextYearCommand) -> 'MiniTrainingIdentity':
+    # GIVEN
+    repository = MiniTrainingRepository()
+    existing_mini_training = repository.get(
+        entity_id=MiniTrainingIdentity(acronym=copy_cmd.acronym, year=copy_cmd.postpone_from_year)
+    )
+
+    # WHEN
+    mini_training_next_year = MiniTrainingBuilder().copy_to_next_year(existing_mini_training, repository)
+
+    # THEN
+    identity = repository.create(mini_training_next_year)
+
+    return identity

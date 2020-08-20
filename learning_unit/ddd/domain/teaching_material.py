@@ -23,14 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import attr
 
 
+@attr.s(frozen=True, slots=True)
 class TeachingMaterial:
-    def __init__(
-        self,
-        title: str = None,
-        mandatory: bool = False,
-    ):
-
-        self.title = title
-        self.is_mandatory = mandatory
+    title = attr.ib(type=str)
+    is_mandatory = attr.ib(type=bool)

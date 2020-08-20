@@ -25,9 +25,11 @@
 ##############################################################################
 from typing import Optional, List
 
+from base.models.group_element_year import GroupElementYear
 from education_group.ddd.command import CreateOrphanGroupCommand
 from osis_common.ddd import interface
 from osis_common.ddd.interface import Entity
+from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception
 from program_management.ddd.repositories import persist_tree, load_tree, node
@@ -47,8 +49,20 @@ class ProgramTreeRepository(interface.AbstractRepository):
         return load_tree.load_trees_from_children(node_db_ids, **kwargs)
 
     @classmethod
-    def delete(cls, entity_id: 'ProgramTreeIdentity') -> None:
-        raise NotImplementedError
+    def delete(
+            cls,
+            entity_id: 'ProgramTreeIdentity',
+            delete_node_service: interface.ApplicationService = None,
+    ) -> None:
+        program_tree = cls.get(entity_id)
+        links = program_tree.get_all_links()
+        nodes = program_tree.get_all_nodes()
+
+        GroupElementYear.objects.filter(pk__in=(link.pk for link in links)).delete()
+
+        for node in nodes:
+            cmd = command.DeleteNodeCommand(code=node.code, year=node.year, node_type=node.node_type.name)
+            delete_node_service(cmd)
 
     @classmethod
     def create(
@@ -72,10 +86,10 @@ class ProgramTreeRepository(interface.AbstractRepository):
                     management_entity_acronym=child_node.management_entity_acronym,
                     teaching_campus_name=child_node.teaching_campus.name,
                     organization_name=child_node.teaching_campus.university_name,
-                    remark_fr=child_node.remark_fr,
-                    remark_en=child_node.remark_en,
+                    remark_fr=child_node.remark_fr or "",
+                    remark_en=child_node.remark_en or "",
                     start_year=child_node.start_year,
-                    end_year=child_node.end_date,
+                    end_year=child_node.end_year,
                 )
             )
         persist_tree.persist(program_tree)

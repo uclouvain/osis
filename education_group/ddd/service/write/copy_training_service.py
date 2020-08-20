@@ -26,6 +26,7 @@
 from django.db import transaction
 
 from education_group.ddd import command
+from education_group.ddd.domain import exception
 from education_group.ddd.domain.training import TrainingBuilder, TrainingIdentity
 from education_group.ddd.repository.training import TrainingRepository
 
@@ -42,6 +43,10 @@ def copy_training_to_next_year(copy_cmd: command.CopyTrainingToNextYearCommand) 
     training_next_year = TrainingBuilder().copy_to_next_year(existing_training, repository)
 
     # THEN
-    identity = repository.create(training_next_year)
+    try:
+        with transaction.atomic():
+            identity = repository.create(training_next_year)
+    except exception.TrainingAcronymAlreadyExistException:
+        identity = repository.update(training_next_year)
 
     return identity

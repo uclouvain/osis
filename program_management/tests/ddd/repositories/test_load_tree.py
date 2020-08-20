@@ -250,28 +250,3 @@ class TestLoadTreesFromChildren(TestCase):
         result = load_tree.load_trees_from_children([child.id], link_type=LinkTypes.REFERENCE)
         expected_result = [load_tree.load(parent_node_type_reference.pk)]
         self.assertListEqual(result, expected_result)
-
-
-class TestLoadVersion(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.academic_year = AcademicYearFactory(current=True)
-        cls.education_group_version = EducationGroupVersionFactory(
-            root_group__academic_year=cls.academic_year,
-            offer__academic_year=cls.academic_year
-        )
-
-        # Create tree of this version
-        cls.root_link = GroupElementYearFactory(parent_element__group_year=cls.education_group_version.root_group)
-        GroupElementYearFactory(
-            parent_element=cls.root_link.child_element,
-            child_element__group_year__academic_year=cls.academic_year
-        )
-        GroupElementYearChildLeafFactory(
-            parent_element=cls.root_link.child_element,
-            child_element__learning_unit_year__academic_year=cls.academic_year
-        )
-
-    def test_load_version_case_program_tree_version_not_found(self):
-        with self.assertRaises(ProgramTreeVersionNotFoundException):
-            load_tree.load_version('DUMMY', 2018, '', True)

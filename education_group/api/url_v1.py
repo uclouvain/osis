@@ -60,27 +60,29 @@ urlpatterns = [
         TrainingDetail.as_view(),
         name=TrainingDetail.name
     ),
+    url(
+        r'^mini_trainings/(?P<year>[\d]{4})/(?P<acronym>[\w]+([&/\-_:É ][\w]+){0,3})/versions/(?P<version_name>[\w]*)$',
+        MiniTrainingDetail.as_view(),
+        name=MiniTrainingDetail.name
+    ),
+    url(
+        r'^mini_trainings/(?P<year>[\d]{4})/(?P<acronym>[\w]+([&/\-_:É ][\w]+){0,3})/versions/(?P<version_name>[\w]*)/',
+        include([
+            url(r'^tree$', MiniTrainingTreeView.as_view(), name=MiniTrainingTreeView.name),
+            url(r'^title$', MiniTrainingTitle.as_view(), name=MiniTrainingTitle.name),
+            url(r'^offer_roots$', OfferRoots.as_view(), name=OfferRoots.name),
+        ])
+    ),
     url(r'^mini_trainings$', MiniTrainingList.as_view(), name=MiniTrainingList.name),
-    url(r'^mini_trainings/(?P<year>[\d]{4})/(?P<official_partial_acronym>[\w]+)/', include([
+    # TODO: Limit special characters authorized in mini trainings urls (in 4831)
+    url(r'^mini_trainings/(?P<year>[\d]{4})/(?P<acronym>[\w]+([&/\-_:É ][\w]+){0,3})/', include([
         url(r'^tree$', MiniTrainingTreeView.as_view(), name=MiniTrainingTreeView.name),
         url(r'^title$', MiniTrainingTitle.as_view(), name=MiniTrainingTitle.name),
         url(r'^offer_roots$', OfferRoots.as_view(), name=OfferRoots.name),
         url(r'^versions$', MiniTrainingVersionList.as_view(), name=MiniTrainingVersionList.name)
     ])),
     url(
-        r'^mini_trainings/(?P<year>[\d]{4})/(?P<official_partial_acronym>[\w]+)/versions/(?P<version_name>[\w]*)$',
-        MiniTrainingDetail.as_view(),
-        name=MiniTrainingDetail.name
-    ),
-    url(
-        r'^mini_trainings/(?P<year>[\d]{4})/(?P<official_partial_acronym>[\w]+)/versions/(?P<version_name>[\w]*)/',
-        include([
-            url(r'^tree$', MiniTrainingTreeView.as_view(), name=MiniTrainingTreeView.name),
-            url(r'^title$', MiniTrainingTitle.as_view(), name=MiniTrainingTitle.name),
-        ])
-    ),
-    url(
-        r'^mini_trainings/(?P<year>[\d]{4})/(?P<official_partial_acronym>[\w]+)$',
+        r'^mini_trainings/(?P<year>[\d]{4})/(?P<acronym>[\w]+([&/\-_:É ][\w]+){0,3})$',
         MiniTrainingDetail.as_view(),
         name=MiniTrainingDetail.name
     ),

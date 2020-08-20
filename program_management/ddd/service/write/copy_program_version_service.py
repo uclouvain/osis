@@ -26,6 +26,7 @@
 from django.db import transaction
 
 from program_management.ddd.command import CopyTreeVersionToNextYearCommand
+from program_management.ddd.domain import exception
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionBuilder, ProgramTreeVersionIdentity
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 
@@ -47,6 +48,10 @@ def copy_tree_version_to_next_year(copy_cmd: CopyTreeVersionToNextYearCommand) -
     tree_version_next_year = ProgramTreeVersionBuilder().copy_to_next_year(existing_program_tree_version, repository)
 
     # THEN
-    identity = repository.create(tree_version_next_year)
+    try:
+        with transaction.atomic():
+            identity = repository.create(tree_version_next_year)
+    except exception.ProgramTreeAlreadyExistsException:
+        identity = repository.update(tree_version_next_year)
 
     return identity
