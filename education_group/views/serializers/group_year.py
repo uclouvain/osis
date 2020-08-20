@@ -54,6 +54,7 @@ class GroupYearSerializer(serializers.HyperlinkedModelSerializer):
 
     # Display human readable value
     education_group_type_text = serializers.CharField(source='education_group_type.get_name_display', read_only=True)
+    version_name = serializers.CharField(source='educationgroupversion.version_name', read_only=True)
 
     class Meta:
         model = GroupYear
@@ -66,4 +67,5 @@ class GroupYearSerializer(serializers.HyperlinkedModelSerializer):
             'title',
             'academic_year',
             'management_entity',
+            'version_name'
         )

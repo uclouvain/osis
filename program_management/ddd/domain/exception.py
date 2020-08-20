@@ -23,9 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from program_management.ddd.business_types import *
-from osis_common.ddd.interface import BusinessException
 from django.utils.translation import gettext_lazy as _
+
+from osis_common.ddd.interface import BusinessException, BusinessExceptions
 from program_management.ddd.business_types import *
 
 
@@ -99,3 +99,10 @@ class CannotCopyTreeDueToEndDate(BusinessException):
             end_year=tree.root_node.end_year,
         )
         super().__init__(message, **kwargs)
+
+
+# TODO : use BusinessException instead of BusinessExceptions
+class ProgramTreeVersionMismatch(BusinessExceptions):
+    def __init__(self, *args, **kwargs):
+        messages = [_('The child version must be the same as the root node version')]
+        super().__init__(messages, **kwargs)

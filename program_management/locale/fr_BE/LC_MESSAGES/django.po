@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-06 14:46+0200\n"
+"POT-Creation-Date: 2020-08-18 12:14+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -571,6 +571,9 @@ msgid ""
 msgstr ""
 "L'élément %(child)s que vous voulez attachez est déjà un parent de l'élément "
 "auquel vous voulez rattachez."
+
+msgid "The child version must be the same as the root node version"
+msgstr "La version de la formation ajoutée doit être la même que celle du parent."
 
 #, python-format
 msgid "The learning unit %(acronym)s is not contained inside the formation"

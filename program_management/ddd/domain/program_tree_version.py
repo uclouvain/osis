@@ -23,15 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+
 import attr
 
 from osis_common.ddd import interface
 from program_management.ddd.business_types import *
-import attr
 from program_management.ddd.command import CreateStandardVersionCommand
 from program_management.ddd.domain import exception
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity, ProgramTree
-from program_management.ddd.validators.validators_by_business_action import CopyProgramTreeVersionValidatorList
+from program_management.ddd.validators import validators_by_business_action
 
 STANDARD = ""
 
@@ -53,7 +53,7 @@ class ProgramTreeVersionBuilder:
             copy_from: 'ProgramTreeVersion',
             tree_version_repository: 'ProgramTreeVersionRepository'
     ) -> 'ProgramTreeVersion':
-        CopyProgramTreeVersionValidatorList(copy_from).validate()
+        validators_by_business_action.CopyProgramTreeVersionValidatorList(copy_from).validate()
         identity_next_year = attr.evolve(copy_from.entity_id, year=copy_from.entity_id.year + 1)
         try:
             tree_version_next_year = tree_version_repository.get(identity_next_year)

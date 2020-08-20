@@ -67,6 +67,8 @@
                 "targets": 2,
                 "data": "acronym",
                 "render": function ( data, type, row, meta ) {
+                    const version = row['version_name'];
+                    data += version ? `[${version}]`: '';
                     return '<a href="'+ row['url'] +'">'+ data + '</a>';
                 }
             },
