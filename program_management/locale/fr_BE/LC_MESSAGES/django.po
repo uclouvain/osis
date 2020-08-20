@@ -518,8 +518,8 @@ msgstr "Légende proposition"
 msgid "Quadrimester"
 msgstr "Quadrimestre"
 
-msgid "Rattached to"
-msgstr ""
+msgid "Prolong"
+msgstr "Prolonger la version existante"
 
 msgid "Registration ID"
 msgstr "NOMA"

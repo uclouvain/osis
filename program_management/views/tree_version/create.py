@@ -190,5 +190,3 @@ def _convert_form_to_postpone_command(
         until_year=form.cleaned_data['end_year'],
         from_code=node_id.code,
     )
-
-# TODO :: rename bouton to prolonger

@@ -488,8 +488,8 @@ msgstr ""
 msgid "Quadrimester"
 msgstr ""
 
-msgid "Rattached to"
-msgstr ""
+msgid "Extend"
+msgstr "Prolong"
 
 msgid "Registration ID"
 msgstr ""
