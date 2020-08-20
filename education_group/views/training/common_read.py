@@ -161,6 +161,11 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
                                               args=[self.education_group_version.root_group.academic_year.year,
                                                     self.education_group_version.root_group.partial_acronym]
                                               ),
+            "generate_pdf_url": reverse("group_pdf_content",
+                                        args=[self.education_group_version.root_group.academic_year.year,
+                                              self.education_group_version.root_group.partial_acronym,
+                                              ]
+                                        ),
         }
 
     def get_permission_object(self):

@@ -48,6 +48,7 @@
                 {% a_tag_modal_has_perm create_mini_training_url _('New Mini-Training') 'base.add_minitraining' user %}
             </li>
         {% endif %}
+
         <li class="divider"></li>
         {% if update_group_url %}
             <li>
@@ -77,6 +78,10 @@
                 {% a_tag_modal_has_perm delete_mini_training_url _('Delete permanently') 'base.delete_all_minitraining' user education_group_version.offer %}
             </li>
         {% endif %}
+
+        <li class="divider"></li>
+        {% link_pdf_content_education_group generate_pdf_url %}
+
         <li class="divider"></li>
 	    <li>
             <a href="{{ xls_ue_prerequisites }}"
