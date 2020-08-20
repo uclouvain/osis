@@ -87,6 +87,6 @@ class LearningUnitDescriptionFicheFilter(LearningUnitFilter):
         return queryset.annotate(
             summary_status=RawSQL(
                 extra_query,
-                (tuple(CMS_LABEL_PEDAGOGY), ac_calendar.start_date,)
+                (tuple(CMS_LABEL_PEDAGOGY), ac_calendar and ac_calendar.start_date,)
             )
         )
