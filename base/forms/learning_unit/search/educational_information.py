@@ -68,7 +68,7 @@ class LearningUnitDescriptionFicheFilter(LearningUnitFilter):
     def _compute_summary_status(self, queryset):
         ac_calendar = academic_calendar.get_by_reference_and_data_year(
             SUMMARY_COURSE_SUBMISSION,
-            self.form.cleaned_data['academic_year'].past()
+            self.form.cleaned_data['academic_year']
         )
 
         extra_query = """
