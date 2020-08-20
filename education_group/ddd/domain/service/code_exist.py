@@ -23,34 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db import transaction
+from typing import Union
 
-from education_group.ddd.domain import exception
-from education_group.ddd.service.write.create_group_service import create_orphan_group
-from program_management.ddd.command import CopyProgramTreeToNextYearCommand
-from program_management.ddd.domain.program_tree import ProgramTreeIdentity, ProgramTreeBuilder
-from program_management.ddd.repositories.program_tree import ProgramTreeRepository
+from education_group.models.group_year import GroupYear
+from osis_common.ddd import interface
 
 
-@transaction.atomic()
-def copy_program_tree_to_next_year(copy_cmd: CopyProgramTreeToNextYearCommand) -> 'ProgramTreeIdentity':
-    # GIVEN
-    repository = ProgramTreeRepository()
-    existing_program_tree = repository.get(
-        entity_id=ProgramTreeIdentity(
-            code=copy_cmd.code,
-            year=copy_cmd.year,
-        )
-    )
-
-    # WHEN
-    program_tree_next_year = ProgramTreeBuilder().copy_to_next_year(existing_program_tree, repository)
-
-    # THEN
-    try:
-        with transaction.atomic():
-            identity = repository.create(program_tree_next_year, create_group_service=create_orphan_group)
-    except exception.CodeAlreadyExistException:
-        identity = repository.update(program_tree_next_year)
-
-    return identity
+class CheckCodeExist(interface.DomainService):
+    @classmethod
+    def get_existing_year(cls, code: str) -> Union[int, None]:
+        existing_group = GroupYear.objects.filter(partial_acronym=code).select_related('academic_year').first()
+        if existing_group:
+            return existing_group.academic_year.year
+        return None
