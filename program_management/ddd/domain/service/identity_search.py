@@ -33,7 +33,7 @@ from education_group.models.group_year import GroupYear
 from osis_common.ddd import interface
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, STANDARD
 from education_group.ddd.domain.service.identity_search import TrainingIdentitySearch \
     as EducationGroupTrainingIdentitySearch
 from program_management.models.education_group_version import EducationGroupVersion
@@ -59,12 +59,17 @@ class NodeIdentitySearch(interface.DomainService):
     def get_from_program_tree_identity(self, tree_identity: 'ProgramTreeIdentity') -> 'NodeIdentity':
         return NodeIdentity(year=tree_identity.year, code=tree_identity.code)
 
-    def get_from_training_identity(self, training_identity: 'TrainingIdentity') -> 'NodeIdentity':
+    def get_from_training_identity(
+            self,
+            training_identity: 'TrainingIdentity',
+            version_name: str = STANDARD,
+            is_transition: str = False,
+    ) -> 'NodeIdentity':
         values = GroupYear.objects.filter(
             educationgroupversion__offer__acronym=training_identity.acronym,
             educationgroupversion__offer__academic_year__year=training_identity.year,
-            educationgroupversion__version_name='',
-            educationgroupversion__is_transition=False
+            educationgroupversion__version_name=version_name,
+            educationgroupversion__is_transition=is_transition,
         ).values(
             'partial_acronym'
         )

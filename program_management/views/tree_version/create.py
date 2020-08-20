@@ -105,7 +105,6 @@ class CreateProgramTreeVersion(AjaxPermissionRequiredMixin, AjaxTemplateMixin, V
                 )
 
             self._display_success_messages(identities)
-            # return HttpResponseRedirect(self.get_success_url(identities[0]))
 
         return render(request, self.template_name, self.get_context_data(form))
 
@@ -192,7 +191,4 @@ def _convert_form_to_postpone_command(
         from_code=node_id.code,
     )
 
-
 # TODO :: rename bouton to prolonger
-# TODO :: Ajouter lien dans le success message
-# TODO :: rename get_from_training_identity -> standard
