@@ -101,7 +101,7 @@ class MiniTrainingRepository(interface.AbstractRepository):
             )
 
         except IntegrityError:
-            raise exception.MiniTrainingCodeAlreadyExistException()
+            raise exception.CodeAlreadyExistException(year=mini_training_obj.year)
 
         return mini_training_obj.entity_id
 
