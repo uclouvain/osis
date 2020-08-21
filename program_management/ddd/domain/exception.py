@@ -103,6 +103,8 @@ class CannotCopyTreeDueToEndDate(BusinessException):
 
 # TODO : use BusinessException instead of BusinessExceptions
 class ProgramTreeVersionMismatch(BusinessExceptions):
-    def __init__(self, *args, **kwargs):
-        messages = [_('The child version must be the same as the root node version')]
+    def __init__(self, root_node: 'Node', node_to_add: 'Node', *args, **kwargs):
+        messages = [_("%(node_to_add)s version must be the same as %(root_node)s version") % {
+            'node_to_add': node_to_add, 'root_node': root_node
+        }]
         super().__init__(messages, **kwargs)

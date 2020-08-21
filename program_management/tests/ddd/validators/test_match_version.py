@@ -63,8 +63,9 @@ class TestMatchVersionValidator(TestValidatorValidateMixin, SimpleTestCase):
             ProgramTreeVersionIdentity(offer_acronym=self.node_to_attach.code, version_name='B', **identity_values)
         ]
         expected_message = _(
-            'The child version must be the same as the root node version'
-        )
+            '%(node_to_add)s version must be the same as %(root_node)s version'
+        ) % {'node_to_add': self.node_to_attach, 'root_node': self.tree.root_node}
+
         self.assertValidatorRaises(
             MatchVersionValidator(self.tree, self.node_to_attach),
             [expected_message]

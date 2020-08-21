@@ -32,7 +32,6 @@ from django.utils.translation import gettext_lazy as _
 from waffle.testutils import override_flag
 
 import osis_common.ddd.interface
-from base.ddd.utils import business_validator
 from base.models.enums.education_group_types import GroupType
 from base.models.enums.link_type import LinkTypes
 from base.tests.factories.academic_year import AcademicYearFactory
@@ -119,7 +118,8 @@ class TestPasteNodeView(TestCase):
         self.assertTrue(self.permission_mock.called)
 
     @mock.patch('program_management.ddd.service.read.element_selected_service.retrieve_element_selected')
-    def test_should_return_formset_when_elements_are_selected(self, mock_cache_elems):
+    @mock.patch('program_management.ddd.service.read.check_paste_node_service.check_paste')
+    def test_should_return_formset_when_elements_are_selected(self, mock_check_paste, mock_cache_elems):
         subgroup_to_attach = NodeGroupYearFactory(node_type=GroupType.SUB_GROUP)
         subgroup_to_attach_2 = NodeGroupYearFactory(node_type=GroupType.SUB_GROUP,)
 
@@ -141,7 +141,13 @@ class TestPasteNodeView(TestCase):
 
     @mock.patch('program_management.ddd.service.read.element_selected_service.retrieve_element_selected')
     @mock.patch('program_management.forms.tree.paste.PasteNodesFormset.is_valid')
-    def test_should_rereturn_fromset_when_post_data_are_not_valid(self, mock_formset_is_valid, mock_cache_elems):
+    @mock.patch('program_management.ddd.service.read.check_paste_node_service.check_paste')
+    def test_should_rereturn_fromset_when_post_data_are_not_valid(
+            self,
+            mock_check_paste,
+            mock_formset_is_valid,
+            mock_cache_elems
+    ):
         subgroup_to_attach = NodeGroupYearFactory(node_type=GroupType.SUB_GROUP)
         mock_cache_elems.return_value = {
             "element_code": subgroup_to_attach.code,
@@ -149,6 +155,7 @@ class TestPasteNodeView(TestCase):
             "path_to_detach": None
         }
         mock_formset_is_valid.return_value = False
+        mock_check_paste.side_effect = osis_common.ddd.interface.BusinessExceptions(["Not valid"])
 
         # To path :  BIR1BA ---> LBIR101G
         path = "|".join([str(self.tree.root_node.pk), str(self.tree.root_node.children[1].child.pk)])
@@ -366,3 +373,34 @@ class TestCheckPasteView(TestCase):
             response.json(),
             {"error_messages": []}
         )
+
+    def test_should_store_check_result_in_session(self):
+        code = "LSINF1254"
+        check_key = '{}|{}'.format(self.path, code)
+        response = self.client.get(
+            self.url,
+            data={
+                "path": self.path,
+                "codes": code,
+                "year": 2021,
+            },
+            HTTP_ACCEPT="application/json"
+        )
+        self.assertTrue(response.wsgi_request.session.get(check_key))
+
+    def test_should_clear_cached_check_result_from_session_if_exists(self):
+        code = "LSINF1254"
+        check_key = '{}|{}'.format(self.path, code)
+        session = self.client.session
+        session[check_key] = True
+        session.save()
+        response = self.client.get(
+            self.url,
+            data={
+                "path": self.path,
+                "codes": code,
+                "year": 2021,
+            },
+            HTTP_ACCEPT="application/json"
+        )
+        self.assertFalse(response.wsgi_request.session.get(check_key))
