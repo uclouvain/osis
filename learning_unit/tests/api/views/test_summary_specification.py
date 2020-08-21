@@ -29,7 +29,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from base.business.learning_unit import CMS_LABEL_PEDAGOGY, CMS_LABEL_SPECIFICATIONS
+from base.business.learning_unit import CMS_LABEL_PEDAGOGY, CMS_LABEL_SPECIFICATIONS, CMS_LABEL_PEDAGOGY_FORCE_MAJEURE
 from base.models.enums import learning_unit_year_subtypes
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
@@ -90,7 +90,7 @@ class LearningUnitSummarySpecificationTestCase(APITestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        expected_keys = set(CMS_LABEL_PEDAGOGY + CMS_LABEL_SPECIFICATIONS)
+        expected_keys = set(CMS_LABEL_PEDAGOGY + CMS_LABEL_SPECIFICATIONS + CMS_LABEL_PEDAGOGY_FORCE_MAJEURE)
 
         diff = set(response.data.keys()) - expected_keys
         self.assertFalse(diff)
@@ -118,7 +118,7 @@ class LearningUnitSummarySpecificationTestCase(APITestCase):
         url = reverse('learning_unit_api_v1:' + LearningUnitSummarySpecification.name, kwargs=url_kwargs)
         response = self.client.get(url)
 
-        expected_keys = set(CMS_LABEL_PEDAGOGY + CMS_LABEL_SPECIFICATIONS)
+        expected_keys = set(CMS_LABEL_PEDAGOGY + CMS_LABEL_SPECIFICATIONS + CMS_LABEL_PEDAGOGY_FORCE_MAJEURE)
 
         diff = set(response.data.keys()) - expected_keys
         self.assertFalse(diff)
