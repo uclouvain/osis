@@ -147,7 +147,7 @@ class LinkFactory:
         else:
             return LinkWithChildBranch(parent, child, **kwargs)
 
-    def duplicate(self, duplicate_from: 'Link', new_parent: 'Node', new_child: 'Node') -> 'Link':  # TODO :: unit tests + move into Builder intead of factory?
+    def duplicate(self, duplicate_from: 'Link', new_parent: 'Node', new_child: 'Node') -> 'Link':
         copied_link = attr.evolve(duplicate_from, child=new_child, parent=new_parent)
         copied_link._has_changed = True
         return copied_link

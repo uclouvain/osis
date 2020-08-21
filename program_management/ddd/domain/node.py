@@ -106,6 +106,7 @@ class NodeFactory:
             existing_code=duplicate_from.entity_id.code,
             year=duplicate_from.entity_id.year,
         )
+        start_year = duplicate_from.start_year if override_start_year_to == DO_NOT_OVERRIDE else override_start_year_to
         copied_node = attr.evolve(
             duplicate_from,
             entity_id=NodeIdentity(code=new_code, year=duplicate_from.entity_id.year),
@@ -113,8 +114,7 @@ class NodeFactory:
             end_year=duplicate_from.end_year if override_end_year_to == DO_NOT_OVERRIDE else override_end_year_to,
             # TODO: Replace end_date by end_year
             end_date=duplicate_from.end_date if override_end_year_to == DO_NOT_OVERRIDE else override_end_year_to,
-            start_year=
-            duplicate_from.start_year if override_start_year_to == DO_NOT_OVERRIDE else override_start_year_to,
+            start_year=start_year,
             children=[],
             node_id=None,
         )
