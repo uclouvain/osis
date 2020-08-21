@@ -30,43 +30,47 @@ from education_group.ddd.service.write import delete_orphan_group_service, delet
     delete_orphan_mini_training_service
 from program_management.ddd import command
 from program_management.ddd.domain.node import NodeIdentity
+from program_management.ddd.domain import exception as program_management_exception
 
 
 @transaction.atomic()
 def delete_node(cmd: command.DeleteNodeCommand) -> None:
     node_id = NodeIdentity(code=cmd.code, year=cmd.year)
 
-    if cmd.node_type in GroupType.get_names():
-        cmd = command_education_group.DeleteOrphanGroupCommand(code=node_id.code, year=node_id.year)
-        try:
-            delete_orphan_group_service.delete_orphan_group(cmd)
-        except exception.GroupNotFoundException:
-            pass
-    elif cmd.node_type in TrainingType.get_names():
-        cmd = command_education_group.DeleteOrphanTrainingCommand(
-            acronym=cmd.acronym,
-            year=node_id.year
-        )
-        try:
-            delete_orphan_training_service.delete_orphan_training(cmd)
-        except exception.TrainingNotFoundException:
-            pass
-        cmd = command_education_group.DeleteOrphanGroupCommand(code=node_id.code, year=node_id.year)
-        try:
-            delete_orphan_group_service.delete_orphan_group(cmd)
-        except exception.GroupNotFoundException:
-            pass
-    elif cmd.node_type in MiniTrainingType.get_names():
-        cmd = command_education_group.DeleteOrphanMiniTrainingCommand(
-            acronym=cmd.acronym,
-            year=cmd.year
-        )
-        try:
-            delete_orphan_mini_training_service.delete_orphan_mini_training(cmd)
-        except exception.MiniTrainingNotFoundException:
-            pass
-        cmd = command_education_group.DeleteOrphanGroupCommand(code=node_id.code, year=node_id.year)
-        try:
-            delete_orphan_group_service.delete_orphan_group(cmd)
-        except exception.GroupNotFoundException:
-            pass
+    try:
+        if cmd.node_type in GroupType.get_names():
+            cmd = command_education_group.DeleteOrphanGroupCommand(code=node_id.code, year=node_id.year)
+            try:
+                delete_orphan_group_service.delete_orphan_group(cmd)
+            except exception.GroupNotFoundException:
+                pass
+        elif cmd.node_type in TrainingType.get_names():
+            cmd = command_education_group.DeleteOrphanTrainingCommand(
+                acronym=cmd.acronym,
+                year=node_id.year
+            )
+            try:
+                delete_orphan_training_service.delete_orphan_training(cmd)
+            except exception.TrainingNotFoundException:
+                pass
+            cmd = command_education_group.DeleteOrphanGroupCommand(code=node_id.code, year=node_id.year)
+            try:
+                delete_orphan_group_service.delete_orphan_group(cmd)
+            except exception.GroupNotFoundException:
+                pass
+        elif cmd.node_type in MiniTrainingType.get_names():
+            cmd = command_education_group.DeleteOrphanMiniTrainingCommand(
+                acronym=cmd.acronym,
+                year=cmd.year
+            )
+            try:
+                delete_orphan_mini_training_service.delete_orphan_mini_training(cmd)
+            except exception.MiniTrainingNotFoundException:
+                pass
+            cmd = command_education_group.DeleteOrphanGroupCommand(code=node_id.code, year=node_id.year)
+            try:
+                delete_orphan_group_service.delete_orphan_group(cmd)
+            except exception.GroupNotFoundException:
+                pass
+    except (exception.GroupIsBeingUsedException, exception.MiniTrainingIsBeingUsedException):
+        raise program_management_exception.NodeIsUsedException

@@ -90,3 +90,7 @@ class CannotCopyTreeDueToEndDate(BusinessException):
             end_year=tree.root_node.end_year,
         )
         super().__init__(message, **kwargs)
+
+
+class NodeIsUsedException(Exception):
+    pass
