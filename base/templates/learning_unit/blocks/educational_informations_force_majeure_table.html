@@ -36,7 +36,7 @@
     </thead>
     <tbody>
         {% for translated_label in cms_force_majeure_labels_translated %}
-            {% include 'learning_unit/blocks/panel/cms_informations.html' %}
+            {% include 'learning_unit/blocks/panel/cms_informations.html' with can_edit_information=can_edit_force_majeur_section %}
         {% endfor %}
     </tbody>
 </table>
