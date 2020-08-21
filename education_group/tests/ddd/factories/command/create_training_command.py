@@ -23,10 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import operator
 from decimal import Decimal
 
 import factory.fuzzy
 
+from base.models.enums.active_status import ActiveStatusEnum
+from base.models.enums.education_group_types import TrainingType
 from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.ddd import command
 
@@ -36,11 +39,11 @@ class CreateTrainingCommandFactory(factory.Factory):
         model = command.CreateTrainingCommand
         abstract = False
 
-    abbreviated_title = "Title "
-    status = " Status "
-    code = " Code "
+    abbreviated_title = factory.Sequence(lambda n: 'TrainingTitle%d' % n)
+    status = factory.Iterator(ActiveStatusEnum.choices(), getter=operator.itemgetter(0))
+    code = factory.Sequence(lambda n: 'CODE%d' % n)
     year = 2019
-    type = " Type "
+    type = factory.Iterator(TrainingType.choices(), getter=operator.itemgetter(0))
     credits = 23
     schedule_type = ScheduleTypeEnum.DAILY.name
     duration = 3
@@ -49,34 +52,34 @@ class CreateTrainingCommandFactory(factory.Factory):
     title_en = "title  en "
     partial_title_fr = None
     partial_title_en = None
-    keywords = None
+    keywords = ""
     internship_presence = None
-    is_enrollment_enabled = None
-    has_online_re_registration = None
-    has_partial_deliberation = None
-    has_admission_exam = None
-    has_dissertation = None
-    produce_university_certificate = None
+    is_enrollment_enabled = False
+    has_online_re_registration = False
+    has_partial_deliberation = False
+    has_admission_exam = False
+    has_dissertation = False
+    produce_university_certificate = True
     decree_category = None
     rate_code = None
-    main_language = None
+    main_language = 'French'
     english_activities = None
     other_language_activities = None
-    internal_comment = None
+    internal_comment = ""
     main_domain_code = None
     main_domain_decree = None
-    secondary_domains = None
+    secondary_domains = []
     isced_domain_code = None
-    management_entity_acronym = None
-    administration_entity_acronym = None
+    management_entity_acronym = factory.Sequence(lambda n: 'ENTITY%d' % n)
+    administration_entity_acronym = factory.SelfAttribute("management_entity_acronym")
     end_year = None
-    teaching_campus_name = None
-    teaching_campus_organization_name = None
-    enrollment_campus_name = None
-    enrollment_campus_organization_name = None
+    teaching_campus_name = factory.Sequence(lambda n: 'TeachingCampus%d' % n)
+    teaching_campus_organization_name = factory.Sequence(lambda n: 'TeachingOrganization%d' % n)
+    enrollment_campus_name = factory.SelfAttribute("teaching_campus_name")
+    enrollment_campus_organization_name = factory.SelfAttribute("teaching_campus_organization_name")
     other_campus_activities = None
     funding_orientation = None
-    can_be_international_funded = None
+    can_be_international_funded = True
     international_funding_orientation = None
     ares_code = None
     ares_graca = None
@@ -85,13 +88,13 @@ class CreateTrainingCommandFactory(factory.Factory):
     coefficient = None
     academic_type = None
     duration_unit = None
-    leads_to_diploma = None
-    printing_title = None
-    professional_title = None
-    aims = None
+    leads_to_diploma = True
+    printing_title = ''
+    professional_title = ''
+    aims = []
     constraint_type = None
     min_constraint = None
     max_constraint = None
     remark_fr = None
     remark_en = None
-    can_be_funded = None
+    can_be_funded = True

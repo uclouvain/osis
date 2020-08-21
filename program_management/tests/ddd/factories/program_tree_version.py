@@ -27,7 +27,7 @@ import factory.fuzzy
 
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersion, ProgramTreeVersionIdentity
-from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory, ProgramTreeIdentityFactory
+from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
 
 class ProgramTreeVersionIdentityFactory(factory.Factory):
@@ -49,7 +49,7 @@ class ProgramTreeVersionFactory(factory.Factory):
         abstract = False
 
     tree = factory.SubFactory(ProgramTreeFactory)
-    entity_identity = None
+    entity_identity = factory.SubFactory(ProgramTreeVersionIdentityFactory)
     program_tree_identity = ProgramTreeIdentity(code="CODE", year=2020)
     program_tree_repository = None
     entity_id = ProgramTreeVersionIdentity(
@@ -58,3 +58,15 @@ class ProgramTreeVersionFactory(factory.Factory):
         version_name="",
         is_transition=False
     )
+
+    @staticmethod
+    def produce_standard_2M_program_tree(current_year: int, end_year: int) -> 'ProgramTreeVersion':
+        """Creates a 2M standard version"""
+        tree_standard = ProgramTreeFactory.produce_standard_2M_program_tree(current_year, end_year)
+
+        return ProgramTreeVersionFactory(
+            tree=tree_standard,
+            entity_identity__year=current_year,
+            program_tree_identity=tree_standard.entity_id,
+        )
+

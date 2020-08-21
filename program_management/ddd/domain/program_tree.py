@@ -68,10 +68,10 @@ class ProgramTreeBuilder:
             override_start_year_to: int = None
     ) -> 'ProgramTree':
         """
-        Generates a new program tree based on attributes from 'copy_from' program tree but with new nodes identities and
-        new link identities.
-        :param end_year: end year of existence
+        Generates new program tree with new nodes and links based on attributes of 'duplicate_from' program tree.
         :param duplicate_from: The program tree from which are copied attributes in the new one.
+        :param override_end_year_to: This param override the 'end year' of all nodes and links in the Tree.
+        :param override_start_year_to: This param override the 'start year' of all nodes and links in the Tree.
         :return:
         """
         copied_root = self._duplicate_root_and_direct_children(

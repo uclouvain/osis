@@ -26,7 +26,9 @@
 import factory.fuzzy
 
 from base.models.authorized_relationship import AuthorizedRelationshipList
+from base.models.enums.education_group_types import GroupType, TrainingType
 from program_management.ddd.domain.program_tree import ProgramTree, ProgramTreeIdentity
+from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 
 
@@ -48,3 +50,36 @@ class ProgramTreeFactory(factory.Factory):
 
     root_node = factory.SubFactory(NodeGroupYearFactory)
     authorized_relationships = AuthorizedRelationshipList([])
+
+    @staticmethod
+    def produce_standard_2M_program_tree(current_year: int, end_year: int) -> 'ProgramTree':
+        """Creates a 2M standard version"""
+
+        tree_standard = ProgramTreeFactory(
+            root_node__node_type=TrainingType.PGRM_MASTER_120,
+            root_node__end_year=end_year,
+            root_node__year=current_year,
+        )
+        link1 = LinkFactory(
+            parent=tree_standard.root_node,
+            child__node_type=GroupType.COMMON_CORE,
+            child__end_year=end_year,
+            child__year=current_year,
+        )
+        link2 = LinkFactory(
+            parent=tree_standard.root_node,
+            child__node_type=GroupType.FINALITY_120_LIST_CHOICE,
+            child__end_year=end_year,
+            child__year=current_year,
+        )
+        link3 = LinkFactory(
+            parent=tree_standard.root_node,
+            child__node_type=GroupType.OPTION_LIST_CHOICE,
+            child__end_year=end_year,
+            child__year=current_year,
+        )
+        tree_standard.root_node.children = [link1, link2, link3]
+
+        return tree_standard
+
+
