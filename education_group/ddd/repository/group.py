@@ -106,7 +106,7 @@ class GroupRepository(interface.AbstractRepository):
                 remark_en=group.remark.text_en,
             )
         except IntegrityError:
-            raise exception.GroupCodeAlreadyExistException
+            raise exception.CodeAlreadyExistException(year=group.year)
 
         return GroupIdentity(
             code=group_year_created.partial_acronym,
