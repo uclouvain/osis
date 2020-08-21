@@ -1842,10 +1842,8 @@ msgstr "Pas inscrit"
 msgid "Not in period to edit description fiche."
 msgstr "Vous n'êtes pas en période de modification des fiches descriptives."
 
-#, fuzzy
-#| msgid "Not in period to edit description fiche."
 msgid "Not in period to edit force majeure section."
-msgstr "Vous n'êtes pas en période de modification des fiches descriptives."
+msgstr "Vous n'êtes pas en période de modification des fiches descriptives (Cas de force majeure)."
 
 msgid "Not in range of years which can be edited by you"
 msgstr ""
@@ -2581,10 +2579,8 @@ msgstr "Succès"
 msgid "Summary course submission"
 msgstr "Soumission des fiches descriptives"
 
-#, fuzzy
-#| msgid "Summary course submission"
 msgid "Summary course submission force majeure"
-msgstr "Soumission des fiches descriptives"
+msgstr "Adaptation des fiches descriptives (Cas de force majeure)"
 
 msgid "Summary course submission is not allowed for tutors during this period."
 msgstr ""
