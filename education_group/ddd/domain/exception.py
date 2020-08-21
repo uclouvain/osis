@@ -16,6 +16,14 @@ class GroupNotFoundException(Exception):
     pass
 
 
+class GroupIsBeingUsedException(Exception):
+    pass
+
+
+class MiniTrainingIsBeingUsedException(Exception):
+    pass
+
+
 class GroupCodeAlreadyExistException(BusinessException):
     def __init__(self, *args, **kwargs):
         message = _("Code already exists")
