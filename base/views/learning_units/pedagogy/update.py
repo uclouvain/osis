@@ -73,6 +73,8 @@ def learning_unit_pedagogy_edit(request, learning_unit_year_id):
                      LearningUnitYear)
 def learning_unit_pedagogy_force_majeure_edit(request, learning_unit_year_id):
     redirect_url = reverse("learning_unit_pedagogy", kwargs={'learning_unit_year_id': learning_unit_year_id})
+    if request.method == 'POST':
+        return post_method_edit_force_majeure_pedagogy(request, redirect_url)
     return edit_learning_unit_pedagogy(request, learning_unit_year_id, redirect_url)
 
 
@@ -103,6 +105,14 @@ def edit_learning_unit_pedagogy(request, learning_unit_year_id, redirect_url):
     context['cms_label_pedagogy_fr_only'] = CMS_LABEL_PEDAGOGY_FR_ONLY
     context['label_name'] = label_name
     return render(request, "learning_unit/pedagogy_edit.html", context)
+
+
+def post_method_edit_force_majeure_pedagogy(request, redirect_url):
+    form = LearningUnitPedagogyEditForm(request.POST)
+    if form.is_valid():
+        form.save(postpone=False)
+        display_success_messages(request, _("The learning unit has been updated (without report)."))
+        return redirect(redirect_url)
 
 
 def _post_learning_unit_pedagogy_form(request):

@@ -54,10 +54,12 @@ class LearningUnitPedagogyEditForm(forms.Form):
         self.fields['trans_text'].initial = value.text
 
     @atomic
-    def save(self):
+    def save(self, postpone=True):
         trans_text = self._get_or_create_translated_text()
         start_luy = learning_unit_year.get_by_id(trans_text.reference)
-        self.luys = [start_luy] + list(start_luy.find_gt_learning_units_year())
+        self.luys = [start_luy]
+        if postpone:
+            self.luys += list(start_luy.find_gt_learning_units_year())
 
         reference_ids = [start_luy.id]
         if is_pedagogy_data_must_be_postponed(start_luy):
