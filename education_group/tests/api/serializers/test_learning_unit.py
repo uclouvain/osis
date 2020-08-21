@@ -49,11 +49,12 @@ class EducationGroupRootsListSerializerTestCase(TestCase):
             partial_acronym='LBIR1000I',
             academic_year=cls.academic_year,
         )
+        relative_credits = 15
         group = GroupFactory(academic_year=cls.academic_year)
         cls.luy = LearningUnitYearFactory(academic_year=cls.academic_year)
         GroupElementYearFactory(parent=cls.training, child_branch=group, child_leaf=None)
         cls.group_element_year = GroupElementYearFactory(
-            parent=group, child_leaf=cls.luy, child_branch=None, relative_credits=15
+            parent=group, child_leaf=cls.luy, child_branch=None, relative_credits=relative_credits
         )
 
         url = reverse('learning_unit_api_v1:' + EducationGroupRootsList.name, kwargs={
@@ -61,7 +62,7 @@ class EducationGroupRootsListSerializerTestCase(TestCase):
             'year': cls.academic_year.year,
         })
         cls.offer = EducationGroupYear.objects.filter(id=cls.training.id).annotate(
-            relative_credits=Value(cls.group_element_year.relative_credits, output_field=IntegerField())
+            relative_credits=Value(relative_credits, output_field=IntegerField())
         ).first()
         cls.serializer = EducationGroupRootsListSerializer(cls.offer, context={
             'request': RequestFactory().get(url),
