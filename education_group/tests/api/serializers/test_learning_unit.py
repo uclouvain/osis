@@ -61,7 +61,7 @@ class EducationGroupRootsListSerializerTestCase(TestCase):
             'year': cls.academic_year.year,
         })
         cls.offer = EducationGroupYear.objects.filter(id=cls.training.id).annotate(
-            relative_credits=Value(15, output_field=IntegerField())
+            relative_credits=Value(cls.group_element_year.relative_credits, output_field=IntegerField())
         ).first()
         cls.serializer = EducationGroupRootsListSerializer(cls.offer, context={
             'request': RequestFactory().get(url),
