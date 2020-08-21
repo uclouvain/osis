@@ -67,18 +67,15 @@ class TestCreateProgramTreeVersion(TestCase, MockPatcherMixin):
             abbreviated_title=self.offer_acronym,
             year=self.current_year,
             code='LDROI200M',
+            type=TrainingType.PGRM_MASTER_120.name
         )
 
         # TODO :: mock with fake repository
-        EducationGroupTypeFactory(name=cmd.type)
-        EducationGroupTypeFactory(name=cmd.type)
-        EducationGroupTypeFactory(name=cmd.type)
-        EducationGroupTypeFactory(name=cmd.type)
         EntityVersionFactory(acronym=cmd.management_entity_acronym)
         CampusFactory(name=cmd.teaching_campus_name, organization__name=cmd.teaching_campus_organization_name)
         LanguageFactory(name=cmd.main_language)
         AcademicYearFactory.produce_in_future(cmd.year)
-        root_type = EducationGroupTypeFactory(name=TrainingType.PGRM_MASTER_120.name)
+        root_type = EducationGroupTypeFactory(name=cmd.type)
         AuthorizedRelationshipFactory(parent_type=root_type, child_type=EducationGroupTypeFactory(name=GroupType.COMMON_CORE.name))
         AuthorizedRelationshipFactory(parent_type=root_type, child_type=EducationGroupTypeFactory(name=GroupType.FINALITY_120_LIST_CHOICE.name))
         AuthorizedRelationshipFactory(parent_type=root_type, child_type=EducationGroupTypeFactory(name=GroupType.OPTION_LIST_CHOICE.name))

@@ -51,7 +51,7 @@ def duplicate_program_tree(
     # THEN
     program_tree_identity = ProgramTreeRepository().create(
         program_tree=program_tree,
-        create_group_service=create_group_service.create_orphan_group
+        create_orphan_group_service=create_group_service.create_orphan_group
     )
 
     return program_tree_identity

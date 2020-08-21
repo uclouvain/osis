@@ -64,6 +64,7 @@ class NodeFactory:
             year=next_year,
             end_year=end_year,
             children=[],
+            node_id=None,
         )
         node_next_year._has_changed = True
         return node_next_year
@@ -115,6 +116,7 @@ class NodeFactory:
             start_year=
             duplicate_from.start_year if override_start_year_to == DO_NOT_OVERRIDE else override_start_year_to,
             children=[],
+            node_id=None,
         )
         copied_node._has_changed = True
         return copied_node

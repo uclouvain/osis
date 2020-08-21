@@ -23,10 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Optional, List
+from typing import Optional, List, Union
 
 from base.models.group_element_year import GroupElementYear
-from education_group.ddd.command import CreateOrphanGroupCommand
+from education_group.ddd.command import CreateOrphanGroupCommand, CopyGroupCommand
 from osis_common.ddd import interface
 from osis_common.ddd.interface import Entity
 from program_management.ddd import command
@@ -68,30 +68,40 @@ class ProgramTreeRepository(interface.AbstractRepository):
     def create(
             cls,
             program_tree: 'ProgramTree',
-            create_group_service: interface.ApplicationService = None
+            create_orphan_group_service: interface.ApplicationService = None,
+            copy_group_service: interface.ApplicationService = None
     ) -> 'ProgramTreeIdentity':
         for node in [n for n in program_tree.get_all_nodes() if n._has_changed is True]:
-            create_group_service(
-                CreateOrphanGroupCommand(
-                    code=node.code,
-                    year=node.year,
-                    type=node.node_type.name,
-                    abbreviated_title=node.title,
-                    title_fr=node.group_title_fr,
-                    title_en=node.group_title_en,
-                    credits=int(node.credits) if node.credits else None,
-                    constraint_type=node.constraint_type.name if node.constraint_type else None,
-                    min_constraint=node.min_constraint,
-                    max_constraint=node.max_constraint,
-                    management_entity_acronym=node.management_entity_acronym,
-                    teaching_campus_name=node.teaching_campus.name,
-                    organization_name=node.teaching_campus.university_name,
-                    remark_fr=node.remark_fr or "",
-                    remark_en=node.remark_en or "",
-                    start_year=node.start_year,
-                    end_year=node.end_year,
+            if create_orphan_group_service:
+                create_orphan_group_service(
+                    CreateOrphanGroupCommand(
+                        code=node.code,
+                        year=node.year,
+                        type=node.node_type.name,
+                        abbreviated_title=node.title,
+                        title_fr=node.group_title_fr,
+                        title_en=node.group_title_en,
+                        credits=int(node.credits) if node.credits else None,
+                        constraint_type=node.constraint_type.name if node.constraint_type else None,
+                        min_constraint=node.min_constraint,
+                        max_constraint=node.max_constraint,
+                        management_entity_acronym=node.management_entity_acronym,
+                        teaching_campus_name=node.teaching_campus.name,
+                        organization_name=node.teaching_campus.university_name,
+                        remark_fr=node.remark_fr or "",
+                        remark_en=node.remark_en or "",
+                        start_year=node.start_year,
+                        end_year=node.end_year,
+                    )
                 )
-            )
+            if copy_group_service:
+                copy_group_service(
+                    CopyGroupCommand(
+                        from_code=node.code,
+                        from_year=node.year - 1,
+                    )
+                )
+
         persist_tree.persist(program_tree)
         return program_tree.entity_id
 
