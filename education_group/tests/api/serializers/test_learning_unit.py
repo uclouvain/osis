@@ -24,9 +24,11 @@
 #
 ##############################################################################
 from django.conf import settings
+from django.db.models import Value, IntegerField
 from django.test import TestCase, RequestFactory
 from rest_framework.reverse import reverse
 
+from base.models.education_group_year import EducationGroupYear
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import TrainingFactory, GroupFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
@@ -58,11 +60,13 @@ class EducationGroupRootsListSerializerTestCase(TestCase):
             'acronym': cls.luy.acronym,
             'year': cls.academic_year.year,
         })
-        cls.serializer = EducationGroupRootsListSerializer(cls.training, context={
+        cls.offer = EducationGroupYear.objects.filter(id=cls.training.id).annotate(
+            relative_credits=Value(15, output_field=IntegerField())
+        ).first()
+        cls.serializer = EducationGroupRootsListSerializer(cls.offer, context={
             'request': RequestFactory().get(url),
             'language': settings.LANGUAGE_CODE_EN,
             'learning_unit_year': cls.luy,
-            'education_group_root_ids': {group.id: [cls.training.id]}
         })
 
     def test_contains_expected_fields(self):
