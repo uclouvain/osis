@@ -169,6 +169,7 @@ class ProgramTreeVersion(interface.RootEntity):
     entity_identity = entity_id = attr.ib(type=ProgramTreeVersionIdentity)
     program_tree_identity = attr.ib(type=ProgramTreeIdentity)
     program_tree_repository = attr.ib(type=interface.AbstractRepository)
+    version_name = attr.ib(type=str)
     title_fr = attr.ib(type=str, default=None)
     title_en = attr.ib(type=str, default=None)
     tree = attr.ib(type=ProgramTree, default=None)
@@ -187,8 +188,8 @@ class ProgramTreeVersion(interface.RootEntity):
     def is_transition(self) -> bool:
         return self.entity_id.is_transition
 
-    @property
-    def version_name(self) -> str:
+    @version_name.default
+    def _version_name(self) -> str:
         return self.entity_id.version_name
 
     @property

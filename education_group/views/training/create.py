@@ -148,7 +148,7 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             training_ids = create_and_attach_training_service.create_and_attach_training(cmd)
         else:
             training_ids = create_and_report_training_with_program_tree(
-                command.CreateTrainingCommand(**create_training_data)
+                command.CreateAndPostponeTrainingAndProgramTreeCommand(**create_training_data)
             )
         return training_ids
 
