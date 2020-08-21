@@ -35,14 +35,8 @@
     </tr>
     </thead>
     <tbody>
-        <td style="padding: 20px;">
-            <label>Force Majeure label</label>
-        </td>
-        <td style="padding: 20px;">
-            TEXT FRENCH
-        </td>
-        <td style="padding: 20px;">
-            TEXT ENGLISH
-        </td>
+        {% for translated_label in cms_force_majeure_labels_translated %}
+            {% include 'learning_unit/blocks/panel/cms_informations.html' %}
+        {% endfor %}
     </tbody>
 </table>

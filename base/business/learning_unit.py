@@ -47,6 +47,11 @@ CMS_LABEL_PEDAGOGY_FR_AND_EN = ['resume', 'teaching_methods', 'evaluation_method
                                 'online_resources']
 CMS_LABEL_PEDAGOGY_FR_ONLY = ['bibliography', 'mobility']
 CMS_LABEL_PEDAGOGY = CMS_LABEL_PEDAGOGY_FR_AND_EN + CMS_LABEL_PEDAGOGY_FR_ONLY
+CMS_LABEL_PEDAGOGY_FORCE_MAJEURE = [
+    'teaching_methods_force_majeure',
+    'evaluation_methods_force_majeure',
+    'other_informations_force_majeure'
+]
 
 CMS_LABEL_SUMMARY = ['resume']
 
