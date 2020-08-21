@@ -185,7 +185,6 @@ def check_paste(request, node_to_paste) -> List[str]:
         if not request.session.get(check_key):
             check_paste_node_service.check_paste(check_command)
     except osis_common.ddd.interface.BusinessExceptions as business_exception:
-        business_exception.messages.insert(0, node_to_paste['element_code'])
         return business_exception.messages
 
     # cache result to avoid double check

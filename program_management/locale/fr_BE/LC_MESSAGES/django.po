@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-18 12:14+0200\n"
+"POT-Creation-Date: 2020-08-21 09:30+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -25,6 +25,10 @@ msgstr "\"%(child)s\" a été retiré de \"%(parent)s\""
 #, python-format
 msgid "\"%(child)s\" has been pasted into \"%(parent)s\""
 msgstr "\"%(child)s\" a été collé dans \"%(parent)s\""
+
+#, python-format
+msgid "%(node_to_add)s version must be the same as %(root_node)s version"
+msgstr "La version de %(node_to_add)s doit être la même que %(root_node)s."
 
 #, python-format
 msgid "%(start_index)s to %(end_index)s of %(total_counts)s learning units"
@@ -571,9 +575,6 @@ msgid ""
 msgstr ""
 "L'élément %(child)s que vous voulez attachez est déjà un parent de l'élément "
 "auquel vous voulez rattachez."
-
-msgid "The child version must be the same as the root node version"
-msgstr "La version de la formation ajoutée doit être la même que celle du parent."
 
 #, python-format
 msgid "The learning unit %(acronym)s is not contained inside the formation"
