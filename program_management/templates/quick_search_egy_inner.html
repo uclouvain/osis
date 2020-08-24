@@ -73,7 +73,13 @@
                 }
             },
             { "name": "code", "targets": 3, "data": "code"},
-            { "name": "title", "targets": 4, "data": "title"}
+            {
+                "name": "title",
+                "targets": 4,
+                "data": "title",
+                "render": function ( data, type, row, meta ) {
+                    return row['version_title'] ? row['version_title']: data;
+                }}
         ];
     </script>
     {{ block.super }}

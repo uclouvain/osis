@@ -21,6 +21,7 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+from types import SimpleNamespace
 from unittest import mock
 
 from django.contrib import messages
@@ -119,9 +120,22 @@ class TestPasteNodeView(TestCase):
 
     @mock.patch('program_management.ddd.service.read.element_selected_service.retrieve_element_selected')
     @mock.patch('program_management.ddd.service.read.check_paste_node_service.check_paste')
-    def test_should_return_formset_when_elements_are_selected(self, mock_check_paste, mock_cache_elems):
+    @mock.patch(
+        'program_management.ddd.domain.service.identity_search.ProgramTreeVersionIdentitySearch.get_from_node_identity'
+    )
+    @mock.patch('program_management.ddd.repositories.node.NodeRepository.get')
+    def test_should_return_formset_when_elements_are_selected(
+            self,
+            mock_get_node,
+            mock_get_version,
+            mock_check_paste,
+            mock_cache_elems
+    ):
         subgroup_to_attach = NodeGroupYearFactory(node_type=GroupType.SUB_GROUP)
         subgroup_to_attach_2 = NodeGroupYearFactory(node_type=GroupType.SUB_GROUP,)
+
+        mock_get_node.side_effect = [subgroup_to_attach, subgroup_to_attach_2]
+        mock_get_version.return_value = SimpleNamespace(version_name='')
 
         # To path :  BIR1BA ---> LBIR101G
         path = "|".join([str(self.tree.root_node.pk), str(self.tree.root_node.children[1].child.pk)])
@@ -142,13 +156,20 @@ class TestPasteNodeView(TestCase):
     @mock.patch('program_management.ddd.service.read.element_selected_service.retrieve_element_selected')
     @mock.patch('program_management.forms.tree.paste.PasteNodesFormset.is_valid')
     @mock.patch('program_management.ddd.service.read.check_paste_node_service.check_paste')
+    @mock.patch(
+        'program_management.ddd.domain.service.identity_search.ProgramTreeVersionIdentitySearch.get_from_node_identity'
+    )
+    @mock.patch('program_management.ddd.repositories.node.NodeRepository.get')
     def test_should_rereturn_fromset_when_post_data_are_not_valid(
             self,
+            mock_get_node,
+            mock_get_version,
             mock_check_paste,
             mock_formset_is_valid,
-            mock_cache_elems
+            mock_cache_elems,
     ):
         subgroup_to_attach = NodeGroupYearFactory(node_type=GroupType.SUB_GROUP)
+        mock_get_node.return_value = subgroup_to_attach
         mock_cache_elems.return_value = {
             "element_code": subgroup_to_attach.code,
             "element_year": subgroup_to_attach.year,
@@ -156,6 +177,7 @@ class TestPasteNodeView(TestCase):
         }
         mock_formset_is_valid.return_value = False
         mock_check_paste.side_effect = osis_common.ddd.interface.BusinessExceptions(["Not valid"])
+        mock_get_version.return_value = SimpleNamespace(version_name='')
 
         # To path :  BIR1BA ---> LBIR101G
         path = "|".join([str(self.tree.root_node.pk), str(self.tree.root_node.children[1].child.pk)])
