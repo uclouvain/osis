@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-13 08:27+0200\n"
+"POT-Creation-Date: 2020-08-21 11:01+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -944,6 +944,9 @@ msgstr "Fin de cycle"
 msgid "End year"
 msgstr "Année de fin"
 
+msgid "Ending date"
+msgstr "Date de fermeture"
+
 msgid "Ending of course registration"
 msgstr "Fin inscription aux cours"
 
@@ -1098,6 +1101,9 @@ msgstr "N° dossier"
 
 msgid "For all students"
 msgstr "Pour tous les étudiants"
+
+msgid "Force majeure : adaptation of the description fiche"
+msgstr "Cas de force majeure :  adaptation de la fiche descriptive"
 
 msgid "Force state"
 msgstr "Forcer l'état"
@@ -1836,6 +1842,9 @@ msgstr "Pas inscrit"
 msgid "Not in period to edit description fiche."
 msgstr "Vous n'êtes pas en période de modification des fiches descriptives."
 
+msgid "Not in period to edit force majeure section."
+msgstr "Vous n'êtes pas en période de modification des fiches descriptives (Cas de force majeure)."
+
 msgid "Not in range of years which can be edited by you"
 msgstr ""
 "L'unité d'enseignement n'est pas dans la fourchette d'années que vous pouvez "
@@ -1891,6 +1900,9 @@ msgstr "Ouvert aux externes"
 
 msgid "Open minor"
 msgstr "Mineure d’ouverture"
+
+msgid "Opening date"
+msgstr "Date d'ouverture"
 
 msgid "Opening to Adults"
 msgstr "Ouverture aux adultes"
@@ -2566,6 +2578,9 @@ msgstr "Succès"
 
 msgid "Summary course submission"
 msgstr "Soumission des fiches descriptives"
+
+msgid "Summary course submission force majeure"
+msgstr "Adaptation des fiches descriptives (Cas de force majeure)"
 
 msgid "Summary course submission is not allowed for tutors during this period."
 msgstr ""
@@ -3356,7 +3371,8 @@ msgid ""
 "You cannot put in proposal for ending date on the first year of the learning "
 "unit."
 msgstr ""
-"Vous ne pouvez pas créer une proposition de fin d'enseignement sur la première année d'organisation de l'UE."
+"Vous ne pouvez pas créer une proposition de fin d'enseignement sur la "
+"première année d'organisation de l'UE."
 
 msgid "You don't have the rights to consolidate"
 msgstr "Vous n'avez pas le droit de consolider"

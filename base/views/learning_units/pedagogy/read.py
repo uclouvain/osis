@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import itertools
+from typing import List
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required, permission_required
@@ -35,9 +36,10 @@ from reversion.models import Version
 from attribution.models.attribution import Attribution
 from base import models as mdl
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY_FR_ONLY, \
-    CMS_LABEL_PEDAGOGY
+    CMS_LABEL_PEDAGOGY, CMS_LABEL_PEDAGOGY_FORCE_MAJEURE
 from base.business.learning_units import perms
-from base.business.learning_units.perms import is_eligible_to_update_learning_unit_pedagogy
+from base.business.learning_units.perms import is_eligible_to_update_learning_unit_pedagogy, \
+    is_eligible_to_update_learning_unit_pedagogy_force_majeure_section
 from base.models.person import Person
 from base.models.teaching_material import TeachingMaterial
 from base.views.common import add_to_session
@@ -62,41 +64,14 @@ def read_learning_unit_pedagogy(request, learning_unit_year_id, context, templat
 
     learning_unit_year = context['learning_unit_year']
     perm_to_edit = is_eligible_to_update_learning_unit_pedagogy(learning_unit_year, person)
+    perm_to_edit_force_majeure = is_eligible_to_update_learning_unit_pedagogy_force_majeure_section(
+        learning_unit_year,
+        person
+    )
     user_language = mdl.person.get_user_interface_language(request.user)
 
-    translated_labels_with_text = TranslatedTextLabel.objects.filter(
-        language=user_language,
-        text_label__label__in=CMS_LABEL_PEDAGOGY
-    ).prefetch_related(
-        Prefetch(
-            "text_label__translatedtext_set",
-            queryset=TranslatedText.objects.filter(
-                language=settings.LANGUAGE_CODE_FR,
-                entity=LEARNING_UNIT_YEAR,
-                reference=learning_unit_year_id
-            ),
-            to_attr="text_fr"
-        ),
-        Prefetch(
-            "text_label__translatedtext_set",
-            queryset=TranslatedText.objects.filter(
-                language=settings.LANGUAGE_CODE_EN,
-                entity=LEARNING_UNIT_YEAR,
-                reference=learning_unit_year_id
-            ),
-            to_attr="text_en"
-        )
-    ).annotate(
-        label_ordering=Case(
-            *[When(text_label__label=label, then=Value(i)) for i, label in enumerate(CMS_LABEL_PEDAGOGY)],
-            default=Value(len(CMS_LABEL_PEDAGOGY)),
-            output_field=IntegerField()
-        )
-    ).select_related(
-        "text_label"
-    ).order_by(
-        "label_ordering"
-    )
+    cms_pedagogy_labels_translated = _get_cms_pedagogy_labels_translated(learning_unit_year_id, user_language)
+    cms_force_majeure_labels_translated = _get_cms_force_majeure_labels_translated(learning_unit_year_id, user_language)
     teaching_materials = TeachingMaterial.objects.filter(learning_unit_year=learning_unit_year).order_by('order')
     attributions = Attribution.objects.filter(learning_unit_year=learning_unit_year).select_related(
         "tutor__person"
@@ -104,7 +79,7 @@ def read_learning_unit_pedagogy(request, learning_unit_year_id, context, templat
 
     translated_text_ids = itertools.chain.from_iterable(
         (*translated_label.text_label.text_fr, *translated_label.text_label.text_en)
-        for translated_label in translated_labels_with_text
+        for translated_label in list(cms_pedagogy_labels_translated) + list(cms_force_majeure_labels_translated)
     )
 
     reversion = Version.objects.filter(
@@ -128,12 +103,58 @@ def read_learning_unit_pedagogy(request, learning_unit_year_id, context, templat
         "-revision__date_created"
     ).first()
 
-    context['cms_labels_translated'] = translated_labels_with_text
+    context['cms_labels_translated'] = cms_pedagogy_labels_translated
+    context['cms_force_majeure_labels_translated'] = cms_force_majeure_labels_translated
     context['teaching_materials'] = teaching_materials
     context['can_edit_information'] = perm_to_edit
+    context['can_edit_force_majeur_section'] = perm_to_edit_force_majeure
     context['can_edit_summary_locked_field'] = perms.can_edit_summary_locked_field(learning_unit_year, person)
     context['cms_label_pedagogy_fr_only'] = CMS_LABEL_PEDAGOGY_FR_ONLY
     context['attributions'] = attributions
     context["version"] = reversion
     context['tab_active'] = 'learning_unit_pedagogy'  # Corresponds to url_name
     return render(request, template, context)
+
+
+def _get_cms_pedagogy_labels_translated(learning_unit_year_id: int, user_language: str):
+    return _get_cms_labels_translated(learning_unit_year_id, CMS_LABEL_PEDAGOGY, user_language)
+
+
+def _get_cms_force_majeure_labels_translated(learning_unit_year_id: int, user_language: str):
+    return _get_cms_labels_translated(learning_unit_year_id, CMS_LABEL_PEDAGOGY_FORCE_MAJEURE, user_language)
+
+
+def _get_cms_labels_translated(learning_unit_year_id: int, text_labels: List[str], user_language: str):
+    return TranslatedTextLabel.objects.filter(
+        language=user_language,
+        text_label__label__in=text_labels
+    ).prefetch_related(
+        Prefetch(
+            "text_label__translatedtext_set",
+            queryset=TranslatedText.objects.filter(
+                language=settings.LANGUAGE_CODE_FR,
+                entity=LEARNING_UNIT_YEAR,
+                reference=learning_unit_year_id
+            ),
+            to_attr="text_fr"
+        ),
+        Prefetch(
+            "text_label__translatedtext_set",
+            queryset=TranslatedText.objects.filter(
+                language=settings.LANGUAGE_CODE_EN,
+                entity=LEARNING_UNIT_YEAR,
+                reference=learning_unit_year_id
+            ),
+            to_attr="text_en"
+        )
+    ).annotate(
+        label_ordering=Case(
+            *[When(text_label__label=label, then=Value(i)) for i, label in enumerate(text_labels)],
+            default=Value(len(text_labels)),
+            output_field=IntegerField()
+        )
+    ).select_related(
+        "text_label"
+    ).order_by(
+        "label_ordering"
+    )

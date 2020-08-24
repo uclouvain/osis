@@ -613,6 +613,12 @@ components:
           type: string
         mobility:
           type: string
+        teaching_methods_force_majeure:
+          type: string
+        evaluation_methods_force_majeure:
+          type: string
+        other_informations_force_majeure:
+          type: string
       required:
         - bibliography
         - resume
@@ -623,6 +629,9 @@ components:
         - themes_discussed
         - prerequisite
         - mobility
+        - teaching_methods_force_majeure
+        - evaluation_methods_force_majeure
+        - other_informations_force_majeure
     LearningUnitPrerequisite:
       type: object
       properties:

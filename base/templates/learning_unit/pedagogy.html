@@ -33,8 +33,11 @@
             {% url 'learning_unit_pedagogy_edit' learning_unit_year_id=learning_unit_year.id as post_url %}
 
             {% include "learning_unit/blocks/panel/educational_informations.html" %}
+
+            <h4>{% trans 'Force majeure : adaptation of the description fiche' %}</h4>
+            {% url 'learning_unit_pedagogy_force_majeure_edit' learning_unit_year_id=learning_unit_year.id as force_majeure_update_url %}
+            {% include 'learning_unit/blocks/educational_informations_force_majeure_table.html' with post_url=force_majeure_update_url %}
         </div>
     </div>
-
-<div class="modal fade" id="pedagogy_edit" role="dialog" data-backdrop="static"></div>
+    <div class="modal fade" id="pedagogy_edit" role="dialog" data-backdrop="static"></div>
 {% endblock %}
