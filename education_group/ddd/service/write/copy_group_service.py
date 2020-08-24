@@ -42,6 +42,6 @@ def copy_group(cmd: command.CopyGroupCommand) -> 'GroupIdentity':
     try:
         with transaction.atomic():
             group_id = repository.create(group_next_year)
-    except exception.GroupCodeAlreadyExistException:
+    except exception.CodeAlreadyExistException:
         group_id = repository.update(group_next_year)
     return group_id

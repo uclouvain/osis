@@ -45,7 +45,7 @@ def copy_mini_training_to_next_year(copy_cmd: command.CopyMiniTrainingToNextYear
     try:
         with transaction.atomic():
             identity = repository.create(mini_training_next_year)
-    except exception.MiniTrainingCodeAlreadyExistException:
+    except exception.CodeAlreadyExistException:
         identity = repository.update(mini_training_next_year)
 
     return identity

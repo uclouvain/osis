@@ -26,7 +26,7 @@
 from typing import Optional, List
 
 from django.db import IntegrityError
-from django.db.models import Prefetch, Subquery, OuterRef, Q
+from django.db.models import Prefetch, Subquery, OuterRef, Q, ProtectedError
 from django.utils import timezone
 
 from education_group import publisher
@@ -197,11 +197,14 @@ class GroupRepository(interface.AbstractRepository):
 
     @classmethod
     def delete(cls, entity_id: 'GroupIdentity', **_) -> None:
-        publisher.group_deleted.send(None, group_identity=entity_id)
-        GroupYearModelDb.objects.filter(
-            partial_acronym=entity_id.code,
-            academic_year__year=entity_id.year
-        ).delete()
+        try:
+            publisher.group_deleted.send(None, group_identity=entity_id)
+            GroupYearModelDb.objects.filter(
+                partial_acronym=entity_id.code,
+                academic_year__year=entity_id.year
+            ).delete()
+        except ProtectedError:
+            raise exception.GroupIsBeingUsedException()
 
 
 def _convert_db_model_to_ddd_model(obj: GroupYearModelDb) -> 'Group':
