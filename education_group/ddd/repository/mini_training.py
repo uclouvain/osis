@@ -24,7 +24,7 @@
 from typing import Optional, List
 
 from django.db import IntegrityError
-from django.db.models import Prefetch, Subquery, OuterRef
+from django.db.models import Prefetch, Subquery, OuterRef, ProtectedError
 from django.utils import timezone
 
 from base.models.academic_year import AcademicYear as AcademicYearModelDb
@@ -99,7 +99,7 @@ class MiniTrainingRepository(interface.AbstractRepository):
             )
 
         except IntegrityError:
-            raise exception.MiniTrainingCodeAlreadyExistException()
+            raise exception.CodeAlreadyExistException(year=mini_training_obj.year)
 
         return mini_training_obj.entity_id
 
@@ -173,11 +173,14 @@ class MiniTrainingRepository(interface.AbstractRepository):
 
     @classmethod
     def delete(cls, entity_id: 'mini_training.MiniTrainingIdentity') -> None:
-        EducationGroupYearModelDb.objects.get(
-            acronym=entity_id.acronym,
-            academic_year__year=entity_id.year,
-            education_group_type__name__in=MiniTrainingType.get_names()
-        ).delete()
+        try:
+            EducationGroupYearModelDb.objects.get(
+                acronym=entity_id.acronym,
+                academic_year__year=entity_id.year,
+                education_group_type__name__in=MiniTrainingType.get_names()
+            ).delete()
+        except ProtectedError:
+            raise exception.MiniTrainingIsBeingUsedException()
 
 
 def _convert_type(education_group_type):

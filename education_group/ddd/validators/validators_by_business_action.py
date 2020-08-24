@@ -36,6 +36,7 @@ from education_group.ddd.validators._credits import CreditsValidator
 from education_group.ddd.validators._enrollments import TrainingEnrollmentsValidator, MiniTrainingEnrollmentsValidator
 from education_group.ddd.validators._link_with_epc import TrainingLinkWithEPCValidator, MiniTrainingLinkWithEPCValidator
 from education_group.ddd.validators._start_year_end_year import StartYearEndYearValidator
+from education_group.ddd.validators._unique_code import UniqueCodeValidator
 from education_group.ddd.validators.start_and_end_year_validator import StartAndEndYearValidator
 
 
@@ -43,6 +44,7 @@ class CreateGroupValidatorList(business_validator.BusinessListValidator):
 
     def __init__(self, group: 'Group'):
         self.validators = [
+            UniqueCodeValidator(group.code),
             ContentConstraintValidator(group.content_constraint),
             CreditsValidator(group.credits),
         ]
@@ -62,6 +64,7 @@ class UpdateGroupValidatorList(business_validator.BusinessListValidator):
 class CreateMiniTrainingValidatorList(business_validator.BusinessListValidator):
     def __init__(self, mini_training_domain_obj: 'MiniTraining'):
         self.validators = [
+            UniqueCodeValidator(mini_training_domain_obj.code),
             AcronymRequiredValidator(mini_training_domain_obj.acronym),
             AcronymAlreadyExistValidator(mini_training_domain_obj.acronym),
             StartAndEndYearValidator(mini_training_domain_obj.start_year, mini_training_domain_obj.end_year)
@@ -73,6 +76,7 @@ class CreateTrainingValidatorList(business_validator.BusinessListValidator):
 
     def __init__(self, training: 'Training'):
         self.validators = [
+            UniqueCodeValidator(training.code),
             AcronymRequiredValidator(training.acronym),
             AcronymAlreadyExistValidator(training.acronym),
             StartYearEndYearValidator(training),

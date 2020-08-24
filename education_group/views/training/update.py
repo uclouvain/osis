@@ -205,7 +205,7 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
     def update_links(self) -> List['Link']:
         update_link_commands = [
-            self._convert_form_to_update_link_command(form) for form in self.content_formset.forms if form.has_changed
+            self._convert_form_to_update_link_command(form) for form in self.content_formset.forms if form.has_changed()
         ]
 
         if not update_link_commands:

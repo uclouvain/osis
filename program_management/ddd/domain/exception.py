@@ -117,3 +117,6 @@ class CannotDeleteStandardDueToVersionEndDate(BusinessException):
         )
         super().__init__(message, **kwargs)
 
+
+class NodeIsUsedException(Exception):
+    pass
