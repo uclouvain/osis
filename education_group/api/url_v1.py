@@ -32,6 +32,7 @@ from education_group.api.views.hops import HopsList
 from education_group.api.views.mini_training import MiniTrainingDetail, MiniTrainingTitle, MiniTrainingList, \
     OfferRoots
 from education_group.api.views.training import TrainingList, TrainingDetail, TrainingTitle
+from program_management.api.views.prerequisite import TrainingPrerequisites, MiniTrainingPrerequisites
 
 app_name = "education_group"
 
@@ -41,7 +42,9 @@ urlpatterns = [
     url(r'^trainings/(?P<year>[\d]{4})/(?P<acronym>[\w]+(?:[/ ]?[\w]{1,2}){0,2})/', include([
         url(r'^tree$', TrainingTreeView.as_view(), name=TrainingTreeView.name),
         url(r'^title$', TrainingTitle.as_view(), name=TrainingTitle.name),
-        url(r'^versions$', TrainingVersionList.as_view(), name=TrainingVersionList.name)
+        url(r'^versions$', TrainingVersionList.as_view(), name=TrainingVersionList.name),
+        url(r'^prerequisites$', TrainingPrerequisites.as_view(), {'transition': False},
+            name='{}_official'.format(TrainingPrerequisites.NAME)),
     ])),
     url(
         r'^trainings/(?P<year>[\d]{4})/(?P<acronym>[\w]+(?:[/ ]?[a-zA-Z]{1,2}){0,2})/versions/(?P<version_name>[\w]*)$',
@@ -79,7 +82,9 @@ urlpatterns = [
         url(r'^tree$', MiniTrainingTreeView.as_view(), name=MiniTrainingTreeView.name),
         url(r'^title$', MiniTrainingTitle.as_view(), name=MiniTrainingTitle.name),
         url(r'^offer_roots$', OfferRoots.as_view(), name=OfferRoots.name),
-        url(r'^versions$', MiniTrainingVersionList.as_view(), name=MiniTrainingVersionList.name)
+        url(r'^versions$', MiniTrainingVersionList.as_view(), name=MiniTrainingVersionList.name),
+        url(r'^prerequisites$', MiniTrainingPrerequisites.as_view(), {'transition': False},
+            name='{}_official'.format(MiniTrainingPrerequisites.NAME)),
     ])),
     url(
         r'^mini_trainings/(?P<year>[\d]{4})/(?P<acronym>[\w]+([&/\-_:É ][\w]+){0,3})$',
