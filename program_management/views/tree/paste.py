@@ -44,6 +44,8 @@ from base.views.mixins import AjaxTemplateMixin
 from education_group.models.group_year import GroupYear
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd.domain import node
+from program_management.ddd.domain.node import NodeIdentity
+from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories import node as node_repository
 from program_management.ddd.service.read import element_selected_service, check_paste_node_service
 from program_management.forms.tree.paste import PasteNodesFormset, paste_form_factory, PasteToMinorMajorListChoiceForm
@@ -112,6 +114,8 @@ class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageM
                 node.NodeIdentity(ele["element_code"], ele["element_year"])
             ) for ele in self.nodes_to_paste}
 
+        self._format_title_with_version(context_data["nodes_by_id"])
+
         if not self.nodes_to_paste:
             display_warning_messages(self.request, _("Please cut or copy an item before paste"))
 
@@ -122,6 +126,14 @@ class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageM
             display_error_messages(self.request, error_messages)
 
         return context_data
+
+    def _format_title_with_version(self, nodes_by_id):
+        for ele in self.nodes_to_paste:
+            node_identity = NodeIdentity(code=ele["element_code"], year=ele["element_year"])
+            tree_version = ProgramTreeVersionIdentitySearch().get_from_node_identity(node_identity)
+            node_ele = nodes_by_id[ele['element_code']]
+            node_ele.version = tree_version.version_name
+            node_ele.title = "{}[{}]".format(node_ele.title, node_ele.version) if node_ele.version else node_ele.title
 
     def form_valid(self, formset: PasteNodesFormset):
         link_identities_ids = formset.save()
