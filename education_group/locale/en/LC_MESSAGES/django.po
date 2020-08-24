@@ -411,6 +411,16 @@ msgid "Mini-Training"
 msgstr ""
 
 #, python-format
+msgid "Mini-Training %(acronym)s (%(academic_year)s) successfully deleted."
+msgstr ""
+
+#, python-format
+msgid ""
+"Mini-Training <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> "
+"successfully updated."
+msgstr ""
+
+#, python-format
 msgid ""
 "Mini-training <a href='%(link)s'> %(code)s (%(academic_year)s) </a> "
 "successfully created."
@@ -762,6 +772,9 @@ msgid "duration unit"
 msgstr ""
 
 msgid "filter by section"
+msgstr ""
+
+msgid "hops"
 msgstr ""
 
 msgid "is using in"

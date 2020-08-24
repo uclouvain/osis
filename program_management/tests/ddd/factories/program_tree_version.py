@@ -25,9 +25,20 @@
 ##############################################################################
 import factory.fuzzy
 
-from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersion, ProgramTreeVersionIdentity
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
+
+
+class ProgramTreeVersionIdentityFactory(factory.Factory):
+
+    class Meta:
+        model = ProgramTreeVersionIdentity
+        abstract = False
+
+    offer_acronym = "OFFER"
+    year = 2020
+    version_name = ""
+    is_transition = False
 
 
 class ProgramTreeVersionFactory(factory.Factory):
@@ -38,14 +49,10 @@ class ProgramTreeVersionFactory(factory.Factory):
 
     tree = factory.SubFactory(ProgramTreeFactory)
     entity_identity = None
-    program_tree_identity = ProgramTreeIdentity(code="CODE", year=2020)
+    program_tree_identity = factory.SelfAttribute("tree.entity_id")
     program_tree_repository = None
-    entity_id = ProgramTreeVersionIdentity(
-        offer_acronym="OFFER",
-        year=2020,
-        version_name="",
-        is_transition=False
+    entity_id = factory.SubFactory(
+        ProgramTreeVersionIdentityFactory,
+        offer_acronym=factory.SelfAttribute("..tree.root_node.title"),
+        year=factory.SelfAttribute("..tree.root_node.year")
     )
-
-
-

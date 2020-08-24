@@ -35,15 +35,6 @@ class RelativeCreditShouldBeGreaterOrEqualsThanZero(BusinessException):
         super().__init__(message, **kwargs)
 
 
-class ProgramTreeNotEmptyException(BusinessException):
-    def __init__(self, program_tree: 'ProgramTree', *args, **kwargs):
-        message = _("Program %(acronym)s (%(academic_year)s) is not empty.") % {
-            "acronym": program_tree.root_node.title,
-            "academic_year": str(program_tree.root_node.academic_year)
-        }
-        super().__init__(message, **kwargs)
-
-
 class ProgramTreeNotFoundException(Exception):
     pass
 
@@ -99,3 +90,7 @@ class CannotCopyTreeDueToEndDate(BusinessException):
             end_year=tree.root_node.end_year,
         )
         super().__init__(message, **kwargs)
+
+
+class NodeIsUsedException(Exception):
+    pass

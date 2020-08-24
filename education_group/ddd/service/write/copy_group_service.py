@@ -24,16 +24,15 @@
 
 from django.db import transaction
 
-from education_group import publisher
 from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import group, exception
-from education_group.ddd.repository.group import GroupRepository
+from education_group.ddd.repository import group as group_repository
 
 
 @transaction.atomic()
 def copy_group(cmd: command.CopyGroupCommand) -> 'GroupIdentity':
-    repository = GroupRepository()
+    repository = group_repository.GroupRepository()
     existing_group = repository.get(
         entity_id=group.GroupIdentity(code=cmd.from_code, year=cmd.from_year)
     )
@@ -42,10 +41,7 @@ def copy_group(cmd: command.CopyGroupCommand) -> 'GroupIdentity':
 
     try:
         with transaction.atomic():
-            group_id = GroupRepository.create(group_next_year)
-            # Emit group_created event
-            publisher.group_created.send(None, group_identity=group_id)
+            group_id = repository.create(group_next_year)
     except exception.CodeAlreadyExistException:
-        group_id = GroupRepository.update(group_next_year)
-
+        group_id = repository.update(group_next_year)
     return group_id

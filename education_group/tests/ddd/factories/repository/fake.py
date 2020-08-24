@@ -21,27 +21,32 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from django.test import SimpleTestCase
+from typing import List, Type
 
-from program_management.ddd.validators import _program_tree_empty
-from program_management.tests.ddd.factories.link import LinkFactory
-from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
-from program_management.tests.ddd.validators.mixins import TestValidatorValidateMixin
+from education_group.ddd.business_types import *
+from education_group.ddd.domain import exception
+from testing.mocks import FakeRepository
 
 
-class TestProgramTreeEmptyValidator(TestValidatorValidateMixin, SimpleTestCase):
-    def test_should_not_raise_exception_when_program_tree_is_empty(self):
-        emtpy_program_tree = ProgramTreeFactory()
+def get_fake_group_repository(root_entities: List['Group']) -> Type['FakeRepository']:
+    class_name = "FakeGroupRepository"
+    return type(class_name, (FakeRepository,), {
+        "root_entities": root_entities.copy(),
+        "not_found_exception_class": exception.GroupNotFoundException
+    })
 
-        self.assertValidatorNotRaises(
-            _program_tree_empty.ProgramTreeEmptyValidator(emtpy_program_tree),
-        )
 
-    def test_should_raise_exception_when_program_tree_is_empty(self):
-        program_tree_with_content = ProgramTreeFactory()
-        LinkFactory(parent=program_tree_with_content.root_node)
+def get_fake_mini_training_repository(root_entities: List['MiniTraining']) -> Type['FakeRepository']:
+    class_name = "FakeMiniTrainingRepository"
+    return type(class_name, (FakeRepository,), {
+        "root_entities": root_entities.copy(),
+        "not_found_exception_class": exception.MiniTrainingNotFoundException
+    })
 
-        self.assertValidatorRaises(
-            _program_tree_empty.ProgramTreeEmptyValidator(program_tree_with_content),
-            None
-        )
+
+def get_fake_training_repository(root_entities: List['Training']) -> Type['FakeRepository']:
+    class_name = "FakeTrainingRepository"
+    return type(class_name, (FakeRepository,), {
+        "root_entities": root_entities.copy(),
+        "not_found_exception_class": exception.TrainingNotFoundException
+    })

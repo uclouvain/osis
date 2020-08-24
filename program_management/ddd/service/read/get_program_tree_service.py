@@ -23,9 +23,9 @@
 # ############################################################################
 from program_management.ddd import command
 from program_management.ddd.domain.program_tree import ProgramTree, ProgramTreeIdentity
-from program_management.ddd.repositories.program_tree import ProgramTreeRepository
+from program_management.ddd.repositories import program_tree as program_tree_repository
 
 
 def get_program_tree(cmd: command.GetProgramTree) -> ProgramTree:
     program_tree_id = ProgramTreeIdentity(code=cmd.code, year=cmd.year)
-    return ProgramTreeRepository.get(program_tree_id)
+    return program_tree_repository.ProgramTreeRepository.get(program_tree_id)
