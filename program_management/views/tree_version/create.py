@@ -25,7 +25,6 @@
 ##############################################################################
 from typing import List
 
-from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils.functional import cached_property
@@ -34,6 +33,7 @@ from django.views.generic.base import View
 
 from base.forms.education_group.version import SpecificVersionForm
 from base.models.education_group_year import EducationGroupYear
+from base.models.utils.utils import ChoiceEnum
 from base.views.common import display_success_messages
 from base.views.mixins import AjaxTemplateMixin
 from education_group.ddd.domain import exception
@@ -47,8 +47,13 @@ from program_management.ddd.command import CreateProgramTreeVersionCommand, Exte
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
 from program_management.ddd.service.write import create_and_postpone_tree_version_service, \
-    create_program_tree_version_service, extend_existing_tree_version_service, update_program_tree_version_service, \
+    extend_existing_tree_version_service, update_program_tree_version_service, \
     postpone_tree_version_service
+
+
+class SaveTypes(ChoiceEnum):
+    NEW_VERSION = "new_version"
+    EXTEND = "extend"
 
 
 class CreateProgramTreeVersion(AjaxPermissionRequiredMixin, AjaxTemplateMixin, View):
@@ -92,12 +97,12 @@ class CreateProgramTreeVersion(AjaxPermissionRequiredMixin, AjaxTemplateMixin, V
             save_type = self.request.POST.get("save_type")
 
             identities = []
-            if save_type == "new_version":
+            if save_type == SaveTypes.NEW_VERSION:
                 try:
                     identities = create_and_postpone_tree_version_service.create_and_postpone(command=command)
                 except exception.VersionNameAlreadyExist as e:
                     form.add_error('version_name', e.message)
-            elif save_type == "extend":
+            elif save_type == SaveTypes.EXTEND:
                 identities = extend_existing_tree_version_service.extend_existing_past_version(
                     _convert_form_to_extend_command(form)
                 )
