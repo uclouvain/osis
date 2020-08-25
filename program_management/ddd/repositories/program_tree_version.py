@@ -35,8 +35,7 @@ from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception
 from program_management.ddd.domain import program_tree
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
+from program_management.ddd.domain import program_tree_version
 from program_management.ddd.repositories import program_tree as program_tree_repository
 from program_management.models.education_group_version import EducationGroupVersion
 from django.db.models import Q
@@ -81,7 +80,7 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
         return program_tree_version.entity_id
 
     @classmethod
-    def get(cls, entity_id: ProgramTreeVersionIdentity) -> 'ProgramTreeVersion':
+    def get(cls, entity_id: 'ProgramTreeVersionIdentity') -> 'ProgramTreeVersion':
         qs = EducationGroupVersion.objects.filter(
             version_name=entity_id.version_name,
             offer__acronym=entity_id.offer_acronym,
@@ -112,7 +111,7 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
             cls,
             entity_ids: Optional[List['ProgramTreeVersionIdentity']] = None,
             **kwargs
-    ) -> List[ProgramTreeVersion]:
+    ) -> List['ProgramTreeVersion']:
         qs = GroupYear.objects.all().order_by(
             'educationgroupversion__version_name'
         ).annotate(
@@ -175,13 +174,13 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
 
 
 def _instanciate_tree_version(record_dict: dict) -> 'ProgramTreeVersion':
-    identity = ProgramTreeVersionIdentity(
+    identity = program_tree_version.ProgramTreeVersionIdentity(
         offer_acronym=record_dict['offer_acronym'],
         year=record_dict['offer_year'],
         version_name=record_dict['version_name'],
         is_transition=record_dict['is_transition'],
     )
-    return ProgramTreeVersion(
+    return program_tree_version.ProgramTreeVersion(
         entity_identity=identity,
         entity_id=identity,
         program_tree_identity=program_tree.ProgramTreeIdentity(record_dict['code'], record_dict['offer_year']),
