@@ -23,11 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+
 import attr
 
 from osis_common.ddd import interface
 from program_management.ddd.business_types import *
-import attr
 from program_management.ddd.command import CreateStandardVersionCommand
 from program_management.ddd.domain import exception
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity, ProgramTree
