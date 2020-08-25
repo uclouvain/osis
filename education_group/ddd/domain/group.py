@@ -40,7 +40,7 @@ from education_group.ddd.domain._titles import Titles
 from education_group.ddd.domain._campus import Campus
 from education_group.ddd.domain.service.enum_converter import EducationGroupTypeConverter
 from education_group.ddd.validators.validators_by_business_action import UpdateGroupValidatorList, \
-    CopyGroupValidatorList
+    CopyGroupValidatorList, CreateGroupValidatorList
 from osis_common.ddd import interface
 
 
@@ -73,7 +73,7 @@ class GroupBuilder:
         )
         remark = Remark(text_fr=cmd.remark_fr, text_en=cmd.remark_en)
 
-        return Group(
+        created_group = Group(
             entity_identity=group_id,
             entity_id=group_id,
             type=EducationGroupTypeConverter.convert_type_str_to_enum(cmd.type),
@@ -87,6 +87,8 @@ class GroupBuilder:
             start_year=cmd.start_year,
             end_year=cmd.end_year
         )
+        CreateGroupValidatorList(created_group).validate()
+        return created_group
 
 
 builder = GroupBuilder()

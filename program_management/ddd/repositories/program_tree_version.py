@@ -43,7 +43,6 @@ from django.db.models import Q
 
 
 class ProgramTreeVersionRepository(interface.AbstractRepository):
-
     @classmethod
     def create(
             cls,

@@ -21,42 +21,43 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-import mock
+
 from django.test import TestCase
 
-from base.tests.factories.academic_year import AcademicYearFactory
 from education_group.ddd import command
-from education_group.ddd.domain import training, group
-from education_group.ddd.service.write import postpone_training_service, postpone_group_service
-from education_group.tests.ddd.factories.group import GroupFactory
+from education_group.ddd.domain import exception
+from education_group.ddd.service.write import delete_orphan_training_service
+from education_group.tests.ddd.factories.repository.fake import get_fake_training_repository
 from education_group.tests.ddd.factories.training import TrainingFactory
+from testing.mocks import MockPatcherMixin
 
 
-class TestPostponeGroup(TestCase):
-
+class TestDeleteOrphanTraining(TestCase, MockPatcherMixin):
     @classmethod
     def setUpTestData(cls):
-        AcademicYearFactory(year=2018)
-        AcademicYearFactory(year=2019)
-        AcademicYearFactory(year=2020)
-
-    @mock.patch("education_group.ddd.service.write.copy_group_service.copy_group")
-    def test_should_return_a_number_of_identities_equal_to_difference_of_from_year_and_until_year(
-            self,
-            mock_copy_group_to_next_year_service,
-    ):
-        existing_group = GroupFactory(
-            entity_identity=group.GroupIdentity(code="CODE", year=2018),
-            end_year=2020
+        cls.cmd = command.DeleteOrphanTrainingCommand(
+            year=2018,
+            acronym="MAP29"
         )
-        group_identities = [
-            existing_group.entity_id,
-            group.GroupIdentity(code="CODE", year=2019),
-            group.GroupIdentity(code="CODE", year=2020)
-        ]
-        mock_copy_group_to_next_year_service.side_effect = group_identities
 
-        cmd = command.PostponeGroupCommand(code="CODE", postpone_from_year=2018, postpone_until_year=2021)
-        result = postpone_group_service.postpone_group(cmd)
+    def setUp(self) -> None:
+        self.training_2018 = TrainingFactory(
+            entity_identity__acronym=self.cmd.acronym,
+            entity_identity__year=self.cmd.year
+        )
+        self.fake_training_repo = get_fake_training_repository([self.training_2018])
+        self.mock_repo(
+            "education_group.ddd.repository.training.TrainingRepository",
+            self.fake_training_repo
+        )
 
-        self.assertListEqual(group_identities, result)
+    def test_should_return_entity_identity_of_deleted_training(self):
+        result = delete_orphan_training_service.delete_orphan_training(self.cmd)
+
+        expected_result = self.training_2018.entity_id
+        self.assertEqual(expected_result, result)
+
+    def test_should_remove_training_from_repository(self):
+        entity_identity_of_deleted_training = delete_orphan_training_service.delete_orphan_training(self.cmd)
+        with self.assertRaises(exception.TrainingNotFoundException):
+            self.fake_training_repo.get(entity_identity_of_deleted_training)

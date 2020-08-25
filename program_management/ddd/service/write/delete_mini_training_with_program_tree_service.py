@@ -21,27 +21,28 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from django.test import SimpleTestCase
+from typing import List
 
-from program_management.ddd.validators import _program_tree_empty
-from program_management.tests.ddd.factories.link import LinkFactory
-from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
-from program_management.tests.ddd.validators.mixins import TestValidatorValidateMixin
+from django.db import transaction
+
+from education_group.ddd.business_types import *
+from education_group.ddd.domain import training, mini_training
+from program_management.ddd import command
+from program_management.ddd.service.write import delete_standard_program_tree_version_service
 
 
-class TestProgramTreeEmptyValidator(TestValidatorValidateMixin, SimpleTestCase):
-    def test_should_not_raise_exception_when_program_tree_is_empty(self):
-        emtpy_program_tree = ProgramTreeFactory()
+@transaction.atomic()
+def delete_mini_training_with_program_tree(
+        delete_command: command.DeleteMiniTrainingWithProgramTreeCommand) -> List['MiniTrainingIdentity']:
+    delete_program_tree_version_command = command.DeleteProgramTreeVersionCommand(
+        offer_acronym=delete_command.offer_acronym,
+        version_name=delete_command.version_name,
+        is_transition=delete_command.is_transition,
+        from_year=delete_command.from_year
+    )
+    delete_versions_identities = delete_standard_program_tree_version_service.delete_standard_program_tree_version(
+        delete_program_tree_version_command
+    )
 
-        self.assertValidatorNotRaises(
-            _program_tree_empty.ProgramTreeEmptyValidator(emtpy_program_tree),
-        )
-
-    def test_should_raise_exception_when_program_tree_is_empty(self):
-        program_tree_with_content = ProgramTreeFactory()
-        LinkFactory(parent=program_tree_with_content.root_node)
-
-        self.assertValidatorRaises(
-            _program_tree_empty.ProgramTreeEmptyValidator(program_tree_with_content),
-            None
-        )
+    return [mini_training.MiniTrainingIdentity(acronym=identity.offer_acronym, year=identity.year)
+            for identity in delete_versions_identities]

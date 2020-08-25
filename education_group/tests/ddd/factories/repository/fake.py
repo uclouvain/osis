@@ -21,28 +21,32 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-import mock
-from django.test import TestCase
+from typing import List, Type
 
-from education_group.ddd import command
-from education_group.ddd.service.write import copy_training_service
-from education_group.tests.ddd.factories.training import TrainingFactory
+from education_group.ddd.business_types import *
+from education_group.ddd.domain import exception
+from testing.mocks import FakeRepository
 
 
-class TestCopyTrainingToNextYear(TestCase):
-    @mock.patch("education_group.ddd.service.write.copy_training_service.TrainingRepository")
-    @mock.patch("education_group.ddd.service.write.copy_training_service.TrainingBuilder")
-    def test_should_create_a_copy_for_next_year(
-            self,
-            mock_builder,
-            mock_repository):
-        source_training = TrainingFactory()
-        next_year_training = TrainingFactory()
-        mock_repository.return_value.get.return_value = source_training
-        mock_repository.return_value.create.return_value = next_year_training.entity_id
-        mock_builder.return_value.copy_to_next_year.return_value = next_year_training
+def get_fake_group_repository(root_entities: List['Group']) -> Type['FakeRepository']:
+    class_name = "FakeGroupRepository"
+    return type(class_name, (FakeRepository,), {
+        "root_entities": root_entities.copy(),
+        "not_found_exception_class": exception.GroupNotFoundException
+    })
 
-        cmd = command.CopyTrainingToNextYearCommand(acronym="ACRONYM", postpone_from_year=2018)
-        result = copy_training_service.copy_training_to_next_year(cmd)
 
-        self.assertEqual(next_year_training.entity_id, result)
+def get_fake_mini_training_repository(root_entities: List['MiniTraining']) -> Type['FakeRepository']:
+    class_name = "FakeMiniTrainingRepository"
+    return type(class_name, (FakeRepository,), {
+        "root_entities": root_entities.copy(),
+        "not_found_exception_class": exception.MiniTrainingNotFoundException
+    })
+
+
+def get_fake_training_repository(root_entities: List['Training']) -> Type['FakeRepository']:
+    class_name = "FakeTrainingRepository"
+    return type(class_name, (FakeRepository,), {
+        "root_entities": root_entities.copy(),
+        "not_found_exception_class": exception.TrainingNotFoundException
+    })

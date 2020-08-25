@@ -24,7 +24,7 @@
 from django.db import transaction
 
 from program_management.ddd import command
-from program_management.ddd.repositories.program_tree import ProgramTreeRepository
+from program_management.ddd.repositories import program_tree as program_tree_repository
 from program_management.ddd.service.read import get_program_tree_service
 from program_management.ddd.service.write import delete_node_service
 from program_management.ddd.validators.validators_by_business_action import DeleteProgramTreeValidatorList
@@ -37,7 +37,7 @@ def delete_program_tree(cmd: command.DeleteProgramTreeCommand) -> 'ProgramTreeId
 
     DeleteProgramTreeValidatorList(program_tree).validate()
 
-    ProgramTreeRepository.delete(
+    program_tree_repository.ProgramTreeRepository.delete(
         program_tree.entity_id,
 
         # Service Dependancy injection
