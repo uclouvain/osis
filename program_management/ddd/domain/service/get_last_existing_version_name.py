@@ -23,12 +23,46 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Union
+
+from django.db.models import F
+
+from osis_common.ddd import interface
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 from program_management.models.education_group_version import EducationGroupVersion
 
 
-def check_version_name_exists(working_year: int, offer_acronym: str, version_name: str) -> bool:
-    return EducationGroupVersion.objects.filter(
-        version_name=version_name,
-        root_group__academic_year__year__gte=working_year,
-        root_group__acronym=offer_acronym
-    ).exists()
+class GetLastExistingVersion(interface.DomainService):
+
+    @classmethod
+    def get_last_existing_version_identity(
+            cls,
+            version_name: str,
+            offer_acronym: str,
+            is_transition: bool = False,
+    ) -> Union[ProgramTreeVersionIdentity, None]:
+        group_version = EducationGroupVersion.objects.filter(
+            version_name=version_name,
+            root_group__acronym=offer_acronym,
+            is_transition=is_transition,
+        ).annotate(
+            year=F('offer__academic_year__year'),
+            offer_acronym=F('offer__acronym'),
+        ).values(
+            'version_name',
+            'year',
+            'offer_acronym',
+            'is_transition',
+        ).order_by(
+            'offer__academic_year__year'
+        ).last()
+
+        if not group_version:
+            return
+
+        return ProgramTreeVersionIdentity(
+            offer_acronym=group_version['offer_acronym'],
+            year=group_version['year'],
+            version_name=group_version['version_name'],
+            is_transition=group_version['is_transition'],
+        )

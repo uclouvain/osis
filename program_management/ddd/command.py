@@ -260,6 +260,13 @@ class CreateMiniTrainingAndPasteCommand(interface.CommandRequest):
     path_to_paste = attr.ib(type=str)
 
 
+@attr.s(frozen=True, slots=True)
+class GetLastExistingVersionNameCommand(interface.CommandRequest):
+    version_name = attr.ib(type=str)
+    offer_acronym = attr.ib(type=str)
+    is_transition = attr.ib(type=str)
+
+
 class GetNodeIdentityFromElementId(interface.CommandRequest):
     def __init__(self, element_id: int):
         self.element_id = element_id
