@@ -31,6 +31,7 @@ from base.forms.utils.choice_field import BLANK_CHOICE
 from base.models import academic_year
 from base.models.academic_year import compute_max_academic_year_adjournment
 from education_group.ddd.business_types import *
+from program_management.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
 
 
 class SpecificVersionForm(forms.Form):
@@ -64,7 +65,7 @@ class SpecificVersionForm(forms.Form):
         self.__init_academic_year_choices()
 
     def __init_academic_year_choices(self):
-        max_year = academic_year.find_academic_year_by_year(compute_max_academic_year_adjournment() + 1).year
+        max_year = CalculateEndPostponement().calculate_max_year_of_end_postponement()
         choices_years = [(x, x) for x in range(self.training_identity.year, max_year)]
         self.fields["end_year"].choices = BLANK_CHOICE + choices_years
 
