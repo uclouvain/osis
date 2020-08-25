@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-14 14:57+0200\n"
+"POT-Creation-Date: 2020-08-25 12:53+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -111,8 +111,8 @@ msgid "Are you sure you want to detach %(acronym)s ?"
 msgstr "Are you sure you want to remove %(acronym)s ?"
 
 msgid ""
-"At least an education group year, a group year, a learning unit year or a "
-"learning class year has to be set"
+"At least a group year, a learning unit year or a learning class year has to "
+"be set"
 msgstr ""
 
 msgid "Attribution entity"
@@ -377,8 +377,8 @@ msgid "Online resources"
 msgstr ""
 
 msgid ""
-"Only one of the following has to be set : an education group year, a group "
-"year, a learning unit year or a learning class"
+"Only one of the following has to be set : a group year, a learning unit year "
+"or a learning class"
 msgstr ""
 
 #, python-format
@@ -713,9 +713,6 @@ msgid "[%(academic_year)s] The content of the program is not empty."
 msgstr ""
 
 msgid "bibliography"
-msgstr ""
-
-msgid "education group year"
 msgstr ""
 
 msgid "email"

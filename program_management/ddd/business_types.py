@@ -3,8 +3,7 @@ from typing import TYPE_CHECKING
 # FIXME :: Temporary solution ; waiting for update python to 3.8 for data structure
 
 if TYPE_CHECKING:
-    from program_management.ddd.domain.node import Node, NodeEducationGroupYear, NodeLearningUnitYear, NodeGroupYear, \
-        NodeIdentity
+    from program_management.ddd.domain.node import Node, NodeLearningUnitYear, NodeGroupYear, NodeIdentity
 
     from program_management.ddd.domain.program_tree import ProgramTree, Path, ProgramTreeIdentity
     from program_management.ddd.domain.program_tree_version import ProgramTreeVersion, ProgramTreeVersionIdentity
