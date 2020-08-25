@@ -145,6 +145,38 @@ paths:
           $ref: '#/components/responses/NotFound'
       tags:
         - trainings
+  /trainings/{year}/{acronym}/prerequisites:
+    get:
+      description: Return the prerequisites of the learning units of the training (standard version)
+      operationId: training_prerequisites_official
+      parameters:
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: path
+          name: acronym
+          required: true
+          schema:
+            description: ''
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayOfProgramTreePrerequisites'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - trainings
   /trainings/{year}/{acronym}/versions:
     get:
       description: Return the versions list of the training
@@ -580,6 +612,38 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+      tags:
+        - mini_trainings
+  /mini_trainings/{year}/{acronym}/prerequisites:
+    get:
+      description: Return the prerequisites of the learning units of the mini-training (standard version)
+      operationId: mini-training_prerequisites_official
+      parameters:
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: path
+          name: acronym
+          required: true
+          schema:
+            description: ''
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayOfProgramTreePrerequisites'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
       tags:
         - mini_trainings
   /mini_trainings/{year}/{acronym}/offer_roots:
