@@ -78,9 +78,8 @@
                 {% a_tag_modal_has_perm delete_mini_training_url _('Delete permanently') 'base.delete_all_minitraining' user education_group_version.offer %}
             </li>
         {% endif %}
-        {% if not node.is_group %}
+        {% if create_version_url %}
             <li>
-                {% url 'create_education_group_version' node.entity_id.year node.entity_id.code as create_version_url %}
                 {% a_tag_modal_has_perm create_version_url _('Create specific version') 'base.add_programtreeversion' user education_group_year %}
             </li>
         {% endif %}
