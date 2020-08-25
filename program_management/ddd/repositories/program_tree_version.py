@@ -34,7 +34,7 @@ from osis_common.ddd import interface
 from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception
-from program_management.ddd.domain.program_tree import ProgramTreeIdentity
+from program_management.ddd.domain import program_tree
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 from program_management.ddd.repositories import program_tree as program_tree_repository
@@ -184,7 +184,7 @@ def _instanciate_tree_version(record_dict: dict) -> 'ProgramTreeVersion':
     return ProgramTreeVersion(
         entity_identity=identity,
         entity_id=identity,
-        program_tree_identity=ProgramTreeIdentity(record_dict['code'], record_dict['offer_year']),
+        program_tree_identity=program_tree.ProgramTreeIdentity(record_dict['code'], record_dict['offer_year']),
         program_tree_repository=program_tree_repository.ProgramTreeRepository(),
         title_fr=record_dict['version_title_fr'],
         title_en=record_dict['version_title_en'],

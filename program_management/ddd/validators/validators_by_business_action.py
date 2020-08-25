@@ -28,6 +28,7 @@ import osis_common.ddd.interface
 from base.ddd.utils import business_validator
 from program_management.ddd import command
 from program_management.ddd.business_types import *
+from program_management.ddd.repositories import program_tree_version as program_tree_version_repository
 from program_management.ddd.validators import _validate_end_date_and_option_finality
 from program_management.ddd.validators._authorized_link_type import AuthorizedLinkTypeValidator
 from program_management.ddd.validators._authorized_relationship import \
@@ -246,7 +247,10 @@ class CopyProgramTreeVersionValidatorList(business_validator.BusinessListValidat
     def __init__(self, copy_from: 'ProgramTreeVersion'):
         self.validators = [
             CheckTreeVersionEndDateValidator(copy_from),
-            CheckExistsStandardVersionValidator(copy_from)
+            CheckExistsStandardVersionValidator(
+                copy_from,
+                program_tree_version_repository.ProgramTreeVersionRepository()
+            )
         ]
         super().__init__()
 
