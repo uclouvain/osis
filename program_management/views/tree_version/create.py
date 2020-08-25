@@ -36,6 +36,7 @@ from base.forms.education_group.version import SpecificVersionForm
 from base.models.education_group_year import EducationGroupYear
 from base.views.common import display_success_messages
 from base.views.mixins import AjaxTemplateMixin
+from education_group.ddd.domain import exception
 from education_group.ddd.domain.service.identity_search import TrainingIdentitySearch
 from education_group.ddd.domain.training import TrainingIdentity
 from education_group.templatetags.academic_year_display import display_as_academic_year
@@ -92,7 +93,10 @@ class CreateProgramTreeVersion(AjaxPermissionRequiredMixin, AjaxTemplateMixin, V
 
             identities = []
             if save_type == "new_version":
-                identities = create_and_postpone_tree_version_service.create_and_postpone(command=command)
+                try:
+                    identities = create_and_postpone_tree_version_service.create_and_postpone(command=command)
+                except exception.VersionNameAlreadyExist as e:
+                    form.add_error('version_name', e.message)
             elif save_type == "extend":
                 identities = extend_existing_tree_version_service.extend_existing_past_version(
                     _convert_form_to_extend_command(form)
@@ -104,7 +108,8 @@ class CreateProgramTreeVersion(AjaxPermissionRequiredMixin, AjaxTemplateMixin, V
                     _convert_form_to_postpone_command(form, self.node_identity)
                 )
 
-            self._display_success_messages(identities)
+            if not form.errors:
+                self._display_success_messages(identities)
 
         return render(request, self.template_name, self.get_context_data(form))
 

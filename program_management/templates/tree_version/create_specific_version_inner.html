@@ -25,7 +25,7 @@
 {% endcomment %}
 
 <div class="modal-content">
-    <form class="form" method="POST" id="SpecificVersionForm" data-validate-url="{% url 'check_version_name' node_identity.year node_identity.code %}"
+    <form class="form" method="POST" id="SpecificVersionForm" data-validate-url="{% url 'check_version_name' training_identity.year training_identity.acronym %}"
     action="{{ request.path }}">
         <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal">×</button>
