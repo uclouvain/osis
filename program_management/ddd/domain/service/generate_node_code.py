@@ -67,10 +67,6 @@ class GenerateNodeCode(interface.DomainService):
 
         return partial_acronym
 
-    def generate_next_code_from_existing(self, existing_code: str, year: int) -> str:
-        last_partial_acronym = _get_last_partial_acronym_using(existing_code, year).partial_acronym
-        return last_partial_acronym[:-4] + str(int(last_partial_acronym[-4:][:-1]) + 1) + last_partial_acronym[-1:]
-
 
 def _get_cnum_subdivision(
         child_node_type: EducationGroupTypesEnum,
@@ -84,11 +80,3 @@ def _get_cnum_subdivision(
         cnum = None
         subdivision = None
     return cnum, subdivision
-
-
-def _get_last_partial_acronym_using(code: str, year: int) -> GroupYear:
-    return GroupYear.objects.filter(
-        partial_acronym__startswith=code[:-4],
-        partial_acronym__endswith=code[-1:],
-        academic_year__year=year
-    ).order_by("partial_acronym").last()

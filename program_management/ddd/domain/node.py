@@ -102,9 +102,9 @@ class NodeFactory:
             override_end_year_to: int = DO_NOT_OVERRIDE,
             override_start_year_to: int = DO_NOT_OVERRIDE
     ) -> 'Node':
-        new_code = GenerateNodeCode().generate_next_code_from_existing(
-            existing_code=duplicate_from.entity_id.code,
-            year=duplicate_from.entity_id.year,
+        new_code = GenerateNodeCode().generate_from_parent_node(
+            parent_node=duplicate_from,
+            child_node_type=duplicate_from.node_type,
         )
         start_year = duplicate_from.start_year if override_start_year_to == DO_NOT_OVERRIDE else override_start_year_to
         copied_node = attr.evolve(
