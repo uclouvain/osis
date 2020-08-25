@@ -135,6 +135,23 @@ class Element(models.Model):
 
     objects = ElementManager()
 
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                check=(
+                    Q(group_year__isnull=False) | Q(learning_unit_year__isnull=True) |
+                    Q(learning_class_year__isnull=True)
+                ) | (
+                    Q(group_year__isnull=True) | Q(learning_unit_year__isnull=False) |
+                    Q(learning_class_year__isnull=True)
+                ) | (
+                    Q(group_year__isnull=True) | Q(learning_unit_year__isnull=True) |
+                    Q(learning_class_year__isnull=False)
+                ),
+                name='only_one_fk_element'
+            )
+        ]
+
     def __str__(self):
         field = {
             NodeType.GROUP: self.group_year,
