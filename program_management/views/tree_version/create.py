@@ -51,7 +51,7 @@ from program_management.ddd.service.write import create_and_postpone_tree_versio
     postpone_tree_version_service
 
 
-class SaveTypes(ChoiceEnum):
+class CreateProgramTreeVersionType(ChoiceEnum):
     NEW_VERSION = "new_version"
     EXTEND = "extend"
 
@@ -97,12 +97,12 @@ class CreateProgramTreeVersion(AjaxPermissionRequiredMixin, AjaxTemplateMixin, V
             save_type = self.request.POST.get("save_type")
 
             identities = []
-            if save_type == SaveTypes.NEW_VERSION:
+            if save_type == CreateProgramTreeVersionType.NEW_VERSION.value:
                 try:
                     identities = create_and_postpone_tree_version_service.create_and_postpone(command=command)
                 except exception.VersionNameAlreadyExist as e:
                     form.add_error('version_name', e.message)
-            elif save_type == SaveTypes.EXTEND:
+            elif save_type == CreateProgramTreeVersionType.EXTEND.value:
                 identities = extend_existing_tree_version_service.extend_existing_past_version(
                     _convert_form_to_extend_command(form)
                 )
