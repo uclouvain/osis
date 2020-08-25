@@ -160,25 +160,6 @@ class Element(models.Model):
         }[self.node_type]
         return str(field)
 
-    def save(self, *args, **kwargs):
-
-        if not any([self.group_year, self.learning_class_year, self.learning_unit_year]):
-            raise AttributeError(
-                _('At least a group year, a learning unit year or a learning class year has '
-                  'to be set')
-            )
-        resulted_counter = Counter([self.group_year,
-                                    self.learning_class_year,
-                                    self.learning_unit_year])
-
-        if resulted_counter[None] < 2:
-            raise AttributeError(
-                _(
-                    'Only one of the following has to be set : a group year, '
-                    'a learning unit year or a learning class')
-            )
-        super().save(*args, **kwargs)
-
     @property
     def node_type(self):
         if self.group_year:

@@ -47,18 +47,8 @@ class TestElementSave(TestCase):
         cls.gy = GroupYearFactory(academic_year=cls.academic_year, group=GroupFactory(start_year=cls.academic_year))
 
     def test_save_no_foreign_key_set(self):
-
-        with self.assertRaisesMessage(
-                AttributeError,
-                _('At least a group year, a learning unit year or a learning class year '
-                  'has to be set')):
-            element = ElementFactory()
-            element.save()
-            self.assertFalse(
-                Element.objects.filter(group_year=None,
-                                       learning_unit_year=None,
-                                       learning_class_year=None).exists()
-            )
+        element = ElementFactory.build()
+        element.save()
 
     def test_save_one_group_year_fk(self):
         element = ElementGroupYearFactory.build(group_year=self.gy)
@@ -83,18 +73,8 @@ class TestElementSave(TestCase):
         )
 
     def test_save_more_than_one_fk(self):
-
-        with self.assertRaisesMessage(
-                AttributeError,
-                _('Only one of the following has to be set : a group year, '
-                  'a learning unit year or a learning class')):
-            element = ElementFactory(learning_class_year=self.lcy, group_year=self.gy)
-            element.save()
-
-            self.assertFalse(
-                Element.objects.filter(group_year=self.gy,
-                                       learning_unit_year=None,
-                                       learning_class_year=self.lcy).exists())
+        element = ElementFactory.build(learning_class_year=self.lcy, group_year=self.gy)
+        element.save()
 
     def test_str_luy(self):
         element = ElementFactory(learning_unit_year=self.luy)
