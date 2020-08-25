@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-14 14:57+0200\n"
+"POT-Creation-Date: 2020-08-17 15:58+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -378,8 +378,14 @@ msgstr "Nouveau Groupement"
 msgid "New Mini-Training"
 msgstr "Nouvelle Mini-Formation"
 
+msgid "New specific version"
+msgstr "Nouvelle version particulière"
+
 msgid "New training"
 msgstr "Nouvelle Formation"
+
+msgid "New version"
+msgstr "Nouvelle version"
 
 msgid "No"
 msgstr "Non"
@@ -507,6 +513,9 @@ msgstr "Légende proposition"
 
 msgid "Quadrimester"
 msgstr "Quadrimestre"
+
+msgid "Prolong"
+msgstr "Prolonger la version existante"
 
 msgid "Registration ID"
 msgstr "NOMA"

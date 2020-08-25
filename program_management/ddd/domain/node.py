@@ -23,11 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import copy
 from _decimal import Decimal
 from collections import OrderedDict
 from typing import List, Set, Dict, Optional
 
 import attr
+from _decimal import Decimal
 
 from base.models.enums.active_status import ActiveStatusEnum
 from base.models.enums.education_group_categories import Categories
@@ -41,10 +43,12 @@ from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.models.enums.constraint_type import ConstraintTypes
 from osis_common.ddd import interface
 from program_management.ddd.business_types import *
+from program_management.ddd.command import DO_NOT_OVERRIDE
 from program_management.ddd.domain._campus import Campus
 from program_management.ddd.domain.academic_year import AcademicYear
 from program_management.ddd.domain.link import factory as link_factory
 from program_management.ddd.domain.prerequisite import Prerequisite, NullPrerequisite
+from program_management.ddd.domain.service.generate_node_code import GenerateNodeCode
 from program_management.models.enums.node_type import NodeType
 
 
@@ -60,6 +64,7 @@ class NodeFactory:
             year=next_year,
             end_year=end_year,
             children=[],
+            node_id=None,
         )
         node_next_year._has_changed = True
         return node_next_year
@@ -73,7 +78,7 @@ class NodeFactory:
             return next_year
         return copy_from_node.end_year
 
-    def get_node(self, type: NodeType, **node_attrs):
+    def get_node(self, type: NodeType, **node_attrs) -> 'Node':
         node_cls = {
             NodeType.EDUCATION_GROUP: NodeEducationGroupYear,   # TODO: Remove when migration is done
 
@@ -90,6 +95,38 @@ class NodeFactory:
             )
 
         return node_cls(**node_attrs)
+
+    def duplicate(
+            self,
+            duplicate_from: 'Node',
+            override_end_year_to: int = DO_NOT_OVERRIDE,
+            override_start_year_to: int = DO_NOT_OVERRIDE
+    ) -> 'Node':
+        new_code = GenerateNodeCode().generate_from_parent_node(
+            parent_node=duplicate_from,
+            child_node_type=duplicate_from.node_type,
+        )
+        start_year = duplicate_from.start_year if override_start_year_to == DO_NOT_OVERRIDE else override_start_year_to
+        copied_node = attr.evolve(
+            duplicate_from,
+            entity_id=NodeIdentity(code=new_code, year=duplicate_from.entity_id.year),
+            code=new_code,
+            end_year=duplicate_from.end_year if override_end_year_to == DO_NOT_OVERRIDE else override_end_year_to,
+            # TODO: Replace end_date by end_year
+            end_date=duplicate_from.end_date if override_end_year_to == DO_NOT_OVERRIDE else override_end_year_to,
+            start_year=start_year,
+            children=[],
+            node_id=None,
+        )
+        copied_node._has_changed = True
+        return copied_node
+
+    def deepcopy_node_without_copy_children_recursively(self, original_node: 'Node') -> 'Node':
+        original_children = original_node.children
+        original_node.children = []  # To avoid recursive deep copy of all children behind
+        copied_node = copy.deepcopy(original_node)
+        original_node.children = original_children
+        return copied_node
 
 
 factory = NodeFactory()
@@ -109,6 +146,7 @@ class Node(interface.Entity):
     node_id = attr.ib(type=int, default=None)
     node_type = attr.ib(type=EducationGroupTypesEnum, default=None)
     end_date = attr.ib(type=int, default=None)
+    start_year = attr.ib(type=int, default=None)
     children = attr.ib(type=List['Link'], factory=list)
     code = attr.ib(type=str, default=None)
     title = attr.ib(type=str, default=None)

@@ -13,6 +13,7 @@ from education_group.views.mini_training.delete import MiniTrainingDeleteView
 from education_group.views.proxy.read import ReadEducationGroupRedirectView
 from education_group.views.training.delete import TrainingDeleteView
 from education_group.views.training.update import TrainingUpdateView
+from base.views.education_groups import create
 
 register_converter(GroupTypeConverter, 'group_type')
 register_converter(MiniTrainingTypeConverter, 'mini_training_type')
