@@ -74,19 +74,6 @@ class TestGroupYearSave(TestCase):
                 GroupYear.objects.filter(group=self.group_2019_2023, academic_year=self.academic_year_less).exists()
             )
 
-    def test_save_case_academic_year_greater_than_end_year_error(self):
-        with self.assertRaisesMessage(
-                AttributeError,
-                _('Please enter an academic year less or equal to group end year.')):
-            group_yr = GroupYearFactory(
-                group=self.group_2019_2023,
-                academic_year=self.academic_year_greater
-            )
-            group_yr.save()
-            self.assertFalse(
-                GroupYear.objects.filter(group=self.group_2019_2023, academic_year=self.academic_year_greater).exists()
-            )
-
     def test_save_case_academic_year_no_check_on_end_year(self):
         group_yr = GroupYearFactory(
             group=self.group_without_end_year,

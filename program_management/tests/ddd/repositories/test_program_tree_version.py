@@ -112,7 +112,7 @@ class TestProgramTreeVersionRepositoryGetMethod(TestCase):
         cls.entity_id = ProgramTreeVersionIdentityFactory(year=cls.year)
         cls.repository = ProgramTreeVersionRepository()
 
-        cls.root_group = ElementFactory(group_year=GroupYearFactory()).group_year
+        cls.root_group = ElementFactory(group_year=GroupYearFactory(academic_year__year=cls.entity_id.year)).group_year
 
     def test_field_mapping(self):
         education_group_version_model_obj = EducationGroupVersionFactory(

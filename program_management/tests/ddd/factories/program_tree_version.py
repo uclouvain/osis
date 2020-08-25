@@ -56,6 +56,7 @@ class ProgramTreeVersionFactory(factory.Factory):
         year=factory.SelfAttribute("..tree.root_node.year")
     )
     entity_identity = factory.SelfAttribute("entity_id")
+    version_name = factory.SelfAttribute("entity_id.version_name")
 
     @staticmethod
     def produce_standard_2M_program_tree(current_year: int, end_year: int) -> 'ProgramTreeVersion':
@@ -64,6 +65,6 @@ class ProgramTreeVersionFactory(factory.Factory):
 
         return ProgramTreeVersionFactory(
             tree=tree_standard,
-            entity_identity__year=current_year,
+            entity_id__year=current_year,
             program_tree_identity=tree_standard.entity_id,
         )

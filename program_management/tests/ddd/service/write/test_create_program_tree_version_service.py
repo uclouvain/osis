@@ -30,6 +30,7 @@ from base.tests.factories.authorized_relationship import AuthorizedRelationshipF
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.entity_version import EntityVersionFactory
+from base.tests.factories.validation_rule import ValidationRuleFactory
 from program_management.ddd.command import CreateProgramTreeVersionCommand
 from program_management.ddd.domain.exception import ProgramTreeVersionNotFoundException
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, STANDARD
@@ -71,15 +72,59 @@ class TestCreateProgramTreeVersion(TestCase, MockPatcherMixin):
             type=TrainingType.PGRM_MASTER_120.name
         )
 
-        # TODO :: mock with fake repository
+        # TODO :: mock all DB access with fake repository
         EntityVersionFactory(acronym=cmd.management_entity_acronym)
         CampusFactory(name=cmd.teaching_campus_name, organization__name=cmd.teaching_campus_organization_name)
         LanguageFactory(name=cmd.main_language)
         AcademicYearFactory.produce_in_future(cmd.year)
         root_type = EducationGroupTypeFactory(name=cmd.type)
-        AuthorizedRelationshipFactory(parent_type=root_type, child_type=EducationGroupTypeFactory(name=GroupType.COMMON_CORE.name))
-        AuthorizedRelationshipFactory(parent_type=root_type, child_type=EducationGroupTypeFactory(name=GroupType.FINALITY_120_LIST_CHOICE.name))
-        AuthorizedRelationshipFactory(parent_type=root_type, child_type=EducationGroupTypeFactory(name=GroupType.OPTION_LIST_CHOICE.name))
+        ValidationRuleFactory(
+            field_reference="TrainingForm.PGRM_MASTER_120.title_fr",
+            initial_value="Master [120] en",
+        )
+        ValidationRuleFactory(
+            field_reference="TrainingForm.PGRM_MASTER_120.code",
+            initial_value="200M",
+        )
+        AuthorizedRelationshipFactory(
+            parent_type=root_type,
+            child_type=EducationGroupTypeFactory(name=GroupType.COMMON_CORE.name),
+            min_count_authorized=1,
+        )
+        ValidationRuleFactory(
+            field_reference="GroupForm.COMMON_CORE.title_fr",
+            initial_value="	Master [120] en",
+        )
+        ValidationRuleFactory(
+            field_reference="GroupForm.COMMON_CORE.code",
+            initial_value="200M",
+        )
+        AuthorizedRelationshipFactory(
+            parent_type=root_type,
+            child_type=EducationGroupTypeFactory(name=GroupType.FINALITY_120_LIST_CHOICE.name),
+            min_count_authorized=1,
+        )
+        ValidationRuleFactory(
+            field_reference="GroupForm.FINALITY_120_LIST_CHOICE.title_fr",
+            initial_value="	Master [120] en",
+        )
+        ValidationRuleFactory(
+            field_reference="GroupForm.FINALITY_120_LIST_CHOICE.code",
+            initial_value="200M",
+        )
+        AuthorizedRelationshipFactory(
+            parent_type=root_type,
+            child_type=EducationGroupTypeFactory(name=GroupType.OPTION_LIST_CHOICE.name),
+            min_count_authorized=1,
+        )
+        ValidationRuleFactory(
+            field_reference="GroupForm.OPTION_LIST_CHOICE.title_fr",
+            initial_value="	Master [120] en",
+        )
+        ValidationRuleFactory(
+            field_reference="GroupForm.OPTION_LIST_CHOICE.code",
+            initial_value="200M",
+        )
 
         training_identity = create_and_report_training_with_program_tree(cmd)
         standard_version_identity = ProgramTreeVersionIdentity(
