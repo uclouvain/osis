@@ -974,6 +974,37 @@ components:
         previous:
           type: string
           format: uri
+    ArrayOfProgramTreePrerequisites:
+      type: array
+      items:
+        $ref: '#/components/schemas/ProgramTreePrerequisites'
+    ProgramTreePrerequisites:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+        code:
+          type: string
+        title:
+          type: string
+        prerequisites_string:
+          type: string
+          example: (codeA OR codeB) AND (codeC)
+        prerequisites:
+          type: array
+          items:
+            $ref: '#/components/schemas/NodeBase'
+    NodeBase:
+      type: object
+      properties:
+        code:
+          type: string
+        url:
+          type: string
+          format: uri
+        title:
+          type: string
     Hops:
       type: object
       properties:
