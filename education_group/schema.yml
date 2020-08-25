@@ -780,7 +780,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TrainingDetailed'
+                $ref: '#/components/schemas/MiniTrainingDetailed'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1202,6 +1202,8 @@ components:
         - $ref: '#/components/schemas/MiniTraining'
         - type: object
           properties:
+            version_name:
+              type: string
             credits:
               type: integer
               minimum: 1
