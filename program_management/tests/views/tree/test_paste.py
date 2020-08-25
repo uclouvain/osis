@@ -48,6 +48,7 @@ from program_management.forms.tree.paste import PasteNodesFormset, PasteNodeForm
 from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory, NodeLearningUnitYearFactory, \
     NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
+from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory
 
 
@@ -132,7 +133,7 @@ class TestPasteNodeView(TestCase):
             mock_cache_elems
     ):
         subgroup_to_attach = NodeGroupYearFactory(node_type=GroupType.SUB_GROUP)
-        subgroup_to_attach_2 = NodeGroupYearFactory(node_type=GroupType.SUB_GROUP,)
+        subgroup_to_attach_2 = NodeGroupYearFactory(node_type=GroupType.SUB_GROUP, )
 
         mock_get_node.side_effect = [subgroup_to_attach, subgroup_to_attach_2]
         mock_get_version.return_value = SimpleNamespace(version_name='')
@@ -196,7 +197,7 @@ class TestPasteNodeView(TestCase):
             mock_form_valid,
             mock_service
     ):
-        subgroup_to_attach = NodeGroupYearFactory(node_type=GroupType.SUB_GROUP,)
+        subgroup_to_attach = NodeGroupYearFactory(node_type=GroupType.SUB_GROUP, )
         mock_cache_elems.return_value = {
             "element_code": subgroup_to_attach.code,
             "element_year": subgroup_to_attach.year,
@@ -219,6 +220,51 @@ class TestPasteNodeView(TestCase):
             msg="View must call attach node service (and not another layer) "
                 "because the 'attach node' action uses multiple domain objects"
         )
+
+    @mock.patch(
+        'program_management.ddd.domain.service.identity_search.ProgramTreeVersionIdentitySearch.get_from_node_identity'
+    )
+    @mock.patch('program_management.ddd.repositories.node.NodeRepository.get')
+    @mock.patch('program_management.ddd.repositories.program_tree.ProgramTreeRepository.get')
+    def test_format_title_version_when_available(self, mock_get_tree, mock_get_node, mock_get_tree_version):
+        subgroup_to_attach = NodeGroupYearFactory(node_type=GroupType.SUB_GROUP)
+
+        mock_get_node.return_value = subgroup_to_attach
+        mock_get_tree.return_value = ProgramTreeFactory()
+        mock_get_tree_version.return_value = ProgramTreeVersionFactory()
+
+        # To path :  BIR1BA ---> LBIR101G
+        path = "|".join([str(self.tree.root_node.pk), str(self.tree.root_node.children[1].child.pk)])
+        response = self.client.get(
+            self.url,
+            data={
+                "path": path,
+                "codes": [subgroup_to_attach.code],
+                "year": subgroup_to_attach.year
+            }
+        )
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertTemplateUsed(response, 'tree/paste_inner.html')
+
+    @mock.patch('program_management.ddd.repositories.node.NodeRepository.get')
+    @mock.patch('program_management.ddd.repositories.program_tree.ProgramTreeRepository.get')
+    def test_format_title_version_when_unavailable(self, mock_get_tree, mock_get_node):
+        subgroup_to_attach = NodeGroupYearFactory(node_type=GroupType.SUB_GROUP)
+
+        mock_get_node.return_value = subgroup_to_attach
+        mock_get_tree.return_value = ProgramTreeFactory()
+
+        # To path :  BIR1BA ---> LBIR101G
+        path = "|".join([str(self.tree.root_node.pk), str(self.tree.root_node.children[1].child.pk)])
+        with self.assertRaises(osis_common.ddd.interface.BusinessException):
+            self.client.get(
+                self.url,
+                data={
+                    "path": path,
+                    "codes": [subgroup_to_attach.code],
+                    "year": subgroup_to_attach.year
+                }
+            )
 
 
 @override_flag('education_group_update', active=True)
