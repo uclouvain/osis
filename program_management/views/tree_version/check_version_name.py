@@ -2,6 +2,7 @@ import re
 
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
 
 from osis_common.decorators.ajax import ajax_required
 from program_management.models.education_group_version import EducationGroupVersion
@@ -9,6 +10,7 @@ from program_management.models.education_group_version import EducationGroupVers
 
 @login_required
 @ajax_required
+@require_http_methods(['GET'])
 def check_version_name(request, year, code):
     version_name = request.GET['version_name']
     existed_version_name = False
