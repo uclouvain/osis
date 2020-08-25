@@ -129,9 +129,12 @@ class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageM
 
     def _format_title_with_version(self, nodes_by_id):
         for ele in self.nodes_to_paste:
-            node_identity = NodeIdentity(code=ele["element_code"], year=ele["element_year"])
-            tree_version = ProgramTreeVersionIdentitySearch().get_from_node_identity(node_identity)
             node_ele = nodes_by_id[ele['element_code']]
+            node_identity = NodeIdentity(code=ele["element_code"], year=ele["element_year"])
+            try:
+                tree_version = ProgramTreeVersionIdentitySearch().get_from_node_identity(node_identity)
+            except osis_common.ddd.interface.BusinessException:
+                continue
             node_ele.version = tree_version.version_name
             node_ele.title = "{}[{}]".format(node_ele.title, node_ele.version) if node_ele.version else node_ele.title
 
