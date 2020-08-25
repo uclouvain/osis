@@ -55,14 +55,15 @@ class ProgramTreeRepository(interface.AbstractRepository):
             delete_node_service: interface.ApplicationService = None,
     ) -> None:
         program_tree = cls.get(entity_id)
-        links = program_tree.get_all_links()
-        nodes = program_tree.get_all_nodes()
 
-        GroupElementYear.objects.filter(pk__in=(link.pk for link in links)).delete()
-
-        for node in nodes:
-            cmd = command.DeleteNodeCommand(code=node.code, year=node.year, node_type=node.node_type.name)
-            delete_node_service(cmd)
+        _delete_node_content(program_tree.root_node, delete_node_service)
+        cmd = command.DeleteNodeCommand(
+            code=program_tree.root_node.code,
+            year=program_tree.root_node.year,
+            node_type=program_tree.root_node.node_type.name,
+            acronym=program_tree.root_node.title
+        )
+        delete_node_service(cmd)
 
     @classmethod
     def create(
@@ -120,3 +121,20 @@ class ProgramTreeRepository(interface.AbstractRepository):
             return load_tree.load(tree_root_id)
         except Element.DoesNotExist:
             raise exception.ProgramTreeNotFoundException()
+
+
+def _delete_node_content(parent_node: 'Node', delete_node_service: interface.ApplicationService) -> None:
+    for link in parent_node.children:
+        child_node = link.child
+        GroupElementYear.objects.filter(pk=link.pk).delete()
+        try:
+            cmd = command.DeleteNodeCommand(
+                code=child_node.code,
+                year=child_node.year,
+                node_type=child_node.node_type.name,
+                acronym=child_node.title
+            )
+            delete_node_service(cmd)
+        except exception.NodeIsUsedException:
+            continue
+        _delete_node_content(link.child, delete_node_service)

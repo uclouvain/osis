@@ -44,6 +44,8 @@ urlpatterns = [
                 mini_training.MiniTrainingReadIdentification.as_view(),
                 name='mini_training_identification'
             ),
+            path('<acronym:acronym>/update/', mini_training.MiniTrainingUpdateView.as_view(),
+                 name='mini_training_update'),
             path('content/', mini_training.MiniTrainingReadContent.as_view(), name='mini_training_content'),
             path('utilization/', mini_training.MiniTrainingReadUtilization.as_view(), name='mini_training_utilization'),
             path(
@@ -175,9 +177,5 @@ urlpatterns = [
         ),
     ])),
     path('<int:year>/<str:code>/publish', general_information.publish, name='publish_general_information'),
-    re_path(
-        r'^(?P<year>[\d]{4})/(?P<acronym>[\w]+(?:[/ ]?[a-zA-Z]{1,2}){0,2})/$',
-        ReadEducationGroupRedirectView.as_view(),
-        name='education_group_read_proxy'
-    ),
+    path('<int:year>/<acronym:acronym>/', ReadEducationGroupRedirectView.as_view(), name='education_group_read_proxy'),
 ]

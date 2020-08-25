@@ -28,16 +28,18 @@ from education_group.ddd import command
 from education_group.ddd.domain import exception, training, group
 from education_group.ddd.service.read import get_update_training_warning_messages
 from education_group.tests.ddd.factories.group import GroupFactory
+from education_group.tests.ddd.factories.repository.fake import get_fake_training_repository, get_fake_group_repository
 from education_group.tests.ddd.factories.training import TrainingFactory
 from testing.mocks import MockPatcherMixin
 
 
 class TestGetWarningMessages(TestCase, MockPatcherMixin):
     def setUp(self):
-        self.fake_training_repo = self.mock_repository("education_group.ddd.repository.training.TrainingRepository")
-        self.fake_training_repo.exception_class = exception.TrainingNotFoundException
-        self.fake_group_repo = self.mock_repository("education_group.ddd.repository.group.GroupRepository")
-        self.fake_group_repo.exception_class = exception.GroupNotFoundException
+        self.fake_training_repo = get_fake_training_repository([])
+        self.mock_repo("education_group.ddd.repository.training.TrainingRepository", self.fake_training_repo)
+
+        self.fake_group_repo = get_fake_group_repository([])
+        self.mock_repo("education_group.ddd.repository.group.GroupRepository", self.fake_group_repo)
 
         self.initial_training = TrainingFactory(entity_identity__year=2020)
         self.initial_group = GroupFactory(entity_identity__year=2020)

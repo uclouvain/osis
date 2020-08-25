@@ -121,16 +121,6 @@ class CopyMiniTrainingValidatorList(business_validator.BusinessListValidator):
         super().__init__()
 
 
-class DeleteOrphanGroupValidatorList(business_validator.BusinessListValidator):
-
-    def __init__(
-            self,
-            group: 'Group',
-    ):
-        self.validators = []
-        super().__init__()
-
-
 class DeleteOrphanTrainingValidatorList(business_validator.BusinessListValidator):
 
     def __init__(

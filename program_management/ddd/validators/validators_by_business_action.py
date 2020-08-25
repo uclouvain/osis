@@ -50,7 +50,6 @@ from program_management.ddd.validators._minimum_editable_year import \
 from program_management.ddd.validators._node_have_link import NodeHaveLinkValidator
 from program_management.ddd.validators._prerequisite_expression_syntax import PrerequisiteExpressionSyntaxValidator
 from program_management.ddd.validators._prerequisites_items import PrerequisiteItemsValidator
-from program_management.ddd.validators._program_tree_empty import ProgramTreeEmptyValidator
 from program_management.ddd.validators._relative_credits import RelativeCreditsValidator
 from program_management.ddd.validators._version_name_exists import VersionNameExistsValidator
 from program_management.ddd.validators.link import CreateLinkValidatorList
@@ -226,7 +225,6 @@ class UpdateLinkValidatorList(business_validator.BusinessListValidator):
 class DeleteProgramTreeValidatorList(business_validator.BusinessListValidator):
     def __init__(self, program_tree: 'ProgramTree'):
         self.validators = [
-            ProgramTreeEmptyValidator(program_tree),
             EmptyProgramTreeValidator(program_tree),
             NodeHaveLinkValidator(program_tree.root_node)
         ]

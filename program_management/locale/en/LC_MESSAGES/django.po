@@ -472,10 +472,6 @@ msgstr ""
 msgid "Produce xls with a list of trainings"
 msgstr ""
 
-#, python-format
-msgid "Program %(acronym)s (%(academic_year)s) is not empty."
-msgstr ""
-
 msgid "Proposal status"
 msgstr ""
 

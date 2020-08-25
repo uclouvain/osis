@@ -200,6 +200,13 @@ class PostponeTrainingWithProgramTreeCommand(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True)
+class PostponeMiniTrainingWithProgramTreeCommand(interface.CommandRequest):
+    abbreviated_title = attr.ib(type=str)
+    code = attr.ib(type=str)
+    from_year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
 class UpdateTrainingCommand(interface.CommandRequest):
     abbreviated_title = attr.ib(type=str)
     code = attr.ib(type=str)
@@ -261,6 +268,35 @@ class UpdateTrainingCommand(interface.CommandRequest):
     printing_title = attr.ib(type=Optional[str])
     professional_title = attr.ib(type=Optional[str])
     aims = attr.ib(type=Optional[List[Tuple[AimCode, AimSection]]])
+
+    constraint_type = attr.ib(type=Optional[str])
+    min_constraint = attr.ib(type=Optional[int])
+    max_constraint = attr.ib(type=Optional[int])
+    remark_fr = attr.ib(type=Optional[str])
+    remark_en = attr.ib(type=Optional[str])
+    organization_name = attr.ib(type=str)
+
+    schedule_type = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class UpdateMiniTrainingCommand(interface.CommandRequest):
+    abbreviated_title = attr.ib(type=str)
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)
+    status = attr.ib(type=str)
+    credits = attr.ib(type=int)
+
+    title_fr = attr.ib(type=str)
+    title_en = attr.ib(type=Optional[str])
+
+    keywords = attr.ib(type=Optional[str])
+
+    management_entity_acronym = attr.ib(type=Optional[str])
+    end_year = attr.ib(type=Optional[int])
+
+    teaching_campus_name = attr.ib(type=Optional[str])
+    teaching_campus_organization_name = attr.ib(type=Optional[str])
 
     constraint_type = attr.ib(type=Optional[str])
     min_constraint = attr.ib(type=Optional[int])
@@ -385,6 +421,7 @@ class PostponeGroupCommand(interface.CommandRequest):
 class PostponeMiniTrainingCommand(interface.CommandRequest):
     acronym = attr.ib(type=str)
     postpone_from_year = attr.ib(type=int)
+    postpone_until_year = attr.ib(type=int)
 
 
 @attr.s(frozen=True, slots=True)
@@ -443,6 +480,13 @@ class GetMiniTrainingCommand(interface.CommandRequest):
 
 @attr.s(frozen=True, slots=True)
 class GetUpdateTrainingWarningMessages(interface.CommandRequest):
+    acronym = attr.ib(type=str)
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class GetUpdateMiniTrainingWarningMessages(interface.CommandRequest):
     acronym = attr.ib(type=str)
     code = attr.ib(type=str)
     year = attr.ib(type=int)

@@ -269,7 +269,7 @@ msgid "Formations"
 msgstr "Formations"
 
 msgid "Group"
-msgstr ""
+msgstr "Groupement"
 
 msgid "IMPOSSIBLE TO DISPLAY BECAUSE OF AN ILLEGAL CHARACTER IN STRING"
 msgstr ""
@@ -298,7 +298,7 @@ msgid "Learning achievements"
 msgstr "Unités d'enseignement"
 
 msgid "Learning class year"
-msgstr "Unités d'enseignement"
+msgstr "Classe"
 
 msgid "Learning unit year"
 msgstr "Unités d'enseignement"
@@ -501,10 +501,6 @@ msgstr ""
 
 msgid "Produce xls with a list of trainings"
 msgstr "Produire un fichier Excel avec la liste des formations"
-
-#, python-format
-msgid "Program %(acronym)s (%(academic_year)s) is not empty."
-msgstr "Le contenu du program %(acronym)s (%(academic_year)s) n'est pas vide."
 
 msgid "Proposal status"
 msgstr "Légende proposition"

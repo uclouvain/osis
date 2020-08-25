@@ -45,7 +45,6 @@ from program_management.models.education_group_version import EducationGroupVers
 
 
 class ProgramTreeVersionRepository(interface.AbstractRepository):
-
     @classmethod
     def create(
             cls,

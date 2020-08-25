@@ -209,6 +209,15 @@ class ProgramTree(interface.RootEntity):
     def is_root(self, node: 'Node'):
         return self.root_node == node
 
+    def allows_learning_unit_child(self, node: 'Node') -> bool:
+        try:
+            return self.authorized_relationships.is_authorized(
+                parent_type=node.node_type,
+                child_type=NodeType.LEARNING_UNIT,
+            )
+        except AttributeError:
+            return False
+
     def get_parents_using_node_as_reference(self, child_node: 'Node') -> List['Node']:
         result = []
         for tree_node in self.get_all_nodes():

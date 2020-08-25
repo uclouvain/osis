@@ -181,25 +181,8 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             delete_command = self._convert_form_to_delete_trainings_command(self.training_form)
             return delete_training_with_program_tree_service.delete_training_with_program_tree(delete_command)
 
-        except program_management_exception.ProgramTreeNotEmptyException as e:
-            self.training_form.add_error("end_year", "")
-            self.training_form.add_error(
-                None,
-                _("Imposible to put end date to %(end_year)s: %(msg)s") % {
-                    "msg": e.message,
-                    "end_year": end_year}
-            )
-
-        except exception.TrainingHaveLinkWithEPC as e:
-            self.training_form.add_error("end_year", "")
-            self.training_form.add_error(
-                None,
-                _("Imposible to put end date to %(end_year)s: %(msg)s") % {
-                    "msg": e.message,
-                    "end_year": end_year}
-            )
-
-        except exception.TrainingHaveEnrollments as e:
+        except (program_management_exception.ProgramTreeNonEmpty, exception.TrainingHaveLinkWithEPC,
+                exception.TrainingHaveEnrollments) as e:
             self.training_form.add_error("end_year", "")
             self.training_form.add_error(
                 None,
@@ -212,7 +195,7 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
     def update_links(self) -> List['Link']:
         update_link_commands = [
-            self._convert_form_to_update_link_command(form) for form in self.content_formset.forms if form.has_changed
+            self._convert_form_to_update_link_command(form) for form in self.content_formset.forms if form.has_changed()
         ]
 
         if not update_link_commands:

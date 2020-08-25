@@ -50,6 +50,11 @@ class ProgramTreeFactory(factory.Factory):
 
     root_node = factory.SubFactory(NodeGroupYearFactory)
     authorized_relationships = AuthorizedRelationshipList([])
+    entity_id = factory.SubFactory(
+        ProgramTreeIdentityFactory,
+        code=factory.SelfAttribute("..root_node.code"),
+        year=factory.SelfAttribute("..root_node.year")
+    )
 
     @staticmethod
     def produce_standard_2M_program_tree(current_year: int, end_year: int) -> 'ProgramTree':
@@ -81,5 +86,3 @@ class ProgramTreeFactory(factory.Factory):
         tree_standard.root_node.children = [link1, link2, link3]
 
         return tree_standard
-
-

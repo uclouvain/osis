@@ -68,7 +68,7 @@ class CreateTrainingCommandFactory(factory.Factory):
     internal_comment = ""
     main_domain_code = None
     main_domain_decree = None
-    secondary_domains = []
+    secondary_domains = factory.LazyFunction(lambda: list())
     isced_domain_code = None
     management_entity_acronym = factory.Sequence(lambda n: 'ENTITY%d' % n)
     administration_entity_acronym = factory.SelfAttribute("management_entity_acronym")
@@ -91,7 +91,7 @@ class CreateTrainingCommandFactory(factory.Factory):
     leads_to_diploma = True
     printing_title = ''
     professional_title = ''
-    aims = []
+    aims = factory.LazyFunction(lambda: list())
     constraint_type = None
     min_constraint = None
     max_constraint = None

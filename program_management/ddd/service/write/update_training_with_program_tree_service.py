@@ -30,7 +30,7 @@ from django.db import transaction
 from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import training, group
-from education_group.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
+from education_group.ddd.domain.service import calculate_end_postponement
 from education_group.ddd.repository import training as training_repository, group as group_repository
 from education_group.ddd.service.write import update_training_service, update_group_service
 from program_management.ddd.command import PostponeProgramTreeVersionCommand, \
@@ -43,7 +43,7 @@ from program_management.ddd.service.write import postpone_tree_version_service, 
 def update_and_report_training_with_program_tree(
         update_command: command.UpdateTrainingCommand
 ) -> List['TrainingIdentity']:
-    postpone_until_year = CalculateEndPostponement.calculate_year_of_postponement(
+    postpone_until_year = calculate_end_postponement.CalculateEndPostponement.calculate_year_of_postponement(
         training.TrainingIdentity(acronym=update_command.abbreviated_title, year=update_command.year),
         group.GroupIdentity(code=update_command.code, year=update_command.year),
         training_repository.TrainingRepository,
