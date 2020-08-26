@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-20 09:56+0200\n"
+"POT-Creation-Date: 2020-08-26 09:35+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -422,16 +422,19 @@ msgstr "Mini formation"
 msgid "Mini-Training"
 msgstr "Mini-Formation"
 
+#, python-format
 msgid "Mini-Training %(acronym)s (%(academic_year)s) successfully deleted."
 msgstr ""
-"La mini-formation %(acronym)s (%(academic_year)s) </a> a été supprimée avec succès"
+"La mini-formation %(acronym)s (%(academic_year)s) </a> a été supprimée avec "
+"succès"
 
+#, python-format
 msgid ""
 "Mini-Training <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> "
 "successfully updated."
 msgstr ""
-"La mini-formation <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> a été "
-"modifiée avec succès"
+"La mini-formation <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> a "
+"été modifiée avec succès"
 
 #, python-format
 msgid ""
@@ -492,10 +495,6 @@ msgstr "Accès personnalisé"
 msgid "Please enter an academic year greater or equal to group start year."
 msgstr ""
 "Veuillez choisir une année académique plus grande ou équale à celle de début"
-
-msgid "Please enter an academic year less or equal to group end year."
-msgstr ""
-"Veuillez entrer une année académique plus petite ou équale à celle de fin"
 
 msgid "Primary language"
 msgstr "Langue principale"
@@ -726,6 +725,9 @@ msgstr "Validité"
 msgid "Validity cannot be greater than last year of organization"
 msgstr ""
 "Validité ne peut pas être supérieure à la dernière année d'organisation"
+
+msgid "Version name {} already exists"
+msgstr "Le nom de version {} existe déjà"
 
 msgid "Web re-registration"
 msgstr "Ré-inscription par internet"
