@@ -114,14 +114,6 @@ class EducationGroupRootsList(LanguageContextSerializerMixin, generics.ListAPIVi
             WHERE element.id = %s LIMIT 1
         """
 
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-        context.update({
-            'learning_unit_year': self.learning_unit_year,
-            'education_group_root_ids': self.education_group_root_ids
-        })
-        return context
-
 
 class LearningUnitPrerequisitesList(LanguageContextSerializerMixin, generics.ListAPIView):
     """
