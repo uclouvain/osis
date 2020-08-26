@@ -21,27 +21,43 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from django.test import SimpleTestCase
+import subprocess
+import sys
 
-from program_management.ddd.validators import _program_tree_empty
-from program_management.tests.ddd.factories.link import LinkFactory
-from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
-from program_management.tests.ddd.validators.mixins import TestValidatorValidateMixin
+from base.management.commands import makemessages
 
 
-class TestProgramTreeEmptyValidator(TestValidatorValidateMixin, SimpleTestCase):
-    def test_should_not_raise_exception_when_program_tree_is_empty(self):
-        emtpy_program_tree = ProgramTreeFactory()
+class MessagesNotTranslatedException(Exception):
+    pass
 
-        self.assertValidatorNotRaises(
-            _program_tree_empty.ProgramTreeEmptyValidator(emtpy_program_tree),
-        )
 
-    def test_should_raise_exception_when_program_tree_is_empty(self):
-        program_tree_with_content = ProgramTreeFactory()
-        LinkFactory(parent=program_tree_with_content.root_node)
+class Command(makemessages.Command):
+    def handle(self, *args, **options):
+        options['keep_pot'] = True
+        options['verbosity'] = 0
 
-        self.assertValidatorRaises(
-            _program_tree_empty.ProgramTreeEmptyValidator(program_tree_with_content),
-            None
-        )
+        super().handle(*args, **options)
+
+        self.check_all_messages_are_translated()
+
+    def check_all_messages_are_translated(self):
+        fr_po_file_location = "locale/fr_BE/LC_MESSAGES/django.po"
+        pot_file_location = "locale/django.pot"
+
+        try:
+            subprocess.run(
+                ["msgcmp", fr_po_file_location, pot_file_location],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                universal_newlines=True,
+                check=True
+            )
+        except subprocess.CalledProcessError as e:
+            self.stderr.write(e.stderr)
+            raise SystemExit(1)
+        finally:
+            self.remove_potfiles()
+
+    def write_po_file(self, potfile, locale):
+        #  don't need to overwrite existing po file
+        pass

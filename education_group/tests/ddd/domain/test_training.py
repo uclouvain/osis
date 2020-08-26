@@ -28,7 +28,6 @@ from django.test import SimpleTestCase
 
 from education_group.ddd.domain import training, exception
 from education_group.tests.ddd.factories.training import TrainingFactory
-from testing import mocks
 
 
 class TestTrainingBuilderCopyToNextYear(SimpleTestCase):

@@ -40,8 +40,8 @@ from base.business.education_groups.general_information_sections import \
 from base.models import academic_year
 from base.models.enums.education_group_categories import Categories
 from base.views.common import display_warning_messages
-from education_group.ddd.business_types import *
 from education_group.ddd import command
+from education_group.ddd.business_types import *
 from education_group.ddd.service.read import get_group_service
 from education_group.forms.academic_year_choices import get_academic_year_choices
 from education_group.models.group_year import GroupYear

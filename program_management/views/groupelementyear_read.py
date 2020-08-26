@@ -61,14 +61,17 @@ def pdf_content(request, year, code, language):
             ProgramTreeIdentitySearch().get_from_node_identity(node_id)
         )
     tree = tree.prune(ignore_children_from={GroupType.MINOR_LIST_CHOICE})
-
-    if language == LANGUAGE_CODE_EN:
-        title = tree.root_node.group_title_en
+    if tree.root_node.is_finality():
+        title = tree.root_node.offer_partial_title_en if language == LANGUAGE_CODE_EN \
+            else tree.root_node.offer_partial_title_fr
     else:
-        title = tree.root_node.group_title_fr
+        title = tree.root_node.group_title_en if language == LANGUAGE_CODE_EN \
+            else tree.root_node.group_title_fr
+
     if program_tree_version and program_tree_version.version_label:
         file_name_version_label = "_{}".format(title, program_tree_version.version_label)
-        title = "{} - Version {}".format(title, program_tree_version.version_label)
+        version_title = program_tree_version.title_en if language == LANGUAGE_CODE_EN else program_tree_version.title_fr
+        title = "{} - {}{}".format(title, version_title, program_tree_version.version_label)
     else:
         file_name_version_label = None
 

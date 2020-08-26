@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-21 09:30+0200\n"
+"POT-Creation-Date: 2020-08-26 09:36+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -113,11 +113,6 @@ msgstr ""
 #, python-format
 msgid "Are you sure you want to detach %(acronym)s ?"
 msgstr "Are you sure you want to remove %(acronym)s ?"
-
-msgid ""
-"At least an education group year, a group year, a learning unit year or a "
-"learning class year has to be set"
-msgstr ""
 
 msgid "Attribution entity"
 msgstr ""
@@ -252,6 +247,9 @@ msgstr ""
 msgid "Formations"
 msgstr ""
 
+msgid "Group"
+msgstr ""
+
 msgid "IMPOSSIBLE TO DISPLAY BECAUSE OF AN ILLEGAL CHARACTER IN STRING"
 msgstr ""
 
@@ -274,6 +272,12 @@ msgid "Language"
 msgstr ""
 
 msgid "Learning achievements"
+msgstr ""
+
+msgid "Learning class year"
+msgstr ""
+
+msgid "Learning unit year"
 msgstr ""
 
 msgid "Learning units"
@@ -350,7 +354,13 @@ msgstr ""
 msgid "New Mini-Training"
 msgstr ""
 
+msgid "New specific version"
+msgstr ""
+
 msgid "New training"
+msgstr ""
+
+msgid "New version"
 msgstr ""
 
 msgid "No"
@@ -369,11 +379,6 @@ msgid "Official"
 msgstr ""
 
 msgid "Online resources"
-msgstr ""
-
-msgid ""
-"Only one of the following has to be set : an education group year, a group "
-"year, a learning unit year or a learning class"
 msgstr ""
 
 #, python-format
@@ -461,8 +466,7 @@ msgstr ""
 msgid "Produce xls with a list of trainings"
 msgstr ""
 
-#, python-format
-msgid "Program %(acronym)s (%(academic_year)s) is not empty."
+msgid "Prolong"
 msgstr ""
 
 msgid "Proposal status"
@@ -505,6 +509,12 @@ msgid "Search"
 msgstr ""
 
 msgid "Session derogation"
+msgstr ""
+
+#, python-format
+msgid ""
+"Specific version for education group year <a href='%(link)s'> "
+"%(offer_acronym)s[%(acronym)s] (%(academic_year)s) </a> successfully created."
 msgstr ""
 
 msgid "Specifications"
@@ -715,9 +725,6 @@ msgid "[%(academic_year)s] The content of the program is not empty."
 msgstr ""
 
 msgid "bibliography"
-msgstr ""
-
-msgid "education group year"
 msgstr ""
 
 msgid "email"

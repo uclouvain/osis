@@ -32,6 +32,7 @@ from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.db.models import Q
 from django.db.models.expressions import F, Func, RawSQL, Value
+from django.db.models.functions import Cast
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.timezone import now
@@ -93,13 +94,13 @@ class EntityVersionQuerySet(CTEQuerySet):
     def entity(self, entity):
         return self.filter(entity=entity)
 
-    def with_children(self, date=None, *extra_fields, **filter_kwargs):
+    def with_children(self, *extra_fields, date=None, **filter_kwargs):
         """
         Use a Common Table Expression to construct the hierarchy of children entities
         The Union is made recursively on LEFT.entity_id = CTE.parent_id
 
-        :param date: Date to filter the entity versions on (default: now)
         :param extra_fields: Any field to add on the cte query
+        :param date: Date to filter the entity versions on (default: now)
         :param filter_kwargs: Any filter to add on the original query
         :return: a CTE queryset that can be used as is, or joined again on
         EntityVersion to get more info, e.g.:
@@ -128,6 +129,16 @@ class EntityVersionQuerySet(CTEQuerySet):
                     "ARRAY[entity_id]", [],
                     output_field=ArrayField(models.IntegerField()),
                 ),
+                acronym_path=RawSQL(
+                    # start the array with the current entity
+                    "ARRAY[acronym]::text[]", [],
+                    output_field=ArrayField(models.TextField()),
+                ),
+                title_path=RawSQL(
+                    # start the array with the current entity
+                    "ARRAY[title]::text[]", [],
+                    output_field=ArrayField(models.TextField()),
+                ),
             ).filter(
                 **filter_kwargs
             ).union(
@@ -145,13 +156,25 @@ class EntityVersionQuerySet(CTEQuerySet):
                         F("entity_id"), cte.col.children,
                         output_field=ArrayField(models.IntegerField()),
                     ),
+                    acronym_path=ArrayConcat(
+                        # Append the child to the array
+                        Cast("acronym", models.TextField()),
+                        cte.col.acronym_path,
+                        output_field=ArrayField(models.TextField()),
+                    ),
+                    title_path=ArrayConcat(
+                        # Append the child to the array
+                        Cast("title", models.TextField()),
+                        cte.col.title_path,
+                        output_field=ArrayField(models.TextField()),
+                    ),
                 ),
                 all=True,
             )
 
         return With.recursive(children_entities)
 
-    def with_parents(self, date=None, *extra_fields, **filter_kwargs):
+    def with_parents(self, *extra_fields, date=None, **filter_kwargs):
         """
         Use a Common Table Expression to construct the hierarchy of parent entities
         The Union is made recursively on LEFT.parent_id = CTE.children_id
@@ -203,8 +226,8 @@ class EntityVersionQuerySet(CTEQuerySet):
 
     def get_tree(self, entity_ids, date=None):
         """
-        :return: a list of dictionnaries returning
-            - entityversion id,
+        :return: a list of dictionaries returning
+            - entityversion_id,
             - acronym,
             - parent_id,
             - entity_id,
@@ -229,7 +252,7 @@ class EntityVersionQuerySet(CTEQuerySet):
                 if isinstance(entity, Entity):
                     entity_ids[i] = entity.pk
 
-        cte = self.with_parents(date, 'acronym', entity_id__in=entity_ids)
+        cte = self.with_parents('acronym', date=date, entity_id__in=entity_ids)
         qs = cte.queryset().with_cte(cte).annotate(
             level=Func('parents', function='cardinality'),
             date=Value(date, models.DateField()),
@@ -243,6 +266,17 @@ class EntityVersionQuerySet(CTEQuerySet):
             'date',
             'level',
         )
+
+    def with_acronym_path(self, **kwargs):
+        cte = self.with_children('start_date', **kwargs)
+        return cte.queryset().with_cte(cte).annotate(
+            path_as_string=Func(
+                'acronym_path',
+                template='%(function)s(%(expressions)s, \'%(separator)s\')',
+                function='ARRAY_TO_STRING',
+                separator=' / ',
+            ),
+        ).filter(parent__isnull=True).order_by('-start_date')
 
     def descendants(self, entity, date=None):
         """ Return the children entities """
