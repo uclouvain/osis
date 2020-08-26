@@ -27,7 +27,7 @@ import factory.fuzzy
 
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType, GroupType
 from base.models.enums.learning_container_year_types import LearningContainerYearType
-from program_management.ddd.domain.node import NodeEducationGroupYear, NodeLearningUnitYear, NodeGroupYear, Node, \
+from program_management.ddd.domain.node import NodeLearningUnitYear, NodeGroupYear, Node, \
     NodeIdentity
 from program_management.ddd.domain._campus import Campus
 from program_management.models.enums.node_type import NodeType
@@ -49,19 +49,6 @@ class NodeFactory(factory.Factory):
     year = factory.fuzzy.FuzzyInteger(low=1999, high=2099)
     end_date = factory.LazyAttribute(generate_end_date)
     entity_id = factory.LazyAttribute(generate_node_identity)
-
-
-class NodeEducationGroupYearFactory(NodeFactory):
-    class Meta:
-        model = NodeEducationGroupYear
-        abstract = False
-
-    node_type = factory.fuzzy.FuzzyChoice(TrainingType)
-    offer_title_fr = factory.fuzzy.FuzzyText(length=240)
-    offer_title_en = factory.fuzzy.FuzzyText(length=240)
-    offer_partial_title_fr = factory.fuzzy.FuzzyText(length=240)
-    offer_partial_title_en = factory.fuzzy.FuzzyText(length=240)
-    children = factory.LazyFunction(list)
 
 
 class CampusFactory(factory.Factory):

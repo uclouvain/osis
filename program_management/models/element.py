@@ -93,7 +93,6 @@ class ElementTypeListFilter(admin.SimpleListFilter):
 class ElementManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().select_related(
-            'education_group_year',
             'group_year',
             'learning_unit_year',
             'learning_class_year'
@@ -115,12 +114,6 @@ class Element(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
 
-    education_group_year = models.ForeignKey(
-        'base.EducationGroupYear',
-        blank=True, null=True,
-        verbose_name=_('education group year'),
-        on_delete=models.PROTECT
-    )
     group_year = models.OneToOneField(
         'education_group.GroupYear',
         blank=True, null=True,
@@ -142,41 +135,34 @@ class Element(models.Model):
 
     objects = ElementManager()
 
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                check=(
+                    Q(group_year__isnull=False) & Q(learning_unit_year__isnull=True) &
+                    Q(learning_class_year__isnull=True)
+                ) | (
+                    Q(group_year__isnull=True) & Q(learning_unit_year__isnull=False) &
+                    Q(learning_class_year__isnull=True)
+                ) | (
+                    Q(group_year__isnull=True) & Q(learning_unit_year__isnull=True) &
+                    Q(learning_class_year__isnull=False)
+                ),
+                name='only_one_fk_element'
+            )
+        ]
+
     def __str__(self):
         field = {
-            NodeType.EDUCATION_GROUP: self.education_group_year,
             NodeType.GROUP: self.group_year,
             NodeType.LEARNING_UNIT: self.learning_unit_year,
             NodeType.LEARNING_CLASS: self.learning_class_year,
         }[self.node_type]
         return str(field)
 
-    def save(self, *args, **kwargs):
-
-        if not any([self.education_group_year, self.group_year, self.learning_class_year, self.learning_unit_year]):
-            raise AttributeError(
-                _('At least an education group year, a group year, a learning unit year or a learning class year has '
-                  'to be set')
-            )
-        resulted_counter = Counter([self.education_group_year,
-                                    self.group_year,
-                                    self.learning_class_year,
-                                    self.learning_unit_year])
-
-        if resulted_counter[None] < 3:
-            raise AttributeError(
-                _(
-                    'Only one of the following has to be set : an education group year, a group year, '
-                    'a learning unit year or a learning class')
-            )
-
-        super().save(*args, **kwargs)
-
     @property
     def node_type(self):
-        if self.education_group_year:
-            return NodeType.EDUCATION_GROUP
-        elif self.group_year:
+        if self.group_year:
             return NodeType.GROUP
         elif self.learning_unit_year:
             return NodeType.LEARNING_UNIT

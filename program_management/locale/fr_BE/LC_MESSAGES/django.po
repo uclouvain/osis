@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-17 15:58+0200\n"
+"POT-Creation-Date: 2020-08-26 08:47+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -114,13 +114,6 @@ msgstr "Annuel"
 #, python-format
 msgid "Are you sure you want to detach %(acronym)s ?"
 msgstr "Êtes-vous sûr·e de vouloir retirer %(acronym)s ?"
-
-msgid ""
-"At least an education group year, a group year, a learning unit year or a "
-"learning class year has to be set"
-msgstr ""
-"Il faut au mininum une clé vers education group year, group year, learning "
-"unit year ou learning class year"
 
 msgid "Attribution entity"
 msgstr ""
@@ -405,13 +398,6 @@ msgstr "Officiel"
 msgid "Online resources"
 msgstr "Ressources en ligne"
 
-msgid ""
-"Only one of the following has to be set : an education group year, a group "
-"year, a learning unit year or a learning class"
-msgstr ""
-"Seulement une des clés étrangères doit être garnie (education group year, "
-"groupe year, learning unit year ou learning class year)"
-
 #, python-format
 msgid ""
 "Option \"%(acronym)s\" cannot be detach because it is contained in "
@@ -502,6 +488,9 @@ msgstr ""
 msgid "Produce xls with a list of trainings"
 msgstr "Produire un fichier Excel avec la liste des formations"
 
+msgid "Prolong"
+msgstr "Prolonger la version existante"
+
 msgid "Proposal status"
 msgstr "Légende proposition"
 
@@ -513,9 +502,6 @@ msgstr "Légende proposition"
 
 msgid "Quadrimester"
 msgstr "Quadrimestre"
-
-msgid "Prolong"
-msgstr "Prolonger la version existante"
 
 msgid "Registration ID"
 msgstr "NOMA"
@@ -546,6 +532,12 @@ msgstr "Recherche"
 
 msgid "Session derogation"
 msgstr "Session dérogation"
+
+#, python-format
+msgid ""
+"Specific version for education group year <a href='%(link)s'> "
+"%(offer_acronym)s[%(acronym)s] (%(academic_year)s) </a> successfully created."
+msgstr ""
 
 msgid "Specifications"
 msgstr "Utilisations"
@@ -782,9 +774,6 @@ msgid "[%(academic_year)s] The content of the program is not empty."
 msgstr "[%(academic_year)s] Le contenu du programme n'est pas vide."
 
 msgid "bibliography"
-msgstr ""
-
-msgid "education group year"
 msgstr ""
 
 msgid "email"
