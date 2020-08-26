@@ -31,7 +31,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.base import View
 
-from base.forms.education_group.version import SpecificVersionForm
+from program_management.forms.version import SpecificVersionForm
 from base.models.education_group_year import EducationGroupYear
 from base.models.utils.utils import ChoiceEnum
 from base.views.common import display_success_messages

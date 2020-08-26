@@ -28,8 +28,6 @@ from django.forms import TextInput
 from django.utils.translation import gettext_lazy as _
 
 from base.forms.utils.choice_field import BLANK_CHOICE
-from base.models import academic_year
-from base.models.academic_year import compute_max_academic_year_adjournment
 from education_group.ddd.business_types import *
 from program_management.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
 
