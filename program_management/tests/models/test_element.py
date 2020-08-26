@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
+from django.db import IntegrityError
 from django.test import TestCase
 from django.utils.translation import gettext as _
 
@@ -47,8 +47,9 @@ class TestElementSave(TestCase):
         cls.gy = GroupYearFactory(academic_year=cls.academic_year, group=GroupFactory(start_year=cls.academic_year))
 
     def test_save_no_foreign_key_set(self):
-        element = ElementFactory.build()
-        element.save()
+        with self.assertRaises(IntegrityError):
+            element = ElementFactory.build()
+            element.save()
 
     def test_save_one_group_year_fk(self):
         element = ElementGroupYearFactory.build(group_year=self.gy)
@@ -73,8 +74,9 @@ class TestElementSave(TestCase):
         )
 
     def test_save_more_than_one_fk(self):
-        element = ElementFactory.build(learning_class_year=self.lcy, group_year=self.gy)
-        element.save()
+        with self.assertRaises(IntegrityError):
+            element = ElementFactory.build(learning_class_year=self.lcy, group_year=self.gy)
+            element.save()
 
     def test_str_luy(self):
         element = ElementFactory(learning_unit_year=self.luy)
