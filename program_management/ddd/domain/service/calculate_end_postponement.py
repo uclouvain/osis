@@ -27,7 +27,10 @@ from typing import Union
 
 from base.models import academic_year
 from education_group.ddd.business_types import *
+from education_group.ddd.domain.training import TrainingIdentity
 from osis_common.ddd import interface
+from program_management.ddd.domain.program_tree import ProgramTreeIdentity
+from program_management.ddd.domain.service.identity_search import TrainingOrMiniTrainingOrGroupIdentitySearch
 
 
 class CalculateEndPostponement(interface.DomainService):
@@ -52,3 +55,16 @@ class CalculateEndPostponement(interface.DomainService):
         default_years_to_postpone = cls.DEFAULT_YEARS_TO_POSTPONE
         current_year = academic_year.starting_academic_year().year
         return default_years_to_postpone + current_year
+
+    @classmethod
+    def calculate_program_tree_end_postponement(
+            cls,
+            identity: 'ProgramTreeIdentity',
+            training_repository: 'TrainingRepository',
+            mini_training_repository: 'MiniTrainingRepository'
+    ) -> int:
+        root_identity = TrainingOrMiniTrainingOrGroupIdentitySearch.get_from_program_tree_identity(identity)
+        return cls.calculate_end_postponement_year(
+            identity=root_identity,
+            repository=training_repository if isinstance(root_identity, TrainingIdentity) else mini_training_repository,
+        )

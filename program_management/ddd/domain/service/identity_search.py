@@ -27,7 +27,9 @@ from typing import Union
 
 from django.db.models import F
 
+from base.models.enums.education_group_types import MiniTrainingType, TrainingType
 from education_group.ddd.domain.group import GroupIdentity
+from education_group.ddd.domain.mini_training import MiniTrainingIdentity
 from education_group.ddd.domain.training import TrainingIdentity
 from education_group.models.group_year import GroupYear
 from osis_common.ddd import interface
@@ -103,6 +105,12 @@ class ProgramTreeIdentitySearch(interface.DomainService):
     def get_from_node_identity(self, node_identity: 'NodeIdentity') -> 'ProgramTreeIdentity':
         return ProgramTreeIdentity(code=node_identity.code, year=node_identity.year)
 
+    def get_from_program_tree_version_identity(
+            self,
+            identity: 'ProgramTreeVersionIdentity'
+    ) -> 'ProgramTreeIdentity':
+        return self.get_from_node_identity(NodeIdentitySearch().get_from_tree_version_identity(identity))
+
 
 class TrainingIdentitySearch(interface.DomainService):
 
@@ -137,3 +145,36 @@ class GroupIdentitySearch(interface.DomainService):
         ).values('code', 'year')
         if values:
             return GroupIdentity(code=values[0]['code'], year=values[0]['year'])
+
+
+class TrainingOrMiniTrainingOrGroupIdentitySearch(interface.DomainService):
+
+    # FIXME :: This function calls another domain : we can't do that. It's the proof that we need to improve the
+    # FIXME :: division of the roots Entities in the domain layer.
+    @classmethod
+    def get_from_program_tree_identity(
+            cls,
+            tree_identity: 'ProgramTreeIdentity'
+    ) -> Union['GroupIdentity', 'MiniTrainingIdentity', 'TrainingIdentity']:
+        try:
+            data = GroupYear.objects.annotate(
+                offer_acronym=F('educationgroupversion__offer__acronym'),
+                offer_type=F('educationgroupversion__offer__education_group_type__name'),
+            ).values(
+                'offer_acronym',
+                'offer_type',
+            ).get(
+                partial_acronym=tree_identity.code,
+                academic_year__year=tree_identity.year,
+            )
+        except GroupYear.DoesNotExist as e:
+            print('')
+            raise e
+        offer_acronym = data['offer_acronym']
+        offer_type = data['offer_type']
+        if not offer_acronym:
+            return GroupIdentity(code=tree_identity.code, year=tree_identity.year)
+        elif offer_type in MiniTrainingType.get_names():
+            return MiniTrainingIdentity(acronym=offer_acronym, year=tree_identity.year)
+        elif offer_type in TrainingType.get_names():
+            return TrainingIdentity(acronym=offer_acronym, year=tree_identity.year)
