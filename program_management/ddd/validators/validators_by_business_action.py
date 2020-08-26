@@ -26,6 +26,7 @@
 
 import osis_common.ddd.interface
 from base.ddd.utils import business_validator
+from base.ddd.utils.business_validator import BusinessListValidator
 from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.repositories import program_tree_version as program_tree_version_repository
@@ -53,6 +54,7 @@ from program_management.ddd.validators._prerequisite_expression_syntax import Pr
 from program_management.ddd.validators._prerequisites_items import PrerequisiteItemsValidator
 from program_management.ddd.validators._relative_credits import RelativeCreditsValidator
 from program_management.ddd.validators._delete_check_versions_end_date import CheckVersionsEndDateValidator
+from program_management.ddd.validators._version_name_exists import VersionNameExistsValidator
 from program_management.ddd.validators.link import CreateLinkValidatorList
 
 
@@ -259,5 +261,20 @@ class CopyProgramTreeValidatorList(business_validator.BusinessListValidator):
     def __init__(self, copy_from: 'ProgramTree'):
         self.validators = [
             CheckProgramTreeEndDateValidator(copy_from)
+        ]
+        super().__init__()
+
+
+class UpdateProgramTreeVersionValidatorList(business_validator.BusinessListValidator):
+    def __init__(self, tree_version: 'ProgramTreeVersion'):
+        self.validators = []
+        super().__init__()
+
+
+class CreateProgramTreeVersionValidatorList(BusinessListValidator):
+
+    def __init__(self, year: int, offer_acronym: str, version_name: str):
+        self.validators = [
+            VersionNameExistsValidator(year, offer_acronym, version_name),
         ]
         super().__init__()

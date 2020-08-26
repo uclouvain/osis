@@ -30,6 +30,7 @@ from education_group.tests.ddd.factories.group import GroupFactory
 from education_group.tests.ddd.factories.repository.fake import get_fake_group_repository, get_fake_training_repository
 from education_group.tests.ddd.factories.training import TrainingFactory
 from program_management.ddd.domain import program_tree, program_tree_version
+from program_management.ddd.domain.program_tree_version import STANDARD
 from program_management.ddd.service.write import update_training_with_program_tree_service
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
@@ -72,7 +73,7 @@ class TestUpdateAndReportTrainingWithProgramTree(MockPatcherMixin, TestCase):
         self.fake_program_tree_repository = get_fake_program_tree_repository(self.program_trees)
 
         self.program_tree_versions = [
-            ProgramTreeVersionFactory(tree=tree, program_tree_repository=self.fake_program_tree_repository)
+            ProgramTreeVersionFactory(tree=tree, entity_id__version_name=STANDARD, program_tree_repository=self.fake_program_tree_repository)
             for tree in self.program_trees
         ]
         self.fake_program_tree_version_repository = get_fake_program_tree_version_repository(self.program_tree_versions)

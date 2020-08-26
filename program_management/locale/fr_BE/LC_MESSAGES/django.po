@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-18 10:43+0200\n"
+"POT-Creation-Date: 2020-08-26 09:36+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -57,6 +57,16 @@ msgid ""
 "not valid</li><li>A ET (B ET C) ET (D ET E): not valid</li><li>A ET (B OU C) "
 "ET (D ET E): not valid</li></ul>"
 msgstr ""
+"<b>Règles de syntaxe:</b><ul><li>Pas de doubles parenthèses.</li><li>Les "
+"opérateurs valides sont OU et ET.</li><li>L'opérateur doit être le même à "
+"l'intérieur de toutes les parenthèses (groupes).</li><li>L'opérateur qui "
+"unit les groupes doit être différent de celui qui unit les UEs dans un "
+"groupe (parenthèses).</li><li>Le code de l'UE ne peut pas comporter "
+"d'espaces (ex: LDROI1001 et non LDROI&nbsp;1001).</li></ul></"
+"p><p><b>Exemples</b>:<ul><li>A OU B OU C: valide</li><li>A ET B ET C : "
+"valide</li><li>A ET (B OU C) ET (D OU E): valide</li><li>A ET (B OU C) OU (D "
+"OU E): non valide</li><li>A ET (B ET C) ET (D ET E): non valide</li><li>A ET "
+"(B OU C) ET (D ET E): non valide</li></ul>"
 
 #, python-format
 msgid "A learning unit cannot be prerequisite to itself : %(acronym)s"
@@ -74,7 +84,7 @@ msgid "Academic year"
 msgstr "Année académique"
 
 msgid "Access condition"
-msgstr ""
+msgstr "Condition d'accès"
 
 msgid "Acronym"
 msgstr "Sigle"
@@ -90,23 +100,23 @@ msgid "Actions"
 msgstr "Actions"
 
 msgid "Active"
-msgstr ""
+msgstr "Actif"
 
 msgid "Activities with prerequisites (in preparation)"
 msgstr "Activité avec prérequis (en préparation)"
 
 msgid "Add"
-msgstr ""
+msgstr "Ajouter"
 
 msgid "Add potential courses"
 msgstr "Ajouts de cours éventuels"
 
 msgctxt "plural"
 msgid "All"
-msgstr ""
+msgstr "Tous"
 
 msgid "Alloc. Ent."
-msgstr ""
+msgstr "Ent. attrib."
 
 msgid "Annual"
 msgstr "Annuel"
@@ -115,15 +125,8 @@ msgstr "Annuel"
 msgid "Are you sure you want to detach %(acronym)s ?"
 msgstr "Êtes-vous sûr·e de vouloir retirer %(acronym)s ?"
 
-msgid ""
-"At least an education group year, a group year, a learning unit year or a "
-"learning class year has to be set"
-msgstr ""
-"Il faut au mininum une clé vers education group year, group year, learning "
-"unit year ou learning class year"
-
 msgid "Attribution entity"
-msgstr ""
+msgstr "Entité d'attribution"
 
 msgid "Block"
 msgstr "Bloc"
@@ -183,7 +186,7 @@ msgid "Cannot perform modification action on root."
 msgstr "Interdit de modifier la racine."
 
 msgid "Category"
-msgstr ""
+msgstr "Catégorie"
 
 msgid "Code"
 msgstr "Code"
@@ -213,7 +216,7 @@ msgid "Cut element"
 msgstr "Elément coupé"
 
 msgid "Description fiche"
-msgstr ""
+msgstr "Fiche descriptive"
 
 msgid "Direct gathering"
 msgstr "Regroupement direct"
@@ -272,7 +275,7 @@ msgid "Group"
 msgstr "Groupement"
 
 msgid "IMPOSSIBLE TO DISPLAY BECAUSE OF AN ILLEGAL CHARACTER IN STRING"
-msgstr ""
+msgstr "IMPOSSIBLE D'AFFICHER A CAUSE D'UN CARACTERE IRREGULIER"
 
 msgid "Include subordinate entities"
 msgstr "Inclure transition"
@@ -378,8 +381,14 @@ msgstr "Nouveau Groupement"
 msgid "New Mini-Training"
 msgstr "Nouvelle Mini-Formation"
 
+msgid "New specific version"
+msgstr "Nouvelle version particulière"
+
 msgid "New training"
 msgstr "Nouvelle Formation"
+
+msgid "New version"
+msgstr "Nouvelle version"
 
 msgid "No"
 msgstr "Non"
@@ -398,13 +407,6 @@ msgstr "Officiel"
 
 msgid "Online resources"
 msgstr "Ressources en ligne"
-
-msgid ""
-"Only one of the following has to be set : an education group year, a group "
-"year, a learning unit year or a learning class"
-msgstr ""
-"Seulement une des clés étrangères doit être garnie (education group year, "
-"groupe year, learning unit year ou learning class year)"
 
 #, python-format
 msgid ""
@@ -467,6 +469,8 @@ msgid ""
 "order, without any duplication. Authorized values are from 1 to 6. Examples: "
 "12, 23, 46"
 msgstr ""
+"Veuillez entrer des chiffres compris entre 1 et %(max_authorized_value)s "
+"dans un ordre croissant, sans duplications. Exemples: 12, 23, 46"
 
 msgid "Practical planned classes"
 msgstr "Classes prévues PP"
@@ -495,6 +499,9 @@ msgstr ""
 
 msgid "Produce xls with a list of trainings"
 msgstr "Produire un fichier Excel avec la liste des formations"
+
+msgid "Prolong"
+msgstr "Prolonger la version existante"
 
 msgid "Proposal status"
 msgstr "Légende proposition"
@@ -538,6 +545,14 @@ msgstr "Recherche"
 msgid "Session derogation"
 msgstr "Session dérogation"
 
+#, python-format
+msgid ""
+"Specific version for education group year <a href='%(link)s'> "
+"%(offer_acronym)s[%(acronym)s] (%(academic_year)s) </a> successfully created."
+msgstr ""
+"La version de la formation <a href='%(link)s'> "
+"%(offer_acronym)s[%(acronym)s] (%(academic_year)s) </a> a été créer avec succés"
+
 msgid "Specifications"
 msgstr "Utilisations"
 
@@ -557,7 +572,7 @@ msgid "Success"
 msgstr "Succès"
 
 msgid "Suppression"
-msgstr ""
+msgstr "Suppression"
 
 msgid "Teaching material"
 msgstr "Méthodes d'enseignement"
@@ -580,6 +595,7 @@ msgstr ""
 #, python-format
 msgid "The learning unit %(acronym)s is not contained inside the formation"
 msgstr ""
+"L'unité d'enseignement %(acronym)s n'est pas contenue dans la formation"
 
 msgid "The learning unit has prerequisites"
 msgstr "L'UE a des prérequis"
@@ -658,16 +674,16 @@ msgid "Transformation"
 msgstr "Autres informations"
 
 msgid "Transformation and modification"
-msgstr ""
+msgstr "Transformation et modification"
 
 msgid "Transition"
 msgstr "Transition"
 
 msgid "Tutors"
-msgstr ""
+msgstr "Enseignant·e·s"
 
 msgid "Type"
-msgstr ""
+msgstr "Type"
 
 msgid "Utilizations"
 msgstr "Utilisations"
@@ -781,10 +797,7 @@ msgid "[%(academic_year)s] The content of the program is not empty."
 msgstr "[%(academic_year)s] Le contenu du programme n'est pas vide."
 
 msgid "bibliography"
-msgstr ""
-
-msgid "education group year"
-msgstr ""
+msgstr "bibliographie"
 
 msgid "email"
 msgstr "email"
@@ -796,7 +809,7 @@ msgid "faculty number"
 msgstr "n° facultaire"
 
 msgid "group year"
-msgstr ""
+msgstr "groupement"
 
 msgid "has as prerequisite"
 msgstr "a comme prérequis"
@@ -818,7 +831,7 @@ msgid "is_prerequisite_of-%(year)s-%(acronym)s"
 msgstr "est_prérequis_de-%(year)s-%(acronym)s"
 
 msgid "learning class year"
-msgstr ""
+msgstr "classe"
 
 msgid "learning unit year"
 msgstr "Unités d'enseignement"

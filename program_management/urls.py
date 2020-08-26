@@ -27,11 +27,12 @@ from django.conf.urls import url
 from django.urls import include, path
 
 import program_management.views.tree.copy_cut
+import program_management.views.tree_version.check_version_name
 from program_management.views import quick_search, create_element
 from program_management.views.proxy.identification import IdentificationRedirectView
 from program_management.views import groupelementyear_update, \
     groupelementyear_read, element_utilization, excel, search, tree, prerequisite_read, prerequisite_update
-from program_management.views.quick_search import QuickSearchLearningUnitYearView, QuickSearchGroupYearView
+from program_management.views.tree_version import create as create_program_tree_version
 
 
 urlpatterns = [
@@ -110,5 +111,17 @@ urlpatterns = [
         ]))
     ])),
 
-    path('<int:year>/<str:code>/', IdentificationRedirectView.as_view(), name='element_identification'),
+    path('<int:year>/<str:code>/', include([
+        path('', IdentificationRedirectView.as_view(), name='element_identification'),
+        path(
+            'create_education_group_version/',
+            create_program_tree_version.CreateProgramTreeVersion.as_view(),
+            name="create_education_group_version"
+        ),
+        path(
+            'check_version_name/',
+            program_management.views.tree_version.check_version_name.check_version_name,
+            name="check_version_name"
+        ),
+    ])),
 ]

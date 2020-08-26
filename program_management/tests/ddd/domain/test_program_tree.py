@@ -51,7 +51,6 @@ from program_management.models.enums import node_type
 from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipObjectFactory
 from program_management.tests.ddd.factories.commands.paste_element_command import PasteElementCommandFactory
 from program_management.tests.ddd.factories.link import LinkFactory
-from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 from program_management.tests.ddd.factories.prerequisite import cast_to_prerequisite
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
@@ -195,7 +194,7 @@ class TestGetCNodesByType(SimpleTestCase):
         self.tree = ProgramTreeFactory(root_node=self.root_node)
 
     def test_should_return_empty_list_if_no_matching_type(self):
-        result = self.tree.get_nodes_by_type(node_type.NodeType.EDUCATION_GROUP)
+        result = self.tree.get_nodes_by_type(node_type.NodeType.LEARNING_UNIT)
         self.assertCountEqual(
             result,
             []
@@ -410,7 +409,7 @@ class TestCopyAndPrune(SimpleTestCase):
     def setUp(self):
         self.auth_relations = [AuthorizedRelationshipObjectFactory()]
 
-        self.original_root = NodeEducationGroupYearFactory()
+        self.original_root = NodeGroupYearFactory()
 
         self.original_link = LinkFactory(parent=self.original_root, block=0)
 

@@ -35,9 +35,9 @@ class ProgramTreeVersionIdentityFactory(factory.Factory):
         model = ProgramTreeVersionIdentity
         abstract = False
 
-    offer_acronym = "OFFER"
-    year = 2020
-    version_name = ""
+    offer_acronym = factory.Sequence(lambda n: 'OfferAcronym%02d' % n)
+    year = factory.fuzzy.FuzzyInteger(low=1999, high=2099)
+    version_name = factory.Sequence(lambda n: 'Version%02d' % n)
     is_transition = False
 
 
@@ -48,7 +48,6 @@ class ProgramTreeVersionFactory(factory.Factory):
         abstract = False
 
     tree = factory.SubFactory(ProgramTreeFactory)
-    entity_identity = None
     program_tree_identity = factory.SelfAttribute("tree.entity_id")
     program_tree_repository = None
     entity_id = factory.SubFactory(
@@ -56,6 +55,19 @@ class ProgramTreeVersionFactory(factory.Factory):
         offer_acronym=factory.SelfAttribute("..tree.root_node.title"),
         year=factory.SelfAttribute("..tree.root_node.year")
     )
+    entity_identity = factory.SelfAttribute("entity_id")
+    version_name = factory.SelfAttribute("entity_id.version_name")
+
+    @staticmethod
+    def produce_standard_2M_program_tree(current_year: int, end_year: int) -> 'ProgramTreeVersion':
+        """Creates a 2M standard version"""
+        tree_standard = ProgramTreeFactory.produce_standard_2M_program_tree(current_year, end_year)
+
+        return ProgramTreeVersionFactory(
+            tree=tree_standard,
+            entity_id__year=current_year,
+            program_tree_identity=tree_standard.entity_id,
+        )
 
 
 class SpecificProgramTreeVersionFactory(ProgramTreeVersionFactory):
