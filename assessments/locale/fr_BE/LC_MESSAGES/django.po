@@ -209,7 +209,7 @@ msgid "Evaluations"
 msgstr "Evaluations"
 
 msgid "Extra time (33% generally)"
-msgstr "Extra temps (33% généralement)"
+msgstr "Tiers-Temps"
 
 msgid "Fax"
 msgstr "Fax"

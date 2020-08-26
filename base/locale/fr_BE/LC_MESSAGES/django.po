@@ -1904,7 +1904,7 @@ msgid "Ph.D"
 msgstr "Doctorat"
 
 msgid "Placeholder"
-msgstr "Espace reservé"
+msgstr "Espace réservé"
 
 msgid "Planned classes"
 msgstr "Classes prévues"
