@@ -550,6 +550,8 @@ msgid ""
 "Specific version for education group year <a href='%(link)s'> "
 "%(offer_acronym)s[%(acronym)s] (%(academic_year)s) </a> successfully created."
 msgstr ""
+"La version de la formation <a href='%(link)s'> "
+"%(offer_acronym)s[%(acronym)s] (%(academic_year)s) </a> a été créer avec succés"
 
 msgid "Specifications"
 msgstr "Utilisations"
