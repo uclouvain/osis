@@ -65,8 +65,8 @@ class TestMatchVersionValidator(TestValidatorValidateMixin, SimpleTestCase):
         expected_message = _(
             '%(node_to_add)s version must be the same as %(root_node)s version'
         ) % {
-            'node_to_add': "{}[{}]".format(self.node_to_attach.code, 'B'),
-            'root_node': "{}[{}]".format(self.tree.root_node.code, 'A')
+            'node_to_add': "{} - {}[{}]".format(self.node_to_attach.code, self.node_to_attach.code, 'B'),
+            'root_node': "{} - {}[{}]".format(self.tree.root_node.code, self.tree.root_node.code, 'A')
         }
 
         self.assertValidatorRaises(
