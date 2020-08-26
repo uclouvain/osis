@@ -82,7 +82,7 @@ class CannotCopyTreeVersionDueToStandardNotExisting(BusinessException):
     def __init__(self, tree_version: 'ProgramTreeVersion', *args, **kwargs):
         message = _(
             "You can't copy the program tree version '{acronym}' "
-            "from {from_year} to {to_year} because standard version"
+            "from {from_year} to {to_year} because standard version "
             "does not exist in {to_year}"
         ).format(
             acronym=tree_version.entity_id.offer_acronym,
