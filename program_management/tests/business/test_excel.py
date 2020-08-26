@@ -74,7 +74,7 @@ class TestGeneratePrerequisitesWorkbook(SimpleTestCase):
 
     def test_header_lines(self):
         expected_first_line = HeaderLine(egy_acronym=self.program_tree.root_node.title,
-                                         egy_title=self.program_tree.root_node.group_title_en,
+                                         egy_title=self.program_tree.root_node.group_title_fr,
                                          code_header=_('Code'),
                                          title_header=_('Title'),
                                          credits_header=_('Cred. rel./abs.'),

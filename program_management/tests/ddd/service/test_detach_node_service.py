@@ -36,7 +36,8 @@ from program_management.ddd.service.write import detach_node_service
 from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipListFactory
 from program_management.tests.ddd.factories.commands.detach_node_command import DetachNodeCommandFactory
 from program_management.tests.ddd.factories.link import LinkFactory
-from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory, NodeLearningUnitYearFactory
+from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory, \
+    NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 from program_management.tests.ddd.service.mixins import ValidatorPatcherMixin
 
@@ -44,7 +45,7 @@ from program_management.tests.ddd.service.mixins import ValidatorPatcherMixin
 class TestDetachNode(TestCase, ValidatorPatcherMixin):
 
     def setUp(self):
-        self.root_node = NodeEducationGroupYearFactory(
+        self.root_node = NodeGroupYearFactory(
             node_type=TrainingType.BACHELOR,
             node_id=1
         )
