@@ -176,14 +176,14 @@ def _get_verbose_comment(link: 'Link'):
     ) if comment_from_lang else ""
 
 
-def get_verbose_remark(node: 'NodeEducationGroupYear'):
+def get_verbose_remark(node: 'NodeGroupYear'):
     remark = node.remark_fr or ""
     if node.remark_en and translation.get_language() == LANGUAGE_CODE_EN:
         remark = node.remark_en
     return remark
 
 
-def get_verbose_constraint(node: 'NodeEducationGroupYear'):
+def get_verbose_constraint(node: 'NodeGroupYear'):
     msg = "from %(min)s to %(max)s credits among" \
         if node.constraint_type == ConstraintTypeEnum.CREDITS else "from %(min)s to %(max)s among"
     return _(msg) % {

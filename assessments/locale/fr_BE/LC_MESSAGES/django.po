@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-25 13:18+0200\n"
+"POT-Creation-Date: 2020-07-23 08:57+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -68,9 +68,6 @@ msgstr "Valeur acceptée: %(justification_label_authorized)s "
 
 msgid "Acronym"
 msgstr "Acronyme"
-
-msgid "Acronym enrollment header"
-msgstr "Sigle"
 
 msgid "Add"
 msgstr "Ajouter"
@@ -134,7 +131,7 @@ msgid "Complete"
 msgstr "Compléter"
 
 msgid "Confirm delete for : "
-msgstr ""
+msgstr "Confirmer suppression pour : "
 
 msgid "Country"
 msgstr "Pays"
@@ -242,7 +239,7 @@ msgstr ""
 "Si vous tentez d'introduire des valeurs décimales, elles seront ignorées."
 
 msgid "Include subordinate entities"
-msgstr ""
+msgstr "Inclure les entités subordonnées"
 
 msgid "Inject"
 msgstr "Injecter"
@@ -295,7 +292,7 @@ msgid "M=Justified Absence"
 msgstr "M=Absence Justifiée"
 
 msgid "Main"
-msgstr ""
+msgstr "Principal"
 
 msgid "Manager"
 msgstr "Gestionnaire"
@@ -429,9 +426,6 @@ msgstr "Le noma ne corresond pas à l'adresse de messagerie"
 msgid "Registration number"
 msgstr "Noma"
 
-msgid "Registration number header"
-msgstr "Noma"
-
 msgid "Remove"
 msgstr "Retirer"
 
@@ -522,9 +516,6 @@ msgid "Selected"
 msgstr "Sélectionné"
 
 msgid "Session"
-msgstr "Session"
-
-msgid "Session enrollment header"
 msgstr "Session"
 
 msgid "Session number"
@@ -649,6 +640,9 @@ msgstr ""
 
 msgid "Without attribution"
 msgstr "Sans attribution"
+
+msgid "Yes"
+msgstr "Oui"
 
 msgid "You can't encode a 'score' and a 'justification' together"
 msgstr "Vous ne pouvez pas encoder une note et une justification ensemble"

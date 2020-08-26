@@ -25,9 +25,11 @@
 ##############################################################################
 from typing import List
 
+import attr
 from django.db import transaction
 
 from education_group.ddd.business_types import *
+from education_group.ddd.command import CreateAndPostponeTrainingAndProgramTreeCommand
 from program_management.ddd import command as pgm_command
 from program_management.ddd.service.write import paste_element_service, create_training_with_program_tree
 
@@ -41,7 +43,9 @@ def create_and_attach_training(
     # Nothing (later, should contains permissions or access rights)
 
     # WHEN
-    training_ids = create_training_with_program_tree.create_and_report_training_with_program_tree(create_and_attach_cmd)
+    training_ids = create_training_with_program_tree.create_and_report_training_with_program_tree(
+        __convert_command(create_and_attach_cmd)
+    )
 
     # THEN
     paste_element_service.paste_element(__convert_to_paste_element_cmd(create_and_attach_cmd))
@@ -56,3 +60,9 @@ def __convert_to_paste_element_cmd(
         node_to_paste_year=create_and_attach_training.year,
         path_where_to_paste=create_and_attach_training.path_to_paste,
     )
+
+
+def __convert_command(
+        cmd: pgm_command.CreateAndAttachTrainingCommand
+) -> CreateAndPostponeTrainingAndProgramTreeCommand:
+    return CreateAndPostponeTrainingAndProgramTreeCommand(**attr.asdict(cmd, recurse=False))

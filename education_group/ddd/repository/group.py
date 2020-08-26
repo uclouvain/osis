@@ -33,23 +33,24 @@ from education_group import publisher
 from education_group.ddd.business_types import *
 
 from base.models.academic_year import AcademicYear as AcademicYearModelDb
+from base.models.campus import Campus as CampusModelDb
 from base.models.education_group_type import EducationGroupType as EducationGroupTypeModelDb
 from base.models.entity import Entity as EntityModelDb
 from base.models.entity_version import EntityVersion as EntityVersionModelDb
-from base.models.campus import Campus as CampusModelDb
-from education_group.ddd.domain.service.enum_converter import EducationGroupTypeConverter
-from education_group.models.group_year import GroupYear as GroupYearModelDb
-from education_group.models.group import Group as GroupModelDb
 from base.models.enums.constraint_type import ConstraintTypeEnum
+from education_group.ddd.business_types import *
 from education_group.ddd.domain import exception, group
-from education_group.ddd.domain.group import GroupIdentity
 from education_group.ddd.domain._campus import Campus
 from education_group.ddd.domain._content_constraint import ContentConstraint
+from education_group.ddd.domain._entity import Entity as EntityValueObject
 from education_group.ddd.domain._remark import Remark
 from education_group.ddd.domain._titles import Titles
-from education_group.ddd.domain._entity import Entity as EntityValueObject
 from education_group.ddd.domain.exception import AcademicYearNotFound, TypeNotFound, ManagementEntityNotFound, \
     TeachingCampusNotFound
+from education_group.ddd.domain.group import GroupIdentity
+from education_group.ddd.domain.service.enum_converter import EducationGroupTypeConverter
+from education_group.models.group import Group as GroupModelDb
+from education_group.models.group_year import GroupYear as GroupYearModelDb
 from osis_common.ddd import interface
 
 

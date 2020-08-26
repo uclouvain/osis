@@ -27,12 +27,13 @@ from typing import Union, List
 
 from django.db.models import F, Subquery
 
+from education_group.ddd.domain.group import GroupIdentity
 from education_group.ddd.domain.training import TrainingIdentity
 from education_group.models.group_year import GroupYear
 from osis_common.ddd import interface
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, STANDARD
 from education_group.ddd.domain.service.identity_search import TrainingIdentitySearch \
     as EducationGroupTrainingIdentitySearch
 from program_management.models.education_group_version import EducationGroupVersion
@@ -84,17 +85,34 @@ class NodeIdentitySearch(interface.DomainService):
     def get_from_program_tree_identity(self, tree_identity: 'ProgramTreeIdentity') -> 'NodeIdentity':
         return NodeIdentity(year=tree_identity.year, code=tree_identity.code)
 
-    def get_from_training_identity(self, training_identity: 'TrainingIdentity') -> 'NodeIdentity':
+    def get_from_training_identity(
+            self,
+            training_identity: 'TrainingIdentity',
+            version_name: str = STANDARD,
+            is_transition: str = False,
+    ) -> 'NodeIdentity':
         values = GroupYear.objects.filter(
             educationgroupversion__offer__acronym=training_identity.acronym,
             educationgroupversion__offer__academic_year__year=training_identity.year,
-            educationgroupversion__version_name='',
-            educationgroupversion__is_transition=False
+            educationgroupversion__version_name=version_name,
+            educationgroupversion__is_transition=is_transition,
         ).values(
             'partial_acronym'
         )
         if values:
             return NodeIdentity(code=values[0]['partial_acronym'], year=training_identity.year)
+
+    def get_from_tree_version_identity(self, tree_version_id: 'ProgramTreeVersionIdentity') -> 'NodeIdentity':
+        values = GroupYear.objects.filter(
+            educationgroupversion__offer__acronym=tree_version_id.offer_acronym,
+            educationgroupversion__offer__academic_year__year=tree_version_id.year,
+            educationgroupversion__version_name=tree_version_id.version_name,
+            educationgroupversion__is_transition=tree_version_id.is_transition,
+        ).values(
+            'partial_acronym',
+        )
+        if values:
+            return NodeIdentity(code=values[0]['partial_acronym'], year=tree_version_id.year)
 
     @classmethod
     def get_from_element_id(cls, element_id: int) -> Union['NodeIdentity', None]:
@@ -129,3 +147,19 @@ class TrainingIdentitySearch(interface.DomainService):
         return EducationGroupTrainingIdentitySearch().get_from_node_identity(
             node_identity=NodeIdentitySearch().get_from_program_tree_identity(tree_identity=identity)
         )
+
+
+# TODO :: review : is this at the correct place?
+class GroupIdentitySearch(interface.DomainService):
+    def get_from_tree_version_identity(self, identity: 'ProgramTreeVersionIdentity') -> 'GroupIdentity':
+        values = EducationGroupVersion.objects.filter(
+            offer__acronym=identity.offer_acronym,
+            offer__academic_year__year=identity.year,
+            is_transition=identity.is_transition,
+            version_name=identity.version_name,
+        ).annotate(
+            code=F('root_group__partial_acronym'),
+            year=F('root_group__academic_year__year'),
+        ).values('code', 'year')
+        if values:
+            return GroupIdentity(code=values[0]['code'], year=values[0]['year'])

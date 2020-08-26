@@ -78,7 +78,11 @@
                 {% a_tag_modal_has_perm delete_mini_training_url _('Delete permanently') 'base.delete_all_minitraining' user education_group_version.offer %}
             </li>
         {% endif %}
-
+        {% if create_version_url %}
+            <li>
+                {% a_tag_modal_has_perm create_version_url _('Create specific version') 'base.add_programtreeversion' user education_group_year %}
+            </li>
+        {% endif %}
         <li class="divider"></li>
         {% link_pdf_content_education_group generate_pdf_url %}
 

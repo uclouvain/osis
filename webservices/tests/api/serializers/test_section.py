@@ -37,8 +37,8 @@ from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from cms.enums.entity_name import OFFER_YEAR
 from cms.tests.factories.translated_text import TranslatedTextFactory
-from program_management.ddd.domain.node import NodeEducationGroupYear
-from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory
+from program_management.ddd.domain.node import NodeGroupYear
+from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 from webservices.api.serializers.section import SectionSerializer, AchievementSectionSerializer, \
     AdmissionConditionSectionSerializer, ContactsSectionSerializer
 from webservices.business import SKILLS_AND_ACHIEVEMENTS_INTRO, SKILLS_AND_ACHIEVEMENTS_EXTRA
@@ -83,7 +83,7 @@ class AchievementSectionSerializerTestCase(TestCase):
         }
         cls.language = settings.LANGUAGE_CODE_EN
         cls.egy = EducationGroupYearFactory()
-        cls.node = NodeEducationGroupYearFactory(
+        cls.node = NodeGroupYearFactory(
             node_id=cls.egy.id,
             node_type=cls.egy.education_group_type,
         )
@@ -120,7 +120,7 @@ class AdmissionConditionSectionSerializerTestCase(TestCase):
             acronym='ARKE2M',
             education_group_type__name=TrainingType.PGRM_MASTER_120.name
         )
-        cls.node = NodeEducationGroupYearFactory(
+        cls.node = NodeGroupYearFactory(
             node_type=cls.egy.education_group_type,
             code=cls.egy.partial_acronym,
             year=cls.egy.academic_year.year
@@ -143,12 +143,12 @@ class AdmissionConditionSectionSerializerTestCase(TestCase):
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 
     def test_ensure_get_education_group_year(self):
-        self.assertIsInstance(self.serializer.context.get('root_node'), NodeEducationGroupYear)
+        self.assertIsInstance(self.serializer.context.get('root_node'), NodeGroupYear)
         self.assertEqual(self.serializer.context.get('root_node'), self.node)
 
     def test_ensure_admission_condition_is_created_if_not_exists(self):
         training_wihtout_admission_condition = TrainingFactory(education_group_type__name=TrainingType.BACHELOR.name)
-        node = NodeEducationGroupYearFactory(
+        node = NodeGroupYearFactory(
             code=training_wihtout_admission_condition.partial_acronym,
             year=training_wihtout_admission_condition.academic_year.year,
             node_type=training_wihtout_admission_condition.education_group_type,
@@ -178,7 +178,7 @@ class ContactsSectionSerializerTestCase(TestCase):
             management_entity=management_entity,
             publication_contact_entity=publication_contact_entity
         )
-        cls.node = NodeEducationGroupYearFactory(
+        cls.node = NodeGroupYearFactory(
             node_id=cls.egy.id,
             node_type=cls.egy.education_group_type,
         )
