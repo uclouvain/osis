@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-17 16:07+0200\n"
+"POT-Creation-Date: 2020-08-26 09:32+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -484,7 +484,7 @@ msgid "Cannot set end year to %(end_year)s :"
 msgstr "Impossible de mettre la fin à %(end_year)s :"
 
 msgid "Catalogue"
-msgstr ""
+msgstr "Catalogue"
 
 msgid "Category"
 msgstr "Catégorie"
@@ -931,6 +931,12 @@ msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr ""
 "Assurez-vous que cette valeur est inférieure ou égale à %(limit_value)s."
 
+msgid "Enter a valid latitude."
+msgstr "Entrer une latitute valide."
+
+msgid "Enter a valid longitude."
+msgstr "Entrer une longitude valide"
+
 msgid "Enterprise"
 msgstr "Entreprise"
 
@@ -949,7 +955,7 @@ msgid "Entity charges"
 msgstr "Entités de charges"
 
 msgid "Entity manager"
-msgstr "Gestionnaires d'entités"
+msgstr "Gestionnaire d'entités"
 
 msgid "Entity managers"
 msgstr "Gestionnaires d'entités"
@@ -1282,6 +1288,9 @@ msgstr "Dernière année d'organisation"
 msgid "Lastname"
 msgstr "Nom"
 
+msgid "Latitude"
+msgstr "Latitude"
+
 msgid "Leads to diploma/certificate"
 msgstr "Mène à diplôme/certificat"
 
@@ -1422,11 +1431,14 @@ msgstr "Entité logistique"
 msgid "Logout"
 msgstr "Logout"
 
+msgid "Longitude"
+msgstr "Longitude"
+
 msgid "Look up the address"
 msgstr "Rechercher à partir de l'adresse"
 
 msgid "M."
-msgstr ""
+msgstr "M."
 
 msgid "Main"
 msgstr "Principal"
@@ -1743,7 +1755,7 @@ msgid "Offers enrollments"
 msgstr "Inscriptions aux formations"
 
 msgid "Ok"
-msgstr ""
+msgstr "Ok"
 
 msgid "On the file: direct access or access with additional training"
 msgstr ""
@@ -1892,7 +1904,7 @@ msgid "Ph.D"
 msgstr "Doctorat"
 
 msgid "Placeholder"
-msgstr ""
+msgstr "Espace réservé"
 
 msgid "Planned classes"
 msgstr "Classes prévues"
@@ -2311,18 +2323,11 @@ msgstr "Complément spécifique à l'UE (complet)"
 msgid "Specific complement (Partim)"
 msgstr "Complément spécifique à l'UE (partim)"
 
-msgid ""
-"Specific version for education group year %(offer_acronym)s[%(acronym)s] "
-"(%(academic_year)s) successfully created."
-msgstr ""
-"La version particulière de formations %(offer_acronym)s[%(acronym)s] (%(academic_year)s) à été "
-"créée avec succès."
-
 msgid "Specifications"
 msgstr "Cahier des charges"
 
 msgid "Sport"
-msgstr ""
+msgstr "Sport"
 
 msgid "Start"
 msgstr "Début"
@@ -3103,6 +3108,8 @@ msgstr ""
 
 msgid "You cannot have a specific summary course submission event."
 msgstr ""
+"Vous ne pouvez pas avoir un évènement soumission des fiches descriptives "
+"spécifique"
 
 msgid ""
 "You cannot put in proposal for ending date on the first year of the learning "
@@ -3330,7 +3337,7 @@ msgid "parameters"
 msgstr "paramètres"
 
 msgid "partnerships_financing_configuration"
-msgstr ""
+msgstr "Configuration des financements"
 
 msgid "person"
 msgstr "personne"
