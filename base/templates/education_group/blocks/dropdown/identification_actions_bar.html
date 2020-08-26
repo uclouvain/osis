@@ -48,6 +48,7 @@
                 {% a_tag_modal_has_perm create_mini_training_url _('New Mini-Training') 'base.add_minitraining' user %}
             </li>
         {% endif %}
+
         <li class="divider"></li>
         {% if update_group_url %}
             <li>
@@ -57,6 +58,10 @@
         {% if update_training_url %}
             <li>
                 {% a_tag_has_perm update_training_url _('Modify') 'base.change_educationgroup' user %}
+        {% endif %}
+        {% if update_mini_training_url %}
+            <li>
+            {% a_tag_has_perm update_mini_training_url _('Modify') 'base.change_educationgroup' user %}
         {% endif %}
         {% if delete_group_url %}
             <li>
@@ -73,6 +78,14 @@
                 {% a_tag_modal_has_perm delete_mini_training_url _('Delete permanently') 'base.delete_all_minitraining' user education_group_version.offer %}
             </li>
         {% endif %}
+        {% if create_version_url %}
+            <li>
+                {% a_tag_modal_has_perm create_version_url _('Create specific version') 'base.add_programtreeversion' user education_group_year %}
+            </li>
+        {% endif %}
+        <li class="divider"></li>
+        {% link_pdf_content_education_group generate_pdf_url %}
+
         <li class="divider"></li>
 	    <li>
             <a href="{{ xls_ue_prerequisites }}"

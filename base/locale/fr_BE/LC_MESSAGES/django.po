@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-13 08:27+0200\n"
+"POT-Creation-Date: 2020-08-17 16:07+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -234,6 +234,9 @@ msgstr "Ce code a déjà existé en %(academic_year)s"
 
 msgid "Acronym is invalid"
 msgstr "Sigle/Intitulé abrégé non valide"
+
+msgid "Acronym of version"
+msgstr "Sigle de la version"
 
 msgid "Acronym/Short title"
 msgstr "Sigle/Intitulé abrégé"
@@ -525,6 +528,9 @@ msgstr "Classes"
 msgid "Clear notifications"
 msgstr "Supprimer notifications"
 
+msgid "Click on the map to set the location"
+msgstr "Cliquez sur la carte pour définir l'emplacement"
+
 msgid "Click to reconnect"
 msgstr "Cliquez pour vous reconnecter"
 
@@ -634,6 +640,9 @@ msgstr "Créer"
 
 msgid "Create contact"
 msgstr "Créer contact"
+
+msgid "Create specific version"
+msgstr "Créer une version particulière"
 
 msgid "Creation"
 msgstr "Création"
@@ -922,9 +931,6 @@ msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr ""
 "Assurez-vous que cette valeur est inférieure ou égale à %(limit_value)s."
 
-msgid "Enter text to search"
-msgstr "Entrez le texte à rechercher"
-
 msgid "Enterprise"
 msgstr "Entreprise"
 
@@ -1071,6 +1077,12 @@ msgstr "Complet"
 
 msgid "Full name"
 msgstr "Nom complet"
+
+msgid "Full title of the english version"
+msgstr "Libellé complet de la version en français"
+
+msgid "Full title of the french version"
+msgstr "Libellé complet de la version en anglais"
 
 msgid "Function"
 msgstr "Fonction"
@@ -1410,6 +1422,9 @@ msgstr "Entité logistique"
 msgid "Logout"
 msgstr "Logout"
 
+msgid "Look up the address"
+msgstr "Rechercher à partir de l'adresse"
+
 msgid "M."
 msgstr "M."
 
@@ -1544,6 +1559,9 @@ msgstr "Nombre minimum de relations autorisées"
 
 msgid "Minor list choice"
 msgstr "Liste au choix Mineures"
+
+msgid "Missing search address"
+msgstr "Adresse de recherche manquante"
 
 msgid "Mobile phone"
 msgstr "Téléphone mobile (GSM)"
@@ -2293,6 +2311,13 @@ msgstr "Complément spécifique à l'UE (complet)"
 msgid "Specific complement (Partim)"
 msgstr "Complément spécifique à l'UE (partim)"
 
+msgid ""
+"Specific version for education group year %(offer_acronym)s[%(acronym)s] "
+"(%(academic_year)s) successfully created."
+msgstr ""
+"La version particulière de formations %(offer_acronym)s[%(acronym)s] (%(academic_year)s) à été "
+"créée avec succès."
+
 msgid "Specifications"
 msgstr "Cahier des charges"
 
@@ -2635,10 +2660,10 @@ msgid "The title is made up of the common part and / or any supplement"
 msgstr ""
 "L’intitulé est composé de la partie commune et/ou de l’éventuel complément"
 
-msgid "The user does not have permission to change education groups."
+msgid "The user has not permission to change education groups."
 msgstr "L'utilisateur n'a pas la permission de modifier les formations."
 
-msgid "The user does not have permission to create education groups."
+msgid "The user has not permission to create education groups."
 msgstr "L'utilisateur n'a pas la permission de créer des formations."
 
 msgid "The user is not allowed to change link data."
@@ -2761,6 +2786,9 @@ msgstr "Gestion des stages des étudiants."
 
 msgid "This process helps tutors while scores encoding."
 msgstr "Processus visant à aider les enseignants pour l'encodage des notes."
+
+msgid "This version exists until"
+msgstr "Cette version existe jusqu'en"
 
 msgid "Title"
 msgstr "Intitulé"
@@ -3080,7 +3108,8 @@ msgid ""
 "You cannot put in proposal for ending date on the first year of the learning "
 "unit."
 msgstr ""
-"Vous ne pouvez pas créer une proposition de fin d'enseignement sur la première année d'organisation de l'UE."
+"Vous ne pouvez pas créer une proposition de fin d'enseignement sur la "
+"première année d'organisation de l'UE."
 
 msgid "You don't have the rights to consolidate"
 msgstr "Vous n'avez pas le droit de consolider"
@@ -3290,9 +3319,6 @@ msgstr "non"
 
 msgid "no planned end"
 msgstr "pas de fin prévue"
-
-msgid "on successful completion of this program, each student is able to"
-msgstr "au terme de ce programme, le diplômé est capable de"
 
 msgid "online resources"
 msgstr "ressources en ligne"

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-18 08:10+0200\n"
+"POT-Creation-Date: 2020-08-20 09:56+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -159,8 +159,9 @@ msgstr "Coefficient total de co-diplômation"
 msgid "Code"
 msgstr "Code"
 
-msgid "Code already exists"
-msgstr "Le code existe déjà"
+#, python-format
+msgid "Code already exists in %(academic_year)s"
+msgstr "Le code existe déjà en %(academic_year)s"
 
 msgid "Code co-graduation inter CfB"
 msgstr "Code co-diplômation intra CfB"
@@ -420,6 +421,17 @@ msgstr "Mini formation"
 
 msgid "Mini-Training"
 msgstr "Mini-Formation"
+
+msgid "Mini-Training %(acronym)s (%(academic_year)s) successfully deleted."
+msgstr ""
+"La mini-formation %(acronym)s (%(academic_year)s) </a> a été supprimée avec succès"
+
+msgid ""
+"Mini-Training <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> "
+"successfully updated."
+msgstr ""
+"La mini-formation <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> a été "
+"modifiée avec succès"
 
 #, python-format
 msgid ""
@@ -799,6 +811,9 @@ msgstr "type durée"
 
 msgid "filter by section"
 msgstr "préfiltrer par rubrique"
+
+msgid "hops"
+msgstr "ares"
 
 msgid "is using in"
 msgstr "est utilisée dans"

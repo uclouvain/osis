@@ -25,10 +25,12 @@
 ##############################################################################
 from typing import List
 
+import attr
 from django.db import transaction
 
 from education_group.ddd import command
 from education_group.ddd.business_types import *
+from education_group.ddd.command import CreateAndPostponeTrainingAndProgramTreeCommand, CreateTrainingCommand
 from education_group.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
 from education_group.ddd.service.write import create_group_service, create_orphan_training_service
 from program_management.ddd.command import CreateStandardVersionCommand, PostponeProgramTreeVersionCommand, \
@@ -39,14 +41,16 @@ from program_management.ddd.service.write import create_standard_version_service
 
 @transaction.atomic()
 def create_and_report_training_with_program_tree(
-        create_training_cmd: command.CreateTrainingCommand
+        create_training_cmd: command.CreateAndPostponeTrainingAndProgramTreeCommand
 ) -> List['TrainingIdentity']:
     # GIVEN
     cmd = create_training_cmd
     postpone_until = CalculateEndPostponement.calculate_max_year_of_end_postponement()
 
     # WHEN
-    training_identities = create_orphan_training_service.create_and_postpone_orphan_training(cmd)
+    training_identities = create_orphan_training_service.create_and_postpone_orphan_training(
+        __convert_to_training_command(cmd)
+    )
 
     # THEN
 
@@ -99,7 +103,9 @@ def create_and_report_training_with_program_tree(
     return training_identities
 
 
-def __convert_to_group_command(training_cmd: command.CreateTrainingCommand) -> command.CreateOrphanGroupCommand:
+def __convert_to_group_command(
+        training_cmd: command.CreateAndPostponeTrainingAndProgramTreeCommand
+) -> command.CreateOrphanGroupCommand:
     return command.CreateOrphanGroupCommand(
         code=training_cmd.code,
         year=training_cmd.year,
@@ -119,3 +125,7 @@ def __convert_to_group_command(training_cmd: command.CreateTrainingCommand) -> c
         start_year=training_cmd.year,
         end_year=training_cmd.end_year,
     )
+
+
+def __convert_to_training_command(cmd: CreateAndPostponeTrainingAndProgramTreeCommand) -> 'CreateTrainingCommand':
+    return CreateTrainingCommand(**attr.asdict(cmd, recurse=False))

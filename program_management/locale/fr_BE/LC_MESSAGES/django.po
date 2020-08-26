@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-18 08:11+0200\n"
+"POT-Creation-Date: 2020-08-26 08:47+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -124,13 +124,6 @@ msgstr "Annuel"
 #, python-format
 msgid "Are you sure you want to detach %(acronym)s ?"
 msgstr "Êtes-vous sûr·e de vouloir retirer %(acronym)s ?"
-
-msgid ""
-"At least an education group year, a group year, a learning unit year or a "
-"learning class year has to be set"
-msgstr ""
-"Il faut au mininum une clé vers education group year, group year, learning "
-"unit year ou learning class year"
 
 msgid "Attribution entity"
 msgstr "Entité d'attribution"
@@ -308,7 +301,7 @@ msgid "Learning achievements"
 msgstr "Unités d'enseignement"
 
 msgid "Learning class year"
-msgstr "classe"
+msgstr "Classe"
 
 msgid "Learning unit year"
 msgstr "Unités d'enseignement"
@@ -388,8 +381,14 @@ msgstr "Nouveau Groupement"
 msgid "New Mini-Training"
 msgstr "Nouvelle Mini-Formation"
 
+msgid "New specific version"
+msgstr "Nouvelle version particulière"
+
 msgid "New training"
 msgstr "Nouvelle Formation"
+
+msgid "New version"
+msgstr "Nouvelle version"
 
 msgid "No"
 msgstr "Non"
@@ -408,13 +407,6 @@ msgstr "Officiel"
 
 msgid "Online resources"
 msgstr "Ressources en ligne"
-
-msgid ""
-"Only one of the following has to be set : an education group year, a group "
-"year, a learning unit year or a learning class"
-msgstr ""
-"Seulement une des clés étrangères doit être garnie (education group year, "
-"groupe year, learning unit year ou learning class year)"
 
 #, python-format
 msgid ""
@@ -508,9 +500,8 @@ msgstr ""
 msgid "Produce xls with a list of trainings"
 msgstr "Produire un fichier Excel avec la liste des formations"
 
-#, python-format
-msgid "Program %(acronym)s (%(academic_year)s) is not empty."
-msgstr "Le contenu du program %(acronym)s (%(academic_year)s) n'est pas vide."
+msgid "Prolong"
+msgstr "Prolonger la version existante"
 
 msgid "Proposal status"
 msgstr "Légende proposition"
@@ -553,6 +544,12 @@ msgstr "Recherche"
 
 msgid "Session derogation"
 msgstr "Session dérogation"
+
+#, python-format
+msgid ""
+"Specific version for education group year <a href='%(link)s'> "
+"%(offer_acronym)s[%(acronym)s] (%(academic_year)s) </a> successfully created."
+msgstr ""
 
 msgid "Specifications"
 msgstr "Utilisations"

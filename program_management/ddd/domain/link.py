@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import copy
 
 import attr
 
@@ -145,6 +146,18 @@ class LinkFactory:
             return LinkWithChildLeaf(parent, child, **kwargs)
         else:
             return LinkWithChildBranch(parent, child, **kwargs)
+
+    def duplicate(self, duplicate_from: 'Link', new_parent: 'Node', new_child: 'Node') -> 'Link':
+        copied_link = attr.evolve(duplicate_from, child=new_child, parent=new_parent)
+        copied_link._has_changed = True
+        return copied_link
+
+    def deepcopy_link_without_copy_children_recursively(self, original_link: 'Link'):
+        original_child = original_link.child
+        original_link.child = None  # To avoid recursive deep copy of all children behind
+        new_link = copy.deepcopy(original_link)
+        original_link.child = original_child
+        return new_link
 
 
 factory = LinkFactory()

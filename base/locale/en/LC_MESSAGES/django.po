@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-13 08:27+0200\n"
+"POT-Creation-Date: 2020-08-17 16:07+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -221,6 +221,9 @@ msgid "Acronym existed in %(academic_year)s"
 msgstr ""
 
 msgid "Acronym is invalid"
+msgstr ""
+
+msgid "Acronym of version"
 msgstr ""
 
 msgid "Acronym/Short title"
@@ -508,6 +511,9 @@ msgstr ""
 msgid "Clear notifications"
 msgstr ""
 
+msgid "Click on the map to set the location"
+msgstr ""
+
 msgid "Click to reconnect"
 msgstr ""
 
@@ -616,6 +622,9 @@ msgid "Create"
 msgstr ""
 
 msgid "Create contact"
+msgstr ""
+
+msgid "Create specific version"
 msgstr ""
 
 msgid "Creation"
@@ -892,9 +901,6 @@ msgstr ""
 msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr ""
 
-msgid "Enter text to search"
-msgstr ""
-
 msgid "Enterprise"
 msgstr ""
 
@@ -1037,6 +1043,12 @@ msgid "Full"
 msgstr ""
 
 msgid "Full name"
+msgstr ""
+
+msgid "Full title of the english version"
+msgstr ""
+
+msgid "Full title of the french version"
 msgstr ""
 
 msgid "Function"
@@ -1370,6 +1382,9 @@ msgstr ""
 msgid "Logout"
 msgstr ""
 
+msgid "Look up the address"
+msgstr ""
+
 msgid "M."
 msgstr ""
 
@@ -1496,6 +1511,9 @@ msgid "Minimum number of permitted relationships"
 msgstr ""
 
 msgid "Minor list choice"
+msgstr ""
+
+msgid "Missing search address"
 msgstr ""
 
 msgid "Mobile phone"
@@ -2226,6 +2244,12 @@ msgstr ""
 msgid "Specific complement (Partim)"
 msgstr ""
 
+#, python-format
+msgid ""
+"Specific version for education group year %(offer_acronym)s[%(acronym)s] "
+"(%(academic_year)s) successfully created."
+msgstr ""
+
 msgid "Specifications"
 msgstr ""
 
@@ -2533,10 +2557,10 @@ msgstr ""
 msgid "The title is made up of the common part and / or any supplement"
 msgstr ""
 
-msgid "The user does not have permission to change education groups."
+msgid "The user has not permission to change education groups."
 msgstr ""
 
-msgid "The user does not have permission to create education groups."
+msgid "The user has not permission to create education groups."
 msgstr ""
 
 msgid "The user is not allowed to change link data."
@@ -2639,6 +2663,9 @@ msgid "This process controls students internships."
 msgstr ""
 
 msgid "This process helps tutors while scores encoding."
+msgstr ""
+
+msgid "This version exists until"
 msgstr ""
 
 msgid "Title"
@@ -3132,9 +3159,6 @@ msgid "no"
 msgstr ""
 
 msgid "no planned end"
-msgstr ""
-
-msgid "on successful completion of this program, each student is able to"
 msgstr ""
 
 msgid "online resources"

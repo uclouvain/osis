@@ -24,11 +24,13 @@
 #
 ##############################################################################
 import datetime
+import operator
 import string
 import random
 
 import factory.fuzzy
 
+from base.models.enums.quadrimesters import DerogationQuadrimester
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.utils.fuzzy import FuzzyBoolean
@@ -67,6 +69,7 @@ class GroupElementYearFactory(factory.django.DjangoModelFactory):
     block = factory.LazyFunction(_generate_block_value)
     # FIXME :: DEPRECATED - Use parent_element instead
     parent = factory.SubFactory(EducationGroupYearFactory)
+    quadrimester_derogation = factory.Iterator(DerogationQuadrimester.choices(), getter=operator.itemgetter(0))
     child_branch = factory.SubFactory(
         EducationGroupYearFactory,
         academic_year=factory.SelfAttribute("..parent.academic_year")

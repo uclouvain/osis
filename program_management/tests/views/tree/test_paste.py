@@ -45,7 +45,7 @@ from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command
 from program_management.ddd.domain import link
 from program_management.forms.tree.paste import PasteNodesFormset, PasteNodeForm
-from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory, NodeLearningUnitYearFactory, \
+from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory, \
     NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 from program_management.tests.factories.element import ElementGroupYearFactory
@@ -98,10 +98,10 @@ class TestPasteNodeView(TestCase):
                 |---LBIR1110 (UE)
            |----LBIR101G (subgroup)
         """
-        root_node = NodeEducationGroupYearFactory(code="BIR1BA")
-        common_core = NodeEducationGroupYearFactory(code="LBIR150T")
+        root_node = NodeGroupYearFactory(code="BIR1BA")
+        common_core = NodeGroupYearFactory(code="LBIR150T")
         learning_unit_node = NodeLearningUnitYearFactory(code='LBIR1110')
-        subgroup = NodeEducationGroupYearFactory(code="LBIR101G")
+        subgroup = NodeGroupYearFactory(code="LBIR101G")
 
         common_core.add_child(learning_unit_node)
         root_node.add_child(common_core)

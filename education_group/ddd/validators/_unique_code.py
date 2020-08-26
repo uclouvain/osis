@@ -21,27 +21,18 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-import mock
-from django.test import TestCase
 
-from education_group.ddd import command
-from education_group.ddd.domain import training
-from education_group.ddd.service.write import postpone_training_service
+from base.ddd.utils import business_validator
+from education_group.ddd.domain.exception import CodeAlreadyExistException
+from education_group.ddd.domain.service.code_exist import CheckCodeExist
 
 
-class TestPostponeTraining(TestCase):
-    @mock.patch("education_group.ddd.service.write.copy_training_service.copy_training_to_next_year")
-    def test_should_return_a_number_of_identities_equal_to_difference_of_from_year_and_until_year(
-            self,
-            mock_copy_training_to_next_year_service,
-    ):
-        training_identities = [
-            training.TrainingIdentity(acronym="ACRO", year=2018),
-            training.TrainingIdentity(acronym="ACRO", year=2019),
-            training.TrainingIdentity(acronym="ACRO", year=2020)
-        ]
-        mock_copy_training_to_next_year_service.side_effect = training_identities
+class UniqueCodeValidator(business_validator.BusinessValidator):
+    def __init__(self, code: str):
+        super().__init__()
+        self.code = code
 
-        cmd = command.PostponeTrainingCommand(acronym="ACRO", postpone_from_year=2018, postpone_until_year=2021)
-        result = postpone_training_service.postpone_training(cmd)
-        self.assertListEqual(training_identities, result)
+    def validate(self, *args, **kwargs):
+        existing_year = CheckCodeExist.get_existing_year(self.code)
+        if existing_year:
+            raise CodeAlreadyExistException(year=existing_year)
