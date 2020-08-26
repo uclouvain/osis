@@ -74,8 +74,9 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
             warning_messages = detach_warning_messages_service.detach_warning_messages(detach_node_command)
             display_warning_messages(self.request, warning_messages)
 
-            context['confirmation_message'] = _("Are you sure you want to detach %(acronym)s ?") % {
-                "acronym": link_to_detach_id.child_code
+            context['confirmation_message'] = _("Are you sure you want to detach %(acronym)s - %(title)s ?") % {
+                "acronym": link_to_detach_id.child_code,
+                "title": link_to_detach_id.child_title
             }
         return context
 
