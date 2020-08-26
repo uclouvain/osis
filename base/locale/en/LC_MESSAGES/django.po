@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-17 16:07+0200\n"
+"POT-Creation-Date: 2020-08-26 09:32+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -901,6 +901,12 @@ msgstr ""
 msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr ""
 
+msgid "Enter a valid latitude."
+msgstr ""
+
+msgid "Enter a valid longitude."
+msgstr ""
+
 msgid "Enterprise"
 msgstr ""
 
@@ -1245,6 +1251,9 @@ msgstr ""
 msgid "Lastname"
 msgstr ""
 
+msgid "Latitude"
+msgstr ""
+
 msgid "Leads to diploma/certificate"
 msgstr ""
 
@@ -1380,6 +1389,9 @@ msgid "Logistics entity"
 msgstr ""
 
 msgid "Logout"
+msgstr ""
+
+msgid "Longitude"
 msgstr ""
 
 msgid "Look up the address"
@@ -2242,12 +2254,6 @@ msgid "Specific complement (Full)"
 msgstr ""
 
 msgid "Specific complement (Partim)"
-msgstr ""
-
-#, python-format
-msgid ""
-"Specific version for education group year %(offer_acronym)s[%(acronym)s] "
-"(%(academic_year)s) successfully created."
 msgstr ""
 
 msgid "Specifications"
