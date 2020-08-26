@@ -33,8 +33,8 @@ class HasVersionWithGreaterEndYear(interface.DomainService):
     @classmethod
     def greater_than_standard_year(cls, standard_version: 'ProgramTreeVersion') -> bool:
         return EducationGroupVersion.objects.filter(
-            Q(offer__education_group__end_year__isnull=True) |
-            Q(offer__education_group__end_year__year__gte=standard_version.entity_id.year),
+            Q(root_group__group__end_year__isnull=True) |
+            Q(root_group__group__end_year__year__gte=standard_version.entity_id.year),
             offer__acronym=standard_version.entity_id.offer_acronym,
         ).exclude(
             version_name=standard_version.version_name
