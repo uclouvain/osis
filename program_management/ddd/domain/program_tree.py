@@ -35,6 +35,7 @@ from osis_common.ddd import interface
 from osis_common.decorators.deprecated import deprecated
 from program_management.ddd import command
 from program_management.ddd.business_types import *
+from program_management.ddd.command import DO_NOT_OVERRIDE
 from program_management.ddd.domain import prerequisite, exception
 from program_management.ddd.domain.link import factory as link_factory
 from program_management.ddd.domain.node import factory as node_factory, NodeIdentity, Node
