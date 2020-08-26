@@ -109,12 +109,6 @@ class EducationGroupRootsListSerializerTestCase(TestCase):
             self.training.education_group_type.name
         )
 
-    def test_get_appropriate_learning_unit_credits(self):
-        self.assertEqual(
-            self.serializer.data['learning_unit_credits'],
-            self.group_element_year.relative_credits
-        )
-
 
 class LearningUnitYearPrerequisitesListSerializerTestCase(TestCase):
     @classmethod
