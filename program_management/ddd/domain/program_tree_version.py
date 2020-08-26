@@ -175,7 +175,6 @@ class ProgramTreeVersion(interface.RootEntity):
     title_fr = attr.ib(type=str, default=None)
     title_en = attr.ib(type=str, default=None)
     tree = attr.ib(type='ProgramTree', default=None)
-    tree = attr.ib(type=ProgramTree, default=None)
     end_year_of_existence = attr.ib(type=int, default=None)
 
     def get_tree(self) -> 'ProgramTree':
