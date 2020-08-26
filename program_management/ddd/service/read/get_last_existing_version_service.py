@@ -21,18 +21,17 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+from typing import Union
 
-from base.ddd.utils import business_validator
-from education_group.ddd.business_types import *
-from education_group.ddd.domain import exception
-from education_group.ddd.domain.exception import CannotCopyTrainingDueToEndDate
+from program_management.ddd import command
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
+from program_management.ddd.domain.service.get_last_existing_version_name import GetLastExistingVersion
 
 
-class CheckGroupEndDateValidator(business_validator.BusinessValidator):
-    def __init__(self, group: 'Group'):
-        super().__init__()
-        self.group = group
-
-    def validate(self, *args, **kwargs):
-        if self.group.end_year and self.group.year >= self.group.end_year:
-            raise exception.CannotCopyGroupDueToEndDate(group=self.group)
+def get_last_existing_version_identity(
+        cmd: command.GetLastExistingVersionNameCommand
+) -> Union[ProgramTreeVersionIdentity, None]:
+    return GetLastExistingVersion().get_last_existing_version_identity(
+        cmd.version_name,
+        cmd.offer_acronym,
+    )
