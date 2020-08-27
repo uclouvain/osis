@@ -83,14 +83,16 @@ class CreateProgramTreeVersion(AjaxPermissionRequiredMixin, AjaxTemplateMixin, V
 
     def get(self, request, *args, **kwargs):
         form = SpecificVersionForm(
-            training_identity=self.training_identity
+            training_identity=self.training_identity,
+            node_identity=self.node_identity,
         )
         return render(request, self.template_name, self.get_context_data(form))
 
     def post(self, request, *args, **kwargs):
         form = SpecificVersionForm(
             data=request.POST,
-            training_identity=self.training_identity
+            training_identity=self.training_identity,
+            node_identity=self.node_identity,
         )
         if form.is_valid():
             command = _convert_form_to_create_command(form)

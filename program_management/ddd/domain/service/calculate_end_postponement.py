@@ -33,9 +33,10 @@ from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 from program_management.ddd.domain.service.identity_search import TrainingOrMiniTrainingOrGroupIdentitySearch
 
 
-class CalculateEndPostponement(interface.DomainService):
+DEFAULT_YEARS_TO_POSTPONE = 6
 
-    DEFAULT_YEARS_TO_POSTPONE = 6
+
+class CalculateEndPostponement(interface.DomainService):
 
     @classmethod
     def calculate_end_postponement_year(
@@ -43,18 +44,11 @@ class CalculateEndPostponement(interface.DomainService):
             identity: Union['TrainingIdentity', 'MiniTrainingIdentity'],
             repository: Union['TrainingRepository', 'MiniTrainingRepository']
     ) -> int:
-        default_years_to_postpone = cls.DEFAULT_YEARS_TO_POSTPONE
-        current_year = academic_year.starting_academic_year().year
+        max_year = _calculate_max_year_of_end_postponement()
         training = repository.get(identity)
-        if training.end_year:
-            default_years_to_postpone = training.end_year - training.year
-        return current_year + default_years_to_postpone
-
-    @classmethod
-    def calculate_max_year_of_end_postponement(cls) -> int:
-        default_years_to_postpone = cls.DEFAULT_YEARS_TO_POSTPONE
-        current_year = academic_year.starting_academic_year().year
-        return default_years_to_postpone + current_year
+        if training.end_year is None:
+            return max_year
+        return min(max_year, training.end_year)
 
     @classmethod
     def calculate_program_tree_end_postponement(
@@ -68,3 +62,9 @@ class CalculateEndPostponement(interface.DomainService):
             identity=root_identity,
             repository=training_repository if isinstance(root_identity, TrainingIdentity) else mini_training_repository,
         )
+
+
+def _calculate_max_year_of_end_postponement() -> int:
+    default_years_to_postpone = DEFAULT_YEARS_TO_POSTPONE
+    current_year = academic_year.starting_academic_year().year
+    return default_years_to_postpone + current_year

@@ -156,20 +156,7 @@ class TrainingOrMiniTrainingOrGroupIdentitySearch(interface.DomainService):
             cls,
             tree_identity: 'ProgramTreeIdentity'
     ) -> Union['GroupIdentity', 'MiniTrainingIdentity', 'TrainingIdentity']:
-        try:
-            data = GroupYear.objects.annotate(
-                offer_acronym=F('educationgroupversion__offer__acronym'),
-                offer_type=F('educationgroupversion__offer__education_group_type__name'),
-            ).values(
-                'offer_acronym',
-                'offer_type',
-            ).get(
-                partial_acronym=tree_identity.code,
-                academic_year__year=tree_identity.year,
-            )
-        except GroupYear.DoesNotExist as e:
-            print('')
-            raise e
+        data = _get_data_from_db(tree_identity)
         offer_acronym = data['offer_acronym']
         offer_type = data['offer_type']
         if not offer_acronym:
@@ -178,3 +165,16 @@ class TrainingOrMiniTrainingOrGroupIdentitySearch(interface.DomainService):
             return MiniTrainingIdentity(acronym=offer_acronym, year=tree_identity.year)
         elif offer_type in TrainingType.get_names():
             return TrainingIdentity(acronym=offer_acronym, year=tree_identity.year)
+
+
+def _get_data_from_db(tree_identity):
+    return GroupYear.objects.annotate(
+        offer_acronym=F('educationgroupversion__offer__acronym'),
+        offer_type=F('educationgroupversion__offer__education_group_type__name'),
+    ).values(
+        'offer_acronym',
+        'offer_type',
+    ).get(
+        partial_acronym=tree_identity.code,
+        academic_year__year=tree_identity.year,
+    )
