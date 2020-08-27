@@ -239,9 +239,7 @@ class DeleteStandardVersionValidatorList(business_validator.BusinessListValidato
             self,
             program_tree_version: 'ProgramTreeVersion',
     ):
-        self.validators = [
-            CheckVersionsEndDateValidator(program_tree_version)
-        ]
+        self.validators = []
         super().__init__()
 
 

@@ -26,7 +26,7 @@ from django.test import SimpleTestCase
 
 from program_management.ddd.validators import _check_exists_standard_version
 from program_management.tests.ddd.factories.program_tree_version import SpecificProgramTreeVersionFactory, \
-    ProgramTreeVersionFactory
+    ProgramTreeVersionFactory, StandardProgramTreeVersionFactory
 from program_management.tests.ddd.factories.repository.fake import get_fake_program_tree_version_repository
 from program_management.tests.ddd.validators.mixins import TestValidatorValidateMixin
 
@@ -57,7 +57,7 @@ class TestCheckExistsStandardVersionValidatorTest(SimpleTestCase, TestValidatorV
         self.assertValidatorNotRaises(validator)
 
     def test_should_be_valid_when_tree_version_is_already_standard(self):
-        standard_tree = ProgramTreeVersionFactory()
+        standard_tree = StandardProgramTreeVersionFactory()
 
         validator = _check_exists_standard_version.CheckExistsStandardVersionValidator(
             standard_tree,

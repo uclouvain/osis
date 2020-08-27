@@ -70,6 +70,15 @@ class ProgramTreeVersionFactory(factory.Factory):
         )
 
 
+class StandardProgramTreeVersionFactory(ProgramTreeVersionFactory):
+    entity_id = factory.SubFactory(
+        ProgramTreeVersionIdentityFactory,
+        offer_acronym=factory.SelfAttribute("..tree.root_node.title"),
+        year=factory.SelfAttribute("..tree.root_node.year"),
+        version_name=""
+    )
+
+
 class SpecificProgramTreeVersionFactory(ProgramTreeVersionFactory):
     entity_id = factory.SubFactory(
         ProgramTreeVersionIdentityFactory,
