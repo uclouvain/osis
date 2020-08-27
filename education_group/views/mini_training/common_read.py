@@ -41,6 +41,7 @@ from base.business.education_groups.general_information_sections import \
 from base.models import academic_year
 from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import MiniTrainingType
+from base.utils.urls import reverse_with_get
 from base.views.common import display_warning_messages
 from education_group.forms.academic_year_choices import get_academic_year_choices
 from education_group.views.mixin import ElementSelectedClipBoardMixin
@@ -158,6 +159,7 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             "create_group_url": self.get_create_group_url(),
             "create_training_url": self.get_create_training_url(),
             "create_mini_training_url": self.get_create_mini_training_url(),
+            "update_mini_training_url": self.get_update_mini_training_url(),
             "delete_mini_training_url": self.get_delete_mini_training_url(),
             "is_root_node": is_root_node,
         }
@@ -176,6 +178,14 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
     def get_create_training_url(self):
         return reverse('create_element_select_type', kwargs={'category': Categories.TRAINING.name}) + \
                "?path_to={}".format(self.get_path())
+
+    def get_update_mini_training_url(self) -> str:
+        return reverse_with_get(
+            'mini_training_update',
+            kwargs={'year': self.node_identity.year, 'code': self.node_identity.code,
+                    'acronym': self.get_object().title},
+            get={"path": self.get_path(), "tab": self.active_tab.name}
+        )
 
     def get_delete_mini_training_url(self):
         return reverse(

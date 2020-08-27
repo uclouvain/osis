@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import re
+from typing import Optional
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -736,7 +737,7 @@ class EducationGroupYear(SerializableModel):
         )
 
     @cached_property
-    def management_entity_version(self):
+    def management_entity_version(self) -> Optional['entity_version.EntityVersion']:
         return entity_version.find_entity_version_according_academic_year(
             self.management_entity, self.academic_year
         )

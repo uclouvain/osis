@@ -27,21 +27,23 @@ from django.db import transaction
 
 from education_group.ddd import command
 from education_group.ddd.domain import mini_training
-from education_group.ddd.domain.mini_training import MiniTrainingBuilder
-from education_group.ddd.repository.mini_training import MiniTrainingRepository
+from education_group.ddd.domain.service import calculate_end_postponement
+from education_group.ddd.repository import mini_training as mini_training_repository
 from education_group.ddd.service.write import postpone_mini_training_service
 
 
 @transaction.atomic()
 def create_and_postpone_orphan_mini_training(
         cmd: command.CreateMiniTrainingCommand) -> List['mini_training.MiniTrainingIdentity']:
-    mini_training_object = MiniTrainingBuilder().build_from_create_cmd(cmd)
+    postpone_until_year = calculate_end_postponement.CalculateEndPostponement.calculate_max_year_of_end_postponement()
+    mini_training_object = mini_training.MiniTrainingBuilder().build_from_create_cmd(cmd)
 
-    mini_training_identity = MiniTrainingRepository.create(mini_training_object)
+    mini_training_identity = mini_training_repository.MiniTrainingRepository.create(mini_training_object)
     mini_training_identities = postpone_mini_training_service.postpone_mini_training(
         command.PostponeMiniTrainingCommand(
             acronym=cmd.abbreviated_title,
-            postpone_from_year=cmd.year
+            postpone_from_year=cmd.year,
+            postpone_until_year=postpone_until_year
         )
     )
 

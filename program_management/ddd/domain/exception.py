@@ -23,24 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from program_management.ddd.business_types import *
+from osis_common.ddd.interface import BusinessException
 from django.utils.translation import gettext_lazy as _
-
-from osis_common.ddd.interface import BusinessException, BusinessExceptions
 from program_management.ddd.business_types import *
 
 
 class RelativeCreditShouldBeGreaterOrEqualsThanZero(BusinessException):
     def __init__(self, *args, **kwargs):
         message = _("Relative credits must be greater or equals than 0")
-        super().__init__(message, **kwargs)
-
-
-class ProgramTreeNotEmptyException(BusinessException):
-    def __init__(self, program_tree: 'ProgramTree', *args, **kwargs):
-        message = _("Program %(acronym)s (%(academic_year)s) is not empty.") % {
-            "acronym": program_tree.root_node.title,
-            "academic_year": str(program_tree.root_node.academic_year)
-        }
         super().__init__(message, **kwargs)
 
 
@@ -99,6 +90,10 @@ class CannotCopyTreeDueToEndDate(BusinessException):
             end_year=tree.root_node.end_year,
         )
         super().__init__(message, **kwargs)
+
+
+class NodeIsUsedException(Exception):
+    pass
 
 
 # TODO : use BusinessException instead of BusinessExceptions

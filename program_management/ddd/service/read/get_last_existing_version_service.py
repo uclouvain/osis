@@ -21,28 +21,17 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-import mock
-from django.test import TestCase
+from typing import Union
 
-from education_group.ddd import command
-from education_group.ddd.service.write import copy_mini_training_service
-from education_group.tests.factories.mini_training import MiniTrainingFactory
+from program_management.ddd import command
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
+from program_management.ddd.domain.service.get_last_existing_version_name import GetLastExistingVersion
 
 
-class TestCopyMiniTrainingToNextYear(TestCase):
-    @mock.patch("education_group.ddd.service.write.copy_mini_training_service.MiniTrainingRepository")
-    @mock.patch("education_group.ddd.service.write.copy_mini_training_service.MiniTrainingBuilder")
-    def test_should_create_a_copy_for_next_year(
-            self,
-            mock_builder,
-            mock_repository):
-        source_mini_training = MiniTrainingFactory()
-        next_year_mini_training = MiniTrainingFactory()
-        mock_repository.return_value.get.return_value = source_mini_training
-        mock_repository.return_value.create.return_value = next_year_mini_training.entity_id
-        mock_builder.return_value.copy_to_next_year.return_value = next_year_mini_training
-
-        cmd = command.CopyMiniTrainingToNextYearCommand(acronym="ACRO", postpone_from_year=2018)
-        result = copy_mini_training_service.copy_mini_training_to_next_year(cmd)
-
-        self.assertEqual(next_year_mini_training.entity_id, result)
+def get_last_existing_version_identity(
+        cmd: command.GetLastExistingVersionNameCommand
+) -> Union[ProgramTreeVersionIdentity, None]:
+    return GetLastExistingVersion().get_last_existing_version_identity(
+        cmd.version_name,
+        cmd.offer_acronym,
+    )

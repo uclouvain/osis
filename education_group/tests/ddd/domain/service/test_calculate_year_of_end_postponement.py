@@ -31,6 +31,7 @@ from django.test import SimpleTestCase
 from education_group.ddd.domain import training, group, exception
 from education_group.ddd.domain.service import calculate_end_postponement
 from education_group.tests.ddd.factories.group import GroupFactory
+from education_group.tests.ddd.factories.repository.fake import get_fake_training_repository, get_fake_group_repository
 from education_group.tests.ddd.factories.training import TrainingFactory
 from testing.mocks import MockPatcherMixin
 
@@ -56,11 +57,11 @@ class TestCalculateYearOfPostponementConflict(SimpleTestCase, MockPatcherMixin):
         self.training_identity = training.TrainingIdentity(acronym="ACRO", year=2019)
         self.group_identity = group.GroupIdentity(code="CODE", year=2019)
 
-        self.fake_training_repo = self.mock_repository("education_group.ddd.repository.training.TrainingRepository")
-        self.fake_training_repo.exception_class = exception.TrainingNotFoundException
+        self.fake_training_repo = get_fake_training_repository([])
+        self.mock_repo("education_group.ddd.repository.training.TrainingRepository", self.fake_training_repo)
 
-        self.fake_group_repo = self.mock_repository("education_group.ddd.repository.group.GroupRepository")
-        self.fake_group_repo.exception_class = exception.GroupNotFoundException
+        self.fake_group_repo = get_fake_group_repository([])
+        self.mock_repo("education_group.ddd.repository.group.GroupRepository", self.fake_group_repo)
 
     def test_should_return_max_int_if_no_conflicts(self):
         self.fake_training_repo.root_entities = self._generate_trainings_with_no_conflicts()

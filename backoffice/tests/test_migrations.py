@@ -21,17 +21,21 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from base.ddd.utils import business_validator
-from program_management.ddd.business_types import *
-from program_management.ddd.domain import exception
+from io import StringIO
+
+from django.core.management import call_command
+from django.test import TestCase
+
+SUCCESS_EXIT_CODE = 0
 
 
-class ProgramTreeEmptyValidator(business_validator.BusinessValidator):
-
-    def __init__(self, program_tree: 'ProgramTree'):
-        super().__init__()
-        self.program_tree = program_tree
-
-    def validate(self):
-        if not self.program_tree.is_empty():
-            raise exception.ProgramTreeNotEmptyException(self.program_tree)
+class TestMigrations(TestCase):
+    def test_should_not_create_new_migrations_files_when_makemigrations_is_called(self):
+        out = StringIO()
+        try:
+            call_command("makemigrations", dry_run=True, check=True, stdout=out)
+        except SystemExit as e:
+            error_msg = "Some models changes has no migrations file.\n" \
+                        "Migrations file that would be created:\n" \
+                        "{}".format(out.getvalue())
+            self.assertEqual(e.code, SUCCESS_EXIT_CODE, error_msg)

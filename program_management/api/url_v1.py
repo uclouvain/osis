@@ -42,7 +42,7 @@ urlpatterns = [
                 name='{}_version'.format(TrainingPrerequisites.NAME)),
         ])),
     ])),
-    url(r'^mini_trainings/(?P<year>[\d]{4})/(?P<partial_acronym>[\w]+)/', include([
+    url(r'^mini_trainings/(?P<year>[\d]{4})/(?P<acronym>[\w]+)/', include([
         url(r'^transition/prerequisites$', MiniTrainingPrerequisites.as_view(), {'transition': True},
             name='{}_transition'.format(MiniTrainingPrerequisites.NAME)),
         url(r'^prerequisites$', MiniTrainingPrerequisites.as_view(), {'transition': False},

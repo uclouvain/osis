@@ -27,6 +27,8 @@ from decimal import Decimal
 
 import factory.fuzzy
 
+from base.models.enums import education_group_types
+from base.models.enums.active_status import ActiveStatusEnum
 from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.ddd import command
 
@@ -37,16 +39,16 @@ class CreateMiniTrainingCommandFactory(factory.Factory):
         abstract = False
 
     abbreviated_title = "Title "
-    status = " Status "
-    code = " Code "
+    status = ActiveStatusEnum.ACTIVE.name
+    code = "Code"
     year = 2019
-    type = " Type "
+    type = education_group_types.MiniTrainingType.OPTION.name
     credits = 23
     schedule_type = ScheduleTypeEnum.DAILY.name
     start_year = 2019
     end_year = None
-    title_fr = "fr  title "
-    title_en = "title  en "
+    title_fr = "fr  title"
+    title_en = "title  en"
     teaching_campus_name = None
     management_entity_acronym = None
     organization_name = None
