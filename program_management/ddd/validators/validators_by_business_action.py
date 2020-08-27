@@ -29,7 +29,6 @@ from base.ddd.utils import business_validator
 from base.ddd.utils.business_validator import BusinessListValidator
 from program_management.ddd import command
 from program_management.ddd.business_types import *
-from program_management.ddd.repositories import program_tree_version as program_tree_version_repository
 from program_management.ddd.validators import _validate_end_date_and_option_finality
 from program_management.ddd.validators._authorized_link_type import AuthorizedLinkTypeValidator
 from program_management.ddd.validators._authorized_relationship import \
@@ -39,9 +38,9 @@ from program_management.ddd.validators._authorized_relationship_for_all_trees im
     ValidateAuthorizedRelationshipForAllTrees
 from program_management.ddd.validators._authorized_root_type_for_prerequisite import AuthorizedRootTypeForPrerequisite
 from program_management.ddd.validators._block_validator import BlockValidator
-from program_management.ddd.validators._check_exists_standard_version import CheckExistsStandardVersionValidator
 from program_management.ddd.validators._copy_check_end_date_program_tree import CheckProgramTreeEndDateValidator
 from program_management.ddd.validators._copy_check_end_date_tree_version import CheckTreeVersionEndDateValidator
+from program_management.ddd.validators._delete_check_versions_end_date import CheckVersionsEndDateValidator
 from program_management.ddd.validators._detach_option_2M import DetachOptionValidator
 from program_management.ddd.validators._detach_root import DetachRootValidator
 from program_management.ddd.validators._empty_program_tree import EmptyProgramTreeValidator
@@ -53,7 +52,6 @@ from program_management.ddd.validators._node_have_link import NodeHaveLinkValida
 from program_management.ddd.validators._prerequisite_expression_syntax import PrerequisiteExpressionSyntaxValidator
 from program_management.ddd.validators._prerequisites_items import PrerequisiteItemsValidator
 from program_management.ddd.validators._relative_credits import RelativeCreditsValidator
-from program_management.ddd.validators._delete_check_versions_end_date import CheckVersionsEndDateValidator
 from program_management.ddd.validators._version_name_exists import VersionNameExistsValidator
 from program_management.ddd.validators.link import CreateLinkValidatorList
 
@@ -239,14 +237,16 @@ class DeleteStandardVersionValidatorList(business_validator.BusinessListValidato
             self,
             program_tree_version: 'ProgramTreeVersion',
     ):
-        self.validators = []
+        self.validators = [
+            CheckVersionsEndDateValidator(program_tree_version),
+        ]
         super().__init__()
 
 
 class CopyProgramTreeVersionValidatorList(business_validator.BusinessListValidator):
     def __init__(self, copy_from: 'ProgramTreeVersion'):
         self.validators = [
-            CheckTreeVersionEndDateValidator(copy_from),
+            CheckTreeVersionEndDateValidator(copy_from)
         ]
         super().__init__()
 
