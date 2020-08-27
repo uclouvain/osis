@@ -21,6 +21,7 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+import itertools
 from typing import List
 
 from django.db import transaction
@@ -28,7 +29,6 @@ from django.db import transaction
 from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception
-from program_management.ddd.domain.service import calculate_end_postponement
 from program_management.ddd.service.write import delete_standard_version_service
 
 
@@ -36,10 +36,9 @@ from program_management.ddd.service.write import delete_standard_version_service
 def delete_standard_program_tree_version(
         delete_command: command.DeleteProgramTreeVersionCommand) -> List['ProgramTreeVersionIdentity']:
     from_year = delete_command.from_year
-    until_year = calculate_end_postponement.CalculateEndPostponement.calculate_max_year_of_end_postponement()
 
     deleted_program_tree_versions = []
-    for year in range(from_year, until_year+1):
+    for year in itertools.count(from_year):
         try:
             new_delete_command = command.DeleteStandardVersionCommand(
                 acronym=delete_command.offer_acronym,

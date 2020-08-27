@@ -76,17 +76,18 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         return reverse('version_program')
 
     def _get_initial_form(self) -> Dict:
-        default_campus = Campus.objects.filter(name='Louvain-la-Neuve').first()
-
         request_cache = RequestCache(self.request.user, reverse('version_program'))
         if self.get_attach_path():
             default_academic_year = AcademicYear.objects.get(
                 year=self.parent_node_identity.year
-            ).pk
+            ).year
+        elif request_cache.get_value_cached('academic_year'):
+            default_academic_year = AcademicYear.objects.get(
+                id=request_cache.get_value_cached('academic_year')[0]
+            ).year
         else:
-            default_academic_year = request_cache.get_value_cached('academic_year') or starting_academic_year()
+            default_academic_year = starting_academic_year()
         return {
-            'teaching_campus': default_campus,
             'academic_year': default_academic_year
         }
 
@@ -148,7 +149,7 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             training_ids = create_and_attach_training_service.create_and_attach_training(cmd)
         else:
             training_ids = create_and_report_training_with_program_tree(
-                command.CreateTrainingCommand(**create_training_data)
+                command.CreateAndPostponeTrainingAndProgramTreeCommand(**create_training_data)
             )
         return training_ids
 

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-20 09:56+0200\n"
+"POT-Creation-Date: 2020-08-26 09:35+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -411,6 +411,16 @@ msgid "Mini-Training"
 msgstr ""
 
 #, python-format
+msgid "Mini-Training %(acronym)s (%(academic_year)s) successfully deleted."
+msgstr ""
+
+#, python-format
+msgid ""
+"Mini-Training <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> "
+"successfully updated."
+msgstr ""
+
+#, python-format
 msgid ""
 "Mini-training <a href='%(link)s'> %(code)s (%(academic_year)s) </a> "
 "successfully created."
@@ -465,9 +475,6 @@ msgid "Personalized access"
 msgstr ""
 
 msgid "Please enter an academic year greater or equal to group start year."
-msgstr ""
-
-msgid "Please enter an academic year less or equal to group end year."
 msgstr ""
 
 msgid "Primary language"
@@ -687,6 +694,9 @@ msgstr ""
 msgid "Validity cannot be greater than last year of organization"
 msgstr ""
 
+msgid "Version name {} already exists"
+msgstr ""
+
 msgid "Web re-registration"
 msgstr ""
 
@@ -762,6 +772,9 @@ msgid "duration unit"
 msgstr ""
 
 msgid "filter by section"
+msgstr ""
+
+msgid "hops"
 msgstr ""
 
 msgid "is using in"

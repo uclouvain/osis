@@ -21,33 +21,32 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-import mock
-from django.test import TestCase
+from typing import List, Type
 
-from program_management.ddd import command
-from program_management.ddd.domain import program_tree
-from program_management.ddd.service.write import postpone_program_tree_service
+from education_group.ddd.business_types import *
+from education_group.ddd.domain import exception
+from testing.mocks import FakeRepository
 
 
-class TestPostponeProgramTree(TestCase):
-    @mock.patch("program_management.ddd.service.write.copy_program_tree_service.copy_program_tree_to_next_year")
-    def test_should_return_a_number_of_identities_equal_to_difference_of_from_year_and_until_year(
-            self,
-            mock_copy_program_to_next_year):
+def get_fake_group_repository(root_entities: List['Group']) -> Type['FakeRepository']:
+    class_name = "FakeGroupRepository"
+    return type(class_name, (FakeRepository,), {
+        "root_entities": root_entities.copy(),
+        "not_found_exception_class": exception.GroupNotFoundException
+    })
 
-        program_tree_identities = [
-            program_tree.ProgramTreeIdentity("CODE", year=2018),
-            program_tree.ProgramTreeIdentity("CODE", year=2019),
-            program_tree.ProgramTreeIdentity("CODE", year=2020)
-        ]
-        mock_copy_program_to_next_year.side_effect = program_tree_identities
 
-        cmd = command.PostponeProgramTreeCommand(
-            from_year=2018,
-            from_code="CODE",
-            offer_acronym="ACRONYM",
-            until_year=2021
-        )
-        result = postpone_program_tree_service.postpone_program_tree(cmd)
+def get_fake_mini_training_repository(root_entities: List['MiniTraining']) -> Type['FakeRepository']:
+    class_name = "FakeMiniTrainingRepository"
+    return type(class_name, (FakeRepository,), {
+        "root_entities": root_entities.copy(),
+        "not_found_exception_class": exception.MiniTrainingNotFoundException
+    })
 
-        self.assertListEqual(program_tree_identities, result)
+
+def get_fake_training_repository(root_entities: List['Training']) -> Type['FakeRepository']:
+    class_name = "FakeTrainingRepository"
+    return type(class_name, (FakeRepository,), {
+        "root_entities": root_entities.copy(),
+        "not_found_exception_class": exception.TrainingNotFoundException
+    })

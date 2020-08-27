@@ -21,18 +21,3 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-
-from base.ddd.utils import business_validator
-from education_group.ddd.business_types import *
-from education_group.ddd.domain import exception
-from education_group.ddd.domain.exception import CannotCopyTrainingDueToEndDate
-
-
-class CheckGroupEndDateValidator(business_validator.BusinessValidator):
-    def __init__(self, group: 'Group'):
-        super().__init__()
-        self.group = group
-
-    def validate(self, *args, **kwargs):
-        if self.group.end_year and self.group.year >= self.group.end_year:
-            raise exception.CannotCopyGroupDueToEndDate(group=self.group)

@@ -21,28 +21,28 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-import mock
-from django.test import TestCase
+from typing import List
 
-from education_group.ddd import command
-from education_group.ddd.service.write import copy_training_service
-from education_group.tests.ddd.factories.training import TrainingFactory
+from django.db import transaction
+
+from education_group.ddd.business_types import *
+from education_group.ddd.domain import training, mini_training
+from program_management.ddd import command
+from program_management.ddd.service.write import delete_standard_program_tree_version_service
 
 
-class TestCopyTrainingToNextYear(TestCase):
-    @mock.patch("education_group.ddd.service.write.copy_training_service.TrainingRepository")
-    @mock.patch("education_group.ddd.service.write.copy_training_service.TrainingBuilder")
-    def test_should_create_a_copy_for_next_year(
-            self,
-            mock_builder,
-            mock_repository):
-        source_training = TrainingFactory()
-        next_year_training = TrainingFactory()
-        mock_repository.return_value.get.return_value = source_training
-        mock_repository.return_value.create.return_value = next_year_training.entity_id
-        mock_builder.return_value.copy_to_next_year.return_value = next_year_training
+@transaction.atomic()
+def delete_mini_training_with_program_tree(
+        delete_command: command.DeleteMiniTrainingWithProgramTreeCommand) -> List['MiniTrainingIdentity']:
+    delete_program_tree_version_command = command.DeleteProgramTreeVersionCommand(
+        offer_acronym=delete_command.offer_acronym,
+        version_name=delete_command.version_name,
+        is_transition=delete_command.is_transition,
+        from_year=delete_command.from_year
+    )
+    delete_versions_identities = delete_standard_program_tree_version_service.delete_standard_program_tree_version(
+        delete_program_tree_version_command
+    )
 
-        cmd = command.CopyTrainingToNextYearCommand(acronym="ACRONYM", postpone_from_year=2018)
-        result = copy_training_service.copy_training_to_next_year(cmd)
-
-        self.assertEqual(next_year_training.entity_id, result)
+    return [mini_training.MiniTrainingIdentity(acronym=identity.offer_acronym, year=identity.year)
+            for identity in delete_versions_identities]

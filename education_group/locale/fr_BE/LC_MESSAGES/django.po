@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-20 09:56+0200\n"
+"POT-Creation-Date: 2020-08-26 09:35+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -189,6 +189,7 @@ msgstr "Contrainte"
 
 msgid "Coorganization can only be changed by central manager"
 msgstr ""
+"Co-organisation peuvent seulement être modifié par les gestionnaire centraux"
 
 msgid "Copied element"
 msgstr "Élément copié"
@@ -312,22 +313,22 @@ msgid "Funding international cooperation CCD/CUD direction"
 msgstr "Orientation coopération internationale CCD/CUD"
 
 msgid "General Conditions"
-msgstr ""
+msgstr "Conditions Générales"
 
 msgid "General informations"
-msgstr ""
+msgstr "Infos générales"
 
 msgid "Go down"
-msgstr ""
+msgstr "Descendre"
 
 msgid "Go up"
-msgstr ""
+msgstr "Monter"
 
 msgid "Graduates"
-msgstr ""
+msgstr "Diplômés"
 
 msgid "Group"
-msgstr ""
+msgstr "Groupe"
 
 #, python-format
 msgid ""
@@ -346,80 +347,94 @@ msgstr ""
 "mis à jour avec succès"
 
 msgid "Holders of a 2nd cycle University degree"
-msgstr ""
+msgstr "Diplômés du 2° cycle universitaire"
 
 msgid "Holders of a non-University 2nd cycle degree"
-msgstr ""
+msgstr "Diplômés de 2° cycle non universitaire"
 
 msgid "ISCED domain"
 msgstr "Domaine ISCED/CITE"
 
 msgid "Identification"
-msgstr ""
+msgstr "Identification"
 
 #, python-format
 msgid "Imposible to put end date to %(end_year)s: %(msg)s"
 msgstr "Impossible de mettre la fin à %(end_year)s: %(msg)s"
 
 msgid "Institution"
-msgstr ""
+msgstr "Institution"
 
 msgid "Internship"
 msgstr "Stage"
 
 msgid "Jury"
-msgstr ""
+msgstr "Jury"
 
 msgid "Jury members"
-msgstr ""
+msgstr "Membres du jury"
 
 msgid "Keywords"
-msgstr ""
+msgstr "Mots clés"
 
 msgid "Language Exam"
-msgstr ""
+msgstr "Examen de langue"
 
 msgid "Last modifications"
-msgstr ""
+msgstr "Dernières modifications"
 
 msgid "Last year of organization"
-msgstr ""
+msgstr "Dernière année d'organisation"
 
 msgid "Leads to diploma/certificate"
-msgstr ""
+msgstr "Mène à diplôme/certificat"
 
 msgid "Learning location"
-msgstr ""
+msgstr "Lieu d'enseignement"
 
 msgid "Learning unit"
-msgstr ""
+msgstr "Unité d'enseignement"
 
 msgid "Link type"
-msgstr ""
+msgstr "Type de lien"
 
 msgid "Linked with EPC"
 msgstr "Liens existants dans l'application EPC."
 
 msgid "Main"
-msgstr ""
+msgstr "Principale"
 
 msgid "Management entity"
-msgstr ""
+msgstr "Entité de gestion"
 
 msgid "Mandatory"
-msgstr ""
+msgstr "Obligatoire"
 
 msgid "Marks presentation"
-msgstr ""
+msgstr "Remise des notes"
 
 msgid "Masters"
-msgstr ""
+msgstr "Masters"
 
 msgid "Mini training"
-msgstr ""
+msgstr "Mini formation"
 
 msgid "Mini-Training"
+msgstr "Mini-Formation"
+
+#, python-format
+msgid "Mini-Training %(acronym)s (%(academic_year)s) successfully deleted."
 msgstr ""
+"La mini-formation %(acronym)s (%(academic_year)s) </a> a été supprimée avec "
+"succès"
+
+#, python-format
+msgid ""
+"Mini-Training <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> "
+"successfully updated."
+msgstr ""
+"La mini-formation <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> a "
+"été modifiée avec succès"
 
 #, python-format
 msgid ""
@@ -433,7 +448,7 @@ msgid "Modification"
 msgstr "Modification"
 
 msgid "New Education Group"
-msgstr ""
+msgstr "Nouveau Groupement"
 
 msgid "New Mini-Training"
 msgstr "Nouvelle Mini-Formation"
@@ -442,124 +457,122 @@ msgid "New Training"
 msgstr "Nouvelle Formation"
 
 msgid "Non university Bachelors"
-msgstr ""
+msgstr "Bacheliers non universitaires"
 
 msgid "Number of elements"
-msgstr ""
+msgstr "Nombre d'éléments"
 
 msgid "Opening to Adults"
-msgstr ""
+msgstr "Ouverture aux adultes"
 
 msgid "Other academic responsibles"
-msgstr ""
+msgstr "Autres responsables académiques"
 
 msgid "Other contacts"
-msgstr ""
+msgstr "Autres contacts"
 
 msgid "Other languages activities"
 msgstr "Activités dans d'autres langues"
 
 msgid "Others Bachelors of the French speaking Community of Belgium"
-msgstr ""
+msgstr "Autres bacheliers de la Communauté française de Belgique"
 
 msgid "Own comment"
-msgstr ""
+msgstr "Commentaire propre"
 
 msgid "Partial deliberation"
-msgstr ""
+msgstr "Sous-épreuve"
 
 msgid "Partial title in English"
-msgstr ""
+msgstr "Intitulé partiel en anglais"
 
 msgid "Partial title in French"
-msgstr ""
+msgstr "Intitulé partiel en français"
 
 msgid "Personalized access"
-msgstr ""
+msgstr "Accès personnalisé"
 
 msgid "Please enter an academic year greater or equal to group start year."
 msgstr ""
-
-msgid "Please enter an academic year less or equal to group end year."
-msgstr ""
+"Veuillez choisir une année académique plus grande ou équale à celle de début"
 
 msgid "Primary language"
-msgstr ""
+msgstr "Langue principale"
 
 msgid "Producing annexe"
-msgstr ""
+msgstr "Production du supplément / annexe"
 
 msgid "Producing certificat"
-msgstr ""
+msgstr "Production du diplôme / certificat"
 
 msgid "Professionnal title"
-msgstr ""
+msgstr "Titre professionnel"
 
 msgid "Program managers"
-msgstr ""
+msgstr "Gestionnaires de parcours étudiant"
 
 msgid "Program organized with other institutes"
-msgstr ""
+msgstr "Programme co-organisés avec d'autres institutions"
 
 msgid "Rate code"
-msgstr ""
+msgstr "Code tarif"
 
 msgid "Reduction"
-msgstr ""
+msgstr "Inscriptions en allègement"
 
 msgid "Reference institution"
-msgstr ""
+msgstr "Institution de référence"
 
 msgid "Refresh publication"
-msgstr ""
+msgstr "Réactualiser la publication"
 
 msgid "Remark"
-msgstr ""
+msgstr "Remarque"
 
 msgid "Remarks"
-msgstr ""
+msgstr "Remarques"
 
 msgid "Schedule type"
-msgstr ""
+msgstr "Type horaire"
 
 msgid "Scores diffusion"
-msgstr ""
+msgstr "Diffusion des notes"
 
 msgid "Search..."
 msgstr "Recherche..."
 
 msgid "Session"
-msgstr ""
+msgstr "Session"
 
 msgid "Signatory qualification"
-msgstr ""
+msgstr "Qualification du signataire"
 
 msgid "Special Conditions"
-msgstr ""
+msgstr "Conditions spéciales"
 
 msgid "Specific Conditions"
-msgstr ""
+msgstr "Conditions Particulières"
 
 msgid "Specific admission requirements"
-msgstr ""
+msgstr "Conditions spécifiques d'admission"
 
 msgid "Stage"
-msgstr ""
+msgstr "Stage"
 
 msgid "Standard"
-msgstr ""
+msgstr "Standard"
 
 msgid "Start"
-msgstr ""
+msgstr "Début"
 
 msgid "Start academic year"
 msgstr "Année académique de début"
 
 msgid "Status"
-msgstr ""
+msgstr "Statut"
 
 msgid "The field can contain only one value."
-msgstr ""
+msgstr "Ce champ ne peut contenir qu'une seule valeur."
 
 msgid "The fields concerning ARES have to be ALL filled-in or none of them"
 msgstr ""
@@ -593,7 +606,7 @@ msgstr "La mini-formation %(code)s a été supprimée."
 
 #, python-format
 msgid "The program %(acronym)s will be published soon"
-msgstr ""
+msgstr "Le programme %(acronym)s sera publié sous peu"
 
 msgid ""
 "The scope of the user is limited and prevents this action to be performed"
@@ -632,28 +645,28 @@ msgid "The user is not allowed to create/modify this type of education group"
 msgstr "L'utilisateur n'est pas autorisé à créer/modifer ce type de formation"
 
 msgid "The user is not attached to the management entity"
-msgstr ""
+msgstr "L’utilisateur n’est pas attaché à l’entité de gestion"
 
 msgid "The value of this attribute is inherited from the standard OF"
-msgstr ""
+msgstr "La valeur de ce champ est hérité de la version standard"
 
 msgid "There can only be one type 2 expectation"
 msgstr "Il ne peut y avoir qu'un seul attendu de type 2"
 
 msgid "Title"
-msgstr ""
+msgstr "Intitulé"
 
 msgid "Title in English"
-msgstr ""
+msgstr "Intitulé en anglais"
 
 msgid "Title in French"
-msgstr ""
+msgstr "Intitulé en français"
 
 msgid "Titles"
 msgstr "Intitulés"
 
 msgid "Training"
-msgstr ""
+msgstr "Formation"
 
 #, python-format
 msgid "Training %(acronym)s (%(academic_year)s) successfully deleted."
@@ -677,47 +690,50 @@ msgstr ""
 "modifiée avec succès"
 
 msgid "Trainings"
-msgstr ""
+msgstr "Formations"
 
 msgid "Type of constraint"
-msgstr ""
+msgstr "Type de contrainte"
 
 msgid "Type of training"
-msgstr ""
+msgstr "Type de formation"
 
 msgid "UCL Bachelors"
-msgstr ""
+msgstr "Bacheliers UCL"
 
 msgid "UCL Diploma"
-msgstr ""
+msgstr "Diplôme avec l'UCL"
 
 msgid "University Bachelors"
-msgstr ""
+msgstr "Bacheliers universitaires"
 
 msgid "University certificate"
-msgstr ""
+msgstr "Certificat universitaire"
 
 msgid "Update Training"
 msgstr "Modifier Formation"
 
 msgid "User"
-msgstr ""
+msgstr "Utilisateur"
 
 msgid "Utilizations"
-msgstr ""
+msgstr "Utilisations"
 
 msgid "Validity"
-msgstr ""
+msgstr "Validité"
 
 msgid "Validity cannot be greater than last year of organization"
 msgstr ""
 "Validité ne peut pas être supérieure à la dernière année d'organisation"
 
+msgid "Version name {} already exists"
+msgstr "Le nom de version {} existe déjà"
+
 msgid "Web re-registration"
-msgstr ""
+msgstr "Ré-inscription par internet"
 
 msgid "Weighting"
-msgstr ""
+msgstr "Pondération par crédit"
 
 msgid "Yes, I confirm."
 msgstr "Oui, je confirme."
@@ -760,34 +776,34 @@ msgid "You should precise constraint type"
 msgstr "Vous devez préciser le type de contrainte"
 
 msgid "activate to sort column ascending"
-msgstr ""
+msgstr "activer pour trier la colonne par ordre croissant"
 
 msgid "activate to sort column descending"
-msgstr ""
+msgstr "activer pour trier la colonne par ordre décroissant"
 
 msgid "activities in English"
-msgstr ""
+msgstr "activités en anglais"
 
 msgid "additional informations"
-msgstr ""
+msgstr "informations supplémentaires"
 
 msgid "at"
-msgstr ""
+msgstr "à"
 
 msgid "certificate aims"
-msgstr ""
+msgstr "attendus du diplôme"
 
 msgid "co-graduation"
 msgstr "co-diplômation"
 
 msgid "code"
-msgstr ""
+msgstr "code"
 
 msgid "comment (internal)"
-msgstr ""
+msgstr "commentaire (interne)"
 
 msgid "credits"
-msgstr ""
+msgstr "crédits"
 
 msgid "dissertation"
 msgstr "mémoire"
@@ -798,47 +814,50 @@ msgstr "type durée"
 msgid "filter by section"
 msgstr "préfiltrer par rubrique"
 
+msgid "hops"
+msgstr "ares"
+
 msgid "is using in"
-msgstr ""
+msgstr "est utilisée dans"
 
 msgid "main domain"
-msgstr "Domaine principal"
+msgstr "domaine principal"
 
 msgid "maximum constraint"
-msgstr ""
+msgstr "contrainte maximum"
 
 msgid "minimum constraint"
-msgstr ""
+msgstr "contrainte minimum"
 
 msgid "of version"
 msgstr "de la version"
 
 msgid "on successful completion of this program, each student is able to"
-msgstr ""
+msgstr "au terme de ce programme, le diplômé est capable de"
 
 msgid "remark"
-msgstr ""
+msgstr "remarque"
 
 msgid "remark in english"
-msgstr ""
+msgstr "remarque en anglais"
 
 msgid "secondary domains"
-msgstr ""
+msgstr "domaines secondaires"
 
 msgid "skills and achievements"
-msgstr ""
+msgstr "compétences et acquis"
 
 msgid "the program aims"
-msgstr ""
+msgstr "le programme vise"
 
 msgid "to"
-msgstr ""
+msgstr "à"
 
 msgid "type of constraint"
-msgstr ""
+msgstr "type de contrainte"
 
 msgid "undefined"
-msgstr ""
+msgstr "indéfini"
 
 msgid "unspecified"
 msgstr "indéterminé"
