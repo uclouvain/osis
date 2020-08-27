@@ -44,7 +44,7 @@ class TestCalculateEndPostponementYearAsTraining(MockPatcherMixin, TestCase):
     def setUp(self):
         self.current_year = 2020
         self.maximum_postponement_year = 2025
-        AcademicYearFactory.produce_in_future(self.current_year)
+        AcademicYearFactory.produce_in_future(self.current_year - 1)
 
         self.root_node_code = 'LDROI200M'
 
