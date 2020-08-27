@@ -59,7 +59,9 @@ class TestCalculateEndPostponementYearAsTraining(MockPatcherMixin, TestCase):
             entity_id__version_name=STANDARD,
             program_tree_repository=self.fake_program_tree_repository
         )
-        self.fake_program_tree_version_repository = get_fake_program_tree_version_repository([self.program_tree_version])
+        self.fake_program_tree_version_repository = get_fake_program_tree_version_repository(
+            [self.program_tree_version]
+        )
 
         self.command = GetEndPostponementYearCommandFactory(
             code=self.root_node_code,
@@ -69,7 +71,10 @@ class TestCalculateEndPostponementYearAsTraining(MockPatcherMixin, TestCase):
     @mock.patch("program_management.ddd.domain.service.identity_search._get_data_from_db")
     def test_when_root_node_is_training_and_end_year_is_none(self, mock_data_from_db):
         training = TrainingFactory(entity_identity__year=self.current_year, end_year=None)
-        mock_data_from_db.return_value = {"offer_acronym": training.entity_identity.acronym, "offer_type": training.type.name}
+        mock_data_from_db.return_value = {
+            "offer_acronym": training.entity_identity.acronym,
+            "offer_type": training.type.name
+        }
         fake_training_repository = get_fake_training_repository([training])
         result = CalculateEndPostponement.calculate_program_tree_end_postponement(
             identity=self.program_tree.entity_id,
@@ -82,7 +87,10 @@ class TestCalculateEndPostponementYearAsTraining(MockPatcherMixin, TestCase):
     def test_when_root_node_is_training_and_end_year_gt_maximum_postponement(self, mock_data_from_db):
         end_year = self.maximum_postponement_year + 5
         training = TrainingFactory(entity_identity__year=self.current_year, end_year=end_year)
-        mock_data_from_db.return_value = {"offer_acronym": training.entity_identity.acronym, "offer_type": training.type.name}
+        mock_data_from_db.return_value = {
+            "offer_acronym": training.entity_identity.acronym,
+            "offer_type": training.type.name
+        }
         fake_training_repository = get_fake_training_repository([training])
         result = CalculateEndPostponement.calculate_program_tree_end_postponement(
             identity=self.program_tree.entity_id,
@@ -95,7 +103,10 @@ class TestCalculateEndPostponementYearAsTraining(MockPatcherMixin, TestCase):
     def test_when_root_node_is_training_and_end_year_lt_maximum_postponement(self, mock_data_from_db):
         end_year = self.maximum_postponement_year - 3
         training = TrainingFactory(entity_identity__year=self.current_year, end_year=end_year)
-        mock_data_from_db.return_value = {"offer_acronym": training.entity_identity.acronym, "offer_type": training.type.name}
+        mock_data_from_db.return_value = {
+            "offer_acronym": training.entity_identity.acronym,
+            "offer_type": training.type.name
+        }
         fake_training_repository = get_fake_training_repository([training])
         result = CalculateEndPostponement.calculate_program_tree_end_postponement(
             identity=self.program_tree.entity_id,
@@ -108,7 +119,10 @@ class TestCalculateEndPostponementYearAsTraining(MockPatcherMixin, TestCase):
     def test_when_root_node_is_training_and_end_year_equals_maximum_postponement(self, mock_data_from_db):
         end_year = self.maximum_postponement_year
         training = TrainingFactory(entity_identity__year=self.current_year, end_year=end_year)
-        mock_data_from_db.return_value = {"offer_acronym": training.entity_identity.acronym, "offer_type": training.type.name}
+        mock_data_from_db.return_value = {
+            "offer_acronym": training.entity_identity.acronym,
+            "offer_type": training.type.name
+        }
         fake_training_repository = get_fake_training_repository([training])
         result = CalculateEndPostponement.calculate_program_tree_end_postponement(
             identity=self.program_tree.entity_id,
