@@ -127,7 +127,6 @@ class FilterEducationGroupRootsTestCase(APITestCase):
                 'learning_unit_year': self.learning_unit_year
             }
         )
-
         self.assertEqual(response.data, serializer.data)
 
     def test_get_finality_root_and_not_itself(self):
@@ -244,7 +243,6 @@ class EducationGroupRootsListTestCase(APITestCase):
             many=True,
             context={
                 'request': RequestFactory().get(self.url),
-
                 'language': settings.LANGUAGE_CODE_FR,
                 'learning_unit_year': self.learning_unit_year
             }
