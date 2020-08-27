@@ -189,7 +189,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             'training_update',
             kwargs={'code': self.kwargs['code'], 'year': self.kwargs['year'], 'title': self.get_object().title},
             get={"path_to": self.get_path(), "tab": self.active_tab.name}
-        ) if self.current_version.is_standard_version else None
+        )
 
     def get_delete_training_url(self):
         return reverse('training_delete', kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}) + \
