@@ -247,10 +247,6 @@ class CopyProgramTreeVersionValidatorList(business_validator.BusinessListValidat
     def __init__(self, copy_from: 'ProgramTreeVersion'):
         self.validators = [
             CheckTreeVersionEndDateValidator(copy_from),
-            CheckExistsStandardVersionValidator(
-                copy_from,
-                program_tree_version_repository.ProgramTreeVersionRepository()
-            )
         ]
         super().__init__()
 

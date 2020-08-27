@@ -78,20 +78,6 @@ class CannotCopyTreeVersionDueToEndDate(BusinessException):
         super().__init__(message, **kwargs)
 
 
-class CannotCopyTreeVersionDueToStandardNotExisting(BusinessException):
-    def __init__(self, tree_version: 'ProgramTreeVersion', *args, **kwargs):
-        message = _(
-            "You can't copy the program tree version '{acronym}' "
-            "from {from_year} to {to_year} because standard version "
-            "does not exist in {to_year}"
-        ).format(
-            acronym=tree_version.entity_id.offer_acronym,
-            from_year=tree_version.get_tree().root_node.year,
-            to_year=tree_version.get_tree().root_node.year + 1,
-        )
-        super().__init__(message, **kwargs)
-
-
 class CannotCopyTreeDueToEndDate(BusinessException):
     def __init__(self, tree: 'ProgramTree', *args, **kwargs):
         message = _(

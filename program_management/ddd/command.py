@@ -419,7 +419,6 @@ class DeleteAllProgramTreeCommand(interface.CommandRequest):
 class DeleteStandardVersionCommand(interface.CommandRequest):
     acronym = attr.ib(type=str)
     year = attr.ib(type=int)
-    version_name = attr.ib(type=str, default="")
 
 
 @attr.s(frozen=True, slots=True)

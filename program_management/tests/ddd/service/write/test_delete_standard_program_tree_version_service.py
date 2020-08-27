@@ -35,7 +35,7 @@ from education_group.tests.ddd.factories.training import TrainingFactory
 from education_group.tests.factories.mini_training import MiniTrainingFactory
 from program_management.ddd import command
 from program_management.ddd.domain import program_tree, exception
-from program_management.ddd.service.write import delete_program_tree_version_service
+from program_management.ddd.service.write import delete_standard_program_tree_version_service
 from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipListFactory, \
     MandatoryRelationshipObjectFactory
 from program_management.tests.ddd.factories.link import LinkFactory
@@ -146,13 +146,13 @@ class TestDeleteStandardProgramTreeService(TestCase, MockPatcherMixin):
         return tree
 
     def test_should_return_program_tree_version_identities(self):
-        result = delete_program_tree_version_service.delete_program_tree_version(self.cmd)
+        result = delete_standard_program_tree_version_service.delete_standard_program_tree_version(self.cmd)
         expected_result = [tree_version.entity_id for tree_version in self.program_tree_versions]
 
         self.assertListEqual(expected_result, result)
 
     def test_should_delete_program_tree_versions(self):
-        tree_version_identities = delete_program_tree_version_service.delete_program_tree_version(
+        tree_version_identities = delete_standard_program_tree_version_service.delete_standard_program_tree_version(
             self.cmd
         )
         for identity in tree_version_identities:
@@ -160,7 +160,7 @@ class TestDeleteStandardProgramTreeService(TestCase, MockPatcherMixin):
                 self.fake_program_tree_version_repo.get(identity)
 
     def test_should_delete_program_trees(self):
-        delete_program_tree_version_service.delete_program_tree_version(self.cmd)
+        delete_standard_program_tree_version_service.delete_standard_program_tree_version(self.cmd)
 
         program_tree_identities = [tree.entity_id for tree in self.program_trees]
         for identity in program_tree_identities:
@@ -168,7 +168,7 @@ class TestDeleteStandardProgramTreeService(TestCase, MockPatcherMixin):
                 self.fake_program_tree_repo.get(identity)
 
     def test_should_delete_trainings(self):
-        delete_program_tree_version_service.delete_program_tree_version(self.cmd)
+        delete_standard_program_tree_version_service.delete_standard_program_tree_version(self.cmd)
 
         training_identities = [obj.entity_id for obj in self.trainings]
         for identity in training_identities:
@@ -176,7 +176,7 @@ class TestDeleteStandardProgramTreeService(TestCase, MockPatcherMixin):
                 self.fake_training_repo.get(identity)
 
     def test_should_delete_mini_trainings(self):
-        delete_program_tree_version_service.delete_program_tree_version(self.cmd)
+        delete_standard_program_tree_version_service.delete_standard_program_tree_version(self.cmd)
 
         mini_training_identities = [obj.entity_id for obj in self.mini_trainings]
         for identity in mini_training_identities:
@@ -184,21 +184,9 @@ class TestDeleteStandardProgramTreeService(TestCase, MockPatcherMixin):
                 self.fake_mini_training_repo.get(identity)
 
     def test_should_delete_groups(self):
-        delete_program_tree_version_service.delete_program_tree_version(self.cmd)
+        delete_standard_program_tree_version_service.delete_standard_program_tree_version(self.cmd)
 
         group_identities = [obj.entity_id for obj in self.groups]
         for identity in group_identities:
             with self.assertRaises(education_group_exception.GroupNotFoundException):
                 self.fake_group_repo.get(identity)
-
-
-#  Same test as above but for specific version
-class TestDeleteSpecificVersionProgramTreeTest(TestDeleteStandardProgramTreeService):
-    @classmethod
-    def setUpTestData(cls):
-        cls.cmd = command.DeleteProgramTreeVersionCommand(
-            offer_acronym="ROOT",
-            from_year=2018,
-            is_transition=False,
-            version_name="SPECIFIC"
-        )

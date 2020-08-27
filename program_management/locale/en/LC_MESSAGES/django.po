@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-26 13:29+0200\n"
+"POT-Creation-Date: 2020-08-27 13:54+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -686,12 +686,6 @@ msgstr ""
 msgid ""
 "You can't copy the program tree version '{acronym}' from {from_year} to "
 "{to_year} because it ends in {end_year}"
-msgstr ""
-
-#, python-brace-format
-msgid ""
-"You can't copy the program tree version '{acronym}' from {from_year} to "
-"{to_year} because standard version does not exist in {to_year}"
 msgstr ""
 
 #, python-brace-format
