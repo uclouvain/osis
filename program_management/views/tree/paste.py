@@ -139,10 +139,17 @@ class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageM
             node_ele.title = "{}[{}]".format(node_ele.title, node_ele.version) if node_ele.version else node_ele.title
 
     def form_valid(self, formset: PasteNodesFormset):
-        link_identities_ids = formset.save()
-        if None in link_identities_ids:
+        try:
+            link_identities_ids = formset.save()
+        except osis_common.ddd.interface.BusinessExceptions as business_exception:
+            formset.forms[0].add_error(field=None, error=business_exception.messages)
             return self.form_invalid(formset)
+        messages = self._append_success_messages(link_identities_ids)
+        display_success_messages(self.request, messages)
+        ElementCache(self.request.user.id).clear()
+        return super().form_valid(formset)
 
+    def _append_success_messages(self, link_identities_ids):
         messages = []
         for link_identity in link_identities_ids:
             messages.append(
@@ -151,10 +158,7 @@ class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageM
                     "parent": link_identity.parent_code
                 }
             )
-
-        display_success_messages(self.request, messages)
-        ElementCache(self.request.user.id).clear()
-        return super().form_valid(formset)
+        return messages
 
     def _is_parent_a_minor_major_list_choice(self, formset):
         return any(isinstance(form, PasteToMinorMajorListChoiceForm) for form in formset)

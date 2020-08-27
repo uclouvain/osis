@@ -100,15 +100,18 @@ class NodeIsUsedException(Exception):
 class ProgramTreeVersionMismatch(BusinessExceptions):
     def __init__(
             self,
-            root_identity: 'ProgramTreeVersionIdentity',
-            child_identity: 'ProgramTreeVersionIdentity',
+            root: 'Node',
+            child: 'Node',
+            root_version_identity: 'ProgramTreeVersionIdentity',
+            child_version_identity: 'ProgramTreeVersionIdentity',
             *args,
             **kwargs
     ):
-        root_node_version_title = self._get_version_title(root_identity)
-        node_to_add_version_title = self._get_version_title(child_identity)
+        root_node_version_title = self._get_version_title(root_version_identity)
+        node_to_add_version_title = self._get_version_title(child_version_identity)
         messages = [_("%(node_to_add)s version must be the same as %(root_node)s version") % {
-            'node_to_add': node_to_add_version_title, 'root_node': root_node_version_title
+            'node_to_add': '{} - {}'.format(child.code, node_to_add_version_title),
+            'root_node': '{} - {}'.format(root.code, root_node_version_title)
         }]
         super().__init__(messages, **kwargs)
 
