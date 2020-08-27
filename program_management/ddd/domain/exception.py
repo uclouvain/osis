@@ -23,9 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from program_management.ddd.business_types import *
-from osis_common.ddd.interface import BusinessException
 from django.utils.translation import gettext_lazy as _
+
+from osis_common.ddd.interface import BusinessException, BusinessExceptions
 from program_management.ddd.business_types import *
 
 

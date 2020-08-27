@@ -30,25 +30,23 @@ import attr
 
 from base.models.authorized_relationship import AuthorizedRelationshipList
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, GroupType, MiniTrainingType
-from base.models.enums.link_type import LinkTypes
+from education_group.ddd.business_types import *
 from osis_common.ddd import interface
 from osis_common.decorators.deprecated import deprecated
 from program_management.ddd import command
 from program_management.ddd.business_types import *
-from program_management.ddd.domain.node import factory as node_factory, NodeIdentity, Node
-from program_management.ddd.domain.link import factory as link_factory
+from program_management.ddd.command import DO_NOT_OVERRIDE
 from program_management.ddd.domain import prerequisite, exception
+from program_management.ddd.domain.link import factory as link_factory
+from program_management.ddd.domain.node import factory as node_factory, NodeIdentity, Node
 from program_management.ddd.domain.service.generate_node_abbreviated_title import GenerateNodeAbbreviatedTitle
 from program_management.ddd.domain.service.generate_node_code import GenerateNodeCode
 from program_management.ddd.domain.service.validation_rule import FieldValidationRule
 from program_management.ddd.repositories import load_authorized_relationship
 from program_management.ddd.validators import validators_by_business_action
 from program_management.ddd.validators._path_validator import PathValidator
-from program_management.ddd.validators.validators_by_business_action import CopyProgramTreeVersionValidatorList, \
-    CopyProgramTreeValidatorList
 from program_management.models.enums import node_type
 from program_management.models.enums.node_type import NodeType
-from education_group.ddd.business_types import *
 
 PATH_SEPARATOR = '|'
 Path = str  # Example : "root|node1|node2|child_leaf"
