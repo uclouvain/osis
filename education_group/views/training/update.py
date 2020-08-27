@@ -158,14 +158,6 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 exception.ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum) as e:
             self.training_form.add_error("min_constraint", e.message)
             self.training_form.add_error("max_constraint", "")
-        except program_management_exception.CannotCopyTreeVersionDueToStandardNotExisting as e:
-            self.training_form.add_error("end_year", "")
-            self.training_form.add_error(
-                None,
-                _("Imposible to put end date to %(end_year)s: %(msg)s") % {
-                    "msg": e.message,
-                    "end_year": end_year}
-            )
         return []
 
     def report_training(self) -> List['TrainingIdentity']:
