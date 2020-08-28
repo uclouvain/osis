@@ -78,7 +78,7 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
             context['confirmation_message'] = _("Are you sure you want to detach %(acronym)s%(title)s ?") % {
                 "acronym": link_to_detach_id.child_code,
                 "title": " - {}".format(link_to_detach.child_element.group_year.acronym)
-                if link_to_detach.child_element.group_year else ""
+                         if link_to_detach.child_element.group_year else ""
             }
         return context
 
