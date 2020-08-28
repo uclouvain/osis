@@ -32,6 +32,7 @@ def get_last_existing_version_identity(
         cmd: command.GetLastExistingVersionNameCommand
 ) -> Union[ProgramTreeVersionIdentity, None]:
     return GetLastExistingVersion().get_last_existing_version_identity(
-        cmd.version_name,
-        cmd.offer_acronym,
+        version_name=cmd.version_name,
+        offer_acronym=cmd.offer_acronym,
+        is_transition=cmd.is_transition,
     )
