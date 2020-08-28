@@ -21,16 +21,12 @@ msgstr ""
 msgid "\"%(child)s\" has been pasted into \"%(parent)s\""
 msgstr "\"%(child)s\" has been removed from \"%(parent)s\""
 
-#, fuzzy, python-format
-#| msgid ""
-#| "\"%(child)s - %(child_title)s\" has been detached from \"%(parent)s - "
-#| "%(parent_title)s\""
+#, python-format
 msgid ""
 "\"%(child)s%(child_title)s\" has been detached from \"%(parent)s"
 "%(parent_title)s\""
 msgstr ""
-"\"%(child)s - %(child_title)s\" has been removed from \"%(parent)s - "
-"%(parent_title)s\""
+"\"%(child)s%(child_title)s\" has been removed from \"%(parent)s%(parent_title)s\""
 
 #, python-format
 msgid "%(start_index)s to %(end_index)s of %(total_counts)s learning units"
