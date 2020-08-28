@@ -102,9 +102,11 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
 
         display_success_messages(
             self.request,
-            [_("\"%(child)s\" has been detached from \"%(parent)s\"") % {
+            [_("\"%(child)s - %(child_title)s\" has been detached from \"%(parent)s - %(parent_title)s\"") % {
                 'child': link_entity_id.child_code,
+                'child_title': link_entity_id.child_title,
                 'parent': link_entity_id.parent_code,
+                'parent_title': link_entity_id.parent_title,
             }]
         )
 
