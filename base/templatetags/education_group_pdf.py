@@ -38,7 +38,6 @@ from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from base.templatetags.education_group import register
 from program_management.ddd.business_types import *
 from program_management.serializers.node_view import get_program_tree_version_complete_name
-from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 # TODO :: Remove this file and move the code into a Serializer
 
@@ -196,9 +195,8 @@ def get_verbose_constraint(node: 'NodeGroupYear'):
 
 def get_verbose_title_group(node: 'NodeGroupYear'):
     if node.is_finality():
-        node_identity = NodeIdentity(code=node.code, year=node.year)
         version_complete_label = get_program_tree_version_complete_name(
-            node_identity,
+            node.entity_id,
             ProgramTreeVersionRepository.search_all_versions_from_root_node(node),
             translation.get_language()
         )

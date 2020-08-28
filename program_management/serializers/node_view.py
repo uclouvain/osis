@@ -198,13 +198,13 @@ def get_program_tree_version_name(node_identity: 'NodeIdentity', tree_versions: 
 
 def get_program_tree_version_complete_name(node_identity: 'NodeIdentity',
                                            tree_versions: List['ProgramTreeVersion'],
-                                           language: str):
-    if tree_versions:
+                                           language: str) -> str:
+
+    for program_tree_version in tree_versions:
         program_tree_identity = ProgramTreeIdentitySearch().get_from_node_identity(node_identity)
-        for program_tree_version in tree_versions:
-            if program_tree_version.program_tree_identity == program_tree_identity:
-                if language == LANGUAGE_CODE_EN and program_tree_version.title_en:
-                    return " - {}{}".format(program_tree_version.title_en, program_tree_version.version_label)
-                else:
-                    return " - {}{}".format(program_tree_version.title_fr, program_tree_version.version_label)
+        if program_tree_version.program_tree_identity == program_tree_identity:
+            if language == LANGUAGE_CODE_EN and program_tree_version.title_en:
+                return " - {}{}".format(program_tree_version.title_en, program_tree_version.version_label)
+            else:
+                return " - {}{}".format(program_tree_version.title_fr, program_tree_version.version_label)
     return ''
