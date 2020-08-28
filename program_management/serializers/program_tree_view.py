@@ -85,3 +85,11 @@ def __get_tree_version_label(view_tree):
         if t.get_tree().root_node.pk == view_tree.root_node.pk:
             return t.version_label
     return ''
+
+
+def _get_program_tree_version_for_tree(tree_nodes: Set['Node']) -> List['ProgramTreeVersion']:
+    commands = [
+        program_management.ddd.command.SearchAllVersionsFromRootNodesCommand(code=node.code,
+                                                                             year=node.year) for node in tree_nodes
+    ]
+    return search_all_versions_from_root_nodes(commands)
