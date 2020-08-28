@@ -75,9 +75,10 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
             display_warning_messages(self.request, warning_messages)
 
             link_to_detach = self.get_object()
-            context['confirmation_message'] = _("Are you sure you want to detach %(acronym)s - %(title)s ?") % {
+            context['confirmation_message'] = _("Are you sure you want to detach %(acronym)s%(title)s ?") % {
                 "acronym": link_to_detach_id.child_code,
-                "title": link_to_detach.child_element.group_year.acronym
+                "title": " - {}".format(link_to_detach.child_element.group_year.acronym)
+                if link_to_detach.child_element.group_year else ""
             }
         return context
 
@@ -96,8 +97,8 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
 
     def form_valid(self, form):
         link = self.get_object()
-        parent_title = link.parent_element.group_year.acronym
-        child_title = link.child_element.group_year.acronym
+        parent_title = link.parent_element.group_year.acronym if link.parent_element.group_year else None
+        child_title = link.child_element.group_year.acronym if link.child_element.group_year else None
         try:
             link_entity_id = form.save()
         except osis_common.ddd.interface.BusinessExceptions as business_exception:
@@ -106,11 +107,11 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
 
         display_success_messages(
             self.request,
-            [_("\"%(child)s - %(child_title)s\" has been detached from \"%(parent)s - %(parent_title)s\"") % {
+            [_("\"%(child)s%(child_title)s\" has been detached from \"%(parent)s%(parent_title)s\"") % {
                 'child': link_entity_id.child_code,
-                'child_title': child_title,
+                'child_title': " - {}".format(child_title) if child_title else "",
                 'parent': link_entity_id.parent_code,
-                'parent_title': parent_title,
+                'parent_title': " - {}".format(parent_title) if parent_title else "",
             }]
         )
 
