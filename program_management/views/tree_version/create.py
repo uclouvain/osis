@@ -31,7 +31,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.base import View
 
-from base.forms.education_group.version import SpecificVersionForm
+from program_management.forms.version import SpecificVersionForm
 from base.models.education_group_year import EducationGroupYear
 from base.models.utils.utils import ChoiceEnum
 from base.views.common import display_success_messages
@@ -83,14 +83,16 @@ class CreateProgramTreeVersion(AjaxPermissionRequiredMixin, AjaxTemplateMixin, V
 
     def get(self, request, *args, **kwargs):
         form = SpecificVersionForm(
-            training_identity=self.training_identity
+            training_identity=self.training_identity,
+            node_identity=self.node_identity,
         )
         return render(request, self.template_name, self.get_context_data(form))
 
     def post(self, request, *args, **kwargs):
         form = SpecificVersionForm(
             data=request.POST,
-            training_identity=self.training_identity
+            training_identity=self.training_identity,
+            node_identity=self.node_identity,
         )
         if form.is_valid():
             command = _convert_form_to_create_command(form)

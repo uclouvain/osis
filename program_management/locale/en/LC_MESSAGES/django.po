@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-26 09:36+0200\n"
+"POT-Creation-Date: 2020-08-27 17:38+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -72,6 +72,9 @@ msgid "Access condition"
 msgstr ""
 
 msgid "Acronym"
+msgstr ""
+
+msgid "Acronym of version"
 msgstr ""
 
 msgid "Acronym/Short title"
@@ -241,6 +244,12 @@ msgid "Formation catalogue"
 msgstr ""
 
 msgid "Formations"
+msgstr ""
+
+msgid "Full title of the english version"
+msgstr ""
+
+msgid "Full title of the french version"
 msgstr ""
 
 msgid "Group"
@@ -604,6 +613,9 @@ msgid ""
 msgstr ""
 
 msgid "This form must be submitted to the secretariat of your faculty"
+msgstr ""
+
+msgid "This version exists until"
 msgstr ""
 
 msgid "Title"

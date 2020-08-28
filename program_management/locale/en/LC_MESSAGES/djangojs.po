@@ -1,0 +1,32 @@
+msgid "Close all"
+msgstr ""
+
+msgid "Copy"
+msgstr ""
+
+msgid "Cut"
+msgstr ""
+
+msgid "Detach"
+msgstr ""
+
+msgid "Existed name version in "
+msgstr ""
+
+msgid "Existing name version"
+msgstr ""
+
+msgid "Invalid name version"
+msgstr ""
+
+msgid "Modify the link"
+msgstr ""
+
+msgid "Open all"
+msgstr ""
+
+msgid "Paste"
+msgstr ""
+
+msgid "Search"
+msgstr ""
