@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-26 09:36+0200\n"
+"POT-Creation-Date: 2020-08-27 17:38+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -88,6 +88,9 @@ msgstr "Condition d'accès"
 
 msgid "Acronym"
 msgstr "Sigle"
+
+msgid "Acronym of version"
+msgstr "Sigle de la version"
 
 msgid "Acronym/Short title"
 msgstr "Sigle/Intitulé abrégé"
@@ -270,6 +273,12 @@ msgstr "Catalogue des formations"
 
 msgid "Formations"
 msgstr "Formations"
+
+msgid "Full title of the english version"
+msgstr "Intitulé de la version en anglais"
+
+msgid "Full title of the french version"
+msgstr "Intitulé de la version en français"
 
 msgid "Group"
 msgstr "Groupement"
@@ -551,7 +560,8 @@ msgid ""
 "%(offer_acronym)s[%(acronym)s] (%(academic_year)s) </a> successfully created."
 msgstr ""
 "La version de la formation <a href='%(link)s'> "
-"%(offer_acronym)s[%(acronym)s] (%(academic_year)s) </a> a été créer avec succés"
+"%(offer_acronym)s[%(acronym)s] (%(academic_year)s) </a> a été créée avec "
+"succés"
 
 msgid "Specifications"
 msgstr "Utilisations"
@@ -657,6 +667,9 @@ msgstr ""
 
 msgid "This form must be submitted to the secretariat of your faculty"
 msgstr "Ce formulaire doit être remis au secrétariat de votre faculté"
+
+msgid "This version exists until"
+msgstr "Date de fin d'existence"
 
 msgid "Title"
 msgstr "Intitulé"
