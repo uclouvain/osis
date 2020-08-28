@@ -28,6 +28,7 @@ from typing import List
 from django.db import transaction
 
 from education_group.ddd.domain.training import TrainingIdentity
+from education_group.ddd.repository.mini_training import MiniTrainingRepository
 from education_group.ddd.repository.training import TrainingRepository
 from program_management.ddd.command import PostponeProgramTreeCommand, CopyProgramTreeToNextYearCommand
 from program_management.ddd.domain import exception
@@ -48,9 +49,10 @@ def postpone_program_tree(
     end_postponement_year = postpone_cmd.until_year
 
     if not end_postponement_year:
-        end_postponement_year = CalculateEndPostponement.calculate_program_tree_end_postponement_year(
-            training_identity=TrainingIdentity(acronym=postpone_cmd.offer_acronym, year=postpone_cmd.from_year),
-            training_repository=TrainingRepository()
+        end_postponement_year = CalculateEndPostponement.calculate_program_tree_end_postponement(
+            identity=ProgramTreeIdentity(code=postpone_cmd.from_code, year=postpone_cmd.from_year),
+            training_repository=TrainingRepository(),
+            mini_training_repository=MiniTrainingRepository(),
         )
 
     # WHEN

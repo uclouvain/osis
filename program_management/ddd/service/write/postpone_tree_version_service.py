@@ -27,12 +27,14 @@ from typing import List
 
 from django.db import transaction
 
-from education_group.ddd.domain.training import TrainingIdentity
+from education_group.ddd.repository.mini_training import MiniTrainingRepository
 from education_group.ddd.repository.training import TrainingRepository
 from program_management.ddd.command import PostponeProgramTreeVersionCommand, CopyTreeVersionToNextYearCommand
 from program_management.ddd.domain import exception
+from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 from program_management.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
+from program_management.ddd.domain.service.identity_search import NodeIdentitySearch, ProgramTreeIdentitySearch
 from program_management.ddd.service.write import copy_program_version_service
 
 
@@ -46,10 +48,18 @@ def postpone_program_tree_version(
     from_year = postpone_cmd.from_year
     end_postponement_year = postpone_cmd.until_year
 
+    program_tree_version_identity = ProgramTreeVersionIdentity(
+        offer_acronym=postpone_cmd.from_offer_acronym,
+        version_name=postpone_cmd.from_version_name,
+        year=postpone_cmd.from_year,
+        is_transition=postpone_cmd.from_is_transition,
+    )
+
     if not end_postponement_year:
-        end_postponement_year = CalculateEndPostponement.calculate_program_tree_end_postponement_year(
-            training_identity=TrainingIdentity(acronym=postpone_cmd.from_offer_acronym, year=postpone_cmd.from_year),
-            training_repository=TrainingRepository()
+        end_postponement_year = CalculateEndPostponement.calculate_program_tree_end_postponement(
+            identity=ProgramTreeIdentitySearch().get_from_program_tree_version_identity(program_tree_version_identity),
+            training_repository=TrainingRepository(),
+            mini_training_repository=MiniTrainingRepository(),
         )
 
     # WHEN
