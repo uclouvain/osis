@@ -24,13 +24,13 @@ msgid "Copy"
 msgstr "Copier"
 
 msgid "Cut"
-msgstr "Coller"
+msgstr "Couper"
 
 msgid "Detach"
 msgstr "Détacher"
 
 msgid "Existed name version in "
-msgstr "Cette version existe déjà dans le passé en "
+msgstr "Cette version existe dans le passé en "
 
 msgid "Existing name version"
 msgstr "Cette version existe déjà"
