@@ -33,7 +33,7 @@ from program_management.views.proxy.identification import IdentificationRedirect
 from program_management.views import groupelementyear_update, \
     groupelementyear_read, element_utilization, excel, search, tree, prerequisite_read, prerequisite_update
 from program_management.views.tree_version import create as create_program_tree_version
-
+from program_management.views.tree_version.delete import TreeVersionDeleteView
 
 urlpatterns = [
     url(r'^(?P<root_id>[0-9]+)/(?P<education_group_year_id>[0-9]+)/', include([
@@ -123,5 +123,7 @@ urlpatterns = [
             program_management.views.tree_version.check_version_name.check_version_name,
             name="check_version_name"
         ),
+        path('delete/', TreeVersionDeleteView.as_view(), name='all_tree_versions_delete'),
     ])),
+
 ]
