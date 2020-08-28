@@ -30,8 +30,6 @@ from django.forms import BaseModelFormSet, modelformset_factory
 
 from base.models.enums import education_group_categories
 from base.models.group_element_year import GroupElementYear
-from program_management.business.group_element_years.attach import AttachEducationGroupYearStrategy, \
-    AttachLearningUnitYearStrategy
 from program_management.business.group_element_years.management import CheckAuthorizedRelationshipAttach
 
 
@@ -108,12 +106,6 @@ class GroupElementYearForm(forms.ModelForm):
         if not check.is_valid():
             raise ValidationError(check.errors)
         return data_cleaned
-
-    def clean(self):
-        strategy = AttachEducationGroupYearStrategy if self.instance.child_branch else \
-            AttachLearningUnitYearStrategy
-        strategy(parent=self.instance.parent, child=self.instance.child, instance=self.instance).is_valid()
-        return super().clean()
 
     def _check_authorized_relationship(self, child_type):
         return self.instance.parent.education_group_type.authorized_parent_type.filter(child_type=child_type).exists()
