@@ -34,6 +34,7 @@ from program_management.ddd.service.write import delete_standard_version_service
 
 @transaction.atomic()
 def delete_standard_program_tree_version(
+        #  TODO : create a new command and rename service to ShortenStandardProgramTreeVersionCommand
         delete_command: command.DeleteProgramTreeVersionCommand) -> List['ProgramTreeVersionIdentity']:
     from_year = delete_command.from_year
 

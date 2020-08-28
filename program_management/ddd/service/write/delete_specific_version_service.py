@@ -27,23 +27,21 @@ from program_management.ddd import command
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, STANDARD
 from program_management.ddd.repositories import program_tree_version as program_tree_version_repository
 from program_management.ddd.service.write import delete_program_tree_service
-from program_management.ddd.validators.validators_by_business_action import DeleteStandardVersionValidatorList
+from program_management.ddd.validators.validators_by_business_action import DeleteStandardVersionValidatorList, \
+    DeleteSpecificVersionValidatorList
 
 
 @transaction.atomic()
-def delete_standard_version(cmd: command.DeleteStandardVersionCommand) -> ProgramTreeVersionIdentity:
-    # TODO :: reuse delete_specific_version_service
+def delete_specific_version(cmd: command.DeleteSpecificVersionCommand) -> ProgramTreeVersionIdentity:
     program_tree_version_id = ProgramTreeVersionIdentity(
         offer_acronym=cmd.acronym,
         year=cmd.year,
-        version_name=STANDARD,
-        is_transition=False
+        version_name=cmd.version_name,
+        is_transition=cmd.is_transition,
     )
     program_tree_version = program_tree_version_repository.ProgramTreeVersionRepository.get(program_tree_version_id)
 
-    DeleteStandardVersionValidatorList(program_tree_version).validate()
-    # TODO :: créer 2 services différents : delete minitraining standard version et 1 delete training standard version
-    # TODO :: supprimer l'appel aux delete des minitraining et training dans delete_node service
+    DeleteSpecificVersionValidatorList(program_tree_version).validate()
 
     program_tree_version_repository.ProgramTreeVersionRepository.delete(
         program_tree_version_id,

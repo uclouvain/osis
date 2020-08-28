@@ -428,6 +428,21 @@ class DeleteStandardVersionCommand(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True)
+class DeleteAllSpecificVersionCommand(interface.CommandRequest):
+    acronym = attr.ib(type=str)
+    version_name = attr.ib(type=str)
+    is_transition = attr.ib(type=bool)
+
+
+@attr.s(frozen=True, slots=True)
+class DeleteSpecificVersionCommand(interface.CommandRequest):
+    acronym = attr.ib(type=str)
+    year = attr.ib(type=int)
+    version_name = attr.ib(type=str)
+    is_transition = attr.ib(type=bool)
+
+
+@attr.s(frozen=True, slots=True)
 class DeleteNodeCommand(interface.CommandRequest):
     code = attr.ib(type=str)
     year = attr.ib(type=int)

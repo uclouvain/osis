@@ -28,19 +28,34 @@ from typing import List
 from django.db.models import F
 
 from osis_common.ddd import interface
-from education_group.models.group_year import GroupYear
-from program_management.ddd.domain.node import NodeIdentity
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
+from program_management.models.education_group_version import EducationGroupVersion
 
 
-# TODO :: rename to NodeIdentitiesSearch
-class ExistingAcademicYearSearch(interface.DomainService):
-    def search_from_code(self, group_code: str) -> List[NodeIdentity]:
-        years = GroupYear.objects.filter(
-            group__groupyear__partial_acronym=group_code,
+class ProgramTreeIdentitiesSearch(interface.DomainService):
+
+    @classmethod
+    def search(cls, acronym: str, version_name: str, is_transition: bool = False) -> List[ProgramTreeVersionIdentity]:
+        values = EducationGroupVersion.objects.filter(
+            version_name=version_name,
+            offer__acronym=acronym,
+            is_transition=is_transition,
         ).annotate(
-            year=F('academic_year__year'),
-        ).values_list(
+            year=F('offer__academic_year__year'),
+        ).values(
+            'version_name',
+            'offer__acronym',
+            'is_transition',
             'year',
-            flat=True
-        ).distinct()
-        return [NodeIdentity(code=group_code, year=year) for year in sorted(years)]
+        )
+        if values:
+            return [
+                ProgramTreeVersionIdentity(
+                    version_name=value['version_name'],
+                    offer_acronym=value['offer__acronym'],
+                    year=value['year'],
+                    is_transition=value['is_transition'],
+                )
+                for value in values
+            ]
+        return []
