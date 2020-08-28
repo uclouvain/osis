@@ -66,14 +66,16 @@ def pdf_content(request, year, code, language):
         )
     tree = tree.prune(ignore_children_from={GroupType.MINOR_LIST_CHOICE})
     if tree.root_node.is_finality():
-        title = tree.root_node.offer_partial_title_en if language == LANGUAGE_CODE_EN and tree.root_node.offer_partial_title_en \
+        title = tree.root_node.offer_partial_title_en \
+            if language == LANGUAGE_CODE_EN and tree.root_node.offer_partial_title_en \
             else tree.root_node.offer_partial_title_fr
     else:
         title = tree.root_node.group_title_en if language == LANGUAGE_CODE_EN and tree.root_node.group_title_en \
             else tree.root_node.group_title_fr
 
     if program_tree_version and program_tree_version.version_label:
-        version_title = program_tree_version.title_en if language == LANGUAGE_CODE_EN and program_tree_version.title_en else program_tree_version.title_fr
+        version_title = program_tree_version.title_en \
+            if language == LANGUAGE_CODE_EN and program_tree_version.title_en else program_tree_version.title_fr
         title = "{} - {}{}".format(title, version_title, program_tree_version.version_label)
 
     context = {
