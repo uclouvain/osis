@@ -1085,10 +1085,10 @@ msgid "Full name"
 msgstr "Nom complet"
 
 msgid "Full title of the english version"
-msgstr "Libellé complet de la version en français"
+msgstr "Libellé complet de la version en anglais"
 
 msgid "Full title of the french version"
-msgstr "Libellé complet de la version en anglais"
+msgstr "Libellé complet de la version en français"
 
 msgid "Function"
 msgstr "Fonction"

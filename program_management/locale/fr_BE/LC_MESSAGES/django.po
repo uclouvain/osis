@@ -91,6 +91,9 @@ msgstr "Condition d'accès"
 msgid "Acronym"
 msgstr "Sigle"
 
+msgid "Acronym of version"
+msgstr "Sigle de la version"
+
 msgid "Acronym/Short title"
 msgstr "Sigle/Intitulé abrégé"
 
@@ -272,6 +275,12 @@ msgstr "Catalogue des formations"
 
 msgid "Formations"
 msgstr "Formations"
+
+msgid "Full title of the english version"
+msgstr "Intitulé de la version en anglais"
+
+msgid "Full title of the french version"
+msgstr "Intitulé de la version en français"
 
 msgid "Group"
 msgstr "Groupement"
@@ -553,7 +562,7 @@ msgid ""
 "%(offer_acronym)s[%(acronym)s] (%(academic_year)s) </a> successfully created."
 msgstr ""
 "La version de la formation <a href='%(link)s'> "
-"%(offer_acronym)s[%(acronym)s] (%(academic_year)s) </a> a été créer avec "
+"%(offer_acronym)s[%(acronym)s] (%(academic_year)s) </a> a été créée avec "
 "succés"
 
 msgid "Specifications"
@@ -660,6 +669,9 @@ msgstr ""
 
 msgid "This form must be submitted to the secretariat of your faculty"
 msgstr "Ce formulaire doit être remis au secrétariat de votre faculté"
+
+msgid "This version exists until"
+msgstr "Date de fin d'existence"
 
 msgid "Title"
 msgstr "Intitulé"
