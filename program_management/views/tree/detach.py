@@ -74,9 +74,10 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
             warning_messages = detach_warning_messages_service.detach_warning_messages(detach_node_command)
             display_warning_messages(self.request, warning_messages)
 
+            link_to_detach = self.get_object()
             context['confirmation_message'] = _("Are you sure you want to detach %(acronym)s - %(title)s ?") % {
                 "acronym": link_to_detach_id.child_code,
-                "title": ''
+                "title": link_to_detach.child_element.group_year.acronym
             }
         return context
 
@@ -94,6 +95,9 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
         return obj
 
     def form_valid(self, form):
+        link = self.get_object()
+        parent_title = link.parent_element.group_year.acronym
+        child_title = link.child_element.group_year.acronym
         try:
             link_entity_id = form.save()
         except osis_common.ddd.interface.BusinessExceptions as business_exception:
@@ -104,9 +108,9 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
             self.request,
             [_("\"%(child)s - %(child_title)s\" has been detached from \"%(parent)s - %(parent_title)s\"") % {
                 'child': link_entity_id.child_code,
-                'child_title': '',
+                'child_title': child_title,
                 'parent': link_entity_id.parent_code,
-                'parent_title': '',
+                'parent_title': parent_title,
             }]
         )
 
