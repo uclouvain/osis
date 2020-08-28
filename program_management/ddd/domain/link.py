@@ -68,10 +68,7 @@ class Link(interface.Entity):
     @entity_id.default
     def _link_identity(self) -> LinkIdentity:
         if self.parent and self.child:
-            return LinkIdentity(self.parent.code,
-                                self.child.code,
-                                self.parent.year,
-                                self.child.year)
+            return LinkIdentity(self.parent.code, self.child.code, self.parent.year, self.child.year)
 
     @property
     def has_changed(self):
