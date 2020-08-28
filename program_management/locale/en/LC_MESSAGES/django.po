@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-27 17:38+0200\n"
+"POT-Creation-Date: 2020-08-28 09:08+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,8 +17,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #, python-format
-msgid "\"%(child)s\" has been detached from \"%(parent)s\""
-msgstr "\"%(child)s\" has been removed from \"%(parent)s\""
+msgid ""
+"\"%(child)s - %(child_title)s\" has been detached from \"%(parent)s - "
+"%(parent_title)s\""
+msgstr "\"%(child)s - %(child_title)s\" has been removed from \"%(parent)s - %(parent_title)s\""
 
 #, fuzzy, python-format
 #| msgid "\"%(child)s\" has been detached from \"%(parent)s\""
@@ -110,8 +112,8 @@ msgid "Annual"
 msgstr ""
 
 #, python-format
-msgid "Are you sure you want to detach %(acronym)s ?"
-msgstr "Are you sure you want to remove %(acronym)s ?"
+msgid "Are you sure you want to detach %(acronym)s - %(title)s ?"
+msgstr "Are you sure you want to remove %(acronym)s - %(title)s ?"
 
 msgid "Attribution entity"
 msgstr ""
