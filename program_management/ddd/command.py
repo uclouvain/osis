@@ -451,3 +451,9 @@ class DuplicateProgramTree(interface.CommandRequest):
     from_root_year = attr.ib(type=int)
     override_end_year_to = attr.ib(type=int, default=DO_NOT_OVERRIDE)
     override_start_year_to = attr.ib(type=int, default=DO_NOT_OVERRIDE)
+
+
+@attr.s(frozen=True, slots=True)
+class PublishProgramTreesVersionUsingNodeCommand(interface.CommandRequest):
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)

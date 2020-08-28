@@ -1,4 +1,4 @@
-from django.urls import include, path, register_converter, re_path
+from django.urls import include, path, register_converter
 
 from base.views.education_groups.achievement.create import CreateEducationGroupDetailedAchievement, \
     CreateEducationGroupAchievement
@@ -13,7 +13,6 @@ from education_group.views.mini_training.delete import MiniTrainingDeleteView
 from education_group.views.proxy.read import ReadEducationGroupRedirectView
 from education_group.views.training.delete import TrainingDeleteView
 from education_group.views.training.update import TrainingUpdateView
-from base.views.education_groups import create
 
 register_converter(GroupTypeConverter, 'group_type')
 register_converter(MiniTrainingTypeConverter, 'mini_training_type')
@@ -155,6 +154,8 @@ urlpatterns = [
     ])),
     path('general_information/<int:year>/', include([
         path('common/', general_information.CommonGeneralInformation.as_view(), name="common_general_information"),
+        path('publish/common-pedagogy', general_information.publish_common_pedagogy, name="publish_common_pedagogy"),
+        path('publish/common-admission', general_information.publish_common_admission, name="publish_common_admission"),
         path(
             'common-bachelor/',
             general_information.CommonBachelorAdmissionCondition.as_view(),
@@ -176,6 +177,5 @@ urlpatterns = [
             name="common_master_specialized_admission_condition"
         ),
     ])),
-    path('<int:year>/<str:code>/publish', general_information.publish, name='publish_general_information'),
     path('<int:year>/<acronym:acronym>/', ReadEducationGroupRedirectView.as_view(), name='education_group_read_proxy'),
 ]

@@ -23,10 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import random
 from unittest import mock
 
-from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponseNotFound, HttpResponse
 from django.test import TestCase, override_settings
@@ -34,12 +32,9 @@ from requests import Timeout
 
 from base.business.education_groups import general_information
 from base.business.education_groups.general_information import PublishException, _bulk_publish, \
-    _get_url_to_publish
+    _get_code_computed_according_type
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType
-from base.tests.factories.academic_year import create_current_academic_year
-from base.tests.factories.education_group_year import TrainingFactory, EducationGroupYearCommonFactory, \
-    EducationGroupYearCommonBachelorFactory, MiniTrainingFactory, EducationGroupYearFactory
-from base.tests.factories.group_element_year import GroupElementYearFactory
+from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 
 
 @override_settings(ESB_API_URL="api.esb.com",
@@ -50,137 +45,88 @@ from base.tests.factories.group_element_year import GroupElementYearFactory
 class TestPublishGeneralInformation(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.academic_year = create_current_academic_year()
-        cls.training = TrainingFactory(education_group_type__name=TrainingType.PGRM_MASTER_120.name)
+        cls.node = NodeGroupYearFactory(node_type=TrainingType.PGRM_MASTER_120)
+
+    def setUp(self):
+        self.get_pgrm_trees_patcher = mock.patch("base.business.education_groups.general_information."
+                                                 "search_program_trees_using_node_service."
+                                                 "search_program_trees_using_node",
+                                                 return_value=[])
+        self.mocked_get_pgrm_trees = self.get_pgrm_trees_patcher.start()
+        self.addCleanup(self.get_pgrm_trees_patcher.stop)
 
     @override_settings(ESB_REFRESH_PEDAGOGY_ENDPOINT=None)
     def test_publish_case_missing_settings(self):
         with self.assertRaises(ImproperlyConfigured):
-            general_information.publish_group_year(self.training)
+            general_information.publish_group_year(self.node.code, self.node.year)
 
     @mock.patch('requests.get', return_value=HttpResponse)
     @mock.patch('threading.Thread')
     def test_publish_call_seperate_thread(self, mock_thread, mock_get):
         mock_thread.start.return_value = True
-        general_information.publish_group_year(self.training)
+        general_information.publish_group_year(self.node.code, self.node.year)
         self.assertTrue(mock_thread.start)
 
     @mock.patch('requests.get', return_value=HttpResponseNotFound)
     def test_publish_case_not_found_return_false(self, mock_requests):
-        response = general_information._publish(self.training)
+        dummy_url = 'dummy_url'
+        response = general_information._publish(dummy_url, self.node.code, self.node.year)
         self.assertIsInstance(response, bool)
         self.assertFalse(response)
 
     @mock.patch('requests.get', side_effect=Timeout)
     def test_publish_case_timout_reached(self, mock_requests):
+        dummy_url = 'dummy_url'
         with self.assertRaises(PublishException):
-            general_information._publish(self.training)
+            general_information._publish(dummy_url, self.node.code, self.node.year)
 
     @mock.patch('requests.get', return_value=HttpResponse)
     def test_publish_case_success(self, mock_requests):
-        response = general_information._publish(self.training)
+        dummy_url = 'dummy_url'
+        response = general_information._publish(dummy_url, self.node.code, self.node.year)
         self.assertIsInstance(response, bool)
         self.assertTrue(response)
 
 
-class TestBulkPublish(TestCase):
-    @mock.patch('base.business.education_groups.general_information._publish', return_value=True)
-    def test_bulk_publish(self, mock_publish):
-        training_1 = TrainingFactory()
-        training_2 = TrainingFactory()
-
-        result = _bulk_publish([training_1, training_2])
-        self.assertIsInstance(result, list)
-        self.assertListEqual(result, [True, True])
-
-
 @override_settings(ESB_API_URL="api.esb.com",
+                   ESB_AUTHORIZATION="Basic dummy:1234",
                    ESB_REFRESH_PEDAGOGY_ENDPOINT="offer/{year}/{code}/refresh",
                    ESB_REFRESH_COMMON_PEDAGOGY_ENDPOINT='offer/{year}/common/refresh',
                    ESB_REFRESH_COMMON_ADMISSION_ENDPOINT='offer/{year}/common_admission/refresh')
-class TestGetUrlToPublish(TestCase):
-    def test_get_publish_url_case_is_common_of_common(self):
-        common = EducationGroupYearCommonFactory()
-        expected_url = "{api_url}/{endpoint}".format(
-            api_url=settings.ESB_API_URL,
-            endpoint=settings.ESB_REFRESH_COMMON_PEDAGOGY_ENDPOINT.format(year=common.academic_year.year),
+class TestBulkPublish(TestCase):
+    @mock.patch('base.business.education_groups.general_information._publish', return_value=True)
+    def test_bulk_publish_assert_call_publish(self, mock_publish):
+        node_1 = NodeGroupYearFactory(node_type=TrainingType.PGRM_MASTER_120)
+        node_2 = NodeGroupYearFactory(node_type=TrainingType.PGRM_MASTER_180_240)
+
+        _bulk_publish([node_1, node_2])
+        self.assertTrue(mock_publish.called)
+
+
+class TestGetCodeComputedAccordingType(TestCase):
+    def test_assert_minor_code_computed(self):
+        node = NodeGroupYearFactory(title="MINOR", node_type=MiniTrainingType.ACCESS_MINOR)
+
+        expected_computed_code = "min-{}".format(node.code)
+        self.assertEqual(
+            _get_code_computed_according_type(node),
+            expected_computed_code
         )
 
-        self.assertEqual(expected_url, _get_url_to_publish(common))
+    def test_assert_deepening_code_computed(self):
+        node = NodeGroupYearFactory(title="DEEPENING", node_type=MiniTrainingType.DEEPENING)
 
-    def test_get_publish_url_case_common_type(self):
-        bachelor_common = EducationGroupYearCommonBachelorFactory()
-        expected_url = "{api_url}/{endpoint}".format(
-            api_url=settings.ESB_API_URL,
-            endpoint=settings.ESB_REFRESH_COMMON_ADMISSION_ENDPOINT.format(year=bachelor_common.academic_year.year),
+        expected_computed_code = "app-{}".format(node.code)
+        self.assertEqual(
+            _get_code_computed_according_type(node),
+            expected_computed_code
         )
 
-        self.assertEqual(expected_url, _get_url_to_publish(bachelor_common))
+    def test_assert_major_code_computed(self):
+        node = NodeGroupYearFactory(title="MAJOR", node_type=MiniTrainingType.FSA_SPECIALITY)
 
-    def test_get_publish_url_case_not_common_and_general_case(self):
-        types_to_use = [
-            training_type for training_type in [t.name for t in TrainingType]
-            if training_type not in TrainingType.finality_types()
-        ]
-        training = TrainingFactory(education_group_type__name=random.choice(types_to_use))
-        expected_url = "{api_url}/{endpoint}".format(
-            api_url=settings.ESB_API_URL,
-            endpoint=settings.ESB_REFRESH_PEDAGOGY_ENDPOINT.format(
-                year=training.academic_year.year,
-                code=training.acronym
-            ),
+        expected_computed_code = "fsa1ba-{}".format(node.code)
+        self.assertEqual(
+            _get_code_computed_according_type(node),
+            expected_computed_code
         )
-        self.assertEqual(expected_url, _get_url_to_publish(training))
-
-    def test_get_publish_url_case_not_common_and_finality_or_option_case(self):
-        training = EducationGroupYearFactory(
-            education_group_type__name=random.choice(TrainingType.finality_types() + [MiniTrainingType.OPTION.name])
-        )
-        parent = TrainingFactory(
-            education_group_type__name=TrainingType.PGRM_MASTER_120.name,
-            academic_year=training.academic_year
-        )
-        GroupElementYearFactory(parent=parent, child_branch=training)
-        expected_url = "{api_url}/{endpoint}".format(
-            api_url=settings.ESB_API_URL,
-            endpoint=settings.ESB_REFRESH_PEDAGOGY_ENDPOINT.format(
-                year=training.academic_year.year,
-                code="{parent}-{partial_acronym}".format(
-                    parent=parent.acronym,
-                    partial_acronym=training.partial_acronym
-                )
-            ),
-        )
-        self.assertEqual(expected_url, _get_url_to_publish(training))
-
-    def test_get_publish_url_case_not_common_and_mini_training_case(self):
-        mini_training = MiniTrainingFactory(
-            education_group_type__name=random.choice([
-                t.name for t in MiniTrainingType
-                if t.name not in [MiniTrainingType.OPTION.name, MiniTrainingType.FSA_SPECIALITY.name]
-            ])
-        )
-        expected_url = "{api_url}/{endpoint}".format(
-            api_url=settings.ESB_API_URL,
-            endpoint=settings.ESB_REFRESH_PEDAGOGY_ENDPOINT.format(
-                year=mini_training.academic_year.year,
-                code=self._get_correct_mini_training_code(mini_training)
-            ),
-        )
-        self.assertEqual(expected_url, _get_url_to_publish(mini_training))
-
-    def test_get_publish_url_case_not_common_and_fsa_speciality_case(self):
-        fsa_speciality = MiniTrainingFactory(education_group_type__name=MiniTrainingType.FSA_SPECIALITY.name)
-        expected_url = "{api_url}/{endpoint}".format(
-            api_url=settings.ESB_API_URL,
-            endpoint=settings.ESB_REFRESH_PEDAGOGY_ENDPOINT.format(
-                year=fsa_speciality.academic_year.year,
-                code='fsa1ba-{partial_acronym}'.format(partial_acronym=fsa_speciality.partial_acronym)
-            ),
-        )
-        self.assertEqual(expected_url, _get_url_to_publish(fsa_speciality))
-
-    def _get_correct_mini_training_code(self, mini_training):
-        return "app-{}".format(mini_training.partial_acronym) if mini_training.is_deepening else \
-            "min-{}".format(mini_training.partial_acronym) if mini_training.is_minor else \
-            mini_training.acronym

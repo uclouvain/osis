@@ -32,15 +32,14 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse
 
-from base.models.education_group_year import EducationGroupYear
-from base.models.enums.education_group_types import TrainingType, GroupType
-from education_group.models.group_year import GroupYear
-from program_management.ddd.repositories.find_roots import find_roots
+from program_management.ddd import command as command_program_management
+from program_management.ddd.business_types import *
+from program_management.ddd.service.read import search_program_trees_using_node_service
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 
-def publish_group_year(group_year_obj: GroupYear) -> bool:
+def publish_group_year(code: str, year: int) -> bool:
     if not all([settings.ESB_API_URL, settings.ESB_AUTHORIZATION, settings.ESB_REFRESH_PEDAGOGY_ENDPOINT,
                 settings.ESB_REFRESH_COMMON_PEDAGOGY_ENDPOINT,
                 settings.ESB_REFRESH_COMMON_ADMISSION_ENDPOINT]):
@@ -48,22 +47,32 @@ def publish_group_year(group_year_obj: GroupYear) -> bool:
                                    'ESB_REFRESH_COMMON_PEDAGOGY_ENDPOINT /  '
                                    'ESB_REFRESH_COMMON_ADMISSION_ENDPOINT must be set in configuration')
 
-    trainings = find_roots([group_year_obj], as_instances=True).get(group_year_obj.pk, [])
-
-    education_groups_to_publish = [group_year_obj] + trainings \
-        if group_year_obj.education_group_type.name != GroupType.COMMON_CORE.name \
-        else trainings
-    t = Thread(target=_bulk_publish, args=(education_groups_to_publish,))
-    t.start()
+    if code == 'common':
+        endpoint = settings.ESB_REFRESH_COMMON_PEDAGOGY_ENDPOINT.format(year=year)
+        url = "{esb_api}/{endpoint}".format(esb_api=settings.ESB_API_URL, endpoint=endpoint)
+        _publish(url, code, year)
+    elif code.startswith('common'):
+        endpoint = settings.ESB_REFRESH_COMMON_ADMISSION_ENDPOINT.format(year=year)
+        url = "{esb_api}/{endpoint}".format(esb_api=settings.ESB_API_URL, endpoint=endpoint)
+        _publish(url, code, year)
+    else:
+        cmd = command_program_management.GetProgramTreesFromNodeCommand(code=code, year=year)
+        program_trees = search_program_trees_using_node_service.search_program_trees_using_node(cmd)
+        nodes_to_publish = [program_tree.root_node for program_tree in program_trees]
+        t = Thread(target=_bulk_publish, args=(nodes_to_publish,))
+        t.start()
     return True
 
 
-def _bulk_publish(education_group_years: List[EducationGroupYear]) -> List[bool]:
-    return [_publish(education_group_year) for education_group_year in education_group_years]
+def _bulk_publish(nodes: List['NodeGroupYear']) -> None:
+    for node in nodes:
+        code_computed_for_esb = _get_code_computed_according_type(node)
+        endpoint = settings.ESB_REFRESH_PEDAGOGY_ENDPOINT.format(year=node.year, code=code_computed_for_esb)
+        url = "{esb_api}/{endpoint}".format(esb_api=settings.ESB_API_URL, endpoint=endpoint)
+        _publish(url, node.code, node.year)
 
 
-def _publish(education_group_year: EducationGroupYear) -> bool:
-    publish_url = _get_url_to_publish(education_group_year)
+def _publish(publish_url: str, code: str, year: int) -> bool:
     try:
         response = requests.get(
             publish_url,
@@ -72,44 +81,27 @@ def _publish(education_group_year: EducationGroupYear) -> bool:
         )
         if response.status_code != HttpResponse.status_code:
             logger.info(
-                "The program {acronym} has no page to publish on it".format(acronym=education_group_year.acronym)
+                "The program {code} - {year} has no page to publish on it".format(code=code, year=year)
             )
             return False
         return True
     except Exception:
-        raise PublishException("Unable to publish sections for the program {acronym}".format(
-            acronym=education_group_year.acronym)
+        error_msg = "Unable to publish sections for the program {code} - {year}".format(
+            code=code,
+            year=year
         )
+        raise PublishException(error_msg)
 
 
-def _get_url_to_publish(education_group_year: EducationGroupYear) -> str:
-    if education_group_year.is_main_common:
-        endpoint = settings.ESB_REFRESH_COMMON_PEDAGOGY_ENDPOINT.format(year=education_group_year.academic_year.year)
-    elif education_group_year.is_common:
-        endpoint = settings.ESB_REFRESH_COMMON_ADMISSION_ENDPOINT.format(year=education_group_year.academic_year.year)
-    else:
-        code = _get_code_according_type(education_group_year)
-        endpoint = settings.ESB_REFRESH_PEDAGOGY_ENDPOINT.format(
-            year=education_group_year.academic_year.year,
-            code=code
-        )
-    return "{esb_api}/{endpoint}".format(esb_api=settings.ESB_API_URL, endpoint=endpoint)
-
-
-def _get_code_according_type(education_group_year: EducationGroupYear) -> str:
-    code = education_group_year.acronym
-    if education_group_year.is_minor:
-        code = "min-{}".format(education_group_year.partial_acronym)
-    elif education_group_year.is_deepening:
-        code = "app-{}".format(education_group_year.partial_acronym)
-    elif education_group_year.is_option or education_group_year.is_finality:
-        parent = EducationGroupYear.hierarchy.filter(pk=education_group_year.pk).get_parents().get(
-            education_group_type__name__in=[TrainingType.PGRM_MASTER_120.name, TrainingType.PGRM_MASTER_180_240.name]
-        )
-        code = "{}-{}".format(parent.acronym, education_group_year.partial_acronym)
-    elif education_group_year.is_major:
-        code = "fsa1ba-{}".format(education_group_year.partial_acronym)
-    return code
+def _get_code_computed_according_type(node: 'NodeGroupYear') -> str:
+    code_computed_for_esb = node.title
+    if node.is_minor():
+        code_computed_for_esb = "min-{}".format(node.code)
+    elif node.is_deepening():
+        code_computed_for_esb = "app-{}".format(node.code)
+    elif node.is_major():
+        code_computed_for_esb = "fsa1ba-{}".format(node.code)
+    return code_computed_for_esb
 
 
 class PublishException(Exception):

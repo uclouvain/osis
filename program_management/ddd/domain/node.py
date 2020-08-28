@@ -213,7 +213,16 @@ class Node(interface.Entity):
         return self.node_type in GroupType.minor_major_list_choice_enums()
 
     def is_minor_or_deepening(self) -> bool:
-        return self.node_type in MiniTrainingType.minors_and_deepening()
+        return self.is_minor() or self.is_deepening()
+
+    def is_minor(self) -> bool:
+        return self.node_type in MiniTrainingType.minors_enum()
+
+    def is_deepening(self) -> bool:
+        return self.node_type == MiniTrainingType.DEEPENING
+
+    def is_major(self) -> bool:
+        return self.node_type == MiniTrainingType.FSA_SPECIALITY
 
     def get_direct_child_as_node(self, node_id: 'NodeIdentity') -> 'Node':
         return next(node for node in self.get_direct_children_as_nodes() if node.entity_id == node_id)
