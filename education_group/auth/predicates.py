@@ -13,6 +13,8 @@ from education_group.auth.scope import Scope
 from education_group.models.group_year import GroupYear
 from osis_role import errors
 from osis_role.errors import predicate_failed_msg, set_permission_error, get_permission_error
+from program_management.ddd.repositories import load_tree_version
+from program_management.models.element import Element
 
 
 @predicate(bind=True)
@@ -95,6 +97,21 @@ def is_user_attached_to_management_entity(
     if education_group_year:
         user_entity_ids = self.context['role_qs'].get_entities_ids()
         return education_group_year.management_entity_id in user_entity_ids
+    return education_group_year
+
+
+@predicate(bind=True)
+@predicate_failed_msg(message=_("You must create the version of the concerned training and then attach that version"
+                                " inside this version"))
+def is_element_only_inside_standard_program(
+        self,
+        user: User,
+        education_group_year: Union[EducationGroupYear, GroupYear] = None
+):
+    if isinstance(education_group_year, GroupYear):
+        element_id = Element.objects.get(group_year=education_group_year).id
+        tree_versions = load_tree_version.load_tree_versions_from_children([element_id])
+        return all((version.is_standard_version for version in tree_versions))
     return education_group_year
 
 
