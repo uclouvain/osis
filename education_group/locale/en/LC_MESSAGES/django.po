@@ -23,13 +23,13 @@ msgid_plural "%(count_enrollment)d students are enrolled in the mini-training."
 msgstr[0] ""
 msgstr[1] ""
 
-#, python-format, python-brace-format
+#, python-format
 msgid ""
-"%(count_enrollment)d student is enrolled in the training {acronym} "
-"({academic_year})."
+"%(count_enrollment)d student is enrolled in the training %(acronym)s "
+"(%(academic_year)s)."
 msgid_plural ""
-"%(count_enrollment)d students are enrolled in the training {acronym} "
-"({academic_year})."
+"%(count_enrollment)d students are enrolled in the training %(acronym)s "
+"(%(academic_year)s)."
 msgstr[0] ""
 msgstr[1] ""
 
@@ -347,7 +347,7 @@ msgid "Identification"
 msgstr ""
 
 #, python-format
-msgid "Imposible to put end date to %(end_year)s: %(msg)s"
+msgid "Impossible to put end date to %(end_year)s: %(msg)s"
 msgstr ""
 
 msgid "Institution"
@@ -593,11 +593,7 @@ msgid "The training %(code)s has been deleted."
 msgstr ""
 
 #, python-brace-format
-msgid "The training {acronym} ({academic_year}) has inscriptions"
-msgstr ""
-
-#, python-brace-format
-msgid "The training {acronym} ({academic_year}) is linked to epc"
+msgid "The training {acronym} ({academic_year}) have links in EPC application"
 msgstr ""
 
 #, python-format
