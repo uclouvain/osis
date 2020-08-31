@@ -23,9 +23,8 @@
 # ############################################################################
 from unittest import mock
 
-from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse
-from django.test import TestCase, override_settings
+from django.test import TestCase
 
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType
 from program_management.ddd import command
@@ -34,11 +33,6 @@ from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
 
-@override_settings(
-    ESB_API_URL="api.esb.com",
-    ESB_AUTHORIZATION="Basic dummy:1234",
-    ESB_REFRESH_PEDAGOGY_ENDPOINT="offer/{year}/{code}/refresh"
-)
 class TestPublishProgramTreesUsingNodeService(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -58,10 +52,13 @@ class TestPublishProgramTreesUsingNodeService(TestCase):
         self.mocked_get_pgrm_trees = self.get_pgrm_trees_patcher.start()
         self.addCleanup(self.get_pgrm_trees_patcher.stop)
 
-    @override_settings(ESB_REFRESH_PEDAGOGY_ENDPOINT=None)
-    def test_publish_case_missing_settings(self):
-        with self.assertRaises(ImproperlyConfigured):
-            publish_program_trees_using_node_service.publish_program_trees_using_node(self.cmd)
+        self.get_publish_url_patcher = mock.patch(
+            "program_management.ddd.service.write.publish_program_trees_using_node_service."
+            "GetNodePublishUrl.get_url_from_node",
+            return_value="dummy-url"
+        )
+        self.mocked_get_publish_url = self.get_publish_url_patcher.start()
+        self.addCleanup(self.get_publish_url_patcher.stop)
 
     @mock.patch('requests.get', return_value=HttpResponse)
     @mock.patch('threading.Thread')
@@ -71,12 +68,6 @@ class TestPublishProgramTreesUsingNodeService(TestCase):
         self.assertTrue(mock_thread.start)
 
 
-@override_settings(
-    ESB_API_URL="api.esb.com",
-    ESB_AUTHORIZATION="Basic dummy:1234",
-    ESB_REFRESH_PEDAGOGY_ENDPOINT="offer/{year}/{code}/refresh",
-    REQUESTS_TIMEOUT=20
-)
 class TestBulkPublish(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -90,39 +81,20 @@ class TestBulkPublish(TestCase):
         self.mocked_requests_get = self.requests_get_patcher.start()
         self.addCleanup(self.requests_get_patcher.stop)
 
+        self.get_publish_url_patcher = mock.patch(
+            "program_management.ddd.service.write.publish_program_trees_using_node_service."
+            "GetNodePublishUrl.get_url_from_node",
+            return_value="dummy-url"
+        )
+        self.mocked_get_publish_url = self.get_publish_url_patcher.start()
+        self.addCleanup(self.get_publish_url_patcher.stop)
+
     def test_assert_multiple_publication_call(self):
-        publish_program_trees_using_node_service._bulk_publish([self.minor, self.deepening])
-        self.assertEqual(self.mocked_requests_get.call_count, 2)
+        publish_program_trees_using_node_service._bulk_publish([
+            self.minor,
+            self.deepening,
+            self.major,
+            self.training
+        ])
+        self.assertEqual(self.mocked_requests_get.call_count, 4)
 
-    def test_assert_minor_publish_url(self):
-        publish_program_trees_using_node_service._bulk_publish([self.minor])
-
-        code = "min-{}".format(self.minor.code)
-        expected_publish_url = "api.esb.com/offer/{year}/{code}/refresh".format(year=self.minor.year, code=code)
-        self.mocked_requests_get.assert_called_with(
-            expected_publish_url,
-            headers={"Authorization": "Basic dummy:1234"},
-            timeout=20
-        )
-
-    def test_assert_deepening_publish_url(self):
-        publish_program_trees_using_node_service._bulk_publish([self.deepening])
-
-        code = "app-{}".format(self.deepening.code)
-        expected_publish_url = "api.esb.com/offer/{year}/{code}/refresh".format(year=self.deepening.year, code=code)
-        self.mocked_requests_get.assert_called_with(
-            expected_publish_url,
-            headers={"Authorization": "Basic dummy:1234"},
-            timeout=20
-        )
-
-    def test_assert_major_publish_url(self):
-        publish_program_trees_using_node_service._bulk_publish([self.major])
-
-        code = "fsa1ba-{}".format(self.major.code)
-        expected_publish_url = "api.esb.com/offer/{year}/{code}/refresh".format(year=self.major.year, code=code)
-        self.mocked_requests_get.assert_called_with(
-            expected_publish_url,
-            headers={"Authorization": "Basic dummy:1234"},
-            timeout=20
-        )

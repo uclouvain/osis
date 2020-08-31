@@ -28,21 +28,17 @@ from typing import List
 
 import requests
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
 from django.db import transaction
 
 from program_management.ddd.business_types import *
 from program_management.ddd.command import PublishProgramTreesVersionUsingNodeCommand, GetProgramTreesFromNodeCommand
 from program_management.ddd.domain.exception import PublishNodesException
+from program_management.ddd.domain.service.get_node_publish_url import GetNodePublishUrl
 from program_management.ddd.service.read import search_program_trees_using_node_service
 
 
 @transaction.atomic()
 def publish_program_trees_using_node(cmd: PublishProgramTreesVersionUsingNodeCommand) -> List['ProgramTreeIdentity']:
-    if not all([settings.ESB_API_URL, settings.ESB_AUTHORIZATION, settings.ESB_REFRESH_PEDAGOGY_ENDPOINT]):
-        raise ImproperlyConfigured('ESB_API_URL / ESB_AUTHORIZATION / ESB_REFRESH_PEDAGOGY_ENDPOINT' 
-                                   'must be set in configuration')
-
     cmd = GetProgramTreesFromNodeCommand(code=cmd.code, year=cmd.year)
     program_trees = search_program_trees_using_node_service.search_program_trees_using_node(cmd)
     nodes_to_publish = [program_tree.root_node for program_tree in program_trees]
@@ -54,7 +50,7 @@ def publish_program_trees_using_node(cmd: PublishProgramTreesVersionUsingNodeCom
 def _bulk_publish(nodes: List['NodeGroupYear']) -> None:
     error_root_nodes_ids = []
     for node in nodes:
-        publish_url = __get_publish_url(node)
+        publish_url = GetNodePublishUrl.get_url_from_node(node)
         try:
             __publish(publish_url)
         except Exception:
@@ -68,18 +64,5 @@ def __publish(publish_url: str):
     return requests.get(
         publish_url,
         headers={"Authorization": settings.ESB_AUTHORIZATION},
-        timeout=settings.REQUESTS_TIMEOUT
+        timeout=settings.REQUESTS_TIMEOUT or 20
     )
-
-
-def __get_publish_url(node: 'NodeGroupYear') -> str:
-    code_computed_for_esb = node.title
-    if node.is_minor():
-        code_computed_for_esb = "min-{}".format(node.code)
-    elif node.is_deepening():
-        code_computed_for_esb = "app-{}".format(node.code)
-    elif node.is_major():
-        code_computed_for_esb = "fsa1ba-{}".format(node.code)
-
-    endpoint = settings.ESB_REFRESH_PEDAGOGY_ENDPOINT.format(year=node.year, code=code_computed_for_esb)
-    return "{esb_api}/{endpoint}".format(esb_api=settings.ESB_API_URL, endpoint=endpoint)
