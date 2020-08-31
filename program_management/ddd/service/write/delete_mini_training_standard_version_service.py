@@ -23,18 +23,27 @@
 # ############################################################################
 from django.db import transaction
 
+from education_group.ddd import command as command_education_group
+from education_group.ddd.service.write import delete_orphan_mini_training_service
 from program_management.ddd import command
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, STANDARD
-from program_management.ddd.service.write import delete_specific_version_service
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
+from program_management.ddd.service.write import delete_standard_version_service
 
 
 @transaction.atomic()
-def delete_standard_version(cmd: command.DeleteStandardVersionCommand) -> ProgramTreeVersionIdentity:
-    return delete_specific_version_service.delete_specific_version(
-        command.DeleteSpecificVersionCommand(
-            acronym=cmd.acronym,
+def delete_mini_training_standard_version(
+        cmd: command.DeleteMiniTrainingWithStandardVersionCommand
+) -> ProgramTreeVersionIdentity:
+    tree_version_id = delete_standard_version_service.delete_standard_version(
+        command.DeleteStandardVersionCommand(
+            acronym=cmd.mini_training_acronym,
             year=cmd.year,
-            version_name=STANDARD,
-            is_transition=False
         )
     )
+    delete_orphan_mini_training_service.delete_orphan_mini_training(
+        command_education_group.DeleteOrphanMiniTrainingCommand(
+            acronym=cmd.mini_training_acronym,
+            year=cmd.year
+        )
+    )
+    return tree_version_id

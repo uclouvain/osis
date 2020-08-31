@@ -47,7 +47,8 @@ from program_management.ddd.domain.exception import ProgramTreeNonEmpty, NodeHav
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
-from program_management.ddd.service.write import delete_standard_version_service
+from program_management.ddd.service.write import delete_standard_version_service, \
+    delete_training_standard_version_service
 
 
 class TrainingDeleteView(PermissionRequiredMixin, AjaxTemplateMixin, DeleteView):
@@ -71,12 +72,12 @@ class TrainingDeleteView(PermissionRequiredMixin, AjaxTemplateMixin, DeleteView)
             raise Http404
 
     def delete(self, request, *args, **kwargs):
-        cmd_delete = command_program_management.DeleteStandardVersionCommand(
-            self.get_training().acronym,
-            self.get_training().year
+        cmd_delete = command_program_management.DeleteTrainingStandardVersionCommand(
+            offer_acronym=self.get_training().acronym,
+            year=self.get_training().year
         )
         try:
-            delete_standard_version_service.delete_standard_version(cmd_delete)
+            delete_training_standard_version_service.delete_training_standard_version(cmd_delete)
             display_success_messages(request, self.get_success_message())
             return self._ajax_response() or HttpResponseRedirect(self.get_success_url())
         except (ProgramTreeNonEmpty, NodeHaveLinkException,) as e:

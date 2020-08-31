@@ -393,6 +393,18 @@ class DeleteTrainingWithProgramTreeCommand(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True)
+class DeleteTrainingStandardVersionCommand(interface.CommandRequest):
+    offer_acronym = attr.ib(type=str)
+    year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class DeleteMiniTrainingWithStandardVersionCommand(interface.CommandRequest):
+    mini_training_acronym = attr.ib(type=str)
+    year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
 class DeleteMiniWithProgramTreeCommand(interface.CommandRequest):
     code = attr.ib(type=str)
     offer_acronym = attr.ib(type=str)
