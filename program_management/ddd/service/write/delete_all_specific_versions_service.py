@@ -38,13 +38,12 @@ def delete_all_program_tree_versions(
 
     tree_versions_to_delete = ProgramTreeVersionRepository().search(
         version_name=cmd.version_name,
-        acronym=cmd.acronym,
+        offer_acronym=cmd.acronym,
         is_transition=cmd.is_transition,
     )
 
     tree_versions_identities = []
     for tree_version in tree_versions_to_delete:
-        _call_delete_program_tree_service(tree_version)
         deleted_tree_version_identity = _call_delete_specific_version_service(tree_version)
         tree_versions_identities.append(deleted_tree_version_identity)
 
@@ -54,17 +53,9 @@ def delete_all_program_tree_versions(
 def _call_delete_specific_version_service(tree_version: 'ProgramTreeVersion') -> 'ProgramTreeVersionIdentity':
     return delete_specific_version_service.delete_specific_version(
         command.DeleteSpecificVersionCommand(
-            acronym=tree_version.entity_identity.acronym,
+            acronym=tree_version.entity_identity.offer_acronym,
             year=tree_version.entity_identity.year,
             version_name=tree_version.entity_identity.version_name,
             is_transition=tree_version.entity_identity.is_transition,
         )
     )
-
-
-def _call_delete_program_tree_service(tree_version: 'ProgramTreeVersion') -> List['ProgramTreeIdentity']:
-    cmd_delete_program_tree = command.DeleteProgramTreeCommand(
-        code=tree_version.program_tree_identity.code,
-        year=tree_version.program_tree_identity.year,
-    )
-    return delete_program_tree_service.delete_program_tree(cmd_delete_program_tree)
