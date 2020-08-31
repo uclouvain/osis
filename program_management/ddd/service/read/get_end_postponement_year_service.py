@@ -21,31 +21,19 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from django.db import transaction
 
+from education_group.ddd.repository.mini_training import MiniTrainingRepository
+from education_group.ddd.repository.training import TrainingRepository
 from program_management.ddd import command
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, STANDARD
-from program_management.ddd.repositories import program_tree_version as program_tree_version_repository
-from program_management.ddd.service.write import delete_program_tree_service
-from program_management.ddd.validators.validators_by_business_action import DeleteStandardVersionValidatorList
+from program_management.ddd.domain.program_tree import ProgramTreeIdentity
+from program_management.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
 
 
-@transaction.atomic()
-def delete_standard_version(cmd: command.DeleteStandardVersionCommand) -> ProgramTreeVersionIdentity:
-    program_tree_version_id = ProgramTreeVersionIdentity(
-        offer_acronym=cmd.acronym,
-        year=cmd.year,
-        version_name=STANDARD,
-        is_transition=False
+def calculate_program_tree_end_postponement(
+        cmd: command.GetEndPostponementYearCommand
+) -> int:
+    return CalculateEndPostponement().calculate_program_tree_end_postponement(
+        identity=ProgramTreeIdentity(cmd.code, cmd.year),
+        training_repository=TrainingRepository(),
+        mini_training_repository=MiniTrainingRepository()
     )
-    program_tree_version = program_tree_version_repository.ProgramTreeVersionRepository.get(program_tree_version_id)
-
-    DeleteStandardVersionValidatorList(program_tree_version).validate()
-
-    program_tree_version_repository.ProgramTreeVersionRepository.delete(
-        program_tree_version_id,
-
-        # Service dependency injection
-        delete_program_tree_service=delete_program_tree_service.delete_program_tree
-    )
-    return program_tree_version_id
