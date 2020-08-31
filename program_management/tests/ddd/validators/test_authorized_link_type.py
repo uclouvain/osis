@@ -23,13 +23,13 @@
 # ############################################################################
 import factory.fuzzy
 from django.test import SimpleTestCase
+from django.utils.translation import gettext_lazy as _
 
 from base.models.enums.education_group_types import GroupType, MiniTrainingType
 from base.models.enums.link_type import LinkTypes
 from program_management.ddd.validators._authorized_link_type import AuthorizedLinkTypeValidator
 from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory, NodeGroupYearFactory
 from program_management.tests.ddd.validators.mixins import TestValidatorValidateMixin
-from django.utils.translation import gettext_lazy as _
 
 
 class TestAuthorizedLinkTypeValidator(TestValidatorValidateMixin, SimpleTestCase):
@@ -54,7 +54,7 @@ class TestAuthorizedLinkTypeValidator(TestValidatorValidateMixin, SimpleTestCase
 
     def test_a_none_link_type_with_a_minor_major_list_and_a_minitraining_as_child_should_raise_exception(self):
         minor_major_list_parent_node = NodeGroupYearFactory(
-            node_type=factory.fuzzy.FuzzyChoice(GroupType.minor_major_list_choice_enums())
+            node_type=factory.fuzzy.FuzzyChoice(GroupType.minor_major_option_list_choice_enums())
         )
         minitraining_node_to_add = NodeGroupYearFactory(node_type=factory.fuzzy.FuzzyChoice(MiniTrainingType))
         link_type = None
@@ -69,7 +69,7 @@ class TestAuthorizedLinkTypeValidator(TestValidatorValidateMixin, SimpleTestCase
 
     def test_a_reference_link_type_with_a_minor_major_list_and_a_minitraining_as_child_should_raise_exception(self):
         minor_major_list_parent_node = NodeGroupYearFactory(
-            node_type=factory.fuzzy.FuzzyChoice(GroupType.minor_major_list_choice_enums())
+            node_type=factory.fuzzy.FuzzyChoice(GroupType.minor_major_option_list_choice_enums())
         )
         minitraining_child_node = NodeGroupYearFactory(node_type=factory.fuzzy.FuzzyChoice(MiniTrainingType))
         link_type = LinkTypes.REFERENCE

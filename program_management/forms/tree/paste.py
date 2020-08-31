@@ -29,7 +29,6 @@ from django.db import transaction
 from django.forms import BaseFormSet
 
 import osis_common.ddd.interface
-from base.ddd.utils import business_validator
 from base.forms.utils import choice_field
 from base.models.enums.link_type import LinkTypes
 from program_management.ddd import command
@@ -77,11 +76,11 @@ def _get_form_class(
 
     authorized_relationship = load_authorized_relationship.load()
 
-    if node_to_paste_into.is_minor_major_list_choice():
-        return PasteToMinorMajorListChoiceForm
+    if node_to_paste_into.is_minor_major_option_list_choice():
+        return PasteToMinorMajorOptionListChoiceForm
     elif node_to_paste.node_type == NodeType.LEARNING_UNIT:
         return PasteLearningUnitForm
-    elif node_to_paste_into.is_training() and node_to_paste.is_minor_major_list_choice():
+    elif node_to_paste_into.is_training() and node_to_paste.is_minor_major_option_list_choice():
         return PasteMinorMajorListChoiceToTrainingForm
     elif not authorized_relationship.is_authorized(node_to_paste_into.node_type, node_to_paste.node_type):
         return PasteNotAuthorizedChildren
@@ -161,7 +160,7 @@ class PasteMinorMajorListChoiceToTrainingForm(PasteNodeForm):
                 field.disabled = True
 
 
-class PasteToMinorMajorListChoiceForm(PasteNodeForm):
+class PasteToMinorMajorOptionListChoiceForm(PasteNodeForm):
     is_mandatory = None
     block = None
     link_type = None

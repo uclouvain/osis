@@ -95,10 +95,11 @@ class GroupElementYearForm(forms.ModelForm):
         The validation with learning_units (child_leaf) is in the model.
         """
         data_cleaned = self.cleaned_data.get('link_type')
-        if not self.instance.child_branch:
+        if not self.instance.child_branch or not self.instance.parent:
             return data_cleaned
 
         link = GroupElementYear(pk=self.instance.pk, child_branch=self.instance.child_branch, link_type=data_cleaned)
+
         check = CheckAuthorizedRelationshipAttach(
             self.instance.parent,
             link_to_attach=link,

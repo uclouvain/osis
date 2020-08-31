@@ -29,12 +29,12 @@ from django.test import SimpleTestCase
 import program_management.forms
 from base.models.enums.education_group_types import MiniTrainingType, GroupType
 from program_management.ddd.domain.program_tree import ProgramTree
+from program_management.ddd.repositories import node as node_repository
 from program_management.forms.tree.paste import PasteNodeForm
 from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipListFactory, \
     AuthorizedRelationshipObjectFactory
 from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory, \
     NodeGroupYearFactory
-from program_management.ddd.repositories import node as node_repository
 
 
 class TestAttachNodeFormFactory(SimpleTestCase):
@@ -97,7 +97,7 @@ class TestAttachNodeFormFactory(SimpleTestCase):
     def test_form_returned_when_parent_is_minor_major_list_choice(self):
         path = "6"
         node_to_attach_from = NodeGroupYearFactory(
-            node_type=factory.fuzzy.FuzzyChoice(GroupType.minor_major_list_choice_enums()),
+            node_type=factory.fuzzy.FuzzyChoice(GroupType.minor_major_option_list_choice_enums()),
             node_id=6
         )
         node_to_attach = NodeGroupYearFactory()
@@ -119,13 +119,13 @@ class TestAttachNodeFormFactory(SimpleTestCase):
             node_to_attach.code,
             node_to_attach.year
         )
-        self.assertIsInstance(form, program_management.forms.tree.paste.PasteToMinorMajorListChoiceForm)
+        self.assertIsInstance(form, program_management.forms.tree.paste.PasteToMinorMajorOptionListChoiceForm)
 
     def test_form_returned_when_parent_is_training_and_child_is_minor_major_list_choice(self):
         path = "65|589"
         node_to_attach_from = NodeGroupYearFactory()
         node_to_attach = NodeGroupYearFactory(
-            node_type=factory.fuzzy.FuzzyChoice(GroupType.minor_major_list_choice_enums())
+            node_type=factory.fuzzy.FuzzyChoice(GroupType.minor_major_option_list_choice_enums())
         )
         self._mock_load_node(node_to_attach_from)
         self._mock_node_repo_get(node_to_attach)
@@ -237,7 +237,7 @@ class TestAttachNodeFormFields(SimpleTestCase):
 
     def test_attach_to_minor_major_list_choice_should_remove_all_fields_but_access_condition(self):
         node_to_attach = NodeGroupYearFactory()
-        form = program_management.forms.tree.paste.PasteToMinorMajorListChoiceForm("", node_to_attach.node_id, node_to_attach.node_type)
+        form = program_management.forms.tree.paste.PasteToMinorMajorOptionListChoiceForm("", node_to_attach.node_id, node_to_attach.node_type)
         actual_fields = form.fields
         expected_fields = ["access_condition"]
 
