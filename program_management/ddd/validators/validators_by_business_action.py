@@ -161,7 +161,7 @@ class DetachNodeValidatorList(business_validator.BusinessListValidator):
         if node_to_detach.is_group_or_mini_or_training():
             path_to_node_to_detach = path_to_parent + '|' + str(node_to_detach.node_id)
             self.validators = [
-                DetachRootValidator(tree, path_to_parent),
+                DetachRootValidator(tree, path_to_node_to_detach),
                 MinimumEditableYearValidator(tree),
                 DetachAuthorizedRelationshipValidator(tree, node_to_detach, detach_from),
                 IsPrerequisiteValidator(tree, path_to_parent, node_to_detach),

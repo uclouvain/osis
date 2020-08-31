@@ -22,19 +22,19 @@ msgid_plural "%(count_enrollment)d students are enrolled in the mini-training."
 msgstr[0] "%(count_enrollment)d étudiant est inscrit à la mini-formation."
 msgstr[1] "%(count_enrollment)d étudiants sont inscrits à la mini-formation."
 
-#, python-format, python-brace-format
+#, python-format
 msgid ""
-"%(count_enrollment)d student is enrolled in the training {acronym} "
-"({academic_year})."
+"%(count_enrollment)d student is enrolled in the training %(acronym)s "
+"(%(academic_year)s)."
 msgid_plural ""
-"%(count_enrollment)d students are enrolled in the training {acronym} "
-"({academic_year})."
+"%(count_enrollment)d students are enrolled in the training %(acronym)s "
+"(%(academic_year)s)."
 msgstr[0] ""
-"%(count_enrollment)d étudiant est inscrit à la formation {acronym} "
-"({academic_year})."
+"%(count_enrollment)d étudiant est inscrit à la formation %(acronym)s "
+"(%(academic_year)s)."
 msgstr[1] ""
-"%(count_enrollment)d étudiants sont inscrits à la formation {acronym} "
-"({academic_year})."
+"%(count_enrollment)d étudiants sont inscrits à la formation %(acronym)s "
+"(%(academic_year)s)."
 
 #, python-format
 msgid "%(max)s must be greater or equals than %(min)s"
@@ -359,7 +359,7 @@ msgid "Identification"
 msgstr "Identification"
 
 #, python-format
-msgid "Imposible to put end date to %(end_year)s: %(msg)s"
+msgid "Impossible to put end date to %(end_year)s: %(msg)s"
 msgstr "Impossible de mettre la fin à %(end_year)s: %(msg)s"
 
 msgid "Institution"
@@ -615,16 +615,14 @@ msgstr ""
 "action"
 
 #, python-format
-msgid "The training %(code)s has been deleted."
-msgstr "La formation %(code)s a été supprimée."
+msgid "The training %(acronym)s - %(title)s has been deleted."
+msgstr "La formation %(acronym)s - %(title)s a été supprimée."
 
 #, python-brace-format
-msgid "The training {acronym} ({academic_year}) has inscriptions"
-msgstr "La formation {acronym} ({academic_year}) dispose d'inscriptions"
-
-#, python-brace-format
-msgid "The training {acronym} ({academic_year}) is linked to epc"
-msgstr "La formation {acronym} ({academic_year}) est liée à epc"
+msgid "The training {acronym} ({academic_year}) have links in EPC application"
+msgstr ""
+"La formation {acronym} ({academic_year}) contient des liaisons dans "
+"l'application EPC"
 
 #, python-format
 msgctxt "female"

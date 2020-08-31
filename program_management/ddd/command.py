@@ -30,6 +30,7 @@ import attr
 from base.models.enums.link_type import LinkTypes
 from education_group.ddd import command as education_group_command
 from osis_common.ddd import interface
+from program_management.ddd.business_types import *
 
 
 class DetachNodeCommand(interface.CommandRequest):
@@ -457,3 +458,10 @@ class DuplicateProgramTree(interface.CommandRequest):
     from_root_year = attr.ib(type=int)
     override_end_year_to = attr.ib(type=int, default=DO_NOT_OVERRIDE)
     override_start_year_to = attr.ib(type=int, default=DO_NOT_OVERRIDE)
+
+
+@attr.s(frozen=True, slots=True)
+class DeleteAllStandardVersionCommand(interface.CommandRequest):
+    acronym = attr.ib(type=str)
+    year = attr.ib(type=int)
+
