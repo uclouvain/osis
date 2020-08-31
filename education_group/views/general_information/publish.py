@@ -12,11 +12,11 @@ from education_group.ddd.service.write import publish_common_pedagogy_service, p
 
 @login_required
 @require_http_methods(['POST'])
-def publish_common_admission(request, year, redirect_view):
+def publish_common_admission_conditions(request, year, redirect_view):
     try:
         cmd = command.PublishCommonAdmissionCommand(year=year)
         publish_common_admission_service.publish_common_admission(cmd)
-        display_success_messages(request, _('Common admission will be published soon'))
+        display_success_messages(request, _('Common admission conditions will be published soon'))
     except PublishException as e:
         display_error_messages(request, str(e))
     return HttpResponseRedirect(reverse(redirect_view, kwargs={'year': year}))

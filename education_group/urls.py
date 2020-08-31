@@ -162,7 +162,7 @@ urlpatterns = [
         ),
         path(
             'common-bachelor/publish',
-            general_information.publish_common_admission,
+            general_information.publish_common_admission_conditions,
             {'redirect_view': 'common_bachelor_admission_condition'},
             name="publish_common_bachelor_admission_condition"
         ),
@@ -173,7 +173,7 @@ urlpatterns = [
         ),
         path(
             'common-aggregate/publish',
-            general_information.publish_common_admission,
+            general_information.publish_common_admission_conditions,
             {'redirect_view': 'common_aggregate_admission_condition'},
             name="publish_common_aggregate_admission_condition"
         ),
@@ -184,7 +184,7 @@ urlpatterns = [
         ),
         path(
             'common-master/publish',
-            general_information.publish_common_admission,
+            general_information.publish_common_admission_conditions,
             {'redirect_view': 'common_master_admission_condition'},
             name="publish_common_master_admission_condition"
         ),
@@ -195,7 +195,7 @@ urlpatterns = [
         ),
         path(
             'common-master-specialized/publish',
-            general_information.publish_common_admission,
+            general_information.publish_common_admission_conditions,
             {'redirect_view': 'common_master_specialized_admission_condition'},
             name="publish_common_master_specialized_admission_condition"
         ),
