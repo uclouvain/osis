@@ -28,13 +28,10 @@ import urllib
 from unittest import mock
 
 from django.conf import settings
-from django.contrib import messages
-from django.contrib.messages import get_messages
 from django.http import HttpResponseForbidden, HttpResponseNotFound, HttpResponse, HttpResponseRedirect
 from django.test import TestCase, RequestFactory
 from django.urls import reverse
 
-from base.business.education_groups.general_information import PublishException
 from base.forms.education_group_admission import UpdateTextForm
 from base.forms.education_group_pedagogy_edit import EducationGroupPedagogyEditForm
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine, CONDITION_ADMISSION_ACCESSES
@@ -45,12 +42,11 @@ from base.tests.factories.education_group_year import TrainingFactory, Education
     EducationGroupYearCommonBachelorFactory, \
     EducationGroupYearCommonSpecializedMasterFactory, EducationGroupYearCommonMasterFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
-from base.tests.factories.person import PersonWithPermissionsFactory, PersonFactory
+from base.tests.factories.person import PersonFactory
 from cms.enums import entity_name
 from cms.tests.factories.text_label import OfferTextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextRandomFactory, \
     OfferTranslatedTextFactory
-from education_group.tests.factories.group_year import GroupYearFactory
 from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementFactory
 
