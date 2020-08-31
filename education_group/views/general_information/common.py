@@ -52,9 +52,10 @@ class CommonGeneralInformation(PermissionRequiredMixin, TemplateView):
             "tab_urls": self.get_tab_urls(),
             "sections": self.get_sections(),
             "update_label_url": self.get_update_label_url(),
+            "publish_url": self.get_publish_url(),
             "can_edit_information": self.request.user.has_perm(
                 "base.change_commonpedagogyinformation", self.get_object()
-            )
+            ),
         }
 
     def get_tab_urls(self):
@@ -79,3 +80,6 @@ class CommonGeneralInformation(PermissionRequiredMixin, TemplateView):
     def get_update_label_url(self):
         offer_id = self.get_object().pk
         return reverse('education_group_pedagogy_edit', args=[offer_id])
+
+    def get_publish_url(self):
+        return reverse('publish_common_general_information', kwargs={'year': self.kwargs['year']})
