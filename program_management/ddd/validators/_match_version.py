@@ -43,5 +43,6 @@ class MatchVersionValidator(business_validator.BusinessValidator):
         self.child_version = self.version_search.get_from_node_identity(self.node_to_add.entity_id)
         if self.node_to_add.is_training() and self.root_node_version.version_name != self.child_version.version_name:
             raise exception.ProgramTreeVersionMismatch(
-                self.root_node, self.node_to_add, self.root_node_version, self.child_version
+                self.root_node_version, self.child_version,
+                root_code=self.root_node.code, child_code=self.node_to_add.code,
             )
