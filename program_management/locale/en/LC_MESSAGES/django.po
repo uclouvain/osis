@@ -759,6 +759,3 @@ msgstr ""
 
 msgid "yes,no"
 msgstr ""
-
-#~ msgid "Cannot detach due to prerequisites."
-#~ msgstr "Cannot remove link due to prerequisites."
