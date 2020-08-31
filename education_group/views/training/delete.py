@@ -77,7 +77,7 @@ class TrainingDeleteView(PermissionRequiredMixin, AjaxTemplateMixin, DeleteView)
             self.get_training().year
         )
         try:
-            delete_all_standard_versions_service.delete_all_standard_versions(cmd_delete)
+            delete_all_standard_versions_service.delete_all_training_standard_versions(cmd_delete)
             display_success_messages(request, self.get_success_message())
             return self._ajax_response() or HttpResponseRedirect(self.get_success_url())
         except (

@@ -25,15 +25,16 @@ from typing import List
 
 from django.db import transaction
 
-from program_management.ddd.business_types import *
 from program_management.ddd import command
 from program_management.ddd.domain.program_tree_version import STANDARD, ProgramTreeVersionIdentity
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
-from program_management.ddd.service.write import delete_standard_version_service
+from program_management.ddd.service.write import delete_training_standard_version_service
 
 
 @transaction.atomic()
-def delete_all_standard_versions(cmd: command.DeleteAllStandardVersionCommand) -> List['ProgramTreeVersionIdentity']:
+def delete_all_training_standard_versions(
+        cmd: command.DeleteAllStandardVersionCommand
+) -> List['ProgramTreeVersionIdentity']:
     program_tree_standard_id = ProgramTreeVersionIdentity(
         offer_acronym=cmd.acronym,
         year=cmd.year,
@@ -45,9 +46,10 @@ def delete_all_standard_versions(cmd: command.DeleteAllStandardVersionCommand) -
     )
 
     for program_tree_version_id in program_tree_version_ids:
-        cmd_delete_standard_version = command.DeleteStandardVersionCommand(
-            acronym=program_tree_version_id.offer_acronym,
-            year=program_tree_version_id.year
+        delete_training_standard_version_service.delete_training_standard_version(
+            command.DeleteTrainingStandardVersionCommand(
+                offer_acronym=program_tree_version_id.offer_acronym,
+                year=program_tree_version_id.year,
+            )
         )
-        delete_standard_version_service.delete_standard_version(cmd_delete_standard_version)
     return program_tree_version_ids
