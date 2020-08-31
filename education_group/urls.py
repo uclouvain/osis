@@ -154,12 +154,17 @@ urlpatterns = [
     ])),
     path('general_information/<int:year>/', include([
         path('common/', general_information.CommonGeneralInformation.as_view(), name="common_general_information"),
-        path('publish/common-pedagogy', general_information.publish_common_pedagogy, name="publish_common_pedagogy"),
-        path('publish/common-admission', general_information.publish_common_admission, name="publish_common_admission"),
+        path('common/publish', general_information.publish_common_pedagogy, name="publish_common_general_information"),
         path(
             'common-bachelor/',
             general_information.CommonBachelorAdmissionCondition.as_view(),
             name="common_bachelor_admission_condition"
+        ),
+        path(
+            'common-bachelor/publish',
+            general_information.publish_common_admission,
+            {'redirect_view': 'common_bachelor_admission_condition'},
+            name="publish_common_bachelor_admission_condition"
         ),
         path(
             'common-aggregate/',
@@ -167,14 +172,32 @@ urlpatterns = [
             name="common_aggregate_admission_condition"
         ),
         path(
+            'common-aggregate/publish',
+            general_information.publish_common_admission,
+            {'redirect_view': 'common_aggregate_admission_condition'},
+            name="publish_common_aggregate_admission_condition"
+        ),
+        path(
             'common-master/',
             general_information.CommonMasterAdmissionCondition.as_view(),
             name="common_master_admission_condition"
         ),
         path(
+            'common-master/publish',
+            general_information.publish_common_admission,
+            {'redirect_view': 'common_master_admission_condition'},
+            name="publish_common_master_admission_condition"
+        ),
+        path(
             'common-master-specialized/',
             general_information.CommonMasterSpecializedAdmissionCondition.as_view(),
             name="common_master_specialized_admission_condition"
+        ),
+        path(
+            'common-master-specialized/publish',
+            general_information.publish_common_admission,
+            {'redirect_view': 'common_master_specialized_admission_condition'},
+            name="publish_common_master_specialized_admission_condition"
         ),
     ])),
     path('<int:year>/<acronym:acronym>/', ReadEducationGroupRedirectView.as_view(), name='education_group_read_proxy'),

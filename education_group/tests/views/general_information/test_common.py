@@ -76,6 +76,10 @@ class TestCommonGeneralInformation(TestCase):
         ])
         self.assertEqual(response.context['update_label_url'], expected_update_url)
 
+        expected_publish_url = reverse('publish_common_general_information', kwargs={
+            'year': self.common_education_group_year.academic_year.year
+        })
+        self.assertEqual(response.context['publish_url'], expected_publish_url)
         self.assertIn("tab_urls", response.context)
         self.assertIn("sections", response.context)
         self.assertIn("can_edit_information", response.context)

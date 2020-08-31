@@ -81,6 +81,10 @@ class TestCommonAggregateAdmissionCondition(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(response.context['object'], self.common_aggregate_education_group_year)
+        expected_publish_url = reverse('publish_common_aggregate_admission_condition', kwargs={
+            'year': self.common_aggregate_education_group_year.academic_year.year
+        })
+        self.assertEqual(response.context['publish_url'], expected_publish_url)
         self.assertEqual(
             response.context['admission_condition'],
             self.common_aggregate_education_group_year.admissioncondition

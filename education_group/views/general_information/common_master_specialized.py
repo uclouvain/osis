@@ -54,7 +54,8 @@ class CommonMasterSpecializedAdmissionCondition(PermissionRequiredMixin, Templat
             "tab_urls": self.get_tab_urls(),
             "can_edit_information": self.request.user.has_perm(
                 "base.change_commonadmissioncondition", self.get_object()
-            )
+            ),
+            "publish_url": self.get_publish_url()
         }
 
     def get_tab_urls(self):
@@ -76,3 +77,6 @@ class CommonMasterSpecializedAdmissionCondition(PermissionRequiredMixin, Templat
             ).select_related('admissioncondition').get()
         except EducationGroupYear.DoesNotExist:
             raise Http404
+
+    def get_publish_url(self):
+        return reverse('publish_common_master_specialized_admission_condition', kwargs={'year': self.kwargs['year']})
