@@ -33,9 +33,9 @@ register = template.Library()
 
 
 @register.simple_tag
-def version_details(child: 'NodeGroupYear', tree_versions: List['ProgramTreeVersion']) -> Dict[str, str]:
+def version_details(entity_id: 'NodeIdentity', tree_versions: List['ProgramTreeVersion']) -> Dict[str, str]:
     for program_tree_version in tree_versions:
-        program_tree_identity = ProgramTreeIdentitySearch().get_from_node_identity(child.entity_id)
+        program_tree_identity = ProgramTreeIdentitySearch().get_from_node_identity(entity_id)
         if program_tree_version.program_tree_identity == program_tree_identity:
             return {"title": " - {}".format(program_tree_version.title_fr),
                     "version_label": program_tree_version.version_label}

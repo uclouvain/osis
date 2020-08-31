@@ -52,7 +52,7 @@
                             <td>
                                 {% if not link.child.is_learning_unit %}
                                     {{ link.child.title }}
-                                    {% version_details link.child tree_different_versions as version_infos %}
+                                    {% version_details link.child.entity_id tree_different_versions as version_infos %}
                                     {% if version_infos %}
                                         {{ version_infos.version_label }}
                                     {% endif %}
