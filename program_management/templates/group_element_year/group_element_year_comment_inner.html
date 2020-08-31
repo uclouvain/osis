@@ -54,18 +54,19 @@
                                 <td style="word-wrap: break-word; min-width: 75px;max-width: 75px;">{% if not node.is_learning_unit %}{{ node.title }}{% else %}-{% endif %}</td>
                                 <td>{{ node.code }}</td>
                                 <td>{% bootstrap_field form.access_condition %}</td>
+                                <input type="hidden" id="id_{{ form.prefix }}-link_type" name="{{ form.prefix }}-link_type" value="{{ form.instance.link_type }}"/>
                             </tr>
                         {% endfor %}
                         </tbody>
                     </table>
                 {% else %}
-                    {% if is_education_group_year_formset %}
+                    {% if is_group_year_formset %}
                         <table class="table">
                             <thead>
                                 <tr>
                                     <th>{% trans 'Acronym/Short title' context 'abbreviation' %}</th>
                                     <th>{% trans 'Code' %}</th>
-                                    {% if  formset.forms.0.instance.parent.is_minor_major_option_list_choice %}
+                                    {% if  formset.forms.0.instance.parent_element.group_year.is_minor_major_option_list_choice %}
                                     <th>{% trans 'Access condition' %}</th>
                                     {% else %}
                                     <th>{% trans 'Mandatory' %}</th>
@@ -83,9 +84,9 @@
                                 {% endif %}
                                 <tr class="link-formset" data-formset-form id="{{ form.prefix }}">
                                     {{ form.id }}
-                                    <td style="word-wrap: break-word; min-width: 75px;max-width: 75px;">{{ form.instance.child_branch.acronym }}</td>
-                                    <td>{{ form.instance.child_branch.partial_acronym }}</td>
-                                    {% if form.instance.parent.is_minor_major_option_list_choice %}
+                                    <td style="word-wrap: break-word; min-width: 75px;max-width: 75px;">{{ form.instance.child_element.group_year.acronym }}</td>
+                                    <td>{{ form.instance.child_element.group_year.partial_acronym }}</td>
+                                    {% if form.instance.parent_element.group_year.is_minor_major_option_list_choice %}
                                     <td>{{ form.access_condition }}</td>
                                     {% else %}
                                     <td>{{ form.is_mandatory }}</td>
@@ -117,9 +118,9 @@
                                 {% endif %}
                                 <tr class="link-formset" data-formset-form id="{{ form.prefix }}">
                                     {{ form.id }}
-                                    <td >{{ form.instance.child_leaf.acronym }}</td>
+                                    <td >{{ form.instance.child_element.learning_unit_year.acronym }}</td>
                                     <td>
-                                        {% with form.instance.child.credits|floatformat:-2|default_if_none:'-' as absolute_credits %}
+                                        {% with form.instance.child_element.learning_unit_year.credits|floatformat:-2|default_if_none:'-' as absolute_credits %}
                                             {% bootstrap_field form.relative_credits show_label=False addon_after='/'|add:absolute_credits %}
                                         {% endwith %}
                                     </td>

@@ -53,7 +53,7 @@ class UpdateGroupElementYearView(GenericGroupElementYearMixin, UpdateView):
         context = super().get_context_data(**kwargs)
         context['formset'] = context["form"]
         if len(context["formset"]) > 0:
-            context['is_education_group_year_formset'] = bool(context["formset"][0].instance.child_branch)
+            context['is_group_year_formset'] = bool(context["formset"][0].instance.child_element.group_year)
         group_year = self.object.child_element.group_year
         parent = self.object.parent_element.group_year
         parent_node = self._get_node(parent.partial_acronym, parent.academic_year.year)
