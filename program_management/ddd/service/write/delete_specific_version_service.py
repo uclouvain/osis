@@ -27,8 +27,7 @@ from program_management.ddd import command
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, STANDARD
 from program_management.ddd.repositories import program_tree_version as program_tree_version_repository
 from program_management.ddd.service.write import delete_program_tree_service
-from program_management.ddd.validators.validators_by_business_action import DeleteStandardVersionValidatorList, \
-    DeleteSpecificVersionValidatorList
+from program_management.ddd.validators.validators_by_business_action import DeleteSpecificVersionValidatorList
 
 
 @transaction.atomic()

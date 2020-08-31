@@ -231,15 +231,6 @@ class DeleteProgramTreeValidatorList(business_validator.BusinessListValidator):
         super().__init__()
 
 
-class DeleteStandardVersionValidatorList(business_validator.BusinessListValidator):
-    def __init__(
-            self,
-            program_tree_version: 'ProgramTreeVersion',
-    ):
-        self.validators = []
-        super().__init__()
-
-
 class DeleteSpecificVersionValidatorList(business_validator.BusinessListValidator):
     def __init__(
             self,
