@@ -26,18 +26,18 @@ from unittest import mock
 from django.http import HttpResponse
 from django.test import TestCase, override_settings
 
-from education_group.ddd.command import PublishCommonPedagogyCommand
-from education_group.ddd.service.write import publish_common_pedagogy_service
+from education_group.ddd.command import PublishCommonAdmissionCommand
+from education_group.ddd.service.write import publish_common_admission_conditions_service
 
 
 @override_settings(
     ESB_AUTHORIZATION="Basic dummy:1234",
-    REQUESTS_TIMEOUT=30
+    REQUESTS_TIMEOUT=40
 )
-class TestPublishCommonPedagogyService(TestCase):
+class TestPublishCommonAdmissionService(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.cmd = PublishCommonPedagogyCommand(year=2018)
+        cls.cmd = PublishCommonAdmissionCommand(year=2018)
 
     def setUp(self):
         self.requests_get_patcher = mock.patch('requests.get', return_value=HttpResponse)
@@ -45,17 +45,19 @@ class TestPublishCommonPedagogyService(TestCase):
         self.addCleanup(self.requests_get_patcher.stop)
 
         self.get_publish_url_patcher = mock.patch(
-            "education_group.ddd.service.write.publish_common_pedagogy_service."
-            "GetCommonPublishUrl.get_url_pedagogy",
-            return_value="api.esb.com/common/2018/refresh"
+            "education_group.ddd.service.write.publish_common_admission_conditions_service."
+            "GetCommonPublishUrl.get_url_admission_conditions",
+            return_value="api.esb.com/common-admission/2018/refresh"
         )
         self.mocked_get_publish_url = self.get_publish_url_patcher.start()
         self.addCleanup(self.get_publish_url_patcher.stop)
 
     def test_publish_call_external_service(self):
-        publish_common_pedagogy_service.publish_common_pedagogy(self.cmd)
+        publish_common_admission_conditions_service.publish_common_admission_conditions(self.cmd)
+
         self.mocked_requests_get.assert_called_with(
-            "api.esb.com/common/2018/refresh",
+            "api.esb.com/common-admission/2018/refresh",
             headers={"Authorization": "Basic dummy:1234"},
-            timeout=30
+            timeout=40
         )
+

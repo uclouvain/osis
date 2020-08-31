@@ -25,22 +25,16 @@
 ##############################################################################
 import requests
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
 from django.db import transaction
 
 from education_group.ddd.command import PublishCommonPedagogyCommand
 from education_group.ddd.domain.exception import PublishCommonPedagogyException
+from education_group.ddd.domain.service.get_common_publish_url import GetCommonPublishUrl
 
 
 @transaction.atomic()
 def publish_common_pedagogy(cmd: PublishCommonPedagogyCommand) -> None:
-    if not all([settings.ESB_API_URL, settings.ESB_AUTHORIZATION, settings.ESB_REFRESH_COMMON_PEDAGOGY_ENDPOINT]):
-        raise ImproperlyConfigured('ESB_API_URL / ESB_AUTHORIZATION / ESB_REFRESH_COMMON_PEDAGOGY_ENDPOINT'
-                                   'must be set in configuration')
-
-    endpoint = settings.ESB_REFRESH_COMMON_PEDAGOGY_ENDPOINT.format(year=cmd.year)
-    publish_url = "{esb_api}/{endpoint}".format(esb_api=settings.ESB_API_URL, endpoint=endpoint)
-
+    publish_url = GetCommonPublishUrl.get_url_pedagogy(cmd.year)
     try:
         requests.get(
             publish_url,

@@ -23,23 +23,27 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import requests
 from django.conf import settings
-from django.db import transaction
+from django.core.exceptions import ImproperlyConfigured
 
-from education_group.ddd.command import PublishCommonAdmissionCommand
-from education_group.ddd.domain.exception import PublishCommonAdmissionConditionException
-from education_group.ddd.domain.service.get_common_publish_url import GetCommonPublishUrl
+from osis_common.ddd import interface
 
 
-@transaction.atomic()
-def publish_common_admission_conditions(cmd: PublishCommonAdmissionCommand) -> None:
-    publish_url = GetCommonPublishUrl.get_url_admission_conditions(cmd.year)
-    try:
-        requests.get(
-            publish_url,
-            headers={"Authorization": settings.ESB_AUTHORIZATION},
-            timeout=settings.REQUESTS_TIMEOUT or 20
-        )
-    except Exception:
-        raise PublishCommonAdmissionConditionException(year=cmd.year)
+class GetCommonPublishUrl(interface.DomainService):
+    @classmethod
+    def get_url_admission_conditions(cls, year: int) -> str:
+        if not all([settings.ESB_API_URL, settings.ESB_REFRESH_COMMON_ADMISSION_ENDPOINT]):
+            raise ImproperlyConfigured('ESB_API_URL / ESB_REFRESH_COMMON_ADMISSION_ENDPOINT'
+                                       'must be set in configuration')
+
+        endpoint = settings.ESB_REFRESH_COMMON_ADMISSION_ENDPOINT.format(year=year)
+        return "{esb_api}/{endpoint}".format(esb_api=settings.ESB_API_URL, endpoint=endpoint)
+
+    @classmethod
+    def get_url_pedagogy(cls, year: int) -> str:
+        if not all([settings.ESB_API_URL, settings.ESB_REFRESH_COMMON_PEDAGOGY_ENDPOINT]):
+            raise ImproperlyConfigured('ESB_API_URL / ESB_REFRESH_COMMON_PEDAGOGY_ENDPOINT'
+                                       'must be set in configuration')
+
+        endpoint = settings.ESB_REFRESH_COMMON_PEDAGOGY_ENDPOINT.format(year=year)
+        return "{esb_api}/{endpoint}".format(esb_api=settings.ESB_API_URL, endpoint=endpoint)

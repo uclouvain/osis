@@ -21,44 +21,45 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from unittest import mock
-
 from django.core.exceptions import ImproperlyConfigured
-from django.http import HttpResponse
-from django.test import TestCase, override_settings
+from django.test import SimpleTestCase, override_settings
 
-from education_group.ddd.command import PublishCommonAdmissionCommand
-from education_group.ddd.service.write import publish_common_admission_conditions_service
+from education_group.ddd.domain.service.get_common_publish_url import GetCommonPublishUrl
 
 
 @override_settings(
     ESB_API_URL="api.esb.com",
-    ESB_AUTHORIZATION="Basic dummy:1234",
-    ESB_REFRESH_COMMON_ADMISSION_ENDPOINT="common-admission/{year}/refresh",
-    REQUESTS_TIMEOUT=20
+    ESB_REFRESH_COMMON_ADMISSION_ENDPOINT="common/{year}/refresh",
 )
-class TestPublishCommonAdmissionService(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.cmd = PublishCommonAdmissionCommand(year=2018)
-
-    def setUp(self):
-        self.requests_get_patcher = mock.patch('requests.get', return_value=HttpResponse)
-        self.mocked_requests_get = self.requests_get_patcher.start()
-        self.addCleanup(self.requests_get_patcher.stop)
-
+class TestGetCommonAdmissionConditionsPublishUrl(SimpleTestCase):
     @override_settings(ESB_REFRESH_COMMON_ADMISSION_ENDPOINT=None)
     def test_publish_case_missing_settings(self):
         with self.assertRaises(ImproperlyConfigured):
-            publish_common_admission_conditions_service.publish_common_admission_conditions(self.cmd)
+            GetCommonPublishUrl.get_url_admission_conditions(2018)
 
-    def test_publish_call_external_service(self):
-        publish_common_admission_conditions_service.publish_common_admission_conditions(self.cmd)
+    def test_assert_common_admission_conditions_publish_url(self):
+        expected_publish_url = "api.esb.com/common/2018/refresh"
 
-        expected_publish_url = "api.esb.com/common-admission/{year}/refresh".format(year=self.cmd.year)
-        self.mocked_requests_get.assert_called_with(
-            expected_publish_url,
-            headers={"Authorization": "Basic dummy:1234"},
-            timeout=20
+        self.assertEqual(
+            GetCommonPublishUrl.get_url_admission_conditions(2018),
+            expected_publish_url
         )
 
+
+@override_settings(
+    ESB_API_URL="api.esb.com",
+    ESB_REFRESH_COMMON_PEDAGOGY_ENDPOINT="common-pedagogy/{year}/refresh",
+)
+class TestGetCommonPedagogyPublishUrl(SimpleTestCase):
+    @override_settings(ESB_REFRESH_COMMON_PEDAGOGY_ENDPOINT=None)
+    def test_publish_case_missing_settings(self):
+        with self.assertRaises(ImproperlyConfigured):
+            GetCommonPublishUrl.get_url_pedagogy(2018)
+
+    def test_assert_common_admission_conditions_publish_url(self):
+        expected_publish_url = "api.esb.com/common-pedagogy/2018/refresh"
+
+        self.assertEqual(
+            GetCommonPublishUrl.get_url_pedagogy(2018),
+            expected_publish_url
+        )
