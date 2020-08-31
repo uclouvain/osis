@@ -193,9 +193,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
         )
 
     def get_delete_training_url(self):
-        # TODO :: remove unused path arg !
-        return reverse('training_delete', kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}) + \
-               "?path={}".format(self.get_path())
+        return reverse('training_delete', kwargs={'year': self.node_identity.year, 'code': self.node_identity.code})
 
     def get_delete_all_tree_versions_url(self):
         return reverse(
