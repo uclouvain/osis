@@ -28,12 +28,12 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db import transaction
 
-from base.business.education_groups.general_information import PublishException
 from education_group.ddd.command import PublishCommonAdmissionCommand
+from education_group.ddd.domain.exception import PublishCommonAdmissionConditionException
 
 
 @transaction.atomic()
-def publish_common_admission(cmd: PublishCommonAdmissionCommand) -> None:
+def publish_common_admission_conditions(cmd: PublishCommonAdmissionCommand) -> None:
     if not all([settings.ESB_API_URL, settings.ESB_AUTHORIZATION, settings.ESB_REFRESH_COMMON_ADMISSION_ENDPOINT]):
         raise ImproperlyConfigured('ESB_API_URL / ESB_AUTHORIZATION / ESB_REFRESH_COMMON_ADMISSION_ENDPOINT' 
                                    'must be set in configuration')
@@ -48,5 +48,4 @@ def publish_common_admission(cmd: PublishCommonAdmissionCommand) -> None:
             timeout=settings.REQUESTS_TIMEOUT
         )
     except Exception:
-        error_msg = "Unable to publish common admission for {year}".format(year=cmd.year)
-        raise PublishException(error_msg)
+        raise PublishCommonAdmissionConditionException(year=cmd.year)

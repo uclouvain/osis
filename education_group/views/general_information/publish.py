@@ -4,10 +4,12 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
 
-from base.business.education_groups.general_information import PublishException
 from base.views.common import display_error_messages, display_success_messages
 from education_group.ddd import command
-from education_group.ddd.service.write import publish_common_pedagogy_service, publish_common_admission_service
+from education_group.ddd.domain.exception import PublishCommonAdmissionConditionException, \
+    PublishCommonPedagogyException
+from education_group.ddd.service.write import publish_common_pedagogy_service, \
+    publish_common_admission_conditions_service
 
 
 @login_required
@@ -15,10 +17,10 @@ from education_group.ddd.service.write import publish_common_pedagogy_service, p
 def publish_common_admission_conditions(request, year, redirect_view):
     try:
         cmd = command.PublishCommonAdmissionCommand(year=year)
-        publish_common_admission_service.publish_common_admission(cmd)
+        publish_common_admission_conditions_service.publish_common_admission_conditions(cmd)
         display_success_messages(request, _('Common admission conditions will be published soon'))
-    except PublishException as e:
-        display_error_messages(request, str(e))
+    except PublishCommonAdmissionConditionException as e:
+        display_error_messages(request, e.message)
     return HttpResponseRedirect(reverse(redirect_view, kwargs={'year': year}))
 
 
@@ -29,6 +31,6 @@ def publish_common_pedagogy(request, year):
         cmd = command.PublishCommonPedagogyCommand(year=year)
         publish_common_pedagogy_service.publish_common_pedagogy(cmd)
         display_success_messages(request, _('Common general informations will be published soon'))
-    except PublishException as e:
-        display_error_messages(request, str(e))
+    except PublishCommonPedagogyException as e:
+        display_error_messages(request, e.message)
     return HttpResponseRedirect(reverse('common_general_information', kwargs={'year': year}))

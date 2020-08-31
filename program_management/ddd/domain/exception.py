@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
+
 from program_management.ddd.business_types import *
 from osis_common.ddd.interface import BusinessException
 from django.utils.translation import gettext_lazy as _
@@ -94,3 +96,12 @@ class CannotCopyTreeDueToEndDate(BusinessException):
 
 class NodeIsUsedException(Exception):
     pass
+
+
+class PublishNodesException(BusinessException):
+    def __init__(self, node_ids: List['NodeIdentity'], **kwargs):
+        messages = []
+        for node in node_ids:
+            msg = _("Unable to publish sections for {code} - {year}").format(code=node.code, year=node.year)
+            messages.append(msg)
+        super().__init__(','.join(messages), **kwargs)

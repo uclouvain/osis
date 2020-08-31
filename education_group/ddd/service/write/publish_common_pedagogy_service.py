@@ -28,8 +28,8 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db import transaction
 
-from base.business.education_groups.general_information import PublishException
 from education_group.ddd.command import PublishCommonPedagogyCommand
+from education_group.ddd.domain.exception import PublishCommonPedagogyException
 
 
 @transaction.atomic()
@@ -48,5 +48,4 @@ def publish_common_pedagogy(cmd: PublishCommonPedagogyCommand) -> None:
             timeout=settings.REQUESTS_TIMEOUT
         )
     except Exception:
-        error_msg = "Unable to publish common pedagogy for {year}".format(year=cmd.year)
-        raise PublishException(error_msg)
+        raise PublishCommonPedagogyException(year=cmd.year)

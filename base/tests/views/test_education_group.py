@@ -155,58 +155,6 @@ class EducationGroupPedagogyUpdateViewTestCase(TestCase):
         self.assertIn(anchor_expected, response.url)
 
 
-class EducationGroupPublishViewTestCase(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.academic_year = create_current_academic_year()
-        cls.training = TrainingFactory(academic_year=cls.academic_year)
-        cls.group = GroupYearFactory(
-            academic_year=cls.academic_year,
-            partial_acronym=cls.training.partial_acronym
-        )
-        cls.url = reverse('publish_general_information', args=(cls.academic_year.year, cls.group.partial_acronym))
-        cls.person = PersonWithPermissionsFactory('view_educationgroup')
-
-    def setUp(self):
-        self.client.force_login(self.person.user)
-
-    def test_publish_case_user_not_logged(self):
-        self.client.logout()
-        response = self.client.post(self.url)
-        self.assertRedirects(response, LOGIN_NEXT.format(self.url))
-
-    def test_public_case_methods_not_allowed(self):
-        methods_not_allowed = ['get', 'delete', 'put']
-        for method in methods_not_allowed:
-            request_to_call = getattr(self.client, method)
-            response = request_to_call(self.url)
-            self.assertEqual(response.status_code, 405)
-
-    @mock.patch("base.business.education_groups.general_information.publish_group_year",
-                side_effect=lambda e: "portal-url")
-    def test_publish_case_ok_redirection_with_success_message(self, mock_publish):
-        response = self.client.post(self.url)
-
-        msg = [m.message for m in get_messages(response.wsgi_request)]
-        msg_level = [m.level for m in get_messages(response.wsgi_request)]
-
-        self.assertEqual(len(msg), 1)
-        self.assertIn(messages.SUCCESS, msg_level)
-        self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
-
-    @mock.patch("base.business.education_groups.general_information.publish_group_year",
-                side_effect=PublishException('error'))
-    def test_publish_case_ko_redirection_with_error_message(self, mock_publish):
-        response = self.client.post(self.url)
-
-        msg = [m.message for m in get_messages(response.wsgi_request)]
-        msg_level = [m.level for m in get_messages(response.wsgi_request)]
-
-        self.assertEqual(len(msg), 1)
-        self.assertIn(messages.ERROR, msg_level)
-        self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
-
-
 class AdmissionConditionEducationGroupYearTest(TestCase):
     @classmethod
     def setUpTestData(cls):

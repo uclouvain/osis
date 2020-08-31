@@ -38,7 +38,7 @@ class TestPublishCommonAdmissionCondition(TestCase):
     def setUp(self) -> None:
         self.publish_service_patcher = mock.patch(
             "education_group.views.general_information.publish."
-            "publish_common_admission_service.publish_common_admission",
+            "publish_common_admission_conditions_service.publish_common_admission_conditions",
             return_value=None
         )
         self.mocked_publish_service = self.publish_service_patcher.start()

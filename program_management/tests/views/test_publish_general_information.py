@@ -30,9 +30,9 @@ from django.http import HttpResponseRedirect
 from django.test import TestCase
 from django.urls import reverse
 
-from base.business.education_groups.general_information import PublishException
-
 from base.tests.factories.person import PersonWithPermissionsFactory
+from program_management.ddd.domain.exception import PublishNodesException
+from program_management.ddd.domain.node import NodeIdentity
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
 
@@ -85,7 +85,7 @@ class GeneralInformationPublishViewTestCase(TestCase):
 
     @mock.patch("program_management.views.publish_general_information."
                 "publish_program_trees_using_node_service.publish_program_trees_using_node",
-                side_effect=PublishException('error'))
+                side_effect=PublishNodesException([NodeIdentity(code='LDROI100', year=2018)]))
     def test_publish_case_ko_redirection_with_error_message(self, mock_publish):
         response = self.client.post(self.url)
 

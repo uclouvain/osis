@@ -29,10 +29,9 @@ from django.http import HttpResponseRedirect, Http404
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 
-from base.business.education_groups.general_information import PublishException
 from base.views.common import display_error_messages, display_success_messages
 from program_management.ddd import command as command_program_management
-from program_management.ddd.domain.exception import ProgramTreeNotFoundException
+from program_management.ddd.domain.exception import ProgramTreeNotFoundException, PublishNodesException
 from program_management.ddd.service.read import get_program_tree_service
 from program_management.ddd.service.write import publish_program_trees_using_node_service
 
@@ -56,8 +55,8 @@ def publish(request, year, code):
         display_success_messages(request, message)
     except ProgramTreeNotFoundException:
         raise Http404
-    except PublishException as e:
-        display_error_messages(request, str(e))
+    except PublishNodesException as e:
+        display_error_messages(request, e.message)
 
     if program_tree.root_node.is_training():
         url_name = 'training_general_information'

@@ -28,7 +28,7 @@ from django.http import HttpResponse
 from django.test import TestCase, override_settings
 
 from education_group.ddd.command import PublishCommonAdmissionCommand
-from education_group.ddd.service.write import publish_common_admission_service
+from education_group.ddd.service.write import publish_common_admission_conditions_service
 
 
 @override_settings(
@@ -50,10 +50,10 @@ class TestPublishCommonAdmissionService(TestCase):
     @override_settings(ESB_REFRESH_COMMON_ADMISSION_ENDPOINT=None)
     def test_publish_case_missing_settings(self):
         with self.assertRaises(ImproperlyConfigured):
-            publish_common_admission_service.publish_common_admission(self.cmd)
+            publish_common_admission_conditions_service.publish_common_admission_conditions(self.cmd)
 
     def test_publish_call_external_service(self):
-        publish_common_admission_service.publish_common_admission(self.cmd)
+        publish_common_admission_conditions_service.publish_common_admission_conditions(self.cmd)
 
         expected_publish_url = "api.esb.com/common-admission/{year}/refresh".format(year=self.cmd.year)
         self.mocked_requests_get.assert_called_with(

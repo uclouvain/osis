@@ -32,8 +32,8 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db import transaction
 
 from program_management.ddd.business_types import *
-from base.business.education_groups.general_information import PublishException
 from program_management.ddd.command import PublishProgramTreesVersionUsingNodeCommand, GetProgramTreesFromNodeCommand
+from program_management.ddd.domain.exception import PublishNodesException
 from program_management.ddd.service.read import search_program_trees_using_node_service
 
 
@@ -52,19 +52,16 @@ def publish_program_trees_using_node(cmd: PublishProgramTreesVersionUsingNodeCom
 
 
 def _bulk_publish(nodes: List['NodeGroupYear']) -> None:
-    error_msgs = []
+    error_root_nodes_ids = []
     for node in nodes:
         publish_url = __get_publish_url(node)
         try:
             __publish(publish_url)
         except Exception:
-            error_msg = "Unable to publish sections for the program {code} - {year}".format(
-                code=node.code, year=node.year
-            )
-            error_msgs.append(error_msg)
+            error_root_nodes_ids.append(node.entity_id)
 
-    if error_msgs:
-        raise PublishException(",".join(error_msgs))
+    if error_root_nodes_ids:
+        raise PublishNodesException(node_ids=error_root_nodes_ids)
 
 
 def __publish(publish_url: str):
