@@ -187,15 +187,3 @@ class VersionNameAlreadyExist(BusinessException):
     def __init__(self, version_name: str, *args, **kwargs):
         message = _("Version name {} already exists").format(version_name)
         super().__init__(message, **kwargs)
-
-
-class PublishCommonAdmissionConditionException(BusinessException):
-    def __init__(self, year: int, **kwargs):
-        message = _("Unable to publish common admission conditions for {year}").format(year=year)
-        super().__init__(message, **kwargs)
-
-
-class PublishCommonPedagogyException(BusinessException):
-    def __init__(self, year: int, **kwargs):
-        message = _("Unable to publish common general informations for {year}").format(year=year)
-        super().__init__(message, **kwargs)

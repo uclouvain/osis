@@ -26,9 +26,9 @@
 import requests
 from django.conf import settings
 from django.db import transaction
+from django.utils.translation import gettext_lazy as _
 
 from education_group.ddd.command import PublishCommonPedagogyCommand
-from education_group.ddd.domain.exception import PublishCommonPedagogyException
 from education_group.ddd.domain.service.get_common_publish_url import GetCommonPublishUrl
 
 
@@ -43,3 +43,9 @@ def publish_common_pedagogy(cmd: PublishCommonPedagogyCommand) -> None:
         )
     except Exception:
         raise PublishCommonPedagogyException(year=cmd.year)
+
+
+class PublishCommonPedagogyException(Exception):
+    def __init__(self, year: int, **kwargs):
+        self.message = _("Unable to publish common general informations for {year}").format(year=year)
+        super().__init__(**kwargs)

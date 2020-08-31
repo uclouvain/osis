@@ -31,7 +31,8 @@ from django.views.decorators.http import require_http_methods
 
 from base.views.common import display_error_messages, display_success_messages
 from program_management.ddd import command as command_program_management
-from program_management.ddd.domain.exception import ProgramTreeNotFoundException, PublishNodesException
+from program_management.ddd.domain.exception import ProgramTreeNotFoundException
+from program_management.ddd.service.write.publish_program_trees_using_node_service import PublishNodesException
 from program_management.ddd.service.read import get_program_tree_service
 from program_management.ddd.service.write import publish_program_trees_using_node_service
 

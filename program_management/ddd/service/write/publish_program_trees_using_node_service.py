@@ -29,10 +29,10 @@ from typing import List
 import requests
 from django.conf import settings
 from django.db import transaction
+from django.utils.translation import gettext_lazy as _
 
 from program_management.ddd.business_types import *
 from program_management.ddd.command import PublishProgramTreesVersionUsingNodeCommand, GetProgramTreesFromNodeCommand
-from program_management.ddd.domain.exception import PublishNodesException
 from program_management.ddd.domain.service.get_node_publish_url import GetNodePublishUrl
 from program_management.ddd.service.read import search_program_trees_using_node_service
 
@@ -66,3 +66,13 @@ def __publish(publish_url: str):
         headers={"Authorization": settings.ESB_AUTHORIZATION},
         timeout=settings.REQUESTS_TIMEOUT or 20
     )
+
+
+class PublishNodesException(Exception):
+    def __init__(self, node_ids: List['NodeIdentity'], *args, **kwargs):
+        messages = []
+        for node in node_ids:
+            msg = _("Unable to publish sections for {code} - {year}").format(code=node.code, year=node.year)
+            messages.append(msg)
+        self.message = ','.join(messages)
+        super().__init__(**kwargs)

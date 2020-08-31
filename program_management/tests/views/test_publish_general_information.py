@@ -31,7 +31,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from base.tests.factories.person import PersonWithPermissionsFactory
-from program_management.ddd.domain.exception import PublishNodesException
+from program_management.ddd.service.write.publish_program_trees_using_node_service import PublishNodesException
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
