@@ -186,7 +186,7 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             self.training_form.add_error("end_year", "")
             self.training_form.add_error(
                 None,
-                _("Imposible to put end date to %(end_year)s: %(msg)s") % {
+                _("Impossible to put end date to %(end_year)s: %(msg)s") % {
                     "msg": e.message,
                     "end_year": end_year}
             )
