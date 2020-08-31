@@ -32,8 +32,7 @@ from education_group.models.group_year import GroupYear
 from program_management.ddd.domain.node import NodeIdentity
 
 
-# TODO :: rename to NodeIdentitiesSearch
-class ExistingAcademicYearSearch(interface.DomainService):
+class NodeIdentitiesSearch(interface.DomainService):
     def search_from_code(self, group_code: str) -> List[NodeIdentity]:
         years = GroupYear.objects.filter(
             group__groupyear__partial_acronym=group_code,
