@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+from typing import List, Dict
 from django import template
 
 from program_management.ddd.domain.service.identity_search import ProgramTreeIdentitySearch
@@ -33,7 +33,7 @@ register = template.Library()
 
 
 @register.simple_tag
-def version_details(child: 'NodeGroupYear', tree_versions: List['ProgramTreeVersion']) -> str:
+def version_details(child: 'NodeGroupYear', tree_versions: List['ProgramTreeVersion']) -> Dict[str, str]:
     for program_tree_version in tree_versions:
         program_tree_identity = ProgramTreeIdentitySearch().get_from_node_identity(child.entity_id)
         if program_tree_version.program_tree_identity == program_tree_identity:
