@@ -118,11 +118,14 @@ urlpatterns = [
             create_program_tree_version.CreateProgramTreeVersion.as_view(),
             name="create_education_group_version"
         ),
+        path('publish', publish_general_information.publish, name='publish_general_information'),
+    ])),
+
+    path('<int:year>/<acronym:acronym>/', include([
         path(
             'check_version_name/',
             program_management.views.tree_version.check_version_name.check_version_name,
             name="check_version_name"
         ),
-        path('publish', publish_general_information.publish, name='publish_general_information'),
     ])),
 ]
