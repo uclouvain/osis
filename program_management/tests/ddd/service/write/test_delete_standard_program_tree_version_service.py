@@ -21,7 +21,6 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from unittest import mock
 
 from django.test import TestCase
 
@@ -36,7 +35,6 @@ from education_group.tests.ddd.factories.training import TrainingFactory
 from education_group.tests.factories.mini_training import MiniTrainingFactory
 from program_management.ddd import command
 from program_management.ddd.domain import program_tree, exception
-from program_management.ddd.domain.program_tree_version import STANDARD
 from program_management.ddd.service.write import delete_standard_program_tree_version_service
 from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipListFactory, \
     MandatoryRelationshipObjectFactory
@@ -48,7 +46,7 @@ from program_management.tests.ddd.factories.repository.fake import get_fake_prog
 from testing.mocks import MockPatcherMixin
 
 
-class TestDeleteStandardVersionService(TestCase, MockPatcherMixin):
+class TestDeleteStandardProgramTreeService(TestCase, MockPatcherMixin):
     @classmethod
     def setUpTestData(cls):
         cls.cmd = command.DeleteProgramTreeVersionCommand(
@@ -87,7 +85,11 @@ class TestDeleteStandardVersionService(TestCase, MockPatcherMixin):
         self.fake_program_tree_repo = get_fake_program_tree_repository(self.program_trees)
 
         self.program_tree_versions = [
-            ProgramTreeVersionFactory(tree=tree, entity_id__version_name=STANDARD, program_tree_repository=self.fake_program_tree_repo)
+            ProgramTreeVersionFactory(
+                tree=tree,
+                program_tree_repository=self.fake_program_tree_repo,
+                entity_id__version_name=self.cmd.version_name
+            )
             for tree in self.program_trees
         ]
         self.fake_program_tree_version_repo = get_fake_program_tree_version_repository(self.program_tree_versions)

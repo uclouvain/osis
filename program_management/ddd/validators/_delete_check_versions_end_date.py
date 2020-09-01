@@ -21,33 +21,23 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-import itertools
-from typing import List
-
-from django.db import transaction
-
-from program_management.ddd import command
+from base.ddd.utils import business_validator
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception
-from program_management.ddd.service.write import delete_standard_version_service
+from program_management.ddd.domain.service import has_version_with_greater_end_year
 
 
-@transaction.atomic()
-def delete_standard_program_tree_version(
-        delete_command: command.DeleteProgramTreeVersionCommand) -> List['ProgramTreeVersionIdentity']:
-    from_year = delete_command.from_year
+class CheckVersionsEndDateValidator(business_validator.BusinessValidator):
+    def __init__(self, tree_version: 'ProgramTreeVersion'):
+        self.tree_version = tree_version
+        super().__init__()
 
-    deleted_program_tree_versions = []
-    for year in itertools.count(from_year):
-        try:
-            new_delete_command = command.DeleteStandardVersionCommand(
-                acronym=delete_command.offer_acronym,
-                year=year,
-            )
-            deleted_program_tree_versions.append(
-                delete_standard_version_service.delete_standard_version(new_delete_command)
-            )
-        except exception.ProgramTreeVersionNotFoundException:
-            break
+    def validate(self, *args, **kwargs):
+        if not self.tree_version.is_standard:
+            return
 
-    return deleted_program_tree_versions
+        exists = has_version_with_greater_end_year.HasVersionWithGreaterEndYear.greater_than_standard_year(
+            self.tree_version
+        )
+        if exists:
+            raise exception.CannotDeleteStandardDueToVersionEndDate(self.tree_version)
