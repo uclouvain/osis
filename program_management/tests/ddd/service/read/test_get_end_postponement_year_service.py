@@ -21,15 +21,21 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from base.models.education_group_year import EducationGroupYear
-from education_group.ddd.business_types import *
-from osis_common.ddd import interface
+from unittest import mock
+
+from django.test import SimpleTestCase
+
+from program_management.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
+from program_management.ddd.service.read import get_end_postponement_year_service
+from program_management.tests.ddd.factories.commands.get_end_postponement_year_command import \
+    GetEndPostponementYearCommandFactory
 
 
-class TrainingIsLinkedToEpc(interface.DomainService):
-    @classmethod
-    def is_linked_to_epc(cls, training: 'Training') -> bool:
-        return EducationGroupYear.objects.get(
-            acronym=training.acronym,
-            academic_year__year=training.year
-        ).linked_with_epc
+class TestGetEndPostponementYearService(SimpleTestCase):
+
+    @mock.patch.object(CalculateEndPostponement, 'calculate_program_tree_end_postponement')
+    def test_domain_service_is_called(self, mock_domain_service):
+        get_end_postponement_year_service.calculate_program_tree_end_postponement(
+            GetEndPostponementYearCommandFactory()
+        )
+        self.assertTrue(mock_domain_service.called)

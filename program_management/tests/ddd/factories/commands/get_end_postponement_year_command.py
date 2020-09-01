@@ -21,16 +21,15 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from base.models import offer_enrollment
-from osis_common.ddd import interface
-from education_group.ddd.business_types import *
+import factory.fuzzy
+
+from program_management.ddd import command
 
 
-class TrainingHasInscriptions(interface.DomainService):
-    @classmethod
-    def has_inscriptions(cls, training: 'Training') -> bool:
-        qs_inscriptions_exists = offer_enrollment.OfferEnrollment.objects.filter(
-            education_group_year__acronym=training.acronym,
-            education_group_year__academic_year__year=training.year
-        ).exists()
-        return qs_inscriptions_exists
+class GetEndPostponementYearCommandFactory(factory.Factory):
+    class Meta:
+        model = command.GetEndPostponementYearCommand
+        abstract = False
+
+    code = factory.Sequence(lambda n: 'Code%02d' % n)
+    year = factory.Faker("random_int")

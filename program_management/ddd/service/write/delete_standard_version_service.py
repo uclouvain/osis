@@ -45,7 +45,7 @@ def delete_standard_version(cmd: command.DeleteStandardVersionCommand) -> Progra
     program_tree_version_repository.ProgramTreeVersionRepository.delete(
         program_tree_version_id,
 
-        # Service Dependancy injection
+        # Service dependency injection
         delete_program_tree_service=delete_program_tree_service.delete_program_tree
     )
     return program_tree_version_id

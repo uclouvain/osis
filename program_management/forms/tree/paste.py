@@ -29,7 +29,6 @@ from django.db import transaction
 from django.forms import BaseFormSet
 
 import osis_common.ddd.interface
-from base.ddd.utils import business_validator
 from base.forms.utils import choice_field
 from base.models.enums.link_type import LinkTypes
 from program_management.ddd import command
@@ -122,10 +121,7 @@ class PasteNodeForm(forms.Form):
     def save(self) -> Optional['LinkIdentity']:
         result = None
         if self.is_valid():
-            try:
-                result = paste_element_service.paste_element(self._create_paste_command())
-            except osis_common.ddd.interface.BusinessExceptions as business_exception:
-                self.add_error(None, business_exception.messages)
+            result = paste_element_service.paste_element(self._create_paste_command())
         return result
 
     def _create_paste_command(self) -> command.PasteElementCommand:

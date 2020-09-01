@@ -29,7 +29,7 @@ from django.utils import translation
 from django.views.generic import FormView
 from waffle.decorators import waffle_switch
 
-from base.forms.education_group.common import SelectLanguage
+from program_management.forms.pdf_select_language import PDFSelectLanguage
 from base.models.enums.education_group_types import GroupType
 from base.views.mixins import FlagMixin, AjaxTemplateMixin
 from osis_common.document.pdf_build import render_pdf
@@ -39,6 +39,7 @@ from program_management.ddd.domain.service.identity_search import ProgramTreeVer
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 from backoffice.settings.base import LANGUAGE_CODE_EN
+from program_management.ddd.domain import exception
 
 
 CURRENT_SIZE_FOR_ANNUAL_COLUMN = 15
@@ -53,7 +54,10 @@ def pdf_content(request, year, code, language):
     node_id = NodeIdentity(code=code, year=year)
 
     program_tree_id = ProgramTreeVersionIdentitySearch().get_from_node_identity(node_id)
-    program_tree_version = ProgramTreeVersionRepository.get(program_tree_id)
+    try:
+        program_tree_version = ProgramTreeVersionRepository.get(program_tree_id)
+    except exception.ProgramTreeVersionNotFoundException:
+        program_tree_version = None
     if program_tree_version:
         tree = program_tree_version.get_tree()
     else:
@@ -62,18 +66,17 @@ def pdf_content(request, year, code, language):
         )
     tree = tree.prune(ignore_children_from={GroupType.MINOR_LIST_CHOICE})
     if tree.root_node.is_finality():
-        title = tree.root_node.offer_partial_title_en if language == LANGUAGE_CODE_EN \
+        title = tree.root_node.offer_partial_title_en \
+            if language == LANGUAGE_CODE_EN and tree.root_node.offer_partial_title_en \
             else tree.root_node.offer_partial_title_fr
     else:
-        title = tree.root_node.group_title_en if language == LANGUAGE_CODE_EN \
+        title = tree.root_node.group_title_en if language == LANGUAGE_CODE_EN and tree.root_node.group_title_en \
             else tree.root_node.group_title_fr
 
     if program_tree_version and program_tree_version.version_label:
-        file_name_version_label = "_{}".format(title, program_tree_version.version_label)
-        version_title = program_tree_version.title_en if language == LANGUAGE_CODE_EN else program_tree_version.title_fr
+        version_title = program_tree_version.title_en \
+            if language == LANGUAGE_CODE_EN and program_tree_version.title_en else program_tree_version.title_fr
         title = "{} - {}{}".format(title, version_title, program_tree_version.version_label)
-    else:
-        file_name_version_label = None
 
     context = {
         'root': tree.root_node,
@@ -89,7 +92,11 @@ def pdf_content(request, year, code, language):
         return render_pdf(
             request,
             context=context,
-            filename=_build_file_name(file_name_version_label, program_tree_version, tree.root_node.title),
+            filename="{}{}".format(
+                tree.root_node.title,
+                program_tree_version.version_label if program_tree_version and program_tree_version.version_label
+                else ''
+            ),
             template='pdf_content.html',
         )
 
@@ -97,7 +104,7 @@ def pdf_content(request, year, code, language):
 class ReadEducationGroupTypeView(FlagMixin, AjaxTemplateMixin, FormView):
     flag = "pdf_content"
     template_name = "group_element_year/pdf_content.html"
-    form_class = SelectLanguage
+    form_class = PDFSelectLanguage
 
     def form_valid(self, form):
         self.kwargs['language'] = form.cleaned_data['language']
@@ -112,13 +119,3 @@ def get_main_part_col_length(max_block):
         return MAIN_PART_INIT_SIZE
     else:
         return MAIN_PART_INIT_SIZE - ((max_block-USUAL_NUMBER_OF_BLOCKS) * (CURRENT_SIZE_FOR_ANNUAL_COLUMN + PADDING))
-
-
-def _build_file_name(file_name_version_label, program_tree_version, title):
-    if program_tree_version:
-        return "{}{}".format(
-            program_tree_version.entity_id.offer_acronym,
-            file_name_version_label if file_name_version_label else ''
-        )
-
-    return title

@@ -5,7 +5,7 @@
 #  The core business involves the administration of students, teachers,
 #  courses, programs and so on.
 #
-#  Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#  Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -21,13 +21,19 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from django.utils.translation import gettext_lazy as _
 
-from base.business.education_groups.perms import can_raise_exception
+from education_group.ddd.repository.mini_training import MiniTrainingRepository
+from education_group.ddd.repository.training import TrainingRepository
+from program_management.ddd import command
+from program_management.ddd.domain.program_tree import ProgramTreeIdentity
+from program_management.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
 
 
-def is_eligible_to_update_group_element_year_content(person, group_element_year, raise_exception):
-    result = person.user.has_perm('base.change_link_data') and \
-                person.user.has_perm('base.change_educationgroup', group_element_year.parent)
-    can_raise_exception(raise_exception, result, _("The user is not allowed to change link data."))
-    return result
+def calculate_program_tree_end_postponement(
+        cmd: command.GetEndPostponementYearCommand
+) -> int:
+    return CalculateEndPostponement().calculate_program_tree_end_postponement(
+        identity=ProgramTreeIdentity(cmd.code, cmd.year),
+        training_repository=TrainingRepository(),
+        mini_training_repository=MiniTrainingRepository()
+    )
