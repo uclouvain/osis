@@ -42,12 +42,9 @@ from education_group.ddd.business_types import *
 
 from base.business.event_perms import EventPermEducationGroupEdition
 from base.forms.common import ValidationRuleMixin
-from base.forms.education_group.common import MainCampusChoiceField
-from base.forms.education_group.training import _get_section_choices
-from base.forms.utils.choice_field import BLANK_CHOICE
+from base.forms.utils.choice_field import BLANK_CHOICE, add_blank
 from base.models import campus
 from base.models.academic_year import AcademicYear
-from base.models.campus import Campus
 from base.models.certificate_aim import CertificateAim
 from base.models.enums.academic_type import AcademicTypes
 from base.models.enums.active_status import ActiveStatusEnum
@@ -71,6 +68,10 @@ from reference.models.language import Language, FR_CODE_LANGUAGE
 from rules_management.enums import TRAINING_PGRM_ENCODING_PERIOD, \
     TRAINING_DAILY_MANAGEMENT
 from rules_management.mixins import PermissionFieldMixin
+
+
+def _get_section_choices():
+    return add_blank(CertificateAim.objects.values_list('section', 'section').distinct().order_by('section'))
 
 
 class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
@@ -219,12 +220,12 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         required=False,
         to_field_name="year"
     )
-    teaching_campus = MainCampusChoiceField(
+    teaching_campus = fields.MainCampusChoiceField(
         queryset=None,
         label=_("Learning location"),
         to_field_name="name"
     )
-    enrollment_campus = MainCampusChoiceField(
+    enrollment_campus = fields.MainCampusChoiceField(
         queryset=None,
         label=_("Enrollment campus"),
         to_field_name="name"
