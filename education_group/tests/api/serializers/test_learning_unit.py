@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from django.conf import settings
+from django.db.models import Value, IntegerField
 from django.test import TestCase, RequestFactory
 from rest_framework.reverse import reverse
 
@@ -37,6 +38,7 @@ from education_group.api.serializers.learning_unit import EducationGroupRootsLis
 from education_group.api.serializers.learning_unit import LearningUnitYearPrerequisitesListSerializer
 from education_group.api.views.learning_unit import LearningUnitPrerequisitesList, EducationGroupRootsList
 from education_group.tests.factories.group_year import GroupYearFactory
+from program_management.models.education_group_version import EducationGroupVersion
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 from program_management.tests.factories.element import ElementFactory
 
@@ -60,14 +62,17 @@ class EducationGroupRootsListSerializerTestCase(TestCase):
         cls.luy = LearningUnitYearFactory(academic_year=cls.academic_year)
         luy_element = ElementFactory(learning_unit_year=cls.luy)
         GroupElementYearFactory(parent_element=root_element, child_element=group_element)
-
+        relative_credits = 15
         cls.group_element_year = GroupElementYearFactory(
-            parent_element=group_element, child_element=luy_element, relative_credits=15)
+            parent_element=group_element, child_element=luy_element, relative_credits=relative_credits)
+        cls.annotated_version = EducationGroupVersion.objects.filter(id=cls.version.id).annotate(
+            relative_credits=Value(relative_credits, output_field=IntegerField())
+        ).first()
         url = reverse('learning_unit_api_v1:' + EducationGroupRootsList.name, kwargs={
             'acronym': cls.luy.acronym,
             'year': cls.academic_year.year
         })
-        cls.serializer = EducationGroupRootsListSerializer(cls.version, context={
+        cls.serializer = EducationGroupRootsListSerializer(cls.annotated_version, context={
             'request': RequestFactory().get(url),
             'language': settings.LANGUAGE_CODE_EN,
             'learning_unit_year': cls.luy

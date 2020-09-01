@@ -41,16 +41,26 @@ class MockFormValid(mock.Mock):
         return mock.MagicMock()
 
 
-class MockRepository:
+class FakeRepository:
     root_entities = list()  # type: List['interface.RootEntity']
-    exception_class = None
+    not_found_exception_class = None
 
     @classmethod
     def create(cls, domain_obj: interface.RootEntity, **_) -> interface.EntityIdentity:
+        cls.root_entities.append(domain_obj)
         return domain_obj.entity_id
 
     @classmethod
     def update(cls, domain_obj: interface.RootEntity, **_) -> interface.EntityIdentity:
+        idx = -1
+        for idx, entity in enumerate(cls.root_entities):
+            if entity.entity_id == domain_obj.entity_id:
+                break
+        if idx >= 0:
+            cls.root_entities[idx] = domain_obj
+        else:
+            raise cls.not_found_exception_class()
+
         return domain_obj.entity_id
 
     @classmethod
@@ -58,11 +68,16 @@ class MockRepository:
         try:
             return next((root_entity for root_entity in cls.root_entities if root_entity.entity_id == entity_id))
         except StopIteration:
-            raise cls.exception_class()
+            raise cls.not_found_exception_class()
 
     @classmethod
     def delete(cls, entity_id: interface.EntityIdentity, **_) -> None:
-        pass
+        idx = -1
+        for idx, entity in enumerate(cls.root_entities):
+            if entity.entity_id == entity_id:
+                break
+        if idx >= 0:
+            cls.root_entities.pop(idx)
 
 
 class MockPatcherMixin:
@@ -72,12 +87,18 @@ class MockPatcherMixin:
 
         return service_patcher.start()
 
+    def mock_repo(self, repository_path: 'str', fake_repo: 'Any') -> mock.Mock:
+        repository_patcher = mock.patch(repository_path, new=fake_repo)
+        self.addCleanup(repository_patcher.stop)
+
+        return repository_patcher.start()
+
     def mock_repository(
             self,
             repository_path: str,
-            root_entities: List['interface.RootEntity'] = None) -> 'MockRepository':
+            root_entities: List['interface.RootEntity'] = None) -> 'FakeRepository':
         class_name = "Fake" + repository_path.split('.')[-1]
-        fake_repo = type(class_name, (MockRepository,), {
+        fake_repo = type(class_name, (FakeRepository,), {
             "root_entities": root_entities or list()
         })
 

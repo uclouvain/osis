@@ -26,16 +26,17 @@
 from django.db import transaction
 
 from education_group.ddd.domain import exception
+from education_group.ddd.service.write import copy_group_service
 from education_group.ddd.service.write.create_group_service import create_orphan_group
 from program_management.ddd.command import CopyProgramTreeToNextYearCommand
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity, ProgramTreeBuilder
-from program_management.ddd.repositories.program_tree import ProgramTreeRepository
+from program_management.ddd.repositories import program_tree as program_tree_repository
 
 
 @transaction.atomic()
 def copy_program_tree_to_next_year(copy_cmd: CopyProgramTreeToNextYearCommand) -> 'ProgramTreeIdentity':
     # GIVEN
-    repository = ProgramTreeRepository()
+    repository = program_tree_repository.ProgramTreeRepository()
     existing_program_tree = repository.get(
         entity_id=ProgramTreeIdentity(
             code=copy_cmd.code,
@@ -47,10 +48,11 @@ def copy_program_tree_to_next_year(copy_cmd: CopyProgramTreeToNextYearCommand) -
     program_tree_next_year = ProgramTreeBuilder().copy_to_next_year(existing_program_tree, repository)
 
     # THEN
+    # TODO :: remove this try except and add Repository.upsert() function
     try:
         with transaction.atomic():
-            identity = repository.create(program_tree_next_year, create_group_service=create_orphan_group)
-    except exception.GroupCodeAlreadyExistException:
+            identity = repository.create(program_tree_next_year, copy_group_service=copy_group_service.copy_group)
+    except exception.CodeAlreadyExistException:
         identity = repository.update(program_tree_next_year)
 
     return identity

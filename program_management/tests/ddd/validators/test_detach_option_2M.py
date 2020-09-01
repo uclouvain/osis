@@ -73,3 +73,17 @@ class TestDetachOptionValidator(TestValidatorValidateMixin, SimpleTestCase):
             "finality_acronym": link_finality_option.parent.title
         }
         self.assertValidatorRaises(validator, [expected_message])
+
+    def test_should_not_raise_exception_when_node_to_detach_is_a_finality(self):
+        working_tree = ProgramTreeFactory(root_node__node_type=TrainingType.PGRM_MASTER_120)
+        link_root_finality = LinkFactory(parent=working_tree.root_node, child__node_type=TrainingType.MASTER_MA_120)
+        link_finality_option = LinkFactory(parent=link_root_finality.child, child__node_type=MiniTrainingType.OPTION)
+
+        path_to_detach = program_tree.build_path(working_tree.root_node, link_root_finality.child)
+
+        self.mock_repository.configure_mock(
+            **{"search_from_children.return_value": [working_tree]}
+        )
+
+        validator = DetachOptionValidator(working_tree, path_to_detach, self.mock_repository)
+        self.assertValidatorNotRaises(validator)

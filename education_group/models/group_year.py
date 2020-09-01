@@ -179,11 +179,6 @@ class GroupYear(models.Model):
             raise AttributeError(
                 _('Please enter an academic year greater or equal to group start year.')
             )
-        if self.group.end_year and self.academic_year.year > self.group.end_year.year:
-            raise AttributeError(
-                _('Please enter an academic year less or equal to group end year.')
-            )
-
         super().save(*args, **kwargs)
 
     def delete(self, using=None, keep_parents=False):

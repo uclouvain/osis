@@ -24,70 +24,24 @@
 #
 ##############################################################################
 import string
-import random
 
 import factory.fuzzy
 
 from base.models.enums import active_status, schedule_type as schedule_type_enum
-from education_group.ddd.domain._campus import Campus
-from education_group.ddd.domain._entity import Entity as EntityValueObject
-from base.models.enums.constraint_type import ConstraintTypeEnum
 from base.models.enums.education_group_types import MiniTrainingType
-from education_group.ddd.domain._content_constraint import ContentConstraint
-from education_group.ddd.domain._remark import Remark
-from education_group.ddd.domain._titles import Titles
 from education_group.ddd.domain.mini_training import MiniTraining, MiniTrainingIdentity
+from education_group.tests.ddd.factories.campus import CampusIdentityFactory
+from education_group.tests.ddd.factories.entity import EntityFactory
+from education_group.tests.ddd.factories.titles import TitlesFactory
 
 
-def generate_mini_training_identity(mini_training: 'MiniTraining') -> 'MiniTrainingIdentity':
-    acronym = "".join(random.sample(string.ascii_uppercase, k=8))
-    return MiniTrainingIdentity(acronym=acronym, year=mini_training.start_year)
+class MiniTrainingIdentityFactory(factory.Factory):
+    class Meta:
+        model = MiniTrainingIdentity
+        abstract = False
 
-
-def generate_mini_training_code() -> str:
-    sigle_ele = "".join(random.sample(string.ascii_uppercase, k=5))
-    cnum = "".join(random.sample(string.digits, k=3))
-    subdivision = random.choice(string.ascii_uppercase)
-    code = "{sigle_ele}{cnum}{subdivision}".format(
-        sigle_ele=sigle_ele,
-        cnum=cnum,
-        subdivision=subdivision
-    )
-    return code
-
-
-def generate_titles(mini_training: 'MiniTraining') -> 'Titles':
-    return Titles(
-        title_fr=factory.fuzzy.FuzzyText(length=120).fuzz(),
-        title_en=factory.fuzzy.FuzzyText(length=120).fuzz(),
-    )
-
-
-def generate_content_constraint(mini_training: 'MiniTraining') -> 'ContentConstraint':
-    return ContentConstraint(
-        type=ConstraintTypeEnum.CREDITS,
-        minimum=factory.fuzzy.FuzzyInteger(low=0, high=10).fuzz(),
-        maximum=factory.fuzzy.FuzzyInteger(low=11, high=180).fuzz()
-    )
-
-
-def generate_management_entity(mini_training: 'MiniTraining') -> 'EntityValueObject':
-    management_acronym = "".join(random.sample(string.ascii_uppercase, k=4))
-    return EntityValueObject(acronym=management_acronym)
-
-
-def generate_teaching_campus(mini_training: 'MiniTraining') -> 'Campus':
-    return Campus(
-        name=factory.fuzzy.FuzzyText(length=20).fuzz(),
-        university_name=factory.fuzzy.FuzzyText(length=20).fuzz(),
-    )
-
-
-def generate_remark(mini_training: 'MiniTraining') -> 'Remark':
-    return Remark(
-        text_fr=factory.fuzzy.FuzzyText(length=120).fuzz(),
-        text_en=factory.fuzzy.FuzzyText(length=120).fuzz()
-    )
+    acronym = factory.Sequence(lambda n: 'Acronym%02d' % n)
+    year = factory.fuzzy.FuzzyInteger(1999, 2099)
 
 
 class MiniTrainingFactory(factory.Factory):
@@ -95,16 +49,16 @@ class MiniTrainingFactory(factory.Factory):
         model = MiniTraining
         abstract = False
 
-    entity_identity = factory.LazyAttribute(generate_mini_training_identity)
+    entity_identity = factory.SubFactory(MiniTrainingIdentityFactory)
     entity_id = factory.LazyAttribute(lambda o: o.entity_identity)
     type = factory.Iterator(MiniTrainingType)
-    code = factory.LazyFunction(generate_mini_training_code)
+    code = factory.Sequence(lambda n: 'MiniCode%02d' % n)
     abbreviated_title = factory.fuzzy.FuzzyText(length=20, chars=string.ascii_uppercase)
-    titles = factory.LazyAttribute(generate_titles)
+    titles = factory.SubFactory(TitlesFactory)
     status = factory.Iterator(active_status.ActiveStatusEnum)
     schedule_type = factory.Iterator(schedule_type_enum.ScheduleTypeEnum)
     credits = factory.fuzzy.FuzzyInteger(60, 180)
-    management_entity = factory.LazyAttribute(generate_management_entity)
-    teaching_campus = factory.LazyAttribute(generate_teaching_campus)
+    management_entity = factory.SubFactory(EntityFactory)
+    teaching_campus = factory.SubFactory(CampusIdentityFactory)
     start_year = factory.fuzzy.FuzzyInteger(low=1999, high=2099)
     end_year = None

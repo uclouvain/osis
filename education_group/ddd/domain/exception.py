@@ -16,16 +16,18 @@ class GroupNotFoundException(Exception):
     pass
 
 
-class GroupCodeAlreadyExistException(BusinessException):
-    def __init__(self, *args, **kwargs):
-        message = _("Code already exists")
+class CodeAlreadyExistException(BusinessException):
+    def __init__(self, year: int, **kwargs):
+        message = _("Code already exists in %(academic_year)s") % {"academic_year": display_as_academic_year(year)}
         super().__init__(message, **kwargs)
 
 
-class MiniTrainingCodeAlreadyExistException(BusinessException):
-    def __init__(self, *args, **kwargs):
-        message = _("Code already exists")
-        super().__init__(message, **kwargs)
+class GroupIsBeingUsedException(Exception):
+    pass
+
+
+class MiniTrainingIsBeingUsedException(Exception):
+    pass
 
 
 class TrainingAcronymAlreadyExistException(BusinessException):
@@ -186,4 +188,10 @@ class MiniTrainingHaveLinkWithEPC(BusinessException):
             abbreviated_title=abbreviated_title,
             academic_year=display_as_academic_year(year)
         )
+        super().__init__(message, **kwargs)
+
+
+class VersionNameAlreadyExist(BusinessException):
+    def __init__(self, version_name: str, *args, **kwargs):
+        message = _("Version name {} already exists").format(version_name)
         super().__init__(message, **kwargs)

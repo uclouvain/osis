@@ -13,8 +13,9 @@ from base.models.enums.education_group_types import GroupType
 from base.utils.cache import RequestCache
 from base.views.common import display_success_messages
 from education_group.ddd import command
-from education_group.ddd.domain.exception import GroupCodeAlreadyExistException, ContentConstraintTypeMissing, \
-    ContentConstraintMinimumMaximumMissing, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum
+from education_group.ddd.domain.exception import ContentConstraintTypeMissing, \
+    ContentConstraintMinimumMaximumMissing, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum, \
+    CodeAlreadyExistException
 from education_group.ddd.domain.group import GroupIdentity, Group
 from education_group.ddd.service.read import get_group_service
 from education_group.ddd.service.write import create_group_service
@@ -105,7 +106,7 @@ class GroupCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                         end_year=None
                     )
                     group_id = create_group_service.create_orphan_group(cmd_create)
-            except GroupCodeAlreadyExistException as e:
+            except CodeAlreadyExistException as e:
                 group_form.add_error('code', e.message)
             except ContentConstraintTypeMissing as e:
                 group_form.add_error('constraint_type', e.message)

@@ -37,6 +37,7 @@ class OrganizationFactory(factory.DjangoModelFactory):
     changed = factory.Faker('date_time_this_month', tzinfo=get_tzinfo())
 
     type = factory.Iterator(organization_type.ORGANIZATION_TYPE, getter=lambda c: c[0])
+    name = "Name"
 
 
 class MainOrganizationFactory(OrganizationFactory):

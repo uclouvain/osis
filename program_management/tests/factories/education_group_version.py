@@ -44,7 +44,13 @@ class EducationGroupVersionFactory(factory.DjangoModelFactory):
     is_transition = False
     version_name = factory.fuzzy.FuzzyText(length=10)
     root_group = factory.SubFactory(GroupYearFactory)
-    offer = factory.SubFactory(EducationGroupYearFactory)
+    offer = factory.SubFactory(
+        EducationGroupYearFactory,
+        partial_acronym=factory.SelfAttribute('..root_group.partial_acronym'),
+        acronym=factory.SelfAttribute('..root_group.acronym'),
+        academic_year=factory.SelfAttribute('..root_group.academic_year'),
+        education_group_type=factory.SelfAttribute('..root_group.education_group_type')
+    )
     title_fr = factory.fuzzy.FuzzyText(length=15)
     title_en = factory.fuzzy.FuzzyText(length=15)
 

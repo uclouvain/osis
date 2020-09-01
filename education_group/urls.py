@@ -1,4 +1,4 @@
-from django.urls import include, path, register_converter, re_path
+from django.urls import include, path, register_converter
 
 from base.views.education_groups.achievement.create import CreateEducationGroupDetailedAchievement, \
     CreateEducationGroupAchievement
@@ -43,6 +43,8 @@ urlpatterns = [
                 mini_training.MiniTrainingReadIdentification.as_view(),
                 name='mini_training_identification'
             ),
+            path('<acronym:acronym>/update/', mini_training.MiniTrainingUpdateView.as_view(),
+                 name='mini_training_update'),
             path('content/', mini_training.MiniTrainingReadContent.as_view(), name='mini_training_content'),
             path('utilization/', mini_training.MiniTrainingReadUtilization.as_view(), name='mini_training_utilization'),
             path(
@@ -152,10 +154,17 @@ urlpatterns = [
     ])),
     path('general_information/<int:year>/', include([
         path('common/', general_information.CommonGeneralInformation.as_view(), name="common_general_information"),
+        path('common/publish', general_information.publish_common_pedagogy, name="publish_common_general_information"),
         path(
             'common-bachelor/',
             general_information.CommonBachelorAdmissionCondition.as_view(),
             name="common_bachelor_admission_condition"
+        ),
+        path(
+            'common-bachelor/publish',
+            general_information.publish_common_admission_conditions,
+            {'redirect_view': 'common_bachelor_admission_condition'},
+            name="publish_common_bachelor_admission_condition"
         ),
         path(
             'common-aggregate/',
@@ -163,20 +172,33 @@ urlpatterns = [
             name="common_aggregate_admission_condition"
         ),
         path(
+            'common-aggregate/publish',
+            general_information.publish_common_admission_conditions,
+            {'redirect_view': 'common_aggregate_admission_condition'},
+            name="publish_common_aggregate_admission_condition"
+        ),
+        path(
             'common-master/',
             general_information.CommonMasterAdmissionCondition.as_view(),
             name="common_master_admission_condition"
+        ),
+        path(
+            'common-master/publish',
+            general_information.publish_common_admission_conditions,
+            {'redirect_view': 'common_master_admission_condition'},
+            name="publish_common_master_admission_condition"
         ),
         path(
             'common-master-specialized/',
             general_information.CommonMasterSpecializedAdmissionCondition.as_view(),
             name="common_master_specialized_admission_condition"
         ),
+        path(
+            'common-master-specialized/publish',
+            general_information.publish_common_admission_conditions,
+            {'redirect_view': 'common_master_specialized_admission_condition'},
+            name="publish_common_master_specialized_admission_condition"
+        ),
     ])),
-    path('<int:year>/<str:code>/publish', general_information.publish, name='publish_general_information'),
-    re_path(
-        r'^(?P<year>[\d]{4})/(?P<acronym>[\w]+(?:[/ ]?[a-zA-Z]{1,2}){0,2})/$',
-        ReadEducationGroupRedirectView.as_view(),
-        name='education_group_read_proxy'
-    ),
+    path('<int:year>/<acronym:acronym>/', ReadEducationGroupRedirectView.as_view(), name='education_group_read_proxy'),
 ]

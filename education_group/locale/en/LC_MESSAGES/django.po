@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-19 12:38+0200\n"
+"POT-Creation-Date: 2020-08-31 10:16+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -158,13 +158,20 @@ msgstr ""
 msgid "Code"
 msgstr ""
 
-msgid "Code already exists"
+#, python-format
+msgid "Code already exists in %(academic_year)s"
 msgstr ""
 
 msgid "Code co-graduation inter CfB"
 msgstr ""
 
 msgid "Comment"
+msgstr ""
+
+msgid "Common admission conditions will be published soon"
+msgstr ""
+
+msgid "Common general informations will be published soon"
 msgstr ""
 
 msgid "Conditions"
@@ -389,6 +396,9 @@ msgstr ""
 msgid "Link type"
 msgstr ""
 
+msgid "Linked with EPC"
+msgstr ""
+
 msgid "Main"
 msgstr ""
 
@@ -408,6 +418,16 @@ msgid "Mini training"
 msgstr ""
 
 msgid "Mini-Training"
+msgstr ""
+
+#, python-format
+msgid "Mini-Training %(acronym)s (%(academic_year)s) successfully deleted."
+msgstr ""
+
+#, python-format
+msgid ""
+"Mini-Training <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> "
+"successfully updated."
 msgstr ""
 
 #, python-format
@@ -593,7 +613,7 @@ msgid ""
 msgstr ""
 
 #, python-format
-msgid "The training %(acronym)s - %(title)s has been deleted."
+msgid "The training %(code)s has been deleted."
 msgstr ""
 
 #, python-brace-format
@@ -694,6 +714,9 @@ msgstr ""
 msgid "Validity cannot be greater than last year of organization"
 msgstr ""
 
+msgid "Version name {} already exists"
+msgstr ""
+
 msgid "Web re-registration"
 msgstr ""
 
@@ -769,6 +792,9 @@ msgid "duration unit"
 msgstr ""
 
 msgid "filter by section"
+msgstr ""
+
+msgid "hops"
 msgstr ""
 
 msgid "is using in"

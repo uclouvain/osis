@@ -45,7 +45,7 @@ class MiniTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     code = forms.CharField(max_length=15, label=_("Code"), required=False)
     academic_year = forms.ModelChoiceField(
         queryset=AcademicYear.objects.all(),
-        label=_("Validity"),
+        label=_("Start"),
         to_field_name="year"
     )
     end_year = forms.ModelChoiceField(
@@ -135,8 +135,6 @@ class MiniTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
                 year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION
             )
 
-            self.fields['academic_year'].label = _('Start')
-
     def __init_management_entity_field(self):
         self.fields['management_entity'] = fields.ManagementEntitiesChoiceField(
             person=self.user.person,
@@ -180,3 +178,30 @@ class MiniTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
                 'organization_name': self.cleaned_data['teaching_campus'].organization.name,
             }
         return None
+
+
+class UpdateMiniTrainingForm(MiniTrainingForm):
+    start_year = forms.ModelChoiceField(
+        queryset=AcademicYear.objects.all(),
+        label=_('Start academic year'),
+        to_field_name="year",
+        disabled=True,
+        required=False
+    )
+    end_year = forms.ModelChoiceField(
+        queryset=AcademicYear.objects.all(),
+        label=_('Last year of organization'),
+        required=False,
+        to_field_name="year"
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["academic_year"].label = _('Validity')
+        self.fields["academic_year"].disabled = True
+        self.__init_end_year_field()
+
+    def __init_end_year_field(self):
+        initial_academic_year_value = self.initial.get("academic_year", None)
+        if initial_academic_year_value:
+            self.fields["end_year"].queryset = AcademicYear.objects.filter(year__gte=initial_academic_year_value)

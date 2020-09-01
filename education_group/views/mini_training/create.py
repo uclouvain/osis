@@ -86,7 +86,7 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
                 extra_tags='safe')
             return super().form_valid(form)
 
-        except exception.MiniTrainingCodeAlreadyExistException as e:
+        except exception.CodeAlreadyExistException as e:
             form.add_error("code", e.message)
         except exception.AcronymAlreadyExist as e:
             form.add_error('abbreviated_title', e.message)

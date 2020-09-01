@@ -26,6 +26,7 @@
 
 import osis_common.ddd.interface
 from base.ddd.utils import business_validator
+from base.ddd.utils.business_validator import BusinessListValidator
 from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.validators import _validate_end_date_and_option_finality
@@ -49,8 +50,8 @@ from program_management.ddd.validators._minimum_editable_year import \
 from program_management.ddd.validators._node_have_link import NodeHaveLinkValidator
 from program_management.ddd.validators._prerequisite_expression_syntax import PrerequisiteExpressionSyntaxValidator
 from program_management.ddd.validators._prerequisites_items import PrerequisiteItemsValidator
-from program_management.ddd.validators._program_tree_empty import ProgramTreeEmptyValidator
 from program_management.ddd.validators._relative_credits import RelativeCreditsValidator
+from program_management.ddd.validators._version_name_exists import VersionNameExistsValidator
 from program_management.ddd.validators.link import CreateLinkValidatorList
 
 
@@ -160,7 +161,7 @@ class DetachNodeValidatorList(business_validator.BusinessListValidator):
         if node_to_detach.is_group_or_mini_or_training():
             path_to_node_to_detach = path_to_parent + '|' + str(node_to_detach.node_id)
             self.validators = [
-                DetachRootValidator(tree, path_to_parent),
+                DetachRootValidator(tree, path_to_node_to_detach),
                 MinimumEditableYearValidator(tree),
                 DetachAuthorizedRelationshipValidator(tree, node_to_detach, detach_from),
                 IsPrerequisiteValidator(tree, path_to_parent, node_to_detach),
@@ -224,7 +225,6 @@ class UpdateLinkValidatorList(business_validator.BusinessListValidator):
 class DeleteProgramTreeValidatorList(business_validator.BusinessListValidator):
     def __init__(self, program_tree: 'ProgramTree'):
         self.validators = [
-            ProgramTreeEmptyValidator(program_tree),
             EmptyProgramTreeValidator(program_tree),
             NodeHaveLinkValidator(program_tree.root_node)
         ]
@@ -252,5 +252,20 @@ class CopyProgramTreeValidatorList(business_validator.BusinessListValidator):
     def __init__(self, copy_from: 'ProgramTree'):
         self.validators = [
             CheckProgramTreeEndDateValidator(copy_from)
+        ]
+        super().__init__()
+
+
+class UpdateProgramTreeVersionValidatorList(business_validator.BusinessListValidator):
+    def __init__(self, tree_version: 'ProgramTreeVersion'):
+        self.validators = []
+        super().__init__()
+
+
+class CreateProgramTreeVersionValidatorList(BusinessListValidator):
+
+    def __init__(self, year: int, offer_acronym: str, version_name: str):
+        self.validators = [
+            VersionNameExistsValidator(year, offer_acronym, version_name),
         ]
         super().__init__()

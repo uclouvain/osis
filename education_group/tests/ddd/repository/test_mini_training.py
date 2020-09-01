@@ -25,6 +25,8 @@ from django.forms import model_to_dict
 from django.test import TestCase
 
 from base.models import education_group_year
+from base.models.education_group import EducationGroup
+from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_types
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.campus import CampusFactory
@@ -122,3 +124,73 @@ class TestMiniTrainingRepositoryGetMethod(TestCase):
         )
 
 
+class TestMiniTrainingRepositoryUpdateMethod(TestCase):
+    def setUp(self) -> None:
+        self.education_group_year_db = EducationGroupYearFactory(
+            partial_acronym="CODE",
+            acronym="ACRONYM",
+            academic_year__year=2022,
+            education_group_type__minitraining=True
+        )
+        self.management_entity = EntityVersionFactory(acronym="MANA")
+        self.campus = CampusFactory(name="CAMPUS", organization__name="ORG")
+
+        self.mini_training_to_persist_update = MiniTrainingFactory(
+            entity_identity__acronym=self.education_group_year_db.acronym,
+            entity_identity__year=self.education_group_year_db.academic_year.year,
+            type=education_group_types.MiniTrainingType[self.education_group_year_db.education_group_type.name],
+            management_entity__acronym="MANA",
+            teaching_campus__name="CAMPUS",
+            teaching_campus__university_name="ORG",
+        )
+
+    def test_should_raise_mini_training_not_found_exception_when_mini_training_not_existing_in_repository(self):
+        inexistent_mini_training = MiniTrainingFactory(entity_identity__acronym="INEXISTENT")
+
+        with self.assertRaises(exception.MiniTrainingNotFoundException):
+            mini_training.MiniTrainingRepository.update(inexistent_mini_training)
+
+    def test_should_return_entity_identity(self):
+        result = mini_training.MiniTrainingRepository.update(self.mini_training_to_persist_update)
+
+        self.assertEqual(self.mini_training_to_persist_update.entity_id, result)
+
+    def test_should_persist_fields(self):
+        mini_training.MiniTrainingRepository.update(self.mini_training_to_persist_update)
+
+        self.education_group_year_db.refresh_from_db()
+
+        self._assert_fields_updated_to_repository(
+            self.mini_training_to_persist_update,
+            self.education_group_year_db
+        )
+
+    def _assert_fields_updated_to_repository(self, domain_obj: 'MiniTraining', repo_obj: 'EducationGroupYear'):
+        self.assertEqual(domain_obj.end_year, repo_obj.education_group.end_year)
+
+        self.assertEqual(domain_obj.titles.title_fr, repo_obj.title)
+        self.assertEqual(domain_obj.titles.title_en, repo_obj.title_english)
+
+        self.assertEqual(domain_obj.status.name, repo_obj.active)
+        self.assertEqual(domain_obj.schedule_type.name, repo_obj.schedule_type)
+        self.assertEqual(domain_obj.credits, repo_obj.credits)
+        self.assertEqual(domain_obj.keywords, repo_obj.keywords)
+
+        self.assertEqual(domain_obj.management_entity.acronym, repo_obj.management_entity_version.acronym)
+        self.assertEqual(domain_obj.teaching_campus.name, repo_obj.main_teaching_campus.name)
+        self.assertEqual(domain_obj.teaching_campus.university_name, repo_obj.main_teaching_campus.organization.name)
+
+
+class TestMiniTrainingDeleteMethod(TestCase):
+    def setUp(self) -> None:
+        self.education_group_year_db = EducationGroupYearFactory(education_group_type__minitraining=True)
+        self.entity_identity = MiniTrainingIdentity(
+            acronym=self.education_group_year_db.acronym,
+            year=self.education_group_year_db.academic_year.year
+        )
+
+    def test_should_delete_education_group_year(self):
+        mini_training.MiniTrainingRepository.delete(self.entity_identity)
+
+        with self.assertRaises(exception.MiniTrainingNotFoundException):
+            mini_training.MiniTrainingRepository.get(self.entity_identity)

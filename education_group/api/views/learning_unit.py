@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.db.models.expressions import RawSQL
 from django_filters import rest_framework as filters
 from rest_framework import generics
 from rest_framework.generics import get_object_or_404
@@ -72,7 +73,12 @@ class EducationGroupRootsList(LanguageContextSerializerMixin, generics.ListAPIVi
 
         return EducationGroupVersion.objects.filter(
             root_group__element__in=root_elements
-        ).select_related('offer__academic_year', 'offer__education_group_type')
+        ).select_related('offer__academic_year', 'offer__education_group_type').annotate(
+            relative_credits=RawSQL(
+                self.get_extra_query(),
+                (self.element.id,)
+            )
+        )
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
@@ -80,6 +86,33 @@ class EducationGroupRootsList(LanguageContextSerializerMixin, generics.ListAPIVi
             'learning_unit_year': self.element.learning_unit_year
         })
         return context
+
+    @staticmethod
+    def get_extra_query():
+        return """
+            WITH RECURSIVE group_element_year_children AS (
+                SELECT gey.child_element_id, gey.relative_credits
+                FROM base_groupelementyear gey
+                JOIN program_management_element parent_element ON parent_element.id = gey.parent_element_id
+                JOIN education_group_groupyear parent_groupyear ON parent_groupyear.id = parent_element.group_year_id
+                JOIN program_management_educationgroupversion parent_version ON parent_version.root_group_id = parent_groupyear.id
+                WHERE parent_version.id = (
+                    SELECT version.id 
+                    FROM program_management_educationgroupversion version
+                    JOIN education_group_groupyear group_year ON version.root_group_id = group_year.id
+                    JOIN program_management_element element ON group_year.id = element.group_year_id
+                    WHERE version.id = program_management_educationgroupversion.id
+                )
+                UNION ALL
+                SELECT child.child_element_id, child.relative_credits
+                FROM base_groupelementyear AS child
+                INNER JOIN group_element_year_children AS parent on parent.child_element_id = child.parent_element_id
+            )
+            SELECT geyc.relative_credits
+            FROM group_element_year_children geyc
+            JOIN program_management_element element ON geyc.child_element_id = element.id
+            WHERE element.id = %s LIMIT 1
+        """
 
 
 class LearningUnitPrerequisitesList(LanguageContextSerializerMixin, generics.ListAPIView):

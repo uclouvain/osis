@@ -26,21 +26,43 @@ from unittest.mock import patch
 from django.test import TestCase
 
 from education_group.ddd import command
-from education_group.ddd.service.write import delete_orphan_mini_training_service
+from education_group.ddd.domain import exception
+from education_group.ddd.service.write import delete_orphan_group_service, delete_orphan_mini_training_service
+from education_group.tests.ddd.factories.group import GroupFactory
+from education_group.tests.ddd.factories.repository.fake import get_fake_group_repository, \
+    get_fake_mini_training_repository
+from education_group.tests.factories.mini_training import MiniTrainingFactory
+from testing.mocks import MockPatcherMixin
 
 
-class TestDeleteOrphanMiniTraining(TestCase):
+class TestDeleteOrphanMiniTraining(TestCase, MockPatcherMixin):
     @classmethod
     def setUpTestData(cls):
-        cls.cmd = command.DeleteOrphanMiniTrainingCommand(year=2018, abbreviated_title="MINIAPP")
+        cls.cmd = command.DeleteOrphanMiniTrainingCommand(
+            year=2018,
+            acronym="MAP29"
+        )
 
-    @patch('education_group.ddd.service.write.delete_orphan_mini_training_service.MiniTrainingRepository.get')
-    @patch('education_group.ddd.service.write.delete_orphan_mini_training_service.'
-           'DeleteOrphanMiniTrainingValidatorList.validate')
-    @patch('education_group.ddd.service.write.delete_orphan_mini_training_service.MiniTrainingRepository.delete')
-    def test_assert_repository_called(self, mock_delete_repo, mock_delete_validator, mock_get_repo):
-        delete_orphan_mini_training_service.delete_orphan_mini_training(self.cmd)
+    def setUp(self) -> None:
+        self.mini_training_2018 = MiniTrainingFactory(
+            entity_identity__acronym=self.cmd.acronym,
+            entity_identity__year=self.cmd.year
+        )
+        self.fake_mini_training_repo = get_fake_mini_training_repository([self.mini_training_2018])
+        self.mock_repo(
+            "education_group.ddd.repository.mini_training.MiniTrainingRepository",
+            self.fake_mini_training_repo
+        )
 
-        self.assertTrue(mock_get_repo.called)
-        self.assertTrue(mock_delete_validator.called)
-        self.assertTrue(mock_delete_repo.called)
+    def test_should_return_entity_identity_of_deleted_mini_training(self):
+        result = delete_orphan_mini_training_service.delete_orphan_mini_training(self.cmd)
+
+        expected_result = self.mini_training_2018.entity_id
+        self.assertEqual(expected_result, result)
+
+    def test_should_remove_mini_training_from_repository(self):
+        entity_identity_of_deleted_mini_training = delete_orphan_mini_training_service.delete_orphan_mini_training(
+            self.cmd
+        )
+        with self.assertRaises(exception.MiniTrainingNotFoundException):
+            self.fake_mini_training_repo.get(entity_identity_of_deleted_mini_training)

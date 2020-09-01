@@ -26,10 +26,14 @@ from unittest.mock import patch
 from django.test import TestCase
 
 from education_group.ddd import command
+from education_group.ddd.domain import exception
 from education_group.ddd.service.write import delete_orphan_group_service
+from education_group.tests.ddd.factories.group import GroupFactory
+from education_group.tests.ddd.factories.repository.fake import get_fake_group_repository
+from testing.mocks import MockPatcherMixin
 
 
-class TestDeleteOrphanGroup(TestCase):
+class TestDeleteOrphanGroup(TestCase, MockPatcherMixin):
     @classmethod
     def setUpTestData(cls):
         cls.cmd = command.DeleteOrphanGroupCommand(
@@ -37,12 +41,18 @@ class TestDeleteOrphanGroup(TestCase):
             code="LTRONC1"
         )
 
-    @patch('education_group.ddd.service.write.delete_orphan_group_service.GroupRepository.get')
-    @patch('education_group.ddd.service.write.delete_orphan_group_service.DeleteOrphanGroupValidatorList.validate')
-    @patch('education_group.ddd.service.write.delete_orphan_group_service.GroupRepository.delete')
-    def test_assert_repository_called(self, mock_delete_repo, mock_delete_validator, mock_get_repo):
-        delete_orphan_group_service.delete_orphan_group(self.cmd)
+    def setUp(self) -> None:
+        self.group_2018 = GroupFactory(entity_identity__code=self.cmd.code, entity_identity__year=self.cmd.year)
+        self.fake_group_repo = get_fake_group_repository([self.group_2018])
+        self.mock_repo("education_group.ddd.repository.group.GroupRepository", self.fake_group_repo)
 
-        self.assertTrue(mock_get_repo.called)
-        self.assertTrue(mock_delete_validator.called)
-        self.assertTrue(mock_delete_repo.called)
+    def test_should_return_entity_identity_of_deleted_group(self):
+        result = delete_orphan_group_service.delete_orphan_group(self.cmd)
+
+        expected_result = self.group_2018.entity_id
+        self.assertEqual(expected_result, result)
+
+    def test_should_remove_group_from_repository(self):
+        entity_identity_of_deleted_group = delete_orphan_group_service.delete_orphan_group(self.cmd)
+        with self.assertRaises(exception.GroupNotFoundException):
+            self.fake_group_repo.get(entity_identity_of_deleted_group)
