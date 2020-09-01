@@ -17,7 +17,7 @@ from program_management.ddd.service.read import get_last_existing_version_servic
 def check_version_name(request, year, code):
     version_name = request.GET['version_name']
     existed_version_name = False
-    existing_version = __get_last_existing_version(version_name, code)
+    existing_version = __get_last_existing_version(version_name, code) if request.GET['version_name'] != "" else None
     last_using = None
     if existing_version and existing_version.year < year:
         last_using = display_as_academic_year(existing_version.year)
