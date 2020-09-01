@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-31 10:16+0200\n"
+"POT-Creation-Date: 2020-09-01 09:51+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -364,6 +364,10 @@ msgstr "Domaine ISCED/CITE"
 msgid "Identification"
 msgstr "Identification"
 
+#, fuzzy, python-format
+msgid "Imposible to put end date to %(end_year)s: %(msg)s"
+msgstr "Impossible de mettre la fin à %(end_year)s: %(msg)s"
+
 #, python-format
 msgid "Impossible to put end date to %(end_year)s: %(msg)s"
 msgstr "Impossible de mettre la fin à %(end_year)s: %(msg)s"
@@ -452,6 +456,10 @@ msgstr ""
 
 msgid "Modification"
 msgstr "Modification"
+
+#, python-brace-format
+msgid "Multiple entities {entity_acronym} found in {year}"
+msgstr "Plusieurs entités '{entity_acronym}' trouvées pour l'année {year}"
 
 msgid "New Education Group"
 msgstr "Nouveau Groupement"
@@ -703,6 +711,14 @@ msgstr "Bacheliers UCL"
 
 msgid "UCL Diploma"
 msgstr "Diplôme avec l'UCL"
+
+#, python-brace-format
+msgid "Unable to publish common admission conditions for {year}"
+msgstr ""
+
+#, python-brace-format
+msgid "Unable to publish common general informations for {year}"
+msgstr ""
 
 msgid "University Bachelors"
 msgstr "Bacheliers universitaires"

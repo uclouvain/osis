@@ -102,7 +102,7 @@ class CreateProgramTreeVersion(AjaxPermissionRequiredMixin, AjaxTemplateMixin, V
             if save_type == CreateProgramTreeVersionType.NEW_VERSION.value:
                 try:
                     identities = create_and_postpone_tree_version_service.create_and_postpone(command=command)
-                except exception.VersionNameAlreadyExist as e:
+                except (exception.VersionNameAlreadyExist, exception.MultipleEntitiesFoundException) as e:
                     form.add_error('version_name', e.message)
             elif save_type == CreateProgramTreeVersionType.EXTEND.value:
                 identities = extend_existing_tree_version_service.extend_existing_past_version(
