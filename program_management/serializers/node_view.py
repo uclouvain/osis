@@ -37,6 +37,7 @@ from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.program_tree import PATH_SEPARATOR
 from program_management.ddd.domain.service.identity_search import ProgramTreeIdentitySearch
 from program_management.models.enums.node_type import NodeType
+from backoffice.settings.base import LANGUAGE_CODE_EN
 
 
 def serialize_children(
@@ -44,7 +45,7 @@ def serialize_children(
         path: str,
         tree: 'ProgramTree',
         context=None,
-        mini_training_tree_versions: List['ProgramTreeVersion'] = None
+        nodes_of_tree_versions: List['ProgramTreeVersion'] = None
 ) -> List[dict]:
     serialized_children = []
     for link in children:
@@ -52,7 +53,7 @@ def serialize_children(
         if link.child.is_learning_unit():
             serialized_node = _leaf_view_serializer(link, child_path, tree, context=context)
         else:
-            serialized_node = _get_node_view_serializer(link, child_path, tree, context, mini_training_tree_versions)
+            serialized_node = _get_node_view_serializer(link, child_path, tree, context, nodes_of_tree_versions)
         serialized_children.append(serialized_node)
     return serialized_children
 
@@ -123,7 +124,7 @@ def _get_node_view_serializer(
         path: str,
         tree: 'ProgramTree',
         context=None,
-        mini_training_tree_versions: List['ProgramTreeVersion'] = None
+        nodes_of_tree_versions: List['ProgramTreeVersion'] = None
 ) -> dict:
 
     return {
@@ -135,7 +136,7 @@ def _get_node_view_serializer(
                  'title': link.child.title,
                  'version': get_program_tree_version_name(
                      NodeIdentity(code=link.child.code, year=link.child.year),
-                     mini_training_tree_versions
+                     nodes_of_tree_versions
                  )
                  },
         'children': serialize_children(
@@ -143,7 +144,7 @@ def _get_node_view_serializer(
             path=path,
             tree=tree,
             context=context,
-            mini_training_tree_versions=mini_training_tree_versions
+            nodes_of_tree_versions=nodes_of_tree_versions
         ),
         'a_attr': _get_node_view_attribute_serializer(link, path, tree, context=context),
     }
@@ -192,4 +193,18 @@ def get_program_tree_version_name(node_identity: 'NodeIdentity', tree_versions: 
             ),
             ''
         )
+    return ''
+
+
+def get_program_tree_version_complete_name(node_identity: 'NodeIdentity',
+                                           tree_versions: List['ProgramTreeVersion'],
+                                           language: str) -> str:
+
+    for program_tree_version in tree_versions:
+        program_tree_identity = ProgramTreeIdentitySearch().get_from_node_identity(node_identity)
+        if program_tree_version.program_tree_identity == program_tree_identity:
+            if language == LANGUAGE_CODE_EN and program_tree_version.title_en:
+                return " - {}{}".format(program_tree_version.title_en, program_tree_version.version_label)
+            else:
+                return " - {}{}".format(program_tree_version.title_fr, program_tree_version.version_label)
     return ''
