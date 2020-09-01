@@ -24,7 +24,6 @@
 #
 ##############################################################################
 from http import HTTPStatus
-from unittest import mock
 
 from django.http import HttpResponseNotFound
 from django.test import TestCase
@@ -35,7 +34,7 @@ from base.tests.factories.academic_year import AcademicYearFactory, get_current_
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
-from base.tests.factories.person import CentralManagerFactory
+from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 
 
 @override_flag('education_group_update', active=True)
@@ -45,17 +44,25 @@ class TestEdit(TestCase):
         cls.academic_year = AcademicYearFactory(year=get_current_year() + 1)
         cls.next_academic_year_1 = AcademicYearFactory(year=cls.academic_year.year + 1)
         cls.next_academic_year_2 = AcademicYearFactory(year=cls.academic_year.year + 2)
-        cls.education_group_year = EducationGroupYearFactory(academic_year=cls.academic_year,
-                                                             education_group__end_year=cls.next_academic_year_2)
-        cls.education_group_year_child = EducationGroupYearFactory(academic_year=cls.academic_year,
-                                                                   education_group__end_year=cls.next_academic_year_2)
-        cls.group_element_year = GroupElementYearFactory(parent=cls.education_group_year,
-                                                         child_branch=cls.education_group_year_child)
+        cls.education_group_year = EducationGroupYearFactory(
+            academic_year=cls.academic_year,
+            education_group__end_year=cls.next_academic_year_2
+        )
+        cls.education_group_year_child = EducationGroupYearFactory(
+            academic_year=cls.academic_year,
+            education_group__end_year=cls.next_academic_year_2
+        )
+        cls.group_element_year = GroupElementYearFactory(
+            parent=cls.education_group_year,
+            child_branch=cls.education_group_year_child
+        )
         AuthorizedRelationshipFactory(
             parent_type=cls.education_group_year.education_group_type,
             child_type=cls.group_element_year.child_branch.education_group_type,
         )
-        cls.person = CentralManagerFactory()
+        cls.person = CentralManagerFactory(
+            entity=cls.group_element_year.parent_element.group_year.management_entity
+        ).person
         cls.url = reverse(
             "group_element_year_update",
             kwargs={
@@ -68,12 +75,6 @@ class TestEdit(TestCase):
 
     def setUp(self):
         self.client.force_login(self.person.user)
-        self.perm_patcher = mock.patch(
-            "program_management.business.group_element_years.perms.is_eligible_to_update_group_element_year_content",
-            return_value=True
-        )
-        self.mocked_perm = self.perm_patcher.start()
-        self.addCleanup(self.perm_patcher.stop)
 
     def test_edit_case_user_not_logged(self):
         self.client.logout()

@@ -36,6 +36,7 @@ from education_group.tests.factories.group_year import GroupYearFactory
 class EducationGroupVersionFactory(factory.DjangoModelFactory):
     class Meta:
         model = 'program_management.EducationGroupVersion'
+        django_get_or_create = ('version_name', 'offer', 'is_transition')
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.today() - relativedelta(years=1), datetime.today())
@@ -43,7 +44,13 @@ class EducationGroupVersionFactory(factory.DjangoModelFactory):
     is_transition = False
     version_name = factory.fuzzy.FuzzyText(length=10)
     root_group = factory.SubFactory(GroupYearFactory)
-    offer = factory.SubFactory(EducationGroupYearFactory)
+    offer = factory.SubFactory(
+        EducationGroupYearFactory,
+        partial_acronym=factory.SelfAttribute('..root_group.partial_acronym'),
+        acronym=factory.SelfAttribute('..root_group.acronym'),
+        academic_year=factory.SelfAttribute('..root_group.academic_year'),
+        education_group_type=factory.SelfAttribute('..root_group.education_group_type')
+    )
     title_fr = factory.fuzzy.FuzzyText(length=15)
     title_en = factory.fuzzy.FuzzyText(length=15)
 
@@ -60,3 +67,10 @@ class StandardTransitionEducationGroupVersionFactory(EducationGroupVersionFactor
 class ParticularTransitionEducationGroupVersionFactory(EducationGroupVersionFactory):
     version_name = 'CEMS'
     is_transition = True
+
+
+def create_with_version(version_offer=None, **kwargs):
+    group_yr = GroupYearFactory(**kwargs)
+    if version_offer:
+        EducationGroupVersionFactory(offer=version_offer, root_group=group_yr)
+    return group_yr
