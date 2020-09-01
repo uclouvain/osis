@@ -139,23 +139,6 @@ class TestGroupElementYearForm(TestCase):
         form = GroupElementYearForm(parent=self.parent, child_branch=self.child_branch)
         self.assertTrue("access_condition" not in list(form.fields.keys()))
 
-    def test_child_education_group_year_without_authorized_relationship_fails(self):
-        form = GroupElementYearForm(
-            data={'link_type': ""},
-            parent=self.parent,
-            child_branch=self.child_branch
-        )
-
-        self.assertFalse(form.is_valid())
-        self.assertEqual(
-            form.errors["link_type"],
-            [_("You cannot add \"%(child_types)s\" to \"%(parent)s\" (type \"%(parent_type)s\")") % {
-                 'child_types': self.child_branch.education_group_type,
-                 'parent': self.parent,
-                 'parent_type': self.parent.education_group_type,
-             }]
-        )
-
     def test_initial_value_relative_credits(self):
         form = GroupElementYearForm(parent=self.parent, child_branch=self.child_branch)
         self.assertEqual(form.initial['relative_credits'], self.child_branch.credits)

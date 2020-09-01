@@ -23,14 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
 from django import forms
-from django.core.exceptions import ValidationError
 from django.forms import BaseModelFormSet, modelformset_factory
 
 from base.models.enums import education_group_categories
 from base.models.group_element_year import GroupElementYear
-from program_management.business.group_element_years.management import CheckAuthorizedRelationshipAttach
 
 
 class GroupElementYearForm(forms.ModelForm):
@@ -88,24 +85,6 @@ class GroupElementYearForm(forms.ModelForm):
 
     def save(self, commit=True):
         return super().save(commit)
-
-    def clean_link_type(self):
-        """
-        All of these controls only work with child branch.
-        The validation with learning_units (child_leaf) is in the model.
-        """
-        data_cleaned = self.cleaned_data.get('link_type')
-        if not self.instance.child_branch:
-            return data_cleaned
-
-        link = GroupElementYear(pk=self.instance.pk, child_branch=self.instance.child_branch, link_type=data_cleaned)
-        check = CheckAuthorizedRelationshipAttach(
-            self.instance.parent,
-            link_to_attach=link,
-        )
-        if not check.is_valid():
-            raise ValidationError(check.errors)
-        return data_cleaned
 
     def _check_authorized_relationship(self, child_type):
         return self.instance.parent.education_group_type.authorized_parent_type.filter(child_type=child_type).exists()
