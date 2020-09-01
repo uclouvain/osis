@@ -107,8 +107,8 @@ class ProgramTreeVersionMismatch(BusinessExceptions):
     ):
         root_node_version_title = self._get_version_title(root_version_identity)
         node_to_add_version_title = self._get_version_title(child_version_identity)
-        root_code = kwargs.get('root_code')
-        child_code = kwargs.get('child_code')
+        root_code = kwargs.pop('root_code')
+        child_code = kwargs.pop('child_code')
         messages = [_("%(node_to_add)s version must be the same as %(root_node)s version") % {
             'node_to_add': '{} - {}'.format(child_code, node_to_add_version_title),
             'root_node': '{} - {}'.format(root_code, root_node_version_title)
