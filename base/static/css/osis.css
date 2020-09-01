@@ -554,7 +554,7 @@ table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:after, 
 {
   text-transform: capitalize;
 }
-
+.of_unversioned_field #title,
 .of_unversioned_field #academic_type,
 .of_unversioned_field #duration,
 .of_unversioned_field #internship,
@@ -595,13 +595,19 @@ table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:after, 
 {
     color: grey;
 }
-
+.of_unversioned_field #version_label{
+    color: black;
+}
 .container-align-items-center {
     display: flex;
     align-items: center;
 }
 
-.form-tab.has-error > a::after{
+.glyphicon.medium {
+    font-size: 1.1em;
+}
+
+.form-tab.contains-error > a::after{
     content: '';
     display: inline-block;
     width: 0.8em;
@@ -609,4 +615,34 @@ table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:after, 
     border-radius: 1em;
     margin-left: 0.5em;
     background-color: red;
+}
+
+.osis-select .select2-container--default .select2-selection--multiple .select2-selection__rendered {
+    display: grid;
+    padding: 0 0 5px 0;
+}
+
+/* Not displiaying possibility to remove all selected elements */
+.osis-select .select2-container--default .select2-selection--multiple .select2-selection__clear {
+    display: none;
+}
+
+/* Overrided to get items in list */
+.osis-select .select2-container .select2-selection--multiple,
+.osis-select .select2-container--open .select2-dropdown--above {
+    width: 100%;
+}
+
+@media screen and (max-width: 960px) {
+    /* To align dropdown list to the width of selected elements */
+    .osis-select .select2-container--open .select2-dropdown--above,
+    .osis-select .select2-container .select2-selection--multiple {
+        width: 100%;
+
+    }
+}
+
+/* When the lines are too long in <li> */
+.osis-select .select2-selection__rendered li {
+    white-space: pre-line;
 }

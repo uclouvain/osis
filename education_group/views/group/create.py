@@ -1,21 +1,21 @@
 from typing import List, Dict, Union
 
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.base import View
 
-from base.models import academic_year, entity_version
+from base.models import academic_year
 from base.models.academic_year import starting_academic_year
-from base.models.campus import Campus
 from base.models.enums.education_group_types import GroupType
 from base.utils.cache import RequestCache
 from base.views.common import display_success_messages
 from education_group.ddd import command
-from education_group.ddd.domain.exception import GroupCodeAlreadyExistException, ContentConstraintTypeMissing, \
-    ContentConstraintMinimumMaximumMissing, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum
+from education_group.ddd.domain.exception import ContentConstraintTypeMissing, \
+    ContentConstraintMinimumMaximumMissing, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum, \
+    CodeAlreadyExistException
 from education_group.ddd.domain.group import GroupIdentity, Group
 from education_group.ddd.service.read import get_group_service
 from education_group.ddd.service.write import create_group_service
@@ -23,7 +23,6 @@ from education_group.forms.group import GroupForm, GroupAttachForm
 from education_group.models.group_year import GroupYear
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from osis_role.contrib.views import PermissionRequiredMixin
-
 from program_management.ddd import command as command_pgrm
 from program_management.ddd.domain.program_tree import Path
 from program_management.ddd.service.read import node_identity_service
@@ -56,7 +55,6 @@ class GroupCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         return GroupForm
 
     def _get_initial_form(self) -> Dict:
-        default_campus = Campus.objects.filter(name='Louvain-la-Neuve').first()
         request_cache = RequestCache(self.request.user, reverse('version_program'))
         default_academic_year = request_cache.get_value_cached('academic_year') or starting_academic_year()
 
@@ -64,12 +62,11 @@ class GroupCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         parent_group = self.get_parent_group()
         if parent_group:
             default_academic_year = academic_year.find_academic_year_by_year(parent_group.year)
-            default_management_entity = entity_version.find(parent_group.management_entity.acronym)
+            default_management_entity = parent_group.management_entity.acronym
 
         return {
-            'teaching_campus': default_campus,
             'academic_year': default_academic_year,
-            'management_entity': default_management_entity,
+            'management_entity': default_management_entity
         }
 
     def post(self, request, *args, **kwargs):
@@ -109,7 +106,7 @@ class GroupCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                         end_year=None
                     )
                     group_id = create_group_service.create_orphan_group(cmd_create)
-            except GroupCodeAlreadyExistException as e:
+            except CodeAlreadyExistException as e:
                 group_form.add_error('code', e.message)
             except ContentConstraintTypeMissing as e:
                 group_form.add_error('constraint_type', e.message)
@@ -117,7 +114,6 @@ class GroupCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                     as e:
                 group_form.add_error('min_constraint', e.message)
                 group_form.add_error('max_constraint', '')
-
             if not group_form.errors:
                 display_success_messages(request, self.get_success_msg(group_id), extra_tags='safe')
                 return HttpResponseRedirect(self.get_success_url(group_id))

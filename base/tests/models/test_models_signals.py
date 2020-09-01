@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -150,7 +150,7 @@ class AddToGroupsSignalsTest(TestCase):
 
     def create_test_pgm_manager(self):
         egy = EducationGroupYearFactory(academic_year__current=True)
-        offer_year = OfferYearFactory(academic_year=egy.academic_year, acronym=egy.acronym)
+        offer_year = OfferYearFactory(corresponding_education_group_year=egy)
         return ProgramManagerFactory(offer_year=offer_year, education_group=egy.education_group, person=self.person_foo)
 
     def create_test_entity_manager(self):

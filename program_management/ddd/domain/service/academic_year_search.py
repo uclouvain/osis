@@ -27,19 +27,19 @@ from typing import List
 
 from django.db.models import F
 
-from education_group.models.group_year import GroupYear
 from osis_common.ddd import interface
-from program_management.ddd.business_types import *
+from education_group.models.group_year import GroupYear
+from program_management.ddd.domain.node import NodeIdentity
 
 
 class ExistingAcademicYearSearch(interface.DomainService):
-    def search_from_node_identity(self, node_identity: 'NodeIdentity') -> List[int]:
-        return GroupYear.objects.filter(
-            group__groupyear__partial_acronym=node_identity.code,
-            group__groupyear__academic_year__year=node_identity.year,
+    def search_from_code(self, group_code: str) -> List[NodeIdentity]:
+        years = GroupYear.objects.filter(
+            group__groupyear__partial_acronym=group_code,
         ).annotate(
             year=F('academic_year__year'),
         ).values_list(
             'year',
             flat=True
         ).distinct()
+        return [NodeIdentity(code=group_code, year=year) for year in sorted(years)]

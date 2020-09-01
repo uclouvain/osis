@@ -26,29 +26,31 @@
 from typing import Optional, List
 
 from django.db import IntegrityError
-from django.db.models import Prefetch, Subquery, OuterRef, Q
+from django.db.models import Prefetch, Subquery, OuterRef, Q, ProtectedError
 from django.utils import timezone
 
+from education_group import publisher
 from education_group.ddd.business_types import *
 
 from base.models.academic_year import AcademicYear as AcademicYearModelDb
+from base.models.campus import Campus as CampusModelDb
 from base.models.education_group_type import EducationGroupType as EducationGroupTypeModelDb
 from base.models.entity import Entity as EntityModelDb
 from base.models.entity_version import EntityVersion as EntityVersionModelDb
-from base.models.campus import Campus as CampusModelDb
-from education_group.ddd.domain.service.enum_converter import EducationGroupTypeConverter
-from education_group.models.group_year import GroupYear as GroupYearModelDb
-from education_group.models.group import Group as GroupModelDb
 from base.models.enums.constraint_type import ConstraintTypeEnum
+from education_group.ddd.business_types import *
 from education_group.ddd.domain import exception, group
-from education_group.ddd.domain.group import GroupIdentity
 from education_group.ddd.domain._campus import Campus
 from education_group.ddd.domain._content_constraint import ContentConstraint
+from education_group.ddd.domain._entity import Entity as EntityValueObject
 from education_group.ddd.domain._remark import Remark
 from education_group.ddd.domain._titles import Titles
-from education_group.ddd.domain._entity import Entity as EntityValueObject
 from education_group.ddd.domain.exception import AcademicYearNotFound, TypeNotFound, ManagementEntityNotFound, \
     TeachingCampusNotFound
+from education_group.ddd.domain.group import GroupIdentity
+from education_group.ddd.domain.service.enum_converter import EducationGroupTypeConverter
+from education_group.models.group import Group as GroupModelDb
+from education_group.models.group_year import GroupYear as GroupYearModelDb
 from osis_common.ddd import interface
 
 
@@ -57,6 +59,7 @@ class GroupRepository(interface.AbstractRepository):
     def create(cls, group: 'Group', **_) -> 'GroupIdentity':
         try:
             academic_year = AcademicYearModelDb.objects.only('id').get(year=group.year)
+            start_year = AcademicYearModelDb.objects.only('id').get(year=group.start_year)
             education_group_type = EducationGroupTypeModelDb.objects.only('id').get(name=group.type.name)
             management_entity = EntityVersionModelDb.objects.current(timezone.now()).only('entity_id').get(
                 acronym=group.management_entity.acronym,
@@ -85,7 +88,7 @@ class GroupRepository(interface.AbstractRepository):
 
         group_upserted, created = GroupModelDb.objects.update_or_create(
             pk=group_pk,
-            defaults={'start_year': academic_year, 'end_year': end_year}
+            defaults={'start_year': start_year, 'end_year': end_year}
         )
         try:
             group_year_created = GroupYearModelDb.objects.create(
@@ -106,12 +109,14 @@ class GroupRepository(interface.AbstractRepository):
                 remark_en=group.remark.text_en,
             )
         except IntegrityError:
-            raise exception.GroupCodeAlreadyExistException
+            raise exception.CodeAlreadyExistException(year=group.year)
 
-        return GroupIdentity(
+        group_id = GroupIdentity(
             code=group_year_created.partial_acronym,
             year=group_year_created.academic_year.year
         )
+        publisher.group_created.send(None, group_identity=group_id)
+        return group_id
 
     @classmethod
     def update(cls, group: 'Group', **_) -> 'GroupIdentity':
@@ -148,6 +153,10 @@ class GroupRepository(interface.AbstractRepository):
         group_db_obj.remark_fr = group.remark.text_fr
         group_db_obj.remark_en = group.remark.text_en
         group_db_obj.save()
+
+        group_db_obj.group.end_year = AcademicYearModelDb.objects.only('id').get(year=group.end_year) \
+            if group.end_year else None
+        group_db_obj.group.save()
         return group.entity_id
 
     @classmethod
@@ -189,13 +198,21 @@ class GroupRepository(interface.AbstractRepository):
 
     @classmethod
     def delete(cls, entity_id: 'GroupIdentity', **_) -> None:
-        raise NotImplementedError
+        try:
+            publisher.group_deleted.send(None, group_identity=entity_id)
+            GroupYearModelDb.objects.filter(
+                partial_acronym=entity_id.code,
+                academic_year__year=entity_id.year
+            ).delete()
+        except ProtectedError:
+            raise exception.GroupIsBeingUsedException()
 
 
 def _convert_db_model_to_ddd_model(obj: GroupYearModelDb) -> 'Group':
     entity_id = GroupIdentity(code=obj.partial_acronym, year=obj.academic_year.year)
     return group.Group(
         entity_identity=entity_id,
+        entity_id=entity_id,
         type=EducationGroupTypeConverter.convert_type_str_to_enum(obj.education_group_type.name),
         abbreviated_title=obj.acronym,
         titles=Titles(

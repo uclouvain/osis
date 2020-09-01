@@ -32,6 +32,7 @@ from django.test import SimpleTestCase
 import osis_common.ddd.interface
 from base.ddd.utils import business_validator
 from base.ddd.utils.validation_message import MessageLevel, BusinessValidationMessage
+from base.models.authorized_relationship import AuthorizedRelationshipList
 from base.models.enums import prerequisite_operator
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
 from base.models.enums.link_type import LinkTypes
@@ -50,7 +51,6 @@ from program_management.models.enums import node_type
 from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipObjectFactory
 from program_management.tests.ddd.factories.commands.paste_element_command import PasteElementCommandFactory
 from program_management.tests.ddd.factories.link import LinkFactory
-from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 from program_management.tests.ddd.factories.prerequisite import cast_to_prerequisite
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
@@ -194,7 +194,7 @@ class TestGetCNodesByType(SimpleTestCase):
         self.tree = ProgramTreeFactory(root_node=self.root_node)
 
     def test_should_return_empty_list_if_no_matching_type(self):
-        result = self.tree.get_nodes_by_type(node_type.NodeType.EDUCATION_GROUP)
+        result = self.tree.get_nodes_by_type(node_type.NodeType.LEARNING_UNIT)
         self.assertCountEqual(
             result,
             []
@@ -409,7 +409,7 @@ class TestCopyAndPrune(SimpleTestCase):
     def setUp(self):
         self.auth_relations = [AuthorizedRelationshipObjectFactory()]
 
-        self.original_root = NodeEducationGroupYearFactory()
+        self.original_root = NodeGroupYearFactory()
 
         self.original_link = LinkFactory(parent=self.original_root, block=0)
 
@@ -819,3 +819,100 @@ class TestUpdateLink(SimpleTestCase):
         )
         self.assertTrue(mock_update_link_validator_list.called)
         self.assertIsInstance(result, Link)
+
+
+class TestProgramTreeIsEmpty(SimpleTestCase):
+    def test_should_return_true_when_root_node_has_no_children(self):
+        empty_program_tree = ProgramTreeFactory()
+
+        self.assertTrue(empty_program_tree.is_empty())
+
+    def test_should_return_true_when_root_node_only_contains_mandatory_children(self):
+        program_tree_with_only_mandatory_children = self.create_program_tree_with_only_mandatory_children()
+
+        self.assertTrue(program_tree_with_only_mandatory_children.is_empty())
+
+    def test_should_return_false_when_root_node_contains_not_mandatory_children(self):
+        program_tree_with_non_mandatory_children = self.create_program_tree_with_non_mandatory_children()
+
+        self.assertFalse(program_tree_with_non_mandatory_children.is_empty())
+
+    def create_program_tree_with_non_mandatory_children(self):
+        root_node = NodeGroupYearFactory()
+        LinkFactory(parent=root_node)
+        return ProgramTreeFactory(root_node=root_node)
+
+    def create_program_tree_with_only_mandatory_children(self) -> 'ProgramTree':
+        root_node = NodeGroupYearFactory()
+        child_node = NodeGroupYearFactory()
+        LinkFactory(parent=root_node, child=child_node)
+        program_tree_with_only_mandatory_children = ProgramTreeFactory(
+            root_node=root_node,
+            authorized_relationships=AuthorizedRelationshipList([
+                AuthorizedRelationshipObjectFactory(
+                    parent_type=root_node.node_type,
+                    child_type=child_node.node_type,
+                    min_constraint=1,
+                    max_constraint=1
+                )
+            ])
+        )
+        return program_tree_with_only_mandatory_children
+
+
+class TestIsEmpty(SimpleTestCase):
+    def test_assert_is_empty_case_contains_nothing(self):
+        program_tree = ProgramTreeFactory(
+            authorized_relationships=AuthorizedRelationshipList([
+                AuthorizedRelationshipObjectFactory()
+            ])
+        )
+        self.assertTrue(program_tree.is_empty())
+
+    def test_assert_is_empty_case_contains_only_mandatory_child(self):
+        root_node = NodeGroupYearFactory()
+        child_node = NodeGroupYearFactory()
+        LinkFactory(parent=root_node, child=child_node)
+
+        auth_relation = AuthorizedRelationshipObjectFactory(
+            parent_type=root_node.node_type,
+            child_type=child_node.node_type,
+            min_constraint=1,
+            max_constraint=1
+        )
+        program_tree = ProgramTreeFactory(
+            root_node=root_node,
+            authorized_relationships=AuthorizedRelationshipList([auth_relation])
+        )
+        self.assertTrue(program_tree.is_empty())
+
+    def test_assert_is_not_empty_case_contain_more_than_mandatory(self):
+        """
+        root_node
+        |---child_node (Mandatory)
+        |--- child_node_2
+        """
+        root_node = NodeGroupYearFactory()
+        child_node = NodeGroupYearFactory()
+        LinkFactory(parent=root_node, child=child_node)
+
+        child_node_2 = NodeGroupYearFactory()
+        LinkFactory(parent=root_node, child=child_node_2)
+
+        auth_relation_child = AuthorizedRelationshipObjectFactory(
+            parent_type=root_node.node_type,
+            child_type=child_node.node_type,
+            min_constraint=1,
+            max_constraint=1
+        )
+        auth_relation_child_2 = AuthorizedRelationshipObjectFactory(
+            parent_type=root_node.node_type,
+            child_type=child_node_2.node_type,
+            min_constraint=0,
+            max_constraint=1
+        )
+        program_tree = ProgramTreeFactory(
+            root_node=root_node,
+            authorized_relationships=AuthorizedRelationshipList([auth_relation_child, auth_relation_child_2])
+        )
+        self.assertFalse(program_tree.is_empty())

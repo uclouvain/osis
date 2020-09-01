@@ -9,7 +9,7 @@ from django.utils.translation import gettext_lazy as _
 
 from base.tests.factories.education_group_type import GroupEducationGroupTypeFactory
 from base.tests.factories.person import PersonFactory
-from education_group.ddd.domain.exception import GroupCodeAlreadyExistException, ContentConstraintTypeMissing
+from education_group.ddd.domain.exception import ContentConstraintTypeMissing, CodeAlreadyExistException
 from education_group.ddd.domain.group import GroupIdentity
 from education_group.forms.group import GroupForm, GroupAttachForm
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
@@ -132,7 +132,7 @@ class TestCreateOrphanGroupPostMethod(TestCase):
         mock_form_is_valid.return_value = True
         mock_form_clean_data.return_value = defaultdict(lambda: None)
 
-        mock_service_create_group.side_effect = GroupCodeAlreadyExistException
+        mock_service_create_group.side_effect = CodeAlreadyExistException(year=2018)
 
         response = self.client.post(self.url)
         self.assertIsInstance(response.context['group_form'], GroupForm)
@@ -233,6 +233,3 @@ class TestCreateNonOrphanGroupPostMethod(TestCase):
             reverse('group_identification', kwargs={'code': 'LTRONC1000', 'year': 2018}) + \
             "?path={}".format(str(self.parent_element.pk))
         self.assertRedirects(response, expected_redirect, fetch_redirect_response=False)
-
-
-

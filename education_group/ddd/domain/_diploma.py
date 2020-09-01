@@ -25,6 +25,8 @@
 ##############################################################################
 from typing import List
 
+import attr
+
 from osis_common.ddd import interface
 
 
@@ -58,18 +60,9 @@ class DiplomaAim(interface.Entity):
         return self.entity_id.code
 
 
+@attr.s(frozen=True, slots=True)
 class Diploma(interface.ValueObject):
-    def __init__(self, leads_to_diploma: bool, printing_title: str, professional_title: str, aims: List['DiplomaAim']):
-        self.leads_to_diploma = leads_to_diploma or False
-        self.printing_title = printing_title or ''
-        self.professional_title = professional_title or ''
-        self.aims = aims or []
-
-    def __eq__(self, other):
-        return self.leads_to_diploma == other.leads_to_diploma \
-               and self.printing_title == other.printing_title \
-               and self.professional_title == other.professional_title \
-               and self.aims == other.aims
-
-    def __hash__(self):
-        return hash(str(self.leads_to_diploma) + self.printing_title + self.professional_title + str(self.aims))
+    leads_to_diploma = attr.ib(type=bool, default=False)
+    printing_title = attr.ib(type=str, default='')
+    professional_title = attr.ib(type=str, default='')
+    aims = attr.ib(type=List['DiplomaAim'], factory=list)

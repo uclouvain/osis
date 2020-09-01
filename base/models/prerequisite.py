@@ -26,20 +26,20 @@
 import itertools
 
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
 from base.models.enums import prerequisite_operator
 from base.models.enums.prerequisite_operator import OR, AND
 from osis_common.models.osis_model_admin import OsisModelAdmin
-from django.utils.translation import gettext_lazy as _
 
 
 class PrerequisiteAdmin(VersionAdmin, OsisModelAdmin):
-    list_display = ('learning_unit_year', 'education_group_year')
-    raw_id_fields = ('learning_unit_year', 'education_group_year')
-    list_filter = ('education_group_year__academic_year',)
-    search_fields = ['learning_unit_year__acronym', 'education_group_year__acronym',
-                     'education_group_year__partial_acronym']
+    list_display = ('learning_unit_year', 'education_group_version')
+    raw_id_fields = ('learning_unit_year', 'education_group_version')
+    list_filter = ('education_group_version__offer__academic_year',)
+    search_fields = ['learning_unit_year__acronym', 'education_group_version__offer__acronym',
+                     'education_group_version__root_group__partial_acronym']
     readonly_fields = ('prerequisite_string',)
 
 
@@ -62,7 +62,7 @@ class Prerequisite(models.Model):
     # TODO : Remove this field after migration
     education_group_year = models.ForeignKey(
         "EducationGroupYear", on_delete=models.CASCADE,
-        null=True,  # TODO :: remove this field after migration on education_group_version
+        null=True, blank=True  # TODO :: remove this field after migration on education_group_version
     )
     education_group_version = models.ForeignKey(
         "program_management.EducationGroupVersion",
@@ -76,10 +76,13 @@ class Prerequisite(models.Model):
     )
 
     class Meta:
-        unique_together = ('learning_unit_year', 'education_group_year')
+        unique_together = ('learning_unit_year', 'education_group_version')
 
     def __str__(self):
-        return "{} / {}".format(self.education_group_year, self.learning_unit_year)
+        return "{} / {}".format(
+            self.education_group_version.offer if self.education_group_version else self.education_group_year,
+            self.learning_unit_year
+        )
 
     def save(self, *args, **kwargs):
         # TODO: Remove when migration is done (Field: education_group_year will be deleted)

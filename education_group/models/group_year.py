@@ -58,6 +58,9 @@ class GroupYearAdmin(VersionAdmin, OsisModelAdmin):
                     'changed')
     list_filter = ('education_group_type', 'academic_year')
     search_fields = ['acronym', 'partial_acronym', 'title_fr', 'group__pk', 'id']
+    raw_id_fields = (
+        'education_group_type', 'academic_year', 'group', 'main_teaching_campus',
+    )
 
 
 class GroupYear(models.Model):
@@ -176,12 +179,15 @@ class GroupYear(models.Model):
             raise AttributeError(
                 _('Please enter an academic year greater or equal to group start year.')
             )
-        if self.group.end_year and self.academic_year.year > self.group.end_year.year:
-            raise AttributeError(
-                _('Please enter an academic year less or equal to group end year.')
-            )
-
         super().save(*args, **kwargs)
+
+    def delete(self, using=None, keep_parents=False):
+        result = super().delete(using, keep_parents)
+
+        has_group_anymore_children = self.group.groupyear_set.all().exists()
+        if not has_group_anymore_children:
+            result = self.group.delete()
+        return result
 
     @property
     def complete_title(self):

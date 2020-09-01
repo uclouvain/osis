@@ -31,8 +31,8 @@ from base.business.event_perms import EventPermEducationGroupEdition
 from base.models.education_group_year import EducationGroupYear
 
 ERRORS_MSG = {
-    "base.add_educationgroup": _("The user does not have permission to create education groups."),
-    "base.change_educationgroup": _("The user does not have permission to change education groups."),
+    "base.add_educationgroup": _("The user has not permission to create education groups."),
+    "base.change_educationgroup": _("The user has not permission to change education groups."),
     "base.change_link_data": _("The user is not allowed to change link data.")
 }
 

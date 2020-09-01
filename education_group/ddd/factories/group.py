@@ -90,6 +90,7 @@ class GroupFactory(factory.Factory):
         abstract = False
 
     entity_identity = factory.LazyAttribute(generate_group_identity)
+    entity_id = factory.LazyAttribute(lambda o: o.entity_identity)
     type = GroupType.COMMON_CORE
     abbreviated_title = factory.fuzzy.FuzzyText(length=20, chars=string.ascii_uppercase)
     titles = factory.LazyAttribute(generate_titles)

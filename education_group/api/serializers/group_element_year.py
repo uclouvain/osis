@@ -43,7 +43,7 @@ class RecursiveField(serializers.Serializer):
 
 
 class CommonNodeHyperlinkedRelatedField(serializers.HyperlinkedIdentityField):
-    def get_url(self, obj: 'Link', view_name, request, format):
+    def get_url(self, obj: 'Link', _, request, format):
         if obj.is_link_with_learning_unit():
             view_name = 'learning_unit_api_v1:' + LearningUnitDetailed.name
             url_kwargs = {
@@ -66,7 +66,7 @@ class CommonNodeHyperlinkedRelatedField(serializers.HyperlinkedIdentityField):
                 view_name = 'education_group_api_v1:' + MiniTrainingDetail.name
                 url_kwargs = {
                     'year': obj.child.year,
-                    'official_partial_acronym': obj.child.code,
+                    'acronym': obj.child.title,
                 }
 
         return reverse(view_name, kwargs=url_kwargs, request=request, format=format)

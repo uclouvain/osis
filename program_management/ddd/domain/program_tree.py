@@ -23,22 +23,22 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import copy
 from collections import Counter
 from typing import List, Set, Optional
 
 import attr
 
 from base.models.authorized_relationship import AuthorizedRelationshipList
-from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, GroupType, MiniTrainingType
-from base.models.enums.link_type import LinkTypes
+from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, GroupType
+from education_group.ddd.business_types import *
 from osis_common.ddd import interface
 from osis_common.decorators.deprecated import deprecated
 from program_management.ddd import command
 from program_management.ddd.business_types import *
-from program_management.ddd.domain.node import factory as node_factory, NodeIdentity, Node
-from program_management.ddd.domain.link import factory as link_factory
+from program_management.ddd.command import DO_NOT_OVERRIDE
 from program_management.ddd.domain import prerequisite, exception
+from program_management.ddd.domain.link import factory as link_factory
+from program_management.ddd.domain.node import factory as node_factory, NodeIdentity, Node
 from program_management.ddd.domain.service.generate_node_abbreviated_title import GenerateNodeAbbreviatedTitle
 from program_management.ddd.domain.service.generate_node_code import GenerateNodeCode
 from program_management.ddd.domain.service.validation_rule import FieldValidationRule
@@ -47,7 +47,6 @@ from program_management.ddd.validators import validators_by_business_action
 from program_management.ddd.validators._path_validator import PathValidator
 from program_management.models.enums import node_type
 from program_management.models.enums.node_type import NodeType
-from education_group.ddd.business_types import *
 
 PATH_SEPARATOR = '|'
 Path = str  # Example : "root|node1|node2|child_leaf"
@@ -61,7 +60,57 @@ class ProgramTreeIdentity(interface.EntityIdentity):
 
 class ProgramTreeBuilder:
 
+    def duplicate(
+            self,
+            duplicate_from: 'ProgramTree',
+            override_end_year_to: int = DO_NOT_OVERRIDE,
+            override_start_year_to: int = None
+    ) -> 'ProgramTree':
+        """
+        Generates new program tree with new nodes and links based on attributes of 'duplicate_from' program tree.
+        :param duplicate_from: The program tree from which are copied attributes in the new one.
+        :param override_end_year_to: This param override the 'end year' of all nodes and links in the Tree.
+        :param override_start_year_to: This param override the 'start year' of all nodes and links in the Tree.
+        :return:
+        """
+        copied_root = self._duplicate_root_and_direct_children(
+            duplicate_from,
+            override_end_year_to=override_end_year_to,
+            override_start_year_to=override_start_year_to
+        )
+        copied_tree = attr.evolve(  # Copy to new object
+            duplicate_from,
+            root_node=copied_root,
+            entity_id=ProgramTreeIdentity(code=copied_root.code, year=copied_root.year),
+        )
+        return copied_tree
+
+    def _duplicate_root_and_direct_children(
+            self,
+            program_tree: 'ProgramTree',
+            override_end_year_to: int = DO_NOT_OVERRIDE,
+            override_start_year_to: int = DO_NOT_OVERRIDE
+    ) -> 'Node':
+        copy_from_node = program_tree.root_node
+        new_parent = node_factory.duplicate(
+            copy_from_node,
+            override_end_year_to=override_end_year_to,
+            override_start_year_to=override_start_year_to
+        )
+        mandatory_children_types = program_tree.get_ordered_mandatory_children_types(program_tree.root_node)
+        for copy_from_link in [n for n in copy_from_node.children if n.child.node_type in mandatory_children_types]:
+            child_node = copy_from_link.child
+            new_child = node_factory.duplicate(
+                child_node,
+                override_end_year_to=override_end_year_to,
+                override_start_year_to=override_start_year_to
+            )
+            copied_link = link_factory.duplicate(copy_from_link, new_parent, new_child)
+            new_parent.children.append(copied_link)
+        return new_parent
+
     def copy_to_next_year(self, copy_from: 'ProgramTree', repository: 'ProgramTreeRepository') -> 'ProgramTree':
+        validators_by_business_action.CopyProgramTreeValidatorList(copy_from).validate()
         identity_next_year = attr.evolve(copy_from.entity_id, year=copy_from.entity_id.year + 1)
         try:
             program_tree_next_year = repository.get(identity_next_year)
@@ -79,13 +128,11 @@ class ProgramTreeBuilder:
 
     def _copy_node_and_children_to_next_year(self, copy_from_node: 'Node') -> 'Node':
         parent_next_year = node_factory.copy_to_next_year(copy_from_node)
-        links_next_year = []
         for copy_from_link in copy_from_node.children:
             child_node = copy_from_link.child
             child_next_year = self._copy_node_and_children_to_next_year(child_node)
             link_next_year = link_factory.copy_to_next_year(copy_from_link, parent_next_year, child_next_year)
             parent_next_year.children.append(link_next_year)
-            links_next_year.append(link_next_year)
         return parent_next_year
 
     def build_from_orphan_group_as_root(
@@ -105,6 +152,7 @@ class ProgramTreeBuilder:
         children = []
         root_node = program_tree.root_node
         for child_type in program_tree.get_ordered_mandatory_children_types(program_tree.root_node):
+            # TODO :: move this below into NodeBuilder
             generated_child_title = FieldValidationRule.get(
                 child_type,
                 'title_fr'
@@ -124,6 +172,7 @@ class ProgramTreeBuilder:
                     child_title=generated_child_title,
                     parent_abbreviated_title=root_node.title
                 ),
+                start_year=root_node.year,
             )
             child._has_changed = True
             root_node.add_child(child, is_mandatory=True)
@@ -138,6 +187,17 @@ class ProgramTree(interface.RootEntity):
     authorized_relationships = attr.ib(type=AuthorizedRelationshipList, factory=list)
     entity_id = attr.ib(type=ProgramTreeIdentity)  # FIXME :: pass entity_id as mandatory param !
 
+    def is_empty(self, parent_node=None):
+        parent_node = parent_node or self.root_node
+        for child_node in parent_node.children_as_nodes:
+            if not self.is_empty(parent_node=child_node):
+                return False
+            is_mandatory_children = child_node.node_type in self.authorized_relationships.\
+                get_ordered_mandatory_children_types(parent_node.node_type) if self.authorized_relationships else []
+            if not is_mandatory_children:
+                return False
+        return True
+
     @entity_id.default
     def _entity_id(self) -> 'ProgramTreeIdentity':
         return ProgramTreeIdentity(self.root_node.code, self.root_node.year)
@@ -147,6 +207,15 @@ class ProgramTree(interface.RootEntity):
 
     def is_root(self, node: 'Node'):
         return self.root_node == node
+
+    def allows_learning_unit_child(self, node: 'Node') -> bool:
+        try:
+            return self.authorized_relationships.is_authorized(
+                parent_type=node.node_type,
+                child_type=NodeType.LEARNING_UNIT,
+            )
+        except AttributeError:
+            return False
 
     def get_parents_using_node_as_reference(self, child_node: 'Node') -> List['Node']:
         result = []
@@ -292,10 +361,6 @@ class ProgramTree(interface.RootEntity):
         finality_types = set(TrainingType.finality_types_enum())
         return self.get_all_nodes(types=finality_types)
 
-    def get_all_mini_training(self) -> Set['Node']:
-        mini_training_types = set(MiniTrainingType.mini_training_types_enum())
-        return self.get_all_nodes(types=mini_training_types)
-
     def get_greater_block_value(self) -> int:
         all_links = self.get_all_links()
         if not all_links:
@@ -428,6 +493,20 @@ class ProgramTree(interface.RootEntity):
             [str(grp.block) for grp in self.get_links_using_node(node) if grp.block]
         )
 
+    def is_empty(self):
+        """
+        Check if tree is empty.
+        An empty tree is defined as a tree with other link than mandatory groups
+        """
+        nodes = self.get_all_nodes()
+        for node in nodes:
+            counter_direct_children = Counter(node.get_children_types(include_nodes_used_as_reference=True))
+            counter_mandatory_direct_children = Counter(self.get_ordered_mandatory_children_types(node))
+
+            if counter_direct_children - counter_mandatory_direct_children:
+                return False
+        return True
+
     def update_link(
             self,
             parent_path: Path,
@@ -496,30 +575,14 @@ def build_path(*nodes):
 
 
 def _copy(root: 'Node', ignore_children_from: Set[EducationGroupTypesEnum] = None):
-    new_node = _deepcopy_node_without_copy_children_recursively(root)
+    new_node = node_factory.deepcopy_node_without_copy_children_recursively(root)
     new_children = []
     for link in root.children:
         if ignore_children_from and link.parent.node_type in ignore_children_from:
             continue
         new_child = _copy(link.child, ignore_children_from=ignore_children_from)
-        new_link = _deepcopy_link_without_copy_children_recursively(link)
+        new_link = link_factory.deepcopy_link_without_copy_children_recursively(link)
         new_link.child = new_child
         new_children.append(new_link)
     new_node.children = new_children
     return new_node
-
-
-def _deepcopy_node_without_copy_children_recursively(original_node: 'Node'):
-    original_children = original_node.children
-    original_node.children = []  # To avoid recursive deep copy of all children behind
-    copied_node = copy.deepcopy(original_node)
-    original_node.children = original_children
-    return copied_node
-
-
-def _deepcopy_link_without_copy_children_recursively(original_link: 'Link'):
-    original_child = original_link.child
-    original_link.child = None  # To avoid recursive deep copy of all children behind
-    new_link = copy.deepcopy(original_link)
-    original_link.child = original_child
-    return new_link

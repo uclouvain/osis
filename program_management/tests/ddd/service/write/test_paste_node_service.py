@@ -103,7 +103,8 @@ class TestPasteNode(TestCase, ValidatorPatcherMixin):
             program_management.ddd.service.write.paste_element_service.paste_element(self.paste_command)
 
     @patch.object(program_tree.ProgramTree, 'detach_node')
-    @patch("program_management.ddd.service.tree_service.search_trees_using_node")
+    @mock.patch('program_management.ddd.service.read.search_program_trees_using_node_service'
+                '.search_program_trees_using_node')
     def test_when_path_to_detach_is_set_then_should_call_detach(self, mock_search_trees, mock_detach):
         other_tree = ProgramTreeFactory()
         LinkFactory(parent=other_tree.root_node, child=self.node_to_paste)

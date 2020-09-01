@@ -170,6 +170,14 @@ class TestMiniTrainingReadIdentification(TestCase):
         self.assertEqual(response.context['create_training_url'], expected_create_training_url)
         self.assertEqual(response.context['create_mini_training_url'], expected_create_mini_training_url)
 
+    def test_assert_delete_url_correctly_computed(self):
+        path = "{}".format(self.root_group_element.pk)
+        expected_delete_mini_training_url = reverse('mini_training_delete', kwargs={'year': 2019, 'code': 'LBIOL100P'}) + \
+            "?path={}".format(path)
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.context['delete_mini_training_url'], expected_delete_mini_training_url)
+
 
 class TestMiniTrainingReadIdentificationTabs(TestCase):
     @classmethod

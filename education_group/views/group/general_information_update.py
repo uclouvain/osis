@@ -98,6 +98,7 @@ class GroupUpdateGeneralInformation(GroupRead):
                 language=get_user_interface_language(self.request.user)
             )
         }
+
         return {
             **super().get_context_data(**kwargs),
             **context

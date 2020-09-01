@@ -32,7 +32,7 @@ from cms.models.translated_text import TranslatedText
 from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextRandomFactory
 from cms.tests.factories.translated_text_label import TranslatedTextLabelFactory
-from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory
+from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 from webservices import business
 
 
@@ -75,7 +75,7 @@ class GetEvaluationTestCase(TestCase):
 class GetContactsIntroTextTestCase(TestCase):
     def setUp(self):
         self.education_group_year = EducationGroupYearFactory()
-        self.node = NodeEducationGroupYearFactory(
+        self.node = NodeGroupYearFactory(
             code=self.education_group_year.partial_acronym,
             year=self.education_group_year.academic_year.year,
             node_type=self.education_group_year.education_group_type,
@@ -98,7 +98,7 @@ class GetContactsIntroTextTestCase(TestCase):
 
     def test_get_contacts_intro_text_case_no_value(self):
         education_group_year = EducationGroupYearFactory()
-        node = NodeEducationGroupYearFactory(
+        node = NodeGroupYearFactory(
             node_type=education_group_year.education_group_type,
             code=education_group_year.partial_acronym,
             year=education_group_year.academic_year.year

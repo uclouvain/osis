@@ -54,6 +54,7 @@ class MiniTrainingFilter(filters.FilterSet):
     acronym = filters.CharFilter(field_name="offer__acronym", lookup_expr='icontains')
     title = filters.CharFilter(field_name="root_group__title_fr", lookup_expr='icontains')
     title_english = filters.CharFilter(field_name="root_group__title_en", lookup_expr='icontains')
+    year = filters.NumberFilter(field_name="offer__academic_year__year")
 
     order_by_field = 'ordering'
     ordering = OrderingFilterWithDefault(
@@ -75,8 +76,19 @@ class MiniTrainingFilter(filters.FilterSet):
         ]
 
     @staticmethod
-    def filter_version_type(queryset, name, value):
-        return utils.filter_version_type(queryset, value)
+    def filter_version_type(queryset, _, value):
+        qs = EducationGroupVersion.objects.filter(
+            offer__education_group_type__category=education_group_categories.MINI_TRAINING,
+        ).select_related(
+            'offer__education_group_type',
+            'offer__academic_year',
+            'root_group'
+        ).prefetch_related(
+            'offer__management_entity__entityversion_set'
+        ).exclude(
+            offer__acronym__icontains='common',
+        )
+        return utils.filter_version_type(qs, value)
 
 
 class MiniTrainingList(LanguageContextSerializerMixin, generics.ListAPIView):
@@ -85,7 +97,8 @@ class MiniTrainingList(LanguageContextSerializerMixin, generics.ListAPIView):
     """
     name = 'minitraining_list'
     queryset = EducationGroupVersion.objects.filter(
-        offer__education_group_type__category=education_group_categories.MINI_TRAINING
+        offer__education_group_type__category=education_group_categories.MINI_TRAINING,
+        is_transition=False
     ).select_related(
         'offer__education_group_type',
         'offer__academic_year',
@@ -113,7 +126,7 @@ class MiniTrainingDetail(LanguageContextSerializerMixin, generics.RetrieveAPIVie
     serializer_class = MiniTrainingDetailSerializer
 
     def get_object(self):
-        partial_acronym = self.kwargs['official_partial_acronym']
+        acronym = self.kwargs['acronym']
         year = self.kwargs['year']
         version_name = self.kwargs.get('version_name', '')
 
@@ -128,9 +141,10 @@ class MiniTrainingDetail(LanguageContextSerializerMixin, generics.RetrieveAPIVie
             ).prefetch_related(
                 'offer__management_entity__entityversion_set',
             ),
-            offer__partial_acronym__iexact=partial_acronym,
+            offer__acronym__iexact=acronym,
             offer__academic_year__year=year,
-            version_name=version_name
+            version_name__iexact=version_name,
+            is_transition=False
         )
         return egv
 
@@ -143,19 +157,21 @@ class MiniTrainingTitle(LanguageContextSerializerMixin, generics.RetrieveAPIView
     serializer_class = EducationGroupTitleSerializer
 
     def get_object(self):
-        acronym = self.kwargs['official_partial_acronym']
+        acronym = self.kwargs['acronym']
         year = self.kwargs['year']
         version_name = self.kwargs.get('version_name', '')
 
         egv = get_object_or_404(
-            EducationGroupVersion.objects.all(
+            EducationGroupVersion.objects.filter(
+                offer__education_group_type__category=education_group_categories.MINI_TRAINING,
             ).select_related(
                 'offer__academic_year',
                 'root_group'
             ),
-            offer__partial_acronym__iexact=acronym,
+            offer__acronym__iexact=acronym,
             root_group__academic_year__year=year,
-            version_name=version_name
+            version_name__iexact=version_name,
+            is_transition=False
         )
         return egv
 
@@ -168,14 +184,17 @@ class OfferRoots(LanguageContextSerializerMixin, generics.ListAPIView):
     serializer_class = TrainingListSerializer
 
     def get_queryset(self):
-        acronym = self.kwargs['official_partial_acronym']
+        acronym = self.kwargs['acronym']
         year = self.kwargs['year']
+        version_name = self.kwargs.get('version_name', '')
+
         element = get_object_or_404(
             Element.objects.all().select_related(
                 'group_year__academic_year',
             ),
-            group_year__partial_acronym__iexact=acronym,
-            group_year__academic_year__year=year
+            group_year__educationgroupversion__offer__acronym__iexact=acronym,
+            group_year__academic_year__year=year,
+            group_year__educationgroupversion__version_name__iexact=version_name
         )
         root_elements = program_management.ddd.repositories.find_roots.find_roots(
             [element],

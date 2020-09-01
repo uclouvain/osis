@@ -39,8 +39,9 @@ class EducationGroupTitleSerializer(serializers.ModelSerializer):
         )
 
     def get_title(self, version):
-        language = self.context.get('language')
-        return getattr(
-            version.root_group,
-            'title_' + ('en' if language and language not in settings.LANGUAGE_CODE_FR else 'fr')
-        )
+        field_suffix = '_en' if self.context.get('language') == settings.LANGUAGE_CODE_EN else '_fr'
+        field_name = 'title' + field_suffix
+        title = getattr(version.root_group, 'title' + field_suffix)
+        version_title = getattr(version, field_name)
+        title_suffix = ' [{}]'.format(version_title) if version_title else ''
+        return title + title_suffix if title else None

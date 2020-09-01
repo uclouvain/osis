@@ -321,7 +321,7 @@ class TestContent(TestCase):
 
         self.assertCountEqual(
             _get_optional_data([], self.luy, optional_data, self.link_1_1),
-            [self.link_1_1.relative_credits or '-', self.luy.credits.to_integral_value()]
+            [self.link_1_1.relative_credits or '-', self.luy.credits.to_integral_value() or '-']
         )
 
     def test_get_optional_has_periodicity(self):
@@ -384,8 +384,8 @@ class TestContent(TestCase):
                                  self.teacher_2.email))
 
     def test_build_description_fiche_cols(self):
-        teaching_material_1 = DddTeachingMaterialFactory(title='Title mandatory', mandatory=True)
-        teaching_material_2 = DddTeachingMaterialFactory(title='Title non-mandatory', mandatory=False)
+        teaching_material_1 = DddTeachingMaterialFactory(title='Title mandatory', is_mandatory=True)
+        teaching_material_2 = DddTeachingMaterialFactory(title='Title non-mandatory', is_mandatory=False)
 
         ue_description_fiche = _initialize_cms_data_description_fiche()
 

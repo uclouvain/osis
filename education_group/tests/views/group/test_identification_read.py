@@ -109,3 +109,11 @@ class TestGroupReadIdentification(TestCase):
         self.assertEqual(response.context['create_group_url'], expected_create_group_url)
         self.assertEqual(response.context['create_training_url'], expected_create_training_url)
         self.assertEqual(response.context['create_mini_training_url'], expected_create_mini_training_url)
+
+    def test_assert_delete_url_correctly_computed(self):
+        path = "{}".format(self.element_group_year.pk)
+        expected_delete_group_url = reverse('group_delete', kwargs={'code': "LTRONC100B", 'year': 2018}) + \
+            "?path={}".format(path)
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.context['delete_group_url'], expected_delete_group_url)

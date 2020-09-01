@@ -24,21 +24,39 @@
 #
 ##############################################################################
 import copy
+from typing import Optional
+
+import attr
 
 from base.models.enums.constraint_type import ConstraintTypeEnum
 from base.models.enums.education_group_types import EducationGroupTypesEnum, GroupType
 from education_group.ddd import command
-from education_group.ddd.domain._campus import Campus
+from education_group.ddd.business_types import *
+from education_group.ddd.domain import exception
 from education_group.ddd.domain._content_constraint import ContentConstraint
 from education_group.ddd.domain._entity import Entity
 from education_group.ddd.domain._remark import Remark
 from education_group.ddd.domain._titles import Titles
+from education_group.ddd.domain._campus import Campus
 from education_group.ddd.domain.service.enum_converter import EducationGroupTypeConverter
-from education_group.ddd.validators.validators_by_business_action import UpdateGroupValidatorList
+from education_group.ddd.validators.validators_by_business_action import UpdateGroupValidatorList, \
+    CopyGroupValidatorList, CreateGroupValidatorList
 from osis_common.ddd import interface
 
 
 class GroupBuilder:
+    @classmethod
+    def copy_to_next_year(cls, group_from: 'Group', group_repository: 'GroupRepository') -> 'Group':
+        identity_next_year = GroupIdentity(code=group_from.code, year=group_from.year + 1)
+        CopyGroupValidatorList(group_from).validate()
+        try:
+            group_next_year = group_repository.get(identity_next_year)
+            group_next_year.update_from_other_group(group_from)
+        except exception.GroupNotFoundException:
+            group_next_year = copy.deepcopy(group_from)
+            group_next_year.entity_id = identity_next_year
+        return group_next_year
+
     @classmethod
     def build_from_create_cmd(cls, cmd: command.CreateOrphanGroupCommand):
         group_id = GroupIdentity(code=cmd.code, year=cmd.year)
@@ -55,8 +73,9 @@ class GroupBuilder:
         )
         remark = Remark(text_fr=cmd.remark_fr, text_en=cmd.remark_en)
 
-        return Group(
+        created_group = Group(
             entity_identity=group_id,
+            entity_id=group_id,
             type=EducationGroupTypeConverter.convert_type_str_to_enum(cmd.type),
             abbreviated_title=cmd.abbreviated_title,
             titles=titles,
@@ -68,56 +87,32 @@ class GroupBuilder:
             start_year=cmd.start_year,
             end_year=cmd.end_year
         )
-
-    @classmethod
-    def build_next_year_group(cls, from_group: 'Group'):
-        group = copy.deepcopy(from_group)
-        group.entity_id = GroupIdentity(code=from_group.code, year=from_group.year + 1)
-        return group
+        CreateGroupValidatorList(created_group).validate()
+        return created_group
 
 
 builder = GroupBuilder()
 
 
+@attr.s(frozen=True, slots=True)
 class GroupIdentity(interface.EntityIdentity):
-    def __init__(self, code: str, year: int):
-        self.code = code.upper()
-        self.year = year
-
-    def __hash__(self):
-        return hash(self.code + str(self.year))
-
-    def __eq__(self, other):
-        return self.code == other.code and self.year == other.year
+    code = attr.ib(type=str, converter=lambda value: value.upper())
+    year = attr.ib(type=int)
 
 
+@attr.s(slots=True)
 class Group(interface.RootEntity):
-    def __init__(
-        self,
-        entity_identity: 'GroupIdentity',
-        type: EducationGroupTypesEnum,
-        abbreviated_title: str,
-        titles: Titles,
-        credits: int,
-        content_constraint: ContentConstraint,
-        management_entity: Entity,
-        teaching_campus: Campus,
-        remark: Remark,
-        start_year: int,
-        end_year: int = None,
-    ):
-        super(Group, self).__init__(entity_id=entity_identity)
-        self.entity_id = entity_identity
-        self.type = type
-        self.abbreviated_title = abbreviated_title.upper()
-        self.titles = titles
-        self.credits = credits
-        self.content_constraint = content_constraint
-        self.management_entity = management_entity
-        self.teaching_campus = teaching_campus
-        self.remark = remark
-        self.start_year = start_year
-        self.end_year = end_year
+    entity_id = entity_identity = attr.ib(type=GroupIdentity)
+    type = attr.ib(type=EducationGroupTypesEnum)
+    abbreviated_title = attr.ib(type=str, converter=lambda title: title.upper())
+    titles = attr.ib(type=Titles)
+    credits = attr.ib(type=int)
+    content_constraint = attr.ib(type=ContentConstraint)
+    management_entity = attr.ib(type=Entity)
+    teaching_campus = attr.ib(type=Campus)
+    remark = attr.ib(type=Remark)
+    start_year = attr.ib(type=int)
+    end_year = attr.ib(type=Optional[int], default=None)
 
     @property
     def code(self) -> str:
@@ -138,7 +133,8 @@ class Group(interface.RootEntity):
             content_constraint: ContentConstraint,
             management_entity: Entity,
             teaching_campus: Campus,
-            remark: Remark
+            remark: Remark,
+            end_year: int
     ):
         self.abbreviated_title = abbreviated_title.upper()
         self.titles = titles
@@ -147,5 +143,29 @@ class Group(interface.RootEntity):
         self.management_entity = management_entity
         self.teaching_campus = teaching_campus
         self.remark = remark
+        self.end_year = end_year
         UpdateGroupValidatorList(self).validate()
         return self
+
+    def has_same_values_as(self, other_group: 'Group') -> bool:
+        return not bool(self.get_conflicted_fields(other_group))
+
+    def get_conflicted_fields(self, other_group: 'Group') -> bool:
+        fields_not_to_consider = ("year", "entity_id", "entity_identity")
+        conflicted_fields = []
+        for field_name in self.__slots__:
+            if field_name in fields_not_to_consider:
+                continue
+            if getattr(self, field_name) != getattr(other_group, field_name):
+                conflicted_fields.append(field_name)
+        return conflicted_fields
+
+    def update_from_other_group(self, other_group: 'Group'):
+        fields_not_to_update = (
+            "year", "code", "entity_id", "entity_identity"
+        )
+        for field in other_group.__slots__:
+            if field in fields_not_to_update:
+                continue
+            value = getattr(other_group, field)
+            setattr(self, field, value)

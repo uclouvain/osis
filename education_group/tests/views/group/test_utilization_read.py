@@ -79,7 +79,8 @@ class TestGroupReadUtilization(TestCase):
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, "education_group_app/group/utilization_read.html")
 
-    @mock.patch('program_management.ddd.service.tree_service.search_tree_versions_using_node', return_value=[])
+    @mock.patch('program_management.ddd.service.read.search_tree_versions_using_node_service'
+                '.search_tree_versions_using_node', return_value=[])
     def test_assert_context_data(self, mock_tree_service):
         response = self.client.get(self.url)
 

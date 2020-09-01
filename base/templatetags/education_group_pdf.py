@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -34,10 +34,11 @@ from django.utils.translation import gettext_lazy as _
 
 from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.models.enums.constraint_type import ConstraintTypeEnum
-from base.models.enums.learning_unit_year_periodicity import BIENNIAL_EVEN, BIENNIAL_ODD, ANNUAL
+from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from base.templatetags.education_group import register
 from program_management.ddd.business_types import *
-
+from program_management.serializers.node_view import get_program_tree_version_complete_name
+from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 # TODO :: Remove this file and move the code into a Serializer
 
 OPTIONAL_PNG = static('img/education_group_year/optional.png')
@@ -176,14 +177,14 @@ def _get_verbose_comment(link: 'Link'):
     ) if comment_from_lang else ""
 
 
-def get_verbose_remark(node: 'NodeEducationGroupYear'):
+def get_verbose_remark(node: 'NodeGroupYear'):
     remark = node.remark_fr or ""
     if node.remark_en and translation.get_language() == LANGUAGE_CODE_EN:
         remark = node.remark_en
     return remark
 
 
-def get_verbose_constraint(node: 'NodeEducationGroupYear'):
+def get_verbose_constraint(node: 'NodeGroupYear'):
     msg = "from %(min)s to %(max)s credits among" \
         if node.constraint_type == ConstraintTypeEnum.CREDITS else "from %(min)s to %(max)s among"
     return _(msg) % {
@@ -192,15 +193,24 @@ def get_verbose_constraint(node: 'NodeEducationGroupYear'):
     }
 
 
-def get_verbose_title_group(node: 'NodeEducationGroupYear'):
+def get_verbose_title_group(node: 'NodeGroupYear'):
     if node.is_finality():
+        version_complete_label = get_program_tree_version_complete_name(
+            node.entity_id,
+            ProgramTreeVersionRepository.search_all_versions_from_root_node(node),
+            translation.get_language()
+        )
+
         if node.offer_partial_title_en and translation.get_language() == LANGUAGE_CODE_EN:
-            return node.offer_partial_title_en
-        return node.offer_partial_title_fr
+            offer_partial_title = node.offer_partial_title_en
+        else:
+            offer_partial_title = node.offer_partial_title_fr
+
+        return "{}{}".format(offer_partial_title, version_complete_label)
     else:
-        if node.offer_title_en and translation.get_language() == LANGUAGE_CODE_EN:
-            return node.offer_title_en
-        return node.offer_title_fr
+        if node.group_title_en and translation.get_language() == LANGUAGE_CODE_EN:
+            return node.group_title_en
+        return node.group_title_fr
 
 
 def get_verbose_credits(link: 'Link'):
@@ -261,9 +271,9 @@ def get_status_picture(node: 'NodeLearningUnitYear'):
 
 
 def get_biennial_picture(node: 'NodeLearningUnitYear'):
-    if node.periodicity == BIENNIAL_EVEN:
+    if node.periodicity == PeriodicityEnum.BIENNIAL_EVEN:
         return BISANNUAL_EVEN
-    elif node.periodicity == BIENNIAL_ODD:
+    elif node.periodicity == PeriodicityEnum.BIENNIAL_ODD:
         return BISANNUAL_ODD
     else:
         return ""
@@ -279,11 +289,11 @@ def get_prerequis_picture(node: 'NodeLearningUnitYear'):
 
 def get_case_picture(node: 'NodeLearningUnitYear'):
     if node.status:
-        if node.periodicity == ANNUAL:
+        if node.periodicity == PeriodicityEnum.ANNUAL:
             return VALIDATE_CASE_JPG
-        elif node.periodicity == BIENNIAL_EVEN and node.academic_year.is_even:
+        elif node.periodicity == PeriodicityEnum.BIENNIAL_EVEN and node.academic_year.is_even:
             return VALIDATE_CASE_JPG
-        elif node.periodicity == BIENNIAL_ODD and node.academic_year.is_odd:
+        elif node.periodicity == PeriodicityEnum.BIENNIAL_ODD and node.academic_year.is_odd:
             return VALIDATE_CASE_JPG
     return INVALIDATE_CASE_JPG
 

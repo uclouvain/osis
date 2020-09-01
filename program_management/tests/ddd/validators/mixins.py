@@ -29,7 +29,7 @@ from base.ddd.utils import business_validator
 
 class TestValidatorValidateMixin:
     def assertValidatorRaises(self, validator: business_validator.BusinessValidator, messages: Optional[List[str]]):
-        with self.assertRaises(osis_common.ddd.interface.BusinessExceptions) as context_exc:
+        with self.assertRaises(osis_common.ddd.interface.BusinessException) as context_exc:
             validator.validate()
 
         if messages is not None:

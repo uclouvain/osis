@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-27 09:47+0200\n"
+"POT-Creation-Date: 2020-08-31 12:04+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -24,6 +24,10 @@ msgstr "\"%(child)s\" has been removed from \"%(parent)s\""
 #| msgid "\"%(child)s\" has been detached from \"%(parent)s\""
 msgid "\"%(child)s\" has been pasted into \"%(parent)s\""
 msgstr "\"%(child)s\" has been removed from \"%(parent)s\""
+
+#, python-format
+msgid "%(node_to_add)s version must be the same as %(root_node)s version"
+msgstr ""
 
 #, python-format
 msgid "%(start_index)s to %(end_index)s of %(total_counts)s learning units"
@@ -74,6 +78,9 @@ msgstr ""
 msgid "Acronym"
 msgstr ""
 
+msgid "Acronym of version"
+msgstr ""
+
 msgid "Acronym/Short title"
 msgstr ""
 
@@ -110,11 +117,6 @@ msgstr ""
 msgid "Are you sure you want to detach %(acronym)s ?"
 msgstr "Are you sure you want to remove %(acronym)s ?"
 
-msgid ""
-"At least an education group year, a group year, a learning unit year or a "
-"learning class year has to be set"
-msgstr ""
-
 msgid "Attribution entity"
 msgstr ""
 
@@ -130,9 +132,6 @@ msgid ""
 "\"%(child_types)s\" for \"%(parent)s\" has already reached the limit."
 msgstr ""
 
-msgid "Cannot add any element to learning unit"
-msgstr ""
-
 #, python-format
 msgid "Cannot add any element to learning unit %(parent_node)s"
 msgstr ""
@@ -140,9 +139,6 @@ msgstr ""
 #, python-format
 msgid "Cannot attach a node %(node)s to himself."
 msgstr ""
-
-msgid "Cannot detach due to prerequisites."
-msgstr "Cannot remove link due to prerequisites."
 
 #, python-format
 msgid ""
@@ -166,9 +162,6 @@ msgstr ""
 
 msgid "Cannot perform detach action on root."
 msgstr "Cannot perform remove action on root."
-
-msgid "Cannot perform modification action on root."
-msgstr ""
 
 msgid "Category"
 msgstr ""
@@ -220,16 +213,6 @@ msgstr ""
 
 #, python-format
 msgid ""
-"Finality \"%(acronym)s\" has an end date greater than %(root_acronym)s "
-"program."
-msgid_plural ""
-"Finalities \"%(acronym)s\" have an end date greater than %(root_acronym)s "
-"program."
-msgstr[0] ""
-msgstr[1] ""
-
-#, python-format
-msgid ""
 "Finality \"%(code)s\" has an end date greater than %(root_code)s program."
 msgid_plural ""
 "Finalities \"%(code)s\" have an end date greater than %(root_code)s program."
@@ -246,6 +229,15 @@ msgid "Formation catalogue"
 msgstr ""
 
 msgid "Formations"
+msgstr ""
+
+msgid "Full title of the english version"
+msgstr ""
+
+msgid "Full title of the french version"
+msgstr ""
+
+msgid "Group"
 msgstr ""
 
 msgid "IMPOSSIBLE TO DISPLAY BECAUSE OF AN ILLEGAL CHARACTER IN STRING"
@@ -270,6 +262,12 @@ msgid "Language"
 msgstr ""
 
 msgid "Learning achievements"
+msgstr ""
+
+msgid "Learning class year"
+msgstr ""
+
+msgid "Learning unit year"
 msgstr ""
 
 msgid "Learning units"
@@ -343,7 +341,16 @@ msgstr ""
 msgid "New Education Group"
 msgstr ""
 
+msgid "New Mini-Training"
+msgstr ""
+
+msgid "New specific version"
+msgstr ""
+
 msgid "New training"
+msgstr ""
+
+msgid "New version"
 msgstr ""
 
 msgid "No"
@@ -364,11 +371,6 @@ msgstr ""
 msgid "Online resources"
 msgstr ""
 
-msgid ""
-"Only one of the following has to be set : an education group year, a group "
-"year, a learning unit year or a learning class"
-msgstr ""
-
 #, python-format
 msgid ""
 "Option \"%(acronym)s\" cannot be detach because it is contained in "
@@ -382,13 +384,6 @@ msgstr[0] ""
 msgstr[1] ""
 "Options \"%(acronym)s\" cannot be removed because they are contained in "
 "%(finality_acronym)s program."
-
-#, python-format
-msgid "Option \"%(acronym)s\" must be present in %(root_acronym)s program."
-msgid_plural ""
-"Options \"%(acronym)s\" must be present in %(root_acronym)s program."
-msgstr[0] ""
-msgstr[1] ""
 
 #, python-format
 msgid "Option \"%(code)s\" must be present in %(root_code)s program."
@@ -454,6 +449,9 @@ msgstr ""
 msgid "Produce xls with a list of trainings"
 msgstr ""
 
+msgid "Prolong"
+msgstr ""
+
 msgid "Proposal status"
 msgstr ""
 
@@ -496,6 +494,12 @@ msgstr ""
 msgid "Session derogation"
 msgstr ""
 
+#, python-format
+msgid ""
+"Specific version for education group year <a href='%(link)s'> "
+"%(offer_acronym)s[%(acronym)s] (%(academic_year)s) </a> successfully created."
+msgstr ""
+
 msgid "Specifications"
 msgstr ""
 
@@ -531,6 +535,9 @@ msgstr ""
 msgid ""
 "The child %(child)s you want to attach is a parent of the node you want to "
 "attach."
+msgstr ""
+
+msgid "The child version must be the same as the root node version"
 msgstr ""
 
 #, python-format
@@ -572,10 +579,11 @@ msgid ""
 "group year %(acronym)s will we deleted: %(learning_units)s"
 msgstr ""
 
-msgid "The registration form is available at the Secretariat of"
+#, python-format
+msgid "The program %(title)s - %(academic_year)s will be published soon"
 msgstr ""
 
-msgid "The user is not allowed to change link data."
+msgid "The registration form is available at the Secretariat of"
 msgstr ""
 
 msgid "Themes discussed"
@@ -587,6 +595,9 @@ msgid ""
 msgstr ""
 
 msgid "This form must be submitted to the secretariat of your faculty"
+msgstr ""
+
+msgid "This version exists until"
 msgstr ""
 
 msgid "Title"
@@ -614,6 +625,10 @@ msgid "Tutors"
 msgstr ""
 
 msgid "Type"
+msgstr ""
+
+#, python-brace-format
+msgid "Unable to publish sections for {code} - {year}"
 msgstr ""
 
 msgid "Utilizations"
@@ -644,20 +659,25 @@ msgid ""
 msgstr ""
 
 #, python-format
-msgid "You can not add a learning unit to a %(category)s of type %(type)s."
-msgstr ""
-
-#, python-format
 msgid "You can not add the same child %(child_node)s several times."
-msgstr ""
-
-msgid "You can not add the same child several times."
 msgstr ""
 
 #, python-format
 msgid ""
 "You can not attach a learning unit like %(node)s to element %(parent)s of "
 "type %(type)s."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"You can't copy the program tree '{code}' from {from_year} to {to_year} "
+"because it ends in {end_year}"
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"You can't copy the program tree version '{acronym}' from {from_year} to "
+"{to_year} because it ends in {end_year}"
 msgstr ""
 
 #, python-format
@@ -678,10 +698,17 @@ msgid ""
 "learning unit (current context: %(title)s)"
 msgstr ""
 
-msgid "bibliography"
+#, python-format
+msgid ""
+"[%(academic_year)s] %(code)s has links to another training / mini-training / "
+"group"
 msgstr ""
 
-msgid "education group year"
+#, python-format
+msgid "[%(academic_year)s] The content of the program is not empty."
+msgstr ""
+
+msgid "bibliography"
 msgstr ""
 
 msgid "email"

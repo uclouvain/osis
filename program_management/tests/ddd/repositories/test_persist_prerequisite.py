@@ -36,7 +36,8 @@ from program_management.ddd.domain import prerequisite
 from program_management.ddd.domain.prerequisite import NullPrerequisite
 from program_management.ddd.repositories import _persist_prerequisite
 from program_management.tests.ddd.factories.link import LinkFactory
-from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory, NodeLearningUnitYearFactory
+from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory, \
+    NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory, ElementLearningUnitYearFactory
@@ -64,7 +65,7 @@ class TestPersistPrerequisite(TestCase):
             root_group=self.root_element.group_year,
             offer__academic_year__current=True
         )
-        self.root_node = NodeEducationGroupYearFactory(node_id=self.root_element.pk)
+        self.root_node = NodeGroupYearFactory(node_id=self.root_element.pk)
 
         self.element_learning_unit_year = ElementLearningUnitYearFactory(
             learning_unit_year__academic_year__current=True

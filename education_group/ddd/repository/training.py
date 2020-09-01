@@ -23,9 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import functools
+import operator
 from typing import Optional, List
 
-from django.db.models import Subquery, OuterRef, Prefetch, QuerySet
+from django.db import IntegrityError
+from django.db.models import Subquery, OuterRef, Prefetch, QuerySet, Q
 
 from base.models import entity_version
 from base.models.academic_year import AcademicYear as AcademicYearModelDb
@@ -36,17 +39,12 @@ from base.models.education_group_certificate_aim \
     import EducationGroupCertificateAim as EducationGroupCertificateAimModelDb
 from base.models.education_group_organization import EducationGroupOrganization as EducationGroupOrganizationModelDb
 from base.models.education_group_type import EducationGroupType as EducationGroupTypeModelDb
-from base.models.education_group_year import EducationGroupYear as EducationGroupYearModelDb
+from base.models.education_group_year import EducationGroupYear as EducationGroupYearModelDb, EducationGroupYear
 from base.models.education_group_year_domain import EducationGroupYearDomain as EducationGroupYearDomainModelDb
-from base.models.enums.active_status import ActiveStatusEnum
-from base.models.hops import Hops as HopsModelDb
-from education_group.ddd.domain.training import TrainingIdentityThroughYears
-from reference.models.language import Language as LanguageModelDb
-from reference.models.domain import Domain as DomainModelDb
-from reference.models.domain_isced import DomainIsced as DomainIscedModelDb
 from base.models.entity import Entity
 from base.models.entity_version import EntityVersion
 from base.models.enums.academic_type import AcademicTypes
+from base.models.enums.active_status import ActiveStatusEnum
 from base.models.enums.activity_presence import ActivityPresence
 from base.models.enums.decree_category import DecreeCategories
 from base.models.enums.diploma_coorganization import DiplomaCoorganizationTypes
@@ -56,6 +54,7 @@ from base.models.enums.funding_codes import FundingCodes
 from base.models.enums.internship_presence import InternshipPresence
 from base.models.enums.rate_code import RateCode
 from base.models.enums.schedule_type import ScheduleTypeEnum
+from base.models.hops import Hops as HopsModelDb
 from base.models.organization_address import OrganizationAddress
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import training, exception
@@ -72,47 +71,61 @@ from education_group.ddd.domain._isced_domain import IscedDomain, IscedDomainIde
 from education_group.ddd.domain._language import Language
 from education_group.ddd.domain._study_domain import StudyDomain, StudyDomainIdentity
 from education_group.ddd.domain._titles import Titles
+from education_group.ddd.domain.training import TrainingIdentityThroughYears
 from osis_common.ddd import interface
+from reference.models.domain import Domain as DomainModelDb
+from reference.models.domain_isced import DomainIsced as DomainIscedModelDb
+from reference.models.language import Language as LanguageModelDb
 
 
 class TrainingRepository(interface.AbstractRepository):
     @classmethod
     def create(cls, training: 'Training', **_) -> 'TrainingIdentity':
         education_group_db_obj = _save_education_group(training)
-        education_group_year_db_obj = _save_education_group_year(training, education_group_db_obj)
+        education_group_year_db_obj = _create_education_group_year(training, education_group_db_obj)
         _save_secondary_domains(training, education_group_year_db_obj)
         _save_hops(training, education_group_year_db_obj)
         _save_certificate_aims(training, education_group_year_db_obj)
         return training.entity_id
 
     @classmethod
-    def update(cls, entity: 'Training', **_) -> 'TrainingIdentity':
-        raise NotImplementedError
+    def update(cls, training: 'Training', **_) -> 'TrainingIdentity':
+        education_group_db_obj = _save_education_group(training)
+        education_group_year_db_obj = _update_education_group_year(training, education_group_db_obj)
+        _save_secondary_domains(training, education_group_year_db_obj)
+        _save_hops(training, education_group_year_db_obj)
+        _save_certificate_aims(training, education_group_year_db_obj)
+        return training.entity_id
 
     @classmethod
     def get(cls, entity_id: 'TrainingIdentity') -> 'Training':
-        qs = _get_queryset_to_fetch_data_for_training(entity_id)
+        qs = _get_queryset_to_fetch_data_for_training([entity_id])
 
         try:
             education_group_year_db = qs.get()
         except EducationGroupYearModelDb.DoesNotExist:
-            raise exception.TrainingNotFoundException
+            raise exception.TrainingNotFoundException()
 
-        return _convert_education_group_year_to_training(entity_id, education_group_year_db)
+        return _convert_education_group_year_to_training(education_group_year_db)
 
     @classmethod
     def search(cls, entity_ids: Optional[List['TrainingIdentity']] = None, **kwargs) -> List['Training']:
-        raise NotImplementedError
+        qs = _get_queryset_to_fetch_data_for_training(entity_ids)
+        return [_convert_education_group_year_to_training(education_group_year_db) for education_group_year_db in qs]
 
     @classmethod
     def delete(cls, entity_id: 'TrainingIdentity', **_) -> None:
-        raise NotImplementedError
+        EducationGroupYear.objects.filter(
+            acronym=entity_id.acronym,
+            academic_year__year=entity_id.year
+        ).delete()
 
 
 def _convert_education_group_year_to_training(
-        entity_id: 'TrainingIdentity',
         obj: EducationGroupYearModelDb
 ) -> 'Training':
+    entity_id = training.TrainingIdentity(acronym=obj.acronym, year=obj.academic_year.year)
+
     secondary_domains = __convert_study_domains_from_db(obj)
 
     coorganizations = __convert_coorganizations_from_db(entity_id, obj)
@@ -122,6 +135,7 @@ def _convert_education_group_year_to_training(
     return training.Training(
         entity_identity=entity_id,
         entity_id=entity_id,
+        code=obj.partial_acronym,
         identity_through_years=TrainingIdentityThroughYears(uuid=obj.education_group_id),
         type=TrainingType[obj.education_group_type.name],
         credits=obj.credits,
@@ -269,10 +283,13 @@ def __convert_coorganizations_from_db(
     return coorganizations
 
 
-def _get_queryset_to_fetch_data_for_training(entity_id: 'TrainingIdentity') -> QuerySet:
+def _get_queryset_to_fetch_data_for_training(entity_ids: List['TrainingIdentity']) -> QuerySet:
+    filter_clause = functools.reduce(
+        operator.or_,
+        ((Q(acronym=entity_id.acronym) & Q(academic_year__year=entity_id.year)) for entity_id in entity_ids)
+    )
     return EducationGroupYearModelDb.objects.filter(
-        acronym=entity_id.acronym,
-        academic_year__year=entity_id.year
+        filter_clause
     ).select_related(
         'education_group_type',
         'hops',
@@ -337,13 +354,14 @@ def _save_education_group(
     return education_group_db_obj
 
 
-def _save_education_group_year(
+def _create_education_group_year(
         training: 'Training',
         education_group_db_obj: EducationGroupModelDb
 ) -> EducationGroupYearModelDb:
     obj = EducationGroupYearModelDb(
         academic_year=AcademicYearModelDb.objects.get(year=training.entity_id.year),
         acronym=training.entity_id.acronym,
+        partial_acronym=training.code,
         education_group_type=EducationGroupTypeModelDb.objects.get(name=training.type.name),
         active=training.status.name,
         credits=training.credits,
@@ -394,7 +412,8 @@ def _save_education_group_year(
             name=training.enrollment_campus.name,
             organization__name=training.enrollment_campus.university_name,
         ) if training.teaching_campus else None,
-        other_campus_activities=training.other_campus_activities.name if training.other_campus_activities else None,
+        other_campus_activities=training.other_campus_activities.name
+        if training.other_campus_activities else None,
         funding=training.funding.can_be_funded,
         funding_direction=training.funding.funding_orientation.name
         if training.funding and training.funding.funding_orientation else '',
@@ -409,7 +428,88 @@ def _save_education_group_year(
         diploma_printing_title=training.diploma.printing_title,
         professional_title=training.diploma.professional_title,
     )
-    obj.save()
+    try:
+        obj.save()
+    except IntegrityError:
+        raise exception.TrainingAcronymAlreadyExistException(training.acronym)
+    return obj
+
+
+def _update_education_group_year(
+        training: 'Training',
+        education_group_db_obj: EducationGroupModelDb
+) -> EducationGroupYearModelDb:
+    obj, _created = EducationGroupYearModelDb.objects.update_or_create(
+        academic_year=AcademicYearModelDb.objects.get(year=training.entity_id.year),
+        acronym=training.entity_id.acronym,
+        defaults={
+            'education_group_type': EducationGroupTypeModelDb.objects.get(name=training.type.name),
+            'active': training.status.name,
+            'credits': training.credits,
+            'schedule_type': training.schedule_type.name if training.schedule_type else None,
+            'duration': training.duration,
+            'education_group': education_group_db_obj,
+            'title': training.titles.title_fr,
+            'partial_title': training.titles.partial_title_fr,
+            'title_english': training.titles.title_en,
+            'partial_title_english': training.titles.partial_title_en,
+            'keywords': training.keywords,
+            'internship': training.internship_presence.name if training.internship_presence else None,
+            'enrollment_enabled': training.is_enrollment_enabled,
+            'web_re_registration': training.has_online_re_registration,
+            'partial_deliberation': training.has_partial_deliberation,
+            'admission_exam': training.has_admission_exam,
+            'dissertation': training.has_dissertation,
+            'university_certificate': training.produce_university_certificate,
+            'decree_category': training.decree_category.name if training.decree_category else None,
+            'rate_code': training.rate_code.name if training.rate_code else None,
+            'primary_language': LanguageModelDb.objects.get(
+                name=training.main_language.name
+            ) if training.main_language else None,
+            'english_activities': training.english_activities.name if training.english_activities else None,
+            'other_language_activities': training.other_language_activities.name
+            if training.other_language_activities else None,
+            'internal_comment': training.internal_comment,
+            'main_domain': DomainModelDb.objects.get(
+                code=training.main_domain.entity_id.code,
+                decree__name=training.main_domain.entity_id.decree_name,
+            ) if training.main_domain else None,
+            'isced_domain': DomainIscedModelDb.objects.get(
+                code=training.isced_domain.entity_id.code
+            ) if training.isced_domain else None,
+            'management_entity_id': entity_version.find_by_acronym_and_year(
+                acronym=training.management_entity.acronym,
+                year=training.year,
+            ).entity_id if training.management_entity else None,
+            'administration_entity_id': entity_version.find_by_acronym_and_year(
+                acronym=training.administration_entity.acronym,
+                year=training.year,
+            ).entity_id if training.administration_entity else None,
+            'main_teaching_campus': CampusModelDb.objects.get(
+                name=training.teaching_campus.name,
+                organization__name=training.teaching_campus.university_name,
+            ) if training.teaching_campus else None,
+            'enrollment_campus': CampusModelDb.objects.get(
+                name=training.enrollment_campus.name,
+                organization__name=training.enrollment_campus.university_name,
+            ) if training.teaching_campus else None,
+            'other_campus_activities': training.other_campus_activities.name
+            if training.other_campus_activities else None,
+            'funding': training.funding.can_be_funded,
+            'funding_direction': training.funding.funding_orientation.name
+            if training.funding and training.funding.funding_orientation else '',
+            'funding_cud': training.funding.can_be_international_funded,
+            'funding_direction_cud': training.funding.international_funding_orientation.name
+            if training.funding and training.funding.international_funding_orientation else '',
+            'co_graduation': training.co_graduation.code_inter_cfb,
+            'co_graduation_coefficient': training.co_graduation.coefficient,
+            'academic_type': training.academic_type.name if training.academic_type else None,
+            'duration_unit': training.duration_unit.name if training.duration_unit else None,
+            'joint_diploma': training.diploma.leads_to_diploma,
+            'diploma_printing_title': training.diploma.printing_title,
+            'professional_title': training.diploma.professional_title,
+        }
+    )
     return obj
 
 
@@ -417,6 +517,7 @@ def _save_secondary_domains(
         training: 'Training',
         education_group_year_db_obj: EducationGroupYearModelDb
 ) -> List[EducationGroupYearDomainModelDb]:
+    _delete_secondary_domains(education_group_year_db_obj)
     saved_objs = []
     for dom in training.secondary_domains:
         obj = EducationGroupYearDomainModelDb(
@@ -427,26 +528,45 @@ def _save_secondary_domains(
     return saved_objs
 
 
+def _delete_secondary_domains(education_group_year_db_obj: EducationGroupYearModelDb) -> None:
+    secondary_domains_qs = EducationGroupYearDomainModelDb.objects.filter(
+        education_group_year=education_group_year_db_obj
+    )
+    for secondary_domain_obj in secondary_domains_qs:
+        secondary_domain_obj.delete()
+
+
 def _save_hops(
         training: 'Training',
         education_group_year_db_obj: EducationGroupYearModelDb
 ) -> List[HopsModelDb]:
+    _delete_hops(education_group_year_db_obj)
     saved_objs = []
     if training.hops:
-        obj = HopsModelDb(
+        obj, created = HopsModelDb.objects.update_or_create(
             education_group_year=education_group_year_db_obj,
-            ares_study=training.hops.ares_code,
-            ares_graca=training.hops.ares_graca,
-            ares_ability=training.hops.ares_authorization,
-        ).save()
+            defaults={
+                'ares_study': training.hops.ares_code,
+                'ares_graca': training.hops.ares_graca,
+                'ares_ability': training.hops.ares_authorization
+            }
+        )
         saved_objs.append(obj)
     return saved_objs
+
+
+def _delete_hops(education_group_year_db_obj: EducationGroupYearModelDb) -> None:
+    try:
+        HopsModelDb.objects.get(education_group_year=education_group_year_db_obj).delete()
+    except HopsModelDb.DoesNotExist:
+        pass
 
 
 def _save_certificate_aims(
         training: 'Training',
         education_group_year_db_obj: EducationGroupYearModelDb
 ) -> List[EducationGroupCertificateAimModelDb]:
+    _delete_certificate_aims(education_group_year_db_obj)
     saved_objs = []
     if training.diploma:
         for aim in training.diploma.aims:
@@ -456,3 +576,11 @@ def _save_certificate_aims(
             ).save()
             saved_objs.append(obj)
     return saved_objs
+
+
+def _delete_certificate_aims(education_group_year_db_obj: EducationGroupYearModelDb) -> None:
+    certificate_aims_qs = EducationGroupCertificateAimModelDb.objects.filter(
+        education_group_year=education_group_year_db_obj
+    )
+    for aim in certificate_aims_qs:
+        aim.delete()
