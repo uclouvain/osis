@@ -6,14 +6,16 @@ from django.utils.translation import gettext_lazy as _, pgettext
 from rules import predicate
 
 from base.business.event_perms import EventPermEducationGroupEdition
-from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_categories import Categories
 from education_group.auth.scope import Scope
 from education_group.models.group_year import GroupYear
-from osis_role import errors
+from osis_common.ddd import interface
 from osis_role.errors import predicate_failed_msg, set_permission_error, get_permission_error
-from program_management.ddd.repositories import load_tree_version
+from program_management.ddd.domain import exception
+from program_management.ddd.domain.service import identity_search
+from program_management.ddd.repositories import load_tree_version, \
+    program_tree_version as program_tree_version_repository
 from program_management.models.element import Element
 
 
@@ -110,6 +112,18 @@ def is_element_only_inside_standard_program(
 ):
     if isinstance(education_group_year, GroupYear):
         element_id = Element.objects.get(group_year=education_group_year).id
+        try:
+            node_identity = identity_search.NodeIdentitySearch.get_from_element_id(element_id)
+            tree_version_identity = identity_search.ProgramTreeVersionIdentitySearch(
+            ).get_from_node_identity(
+                node_identity
+            )
+            tree_version = tree_version_identity and program_tree_version_repository.ProgramTreeVersionRepository(
+            ).get(tree_version_identity)
+            if tree_version and not tree_version.is_standard_version:
+                return False
+        except (interface.BusinessException, exception.ProgramTreeVersionNotFoundException):
+            pass
         tree_versions = load_tree_version.load_tree_versions_from_children([element_id])
         return all((version.is_standard_version for version in tree_versions))
     return education_group_year
