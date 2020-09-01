@@ -31,6 +31,7 @@ from django.db.models import Q
 
 from base.models.academic_year import AcademicYear
 from base.models.education_group_year import EducationGroupYear
+from education_group.ddd.domain.exception import TrainingNotFoundException
 from education_group.models.group import Group
 from education_group.models.group_year import GroupYear
 from osis_common.ddd import interface
@@ -51,12 +52,17 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
             program_tree_version: 'ProgramTreeVersion',
             **_
     ) -> 'ProgramTreeVersionIdentity':
-        education_group_year_id = EducationGroupYear.objects.filter(
-            acronym=program_tree_version.entity_id.offer_acronym,
-            academic_year__year=program_tree_version.entity_id.year,
-        ).values_list(
-            'pk', flat=True
-        )[0]
+        offer_acronym = program_tree_version.entity_id.offer_acronym
+        year = program_tree_version.entity_id.year
+        try:
+            education_group_year_id = EducationGroupYear.objects.filter(
+                acronym=offer_acronym,
+                academic_year__year=year,
+            ).values_list(
+                'pk', flat=True
+            )[0]
+        except IndexError:
+            raise TrainingNotFoundException(acronym=offer_acronym, year=year)
 
         group_year_id = GroupYear.objects.filter(
             partial_acronym=program_tree_version.program_tree_identity.code,
