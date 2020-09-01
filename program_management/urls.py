@@ -28,7 +28,7 @@ from django.urls import include, path
 
 import program_management.views.tree.copy_cut
 import program_management.views.tree_version.check_version_name
-from program_management.views import quick_search, create_element
+from program_management.views import quick_search, create_element, publish_general_information
 from program_management.views.proxy.identification import IdentificationRedirectView
 from program_management.views import groupelementyear_update, \
     groupelementyear_read, element_utilization, excel, search, tree, prerequisite_read, prerequisite_update
@@ -123,5 +123,6 @@ urlpatterns = [
             program_management.views.tree_version.check_version_name.check_version_name,
             name="check_version_name"
         ),
+        path('publish', publish_general_information.publish, name='publish_general_information'),
     ])),
 ]
