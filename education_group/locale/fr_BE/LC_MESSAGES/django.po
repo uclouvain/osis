@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-26 09:35+0200\n"
+"POT-Creation-Date: 2020-08-31 10:16+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -168,6 +168,12 @@ msgstr "Code co-diplômation intra CfB"
 
 msgid "Comment"
 msgstr "Commentaire"
+
+msgid "Common admission conditions will be published soon"
+msgstr "Les conditions d'admission communes seront publiées sous peu"
+
+msgid "Common general informations will be published soon"
+msgstr "Les informations générales communes seront publiées sous peu"
 
 msgid "Conditions"
 msgstr "Conditions"
@@ -603,10 +609,6 @@ msgstr "Le lien de %(code)s - %(acronym)s - %(year)s a été mis à jour."
 #, python-format
 msgid "The mini-training %(code)s has been deleted."
 msgstr "La mini-formation %(code)s a été supprimée."
-
-#, python-format
-msgid "The program %(acronym)s will be published soon"
-msgstr "Le programme %(acronym)s sera publié sous peu"
 
 msgid ""
 "The scope of the user is limited and prevents this action to be performed"

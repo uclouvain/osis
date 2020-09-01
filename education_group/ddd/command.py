@@ -490,3 +490,13 @@ class GetUpdateMiniTrainingWarningMessages(interface.CommandRequest):
     acronym = attr.ib(type=str)
     code = attr.ib(type=str)
     year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class PublishCommonAdmissionCommand(interface.CommandRequest):
+    year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class PublishCommonPedagogyCommand(interface.CommandRequest):
+    year = attr.ib(type=int)
