@@ -33,8 +33,7 @@ from program_management.ddd.command import CreateStandardVersionCommand
 from program_management.ddd.domain import exception
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity, ProgramTree
 from program_management.ddd.validators import validators_by_business_action
-from program_management.ddd.validators.validators_by_business_action import CopyProgramTreeVersionValidatorList, \
-    CreateProgramTreeVersionValidatorList
+from program_management.ddd.validators.validators_by_business_action import CreateProgramTreeVersionValidatorList
 
 STANDARD = ""
 
@@ -56,7 +55,7 @@ class ProgramTreeVersionBuilder:
             copy_from: 'ProgramTreeVersion',
             tree_version_repository: 'ProgramTreeVersionRepository'
     ) -> 'ProgramTreeVersion':
-        CopyProgramTreeVersionValidatorList(copy_from).validate()
+        validators_by_business_action.CopyProgramTreeVersionValidatorList(copy_from).validate()
         identity_next_year = attr.evolve(copy_from.entity_id, year=copy_from.entity_id.year + 1)
         try:
             tree_version_next_year = tree_version_repository.get(identity_next_year)

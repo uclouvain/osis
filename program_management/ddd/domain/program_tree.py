@@ -29,7 +29,7 @@ from typing import List, Set, Optional
 import attr
 
 from base.models.authorized_relationship import AuthorizedRelationshipList
-from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, GroupType, MiniTrainingType
+from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, GroupType
 from education_group.ddd.business_types import *
 from osis_common.ddd import interface
 from osis_common.decorators.deprecated import deprecated
@@ -45,7 +45,6 @@ from program_management.ddd.domain.service.validation_rule import FieldValidatio
 from program_management.ddd.repositories import load_authorized_relationship
 from program_management.ddd.validators import validators_by_business_action
 from program_management.ddd.validators._path_validator import PathValidator
-from program_management.ddd.validators.validators_by_business_action import CopyProgramTreeValidatorList
 from program_management.models.enums import node_type
 from program_management.models.enums.node_type import NodeType
 
@@ -111,7 +110,7 @@ class ProgramTreeBuilder:
         return new_parent
 
     def copy_to_next_year(self, copy_from: 'ProgramTree', repository: 'ProgramTreeRepository') -> 'ProgramTree':
-        CopyProgramTreeValidatorList(copy_from).validate()
+        validators_by_business_action.CopyProgramTreeValidatorList(copy_from).validate()
         identity_next_year = attr.evolve(copy_from.entity_id, year=copy_from.entity_id.year + 1)
         try:
             program_tree_next_year = repository.get(identity_next_year)
@@ -361,10 +360,6 @@ class ProgramTree(interface.RootEntity):
     def get_all_finalities(self) -> Set['Node']:
         finality_types = set(TrainingType.finality_types_enum())
         return self.get_all_nodes(types=finality_types)
-
-    def get_all_mini_training(self) -> Set['Node']:
-        mini_training_types = set(MiniTrainingType.mini_training_types_enum())
-        return self.get_all_nodes(types=mini_training_types)
 
     def get_greater_block_value(self) -> int:
         all_links = self.get_all_links()
