@@ -130,7 +130,7 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
             raise exception.ProgramTreeVersionNotFoundException()
 
     @classmethod
-    def get_last_in_past(cls, entity_id: 'program_tree_version.ProgramTreeVersionIdentity') -> 'ProgramTreeVersion':
+    def get_last_in_past(cls, entity_id: 'ProgramTreeVersionIdentity') -> 'ProgramTreeVersion':
         qs = EducationGroupVersion.objects.filter(
             version_name=entity_id.version_name,
             offer__acronym=entity_id.offer_acronym,

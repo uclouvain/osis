@@ -169,9 +169,13 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             delete_command = self._convert_form_to_delete_mini_trainings_command(self.mini_training_form)
             return delete_mini_training_with_program_tree_service.delete_mini_training_with_program_tree(delete_command)
 
-        except (program_management_exception.ProgramTreeNonEmpty, exception.MiniTrainingHaveLinkWithEPC,
-                exception.MiniTrainingHaveEnrollments, program_management_exception.NodeHaveLinkException,
-                program_management_exception.CannotDeleteStandardDueToVersionEndDate) as e:
+        except (
+            program_management_exception.ProgramTreeNonEmpty,
+            exception.MiniTrainingHaveLinkWithEPC,
+            exception.MiniTrainingHaveEnrollments,
+            program_management_exception.NodeHaveLinkException,
+            program_management_exception.CannotDeleteStandardDueToVersionEndDate
+        ) as e:
             self.mini_training_form.add_error("end_year", "")
             self.mini_training_form.add_error(
                 None,
