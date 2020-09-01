@@ -29,7 +29,7 @@ from django.utils import translation
 from django.views.generic import FormView
 from waffle.decorators import waffle_switch
 
-from base.forms.education_group.common import SelectLanguage
+from program_management.forms.pdf_select_language import PDFSelectLanguage
 from base.models.enums.education_group_types import GroupType
 from base.views.mixins import FlagMixin, AjaxTemplateMixin
 from osis_common.document.pdf_build import render_pdf
@@ -104,7 +104,7 @@ def pdf_content(request, year, code, language):
 class ReadEducationGroupTypeView(FlagMixin, AjaxTemplateMixin, FormView):
     flag = "pdf_content"
     template_name = "group_element_year/pdf_content.html"
-    form_class = SelectLanguage
+    form_class = PDFSelectLanguage
 
     def form_valid(self, form):
         self.kwargs['language'] = form.cleaned_data['language']
