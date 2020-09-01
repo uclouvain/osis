@@ -557,20 +557,12 @@ class EducationGroupYear(SerializableModel):
         )
 
     @property
-    def type(self):
-        return self.education_group_type.name
-
-    @property
     def is_option(self):
-        return self.type == MiniTrainingType.OPTION.name
+        return self.education_group_type.name == MiniTrainingType.OPTION.name
 
     @property
     def is_finality(self):
-        return self.type in TrainingType.finality_types()
-
-    @property
-    def is_attestation(self):
-        return self.type in TrainingType.attestation_types()
+        return self.education_group_type.name in TrainingType.finality_types()
 
     @property
     def is_continuing_education_education_group_year(self):
@@ -578,19 +570,19 @@ class EducationGroupYear(SerializableModel):
 
     @property
     def is_minor(self):
-        return self.type in MiniTrainingType.minors()
+        return self.education_group_type.name in MiniTrainingType.minors()
 
     @property
     def is_major(self):
-        return self.type == MiniTrainingType.FSA_SPECIALITY.name
+        return self.education_group_type.name == MiniTrainingType.FSA_SPECIALITY.name
 
     @property
     def is_deepening(self):
-        return self.type == MiniTrainingType.DEEPENING.name
+        return self.education_group_type.name == MiniTrainingType.DEEPENING.name
 
     @property
     def is_minor_major_option_list_choice(self):
-        return self.type in GroupType.minor_major_option_list_choice()
+        return self.education_group_type.name in GroupType.minor_major_option_list_choice()
 
     @property
     def is_common(self):
@@ -606,27 +598,27 @@ class EducationGroupYear(SerializableModel):
 
     @property
     def is_master120(self):
-        return self.type == TrainingType.PGRM_MASTER_120.name
+        return self.education_group_type.name == TrainingType.PGRM_MASTER_120.name
 
     @property
     def is_master60(self):
-        return self.type == TrainingType.MASTER_M1.name
+        return self.education_group_type.name == TrainingType.MASTER_M1.name
 
     @property
     def is_aggregation(self):
-        return self.type == TrainingType.AGGREGATION.name
+        return self.education_group_type.name == TrainingType.AGGREGATION.name
 
     @property
     def is_specialized_master(self):
-        return self.type == TrainingType.MASTER_MC.name
+        return self.education_group_type.name == TrainingType.MASTER_MC.name
 
     @property
     def is_bachelor(self):
-        return self.type == TrainingType.BACHELOR.name
+        return self.education_group_type.name == TrainingType.BACHELOR.name
 
     @property
     def is_master180(self):
-        return self.type == TrainingType.PGRM_MASTER_180_240.name
+        return self.education_group_type.name == TrainingType.PGRM_MASTER_180_240.name
 
     @property
     def has_common_admission_condition(self):
@@ -661,31 +653,11 @@ class EducationGroupYear(SerializableModel):
     def complete_title(self):
         return self.verbose_title
 
-    @property
-    def verbose_remark(self):
-        if self.remark_english and translation.get_language() == LANGUAGE_CODE_EN:
-            return self.remark_english
-        return self.remark
-
-    @property
-    def verbose_duration(self):
-        if self.duration and self.duration_unit:
-            return "{} {}".format(self.duration, self.get_duration_unit_display())
-        return ""
-
     def get_absolute_url(self):
         return reverse(
             'education_group_read_proxy',
             args=[self.academic_year.year, self.acronym]
         )
-
-    @property
-    def str_domains(self):
-        ch = "{}-{}\n".format(self.main_domain.decree, self.main_domain.name) if self.main_domain else ""
-
-        for domain in self.secondary_domains.all():
-            ch += "{}-{}\n".format(domain.decree, domain.name)
-        return ch
 
     @cached_property
     def administration_entity_version(self):
@@ -749,22 +721,6 @@ class EducationGroupYear(SerializableModel):
     @property
     def category(self):
         return self.education_group_type.category
-
-    @property
-    def direct_parents_of_branch(self):
-        return EducationGroupYear.objects.filter(
-            groupelementyear__child_branch=self
-        ).distinct()
-
-    @property
-    def ascendants_of_branch(self):
-        ascendants = []
-
-        for parent in self.direct_parents_of_branch:
-            ascendants.append(parent)
-            ascendants += parent.ascendants_of_branch
-
-        return list(set(ascendants))
 
     def clean(self):
         self.clean_academic_year()
@@ -908,37 +864,6 @@ class EducationGroupYear(SerializableModel):
             return None
 
 
-def search(**kwargs):
-    qs = EducationGroupYear.objects
-
-    if "id" in kwargs:
-        if isinstance(kwargs['id'], list):
-            qs = qs.filter(id__in=kwargs['id'])
-        else:
-            qs = qs.filter(id=kwargs['id'])
-    if "academic_year" in kwargs:
-        qs = qs.filter(academic_year=kwargs['academic_year'])
-    if kwargs.get("acronym"):
-        qs = qs.filter(acronym__icontains=kwargs['acronym'])
-    if kwargs.get("title"):
-        qs = qs.filter(title__icontains=kwargs['title'])
-    if "education_group_type" in kwargs:
-        if isinstance(kwargs['education_group_type'], list):
-            qs = qs.filter(education_group_type__in=kwargs['education_group_type'])
-        else:
-            qs = qs.filter(education_group_type=kwargs['education_group_type'])
-    elif kwargs.get('category'):
-        qs = qs.filter(education_group_type__category=kwargs['category'])
-
-    if kwargs.get("partial_acronym"):
-        qs = qs.filter(partial_acronym__icontains=kwargs['partial_acronym'])
-
-    if kwargs.get("enrollment_states"):
-        qs = qs.filter(offerenrollment__enrollment_state__in=kwargs['enrollment_states'])
-
-    return qs.select_related('education_group_type', 'academic_year')
-
-
 def have_link_with_epc(acronym: str, year: int) -> bool:
     return EducationGroupYear.objects.filter(
         acronym=acronym,
@@ -958,9 +883,12 @@ def find_with_enrollments_count(learning_unit_year):
 
 
 def _count_education_group_enrollments_by_id(education_groups_years):
-    educ_groups = search(id=[educ_group.id for educ_group in education_groups_years],
-                         enrollment_states=[SUBSCRIBED, PROVISORY]) \
-        .annotate(count_formation_enrollments=Count('offerenrollment')).values('id', 'count_formation_enrollments')
+    educ_groups = EducationGroupYear.objects.filter(
+        pk__in=[educ_group.id for educ_group in education_groups_years],
+        offerenrollment__enrollment_state__in=[SUBSCRIBED, PROVISORY]
+    ).annotate(
+        count_formation_enrollments=Count('offerenrollment')
+    ).values('id', 'count_formation_enrollments')
     return {obj['id']: obj['count_formation_enrollments'] for obj in educ_groups}
 
 
