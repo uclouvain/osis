@@ -36,7 +36,11 @@ class RelativeCreditShouldBeGreaterOrEqualsThanZero(BusinessException):
 
 
 class ProgramTreeNotFoundException(Exception):
-    pass
+    def __init__(self, *args, code: str = '', year: int = None):
+        message = ''
+        if code or year:
+            message = _("Program tree not found : {code} {year}".format(code=code, year=year))
+        super().__init__(message, *args)
 
 
 class ProgramTreeVersionNotFoundException(Exception):

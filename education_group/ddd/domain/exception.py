@@ -5,7 +5,11 @@ from education_group.ddd.business_types import *
 
 
 class TrainingNotFoundException(Exception):
-    pass
+    def __init__(self, *args, acronym: str = None, year: int = None):
+        message = ''
+        if acronym or year:
+            message = _("Training not found : {acronym} {year}".format(acronym=acronym, year=year))
+        super().__init__(message, *args)
 
 
 class MiniTrainingNotFoundException(Exception):
