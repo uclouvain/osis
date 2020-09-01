@@ -26,6 +26,10 @@ msgid "\"%(child)s\" has been pasted into \"%(parent)s\""
 msgstr "\"%(child)s\" has been removed from \"%(parent)s\""
 
 #, python-format
+msgid "%(node_to_add)s version must be the same as %(root_node)s version"
+msgstr ""
+
+#, python-format
 msgid "%(start_index)s to %(end_index)s of %(total_counts)s learning units"
 msgstr ""
 
@@ -531,6 +535,9 @@ msgstr ""
 msgid ""
 "The child %(child)s you want to attach is a parent of the node you want to "
 "attach."
+msgstr ""
+
+msgid "The child version must be the same as the root node version"
 msgstr ""
 
 #, python-format

@@ -95,9 +95,10 @@ class EducationGroupRootsList(LanguageContextSerializerMixin, generics.ListAPIVi
                 FROM base_groupelementyear gey
                 JOIN program_management_element parent_element ON parent_element.id = gey.parent_element_id
                 JOIN education_group_groupyear parent_groupyear ON parent_groupyear.id = parent_element.group_year_id
-                JOIN program_management_educationgroupversion parent_version ON parent_version.root_group_id = parent_groupyear.id
+                JOIN program_management_educationgroupversion parent_version
+                ON parent_version.root_group_id = parent_groupyear.id
                 WHERE parent_version.id = (
-                    SELECT version.id 
+                    SELECT version.id
                     FROM program_management_educationgroupversion version
                     JOIN education_group_groupyear group_year ON version.root_group_id = group_year.id
                     JOIN program_management_element element ON group_year.id = element.group_year_id

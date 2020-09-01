@@ -35,7 +35,7 @@ class TestProgramTreeVersionBuilderCopyToNextYear(SimpleTestCase):
         self.copy_from_program_tree_version = ProgramTreeVersionFactory()
         self.mock_repository = mock.create_autospec(ProgramTreeVersionRepository)
 
-    @mock.patch("program_management.ddd.domain.program_tree_version.CopyProgramTreeVersionValidatorList")
+    @mock.patch("program_management.ddd.validators.validators_by_business_action.CopyProgramTreeVersionValidatorList")
     def test_should_create_new_tree_version_when_does_not_exist_for_next_year(self, mock_validator):
         mock_validator.return_value.validate.return_value = None
         self.mock_repository.get.side_effect = exception.ProgramTreeVersionNotFoundException
@@ -51,7 +51,7 @@ class TestProgramTreeVersionBuilderCopyToNextYear(SimpleTestCase):
         )
         self.assertEqual(expected_tree_identity, result_tree_version.program_tree_identity)
 
-    @mock.patch("program_management.ddd.domain.program_tree_version.CopyProgramTreeVersionValidatorList")
+    @mock.patch("program_management.ddd.validators.validators_by_business_action.CopyProgramTreeVersionValidatorList")
     def test_should_return_existing_tree_version_when_already_exists_for_next_year(self, mock_validator):
         mock_validator.return_value.validate.return_value = None
         next_year_program_tree_version = ProgramTreeVersionFactory()
