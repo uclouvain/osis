@@ -121,7 +121,7 @@ class CreateProgramTreeVersion(AjaxPermissionRequiredMixin, AjaxTemplateMixin, V
                 node_identity = NodeIdentitySearch().get_from_tree_version_identity(identities[0])
                 url = reverse(
                     "element_identification",
-                    kwargs={'year': node_identity.year, 'code': node_identity.code}
+                    kwargs={'year': self.node_identity.year, 'code': node_identity.code}
                 )
                 return JsonResponse({
                     'success_url': url
