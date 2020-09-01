@@ -267,6 +267,12 @@ class GetLastExistingVersionNameCommand(interface.CommandRequest):
     is_transition = attr.ib(type=str)
 
 
+@attr.s(frozen=True, slots=True)
+class GetEndPostponementYearCommand(interface.CommandRequest):
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)
+
+
 class GetNodeIdentityFromElementId(interface.CommandRequest):
     def __init__(self, element_id: int):
         self.element_id = element_id

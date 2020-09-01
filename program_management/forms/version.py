@@ -28,10 +28,10 @@ from django.forms import TextInput
 from django.utils.translation import gettext_lazy as _
 
 from base.forms.utils.choice_field import BLANK_CHOICE
-from base.models import academic_year
-from base.models.academic_year import compute_max_academic_year_adjournment
 from education_group.ddd.business_types import *
-from program_management.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
+from program_management.ddd.command import GetEndPostponementYearCommand
+from program_management.ddd.domain.node import NodeIdentity
+from program_management.ddd.service.read import get_end_postponement_year_service
 
 
 class SpecificVersionForm(forms.Form):
@@ -58,15 +58,19 @@ class SpecificVersionForm(forms.Form):
         label=_('This version exists until'),
     )
 
-    def __init__(self, training_identity: 'TrainingIdentity', *args, **kwargs):
+    def __init__(self, training_identity: 'TrainingIdentity', node_identity: 'NodeIdentity', *args, **kwargs):
         self.training_identity = training_identity
+        self.node_identity = node_identity
         super().__init__(*args, **kwargs)
 
         self.__init_academic_year_choices()
 
     def __init_academic_year_choices(self):
-        max_year = CalculateEndPostponement().calculate_max_year_of_end_postponement()
-        choices_years = [(x, x) for x in range(self.training_identity.year, max_year)]
+        # TODO :: unit tests on this service (or on the domain service)
+        max_year = get_end_postponement_year_service.calculate_program_tree_end_postponement(
+            GetEndPostponementYearCommand(code=self.node_identity.code, year=self.node_identity.year)
+        )
+        choices_years = [(x, x) for x in range(self.training_identity.year, max_year + 1)]
         self.fields["end_year"].choices = BLANK_CHOICE + choices_years
 
     def clean_end_year(self):

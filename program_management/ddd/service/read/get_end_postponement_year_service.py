@@ -21,18 +21,19 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from typing import Union
 
+from education_group.ddd.repository.mini_training import MiniTrainingRepository
+from education_group.ddd.repository.training import TrainingRepository
 from program_management.ddd import command
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
-from program_management.ddd.domain.service.get_last_existing_version_name import GetLastExistingVersion
+from program_management.ddd.domain.program_tree import ProgramTreeIdentity
+from program_management.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
 
 
-def get_last_existing_version_identity(
-        cmd: command.GetLastExistingVersionNameCommand
-) -> Union[ProgramTreeVersionIdentity, None]:
-    return GetLastExistingVersion().get_last_existing_version_identity(
-        version_name=cmd.version_name,
-        offer_acronym=cmd.offer_acronym,
-        is_transition=cmd.is_transition,
+def calculate_program_tree_end_postponement(
+        cmd: command.GetEndPostponementYearCommand
+) -> int:
+    return CalculateEndPostponement().calculate_program_tree_end_postponement(
+        identity=ProgramTreeIdentity(cmd.code, cmd.year),
+        training_repository=TrainingRepository(),
+        mini_training_repository=MiniTrainingRepository()
     )

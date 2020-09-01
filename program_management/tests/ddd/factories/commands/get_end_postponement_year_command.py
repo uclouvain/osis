@@ -21,18 +21,15 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from typing import Union
+import factory.fuzzy
 
 from program_management.ddd import command
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
-from program_management.ddd.domain.service.get_last_existing_version_name import GetLastExistingVersion
 
 
-def get_last_existing_version_identity(
-        cmd: command.GetLastExistingVersionNameCommand
-) -> Union[ProgramTreeVersionIdentity, None]:
-    return GetLastExistingVersion().get_last_existing_version_identity(
-        version_name=cmd.version_name,
-        offer_acronym=cmd.offer_acronym,
-        is_transition=cmd.is_transition,
-    )
+class GetEndPostponementYearCommandFactory(factory.Factory):
+    class Meta:
+        model = command.GetEndPostponementYearCommand
+        abstract = False
+
+    code = factory.Sequence(lambda n: 'Code%02d' % n)
+    year = factory.Faker("random_int")

@@ -17,7 +17,7 @@ from program_management.ddd.service.read import get_last_existing_version_servic
 def check_version_name(request, year, code):
     version_name = request.GET['version_name']
     existed_version_name = False
-    existing_version = __get_last_existing_version(version_name, year, code)
+    existing_version = __get_last_existing_version(version_name, code)
     last_using = None
     if existing_version and existing_version.year < year:
         last_using = display_as_academic_year(existing_version.year)
@@ -31,11 +31,11 @@ def check_version_name(request, year, code):
         "version_name": request.GET['version_name']}, safe=False)
 
 
-def __get_last_existing_version(version_name: str, year: int, offer_acronym: str) -> ProgramTreeVersionIdentity:
+def __get_last_existing_version(version_name: str, offer_acronym: str) -> ProgramTreeVersionIdentity:
     return get_last_existing_version_service.get_last_existing_version_identity(
         GetLastExistingVersionNameCommand(
-            version_name=version_name,
-            offer_acronym=offer_acronym,
+            version_name=version_name.upper(),
+            offer_acronym=offer_acronym.upper(),
             is_transition=False,
         )
     )
