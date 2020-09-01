@@ -19,6 +19,8 @@ from education_group.auth.scope import Scope
 from education_group.tests.factories.auth.faculty_manager import FacultyManagerFactory
 from education_group.tests.factories.group_year import GroupYearFactory
 from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
+from program_management.tests.factories.education_group_version import EducationGroupVersionFactory, \
+    StandardEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementFactory
 
 
@@ -438,5 +440,19 @@ class TestIsElementOnlyInsideStandardProgram(TestCase):
             ProgramTreeVersionFactory(entity_id__version_name="NON_STANDARD")
         ]
         self.assertFalse(
+            predicates.is_element_only_inside_standard_program(self.user, self.group_year)
+        )
+
+    def test_should_return_false_when_element_is_a_tree_version_that_is_specific(self):
+        EducationGroupVersionFactory(root_group=self.group_year)
+
+        self.assertFalse(
+            predicates.is_element_only_inside_standard_program(self.user, self.group_year)
+        )
+
+    def test_should_return_true_when_element_is_a_tree_version_that_is_standard(self):
+        StandardEducationGroupVersionFactory(root_group=self.group_year)
+
+        self.assertTrue(
             predicates.is_element_only_inside_standard_program(self.user, self.group_year)
         )
