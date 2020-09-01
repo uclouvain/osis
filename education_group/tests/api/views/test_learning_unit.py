@@ -92,11 +92,6 @@ class FilterEducationGroupRootsTestCase(APITestCase):
             academic_year=cls.academic_year,
             learning_container_year__academic_year=cls.academic_year
         )
-<<<<<<< HEAD
-        gey = GroupElementYearFactory(parent=cls.common_core, child_branch=None, child_leaf=cls.learning_unit_year)
-        GroupElementYearFactory(parent=cls.sub_group, child_branch=None, child_leaf=cls.learning_unit_year)
-        cls.offer = EducationGroupYear.objects.filter(id=cls.training.id).annotate(
-=======
         cls.luy_element = ElementFactory(learning_unit_year=cls.learning_unit_year)
         gey = GroupElementYearFactory(
             parent_element=common_core_element,
@@ -107,7 +102,6 @@ class FilterEducationGroupRootsTestCase(APITestCase):
             child_element=cls.luy_element
         )
         cls.annotated_version = EducationGroupVersion.objects.filter(id=cls.version.id).annotate(
->>>>>>> 5ee487845132a5616759397a83112e39e7d60fe8
             relative_credits=Value(gey.relative_credits, output_field=IntegerField())
         ).first()
         url_kwargs = {
@@ -126,20 +120,12 @@ class FilterEducationGroupRootsTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         serializer = EducationGroupRootsListSerializer(
-<<<<<<< HEAD
-            [self.offer],
-=======
             [self.annotated_version],
->>>>>>> 5ee487845132a5616759397a83112e39e7d60fe8
             many=True,
             context={
                 'request': RequestFactory().get(self.url),
                 'language': settings.LANGUAGE_CODE_FR,
-<<<<<<< HEAD
-                'learning_unit_year': self.learning_unit_year,
-=======
                 'learning_unit_year': self.learning_unit_year
->>>>>>> 5ee487845132a5616759397a83112e39e7d60fe8
             }
         )
         self.assertEqual(response.data, serializer.data)
@@ -158,17 +144,11 @@ class FilterEducationGroupRootsTestCase(APITestCase):
             academic_year=self.academic_year,
             education_group_type__name=TrainingType.MASTER_MD_120.name
         )
-<<<<<<< HEAD
-        GroupElementYearFactory(parent=finality, child_branch=sub_group, child_leaf=None)
-        gey = GroupElementYearFactory(parent=sub_group, child_branch=None, child_leaf=self.learning_unit_year)
-        offer = EducationGroupYear.objects.filter(id=finality_root.id).annotate(
-=======
         finality_element = ElementFactory(group_year=finality)
 
         GroupElementYearFactory(parent_element__group_year=finality_root_group, child_element=finality_element)
         gey = GroupElementYearFactory(parent_element=finality_element, child_element=self.luy_element)
         annotated_finality = EducationGroupVersion.objects.filter(id=finality_root_version.id).annotate(
->>>>>>> 5ee487845132a5616759397a83112e39e7d60fe8
             relative_credits=Value(gey.relative_credits, output_field=IntegerField())
         ).first()
         query_string = {'ignore_complementary_module': 'true'}
@@ -176,26 +156,14 @@ class FilterEducationGroupRootsTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         serializer = EducationGroupRootsListSerializer(
-<<<<<<< HEAD
-            [offer, self.offer],
-=======
             [self.annotated_version, annotated_finality],
->>>>>>> 5ee487845132a5616759397a83112e39e7d60fe8
             many=True,
             context={
                 'request': RequestFactory().get(self.url),
                 'language': settings.LANGUAGE_CODE_FR,
-<<<<<<< HEAD
-                'learning_unit_year': self.learning_unit_year,
-            }
-        )
-        print(response.data)
-        print(serializer.data)
-=======
                 'learning_unit_year': self.learning_unit_year
             }
         )
->>>>>>> 5ee487845132a5616759397a83112e39e7d60fe8
         self.assertCountEqual(response.data, serializer.data)
 
 
@@ -228,9 +196,6 @@ class EducationGroupRootsListTestCase(APITestCase):
             academic_year=cls.academic_year,
             learning_container_year__academic_year=cls.academic_year
         )
-<<<<<<< HEAD
-        gey = GroupElementYearFactory(parent=cls.common_core, child_branch=None, child_leaf=cls.learning_unit_year)
-=======
         luy_element = ElementFactory(learning_unit_year=cls.learning_unit_year)
         gey = GroupElementYearFactory(
             parent_element=common_core_element,
@@ -239,7 +204,6 @@ class EducationGroupRootsListTestCase(APITestCase):
         cls.annotated_version = EducationGroupVersion.objects.filter(id=cls.version.id).annotate(
             relative_credits=Value(gey.relative_credits, output_field=IntegerField())
         ).first()
->>>>>>> 5ee487845132a5616759397a83112e39e7d60fe8
         cls.user = UserFactory()
         cls.offer = EducationGroupYear.objects.filter(id=cls.training.id).annotate(
             relative_credits=Value(gey.relative_credits, output_field=IntegerField())
@@ -279,21 +243,12 @@ class EducationGroupRootsListTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         serializer = EducationGroupRootsListSerializer(
-<<<<<<< HEAD
-            [self.offer],
-            many=True,
-            context={
-                'request': RequestFactory().get(self.url),
-                'language': settings.LANGUAGE_CODE_EN,
-                'learning_unit_year': self.learning_unit_year,
-=======
             [self.annotated_version],
             many=True,
             context={
                 'request': RequestFactory().get(self.url),
                 'language': settings.LANGUAGE_CODE_FR,
                 'learning_unit_year': self.learning_unit_year
->>>>>>> 5ee487845132a5616759397a83112e39e7d60fe8
             }
         )
         self.assertEqual(response.data, serializer.data)
@@ -363,8 +318,4 @@ class LearningUnitPrerequisitesViewTestCase(APITestCase):
                 'language': settings.LANGUAGE_CODE_FR
             }
         )
-<<<<<<< HEAD
-        self.assertEqual(response.data, serializer.data)
-=======
         self.assertListEqual(response.data, serializer.data)
->>>>>>> 5ee487845132a5616759397a83112e39e7d60fe8
