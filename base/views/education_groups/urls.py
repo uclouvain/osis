@@ -33,7 +33,7 @@ from base.views.education_groups.publication_contact import CreateEducationGroup
 from base.views.education_groups.search import EducationGroupTypeAutoComplete
 from base.views.education_groups.update import CertificateAimAutocomplete
 from education_group import urls as education_group_urls
-from . import create, delete
+from . import delete
 from .achievement.urls import urlpatterns as urlpatterns_achievement
 
 urlpatterns = [
@@ -52,12 +52,6 @@ urlpatterns = [
         r'^clear_clipboard/$',
         clear_clipboard,
         name='education_group_clear_clipboard'
-    ),
-    url(
-        r'^validate_field/(?P<category>[A-Z_]+)/', include([
-            url(r'^$', create.validate_field, name='validate_education_group_field'),
-            url(r'^(?P<education_group_year_pk>[0-9]+)/', create.validate_field, name='validate_education_group_field'),
-        ])
     ),
     url(r'^(?P<education_group_year_id>[0-9]+)/', include([
         url(r'^informations/edit/$', education_group.education_group_year_pedagogy_edit,
