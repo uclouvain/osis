@@ -16,19 +16,22 @@ from program_management.ddd.service.read import get_last_existing_version_servic
 @require_http_methods(['GET'])
 def check_version_name(request, year, acronym):
     version_name = request.GET['version_name']
-    existed_version_name = False
-    existing_version = __get_last_existing_version(version_name, acronym) if request.GET['version_name'] != "" else None
     last_using = None
-    if existing_version and existing_version.year < year:
-        last_using = display_as_academic_year(existing_version.year)
-        existed_version_name = True
-    valid = bool(re.match("^[A-Z]{0,15}$", request.GET['version_name'].upper()))
+    existing_version = False
+    existed_version_name = False
+    valid = False
+    if version_name != "":
+        existing_version = __get_last_existing_version(version_name, acronym)
+        if existing_version and existing_version.year < year:
+            last_using = display_as_academic_year(existing_version.year)
+            existed_version_name = True
+        valid = bool(re.match("^[A-Z]{0,15}$", version_name.upper()))
     return JsonResponse({
         "existed_version_name": existed_version_name,
         "existing_version_name": bool(existing_version and existing_version.year >= year),
         "last_using": last_using,
         "valid": valid,
-        "version_name": request.GET['version_name']}, safe=False)
+        "version_name": version_name}, safe=False)
 
 
 def __get_last_existing_version(version_name: str, offer_acronym: str) -> ProgramTreeVersionIdentity:
