@@ -196,10 +196,11 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
                "?path={}".format(self.get_path())
 
     def get_create_version_url(self):
-        return reverse(
-            'create_education_group_version',
-            kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}
-        ) + "?path={}".format(self.get_path())
+        if len(self.get_path().split('|')) <= 1:  # Can only create versions from the root
+            return reverse(
+                'create_education_group_version',
+                kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}
+            ) + "?path={}".format(self.get_path())
 
     def get_tab_urls(self):
         node_identity = self.get_object().entity_id
