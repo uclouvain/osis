@@ -29,7 +29,7 @@ from django.db import IntegrityError
 from django.test import TestCase, override_settings
 from django.utils.translation import gettext_lazy as _
 
-from base.models.education_group_year import search, find_with_enrollments_count
+from base.models.education_group_year import find_with_enrollments_count
 from base.models.enums import education_group_categories, duration_unit, offer_enrollment_state, education_group_types
 from base.models.enums.constraint_type import CREDITS
 from base.models.exceptions import MaximumOneParentAllowedException, ValidationWarning
@@ -139,34 +139,6 @@ class EducationGroupYearTest(TestCase):
         )
         self.assertEqual(self.education_group_year_1.verbose_credit, verbose__waiting)
 
-    def test_search(self):
-        result = search(id=[self.education_group_year_1.id, self.education_group_year_2.id])
-        self.assertEqual(len(result), 2)
-
-        result = search(education_group_type=self.education_group_year_2.education_group_type)
-        self.assertEqual(result.first().education_group_type,
-                         self.education_group_year_2.education_group_type)
-
-        result = search(education_group_type=[self.education_group_type_training,
-                                              self.education_group_type_minitraining])
-        self.assertEqual(len(result), 4)
-
-        OfferEnrollmentFactory(education_group_year=self.education_group_year_2,
-                               enrollment_state=offer_enrollment_state.SUBSCRIBED)
-        OfferEnrollmentFactory(education_group_year=self.education_group_year_2,
-                               enrollment_state=offer_enrollment_state.PENDING)
-        result = search(enrollment_states=[offer_enrollment_state.SUBSCRIBED])
-        self.assertEqual(len(result), 1)
-
-    def test_domains_property(self):
-        domains = self.education_group_year_1.str_domains
-        self.assertEqual(domains, '')
-
-        domains = self.education_group_year_2.str_domains
-        offer_year_domain = "{}-{}\n".format(self.educ_group_year_domain.domain.decree,
-                                             self.educ_group_year_domain.domain.name)
-        self.assertEqual(domains, offer_year_domain)
-
     def test_administration_entity_version_property(self):
         self.assertEqual(self.education_group_year_2.administration_entity_version, self.entity_version_admin)
 
@@ -186,59 +158,6 @@ class EducationGroupYearTest(TestCase):
         group = GroupFactory(academic_year=self.academic_year)
         GroupElementYearFactory(child_branch=group, parent=self.education_group_year_2)
         self.assertIsNone(group.parent_by_training())
-
-    def test_direct_parents_of_branch(self):
-        GroupElementYearFactory(
-            parent=self.education_group_year_2,
-            child_branch=self.education_group_year_1
-        )
-        GroupElementYearFactory(
-            parent=self.education_group_year_4,
-            child_branch=self.education_group_year_1
-        )
-        GroupElementYearFactory(
-            parent=self.education_group_year_5,
-            child_branch=self.education_group_year_4
-        )
-
-        self.assertCountEqual(
-            self.education_group_year_1.direct_parents_of_branch,
-            [
-                self.education_group_year_2,
-                self.education_group_year_3,
-                self.education_group_year_4,
-                self.education_group_year_6
-            ]
-        )
-
-    def test_ascendants_of_branch(self):
-        GroupElementYearFactory(
-            parent=self.education_group_year_2,
-            child_branch=self.education_group_year_1
-        )
-        GroupElementYearFactory(
-            parent=self.education_group_year_4,
-            child_branch=self.education_group_year_1
-        )
-        GroupElementYearFactory(
-            parent=self.education_group_year_5,
-            child_branch=self.education_group_year_4
-        )
-        GroupElementYearFactory(
-            parent=self.education_group_year_5,
-            child_branch=self.education_group_year_1
-        )
-
-        self.assertCountEqual(
-            self.education_group_year_1.ascendants_of_branch,
-            [
-                self.education_group_year_2,
-                self.education_group_year_3,
-                self.education_group_year_4,
-                self.education_group_year_5,
-                self.education_group_year_6,
-            ]
-        )
 
     def test_is_mini_training(self):
         self.assertFalse(self.education_group_year_1.is_mini_training())
@@ -534,39 +453,6 @@ class TestFindWithEnrollmentsCount(TestCase):
         result = find_with_enrollments_count(self.learning_unit_year)
         expected_list_order = [group_2.parent, group_3.parent, group_1.parent]
         self.assertEqual(list(result), expected_list_order)
-
-
-class EducationGroupYearVerboseTest(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.education_group_year = EducationGroupYearFactory()
-
-    def test_verbose_duration_case_no_empty_property(self):
-        self.education_group_year.duration = 1
-        self.education_group_year.duration_unit = duration_unit.QUADRIMESTER
-
-        expected = '{} {}'.format(1, _(dict(duration_unit.DURATION_UNIT).get(duration_unit.QUADRIMESTER)))
-        self.assertEqual(self.education_group_year.verbose_duration, expected)
-
-    def test_verbose_duration_case_no_duration(self):
-        self.education_group_year.duration = None
-        self.education_group_year.duration_unit = duration_unit.QUADRIMESTER
-
-        expected = ''
-        self.assertEqual(self.education_group_year.verbose_duration, expected)
-
-    def test_verbose_duration_case_no_duration_unit(self):
-        self.education_group_year.duration = 1
-        self.education_group_year.duration_unit = None
-
-        expected = ''
-        self.assertEqual(self.education_group_year.verbose_duration, expected)
-
-
-class EducationGroupYearTypeTest(TestCase):
-    def test_type_property(self):
-        education_group_year = EducationGroupYearFactory()
-        self.assertEqual(education_group_year.type, education_group_year.education_group_type.name)
 
 
 class EducationGroupYearDeleteCms(TestCase):
