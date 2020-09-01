@@ -38,8 +38,7 @@ from base.business import event_perms
 from base.business.learning_units.perms import is_eligible_to_update_learning_unit_pedagogy, \
     find_educational_information_submission_dates_of_learning_unit_year, can_user_edit_educational_information, \
     find_educational_information_force_majeure_submission_dates_of_learning_unit_year, \
-    is_eligible_to_update_learning_unit_pedagogy_force_majeure_section, \
-    can_user_edit_educational_information_force_majeure
+    is_eligible_to_update_learning_unit_pedagogy_force_majeure_section
 from base.models import entity_calendar
 from base.models.enums import academic_calendar_type
 from base.models.learning_unit_year import LearningUnitYear
@@ -58,16 +57,9 @@ from base.views.learning_units.perms import PermissionDecorator
 def list_my_attributions_summary_editable(request):
     tutor = get_object_or_404(Tutor, person__user=request.user)
     event_perm = event_perms.EventPermSummaryCourseSubmission()
-    calendar = academic_calendar_type.SUMMARY_COURSE_SUBMISSION
-    can_user_edit_fn = can_user_edit_educational_information
 
-    event_perm_force_majeure = event_perms.EventPermSummaryCourseSubmissionForceMajeure()
     if event_perm.is_open():
         data_year = event_perm.get_academic_years().get()
-    elif event_perm_force_majeure.is_open():
-        data_year = event_perm_force_majeure.get_academic_years().get()
-        calendar = academic_calendar_type.SUMMARY_COURSE_SUBMISSION_FORCE_MAJEURE
-        can_user_edit_fn = can_user_edit_educational_information_force_majeure
     else:
         previous_opened_calendar = event_perm.get_previous_opened_calendar()
         data_year = previous_opened_calendar.data_year
@@ -95,8 +87,12 @@ def list_my_attributions_summary_editable(request):
         tutor=tutor
     )
 
-    entity_calendars = entity_calendar.build_calendar_by_entities(ac_year=data_year, reference=calendar)
-    errors = (can_user_edit_fn(user=tutor.person.user, learning_unit_year_id=luy.id) for luy in learning_unit_years)
+    entity_calendars = entity_calendar.build_calendar_by_entities(
+        ac_year=data_year,
+        reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
+    )
+    errors = (can_user_edit_educational_information(user=tutor.person.user, learning_unit_year_id=luy.id)
+              for luy in learning_unit_years)
     context = {
         'learning_unit_years_with_errors': list(zip(learning_unit_years, errors)),
         'entity_calendars': entity_calendars,
