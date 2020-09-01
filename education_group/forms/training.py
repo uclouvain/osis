@@ -42,7 +42,6 @@ from education_group.ddd.business_types import *
 
 from base.business.event_perms import EventPermEducationGroupEdition
 from base.forms.common import ValidationRuleMixin
-from base.forms.education_group.common import MainCampusChoiceField
 from base.forms.utils.choice_field import BLANK_CHOICE, add_blank
 from base.models import campus
 from base.models.academic_year import AcademicYear
@@ -221,12 +220,12 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         required=False,
         to_field_name="year"
     )
-    teaching_campus = MainCampusChoiceField(
+    teaching_campus = fields.MainCampusChoiceField(
         queryset=None,
         label=_("Learning location"),
         to_field_name="name"
     )
-    enrollment_campus = MainCampusChoiceField(
+    enrollment_campus = fields.MainCampusChoiceField(
         queryset=None,
         label=_("Enrollment campus"),
         to_field_name="name"
