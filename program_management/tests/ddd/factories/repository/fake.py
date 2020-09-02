@@ -21,7 +21,7 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from typing import List, Type
+from typing import List, Type, Optional
 
 from osis_common.ddd import interface
 from program_management.ddd import command
@@ -44,7 +44,8 @@ def get_fake_program_tree_version_repository(root_entities: List['ProgramTreeVer
     return type(class_name, (FakeRepository,), {
         "root_entities": root_entities.copy(),
         "not_found_exception_class": exception.ProgramTreeVersionNotFoundException,
-        "delete": _delete_program_tree_version
+        "delete": _delete_program_tree_version,
+        "search": _search_program_tree_version,
     })
 
 
@@ -85,3 +86,22 @@ def _delete_program_tree(
         cmd = command.DeleteNodeCommand(code=node.code, year=node.year, node_type=node.node_type.name,
                                         acronym=node.title)
         delete_node_service(cmd)
+
+
+@classmethod
+def _search_program_tree_version(
+        cls,
+        entity_ids: Optional[List['ProgramTreeVersionIdentity']] = None,
+        version_name: str = None,
+        offer_acronym: str = None,
+        is_transition: bool = False,
+        **kwargs
+) -> List['ProgramTreeVersion']:
+    result = cls.root_entities  # type: List[ProgramTreeVersion]
+    if version_name is not None:
+        result = (tree_version for tree_version in result if tree_version.version_name == version_name)
+    if offer_acronym is not None:
+        result = (tree_version for tree_version in result if tree_version.entity_id.offer_acronym == offer_acronym)
+    if is_transition is not None:
+        result = (tree_version for tree_version in result if tree_version.is_transition == is_transition)
+    return list(result)
