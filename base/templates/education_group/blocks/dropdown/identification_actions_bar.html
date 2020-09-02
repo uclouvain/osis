@@ -35,17 +35,17 @@
             {# Other actions have to be fixed, look in the identifiation_actions_bar_to_be_fixed.html #}
             {% if create_group_url %}
                 <li>
-                    {% a_tag_modal_has_perm create_group_url _('New Education Group') 'base.add_group' user %}
+                    {% a_tag_modal_has_perm create_group_url _('New Education Group') 'base.add_group' user group_year %}
                 </li>
             {% endif %}
             {% if create_training_url %}
                 <li>
-                    {% a_tag_modal_has_perm create_training_url _('New Training') 'base.add_training' user %}
+                    {% a_tag_modal_has_perm create_training_url _('New Training') 'base.add_training' user group_year %}
                 </li>
             {% endif %}
             {% if create_mini_training_url %}
                 <li>
-                    {% a_tag_modal_has_perm create_mini_training_url _('New Mini-Training') 'base.add_minitraining' user %}
+                    {% a_tag_modal_has_perm create_mini_training_url _('New Mini-Training') 'base.add_minitraining' user group_year %}
                 </li>
             {% endif %}
 

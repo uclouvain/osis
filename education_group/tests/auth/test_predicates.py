@@ -4,7 +4,8 @@ import mock
 from django.test import TestCase, override_settings
 from mock import patch
 
-from base.models.enums.education_group_types import TrainingType
+from base.models.enums import education_group_categories
+from base.models.enums.education_group_types import TrainingType, EducationGroupTypesEnum
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group import EducationGroupFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory, ContinuingEducationTrainingFactory, \
@@ -18,6 +19,7 @@ from education_group.auth.roles.faculty_manager import FacultyManager
 from education_group.auth.scope import Scope
 from education_group.tests.factories.auth.faculty_manager import FacultyManagerFactory
 from education_group.tests.factories.group_year import GroupYearFactory
+from program_management.tests.factories.element import ElementFactory, ElementGroupYearFactory
 
 
 class TestUserAttachedToManagementEntity(TestCase):
@@ -394,5 +396,55 @@ class TestAreAllEducationGroupRemovable(TestCase):
             predicates.are_all_groups_removable(
                 person.user,
                 groups[0]
+            )
+        )
+
+
+class TestIsAllowedToCreateChildrenOfSpecificCategory(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = UserFactory.build()
+        cls.group_year = ElementGroupYearFactory().group_year
+
+    def setUp(self):
+        self.predicate_context_mock = mock.patch(
+            "rules.Predicate.context",
+            new_callable=mock.PropertyMock,
+            return_value={
+                'perm_name': 'dummy-perm'
+            }
+        )
+        self.predicate_context_mock.start()
+        self.addCleanup(self.predicate_context_mock.stop)
+
+    def test_should_return_true_when_no_group_year_given(self):
+        self.assertTrue(
+            predicates._is_allowed_to_create_children_of_specific_category(
+                None,
+                education_group_categories.Categories.TRAINING.name
+            )
+        )
+
+    @mock.patch("program_management.ddd.service.read.allowed_children_types_service.get_allowed_child_types")
+    def test_should_return_true_when_group_year_given_and_it_is_possible_to_create_children_of_category_training(
+            self,
+            mock_get_allowed_child_types):
+        mock_get_allowed_child_types.return_value = {TrainingType.BACHELOR}
+        self.assertTrue(
+            predicates._is_allowed_to_create_children_of_specific_category(
+                self.group_year,
+                education_group_categories.Categories.TRAINING.name
+            )
+        )
+
+    @mock.patch("program_management.ddd.service.read.allowed_children_types_service.get_allowed_child_types")
+    def test_should_return_false_when_group_year_given_and_they_are_no_allowed_child_of_category_training(
+            self,
+            mock_get_allowed_child_types):
+        mock_get_allowed_child_types.return_value = {}
+        self.assertFalse(
+            predicates._is_allowed_to_create_children_of_specific_category(
+                self.group_year,
+                education_group_categories.Categories.TRAINING.name
             )
         )
