@@ -522,7 +522,7 @@ msgid "Search"
 msgstr "Recherche"
 
 msgid "Select a language"
-msgstr ""
+msgstr "Sélectionner une langue"
 
 msgid "Session derogation"
 msgstr "Session dérogation"
