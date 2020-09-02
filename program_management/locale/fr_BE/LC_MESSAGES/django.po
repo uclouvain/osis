@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-27 17:38+0200\n"
+"POT-Creation-Date: 2020-09-02 15:45+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -125,6 +125,11 @@ msgid "Annual"
 msgstr "Annuel"
 
 #, python-format
+msgid "Are you sure you want to delete %(offer_acronym)s [%(version_name)s] ?"
+msgstr ""
+"Êtes-vous sûr·e de vouloir supprimer %(offer_acronym)s [%(version_name)s] ?"
+
+#, python-format
 msgid "Are you sure you want to detach %(acronym)s ?"
 msgstr "Êtes-vous sûr·e de vouloir retirer %(acronym)s ?"
 
@@ -145,9 +150,6 @@ msgstr ""
 "Ne peut pas attacher \"%(child)s\" car le nombre d'enfants de type(s) "
 "\"%(child_types)s\" pour \"%(parent)s\" a atteint la limite maximum."
 
-msgid "Cannot add any element to learning unit"
-msgstr "Interdit d'ajouter des éléments à une UE"
-
 #, python-format
 msgid "Cannot add any element to learning unit %(parent_node)s"
 msgstr "Interdit d'ajouter des éléments à  l'UE %(parent_node)s"
@@ -155,9 +157,6 @@ msgstr "Interdit d'ajouter des éléments à  l'UE %(parent_node)s"
 #, python-format
 msgid "Cannot attach a node %(node)s to himself."
 msgstr "Interdit d'attacher un élément %(node)s à lui-même."
-
-msgid "Cannot detach due to prerequisites."
-msgstr "Interdit de retirer à cause des prérequis."
 
 #, python-format
 msgid ""
@@ -184,9 +183,6 @@ msgstr ""
 
 msgid "Cannot perform detach action on root."
 msgstr "Interdit de retirer la racine."
-
-msgid "Cannot perform modification action on root."
-msgstr "Interdit de modifier la racine."
 
 msgid "Category"
 msgstr "Catégorie"
@@ -235,20 +231,6 @@ msgstr "Mode d'évaluation des acquis des étudiants"
 
 msgid "Export"
 msgstr "Exporter"
-
-#, python-format
-msgid ""
-"Finality \"%(acronym)s\" has an end date greater than %(root_acronym)s "
-"program."
-msgid_plural ""
-"Finalities \"%(acronym)s\" have an end date greater than %(root_acronym)s "
-"program."
-msgstr[0] ""
-"La finalité \"%(acronym)s\" a une date de fin plus grande que le programme "
-"%(root_acronym)s."
-msgstr[1] ""
-"Les finalités \"%(acronym)s\" ont une date de fin plus grande que le "
-"programme %(root_acronym)s."
 
 #, python-format
 msgid ""
@@ -430,17 +412,6 @@ msgstr[0] ""
 msgstr[1] ""
 "Les options \"%(acronym)s\" ne peuvent pas être retirées car elles sont "
 "présentes dans le programme %(finality_acronym)s."
-
-#, python-format
-msgid "Option \"%(acronym)s\" must be present in %(root_acronym)s program."
-msgid_plural ""
-"Options \"%(acronym)s\" must be present in %(root_acronym)s program."
-msgstr[0] ""
-"L'option \"%(acronym)s\" doit être présente dans le programme "
-"%(root_acronym)s."
-msgstr[1] ""
-"Les options \"%(acronym)s\" doivent être présentes dans le programme "
-"%(root_acronym)s."
 
 #, python-format
 msgid "Option \"%(code)s\" must be present in %(root_code)s program."
@@ -649,11 +620,15 @@ msgstr ""
 "l'organisation de formation annualisée %(acronym)s seront supprimés: "
 "%(learning_units)s"
 
+#, python-format
+msgid ""
+"The program tree version %(offer_acronym)s [%(version_name)s] has been "
+"deleted."
+msgstr ""
+"La version de programme %(offer_acronym)s [%(version_name)s] a été supprimé."
+
 msgid "The registration form is available at the Secretariat of"
 msgstr "Le formulaire d'inscription est disponible au Secrétariat de"
-
-msgid "The user is not allowed to change link data."
-msgstr "L'utilisateur n'a pas la permission de modifier le contenu d'un lien"
 
 msgid "Themes discussed"
 msgstr "Thèmes abordés"
@@ -728,18 +703,9 @@ msgstr ""
 "d'enseignement %(child_node)s"
 
 #, python-format
-msgid "You can not add a learning unit to a %(category)s of type %(type)s."
-msgstr ""
-"Vous ne pouvez pas ajouter une unité d'enseignement à un(e) %(category)s de "
-"type %(type)s."
-
-#, python-format
 msgid "You can not add the same child %(child_node)s several times."
 msgstr ""
 "Vous ne pouvez pas ajouter plusieurs fois le même enfant %(child_node)s."
-
-msgid "You can not add the same child several times."
-msgstr "Vous ne pouvez pas ajouter plusieurs fois le même enfant."
 
 #, python-format
 msgid ""

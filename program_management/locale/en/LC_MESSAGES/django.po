@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-27 17:38+0200\n"
+"POT-Creation-Date: 2020-09-02 15:45+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -109,6 +109,11 @@ msgstr ""
 msgid "Annual"
 msgstr ""
 
+#, fuzzy, python-format
+#| msgid "Are you sure you want to detach %(acronym)s ?"
+msgid "Are you sure you want to delete %(offer_acronym)s [%(version_name)s] ?"
+msgstr "Are you sure you want to remove %(acronym)s ?"
+
 #, python-format
 msgid "Are you sure you want to detach %(acronym)s ?"
 msgstr "Are you sure you want to remove %(acronym)s ?"
@@ -128,9 +133,6 @@ msgid ""
 "\"%(child_types)s\" for \"%(parent)s\" has already reached the limit."
 msgstr ""
 
-msgid "Cannot add any element to learning unit"
-msgstr ""
-
 #, python-format
 msgid "Cannot add any element to learning unit %(parent_node)s"
 msgstr ""
@@ -138,9 +140,6 @@ msgstr ""
 #, python-format
 msgid "Cannot attach a node %(node)s to himself."
 msgstr ""
-
-msgid "Cannot detach due to prerequisites."
-msgstr "Cannot remove link due to prerequisites."
 
 #, python-format
 msgid ""
@@ -164,9 +163,6 @@ msgstr ""
 
 msgid "Cannot perform detach action on root."
 msgstr "Cannot perform remove action on root."
-
-msgid "Cannot perform modification action on root."
-msgstr ""
 
 msgid "Category"
 msgstr ""
@@ -215,16 +211,6 @@ msgstr ""
 
 msgid "Export"
 msgstr ""
-
-#, python-format
-msgid ""
-"Finality \"%(acronym)s\" has an end date greater than %(root_acronym)s "
-"program."
-msgid_plural ""
-"Finalities \"%(acronym)s\" have an end date greater than %(root_acronym)s "
-"program."
-msgstr[0] ""
-msgstr[1] ""
 
 #, python-format
 msgid ""
@@ -399,13 +385,6 @@ msgstr[0] ""
 msgstr[1] ""
 "Options \"%(acronym)s\" cannot be removed because they are contained in "
 "%(finality_acronym)s program."
-
-#, python-format
-msgid "Option \"%(acronym)s\" must be present in %(root_acronym)s program."
-msgid_plural ""
-"Options \"%(acronym)s\" must be present in %(root_acronym)s program."
-msgstr[0] ""
-msgstr[1] ""
 
 #, python-format
 msgid "Option \"%(code)s\" must be present in %(root_code)s program."
@@ -598,10 +577,13 @@ msgid ""
 "group year %(acronym)s will we deleted: %(learning_units)s"
 msgstr ""
 
-msgid "The registration form is available at the Secretariat of"
+#, python-format
+msgid ""
+"The program tree version %(offer_acronym)s [%(version_name)s] has been "
+"deleted."
 msgstr ""
 
-msgid "The user is not allowed to change link data."
+msgid "The registration form is available at the Secretariat of"
 msgstr ""
 
 msgid "Themes discussed"
@@ -673,14 +655,7 @@ msgid ""
 msgstr ""
 
 #, python-format
-msgid "You can not add a learning unit to a %(category)s of type %(type)s."
-msgstr ""
-
-#, python-format
 msgid "You can not add the same child %(child_node)s several times."
-msgstr ""
-
-msgid "You can not add the same child several times."
 msgstr ""
 
 #, python-format
@@ -787,3 +762,6 @@ msgstr ""
 
 msgid "yes,no"
 msgstr ""
+
+#~ msgid "Cannot detach due to prerequisites."
+#~ msgstr "Cannot remove link due to prerequisites."

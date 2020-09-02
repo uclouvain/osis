@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-26 09:32+0200\n"
+"POT-Creation-Date: 2020-09-02 15:15+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -221,9 +221,6 @@ msgid "Acronym existed in %(academic_year)s"
 msgstr ""
 
 msgid "Acronym is invalid"
-msgstr ""
-
-msgid "Acronym of version"
 msgstr ""
 
 msgid "Acronym/Short title"
@@ -706,6 +703,9 @@ msgstr ""
 msgid "Delete selected messages"
 msgstr ""
 
+msgid "Delete tree version permanently"
+msgstr ""
+
 msgid "Deliberation"
 msgstr ""
 
@@ -813,19 +813,8 @@ msgstr ""
 
 #, python-format
 msgid ""
-"Education group year %(acronym)s (%(academic_year)s) successfuly deleted."
-msgstr ""
-
-#, python-format
-msgid ""
 "Education group year <a href='%(link)s'> %(acronym)s (%(academic_year)s) </"
 "a> successfully created."
-msgstr ""
-
-#, python-format
-msgid ""
-"Education group year <a href='%(link)s'> %(acronym)s (%(academic_year)s) </"
-"a> successfuly updated."
 msgstr ""
 
 msgid "Education_groups"
@@ -1049,12 +1038,6 @@ msgid "Full"
 msgstr ""
 
 msgid "Full name"
-msgstr ""
-
-msgid "Full title of the english version"
-msgstr ""
-
-msgid "Full title of the french version"
 msgstr ""
 
 msgid "Function"
@@ -2411,14 +2394,6 @@ msgid "The education group has been deleted."
 msgstr ""
 
 #, python-format
-msgid "The end date must be greater or equals to the finality %(acronym)s"
-msgstr ""
-
-#, python-format
-msgid "The end date must be less or equals to the root %(acronym)s"
-msgstr ""
-
-#, python-format
 msgid ""
 "The entity %(entity_acronym)s does not exist for the selected academic year "
 "%(academic_year)s"
@@ -2442,9 +2417,6 @@ msgid "The following education groups ended with error"
 msgstr ""
 
 msgid "The following learning units ended with error"
-msgstr ""
-
-msgid "The following links has been updated"
 msgstr ""
 
 msgid "The format of the range date is not valid"
@@ -2511,10 +2483,6 @@ msgid "The learning unit's description fiche is not editable."
 msgstr ""
 
 msgid "The learning units"
-msgstr ""
-
-#, python-format
-msgid "The link of %(acronym)s has been updated"
 msgstr ""
 
 #, python-format
@@ -2669,9 +2637,6 @@ msgid "This process controls students internships."
 msgstr ""
 
 msgid "This process helps tutors while scores encoding."
-msgstr ""
-
-msgid "This version exists until"
 msgstr ""
 
 msgid "Title"

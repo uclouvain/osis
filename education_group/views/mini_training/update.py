@@ -173,7 +173,7 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             self.mini_training_form.add_error("end_year", "")
             self.mini_training_form.add_error(
                 None,
-                _("Imposible to put end date to %(end_year)s: %(msg)s") % {"msg": e.message, "end_year": end_year}
+                _("Impossible to put end date to %(end_year)s: %(msg)s") % {"msg": e.message, "end_year": end_year}
             )
 
         return []
