@@ -18,8 +18,12 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #, python-format
-msgid "%(count_enrollment)d student is enrolled in the mini-training."
-msgid_plural "%(count_enrollment)d students are enrolled in the mini-training."
+msgid ""
+"%(count_enrollment)d student is enrolled in the mini-training "
+"%(abbreviated_title)s (%(academic_year)s)."
+msgid_plural ""
+"%(count_enrollment)d students are enrolled in the mini-training "
+"%(abbreviated_title)s (%(academic_year)s)."
 msgstr[0] ""
 msgstr[1] ""
 
@@ -483,6 +487,9 @@ msgstr ""
 msgid "Please enter an academic year greater or equal to group start year."
 msgstr ""
 
+msgid "Please enter an academic year less or equal to group end year."
+msgstr ""
+
 msgid "Primary language"
 msgstr ""
 
@@ -583,7 +590,22 @@ msgid "The link of %(code)s - %(acronym)s - %(year)s has been updated."
 msgstr ""
 
 #, python-format
-msgid "The mini-training %(code)s has been deleted."
+msgid "The mini-training %(code)s - %(title)s has been deleted."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The mini-training {abbreviated_title} ({academic_year}) have links in EPC "
+"application"
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The mini-training {acronym} ({academic_year}) have links in EPC application"
+msgstr ""
+
+#, python-format
+msgid "The program %(acronym)s will be published soon"
 msgstr ""
 
 msgid ""

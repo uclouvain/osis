@@ -44,4 +44,4 @@ class MiniTrainingLinkWithEPCValidator(business_validator.BusinessValidator):
 
     def validate(self, *args, **kwargs):
         if LinkWithEPC().is_mini_training_have_link_with_epc(self.mini_training_id):
-            raise MiniTrainingHaveLinkWithEPC
+            raise MiniTrainingHaveLinkWithEPC(self.mini_training_id.acronym, self.mini_training_id.year)
