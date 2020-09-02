@@ -364,8 +364,6 @@ msgstr "Domaine ISCED/CITE"
 msgid "Identification"
 msgstr "Identification"
 
-#, fuzzy, python-format
-#| msgid "Impossible to put end date to %(end_year)s: %(msg)s"
 msgid "Imposible to put end date to %(end_year)s: %(msg)s"
 msgstr "Impossible de mettre la fin à %(end_year)s: %(msg)s"
 
@@ -882,12 +880,3 @@ msgstr "indéfini"
 
 msgid "unspecified"
 msgstr "indéterminé"
-
-#~ msgid "No type of Group can be created as child"
-#~ msgstr "Aucun type de Groupement ne peut être créé comme enfant"
-
-#~ msgid "No type of Mini-Training can be created as child"
-#~ msgstr "Aucun type de Mini-Formation ne peut être créé comme enfant"
-
-#~ msgid "No type of Training can be created as child"
-#~ msgstr "Aucun type de Formation ne peut être créé comme enfant"
