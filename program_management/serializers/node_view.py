@@ -45,7 +45,7 @@ def serialize_children(
         path: str,
         tree: 'ProgramTree',
         context=None,
-        mini_training_tree_versions: List['ProgramTreeVersion'] = None
+        nodes_of_tree_versions: List['ProgramTreeVersion'] = None
 ) -> List[dict]:
     serialized_children = []
     for link in children:
@@ -53,7 +53,7 @@ def serialize_children(
         if link.child.is_learning_unit():
             serialized_node = _leaf_view_serializer(link, child_path, tree, context=context)
         else:
-            serialized_node = _get_node_view_serializer(link, child_path, tree, context, mini_training_tree_versions)
+            serialized_node = _get_node_view_serializer(link, child_path, tree, context, nodes_of_tree_versions)
         serialized_children.append(serialized_node)
     return serialized_children
 
@@ -71,7 +71,6 @@ def _get_node_view_attribute_serializer(link: 'Link', path: 'Path', tree: 'Progr
         'title': link.child.code,
         'paste_url': reverse_with_get('tree_paste_node', get={"path": path}),
         'detach_url': reverse_with_get('tree_detach_node', args=[context['root'].pk], get={"path": path}),
-        'modify_url': reverse('group_element_year_update', args=[context['root'].pk, link.child.pk, link.pk]),
         'search_url': reverse_with_get(
             'quick_search_learning_unit' if tree.allows_learning_unit_child(
                 link.child) else 'quick_search_education_group',
@@ -124,7 +123,7 @@ def _get_node_view_serializer(
         path: str,
         tree: 'ProgramTree',
         context=None,
-        mini_training_tree_versions: List['ProgramTreeVersion'] = None
+        nodes_of_tree_versions: List['ProgramTreeVersion'] = None
 ) -> dict:
 
     return {
@@ -136,7 +135,7 @@ def _get_node_view_serializer(
                  'title': link.child.title,
                  'version': get_program_tree_version_name(
                      NodeIdentity(code=link.child.code, year=link.child.year),
-                     mini_training_tree_versions
+                     nodes_of_tree_versions
                  )
                  },
         'children': serialize_children(
@@ -144,7 +143,7 @@ def _get_node_view_serializer(
             path=path,
             tree=tree,
             context=context,
-            mini_training_tree_versions=mini_training_tree_versions
+            nodes_of_tree_versions=nodes_of_tree_versions
         ),
         'a_attr': _get_node_view_attribute_serializer(link, path, tree, context=context),
     }

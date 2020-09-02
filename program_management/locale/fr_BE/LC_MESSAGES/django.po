@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-27 17:38+0200\n"
+"POT-Creation-Date: 2020-08-31 12:04+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -25,6 +25,10 @@ msgstr "\"%(child)s\" a été retiré de \"%(parent)s\""
 #, python-format
 msgid "\"%(child)s\" has been pasted into \"%(parent)s\""
 msgstr "\"%(child)s\" a été collé dans \"%(parent)s\""
+
+#, python-format
+msgid "%(node_to_add)s version must be the same as %(root_node)s version"
+msgstr "La version de %(node_to_add)s doit être la même que %(root_node)s."
 
 #, python-format
 msgid "%(start_index)s to %(end_index)s of %(total_counts)s learning units"
@@ -145,9 +149,6 @@ msgstr ""
 "Ne peut pas attacher \"%(child)s\" car le nombre d'enfants de type(s) "
 "\"%(child_types)s\" pour \"%(parent)s\" a atteint la limite maximum."
 
-msgid "Cannot add any element to learning unit"
-msgstr "Interdit d'ajouter des éléments à une UE"
-
 #, python-format
 msgid "Cannot add any element to learning unit %(parent_node)s"
 msgstr "Interdit d'ajouter des éléments à  l'UE %(parent_node)s"
@@ -155,9 +156,6 @@ msgstr "Interdit d'ajouter des éléments à  l'UE %(parent_node)s"
 #, python-format
 msgid "Cannot attach a node %(node)s to himself."
 msgstr "Interdit d'attacher un élément %(node)s à lui-même."
-
-msgid "Cannot detach due to prerequisites."
-msgstr "Interdit de retirer à cause des prérequis."
 
 #, python-format
 msgid ""
@@ -184,9 +182,6 @@ msgstr ""
 
 msgid "Cannot perform detach action on root."
 msgstr "Interdit de retirer la racine."
-
-msgid "Cannot perform modification action on root."
-msgstr "Interdit de modifier la racine."
 
 msgid "Category"
 msgstr "Catégorie"
@@ -235,20 +230,6 @@ msgstr "Mode d'évaluation des acquis des étudiants"
 
 msgid "Export"
 msgstr "Exporter"
-
-#, python-format
-msgid ""
-"Finality \"%(acronym)s\" has an end date greater than %(root_acronym)s "
-"program."
-msgid_plural ""
-"Finalities \"%(acronym)s\" have an end date greater than %(root_acronym)s "
-"program."
-msgstr[0] ""
-"La finalité \"%(acronym)s\" a une date de fin plus grande que le programme "
-"%(root_acronym)s."
-msgstr[1] ""
-"Les finalités \"%(acronym)s\" ont une date de fin plus grande que le "
-"programme %(root_acronym)s."
 
 #, python-format
 msgid ""
@@ -430,17 +411,6 @@ msgstr[0] ""
 msgstr[1] ""
 "Les options \"%(acronym)s\" ne peuvent pas être retirées car elles sont "
 "présentes dans le programme %(finality_acronym)s."
-
-#, python-format
-msgid "Option \"%(acronym)s\" must be present in %(root_acronym)s program."
-msgid_plural ""
-"Options \"%(acronym)s\" must be present in %(root_acronym)s program."
-msgstr[0] ""
-"L'option \"%(acronym)s\" doit être présente dans le programme "
-"%(root_acronym)s."
-msgstr[1] ""
-"Les options \"%(acronym)s\" doivent être présentes dans le programme "
-"%(root_acronym)s."
 
 #, python-format
 msgid "Option \"%(code)s\" must be present in %(root_code)s program."
@@ -649,11 +619,12 @@ msgstr ""
 "l'organisation de formation annualisée %(acronym)s seront supprimés: "
 "%(learning_units)s"
 
+#, python-format
+msgid "The program %(title)s - %(academic_year)s will be published soon"
+msgstr "Le programme %(title)s - %(academic_year)s sera publié sous peu"
+
 msgid "The registration form is available at the Secretariat of"
 msgstr "Le formulaire d'inscription est disponible au Secrétariat de"
-
-msgid "The user is not allowed to change link data."
-msgstr "L'utilisateur n'a pas la permission de modifier le contenu d'un lien"
 
 msgid "Themes discussed"
 msgstr "Thèmes abordés"
@@ -698,6 +669,10 @@ msgstr "Enseignant·e·s"
 msgid "Type"
 msgstr "Type"
 
+#, python-brace-format
+msgid "Unable to publish sections for {code} - {year}"
+msgstr "Impossible de publier les sections pour {code} - {year}"
+
 msgid "Utilizations"
 msgstr "Utilisations"
 
@@ -728,18 +703,9 @@ msgstr ""
 "d'enseignement %(child_node)s"
 
 #, python-format
-msgid "You can not add a learning unit to a %(category)s of type %(type)s."
-msgstr ""
-"Vous ne pouvez pas ajouter une unité d'enseignement à un(e) %(category)s de "
-"type %(type)s."
-
-#, python-format
 msgid "You can not add the same child %(child_node)s several times."
 msgstr ""
 "Vous ne pouvez pas ajouter plusieurs fois le même enfant %(child_node)s."
-
-msgid "You can not add the same child several times."
-msgstr "Vous ne pouvez pas ajouter plusieurs fois le même enfant."
 
 #, python-format
 msgid ""
@@ -764,6 +730,14 @@ msgid ""
 msgstr ""
 "Vous ne pouvez pas copier la version de  programme '{acronym}' de "
 "{from_year} à {to_year} parce qu'elle finit en {end_year}"
+
+#, python-brace-format
+msgid ""
+"You can't delete the standard program tree '{code}' in {year} as specific "
+"versions exists during this year."
+msgstr ""
+"Vous ne pouvez pas supprimer le programme standard '{code}' en {year} parce "
+"qu'il existe une version particiulière durant cette année."
 
 #, python-format
 msgid ""

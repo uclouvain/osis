@@ -492,3 +492,8 @@ class DeleteAllStandardVersionCommand(interface.CommandRequest):
     acronym = attr.ib(type=str)
     year = attr.ib(type=int)
 
+
+@attr.s(frozen=True, slots=True)
+class PublishProgramTreesVersionUsingNodeCommand(interface.CommandRequest):
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)

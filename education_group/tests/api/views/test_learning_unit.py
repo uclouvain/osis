@@ -30,6 +30,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import GroupType, TrainingType
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.education_group_year import TrainingFactory, EducationGroupYearMasterFactory
@@ -204,6 +205,9 @@ class EducationGroupRootsListTestCase(APITestCase):
             relative_credits=Value(gey.relative_credits, output_field=IntegerField())
         ).first()
         cls.user = UserFactory()
+        cls.offer = EducationGroupYear.objects.filter(id=cls.training.id).annotate(
+            relative_credits=Value(gey.relative_credits, output_field=IntegerField())
+        ).first()
         url_kwargs = {
             'acronym': cls.learning_unit_year.acronym,
             'year': cls.learning_unit_year.academic_year.year

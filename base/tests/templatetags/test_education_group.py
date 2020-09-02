@@ -55,9 +55,6 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
         cls.education_group_year = TrainingFactory(academic_year=academic_year)
         cls.person = PersonFactory()
         CentralManagerFactory(person=cls.person, entity=cls.education_group_year.management_entity)
-
-        cls.url = reverse('delete_education_group', args=[cls.education_group_year.id, cls.education_group_year.id])
-
         cls.request = RequestFactory().get("")
 
     def setUp(self):

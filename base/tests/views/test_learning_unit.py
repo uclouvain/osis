@@ -629,9 +629,8 @@ class LearningUnitViewTestCase(TestCase):
         )
         group_element1 = GroupElementYearFactory(
             child_element=learning_unit_year_element,
-            parent_element=ElementFactory(group_year=parent_1_version.root_group),
-            child_branch=None,
-            parent=None)
+            parent_element=ElementFactory(group_year=parent_1_version.root_group)
+        )
 
         parent_2 = EducationGroupYearFactory(partial_acronym='LBIOL601R', academic_year=self.current_academic_year,
                                              education_group_type=educ_group_type_matching_filters)
@@ -643,9 +642,8 @@ class LearningUnitViewTestCase(TestCase):
         )
         group_element2 = GroupElementYearFactory(
             child_element=learning_unit_year_element,
-            parent_element=ElementFactory(group_year=parent_2_version.root_group),
-            child_branch=None,
-            parent=None)
+            parent_element=ElementFactory(group_year=parent_2_version.root_group)
+        )
 
         parent_3 = EducationGroupYearFactory(partial_acronym='LBIOL608R', academic_year=self.current_academic_year,
                                              education_group_type=educ_group_type_matching_filters)
@@ -657,9 +655,8 @@ class LearningUnitViewTestCase(TestCase):
         )
         group_element3 = GroupElementYearFactory(
             child_element=learning_unit_year_element,
-            parent_element=ElementFactory(group_year=parent_3_version.root_group),
-            child_branch=None,
-            parent=None)
+            parent_element=ElementFactory(group_year=parent_3_version.root_group)
+        )
 
         response = self.client.get(reverse('learning_unit_formations', args=[learning_unit_year.id]))
         context = response.context
