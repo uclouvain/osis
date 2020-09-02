@@ -112,16 +112,6 @@ class TestLearningUnitXls(TestCase):
         )
         # Particular OF
         cls.create_version(direct_parent_type)
-        #
-        cls.an_education_group = EducationGroupYearFactory(academic_year=cls.academic_year,
-                                                           acronym=PARENT_ACRONYM,
-                                                           title=PARENT_TITLE,
-                                                           partial_acronym=PARENT_PARTIAL_ACRONYM)
-
-        cls.group_element_child2 = GroupElementYearFactory(
-            parent_element=ElementFactory(group_year=cls.an_education_group),
-            child_element=cls.group_element_child.parent_element,
-        )
         cls.old_academic_year = AcademicYearFactory(year=datetime.date.today().year - 2)
         cls.current_academic_year = AcademicYearFactory(year=datetime.date.today().year)
         generatorContainer = GenerateContainer(cls.old_academic_year, cls.current_academic_year)
