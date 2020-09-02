@@ -43,12 +43,16 @@ from program_management.ddd.domain.link import Link
 from program_management.ddd.domain.prerequisite import PrerequisiteItem
 from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.ddd.domain.program_tree import build_path
+from program_management.ddd.domain.service.generate_node_abbreviated_title import GenerateNodeAbbreviatedTitle
+from program_management.ddd.domain.service.generate_node_code import GenerateNodeCode
+from program_management.ddd.domain.service.validation_rule import FieldValidationRule
 from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 from program_management.ddd.validators.validators_by_business_action import DetachNodeValidatorList
 from program_management.ddd.validators.validators_by_business_action import PasteNodeValidatorList, \
     UpdatePrerequisiteValidatorList
 from program_management.models.enums import node_type
-from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipObjectFactory
+from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipObjectFactory, \
+    AuthorizedRelationshipListFactory
 from program_management.tests.ddd.factories.commands.paste_element_command import PasteElementCommandFactory
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
@@ -59,10 +63,22 @@ from program_management.tests.ddd.service.mixins import ValidatorPatcherMixin
 
 class TestProgramTreeBuilderCopyToNextYear(SimpleTestCase):
     def setUp(self) -> None:
-        self.copy_from_program_tree = ProgramTreeFactory()
+        self.authorized_relation = AuthorizedRelationshipObjectFactory()
+        self.authorized_relations_list = AuthorizedRelationshipListFactory(
+            authorized_relationships=[self.authorized_relation]
+        )
+        self.copy_from_program_tree = ProgramTreeFactory(
+            authorized_relationships=self.authorized_relations_list,
+            root_node__node_type=self.authorized_relation.parent_type,
+        )
         self.mock_repository = mock.create_autospec(ProgramTreeRepository)
 
-    def test_should_create_new_program_tree_when_does_not_exist_for_next_year(self):
+    @mock.patch.object(GenerateNodeCode, 'generate_from_parent_node')
+    @mock.patch.object(GenerateNodeAbbreviatedTitle, 'generate')
+    @mock.patch.object(FieldValidationRule, 'get')
+    @mock.patch('program_management.ddd.repositories.load_authorized_relationship.load')
+    def test_should_create_new_program_tree_when_does_not_exist_for_next_year(self, mock_relationships, *mocks):
+        mock_relationships.return_value = self.authorized_relations_list
         self.mock_repository.get.side_effect = exception.ProgramTreeNotFoundException
 
         resulted_tree = program_tree.ProgramTreeBuilder().copy_to_next_year(
@@ -75,9 +91,23 @@ class TestProgramTreeBuilderCopyToNextYear(SimpleTestCase):
             year=self.copy_from_program_tree.entity_id.year+1
         )
         self.assertEqual(expected_identity, resulted_tree.entity_id)
+        self._assert_mandatory_children_are_created(resulted_tree)
 
-    def test_should_return_existing_tree_when_exists_for_next_year(self):
-        program_tree_next_year = ProgramTreeFactory()
+    def _assert_mandatory_children_are_created(self, resulted_tree):
+        children = resulted_tree.root_node.children_as_nodes
+        self.assertTrue(len(children) == 1)
+        self.assertEqual(self.authorized_relation.child_type, children[0].node_type)
+
+    @mock.patch.object(GenerateNodeCode, 'generate_from_parent_node')
+    @mock.patch.object(GenerateNodeAbbreviatedTitle, 'generate')
+    @mock.patch.object(FieldValidationRule, 'get')
+    @mock.patch('program_management.ddd.repositories.load_authorized_relationship.load')
+    def test_should_return_existing_tree_when_exists_for_next_year(self, mock_relationships, *mocks):
+        mock_relationships.return_value = self.authorized_relations_list
+        program_tree_next_year = ProgramTreeFactory(
+            authorized_relationships=self.authorized_relations_list,
+            root_node__node_type=self.authorized_relation.parent_type,
+        )
         self.mock_repository.get.return_value = program_tree_next_year
 
         resulted_tree = program_tree.ProgramTreeBuilder().copy_to_next_year(
@@ -86,6 +116,7 @@ class TestProgramTreeBuilderCopyToNextYear(SimpleTestCase):
         )
 
         self.assertEqual(program_tree_next_year, resulted_tree)
+        self._assert_mandatory_children_are_created(resulted_tree)
 
 
 class TestGetNodeProgramTree(SimpleTestCase):
