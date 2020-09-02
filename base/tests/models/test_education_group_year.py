@@ -426,7 +426,7 @@ class TestFindWithEnrollmentsCount(TestCase):
         )
 
         result = find_with_enrollments_count(self.learning_unit_year)
-        expected_list_order = [education_group_year, education_group_year_2, education_group_year_3]
+        expected_list_order = [education_group_year_2, education_group_year_3, education_group_year]
         self.assertEqual(list(result), expected_list_order)
 
 
