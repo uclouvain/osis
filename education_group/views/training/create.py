@@ -1,4 +1,4 @@
-from typing import List, Dict, Union
+from typing import List, Dict, Union, Optional
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
@@ -21,6 +21,7 @@ from education_group.ddd.domain.exception import ContentConstraintTypeMissing, \
     AcronymAlreadyExist, StartYearGreaterThanEndYear, MaximumCertificateAimType2Reached, CodeAlreadyExistException
 from education_group.ddd.domain.training import TrainingIdentity
 from education_group.forms.training import CreateTrainingForm
+from education_group.models.group_year import GroupYear
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from education_group.views.proxy.read import Tab
 from osis_role.contrib.views import PermissionRequiredMixin
@@ -196,16 +197,14 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
     def get_attach_path(self) -> Union[Path, None]:
         return self.request.GET.get('path_to') or None
 
-    def get_permission_object(self) -> Union[EducationGroupYear, None]:
-        qs = EducationGroupYear.objects.select_related('academic_year', 'management_entity')
+    def get_permission_object(self) -> Optional[GroupYear]:
+        qs = GroupYear.objects.select_related('academic_year', 'management_entity')
         path = self.get_attach_path()
         if path:
             # Take parent from path (latest element)
             # Ex:  path: 4456|565|5656
             parent_id = path.split("|")[-1]
-            qs = qs.filter(
-                educationgroupversion__root_group__element__id=parent_id,
-            )
+            qs = qs.filter(element__id=parent_id,)
         else:
             qs = qs.filter(
                 partial_acronym=self.request.POST.get('code'),
@@ -213,7 +212,7 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             )
         try:
             return qs.get()
-        except EducationGroupYear.DoesNotExist:
+        except GroupYear.DoesNotExist:
             return None
 
 
