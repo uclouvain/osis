@@ -36,31 +36,6 @@ class EducationGroupAdmin(VersionAdmin, SerializableModelAdmin):
     list_display = ('most_recent_acronym', 'start_year', 'end_year', 'changed')
     search_fields = ('educationgroupyear__acronym', 'educationgroupyear__partial_acronym')
 
-    actions = [
-        'apply_education_group_year_postponement'
-    ]
-
-    def apply_education_group_year_postponement(self, request, queryset):
-        # Potential circular imports
-        from base.business.education_groups.automatic_postponement import EducationGroupAutomaticPostponementToN6
-        from base.views.common import display_success_messages, display_error_messages
-
-        result, errors = EducationGroupAutomaticPostponementToN6(queryset).postpone()
-        count = len(result)
-        display_success_messages(
-            request, ngettext(
-                "%(count)d education group has been postponed with success.",
-                "%(count)d education groups have been postponed with success.", count
-            ) % {'count': count}
-        )
-        if errors:
-            display_error_messages(request, "{} : {}".format(
-                _("The following education groups ended with error"),
-                ", ".join([str(error) for error in errors])
-            ))
-
-    apply_education_group_year_postponement.short_description = _("Apply postponement on education group year")
-
 
 class EducationGroupManager(SerializableModelManager):
     def having_related_training(self, **kwargs):
