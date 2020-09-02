@@ -23,48 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
-from django.db import IntegrityError
 from django.test import TestCase
 
 from base.models.enums.link_type import LinkTypes
 from base.models.group_element_year import GroupElementYear
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory, GroupElementYearChildLeafFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from program_management.ddd.repositories import find_roots
 from program_management.tests.factories.element import ElementGroupYearFactory
-
-
-class TestSaveGroupElementYear(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.academic_year = AcademicYearFactory()
-
-    def test_simple_saves_ok(self):
-        egy1 = EducationGroupYearFactory(academic_year=self.academic_year)
-        egy2 = EducationGroupYearFactory(academic_year=self.academic_year)
-        egy3 = EducationGroupYearFactory(academic_year=self.academic_year)
-
-        GroupElementYearFactory(
-            parent=egy2,
-            child_branch=egy1,
-        )
-        GroupElementYearFactory(
-            parent=egy3,
-            child_branch=egy2,
-        )
-
-    def test_save_with_child_branch_and_child_leaf_ko(self):
-        egy = EducationGroupYearFactory(academic_year=self.academic_year)
-        luy = LearningUnitYearFactory()
-        with self.assertRaises(IntegrityError):
-            GroupElementYearFactory(
-                parent=egy,
-                child_branch=egy,
-                child_leaf=luy,
-            )
 
 
 class TestManagerGetAdjacencyList(TestCase):
@@ -218,18 +184,7 @@ class TestManagerGetRoots(TestCase):
         )
         self.assertEqual(len(child_root_list), 0)
 
-    def test_when_child_leaf_given_then_return_all_their_root(self):
-        child_element_ids = [self.level_21.child_element_id]
-        child_root_list = GroupElementYear.objects.get_root_list(
-            child_element_ids=child_element_ids,
-            root_category_name=self.root_categories_name
-        )
-        self.assertCountEqual(
-            child_root_list,
-            [{"child_id": self.level_21.child_element_id, "root_id": self.level_2.parent_element_id}]
-        )
-
-    def test_when_child_branch_given_then_return_all_their_root(self):
+    def test_when_child_element_given_then_return_all_their_root(self):
         child_element_ids = [self.level_11.child_element_id]
         child_root_list = GroupElementYear.objects.get_root_list(
             child_element_ids=child_element_ids,

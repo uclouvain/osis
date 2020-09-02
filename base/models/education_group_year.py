@@ -680,10 +680,6 @@ class EducationGroupYear(SerializableModel):
         return None
 
     @cached_property
-    def children(self):
-        return self.groupelementyear_set.select_related('child_branch', 'child_leaf')
-
-    @cached_property
     def coorganizations(self):
         return self.educationgrouporganization_set.all().order_by('all_students')
 
