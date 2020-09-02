@@ -71,7 +71,6 @@ def _get_node_view_attribute_serializer(link: 'Link', path: 'Path', tree: 'Progr
         'title': link.child.code,
         'paste_url': reverse_with_get('tree_paste_node', get={"path": path}),
         'detach_url': reverse_with_get('tree_detach_node', args=[context['root'].pk], get={"path": path}),
-        'modify_url': reverse('group_element_year_update', args=[context['root'].pk, link.child.pk, link.pk]),
         'search_url': reverse_with_get(
             'quick_search_learning_unit' if tree.allows_learning_unit_child(
                 link.child) else 'quick_search_education_group',
