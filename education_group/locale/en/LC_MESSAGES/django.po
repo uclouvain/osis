@@ -765,6 +765,11 @@ msgid ""
 "You cannot change/delete a education group existing before %(limit_year)s"
 msgstr ""
 
+msgid ""
+"You must create the version of the concerned training and then attach that "
+"version inside this version"
+msgstr ""
+
 msgid "You should precise at least minimum or maximum constraint"
 msgstr ""
 

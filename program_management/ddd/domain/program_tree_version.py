@@ -192,7 +192,7 @@ class ProgramTreeVersion(interface.RootEntity):
         return self.entity_id.version_name
 
     @property
-    def is_standard_version(self):
+    def is_standard_version(self) -> bool:
         return self.entity_id.version_name == STANDARD and not self.entity_id.is_transition
 
     @property
