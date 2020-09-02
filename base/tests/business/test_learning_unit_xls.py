@@ -119,8 +119,8 @@ class TestLearningUnitXls(TestCase):
                                                            partial_acronym=PARENT_PARTIAL_ACRONYM)
 
         cls.group_element_child2 = GroupElementYearFactory(
-            parent=cls.an_education_group,
-            child_branch=cls.group_element_child.parent,
+            parent_element=ElementFactory(group_year=cls.an_education_group),
+            child_element=cls.group_element_child.parent_element,
         )
         cls.old_academic_year = AcademicYearFactory(year=datetime.date.today().year - 2)
         cls.current_academic_year = AcademicYearFactory(year=datetime.date.today().year)

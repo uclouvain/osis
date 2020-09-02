@@ -59,28 +59,28 @@ class ProgramGenerators:
         return result
 
     def create_structure(self):
-        for training in self.trainings:
-            self._create_structure(training)
+        # TODO: Refactor for using DDD service (cf. OSIS-4999)
+        pass
+        # for training in self.trainings:
+        #     self._create_structure(training)
 
-    def _create_structure(self, education_group_year_obj: EducationGroupYear, level=3):
-        if level <= 0 and education_group_year_obj.education_group_type.learning_unit_child_allowed:
-            number_lu = random.randint(3, 5)
-            luys = random.choices(self.learning_unit_years, k=number_lu)
-            for luy in luys:
-                GroupElementYearChildLeafFactory(
-                    parent=education_group_year_obj,
-                    child_leaf=luy
-                )
-
-        relationships = self.relationships.get(education_group_year_obj.education_group_type, [])
-        for relationship in relationships:
-            generate = bool(random.randint(0, 1))
-            if not (relationship.min_count_authorized == 1 or generate):
-                continue
-            grp = GroupElementYearFactory(
-                parent=education_group_year_obj,
-                child_branch__education_group_type=relationship.child_type,
-                child_branch__management_entity=education_group_year_obj.management_entity
-            )
-            self._create_structure(grp.child_branch, level=level-1)
-
+    # def _create_structure(self, education_group_year_obj: EducationGroupYear, level=3):
+    #     if level <= 0 and education_group_year_obj.education_group_type.learning_unit_child_allowed:
+    #         number_lu = random.randint(3, 5)
+    #         luys = random.choices(self.learning_unit_years, k=number_lu)
+    #         for luy in luys:
+    #             GroupElementYearChildLeafFactory(
+    #                 parent_element= ####,
+    #                 child_element= ####
+    #             )
+    #
+    #     relationships = self.relationships.get(education_group_year_obj.education_group_type, [])
+    #     for relationship in relationships:
+    #         generate = bool(random.randint(0, 1))
+    #         if not (relationship.min_count_authorized == 1 or generate):
+    #             continue
+    #         grp = GroupElementYearFactory(
+    #             parent_element=#####,
+    #             child_element=####
+    #         )
+    #         self._create_structure(grp.child_element, level=level-1)

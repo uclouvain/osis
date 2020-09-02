@@ -370,9 +370,6 @@ class TestFindWithEnrollmentsCount(TestCase):
         cls.current_academic_year = create_current_academic_year()
         cls.learning_unit_year = LearningUnitYearFactory(academic_year=cls.current_academic_year)
         cls.education_group_year = EducationGroupYearFactory(academic_year=cls.current_academic_year)
-        GroupElementYearFactory(parent=cls.education_group_year,
-                                child_branch=None,
-                                child_leaf=cls.learning_unit_year)
 
     def test_without_learning_unit_enrollment_but_with_offer_enrollments(self):
         OfferEnrollmentFactory(education_group_year=self.education_group_year)
@@ -411,24 +408,25 @@ class TestFindWithEnrollmentsCount(TestCase):
         self.assertEqual(result[0].count_learning_unit_enrollments, 1)
 
     def test_ordered_by_acronym(self):
-        group_1 = GroupElementYearFactory(parent=EducationGroupYearFactory(acronym='XDRT1234'),
-                                          child_branch=None,
-                                          child_leaf=self.learning_unit_year)
-        group_2 = GroupElementYearFactory(parent=EducationGroupYearFactory(acronym='BMED1000'),
-                                          child_branch=None,
-                                          child_leaf=self.learning_unit_year)
-        group_3 = GroupElementYearFactory(parent=EducationGroupYearFactory(acronym='LDROI1001'),
-                                          child_branch=None,
-                                          child_leaf=self.learning_unit_year)
-        LearningUnitEnrollmentFactory(learning_unit_year=self.learning_unit_year,
-                                      offer_enrollment__education_group_year=group_1.parent)
-        LearningUnitEnrollmentFactory(learning_unit_year=self.learning_unit_year,
-                                      offer_enrollment__education_group_year=group_2.parent)
-        LearningUnitEnrollmentFactory(learning_unit_year=self.learning_unit_year,
-                                      offer_enrollment__education_group_year=group_3.parent)
+        education_group_year = EducationGroupYearFactory(acronym='XDRT1234')
+        education_group_year_2 = EducationGroupYearFactory(acronym='BMED1000')
+        education_group_year_3 = EducationGroupYearFactory(acronym='LDROI1001')
+
+        LearningUnitEnrollmentFactory(
+            learning_unit_year=self.learning_unit_year,
+            offer_enrollment__education_group_year=education_group_year
+        )
+        LearningUnitEnrollmentFactory(
+            learning_unit_year=self.learning_unit_year,
+            offer_enrollment__education_group_year=education_group_year_2
+        )
+        LearningUnitEnrollmentFactory(
+            learning_unit_year=self.learning_unit_year,
+            offer_enrollment__education_group_year=education_group_year_3
+        )
 
         result = find_with_enrollments_count(self.learning_unit_year)
-        expected_list_order = [group_2.parent, group_3.parent, group_1.parent]
+        expected_list_order = [education_group_year, education_group_year_2, education_group_year_3]
         self.assertEqual(list(result), expected_list_order)
 
 

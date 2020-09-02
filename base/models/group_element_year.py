@@ -27,12 +27,10 @@ import re
 
 from django.core.exceptions import ValidationError
 from django.db import models, connection
-from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from ordered_model.models import OrderedModel
 from reversion.admin import VersionAdmin
 
-from base.models.education_group_year import EducationGroupYear
 from base.models.enums import quadrimesters
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType
 from base.models.enums.link_type import LinkTypes
@@ -297,26 +295,6 @@ class GroupElementYear(OrderedModel):
         on_delete=models.PROTECT,
     )
 
-    parent = models.ForeignKey(
-        EducationGroupYear,
-        null=True, blank=True,  # TODO: can not be null, dirty data
-        on_delete=models.PROTECT,
-    )
-
-    child_branch = models.ForeignKey(
-        EducationGroupYear,
-        related_name='child_branch',  # TODO: can not be child_branch
-        blank=True, null=True,
-        on_delete=models.CASCADE,
-    )
-
-    child_leaf = models.ForeignKey(
-        'LearningUnitYear',
-        related_name='child_leaf',  # TODO: can not be child_leaf
-        blank=True, null=True,
-        on_delete=models.CASCADE,
-    )
-
     relative_credits = models.IntegerField(
         blank=True,
         null=True,
@@ -376,23 +354,16 @@ class GroupElementYear(OrderedModel):
         blank=True, null=True, verbose_name=_('Link type')
     )
 
-    order_with_respect_to = 'parent'
+    order_with_respect_to = 'parent_element'
 
     objects = GroupElementYearManager()
 
     class Meta:
-        unique_together = (('parent', 'child_branch'), ('parent', 'child_leaf'), ('parent_element', 'child_element'),)
+        unique_together = (
+            ('parent_element', 'child_element'),
+        )
         ordering = ('order',)
-        constraints = [
-            models.CheckConstraint(
-                check=~models.Q(child_branch__isnull=False, child_leaf__isnull=False),
-                name="child_branch_xor_child_leaf"
-            )
-        ]
+        constraints = []
 
     def __str__(self):
         return "{} - {}".format(self.parent_element, self.child_element)
-
-    @cached_property
-    def child(self):
-        return self.child_branch or self.child_leaf

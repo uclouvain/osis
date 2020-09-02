@@ -52,12 +52,7 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
             learning_unit_year=cls.learning_unit_year_child
         )
 
-        GroupElementYearFactory(
-            parent_element=cls.element_parent,
-            child_element=cls.element_child,
-            child_leaf=cls.learning_unit_year_child,
-            child_branch=None
-        )
+        GroupElementYearFactory(parent_element=cls.element_parent, child_element=cls.element_child)
         cls.person = CentralManagerFactory(entity=cls.element_parent.group_year.management_entity).person
 
         cls.url = reverse("learning_unit_prerequisite_update",
