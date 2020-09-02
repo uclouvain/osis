@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, Optional
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -6,13 +6,14 @@ from django.utils.translation import gettext_lazy as _, pgettext
 from rules import predicate
 
 from base.business.event_perms import EventPermEducationGroupEdition
-from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
+from base.models.enums import education_group_categories
 from base.models.enums.education_group_categories import Categories
 from education_group.auth.scope import Scope
 from education_group.models.group_year import GroupYear
-from osis_role import errors
 from osis_role.errors import predicate_failed_msg, set_permission_error, get_permission_error
+from program_management.ddd import command
+from program_management.ddd.service.read import allowed_children_types_service
 
 
 @predicate(bind=True)
@@ -120,3 +121,41 @@ def is_user_linked_to_all_scopes_of_management_entity(self, user, education_grou
         }
         return user_scopes.get(education_group_year.management_entity_id) == Scope.ALL.value
     return None
+
+
+@predicate(bind=True)
+@predicate_failed_msg(message=_("No type of Training can be created as child"))
+def is_allowed_to_create_children_of_category_training(self, user: User, group_year: Optional[GroupYear]):
+    return _is_allowed_to_create_children_of_specific_category(
+        group_year,
+        education_group_categories.Categories.TRAINING.name
+    )
+
+
+@predicate(bind=True)
+@predicate_failed_msg(message=_("No type of Mini-Training can be created as child"))
+def is_allowed_to_create_children_of_category_mini_training(self, user: User, group_year: Optional[GroupYear]):
+    return _is_allowed_to_create_children_of_specific_category(
+        group_year,
+        education_group_categories.Categories.MINI_TRAINING.name
+    )
+
+
+@predicate(bind=True)
+@predicate_failed_msg(message=_("No type of Group can be created as child"))
+def is_allowed_to_create_children_of_category_group(self, user: User, group_year: Optional[GroupYear]):
+    return _is_allowed_to_create_children_of_specific_category(
+        group_year,
+        education_group_categories.Categories.GROUP.name
+    )
+
+
+def _is_allowed_to_create_children_of_specific_category(parent_group_year: Optional[GroupYear], category: str) -> bool:
+    if not parent_group_year:
+        return True
+
+    cmd = command.GetAllowedChildTypeCommand(
+        category=category,
+        path_to_paste=str(parent_group_year.element.id)
+    )
+    return bool(allowed_children_types_service.get_allowed_child_types(cmd))

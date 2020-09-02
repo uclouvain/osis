@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-31 10:16+0200\n"
+"POT-Creation-Date: 2020-09-02 10:48+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -364,6 +364,11 @@ msgstr "Domaine ISCED/CITE"
 msgid "Identification"
 msgstr "Identification"
 
+#, fuzzy, python-format
+#| msgid "Impossible to put end date to %(end_year)s: %(msg)s"
+msgid "Imposible to put end date to %(end_year)s: %(msg)s"
+msgstr "Impossible de mettre la fin à %(end_year)s: %(msg)s"
+
 #, python-format
 msgid "Impossible to put end date to %(end_year)s: %(msg)s"
 msgstr "Impossible de mettre la fin à %(end_year)s: %(msg)s"
@@ -461,6 +466,15 @@ msgstr "Nouvelle Mini-Formation"
 
 msgid "New Training"
 msgstr "Nouvelle Formation"
+
+msgid "No type of Group can be created as child"
+msgstr "Aucun type de Groupement ne peut être créé comme enfant"
+
+msgid "No type of Mini-Training can be created as child"
+msgstr "Aucun type de Mini-Formation ne peut être créé comme enfant"
+
+msgid "No type of Training can be created as child"
+msgstr "Aucun type de Formation ne peut être créé comme enfant"
 
 msgid "Non university Bachelors"
 msgstr "Bacheliers non universitaires"
@@ -703,6 +717,14 @@ msgstr "Bacheliers UCL"
 
 msgid "UCL Diploma"
 msgstr "Diplôme avec l'UCL"
+
+#, python-brace-format
+msgid "Unable to publish common admission conditions for {year}"
+msgstr ""
+
+#, python-brace-format
+msgid "Unable to publish common general informations for {year}"
+msgstr ""
 
 msgid "University Bachelors"
 msgstr "Bacheliers universitaires"

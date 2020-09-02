@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-31 10:16+0200\n"
+"POT-Creation-Date: 2020-09-02 10:48+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -353,6 +353,10 @@ msgid "Identification"
 msgstr ""
 
 #, python-format
+msgid "Imposible to put end date to %(end_year)s: %(msg)s"
+msgstr ""
+
+#, python-format
 msgid "Impossible to put end date to %(end_year)s: %(msg)s"
 msgstr ""
 
@@ -442,6 +446,15 @@ msgid "New Mini-Training"
 msgstr ""
 
 msgid "New Training"
+msgstr ""
+
+msgid "No type of Group can be created as child"
+msgstr ""
+
+msgid "No type of Mini-Training can be created as child"
+msgstr ""
+
+msgid "No type of Training can be created as child"
 msgstr ""
 
 msgid "Non university Bachelors"
@@ -591,7 +604,7 @@ msgid ""
 msgstr ""
 
 #, python-format
-msgid "The training %(code)s has been deleted."
+msgid "The training %(acronym)s - %(title)s has been deleted."
 msgstr ""
 
 #, python-brace-format
@@ -669,6 +682,14 @@ msgid "UCL Bachelors"
 msgstr ""
 
 msgid "UCL Diploma"
+msgstr ""
+
+#, python-brace-format
+msgid "Unable to publish common admission conditions for {year}"
+msgstr ""
+
+#, python-brace-format
+msgid "Unable to publish common general informations for {year}"
 msgstr ""
 
 msgid "University Bachelors"
