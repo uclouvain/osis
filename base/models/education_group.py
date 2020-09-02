@@ -25,14 +25,10 @@
 ##############################################################################
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Q
 from django.utils.translation import gettext_lazy as _, ngettext
 from reversion.admin import VersionAdmin
 
-from base.business.education_groups import shorten
-from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
-from base.models.enums.education_group_types import TrainingType
 from osis_common.models.serializable_model import SerializableModelAdmin, SerializableModel, SerializableModelManager
 
 
@@ -127,7 +123,3 @@ class EducationGroup(SerializableModel):
                         "min": _("Start"),
                     }
                 })
-
-        # Check if end_year could be set according to protected data
-        if self.end_year:
-            shorten.check_education_group_end_date(self, self.end_year)
