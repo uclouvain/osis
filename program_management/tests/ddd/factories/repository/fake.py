@@ -35,7 +35,8 @@ def get_fake_program_tree_repository(root_entities: List['ProgramTree']) -> Type
     return type(class_name, (FakeRepository,), {
         "root_entities": root_entities.copy(),
         "not_found_exception_class": exception.ProgramTreeNotFoundException,
-        "delete": _delete_program_tree
+        "delete": _delete_program_tree,
+        "search_from_children": _search_from_children
     })
 
 
@@ -105,3 +106,15 @@ def _search_program_tree_version(
     if is_transition is not None:
         result = (tree_version for tree_version in result if tree_version.is_transition == is_transition)
     return list(result)
+
+
+@classmethod
+def _search_from_children(cls, node_ids: List['NodeIdentity'], **kwargs) -> List['ProgramTree']:
+    result = []
+    set_node_ids = set(node_ids)
+    for tree in cls.root_entities:
+        children_nodes = tree.get_all_nodes() - {tree.root_node}
+        children_nodes_ids = set([node.entity_id for node in children_nodes])
+        if not children_nodes_ids.isdisjoint(set_node_ids):
+            result.append(tree)
+    return result
