@@ -67,7 +67,7 @@ MAXIMUM_CREDITS = 500
 # through the recursive database structure
 # ! It is a raw SQL : Use it only in last resort !
 # The returned structure is :
-# { id, gs_origin, child_branch_id, child_leaf_id, parent_id, acronym,
+# { id, gs_origin, child_element_id, parent_element_id, acronym,
 #   title, category, name, id (for education_group_type) and level }
 SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS = """\
 WITH RECURSIVE group_element_year_parent AS (
