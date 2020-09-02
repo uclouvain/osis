@@ -97,6 +97,18 @@ class CannotCopyTreeDueToEndDate(BusinessException):
         super().__init__(message, **kwargs)
 
 
+class CannotDeleteStandardDueToVersionEndDate(BusinessException):
+    def __init__(self, tree: 'ProgramTreeVersion', *args, **kwargs):
+        message = _(
+            "You can't delete the standard program tree '{code}' "
+            "in {year} as specific versions exists during this year."
+        ).format(
+            code=tree.program_tree_identity.code,
+            year=tree.entity_id.year,
+        )
+        super().__init__(message, **kwargs)
+
+
 class NodeIsUsedException(Exception):
     pass
 
