@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-31 12:04+0200\n"
+"POT-Creation-Date: 2020-09-02 15:07+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -520,6 +520,9 @@ msgstr "Enregistrer"
 
 msgid "Search"
 msgstr "Recherche"
+
+msgid "Select a language"
+msgstr ""
 
 msgid "Session derogation"
 msgstr "Session dérogation"
