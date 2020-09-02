@@ -7,6 +7,7 @@ from django.test import TestCase
 from django.urls import reverse, exceptions
 from django.utils.translation import gettext_lazy as _
 
+from base.models.enums import education_group_types
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group_type import GroupEducationGroupTypeFactory
 from base.tests.factories.person import PersonFactory
@@ -160,7 +161,7 @@ class TestCreateOrphanGroupPostMethod(TestCase):
 class TestCreateNonOrphanGroupGetMethod(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.type = GroupEducationGroupTypeFactory()
+        cls.type = GroupEducationGroupTypeFactory(name=education_group_types.GroupType.COMMON_CORE.name)
 
         cls.central_manager = CentralManagerFactory()
         cls.parent_element = ElementGroupYearFactory(
@@ -196,9 +197,8 @@ class TestCreateNonOrphanGroupGetMethod(TestCase):
 class TestCreateNonOrphanGroupPostMethod(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.type = GroupEducationGroupTypeFactory()
+        cls.type = GroupEducationGroupTypeFactory(name=education_group_types.GroupType.COMMON_CORE.name)
         cls.central_manager = CentralManagerFactory()
-
         cls.parent_element = ElementGroupYearFactory(
             group_year__management_entity=cls.central_manager.entity
         )
