@@ -124,33 +124,65 @@ def is_user_linked_to_all_scopes_of_management_entity(self, user, education_grou
 
 
 @predicate(bind=True)
-@predicate_failed_msg(message=_("No type of Training can be created as child"))
-def is_allowed_to_create_children_of_category_training(self, user: User, group_year: Optional[GroupYear]):
+def is_allowed_to_create_children_of_category_training(self, user: User, parent_group_year: Optional[GroupYear]):
+    _get_is_allowed_to_create_children_of_specific_category_error_msg(
+        self,
+        user,
+        parent_group_year,
+        education_group_categories.Categories.TRAINING.value
+    )
     return _is_allowed_to_create_children_of_specific_category(
-        group_year,
+        parent_group_year,
         education_group_categories.Categories.TRAINING.name
     )
 
 
 @predicate(bind=True)
-@predicate_failed_msg(message=_("No type of Mini-Training can be created as child"))
-def is_allowed_to_create_children_of_category_mini_training(self, user: User, group_year: Optional[GroupYear]):
+def is_allowed_to_create_children_of_category_mini_training(self, user: User, parent_group_year: Optional[GroupYear]):
+    _get_is_allowed_to_create_children_of_specific_category_error_msg(
+        self,
+        user,
+        parent_group_year,
+        education_group_categories.Categories.MINI_TRAINING.value
+    )
     return _is_allowed_to_create_children_of_specific_category(
-        group_year,
+        parent_group_year,
         education_group_categories.Categories.MINI_TRAINING.name
     )
 
 
 @predicate(bind=True)
-@predicate_failed_msg(message=_("No type of Group can be created as child"))
-def is_allowed_to_create_children_of_category_group(self, user: User, group_year: Optional[GroupYear]):
+def is_allowed_to_create_children_of_category_group(self, user: User, parent_group_year: Optional[GroupYear]):
+    _get_is_allowed_to_create_children_of_specific_category_error_msg(
+        self,
+        user,
+        parent_group_year,
+        education_group_categories.Categories.GROUP.value
+    )
     return _is_allowed_to_create_children_of_specific_category(
-        group_year,
+        parent_group_year,
         education_group_categories.Categories.GROUP.name
     )
 
 
-def _is_allowed_to_create_children_of_specific_category(parent_group_year: Optional[GroupYear], category: str) -> bool:
+def _get_is_allowed_to_create_children_of_specific_category_error_msg(
+        self,
+        user: User,
+        parent_group_year: Optional[GroupYear],
+        child_type: str) -> None:
+    if not parent_group_year:
+        return
+    error_msg = _("No type of %(child_category)s can be created as child of %(category)s of type %(type)s") % {
+        "child_category": child_type,
+        "category": parent_group_year.education_group_type.get_category_display(),
+        "type": parent_group_year.education_group_type.get_name_display()
+    }
+    set_permission_error(user, self.context['perm_name'], error_msg)
+
+
+def _is_allowed_to_create_children_of_specific_category(
+        parent_group_year: Optional[GroupYear],
+        category: str) -> bool:
     if not parent_group_year:
         return True
 

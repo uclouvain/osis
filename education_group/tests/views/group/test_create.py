@@ -7,6 +7,7 @@ from django.test import TestCase
 from django.urls import reverse, exceptions
 from django.utils.translation import gettext_lazy as _
 
+from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group_type import GroupEducationGroupTypeFactory
 from base.tests.factories.person import PersonFactory
 from education_group.ddd.domain.exception import ContentConstraintTypeMissing, CodeAlreadyExistException
@@ -165,6 +166,10 @@ class TestCreateNonOrphanGroupGetMethod(TestCase):
         cls.parent_element = ElementGroupYearFactory(
             group_year__management_entity=cls.central_manager.entity
         )
+        AuthorizedRelationshipFactory(
+            parent_type=cls.parent_element.group_year.education_group_type,
+            child_type=cls.type
+        )
         cls.url = reverse('group_create', kwargs={'type': cls.type.name}) +\
             "?path_to={}".format(str(cls.parent_element.pk))
 
@@ -196,6 +201,10 @@ class TestCreateNonOrphanGroupPostMethod(TestCase):
 
         cls.parent_element = ElementGroupYearFactory(
             group_year__management_entity=cls.central_manager.entity
+        )
+        AuthorizedRelationshipFactory(
+            parent_type=cls.parent_element.group_year.education_group_type,
+            child_type=cls.type
         )
         cls.url = reverse('group_create', kwargs={'type': cls.type.name}) +\
             "?path_to={}".format(str(cls.parent_element.pk))

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-02 10:48+0200\n"
+"POT-Creation-Date: 2020-09-02 11:07+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -467,14 +467,13 @@ msgstr "Nouvelle Mini-Formation"
 msgid "New Training"
 msgstr "Nouvelle Formation"
 
-msgid "No type of Group can be created as child"
-msgstr "Aucun type de Groupement ne peut être créé comme enfant"
-
-msgid "No type of Mini-Training can be created as child"
-msgstr "Aucun type de Mini-Formation ne peut être créé comme enfant"
-
-msgid "No type of Training can be created as child"
-msgstr "Aucun type de Formation ne peut être créé comme enfant"
+#, python-format
+msgid ""
+"No type of %(child_category)s can be created as child of %(category)s of "
+"type %(type)s"
+msgstr ""
+"Aucun type de %(child_category)s ne peut être créé comme enfant d'un(e) "
+"%(category)s de type %(type)s"
 
 msgid "Non university Bachelors"
 msgstr "Bacheliers non universitaires"
@@ -883,3 +882,12 @@ msgstr "indéfini"
 
 msgid "unspecified"
 msgstr "indéterminé"
+
+#~ msgid "No type of Group can be created as child"
+#~ msgstr "Aucun type de Groupement ne peut être créé comme enfant"
+
+#~ msgid "No type of Mini-Training can be created as child"
+#~ msgstr "Aucun type de Mini-Formation ne peut être créé comme enfant"
+
+#~ msgid "No type of Training can be created as child"
+#~ msgstr "Aucun type de Formation ne peut être créé comme enfant"
