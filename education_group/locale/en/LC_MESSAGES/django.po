@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-26 09:35+0200\n"
+"POT-Creation-Date: 2020-09-02 15:16+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -347,6 +347,10 @@ msgid "Identification"
 msgstr ""
 
 #, python-format
+msgid "Imposible to put end date to %(end_year)s: %(msg)s"
+msgstr ""
+
+#, python-format
 msgid "Impossible to put end date to %(end_year)s: %(msg)s"
 msgstr ""
 
@@ -589,7 +593,7 @@ msgid ""
 msgstr ""
 
 #, python-format
-msgid "The training %(code)s has been deleted."
+msgid "The training %(acronym)s - %(title)s has been deleted."
 msgstr ""
 
 #, python-brace-format
