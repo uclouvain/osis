@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-27 17:38+0200\n"
+"POT-Creation-Date: 2020-09-02 14:19+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -23,8 +23,12 @@ msgid "\"%(child)s\" has been detached from \"%(parent)s\""
 msgstr "\"%(child)s\" a été retiré de \"%(parent)s\""
 
 #, python-format
-msgid "\"%(child)s\" has been pasted into \"%(parent)s\""
-msgstr "\"%(child)s\" a été collé dans \"%(parent)s\""
+msgid ""
+"\"%(child_year)s - %(child)s\" has been %(copy_message)s into "
+"\"%(parent_year)s - %(parent)s%(parent_title)s\""
+msgstr ""
+"\"%(child_year)s - %(child)s\" a été %(copy_message)s dans "
+"\"%(parent_year)s - %(parent)s%(parent_title)s\""
 
 #, python-format
 msgid "%(start_index)s to %(end_index)s of %(total_counts)s learning units"
@@ -145,9 +149,6 @@ msgstr ""
 "Ne peut pas attacher \"%(child)s\" car le nombre d'enfants de type(s) "
 "\"%(child_types)s\" pour \"%(parent)s\" a atteint la limite maximum."
 
-msgid "Cannot add any element to learning unit"
-msgstr "Interdit d'ajouter des éléments à une UE"
-
 #, python-format
 msgid "Cannot add any element to learning unit %(parent_node)s"
 msgstr "Interdit d'ajouter des éléments à  l'UE %(parent_node)s"
@@ -155,9 +156,6 @@ msgstr "Interdit d'ajouter des éléments à  l'UE %(parent_node)s"
 #, python-format
 msgid "Cannot attach a node %(node)s to himself."
 msgstr "Interdit d'attacher un élément %(node)s à lui-même."
-
-msgid "Cannot detach due to prerequisites."
-msgstr "Interdit de retirer à cause des prérequis."
 
 #, python-format
 msgid ""
@@ -184,9 +182,6 @@ msgstr ""
 
 msgid "Cannot perform detach action on root."
 msgstr "Interdit de retirer la racine."
-
-msgid "Cannot perform modification action on root."
-msgstr "Interdit de modifier la racine."
 
 msgid "Category"
 msgstr "Catégorie"
@@ -235,20 +230,6 @@ msgstr "Mode d'évaluation des acquis des étudiants"
 
 msgid "Export"
 msgstr "Exporter"
-
-#, python-format
-msgid ""
-"Finality \"%(acronym)s\" has an end date greater than %(root_acronym)s "
-"program."
-msgid_plural ""
-"Finalities \"%(acronym)s\" have an end date greater than %(root_acronym)s "
-"program."
-msgstr[0] ""
-"La finalité \"%(acronym)s\" a une date de fin plus grande que le programme "
-"%(root_acronym)s."
-msgstr[1] ""
-"Les finalités \"%(acronym)s\" ont une date de fin plus grande que le "
-"programme %(root_acronym)s."
 
 #, python-format
 msgid ""
@@ -432,17 +413,6 @@ msgstr[1] ""
 "présentes dans le programme %(finality_acronym)s."
 
 #, python-format
-msgid "Option \"%(acronym)s\" must be present in %(root_acronym)s program."
-msgid_plural ""
-"Options \"%(acronym)s\" must be present in %(root_acronym)s program."
-msgstr[0] ""
-"L'option \"%(acronym)s\" doit être présente dans le programme "
-"%(root_acronym)s."
-msgstr[1] ""
-"Les options \"%(acronym)s\" doivent être présentes dans le programme "
-"%(root_acronym)s."
-
-#, python-format
 msgid "Option \"%(code)s\" must be present in %(root_code)s program."
 msgid_plural "Options \"%(code)s\" must be present in %(root_code)s program."
 msgstr[0] ""
@@ -591,8 +561,8 @@ msgid "Teaching methods"
 msgstr "Méthodes d'enseignement"
 
 #, python-format
-msgid "The %(acronym)s has been moved"
-msgstr "%(acronym)s a été déplacé"
+msgid "The %(year)s - %(acronym)s has been moved"
+msgstr "%(year)s - %(acronym)s a été déplacé"
 
 #, python-format
 msgid ""
@@ -651,9 +621,6 @@ msgstr ""
 
 msgid "The registration form is available at the Secretariat of"
 msgstr "Le formulaire d'inscription est disponible au Secrétariat de"
-
-msgid "The user is not allowed to change link data."
-msgstr "L'utilisateur n'a pas la permission de modifier le contenu d'un lien"
 
 msgid "Themes discussed"
 msgstr "Thèmes abordés"
@@ -728,18 +695,9 @@ msgstr ""
 "d'enseignement %(child_node)s"
 
 #, python-format
-msgid "You can not add a learning unit to a %(category)s of type %(type)s."
-msgstr ""
-"Vous ne pouvez pas ajouter une unité d'enseignement à un(e) %(category)s de "
-"type %(type)s."
-
-#, python-format
 msgid "You can not add the same child %(child_node)s several times."
 msgstr ""
 "Vous ne pouvez pas ajouter plusieurs fois le même enfant %(child_node)s."
-
-msgid "You can not add the same child several times."
-msgstr "Vous ne pouvez pas ajouter plusieurs fois le même enfant."
 
 #, python-format
 msgid ""
@@ -801,6 +759,9 @@ msgstr ""
 msgid "[%(academic_year)s] The content of the program is not empty."
 msgstr "[%(academic_year)s] Le contenu du programme n'est pas vide."
 
+msgid "added"
+msgstr "ajouté"
+
 msgid "bibliography"
 msgstr "bibliographie"
 
@@ -846,6 +807,9 @@ msgstr "le"
 
 msgid "optional"
 msgstr "optionnel"
+
+msgid "pasted"
+msgstr "collé"
 
 #, python-format
 msgid "prerequisites-%(year)s-%(acronym)s"
