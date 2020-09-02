@@ -48,11 +48,6 @@ class GroupElementYearAdmin(VersionAdmin, OsisModelAdmin):
     list_display = ('parent_element', 'child_element',)
     readonly_fields = ('order',)
     search_fields = [
-        'child_branch__acronym',
-        'child_branch__partial_acronym',
-        'child_leaf__acronym',
-        'parent__acronym',
-        'parent__partial_acronym',
         'child_element__group_year__acronym',
         'child_element__group_year__partial_acronym',
         'parent_element__group_year__acronym',
@@ -401,7 +396,3 @@ class GroupElementYear(OrderedModel):
     @cached_property
     def child(self):
         return self.child_branch or self.child_leaf
-
-
-def fetch_row_sql(root_ids):
-    return GroupElementYear.objects.get_adjacency_list(root_ids)

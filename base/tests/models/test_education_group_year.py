@@ -32,7 +32,7 @@ from django.utils.translation import gettext_lazy as _
 from base.models.education_group_year import find_with_enrollments_count
 from base.models.enums import education_group_categories, duration_unit, offer_enrollment_state, education_group_types
 from base.models.enums.constraint_type import CREDITS
-from base.models.exceptions import MaximumOneParentAllowedException, ValidationWarning
+from base.models.exceptions import ValidationWarning
 from base.models.validation_rule import ValidationRule
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
@@ -120,15 +120,6 @@ class EducationGroupYearTest(TestCase):
             parent=None
         )
 
-        self.group_element_year_4 = GroupElementYearFactory(
-            parent=self.education_group_year_3,
-            child_branch=self.education_group_year_1
-        )
-        self.group_element_year_5 = GroupElementYearFactory(
-            parent=self.education_group_year_6,
-            child_branch=self.education_group_year_1
-        )
-
     def test_verbose_type(self):
         type_of_egt = self.education_group_year_1.education_group_type.get_name_display()
         self.assertEqual(type_of_egt, self.education_group_year_1.verbose_type)
@@ -144,20 +135,6 @@ class EducationGroupYearTest(TestCase):
 
     def test_management_entity_version_property(self):
         self.assertEqual(self.education_group_year_3.management_entity_version, self.entity_version_management)
-
-    def test_parent_by_training(self):
-        parent_by_training = self.education_group_year_3.is_training()
-        self.assertTrue(parent_by_training)
-
-        parent_by_training = self.education_group_year_2.parent_by_training()
-        self.assertIsNone(parent_by_training)
-
-        with self.assertRaises(MaximumOneParentAllowedException):
-            self.education_group_year_1.parent_by_training()
-
-        group = GroupFactory(academic_year=self.academic_year)
-        GroupElementYearFactory(child_branch=group, parent=self.education_group_year_2)
-        self.assertIsNone(group.parent_by_training())
 
     def test_is_mini_training(self):
         self.assertFalse(self.education_group_year_1.is_mini_training())
