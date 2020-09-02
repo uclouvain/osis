@@ -67,11 +67,19 @@
                 "targets": 2,
                 "data": "acronym",
                 "render": function ( data, type, row, meta ) {
+                    const version = row['version_name'];
+                    data += version ? `[${version}]`: '';
                     return '<a href="'+ row['url'] +'">'+ data + '</a>';
                 }
             },
             { "name": "code", "targets": 3, "data": "code"},
-            { "name": "title", "targets": 4, "data": "title"}
+            {
+                "name": "title",
+                "targets": 4,
+                "data": "title",
+                "render": function ( data, type, row, meta ) {
+                    return row['version_title'] ? row['version_title']: data;
+                }}
         ];
     </script>
     {{ block.super }}

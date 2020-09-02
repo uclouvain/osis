@@ -44,6 +44,7 @@ def step_impl(context, acronym, year):
     entity = Entity.objects.filter(entityversion__acronym='DRT').first()
     campus = Campus.objects.filter(organization__type='MAIN').first()
 
+    # TODO use DDD service in order to create a Training [+Tree]
     training = TrainingFactory(
         acronym=acronym,
         partial_acronym='LDROI200S',
@@ -54,9 +55,8 @@ def step_impl(context, acronym, year):
         enrollment_campus=campus,
         main_teaching_campus=campus,
         title='Master [120] en , à finalité spécialisée'
-
     )
-    create_initial_group_element_year_structure([training])
+    # create_initial_group_element_year_structure([training])
 
 
 @step("Cliquer sur le premier sigle dans la liste de résultats")

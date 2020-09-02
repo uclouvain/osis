@@ -25,9 +25,6 @@
 ##############################################################################
 from django.test import TestCase
 
-from base.business.education_groups.postponement import EDUCATION_GROUP_MAX_POSTPONE_YEARS, _compute_end_year
-from base.business.utils.model import model_to_dict_fk
-from base.models.education_group_year import EducationGroupYear
 from base.models.enums import entity_type
 from base.models.enums import organization_type
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
@@ -69,50 +66,3 @@ class EducationGroupPostponementTestCase(TestCase):
         # Create two secondary domains
         EducationGroupYearDomainFactory(education_group_year=self.education_group_year)
         EducationGroupYearDomainFactory(education_group_year=self.education_group_year)
-
-
-class TestComputeEndPostponement(EducationGroupPostponementTestCase):
-    def test_education_group_max_postpone_years(self):
-        expected_max_postpone = 6
-        self.assertEqual(EDUCATION_GROUP_MAX_POSTPONE_YEARS, expected_max_postpone)
-
-    def test_compute_end_postponement_case_no_specific_end_date_and_no_data_in_future(self):
-        # Set end date of education group to None
-        self.education_group_year.education_group.end_year = None
-        self.education_group_year.education_group.save()
-        self.education_group_year.refresh_from_db()
-        # Remove all data in future
-        EducationGroupYear.objects.filter(academic_year__year__gt=self.current_academic_year.year).delete()
-
-        expected_end_year = self.current_academic_year.year + EDUCATION_GROUP_MAX_POSTPONE_YEARS
-        result = _compute_end_year(self.education_group_year.education_group)
-        self.assertEqual(result, expected_end_year)
-
-    def test_compute_end_postponement_case_specific_end_date_and_no_data_in_future(self):
-        # Set end date of education group
-        self.education_group_year.education_group.end_year = self.generated_ac_years.academic_years[1]
-        self.education_group_year.education_group.save()
-        self.education_group_year.refresh_from_db()
-        # Remove all data in future
-        EducationGroupYear.objects.filter(academic_year__year__gt=self.current_academic_year.year).delete()
-
-        result = _compute_end_year(self.education_group_year.education_group)
-        self.assertEqual(result, self.education_group_year.education_group.end_year.year)
-
-    def test_compute_end_postponement_case_specific_end_date_and_data_in_future_gte(self):
-        # Set end date of education group
-        self.education_group_year.education_group.end_year = self.generated_ac_years.academic_years[1]
-        self.education_group_year.refresh_from_db()
-
-        # Create data in future
-        lastest_academic_year = self.generated_ac_years.academic_years[-1]
-        field_to_exclude = ['id', 'external_id', 'academic_year', 'languages', 'secondary_domains', 'certificate_aims']
-        defaults = model_to_dict_fk(self.education_group_year, exclude=field_to_exclude)
-        EducationGroupYear.objects.update_or_create(
-            education_group=self.education_group_year.education_group,
-            academic_year=lastest_academic_year,
-            defaults=defaults
-        )
-
-        result = _compute_end_year(self.education_group_year.education_group)
-        self.assertEqual(result, lastest_academic_year.year)
