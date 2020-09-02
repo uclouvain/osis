@@ -88,8 +88,7 @@
 
         {# Delete link #}
         <li>
-            {% url 'delete_education_group' root.pk education_group_year.pk as delete_url %}
-            {% a_tag_has_perm delete_url _('Delete permanently') delete_perm user education_group_year %}
+
         </li>
 
         {# Generate PDF link #}
