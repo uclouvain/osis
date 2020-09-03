@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-01 09:51+0200\n"
+"POT-Creation-Date: 2020-09-03 11:16+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -416,9 +416,6 @@ msgstr "Unité d'enseignement"
 msgid "Link type"
 msgstr "Type de lien"
 
-msgid "Linked with EPC"
-msgstr "Liens existants dans l'application EPC."
-
 msgid "Main"
 msgstr "Principale"
 
@@ -634,17 +631,6 @@ msgstr ""
 "La mini-formation {abbreviated_title} ({academic_year}) contient des "
 "liaisons dans l'application EPC"
 
-#, python-brace-format
-msgid ""
-"The mini-training {acronym} ({academic_year}) have links in EPC application"
-msgstr ""
-"La mini-formation {acronym} ({academic_year}) contient des liaisons dans "
-"l'application EPC"
-
-#, python-format
-msgid "The program %(acronym)s will be published soon"
-msgstr ""
-
 msgid ""
 "The scope of the user is limited and prevents this action to be performed"
 msgstr ""
@@ -723,6 +709,10 @@ msgid ""
 msgstr ""
 "La formation <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> a été "
 "modifiée avec succès"
+
+#, python-brace-format
+msgid "Training not found : {acronym} {year}"
+msgstr "Formation non trouvée : {acronym} {year}"
 
 msgid "Trainings"
 msgstr "Formations"
@@ -815,8 +805,9 @@ msgstr ""
 msgid ""
 "You must create the version of the concerned training and then attach that "
 "version inside this version"
-msgstr "Il faut créer la version correspondante dans la formation concernée et "
-"puis ajouter cette version dans cette formation"
+msgstr ""
+"Il faut créer la version correspondante dans la formation concernée et puis "
+"ajouter cette version dans cette formation"
 
 msgid "You should precise at least minimum or maximum constraint"
 msgstr "Vous devez préciser au moins la contrainte minimum ou maximum"
