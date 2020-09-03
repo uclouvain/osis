@@ -274,8 +274,8 @@ class TestPasteWithCutView(TestCase):
         cls.academic_year = AcademicYearFactory(current=True)
         cls.root_element = ElementGroupYearFactory(group_year__academic_year=cls.academic_year)
         cls.group_element_year = GroupElementYearFactory(
-            parent__academic_year=cls.academic_year,
-            generate_element=True
+            parent_element__group_year__academic_year=cls.academic_year,
+            child_element__group_year__academic_year=cls.academic_year
         )
         cls.selected_element = ElementGroupYearFactory(
             group_year__academic_year=cls.academic_year

@@ -38,6 +38,7 @@ from base.tests.factories.education_group_year import EducationGroupYearFactory,
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.person import CentralManagerForUEFactory, PersonFactory
 from base.tests.factories.user import SuperUserFactory
+from education_group.tests.factories.group_year import GroupYearFactory
 
 
 @skip("FIXME :: to fix in OSIS-4737")
@@ -68,15 +69,17 @@ class TestReadPdfContent(TestCase):
     @classmethod
     def setUpTestData(cls):
         academic_year = AcademicYearFactory()
-        education_group_year = EducationGroupYearFactory(academic_year=academic_year)
-        GroupElementYearFactory(parent=education_group_year,
-                                child_branch__academic_year=academic_year)
+        group_year = GroupYearFactory(academic_year=academic_year)
+        GroupElementYearFactory(
+            parent_element__group_year=group_year,
+            child_element__group_year__academic_year=academic_year
+        )
         cls.person = CentralManagerForUEFactory("view_educationgroup")
         cls.url = reverse(
             "group_content",
             kwargs={
-                "root_id": education_group_year.id,
-                "education_group_year_id": education_group_year.id
+                "root_id": group_year.id,
+                "education_group_year_id": group_year.id
             }
         )
         cls.post_valid_data = {'action': 'Generate pdf', 'language': LANGUAGE_CODE_EN}
