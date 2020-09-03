@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-31 12:04+0200\n"
+"POT-Creation-Date: 2020-09-02 15:45+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,13 +20,10 @@ msgstr ""
 msgid "\"%(child)s\" has been detached from \"%(parent)s\""
 msgstr "\"%(child)s\" has been removed from \"%(parent)s\""
 
-#, python-format
+#, fuzzy, python-format
+#| msgid "\"%(child)s\" has been detached from \"%(parent)s\""
 msgid "\"%(child)s\" has been pasted into \"%(parent)s\""
-msgstr ""
-
-#, python-format
-msgid "%(node_to_add)s version must be the same as %(root_node)s version"
-msgstr ""
+msgstr "\"%(child)s\" has been removed from \"%(parent)s\""
 
 #, python-format
 msgid "%(start_index)s to %(end_index)s of %(total_counts)s learning units"
@@ -111,6 +108,11 @@ msgstr ""
 
 msgid "Annual"
 msgstr ""
+
+#, fuzzy, python-format
+#| msgid "Are you sure you want to detach %(acronym)s ?"
+msgid "Are you sure you want to delete %(offer_acronym)s [%(version_name)s] ?"
+msgstr "Are you sure you want to remove %(acronym)s ?"
 
 #, python-format
 msgid "Are you sure you want to detach %(acronym)s ?"
@@ -536,9 +538,6 @@ msgid ""
 "attach."
 msgstr ""
 
-msgid "The child version must be the same as the root node version"
-msgstr ""
-
 #, python-format
 msgid "The learning unit %(acronym)s is not contained inside the formation"
 msgstr ""
@@ -579,7 +578,9 @@ msgid ""
 msgstr ""
 
 #, python-format
-msgid "The program %(title)s - %(academic_year)s will be published soon"
+msgid ""
+"The program tree version %(offer_acronym)s [%(version_name)s] has been "
+"deleted."
 msgstr ""
 
 msgid "The registration form is available at the Secretariat of"
@@ -624,10 +625,6 @@ msgid "Tutors"
 msgstr ""
 
 msgid "Type"
-msgstr ""
-
-#, python-brace-format
-msgid "Unable to publish sections for {code} - {year}"
 msgstr ""
 
 msgid "Utilizations"
@@ -677,12 +674,6 @@ msgstr ""
 msgid ""
 "You can't copy the program tree version '{acronym}' from {from_year} to "
 "{to_year} because it ends in {end_year}"
-msgstr ""
-
-#, python-brace-format
-msgid ""
-"You can't delete the standard program tree '{code}' in {year} as specific "
-"versions exists during this year."
 msgstr ""
 
 #, python-format
@@ -771,3 +762,6 @@ msgstr ""
 
 msgid "yes,no"
 msgstr ""
+
+#~ msgid "Cannot detach due to prerequisites."
+#~ msgstr "Cannot remove link due to prerequisites."

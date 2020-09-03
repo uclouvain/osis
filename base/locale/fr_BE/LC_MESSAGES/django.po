@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-26 09:32+0200\n"
+"POT-Creation-Date: 2020-09-02 15:15+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -234,9 +234,6 @@ msgstr "Ce code a déjà existé en %(academic_year)s"
 
 msgid "Acronym is invalid"
 msgstr "Sigle/Intitulé abrégé non valide"
-
-msgid "Acronym of version"
-msgstr "Sigle de la version"
 
 msgid "Acronym/Short title"
 msgstr "Sigle/Intitulé abrégé"
@@ -728,6 +725,9 @@ msgstr "Supprimer définitivement"
 msgid "Delete selected messages"
 msgstr "Supprimer les messages sélectionnés"
 
+msgid "Delete tree version permanently"
+msgstr "Supprimer version de programme définitivement"
+
 msgid "Deliberation"
 msgstr "Délibération"
 
@@ -836,26 +836,11 @@ msgstr "Organisation de formations annualisée"
 
 #, python-format
 msgid ""
-"Education group year %(acronym)s (%(academic_year)s) successfuly deleted."
-msgstr ""
-"Organisation de formations %(acronym)s (%(academic_year)s) supprimée avec "
-"succès."
-
-#, python-format
-msgid ""
 "Education group year <a href='%(link)s'> %(acronym)s (%(academic_year)s) </"
 "a> successfully created."
 msgstr ""
 "Organisation de formations <a href='%(link)s'> %(acronym)s "
 "(%(academic_year)s) </a> créée avec succès."
-
-#, python-format
-msgid ""
-"Education group year <a href='%(link)s'> %(acronym)s (%(academic_year)s) </"
-"a> successfuly updated."
-msgstr ""
-"Organisation de formations <a href='%(link)s'> %(acronym)s "
-"(%(academic_year)s) </a> mise à jour avec succès."
 
 msgid "Education_groups"
 msgstr "Formations"
@@ -1083,12 +1068,6 @@ msgstr "Complet"
 
 msgid "Full name"
 msgstr "Nom complet"
-
-msgid "Full title of the english version"
-msgstr "Libellé complet de la version en anglais"
-
-msgid "Full title of the french version"
-msgstr "Libellé complet de la version en français"
 
 msgid "Function"
 msgstr "Fonction"
@@ -2484,15 +2463,6 @@ msgid "The education group has been deleted."
 msgstr "La formation a été supprimée."
 
 #, python-format
-msgid "The end date must be greater or equals to the finality %(acronym)s"
-msgstr ""
-"La date de fin doit être plus grande ou égale à la finalité %(acronym)s"
-
-#, python-format
-msgid "The end date must be less or equals to the root %(acronym)s"
-msgstr "La date de fin doit être plus petite ou égale à la racine %(acronym)s"
-
-#, python-format
 msgid ""
 "The entity %(entity_acronym)s does not exist for the selected academic year "
 "%(academic_year)s"
@@ -2521,9 +2491,6 @@ msgstr "Les groupements suivants se sont terminés par une erreur"
 
 msgid "The following learning units ended with error"
 msgstr "Les unités d'enseignement suivantes se sont terminées par une erreur"
-
-msgid "The following links has been updated"
-msgstr "Les liens suivants ont été mis à jour"
 
 msgid "The format of the range date is not valid"
 msgstr "Le format de la plage de dates n'est pas valide"
@@ -2603,10 +2570,6 @@ msgstr ""
 
 msgid "The learning units"
 msgstr "Les unités d'enseignement"
-
-#, python-format
-msgid "The link of %(acronym)s has been updated"
-msgstr "Le lien de %(acronym)s a été mis à jour"
 
 #, python-format
 msgid ""
@@ -2791,9 +2754,6 @@ msgstr "Gestion des stages des étudiants."
 
 msgid "This process helps tutors while scores encoding."
 msgstr "Processus visant à aider les enseignants pour l'encodage des notes."
-
-msgid "This version exists until"
-msgstr "Cette version existe jusqu'en"
 
 msgid "Title"
 msgstr "Intitulé"

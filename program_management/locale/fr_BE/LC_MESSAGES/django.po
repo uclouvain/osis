@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-31 12:04+0200\n"
+"POT-Creation-Date: 2020-09-02 15:45+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -25,10 +25,6 @@ msgstr "\"%(child)s\" a été retiré de \"%(parent)s\""
 #, python-format
 msgid "\"%(child)s\" has been pasted into \"%(parent)s\""
 msgstr "\"%(child)s\" a été collé dans \"%(parent)s\""
-
-#, python-format
-msgid "%(node_to_add)s version must be the same as %(root_node)s version"
-msgstr "La version de %(node_to_add)s doit être la même que %(root_node)s."
 
 #, python-format
 msgid "%(start_index)s to %(end_index)s of %(total_counts)s learning units"
@@ -127,6 +123,11 @@ msgstr "Ent. attrib."
 
 msgid "Annual"
 msgstr "Annuel"
+
+#, python-format
+msgid "Are you sure you want to delete %(offer_acronym)s [%(version_name)s] ?"
+msgstr ""
+"Êtes-vous sûr·e de vouloir supprimer %(offer_acronym)s [%(version_name)s] ?"
 
 #, python-format
 msgid "Are you sure you want to detach %(acronym)s ?"
@@ -620,8 +621,11 @@ msgstr ""
 "%(learning_units)s"
 
 #, python-format
-msgid "The program %(title)s - %(academic_year)s will be published soon"
-msgstr "Le programme %(title)s - %(academic_year)s sera publié sous peu"
+msgid ""
+"The program tree version %(offer_acronym)s [%(version_name)s] has been "
+"deleted."
+msgstr ""
+"La version de programme %(offer_acronym)s [%(version_name)s] a été supprimé."
 
 msgid "The registration form is available at the Secretariat of"
 msgstr "Le formulaire d'inscription est disponible au Secrétariat de"
@@ -668,10 +672,6 @@ msgstr "Enseignant·e·s"
 
 msgid "Type"
 msgstr "Type"
-
-#, python-brace-format
-msgid "Unable to publish sections for {code} - {year}"
-msgstr "Impossible de publier les sections pour {code} - {year}"
 
 msgid "Utilizations"
 msgstr "Utilisations"
@@ -730,14 +730,6 @@ msgid ""
 msgstr ""
 "Vous ne pouvez pas copier la version de  programme '{acronym}' de "
 "{from_year} à {to_year} parce qu'elle finit en {end_year}"
-
-#, python-brace-format
-msgid ""
-"You can't delete the standard program tree '{code}' in {year} as specific "
-"versions exists during this year."
-msgstr ""
-"Vous ne pouvez pas supprimer le programme standard '{code}' en {year} parce "
-"qu'il existe une version particiulière durant cette année."
 
 #, python-format
 msgid ""
