@@ -120,7 +120,7 @@ class ProgramTreeRepository(interface.AbstractRepository):
             ).pk
             return load_tree.load(tree_root_id)
         except Element.DoesNotExist:
-            raise exception.ProgramTreeNotFoundException()
+            raise exception.ProgramTreeNotFoundException(code=entity_id.code, year=entity_id.year)
 
 
 def _delete_node_content(parent_node: 'Node', delete_node_service: interface.ApplicationService) -> None:

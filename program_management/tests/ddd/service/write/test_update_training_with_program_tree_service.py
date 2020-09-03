@@ -24,6 +24,7 @@
 import mock
 from django.test import TestCase
 
+from base.models.authorized_relationship import AuthorizedRelationshipList
 from education_group.ddd.domain import training, group
 from education_group.tests.ddd.factories.command.update_training_factory import UpdateTrainingCommandFactory
 from education_group.tests.ddd.factories.group import GroupFactory
@@ -41,6 +42,10 @@ from testing.mocks import MockPatcherMixin
 
 @mock.patch("education_group.ddd.domain.service.calculate_end_postponement."
             "CalculateEndPostponement.calculate_year_of_postponement", return_value=2021)
+@mock.patch(
+    'program_management.ddd.repositories.load_authorized_relationship.load',
+    return_value=AuthorizedRelationshipList([])
+)
 class TestUpdateAndReportTrainingWithProgramTree(MockPatcherMixin, TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -89,7 +94,7 @@ class TestUpdateAndReportTrainingWithProgramTree(MockPatcherMixin, TestCase):
             self.fake_program_tree_version_repository
         )
 
-    def test_should_return_training_identities(self, mock_postponement_end_year):
+    def test_should_return_training_identities(self, *mocks):
         result = update_training_with_program_tree_service.update_and_report_training_with_program_tree(self.cmd)
 
         expected_result = [
@@ -97,7 +102,7 @@ class TestUpdateAndReportTrainingWithProgramTree(MockPatcherMixin, TestCase):
         ]
         self.assertListEqual(expected_result, result)
 
-    def test_should_postpone_groups(self, mock_postponement_end_year):
+    def test_should_postpone_groups(self, *mocks):
         update_training_with_program_tree_service.update_and_report_training_with_program_tree(self.cmd)
 
         group_identities = [
@@ -111,7 +116,7 @@ class TestUpdateAndReportTrainingWithProgramTree(MockPatcherMixin, TestCase):
                 postponed_group = self.fake_group_repository.get(identity)
                 self.assertTrue(postponed_group.has_same_values_as(base_group))
 
-    def test_should_postpone_trainings(self, mock_postponement_end_year):
+    def test_should_postpone_trainings(self, *mocks):
         training_identities = update_training_with_program_tree_service.update_and_report_training_with_program_tree(
             self.cmd
         )
@@ -123,7 +128,7 @@ class TestUpdateAndReportTrainingWithProgramTree(MockPatcherMixin, TestCase):
                 postponed_training = self.fake_training_repository.get(identity)
                 self.assertTrue(postponed_training.has_same_values_as(base_training))
 
-    def test_should_postpone_program_tree(self, mock_postponement_end_year):
+    def test_should_postpone_program_tree(self, *mocks):
         update_training_with_program_tree_service.update_and_report_training_with_program_tree(self.cmd)
 
         program_tree_identities = [
@@ -134,7 +139,7 @@ class TestUpdateAndReportTrainingWithProgramTree(MockPatcherMixin, TestCase):
             with self.subTest(year=identity.year):
                 self.assertTrue(self.fake_program_tree_repository.get(identity))
 
-    def test_should_postpone_program_tree_version(self, mock_postponement_end_year):
+    def test_should_postpone_program_tree_version(self, *mocks):
         update_training_with_program_tree_service.update_and_report_training_with_program_tree(self.cmd)
 
         program_tree_version_identities = [
