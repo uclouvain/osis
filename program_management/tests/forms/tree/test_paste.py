@@ -229,7 +229,11 @@ class TestAttachNodeFormFields(SimpleTestCase):
 
     def test_attach_learning_unit_form_should_remove_access_condition_and_link_type_field(self):
         node_to_attach = NodeLearningUnitYearFactory()
-        form = program_management.forms.tree.paste.PasteLearningUnitForm("", node_to_attach.node_id, node_to_attach.node_type)
+        form = program_management.forms.tree.paste.PasteLearningUnitForm(
+            "",
+            node_to_attach.node_id,
+            node_to_attach.node_type
+        )
         actual_fields = form.fields
 
         self.assertNotIn("access_condition", actual_fields)
@@ -237,7 +241,11 @@ class TestAttachNodeFormFields(SimpleTestCase):
 
     def test_attach_to_minor_major_list_choice_should_remove_all_fields_but_access_condition(self):
         node_to_attach = NodeGroupYearFactory()
-        form = program_management.forms.tree.paste.PasteToMinorMajorOptionListChoiceForm("", node_to_attach.node_id, node_to_attach.node_type)
+        form = program_management.forms.tree.paste.PasteToMinorMajorOptionListChoiceForm(
+            "",
+            node_to_attach.node_id,
+            node_to_attach.node_type
+        )
         actual_fields = form.fields
         expected_fields = ["access_condition"]
 
@@ -245,7 +253,11 @@ class TestAttachNodeFormFields(SimpleTestCase):
 
     def test_attach_minor_major_list_choice_to_training_form_should_disable_all_fields_but_block(self):
         node_to_attach = NodeGroupYearFactory()
-        form = program_management.forms.tree.paste.PasteMinorMajorListChoiceToTrainingForm("", node_to_attach.node_id, node_to_attach.node_type)
+        form = program_management.forms.tree.paste.PasteMinorMajorListChoiceToTrainingForm(
+            "",
+            node_to_attach.node_id,
+            node_to_attach.node_type
+        )
 
         expected_fields_disabled = ["block"]
         actual_fields_disabled = [name for name, field in form.fields.items() if not field.disabled]
@@ -253,7 +265,11 @@ class TestAttachNodeFormFields(SimpleTestCase):
 
     def test_attach_not_authorized_children_should_remove_relative_credits_and_access_condition(self):
         node_to_attach = NodeGroupYearFactory()
-        form = program_management.forms.tree.paste.PasteNotAuthorizedChildren("", node_to_attach.node_id, node_to_attach.node_type)
+        form = program_management.forms.tree.paste.PasteNotAuthorizedChildren(
+            "",
+            node_to_attach.node_id,
+            node_to_attach.node_type
+        )
         actual_fields = form.fields
 
         self.assertNotIn("access_condition", actual_fields)
