@@ -20,6 +20,10 @@ from education_group.auth.scope import Scope
 from education_group.tests.factories.auth.faculty_manager import FacultyManagerFactory
 from education_group.tests.factories.group_year import GroupYearFactory
 from program_management.tests.factories.element import ElementFactory, ElementGroupYearFactory
+from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
+from program_management.tests.factories.education_group_version import EducationGroupVersionFactory, \
+    StandardEducationGroupVersionFactory
+from program_management.tests.factories.element import ElementFactory
 
 
 class TestUserAttachedToManagementEntity(TestCase):
@@ -447,4 +451,60 @@ class TestIsAllowedToCreateChildrenOfSpecificCategory(TestCase):
                 self.group_year,
                 education_group_categories.Categories.TRAINING.name
             )
+        )
+
+
+class TestIsElementOnlyInsideStandardProgram(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.group_year = GroupYearFactory(education_group_type__group=True)
+        ElementFactory(group_year=cls.group_year)
+
+        cls.user = UserFactory.build()
+
+    def setUp(self):
+        self.predicate_context_mock = mock.patch(
+            "rules.Predicate.context",
+            new_callable=mock.PropertyMock,
+            return_value={
+                'perm_name': 'dummy-perm'
+            }
+        )
+        self.predicate_context_mock.start()
+        self.addCleanup(self.predicate_context_mock.stop)
+
+    def test_should_return_true_when_element_is_not_inside_tree_versions(self):
+        self.assertTrue(
+            predicates.is_element_only_inside_standard_program(self.user, self.group_year)
+        )
+
+    @mock.patch("program_management.ddd.repositories.load_tree_version.load_tree_versions_from_children")
+    def test_should_return_true_when_all_trees_are_standard(self, mock_load_tree_versions):
+        mock_load_tree_versions.return_value = [ProgramTreeVersionFactory(entity_id__version_name="")]
+        self.assertTrue(
+            predicates.is_element_only_inside_standard_program(self.user, self.group_year)
+        )
+
+    @mock.patch("program_management.ddd.repositories.load_tree_version.load_tree_versions_from_children")
+    def test_should_return_false_when_a_tree_is_non_standard(self, mock_load_tree_versions):
+        mock_load_tree_versions.return_value = [
+            ProgramTreeVersionFactory(entity_id__version_name=""),
+            ProgramTreeVersionFactory(entity_id__version_name="NON_STANDARD")
+        ]
+        self.assertFalse(
+            predicates.is_element_only_inside_standard_program(self.user, self.group_year)
+        )
+
+    def test_should_return_false_when_element_is_a_tree_version_that_is_specific(self):
+        EducationGroupVersionFactory(root_group=self.group_year)
+
+        self.assertFalse(
+            predicates.is_element_only_inside_standard_program(self.user, self.group_year)
+        )
+
+    def test_should_return_true_when_element_is_a_tree_version_that_is_standard(self):
+        StandardEducationGroupVersionFactory(root_group=self.group_year)
+
+        self.assertTrue(
+            predicates.is_element_only_inside_standard_program(self.user, self.group_year)
         )

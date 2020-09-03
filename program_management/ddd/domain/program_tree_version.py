@@ -31,7 +31,7 @@ from program_management.ddd.business_types import *
 from program_management.ddd.command import CreateProgramTreeVersionCommand
 from program_management.ddd.command import CreateStandardVersionCommand
 from program_management.ddd.domain import exception
-from program_management.ddd.domain.program_tree import ProgramTreeIdentity, ProgramTree
+from program_management.ddd.domain import program_tree
 from program_management.ddd.validators import validators_by_business_action
 from program_management.ddd.validators.validators_by_business_action import CreateProgramTreeVersionValidatorList
 
@@ -90,7 +90,7 @@ class ProgramTreeVersionBuilder:
             version_name=STANDARD,
             is_transition=False,
         )
-        tree_identity = ProgramTreeIdentity(code=cmd.code, year=cmd.year)
+        tree_identity = program_tree.ProgramTreeIdentity(code=cmd.code, year=cmd.year)
         return ProgramTreeVersion(
             entity_identity=tree_version_identity,
             entity_id=tree_version_identity,
@@ -106,7 +106,11 @@ class ProgramTreeVersionBuilder:
             new_tree_identity: 'ProgramTreeIdentity',
             command: 'CreateProgramTreeVersionCommand',
     ) -> 'ProgramTreeVersion':
-        validator = CreateProgramTreeVersionValidatorList(command.year, command.offer_acronym, command.version_name)
+        validator = validators_by_business_action.CreateProgramTreeVersionValidatorList(
+            command.year,
+            command.offer_acronym,
+            command.version_name
+        )
         if validator.is_valid():
             assert isinstance(from_standard_version, ProgramTreeVersion)
             assert from_standard_version.is_standard, "Forbidden to copy from a non Standard version"
@@ -166,12 +170,12 @@ class UpdateProgramTreeVersiongData:
 class ProgramTreeVersion(interface.RootEntity):
 
     entity_identity = entity_id = attr.ib(type=ProgramTreeVersionIdentity)
-    program_tree_identity = attr.ib(type=ProgramTreeIdentity)
+    program_tree_identity = attr.ib(type='ProgramTreeIdentity')
     program_tree_repository = attr.ib(type=interface.AbstractRepository)
     version_name = attr.ib(type=str)
     title_fr = attr.ib(type=str, default=None)
     title_en = attr.ib(type=str, default=None)
-    tree = attr.ib(type=ProgramTree, default=None)
+    tree = attr.ib(type='ProgramTree', default=None)
     end_year_of_existence = attr.ib(type=int, default=None)
 
     def get_tree(self) -> 'ProgramTree':
@@ -192,7 +196,7 @@ class ProgramTreeVersion(interface.RootEntity):
         return self.entity_id.version_name
 
     @property
-    def is_standard_version(self):
+    def is_standard_version(self) -> bool:
         return self.entity_id.version_name == STANDARD and not self.entity_id.is_transition
 
     @property

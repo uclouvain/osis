@@ -819,6 +819,12 @@ msgstr ""
 "Vous ne pouvez pas supprimer/modifier une formation existant avant "
 "%(limit_year)s"
 
+msgid ""
+"You must create the version of the concerned training and then attach that "
+"version inside this version"
+msgstr "Il faut créer la version correspondante dans la formation concernée et "
+"puis ajouter cette version dans cette formation"
+
 msgid "You should precise at least minimum or maximum constraint"
 msgstr "Vous devez préciser au moins la contrainte minimum ou maximum"
 

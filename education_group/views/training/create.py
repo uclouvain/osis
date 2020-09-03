@@ -1,4 +1,4 @@
-from typing import List, Dict, Union
+from typing import List, Dict, Union, Optional
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
@@ -20,7 +20,9 @@ from education_group.ddd.domain.exception import ContentConstraintTypeMissing, \
     ContentConstraintMinimumMaximumMissing, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum, \
     AcronymAlreadyExist, StartYearGreaterThanEndYear, MaximumCertificateAimType2Reached, CodeAlreadyExistException
 from education_group.ddd.domain.training import TrainingIdentity
+from education_group.ddd.service.read import get_group_service
 from education_group.forms.training import CreateTrainingForm
+from education_group.models.group_year import GroupYear
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from education_group.views.proxy.read import Tab
 from osis_role.contrib.views import PermissionRequiredMixin
@@ -29,6 +31,7 @@ from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.program_tree import Path
 from program_management.ddd.domain.service.element_id_search import ElementIdSearch
 from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
+from program_management.ddd.service.read import node_identity_service
 from program_management.ddd.service.write import create_and_attach_training_service
 from program_management.ddd.service.write.create_training_with_program_tree import \
     create_and_report_training_with_program_tree
@@ -77,10 +80,16 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
     def _get_initial_form(self) -> Dict:
         request_cache = RequestCache(self.request.user, reverse('version_program'))
+        default_management_entity = None
         if self.get_attach_path():
             default_academic_year = AcademicYear.objects.get(
                 year=self.parent_node_identity.year
             ).year
+            parent_identity = self.get_parent_identity()
+            domain_obj = get_group_service.get_group(
+                command.GetGroupCommand(code=parent_identity.code, year=parent_identity.year)
+            )
+            default_management_entity = domain_obj.management_entity.acronym
         elif request_cache.get_value_cached('academic_year'):
             default_academic_year = AcademicYear.objects.get(
                 id=request_cache.get_value_cached('academic_year')[0]
@@ -88,8 +97,18 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         else:
             default_academic_year = starting_academic_year()
         return {
-            'academic_year': default_academic_year
+            'academic_year': default_academic_year,
+            'management_entity': default_management_entity
         }
+
+    def get_parent_identity(self) -> Optional['NodeIdentity']:
+        if self.get_attach_path():
+            cmd_get_node_id = program_management_command.GetNodeIdentityFromElementId(
+                int(self.get_attach_path().split('|')[-1])
+            )
+            parent_id = node_identity_service.get_node_identity_from_element_id(cmd_get_node_id)
+            return parent_id
+        return None
 
     def post(self, request, *args, **kwargs):
         training_form = CreateTrainingForm(
@@ -196,16 +215,14 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
     def get_attach_path(self) -> Union[Path, None]:
         return self.request.GET.get('path_to') or None
 
-    def get_permission_object(self) -> Union[EducationGroupYear, None]:
-        qs = EducationGroupYear.objects.select_related('academic_year', 'management_entity')
+    def get_permission_object(self) -> Optional[GroupYear]:
+        qs = GroupYear.objects.select_related('academic_year', 'management_entity')
         path = self.get_attach_path()
         if path:
             # Take parent from path (latest element)
             # Ex:  path: 4456|565|5656
             parent_id = path.split("|")[-1]
-            qs = qs.filter(
-                educationgroupversion__root_group__element__id=parent_id,
-            )
+            qs = qs.filter(element__id=parent_id,)
         else:
             qs = qs.filter(
                 partial_acronym=self.request.POST.get('code'),
@@ -213,7 +230,7 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             )
         try:
             return qs.get()
-        except EducationGroupYear.DoesNotExist:
+        except GroupYear.DoesNotExist:
             return None
 
 

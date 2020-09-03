@@ -734,6 +734,14 @@ msgstr ""
 "Vous ne pouvez pas copier la version de  programme '{acronym}' de "
 "{from_year} à {to_year} parce qu'elle finit en {end_year}"
 
+#, python-brace-format
+msgid ""
+"You can't delete the standard program tree '{code}' in {year} as specific "
+"versions exists during this year."
+msgstr ""
+"Vous ne pouvez pas supprimer le programme standard '{code}' en {year} parce "
+"qu'il existe une version particiulière durant cette année."
+
 #, python-format
 msgid ""
 "You cannot add \"%(child)s\" of type \"%(child_types)s\" to \"%(parent)s\" "
