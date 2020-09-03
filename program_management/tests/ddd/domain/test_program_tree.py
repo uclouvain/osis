@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import inspect
+from copy import copy
 from unittest import mock
 from unittest.mock import patch
 
@@ -71,6 +72,9 @@ class TestProgramTreeBuilderCopyToNextYear(SimpleTestCase):
             authorized_relationships=self.authorized_relations_list,
             root_node__node_type=self.authorized_relation.parent_type,
         )
+        self.copy_from_program_tree.root_node.add_child(
+            NodeGroupYearFactory(node_type=self.authorized_relation.child_type)
+        )
         self.mock_repository = mock.create_autospec(ProgramTreeRepository)
 
     @mock.patch.object(GenerateNodeCode, 'generate_from_parent_node')
@@ -93,10 +97,41 @@ class TestProgramTreeBuilderCopyToNextYear(SimpleTestCase):
         self.assertEqual(expected_identity, resulted_tree.entity_id)
         self._assert_mandatory_children_are_created(resulted_tree)
 
+    @mock.patch.object(GenerateNodeCode, 'generate_from_parent_node')
+    @mock.patch.object(GenerateNodeAbbreviatedTitle, 'generate')
+    @mock.patch.object(FieldValidationRule, 'get')
+    @mock.patch('program_management.ddd.repositories.load_authorized_relationship.load')
+    def test_should_not_create_mandatory_children_if_previous_year_does_not(self, mock_relationships, *mocks):
+        """If the program tree from previous year is inconsistent, it's not the responsibility of the application code
+        to fix these dirty data. To fix this, we need to create script to fix the dirty data and fix the business code
+        in charge of creating program trees."""
+        mock_relationships.return_value = self.authorized_relations_list
+        self.mock_repository.get.side_effect = exception.ProgramTreeNotFoundException
+        inconsistent_program_tree = ProgramTreeFactory(
+            root_node__children=[],
+            authorized_relationships=self.authorized_relations_list
+        )
+        self.mock_repository.update(inconsistent_program_tree)
+        resulted_tree = program_tree.ProgramTreeBuilder().copy_to_next_year(
+            inconsistent_program_tree,
+            self.mock_repository
+        )
+
+        expected_identity = program_tree.ProgramTreeIdentity(
+            code=inconsistent_program_tree.entity_id.code,
+            year=inconsistent_program_tree.entity_id.year+1
+        )
+        self.assertEqual(expected_identity, resulted_tree.entity_id)
+        self._assert_mandatory_children_are_not_created(resulted_tree)
+
     def _assert_mandatory_children_are_created(self, resulted_tree):
         children = resulted_tree.root_node.children_as_nodes
         self.assertTrue(len(children) == 1)
         self.assertEqual(self.authorized_relation.child_type, children[0].node_type)
+
+    def _assert_mandatory_children_are_not_created(self, resulted_tree):
+        children = resulted_tree.root_node.children_as_nodes
+        self.assertTrue(len(children) == 0)
 
     @mock.patch.object(GenerateNodeCode, 'generate_from_parent_node')
     @mock.patch.object(GenerateNodeAbbreviatedTitle, 'generate')

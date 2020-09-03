@@ -135,7 +135,7 @@ class ProgramTreeBuilder:
             child_current_year = next((c for c in children_current_year if c.node_type == child_type), None)
             if child_current_year:
                 child_next_year = node_factory.copy_to_next_year(child_current_year)
-            root_next_year.add_child(child_next_year, is_mandatory=True)
+                root_next_year.add_child(child_next_year, is_mandatory=True)
 
         return program_tree_next_year
 
