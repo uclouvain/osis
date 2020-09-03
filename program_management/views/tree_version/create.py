@@ -25,13 +25,13 @@
 ##############################################################################
 from typing import List
 
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.base import View
 
-from program_management.forms.version import SpecificVersionForm
 from base.models.education_group_year import EducationGroupYear
 from base.models.utils.utils import ChoiceEnum
 from base.views.common import display_success_messages
@@ -49,6 +49,7 @@ from program_management.ddd.domain.service.identity_search import NodeIdentitySe
 from program_management.ddd.service.write import create_and_postpone_tree_version_service, \
     extend_existing_tree_version_service, update_program_tree_version_service, \
     postpone_tree_version_service
+from program_management.forms.version import SpecificVersionForm
 
 
 class CreateProgramTreeVersionType(ChoiceEnum):
@@ -102,7 +103,7 @@ class CreateProgramTreeVersion(AjaxPermissionRequiredMixin, AjaxTemplateMixin, V
             if save_type == CreateProgramTreeVersionType.NEW_VERSION.value:
                 try:
                     identities = create_and_postpone_tree_version_service.create_and_postpone(command=command)
-                except exception.VersionNameAlreadyExist as e:
+                except (exception.VersionNameAlreadyExist, exception.MultipleEntitiesFoundException) as e:
                     form.add_error('version_name', e.message)
             elif save_type == CreateProgramTreeVersionType.EXTEND.value:
                 identities = extend_existing_tree_version_service.extend_existing_past_version(
@@ -117,7 +118,14 @@ class CreateProgramTreeVersion(AjaxPermissionRequiredMixin, AjaxTemplateMixin, V
 
             if not form.errors:
                 self._display_success_messages(identities)
-
+                node_identity = NodeIdentitySearch().get_from_tree_version_identity(identities[0])
+                url = reverse(
+                    "element_identification",
+                    kwargs={'year': self.node_identity.year, 'code': node_identity.code}
+                )
+                return JsonResponse({
+                    'success_url': url
+                })
         return render(request, self.template_name, self.get_context_data(form))
 
     def _call_rule(self, rule):
@@ -130,7 +138,7 @@ class CreateProgramTreeVersion(AjaxPermissionRequiredMixin, AjaxTemplateMixin, V
             'form': form,
         }
 
-    def get_success_url(self, created_version_id: 'ProgramTreeVersionIdentity'):
+    def get_url_program_version(self, created_version_id: 'ProgramTreeVersionIdentity'):
         node_identity = NodeIdentitySearch().get_from_tree_version_identity(created_version_id)
         return reverse(
             "element_identification",
@@ -148,7 +156,7 @@ class CreateProgramTreeVersion(AjaxPermissionRequiredMixin, AjaxTemplateMixin, V
                     "Specific version for education group year "
                     "<a href='%(link)s'> %(offer_acronym)s[%(acronym)s] (%(academic_year)s) </a> successfully created."
                 ) % {
-                    "link": self.get_success_url(created_identity),
+                    "link": self.get_url_program_version(created_identity),
                     "offer_acronym": created_identity.offer_acronym,
                     "acronym": created_identity.version_name,
                     "academic_year": display_as_academic_year(created_identity.year)

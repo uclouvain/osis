@@ -79,6 +79,7 @@
                 </li>
             {% endif %}
             {% if create_version_url %}
+                <li class="divider"></li>
                 <li>
                     {% a_tag_modal_has_perm create_version_url _('Create specific version') 'base.add_programtreeversion' user education_group_version.offer %}
                 </li>
