@@ -35,6 +35,7 @@ from base.utils.cache import RequestCache
 from base.utils.urls import reverse_with_get
 from base.views.common import display_success_messages, display_error_messages
 from education_group.ddd import command
+from education_group.ddd.business_types import *
 from education_group.ddd.domain import mini_training, exception
 from education_group.ddd.service.read import get_group_service
 from education_group.forms import mini_training as mini_training_form
@@ -43,7 +44,6 @@ from education_group.views.proxy.read import Tab
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command as command_pgrm
 from program_management.ddd.business_types import *
-from program_management.ddd.domain.service.element_id_search import ElementIdSearch
 from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
 from program_management.ddd.service.read import node_identity_service
 from program_management.ddd.service.write import create_and_attach_mini_training_service, \
@@ -113,6 +113,7 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
         context["mini_training_form"] = context["form"]
         context["tabs"] = self.get_tabs()
         context["cancel_url"] = self.get_cancel_url()
+        context["parent_group"] = self.get_parent_group()
         return context
 
     def get_attach_path(self) -> Optional['Path']:
@@ -168,44 +169,41 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
         ]
 
     def get_cancel_url(self) -> str:
-        if self.get_attach_path():
-            parent_identity = self.get_parent_identity()
+        parent_group = self.get_parent_group()
+        if parent_group:
             return reverse(
                 'element_identification',
-                kwargs={'code': parent_identity.code, 'year': parent_identity.year}
+                kwargs={'code': parent_group.code, 'year': parent_group.year}
             ) + "?path={}".format(self.get_attach_path())
         return reverse('version_program')
 
     def get_initial(self) -> Dict:
+        return {
+            'academic_year': self._get_initial_academic_year_for_form(),
+            'management_entity': self._get_initial_management_entity_for_form()
+        }
+
+    def _get_initial_academic_year_for_form(self):
         request_cache = RequestCache(self.request.user, reverse('version_program'))
         academic_year_cached_value = request_cache.get_value_cached('academic_year')
         if academic_year_cached_value:
             default_academic_year = AcademicYear.objects.get(id=academic_year_cached_value[0]).year
         else:
             default_academic_year = starting_academic_year()
+        return default_academic_year
 
-        default_management_entity = None
+    def _get_initial_management_entity_for_form(self):
+        return self.get_parent_group() and self.get_parent_group().management_entity.acronym
 
-        parent_identity = self.get_parent_identity()
-        if parent_identity:
-            default_academic_year = parent_identity.year
-            domain_obj = get_group_service.get_group(
-                command.GetGroupCommand(code=parent_identity.code, year=parent_identity.year)
-            )
-            default_management_entity = domain_obj.management_entity.acronym
-
-        return {
-            'academic_year': default_academic_year,
-            'management_entity': default_management_entity
-        }
-
-    def get_parent_identity(self) -> Optional['NodeIdentity']:
+    def get_parent_group(self) -> Optional['Group']:
         if self.get_attach_path():
             cmd_get_node_id = command_pgrm.GetNodeIdentityFromElementId(
                 int(self.get_attach_path().split('|')[-1])
             )
             parent_id = node_identity_service.get_node_identity_from_element_id(cmd_get_node_id)
-            return parent_id
+            return get_group_service.get_group(
+                command.GetGroupCommand(code=parent_id.code, year=parent_id.year)
+            )
         return None
 
     def _generate_create_command_from_valid_form(
