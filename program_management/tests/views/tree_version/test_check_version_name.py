@@ -90,7 +90,7 @@ class TestCheckVersionName(TestCase):
                 "existed_version_name": False,
                 "existing_version_name": True,
                 "last_using": None,
-                "valid": False,
+                "valid": True,
                 "version_name": self.education_group_version_db_object.version_name
             }
         )
@@ -111,7 +111,7 @@ class TestCheckVersionName(TestCase):
                 "existed_version_name": True,
                 "existing_version_name": False,
                 "last_using": display_as_academic_year(self.year),
-                "valid": False,
+                "valid": True,
                 "version_name": self.education_group_version_db_object.version_name
             }
         )
