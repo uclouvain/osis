@@ -141,7 +141,7 @@ class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageM
         return {
             'credits': obj.credits,
             'code': obj.code,
-            'relative_credits': "%d" % (obj.credits)
+            'relative_credits': "%d" % (obj.credits or 0)
         }
 
     def _format_title_with_version(self, nodes_by_id):
