@@ -133,8 +133,6 @@ class ProgramTreeBuilder:
             if child_current_year.node_type in mandatory_types:
                 child_next_year = node_factory.copy_to_next_year(child_current_year)
                 root_next_year.add_child(child_next_year, is_mandatory=True)
-        if not program_tree_next_year.root_node.children:
-            print()
         return program_tree_next_year
 
     # Do not delete : will be usefull to copy content of a program tree to next year
