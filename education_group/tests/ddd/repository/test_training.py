@@ -88,7 +88,6 @@ class TestTrainingRepositoryCreateMethod(TestCase):
             isced_domain__entity_id=IscedDomainIdentityFactory(code=cls.isced_domain.code),
             management_entity__acronym=cls.entity_version.acronym,
             administration_entity__acronym=cls.entity_version.acronym,
-            teaching_campus=campus_identity,
             enrollment_campus=campus_identity,
             secondary_domains=[
                 StudyDomainFactory(entity_id=study_domain_identity)
@@ -182,10 +181,6 @@ class TestTrainingRepositoryUpdateMethod(TestCase):
             isced_domain__entity_id__code=self.isced_domain.code,
             management_entity=self.training.management_entity,
             administration_entity=self.training.administration_entity,
-            teaching_campus=CampusIdentityFactory(
-                name=self.campus.name,
-                university_name=self.campus.organization.name
-            ),
             enrollment_campus=CampusIdentityFactory(
                 name=self.campus.name,
                 university_name=self.campus.organization.name
@@ -297,7 +292,6 @@ def assert_training_model_equals_training_domain(
     test_instance.assertEqual(education_group_year.internal_comment, training_domain_obj.internal_comment)
     test_instance.assertEqual(education_group_year.main_domain.code, training_domain_obj.main_domain.entity_id.code)
     test_instance.assertEqual(education_group_year.isced_domain.code, training_domain_obj.isced_domain.entity_id.code)
-    test_instance.assertEqual(education_group_year.main_teaching_campus.name, training_domain_obj.teaching_campus.name)
     test_instance.assertEqual(education_group_year.enrollment_campus.name, training_domain_obj.enrollment_campus.name)
     test_instance.assertEqual(
         education_group_year.other_campus_activities,
