@@ -129,11 +129,8 @@ class ProgramTreeBuilder:
             parent_node=root_next_year
         )
         children_current_year = set(copy_from.root_node.get_direct_children_as_nodes())
-        existing_next_year_children_types = set(root_next_year.get_children_types())
-        missing_mandatory_types = [t for t in mandatory_types if t not in existing_next_year_children_types]
-        for child_type in missing_mandatory_types:
-            child_current_year = next((c for c in children_current_year if c.node_type == child_type), None)
-            if child_current_year:
+        for child_current_year in children_current_year:
+            if child_current_year.node_type in mandatory_types:
                 child_next_year = node_factory.copy_to_next_year(child_current_year)
                 root_next_year.add_child(child_next_year, is_mandatory=True)
 
