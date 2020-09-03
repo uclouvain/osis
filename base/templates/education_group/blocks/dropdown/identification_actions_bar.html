@@ -40,7 +40,7 @@
             {% endif %}
             {% if create_training_url %}
                 <li>
-                    {% a_tag_modal_has_perm create_training_url _('New Training') 'base.add_training' user %}
+                    {% a_tag_modal_has_perm create_training_url _('New Training') 'base.add_training' user group_year %}
                 </li>
             {% endif %}
             {% if create_mini_training_url %}

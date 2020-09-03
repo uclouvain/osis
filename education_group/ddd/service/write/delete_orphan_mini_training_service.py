@@ -28,7 +28,7 @@ from education_group.ddd.validators.validators_by_business_action import DeleteO
 
 
 def delete_orphan_mini_training(cmd: command.DeleteOrphanMiniTrainingCommand) -> 'mini_training.MiniTrainingIdentity':
-    mini_training_identity = mini_training.MiniTrainingIdentity(acronym=cmd.acronym, year=cmd.year)
+    mini_training_identity = mini_training.MiniTrainingIdentity(acronym=cmd.abbreviated_title, year=cmd.year)
     mini_training_to_delete = mini_training_repository.MiniTrainingRepository.get(mini_training_identity)
 
     DeleteOrphanMiniTrainingValidatorList(mini_training_to_delete).validate()

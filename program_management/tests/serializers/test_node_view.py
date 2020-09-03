@@ -43,7 +43,7 @@ from program_management.tests.ddd.factories.program_tree import ProgramTreeFacto
 from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
 from base.models.enums.education_group_types import TrainingType
 from program_management.ddd.domain.node import NodeIdentity
-from program_management.forms.education_groups import PARTICULAR
+
 
 class TestNodeViewSerializer(SimpleTestCase):
     def setUp(self):
@@ -91,12 +91,6 @@ class TestNodeViewAttributeSerializer(SimpleTestCase):
     def test_serialize_node_attr_ensure_paste_url(self):
         expected_url = reverse_with_get('tree_paste_node', get={"path": "1|2|6"})
         self.assertEqual(self.serialized_data['paste_url'], expected_url)
-
-    def test_serialize_node_attr_ensure_modify_url(self):
-        expected_url = reverse('group_element_year_update', args=[
-            self.root_node.pk, self.node_child.pk, self.link.pk
-        ])
-        self.assertEqual(self.serialized_data['modify_url'], expected_url)
 
     def test_serializer_node_attr_ensure_search_url(self):
         expected_url = reverse_with_get(

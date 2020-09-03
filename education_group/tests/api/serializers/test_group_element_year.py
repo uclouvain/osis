@@ -256,9 +256,6 @@ class EducationGroupRootNodeTreeSerializerTestCase(SimpleTestCase):
         self.assertTrue(serializer.data['children'][0]['with_prerequisite'])
 
     def test_get_appropriate_credits_for_luy(self):
-        self.assertEqual(self.serializer.data['children'][0]['children'][0]['credits'],
-                         self.luy_gey.relative_credits or self.luy_gey.child_leaf.credits)
-
         luy = NodeLearningUnitYearFactory(year=self.year)
         gey = LinkFactory(
             parent__node_type=GroupType.COMMON_CORE,

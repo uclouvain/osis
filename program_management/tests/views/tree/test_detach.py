@@ -49,8 +49,10 @@ class TestDetachNodeView(TestCase):
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(current=True)
         element = ElementGroupYearFactory(group_year__academic_year=cls.academic_year)
-        cls.group_element_year = GroupElementYearFactory(parent_element=element,
-                                                         child_element__group_year__academic_year=cls.academic_year)
+        cls.group_element_year = GroupElementYearFactory(
+            parent_element=element,
+            child_element__group_year__academic_year=cls.academic_year
+        )
         cls.person = CentralManagerFactory(entity=element.group_year.management_entity).person
         cls.path_to_detach = '|'.join([
             str(cls.group_element_year.parent_element_id),
@@ -102,10 +104,10 @@ class TestDetachNodeView(TestCase):
     @mock.patch("program_management.ddd.service.write.detach_node_service.detach_node")
     def test_detach_case_post_success(self, mock_service):
         mock_service.return_value = link.LinkIdentity(
-            parent_code=self.group_element_year.parent.partial_acronym,
-            child_code=self.group_element_year.child_branch.partial_acronym,
-            parent_year=self.group_element_year.parent.academic_year.year,
-            child_year=self.group_element_year.child_branch.academic_year.year
+            parent_code=self.group_element_year.parent_element.group_year.partial_acronym,
+            child_code=self.group_element_year.child_element.group_year.partial_acronym,
+            parent_year=self.group_element_year.parent_element.group_year.academic_year.year,
+            child_year=self.group_element_year.child_element.group_year.academic_year.year
         )
 
         response = self.client.post(
@@ -123,14 +125,14 @@ class TestDetachNodeView(TestCase):
     @mock.patch("program_management.ddd.service.write.detach_node_service.detach_node")
     def test_detach_when_element_is_in_clipboard(self, mock_service):
         mock_service.return_value = link.LinkIdentity(
-            parent_code=self.group_element_year.parent.partial_acronym,
-            child_code=self.group_element_year.child_branch.partial_acronym,
-            parent_year=self.group_element_year.parent.academic_year.year,
-            child_year=self.group_element_year.child_branch.academic_year.year
+            parent_code=self.group_element_year.parent_element.group_year.partial_acronym,
+            child_code=self.group_element_year.child_element.group_year.partial_acronym,
+            parent_year=self.group_element_year.parent_element.group_year.academic_year.year,
+            child_year=self.group_element_year.child_element.group_year.academic_year.year
         )
         ElementCache(self.person.user).save_element_selected(
-            element_code=self.group_element_year.child_branch.partial_acronym,
-            element_year=self.group_element_year.child_branch.academic_year.year
+            element_code=self.group_element_year.child_element.group_year.partial_acronym,
+            element_year=self.group_element_year.child_element.group_year.academic_year.year
         )
         self.client.post(
             self.url, follow=True, HTTP_X_REQUESTED_WITH='XMLHttpRequest', data={'path': self.path_to_detach}
