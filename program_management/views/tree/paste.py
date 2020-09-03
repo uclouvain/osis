@@ -45,7 +45,6 @@ from education_group.models.group_year import GroupYear
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd.domain import node
 from program_management.ddd.domain.node import NodeGroupYear
-from program_management.ddd.domain import node
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories import node as node_repository
@@ -120,15 +119,13 @@ class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageM
         self._format_title_with_version(context_data["nodes_by_id"])
 
         for form in context_data["formset"].forms:
-            initial = context_data["nodes_by_id"][form.node_code]
-            form.initial = {
-                'credits': initial.credits,
-                'code': initial.code,
-                'relative_credits': "%d" % (initial.credits)
-            }
-            form.is_group_year_form = isinstance(initial, NodeGroupYear)
+            node_elem = context_data["nodes_by_id"][form.node_code]
+            form.initial = self._get_initial_form_kwargs(node_elem)
+            form.is_group_year_form = isinstance(node_elem, NodeGroupYear)
+
         if len(context_data["formset"]) > 0:
             context_data['is_group_year_formset'] = context_data["formset"][0].is_group_year_form
+
         if not self.nodes_to_paste:
             display_warning_messages(self.request, _("Please cut or copy an item before paste"))
 
@@ -139,6 +136,13 @@ class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageM
             display_error_messages(self.request, error_messages)
 
         return context_data
+
+    def _get_initial_form_kwargs(self, obj):
+        return {
+            'credits': obj.credits,
+            'code': obj.code,
+            'relative_credits': "%d" % (obj.credits)
+        }
 
     def _format_title_with_version(self, nodes_by_id):
         for ele in self.nodes_to_paste:
