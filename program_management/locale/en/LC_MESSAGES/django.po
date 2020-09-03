@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-02 15:45+0200\n"
+"POT-Creation-Date: 2020-09-03 11:16+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,10 +20,13 @@ msgstr ""
 msgid "\"%(child)s\" has been detached from \"%(parent)s\""
 msgstr "\"%(child)s\" has been removed from \"%(parent)s\""
 
-#, fuzzy, python-format
-#| msgid "\"%(child)s\" has been detached from \"%(parent)s\""
+#, python-format
 msgid "\"%(child)s\" has been pasted into \"%(parent)s\""
-msgstr "\"%(child)s\" has been removed from \"%(parent)s\""
+msgstr ""
+
+#, python-format
+msgid "%(node_to_add)s version must be the same as %(root_node)s version"
+msgstr ""
 
 #, python-format
 msgid "%(start_index)s to %(end_index)s of %(total_counts)s learning units"
@@ -108,11 +111,6 @@ msgstr ""
 
 msgid "Annual"
 msgstr ""
-
-#, fuzzy, python-format
-#| msgid "Are you sure you want to detach %(acronym)s ?"
-msgid "Are you sure you want to delete %(offer_acronym)s [%(version_name)s] ?"
-msgstr "Are you sure you want to remove %(acronym)s ?"
 
 #, python-format
 msgid "Are you sure you want to detach %(acronym)s ?"
@@ -450,6 +448,10 @@ msgstr ""
 msgid "Produce xls with a list of trainings"
 msgstr ""
 
+#, python-brace-format
+msgid "Program tree not found : {code} {year}"
+msgstr ""
+
 msgid "Prolong"
 msgstr ""
 
@@ -490,6 +492,9 @@ msgid "Save"
 msgstr ""
 
 msgid "Search"
+msgstr ""
+
+msgid "Select a language"
 msgstr ""
 
 msgid "Session derogation"
@@ -552,16 +557,6 @@ msgid "The learning unit is a prerequisite"
 msgstr ""
 
 #, python-format
-msgid "The link of %(acronym)s has been updated"
-msgstr ""
-
-#, python-format
-msgid ""
-"The number of children of type(s) \"%(child_types)s\" for \"%(parent)s\" has "
-"already reached the limit."
-msgstr ""
-
-#, python-format
 msgid "The parent must have at least one child of type(s) \"%(types)s\"."
 msgstr ""
 
@@ -578,9 +573,7 @@ msgid ""
 msgstr ""
 
 #, python-format
-msgid ""
-"The program tree version %(offer_acronym)s [%(version_name)s] has been "
-"deleted."
+msgid "The program %(title)s - %(academic_year)s will be published soon"
 msgstr ""
 
 msgid "The registration form is available at the Secretariat of"
@@ -625,6 +618,10 @@ msgid "Tutors"
 msgstr ""
 
 msgid "Type"
+msgstr ""
+
+#, python-brace-format
+msgid "Unable to publish sections for {code} - {year}"
 msgstr ""
 
 msgid "Utilizations"
@@ -676,16 +673,16 @@ msgid ""
 "{to_year} because it ends in {end_year}"
 msgstr ""
 
-#, python-format
+#, python-brace-format
 msgid ""
-"You cannot add \"%(child)s\" of type \"%(child_types)s\" to \"%(parent)s\" "
-"of type \"%(parent_type)s\""
+"You can't delete the standard program tree '{code}' in {year} as specific "
+"versions exists during this year."
 msgstr ""
 
 #, python-format
 msgid ""
-"You cannot add \"%(child_types)s\" to \"%(parent)s\" (type \"%(parent_type)s"
-"\")"
+"You cannot add \"%(child)s\" of type \"%(child_types)s\" to \"%(parent)s\" "
+"of type \"%(parent_type)s\""
 msgstr ""
 
 #, python-format
@@ -762,6 +759,3 @@ msgstr ""
 
 msgid "yes,no"
 msgstr ""
-
-#~ msgid "Cannot detach due to prerequisites."
-#~ msgstr "Cannot remove link due to prerequisites."

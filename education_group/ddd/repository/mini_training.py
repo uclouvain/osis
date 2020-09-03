@@ -57,18 +57,12 @@ class MiniTrainingRepository(interface.AbstractRepository):
             management_entity = EntityVersionModelDb.objects.current(timezone.now()).only('entity_id').get(
                 acronym=mini_training_obj.management_entity.acronym,
             )
-            teaching_campus = CampusModelDb.objects.only('id').get(
-                name=mini_training_obj.teaching_campus.name,
-                organization__name=mini_training_obj.teaching_campus.university_name
-            )
         except AcademicYearModelDb.DoesNotExist:
             raise exception.AcademicYearNotFound
         except EducationGroupTypeModelDb.DoesNotExist:
             raise exception.TypeNotFound
         except EntityVersionModelDb.DoesNotExist:
             raise exception.ManagementEntityNotFound
-        except CampusModelDb.DoesNotExist:
-            raise exception.TeachingCampusNotFound
 
         try:
             try:
@@ -92,7 +86,6 @@ class MiniTrainingRepository(interface.AbstractRepository):
                 title_english=mini_training_obj.titles.title_en,
                 credits=mini_training_obj.credits,
                 management_entity_id=management_entity.entity_id,
-                main_teaching_campus=teaching_campus,
                 schedule_type=mini_training_obj.schedule_type.name,
                 active=mini_training_obj.status.name,
                 keywords=mini_training_obj.keywords
@@ -124,7 +117,6 @@ class MiniTrainingRepository(interface.AbstractRepository):
                 "education_group__start_year",
                 "education_group__end_year",
                 "education_group_type",
-                "main_teaching_campus__organization"
             ).prefetch_related(
                 Prefetch(
                     'management_entity',
@@ -156,10 +148,6 @@ class MiniTrainingRepository(interface.AbstractRepository):
             credits=education_group_year_db.credits,
             management_entity=EntityValueObject(
                 acronym=education_group_year_db.management_entity.most_recent_acronym,
-            ),
-            teaching_campus=Campus(
-                name=education_group_year_db.main_teaching_campus.name,
-                university_name=education_group_year_db.main_teaching_campus.organization.name,
             ),
             start_year=education_group_year_db.education_group.start_year.year,
             end_year=education_group_year_db.education_group.end_year.year
@@ -205,10 +193,6 @@ def _update_education_group_year(mini_training_obj: 'mini_training.MiniTraining'
     management_entity = EntityVersionModelDb.objects.current(timezone.now()).only('entity_id').get(
         acronym=mini_training_obj.management_entity.acronym,
     )
-    teaching_campus = CampusModelDb.objects.only('id').get(
-        name=mini_training_obj.teaching_campus.name,
-        organization__name=mini_training_obj.teaching_campus.university_name
-    )
     education_group_year_db_obj = EducationGroupYearModelDb.objects.get(
         acronym=mini_training_obj.acronym,
         academic_year__year=mini_training_obj.year
@@ -218,7 +202,6 @@ def _update_education_group_year(mini_training_obj: 'mini_training.MiniTraining'
     education_group_year_db_obj.title_english = mini_training_obj.titles.title_en
     education_group_year_db_obj.credits = mini_training_obj.credits
     education_group_year_db_obj.management_entity_id = management_entity.entity_id
-    education_group_year_db_obj.main_teaching_campus_id = teaching_campus.id
     education_group_year_db_obj.schedule_type = mini_training_obj.schedule_type.name
     education_group_year_db_obj.active = mini_training_obj.status.name
     education_group_year_db_obj.keywords = mini_training_obj.keywords

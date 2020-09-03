@@ -33,11 +33,14 @@ class CentralManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
             'base.view_educationgroup': rules.always_allow,
             'base.add_training':
                 predicates.is_user_attached_to_management_entity &
+                predicates.is_allowed_to_create_children_of_category_training &
                 predicates.is_element_only_inside_standard_program,
             'base.add_minitraining':
-                predicates.is_user_attached_to_management_entity,
+                predicates.is_user_attached_to_management_entity &
+                predicates.is_allowed_to_create_children_of_category_mini_training,
             'base.add_group':
-                predicates.is_user_attached_to_management_entity,
+                predicates.is_user_attached_to_management_entity &
+                predicates.is_allowed_to_create_children_of_category_group,
             # TODO : split in training, minitraining, group
             'base.change_educationgroup':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
