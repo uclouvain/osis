@@ -440,6 +440,10 @@ msgstr ""
 msgid "Modification"
 msgstr ""
 
+#, python-brace-format
+msgid "Multiple entities {entity_acronym} found in {year}"
+msgstr ""
+
 msgid "New Education Group"
 msgstr ""
 
@@ -671,6 +675,10 @@ msgstr ""
 msgid ""
 "Training <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> "
 "successfully updated."
+msgstr ""
+
+#, python-brace-format
+msgid "Training not found : {acronym} {year}"
 msgstr ""
 
 msgid "Trainings"
