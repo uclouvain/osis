@@ -44,6 +44,7 @@ from base.views.mixins import AjaxTemplateMixin
 from education_group.models.group_year import GroupYear
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd.domain import node
+from program_management.ddd.domain.node import NodeGroupYear
 from program_management.ddd.repositories import node as node_repository
 from program_management.ddd.service.read import element_selected_service, check_paste_node_service
 from program_management.forms.tree.paste import PasteNodesFormset, paste_form_factory, \
@@ -104,7 +105,7 @@ class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageM
 
     def get_context_data(self, **kwargs):
         context_data = super().get_context_data(**kwargs)
-        context_data["formset"] = context_data["form"]
+        context_data["formset"] = context_data.pop("form")
         context_data["is_parent_a_minor_major_option_list_choice"] = self._is_parent_a_minor_major_option_list_choice(
             context_data["formset"]
         )
@@ -112,6 +113,16 @@ class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageM
             ele["element_code"]: node_repository.NodeRepository.get(
                 node.NodeIdentity(ele["element_code"], ele["element_year"])
             ) for ele in self.nodes_to_paste}
+        for form in context_data["formset"].forms:
+            initial = context_data["nodes_by_id"][form.node_code]
+            form.initial = {
+                'credits': initial.credits,
+                'code': initial.code,
+                'relative_credits': "%d" % (initial.credits)
+            }
+            form.is_group_year_form = isinstance(initial, NodeGroupYear)
+        if len(context_data["formset"]) > 0:
+            context_data['is_group_year_formset'] = context_data["formset"][0].is_group_year_form
         if not self.nodes_to_paste:
             display_warning_messages(self.request, _("Please cut or copy an item before paste"))
         return context_data
