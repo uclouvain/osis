@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-31 12:04+0200\n"
+"POT-Creation-Date: 2020-09-02 15:07+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -490,6 +490,9 @@ msgstr ""
 msgid "Search"
 msgstr ""
 
+msgid "Select a language"
+msgstr ""
+
 msgid "Session derogation"
 msgstr ""
 
@@ -534,9 +537,6 @@ msgstr ""
 msgid ""
 "The child %(child)s you want to attach is a parent of the node you want to "
 "attach."
-msgstr ""
-
-msgid "The child version must be the same as the root node version"
 msgstr ""
 
 #, python-format
