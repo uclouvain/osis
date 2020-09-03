@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-03 12:59+0200\n"
+"POT-Creation-Date: 2020-09-02 14:47+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -357,6 +357,10 @@ msgid "Identification"
 msgstr ""
 
 #, python-format
+msgid "Imposible to put end date to %(end_year)s: %(msg)s"
+msgstr ""
+
+#, python-format
 msgid "Impossible to put end date to %(end_year)s: %(msg)s"
 msgstr ""
 
@@ -443,6 +447,12 @@ msgid "New Mini-Training"
 msgstr ""
 
 msgid "New Training"
+msgstr ""
+
+#, python-format
+msgid ""
+"No type of %(child_category)s can be created as child of %(category)s of "
+"type %(type)s"
 msgstr ""
 
 msgid "Non university Bachelors"
