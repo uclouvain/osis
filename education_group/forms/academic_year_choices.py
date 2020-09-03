@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 
 from django.urls import reverse
 
@@ -45,17 +45,22 @@ def get_academic_year_choices(
     )
     node_ids = ExistingAcademicYearSearch().search_from_code(node_identity.code)
 
-    return [
-        (
-            _get_href(
-                node_identity=node_id,
-                path='|'.join(str(map_element_id_by_year[elem_id][node_id.year]) for elem_id in element_ids),
-                active_view_name=active_view_name,
-            ),
-            node_id.year
-        )
-        for node_id in node_ids
-    ]
+    result = []
+    for node_id in node_ids:
+        try:
+            result.append(
+                (
+                    _get_href(
+                        node_identity=node_id,
+                        path='|'.join(str(map_element_id_by_year[elem_id][node_id.year]) for elem_id in element_ids),
+                        active_view_name=active_view_name,
+                    ),
+                    node_id.year
+                )
+            )
+        except KeyError:
+            continue
+    return result
 
 
 def _get_href(node_identity: 'NodeIdentity', path: 'Path', active_view_name: str) -> str:
