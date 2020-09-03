@@ -48,11 +48,10 @@ from base.models.enums.constraint_type import CONSTRAINT_TYPE
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType, GroupType
 from base.models.enums.funding_codes import FundingCodes
 from base.models.enums.offer_enrollment_state import SUBSCRIBED, PROVISORY
-from base.models.exceptions import MaximumOneParentAllowedException, ValidationWarning
+from base.models.exceptions import ValidationWarning
 from base.models.validation_rule import ValidationRule
 from osis_common.models.serializable_model import SerializableModel, SerializableModelManager, SerializableModelAdmin, \
     SerializableQuerySet
-from osis_common.utils.models import get_object_or_none
 
 
 class EducationGroupYearAdmin(VersionAdmin, SerializableModelAdmin):
@@ -61,7 +60,7 @@ class EducationGroupYearAdmin(VersionAdmin, SerializableModelAdmin):
     raw_id_fields = (
         'education_group_type', 'academic_year',
         'education_group', 'enrollment_campus',
-        'main_teaching_campus', 'primary_language'
+        'primary_language'
     )
     search_fields = ['acronym', 'partial_acronym', 'title', 'education_group__pk', 'id']
 
@@ -246,15 +245,6 @@ class EducationGroupYear(SerializableModel):
         on_delete=models.PROTECT
     )
 
-    main_teaching_campus = models.ForeignKey(
-        'Campus',
-        blank=True,
-        null=True,
-        related_name='teaching',
-        verbose_name=_("Learning location"),
-        on_delete=models.PROTECT
-    )
-
     dissertation = models.BooleanField(
         default=False,
         verbose_name=_('dissertation')
@@ -387,18 +377,6 @@ class EducationGroupYear(SerializableModel):
         blank=True,
         null=True,
         verbose_name=_("credits"),
-    )
-
-    remark = models.TextField(
-        blank=True,
-        default="",
-        verbose_name=_("remark")
-    )
-
-    remark_english = models.TextField(
-        blank=True,
-        default="",
-        verbose_name=_("remark in english")
     )
 
     min_constraint = models.IntegerField(
