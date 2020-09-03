@@ -48,7 +48,8 @@ from program_management.ddd.domain.exception import ProgramTreeNonEmpty, NodeHav
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
-from program_management.ddd.service.write import delete_all_standard_versions_service
+from program_management.ddd.service.write import delete_all_standard_versions_service, \
+    delete_all_mini_training_versions_service
 
 
 class MiniTrainingDeleteView(PermissionRequiredMixin, AjaxTemplateMixin, DeleteView):
@@ -72,12 +73,12 @@ class MiniTrainingDeleteView(PermissionRequiredMixin, AjaxTemplateMixin, DeleteV
             raise Http404
 
     def delete(self, request, *args, **kwargs):
-        cmd_delete = command_program_management.DeleteAllStandardVersionCommand(
-            self.get_mini_training().acronym,
-            self.get_mini_training().year
+        cmd_delete = command_program_management.DeleteAllMiniTrainingStandardVersionCommand(
+            acronym=self.get_mini_training().acronym,
+            year=self.get_mini_training().year
         )
         try:
-            delete_all_standard_versions_service.delete_all_standard_versions(cmd_delete)
+            delete_all_mini_training_versions_service.delete_all_mini_training_standard_versions(cmd_delete)
             display_success_messages(request, self.get_success_message())
             return self._ajax_response() or HttpResponseRedirect(self.get_success_url())
         except (

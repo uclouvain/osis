@@ -488,7 +488,13 @@ class DuplicateProgramTree(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True)
-class DeleteAllStandardVersionCommand(interface.CommandRequest):
+class DeleteAllTrainingStandardVersionCommand(interface.CommandRequest):
+    acronym = attr.ib(type=str)
+    year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class DeleteAllMiniTrainingStandardVersionCommand(interface.CommandRequest):
     acronym = attr.ib(type=str)
     year = attr.ib(type=int)
 

@@ -27,13 +27,14 @@ from django.db import transaction
 
 from program_management.ddd import command
 from program_management.ddd.domain.program_tree_version import STANDARD, ProgramTreeVersionIdentity
-from program_management.ddd.domain.service import identity_search
-from program_management.ddd.service.write import delete_training_standard_version_service
+from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
+from program_management.ddd.service.write import delete_training_standard_version_service, \
+    delete_mini_training_standard_version_service
 
 
 @transaction.atomic()
-def delete_all_training_standard_versions(
-        cmd: command.DeleteAllTrainingStandardVersionCommand
+def delete_all_mini_training_standard_versions(
+        cmd: command.DeleteAllMiniTrainingStandardVersionCommand
 ) -> List['ProgramTreeVersionIdentity']:
     program_tree_standard_id = ProgramTreeVersionIdentity(
         offer_acronym=cmd.acronym,
@@ -41,14 +42,14 @@ def delete_all_training_standard_versions(
         version_name=STANDARD,
         is_transition=False
     )
-    program_tree_version_ids = identity_search.ProgramTreeVersionIdentitySearch.get_all_program_tree_version_identities(
+    program_tree_version_ids = ProgramTreeVersionIdentitySearch.get_all_program_tree_version_identities(
         program_tree_standard_id
     )
 
     for program_tree_version_id in program_tree_version_ids:
-        delete_training_standard_version_service.delete_training_standard_version(
-            command.DeleteTrainingStandardVersionCommand(
-                offer_acronym=program_tree_version_id.offer_acronym,
+        delete_mini_training_standard_version_service.delete_mini_training_standard_version(
+            command.DeleteMiniTrainingWithStandardVersionCommand(
+                mini_training_acronym=program_tree_version_id.offer_acronym,
                 year=program_tree_version_id.year,
             )
         )

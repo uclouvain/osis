@@ -42,7 +42,7 @@ def delete_mini_training_standard_version(
     )
     delete_orphan_mini_training_service.delete_orphan_mini_training(
         command_education_group.DeleteOrphanMiniTrainingCommand(
-            acronym=cmd.mini_training_acronym,
+            abbreviated_title=cmd.mini_training_acronym,
             year=cmd.year
         )
     )

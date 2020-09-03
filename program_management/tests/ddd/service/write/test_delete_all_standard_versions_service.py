@@ -56,7 +56,7 @@ class TestDeleteAllStandardVersionsService(TestCase):
                                        is_transition=False),
         ]
 
-        cmd = command.DeleteAllStandardVersionCommand(acronym=self.training.acronym, year=self.training.year)
+        cmd = command.DeleteAllTrainingStandardVersionCommand(acronym=self.training.acronym, year=self.training.year)
         delete_all_standard_versions_service.delete_all_training_standard_versions(cmd)
 
         expected_calls = [
