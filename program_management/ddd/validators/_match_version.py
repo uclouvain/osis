@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,18 +23,26 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django import template
 
-from base import models as mdl
-from base.models.enums.link_type import LinkTypes
-
-register = template.Library()
+from base.ddd.utils import business_validator
+from program_management.ddd.domain import exception
 
 
-@register.filter
-def get_parent_of_reference_link(education_group_yr):
-    group_elmt_yrs = mdl.group_element_year.GroupElementYear.objects.filter(
-        child_branch=education_group_yr,
-        link_type=LinkTypes.REFERENCE.name,
-    )
-    return group_elmt_yrs.first()
+class MatchVersionValidator(business_validator.BusinessValidator):
+
+    def __init__(self, tree: 'ProgramTree', node_to_add: 'Node'):
+        super(MatchVersionValidator, self).__init__()
+        self.root_node = tree.root_node
+        self.node_to_add = node_to_add
+
+        from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
+        self.version_search = ProgramTreeVersionIdentitySearch()
+
+    def validate(self):
+        self.root_node_version = self.version_search.get_from_node_identity(self.root_node.entity_id)
+        self.child_version = self.version_search.get_from_node_identity(self.node_to_add.entity_id)
+        if self.node_to_add.is_training() and self.root_node_version.version_name != self.child_version.version_name:
+            raise exception.ProgramTreeVersionMismatch(
+                self.root_node_version, self.child_version,
+                root_code=self.root_node.code, child_code=self.node_to_add.code,
+            )

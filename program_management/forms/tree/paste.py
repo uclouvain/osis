@@ -121,10 +121,7 @@ class PasteNodeForm(forms.Form):
     def save(self) -> Optional['LinkIdentity']:
         result = None
         if self.is_valid():
-            try:
-                result = paste_element_service.paste_element(self._create_paste_command())
-            except osis_common.ddd.interface.BusinessExceptions as business_exception:
-                self.add_error(None, business_exception.messages)
+            result = paste_element_service.paste_element(self._create_paste_command())
         return result
 
     def _create_paste_command(self) -> command.PasteElementCommand:

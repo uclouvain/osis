@@ -679,27 +679,6 @@ class EducationGroupYear(SerializableModel):
             )
         return None
 
-    def parent_by_training(self):
-        """
-        Return the parent, only if the education group and its parent are a training.
-
-        In our structure, it is forbidden to have 2 training parents for a training.
-        """
-
-        if self.is_training():
-            try:
-                return get_object_or_none(
-                    EducationGroupYear,
-                    groupelementyear__child_branch=self,
-                    education_group_type__category=education_group_categories.TRAINING
-                )
-            except EducationGroupYear.MultipleObjectsReturned:
-                raise MaximumOneParentAllowedException('Only one training parent is allowed')
-
-    @cached_property
-    def children(self):
-        return self.groupelementyear_set.select_related('child_branch', 'child_leaf')
-
     @cached_property
     def coorganizations(self):
         return self.educationgrouporganization_set.all().order_by('all_students')

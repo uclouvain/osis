@@ -98,6 +98,7 @@ builder = MiniTrainingBuilder()
 
 @attr.s(frozen=True, slots=True)
 class MiniTrainingIdentity(interface.EntityIdentity):
+    # TODO: Rename acronym to abbreviated_title
     acronym = attr.ib(type=str, converter=lambda code: code.upper())
     year = attr.ib(type=int)
 
@@ -107,6 +108,7 @@ class MiniTraining(interface.RootEntity):
     entity_id = entity_identity = attr.ib(type=MiniTrainingIdentity)
     code = attr.ib(type=str)
     type = attr.ib(type=EducationGroupTypesEnum)
+    # TODO: Make a computed property instead of acronym (see TODO in MiniTrainingIdentity)
     abbreviated_title = attr.ib(type=str)
     titles = attr.ib(type=Titles)
     status = attr.ib(type=ActiveStatusEnum)

@@ -39,12 +39,15 @@ from django.views.generic.base import View
 import osis_common.ddd.interface
 import program_management.ddd.command
 from base.utils.cache import ElementCache
-from base.views.common import display_warning_messages, display_success_messages
+from base.views.common import display_warning_messages, display_success_messages, display_error_messages
 from base.views.mixins import AjaxTemplateMixin
 from education_group.models.group_year import GroupYear
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd.domain import node
 from program_management.ddd.domain.node import NodeGroupYear
+from program_management.ddd.domain import node
+from program_management.ddd.domain.node import NodeIdentity
+from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories import node as node_repository
 from program_management.ddd.service.read import element_selected_service, check_paste_node_service
 from program_management.forms.tree.paste import PasteNodesFormset, paste_form_factory, \
@@ -113,6 +116,9 @@ class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageM
             ele["element_code"]: node_repository.NodeRepository.get(
                 node.NodeIdentity(ele["element_code"], ele["element_year"])
             ) for ele in self.nodes_to_paste}
+
+        self._format_title_with_version(context_data["nodes_by_id"])
+
         for form in context_data["formset"].forms:
             initial = context_data["nodes_by_id"][form.node_code]
             form.initial = {
@@ -125,13 +131,38 @@ class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageM
             context_data['is_group_year_formset'] = context_data["formset"][0].is_group_year_form
         if not self.nodes_to_paste:
             display_warning_messages(self.request, _("Please cut or copy an item before paste"))
+
+        error_messages = list(itertools.chain.from_iterable(
+            check_paste(self.request, element) for element in self.nodes_to_paste
+        ))
+        if error_messages:
+            display_error_messages(self.request, error_messages)
+
         return context_data
 
-    def form_valid(self, formset: PasteNodesFormset):
-        link_identities_ids = formset.save()
-        if None in link_identities_ids:
-            return self.form_invalid(formset)
+    def _format_title_with_version(self, nodes_by_id):
+        for ele in self.nodes_to_paste:
+            node_ele = nodes_by_id[ele['element_code']]
+            node_identity = NodeIdentity(code=ele["element_code"], year=ele["element_year"])
+            try:
+                tree_version = ProgramTreeVersionIdentitySearch().get_from_node_identity(node_identity)
+            except osis_common.ddd.interface.BusinessException:
+                continue
+            node_ele.version = tree_version.version_name
+            node_ele.title = "{}[{}]".format(node_ele.title, node_ele.version) if node_ele.version else node_ele.title
 
+    def form_valid(self, formset: PasteNodesFormset):
+        try:
+            link_identities_ids = formset.save()
+        except osis_common.ddd.interface.BusinessExceptions as business_exception:
+            formset.forms[0].add_error(field=None, error=business_exception.messages)
+            return self.form_invalid(formset)
+        messages = self._append_success_messages(link_identities_ids)
+        display_success_messages(self.request, messages)
+        ElementCache(self.request.user.id).clear()
+        return super().form_valid(formset)
+
+    def _append_success_messages(self, link_identities_ids):
         messages = []
         for link_identity in link_identities_ids:
             messages.append(
@@ -140,10 +171,7 @@ class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageM
                     "parent": link_identity.parent_code
                 }
             )
-
-        display_success_messages(self.request, messages)
-        ElementCache(self.request.user.id).clear()
-        return super().form_valid(formset)
+        return messages
 
     def _is_parent_a_minor_major_option_list_choice(self, formset):
         return any(isinstance(form, PasteToMinorMajorOptionListChoiceForm) for form in formset)
@@ -160,31 +188,41 @@ class CheckPasteView(LoginRequiredMixin, View):
             return [{"element_code": code, "element_year": int(year), "path_to_detach": None} for code in codes]
         return []
 
-    def _check_paste(self, element_selected: dict) -> List[str]:
-        root_id = int(self.request.GET["path"].split("|")[0])
-        check_command = program_management.ddd.command.CheckPasteNodeCommand(
-            root_id=root_id,
-            node_to_past_code=element_selected["element_code"],
-            node_to_paste_year=element_selected["element_year"],
-            path_to_detach=element_selected["path_to_detach"],
-            path_to_paste=self.request.GET["path"],
-        )
-
-        try:
-            check_paste_node_service.check_paste(check_command)
-        except osis_common.ddd.interface.BusinessExceptions as business_exception:
-            return business_exception.messages
-        return []
-
     def get(self, request, *args, **kwargs):
         elements_to_paste = self._retrieve_elements_selected()
         if not elements_to_paste:
             return JsonResponse({"error_messages": [_("Please cut or copy an item before paste")]})
 
         error_messages = list(itertools.chain.from_iterable(
-            self._check_paste(element) for element in elements_to_paste
+            check_paste(request, element) for element in elements_to_paste
         ))
         if error_messages:
             return JsonResponse({"error_messages": error_messages})
 
         return JsonResponse({"error_messages": []})
+
+
+def check_paste(request, node_to_paste) -> List[str]:
+    root_id = int(request.GET["path"].split("|")[0])
+    check_command = program_management.ddd.command.CheckPasteNodeCommand(
+        root_id=root_id,
+        node_to_past_code=node_to_paste["element_code"],
+        node_to_paste_year=node_to_paste["element_year"],
+        path_to_detach=node_to_paste["path_to_detach"],
+        path_to_paste=request.GET["path"],
+    )
+    check_key = '{}|{}'.format(request.GET['path'], node_to_paste['element_code'])
+
+    try:
+        if not request.session.get(check_key):
+            check_paste_node_service.check_paste(check_command)
+    except osis_common.ddd.interface.BusinessExceptions as business_exception:
+        return business_exception.messages
+
+    # cache result to avoid double check
+    if request.session.get(check_key):
+        del request.session[check_key]
+    else:
+        request.session[check_key] = True
+
+    return []
