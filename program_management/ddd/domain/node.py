@@ -29,10 +29,8 @@ from collections import OrderedDict
 from typing import List, Set, Dict, Optional
 
 import attr
-from _decimal import Decimal
 
 from base.models.enums.active_status import ActiveStatusEnum
-from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, MiniTrainingType, GroupType
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
@@ -209,8 +207,8 @@ class Node(interface.Entity):
     def is_group(self) -> bool:
         return self.node_type in GroupType.all()
 
-    def is_minor_major_list_choice(self) -> bool:
-        return self.node_type in GroupType.minor_major_list_choice_enums()
+    def is_minor_major_option_list_choice(self) -> bool:
+        return self.node_type in GroupType.minor_major_option_list_choice_enums()
 
     def is_minor_or_deepening(self) -> bool:
         return self.is_minor() or self.is_deepening()
@@ -340,8 +338,8 @@ class Node(interface.Entity):
     ) -> 'Link':
         link_to_update = next(link for link in self.children if link.child.entity_id == child_id)
 
-        if self.is_minor_major_list_choice() and \
-                not link_to_update.child.is_minor_major_list_choice():
+        if self.is_minor_major_option_list_choice() and \
+                not link_to_update.child.is_minor_major_option_list_choice():
             link_type = LinkTypes.REFERENCE
 
         link_to_update.relative_credits = relative_credits

@@ -400,9 +400,6 @@ msgstr ""
 msgid "Link type"
 msgstr ""
 
-msgid "Linked with EPC"
-msgstr ""
-
 msgid "Main"
 msgstr ""
 
@@ -495,9 +492,6 @@ msgid "Personalized access"
 msgstr ""
 
 msgid "Please enter an academic year greater or equal to group start year."
-msgstr ""
-
-msgid "Please enter an academic year less or equal to group end year."
 msgstr ""
 
 msgid "Primary language"
@@ -607,15 +601,6 @@ msgstr ""
 msgid ""
 "The mini-training {abbreviated_title} ({academic_year}) have links in EPC "
 "application"
-msgstr ""
-
-#, python-brace-format
-msgid ""
-"The mini-training {acronym} ({academic_year}) have links in EPC application"
-msgstr ""
-
-#, python-format
-msgid "The program %(acronym)s will be published soon"
 msgstr ""
 
 msgid ""

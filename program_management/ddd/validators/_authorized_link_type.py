@@ -26,7 +26,6 @@ from typing import Optional
 from django.utils.translation import gettext_lazy as _
 
 import osis_common.ddd.interface
-from base.ddd.utils import business_validator
 from base.ddd.utils.business_validator import BusinessValidator
 from base.models.enums import education_group_types
 from base.models.enums.link_type import LinkTypes
@@ -50,7 +49,7 @@ class AuthorizedLinkTypeValidator(BusinessValidator):
                 }]
             )
 
-        elif self.parent_node.node_type in education_group_types.GroupType.minor_major_list_choice_enums() and\
+        elif self.parent_node.node_type in education_group_types.GroupType.minor_major_option_list_choice_enums() and\
                 self.node_to_add.node_type in education_group_types.MiniTrainingType \
                 and self.link_type != LinkTypes.REFERENCE:
             raise osis_common.ddd.interface.BusinessExceptions(

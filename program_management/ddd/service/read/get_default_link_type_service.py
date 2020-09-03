@@ -26,8 +26,8 @@ from typing import Optional
 from base.models.enums.link_type import LinkTypes
 from program_management.ddd import command
 from program_management.ddd.domain import node
-from program_management.ddd.service.read import node_identity_service
 from program_management.ddd.repositories import node as node_repository
+from program_management.ddd.service.read import node_identity_service
 
 
 def get_default_link_type(get_command: command.GetDefaultLinkType) -> Optional[LinkTypes]:
@@ -41,6 +41,6 @@ def get_default_link_type(get_command: command.GetDefaultLinkType) -> Optional[L
     parent_node = node_repository.NodeRepository.get(parent_node_identity)
     child_node = node_repository.NodeRepository.get(child_node_identity)
 
-    if parent_node.is_minor_major_list_choice() and child_node.is_minor_or_deepening():
+    if parent_node.is_minor_major_option_list_choice() and child_node.is_minor_or_deepening():
         return LinkTypes.REFERENCE
     return None

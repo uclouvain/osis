@@ -416,9 +416,6 @@ msgstr "Unité d'enseignement"
 msgid "Link type"
 msgstr "Type de lien"
 
-msgid "Linked with EPC"
-msgstr "Liens existants dans l'application EPC."
-
 msgid "Main"
 msgstr "Principale"
 
@@ -523,7 +520,7 @@ msgstr ""
 "Veuillez choisir une année académique plus grande ou équale à celle de début"
 
 msgid "Primary language"
-msgstr ""
+msgstr "Langue principale"
 
 msgid "Producing annexe"
 msgstr "Production du supplément / annexe"
@@ -638,17 +635,6 @@ msgstr ""
 "La mini-formation {abbreviated_title} ({academic_year}) contient des "
 "liaisons dans l'application EPC"
 
-#, python-brace-format
-msgid ""
-"The mini-training {acronym} ({academic_year}) have links in EPC application"
-msgstr ""
-"La mini-formation {acronym} ({academic_year}) contient des liaisons dans "
-"l'application EPC"
-
-#, python-format
-msgid "The program %(acronym)s will be published soon"
-msgstr ""
-
 msgid ""
 "The scope of the user is limited and prevents this action to be performed"
 msgstr ""
@@ -745,14 +731,11 @@ msgstr "Diplôme avec l'UCL"
 
 #, python-brace-format
 msgid "Unable to publish common admission conditions for {year}"
-msgstr ""
-"Impossible de publier les conditions d'admissions communes pour l'année "
-"{year}"
+msgstr "Impossible de publier les conditions d'admission communes pour {year}"
 
 #, python-brace-format
 msgid "Unable to publish common general informations for {year}"
-msgstr ""
-"Impossible de publier les informations générales communes pour l'année {year}"
+msgstr "Impossible de publier les informations générales communes pour {year}"
 
 msgid "University Bachelors"
 msgstr "Bacheliers universitaires"
@@ -822,8 +805,9 @@ msgstr ""
 msgid ""
 "You must create the version of the concerned training and then attach that "
 "version inside this version"
-msgstr "Il faut créer la version correspondante dans la formation concernée et "
-"puis ajouter cette version dans cette formation"
+msgstr ""
+"Il faut créer la version correspondante dans la formation concernée et puis "
+"ajouter cette version dans cette formation"
 
 msgid "You should precise at least minimum or maximum constraint"
 msgstr "Vous devez préciser au moins la contrainte minimum ou maximum"

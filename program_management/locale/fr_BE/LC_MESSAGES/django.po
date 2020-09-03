@@ -41,8 +41,7 @@ msgstr "%(start_index)s à %(end_index)s sur %(total_counts)s formations"
 
 #, python-format
 msgid "%(start_index)s to %(end_index)s of %(total_counts)s trainings"
-msgstr ""
-"%(start_index)s à %(end_index)s sur %(total_counts)s unités d'enseignement"
+msgstr "%(start_index)s à %(end_index)s sur %(total_counts)s formations"
 
 msgid "1st quadri"
 msgstr "1er quadri"
@@ -590,18 +589,6 @@ msgid "The learning unit is a prerequisite"
 msgstr "L'UE est un prérequis"
 
 #, python-format
-msgid "The link of %(acronym)s has been updated"
-msgstr "Le lien de %(acronym)s a été mis à jour"
-
-#, python-format
-msgid ""
-"The number of children of type(s) \"%(child_types)s\" for \"%(parent)s\" has "
-"already reached the limit."
-msgstr ""
-"Le nombre d'enfants de type(s) \"%(child_types)s\" pour \"%(parent)s\" a "
-"atteint la limite maximum."
-
-#, python-format
 msgid "The parent must have at least one child of type(s) \"%(types)s\"."
 msgstr "Le parent doit au moins avoir un enfant de type(s) \"%(types)s\"."
 
@@ -749,14 +736,6 @@ msgid ""
 msgstr ""
 "Vous ne pouvez pas attacher \"%(child)s\" de type \"%(child_types)s\" à "
 "\"%(parent)s\" de type \"%(parent_type)s\""
-
-#, python-format
-msgid ""
-"You cannot add \"%(child_types)s\" to \"%(parent)s\" (type \"%(parent_type)s"
-"\")"
-msgstr ""
-"Vous ne pouvez pas ajouter \"%(child_types)s\" à \"%(parent)s\" (de type "
-"\"%(parent_type)s\")"
 
 #, python-format
 msgid ""

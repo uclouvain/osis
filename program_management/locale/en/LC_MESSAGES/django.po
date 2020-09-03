@@ -553,16 +553,6 @@ msgid "The learning unit is a prerequisite"
 msgstr ""
 
 #, python-format
-msgid "The link of %(acronym)s has been updated"
-msgstr ""
-
-#, python-format
-msgid ""
-"The number of children of type(s) \"%(child_types)s\" for \"%(parent)s\" has "
-"already reached the limit."
-msgstr ""
-
-#, python-format
 msgid "The parent must have at least one child of type(s) \"%(types)s\"."
 msgstr ""
 
@@ -689,12 +679,6 @@ msgstr ""
 msgid ""
 "You cannot add \"%(child)s\" of type \"%(child_types)s\" to \"%(parent)s\" "
 "of type \"%(parent_type)s\""
-msgstr ""
-
-#, python-format
-msgid ""
-"You cannot add \"%(child_types)s\" to \"%(parent)s\" (type \"%(parent_type)s"
-"\")"
 msgstr ""
 
 #, python-format
