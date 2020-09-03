@@ -53,7 +53,6 @@ def step_impl(context, acronym, year):
         management_entity=entity,
         administration_entity=entity,
         enrollment_campus=campus,
-        main_teaching_campus=campus,
         title='Master [120] en , à finalité spécialisée'
     )
     # create_initial_group_element_year_structure([training])
