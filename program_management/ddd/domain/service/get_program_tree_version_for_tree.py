@@ -30,7 +30,7 @@ from program_management.ddd.business_types import *
 from program_management.ddd.service.read.search_all_versions_from_root_nodes import search_all_versions_from_root_nodes
 
 
-def _get_program_tree_version_for_tree(tree_nodes: Set['Node']) -> List['ProgramTreeVersion']:
+def get_program_tree_version_for_tree(tree_nodes: Set['Node']) -> List['ProgramTreeVersion']:
     commands = [
         program_management.ddd.command.SearchAllVersionsFromRootNodesCommand(code=node.code,
                                                                              year=node.year) for node in tree_nodes

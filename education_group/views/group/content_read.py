@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from education_group.views.group.common_read import Tab, GroupRead
-from program_management.ddd.domain.service.get_program_tree_version_for_tree import _get_program_tree_version_for_tree
+from program_management.ddd.domain.service.get_program_tree_version_for_tree import get_program_tree_version_for_tree
 
 
 class GroupReadContent(GroupRead):
@@ -36,7 +36,7 @@ class GroupReadContent(GroupRead):
         return {
             **super().get_context_data(**kwargs),
             "children": self.get_object().children,
-            "tree_different_versions": _get_program_tree_version_for_tree(self.get_tree().get_all_nodes())
+            "tree_different_versions": get_program_tree_version_for_tree(self.get_tree().get_all_nodes())
         }
 
     def get_update_group_url(self) -> str:
