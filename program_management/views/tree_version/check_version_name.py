@@ -19,13 +19,12 @@ def check_version_name(request, year, acronym):
     last_using = None
     existing_version = False
     existed_version_name = False
-    valid = False
+    valid = bool(re.match("^[A-Z]{0,15}$", version_name.upper()))
     if version_name != "":
         existing_version = __get_last_existing_version(version_name, acronym)
         if existing_version and existing_version.year < year:
             last_using = display_as_academic_year(existing_version.year)
             existed_version_name = True
-        valid = bool(re.match("^[A-Z]{0,15}$", version_name.upper()))
     return JsonResponse({
         "existed_version_name": existed_version_name,
         "existing_version_name": bool(existing_version and existing_version.year >= year),
