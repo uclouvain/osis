@@ -87,15 +87,21 @@ class TreeVersionDeleteView(PermissionRequiredMixin, AjaxTemplateMixin, DeleteVi
         }
 
     def get_confirmation_message(self) -> str:
-        return _("Are you sure you want to delete %(offer_acronym)s [%(version_name)s] ?") % {
+        return _("Are you sure you want to delete %(offer_acronym)s %(version_name)s ?") % {
             'offer_acronym': self.tree_version_identity.offer_acronym,
-            'version_name': self.tree_version_identity.version_name,
+            'version_name': self._get_version_name_verbose(),
         }
 
+    def _get_version_name_verbose(self) -> str:
+        version_name_verbose = self.tree_version_identity.version_name
+        if version_name_verbose:
+            version_name_verbose = "[" + version_name_verbose + "]"
+        return version_name_verbose
+
     def get_success_message(self):
-        return _("The program tree version %(offer_acronym)s [%(version_name)s] has been deleted.") % {
+        return _("The program tree version %(offer_acronym)s %(version_name)s has been deleted.") % {
             'offer_acronym': self.tree_version_identity.offer_acronym,
-            'version_name': self.tree_version_identity.version_name,
+            'version_name': self._get_version_name_verbose,
         }
 
     def get_success_url(self) -> str:
