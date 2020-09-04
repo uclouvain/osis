@@ -26,11 +26,12 @@
 from typing import Optional, List
 
 from django.db import IntegrityError
-from django.db.models import F
+from django.db.models import F, Case, When, IntegerField
 from django.db.models import Q
 
 from base.models.academic_year import AcademicYear
 from base.models.education_group_year import EducationGroupYear
+from base.models.enums.education_group_categories import Categories
 from education_group.ddd.domain.exception import TrainingNotFoundException
 from education_group.models.group import Group
 from education_group.models.group_year import GroupYear
@@ -119,7 +120,14 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
             # FIXME :: and should remove GroupYear.end_year
             # FIXME :: End_year is useful only for EducationGroupYear (training, minitraining) and programTreeVersions.
             # FIXME :: End year is not useful for Groups. For business, Group doesn't have a 'end date'.
-            end_year_of_existence=F('root_group__group__end_year__year'),
+            end_year_of_existence=Case(
+                When(
+                    offer__education_group_type__category__in={Categories.TRAINING.name, Categories.MINI_TRAINING.name},
+                    then=F('offer__education_group__end_year__year')
+                ),
+                default=F('root_group__group__end_year__year'),
+                output_field=IntegerField(),
+            ),
         ).values(
             'code',
             'offer_acronym',
