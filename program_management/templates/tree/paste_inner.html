@@ -57,7 +57,7 @@
                                 {{ form.id }}
                                 <td style="word-wrap: break-word; min-width: 75px;max-width: 75px;">{% if not node.is_learning_unit %}{{ node.title }}{% else %}-{% endif %}</td>
                                 <td>{{ node.code }}</td>
-                                <td>{% bootstrap_field form.access_condition %}</td>
+                                <td>{{ form.access_condition }}</td>
                             </tr>
                             {% endwith %}
                         {% endfor %}
