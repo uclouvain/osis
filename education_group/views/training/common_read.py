@@ -157,7 +157,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             "create_mini_training_url": self.get_create_mini_training_url(),
             "update_training_url": self.get_update_training_url(),
             "delete_training_url": self.get_delete_training_url(),
-            "delete_all_tree_versions_url": self.get_delete_all_tree_versions_url(),
+            "delete_all_tree_versions_url": self.get_delete_permanently_tree_versions_url(),
             "create_version_url": self.get_create_version_url(),
             "xls_ue_prerequisites": reverse("education_group_learning_units_prerequisites",
                                             args=[self.education_group_version.root_group.academic_year.year,
@@ -199,9 +199,9 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
     def get_delete_training_url(self):
         return reverse('training_delete', kwargs={'year': self.node_identity.year, 'code': self.node_identity.code})
 
-    def get_delete_all_tree_versions_url(self):
+    def get_delete_permanently_tree_version_url(self):
         return reverse(
-            'all_tree_versions_delete',
+            'delete_permanently_tree_version',
             kwargs={
                 'year': self.node_identity.year,
                 'code': self.node_identity.code,

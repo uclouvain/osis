@@ -111,7 +111,7 @@ urlpatterns = [
             name="create_education_group_version"
         ),
         path('publish', publish_general_information.publish, name='publish_general_information'),
-        path('delete/', TreeVersionDeleteView.as_view(), name='all_tree_versions_delete'),
+        path('delete/', TreeVersionDeleteView.as_view(), name='delete_permanently_tree_version'),
     ])),
 
     path('<int:year>/<acronym:acronym>/', include([
