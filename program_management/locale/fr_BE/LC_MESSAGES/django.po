@@ -27,6 +27,10 @@ msgid "\"%(child)s\" has been pasted into \"%(parent)s\""
 msgstr "\"%(child)s\" a été collé dans \"%(parent)s\""
 
 #, python-format
+msgid "%(node_to_add)s version must be the same as %(root_node)s version"
+msgstr "La version de %(node_to_add)s doit être la même que %(root_node)s."
+
+#, python-format
 msgid "%(start_index)s to %(end_index)s of %(total_counts)s learning units"
 msgstr ""
 "%(start_index)s à %(end_index)s sur %(total_counts)s unités d'enseignement"
@@ -726,6 +730,14 @@ msgid ""
 msgstr ""
 "Vous ne pouvez pas copier la version de  programme '{acronym}' de "
 "{from_year} à {to_year} parce qu'elle finit en {end_year}"
+
+#, python-brace-format
+msgid ""
+"You can't delete the standard program tree '{code}' in {year} as specific "
+"versions exists during this year."
+msgstr ""
+"Vous ne pouvez pas supprimer le programme standard '{code}' en {year} parce "
+"qu'il existe une version particiulière durant cette année."
 
 #, python-format
 msgid ""

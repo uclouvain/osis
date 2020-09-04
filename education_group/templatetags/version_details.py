@@ -23,21 +23,20 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from education_group.views.group.common_read import Tab, GroupRead
-from program_management.ddd.domain.service.get_program_tree_version_for_tree import get_program_tree_version_for_tree
+from typing import List, Dict
+from django import template
+
+from program_management.ddd.domain.service.identity_search import ProgramTreeIdentitySearch
+from program_management.ddd.business_types import *
+
+register = template.Library()
 
 
-class GroupReadContent(GroupRead):
-    template_name = "education_group_app/group/content_read.html"
-    active_tab = Tab.CONTENT
-
-    def get_context_data(self, **kwargs):
-
-        return {
-            **super().get_context_data(**kwargs),
-            "children": self.get_object().children,
-            "tree_different_versions": get_program_tree_version_for_tree(self.get_tree().get_all_nodes())
-        }
-
-    def get_update_group_url(self) -> str:
-        return super().get_update_group_url() + "&tab={}".format(self.active_tab)
+@register.simple_tag
+def version_details(entity_id: 'NodeIdentity', tree_versions: List['ProgramTreeVersion']) -> Dict[str, str]:
+    program_tree_identity = ProgramTreeIdentitySearch().get_from_node_identity(entity_id)
+    for program_tree_version in tree_versions:
+        if program_tree_version.program_tree_identity == program_tree_identity:
+            return {"title": " - {}".format(program_tree_version.title_fr),
+                    "version_label": program_tree_version.version_label}
+    return None

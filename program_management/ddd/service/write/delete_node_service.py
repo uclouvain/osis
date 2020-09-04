@@ -60,7 +60,7 @@ def delete_node(cmd: command.DeleteNodeCommand) -> None:
                 pass
         elif cmd.node_type in MiniTrainingType.get_names():
             cmd = command_education_group.DeleteOrphanMiniTrainingCommand(
-                acronym=cmd.acronym,
+                abbreviated_title=cmd.acronym,
                 year=cmd.year
             )
             try:

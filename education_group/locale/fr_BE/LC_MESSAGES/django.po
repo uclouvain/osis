@@ -17,10 +17,18 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #, python-format
-msgid "%(count_enrollment)d student is enrolled in the mini-training."
-msgid_plural "%(count_enrollment)d students are enrolled in the mini-training."
-msgstr[0] "%(count_enrollment)d étudiant est inscrit à la mini-formation."
-msgstr[1] "%(count_enrollment)d étudiants sont inscrits à la mini-formation."
+msgid ""
+"%(count_enrollment)d student is enrolled in the mini-training "
+"%(abbreviated_title)s (%(academic_year)s)."
+msgid_plural ""
+"%(count_enrollment)d students are enrolled in the mini-training "
+"%(abbreviated_title)s (%(academic_year)s)."
+msgstr[0] ""
+"%(count_enrollment)d étudiant est inscrit à la mini-formation "
+"%(abbreviated_title)s (%(academic_year)s)."
+msgstr[1] ""
+"%(count_enrollment)d étudiants sont inscrits à la mini-formation "
+"%(abbreviated_title)s (%(academic_year)s)."
 
 #, python-format
 msgid ""
@@ -503,7 +511,7 @@ msgstr ""
 "Veuillez choisir une année académique plus grande ou équale à celle de début"
 
 msgid "Primary language"
-msgstr "Langue principale"
+msgstr ""
 
 msgid "Producing annexe"
 msgstr "Production du supplément / annexe"
@@ -607,8 +615,27 @@ msgid "The link of %(code)s - %(acronym)s - %(year)s has been updated."
 msgstr "Le lien de %(code)s - %(acronym)s - %(year)s a été mis à jour."
 
 #, python-format
-msgid "The mini-training %(code)s has been deleted."
-msgstr "La mini-formation %(code)s a été supprimée."
+msgid "The mini-training %(code)s - %(title)s has been deleted."
+msgstr "La mini-formation %(code)s - %(title)s a été supprimée."
+
+#, python-brace-format
+msgid ""
+"The mini-training {abbreviated_title} ({academic_year}) have links in EPC "
+"application"
+msgstr ""
+"La mini-formation {abbreviated_title} ({academic_year}) contient des "
+"liaisons dans l'application EPC"
+
+#, python-brace-format
+msgid ""
+"The mini-training {acronym} ({academic_year}) have links in EPC application"
+msgstr ""
+"La mini-formation {acronym} ({academic_year}) contient des liaisons dans "
+"l'application EPC"
+
+#, python-format
+msgid "The program %(acronym)s will be published soon"
+msgstr ""
 
 msgid ""
 "The scope of the user is limited and prevents this action to be performed"
@@ -768,6 +795,12 @@ msgid ""
 msgstr ""
 "Vous ne pouvez pas supprimer/modifier une formation existant avant "
 "%(limit_year)s"
+
+msgid ""
+"You must create the version of the concerned training and then attach that "
+"version inside this version"
+msgstr "Il faut créer la version correspondante dans la formation concernée et "
+"puis ajouter cette version dans cette formation"
 
 msgid "You should precise at least minimum or maximum constraint"
 msgstr "Vous devez préciser au moins la contrainte minimum ou maximum"

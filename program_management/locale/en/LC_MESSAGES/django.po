@@ -20,10 +20,13 @@ msgstr ""
 msgid "\"%(child)s\" has been detached from \"%(parent)s\""
 msgstr "\"%(child)s\" has been removed from \"%(parent)s\""
 
-#, fuzzy, python-format
-#| msgid "\"%(child)s\" has been detached from \"%(parent)s\""
+#, python-format
 msgid "\"%(child)s\" has been pasted into \"%(parent)s\""
-msgstr "\"%(child)s\" has been removed from \"%(parent)s\""
+msgstr ""
+
+#, python-format
+msgid "%(node_to_add)s version must be the same as %(root_node)s version"
+msgstr ""
 
 #, python-format
 msgid "%(start_index)s to %(end_index)s of %(total_counts)s learning units"
@@ -533,6 +536,9 @@ msgid ""
 "attach."
 msgstr ""
 
+msgid "The child version must be the same as the root node version"
+msgstr ""
+
 #, python-format
 msgid "The learning unit %(acronym)s is not contained inside the formation"
 msgstr ""
@@ -671,6 +677,12 @@ msgstr ""
 msgid ""
 "You can't copy the program tree version '{acronym}' from {from_year} to "
 "{to_year} because it ends in {end_year}"
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"You can't delete the standard program tree '{code}' in {year} as specific "
+"versions exists during this year."
 msgstr ""
 
 #, python-format
