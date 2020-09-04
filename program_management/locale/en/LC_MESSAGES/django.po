@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-02 15:07+0200\n"
+"POT-Creation-Date: 2020-09-03 11:16+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -446,6 +446,10 @@ msgid "Produce xls of trainings with administrative data"
 msgstr ""
 
 msgid "Produce xls with a list of trainings"
+msgstr ""
+
+#, python-brace-format
+msgid "Program tree not found : {code} {year}"
 msgstr ""
 
 msgid "Prolong"
