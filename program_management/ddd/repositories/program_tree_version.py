@@ -41,6 +41,7 @@ from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception
 from program_management.ddd.domain import program_tree
 from program_management.ddd.domain import program_tree_version
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 from program_management.ddd.repositories import program_tree as program_tree_repository
 from program_management.models.education_group_version import EducationGroupVersion
 
