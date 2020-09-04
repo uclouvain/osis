@@ -200,6 +200,6 @@ class UpdateTrainingVersionForm(SpecificVersionForm):
     professional_title = forms.CharField(max_length=320, required=False, label=_('Professionnal title'), disabled=True)
     certificate_aims = forms.CharField(required=False, label=_('certificate aims').capitalize(), disabled=True)
 
-    def __init__(self, training_identity: 'TrainingIdentity', node_identity: 'NodeIdentity', *args, **kwargs):
-        super().__init__(training_identity, node_identity, *args, **kwargs)
+    def __init__(self, training_identity: 'TrainingIdentity', node_identity: 'NodeIdentity', **kwargs):
+        super().__init__(training_identity, node_identity, **kwargs)
         self.fields['version_name'].disabled = True

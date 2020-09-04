@@ -32,8 +32,7 @@ from program_management.views import quick_search, create_element, publish_gener
 from program_management.views.proxy.identification import IdentificationRedirectView
 from program_management.views import groupelementyear_read, element_utilization, excel, search, \
     tree, prerequisite_read, prerequisite_update
-from program_management.views.tree_version import create as create_program_tree_version
-
+from program_management.views.tree_version import create as create_program_tree_version, update_training
 
 urlpatterns = [
     url(r'^group_pdf_content/(?P<year>[0-9]+)/(?P<code>[A-Za-z0-9]+)/',
@@ -102,6 +101,12 @@ urlpatterns = [
             ]))
         ]))
     ])),
+
+    path(
+        'training_version/<int:year>/<str:code>/update',
+        update_training.TrainingVersionUpdateView.as_view(),
+        name="update_training_version"
+    ),
 
     path('<int:year>/<str:code>/', include([
         path('', IdentificationRedirectView.as_view(), name='element_identification'),
