@@ -9,6 +9,7 @@ from base.views.education_groups.achievement.update import EducationGroupAchieve
 from education_group.converters import GroupTypeConverter, TrainingTypeConverter, MiniTrainingTypeConverter, \
     AcronymConverter
 from education_group.views import group, training, mini_training, general_information
+from education_group.views.content_update import ContentUpdateView
 from education_group.views.mini_training.delete import MiniTrainingDeleteView
 from education_group.views.proxy.read import ReadEducationGroupRedirectView
 from education_group.views.training.delete import TrainingDeleteView
@@ -20,6 +21,7 @@ register_converter(TrainingTypeConverter, 'training_type')
 register_converter(AcronymConverter, 'acronym')
 
 urlpatterns = [
+    path('<int:year>/<str:code>/content/update/', ContentUpdateView.as_view(), name='content_update'),
     path('groups/', include([
         path('<group_type:type>/create', group.GroupCreateView.as_view(), name='group_create'),
         path('<int:year>/<str:code>/', include([

@@ -42,6 +42,7 @@ from education_group.ddd.domain.service.enum_converter import EducationGroupType
 from education_group.ddd.validators.validators_by_business_action import UpdateGroupValidatorList, \
     CopyGroupValidatorList, CreateGroupValidatorList
 from osis_common.ddd import interface
+from program_management.ddd.domain.academic_year import AcademicYear
 
 
 class GroupBuilder:
@@ -121,6 +122,10 @@ class Group(interface.RootEntity):
     @property
     def year(self) -> int:
         return self.entity_id.year
+
+    @property
+    def academic_year(self) -> AcademicYear:
+        return AcademicYear(self.year)
 
     def is_minor_major_option_list_choice(self):
         return self.type.name in GroupType.minor_major_option_list_choice()
