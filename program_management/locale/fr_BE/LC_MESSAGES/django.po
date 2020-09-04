@@ -576,8 +576,8 @@ msgid ""
 "The child %(child)s you want to attach is a parent of the node you want to "
 "attach."
 msgstr ""
-"L'élément %(child)s que vous voulez attachez est déjà un parent de l'élément "
-"auquel vous voulez rattachez."
+"L'élément %(child)s que vous voulez attacher est déjà un parent de l'élément "
+"auquel vous voulez rattacher."
 
 #, python-format
 msgid "The learning unit %(acronym)s is not contained inside the formation"
