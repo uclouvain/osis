@@ -67,7 +67,7 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
-        if self.mini_training_form.is_valid() and self.content_formset.is_valid():
+        if self.mini_training_form.is_valid():
             deleted_trainings = self.delete_mini_training()
 
             if not self.mini_training_form.errors:
