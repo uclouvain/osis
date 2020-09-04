@@ -298,7 +298,7 @@ class FilterTrainingTestCase(APITestCase):
         self.assertEqual(response.data['results'], serializer.data)
 
     def test_get_training_case_filter_campus(self):
-        query_string = {'campus': self.offers_by_year[2018][2].main_teaching_campus.name}
+        query_string = {'campus': self.standards_by_year[2018][2].root_group.main_teaching_campus.name}
 
         response = self.client.get(self.url, data=query_string)
         self.assertEqual(response.status_code, status.HTTP_200_OK)

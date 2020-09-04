@@ -114,7 +114,7 @@ class TrainingDetailSerializer(TrainingListSerializer):
     )
     enrollment_campus = CampusDetailSerializer(source='offer.enrollment_campus')
     main_teaching_campus = CampusDetailSerializer(source='root_group.main_teaching_campus')
-    active = serializers.CharField(source='root_group.active')
+    active = serializers.CharField(source='offer.active')
     web_re_registration = serializers.BooleanField(source='offer.web_re_registration')
     co_graduation_coefficient = serializers.DecimalField(
         source='offer.co_graduation_coefficient',

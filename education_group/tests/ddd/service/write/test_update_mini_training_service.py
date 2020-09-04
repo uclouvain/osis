@@ -113,7 +113,4 @@ class TestUpdateMiniTraining(TestCase, MockPatcherMixin):
         self.assertEqual(update_mini_training.keywords, self.cmd.keywords)
         self.assertEqual(update_mini_training.management_entity.acronym, self.cmd.management_entity_acronym)
         self.assertEqual(update_mini_training.end_year, self.cmd.end_year)
-        self.assertEqual(update_mini_training.teaching_campus.name, self.cmd.teaching_campus_name)
-        self.assertEqual(update_mini_training.teaching_campus.university_name,
-                         self.cmd.teaching_campus_organization_name)
         self.assertEqual(update_mini_training.schedule_type.name, self.cmd.schedule_type)

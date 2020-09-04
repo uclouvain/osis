@@ -384,7 +384,7 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "academic_year": training_obj.year,
             "start_year": training_obj.start_year,
             "end_year": training_obj.end_year,
-            "teaching_campus": training_obj.teaching_campus.name,
+            "teaching_campus": group_obj.teaching_campus.name,
             "enrollment_campus": training_obj.enrollment_campus.name,
             "other_campus_activities": training_obj.other_campus_activities.name
             if training_obj.other_language_activities else None,

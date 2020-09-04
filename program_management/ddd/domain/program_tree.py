@@ -125,23 +125,14 @@ class ProgramTreeBuilder:
             )
 
         root_next_year = program_tree_next_year.root_node
-        mandatory_types = program_tree_next_year.get_ordered_mandatory_children_types(
+        mandatory_types = copy_from.get_ordered_mandatory_children_types(
             parent_node=root_next_year
         )
-        children_current_year = set(copy_from.root_node.get_direct_children_as_nodes())
-        existing_next_year_children_types = set(root_next_year.get_children_types())
-        missing_mandatory_types = [t for t in mandatory_types if t not in existing_next_year_children_types]
-        for child_type in missing_mandatory_types:
-            child_current_year = next((c for c in children_current_year if c.node_type == child_type), None)
-            if child_current_year:
+        children_current_year = copy_from.root_node.get_direct_children_as_nodes()
+        for child_current_year in children_current_year:
+            if child_current_year.node_type in mandatory_types:
                 child_next_year = node_factory.copy_to_next_year(child_current_year)
-            else:
-                child_next_year = node_factory.generate_from_parent(
-                    parent_node=root_next_year,
-                    child_type=child_type
-                )
-            root_next_year.add_child(child_next_year, is_mandatory=True)
-
+                root_next_year.add_child(child_next_year, is_mandatory=True)
         return program_tree_next_year
 
     # Do not delete : will be usefull to copy content of a program tree to next year

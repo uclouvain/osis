@@ -44,15 +44,13 @@ from base.models.enums import academic_type, internship_presence, schedule_type,
     diploma_printing_orientation, active_status, duration_unit, decree_category, rate_code
 from base.models.enums import education_group_association
 from base.models.enums import education_group_categories
-from base.models.enums.constraint_type import CONSTRAINT_TYPE
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType, GroupType
 from base.models.enums.funding_codes import FundingCodes
 from base.models.enums.offer_enrollment_state import SUBSCRIBED, PROVISORY
-from base.models.exceptions import MaximumOneParentAllowedException, ValidationWarning
+from base.models.exceptions import ValidationWarning
 from base.models.validation_rule import ValidationRule
 from osis_common.models.serializable_model import SerializableModel, SerializableModelManager, SerializableModelAdmin, \
     SerializableQuerySet
-from osis_common.utils.models import get_object_or_none
 
 
 class EducationGroupYearAdmin(VersionAdmin, SerializableModelAdmin):
@@ -61,7 +59,7 @@ class EducationGroupYearAdmin(VersionAdmin, SerializableModelAdmin):
     raw_id_fields = (
         'education_group_type', 'academic_year',
         'education_group', 'enrollment_campus',
-        'main_teaching_campus', 'primary_language'
+        'primary_language'
     )
     search_fields = ['acronym', 'partial_acronym', 'title', 'education_group__pk', 'id']
 
@@ -246,15 +244,6 @@ class EducationGroupYear(SerializableModel):
         on_delete=models.PROTECT
     )
 
-    main_teaching_campus = models.ForeignKey(
-        'Campus',
-        blank=True,
-        null=True,
-        related_name='teaching',
-        verbose_name=_("Learning location"),
-        on_delete=models.PROTECT
-    )
-
     dissertation = models.BooleanField(
         default=False,
         verbose_name=_('dissertation')
@@ -387,41 +376,6 @@ class EducationGroupYear(SerializableModel):
         blank=True,
         null=True,
         verbose_name=_("credits"),
-    )
-
-    remark = models.TextField(
-        blank=True,
-        default="",
-        verbose_name=_("remark")
-    )
-
-    remark_english = models.TextField(
-        blank=True,
-        default="",
-        verbose_name=_("remark in english")
-    )
-
-    min_constraint = models.IntegerField(
-        blank=True,
-        null=True,
-        verbose_name=_("minimum constraint"),
-        validators=[MinValueValidator(1)]
-    )
-
-    max_constraint = models.IntegerField(
-        blank=True,
-        null=True,
-        verbose_name=_("maximum constraint"),
-        validators=[MinValueValidator(1)]
-    )
-
-    constraint_type = models.CharField(
-        max_length=20,
-        choices=CONSTRAINT_TYPE,
-        default=None,
-        blank=True,
-        null=True,
-        verbose_name=_("type of constraint")
     )
 
     main_domain = models.ForeignKey(
@@ -705,10 +659,6 @@ class EducationGroupYear(SerializableModel):
         self.clean_academic_year()
         self.clean_acronym()
         self.clean_partial_acronym()
-        if not self.constraint_type:
-            self.clean_constraint_type()
-        else:
-            self.clean_min_max()
         self.clean_duration_data()
 
     def clean_academic_year(self):
@@ -716,28 +666,6 @@ class EducationGroupYear(SerializableModel):
             raise ValidationError({
                 'academic_year': _("You cannot create/update an education group before %(limit_year)s") % {
                                 "limit_year": settings.YEAR_LIMIT_EDG_MODIFICATION}
-            })
-
-    def clean_constraint_type(self):
-        # If min or max has been set, constraint_type is required
-        if self.min_constraint is not None or self.max_constraint is not None:
-            raise ValidationError({'constraint_type': _("This field is required.")})
-
-    def clean_min_max(self):
-        # If constraint_type has been set, min OR max are required
-        if self.min_constraint is None and self.max_constraint is None:
-            raise ValidationError({
-                'min_constraint': _("You should precise at least minimum or maximum constraint"),
-                'max_constraint': '',
-            })
-
-        if self.min_constraint is not None and self.max_constraint is not None and \
-                self.min_constraint > self.max_constraint:
-            raise ValidationError({
-                'max_constraint': _("%(max)s must be greater or equals than %(min)s") % {
-                    "max": _("maximum constraint").title(),
-                    "min": _("minimum constraint").title(),
-                }
             })
 
     def clean_duration_data(self):

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-01 09:51+0200\n"
+"POT-Creation-Date: 2020-09-03 13:29+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -372,7 +372,7 @@ msgstr "Domaine ISCED/CITE"
 msgid "Identification"
 msgstr "Identification"
 
-#, fuzzy, python-format
+#, python-format
 msgid "Imposible to put end date to %(end_year)s: %(msg)s"
 msgstr "Impossible de mettre la fin à %(end_year)s: %(msg)s"
 
@@ -415,9 +415,6 @@ msgstr "Unité d'enseignement"
 
 msgid "Link type"
 msgstr "Type de lien"
-
-msgid "Linked with EPC"
-msgstr "Liens existants dans l'application EPC."
 
 msgid "Main"
 msgstr "Principale"
@@ -478,6 +475,14 @@ msgstr "Nouvelle Mini-Formation"
 msgid "New Training"
 msgstr "Nouvelle Formation"
 
+#, python-format
+msgid ""
+"No type of %(child_category)s can be created as child of %(category)s of "
+"type %(type)s"
+msgstr ""
+"Aucun type de %(child_category)s ne peut être créé comme enfant d'un(e) "
+"%(category)s de type %(type)s"
+
 msgid "Non university Bachelors"
 msgstr "Bacheliers non universitaires"
 
@@ -519,7 +524,7 @@ msgstr ""
 "Veuillez choisir une année académique plus grande ou équale à celle de début"
 
 msgid "Primary language"
-msgstr ""
+msgstr "Langue principale"
 
 msgid "Producing annexe"
 msgstr "Production du supplément / annexe"
@@ -634,17 +639,6 @@ msgstr ""
 "La mini-formation {abbreviated_title} ({academic_year}) contient des "
 "liaisons dans l'application EPC"
 
-#, python-brace-format
-msgid ""
-"The mini-training {acronym} ({academic_year}) have links in EPC application"
-msgstr ""
-"La mini-formation {acronym} ({academic_year}) contient des liaisons dans "
-"l'application EPC"
-
-#, python-format
-msgid "The program %(acronym)s will be published soon"
-msgstr ""
-
 msgid ""
 "The scope of the user is limited and prevents this action to be performed"
 msgstr ""
@@ -724,6 +718,10 @@ msgstr ""
 "La formation <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> a été "
 "modifiée avec succès"
 
+#, python-brace-format
+msgid "Training not found : {acronym} {year}"
+msgstr "Formation non trouvée : {acronym} {year}"
+
 msgid "Trainings"
 msgstr "Formations"
 
@@ -742,10 +740,13 @@ msgstr "Diplôme avec l'UCL"
 #, python-brace-format
 msgid "Unable to publish common admission conditions for {year}"
 msgstr ""
+"Impossible de publier les conditions d'admissions communes pour l'année "
+"{year}"
 
 #, python-brace-format
 msgid "Unable to publish common general informations for {year}"
 msgstr ""
+"Impossible de publier les informations générales communes pour l'année {year}"
 
 msgid "University Bachelors"
 msgstr "Bacheliers universitaires"
@@ -815,8 +816,9 @@ msgstr ""
 msgid ""
 "You must create the version of the concerned training and then attach that "
 "version inside this version"
-msgstr "Il faut créer la version correspondante dans la formation concernée et "
-"puis ajouter cette version dans cette formation"
+msgstr ""
+"Il faut créer la version correspondante dans la formation concernée et puis "
+"ajouter cette version dans cette formation"
 
 msgid "You should precise at least minimum or maximum constraint"
 msgstr "Vous devez préciser au moins la contrainte minimum ou maximum"
