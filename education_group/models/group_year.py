@@ -33,7 +33,6 @@ from reversion.admin import VersionAdmin
 from base.models import entity_version
 from base.models.campus import Campus
 from base.models.entity import Entity
-from base.models.enums import active_status
 from base.models.enums.education_group_types import GroupType, MiniTrainingType
 from education_group.models.enums.constraint_type import ConstraintTypes
 from osis_common.models.osis_model_admin import OsisModelAdmin
@@ -155,13 +154,6 @@ class GroupYear(models.Model):
         related_name='teaching_campus',
         verbose_name=_("Learning location"),
         on_delete=models.PROTECT
-    )
-
-    active = models.CharField(
-        max_length=20,
-        choices=active_status.ACTIVE_STATUS_LIST,
-        default=active_status.ACTIVE,
-        verbose_name=_('Status')
     )
 
     objects = GroupYearManager()
