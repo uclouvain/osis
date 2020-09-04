@@ -443,6 +443,12 @@ class GetProgramTreesFromNodeCommand(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True)
+class GetProgramTreeVersionFromNodeCommand(interface.CommandRequest):
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
 class GetProgramTreesVersionFromNodeCommand(interface.CommandRequest):
     code = attr.ib(type=str)
     year = attr.ib(type=int)
