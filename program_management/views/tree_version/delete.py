@@ -62,13 +62,13 @@ class TreeVersionDeleteView(PermissionRequiredMixin, AjaxTemplateMixin, DeleteVi
         return ProgramTreeVersionIdentitySearch().get_from_node_identity(self.node_identity)
 
     def delete(self, request, *args, **kwargs):
-        cmd_delete = command_program_management.DeleteAllSpecificVersionCommand(
+        cmd_delete = command_program_management.DeletePermanentlyTreeVersionCommand(
             acronym=self.tree_version_identity.offer_acronym,
             version_name=self.tree_version_identity.version_name,
             is_transition=self.tree_version_identity.is_transition,
         )
         try:
-            delete_all_specific_versions_service.delete_all_program_tree_versions(cmd_delete)
+            delete_all_specific_versions_service.delete_permanently_tree_version(cmd_delete)
             display_success_messages(request, self.get_success_message())
             return self._ajax_response() or HttpResponseRedirect(self.get_success_url())
         except (

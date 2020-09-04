@@ -45,7 +45,7 @@ from testing.mocks import MockPatcherMixin
 class TestDeleteAllProgramTreeVersions(TestCase, MockPatcherMixin):
     @classmethod
     def setUpTestData(cls):
-        cls.cmd = command.DeleteAllSpecificVersionCommand(
+        cls.cmd = command.DeletePermanentlyTreeVersionCommand(
             acronym="ROOT",
             version_name="VERSION",
             is_transition=False,
@@ -135,7 +135,7 @@ class TestDeleteAllProgramTreeVersions(TestCase, MockPatcherMixin):
         return tree_version
 
     def test_should_return_program_tree_version_identity(self):
-        result = delete_all_specific_versions_service.delete_all_program_tree_versions(self.cmd)
+        result = delete_all_specific_versions_service.delete_permanently_tree_version(self.cmd)
         self.assertListEqual(
             result,
             [self.tree_version_2020.entity_id, self.tree_version_2021.entity_id]
@@ -148,15 +148,15 @@ class TestDeleteAllProgramTreeVersions(TestCase, MockPatcherMixin):
         )
 
         with self.assertRaises(exception.ProgramTreeNonEmpty):
-            delete_all_specific_versions_service.delete_all_program_tree_versions(self.cmd)
+            delete_all_specific_versions_service.delete_permanently_tree_version(self.cmd)
 
     def test_should_delete_tree_version(self):
-        delete_all_specific_versions_service.delete_all_program_tree_versions(self.cmd)
+        delete_all_specific_versions_service.delete_permanently_tree_version(self.cmd)
 
         self.assertListEqual(self.fake_program_tree_version_repo.root_entities, [])
         self.assertListEqual(self.fake_program_tree_repo.root_entities, [])
 
     def test_should_delete_group_objects(self):
-        delete_all_specific_versions_service.delete_all_program_tree_versions(self.cmd)
+        delete_all_specific_versions_service.delete_permanently_tree_version(self.cmd)
 
         self.assertListEqual(self.fake_group_repo.root_entities, [])

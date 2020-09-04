@@ -32,8 +32,8 @@ from program_management.ddd.service.write import delete_program_tree_service, de
 
 
 @transaction.atomic()
-def delete_all_program_tree_versions(
-        cmd: command.DeleteAllSpecificVersionCommand
+def delete_permanently_tree_version(
+        cmd: command.DeletePermanentlyTreeVersionCommand
 ) -> List['ProgramTreeVersionIdentity']:
 
     tree_versions_to_delete = program_tree_version_repository.ProgramTreeVersionRepository().search(

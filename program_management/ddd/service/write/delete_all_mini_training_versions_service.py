@@ -33,8 +33,8 @@ from program_management.ddd.service.write import delete_training_standard_versio
 
 
 @transaction.atomic()
-def delete_all_mini_training_standard_versions(
-        cmd: command.DeleteAllMiniTrainingStandardVersionCommand
+def delete_permanently_mini_training_standard_version(
+        cmd: command.DeletePermanentlyMiniTrainingStandardVersionCommand
 ) -> List['ProgramTreeVersionIdentity']:
     program_tree_standard_id = ProgramTreeVersionIdentity(
         offer_acronym=cmd.acronym,

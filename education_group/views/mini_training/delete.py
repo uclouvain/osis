@@ -73,12 +73,12 @@ class MiniTrainingDeleteView(PermissionRequiredMixin, AjaxTemplateMixin, DeleteV
             raise Http404
 
     def delete(self, request, *args, **kwargs):
-        cmd_delete = command_program_management.DeleteAllMiniTrainingStandardVersionCommand(
+        cmd_delete = command_program_management.DeletePermanentlyMiniTrainingStandardVersionCommand(
             acronym=self.get_mini_training().acronym,
             year=self.get_mini_training().year
         )
         try:
-            delete_all_mini_training_versions_service.delete_all_mini_training_standard_versions(cmd_delete)
+            delete_all_mini_training_versions_service.delete_permanently_mini_training_standard_version(cmd_delete)
             display_success_messages(request, self.get_success_message())
             return self._ajax_response() or HttpResponseRedirect(self.get_success_url())
         except (
