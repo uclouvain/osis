@@ -154,7 +154,7 @@ class TestDeleteMiniTrainingPostMethod(TestCase):
 
         self.delete_all_standard_versions_patcher = mock.patch(
             "education_group.views.mini_training.delete.delete_all_mini_training_versions_service."
-            "delete_all_mini_training_standard_versions",
+            "delete_permanently_mini_training_standard_version",
             return_value=[self.program_tree_version.entity_id]
         )
         self.mocked_delete_all_standard_versions = self.delete_all_standard_versions_patcher.start()
