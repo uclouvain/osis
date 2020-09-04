@@ -23,61 +23,52 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import functools
-
-from django.http import HttpResponseRedirect, Http404
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
-
 from django.views.generic import DeleteView
 
 from base.models.education_group_year import EducationGroupYear
 from base.views.common import display_success_messages, display_error_messages
 from base.views.mixins import AjaxTemplateMixin
-from education_group.ddd.business_types import *
-
-from education_group.ddd import command
-from education_group.ddd.domain.exception import TrainingNotFoundException, TrainingHaveLinkWithEPC, \
+from education_group.ddd.domain.exception import TrainingHaveLinkWithEPC, \
     TrainingHaveEnrollments
-from education_group.ddd.service.read import get_training_service
+from education_group.models.group_year import GroupYear
 from osis_role.contrib.views import PermissionRequiredMixin
-from program_management.ddd.business_types import *
 from program_management.ddd import command as command_program_management
+from program_management.ddd.business_types import *
 from program_management.ddd.domain.exception import ProgramTreeNonEmpty, NodeHaveLinkException
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
-from program_management.ddd.service.write import delete_all_standard_versions_service
+from program_management.ddd.service.write import delete_all_specific_versions_service
 
 
-class TrainingDeleteView(PermissionRequiredMixin, AjaxTemplateMixin, DeleteView):
-    template_name = "education_group_app/training/delete_inner.html"
-    permission_required = 'base.delete_all_training'
+class TreeVersionDeleteView(PermissionRequiredMixin, AjaxTemplateMixin, DeleteView):
+    template_name = "tree_version/delete_inner.html"
+    permission_required = 'program_management.delete_all_tree_version'
 
     def get_object(self, queryset=None) -> 'ProgramTreeVersion':
-        node_identity = NodeIdentity(code=self.kwargs['code'], year=self.kwargs['year'])
-        program_tree_version_identity = ProgramTreeVersionIdentitySearch().get_from_node_identity(node_identity)
-        return ProgramTreeVersionRepository.get(program_tree_version_identity)
+        return ProgramTreeVersionRepository.get(self.tree_version_identity)
 
-    @functools.lru_cache()
-    def get_training(self) -> 'Training':
-        try:
-            cmd = command.GetTrainingCommand(
-                acronym=self.get_object().entity_id.offer_acronym,
-                year=self.kwargs['year']
-            )
-            return get_training_service.get_training(cmd)
-        except TrainingNotFoundException:
-            raise Http404
+    @cached_property
+    def node_identity(self) -> 'NodeIdentity':
+        return NodeIdentity(code=self.kwargs['code'], year=self.kwargs['year'])
+
+    @cached_property
+    def tree_version_identity(self) -> 'ProgramTreeVersionIdentity':
+        return ProgramTreeVersionIdentitySearch().get_from_node_identity(self.node_identity)
 
     def delete(self, request, *args, **kwargs):
-        cmd_delete = command_program_management.DeletePermanentlyTrainingStandardVersionCommand(
-            self.get_training().acronym,
-            self.get_training().year
+        cmd_delete = command_program_management.DeletePermanentlyTreeVersionCommand(
+            acronym=self.tree_version_identity.offer_acronym,
+            version_name=self.tree_version_identity.version_name,
+            is_transition=self.tree_version_identity.is_transition,
         )
         try:
-            delete_all_standard_versions_service.delete_permanently_training_standard_version(cmd_delete)
+            delete_all_specific_versions_service.delete_permanently_tree_version(cmd_delete)
             display_success_messages(request, self.get_success_message())
             return self._ajax_response() or HttpResponseRedirect(self.get_success_url())
         except (
@@ -96,15 +87,21 @@ class TrainingDeleteView(PermissionRequiredMixin, AjaxTemplateMixin, DeleteView)
         }
 
     def get_confirmation_message(self) -> str:
-        return _("Are you sure you want to delete %(acronym)s - %(title)s ?") % {
-            'acronym': self.get_training().acronym,
-            'title': self.get_training().titles.title_fr
+        return _("Are you sure you want to delete %(offer_acronym)s %(version_name)s ?") % {
+            'offer_acronym': self.tree_version_identity.offer_acronym,
+            'version_name': self._get_version_name_verbose(),
         }
 
+    def _get_version_name_verbose(self) -> str:
+        version_name_verbose = self.tree_version_identity.version_name
+        if version_name_verbose:
+            version_name_verbose = "[" + version_name_verbose + "]"
+        return version_name_verbose
+
     def get_success_message(self):
-        return _("The training %(acronym)s - %(title)s has been deleted.") % {
-            'acronym': self.get_training().acronym,
-            'title': self.get_training().titles.title_fr
+        return _("The program tree version %(offer_acronym)s %(version_name)s has been deleted.") % {
+            'offer_acronym': self.tree_version_identity.offer_acronym,
+            'version_name': self._get_version_name_verbose,
         }
 
     def get_success_url(self) -> str:
@@ -112,7 +109,7 @@ class TrainingDeleteView(PermissionRequiredMixin, AjaxTemplateMixin, DeleteView)
 
     def get_permission_object(self):
         return get_object_or_404(
-            EducationGroupYear.objects.select_related('education_group_type', 'academic_year', 'management_entity'),
-            academic_year__year=self.kwargs['year'],
-            acronym=self.get_training().acronym
+            GroupYear.objects.select_related('education_group_type', 'academic_year', 'management_entity'),
+            academic_year__year=self.node_identity.year,
+            partial_acronym=self.node_identity.code,
         )

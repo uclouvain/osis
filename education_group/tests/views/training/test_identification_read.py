@@ -273,13 +273,16 @@ class TestTrainingReadIdentification(TestCase):
         self.assertEqual(response.context['create_mini_training_url'], expected_create_mini_training_url)
 
     def test_assert_delete_url_correctly_computed(self):
-        path = "{}".format(self.root_group_element.pk)
         expected_delete_training_url = reverse(
-            'training_delete', kwargs={'year': 2019, 'code': 'LDROI200M'}
-        ) + "?path={}".format(path)
+            'delete_permanently_tree_version',
+            kwargs={
+                'year': 2019,
+                'code': 'LDROI200M',
+            }
+        )
 
         response = self.client.get(self.url)
-        self.assertEqual(response.context['delete_training_url'], expected_delete_training_url)
+        self.assertEqual(response.context['delete_permanently_tree_version'], expected_delete_training_url)
 
 
 class TestTrainingReadIdentificationTabs(TestCase):

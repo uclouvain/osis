@@ -170,6 +170,9 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
     def search(
             cls,
             entity_ids: Optional[List['ProgramTreeVersionIdentity']] = None,
+            version_name: str = None,
+            offer_acronym: str = None,
+            is_transition: bool = False,
             **kwargs
     ) -> List['ProgramTreeVersion']:
         qs = GroupYear.objects.all().order_by(
@@ -195,6 +198,13 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
         )
         if "element_ids" in kwargs:
             qs = qs.filter(element__in=kwargs['element_ids'])
+
+        if version_name is not None:
+            qs = qs.filter(educationgroupversion__version_name=version_name)
+        if offer_acronym is not None:
+            qs = qs.filter(educationgroupversion__offer__acronym=offer_acronym)
+        if is_transition is not None:
+            qs = qs.filter(educationgroupversion__is_transition=is_transition)
 
         results = []
         for record_dict in qs:
