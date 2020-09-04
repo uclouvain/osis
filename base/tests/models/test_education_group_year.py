@@ -31,7 +31,6 @@ from django.utils.translation import gettext_lazy as _
 
 from base.models.education_group_year import find_with_enrollments_count
 from base.models.enums import education_group_categories, duration_unit, offer_enrollment_state, education_group_types
-from base.models.enums.constraint_type import CREDITS
 from base.models.exceptions import ValidationWarning
 from base.models.validation_rule import ValidationRule
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
@@ -40,7 +39,6 @@ from base.tests.factories.education_group_year import EducationGroupYearFactory,
     string_generator
 from base.tests.factories.education_group_year_domain import EducationGroupYearDomainFactory
 from base.tests.factories.entity_version import EntityVersionFactory
-from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollmentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.offer_enrollment import OfferEnrollmentFactory
@@ -175,55 +173,6 @@ class EducationGroupYearCleanTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(year=2019)
-
-    def test_clean_constraint_both_value_set_case_no_errors(self):
-        e = EducationGroupYearFactory(
-            min_constraint=12,
-            max_constraint=20,
-            constraint_type=CREDITS,
-            academic_year=self.academic_year,
-        )
-        try:
-            e.clean()
-        except ValidationError:
-            self.fail()
-
-    def test_clean_constraint_only_one_value_set_case_no_errors(self):
-        e = EducationGroupYearFactory(
-            min_constraint=12,
-            max_constraint=None,
-            constraint_type=CREDITS,
-            academic_year=self.academic_year,
-        )
-        try:
-            e.clean()
-        except ValidationError:
-            self.fail()
-
-        e.min_constraint = None
-        e.max_constraint = 12
-        try:
-            e.clean()
-        except ValidationError:
-            self.fail()
-
-    def test_clean_no_constraint_type(self):
-        e = EducationGroupYearFactory(min_constraint=12, max_constraint=20, constraint_type=None)
-
-        with self.assertRaises(ValidationError):
-            e.clean()
-
-    def test_clean_no_min_max(self):
-        e = EducationGroupYearFactory(min_constraint=None, max_constraint=None, constraint_type=CREDITS)
-
-        with self.assertRaises(ValidationError):
-            e.clean()
-
-    def test_clean_min_gt_max(self):
-        e = EducationGroupYearFactory(min_constraint=20, max_constraint=10, constraint_type=CREDITS)
-
-        with self.assertRaises(ValidationError):
-            e.clean()
 
     def test_clean_case_no_duration_with_duration_unit(self):
         e = EducationGroupYearFactory(duration=None, duration_unit=duration_unit.QUADRIMESTER)

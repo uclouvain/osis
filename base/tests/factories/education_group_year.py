@@ -32,7 +32,6 @@ import factory.fuzzy
 
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories, active_status, schedule_type
-from base.models.enums.constraint_type import CREDITS
 from base.models.enums.duration_unit import DURATION_UNIT
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType
 from base.models.learning_unit_year import MAXIMUM_CREDITS, MINIMUM_CREDITS
@@ -80,19 +79,13 @@ class EducationGroupYearFactory(factory.django.DjangoModelFactory):
     education_group_type = factory.SubFactory(EducationGroupTypeFactory)
     management_entity = factory.SubFactory(EntityFactory)
     administration_entity = factory.SubFactory(EntityFactory)
-    main_teaching_campus = factory.SubFactory(CampusFactory)
     credits = factory.fuzzy.FuzzyInteger(MINIMUM_CREDITS, MAXIMUM_CREDITS)
-    min_constraint = factory.fuzzy.FuzzyInteger(1, MAXIMUM_CREDITS)
-    max_constraint = factory.lazy_attribute(lambda a: a.min_constraint)
-    remark = factory.fuzzy.FuzzyText(length=255)
-    remark_english = factory.fuzzy.FuzzyText(length=255)
     active = active_status.ACTIVE
     schedule_type = schedule_type.DAILY
     weighting = True
     default_learning_unit_enrollment = False
     duration_unit = factory.Iterator(DURATION_UNIT, getter=operator.itemgetter(0))
     duration = factory.fuzzy.FuzzyInteger(1, 5)
-    constraint_type = CREDITS
     linked_with_epc = False
     primary_language = factory.SubFactory(LanguageFactory)
     enrollment_campus = factory.SubFactory(CampusFactory)

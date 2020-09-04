@@ -25,23 +25,17 @@ from django.forms import model_to_dict
 from django.test import TestCase
 
 from base.models import education_group_year
-from base.models.education_group import EducationGroup
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_types
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.campus import CampusFactory
 from base.tests.factories.education_group_type import MiniTrainingEducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from education_group.ddd.domain import exception
-from education_group.ddd.domain._campus import Campus
 from education_group.ddd.domain._entity import Entity as EntityValueObject
 from education_group.ddd.domain.mini_training import MiniTrainingIdentity, MiniTraining
 from education_group.ddd.repository import mini_training
-from education_group.models import group_year, group
 from education_group.tests.factories.mini_training import MiniTrainingFactory
-from program_management.models import education_group_version
-from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 
 
 class TestMiniTrainingRepositoryCreateMethod(TestCase):
@@ -53,10 +47,6 @@ class TestMiniTrainingRepositoryCreateMethod(TestCase):
             start_year=cls.academic_year.year,
             type=education_group_types.MiniTrainingType[cls.education_group_type.name],
             management_entity=EntityValueObject(acronym='DRT'),
-            teaching_campus=Campus(
-                name=cls.campus.name,
-                university_name=cls.campus.organization.name,
-            ),
         )
 
     @classmethod
@@ -64,7 +54,6 @@ class TestMiniTrainingRepositoryCreateMethod(TestCase):
         cls.academic_year = AcademicYearFactory()
         cls.management_entity_version = EntityVersionFactory(acronym='DRT')
         cls.education_group_type = MiniTrainingEducationGroupTypeFactory()
-        cls.campus = CampusFactory()
 
     def test_should_create_db_data_with_correct_values_taken_from_domain_object(self):
         mini_training_identity = mini_training.MiniTrainingRepository.create(self.mini_training)
@@ -88,7 +77,6 @@ class TestMiniTrainingRepositoryCreateMethod(TestCase):
             "title_english": domain_obj.titles.title_en,
             "credits": domain_obj.credits,
             "management_entity": self.management_entity_version.entity.id,
-            "main_teaching_campus": self.campus.id,
         }
 
         actual_values = model_to_dict(
@@ -96,7 +84,6 @@ class TestMiniTrainingRepositoryCreateMethod(TestCase):
             fields=(
                 "academic_year", "partial_acronym", "education_group_type", "acronym", "title", "title_english",
                 "credits", "management_entity",
-                "main_teaching_campus"
             )
         )
         self.assertDictEqual(expected_values, actual_values)
@@ -133,15 +120,12 @@ class TestMiniTrainingRepositoryUpdateMethod(TestCase):
             education_group_type__minitraining=True
         )
         self.management_entity = EntityVersionFactory(acronym="MANA")
-        self.campus = CampusFactory(name="CAMPUS", organization__name="ORG")
 
         self.mini_training_to_persist_update = MiniTrainingFactory(
             entity_identity__acronym=self.education_group_year_db.acronym,
             entity_identity__year=self.education_group_year_db.academic_year.year,
             type=education_group_types.MiniTrainingType[self.education_group_year_db.education_group_type.name],
             management_entity__acronym="MANA",
-            teaching_campus__name="CAMPUS",
-            teaching_campus__university_name="ORG",
         )
 
     def test_should_raise_mini_training_not_found_exception_when_mini_training_not_existing_in_repository(self):
@@ -177,8 +161,6 @@ class TestMiniTrainingRepositoryUpdateMethod(TestCase):
         self.assertEqual(domain_obj.keywords, repo_obj.keywords)
 
         self.assertEqual(domain_obj.management_entity.acronym, repo_obj.management_entity_version.acronym)
-        self.assertEqual(domain_obj.teaching_campus.name, repo_obj.main_teaching_campus.name)
-        self.assertEqual(domain_obj.teaching_campus.university_name, repo_obj.main_teaching_campus.organization.name)
 
 
 class TestMiniTrainingDeleteMethod(TestCase):

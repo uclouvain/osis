@@ -59,6 +59,5 @@ class MiniTrainingFactory(factory.Factory):
     schedule_type = factory.Iterator(schedule_type_enum.ScheduleTypeEnum)
     credits = factory.fuzzy.FuzzyInteger(60, 180)
     management_entity = factory.SubFactory(EntityFactory)
-    teaching_campus = factory.SubFactory(CampusIdentityFactory)
     start_year = factory.fuzzy.FuzzyInteger(low=1999, high=2099)
     end_year = None

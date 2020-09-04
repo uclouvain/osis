@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-31 10:16+0200\n"
+"POT-Creation-Date: 2020-09-03 13:29+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -357,6 +357,10 @@ msgid "Identification"
 msgstr ""
 
 #, python-format
+msgid "Imposible to put end date to %(end_year)s: %(msg)s"
+msgstr ""
+
+#, python-format
 msgid "Impossible to put end date to %(end_year)s: %(msg)s"
 msgstr ""
 
@@ -394,9 +398,6 @@ msgid "Learning unit"
 msgstr ""
 
 msgid "Link type"
-msgstr ""
-
-msgid "Linked with EPC"
 msgstr ""
 
 msgid "Main"
@@ -439,6 +440,10 @@ msgstr ""
 msgid "Modification"
 msgstr ""
 
+#, python-brace-format
+msgid "Multiple entities {entity_acronym} found in {year}"
+msgstr ""
+
 msgid "New Education Group"
 msgstr ""
 
@@ -446,6 +451,12 @@ msgid "New Mini-Training"
 msgstr ""
 
 msgid "New Training"
+msgstr ""
+
+#, python-format
+msgid ""
+"No type of %(child_category)s can be created as child of %(category)s of "
+"type %(type)s"
 msgstr ""
 
 msgid "Non university Bachelors"
@@ -485,9 +496,6 @@ msgid "Personalized access"
 msgstr ""
 
 msgid "Please enter an academic year greater or equal to group start year."
-msgstr ""
-
-msgid "Please enter an academic year less or equal to group end year."
 msgstr ""
 
 msgid "Primary language"
@@ -599,21 +607,12 @@ msgid ""
 "application"
 msgstr ""
 
-#, python-brace-format
-msgid ""
-"The mini-training {acronym} ({academic_year}) have links in EPC application"
-msgstr ""
-
-#, python-format
-msgid "The program %(acronym)s will be published soon"
-msgstr ""
-
 msgid ""
 "The scope of the user is limited and prevents this action to be performed"
 msgstr ""
 
 #, python-format
-msgid "The training %(code)s has been deleted."
+msgid "The training %(acronym)s - %(title)s has been deleted."
 msgstr ""
 
 #, python-brace-format
@@ -678,6 +677,10 @@ msgid ""
 "successfully updated."
 msgstr ""
 
+#, python-brace-format
+msgid "Training not found : {acronym} {year}"
+msgstr ""
+
 msgid "Trainings"
 msgstr ""
 
@@ -691,6 +694,14 @@ msgid "UCL Bachelors"
 msgstr ""
 
 msgid "UCL Diploma"
+msgstr ""
+
+#, python-brace-format
+msgid "Unable to publish common admission conditions for {year}"
+msgstr ""
+
+#, python-brace-format
+msgid "Unable to publish common general informations for {year}"
 msgstr ""
 
 msgid "University Bachelors"
