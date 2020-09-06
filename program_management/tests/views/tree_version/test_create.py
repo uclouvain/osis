@@ -28,20 +28,11 @@ from django.http import HttpResponse
 from django.test import TestCase
 from django.urls import reverse
 
-from base.models.education_group_year import EducationGroupYear
-from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_type import TrainingEducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.person import CentralManagerForUEFactory, PersonFactory, FacultyManagerForUEFactory
-from base.tests.factories.validation_rule import ValidationRuleFactory
-from education_group.models.group_year import GroupYear
 from education_group.tests.factories.group_year import GroupYearFactory
-from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
-from program_management.models.education_group_version import EducationGroupVersion
-from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
-from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionIdentityFactory, \
-    StandardProgramTreeVersionFactory, ProgramTreeVersionFactory
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 from program_management.tests.factories.element import ElementFactory
 from program_management.views.tree_version.create import CreateProgramTreeVersionType
