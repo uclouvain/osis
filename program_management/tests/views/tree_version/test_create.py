@@ -23,85 +23,72 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import random
-from unittest import skip
 
-from django.conf import settings
 from django.http import HttpResponse
 from django.test import TestCase
 from django.urls import reverse
-from waffle.testutils import override_flag, override_switch
 
-from backoffice.settings.base import LANGUAGE_CODE_EN
+from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_type import TrainingEducationGroupTypeFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearBachelorFactory
-from base.tests.factories.group_element_year import GroupElementYearFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.person import CentralManagerForUEFactory, PersonFactory, FacultyManagerForUEFactory
-from base.tests.factories.user import SuperUserFactory
+from base.tests.factories.validation_rule import ValidationRuleFactory
+from education_group.models.group_year import GroupYear
 from education_group.tests.factories.group_year import GroupYearFactory
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionIdentityFactory, \
-    ProgramTreeVersionFactory, StandardProgramTreeVersionFactory
+    StandardProgramTreeVersionFactory, ProgramTreeVersionFactory
+from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
+from program_management.tests.factories.element import ElementFactory
 from program_management.views.tree_version.create import CreateProgramTreeVersionType
 
 
 class TestCreateProgramTreeVersion(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.academic_year = AcademicYearFactory(current=True)
-        cls.year = cls.academic_year.year
-        cls.entity_identity = ProgramTreeVersionIdentityFactory(year=cls.year, version_name="VERSION")
+        cls.current_academic_year = AcademicYearFactory(current=True)
+        cls.current_year = cls.current_academic_year.year
+        AcademicYearFactory.produce_in_future(cls.current_academic_year.year, 10)
         cls.type = TrainingEducationGroupTypeFactory()
-        cls.database_offer = EducationGroupYearFactory(
-            academic_year=cls.academic_year,
+
+        cls.group_year = GroupYearFactory(
+            academic_year=cls.current_academic_year,
+            partial_acronym="LDROI200M"
+        )
+
+        cls.education_group_year = EducationGroupYearFactory(
+            academic_year=cls.current_academic_year,
             education_group_type=cls.type,
-            acronym=cls.entity_identity.offer_acronym,
+            acronym=cls.group_year.acronym
         )
-        cls.repository = ProgramTreeVersionRepository()
-        cls.new_program_tree = ProgramTreeFactory(
-            root_node__year=cls.year,
-            root_node__start_year=cls.year,
-            root_node__end_year=cls.year,
-            root_node__node_type=TrainingType[cls.type.name],
+
+        cls.education_group_version = EducationGroupVersionFactory(
+            offer=cls.education_group_year,
+            root_group=cls.group_year,
+            version_name=""
         )
-        cls.new_program_tree_version = StandardProgramTreeVersionFactory(
-            entity_identity=cls.entity_identity,
-            entity_id=cls.entity_identity,
-            program_tree_identity=cls.new_program_tree.entity_id,
-            tree=cls.new_program_tree,
-        )
-        GroupYearFactory(
-            partial_acronym=cls.new_program_tree_version.program_tree_identity.code,
-            academic_year__year=cls.year
-        )
-        cls.repository.create(cls.new_program_tree_version)
-        cls.standard_version = EducationGroupVersion.objects.get(
-            offer__acronym=cls.new_program_tree_version.entity_id.offer_acronym,
-            offer__academic_year__year=cls.new_program_tree_version.entity_id.year,
-            version_name=cls.new_program_tree_version.entity_id.version_name,
-            is_transition=cls.new_program_tree_version.entity_id.is_transition
-        )
-        cls.url = reverse(
-            "create_education_group_version",
-            kwargs={
-                "year": cls.new_program_tree_version.entity_id.year,
-                "code": cls.new_program_tree_version.entity_id.offer_acronym
-            }
-        )
+
+        cls.element = ElementFactory(group_year=cls.group_year)
+
         cls.central_manager = CentralManagerForUEFactory("view_educationgroup")
         cls.factulty_manager = FacultyManagerForUEFactory("view_educationgroup")
         cls.simple_user = PersonFactory()
+
         cls.valid_data = {
-                "version_name": "CMS",
-                "title": "Titre",
-                "title_english": "Title",
-                "end_year": cls.year,
-                "save_type": CreateProgramTreeVersionType.NEW_VERSION.value
-            }
+            "version_name": "CMS",
+            "title": "Titre",
+            "title_english": "Title",
+            "end_year": cls.current_year,
+            "save_type": CreateProgramTreeVersionType.NEW_VERSION.value
+        }
+        cls.url = reverse(
+            "create_education_group_version",
+            kwargs={"year": cls.group_year.academic_year.year, "code": cls.group_year.partial_acronym}
+        )
 
     def test_get_init_form_create_program_tree_version_with_disconected_user(self):
         response = self.client.get(self.url, data={}, follow=True)
@@ -131,5 +118,5 @@ class TestCreateProgramTreeVersion(TestCase):
         response = self.client.get(self.url, data={}, follow=True)
         self.assertEqual(len(response.context['form'].fields['end_year'].choices), 8)
         self.assertEqual(response.context['form'].fields['end_year'].choices[0][0], None)
-        self.assertEqual(response.context['form'].fields['end_year'].choices[7][0], self.year+6)
+        self.assertEqual(response.context['form'].fields['end_year'].choices[7][0], self.current_year + 6)
         self.assertEqual(response.context['form'].fields['end_year'].initial, None)
