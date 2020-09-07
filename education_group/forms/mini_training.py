@@ -37,12 +37,13 @@ from base.models.enums import active_status, schedule_type as schedule_type_enum
     education_group_types
 from base.models.enums.constraint_type import ConstraintTypeEnum
 from education_group.forms import fields
+from education_group.forms.fields import UpperCaseCharField
 from rules_management.enums import MINI_TRAINING_PGRM_ENCODING_PERIOD, MINI_TRAINING_DAILY_MANAGEMENT
 from rules_management.mixins import PermissionFieldMixin
 
 
 class MiniTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
-    code = forms.CharField(max_length=15, label=_("Code"), required=False)
+    code = UpperCaseCharField(max_length=15, label=_("Code"), required=False)
     academic_year = forms.ModelChoiceField(
         queryset=AcademicYear.objects.all(),
         label=_("Start"),
@@ -53,7 +54,7 @@ class MiniTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         label=_('Last year of organization'),
         required=False
     )
-    abbreviated_title = forms.CharField(max_length=40, label=_("Acronym/Short title"), required=False)
+    abbreviated_title = UpperCaseCharField(max_length=40, label=_("Acronym/Short title"), required=False)
     title_fr = forms.CharField(max_length=240, label=_("Title in French"))
     title_en = forms.CharField(max_length=240, label=_("Title in English"), required=False)
     keywords = forms.CharField(max_length=320, label=_('Keywords'), required=False)
