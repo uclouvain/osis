@@ -119,7 +119,7 @@ class TestAttachNodeFormFactory(SimpleTestCase):
             node_to_attach.code,
             node_to_attach.year
         )
-        self.assertIsInstance(form, program_management.forms.tree.paste.PasteToMinorMajorOptionListChoiceForm)
+        self.assertIsInstance(form, program_management.forms.tree.paste.PasteToMinorMajorListChoiceForm)
 
     def test_form_returned_when_parent_is_training_and_child_is_minor_major_list_choice(self):
         path = "65|589"
@@ -241,7 +241,7 @@ class TestAttachNodeFormFields(SimpleTestCase):
 
     def test_attach_to_minor_major_list_choice_should_remove_all_fields_but_access_condition(self):
         node_to_attach = NodeGroupYearFactory()
-        form = program_management.forms.tree.paste.PasteToMinorMajorOptionListChoiceForm(
+        form = program_management.forms.tree.paste.PasteToMinorMajorListChoiceForm(
             "",
             node_to_attach.node_id,
             node_to_attach.node_type
