@@ -113,23 +113,17 @@ class PermsTestCase(TestCase):
         next_luy = LearningUnitYearFactory(
             learning_unit=self.luy.learning_unit,
             academic_year__year=2021,
-            learning_container_year=self.luy.learning_container_year
+            learning_container_year__learning_container=self.luy.learning_container_year.learning_container
         )
         TutorApplicationFactory(learning_container_year=next_luy.learning_container_year)
         self.assertFalse(
-            perms.is_eligible_for_modification_end_date(
-                self.luy, PersonWithPermissionsFactory('can_edit_learningunit_date')
-            )
+            perms._has_no_applications_in_future_years(self.luy)
         )
 
-    @mock.patch('base.business.learning_units.perms.is_eligible_for_modification')
-    @mock.patch('base.business.learning_units.perms._is_person_eligible_to_modify_end_date_based_on_container_type')
-    def test_eligible_if_has_application_but_none_in_future(self, mock_eligible, mock_person):
+    def test_eligible_if_has_application_but_none_in_future(self):
         TutorApplicationFactory(learning_container_year=self.luy.learning_container_year)
         self.assertTrue(
-            perms.is_eligible_for_modification_end_date(
-                self.luy, PersonWithPermissionsFactory('can_edit_learningunit_date')
-            )
+            perms._has_no_applications_in_future_years(self.luy)
         )
 
     def test_can_faculty_manager_modify_end_date_full(self):
