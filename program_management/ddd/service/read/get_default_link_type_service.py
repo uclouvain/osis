@@ -41,6 +41,6 @@ def get_default_link_type(get_command: command.GetDefaultLinkType) -> Optional[L
     parent_node = node_repository.NodeRepository.get(parent_node_identity)
     child_node = node_repository.NodeRepository.get(child_node_identity)
 
-    if parent_node.is_minor_major_option_list_choice() and child_node.is_minor_or_deepening():
+    if parent_node.is_minor_major_list_choice() and child_node.is_minor_or_deepening():
         return LinkTypes.REFERENCE
     return None

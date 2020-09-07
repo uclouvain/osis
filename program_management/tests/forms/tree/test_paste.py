@@ -97,7 +97,7 @@ class TestAttachNodeFormFactory(SimpleTestCase):
     def test_form_returned_when_parent_is_minor_major_list_choice(self):
         path = "6"
         node_to_attach_from = NodeGroupYearFactory(
-            node_type=factory.fuzzy.FuzzyChoice(GroupType.minor_major_option_list_choice_enums()),
+            node_type=factory.fuzzy.FuzzyChoice(GroupType.minor_major_list_choice_enums()),
             node_id=6
         )
         node_to_attach = NodeGroupYearFactory()
@@ -125,7 +125,7 @@ class TestAttachNodeFormFactory(SimpleTestCase):
         path = "65|589"
         node_to_attach_from = NodeGroupYearFactory()
         node_to_attach = NodeGroupYearFactory(
-            node_type=factory.fuzzy.FuzzyChoice(GroupType.minor_major_option_list_choice_enums())
+            node_type=factory.fuzzy.FuzzyChoice(GroupType.minor_major_list_choice_enums())
         )
         self._mock_load_node(node_to_attach_from)
         self._mock_node_repo_get(node_to_attach)
