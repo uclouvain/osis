@@ -26,13 +26,15 @@
     * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-<div class="row">
-    <div class="col-md-12">
-        <p class="small pull-right" style="margin-right: 20px;">
-            {% trans "Modified by" %} <strong>{{ force_majeure_version.revision.user.author }}</strong> {% trans "the" %} <strong>{{ force_majeure_version.revision.date_created|date:"d/m/Y" }}</strong>
-        </p>
+{% if force_majeure_version %}
+    <div class="row">
+        <div class="col-md-12">
+            <p class="small pull-right" style="margin-right: 20px;">
+                {% trans "Modified by" %} <strong>{{ force_majeure_version.revision.user.author }}</strong> {% trans "the" %} <strong>{{ force_majeure_version.revision.date_created|date:"d/m/Y" }}</strong>
+            </p>
+        </div>
     </div>
-</div>
+{% endif %}
 
 <table class="table">
     <thead>
