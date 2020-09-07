@@ -75,9 +75,7 @@ class GroupYearSerializer(serializers.HyperlinkedModelSerializer):
 
     def get_version_title(self, obj):
         version_title = obj.title_fr
-        versions = EducationGroupVersion.objects.filter(root_group__pk=obj.pk)
-        if versions:
-            version = versions.first()
-            if version.title_fr:
-                return "{} [{}]".format(version_title, version.title_fr)
+        version = EducationGroupVersion.objects.filter(root_group__pk=obj.pk).first()
+        if version and version.title_fr:
+            return "{} [{}]".format(version_title, version.title_fr)
         return version_title
