@@ -79,29 +79,24 @@ def read_learning_unit_pedagogy(request, learning_unit_year_id, context, templat
 
     translated_text_ids = itertools.chain.from_iterable(
         (*translated_label.text_label.text_fr, *translated_label.text_label.text_en)
-        for translated_label in list(cms_pedagogy_labels_translated) + list(cms_force_majeure_labels_translated)
+        for translated_label in list(cms_pedagogy_labels_translated)
     )
-
-    reversion = Version.objects.filter(
-        Q(
+    cms_pedagogy_last_modification_qs = Q(
             content_type=ContentType.objects.get_for_model(TranslatedText),
             object_id__in=map(lambda obj: obj.id, translated_text_ids)
         ) | Q(
             content_type=ContentType.objects.get_for_model(TeachingMaterial),
             object_id__in=map(lambda obj: obj.id, teaching_materials)
         )
-    ).select_related(
-        "revision",
-        "revision__user"
-    ).prefetch_related(
-        Prefetch(
-            "revision__user__person",
-            to_attr="author"
-        )
 
-    ).order_by(
-        "-revision__date_created"
-    ).first()
+    force_majeure_translated_text_ids = itertools.chain.from_iterable(
+        (*translated_label.text_label.text_fr, *translated_label.text_label.text_en)
+        for translated_label in list(cms_force_majeure_labels_translated)
+    )
+    cms_force_majeure_last_modification_qs = Q(
+        content_type=ContentType.objects.get_for_model(TranslatedText),
+        object_id__in=map(lambda obj: obj.id, force_majeure_translated_text_ids)
+    )
 
     context['cms_labels_translated'] = cms_pedagogy_labels_translated
     context['cms_force_majeure_labels_translated'] = cms_force_majeure_labels_translated
@@ -111,7 +106,8 @@ def read_learning_unit_pedagogy(request, learning_unit_year_id, context, templat
     context['can_edit_summary_locked_field'] = perms.can_edit_summary_locked_field(learning_unit_year, person)
     context['cms_label_pedagogy_fr_only'] = CMS_LABEL_PEDAGOGY_FR_ONLY
     context['attributions'] = attributions
-    context["version"] = reversion
+    context["version"] = _get_modification_history(cms_pedagogy_last_modification_qs)
+    context["force_majeure_version"] = _get_modification_history(cms_force_majeure_last_modification_qs)
     context['tab_active'] = 'learning_unit_pedagogy'  # Corresponds to url_name
     return render(request, template, context)
 
@@ -158,3 +154,17 @@ def _get_cms_labels_translated(learning_unit_year_id: int, text_labels: List[str
     ).order_by(
         "label_ordering"
     )
+
+
+def _get_modification_history(filter_qs):
+    return Version.objects.filter(filter_qs).select_related(
+        "revision",
+        "revision__user"
+    ).prefetch_related(
+        Prefetch(
+            "revision__user__person",
+            to_attr="author"
+        )
+    ).order_by(
+        "-revision__date_created"
+    ).first()
