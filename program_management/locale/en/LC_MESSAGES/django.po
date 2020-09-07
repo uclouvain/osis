@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-07 10:34+0200\n"
+"POT-Creation-Date: 2020-09-07 11:51+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -548,12 +548,6 @@ msgid ""
 "attach."
 msgstr ""
 
-#, fuzzy, python-format
-#| msgid "Are you sure you want to detach %(acronym)s ?"
-msgid ""
-"The education group %(offer_acronym)s %(version_name)s has been deleted."
-msgstr "Are you sure you want to remove %(acronym)s ?"
-
 #, python-format
 msgid "The learning unit %(acronym)s is not contained inside the formation"
 msgstr ""
@@ -586,6 +580,12 @@ msgstr ""
 #, python-format
 msgid "The program %(title)s - %(academic_year)s will be published soon"
 msgstr ""
+
+#, fuzzy, python-format
+#| msgid "Are you sure you want to detach %(acronym)s ?"
+msgid ""
+"The program tree version %(offer_acronym)s %(version_name)s has been deleted."
+msgstr "Are you sure you want to remove %(acronym)s ?"
 
 msgid "The registration form is available at the Secretariat of"
 msgstr ""

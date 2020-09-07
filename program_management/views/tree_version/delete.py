@@ -99,7 +99,7 @@ class TreeVersionDeleteView(PermissionRequiredMixin, AjaxTemplateMixin, DeleteVi
         return version_name_verbose
 
     def get_success_message(self):
-        return _("The education group %(offer_acronym)s %(version_name)s has been deleted.") % {
+        return _("The program tree version %(offer_acronym)s %(version_name)s has been deleted.") % {
             'offer_acronym': self.tree_version_identity.offer_acronym,
             'version_name': self._get_version_name_verbose(),
         }
