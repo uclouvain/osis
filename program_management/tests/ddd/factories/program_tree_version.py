@@ -35,9 +35,9 @@ class ProgramTreeVersionIdentityFactory(factory.Factory):
         model = ProgramTreeVersionIdentity
         abstract = False
 
-    offer_acronym = factory.Sequence(lambda n: 'OfferAcronym%02d' % n)
+    offer_acronym = factory.Sequence(lambda n: 'OFFERACRONYM%02d' % n)
     year = factory.fuzzy.FuzzyInteger(low=1999, high=2099)
-    version_name = factory.Sequence(lambda n: 'Version%02d' % n)
+    version_name = factory.Sequence(lambda n: 'VERSION%02d' % n)
     is_transition = False
 
 
