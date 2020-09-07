@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from django import forms
+from django.contrib.auth.models import User
 from django.forms import TextInput
 from django.utils.translation import gettext_lazy as _
 
@@ -85,7 +86,9 @@ class SpecificVersionForm(forms.Form):
 
 class UpdateTrainingVersionForm(SpecificVersionForm):
     # panel_informations_form.html
-    code = forms.CharField(max_length=15, label=_("Code"), disabled=True, required=False)
+    code = forms.CharField(label=_("Code"), disabled=True, required=False)
+    category = forms.CharField(label=_("Category"), disabled=True, required=False)
+    type = forms.CharField(label=_("Type of training"), disabled=True, required=False)
     active = forms.CharField(label=_("Status"), disabled=True, required=False)
     schedule_type = forms.CharField(label=_("Schedule type"), disabled=True, required=False)
     credits = fields.CreditField()
@@ -104,10 +107,12 @@ class UpdateTrainingVersionForm(SpecificVersionForm):
         required=False,
         widget=forms.TextInput
     )
-    offer_title_fr = forms.CharField(max_length=240, label=_("Title in French"), required=False, disabled=True)
-    offer_title_en = forms.CharField(max_length=240, label=_("Title in English"), required=False, disabled=True)
+    offer_title_fr = forms.CharField(label=_("Title in French"), required=False, disabled=True)
+    offer_title_en = forms.CharField(label=_("Title in English"), required=False, disabled=True)
+    offer_partial_title_fr = forms.CharField(label=_("Partial title in French"), required=False, disabled=True)
+    offer_partial_title_en = forms.CharField(label=_("Partial title in English"), required=False, disabled=True)
 
-    keywords = forms.CharField(max_length=320, label=_('Keywords'), required=False, disabled=True)
+    keywords = forms.CharField(label=_('Keywords'), required=False, disabled=True)
 
     # panel_academic_informations_form.html
     academic_type = forms.CharField(label=_("Academic type"), disabled=True, required=False)
@@ -141,16 +146,16 @@ class UpdateTrainingVersionForm(SpecificVersionForm):
     main_language = forms.CharField(label=_("Primary language"), disabled=True, required=False)
     english_activities = forms.CharField(label=_("activities in English").capitalize(), disabled=True, required=False)
     other_language_activities = forms.CharField(label=_("Other languages activities"), disabled=True, required=False)
-    main_domain = forms.CharField(label=_('main domain'), disabled=True, required=False)
-    secondary_domains = forms.CharField(label=_('university_domains'), disabled=True, required=False)
+    main_domain = forms.CharField(label=_('main domain').capitalize(), disabled=True, required=False)
+    secondary_domains = forms.CharField(label=_('secondary domains').title(), disabled=True, required=False)
     isced_domain = forms.CharField(label=_('ISCED domain'), disabled=True, required=False)
-    internal_comment = forms.CharField(label=_("comment (internal)"), disabled=True, required=False)
+    internal_comment = forms.CharField(label=_("comment (internal)").capitalize(), disabled=True, required=False)
 
     # panel_entities_form.html
     management_entity = forms.CharField()
     administration_entity = forms.CharField(label=_("Administration entity"), disabled=True, required=False)
     academic_year = forms.CharField(label=_("Validity"), disabled=True, required=False)
-    start_year = forms.CharField(label=_("Start"), disabled=True, required=False)
+    start_year = forms.CharField(label=_("Start academic year"), disabled=True, required=False)
     teaching_campus = fields.MainCampusChoiceField(
         queryset=None,
         label=_("Learning location"),
@@ -160,7 +165,7 @@ class UpdateTrainingVersionForm(SpecificVersionForm):
     other_campus_activities = forms.CharField(label=_("Activities on other campus"), disabled=True, required=False)
 
     # panel_funding_form.html
-    can_be_funded = forms.BooleanField(initial=False, label=_('Funding'), required=False)
+    can_be_funded = forms.BooleanField(initial=False, label=_('Funding'), disabled=True, required=False)
     funding_direction = forms.CharField(label=_("Funding direction"), disabled=True, required=False)
     can_be_international_funded = forms.BooleanField(
         initial=False,
@@ -200,6 +205,15 @@ class UpdateTrainingVersionForm(SpecificVersionForm):
     professional_title = forms.CharField(max_length=320, required=False, label=_('Professionnal title'), disabled=True)
     certificate_aims = forms.CharField(required=False, label=_('certificate aims').capitalize(), disabled=True)
 
-    def __init__(self, training_identity: 'TrainingIdentity', node_identity: 'NodeIdentity', **kwargs):
+    def __init__(self, training_identity: 'TrainingIdentity', node_identity: 'NodeIdentity', user: User, **kwargs):
+        self.user = user
         super().__init__(training_identity, node_identity, **kwargs)
         self.fields['version_name'].disabled = True
+        self.__init_management_entity_field()
+
+    def __init_management_entity_field(self):
+        self.fields['management_entity'] = fields.ManagementEntitiesChoiceField(
+            person=self.user.person,
+            initial=None,
+            disabled=self.fields['management_entity'].disabled,
+        )

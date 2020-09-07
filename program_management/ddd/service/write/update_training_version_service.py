@@ -23,49 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
 
-import attr
-
-from osis_common.ddd import interface
+from program_management.ddd.command import UpdateTrainingVersionCommand
+from program_management.ddd.business_types import *
 
 
-class DiplomaAimIdentity(interface.EntityIdentity):
-
-    def __init__(self, section: int, code: int):
-        self.section = section
-        self.code = code
-
-    def __eq__(self, other):
-        return self.section == other.section \
-               and self.code == other.code
-
-    def __hash__(self):
-        return hash(str(self.section) + str(self.code))
-
-
-class DiplomaAim(interface.Entity):
-
-    def __init__(self, entity_id: DiplomaAimIdentity, description: str):
-        super(DiplomaAim, self).__init__(entity_id=entity_id)
-        self.entity_id = entity_id
-        self.description = description
-
-    @property
-    def section(self) -> int:
-        return self.entity_id.section
-
-    @property
-    def code(self) -> int:
-        return self.entity_id.code
-
-    def __str__(self):
-        return "{} {}".format(self.code, self.section)
-
-
-@attr.s(frozen=True, slots=True)
-class Diploma(interface.ValueObject):
-    leads_to_diploma = attr.ib(type=bool, default=False)
-    printing_title = attr.ib(type=str, default='')
-    professional_title = attr.ib(type=str, default='')
-    aims = attr.ib(type=List['DiplomaAim'], factory=list)
+def update_training_version(
+        command: 'UpdateTrainingVersionCommand',
+) -> 'ProgramTreeVersionIdentity':
+    pass
