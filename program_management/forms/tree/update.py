@@ -21,10 +21,12 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from typing import Optional
+from typing import Optional, List
 
 from django import forms
 from django.core.exceptions import ValidationError
+from django.db import transaction
+from django.forms import BaseFormSet
 
 import osis_common.ddd.interface
 from base.forms.utils import choice_field
@@ -33,6 +35,12 @@ from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.service.write import update_link_service
 from program_management.ddd.validators import _block_validator
+
+
+class UpdateNodesFormset(BaseFormSet):
+    @transaction.atomic
+    def save(self) -> List[Optional['LinkIdentity']]:
+        return [form.save() for form in self.forms]
 
 
 class UpdateNodeForm(forms.Form):
@@ -70,7 +78,7 @@ class UpdateNodeForm(forms.Form):
             result = update_link_service.update_link(self._create_update_command())
         return result
 
-    def _create_paste_command(self) -> command.UpdateLinkCommand:
+    def _create_update_command(self) -> command.UpdateLinkCommand:
         return command.UpdateLinkCommand(
             parent_node_year='',
             parent_node_code='',
@@ -99,7 +107,7 @@ class UpdateInMinorMajorOptionListChoiceForm(UpdateNodeForm):
     comment_english = None
     relative_credits = None
 
-    def _create_paste_command(self) -> command.UpdateLinkCommand:
+    def _create_update_command(self) -> command.UpdateLinkCommand:
         return command.UpdateLinkCommand(
             parent_node_year='',
             parent_node_code='',
