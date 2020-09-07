@@ -347,7 +347,7 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "academic_year": mini_training_obj.year,
             "start_year": mini_training_obj.start_year,
             "end_year": mini_training_obj.end_year,
-            "teaching_campus": mini_training_obj.teaching_campus.name,
+            "teaching_campus": group_obj.teaching_campus.name,
 
             "remark_fr": group_obj.remark.text_fr,
             "remark_english": group_obj.remark.text_en,
