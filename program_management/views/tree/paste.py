@@ -49,8 +49,8 @@ from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories import node as node_repository
 from program_management.ddd.service.read import element_selected_service, check_paste_node_service
-from program_management.forms.tree.paste import PasteNodesFormset, paste_form_factory, \
-    PasteToMinorMajorOptionListChoiceForm
+from program_management.forms.tree.paste import PasteNodesFormset, paste_form_factory, PasteToMinorMajorListChoiceForm,\
+    PasteToOptionListChoiceForm
 
 
 class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageMixin, FormView):
@@ -178,7 +178,7 @@ class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageM
         return messages
 
     def _is_parent_a_minor_major_option_list_choice(self, formset):
-        return any(isinstance(form, PasteToMinorMajorOptionListChoiceForm) for form in formset)
+        return any(isinstance(form, (PasteToMinorMajorListChoiceForm, PasteToOptionListChoiceForm))for form in formset)
 
     def get_success_url(self):
         return

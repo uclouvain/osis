@@ -49,7 +49,7 @@ class AuthorizedLinkTypeValidator(BusinessValidator):
                 }]
             )
 
-        elif self.parent_node.node_type in education_group_types.GroupType.minor_major_option_list_choice_enums() and\
+        elif self.parent_node.node_type in education_group_types.GroupType.minor_major_list_choice_enums() and\
                 self.node_to_add.node_type in education_group_types.MiniTrainingType \
                 and self.link_type != LinkTypes.REFERENCE:
             raise osis_common.ddd.interface.BusinessExceptions(
