@@ -35,6 +35,8 @@ from base.views.common import display_success_messages
 from education_group.models.group_year import GroupYear
 from osis_role.contrib.views import permission_required
 from program_management.ddd import command, service
+from program_management.ddd.repositories import node as node_repository
+from program_management.ddd.domain import node
 
 
 def group_element_year_parent_getter_via_path(request) -> GroupYear:
@@ -52,7 +54,14 @@ def up(request):
     command_up = command.OrderUpLinkCommand(path=path)
     node_identity_id = service.write.up_link_service.up_link(command_up)
 
-    success_msg = _("The %(acronym)s has been moved") % {'acronym': node_identity_id.code}
+    moved_node = node_repository.NodeRepository.get(
+        node.NodeIdentity(node_identity_id.code, node_identity_id.year)
+    )
+    success_msg = _("The %(year)s - %(acronym)s%(title)s has been moved") % {
+        'acronym': node_identity_id.code,
+        'year': node_identity_id.year,
+        'title': " - {}".format(moved_node.title) if moved_node and moved_node.title else ""
+    }
     display_success_messages(request, success_msg)
 
     http_referer = request.META.get('HTTP_REFERER')
@@ -68,7 +77,15 @@ def down(request):
     command_down = command.OrderDownLinkCommand(path=path)
     node_identity_id = service.write.down_link_service.down_link(command_down)
 
-    success_msg = _("The %(acronym)s has been moved") % {'acronym': node_identity_id.code}
+    moved_node = node_repository.NodeRepository.get(
+        node.NodeIdentity(node_identity_id.code, node_identity_id.year)
+    )
+
+    success_msg = _("The %(year)s - %(acronym)s%(title)s has been moved") % {
+        'acronym': node_identity_id.code,
+        'year': node_identity_id.year,
+        'title': " - {}".format(moved_node.title) if moved_node and moved_node.title else ""
+    }
     display_success_messages(request, success_msg)
 
     http_referer = request.META.get('HTTP_REFERER')
