@@ -26,4 +26,6 @@
 
 
 def to_upper_case_converter(value: str) -> str:
+    if not value:
+        return value
     return value.upper()

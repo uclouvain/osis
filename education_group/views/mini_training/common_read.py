@@ -215,7 +215,7 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             return reverse(
                 'mini_training_delete',
                 kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}
-            ) + "?path={}".format(self.get_path())
+            )
 
     def get_tab_urls(self):
         return OrderedDict({

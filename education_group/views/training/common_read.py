@@ -201,7 +201,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             return reverse(
                 'training_delete',
                 kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}
-            ) + "?path={}".format(self.get_path())
+            )
 
     def get_delete_permanently_tree_version_url(self):
         if not self.program_tree_version_identity.is_standard():

@@ -172,15 +172,12 @@ class TestMiniTrainingReadIdentification(TestCase):
 
     def test_assert_delete_url_correctly_computed(self):
         expected_delete_mini_training_url = reverse(
-            'delete_permanently_tree_version',
-            kwargs={
-                'year': 2019,
-                'code': 'LBIOL100P',
-            }
+            'mini_training_delete',
+            kwargs={'year': 2019, 'code': 'LBIOL100P'}
         )
 
         response = self.client.get(self.url)
-        self.assertEqual(response.context['delete_permanently_tree_version'], expected_delete_mini_training_url)
+        self.assertEqual(response.context['delete_permanently_mini_training_url'], expected_delete_mini_training_url)
 
 
 class TestMiniTrainingReadIdentificationTabs(TestCase):
