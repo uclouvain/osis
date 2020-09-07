@@ -25,9 +25,11 @@
 ##############################################################################
 from django import forms
 from django.forms import TextInput
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from base.forms.utils.choice_field import BLANK_CHOICE
+from base.models.academic_year import current_academic_year
 from education_group.ddd.business_types import *
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from program_management.ddd.command import GetEndPostponementYearCommand
@@ -72,7 +74,12 @@ class SpecificVersionForm(forms.Form):
             GetEndPostponementYearCommand(code=self.node_identity.code, year=self.node_identity.year)
         )
         choices_years = [(x, display_as_academic_year(x)) for x in range(self.training_identity.year, max_year + 1)]
-        self.fields["end_year"].choices = BLANK_CHOICE + choices_years
+
+        if max_year == timezone.now().year+6:
+            self.fields["end_year"].choices = BLANK_CHOICE + choices_years
+        else:
+            self.fields["end_year"].choices = choices_years
+            self.fields["end_year"].initial = choices_years[-1]
 
     def clean_end_year(self):
         end_year = self.cleaned_data["end_year"]
