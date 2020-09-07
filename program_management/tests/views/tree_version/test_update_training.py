@@ -51,7 +51,7 @@ class TestTrainingVersionUpdateGetView(TestCase):
         cls.training_obj = TrainingFactory()
 
         cls.url = reverse(
-            'update_training_version',
+            'training_version_update',
             kwargs={"code": cls.group_obj.code, "year": cls.group_obj.year}
         )
 
@@ -103,7 +103,7 @@ class TestTrainingVersionUpdateGetView(TestCase):
         self.mocked_get_group.return_value = standard_version.tree.root_node
 
         url = reverse(
-            'update_training_version',
+            'training_version_update',
             kwargs={
                 "code": standard_version.tree.root_node.code,
                 "year": standard_version.tree.root_node.year
@@ -160,7 +160,7 @@ class TestTrainingVersionUpdatePostView(TestCase):
         cls.training_obj = TrainingFactory()
 
         cls.url = reverse(
-            'update_training_version',
+            'training_version_update',
             kwargs={"code": cls.group_obj.code, "year": cls.group_obj.year}
         )
 

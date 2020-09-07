@@ -105,7 +105,7 @@ urlpatterns = [
     path(
         'training_version/<int:year>/<str:code>/update',
         update_training.TrainingVersionUpdateView.as_view(),
-        name="update_training_version"
+        name="training_version_update"
     ),
 
     path('<int:year>/<str:code>/', include([

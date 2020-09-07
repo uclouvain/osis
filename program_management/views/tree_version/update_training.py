@@ -35,13 +35,13 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
     template_name = "tree_version/training/update.html"
 
     def dispatch(self, request, *args, **kwargs):
-        # if self.get_program_tree_version_obj().is_standard_version:
-        #     redirect_url = reverse('training_update', kwargs={
-        #         'year': self.get_group_obj().year,
-        #         'code':  self.get_group_obj().code,
-        #         'title': self.get_training_obj().acronym
-        #     })
-        #     return HttpResponseRedirect(redirect_url)
+        if self.get_program_tree_version_obj().is_standard_version:
+            redirect_url = reverse('training_update', kwargs={
+                'year': self.get_group_obj().year,
+                'code':  self.get_group_obj().code,
+                'title': self.get_training_obj().acronym
+            })
+            return HttpResponseRedirect(redirect_url)
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
