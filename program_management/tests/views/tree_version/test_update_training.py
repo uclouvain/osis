@@ -205,3 +205,21 @@ class TestTrainingVersionUpdatePostView(TestCase):
 
         response = self.client.post(self.url)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+
+    @mock.patch('program_management.views.tree_version.update_training.TrainingVersionUpdateView'
+                '._convert_form_to_update_training_version_command', return_value=None)
+    @mock.patch('program_management.views.tree_version.update_training.version'
+                '.UpdateTrainingVersionForm.is_valid', return_value=True)
+    @mock.patch('program_management.forms.version.get_end_postponement_year_service.'
+                'calculate_program_tree_end_postponement', return_value=2025)
+    @mock.patch('program_management.views.tree_version.update_training.update_training_version_service'
+                '.update_training_version', return_value=None)
+    def test_assert_update_training_service_called(self, mock_update_training, *mock):
+        response = self.client.post(self.url, {})
+
+        expected_redirect = reverse(
+            'element_identification',
+            kwargs={"code": self.group_obj.code, "year": self.group_obj.year}
+        )
+        self.assertRedirects(response, expected_redirect, fetch_redirect_response=False)
+        self.assertTrue(mock_update_training.called)
