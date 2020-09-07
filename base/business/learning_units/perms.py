@@ -114,18 +114,19 @@ def is_eligible_for_modification(learning_unit_year, person, raise_exception=Fal
 
 def is_eligible_for_modification_end_date(learning_unit_year, person, raise_exception=False):
     return check_lu_permission(person, 'base.can_edit_learningunit_date', raise_exception) and \
-        is_year_editable(learning_unit_year, raise_exception) and \
-        not (is_learning_unit_year_in_past(learning_unit_year, person, raise_exception)) and \
-        _has_no_applications_this_year(learning_unit_year, raise_exception) and \
-        is_eligible_for_modification(learning_unit_year, person, raise_exception) and \
-        _is_person_eligible_to_modify_end_date_based_on_container_type(learning_unit_year, person,
-                                                                       raise_exception) and \
-        is_external_learning_unit_cograduation(learning_unit_year, person, raise_exception)
+           is_year_editable(learning_unit_year, raise_exception) and \
+           not (is_learning_unit_year_in_past(learning_unit_year, person, raise_exception)) and \
+           _has_no_applications_in_future_years(learning_unit_year, raise_exception) and \
+           is_eligible_for_modification(learning_unit_year, person, raise_exception) and \
+           _is_person_eligible_to_modify_end_date_based_on_container_type(learning_unit_year, person,
+                                                                          raise_exception) and \
+           is_external_learning_unit_cograduation(learning_unit_year, person, raise_exception)
 
 
-def _has_no_applications_this_year(learning_unit_year, raise_exception=False):
+def _has_no_applications_in_future_years(learning_unit_year, raise_exception=False):
     result = not TutorApplication.objects.filter(
-        learning_container_year=learning_unit_year.learning_container_year
+        learning_container_year__learning_container=learning_unit_year.learning_container_year.learning_container,
+        learning_container_year__academic_year__year__gt=learning_unit_year.learning_container_year.academic_year.year
     ).exists()
     can_raise_exception(
         raise_exception, result,
@@ -146,10 +147,10 @@ def is_eligible_to_create_partim(learning_unit_year, person, raise_exception=Fal
 def is_eligible_to_create_modification_proposal(learning_unit_year, person, raise_exception=False):
     result = \
         check_lu_permission(person, 'base.can_propose_learningunit', raise_exception) and \
-        not(is_learning_unit_year_in_past(learning_unit_year, person, raise_exception)) and \
-        not(is_learning_unit_year_a_partim(learning_unit_year, person, raise_exception)) and \
+        not (is_learning_unit_year_in_past(learning_unit_year, person, raise_exception)) and \
+        not (is_learning_unit_year_a_partim(learning_unit_year, person, raise_exception)) and \
         _is_container_type_course_dissertation_or_internship(learning_unit_year, person, raise_exception) and \
-        not(is_learning_unit_year_in_proposal(learning_unit_year, person, raise_exception)) and \
+        not (is_learning_unit_year_in_proposal(learning_unit_year, person, raise_exception)) and \
         is_person_linked_to_entity_in_charge_of_learning_unit(learning_unit_year, person) and \
         is_external_learning_unit_cograduation(learning_unit_year, person, raise_exception)
     #  TODO detail why button is disabled
@@ -233,15 +234,15 @@ def is_eligible_to_consolidate_proposal(proposal, person, raise_exception=False)
 def can_edit_summary_locked_field(learning_unit_year, person):
     flag = Flag.get('educational_information_block_action')
     return flag.is_active_for_user(person.user) and \
-        person.is_faculty_manager and \
-        person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year)
+           person.is_faculty_manager and \
+           person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year)
 
 
 def can_update_learning_achievement(learning_unit_year, person):
     flag = Flag.get('learning_achievement_update')
     return flag.is_active_for_user(person.user) and \
-        person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year) and \
-        is_year_editable(learning_unit_year, raise_exception=False)
+           person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year) and \
+           is_year_editable(learning_unit_year, raise_exception=False)
 
 
 def is_eligible_to_delete_learning_unit_year(learning_unit_year, person, raise_exception=False):
@@ -330,15 +331,15 @@ def _is_person_eligible_to_modify_end_date_based_on_container_type(learning_unit
 
 def is_eligible_to_manage_charge_repartition(learning_unit_year, person):
     return person.user.has_perm("base.can_manage_charge_repartition") and \
-        learning_unit_year.is_partim() and \
-        person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year)
+           learning_unit_year.is_partim() and \
+           person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year)
 
 
 def is_eligible_to_manage_attributions(learning_unit_year, person):
     luy_container_type = learning_unit_year.learning_container_year.container_type
     return person.user.has_perm("base.can_manage_attribution") and \
-        luy_container_type in learning_container_year_types.TYPE_ALLOWED_FOR_ATTRIBUTIONS and \
-        person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year)
+           luy_container_type in learning_container_year_types.TYPE_ALLOWED_FOR_ATTRIBUTIONS and \
+           person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year)
 
 
 def _is_person_central_manager(_, person, raise_exception):
@@ -389,7 +390,7 @@ def is_learning_unit_year_in_proposal(learning_unit_year, _, raise_exception=Fal
 
 def _is_learning_unit_year_in_state_to_create_partim(learning_unit_year, person, raise_exception=False):
     business_check = (person.is_central_manager and not is_learning_unit_year_in_past(learning_unit_year, person)) or \
-        (person.is_faculty_manager and learning_unit_year.learning_container_year)
+                     (person.is_faculty_manager and learning_unit_year.learning_container_year)
 
     calendar_check = event_perms.generate_event_perm_learning_unit_edition(
         person=person,
@@ -414,7 +415,7 @@ def _is_learning_unit_year_in_state_to_be_modified(learning_unit_year, person, r
         raise_exception,
         result,
         MSG_NOT_GOOD_RANGE_OF_YEARS,
-        )
+    )
     return result
 
 
@@ -426,7 +427,7 @@ def _can_delete_learning_unit_year_according_type(learning_unit_year, person, ra
     if not person.is_central_manager and person.is_faculty_manager:
         container_type = learning_unit_year.learning_container_year.container_type
         result = not (
-            container_type == learning_container_year_types.COURSE and learning_unit_year.is_full()
+                container_type == learning_container_year_types.COURSE and learning_unit_year.is_full()
         ) and container_type not in [learning_container_year_types.DISSERTATION,
                                      learning_container_year_types.INTERNSHIP]
     else:
@@ -550,7 +551,7 @@ def _is_calendar_opened_to_edit_educational_information(*, learning_unit_year_id
 
     now = datetime.datetime.now(tz=get_tzinfo())
     value = convert_date_to_datetime(submission_dates["start_date"]) <= now <= \
-        convert_date_to_datetime(submission_dates["end_date"])
+            convert_date_to_datetime(submission_dates["end_date"])
     if not value:
         raise PermissionDenied(permission_denied_msg)
 
@@ -620,7 +621,7 @@ def is_person_linked_to_entity_in_charge_of_lu(learning_unit_year, person, raise
         raise_exception,
         result,
         MSG_ONLY_IF_YOUR_ARE_LINK_TO_ENTITY
-        )
+    )
     return result
 
 
