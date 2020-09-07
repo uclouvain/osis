@@ -51,6 +51,7 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
             "training_version_obj": self.get_program_tree_version_obj(),
             "group_obj": self.get_group_obj(),
             "tabs": self.get_tabs(),
+            "cancel_url": self.get_cancel_url(),
             "is_finality_types": self.get_training_obj().is_finality()
         }
         return render(request, self.template_name, context)
@@ -68,6 +69,9 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
             'element_identification',
             kwargs={'code': self.kwargs['code'], 'year': self.kwargs['year']},
         )
+
+    def get_cancel_url(self) -> str:
+        return self.get_success_url()
 
     def update_training_version(self):
         try:
@@ -203,7 +207,7 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
             "isced_domain": training_obj.isced_domain.entity_id.code if training_obj.isced_domain else None,
             "internal_comment": training_obj.internal_comment,
 
-            "management_entity": training_obj.management_entity.acronym,
+            "management_entity": group_obj.management_entity.acronym,
             "administration_entity": "{} - {}".format(
                 administration_entity_obj.acronym, administration_entity_obj.title
             ) if administration_entity_obj else None,

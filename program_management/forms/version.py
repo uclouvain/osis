@@ -61,6 +61,7 @@ class SpecificVersionForm(forms.Form):
         label=_('This version exists until'),
     )
 
+    # FIXME: Training_identity kwargs is incorrect because it can be a mini_training identity
     def __init__(self, training_identity: 'TrainingIdentity', node_identity: 'NodeIdentity', *args, **kwargs):
         self.training_identity = training_identity
         self.node_identity = node_identity
@@ -208,6 +209,62 @@ class UpdateTrainingVersionForm(SpecificVersionForm):
     def __init__(self, training_identity: 'TrainingIdentity', node_identity: 'NodeIdentity', user: User, **kwargs):
         self.user = user
         super().__init__(training_identity, node_identity, **kwargs)
+        self.fields['version_name'].disabled = True
+        self.__init_management_entity_field()
+
+    def __init_management_entity_field(self):
+        self.fields['management_entity'] = fields.ManagementEntitiesChoiceField(
+            person=self.user.person,
+            initial=None,
+            disabled=self.fields['management_entity'].disabled,
+        )
+
+
+class UpdateMiniTrainingVersionForm(SpecificVersionForm):
+    code = forms.CharField(label=_("Code"), disabled=True, required=False)
+    category = forms.CharField(label=_("Category"), disabled=True, required=False)
+    type = forms.CharField(label=_("Type of training"), disabled=True, required=False)
+    status = forms.CharField(label=_("Status"), disabled=True, required=False)
+    schedule_type = forms.CharField(label=_("Schedule type"), disabled=True, required=False)
+    management_entity = forms.CharField()
+    academic_year = forms.CharField(label=_("Validity"), disabled=True, required=False)
+    start_year = forms.CharField(label=_("Start academic year"), disabled=True, required=False)
+    teaching_campus = fields.MainCampusChoiceField(
+        queryset=None,
+        label=_("Learning location"),
+        to_field_name="name"
+    )
+    credits = fields.CreditField()
+    constraint_type = forms.ChoiceField(
+        choices=BLANK_CHOICE + list(ConstraintTypeEnum.choices()),
+        label=_("Type of constraint"),
+        required=False,
+    )
+    min_constraint = forms.IntegerField(
+        label=_("minimum constraint").capitalize(),
+        required=False,
+        widget=forms.TextInput
+    )
+    max_constraint = forms.IntegerField(
+        label=_("maximum constraint").capitalize(),
+        required=False,
+        widget=forms.TextInput
+    )
+    offer_title_fr = forms.CharField(label=_("Title in French"), required=False, disabled=True)
+    offer_title_en = forms.CharField(label=_("Title in English"), required=False, disabled=True)
+    keywords = forms.CharField(label=_('Keywords'), required=False, disabled=True)
+    remark_fr = forms.CharField(widget=forms.Textarea, label=_("Remark"), required=False)
+    remark_en = forms.CharField(widget=forms.Textarea, label=_("remark in english").capitalize(), required=False)
+
+    def __init__(
+            self,
+            mini_training_identity: 'MiniTrainingIdentity',
+            node_identity: 'NodeIdentity',
+            user: User,
+            **kwargs
+    ):
+        self.user = user
+        super().__init__(mini_training_identity, node_identity, **kwargs)
         self.fields['version_name'].disabled = True
         self.__init_management_entity_field()
 
