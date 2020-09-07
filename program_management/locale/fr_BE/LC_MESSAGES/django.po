@@ -481,7 +481,7 @@ msgstr "Produire un fichier Excel avec la liste des formations"
 
 #, python-brace-format
 msgid "Program tree not found : {code} {year}"
-msgstr ""
+msgstr "Arbre non trouvé : {code} {year}"
 
 msgid "Prolong"
 msgstr "Prolonger la version existante"
