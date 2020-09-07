@@ -112,10 +112,8 @@ msgstr ""
 msgid "Annual"
 msgstr ""
 
-#, fuzzy, python-format
-#| msgid "Are you sure you want to detach %(acronym)s ?"
 msgid "Are you sure you want to delete %(offer_acronym)s %(version_name)s ?"
-msgstr "Are you sure you want to remove %(acronym)s ?"
+msgstr ""
 
 #, python-format
 msgid "Are you sure you want to detach %(acronym)s ?"
@@ -581,11 +579,9 @@ msgstr ""
 msgid "The program %(title)s - %(academic_year)s will be published soon"
 msgstr ""
 
-#, fuzzy, python-format
-#| msgid "Are you sure you want to detach %(acronym)s ?"
 msgid ""
 "The program tree version %(offer_acronym)s %(version_name)s has been deleted."
-msgstr "Are you sure you want to remove %(acronym)s ?"
+msgstr ""
 
 msgid "The registration form is available at the Secretariat of"
 msgstr ""

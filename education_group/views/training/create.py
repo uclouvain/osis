@@ -123,7 +123,6 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             except CodeAlreadyExistException as e:
                 training_form.add_error('code', e.message)
             except AcronymAlreadyExist as e:
-                raise e
                 training_form.add_error('acronym', e.message)
             except ContentConstraintTypeMissing as e:
                 training_form.add_error('constraint_type', e.message)

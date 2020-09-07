@@ -128,10 +128,8 @@ msgstr "Ent. attrib."
 msgid "Annual"
 msgstr "Annuel"
 
-#, fuzzy, python-format
-#| msgid "Are you sure you want to delete %(offer_acronym)s %(version_name)s ?"
 msgid "Are you sure you want to delete %(offer_acronym)s %(version_name)s ?"
-msgstr "Êtes-vous sûr·e de vouloir supprimer %(acronym)s ?"
+msgstr "Êtes-vous sûr·e de vouloir supprimer %(offer_acronym)s %(version_name)s ?"
 
 #, python-format
 msgid "Are you sure you want to detach %(acronym)s ?"

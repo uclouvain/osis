@@ -908,6 +908,3 @@ msgstr "indéfini"
 
 msgid "unspecified"
 msgstr "indéterminé"
-
-#~ msgid "Imposible to put end date to %(end_year)s: %(msg)s"
-#~ msgstr "Impossible de mettre la fin à %(end_year)s: %(msg)s"
