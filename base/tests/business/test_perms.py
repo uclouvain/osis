@@ -86,7 +86,10 @@ class PermsTestCase(TestCase):
         previous_academic_yr = AcademicYearFactory.build(year=cls.academic_yr.year - 1)
         super(AcademicYear, previous_academic_yr).save()
 
-        cls.lunit_container_yr = LearningContainerYearFactory(academic_year=cls.academic_yr)
+        cls.lunit_container_yr = LearningContainerYearFactory(
+            academic_year=cls.academic_yr,
+            requirement_entity=EntityFactory()
+        )
         cls.luy = LearningUnitYearFactory(
             academic_year=cls.academic_yr,
             learning_container_year=cls.lunit_container_yr,
@@ -119,7 +122,9 @@ class PermsTestCase(TestCase):
             )
         )
 
-    def test_eligible_if_has_application_but_none_in_future(self):
+    @mock.patch('base.business.learning_units.perms.is_eligible_for_modification')
+    @mock.patch('base.business.learning_units.perms._is_person_eligible_to_modify_end_date_based_on_container_type')
+    def test_eligible_if_has_application_but_none_in_future(self, mock_eligible, mock_person):
         TutorApplicationFactory(learning_container_year=self.luy.learning_container_year)
         self.assertTrue(
             perms.is_eligible_for_modification_end_date(
