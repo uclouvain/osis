@@ -29,6 +29,7 @@ from django.utils.translation import gettext_lazy as _
 
 from base.forms.utils.choice_field import BLANK_CHOICE
 from education_group.ddd.business_types import *
+from education_group.templatetags.academic_year_display import display_as_academic_year
 from program_management.ddd.command import GetEndPostponementYearCommand
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.service.read import get_end_postponement_year_service
@@ -70,7 +71,7 @@ class SpecificVersionForm(forms.Form):
         max_year = get_end_postponement_year_service.calculate_program_tree_end_postponement(
             GetEndPostponementYearCommand(code=self.node_identity.code, year=self.node_identity.year)
         )
-        choices_years = [(x, x) for x in range(self.training_identity.year, max_year + 1)]
+        choices_years = [(x, display_as_academic_year(x)) for x in range(self.training_identity.year, max_year + 1)]
         self.fields["end_year"].choices = BLANK_CHOICE + choices_years
 
     def clean_end_year(self):
