@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-03 11:16+0200\n"
+"POT-Creation-Date: 2020-09-07 10:34+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -111,6 +111,11 @@ msgstr ""
 
 msgid "Annual"
 msgstr ""
+
+#, fuzzy, python-format
+#| msgid "Are you sure you want to detach %(acronym)s ?"
+msgid "Are you sure you want to delete %(offer_acronym)s %(version_name)s ?"
+msgstr "Are you sure you want to remove %(acronym)s ?"
 
 #, python-format
 msgid "Are you sure you want to detach %(acronym)s ?"
@@ -542,6 +547,12 @@ msgid ""
 "The child %(child)s you want to attach is a parent of the node you want to "
 "attach."
 msgstr ""
+
+#, fuzzy, python-format
+#| msgid "Are you sure you want to detach %(acronym)s ?"
+msgid ""
+"The education group %(offer_acronym)s %(version_name)s has been deleted."
+msgstr "Are you sure you want to remove %(acronym)s ?"
 
 #, python-format
 msgid "The learning unit %(acronym)s is not contained inside the formation"
