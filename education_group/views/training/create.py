@@ -1,3 +1,4 @@
+import functools
 from typing import List, Dict, Union, Optional
 
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -9,13 +10,12 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic.base import View
 
 from base.models.academic_year import starting_academic_year, AcademicYear
-from base.models.campus import Campus
-from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import TrainingType
 from base.utils.cache import RequestCache
 from base.utils.urls import reverse_with_get
 from base.views.common import display_success_messages, display_error_messages
 from education_group.ddd import command
+from education_group.ddd.business_types import *
 from education_group.ddd.domain.exception import ContentConstraintTypeMissing, \
     ContentConstraintMinimumMaximumMissing, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum, \
     AcronymAlreadyExist, StartYearGreaterThanEndYear, MaximumCertificateAimType2Reached, CodeAlreadyExistException
@@ -26,7 +26,7 @@ from education_group.models.group_year import GroupYear
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from education_group.views.proxy.read import Tab
 from osis_role.contrib.views import PermissionRequiredMixin
-from program_management.ddd import command as program_management_command
+from program_management.ddd import command as command_pgrm
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.program_tree import Path
 from program_management.ddd.domain.service.element_id_search import ElementIdSearch
@@ -44,11 +44,6 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
     template_name = "education_group_app/training/upsert/create.html"
 
-    @cached_property
-    def parent_node_identity(self) -> Union[None, 'NodeIdentity']:
-        if self.get_attach_path():
-            return NodeIdentitySearch().get_from_element_id(int(self.get_attach_path().split('|')[-1]))
-
     def get_context(self, training_form: CreateTrainingForm):
         training_type = self.kwargs['type']
         return {
@@ -57,6 +52,7 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "type_text": str(TrainingType.get_value(training_type)),
             "is_finality_types": training_type in TrainingType.finality_types(),
             "cancel_url": self.get_cancel_url(),
+            "parent_group": self.get_parent_group(),
         }
 
     def get(self, request, *args, **kwargs):
@@ -70,44 +66,45 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         return render(request, self.template_name, self.get_context(training_form))
 
     def get_cancel_url(self) -> str:
-        if self.get_attach_path():
+        parent_group = self.get_parent_group()
+        if parent_group:
             return reverse_with_get(
                 'element_identification',
-                kwargs={'code': self.parent_node_identity.code, 'year': self.parent_node_identity.year},
+                kwargs={'code': parent_group.code, 'year': parent_group.year},
                 get={'path': self.get_attach_path()}
             )
         return reverse('version_program')
 
     def _get_initial_form(self) -> Dict:
-        request_cache = RequestCache(self.request.user, reverse('version_program'))
-        default_management_entity = None
-        if self.get_attach_path():
-            default_academic_year = AcademicYear.objects.get(
-                year=self.parent_node_identity.year
-            ).year
-            parent_identity = self.get_parent_identity()
-            domain_obj = get_group_service.get_group(
-                command.GetGroupCommand(code=parent_identity.code, year=parent_identity.year)
-            )
-            default_management_entity = domain_obj.management_entity.acronym
-        elif request_cache.get_value_cached('academic_year'):
-            default_academic_year = AcademicYear.objects.get(
-                id=request_cache.get_value_cached('academic_year')[0]
-            ).year
-        else:
-            default_academic_year = starting_academic_year()
         return {
-            'academic_year': default_academic_year,
-            'management_entity': default_management_entity
+            'academic_year': self._get_initial_academic_year_for_form(),
+            'management_entity': self._get_initial_management_entity_for_form()
         }
 
-    def get_parent_identity(self) -> Optional['NodeIdentity']:
+    def _get_initial_academic_year_for_form(self):
+        parent_group = self.get_parent_group()
+        request_cache = RequestCache(self.request.user, reverse('version_program'))
+        if parent_group:
+            return parent_group.year
+        elif request_cache.get_value_cached('academic_year'):
+            return AcademicYear.objects.get(
+                id=request_cache.get_value_cached('academic_year')[0]
+            ).year
+        return starting_academic_year()
+
+    def _get_initial_management_entity_for_form(self):
+        return self.get_parent_group() and self.get_parent_group().management_entity.acronym
+
+    @functools.lru_cache()
+    def get_parent_group(self) -> Optional['Group']:
         if self.get_attach_path():
-            cmd_get_node_id = program_management_command.GetNodeIdentityFromElementId(
+            cmd_get_node_id = command_pgrm.GetNodeIdentityFromElementId(
                 int(self.get_attach_path().split('|')[-1])
             )
             parent_id = node_identity_service.get_node_identity_from_element_id(cmd_get_node_id)
-            return parent_id
+            return get_group_service.get_group(
+                command.GetGroupCommand(code=parent_id.code, year=parent_id.year)
+            )
         return None
 
     def post(self, request, *args, **kwargs):
@@ -161,7 +158,7 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
     def _call_service(self, create_training_data: dict) -> List['TrainingIdentity']:
         if self.get_attach_path():
-            cmd = program_management_command.CreateAndAttachTrainingCommand(
+            cmd = command_pgrm.CreateAndAttachTrainingCommand(
                 **create_training_data,
                 path_to_paste=self.get_attach_path(),
             )
