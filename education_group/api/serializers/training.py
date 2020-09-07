@@ -118,8 +118,8 @@ class TrainingDetailSerializer(TrainingListSerializer):
     web_re_registration = serializers.BooleanField(source='offer.web_re_registration')
     co_graduation_coefficient = serializers.DecimalField(
         source='offer.co_graduation_coefficient',
-        max_digits=5,
-        decimal_places=2
+        max_digits=7,
+        decimal_places=4
     )
     co_graduation = serializers.CharField(source='offer.co_graduation')
     internal_comment = serializers.CharField(source='offer.internal_comment')
