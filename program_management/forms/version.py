@@ -75,11 +75,11 @@ class SpecificVersionForm(forms.Form):
         )
         choices_years = [(x, display_as_academic_year(x)) for x in range(self.training_identity.year, max_year + 1)]
 
-        if max_year < timezone.now().year+6:
+        if max_year == timezone.now().year+6:
+            self.fields["end_year"].choices = BLANK_CHOICE + choices_years
+        else:
             self.fields["end_year"].choices = choices_years
             self.fields["end_year"].initial = choices_years[-1]
-        else:
-            self.fields["end_year"].choices = BLANK_CHOICE + choices_years
 
     def clean_end_year(self):
         end_year = self.cleaned_data["end_year"]
