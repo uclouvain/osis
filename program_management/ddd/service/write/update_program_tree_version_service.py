@@ -23,13 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.db import transaction
 
 from program_management.ddd.command import UpdateProgramTreeVersionCommand
-from program_management.ddd.domain.program_tree_version import STANDARD, UpdateProgramTreeVersiongData, \
+from program_management.ddd.domain.program_tree_version import UpdateProgramTreeVersiongData, \
     ProgramTreeVersionIdentity
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 
 
+@transaction.atomic()
 def update_program_tree_version(
         command: 'UpdateProgramTreeVersionCommand',
 ) -> 'ProgramTreeVersionIdentity':
