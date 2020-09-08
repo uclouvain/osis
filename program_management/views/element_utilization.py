@@ -23,13 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Dict
+
+from django.urls import reverse
+
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command
-from program_management.ddd.service.read import search_tree_versions_using_node_service
-from program_management.views.generic import LearningUnitGeneric
-from program_management.serializers.node_view import get_program_tree_version_name
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
+from program_management.ddd.service.read import search_tree_versions_using_node_service
+from program_management.serializers.node_view import get_program_tree_version_name
+from program_management.views.generic import LearningUnitGeneric
 
 
 class LearningUnitUtilization(PermissionRequiredMixin, LearningUnitGeneric):
@@ -44,20 +48,43 @@ class LearningUnitUtilization(PermissionRequiredMixin, LearningUnitGeneric):
         program_trees_versions = search_tree_versions_using_node_service.search_tree_versions_using_node(cmd)
 
         context['utilization_rows'] = []
+        parents = []
         for program_tree_version in program_trees_versions:
             tree = program_tree_version.get_tree()
+
             for link in tree.get_links_using_node(self.node):
                 parent_node_identity = NodeIdentity(code=link.parent.code, year=link.parent.year)
-                context['utilization_rows'].append(
-                    {'link': link,
-                     'link_parent_version_label': get_program_tree_version_name(
-                         parent_node_identity,
-                         ProgramTreeVersionRepository.search_all_versions_from_root_node(parent_node_identity)
-                     ),
-                     'root_nodes': [tree.root_node],
-                     'root_version_label': "{}".format(
-                         program_tree_version.version_label if program_tree_version.version_label else ''
-                     )}
-                )
+                if parent_node_identity not in parents:
+                    parents.append(parent_node_identity)
+                    trainings = self._find_trainings_using_learning_unit_year(link)
+
+                    context['utilization_rows'].append(
+                        {'link': link,
+                         'link_parent_version_label': get_program_tree_version_name(
+                             parent_node_identity,
+                             ProgramTreeVersionRepository.search_all_versions_from_root_node(parent_node_identity)
+                         ),
+                         'root_nodes': trainings,
+                         'root_version_label': "{}".format(
+                             program_tree_version.version_label if program_tree_version.version_label else ''
+                         ),
+                         }
+                    )
         context['utilization_rows'] = sorted(context['utilization_rows'], key=lambda row: row['link'].parent.code)
         return context
+
+    @staticmethod
+    def _find_trainings_using_learning_unit_year(link: 'Link') -> Dict:
+        cmd = command.GetProgramTreesVersionFromNodeCommand(code=link.parent.code, year=link.parent.year)
+        program_trees_versions_using_lu = search_tree_versions_using_node_service.search_tree_versions_using_node(cmd)
+        trainings = []
+        for program_tree_version in program_trees_versions_using_lu:
+            root_node = program_tree_version.get_tree().root_node
+            trainings.append({
+                'root_node': root_node,
+                'root_version_label': program_tree_version.version_label,
+                'root_url': reverse('element_identification',
+                                    kwargs={'code': root_node.code,
+                                            'year': root_node.year})
+            })
+        return trainings
