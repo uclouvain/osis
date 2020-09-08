@@ -35,6 +35,7 @@ from education_group.ddd.domain.service.calculate_end_postponement import DEFAUL
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from program_management.ddd.command import GetEndPostponementYearCommand
 from program_management.ddd.domain.node import NodeIdentity
+from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.ddd.service.read import get_end_postponement_year_service
 
 
@@ -62,8 +63,14 @@ class SpecificVersionForm(forms.Form):
         label=_('This version exists until'),
     )
 
-    def __init__(self, training_identity: 'TrainingIdentity', node_identity: 'NodeIdentity', *args, **kwargs):
-        self.training_identity = training_identity
+    def __init__(
+            self,
+            tree_version_identity: 'ProgramTreeVersionIdentity',
+            node_identity: 'NodeIdentity',
+            *args,
+            **kwargs
+    ):
+        self.tree_version_identity = tree_version_identity
         self.node_identity = node_identity
         super().__init__(*args, **kwargs)
 
@@ -75,10 +82,10 @@ class SpecificVersionForm(forms.Form):
         )
         choices_years = [
             (year, display_as_academic_year(year))
-            for year in range(self.training_identity.year, max_year + 1)
+            for year in range(self.tree_version_identity.year, max_year + 1)
         ]
 
-        if not _has_end_year(choices_years):
+        if not ProgramTreeVersionRepository.get(self.tree_version_identity).end_year_of_existence:
             choices_years += BLANK_CHOICE
 
         self.fields["end_year"].choices = choices_years
@@ -90,7 +97,3 @@ class SpecificVersionForm(forms.Form):
 
     def clean_version_name(self):
         return self.cleaned_data['version_name'].upper()
-
-
-def _has_end_year(choices_years):
-    return len(choices_years) < DEFAULT_YEARS_TO_POSTPONE
