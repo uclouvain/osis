@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-03 11:16+0200\n"
+"POT-Creation-Date: 2020-09-08 14:33+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -202,6 +202,9 @@ msgid "English comment"
 msgstr ""
 
 msgid "Entity"
+msgstr ""
+
+msgid "Error(s) in form: The modifications are not saved"
 msgstr ""
 
 msgid "Evaluation methods"
@@ -557,6 +560,10 @@ msgid "The learning unit is a prerequisite"
 msgstr ""
 
 #, python-format
+msgid "The link of %(code)s - %(acronym)s - %(year)s has been updated."
+msgstr ""
+
+#, python-format
 msgid "The parent must have at least one child of type(s) \"%(types)s\"."
 msgstr ""
 
@@ -622,6 +629,9 @@ msgstr ""
 
 #, python-brace-format
 msgid "Unable to publish sections for {code} - {year}"
+msgstr ""
+
+msgid "Update Content"
 msgstr ""
 
 msgid "Utilizations"
