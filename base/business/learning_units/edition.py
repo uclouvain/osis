@@ -24,7 +24,7 @@
 #
 ##############################################################################
 import logging
-from typing import Dict, List, Any, Iterable
+from typing import Dict, List, Any
 
 from django.conf import settings
 from django.db import IntegrityError, transaction, Error
@@ -62,7 +62,6 @@ from cms.models.translated_text import TranslatedText
 from learning_unit.models.learning_class_year import LearningClassYear
 from osis_common.utils.numbers import normalize_fraction
 from reference.models.language import Language
-
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 FIELDS_TO_EXCLUDE_WITH_REPORT = ("is_vacant", "type_declaration_vacant", "attribution_procedure")
@@ -140,7 +139,8 @@ def _check_extend_partim(last_learning_unit_year, new_academic_year):
     lu_parent = last_learning_unit_year.parent
     if last_learning_unit_year.is_partim() and lu_parent:
         actual_end_year = _get_actual_end_year(lu_parent.learning_unit).year
-        if actual_end_year < new_academic_year.year:
+        both_no_end_year = no_planned_end and not lu_parent.learning_unit.end_year
+        if not both_no_end_year and actual_end_year < new_academic_year.year:
             raise IntegrityError(
                 _('The selected end year (%(partim_end_year)s) is greater '
                   'than the end year of the parent %(lu_parent)s') % {
@@ -290,6 +290,8 @@ def _get_actual_end_year(learning_unit_to_edit):
     ).first()
     end_year_lu = proposal.initial_data.get('learning_unit').get('end_year') if proposal \
         else learning_unit_to_edit.end_year
+    print("END YEAR LU : ", end_year_lu)
+    print("COMPUTED : ", compute_max_academic_year_adjournment())
     return end_year_lu or academic_year.find_academic_year_by_year(compute_max_academic_year_adjournment() + 1)
 
 
