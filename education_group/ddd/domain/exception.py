@@ -5,7 +5,11 @@ from education_group.ddd.business_types import *
 
 
 class TrainingNotFoundException(Exception):
-    pass
+    def __init__(self, *args, acronym: str = None, year: int = None):
+        message = ''
+        if acronym or year:
+            message = _("Training not found : {acronym} {year}".format(acronym=acronym, year=year))
+        super().__init__(message, *args)
 
 
 class MiniTrainingNotFoundException(Exception):
@@ -194,4 +198,12 @@ class MiniTrainingHaveLinkWithEPC(BusinessException):
 class VersionNameAlreadyExist(BusinessException):
     def __init__(self, version_name: str, *args, **kwargs):
         message = _("Version name {} already exists").format(version_name)
+        super().__init__(message, **kwargs)
+
+
+class MultipleEntitiesFoundException(BusinessException):
+    def __init__(self, entity_acronym: str, year: int, *args, **kwargs):
+        message = _(
+            "Multiple entities {entity_acronym} found in {year}"
+        ).format(entity_acronym=entity_acronym, year=year)
         super().__init__(message, **kwargs)

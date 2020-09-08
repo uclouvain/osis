@@ -113,19 +113,29 @@ class ProgramTreeBuilder:
         validators_by_business_action.CopyProgramTreeValidatorList(copy_from).validate()
         identity_next_year = attr.evolve(copy_from.entity_id, year=copy_from.entity_id.year + 1)
         try:
-            program_tree_next_year = repository.get(identity_next_year)
             # Case update program tree to next year
-            # TODO :: To implement in OSIS-4809
-            pass
+            program_tree_next_year = repository.get(identity_next_year)
         except exception.ProgramTreeNotFoundException:
             # Case create program tree to next year
-            program_tree_next_year = attr.evolve(  # Copy to new object
-                copy_from,
-                root_node=self._copy_node_and_children_to_next_year(copy_from.root_node),
+            root_next_year = node_factory.copy_to_next_year(copy_from.root_node)
+            program_tree_next_year = ProgramTree(
                 entity_id=identity_next_year,
+                root_node=root_next_year,
+                authorized_relationships=load_authorized_relationship.load()
             )
+
+        root_next_year = program_tree_next_year.root_node
+        mandatory_types = copy_from.get_ordered_mandatory_children_types(
+            parent_node=root_next_year
+        )
+        children_current_year = copy_from.root_node.get_direct_children_as_nodes()
+        for child_current_year in children_current_year:
+            if child_current_year.node_type in mandatory_types:
+                child_next_year = node_factory.copy_to_next_year(child_current_year)
+                root_next_year.add_child(child_next_year, is_mandatory=True)
         return program_tree_next_year
 
+    # Do not delete : will be usefull to copy content of a program tree to next year
     def _copy_node_and_children_to_next_year(self, copy_from_node: 'Node') -> 'Node':
         parent_next_year = node_factory.copy_to_next_year(copy_from_node)
         for copy_from_link in copy_from_node.children:
@@ -147,34 +157,12 @@ class ProgramTreeBuilder:
 
     def _generate_mandatory_direct_children(
             self,
-            program_tree: 'ProgramTree'
+            program_tree: 'ProgramTree',
     ) -> List['Node']:
         children = []
         root_node = program_tree.root_node
         for child_type in program_tree.get_ordered_mandatory_children_types(program_tree.root_node):
-            # TODO :: move this below into NodeBuilder
-            generated_child_title = FieldValidationRule.get(
-                child_type,
-                'title_fr'
-            ).initial_value
-            child = node_factory.get_node(
-                type=NodeType.GROUP,
-                node_type=child_type,
-                code=GenerateNodeCode.generate_from_parent_node(root_node, child_type),
-                title=GenerateNodeAbbreviatedTitle.generate(
-                    parent_node=root_node,
-                    child_node_type=child_type,
-                ),
-                year=root_node.year,
-                teaching_campus=root_node.teaching_campus,
-                management_entity_acronym=root_node.management_entity_acronym,
-                group_title_fr="{child_title} {parent_abbreviated_title}".format(
-                    child_title=generated_child_title,
-                    parent_abbreviated_title=root_node.title
-                ),
-                start_year=root_node.year,
-            )
-            child._has_changed = True
+            child = node_factory.generate_from_parent(parent_node=root_node, child_type=child_type)
             root_node.add_child(child, is_mandatory=True)
             children.append(child)
         return children

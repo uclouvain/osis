@@ -80,6 +80,10 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             path = str(root_element.pk)
         return path
 
+    @functools.lru_cache()
+    def is_root_node(self):
+        return len(self.get_path().split('|')) <= 1
+
     @cached_property
     def node_identity(self) -> 'NodeIdentity':
         return NodeIdentity(code=self.kwargs['code'], year=self.kwargs['year'])
@@ -196,10 +200,11 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
                "?path={}".format(self.get_path())
 
     def get_create_version_url(self):
-        return reverse(
-            'create_education_group_version',
-            kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}
-        ) + "?path={}".format(self.get_path())
+        if self.is_root_node():
+            return reverse(
+                'create_education_group_version',
+                kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}
+            ) + "?path={}".format(self.get_path())
 
     def get_tab_urls(self):
         node_identity = self.get_object().entity_id

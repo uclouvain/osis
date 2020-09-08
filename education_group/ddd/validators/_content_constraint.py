@@ -43,7 +43,7 @@ class ContentConstraintValidator(business_validator.BusinessValidator):
             raise ContentConstraintTypeMissing
 
         if self.content_constraint.type and \
-           (self.content_constraint.maximum is None or self.content_constraint.minimum is None):
+           (self.content_constraint.maximum is None and self.content_constraint.minimum is None):
             raise ContentConstraintMinimumMaximumMissing
 
         if self.content_constraint.minimum is not None and self.content_constraint.maximum is not None and \

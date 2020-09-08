@@ -3,6 +3,11 @@
 
 {% block breadcrumb %}
     {{ block.super }}
+    {% if parent_group %}
+        <li class="active">
+            <a href="{{ cancel_url }}">{{ parent_group.code }}</a>
+        </li>
+    {% endif %}
     <li class="active">
         {% trans 'New Education Group' %}
     </li>
