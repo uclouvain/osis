@@ -30,7 +30,7 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY, CMS_LABEL_SPECIFICATIONS, CMS_LABEL_PEDAGOGY_FR_AND_EN, \
-    CMS_LABEL_PEDAGOGY_FR_ONLY
+    CMS_LABEL_PEDAGOGY_FR_ONLY, CMS_LABEL_PEDAGOGY_FORCE_MAJEURE
 from base.models.learning_unit_year import LearningUnitYear
 from cms.models.translated_text import TranslatedText
 from learning_unit.api.serializers.summary_specification import LearningUnitSummarySpecificationSerializer
@@ -55,7 +55,12 @@ class LearningUnitSummarySpecification(generics.GenericAPIView):
         qs_parent = self._get_translated_texts(parent) if parent else None
         qs = self._get_translated_texts(learning_unit_year).values('label', 'text')
 
-        summary_specification_grouped = dict.fromkeys(CMS_LABEL_PEDAGOGY + CMS_LABEL_SPECIFICATIONS, None)
+        summary_specification_grouped = dict.fromkeys(
+            CMS_LABEL_PEDAGOGY +
+            CMS_LABEL_SPECIFICATIONS +
+            CMS_LABEL_PEDAGOGY_FORCE_MAJEURE,
+            None
+        )
         for key in summary_specification_grouped.keys():
             partim_text = qs.filter(label=key).values_list('text', flat=True).first()
             parent_text = qs_parent.filter(label=key).values_list('text', flat=True).first() if qs_parent else None
@@ -69,13 +74,13 @@ class LearningUnitSummarySpecification(generics.GenericAPIView):
         language = self.request.LANGUAGE_CODE
         qs = TranslatedText.objects.filter(
             reference=luy.pk,
-            text_label__label__in=CMS_LABEL_PEDAGOGY + CMS_LABEL_SPECIFICATIONS
+            text_label__label__in=CMS_LABEL_PEDAGOGY + CMS_LABEL_SPECIFICATIONS + CMS_LABEL_PEDAGOGY_FORCE_MAJEURE
         ).annotate(
             label=F('text_label__label')
         ).filter(
             Q(
                 language=settings.LANGUAGE_CODE_FR if language == settings.LANGUAGE_CODE_FR[:2] else language,
-                label__in=CMS_LABEL_PEDAGOGY_FR_AND_EN + CMS_LABEL_SPECIFICATIONS
+                label__in=CMS_LABEL_PEDAGOGY_FR_AND_EN + CMS_LABEL_SPECIFICATIONS + CMS_LABEL_PEDAGOGY_FORCE_MAJEURE
             )
             |
             Q(
