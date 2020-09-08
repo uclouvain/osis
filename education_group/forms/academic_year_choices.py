@@ -23,7 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List, Tuple, Dict
+import contextlib
+from typing import List, Tuple
 
 from django.urls import reverse
 
@@ -47,7 +48,7 @@ def get_academic_year_choices(
 
     result = []
     for node_id in node_ids:
-        try:
+        with contextlib.suppress(KeyError):
             result.append(
                 (
                     _get_href(
@@ -58,8 +59,6 @@ def get_academic_year_choices(
                     node_id.year
                 )
             )
-        except KeyError:
-            continue
     return result
 
 
