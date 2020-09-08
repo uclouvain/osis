@@ -7,11 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-<<<<<<< HEAD
-"POT-Creation-Date: 2020-08-28 13:52+0200\n"
-=======
 "POT-Creation-Date: 2020-09-03 11:16+0200\n"
->>>>>>> 2e729fd0937c29f379278ea2755c2766fd5888a6
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,16 +16,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-<<<<<<< HEAD
-#, fuzzy, python-format
-#| msgid "\"%(child)s\" has been detached from \"%(parent)s\""
-=======
 #, python-format
 msgid "\"%(child)s\" has been detached from \"%(parent)s\""
 msgstr "\"%(child)s\" has been removed from \"%(parent)s\""
 
 #, python-format
->>>>>>> 2e729fd0937c29f379278ea2755c2766fd5888a6
 msgid "\"%(child)s\" has been pasted into \"%(parent)s\""
 msgstr ""
 
