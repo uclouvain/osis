@@ -21,35 +21,29 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from typing import List
-
 from django.db import transaction
 
+from education_group.ddd import command as command_education_group
+from education_group.ddd.service.write import delete_orphan_mini_training_service
 from program_management.ddd import command
-from program_management.ddd.domain.program_tree_version import STANDARD, ProgramTreeVersionIdentity
-from program_management.ddd.domain.service import identity_search
-from program_management.ddd.service.write import delete_training_standard_version_service
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
+from program_management.ddd.service.write import delete_standard_version_service
 
 
 @transaction.atomic()
-def delete_permanently_training_standard_version(
-        cmd: command.DeletePermanentlyTrainingStandardVersionCommand
-) -> List['ProgramTreeVersionIdentity']:
-    program_tree_standard_id = ProgramTreeVersionIdentity(
-        offer_acronym=cmd.acronym,
-        year=cmd.year,
-        version_name=STANDARD,
-        is_transition=False
-    )
-    program_tree_version_ids = identity_search.ProgramTreeVersionIdentitySearch.get_all_program_tree_version_identities(
-        program_tree_standard_id
-    )
-
-    for program_tree_version_id in program_tree_version_ids:
-        delete_training_standard_version_service.delete_training_standard_version(
-            command.DeleteTrainingStandardVersionCommand(
-                offer_acronym=program_tree_version_id.offer_acronym,
-                year=program_tree_version_id.year,
-            )
+def delete_mini_training_standard_version(
+        cmd: command.DeleteMiniTrainingWithStandardVersionCommand
+) -> ProgramTreeVersionIdentity:
+    tree_version_id = delete_standard_version_service.delete_standard_version(
+        command.DeleteStandardVersionCommand(
+            acronym=cmd.mini_training_acronym,
+            year=cmd.year,
         )
-    return program_tree_version_ids
+    )
+    delete_orphan_mini_training_service.delete_orphan_mini_training(
+        command_education_group.DeleteOrphanMiniTrainingCommand(
+            abbreviated_title=cmd.mini_training_acronym,
+            year=cmd.year
+        )
+    )
+    return tree_version_id

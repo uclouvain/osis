@@ -656,6 +656,9 @@ msgstr ""
 msgid "Delete selected messages"
 msgstr ""
 
+msgid "Delete tree version permanently"
+msgstr ""
+
 msgid "Deliberation"
 msgstr ""
 
