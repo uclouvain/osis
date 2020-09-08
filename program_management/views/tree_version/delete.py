@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils.functional import cached_property
@@ -39,7 +39,8 @@ from education_group.models.group_year import GroupYear
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command as command_program_management
 from program_management.ddd.business_types import *
-from program_management.ddd.domain.exception import ProgramTreeNonEmpty, NodeHaveLinkException
+from program_management.ddd.domain.exception import ProgramTreeNonEmpty, NodeHaveLinkException, \
+    ProgramTreeVersionNotFoundException
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
@@ -51,7 +52,10 @@ class TreeVersionDeleteView(PermissionRequiredMixin, AjaxTemplateMixin, DeleteVi
     permission_required = 'program_management.delete_all_tree_version'
 
     def get_object(self, queryset=None) -> 'ProgramTreeVersion':
-        return ProgramTreeVersionRepository.get(self.tree_version_identity)
+        try:
+            return ProgramTreeVersionRepository.get(self.tree_version_identity)
+        except ProgramTreeVersionNotFoundException:
+            raise Http404
 
     @cached_property
     def node_identity(self) -> 'NodeIdentity':
