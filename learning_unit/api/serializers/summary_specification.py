@@ -36,3 +36,6 @@ class LearningUnitSummarySpecificationSerializer(serializers.Serializer):
     themes_discussed = serializers.CharField(read_only=True)
     prerequisite = serializers.CharField(read_only=True)
     mobility = serializers.CharField(allow_null=True, read_only=True)
+    teaching_methods_force_majeure = serializers.CharField(allow_null=True, read_only=True)
+    evaluation_methods_force_majeure = serializers.CharField(allow_null=True, read_only=True)
+    other_informations_force_majeure = serializers.CharField(allow_null=True, read_only=True)

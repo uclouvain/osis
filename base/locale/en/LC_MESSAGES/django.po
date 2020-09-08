@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-13 08:27+0200\n"
+"POT-Creation-Date: 2020-08-21 11:01+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -903,6 +903,9 @@ msgstr ""
 msgid "End year"
 msgstr ""
 
+msgid "Ending date"
+msgstr ""
+
 msgid "Ending of course registration"
 msgstr ""
 
@@ -1052,6 +1055,9 @@ msgid "Folder num."
 msgstr ""
 
 msgid "For all students"
+msgstr ""
+
+msgid "Force majeure : adaptation of the description fiche"
 msgstr ""
 
 msgid "Force state"
@@ -1762,6 +1768,9 @@ msgstr ""
 msgid "Not in period to edit description fiche."
 msgstr ""
 
+msgid "Not in period to edit force majeure section."
+msgstr ""
+
 msgid "Not in range of years which can be edited by you"
 msgstr ""
 
@@ -1812,6 +1821,9 @@ msgid "Open for externs"
 msgstr ""
 
 msgid "Open minor"
+msgstr ""
+
+msgid "Opening date"
 msgstr ""
 
 msgid "Opening to Adults"
@@ -2473,6 +2485,9 @@ msgid "Success"
 msgstr ""
 
 msgid "Summary course submission"
+msgstr ""
+
+msgid "Summary course submission force majeure"
 msgstr ""
 
 msgid "Summary course submission is not allowed for tutors during this period."
