@@ -94,7 +94,7 @@ class TestCreate(TestCase):
             mock_node_identity_search):
         mini_training_identity = mini_training.MiniTrainingIdentity(acronym="ACRO", year=2020)
         mock_node_identity_search.return_value.get_from_element_id.return_value = node.NodeIdentity(
-            code='Cocode',
+            code='COCODE',
             year=2020
         )
         mock_service.return_value = [mini_training_identity]
@@ -112,7 +112,7 @@ class TestCreate(TestCase):
 
         expected_reverse = reverse_with_get(
             "element_identification",
-            kwargs={"code": "Cocode", "year": 2020},
+            kwargs={"code": "COCODE", "year": 2020},
             get={"path": "10|25"}
 
         )
