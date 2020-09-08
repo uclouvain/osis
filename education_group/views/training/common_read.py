@@ -173,8 +173,8 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
                                         ),
         }
 
-    def get_permission_object(self):
-        return self.education_group_version.offer
+    def get_permission_object(self) -> 'GroupYear':
+        return self.education_group_version.root_group
 
     def get_create_group_url(self):
         return reverse('create_element_select_type', kwargs={'category': Categories.GROUP.name}) + \

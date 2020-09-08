@@ -40,14 +40,12 @@ class FacultyManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
             'base.add_minitraining':
                 predicates.is_user_attached_to_management_entity &
                 predicates.is_user_linked_to_all_scopes_of_management_entity &
-                predicates.is_program_edition_period_open &
-                predicates.is_allowed_to_create_children_of_category_mini_training,
+                predicates.is_program_edition_period_open,
             'base.add_group':
                 predicates.is_user_attached_to_management_entity &
                 predicates.is_user_linked_to_all_scopes_of_management_entity &
                 predicates.is_program_edition_period_open &
-                predicates.is_not_orphan_group &
-                predicates.is_allowed_to_create_children_of_category_group,
+                predicates.is_not_orphan_group,
             # TODO : split in training, minitraining, group
             'base.change_educationgroup':
                 predicates.is_user_attached_to_management_entity &
