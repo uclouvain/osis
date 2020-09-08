@@ -78,8 +78,10 @@ def _get_form_class(
 
     form_class = PasteNodeForm
 
-    if node_to_paste_into.is_minor_major_list_choice():
+    if node_to_paste_into.is_minor_major_list_choice() and not node_to_paste.is_minor_major_list_choice():
         form_class = PasteToMinorMajorListChoiceForm
+    elif node_to_paste_into.is_minor_major_list_choice() and node_to_paste.is_minor_major_list_choice():
+        form_class = PasteMinorMajorListToMinorMajorListChoiceForm
     elif node_to_paste_into.is_option_list_choice():
         form_class = PasteToOptionListChoiceForm
     elif node_to_paste.node_type == NodeType.LEARNING_UNIT:
@@ -184,6 +186,10 @@ class PasteToMinorMajorListChoiceForm(PasteNodeForm):
             relative_credits=self.cleaned_data.get("relative_credits"),
             path_where_to_detach=self.path_to_detach
         )
+
+
+class PasteMinorMajorListToMinorMajorListChoiceForm(PasteNodeForm):
+    access_condition = forms.BooleanField(initial=False, disabled=True)
 
 
 class PasteToOptionListChoiceForm(PasteNodeForm):
