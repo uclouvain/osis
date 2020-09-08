@@ -26,6 +26,7 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
+from attribution.models.tutor_application import TutorApplication
 from base.business import event_perms
 from base.business.learning_units.edition import edit_learning_unit_end_date
 from base.forms.learning_unit.learning_unit_postponement import LearningUnitPostponementForm
@@ -78,6 +79,13 @@ class LearningUnitEndDateForm(forms.Form):
 
         event_perm = self.get_event_perm_generator()(self.person)
         self.luy_current_year = self.learning_unit_year.academic_year.year
+
+        applications = TutorApplication.objects.filter(
+            learning_container_year__learning_container=self.learning_unit_year.learning_container_year.learning_container,
+            learning_container_year__academic_year__year__gte=self.learning_unit_year.learning_container_year.academic_year.year
+        ).order_by('learning_container_year__academic_year__year')
+        if not max_year and applications:
+            max_year = applications.first().learning_container_year.academic_year.year
         academic_years = event_perm.get_academic_years(min_academic_y=self.luy_current_year, max_academic_y=max_year)
 
         return academic_years
@@ -116,10 +124,10 @@ class LearningUnitProposalEndDateForm(LearningUnitEndDateForm):
     def _get_academic_years(self, max_year):
         super()._get_academic_years(max_year)
         # Allow previous year as last organisation year for suppression proposal
-        return AcademicYear.objects.filter(year=self.luy_current_year-1)
+        return AcademicYear.objects.filter(year=self.luy_current_year - 1)
 
     def clean_academic_year(self):
-        return AcademicYear.objects.get(year=self.luy_current_year-1)
+        return AcademicYear.objects.get(year=self.luy_current_year - 1)
 
 
 class LearningUnitDailyManagementEndDateForm(LearningUnitEndDateForm):
