@@ -29,6 +29,7 @@ from django.urls import include, path
 import program_management.views.tree.copy_cut
 import program_management.views.tree_version.check_version_name
 from program_management.views import quick_search, create_element, publish_general_information, content
+from program_management.views.proxy.content import ContentRedirectView
 from program_management.views.proxy.identification import IdentificationRedirectView
 from program_management.views import groupelementyear_read, element_utilization, excel, search, \
     tree, prerequisite_read, prerequisite_update
@@ -106,6 +107,7 @@ urlpatterns = [
 
     path('<int:year>/<str:code>/', include([
         path('', IdentificationRedirectView.as_view(), name='element_identification'),
+        path('content/', ContentRedirectView.as_view(), name='element_content'),
         path(
             'create_education_group_version/',
             create_program_tree_version.CreateProgramTreeVersion.as_view(),

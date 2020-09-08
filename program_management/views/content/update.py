@@ -14,7 +14,6 @@ from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import exception, group
 from education_group.ddd.service.read import get_training_service, get_group_service, get_multiple_groups_service
-from education_group.enums.node_type import NodeType
 from education_group.forms import content as content_forms
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from learning_unit.ddd import command as command_learning_unit_year
@@ -26,6 +25,7 @@ from program_management.ddd import command as command_program_management
 from program_management.ddd.business_types import *
 from program_management.ddd.service.read import get_program_tree_service
 from program_management.ddd.service.write import update_link_service
+from program_management.models.enums.node_type import NodeType
 
 
 class ContentUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
@@ -53,21 +53,10 @@ class ContentUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         display_error_messages(self.request, self._get_default_error_messages())
         return self.get(request, *args, **kwargs)
 
-    def get_tabs(self) -> List:
-        return [
-            {
-                "id": "content",
-                "text": _("Content"),
-                "active": True,
-                "display": True,
-                "include_html": "education_group_app/training/upsert/content_form.html"
-            }
-        ]
-
     def get_success_url(self) -> str:
         get_data = {'path': self.request.GET['path_to']} if self.request.GET.get('path_to') else {}
         return reverse_with_get(
-            'element_identification',
+            'element_content',
             kwargs={'code': self.kwargs['code'], 'year': self.kwargs['year']},
             get=get_data
         )
