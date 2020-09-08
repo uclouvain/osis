@@ -86,7 +86,10 @@ class PermsTestCase(TestCase):
         previous_academic_yr = AcademicYearFactory.build(year=cls.academic_yr.year - 1)
         super(AcademicYear, previous_academic_yr).save()
 
-        cls.lunit_container_yr = LearningContainerYearFactory(academic_year=cls.academic_yr)
+        cls.lunit_container_yr = LearningContainerYearFactory(
+            academic_year=cls.academic_yr,
+            requirement_entity=EntityFactory()
+        )
         cls.luy = LearningUnitYearFactory(
             academic_year=cls.academic_yr,
             learning_container_year=cls.lunit_container_yr,
@@ -106,13 +109,21 @@ class PermsTestCase(TestCase):
 
             self.assertTrue(perms._is_learning_unit_year_in_state_to_be_modified(luy, self.person_fac, False))
 
-    def test_not_eligible_if_has_application(self):
-        luy = LearningUnitYearFactory(academic_year__year=2020)
-        TutorApplicationFactory(learning_container_year=luy.learning_container_year)
+    def test_not_eligible_if_has_application_in_future(self):
+        next_luy = LearningUnitYearFactory(
+            learning_unit=self.luy.learning_unit,
+            academic_year__year=2021,
+            learning_container_year__learning_container=self.luy.learning_container_year.learning_container
+        )
+        TutorApplicationFactory(learning_container_year=next_luy.learning_container_year)
         self.assertFalse(
-            perms.is_eligible_for_modification_end_date(
-                luy, PersonWithPermissionsFactory('can_edit_learningunit_date')
-            )
+            perms._has_no_applications_in_future_years(self.luy)
+        )
+
+    def test_eligible_if_has_application_but_none_in_future(self):
+        TutorApplicationFactory(learning_container_year=self.luy.learning_container_year)
+        self.assertTrue(
+            perms._has_no_applications_in_future_years(self.luy)
         )
 
     def test_can_faculty_manager_modify_end_date_full(self):
