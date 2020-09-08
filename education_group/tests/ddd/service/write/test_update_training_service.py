@@ -32,6 +32,7 @@ from education_group.tests.ddd.factories.training import TrainingFactory
 from testing.mocks import MockPatcherMixin
 
 
+@mock.patch("education_group.ddd.service.write.update_group_service.update_group")
 @mock.patch("education_group.ddd.domain.service.calculate_end_postponement."
             "CalculateEndPostponement.calculate_year_of_postponement", return_value=2020)
 class TestUpdateTraining(TestCase, MockPatcherMixin):
@@ -41,7 +42,7 @@ class TestUpdateTraining(TestCase, MockPatcherMixin):
         self.fake_training_repo = get_fake_training_repository(self.trainings)
         self.mock_repo("education_group.ddd.repository.training.TrainingRepository", self.fake_training_repo)
 
-    def test_should_return_identities(self, mock_end_year_of_postponement):
+    def test_should_return_identities(self, mock_end_year_of_postponement, mock_update_group):
         update_command = UpdateTrainingCommandFactory(year=2018, abbreviated_title="MERC")
 
         result = update_training_service.update_training(update_command)
@@ -49,10 +50,12 @@ class TestUpdateTraining(TestCase, MockPatcherMixin):
         expected_result = [training.TrainingIdentity(acronym="MERC", year=year) for year in range(2018, 2021)]
         self.assertListEqual(expected_result, result)
 
-    def test_should_postpone_updates(self, mock_end_year_of_postponement):
+    def test_should_postpone_updates(self, mock_end_year_of_postponement, mock_update_group):
         update_command = UpdateTrainingCommandFactory(year=2018, abbreviated_title="MERC")
 
         identities = update_training_service.update_training(update_command)
+
+        self.assertTrue(mock_update_group.called)
 
         base_training = self.fake_training_repo.get(identities[0])
 

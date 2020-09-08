@@ -23,38 +23,36 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db import transaction
 
-from program_management.ddd.command import UpdateProgramTreeVersionCommand
-from program_management.ddd.domain.program_tree_version import UpdateProgramTreeVersiongData, \
-    ProgramTreeVersionIdentity
-from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
+import factory.fuzzy
 
-
-@transaction.atomic()
-def update_program_tree_version(
-        command: 'UpdateProgramTreeVersionCommand',
-) -> 'ProgramTreeVersionIdentity':
-    identity = ProgramTreeVersionIdentity(
-        offer_acronym=command.offer_acronym,
-        year=command.year,
-        version_name=command.version_name,
-        is_transition=command.is_transition,
-    )
-    program_tree_version = ProgramTreeVersionRepository().get(entity_id=identity)
-
-    program_tree_version.update(__convert_command_to_update_data(command))
-
-    identity = ProgramTreeVersionRepository.update(
-        program_tree_version=program_tree_version,
-    )
-
-    return identity
+from base.models.enums import education_group_types
+from base.models.enums.active_status import ActiveStatusEnum
+from program_management.ddd import command
 
 
-def __convert_command_to_update_data(cmd: UpdateProgramTreeVersionCommand) -> 'UpdateProgramTreeVersiongData':
-    return UpdateProgramTreeVersiongData(
-        title_fr=cmd.title_fr,
-        title_en=cmd.title_en,
-        end_year_of_existence=cmd.end_year,
-    )
+class UpdateTrainingVersionCommandFactory(factory.Factory):
+    class Meta:
+        model = command.UpdateTrainingVersionCommand
+        abstract = False
+
+    offer_acronym = "DROI2M"
+    version_name = "VERSIONNAME"
+    is_transition = False
+    year = 2019
+    credits = 23
+    end_year = None
+    title_fr = "fr  title"
+    title_en = "title  en"
+    teaching_campus_name = None
+    management_entity_acronym = None
+    teaching_campus_organization_name = None
+    constraint_type = None
+    min_constraint = None
+    max_constraint = None
+    remark_fr = None
+    remark_en = None
+
+
+
+
