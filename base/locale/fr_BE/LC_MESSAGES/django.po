@@ -726,7 +726,7 @@ msgid "Delete selected messages"
 msgstr "Supprimer les messages sélectionnés"
 
 msgid "Delete tree version permanently"
-msgstr "Supprimer version de programme définitivement"
+msgstr "Supprimer cette version définitivement"
 
 msgid "Deliberation"
 msgstr "Délibération"
