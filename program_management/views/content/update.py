@@ -32,7 +32,7 @@ class ContentUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
     permission_required = 'base.change_educationgroup'
     raise_exception = True
 
-    template_name = "education_group_app/content_update.html"
+    template_name = "program_management/content/update.html"
 
     def get(self, request, *args, **kwargs):
         context = {

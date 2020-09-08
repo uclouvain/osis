@@ -28,7 +28,7 @@ from django.urls import include, path
 
 import program_management.views.tree.copy_cut
 import program_management.views.tree_version.check_version_name
-from program_management.views import quick_search, create_element, publish_general_information
+from program_management.views import quick_search, create_element, publish_general_information, content
 from program_management.views.proxy.identification import IdentificationRedirectView
 from program_management.views import groupelementyear_read, element_utilization, excel, search, \
     tree, prerequisite_read, prerequisite_update
@@ -67,6 +67,7 @@ urlpatterns = [
             path('down/', tree.move.down, name="group_element_year_down")
         ])),
     ])),
+    path('<int:year>/<str:code>/content/update/', content.update.ContentUpdateView.as_view(), name='content_update'),
     path('up/', tree.move.up, name="content_up"),
     path('down/', tree.move.down, name="content_down"),
     path('create_element/<str:category>', create_element.SelectTypeCreateElementView.as_view(),
