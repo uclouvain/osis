@@ -290,8 +290,6 @@ def _get_actual_end_year(learning_unit_to_edit):
     ).first()
     end_year_lu = proposal.initial_data.get('learning_unit').get('end_year') if proposal \
         else learning_unit_to_edit.end_year
-    print("END YEAR LU : ", end_year_lu)
-    print("COMPUTED : ", compute_max_academic_year_adjournment())
     return end_year_lu or academic_year.find_academic_year_by_year(compute_max_academic_year_adjournment() + 1)
 
 
