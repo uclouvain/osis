@@ -37,6 +37,6 @@ def version_details(entity_id: 'NodeIdentity', tree_versions: List['ProgramTreeV
     program_tree_identity = ProgramTreeIdentitySearch().get_from_node_identity(entity_id)
     for program_tree_version in tree_versions:
         if program_tree_version.program_tree_identity == program_tree_identity:
-            return {"title": " - {}".format(program_tree_version.title_fr),
+            return {"title": " [{}]".format(program_tree_version.title_fr)if program_tree_version.title_fr else None,
                     "version_label": program_tree_version.version_label}
     return None
