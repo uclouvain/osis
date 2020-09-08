@@ -49,7 +49,7 @@ from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories import node as node_repository
 from program_management.ddd.service.read import element_selected_service, check_paste_node_service
-from program_management.forms.tree.paste import PasteNodesFormset, paste_form_factory, PasteToMinorMajorListChoiceForm, \
+from program_management.forms.tree.paste import PasteNodesFormset, paste_form_factory, PasteToMinorMajorListChoiceForm,\
     PasteToOptionListChoiceForm, PasteMinorMajorListToMinorMajorListChoiceForm
 
 
