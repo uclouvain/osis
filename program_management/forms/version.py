@@ -35,6 +35,7 @@ from education_group.ddd.domain.service.calculate_end_postponement import DEFAUL
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from program_management.ddd.command import GetEndPostponementYearCommand
 from program_management.ddd.domain.node import NodeIdentity
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.ddd.service.read import get_end_postponement_year_service
 

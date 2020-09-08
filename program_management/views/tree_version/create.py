@@ -171,7 +171,7 @@ class CreateProgramTreeVersion(AjaxPermissionRequiredMixin, AjaxTemplateMixin, V
 
 def _convert_form_to_create_command(form: SpecificVersionForm) -> CreateProgramTreeVersionCommand:
     return CreateProgramTreeVersionCommand(
-        offer_acronym=form.tree_version_identity.acronym,
+        offer_acronym=form.tree_version_identity.offer_acronym,
         version_name=form.cleaned_data.get("version_name"),
         year=form.tree_version_identity.year,
         is_transition=False,
@@ -184,7 +184,7 @@ def _convert_form_to_create_command(form: SpecificVersionForm) -> CreateProgramT
 def _convert_form_to_extend_command(form: SpecificVersionForm) -> ExtendProgramTreeVersionCommand:
     return ExtendProgramTreeVersionCommand(
         end_year_of_existence=form.cleaned_data['end_year'],
-        offer_acronym=form.tree_version_identity.acronym,
+        offer_acronym=form.tree_version_identity.offer_acronym,
         version_name=form.cleaned_data.get("version_name"),
         year=form.tree_version_identity.year,
         is_transition=False,
@@ -193,7 +193,7 @@ def _convert_form_to_extend_command(form: SpecificVersionForm) -> ExtendProgramT
 
 def _convert_form_to_update_command(form: SpecificVersionForm) -> UpdateProgramTreeVersionCommand:
     return UpdateProgramTreeVersionCommand(
-        offer_acronym=form.tree_version_identity.acronym,
+        offer_acronym=form.tree_version_identity.offer_acronym,
         version_name=form.cleaned_data.get("version_name"),
         year=form.tree_version_identity.year,
         is_transition=False,
@@ -207,7 +207,7 @@ def _convert_form_to_postpone_command(
         form: SpecificVersionForm, node_id: 'NodeIdentity'
 ) -> PostponeProgramTreeVersionCommand:
     return PostponeProgramTreeVersionCommand(
-        from_offer_acronym=form.tree_version_identity.acronym,
+        from_offer_acronym=form.tree_version_identity.offer_acronym,
         from_version_name=form.cleaned_data['version_name'],
         from_year=form.tree_version_identity.year,
         from_is_transition=False,
