@@ -265,8 +265,8 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     ares_authorization = forms.CharField(label=_('ARES ability'), widget=forms.TextInput(), required=False)
     code_inter_cfb = forms.CharField(max_length=8, label=_('Code co-graduation inter CfB'), required=False)
     coefficient = forms.DecimalField(
-        max_digits=5,
-        decimal_places=2,
+        max_digits=7,
+        decimal_places=4,
         label=_('Co-graduation total coefficient'),
         widget=forms.TextInput(),
         required=False,
