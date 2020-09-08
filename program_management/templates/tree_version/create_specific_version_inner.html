@@ -37,7 +37,7 @@
                 <div class="panel-body">
                     {% bootstrap_label form.version_name.label label_class="control-label" %}
                     <div class="version_name-group">
-                        {% bootstrap_field form.version_name form_group_class='form-group' show_label=False addon_before=training_identity.acronym addon_after=']' %}
+                        {% bootstrap_field form.version_name form_group_class='form-group' show_label=False addon_before=training_identity.acronym|add:"[" addon_after=']' %}
                         <span id="version_name_error_id"></span>
                     </div>
                     {% bootstrap_field form.title %}
