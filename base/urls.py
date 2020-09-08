@@ -53,7 +53,8 @@ from base.views.learning_units.detail import DetailLearningUnitYearView
 from base.views.learning_units.external import create as create_external
 from base.views.learning_units.pedagogy.publish import access_refreshed_publication
 from base.views.learning_units.pedagogy.read import learning_unit_pedagogy
-from base.views.learning_units.pedagogy.update import learning_unit_pedagogy_edit, toggle_summary_locked
+from base.views.learning_units.pedagogy.update import learning_unit_pedagogy_edit, toggle_summary_locked, \
+    learning_unit_pedagogy_force_majeure_edit
 from base.views.learning_units.proposal import create, update
 from base.views.learning_units.update import update_learning_unit, learning_unit_edition_end_date
 from base.views.organization import OrganizationAutocomplete, CountryAutocomplete, CampusAutocomplete
@@ -176,6 +177,11 @@ urlpatterns = [
             url(r'^pedagogy/', include([
                 url(r'^$', learning_unit_pedagogy, name="learning_unit_pedagogy"),
                 url(r'^edit/$', learning_unit_pedagogy_edit, name="learning_unit_pedagogy_edit"),
+                url(
+                    r'^edit_force_majeure/$',
+                    learning_unit_pedagogy_force_majeure_edit,
+                    name="learning_unit_pedagogy_force_majeure_edit"
+                ),
                 url(r'^toggle_summary_locked/$', toggle_summary_locked,
                     name="learning_unit_pedagogy_toggle_summary_locked")
             ])),
