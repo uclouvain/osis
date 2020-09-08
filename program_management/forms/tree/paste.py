@@ -76,17 +76,20 @@ def _get_form_class(
 
     authorized_relationship = load_authorized_relationship.load()
 
+    form_class = PasteNodeForm
+
     if node_to_paste_into.is_minor_major_list_choice():
-        return PasteToMinorMajorListChoiceForm
-    if node_to_paste_into.is_option_list_choice():
-        return PasteToOptionListChoiceForm
+        form_class = PasteToMinorMajorListChoiceForm
+    elif node_to_paste_into.is_option_list_choice():
+        form_class = PasteToOptionListChoiceForm
     elif node_to_paste.node_type == NodeType.LEARNING_UNIT:
-        return PasteLearningUnitForm
+        form_class = PasteLearningUnitForm
     elif node_to_paste_into.is_training() and node_to_paste.is_minor_major_list_choice():
-        return PasteMinorMajorListChoiceToTrainingForm
+        form_class = PasteMinorMajorListChoiceToTrainingForm
     elif not authorized_relationship.is_authorized(node_to_paste_into.node_type, node_to_paste.node_type):
-        return PasteNotAuthorizedChildren
-    return PasteNodeForm
+        form_class = PasteNotAuthorizedChildren
+
+    return form_class
 
 
 class PasteNodeForm(forms.Form):
