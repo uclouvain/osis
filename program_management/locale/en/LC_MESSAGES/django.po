@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-28 13:52+0200\n"
+"POT-Creation-Date: 2020-09-03 11:16+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,10 +16,17 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#, fuzzy, python-format
-#| msgid "\"%(child)s\" has been detached from \"%(parent)s\""
-msgid "\"%(child)s\" has been pasted into \"%(parent)s\""
+#, python-format
+msgid "\"%(child)s\" has been detached from \"%(parent)s\""
 msgstr "\"%(child)s\" has been removed from \"%(parent)s\""
+
+#, python-format
+msgid "\"%(child)s\" has been pasted into \"%(parent)s\""
+msgstr ""
+
+#, python-format
+msgid "%(node_to_add)s version must be the same as %(root_node)s version"
+msgstr ""
 
 #, python-format
 msgid ""
@@ -131,9 +138,6 @@ msgid ""
 "\"%(child_types)s\" for \"%(parent)s\" has already reached the limit."
 msgstr ""
 
-msgid "Cannot add any element to learning unit"
-msgstr ""
-
 #, python-format
 msgid "Cannot add any element to learning unit %(parent_node)s"
 msgstr ""
@@ -141,9 +145,6 @@ msgstr ""
 #, python-format
 msgid "Cannot attach a node %(node)s to himself."
 msgstr ""
-
-msgid "Cannot detach due to prerequisites."
-msgstr "Cannot remove link due to prerequisites."
 
 #, python-format
 msgid ""
@@ -167,9 +168,6 @@ msgstr ""
 
 msgid "Cannot perform detach action on root."
 msgstr "Cannot perform remove action on root."
-
-msgid "Cannot perform modification action on root."
-msgstr ""
 
 msgid "Category"
 msgstr ""
@@ -218,16 +216,6 @@ msgstr ""
 
 msgid "Export"
 msgstr ""
-
-#, python-format
-msgid ""
-"Finality \"%(acronym)s\" has an end date greater than %(root_acronym)s "
-"program."
-msgid_plural ""
-"Finalities \"%(acronym)s\" have an end date greater than %(root_acronym)s "
-"program."
-msgstr[0] ""
-msgstr[1] ""
 
 #, python-format
 msgid ""
@@ -404,13 +392,6 @@ msgstr[1] ""
 "%(finality_acronym)s program."
 
 #, python-format
-msgid "Option \"%(acronym)s\" must be present in %(root_acronym)s program."
-msgid_plural ""
-"Options \"%(acronym)s\" must be present in %(root_acronym)s program."
-msgstr[0] ""
-msgstr[1] ""
-
-#, python-format
 msgid "Option \"%(code)s\" must be present in %(root_code)s program."
 msgid_plural "Options \"%(code)s\" must be present in %(root_code)s program."
 msgstr[0] ""
@@ -474,6 +455,10 @@ msgstr ""
 msgid "Produce xls with a list of trainings"
 msgstr ""
 
+#, python-brace-format
+msgid "Program tree not found : {code} {year}"
+msgstr ""
+
 msgid "Prolong"
 msgstr ""
 
@@ -514,6 +499,9 @@ msgid "Save"
 msgstr ""
 
 msgid "Search"
+msgstr ""
+
+msgid "Select a language"
 msgstr ""
 
 msgid "Session derogation"
@@ -576,16 +564,6 @@ msgid "The learning unit is a prerequisite"
 msgstr ""
 
 #, python-format
-msgid "The link of %(acronym)s has been updated"
-msgstr ""
-
-#, python-format
-msgid ""
-"The number of children of type(s) \"%(child_types)s\" for \"%(parent)s\" has "
-"already reached the limit."
-msgstr ""
-
-#, python-format
 msgid "The parent must have at least one child of type(s) \"%(types)s\"."
 msgstr ""
 
@@ -601,10 +579,11 @@ msgid ""
 "group year %(acronym)s will we deleted: %(learning_units)s"
 msgstr ""
 
-msgid "The registration form is available at the Secretariat of"
+#, python-format
+msgid "The program %(title)s - %(academic_year)s will be published soon"
 msgstr ""
 
-msgid "The user is not allowed to change link data."
+msgid "The registration form is available at the Secretariat of"
 msgstr ""
 
 msgid "Themes discussed"
@@ -648,6 +627,10 @@ msgstr ""
 msgid "Type"
 msgstr ""
 
+#, python-brace-format
+msgid "Unable to publish sections for {code} - {year}"
+msgstr ""
+
 msgid "Utilizations"
 msgstr ""
 
@@ -676,14 +659,7 @@ msgid ""
 msgstr ""
 
 #, python-format
-msgid "You can not add a learning unit to a %(category)s of type %(type)s."
-msgstr ""
-
-#, python-format
 msgid "You can not add the same child %(child_node)s several times."
-msgstr ""
-
-msgid "You can not add the same child several times."
 msgstr ""
 
 #, python-format
@@ -704,16 +680,16 @@ msgid ""
 "{to_year} because it ends in {end_year}"
 msgstr ""
 
-#, python-format
+#, python-brace-format
 msgid ""
-"You cannot add \"%(child)s\" of type \"%(child_types)s\" to \"%(parent)s\" "
-"of type \"%(parent_type)s\""
+"You can't delete the standard program tree '{code}' in {year} as specific "
+"versions exists during this year."
 msgstr ""
 
 #, python-format
 msgid ""
-"You cannot add \"%(child_types)s\" to \"%(parent)s\" (type \"%(parent_type)s"
-"\")"
+"You cannot add \"%(child)s\" of type \"%(child_types)s\" to \"%(parent)s\" "
+"of type \"%(parent_type)s\""
 msgstr ""
 
 #, python-format

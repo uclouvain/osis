@@ -45,15 +45,6 @@ def report_mini_training_with_program_tree(
             postpone_until_year=CalculateEndPostponement.calculate_max_year_of_end_postponement()
         )
     )
-
-    postpone_group_service.postpone_group(
-        command.PostponeGroupCommand(
-            code=report_cmd.code,
-            postpone_from_year=report_cmd.from_year,
-            postpone_until_year=CalculateEndPostponement.calculate_max_year_of_end_postponement()
-        )
-    )
-
     postpone_program_tree_service.postpone_program_tree(
         PostponeProgramTreeCommand(
             from_code=report_cmd.code,

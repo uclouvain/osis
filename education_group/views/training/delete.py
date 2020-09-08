@@ -32,14 +32,15 @@ from django.utils.translation import gettext_lazy as _
 
 from django.views.generic import DeleteView
 
+from base.models.education_group_year import EducationGroupYear
 from base.views.common import display_success_messages, display_error_messages
 from base.views.mixins import AjaxTemplateMixin
 from education_group.ddd.business_types import *
 
 from education_group.ddd import command
-from education_group.ddd.domain.exception import TrainingNotFoundException
+from education_group.ddd.domain.exception import TrainingNotFoundException, TrainingHaveLinkWithEPC, \
+    TrainingHaveEnrollments
 from education_group.ddd.service.read import get_training_service
-from education_group.models.group_year import GroupYear
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd.business_types import *
 from program_management.ddd import command as command_program_management
@@ -47,7 +48,7 @@ from program_management.ddd.domain.exception import ProgramTreeNonEmpty, NodeHav
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
-from program_management.ddd.service.write import delete_standard_version_service
+from program_management.ddd.service.write import delete_all_standard_versions_service
 
 
 class TrainingDeleteView(PermissionRequiredMixin, AjaxTemplateMixin, DeleteView):
@@ -71,15 +72,20 @@ class TrainingDeleteView(PermissionRequiredMixin, AjaxTemplateMixin, DeleteView)
             raise Http404
 
     def delete(self, request, *args, **kwargs):
-        cmd_delete = command_program_management.DeleteStandardVersionCommand(
+        cmd_delete = command_program_management.DeleteAllStandardVersionCommand(
             self.get_training().acronym,
             self.get_training().year
         )
         try:
-            delete_standard_version_service.delete_standard_version(cmd_delete)
+            delete_all_standard_versions_service.delete_all_standard_versions(cmd_delete)
             display_success_messages(request, self.get_success_message())
             return self._ajax_response() or HttpResponseRedirect(self.get_success_url())
-        except (ProgramTreeNonEmpty, NodeHaveLinkException,) as e:
+        except (
+                ProgramTreeNonEmpty,
+                NodeHaveLinkException,
+                TrainingHaveLinkWithEPC,
+                TrainingHaveEnrollments,
+        ) as e:
             display_error_messages(request, e.message)
             return render(request, self.template_name, {})
 
@@ -96,14 +102,17 @@ class TrainingDeleteView(PermissionRequiredMixin, AjaxTemplateMixin, DeleteView)
         }
 
     def get_success_message(self):
-        return _("The training %(code)s has been deleted.") % {'code': self.kwargs['code']}
+        return _("The training %(acronym)s - %(title)s has been deleted.") % {
+            'acronym': self.get_training().acronym,
+            'title': self.get_training().titles.title_fr
+        }
 
     def get_success_url(self) -> str:
         return reverse('version_program')
 
     def get_permission_object(self):
         return get_object_or_404(
-            GroupYear.objects.select_related('education_group_type', 'academic_year', 'management_entity'),
+            EducationGroupYear.objects.select_related('education_group_type', 'academic_year', 'management_entity'),
             academic_year__year=self.kwargs['year'],
-            partial_acronym=self.kwargs['code']
+            acronym=self.get_training().acronym
         )

@@ -152,10 +152,6 @@ class TrainingBuilder:
             management_entity=Entity(acronym=command.management_entity_acronym),
             administration_entity=Entity(acronym=command.administration_entity_acronym),
             end_year=command.end_year,
-            teaching_campus=Campus(
-                name=command.teaching_campus_name,
-                university_name=command.teaching_campus_organization_name,
-            ),
             enrollment_campus=Campus(
                 name=command.enrollment_campus_name,
                 university_name=command.enrollment_campus_organization_name,
@@ -237,7 +233,6 @@ class Training(interface.RootEntity):
     management_entity = attr.ib(type=Entity, default=None)
     administration_entity = attr.ib(type=Entity, default=None)
     end_year = attr.ib(type=int, default=None)
-    teaching_campus = attr.ib(type=Campus, default=None)
     enrollment_campus = attr.ib(type=Campus, default=None)
     other_campus_activities = attr.ib(type=ActivityPresence, default=None)
     funding = attr.ib(type=Funding, default=None)

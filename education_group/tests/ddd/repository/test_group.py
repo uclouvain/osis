@@ -40,7 +40,7 @@ from education_group.ddd.domain._entity import Entity as EntityValueObject
 from education_group.ddd.domain._remark import Remark
 from education_group.ddd.domain._titles import Titles
 from education_group.ddd.domain.exception import AcademicYearNotFound, TypeNotFound, ManagementEntityNotFound, \
-    TeachingCampusNotFound, CodeAlreadyExistException
+    TeachingCampusNotFound, CodeAlreadyExistException, MultipleEntitiesFoundException
 from education_group.ddd.domain.group import GroupIdentity, Group
 from education_group.ddd.factories.group import GroupFactory
 from education_group.ddd.repository.group import GroupRepository
@@ -209,6 +209,15 @@ class TestGroupRepositoryCreateMethod(TestCase):
     def test_assert_raise_group_code_already_exist_exception(self):
         GroupRepository.create(self.group)
         with self.assertRaises(CodeAlreadyExistException):
+            GroupRepository.create(self.group)
+
+    def test_assert_raise_multiple_entities_found_exception(self):
+        EntityVersionFactory(
+            acronym=self.management_entity_version.acronym,
+            start_date=self.management_entity_version.start_date,
+            end_date=self.management_entity_version.end_date,
+        )
+        with self.assertRaises(MultipleEntitiesFoundException):
             GroupRepository.create(self.group)
 
 
