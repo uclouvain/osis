@@ -34,11 +34,9 @@
         <td>{{ row.link.is_mandatory | yesno:_("yes,no") | title }}</td>
         <td>{{ row.link.block | default_if_none:'-' }}</td>
         <td>
-            {% for root_node in row.root_nodes %}
-                {# TODO: Compute URL #}
-                {% url 'element_identification' root_node.year root_node.code as url_root_identification %}
-                <a href="{{ url_root_identification }}">
-                    {{ root_node.title }}{{ row.root_version_label }}</a>
+            {% for root in row.root_nodes %}
+                <a href="{{ root.root_url }}">
+                    {{ root.root_node.title }}{{ root.root_version_label }}</a>
                 {% if not forloop.last %} - {% endif %}
             {% empty %}
                 -
