@@ -23,21 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import attr
+
 from osis_common.ddd import interface
 
 
+@attr.s(frozen=True, slots=True)
 class HOPS(interface.ValueObject):
     """HOPS means "Habilitations et Offre Programmée de l’enseignement Supérieur". """
-
-    def __init__(self, ares_code: int, ares_graca: int, ares_authorization: int):
-        self.ares_code = ares_code
-        self.ares_graca = ares_graca
-        self.ares_authorization = ares_authorization
-
-    def __eq__(self, other):
-        return self.ares_code == other.ares_code \
-               and self.ares_graca == other.ares_graca \
-               and self.ares_authorization == other.ares_authorization
-
-    def __hash__(self):
-        return hash(str(self.ares_code) + str(self.ares_graca) + str(self.ares_authorization))
+    ares_code = attr.ib(type=int)
+    ares_graca = attr.ib(type=int)
+    ares_authorization = attr.ib(type=int)

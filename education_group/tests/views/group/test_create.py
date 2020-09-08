@@ -7,9 +7,11 @@ from django.test import TestCase
 from django.urls import reverse, exceptions
 from django.utils.translation import gettext_lazy as _
 
+from base.models.enums import education_group_types
+from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group_type import GroupEducationGroupTypeFactory
 from base.tests.factories.person import PersonFactory
-from education_group.ddd.domain.exception import GroupCodeAlreadyExistException, ContentConstraintTypeMissing
+from education_group.ddd.domain.exception import ContentConstraintTypeMissing, CodeAlreadyExistException
 from education_group.ddd.domain.group import GroupIdentity
 from education_group.forms.group import GroupForm, GroupAttachForm
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
@@ -132,7 +134,7 @@ class TestCreateOrphanGroupPostMethod(TestCase):
         mock_form_is_valid.return_value = True
         mock_form_clean_data.return_value = defaultdict(lambda: None)
 
-        mock_service_create_group.side_effect = GroupCodeAlreadyExistException
+        mock_service_create_group.side_effect = CodeAlreadyExistException(year=2018)
 
         response = self.client.post(self.url)
         self.assertIsInstance(response.context['group_form'], GroupForm)
@@ -159,11 +161,15 @@ class TestCreateOrphanGroupPostMethod(TestCase):
 class TestCreateNonOrphanGroupGetMethod(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.type = GroupEducationGroupTypeFactory()
+        cls.type = GroupEducationGroupTypeFactory(name=education_group_types.GroupType.COMMON_CORE.name)
 
         cls.central_manager = CentralManagerFactory()
         cls.parent_element = ElementGroupYearFactory(
             group_year__management_entity=cls.central_manager.entity
+        )
+        AuthorizedRelationshipFactory(
+            parent_type=cls.parent_element.group_year.education_group_type,
+            child_type=cls.type
         )
         cls.url = reverse('group_create', kwargs={'type': cls.type.name}) +\
             "?path_to={}".format(str(cls.parent_element.pk))
@@ -191,11 +197,14 @@ class TestCreateNonOrphanGroupGetMethod(TestCase):
 class TestCreateNonOrphanGroupPostMethod(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.type = GroupEducationGroupTypeFactory()
+        cls.type = GroupEducationGroupTypeFactory(name=education_group_types.GroupType.COMMON_CORE.name)
         cls.central_manager = CentralManagerFactory()
-
         cls.parent_element = ElementGroupYearFactory(
             group_year__management_entity=cls.central_manager.entity
+        )
+        AuthorizedRelationshipFactory(
+            parent_type=cls.parent_element.group_year.education_group_type,
+            child_type=cls.type
         )
         cls.url = reverse('group_create', kwargs={'type': cls.type.name}) +\
             "?path_to={}".format(str(cls.parent_element.pk))
@@ -233,6 +242,3 @@ class TestCreateNonOrphanGroupPostMethod(TestCase):
             reverse('group_identification', kwargs={'code': 'LTRONC1000', 'year': 2018}) + \
             "?path={}".format(str(self.parent_element.pk))
         self.assertRedirects(response, expected_redirect, fetch_redirect_response=False)
-
-
-

@@ -87,7 +87,6 @@
                                     {{ form.id }}
                                     <td style="word-wrap: break-word; min-width: 75px;max-width: 75px;">{% if not node.is_learning_unit %}{{ node.title }}{% else %}-{% endif %}</td>
                                     <td>{{ node.code }}</td>
-
                                     <td>{% if form.access_condition %}{% bootstrap_field form.access_condition %}{% else %}-{% endif %}</td>
                                     <td>{{ form.is_mandatory }}</td>
                                     <td style="word-wrap: break-word; min-width: 90px;max-width: 90px;">{% bootstrap_field form.block show_label=False %}</td>

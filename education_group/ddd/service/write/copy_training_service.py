@@ -26,14 +26,15 @@
 from django.db import transaction
 
 from education_group.ddd import command
+from education_group.ddd.domain import exception
 from education_group.ddd.domain.training import TrainingBuilder, TrainingIdentity
-from education_group.ddd.repository.training import TrainingRepository
+from education_group.ddd.repository import training as training_repository
 
 
 @transaction.atomic()
 def copy_training_to_next_year(copy_cmd: command.CopyTrainingToNextYearCommand) -> 'TrainingIdentity':
     # GIVEN
-    repository = TrainingRepository()
+    repository = training_repository.TrainingRepository()
     existing_training = repository.get(
         entity_id=TrainingIdentity(acronym=copy_cmd.acronym, year=copy_cmd.postpone_from_year)
     )
@@ -42,6 +43,10 @@ def copy_training_to_next_year(copy_cmd: command.CopyTrainingToNextYearCommand) 
     training_next_year = TrainingBuilder().copy_to_next_year(existing_training, repository)
 
     # THEN
-    identity = repository.create(training_next_year)
+    try:
+        with transaction.atomic():
+            identity = repository.create(training_next_year)
+    except exception.TrainingAcronymAlreadyExistException:
+        identity = repository.update(training_next_year)
 
     return identity

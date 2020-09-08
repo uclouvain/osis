@@ -321,7 +321,7 @@ class TestContent(TestCase):
 
         self.assertCountEqual(
             _get_optional_data([], self.luy, optional_data, self.link_1_1),
-            [self.link_1_1.relative_credits or '-', self.luy.credits.to_integral_value()]
+            [self.link_1_1.relative_credits or '-', self.luy.credits.to_integral_value() or '-']
         )
 
     def test_get_optional_has_periodicity(self):
@@ -384,8 +384,8 @@ class TestContent(TestCase):
                                  self.teacher_2.email))
 
     def test_build_description_fiche_cols(self):
-        teaching_material_1 = DddTeachingMaterialFactory(title='Title mandatory', mandatory=True)
-        teaching_material_2 = DddTeachingMaterialFactory(title='Title non-mandatory', mandatory=False)
+        teaching_material_1 = DddTeachingMaterialFactory(title='Title mandatory', is_mandatory=True)
+        teaching_material_2 = DddTeachingMaterialFactory(title='Title non-mandatory', is_mandatory=False)
 
         ue_description_fiche = _initialize_cms_data_description_fiche()
 
@@ -482,72 +482,6 @@ class TestContent(TestCase):
         node_not_finality = NodeGroupYearFactory(node_type=GroupType.COMMON_CORE)
         self.assertEqual(_build_main_gathering_label(node_not_finality),
                          "{} - {}".format(node_not_finality.title, node_not_finality.group_title_fr))
-
-
-class TestExcludeUEFromdWorkbook(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.root = TrainingFactory(
-            acronym='DROI2M',
-            education_group_type__name=education_group_types.TrainingType.PGRM_MASTER_120.name
-        )
-        academic_year = cls.root.academic_year
-        finality_list = GroupFactory(
-            acronym='LIST FINALITIES',
-            education_group_type__name=education_group_types.GroupType.FINALITY_120_LIST_CHOICE.name,
-            academic_year=academic_year
-        )
-
-        cls.formation_master_md = TrainingFactory(
-            acronym='DROI2MD',
-            education_group_type__name=education_group_types.TrainingType.MASTER_MD_120.name,
-            academic_year=academic_year
-        )
-
-        common_core = GroupFactory(
-            acronym='TC DROI2MD',
-            education_group_type__name=education_group_types.GroupType.COMMON_CORE.name,
-            academic_year=academic_year
-        )
-        options = GroupFactory(
-            acronym='TC DROI2MD',
-            education_group_type__name=education_group_types.GroupType.OPTION_LIST_CHOICE.name,
-            academic_year=academic_year
-        )
-
-        cls.luy_in_common_core = LearningUnitYearFactory()
-        cls.luy_in_finality_options = LearningUnitYearFactory()
-
-        GroupElementYearFactory(parent=cls.root, child_branch=finality_list, child_leaf=None)
-        GroupElementYearFactory(parent=finality_list, child_branch=cls.formation_master_md, child_leaf=None)
-        GroupElementYearFactory(parent=cls.formation_master_md, child_branch=common_core, child_leaf=None)
-        GroupElementYearFactory(parent=cls.formation_master_md, child_branch=options, child_leaf=None)
-        GroupElementYearFactory(parent=common_core,
-                                child_leaf=cls.luy_in_common_core,
-                                child_branch=None)
-        GroupElementYearFactory(parent=options,
-                                child_leaf=cls.luy_in_finality_options,
-                                child_branch=None)
-
-
-def get_expected_data(gey, luy, main_gathering=None):
-    gathering_str = "{} - {}".format(gey.parent.partial_acronym, gey.parent.title)
-    if main_gathering:
-        main_gathering_str = "{} - {}".format(main_gathering.acronym, main_gathering.title)
-    else:
-        main_gathering_str = gathering_str
-    expected = [luy.acronym,
-                luy.academic_year,
-                luy.complete_title_i18n,
-                luy.get_container_type_display(),
-                luy.get_subtype_display(),
-                gathering_str,
-                main_gathering_str,
-                gey.block or '',
-                _('yes')
-
-                ]
-    return expected
 
 
 def initialize_optional_data():

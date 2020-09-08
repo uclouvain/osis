@@ -36,6 +36,7 @@ from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.models.group_year import GroupYear
 from learning_unit.ddd.repository import load_learning_unit_year
 from program_management.ddd.domain import node
+from program_management.ddd.domain._campus import Campus
 from program_management.models import element
 from program_management.models.enums.node_type import NodeType
 from education_group.models.enums.constraint_type import ConstraintTypes
@@ -54,7 +55,7 @@ def load_node_group_year(node_id: int) -> node.Node:
     try:
         node_data = __load_multiple_node_group_year([node_id])[0]
         node_data["node_id"] = node_data.pop("id")
-        return node.factory.get_node(**__convert_string_to_enum(node_data))
+        return __instanciate_node(**node_data)
     except IndexError:
         raise node.NodeNotFoundException
 
@@ -110,10 +111,19 @@ def load_multiple(element_ids: List[int]) -> List[node.Node]:
         }[node_type]
 
         nodes_objects += [
-            node.factory.get_node(**__convert_string_to_enum(node_data), node_id=elem_grouped[node_data.pop('id')])
+            __instanciate_node(**node_data, node_id=elem_grouped[node_data.pop('id')])
             for node_data in get_method(elem_grouped.keys())
         ]
     return nodes_objects
+
+
+def __instanciate_node(**node_attrs):
+    if node_attrs.get('teaching_campus_name'):
+        node_attrs['teaching_campus'] = Campus(
+            name=node_attrs.pop('teaching_campus_name'),
+            university_name=node_attrs.pop('teaching_campus_university_name'),
+        )
+    return node.factory.get_node(**__convert_string_to_enum(node_attrs))
 
 
 def __convert_string_to_enum(node_data: dict) -> dict:
@@ -173,7 +183,7 @@ def __load_multiple_node_group_year(node_group_year_ids: List[int]) -> QuerySet:
         offer_partial_title_en=F('educationgroupversion__offer__partial_title_english'),
         offer_title_fr=F('educationgroupversion__offer__title'),
         offer_title_en=F('educationgroupversion__offer__title_english'),
-        offer_status=F('educationgroupversion__root_group__active'),
+        offer_status=F('educationgroupversion__offer__active'),
         schedule_type=F('educationgroupversion__offer__schedule_type'),
         keywords=F('educationgroupversion__offer__keywords'),
         group_title_fr=F('title_fr'),

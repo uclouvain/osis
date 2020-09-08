@@ -32,14 +32,23 @@ msgstr "Retirer"
 msgid "Existed code for "
 msgstr "Code a déjà existé pour "
 
+msgid "Existed name version in "
+msgstr "Cette version existe dans le passé en "
+
 msgid "Existing code in "
 msgstr "Code déjà existant en "
+
+msgid "Existing name version"
+msgstr "Cette version existe déjà"
 
 msgid "Insertion of a link to a CDN document"
 msgstr "Insertion d'un lien vers un document du CDN"
 
 msgid "Invalid code"
 msgstr "Code non valide"
+
+msgid "Invalid name version"
+msgstr "Nom de version invalide"
 
 msgid "Link to CDN Doc"
 msgstr "Lien vers document du CDN"

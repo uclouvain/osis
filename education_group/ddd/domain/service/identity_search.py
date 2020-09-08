@@ -26,6 +26,7 @@
 from django.db.models import F
 
 from base.models.education_group_year import EducationGroupYear
+from education_group.ddd.domain.mini_training import MiniTrainingIdentity
 from education_group.ddd.domain.training import TrainingIdentity
 from education_group.models.group_year import GroupYear
 from osis_common.ddd import interface
@@ -42,8 +43,8 @@ class TrainingIdentitySearch(interface.DomainService):
             partial_acronym=node_identity.code,
             academic_year__year=node_identity.year
         ).annotate(
-            offer_acronym=F('educationgroupversion__offer__acronym'),
-            year=F('educationgroupversion__offer__academic_year__year'),
+            offer_acronym=F('acronym'),
+            year=F('academic_year__year'),
         ).values('offer_acronym', 'year')
         if values:
             return TrainingIdentity(acronym=values[0]['offer_acronym'], year=values[0]['year'])
@@ -70,3 +71,20 @@ class TrainingIdentitySearch(interface.DomainService):
             return TrainingIdentity(
                 **values[0]
             )
+
+
+class MiniTrainingIdentitySearch(interface.DomainService):
+    @classmethod
+    def get_from_node_identity(cls, node_identity: 'NodeIdentity') -> 'MiniTrainingIdentity':
+        values = GroupYear.objects.filter(
+            partial_acronym=node_identity.code,
+            academic_year__year=node_identity.year
+        ).annotate(
+            offer_acronym=F('acronym'),
+            year=F('academic_year__year'),
+        ).values('offer_acronym', 'year')
+        if values:
+            return MiniTrainingIdentity(acronym=values[0]['offer_acronym'], year=values[0]['year'])
+        raise BusinessException(
+            "MiniTrainingIdentity not found from NodeIdentity = {n_id.code} - {n_id.year}".format(n_id=node_identity)
+        )

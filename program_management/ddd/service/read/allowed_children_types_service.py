@@ -37,7 +37,7 @@ def get_allowed_child_types(cmd: command.GetAllowedChildTypeCommand) -> Set[Educ
     if cmd.category == Categories.TRAINING.name:
         allowed_child_types = TrainingType
     elif cmd.category == Categories.MINI_TRAINING.name:
-        allowed_child_types = MiniTrainingType
+        allowed_child_types = MiniTrainingType.get_eligible_to_be_created()
     else:
         allowed_child_types = {
             group_type for group_type in GroupType

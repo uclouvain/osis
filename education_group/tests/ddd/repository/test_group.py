@@ -36,17 +36,16 @@ from base.tests.factories.entity_version import EntityVersionFactory
 from education_group.ddd.domain import exception
 from education_group.ddd.domain._campus import Campus
 from education_group.ddd.domain._content_constraint import ContentConstraint
+from education_group.ddd.domain._entity import Entity as EntityValueObject
 from education_group.ddd.domain._remark import Remark
 from education_group.ddd.domain._titles import Titles
-from education_group.ddd.domain._entity import Entity as EntityValueObject
 from education_group.ddd.domain.exception import AcademicYearNotFound, TypeNotFound, ManagementEntityNotFound, \
-    TeachingCampusNotFound, GroupCodeAlreadyExistException
+    TeachingCampusNotFound, CodeAlreadyExistException, MultipleEntitiesFoundException
 from education_group.ddd.domain.group import GroupIdentity, Group
 from education_group.ddd.factories.group import GroupFactory
 from education_group.ddd.repository.group import GroupRepository
-from education_group.tests.factories.group_year import GroupYearFactory
-from education_group.tests.factories.group import GroupFactory as GroupModelDbFactory
 from education_group.models.group_year import GroupYear as GroupYearModelDb
+from education_group.tests.factories.group_year import GroupYearFactory
 
 
 class TestGroupRepositoryGetMethod(TestCase):
@@ -138,6 +137,7 @@ class TestGroupRepositoryCreateMethod(TestCase):
         self.group_identity = GroupIdentity(code="LTRONC1200", year=2017)
         self.group = GroupFactory(
             entity_identity=self.group_identity,
+            entity_id=self.group_identity,
             type=self.education_group_type,
             management_entity=EntityValueObject(acronym='DRT'),
             teaching_campus=Campus(
@@ -149,7 +149,7 @@ class TestGroupRepositoryCreateMethod(TestCase):
         )
 
     def test_assert_raise_academic_year_not_found(self):
-        self.group.entity_id.year = 2000
+        self.group.entity_id = GroupIdentity(code="LTRONC1200", year=2000)
         with self.assertRaises(AcademicYearNotFound):
             GroupRepository.create(self.group)
 
@@ -188,6 +188,9 @@ class TestGroupRepositoryCreateMethod(TestCase):
         self.assertEqual(group_inserted.min_constraint, self.group.content_constraint.minimum)
         self.assertEqual(group_inserted.max_constraint, self.group.content_constraint.maximum)
 
+        self.assertEqual(group_inserted.remark_en, self.group.remark.text_en)
+        self.assertEqual(group_inserted.remark_fr, self.group.remark.text_fr)
+
         self.assertEqual(group_inserted.management_entity_id, self.management_entity_version.entity_id)
         self.assertEqual(group_inserted.academic_year_id, self.academic_year.pk)
         self.assertEqual(group_inserted.education_group_type_id, self.education_group_type.pk)
@@ -205,7 +208,16 @@ class TestGroupRepositoryCreateMethod(TestCase):
 
     def test_assert_raise_group_code_already_exist_exception(self):
         GroupRepository.create(self.group)
-        with self.assertRaises(GroupCodeAlreadyExistException):
+        with self.assertRaises(CodeAlreadyExistException):
+            GroupRepository.create(self.group)
+
+    def test_assert_raise_multiple_entities_found_exception(self):
+        EntityVersionFactory(
+            acronym=self.management_entity_version.acronym,
+            start_date=self.management_entity_version.start_date,
+            end_date=self.management_entity_version.end_date,
+        )
+        with self.assertRaises(MultipleEntitiesFoundException):
             GroupRepository.create(self.group)
 
 
@@ -276,6 +288,7 @@ class TestGroupRepositoryUpdateMethod(TestCase):
         dummy_group_identity = GroupIdentity(code="dummy-code", year=1966)
         group = GroupFactory(
             entity_identity=dummy_group_identity,
+            entity_id=dummy_group_identity,
             management_entity=EntityValueObject(acronym='DRT'),
             teaching_campus=Campus(
                 name=self.group_year_db.main_teaching_campus.name,
@@ -290,6 +303,7 @@ class TestGroupRepositoryUpdateMethod(TestCase):
 
         group = GroupFactory(
             entity_identity=self.group_identity,
+            entity_id=self.group_identity,
             management_entity=EntityValueObject(acronym=new_entity.acronym),
             teaching_campus=Campus(
                 name=self.group_year_db.main_teaching_campus.name,
@@ -316,8 +330,16 @@ class TestGroupRepositoryDeleteMethod(TestCase):
         self.group_year_db = GroupYearFactory()
 
     def test_assert_delete_in_database(self):
-        group_id = GroupIdentity(code=self.group_year_db.partial_acronym, year=self.group_year_db.academic_year.year)
+        group_id = generate_group_identity_from_group_year(self.group_year_db)
         GroupRepository.delete(group_id)
 
         with self.assertRaises(GroupYearModelDb.DoesNotExist):
             GroupYearModelDb.objects.get(partial_acronym=group_id.code, academic_year__year=group_id.year)
+
+
+def generate_group_identity_from_group_year(
+        group_year_obj: 'GroupYearModelDb') -> 'GroupIdentity':
+    return GroupIdentity(
+        code=group_year_obj.partial_acronym,
+        year=group_year_obj.academic_year.year
+    )

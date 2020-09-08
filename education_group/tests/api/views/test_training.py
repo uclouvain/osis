@@ -25,6 +25,7 @@
 ##############################################################################
 
 from django.conf import settings
+from django.db.models import F
 from django.test import RequestFactory
 from django.urls import reverse
 from rest_framework import status
@@ -251,7 +252,7 @@ class FilterTrainingTestCase(APITestCase):
             many=True,
             context={
                 'request': RequestFactory().get(self.url, query_string),
-                'language': settings.LANGUAGE_CODE_EN
+                'language': settings.LANGUAGE_CODE_FR
             },
         )
         self.assertEqual(response.data['results'], serializer.data)
@@ -297,7 +298,7 @@ class FilterTrainingTestCase(APITestCase):
         self.assertEqual(response.data['results'], serializer.data)
 
     def test_get_training_case_filter_campus(self):
-        query_string = {'campus': self.offers_by_year[2018][2].main_teaching_campus.name}
+        query_string = {'campus': self.standards_by_year[2018][2].root_group.main_teaching_campus.name}
 
         response = self.client.get(self.url, data=query_string)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -335,7 +336,7 @@ class FilterTrainingTestCase(APITestCase):
             many=True,
             context={
                 'request': RequestFactory().get(self.url, query_string),
-                'language': settings.LANGUAGE_CODE_EN
+                'language': settings.LANGUAGE_CODE_FR
             },
         )
         self.assertEqual(response.data['results'], serializer.data)
@@ -400,9 +401,12 @@ class GetTrainingTestCase(APITestCase):
     def test_get_valid_training(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-
+        annotated_version = EducationGroupVersion.objects.annotate(
+            domain_code=F('offer__main_domain__code'),
+            domain_name=F('offer__main_domain__name'),
+        ).get(id=self.version.id)
         serializer = TrainingDetailSerializer(
-            self.version,
+            annotated_version,
             context={
                 'request': RequestFactory().get(self.url),
                 'language': settings.LANGUAGE_CODE_FR
@@ -417,3 +421,32 @@ class GetTrainingTestCase(APITestCase):
         })
         response = self.client.get(invalid_url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_get_none_if_no_domain(self):
+        training = TrainingFactory(
+            academic_year=self.academic_year,
+            main_domain=None,
+        )
+        StandardEducationGroupVersionFactory(offer=training)
+        url = reverse('education_group_api_v1:training_read', kwargs={
+            'acronym': training.acronym,
+            'year': self.academic_year.year
+        })
+        response = self.client.get(url)
+        self.assertIsNone(response.data['domain_name'])
+        self.assertIsNone(response.data['domain_code'])
+
+    def test_get_parent_domain_name_if_has_parent(self):
+        domain = DomainFactory(parent=DomainFactory())
+        training = TrainingFactory(
+            academic_year=self.academic_year,
+            main_domain=domain
+        )
+        StandardEducationGroupVersionFactory(offer=training)
+        url = reverse('education_group_api_v1:training_read', kwargs={
+            'acronym': training.acronym,
+            'year': self.academic_year.year
+        })
+        response = self.client.get(url)
+        self.assertEqual(response.data['domain_name'], domain.parent.name)
+        self.assertEqual(response.data['domain_code'], domain.code)

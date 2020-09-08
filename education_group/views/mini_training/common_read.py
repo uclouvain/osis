@@ -41,6 +41,7 @@ from base.business.education_groups.general_information_sections import \
 from base.models import academic_year
 from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import MiniTrainingType
+from base.utils.urls import reverse_with_get
 from base.views.common import display_warning_messages
 from education_group.forms.academic_year_choices import get_academic_year_choices
 from education_group.views.mixin import ElementSelectedClipBoardMixin
@@ -75,6 +76,10 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             path = str(root_element.pk)
         return path
 
+    @functools.lru_cache()
+    def is_root_node(self):
+        return len(self.get_path().split('|')) <= 1
+
     @cached_property
     def node_identity(self) -> 'NodeIdentity':
         return NodeIdentity(code=self.kwargs['code'], year=self.kwargs['year'])
@@ -94,10 +99,9 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
     @functools.lru_cache()
     def get_education_group_version(self):
         try:
-            root_element_id = self.get_path().split("|")[-1]
             return EducationGroupVersion.objects.select_related(
                 'offer', 'root_group'
-            ).get(root_group__element__pk=root_element_id)
+            ).get(root_group__partial_acronym=self.kwargs["code"], root_group__academic_year__year=self.kwargs["year"])
         except (EducationGroupVersion.DoesNotExist, Element.DoesNotExist):
             raise Http404
 
@@ -149,13 +153,19 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
                                               args=[self.get_education_group_version().root_group.academic_year.year,
                                                     self.get_education_group_version().root_group.partial_acronym]
                                               ),
+            "generate_pdf_url": reverse("group_pdf_content",
+                                        args=[self.get_education_group_version().root_group.academic_year.year,
+                                              self.get_education_group_version().root_group.partial_acronym]
+                                        ),
             # TODO: Remove when finished reoganized tempalate
             "group_year": self.get_education_group_version().root_group,
 
             "create_group_url": self.get_create_group_url(),
             "create_training_url": self.get_create_training_url(),
             "create_mini_training_url": self.get_create_mini_training_url(),
+            "update_mini_training_url": self.get_update_mini_training_url(),
             "delete_mini_training_url": self.get_delete_mini_training_url(),
+            "create_version_url": self.get_create_version_url(),
             "is_root_node": is_root_node,
         }
 
@@ -174,11 +184,26 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
         return reverse('create_element_select_type', kwargs={'category': Categories.TRAINING.name}) + \
                "?path_to={}".format(self.get_path())
 
+    def get_update_mini_training_url(self) -> str:
+        return reverse_with_get(
+            'mini_training_update',
+            kwargs={'year': self.node_identity.year, 'code': self.node_identity.code,
+                    'acronym': self.get_object().title},
+            get={"path": self.get_path(), "tab": self.active_tab.name}
+        )
+
     def get_delete_mini_training_url(self):
         return reverse(
             'mini_training_delete',
             kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}
         ) + "?path={}".format(self.get_path())
+
+    def get_create_version_url(self):
+        if self.is_root_node():
+            return reverse(
+                'create_education_group_version',
+                kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}
+            ) + "?path={}".format(self.get_path())
 
     def get_tab_urls(self):
         return OrderedDict({

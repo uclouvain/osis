@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+
 from base.models.authorized_relationship import AuthorizedRelationship as ModelRelationship, \
     AuthorizedRelationshipObject, AuthorizedRelationshipList
 from base.models.education_group_type import EducationGroupType

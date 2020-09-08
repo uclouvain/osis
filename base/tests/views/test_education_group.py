@@ -28,13 +28,10 @@ import urllib
 from unittest import mock
 
 from django.conf import settings
-from django.contrib import messages
-from django.contrib.messages import get_messages
 from django.http import HttpResponseForbidden, HttpResponseNotFound, HttpResponse, HttpResponseRedirect
 from django.test import TestCase, RequestFactory
 from django.urls import reverse
 
-from base.business.education_groups.general_information import PublishException
 from base.forms.education_group_admission import UpdateTextForm
 from base.forms.education_group_pedagogy_edit import EducationGroupPedagogyEditForm
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine, CONDITION_ADMISSION_ACCESSES
@@ -45,12 +42,11 @@ from base.tests.factories.education_group_year import TrainingFactory, Education
     EducationGroupYearCommonBachelorFactory, \
     EducationGroupYearCommonSpecializedMasterFactory, EducationGroupYearCommonMasterFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
-from base.tests.factories.person import PersonWithPermissionsFactory, PersonFactory
+from base.tests.factories.person import PersonFactory
 from cms.enums import entity_name
 from cms.tests.factories.text_label import OfferTextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextRandomFactory, \
     OfferTranslatedTextFactory
-from education_group.tests.factories.group_year import GroupYearFactory
 from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementFactory
 
@@ -62,7 +58,10 @@ class EducationGroupPedagogyUpdateViewTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.current_academic_year = create_current_academic_year()
-        cls.training = TrainingFactory(academic_year=cls.current_academic_year)
+        cls.training = TrainingFactory(
+            academic_year=cls.current_academic_year,
+            education_group_type__name=TrainingType.PGRM_MASTER_120.name
+        )
         version = StandardEducationGroupVersionFactory(
             offer=cls.training,
             root_group__academic_year=cls.current_academic_year,
@@ -149,59 +148,7 @@ class EducationGroupPedagogyUpdateViewTestCase(TestCase):
 
         self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
         anchor_expected = '#section_welcome_introduction'
-        self.assertTrue(anchor_expected in response.url)
-
-
-class EducationGroupPublishViewTestCase(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.academic_year = create_current_academic_year()
-        cls.training = TrainingFactory(academic_year=cls.academic_year)
-        cls.group = GroupYearFactory(
-            academic_year=cls.academic_year,
-            partial_acronym=cls.training.partial_acronym
-        )
-        cls.url = reverse('publish_general_information', args=(cls.academic_year.year, cls.group.partial_acronym))
-        cls.person = PersonWithPermissionsFactory('view_educationgroup')
-
-    def setUp(self):
-        self.client.force_login(self.person.user)
-
-    def test_publish_case_user_not_logged(self):
-        self.client.logout()
-        response = self.client.post(self.url)
-        self.assertRedirects(response, LOGIN_NEXT.format(self.url))
-
-    def test_public_case_methods_not_allowed(self):
-        methods_not_allowed = ['get', 'delete', 'put']
-        for method in methods_not_allowed:
-            request_to_call = getattr(self.client, method)
-            response = request_to_call(self.url)
-            self.assertEqual(response.status_code, 405)
-
-    @mock.patch("base.business.education_groups.general_information.publish_group_year",
-                side_effect=lambda e: "portal-url")
-    def test_publish_case_ok_redirection_with_success_message(self, mock_publish):
-        response = self.client.post(self.url)
-
-        msg = [m.message for m in get_messages(response.wsgi_request)]
-        msg_level = [m.level for m in get_messages(response.wsgi_request)]
-
-        self.assertEqual(len(msg), 1)
-        self.assertIn(messages.SUCCESS, msg_level)
-        self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
-
-    @mock.patch("base.business.education_groups.general_information.publish_group_year",
-                side_effect=PublishException('error'))
-    def test_publish_case_ko_redirection_with_error_message(self, mock_publish):
-        response = self.client.post(self.url)
-
-        msg = [m.message for m in get_messages(response.wsgi_request)]
-        msg_level = [m.level for m in get_messages(response.wsgi_request)]
-
-        self.assertEqual(len(msg), 1)
-        self.assertIn(messages.ERROR, msg_level)
-        self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
+        self.assertIn(anchor_expected, response.url)
 
 
 class AdmissionConditionEducationGroupYearTest(TestCase):
@@ -231,8 +178,6 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         cls.master_adm_cond = AdmissionConditionFactory(
             education_group_year=EducationGroupYearCommonMasterFactory(academic_year=cls.academic_year)
         )
-        GroupElementYearFactory(parent=cls.education_group_parent, child_branch=cls.education_group_child)
-
         cls.cms_label_for_child = OfferTranslatedTextFactory(reference=cls.education_group_child.id)
 
         cls.person = PersonFactory()

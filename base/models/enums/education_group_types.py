@@ -160,10 +160,25 @@ class MiniTrainingType(EducationGroupTypesEnum):
     MOBILITY_PARTNERSHIP = _("Mobility partnership")
 
     @classmethod
+    def get_eligible_to_be_created(cls) -> List['MiniTrainingType']:
+        return [
+            cls.DEEPENING,
+            cls.SOCIETY_MINOR,
+            cls.ACCESS_MINOR,
+            cls.OPEN_MINOR,
+            cls.DISCIPLINARY_COMPLEMENT_MINOR,
+            cls.OPTION
+        ]
+
+    @classmethod
     def minors(cls):
         return [
             cls.SOCIETY_MINOR.name, cls.ACCESS_MINOR.name, cls.OPEN_MINOR.name, cls.DISCIPLINARY_COMPLEMENT_MINOR.name
         ]
+
+    @classmethod
+    def minors_and_deepening(cls) -> List['MiniTrainingType']:
+        return cls.minors_enum() + [cls.DEEPENING]
 
     @classmethod
     def minors_enum(cls):

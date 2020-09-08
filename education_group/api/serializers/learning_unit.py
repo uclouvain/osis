@@ -25,16 +25,33 @@
 ##############################################################################
 from django.conf import settings
 from rest_framework import serializers
+from rest_framework.reverse import reverse
 
 from base.models.education_group_type import EducationGroupType
 from base.models.prerequisite import Prerequisite
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
-from education_group.api.serializers.training import TrainingHyperlinkedIdentityField
-from education_group.api.serializers.utils import TrainingHyperlinkedRelatedField
+from education_group.api.views.mini_training import MiniTrainingDetail
+from education_group.api.views.training import TrainingDetail
+from program_management.models.education_group_version import EducationGroupVersion
+
+
+class EducationGroupRootHyperlinkedIdentityField(serializers.HyperlinkedIdentityField):
+    def get_url(self, obj: EducationGroupVersion, _, request, format):
+        if obj.offer.is_training():
+            view_name = 'education_group_api_v1:' + TrainingDetail.name
+        else:
+            view_name = 'education_group_api_v1:' + MiniTrainingDetail.name
+
+        url_kwargs = {
+            'acronym': obj.offer.acronym,
+            'year': obj.offer.academic_year.year,
+            'version_name': obj.version_name
+        }
+        return reverse(view_name, kwargs=url_kwargs, request=request, format=format)
 
 
 class EducationGroupRootsListSerializer(EducationGroupTitleSerializer, serializers.HyperlinkedModelSerializer):
-    url = TrainingHyperlinkedIdentityField(read_only=True)
+    url = EducationGroupRootHyperlinkedIdentityField(view_name='education_group_api_v1:' + TrainingDetail.name)
     acronym = serializers.CharField(source='offer.acronym', read_only=True)
     academic_year = serializers.IntegerField(source='offer.academic_year.year')
     education_group_type = serializers.SlugRelatedField(
@@ -53,6 +70,7 @@ class EducationGroupRootsListSerializer(EducationGroupTitleSerializer, serialize
                                                       read_only=True)
     decree_category_text = serializers.CharField(source='offer.get_decree_category_display', read_only=True)
     duration_unit_text = serializers.CharField(source='offer.get_duration_unit_display', read_only=True)
+    learning_unit_credits = serializers.SerializerMethodField(read_only=True)
 
     class Meta(EducationGroupTitleSerializer.Meta):
         fields = EducationGroupTitleSerializer.Meta.fields + (
@@ -68,14 +86,34 @@ class EducationGroupRootsListSerializer(EducationGroupTitleSerializer, serialize
             'education_group_type',
             'education_group_type_text',
             'academic_year',
+            'learning_unit_credits',
         )
+
+    def get_learning_unit_credits(self, obj):
+        learning_unit_year = self.context['learning_unit_year']
+        return obj.relative_credits or (learning_unit_year and learning_unit_year.credits)
+
+
+class LearningUnitYearPrerequisitesHyperlinkedIdentityField(serializers.HyperlinkedIdentityField):
+    def get_url(self, obj: Prerequisite, _, request, format):
+        offer = obj.education_group_version.offer
+        if offer.is_training():
+            view_name = 'education_group_api_v1:' + TrainingDetail.name
+        else:
+            view_name = 'education_group_api_v1:' + MiniTrainingDetail.name
+
+        url_kwargs = {
+            'acronym': offer.acronym,
+            'year': offer.academic_year.year,
+            'version_name': obj.education_group_version.version_name
+        }
+        return reverse(view_name, kwargs=url_kwargs, request=request, format=format)
 
 
 # TODO :: OSIS-4735
 class LearningUnitYearPrerequisitesListSerializer(serializers.ModelSerializer):
-    url = TrainingHyperlinkedRelatedField(
-        source='education_group_version',
-        lookup_field='acronym', read_only=True
+    url = LearningUnitYearPrerequisitesHyperlinkedIdentityField(
+        view_name='education_group_api_v1:' + TrainingDetail.name
     )
 
     acronym = serializers.CharField(source='education_group_version.offer.acronym')

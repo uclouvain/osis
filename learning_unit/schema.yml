@@ -597,6 +597,9 @@ components:
         academic_year:
           type: number
           example: 2014
+        learning_unit_credits:
+          type: number
+          multipleOf: 0.01
     LearningUnitAchievement:
       type: object
       properties:

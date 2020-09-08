@@ -31,15 +31,16 @@ from base.models.enums.link_type import LinkTypes
 from base.models.enums.quadrimesters import DerogationQuadrimester
 from education_group.models.group_year import GroupYear
 from osis_common.decorators.deprecated import deprecated
-from program_management.ddd.domain.link import factory as link_factory, LinkIdentity
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import program_tree
 from program_management.ddd.domain.education_group_version_academic_year import EducationGroupVersionAcademicYear
+from program_management.ddd.domain.link import factory as link_factory, LinkIdentity
 from program_management.ddd.domain.prerequisite import NullPrerequisite, Prerequisite
 from program_management.ddd.repositories import load_node, load_prerequisite, \
     load_authorized_relationship
 # Typing
 from program_management.ddd.repositories.load_prerequisite import TreeRootId, NodeId
+from program_management.models.education_group_version import EducationGroupVersion
 
 GroupElementYearColumnName = str
 LinkKey = str  # <parent_id>_<child_id>  Example : "123_124"
@@ -96,8 +97,8 @@ def __convert_link_type_to_enum(link_data: dict) -> None:
 
 
 def __convert_quadrimester_to_enum(gey_dict: dict) -> None:
-    if gey_dict.get('quadrimester'):
-        gey_dict['quadrimester'] = DerogationQuadrimester[gey_dict['quadrimester']]
+    if gey_dict.get('quadrimester_derogation'):
+        gey_dict['quadrimester_derogation'] = DerogationQuadrimester[gey_dict['quadrimester_derogation']]
 
 
 def __load_tree_links(tree_structure: TreeStructure) -> Dict[LinkKey, 'Link']:
@@ -224,10 +225,10 @@ def _get_root_ids(child_element_ids: list, link_type: LinkTypes = None) -> List[
     if not qs:
         return []
     all_parents = set(obj["parent_id"] for obj in qs)
-    parent_by_child_branch = {
+    parent_by_child = {
         obj["child_id"]: obj["parent_id"] for obj in qs
     }
     return set(
         parent_id for parent_id in all_parents
-        if not parent_by_child_branch.get(parent_id)
+        if not parent_by_child.get(parent_id)
     )

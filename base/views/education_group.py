@@ -48,7 +48,8 @@ from education_group.ddd.domain.service.identity_search import TrainingIdentityS
 from education_group.views.proxy.read import Tab
 from osis_common.decorators.ajax import ajax_required
 from program_management.ddd.domain.node import Node
-from program_management.ddd.repositories import load_tree
+from program_management.ddd.domain.program_tree import ProgramTreeIdentity
+from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 
 
 def education_group_year_pedagogy_edit_post(request, node: Node):
@@ -122,7 +123,9 @@ def education_group_year_pedagogy_edit_get(request, node: Node):
 @require_http_methods(['GET', 'POST'])
 @can_change_general_information
 def education_group_year_pedagogy_edit(request, education_group_year_id: int):
-    tree = load_tree.load(education_group_year_id)
+    offer = EducationGroupYear.objects.get(id=education_group_year_id)
+    identity = ProgramTreeIdentity(code=offer.partial_acronym, year=offer.academic_year.year)
+    tree = ProgramTreeRepository.get(identity)
     node = tree.root_node
     if request.method == 'POST':
         return education_group_year_pedagogy_edit_post(request, node)

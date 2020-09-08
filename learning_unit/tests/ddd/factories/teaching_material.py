@@ -36,4 +36,4 @@ class TeachingMaterialFactory(factory.Factory):
         abstract = False
 
     title = factory.fuzzy.FuzzyText(length=240)
-    mandatory = factory.Iterator([True, False])
+    is_mandatory = factory.Iterator([True, False])

@@ -124,6 +124,7 @@ class GroupUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             group_form.cleaned_data['teaching_campus'] else None,
             remark_fr=group_form.cleaned_data['remark_fr'],
             remark_en=group_form.cleaned_data['remark_en'],
+            end_year=self.get_group_obj().end_year,
         )
         try:
             return update_group_service.update_group(cmd_update)
@@ -299,7 +300,7 @@ class GroupUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         ]
 
     def is_content_active_tab(self):
-        return self.request.GET.get('tab') == str(Tab.CONTENT.value)
+        return self.request.GET.get('tab') == str(Tab.CONTENT.value) and self._get_initial_content_formset()
 
     def get_permission_object(self) -> Union[GroupYear, None]:
         try:

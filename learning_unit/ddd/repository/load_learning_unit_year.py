@@ -24,7 +24,6 @@
 #
 ##############################################################################
 import itertools
-
 from typing import List, Dict
 
 from django.conf import settings
@@ -46,7 +45,7 @@ from learning_unit.ddd.domain.learning_unit_year import LearningUnitYear, Lectur
 from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYearIdentity
 from learning_unit.ddd.domain.proposal import Proposal
 from learning_unit.ddd.domain.specifications import Specifications
-from learning_unit.ddd.repository.load_teaching_material import load_teaching_materials
+from learning_unit.ddd.repository.load_teaching_material import bulk_load_teaching_materials
 from osis_common.decorators.deprecated import deprecated
 
 
@@ -158,7 +157,6 @@ def load_multiple(learning_unit_year_ids: List[int]) -> List['LearningUnitYear']
             **__instanciate_volume_domain_object(__convert_string_to_enum(learning_unit_data)),
             proposal=Proposal(learning_unit_data.pop('proposal_type'),
                               learning_unit_data.pop('proposal_state')),
-            # achievements=load_achievements(learning_unit_data['acronym'], learning_unit_data['year']),
             entities=Entities(requirement_entity_acronym=learning_unit_data.pop('requirement_entity_acronym'),
                               allocation_entity_acronym=learning_unit_data.pop('allocation_entity_acronym')),
             description_fiche=DescriptionFiche(
@@ -181,7 +179,7 @@ def load_multiple(learning_unit_year_ids: List[int]) -> List['LearningUnitYear']
                 prerequisite=learning_unit_data.pop('cms_prerequisite'),
                 prerequisite_en=learning_unit_data.pop('cms_prerequisite_en')
                 ),
-            teaching_materials=load_teaching_materials(learning_unit_data['acronym'], learning_unit_data['year'])
+            teaching_materials=[]
             )
         results.append(luy)
     return results
@@ -330,18 +328,17 @@ def load_multiple_by_identity(learning_unit_year_identities: List['LearningUnitY
     )
 
     qs = _annotate_with_description_fiche_specifications(qs)
-
+    teaching_materials_by_learning_unit_identity = bulk_load_teaching_materials(learning_unit_year_identities)
     results = []
-
     for learning_unit_data in qs:
         learning_unit_identity = LearningUnitYearIdentity(code=learning_unit_data['acronym'],
                                                           year=learning_unit_data['year'])
         attributions = attributions_by_ue.get(learning_unit_identity)
         luy = LearningUnitYear(
+            entity_id=learning_unit_identity,
             **__instanciate_volume_domain_object(__convert_string_to_enum(learning_unit_data)),
             proposal=Proposal(learning_unit_data.pop('proposal_type'),
                               learning_unit_data.pop('proposal_state')),
-            # achievements=load_achievements(learning_unit_data['acronym'], learning_unit_data['year']),
             entities=Entities(requirement_entity_acronym=learning_unit_data.pop('requirement_entity_acronym'),
                               allocation_entity_acronym=learning_unit_data.pop('allocation_entity_acronym')),
             description_fiche=DescriptionFiche(
@@ -357,19 +354,18 @@ def load_multiple_by_identity(learning_unit_year_identities: List['LearningUnitY
                     online_resources_en=learning_unit_data.pop('cms_online_resources_en'),
                     bibliography=learning_unit_data.pop('cms_bibliography'),
                     mobility=learning_unit_data.pop('cms_mobility')
-                ),
+            ),
             specifications=Specifications(
                 themes_discussed=learning_unit_data.pop('cms_themes_discussed'),
                 themes_discussed_en=learning_unit_data.pop('cms_themes_discussed_en'),
                 prerequisite=learning_unit_data.pop('cms_prerequisite'),
                 prerequisite_en=learning_unit_data.pop('cms_prerequisite_en')
                 ),
-            teaching_materials=load_teaching_materials(learning_unit_data['acronym'], learning_unit_data['year']),
+            teaching_materials=teaching_materials_by_learning_unit_identity.get(learning_unit_identity, []),
             attributions=attributions
             )
 
         results.append(luy)
-
     return results
 
 

@@ -32,9 +32,13 @@ from django.utils import timezone
 
 from base.business.learning_units.perms import find_last_requirement_entity_version
 from base.models import entity_version
-from base.models.entity_version import build_current_entity_version_structure_in_memory, \
-    find_parent_of_type_into_entity_structure, get_structure_of_entity_version, \
-    get_entity_version_parent_or_itself_from_type
+from base.models.entity_version import (
+    build_current_entity_version_structure_in_memory,
+    find_parent_of_type_into_entity_structure,
+    get_structure_of_entity_version,
+    get_entity_version_parent_or_itself_from_type,
+    EntityVersion,
+)
 from base.models.enums import organization_type
 from base.models.enums.entity_type import FACULTY, SCHOOL, INSTITUTE
 from base.tests.factories.academic_year import AcademicYearFactory
@@ -355,6 +359,37 @@ class EntityVersionTest(TestCase):
             parent=entity_parent,
         )
         self.assertIsNone(entity_school_version_level1.find_faculty_version(ac_yr))
+
+    def test_find_entity_by_acronym_parent(self):
+        parent = EntityVersionFactory(
+            acronym="ROOT",
+            title="Root entity",
+            parent=None,
+        )
+        sector = EntityVersionFactory(
+            acronym="SECTOR",
+            entity_type="SECTOR",
+            parent=parent.entity,
+        )
+        faculty = EntityVersionFactory(
+            acronym="FACULTY",
+            entity_type="FACULTY",
+            parent=sector.entity,
+        )
+        EntityVersionFactory(
+            acronym="SCHOOL",
+            entity_type="SCHOOL",
+            parent=faculty.entity,
+        )
+        base_qs = EntityVersion.objects.with_acronym_path()
+        all_from_sector = base_qs.filter(path_as_string__icontains="sect")
+        self.assertEqual(all_from_sector.count(),3)
+        one_result = base_qs.filter(path_as_string__icontains="schoo")
+        self.assertEqual(one_result.count(), 1)
+        self.assertEqual(
+            one_result.first()['path_as_string'],
+            "ROOT / SECTOR / FACULTY / SCHOOL",
+        )
 
     def test_find_main_entities_version_filtered_by_person(self):
         person = PersonFactory()

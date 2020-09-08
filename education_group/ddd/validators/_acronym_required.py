@@ -28,9 +28,9 @@ from education_group.ddd.domain.exception import AcronymRequired
 
 
 class AcronymRequiredValidator(business_validator.BusinessValidator):
-    def __init__(self, training: 'Training'):
+    def __init__(self, acronym: str):
         super().__init__()
-        self.acronym = training.acronym
+        self.acronym = acronym
 
     def validate(self, *args, **kwargs):
         if not self.acronym:

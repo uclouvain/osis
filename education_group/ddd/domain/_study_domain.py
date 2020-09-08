@@ -23,19 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import attr
+
 from osis_common.ddd import interface
 
 
+@attr.s(frozen=True, slots=True)
 class StudyDomainIdentity(interface.EntityIdentity):
-    def __init__(self, decree_name: str, code: str):
-        self.decree_name = decree_name
-        self.code = code
-
-    def __eq__(self, other):
-        return self.decree_name == other.decree_name and self.code == other.code
-
-    def __hash__(self):
-        return hash(self.decree_name + self.code)
+    decree_name = attr.ib(type=str)
+    code = attr.ib(type=str)
 
 
 class StudyDomain(interface.Entity):
@@ -51,6 +47,11 @@ class StudyDomain(interface.Entity):
     @property
     def decree_name(self) -> str:
         return self.entity_id.decree_name
+
+    def __eq__(self, other):
+        if type(other) == self.__class__:
+            return self.entity_id == other.entity_id
+        return False
 
     def __str__(self):
         return "{obj.decree_name} : {obj.code} {obj.name}".format(obj=self)

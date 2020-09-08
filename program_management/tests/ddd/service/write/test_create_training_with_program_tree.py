@@ -25,12 +25,15 @@ import mock
 from django.test import TestCase
 
 from education_group.ddd.domain import training
-from education_group.tests.ddd.factories.command.create_training_command import CreateTrainingCommandFactory
 from program_management.ddd.domain import program_tree, program_tree_version
 from program_management.ddd.service.write import create_training_with_program_tree
+from education_group.tests.ddd.factories.command.create_and_postpone_training_and_tree_command import \
+    CreateAndPostponeTrainingAndProgramTreeCommandFactory
 
 
 class TestCreateAndReportTrainingWithProgramTree(TestCase):
+    @mock.patch("program_management.ddd.service.write.create_training_with_program_tree."
+                "CalculateEndPostponement.calculate_max_year_of_end_postponement", return_value=2023)
     @mock.patch("program_management.ddd.service.write.postpone_tree_version_service.postpone_program_tree_version")
     @mock.patch("program_management.ddd.service.write.create_standard_version_service.create_standard_program_version")
     @mock.patch("program_management.ddd.service.write.postpone_program_tree_service.postpone_program_tree")
@@ -44,7 +47,8 @@ class TestCreateAndReportTrainingWithProgramTree(TestCase):
             mock_create_standard_program_tree,
             mock_postpone_program_tree,
             mock_create_standard_program_version,
-            mock_postpone_program_tree_version):
+            mock_postpone_program_tree_version,
+            mock_end_postponement):
 
         training_identities = [
             training.TrainingIdentity(acronym="ACRONYM", year=2020),
@@ -60,11 +64,11 @@ class TestCreateAndReportTrainingWithProgramTree(TestCase):
             offer_acronym="Offer",
             year=2020,
             version_name="",
-            is_transition=False
+            is_transition=False,
         )
         mock_postpone_program_tree_version.return_value = None
 
-        cmd = CreateTrainingCommandFactory()
+        cmd = CreateAndPostponeTrainingAndProgramTreeCommandFactory()
         result = create_training_with_program_tree.create_and_report_training_with_program_tree(cmd)
 
         self.assertListEqual(training_identities, result)

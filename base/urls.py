@@ -29,7 +29,6 @@ from django.conf.urls import url, include
 from django.conf.urls.static import static
 from django.urls import path
 
-import base.views.education_groups.create
 import base.views.learning_units.common
 import base.views.learning_units.create
 import base.views.learning_units.delete
@@ -46,6 +45,7 @@ from attribution.views import attribution, tutor_application
 from base.views import learning_achievement, search, user_list
 from base.views import learning_unit, offer, common, institution, organization, academic_calendar, \
     my_osis, entity, student, notifications
+from base.views import geocoding
 from base.views import teaching_material
 from base.views.education_groups import urls as education_groups_urls
 from base.views.filter import filter_cities_by_country, filter_campus_by_city
@@ -301,6 +301,7 @@ urlpatterns = [
         ]))
     ])),
     url(r'^ajax_select/', include(ajax_select_urls)),
+    path('geocoding', base.views.geocoding.geocode),
     url(r'^clear_filter/$', base.views.search.clear_filter, name="clear_filter"),
     url(r'^notifications/', include([
         url(r'^clear/$', base.views.notifications.clear_user_notifications, name="clear_notifications"),

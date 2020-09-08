@@ -21,16 +21,17 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+from copy import copy
+
 import mock
 from django.test import SimpleTestCase
 
 from education_group.ddd.domain import training, exception
 from education_group.tests.ddd.factories.training import TrainingFactory
-from testing import mocks
 
 
 class TestTrainingBuilderCopyToNextYear(SimpleTestCase):
-    @mock.patch("education_group.ddd.repository.training.TrainingRepository", new_callable=mocks.MockRepository)
+    @mock.patch("education_group.ddd.repository.training.TrainingRepository", autospec=True)
     def test_should_return_existing_training_when_training_exists_for_next_year(self, mock_repository):
         training_source = TrainingFactory()
         training_next_year = TrainingFactory()
@@ -41,7 +42,7 @@ class TestTrainingBuilderCopyToNextYear(SimpleTestCase):
 
         self.assertEqual(training_next_year, result)
 
-    @mock.patch("education_group.ddd.repository.training.TrainingRepository", new_callable=mocks.MockRepository)
+    @mock.patch("education_group.ddd.repository.training.TrainingRepository", autospec=True)
     def test_should_copy_with_increment_year_when_training_does_not_exists_for_next_year(self, mock_repository):
         training_source = TrainingFactory()
 
@@ -51,3 +52,17 @@ class TestTrainingBuilderCopyToNextYear(SimpleTestCase):
 
         self.assertEqual(training_source.entity_id.year + 1, result.entity_id.year)
         self.assertEqual(training_source.identity_through_years, result.identity_through_years)
+
+
+class TestTrainingHasSameValuesAs(SimpleTestCase):
+    def test_should_return_false_when_values_are_different(self):
+        training_source = TrainingFactory()
+        other_training = TrainingFactory()
+
+        self.assertFalse(training_source.has_same_values_as(other_training))
+
+    def test_should_return_true_when_values_are_equal(self):
+        training_source = TrainingFactory()
+        other_training = copy(training_source)
+
+        self.assertTrue(training_source, other_training)

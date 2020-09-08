@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from django.conf import settings
+from django.db.models import Q
 from django.test import RequestFactory
 from django.urls import reverse
 from rest_framework import status
@@ -121,6 +122,27 @@ class LearningUnitListTestCase(APITestCase):
 
         qs = LearningUnitYear.objects.filter(
             learning_container_year__isnull=False
+        ).annotate_full_title().order_by('-academic_year__year', 'acronym')
+        serializer = LearningUnitSerializer(
+            qs,
+            many=True,
+            context={
+                'request': RequestFactory().get(self.url),
+                'language': settings.LANGUAGE_CODE
+            }
+        )
+        self.assertEqual(response.data['results'], serializer.data)
+
+    def test_get_no_external_mobility_learning_unit(self):
+        luy = LearningUnitYearFactory()
+        ExternalLearningUnitYearFactory(learning_unit_year=luy, mobility=True)
+        response = self.client.get(self.url, {'lang': 'fr'})
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        qs = LearningUnitYear.objects.filter(
+            Q(learning_container_year__isnull=False) &
+            (Q(externallearningunityear__mobility=False) | Q(externallearningunityear__isnull=True))
         ).annotate_full_title().order_by('-academic_year__year', 'acronym')
         serializer = LearningUnitSerializer(
             qs,
