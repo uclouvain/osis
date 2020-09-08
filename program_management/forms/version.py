@@ -70,7 +70,6 @@ class SpecificVersionForm(forms.Form):
         self.__init_academic_year_choices()
 
     def __init_academic_year_choices(self):
-        # TODO :: unit tests on this service (or on the domain service)
         max_year = get_end_postponement_year_service.calculate_program_tree_end_postponement(
             GetEndPostponementYearCommand(code=self.node_identity.code, year=self.node_identity.year)
         )
@@ -83,6 +82,7 @@ class SpecificVersionForm(forms.Form):
             choices_years += BLANK_CHOICE
 
         self.fields["end_year"].choices = choices_years
+        self.fields["end_year"].initial = choices_years[-1]
 
     def clean_end_year(self):
         end_year = self.cleaned_data["end_year"]
