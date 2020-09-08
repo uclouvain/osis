@@ -44,7 +44,8 @@ from education_group.ddd.service.read import get_mini_training_service
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd.business_types import *
 from program_management.ddd import command as command_program_management
-from program_management.ddd.domain.exception import ProgramTreeNonEmpty, NodeHaveLinkException
+from program_management.ddd.domain.exception import ProgramTreeNonEmpty, NodeHaveLinkException, \
+    CannotDeleteStandardDueToVersionEndDate
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
@@ -86,6 +87,7 @@ class MiniTrainingDeleteView(PermissionRequiredMixin, AjaxTemplateMixin, DeleteV
                 NodeHaveLinkException,
                 MiniTrainingHaveLinkWithEPC,
                 MiniTrainingHaveEnrollments,
+                CannotDeleteStandardDueToVersionEndDate,
         ) as e:
             display_error_messages(request, e.message)
             return render(request, self.template_name, {})
