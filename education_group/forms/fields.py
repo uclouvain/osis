@@ -34,7 +34,7 @@ class ManagementEntitiesChoiceField(EntityRoleChoiceField):
     def get_queryset(self):
         qs = super().get_queryset().pedagogical_entities().order_by('acronym')
         if self.initial:
-            qs |= EntityVersion.objects.filter(pk=self.initial)
+            qs |= EntityVersion.objects.filter(acronym=self.initial)
         return qs
 
     def clean(self, value):
