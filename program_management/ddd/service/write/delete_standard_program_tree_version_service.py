@@ -42,7 +42,7 @@ def delete_standard_program_tree_version(
         try:
             new_delete_command = command.DeleteStandardVersionCommand(
                 acronym=delete_command.offer_acronym,
-                year=year
+                year=year,
             )
             deleted_program_tree_versions.append(
                 delete_standard_version_service.delete_standard_version(new_delete_command)

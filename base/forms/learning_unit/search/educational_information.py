@@ -73,13 +73,13 @@ class LearningUnitDescriptionFicheFilter(LearningUnitFilter):
 
         extra_query = """
             EXISTS(
-                SELECT * 
+                SELECT *
                 FROM cms_translatedtext
                 JOIN cms_textlabel ct on cms_translatedtext.text_label_id = ct.id
                 JOIN reversion_version rv on rv.object_id::int = cms_translatedtext.id
                 JOIN reversion_revision rr on rv.revision_id = rr.id
-                WHERE ct.label in %s 
-                    and rr.date_created >= %s 
+                WHERE ct.label in %s
+                    and rr.date_created >= %s
                     and cms_translatedtext.reference = base_learningunityear.id
             )
         """

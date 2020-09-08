@@ -30,10 +30,10 @@
             <div class="panel panel-default">
                 <div class="panel-body">
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-6" id="title">
                             {% bootstrap_label _("Acronym/Short title") label_class='d-block'%}
                             <p>
-                                {{ node.title }}{% if current_version.version_label != '' %}{{ current_version.version_label }}{% endif %}
+                                {{ node.title }}{% if current_version.version_label != '' %}<span id="version_label">{{ current_version.version_label }}</span>{% endif %}
                             </p>
                         </div>
                         <div class="col-md-6">
@@ -153,7 +153,13 @@
                     <div class="row">
                         <div class="col-md-12">
                             {% bootstrap_label _("Last year of organization") label_class='d-block'%}
-                            <p>{% if node.end_year %}{{ node.end_year|format_to_academic_year }}{% else %}{% trans 'unspecified' %}{% endif %}</p>
+                            <p>
+                                {% if current_version.end_year_of_existence %}
+                                    {{ current_version.end_year_of_existence|format_to_academic_year }}
+                                {% else %}
+                                    {% trans 'unspecified' %}
+                                {% endif %}
+                            </p>
                         </div>
                     </div>
                     <br>

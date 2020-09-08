@@ -48,7 +48,9 @@ from program_management.ddd.domain._campus import Campus
 from program_management.ddd.domain.academic_year import AcademicYear
 from program_management.ddd.domain.link import factory as link_factory
 from program_management.ddd.domain.prerequisite import Prerequisite, NullPrerequisite
+from program_management.ddd.domain.service.generate_node_abbreviated_title import GenerateNodeAbbreviatedTitle
 from program_management.ddd.domain.service.generate_node_code import GenerateNodeCode
+from program_management.ddd.domain.service.validation_rule import FieldValidationRule
 from program_management.models.enums.node_type import NodeType
 
 
@@ -118,6 +120,31 @@ class NodeFactory:
         )
         copied_node._has_changed = True
         return copied_node
+
+    def generate_from_parent(self, parent_node: 'Node', child_type: 'EducationGroupTypesEnum') -> 'Node':
+        generated_child_title = FieldValidationRule.get(
+            child_type,
+            'title_fr'
+        ).initial_value
+        child = self.get_node(
+            type=NodeType.GROUP,
+            node_type=child_type,
+            code=GenerateNodeCode.generate_from_parent_node(parent_node, child_type),
+            title=GenerateNodeAbbreviatedTitle.generate(
+                parent_node=parent_node,
+                child_node_type=child_type,
+            ),
+            year=parent_node.year,
+            teaching_campus=parent_node.teaching_campus,
+            management_entity_acronym=parent_node.management_entity_acronym,
+            group_title_fr="{child_title} {parent_abbreviated_title}".format(
+                child_title=generated_child_title,
+                parent_abbreviated_title=parent_node.title
+            ),
+            start_year=parent_node.year,
+        )
+        child._has_changed = True
+        return child
 
     def deepcopy_node_without_copy_children_recursively(self, original_node: 'Node') -> 'Node':
         original_children = original_node.children
@@ -213,7 +240,16 @@ class Node(interface.Entity):
         return self.node_type in GroupType.minor_major_list_choice_enums()
 
     def is_minor_or_deepening(self) -> bool:
-        return self.node_type in MiniTrainingType.minors_and_deepening()
+        return self.is_minor() or self.is_deepening()
+
+    def is_minor(self) -> bool:
+        return self.node_type in MiniTrainingType.minors_enum()
+
+    def is_deepening(self) -> bool:
+        return self.node_type == MiniTrainingType.DEEPENING
+
+    def is_major(self) -> bool:
+        return self.node_type == MiniTrainingType.FSA_SPECIALITY
 
     def get_direct_child_as_node(self, node_id: 'NodeIdentity') -> 'Node':
         return next(node for node in self.get_direct_children_as_nodes() if node.entity_id == node_id)

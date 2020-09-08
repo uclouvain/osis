@@ -102,7 +102,6 @@ class TrainingFactory(factory.Factory):
     management_entity = factory.SubFactory(EntityFactory)
     administration_entity = factory.SubFactory(EntityFactory)
     end_year = factory.LazyAttribute(generate_end_date)
-    teaching_campus = factory.SubFactory(CampusIdentityFactory)
     enrollment_campus = factory.SubFactory(CampusIdentityFactory)
     other_campus_activities = factory.fuzzy.FuzzyChoice(ActivityPresence)
     funding = factory.SubFactory(FundingFactory)

@@ -39,7 +39,6 @@ from base.business.education_group import can_user_edit_administrative_data, pre
     CHAIR_OF_THE_EXAM_BOARD_COL, EXAM_BOARD_SECRETARY_COL, EXAM_BOARD_SIGNATORY_COL, SIGNATORY_QUALIFICATION_COL, \
     START_EXAM_REGISTRATION_COL, END_EXAM_REGISTRATION_COL, MARKS_PRESENTATION_COL, DISSERTATION_PRESENTATION_COL, \
     DELIBERATION_COL, SCORES_DIFFUSION_COL, SESSION_HEADERS, _get_translated_header_titles
-from base.business.education_groups.perms import get_education_group_year_eligible_management_entities
 from education_group.models.group_year import GroupYear
 
 from base.models.enums import academic_calendar_type
@@ -51,7 +50,6 @@ from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
-from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.mandatary import MandataryFactory
 from base.tests.factories.offer_year_calendar import OfferYearCalendarFactory
 from base.tests.factories.organization import OrganizationFactory
@@ -395,139 +393,3 @@ def _generate_xls_administrative_data_build_parameter(xls_data, user):
             xls_build.ROW_HEIGHT: None,
         }]
     }
-
-
-class EducationGroupGetEligibleEntities(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.academic_year = AcademicYearFactory()
-
-    def test_case_one_egy(self):
-        education_group_year = EducationGroupYearFactory(academic_year=self.academic_year)
-        self.assertEqual(
-            get_education_group_year_eligible_management_entities(education_group_year),
-            [education_group_year.management_entity]
-        )
-
-    def test_case_one_egy_and_parent(self):
-        education_group_year_child = EducationGroupYearFactory(academic_year=self.academic_year)
-        education_group_year_parent = EducationGroupYearFactory(academic_year=self.academic_year)
-        GroupElementYearFactory(
-            parent=education_group_year_parent,
-            child_branch=education_group_year_child
-        )
-
-        self.assertEqual(
-            get_education_group_year_eligible_management_entities(education_group_year_child),
-            [education_group_year_child.management_entity]
-        )
-
-        self.assertEqual(
-            get_education_group_year_eligible_management_entities(education_group_year_parent),
-            [education_group_year_parent.management_entity]
-        )
-
-    def test_case_one_egy_one_parent_no_entity_on_child(self):
-        education_group_year_child = EducationGroupYearFactory(academic_year=self.academic_year)
-        education_group_year_parent = EducationGroupYearFactory(academic_year=self.academic_year)
-        GroupElementYearFactory(
-            parent=education_group_year_parent,
-            child_branch=education_group_year_child
-        )
-        education_group_year_child.management_entity = None
-        education_group_year_child.save()
-
-        self.assertEqual(
-            get_education_group_year_eligible_management_entities(education_group_year_child),
-            [education_group_year_parent.management_entity]
-        )
-
-    def test_case_one_egy_two_parent_no_entity_on_child(self):
-        education_group_year_child = EducationGroupYearFactory(academic_year=self.academic_year)
-        education_group_year_parent1 = EducationGroupYearFactory(academic_year=self.academic_year)
-        GroupElementYearFactory(
-            parent=education_group_year_parent1,
-            child_branch=education_group_year_child
-        )
-        education_group_year_parent2 = EducationGroupYearFactory(academic_year=self.academic_year)
-        GroupElementYearFactory(
-            parent=education_group_year_parent2,
-            child_branch=education_group_year_child
-        )
-        education_group_year_child.management_entity = None
-        education_group_year_child.save()
-
-        self.assertCountEqual(
-            get_education_group_year_eligible_management_entities(education_group_year_child),
-            [
-                education_group_year_parent1.management_entity,
-                education_group_year_parent2.management_entity,
-            ]
-        )
-
-    def test_case_complex_hierarchy(self):
-        education_group_year_child = EducationGroupYearFactory(academic_year=self.academic_year)
-        EntityVersionFactory(entity=education_group_year_child.management_entity, acronym="CHILD")
-
-        education_group_year_parent1 = EducationGroupYearFactory(academic_year=self.academic_year)
-        EntityVersionFactory(entity=education_group_year_parent1.management_entity, acronym="PARENT1")
-        GroupElementYearFactory(
-            parent=education_group_year_parent1,
-            child_branch=education_group_year_child
-        )
-
-        education_group_year_parent2 = EducationGroupYearFactory(academic_year=self.academic_year)
-        EntityVersionFactory(entity=education_group_year_parent2.management_entity, acronym="PARENT2")
-        GroupElementYearFactory(
-            parent=education_group_year_parent2,
-            child_branch=education_group_year_child
-        )
-
-        education_group_year_parent3 = EducationGroupYearFactory(academic_year=self.academic_year)
-        EntityVersionFactory(entity=education_group_year_parent3.management_entity, acronym="PARENT3")
-        GroupElementYearFactory(
-            parent=education_group_year_parent3,
-            child_branch=education_group_year_parent1
-        )
-
-        education_group_year_parent4 = EducationGroupYearFactory(academic_year=self.academic_year)
-        EntityVersionFactory(entity=education_group_year_parent4.management_entity, acronym="PARENT4")
-        GroupElementYearFactory(
-            parent=education_group_year_parent4,
-            child_branch=education_group_year_parent1
-        )
-
-        education_group_year_parent5 = EducationGroupYearFactory(academic_year=self.academic_year)
-        EntityVersionFactory(entity=education_group_year_parent5.management_entity, acronym="PARENT5")
-        GroupElementYearFactory(
-            parent=education_group_year_parent5,
-            child_branch=education_group_year_child
-        )
-        GroupElementYearFactory(
-            parent=education_group_year_parent5,
-            child_branch=education_group_year_parent2
-        )
-
-        education_group_year_parent6 = EducationGroupYearFactory(academic_year=self.academic_year)
-        EntityVersionFactory(entity=education_group_year_parent6.management_entity, acronym="PARENT6")
-        GroupElementYearFactory(
-            parent=education_group_year_parent6,
-            child_branch=education_group_year_parent5
-        )
-
-        education_group_year_child.management_entity = None
-        education_group_year_child.save()
-        education_group_year_parent1.management_entity = None
-        education_group_year_parent1.save()
-        education_group_year_parent5.management_entity = None
-        education_group_year_parent5.save()
-
-        self.assertCountEqual(
-            get_education_group_year_eligible_management_entities(education_group_year_child),
-            [
-                education_group_year_parent2.management_entity,
-                education_group_year_parent3.management_entity,
-                education_group_year_parent4.management_entity,
-                education_group_year_parent6.management_entity,
-            ]
-        )
