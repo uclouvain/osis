@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-03 13:29+0200\n"
+"POT-Creation-Date: 2020-09-08 13:14+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -606,9 +606,6 @@ msgstr ""
 "Les champs concernant les données de l'ARES doivent être soit tous remplis "
 "soit tous vides"
 
-msgid "The following links has been updated"
-msgstr "Les liens suivants ont été mis à jour"
-
 #, python-brace-format
 msgid ""
 "The formation you work with doesn't exist (or is not at the same position) "
@@ -753,6 +750,9 @@ msgstr "Bacheliers universitaires"
 
 msgid "University certificate"
 msgstr "Certificat universitaire"
+
+msgid "Update Content"
+msgstr "Mis à jour Contenu"
 
 msgid "Update Training"
 msgstr "Modifier Formation"
