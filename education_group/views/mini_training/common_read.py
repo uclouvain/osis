@@ -186,10 +186,16 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
                "?path_to={}".format(self.get_path())
 
     def get_update_mini_training_url(self) -> str:
+        if self.current_version.is_standard_version:
+            return reverse_with_get(
+                'mini_training_update',
+                kwargs={'year': self.node_identity.year, 'code': self.node_identity.code,
+                        'acronym': self.get_object().title},
+                get={"path": self.get_path(), "tab": self.active_tab.name}
+            )
         return reverse_with_get(
-            'mini_training_update',
-            kwargs={'year': self.node_identity.year, 'code': self.node_identity.code,
-                    'acronym': self.get_object().title},
+            'mini_training_version_update',
+            kwargs={'year': self.node_identity.year, 'code': self.node_identity.code},
             get={"path": self.get_path(), "tab": self.active_tab.name}
         )
 
