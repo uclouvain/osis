@@ -121,6 +121,8 @@ def extend_learning_unit(learning_unit_to_edit, new_academic_year):
 
     if not new_academic_year:  # If there is no selected academic_year, we take the maximal value
         new_academic_year = AcademicYear.objects.max_adjournment()
+        if last_learning_unit_year.is_partim():
+            new_academic_year = _get_max_academic_year_for_partim(last_learning_unit_year, new_academic_year)
 
     with transaction.atomic():
         for ac_year in get_next_academic_years(learning_unit_to_edit, new_academic_year.year):
@@ -128,6 +130,16 @@ def extend_learning_unit(learning_unit_to_edit, new_academic_year):
             result.append(create_learning_unit_year_creation_message(new_luy))
 
     return result
+
+
+def _get_max_academic_year_for_partim(last_learning_unit_year, new_academic_year):
+    full_learning_unit = last_learning_unit_year.parent.learning_unit
+    last_full = LearningUnitYear.objects.filter(
+        learning_unit=full_learning_unit
+    ).order_by('academic_year').last()
+    if last_full.academic_year.year < new_academic_year.year:
+        new_academic_year = last_full.academic_year
+    return new_academic_year
 
 
 def _check_extend_partim(last_learning_unit_year, new_academic_year):
@@ -710,4 +722,3 @@ def __report_component(reference: LearningComponentYear, to_postpone_to: List[Le
             learning_unit_year=learning_unit_year_obj,
             type=reference.type,
         )
-
