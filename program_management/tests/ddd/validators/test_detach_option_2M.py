@@ -21,10 +21,12 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+from types import SimpleNamespace
 from unittest import mock
 
 from django.test import SimpleTestCase
 from django.utils.translation import ngettext
+from mock import patch
 
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType
 from program_management.ddd.domain import program_tree
@@ -49,11 +51,19 @@ class TestDetachOptionValidator(TestValidatorValidateMixin, SimpleTestCase):
         validator = DetachOptionValidator(working_tree, path_to_detach, self.mock_repository)
         self.assertValidatorNotRaises(validator)
 
-    def test_should_raise_exception_when_node_to_detach_is_an_option_also_present_inside_finality(self):
+    @patch(
+        'program_management.ddd.domain.service.identity_search.ProgramTreeVersionIdentitySearch.get_from_node_identity'
+    )
+    def test_should_raise_exception_when_node_to_detach_is_an_option_also_present_inside_finality(self, mock_version):
         working_tree = ProgramTreeFactory(root_node__node_type=TrainingType.PGRM_MASTER_120)
         link_root_finality = LinkFactory(parent=working_tree.root_node, child__node_type=TrainingType.MASTER_MA_120)
         link_finality_option = LinkFactory(parent=link_root_finality.child, child__node_type=MiniTrainingType.OPTION)
         link_root_option = LinkFactory(parent=working_tree.root_node, child=link_finality_option.child)
+
+        mock_version.side_effect = [
+            SimpleNamespace(version_name='', offer_acronym=link_finality_option.parent.title),
+            SimpleNamespace(version_name='', offer_acronym=link_finality_option.child.title),
+        ]
 
         path_to_detach = program_tree.build_path(working_tree.root_node, link_root_option.child)
 

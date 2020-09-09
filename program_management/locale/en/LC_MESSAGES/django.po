@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-03 11:16+0200\n"
+"POT-Creation-Date: 2020-09-07 11:51+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -110,6 +110,9 @@ msgid "Alloc. Ent."
 msgstr ""
 
 msgid "Annual"
+msgstr ""
+
+msgid "Are you sure you want to delete %(offer_acronym)s %(version_name)s ?"
 msgstr ""
 
 #, python-format
@@ -574,6 +577,10 @@ msgstr ""
 
 #, python-format
 msgid "The program %(title)s - %(academic_year)s will be published soon"
+msgstr ""
+
+msgid ""
+"The program tree version %(offer_acronym)s %(version_name)s has been deleted."
 msgstr ""
 
 msgid "The registration form is available at the Secretariat of"

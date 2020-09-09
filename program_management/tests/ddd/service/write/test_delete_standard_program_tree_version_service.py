@@ -167,22 +167,6 @@ class TestDeleteStandardProgramTreeService(TestCase, MockPatcherMixin):
             with self.assertRaises(exception.ProgramTreeNotFoundException):
                 self.fake_program_tree_repo.get(identity)
 
-    def test_should_delete_trainings(self):
-        delete_standard_program_tree_version_service.delete_standard_program_tree_version(self.cmd)
-
-        training_identities = [obj.entity_id for obj in self.trainings]
-        for identity in training_identities:
-            with self.assertRaises(education_group_exception.TrainingNotFoundException):
-                self.fake_training_repo.get(identity)
-
-    def test_should_delete_mini_trainings(self):
-        delete_standard_program_tree_version_service.delete_standard_program_tree_version(self.cmd)
-
-        mini_training_identities = [obj.entity_id for obj in self.mini_trainings]
-        for identity in mini_training_identities:
-            with self.assertRaises(education_group_exception.MiniTrainingNotFoundException):
-                self.fake_mini_training_repo.get(identity)
-
     def test_should_delete_groups(self):
         delete_standard_program_tree_version_service.delete_standard_program_tree_version(self.cmd)
 

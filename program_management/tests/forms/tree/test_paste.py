@@ -97,7 +97,7 @@ class TestAttachNodeFormFactory(SimpleTestCase):
     def test_form_returned_when_parent_is_minor_major_list_choice(self):
         path = "6"
         node_to_attach_from = NodeGroupYearFactory(
-            node_type=factory.fuzzy.FuzzyChoice(GroupType.minor_major_option_list_choice_enums()),
+            node_type=factory.fuzzy.FuzzyChoice(GroupType.minor_major_list_choice_enums()),
             node_id=6
         )
         node_to_attach = NodeGroupYearFactory()
@@ -119,13 +119,69 @@ class TestAttachNodeFormFactory(SimpleTestCase):
             node_to_attach.code,
             node_to_attach.year
         )
-        self.assertIsInstance(form, program_management.forms.tree.paste.PasteToMinorMajorOptionListChoiceForm)
+        self.assertIsInstance(form, program_management.forms.tree.paste.PasteToMinorMajorListChoiceForm)
+
+    def test_form_returned_when_parent_is_option_list_choice(self):
+        path = "6"
+        node_to_attach_from = NodeGroupYearFactory(
+            node_type=GroupType.OPTION_LIST_CHOICE,
+            node_id=6
+        )
+        node_to_attach = NodeGroupYearFactory()
+        self._mock_load_node(node_to_attach_from)
+        self._mock_node_repo_get(node_to_attach)
+
+        relationship_object = AuthorizedRelationshipObjectFactory(
+            parent_type=node_to_attach_from.node_type,
+            child_type=node_to_attach.node_type
+        )
+        relationships = AuthorizedRelationshipListFactory(
+            authorized_relationships=[relationship_object]
+        )
+        self._mock_load_authorized_relationships(relationships)
+
+        form = program_management.forms.tree.paste.paste_form_factory(
+            None,
+            path,
+            node_to_attach.code,
+            node_to_attach.year
+        )
+        self.assertIsInstance(form, program_management.forms.tree.paste.PasteToOptionListChoiceForm)
+
+    def test_form_returned_when_both_parent_and_child_are_minor_major_list_choice(self):
+        path = "6"
+        node_to_attach_from = NodeGroupYearFactory(
+            node_type=factory.fuzzy.FuzzyChoice(GroupType.minor_major_list_choice_enums()),
+            node_id=6
+        )
+        node_to_attach = NodeGroupYearFactory(node_type=factory.fuzzy.FuzzyChoice(
+            GroupType.minor_major_list_choice_enums())
+        )
+        self._mock_load_node(node_to_attach_from)
+        self._mock_node_repo_get(node_to_attach)
+
+        relationship_object = AuthorizedRelationshipObjectFactory(
+            parent_type=node_to_attach_from.node_type,
+            child_type=node_to_attach.node_type
+        )
+        relationships = AuthorizedRelationshipListFactory(
+            authorized_relationships=[relationship_object]
+        )
+        self._mock_load_authorized_relationships(relationships)
+
+        form = program_management.forms.tree.paste.paste_form_factory(
+            None,
+            path,
+            node_to_attach.code,
+            node_to_attach.year
+        )
+        self.assertIsInstance(form, program_management.forms.tree.paste.PasteMinorMajorListToMinorMajorListChoiceForm)
 
     def test_form_returned_when_parent_is_training_and_child_is_minor_major_list_choice(self):
         path = "65|589"
         node_to_attach_from = NodeGroupYearFactory()
         node_to_attach = NodeGroupYearFactory(
-            node_type=factory.fuzzy.FuzzyChoice(GroupType.minor_major_option_list_choice_enums())
+            node_type=factory.fuzzy.FuzzyChoice(GroupType.minor_major_list_choice_enums())
         )
         self._mock_load_node(node_to_attach_from)
         self._mock_node_repo_get(node_to_attach)
@@ -241,7 +297,7 @@ class TestAttachNodeFormFields(SimpleTestCase):
 
     def test_attach_to_minor_major_list_choice_should_remove_all_fields_but_access_condition(self):
         node_to_attach = NodeGroupYearFactory()
-        form = program_management.forms.tree.paste.PasteToMinorMajorOptionListChoiceForm(
+        form = program_management.forms.tree.paste.PasteToMinorMajorListChoiceForm(
             "",
             node_to_attach.node_id,
             node_to_attach.node_type

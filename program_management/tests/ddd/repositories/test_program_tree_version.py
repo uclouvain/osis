@@ -70,6 +70,7 @@ class TestVersionRepositoryCreateMethod(TestCase):
             entity_id=cls.entity_identity,
             program_tree_identity=cls.new_program_tree.entity_id,
             tree=cls.new_program_tree,
+            end_year_of_existence=cls.academic_year.year,
         )
 
     @patch.object(Node, '_has_changed', return_value=True)
@@ -105,6 +106,10 @@ class TestVersionRepositoryCreateMethod(TestCase):
         self.assertEqual(education_group_version_db_object.version_name, self.new_program_tree_version.version_name)
         self.assertEqual(education_group_version_db_object.title_fr, self.new_program_tree_version.title_fr)
         self.assertEqual(education_group_version_db_object.title_en, self.new_program_tree_version.title_en)
+        self.assertEqual(
+            education_group_version_db_object.root_group.group.end_year.year,
+            self.new_program_tree_version.end_year_of_existence
+        )
 
     def test_assert_raises_training_not_found_exception(self):
         tree_version = ProgramTreeVersionFactory(entity_id__offer_acronym='INEXISTING')
@@ -120,7 +125,12 @@ class TestProgramTreeVersionRepositoryGetMethod(TestCase):
         cls.entity_id = ProgramTreeVersionIdentityFactory(year=cls.year)
         cls.repository = ProgramTreeVersionRepository()
 
-        cls.root_group = ElementFactory(group_year=GroupYearFactory(academic_year__year=cls.entity_id.year)).group_year
+        cls.root_group = ElementFactory(
+            group_year=GroupYearFactory(
+                academic_year__year=cls.entity_id.year,
+                group__end_year=AcademicYearFactory(current=True),
+            )
+        ).group_year
 
     def test_field_mapping(self):
         education_group_version_model_obj = EducationGroupVersionFactory(
@@ -138,3 +148,4 @@ class TestProgramTreeVersionRepositoryGetMethod(TestCase):
         self.assertEqual(version_tree_domain_obj.entity_id.year, education_group_version_model_obj.offer.academic_year.year)
         self.assertEqual(version_tree_domain_obj.entity_id.version_name, education_group_version_model_obj.version_name)
         self.assertEqual(version_tree_domain_obj.entity_id.is_transition, education_group_version_model_obj.is_transition)
+        self.assertEqual(version_tree_domain_obj.end_year_of_existence, self.root_group.group.end_year.year)

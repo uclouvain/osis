@@ -68,14 +68,19 @@
                     {% a_tag_modal_has_perm delete_group_url _('Delete permanently') 'base.delete_all_group' user group_year %}
                 </li>
             {% endif %}
-            {% if delete_training_url %}
+            {% if delete_permanently_training_url %}
                 <li>
-                    {% a_tag_modal_has_perm delete_training_url _('Delete permanently') 'base.delete_all_training' user education_group_version.offer %}
+                    {% a_tag_modal_has_perm delete_permanently_training_url _('Delete permanently') 'base.delete_all_training' user education_group_version.offer %}
                 </li>
             {% endif %}
-            {% if delete_mini_training_url %}
+            {% if delete_permanently_mini_training_url %}
                 <li>
-                    {% a_tag_modal_has_perm delete_mini_training_url _('Delete permanently') 'base.delete_all_minitraining' user education_group_version.offer %}
+                    {% a_tag_modal_has_perm delete_permanently_mini_training_url _('Delete permanently') 'base.delete_all_minitraining' user education_group_version.offer %}
+                </li>
+            {% endif %}
+            {% if delete_permanently_tree_version %}
+                <li>
+                    {% a_tag_modal_has_perm delete_permanently_tree_version _('Delete tree version permanently') 'program_management.delete_all_tree_version' user group_year %}
                 </li>
             {% endif %}
             {% if create_version_url %}

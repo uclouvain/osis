@@ -67,7 +67,7 @@
                                     {{ link.child.title }}
                                 {% else %}
                                     {{ link.child.group_title_fr }}
-                                    {% if version_infos %}
+                                    {% if version_infos and version_infos.title %}
                                         {{ version_infos.title }}
                                     {% endif %}
                                 {% endif %}

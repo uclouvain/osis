@@ -47,8 +47,7 @@ class TestDeleteAllProgramTreeService(TestCase):
         self.mocked_delete_tree_service = self.delete_tree_service_patcher.start()
         self.addCleanup(self.delete_tree_service_patcher.stop)
 
-    @mock.patch("program_management.ddd.service.write.delete_all_program_tree_service"
-                ".ExistingAcademicYearSearch.search_from_code")
+    @mock.patch("program_management.ddd.domain.service.node_identities_search.NodeIdentitiesSearch.search_from_code")
     def test_assert_delete_program_tree_service_called(self, mock_existing_years):
         mock_existing_years.return_value = [
             NodeIdentity(year=2017, code=self.parent.code),
