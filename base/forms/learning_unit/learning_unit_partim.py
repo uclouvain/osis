@@ -203,7 +203,8 @@ class PartimForm(LearningUnitBaseForm):
     def save(self, commit=True):
         learning_unit_instance = self.instance.learning_unit if self.instance else self.learning_unit_full_instance
 
-        start_year = learning_unit_instance.start_year if self._is_update() else self.start_anac
+        start_year = learning_unit_instance.start_year if (self._is_update() or not self.start_anac) \
+            else self.start_anac
         end_anac = learning_unit_instance.end_year
 
         # retrieve original learning unit end year if proposal
