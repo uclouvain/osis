@@ -23,8 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django import shortcuts
 from django.contrib.messages.views import SuccessMessageMixin
-from django.forms import formset_factory
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
@@ -33,7 +33,9 @@ import osis_common
 from base.models.enums.link_type import LinkTypes
 from base.views.common import display_success_messages
 from base.views.mixins import AjaxTemplateMixin
+from education_group.models.group_year import GroupYear
 from osis_common.ddd.interface import BusinessException
+from osis_role.contrib.views import AjaxPermissionRequiredMixin
 from program_management.ddd import command
 from program_management.ddd.domain import node
 from program_management.ddd.domain.node import NodeGroupYear
@@ -42,16 +44,13 @@ from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories import node as node_repository
 from program_management.ddd.service.read import get_program_tree_service
-from program_management.forms.tree.update import UpdateNodeForm, UpdateNodesFormset
+from program_management.forms.tree.update import UpdateNodeForm
 
 
-class UpdateLinkView(AjaxTemplateMixin, SuccessMessageMixin, FormView):
-    template_name = "tree/paste_inner.html"
-
-    # TODO : require 'change_link_data' permission for both GroupYear and LUY
-
-    def get_form_class(self):
-        return formset_factory(form=UpdateNodeForm, formset=UpdateNodesFormset)
+class UpdateLinkView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageMixin, FormView):
+    template_name = "tree/link_update_inner.html"
+    permission_required = "base.change_link_data"
+    form_class = UpdateNodeForm
 
     @cached_property
     def parent_node(self) -> dict:
@@ -67,6 +66,9 @@ class UpdateLinkView(AjaxTemplateMixin, SuccessMessageMixin, FormView):
             code=self.parent_node['element_code'], year=self.parent_node['element_year']
         ))
 
+    def get_permission_object(self):
+        return shortcuts.get_object_or_404(GroupYear, element__pk=self.program_tree.root_node.pk)
+
     def get_form_kwargs(self) -> dict:
         return {
             'parent_node_code': self.parent_node["element_code"],
@@ -78,44 +80,36 @@ class UpdateLinkView(AjaxTemplateMixin, SuccessMessageMixin, FormView):
     def get_form(self, form_class=None):
         if form_class is None:
             form_class = self.get_form_class()
-        return form_class(form_kwargs=self.get_form_kwargs(), data=self.request.POST or None)
+        return form_class(**self.get_form_kwargs(), data=self.request.POST or None)
 
     def get_context_data(self, **kwargs):
         context_data = super().get_context_data(**kwargs)
-        context_data["formset"] = context_data.pop("form")
-        context_data["is_parent_a_minor_major_option_list_choice"] = self._is_parent_a_minor_major_list_choice()
-        context_data["nodes_by_id"] = {
-            self.node_to_update["element_code"]: node_repository.NodeRepository.get(
-                node.NodeIdentity(self.node_to_update["element_code"], self.node_to_update["element_year"])
-            )
-        }
-        self._format_title_with_version(context_data["nodes_by_id"])
+        context_data["is_parent_a_minor_major_option_list_choice"] = self._is_parent_a_minor_major_option_list_choice()
+        context_data["node"] = node_repository.NodeRepository.get(node.NodeIdentity(
+            self.node_to_update["element_code"], self.node_to_update["element_year"]
+        ))
+        self._format_title_with_version(context_data["node"])
 
-        for form in context_data["formset"].forms:
-            node_elem = context_data["nodes_by_id"][form.node_code]
-            link = self.program_tree.get_first_link_occurence_using_node(child_node=node_elem)
-            form.initial = self._get_initial_form_kwargs(link)
-            form.is_group_year_form = isinstance(node_elem, NodeGroupYear)
-
-        if len(context_data["formset"]) > 0:
-            context_data['is_group_year_formset'] = context_data["formset"][0].is_group_year_form
+        node_elem = context_data["node"]
+        link = self.program_tree.get_first_link_occurence_using_node(child_node=node_elem)
+        context_data['form'].initial = self._get_initial_form_kwargs(link)
+        context_data['has_group_year_form'] = isinstance(node_elem, NodeGroupYear)
 
         return context_data
 
-    def form_valid(self, formset: UpdateNodesFormset):
+    def form_valid(self, form: UpdateNodeForm):
         try:
-            link_identities_ids = formset.save()
+            link_identity = form.save()
         except osis_common.ddd.interface.BusinessExceptions as business_exception:
-            formset.forms[0].add_error(field=None, error=business_exception.messages)
-            return self.form_invalid(formset)
-        messages = self._append_success_messages(link_identities_ids)
+            form.add_error(field=None, error=business_exception.messages)
+            return self.form_invalid(form)
+        messages = self._append_success_message(link_identity.child_code)
         display_success_messages(self.request, messages)
-        return super().form_valid(formset)
+        return super().form_valid(form)
 
-    def _append_success_messages(self, link_identities_ids):
+    def _append_success_message(self, child_code):
         messages = []
-        for link_identity in link_identities_ids:
-            messages.append(_("\"%(child)s\" has been successfully updated") % {"child": link_identity.child.code})
+        messages.append(_("\"%(child)s\" has been successfully updated") % {"child": child_code})
         return messages
 
     def _get_initial_form_kwargs(self, obj):
@@ -131,23 +125,18 @@ class UpdateLinkView(AjaxTemplateMixin, SuccessMessageMixin, FormView):
             'relative_credits': obj.relative_credits
         }
 
-    def _format_title_with_version(self, nodes_by_id):
-        node_ele = nodes_by_id[self.node_to_update['element_code']]
+    def _format_title_with_version(self, node):
         node_identity = NodeIdentity(code=self.node_to_update["element_code"], year=self.node_to_update["element_year"])
         try:
             tree_version = ProgramTreeVersionIdentitySearch().get_from_node_identity(node_identity)
-            node_ele.version = tree_version.version_name
-            node_ele.title = "{}[{}]".format(node_ele.title, node_ele.version) if node_ele.version else node_ele.title
+            node.version = tree_version.version_name
+            node.title = "{}[{}]".format(node.title, node.version) if node.version else node.title
         except BusinessException:
             pass
 
-    def _is_parent_a_minor_major_list_choice(self):
-        parent_identity = node.NodeIdentity(
-            code=self.parent_node['element_code'],
-            year=self.parent_node['element_year']
-        )
-        parent_element = node_repository.NodeRepository.get(parent_identity)
-        return parent_element.is_minor_major_list_choice() or parent_element.is_option_list_choice()
+    def _is_parent_a_minor_major_option_list_choice(self):
+        parent = self.program_tree.root_node
+        return parent.is_minor_major_list_choice() or parent.is_option_list_choice()
 
     def get_success_url(self):
         return
