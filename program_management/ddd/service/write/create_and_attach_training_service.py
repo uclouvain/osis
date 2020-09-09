@@ -65,4 +65,10 @@ def __convert_to_paste_element_cmd(
 def __convert_command(
         cmd: pgm_command.CreateAndAttachTrainingCommand
 ) -> CreateAndPostponeTrainingAndProgramTreeCommand:
-    return CreateAndPostponeTrainingAndProgramTreeCommand(**attr.asdict(cmd, recurse=False))
+    return CreateAndPostponeTrainingAndProgramTreeCommand(
+        **attr.asdict(
+            cmd,
+            recurse=False,
+            filter=attr.filters.exclude(attr.fields(pgm_command.CreateAndAttachTrainingCommand).path_to_paste)
+        )
+    )

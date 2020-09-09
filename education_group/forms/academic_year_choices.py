@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import contextlib
 from typing import List, Tuple
 
 from django.urls import reverse
@@ -45,17 +46,20 @@ def get_academic_year_choices(
     )
     node_ids = NodeIdentitiesSearch().search_from_code(node_identity.code)
 
-    return [
-        (
-            _get_href(
-                node_identity=node_id,
-                path='|'.join(str(map_element_id_by_year[elem_id][node_id.year]) for elem_id in element_ids),
-                active_view_name=active_view_name,
-            ),
-            node_id.year
-        )
-        for node_id in node_ids
-    ]
+    result = []
+    for node_id in node_ids:
+        with contextlib.suppress(KeyError):
+            result.append(
+                (
+                    _get_href(
+                        node_identity=node_id,
+                        path='|'.join(str(map_element_id_by_year[elem_id][node_id.year]) for elem_id in element_ids),
+                        active_view_name=active_view_name,
+                    ),
+                    node_id.year
+                )
+            )
+    return result
 
 
 def _get_href(node_identity: 'NodeIdentity', path: 'Path', active_view_name: str) -> str:
