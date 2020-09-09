@@ -23,13 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Dict
+
 from django import forms
 from django.contrib.auth.models import User
 from django.forms import TextInput
 from django.utils.translation import gettext_lazy as _
 
+from base.business.event_perms import EventPermEducationGroupEdition
+from base.forms.common import ValidationRuleMixin
 from base.forms.utils.choice_field import BLANK_CHOICE
 from base.models.enums.constraint_type import ConstraintTypeEnum
+from base.models.enums.education_group_types import TrainingType, MiniTrainingType
 from education_group.forms import fields
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from program_management.ddd.command import GetEndPostponementYearCommand
@@ -37,6 +42,9 @@ from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.ddd.service.read import get_end_postponement_year_service
+from rules_management.enums import MINI_TRAINING_PGRM_ENCODING_PERIOD, MINI_TRAINING_DAILY_MANAGEMENT, \
+    TRAINING_PGRM_ENCODING_PERIOD, TRAINING_DAILY_MANAGEMENT
+from rules_management.mixins import PermissionFieldMixin
 
 
 class SpecificVersionForm(forms.Form):
@@ -100,7 +108,7 @@ class SpecificVersionForm(forms.Form):
         return self.cleaned_data['version_name'].upper()
 
 
-class UpdateTrainingVersionForm(SpecificVersionForm):
+class UpdateTrainingVersionForm(ValidationRuleMixin, PermissionFieldMixin, SpecificVersionForm):
     # panel_informations_form.html
     code = forms.CharField(label=_("Code"), disabled=True, required=False)
     category = forms.CharField(label=_("Category"), disabled=True, required=False)
@@ -221,12 +229,17 @@ class UpdateTrainingVersionForm(SpecificVersionForm):
     professional_title = forms.CharField(max_length=320, required=False, label=_('Professionnal title'), disabled=True)
     certificate_aims = forms.CharField(required=False, label=_('certificate aims').capitalize(), disabled=True)
 
-    def __init__(self,
-                 training_version_identity: 'ProgramTreeVersionIdentity',
-                 node_identity: 'NodeIdentity',
-                 user: User,
-                 **kwargs):
+    def __init__(
+            self,
+            training_version_identity: 'ProgramTreeVersionIdentity',
+            node_identity: 'NodeIdentity',
+            training_type: TrainingType,
+            user: User,
+            **kwargs
+    ):
         self.user = user
+        self.training_type = training_type
+
         super().__init__(training_version_identity, node_identity, **kwargs)
         self.fields['version_name'].disabled = True
         self.__init_management_entity_field()
@@ -238,8 +251,21 @@ class UpdateTrainingVersionForm(SpecificVersionForm):
             disabled=self.fields['management_entity'].disabled,
         )
 
+    # ValidationRuleMixin
+    def field_reference(self, field_name: str) -> str:
+        return '.'.join(["TrainingForm", self.training_type.name, field_name])
 
-class UpdateMiniTrainingVersionForm(SpecificVersionForm):
+    # PermissionFieldMixin
+    def get_context(self) -> str:
+        is_edition_period_opened = EventPermEducationGroupEdition(raise_exception=False).is_open()
+        return TRAINING_PGRM_ENCODING_PERIOD if is_edition_period_opened else TRAINING_DAILY_MANAGEMENT
+
+    # PermissionFieldMixin
+    def get_model_permission_filter_kwargs(self) -> Dict:
+        return {'context': self.get_context()}
+
+
+class UpdateMiniTrainingVersionForm(ValidationRuleMixin, PermissionFieldMixin, SpecificVersionForm):
     code = forms.CharField(label=_("Code"), disabled=True, required=False)
     category = forms.CharField(label=_("Category"), disabled=True, required=False)
     type = forms.CharField(label=_("Type of training"), disabled=True, required=False)
@@ -279,10 +305,13 @@ class UpdateMiniTrainingVersionForm(SpecificVersionForm):
             self,
             mini_training_version_identity: 'ProgramTreeVersionIdentity',
             node_identity: 'NodeIdentity',
+            mini_training_type: MiniTrainingType,
             user: User,
             **kwargs
     ):
         self.user = user
+        self.mini_training_type = mini_training_type
+
         super().__init__(mini_training_version_identity, node_identity, **kwargs)
         self.fields['version_name'].disabled = True
         self.__init_management_entity_field()
@@ -293,3 +322,16 @@ class UpdateMiniTrainingVersionForm(SpecificVersionForm):
             initial=None,
             disabled=self.fields['management_entity'].disabled,
         )
+
+    # ValidationRuleMixin
+    def field_reference(self, field_name: str) -> str:
+        return '.'.join(["MiniTrainingForm", self.mini_training_type.name, field_name])
+
+    # PermissionFieldMixin
+    def get_context(self) -> str:
+        is_edition_period_opened = EventPermEducationGroupEdition(raise_exception=False).is_open()
+        return MINI_TRAINING_PGRM_ENCODING_PERIOD if is_edition_period_opened else MINI_TRAINING_DAILY_MANAGEMENT
+
+    # PermissionFieldMixin
+    def get_model_permission_filter_kwargs(self) -> Dict:
+        return {'context': self.get_context()}

@@ -8,6 +8,7 @@ from django.utils.functional import cached_property
 from django.views import View
 from django.utils.translation import gettext_lazy as _
 
+from base.forms.common import ValidationRuleMixin
 from base.models import entity_version
 from base.views.common import display_error_messages
 from education_group.ddd.domain import exception as exception_education_group
@@ -94,6 +95,7 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
             user=self.request.user,
             training_version_identity=training_version_identity,
             node_identity=node_identity,
+            training_type=self.get_training_obj().type,
             initial=self._get_training_version_form_initial_values()
         )
 

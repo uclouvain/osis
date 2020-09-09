@@ -93,7 +93,8 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
             user=self.request.user,
             mini_training_version_identity=mini_training_version_identity,
             node_identity=node_identity,
-            initial=self._get_mini_training_version_form_initial_values()
+            initial=self._get_mini_training_version_form_initial_values(),
+            mini_training_type=self.get_mini_training_obj().type
         )
 
     @functools.lru_cache()
