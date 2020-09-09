@@ -41,7 +41,10 @@ class LearningAchievementListSerializerTestCase(TestCase):
             'themes_discussed': 'THEMES',
             'prerequisite': 'PREREQUISITES',
             'mobility': 'MOBILITY',
-        }
+            'teaching_methods_force_majeure': 'TEACHING_METHODS_FORCE_MAJEURE',
+            'evaluation_methods_force_majeure': 'EVALUATION_METHODS_FORCE_MAJEURE',
+            'other_informations_force_majeure': 'OTHER_INFORMATIONS_FORCE_MAJEURE'
+         }
         cls.serializer = LearningUnitSummarySpecificationSerializer(data_to_serialize)
 
     def test_contains_expected_fields(self):
@@ -55,5 +58,8 @@ class LearningAchievementListSerializerTestCase(TestCase):
             'themes_discussed',
             'prerequisite',
             'mobility',
+            'teaching_methods_force_majeure',
+            'evaluation_methods_force_majeure',
+            'other_informations_force_majeure',
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
