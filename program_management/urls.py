@@ -33,6 +33,7 @@ from program_management.views import groupelementyear_read, element_utilization,
 from program_management.views import quick_search, create_element, publish_general_information
 from program_management.views.proxy.identification import IdentificationRedirectView
 from program_management.views.tree_version import create as create_program_tree_version
+from program_management.views.tree_version.delete import TreeVersionDeleteView
 
 urlpatterns = [
     url(r'^group_pdf_content/(?P<year>[0-9]+)/(?P<code>[A-Za-z0-9]+)/',
@@ -112,6 +113,7 @@ urlpatterns = [
             name="create_education_group_version"
         ),
         path('publish', publish_general_information.publish, name='publish_general_information'),
+        path('delete/', TreeVersionDeleteView.as_view(), name='delete_permanently_tree_version'),
     ])),
 
     path('<int:year>/<acronym:acronym>/', include([

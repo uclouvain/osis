@@ -28,6 +28,7 @@ from typing import List, Set, Optional
 
 import attr
 
+from base.ddd.utils.converters import to_upper_case_converter
 from base.models.authorized_relationship import AuthorizedRelationshipList
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, GroupType
 from education_group.ddd.business_types import *
@@ -54,7 +55,7 @@ Path = str  # Example : "root|node1|node2|child_leaf"
 
 @attr.s(frozen=True, slots=True)
 class ProgramTreeIdentity(interface.EntityIdentity):
-    code = attr.ib(type=str)
+    code = attr.ib(type=str, converter=to_upper_case_converter)
     year = attr.ib(type=int)
 
 

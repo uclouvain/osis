@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-03 11:16+0200\n"
+"POT-Creation-Date: 2020-09-04 14:28+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -126,6 +126,9 @@ msgstr "Ent. attrib."
 
 msgid "Annual"
 msgstr "Annuel"
+
+msgid "Are you sure you want to delete %(offer_acronym)s %(version_name)s ?"
+msgstr "Êtes-vous sûr·e de vouloir supprimer %(offer_acronym)s %(version_name)s ?"
 
 #, python-format
 msgid "Are you sure you want to detach %(acronym)s ?"
@@ -480,7 +483,7 @@ msgstr "Produire un fichier Excel avec la liste des formations"
 
 #, python-brace-format
 msgid "Program tree not found : {code} {year}"
-msgstr ""
+msgstr "Programme non trouvé : {code} {year}"
 
 msgid "Prolong"
 msgstr "Prolonger la version existante"
@@ -575,8 +578,8 @@ msgid ""
 "The child %(child)s you want to attach is a parent of the node you want to "
 "attach."
 msgstr ""
-"L'élément %(child)s que vous voulez attachez est déjà un parent de l'élément "
-"auquel vous voulez rattachez."
+"L'élément %(child)s que vous voulez attacher est déjà un parent de l'élément "
+"auquel vous voulez rattacher."
 
 #, python-format
 msgid "The learning unit %(acronym)s is not contained inside the formation"
@@ -616,6 +619,11 @@ msgstr ""
 #, python-format
 msgid "The program %(title)s - %(academic_year)s will be published soon"
 msgstr "Le programme %(title)s - %(academic_year)s sera publié sous peu"
+
+msgid ""
+"The program tree version %(offer_acronym)s %(version_name)s has been deleted."
+msgstr ""
+"La version de programme %(offer_acronym)s %(version_name)s a été supprimée avec succès."
 
 msgid "The registration form is available at the Secretariat of"
 msgstr "Le formulaire d'inscription est disponible au Secrétariat de"

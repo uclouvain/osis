@@ -54,7 +54,7 @@ class TestAuthorizedLinkTypeValidator(TestValidatorValidateMixin, SimpleTestCase
 
     def test_a_none_link_type_with_a_minor_major_list_and_a_minitraining_as_child_should_raise_exception(self):
         minor_major_list_parent_node = NodeGroupYearFactory(
-            node_type=factory.fuzzy.FuzzyChoice(GroupType.minor_major_option_list_choice_enums())
+            node_type=factory.fuzzy.FuzzyChoice(GroupType.minor_major_list_choice_enums())
         )
         minitraining_node_to_add = NodeGroupYearFactory(node_type=factory.fuzzy.FuzzyChoice(MiniTrainingType))
         link_type = None
@@ -69,7 +69,7 @@ class TestAuthorizedLinkTypeValidator(TestValidatorValidateMixin, SimpleTestCase
 
     def test_a_reference_link_type_with_a_minor_major_list_and_a_minitraining_as_child_should_raise_exception(self):
         minor_major_list_parent_node = NodeGroupYearFactory(
-            node_type=factory.fuzzy.FuzzyChoice(GroupType.minor_major_option_list_choice_enums())
+            node_type=factory.fuzzy.FuzzyChoice(GroupType.minor_major_list_choice_enums())
         )
         minitraining_child_node = NodeGroupYearFactory(node_type=factory.fuzzy.FuzzyChoice(MiniTrainingType))
         link_type = LinkTypes.REFERENCE
