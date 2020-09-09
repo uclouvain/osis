@@ -30,14 +30,18 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 
 import osis_common
+from base.models.enums.link_type import LinkTypes
 from base.views.common import display_success_messages
 from base.views.mixins import AjaxTemplateMixin
 from osis_common.ddd.interface import BusinessException
+from program_management.ddd import command
 from program_management.ddd.domain import node
 from program_management.ddd.domain.node import NodeGroupYear
 from program_management.ddd.domain.node import NodeIdentity
+from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories import node as node_repository
+from program_management.ddd.service.read import get_program_tree_service
 from program_management.forms.tree.update import UpdateNodeForm, UpdateNodesFormset
 
 
@@ -57,6 +61,12 @@ class UpdateLinkView(AjaxTemplateMixin, SuccessMessageMixin, FormView):
     def node_to_update(self) -> dict:
         return {"element_code": self.kwargs.get('child_code'), "element_year": self.kwargs.get('child_year')}
 
+    @cached_property
+    def program_tree(self) -> ProgramTree:
+        return get_program_tree_service.get_program_tree(command.GetProgramTree(
+            code=self.parent_node['element_code'], year=self.parent_node['element_year']
+        ))
+
     def get_form_kwargs(self) -> dict:
         return {
             'parent_node_code': self.parent_node["element_code"],
@@ -73,7 +83,7 @@ class UpdateLinkView(AjaxTemplateMixin, SuccessMessageMixin, FormView):
     def get_context_data(self, **kwargs):
         context_data = super().get_context_data(**kwargs)
         context_data["formset"] = context_data.pop("form")
-        context_data["is_parent_a_minor_major_option_list_choice"] = self._is_parent_a_minor_major_option_list_choice()
+        context_data["is_parent_a_minor_major_option_list_choice"] = self._is_parent_a_minor_major_list_choice()
         context_data["nodes_by_id"] = {
             self.node_to_update["element_code"]: node_repository.NodeRepository.get(
                 node.NodeIdentity(self.node_to_update["element_code"], self.node_to_update["element_year"])
@@ -83,7 +93,8 @@ class UpdateLinkView(AjaxTemplateMixin, SuccessMessageMixin, FormView):
 
         for form in context_data["formset"].forms:
             node_elem = context_data["nodes_by_id"][form.node_code]
-            form.initial = self._get_initial_form_kwargs(node_elem)
+            link = self.program_tree.get_first_link_occurence_using_node(child_node=node_elem)
+            form.initial = self._get_initial_form_kwargs(link)
             form.is_group_year_form = isinstance(node_elem, NodeGroupYear)
 
         if len(context_data["formset"]) > 0:
@@ -109,9 +120,15 @@ class UpdateLinkView(AjaxTemplateMixin, SuccessMessageMixin, FormView):
 
     def _get_initial_form_kwargs(self, obj):
         return {
-            'credits': obj.credits,
-            'code': obj.code,
-            'relative_credits': "%d" % (obj.credits or 0)
+            'comment': obj.comment,
+            'comment_english': obj.comment_english,
+            'access_condition': obj.access_condition,
+            'is_mandatory': obj.is_mandatory,
+            'link_type': obj.link_type.name if isinstance(obj.link_type, LinkTypes) else obj.link_type,
+            'block': obj.block,
+            'credits': obj.child.credits,
+            'code': obj.child.code,
+            'relative_credits': obj.relative_credits
         }
 
     def _format_title_with_version(self, nodes_by_id):
@@ -124,13 +141,13 @@ class UpdateLinkView(AjaxTemplateMixin, SuccessMessageMixin, FormView):
         except BusinessException:
             pass
 
-    def _is_parent_a_minor_major_option_list_choice(self):
+    def _is_parent_a_minor_major_list_choice(self):
         parent_identity = node.NodeIdentity(
             code=self.parent_node['element_code'],
             year=self.parent_node['element_year']
         )
         parent_element = node_repository.NodeRepository.get(parent_identity)
-        return parent_element.is_minor_major_option_list_choice()
+        return parent_element.is_minor_major_list_choice() or parent_element.is_option_list_choice()
 
     def get_success_url(self):
         return
