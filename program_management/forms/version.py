@@ -33,10 +33,13 @@ from base.forms.utils.choice_field import BLANK_CHOICE
 from base.models.enums.constraint_type import ConstraintTypeEnum
 from base.models.academic_year import current_academic_year
 from education_group.ddd.business_types import *
+from education_group.ddd.domain.service.calculate_end_postponement import DEFAULT_YEARS_TO_POSTPONE
 from education_group.forms import fields
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from program_management.ddd.command import GetEndPostponementYearCommand
 from program_management.ddd.domain.node import NodeIdentity
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
+from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.ddd.service.read import get_end_postponement_year_service
 
 
@@ -64,26 +67,33 @@ class SpecificVersionForm(forms.Form):
         label=_('This version exists until'),
     )
 
-    # FIXME: Training_identity kwargs is incorrect because it can be a mini_training identity
-    def __init__(self, training_identity: 'TrainingIdentity', node_identity: 'NodeIdentity', *args, **kwargs):
-        self.training_identity = training_identity
+    def __init__(
+            self,
+            tree_version_identity: 'ProgramTreeVersionIdentity',
+            node_identity: 'NodeIdentity',
+            *args,
+            **kwargs
+    ):
+        self.tree_version_identity = tree_version_identity
         self.node_identity = node_identity
         super().__init__(*args, **kwargs)
 
         self.__init_academic_year_choices()
 
     def __init_academic_year_choices(self):
-        # TODO :: unit tests on this service (or on the domain service)
         max_year = get_end_postponement_year_service.calculate_program_tree_end_postponement(
             GetEndPostponementYearCommand(code=self.node_identity.code, year=self.node_identity.year)
         )
-        choices_years = [(x, display_as_academic_year(x)) for x in range(self.training_identity.year, max_year + 1)]
+        choices_years = [
+            (year, display_as_academic_year(year))
+            for year in range(self.tree_version_identity.year, max_year + 1)
+        ]
 
-        if max_year == timezone.now().year+6:
-            self.fields["end_year"].choices = BLANK_CHOICE + choices_years
-        else:
-            self.fields["end_year"].choices = choices_years
-            self.fields["end_year"].initial = choices_years[-1]
+        if not ProgramTreeVersionRepository.get(self.tree_version_identity).end_year_of_existence:
+            choices_years += BLANK_CHOICE
+
+        self.fields["end_year"].choices = choices_years
+        self.fields["end_year"].initial = choices_years[-1]
 
     def clean_end_year(self):
         end_year = self.cleaned_data["end_year"]

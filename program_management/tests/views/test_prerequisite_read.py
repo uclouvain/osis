@@ -35,6 +35,7 @@ from base.tests.factories.group_element_year import GroupElementYearChildLeafFac
 from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
 from base.tests.factories.prerequisite import PrerequisiteFactory
 from education_group.tests.factories.group_year import GroupYearFactory
+from program_management.ddd.domain.program_tree_version import STANDARD
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory, ElementLearningUnitYearFactory
 
@@ -49,7 +50,11 @@ class TestLearningUnitPrerequisiteTraining(TestCase):
             education_group_type=cls.offer.education_group_type
         )
         cls.root_element = ElementGroupYearFactory(group_year=cls.root_group)
-        cls.education_group_version = EducationGroupVersionFactory(offer=cls.offer, root_group=cls.root_group)
+        cls.education_group_version = EducationGroupVersionFactory(
+            offer=cls.offer,
+            root_group=cls.root_group,
+            version_name=STANDARD
+        )
 
         cls.element_learning_unit_year = ElementLearningUnitYearFactory(
             learning_unit_year__academic_year=cls.academic_year,
@@ -102,7 +107,11 @@ class TestLearningUnitPrerequisiteGroup(TestCase):
             learning_unit_year__learning_container_year__academic_year=cls.academic_year,
         )
         GroupElementYearChildLeafFactory(parent_element=cls.root_element, child_element=cls.element_learning_unit_year)
-        cls.education_group_version = EducationGroupVersionFactory(offer=cls.offer, root_group=cls.root_group)
+        cls.education_group_version = EducationGroupVersionFactory(
+            offer=cls.offer,
+            root_group=cls.root_group,
+            version_name=STANDARD,
+        )
 
         cls.person = PersonWithPermissionsFactory("view_educationgroup")
         cls.url = reverse(

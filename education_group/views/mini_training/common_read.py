@@ -164,7 +164,8 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             "create_training_url": self.get_create_training_url(),
             "create_mini_training_url": self.get_create_mini_training_url(),
             "update_mini_training_url": self.get_update_mini_training_url(),
-            "delete_mini_training_url": self.get_delete_mini_training_url(),
+            "delete_permanently_mini_training_url": self.get_delete_permanently_mini_training_url(),
+            "delete_permanently_tree_version": self.get_delete_permanently_tree_version_url(),
             "create_version_url": self.get_create_version_url(),
             "is_root_node": is_root_node,
         }
@@ -198,18 +199,29 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             get={"path": self.get_path(), "tab": self.active_tab.name}
         )
 
-    def get_delete_mini_training_url(self):
-        return reverse(
-            'mini_training_delete',
-            kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}
-        ) + "?path={}".format(self.get_path())
-
     def get_create_version_url(self):
         if self.is_root_node():
             return reverse(
                 'create_education_group_version',
                 kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}
             ) + "?path={}".format(self.get_path())
+
+    def get_delete_permanently_tree_version_url(self):
+        if not self.program_tree_version_identity.is_standard():
+            return reverse(
+                'delete_permanently_tree_version',
+                kwargs={
+                    'year': self.node_identity.year,
+                    'code': self.node_identity.code,
+                }
+            )
+
+    def get_delete_permanently_mini_training_url(self):
+        if self.program_tree_version_identity.is_standard():
+            return reverse(
+                'mini_training_delete',
+                kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}
+            )
 
     def get_tab_urls(self):
         return OrderedDict({

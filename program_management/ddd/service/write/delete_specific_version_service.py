@@ -21,35 +21,31 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from typing import List
-
 from django.db import transaction
 
 from program_management.ddd import command
-from program_management.ddd.domain.program_tree_version import STANDARD, ProgramTreeVersionIdentity
-from program_management.ddd.domain.service import identity_search
-from program_management.ddd.service.write import delete_training_standard_version_service
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, STANDARD
+from program_management.ddd.repositories import program_tree_version as program_tree_version_repository
+from program_management.ddd.service.write import delete_program_tree_service
+from program_management.ddd.validators.validators_by_business_action import DeleteSpecificVersionValidatorList
 
 
 @transaction.atomic()
-def delete_permanently_training_standard_version(
-        cmd: command.DeletePermanentlyTrainingStandardVersionCommand
-) -> List['ProgramTreeVersionIdentity']:
-    program_tree_standard_id = ProgramTreeVersionIdentity(
+def delete_specific_version(cmd: command.DeleteSpecificVersionCommand) -> ProgramTreeVersionIdentity:
+    program_tree_version_id = ProgramTreeVersionIdentity(
         offer_acronym=cmd.acronym,
         year=cmd.year,
-        version_name=STANDARD,
-        is_transition=False
+        version_name=cmd.version_name,
+        is_transition=cmd.is_transition,
     )
-    program_tree_version_ids = identity_search.ProgramTreeVersionIdentitySearch.get_all_program_tree_version_identities(
-        program_tree_standard_id
-    )
+    program_tree_version = program_tree_version_repository.ProgramTreeVersionRepository.get(program_tree_version_id)
 
-    for program_tree_version_id in program_tree_version_ids:
-        delete_training_standard_version_service.delete_training_standard_version(
-            command.DeleteTrainingStandardVersionCommand(
-                offer_acronym=program_tree_version_id.offer_acronym,
-                year=program_tree_version_id.year,
-            )
-        )
-    return program_tree_version_ids
+    DeleteSpecificVersionValidatorList(program_tree_version).validate()
+
+    program_tree_version_repository.ProgramTreeVersionRepository.delete(
+        program_tree_version_id,
+
+        # Service Dependancy injection
+        delete_program_tree_service=delete_program_tree_service.delete_program_tree
+    )
+    return program_tree_version_id

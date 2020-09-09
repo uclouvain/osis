@@ -436,6 +436,18 @@ class DeleteTrainingWithProgramTreeCommand(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True)
+class DeleteTrainingStandardVersionCommand(interface.CommandRequest):
+    offer_acronym = attr.ib(type=str)
+    year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class DeleteMiniTrainingWithStandardVersionCommand(interface.CommandRequest):
+    mini_training_acronym = attr.ib(type=str)
+    year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
 class DeleteMiniWithProgramTreeCommand(interface.CommandRequest):
     code = attr.ib(type=str)
     offer_acronym = attr.ib(type=str)
@@ -468,6 +480,21 @@ class DeleteAllProgramTreeCommand(interface.CommandRequest):
 class DeleteStandardVersionCommand(interface.CommandRequest):
     acronym = attr.ib(type=str)
     year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class DeletePermanentlyTreeVersionCommand(interface.CommandRequest):
+    acronym = attr.ib(type=str)
+    version_name = attr.ib(type=str)
+    is_transition = attr.ib(type=bool)
+
+
+@attr.s(frozen=True, slots=True)
+class DeleteSpecificVersionCommand(interface.CommandRequest):
+    acronym = attr.ib(type=str)
+    year = attr.ib(type=int)
+    version_name = attr.ib(type=str)
+    is_transition = attr.ib(type=bool)
 
 
 @attr.s(frozen=True, slots=True)
@@ -509,7 +536,13 @@ class DuplicateProgramTree(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True)
-class DeleteAllStandardVersionCommand(interface.CommandRequest):
+class DeletePermanentlyTrainingStandardVersionCommand(interface.CommandRequest):
+    acronym = attr.ib(type=str)
+    year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class DeletePermanentlyMiniTrainingStandardVersionCommand(interface.CommandRequest):
     acronym = attr.ib(type=str)
     year = attr.ib(type=int)
 
