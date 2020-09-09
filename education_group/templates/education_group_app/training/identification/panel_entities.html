@@ -29,7 +29,11 @@
         <div class="row">
             <div id="management_entity" class="col-md-12">
                 {% bootstrap_label _("Management entity") label_class='d-block'%}
-                <p>{{ education_group_year.management_entity.acronym }}</p>
+                {% if current_version.is_standard %}
+                    <p>{{ education_group_year.management_entity.acronym }}</p>
+                {% else %}
+                    <p>{{ node.management_entity_acronym }}</p>
+                {% endif %}
             </div>
         </div>
         <br>
