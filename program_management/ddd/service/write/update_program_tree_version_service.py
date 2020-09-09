@@ -67,10 +67,10 @@ def __convert_command_to_update_data(cmd: UpdateProgramTreeVersionCommand) -> 'U
 def __call_delete_service(program_tree_version: 'ProgramTreeVersion', end_year_updated: int):
     identity = program_tree_version.entity_identity
 
-    max_year = CalculateEndPostponement.calculate_max_year_of_end_postponement()
+    postponement_limit = CalculateEndPostponement.calculate_end_postponement_limit()
 
-    end_year = program_tree_version.end_year_of_existence or max_year
-    end_year_updated = end_year_updated or max_year
+    end_year = program_tree_version.end_year_of_existence or postponement_limit
+    end_year_updated = end_year_updated or postponement_limit
 
     if end_year > end_year_updated:
         for year_to_delete in range(end_year_updated, program_tree_version.end_year_of_existence):
