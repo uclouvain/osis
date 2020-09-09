@@ -41,8 +41,7 @@ msgstr "%(start_index)s à %(end_index)s sur %(total_counts)s formations"
 
 #, python-format
 msgid "%(start_index)s to %(end_index)s of %(total_counts)s trainings"
-msgstr ""
-"%(start_index)s à %(end_index)s sur %(total_counts)s unités d'enseignement"
+msgstr "%(start_index)s à %(end_index)s sur %(total_counts)s formations"
 
 msgid "1st quadri"
 msgstr "1er quadri"
@@ -484,7 +483,7 @@ msgstr "Produire un fichier Excel avec la liste des formations"
 
 #, python-brace-format
 msgid "Program tree not found : {code} {year}"
-msgstr "Arbre non trouvé : {code} {year}"
+msgstr "Programme non trouvé : {code} {year}"
 
 msgid "Prolong"
 msgstr "Prolonger la version existante"
