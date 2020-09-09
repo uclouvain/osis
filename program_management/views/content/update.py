@@ -37,10 +37,21 @@ class ContentUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         context = {
             "content_formset": self.content_formset,
+            "tabs": self.get_tabs(),
             "group_obj": self.get_group_obj(),
             "cancel_url": self.get_cancel_url(),
         }
         return render(request, self.template_name, context)
+
+    def get_tabs(self) -> List:
+        return [
+            {
+                "text": _("Content"),
+                "active": True,
+                "display": True,
+                "include_html": "program_management/content/block/panel_content.html"
+            },
+        ]
 
     def post(self, request, *args, **kwargs):
         if self.content_formset.is_valid():
