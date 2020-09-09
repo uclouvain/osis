@@ -85,23 +85,3 @@ def __convert_to_update_tree_version_command(command: 'UpdateMiniTrainingVersion
         title_en=command.title_en,
         title_fr=command.title_fr,
     )
-
-
-def __call_delete_service(program_tree_version: 'ProgramTreeVersion', end_year_updated: int):
-    identity = program_tree_version.entity_identity
-
-    postponement_limit = CalculateEndPostponement.calculate_end_postponement_limit()
-
-    end_year = program_tree_version.end_year_of_existence or postponement_limit
-    end_year_updated = end_year_updated or postponement_limit
-
-    if end_year > end_year_updated:
-        for year_to_delete in range(end_year_updated, program_tree_version.end_year_of_existence):
-            delete_specific_version_service.delete_specific_version(
-                DeleteSpecificVersionCommand(
-                    acronym=identity.offer_acronym,
-                    year=year_to_delete,
-                    version_name=identity.version_name,
-                    is_transition=identity.is_transition,
-                )
-            )
