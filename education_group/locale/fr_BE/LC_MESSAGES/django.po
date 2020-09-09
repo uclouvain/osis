@@ -735,14 +735,11 @@ msgstr "Diplôme avec l'UCL"
 
 #, python-brace-format
 msgid "Unable to publish common admission conditions for {year}"
-msgstr ""
-"Impossible de publier les conditions d'admissions communes pour l'année "
-"{year}"
+msgstr "Impossible de publier les conditions d'admission communes pour {year}"
 
 #, python-brace-format
 msgid "Unable to publish common general informations for {year}"
-msgstr ""
-"Impossible de publier les informations générales communes pour l'année {year}"
+msgstr "Impossible de publier les informations générales communes pour {year}"
 
 msgid "University Bachelors"
 msgstr "Bacheliers universitaires"
