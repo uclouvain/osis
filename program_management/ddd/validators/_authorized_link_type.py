@@ -26,7 +26,6 @@ from typing import Optional
 from django.utils.translation import gettext_lazy as _
 
 import osis_common.ddd.interface
-from base.ddd.utils import business_validator
 from base.ddd.utils.business_validator import BusinessValidator
 from base.models.enums import education_group_types
 from base.models.enums.link_type import LinkTypes
