@@ -30,6 +30,7 @@ from typing import List, Set, Dict, Optional
 
 import attr
 
+from base.ddd.utils.converters import to_upper_case_converter
 from base.models.enums.active_status import ActiveStatusEnum
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, MiniTrainingType, GroupType
 from base.models.enums.learning_container_year_types import LearningContainerYearType
@@ -157,7 +158,7 @@ factory = NodeFactory()
 
 @attr.s(frozen=True, slots=True)
 class NodeIdentity(interface.EntityIdentity):
-    code = attr.ib(type=str)
+    code = attr.ib(type=str, converter=to_upper_case_converter)
     year = attr.ib(type=int)
 
 

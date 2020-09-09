@@ -58,7 +58,7 @@ from base.models.enums.internship_presence import InternshipPresence
 from base.models.enums.rate_code import RateCode
 from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.forms import fields
-from education_group.forms.fields import MainEntitiesVersionChoiceField
+from education_group.forms.fields import MainEntitiesVersionChoiceField, UpperCaseCharField
 from education_group.forms.widgets import CertificateAimsWidget
 from reference.models.domain import Domain
 from reference.models.domain_isced import DomainIsced
@@ -77,8 +77,8 @@ def _get_section_choices():
 class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
 
     # panel_informations_form.html
-    acronym = forms.CharField(max_length=15, label=_("Acronym/Short title"))
-    code = forms.CharField(max_length=15, label=_("Code"))
+    acronym = UpperCaseCharField(max_length=15, label=_("Acronym/Short title"))
+    code = UpperCaseCharField(max_length=15, label=_("Code"))
     active = forms.ChoiceField(
         initial=ActiveStatusEnum.ACTIVE.name,
         choices=BLANK_CHOICE + list(ActiveStatusEnum.choices()),
@@ -265,8 +265,8 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     ares_authorization = forms.CharField(label=_('ARES ability'), widget=forms.TextInput(), required=False)
     code_inter_cfb = forms.CharField(max_length=8, label=_('Code co-graduation inter CfB'), required=False)
     coefficient = forms.DecimalField(
-        max_digits=5,
-        decimal_places=2,
+        max_digits=7,
+        decimal_places=4,
         label=_('Co-graduation total coefficient'),
         widget=forms.TextInput(),
         required=False,

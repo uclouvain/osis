@@ -44,7 +44,8 @@ from education_group.ddd.service.read import get_training_service
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd.business_types import *
 from program_management.ddd import command as command_program_management
-from program_management.ddd.domain.exception import ProgramTreeNonEmpty, NodeHaveLinkException
+from program_management.ddd.domain.exception import ProgramTreeNonEmpty, NodeHaveLinkException, \
+    CannotDeleteStandardDueToVersionEndDate
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
@@ -72,12 +73,12 @@ class TrainingDeleteView(PermissionRequiredMixin, AjaxTemplateMixin, DeleteView)
             raise Http404
 
     def delete(self, request, *args, **kwargs):
-        cmd_delete = command_program_management.DeleteAllStandardVersionCommand(
+        cmd_delete = command_program_management.DeletePermanentlyTrainingStandardVersionCommand(
             self.get_training().acronym,
             self.get_training().year
         )
         try:
-            delete_all_standard_versions_service.delete_all_standard_versions(cmd_delete)
+            delete_all_standard_versions_service.delete_permanently_training_standard_version(cmd_delete)
             display_success_messages(request, self.get_success_message())
             return self._ajax_response() or HttpResponseRedirect(self.get_success_url())
         except (
@@ -85,6 +86,7 @@ class TrainingDeleteView(PermissionRequiredMixin, AjaxTemplateMixin, DeleteView)
                 NodeHaveLinkException,
                 TrainingHaveLinkWithEPC,
                 TrainingHaveEnrollments,
+                CannotDeleteStandardDueToVersionEndDate,
         ) as e:
             display_error_messages(request, e.message)
             return render(request, self.template_name, {})

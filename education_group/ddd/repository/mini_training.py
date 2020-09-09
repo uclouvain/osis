@@ -168,6 +168,7 @@ class MiniTrainingRepository(interface.AbstractRepository):
                 education_group_type__name__in=MiniTrainingType.get_names()
             ).delete()
         except ProtectedError:
+            # FIXME :: should be in a business validator, not in the repository
             raise exception.MiniTrainingIsBeingUsedException()
 
 

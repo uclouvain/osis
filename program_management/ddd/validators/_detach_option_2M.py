@@ -46,6 +46,9 @@ class DetachOptionValidator(business_validator.BusinessValidator):
         self.node_to_detach = working_tree.get_node(path_to_node_to_detach)
         self.tree_repository = tree_repository
 
+        from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
+        self.version_search = ProgramTreeVersionIdentitySearch()
+
     def validate(self):
         trees_2m = [
             tree for tree in self.tree_repository.search_from_children(node_ids=[self.node_to_detach.entity_id])
@@ -62,7 +65,12 @@ class DetachOptionValidator(business_validator.BusinessValidator):
                 if not options_to_check:
                     continue
                 for finality in tree_2m.get_all_finalities():
+                    finality_version = self.version_search.get_from_node_identity(finality.entity_id)
                     options_to_detach_used_in_finality = set(options_to_detach) & set(finality.get_option_list())
+                    options_to_detach_versions = [
+                        self.version_search.get_from_node_identity(option.entity_id)
+                        for option in options_to_detach_used_in_finality
+                    ]
                     if options_to_detach_used_in_finality:
                         error_messages.append(
                             ngettext(
@@ -72,8 +80,10 @@ class DetachOptionValidator(business_validator.BusinessValidator):
                                 " %(finality_acronym)s program.",
                                 len(options_to_detach_used_in_finality)
                             ) % {
-                                "acronym": ', '.join(option.title for option in options_to_detach_used_in_finality),
-                                "finality_acronym": finality.title
+                                "acronym": ', '.join(
+                                    [self._get_version_title(option) for option in options_to_detach_versions]
+                                ),
+                                "finality_acronym": self._get_version_title(finality_version)
                             }
                         )
         if error_messages:
@@ -89,3 +99,8 @@ class DetachOptionValidator(business_validator.BusinessValidator):
     def _is_inside_finality(self):
         parents = self.working_tree.get_parents(self.path_to_node_to_detach)
         return self.node_to_detach.is_finality() or any(p.is_finality() for p in parents)
+
+    def _get_version_title(self, version_identity):
+        return "{}[{}]".format(
+            version_identity.offer_acronym, version_identity.version_name
+        ) if version_identity.version_name else version_identity.offer_acronym
