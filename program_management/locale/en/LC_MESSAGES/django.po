@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-07 11:51+0200\n"
+"POT-Creation-Date: 2020-09-09 14:36+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,23 +17,20 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #, python-format
-msgid "\"%(child)s\" has been detached from \"%(parent)s\""
-msgstr "\"%(child)s\" has been removed from \"%(parent)s\""
-
-#, python-format
 msgid "\"%(child)s\" has been pasted into \"%(parent)s\""
 msgstr ""
 
 #, python-format
-msgid "%(node_to_add)s version must be the same as %(root_node)s version"
+msgid ""
+"\"%(child_year)s - %(child)s%(child_title)s\" has been detached from "
+"\"%(parent_year)s - %(parent)s%(parent_title)s\""
 msgstr ""
+"\"%(child_year)s - %(child)s%(child_title)s\" has been removed from "
+"\"%(parent_year)s - %(parent)s%(parent_title)s\""
 
 #, python-format
-msgid ""
-"\"%(child)s%(child_title)s\" has been detached from \"%(parent)s"
-"%(parent_title)s\""
+msgid "%(node_to_add)s version must be the same as %(root_node)s version"
 msgstr ""
-"\"%(child)s%(child_title)s\" has been removed from \"%(parent)s%(parent_title)s\""
 
 #, python-format
 msgid "%(start_index)s to %(end_index)s of %(total_counts)s learning units"
@@ -119,6 +116,7 @@ msgstr ""
 msgid "Annual"
 msgstr ""
 
+#, python-format
 msgid "Are you sure you want to delete %(offer_acronym)s %(version_name)s ?"
 msgstr ""
 
@@ -586,6 +584,7 @@ msgstr ""
 msgid "The program %(title)s - %(academic_year)s will be published soon"
 msgstr ""
 
+#, python-format
 msgid ""
 "The program tree version %(offer_acronym)s %(version_name)s has been deleted."
 msgstr ""
@@ -773,3 +772,7 @@ msgstr ""
 
 msgid "yes,no"
 msgstr ""
+
+#, python-format
+#~ msgid "\"%(child)s\" has been detached from \"%(parent)s\""
+#~ msgstr "\"%(child)s\" has been removed from \"%(parent)s\""
