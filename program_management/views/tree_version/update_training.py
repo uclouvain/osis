@@ -87,12 +87,12 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
 
     @cached_property
     def training_version_form(self) -> 'version.UpdateTrainingVersionForm':
-        training_identity = self.get_training_obj().entity_id
+        training_version_identity = self.get_program_tree_version_obj().entity_id
         node_identity = self.get_program_tree_obj().root_node.entity_id
         return version.UpdateTrainingVersionForm(
             data=self.request.POST or None,
             user=self.request.user,
-            training_identity=training_identity,
+            training_version_identity=training_version_identity,
             node_identity=node_identity,
             initial=self._get_training_version_form_initial_values()
         )
@@ -173,7 +173,7 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
             "active": training_obj.status.value,
             "schedule_type": training_obj.schedule_type.value,
             "credits": training_obj.credits,
-            "constraint_type": group_obj.content_constraint.type.value
+            "constraint_type": group_obj.content_constraint.type.name
             if group_obj.content_constraint.type else None,
             "min_constraint": group_obj.content_constraint.minimum,
             "max_constraint": group_obj.content_constraint.maximum,

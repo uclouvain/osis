@@ -86,12 +86,12 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
 
     @cached_property
     def mini_training_version_form(self) -> 'version.UpdateMiniTrainingVersionForm':
-        mini_training_identity = self.get_mini_training_obj().entity_id
+        mini_training_version_identity = self.get_program_tree_version_obj().entity_id
         node_identity = self.get_program_tree_obj().root_node.entity_id
         return version.UpdateMiniTrainingVersionForm(
             data=self.request.POST or None,
             user=self.request.user,
-            mini_training_identity=mini_training_identity,
+            mini_training_version_identity=mini_training_version_identity,
             node_identity=node_identity,
             initial=self._get_mini_training_version_form_initial_values()
         )

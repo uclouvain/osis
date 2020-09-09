@@ -26,14 +26,10 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.forms import TextInput
-from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from base.forms.utils.choice_field import BLANK_CHOICE
 from base.models.enums.constraint_type import ConstraintTypeEnum
-from base.models.academic_year import current_academic_year
-from education_group.ddd.business_types import *
-from education_group.ddd.domain.service.calculate_end_postponement import DEFAULT_YEARS_TO_POSTPONE
 from education_group.forms import fields
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from program_management.ddd.command import GetEndPostponementYearCommand
@@ -93,7 +89,8 @@ class SpecificVersionForm(forms.Form):
             choices_years += BLANK_CHOICE
 
         self.fields["end_year"].choices = choices_years
-        self.fields["end_year"].initial = choices_years[-1]
+        if not self.fields["end_year"].initial:
+            self.fields["end_year"].initial = choices_years[-1]
 
     def clean_end_year(self):
         end_year = self.cleaned_data["end_year"]
@@ -224,9 +221,13 @@ class UpdateTrainingVersionForm(SpecificVersionForm):
     professional_title = forms.CharField(max_length=320, required=False, label=_('Professionnal title'), disabled=True)
     certificate_aims = forms.CharField(required=False, label=_('certificate aims').capitalize(), disabled=True)
 
-    def __init__(self, training_identity: 'TrainingIdentity', node_identity: 'NodeIdentity', user: User, **kwargs):
+    def __init__(self,
+                 training_version_identity: 'ProgramTreeVersionIdentity',
+                 node_identity: 'NodeIdentity',
+                 user: User,
+                 **kwargs):
         self.user = user
-        super().__init__(training_identity, node_identity, **kwargs)
+        super().__init__(training_version_identity, node_identity, **kwargs)
         self.fields['version_name'].disabled = True
         self.__init_management_entity_field()
 
@@ -276,13 +277,13 @@ class UpdateMiniTrainingVersionForm(SpecificVersionForm):
 
     def __init__(
             self,
-            mini_training_identity: 'MiniTrainingIdentity',
+            mini_training_version_identity: 'ProgramTreeVersionIdentity',
             node_identity: 'NodeIdentity',
             user: User,
             **kwargs
     ):
         self.user = user
-        super().__init__(mini_training_identity, node_identity, **kwargs)
+        super().__init__(mini_training_version_identity, node_identity, **kwargs)
         self.fields['version_name'].disabled = True
         self.__init_management_entity_field()
 
