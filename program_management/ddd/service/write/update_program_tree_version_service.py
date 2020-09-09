@@ -25,10 +25,12 @@
 ##############################################################################
 from django.db import transaction
 
-from program_management.ddd.command import UpdateProgramTreeVersionCommand
+from program_management.ddd.command import UpdateProgramTreeVersionCommand, DeleteSpecificVersionCommand
 from program_management.ddd.domain.program_tree_version import UpdateProgramTreeVersiongData, \
-    ProgramTreeVersionIdentity
+    ProgramTreeVersionIdentity, ProgramTreeVersion
+from program_management.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
+from program_management.ddd.service.write import delete_specific_version_service
 
 
 @transaction.atomic()
@@ -43,10 +45,12 @@ def update_program_tree_version(
     )
     program_tree_version = ProgramTreeVersionRepository().get(entity_id=identity)
 
+    __call_delete_service(program_tree_version, command.end_year)
+
     program_tree_version.update(__convert_command_to_update_data(command))
 
-    identity = ProgramTreeVersionRepository.update(
-        program_tree_version=program_tree_version,
+    identity = ProgramTreeVersionRepository().update(
+        program_tree_version,
     )
 
     return identity
@@ -58,3 +62,23 @@ def __convert_command_to_update_data(cmd: UpdateProgramTreeVersionCommand) -> 'U
         title_en=cmd.title_en,
         end_year_of_existence=cmd.end_year,
     )
+
+
+def __call_delete_service(program_tree_version: 'ProgramTreeVersion', end_year_updated: int):
+    identity = program_tree_version.entity_identity
+
+    max_year = CalculateEndPostponement.calculate_max_year_of_end_postponement()
+
+    end_year = program_tree_version.end_year_of_existence or max_year
+    end_year_updated = end_year_updated or max_year
+
+    if end_year > end_year_updated:
+        for year_to_delete in range(end_year_updated, program_tree_version.end_year_of_existence):
+            delete_specific_version_service.delete_specific_version(
+                DeleteSpecificVersionCommand(
+                    acronym=identity.offer_acronym,
+                    year=year_to_delete,
+                    version_name=identity.version_name,
+                    is_transition=identity.is_transition,
+                )
+            )
