@@ -42,7 +42,7 @@ class EducationGroupVersionFactory(factory.DjangoModelFactory):
     changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.today() - relativedelta(years=1), datetime.today())
 
     is_transition = False
-    version_name = factory.fuzzy.FuzzyText(length=10)
+    version_name = factory.Sequence(lambda n: 'VERSION%d' % n)
     root_group = factory.SubFactory(GroupYearFactory)
     offer = factory.SubFactory(
         EducationGroupYearFactory,

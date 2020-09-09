@@ -29,10 +29,9 @@ from collections import OrderedDict
 from typing import List, Set, Dict, Optional
 
 import attr
-from _decimal import Decimal
 
+from base.ddd.utils.converters import to_upper_case_converter
 from base.models.enums.active_status import ActiveStatusEnum
-from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, MiniTrainingType, GroupType
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
@@ -159,7 +158,7 @@ factory = NodeFactory()
 
 @attr.s(frozen=True, slots=True)
 class NodeIdentity(interface.EntityIdentity):
-    code = attr.ib(type=str)
+    code = attr.ib(type=str, converter=to_upper_case_converter)
     year = attr.ib(type=int)
 
 
@@ -238,6 +237,9 @@ class Node(interface.Entity):
 
     def is_minor_major_list_choice(self) -> bool:
         return self.node_type in GroupType.minor_major_list_choice_enums()
+
+    def is_option_list_choice(self):
+        return self.node_type == GroupType.OPTION_LIST_CHOICE
 
     def is_minor_or_deepening(self) -> bool:
         return self.is_minor() or self.is_deepening()

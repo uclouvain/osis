@@ -21,6 +21,12 @@ from program_management.models.element import Element
 
 
 @predicate(bind=True)
+def are_all_tree_versions_removable(self, user, group_year):
+    groups = group_year.group.groupyear_set.all()
+    return _are_all_removable(self, user, groups, 'program_management.delete_tree_version')
+
+
+@predicate(bind=True)
 def are_all_trainings_removable(self, user, education_group_year):
     trainings = education_group_year.education_group.educationgroupyear_set.all()
     return _are_all_removable(self, user, trainings, 'base.delete_training')

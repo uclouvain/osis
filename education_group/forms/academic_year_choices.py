@@ -29,7 +29,7 @@ from django.urls import reverse
 
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.node import NodeIdentity
-from program_management.ddd.domain.service.academic_year_search import ExistingAcademicYearSearch
+from program_management.ddd.domain.service.node_identities_search import NodeIdentitiesSearch
 from program_management.ddd.domain.service.element_id_search import ElementIdByYearSearch
 
 
@@ -43,7 +43,7 @@ def get_academic_year_choices(
     map_element_id_by_year = ElementIdByYearSearch().search_from_element_ids(
         element_ids=element_ids,
     )
-    node_ids = ExistingAcademicYearSearch().search_from_code(node_identity.code)
+    node_ids = NodeIdentitiesSearch().search_from_code(node_identity.code)
 
     return [
         (

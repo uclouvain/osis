@@ -120,7 +120,7 @@ class TestDeleteTrainingGetMethod(TestCase):
 class TestDeleteTrainingPostMethod(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.training = TrainingFactory()
+        cls.training = TrainingFactory(entity_identity__year=2025)
         cls.root_node = NodeGroupYearFactory(year=cls.training.year)
         cls.program_tree_version = ProgramTreeVersionFactory(
             entity_id=ProgramTreeVersionIdentity(
@@ -154,7 +154,8 @@ class TestDeleteTrainingPostMethod(TestCase):
         self.addCleanup(self.get_training_patcher.stop)
 
         self.delete_all_standard_versions_patcher = mock.patch(
-            "education_group.views.training.delete.delete_all_standard_versions_service.delete_all_standard_versions",
+            "education_group.views.training.delete.delete_all_standard_versions_service"
+            ".delete_permanently_training_standard_version",
             return_value=[self.program_tree_version.entity_id]
         )
         self.mocked_delete_all_standard_versions = self.delete_all_standard_versions_patcher.start()

@@ -26,9 +26,9 @@ from typing import List
 from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.node import NodeIdentity
-from program_management.ddd.repositories.program_tree import ProgramTreeRepository
+from program_management.ddd.repositories import program_tree as program_tree_repository
 
 
 def search_program_trees_using_node(cmd: command.GetProgramTreesFromNodeCommand) -> List['ProgramTree']:
     node_id = NodeIdentity(code=cmd.code, year=cmd.year)
-    return ProgramTreeRepository.search_from_children([node_id])
+    return program_tree_repository.ProgramTreeRepository.search_from_children([node_id])

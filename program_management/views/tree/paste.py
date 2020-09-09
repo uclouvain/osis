@@ -44,11 +44,13 @@ from base.views.mixins import AjaxTemplateMixin
 from education_group.models.group_year import GroupYear
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd.domain import node
+from program_management.ddd.domain.node import NodeGroupYear
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories import node as node_repository
 from program_management.ddd.service.read import element_selected_service, check_paste_node_service
-from program_management.forms.tree.paste import PasteNodesFormset, paste_form_factory, PasteToMinorMajorListChoiceForm
+from program_management.forms.tree.paste import PasteNodesFormset, paste_form_factory, PasteToMinorMajorListChoiceForm,\
+    PasteToOptionListChoiceForm, PasteMinorMajorListToMinorMajorListChoiceForm
 
 
 class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageMixin, FormView):
@@ -105,8 +107,8 @@ class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageM
 
     def get_context_data(self, **kwargs):
         context_data = super().get_context_data(**kwargs)
-        context_data["formset"] = context_data["form"]
-        context_data["is_parent_a_minor_major_list_choice"] = self._is_parent_a_minor_major_list_choice(
+        context_data["formset"] = context_data.pop("form")
+        context_data["is_parent_a_minor_major_option_list_choice"] = self._is_parent_a_minor_major_option_list_choice(
             context_data["formset"]
         )
         context_data["nodes_by_id"] = {
@@ -115,6 +117,14 @@ class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageM
             ) for ele in self.nodes_to_paste}
 
         self._format_title_with_version(context_data["nodes_by_id"])
+
+        for form in context_data["formset"].forms:
+            node_elem = context_data["nodes_by_id"][form.node_code]
+            form.initial = self._get_initial_form_kwargs(node_elem)
+            form.is_group_year_form = isinstance(node_elem, NodeGroupYear)
+
+        if len(context_data["formset"]) > 0:
+            context_data['is_group_year_formset'] = context_data["formset"][0].is_group_year_form
 
         if not self.nodes_to_paste:
             display_warning_messages(self.request, _("Please cut or copy an item before paste"))
@@ -126,6 +136,13 @@ class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageM
             display_error_messages(self.request, error_messages)
 
         return context_data
+
+    def _get_initial_form_kwargs(self, obj):
+        return {
+            'credits': obj.credits,
+            'code': obj.code,
+            'relative_credits': "%d" % (obj.credits or 0)
+        }
 
     def _format_title_with_version(self, nodes_by_id):
         for ele in self.nodes_to_paste:
@@ -160,8 +177,12 @@ class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageM
             )
         return messages
 
-    def _is_parent_a_minor_major_list_choice(self, formset):
-        return any(isinstance(form, PasteToMinorMajorListChoiceForm) for form in formset)
+    def _is_parent_a_minor_major_option_list_choice(self, formset):
+        return any(isinstance(form, (
+            PasteToMinorMajorListChoiceForm,
+            PasteToOptionListChoiceForm,
+            PasteMinorMajorListToMinorMajorListChoiceForm
+        ))for form in formset)
 
     def get_success_url(self):
         return
