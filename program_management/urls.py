@@ -72,7 +72,8 @@ urlpatterns = [
          name='create_element_select_type'),
     path('check_paste/', tree.paste.CheckPasteView.as_view(), name="check_tree_paste_node"),
     path('paste/', tree.paste.PasteNodesView.as_view(), name='tree_paste_node'),
-    path('update/', tree.update.UpdateLinkView.as_view(), name='tree_update_link'),
+    path('update/<str:parent_code>/<int:parent_year>/<str:child_code>/<int:child_year>',
+         tree.update.UpdateLinkView.as_view(), name='tree_update_link'),
     path('cut_element/', tree.copy_cut.cut_to_cache, name='cut_element'),
     path('copy_element/', tree.copy_cut.copy_to_cache, name='copy_element'),
     path('<int:year>/quick_search/', include([

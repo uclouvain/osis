@@ -52,16 +52,11 @@ class UpdateNodeForm(forms.Form):
     comment_english = forms.CharField(widget=forms.widgets.Textarea, required=False)
     relative_credits = forms.IntegerField(widget=forms.widgets.TextInput, required=False)
 
-    def __init__(
-            self,
-            to_path: str,
-            node_to_update_code: str,
-            node_to_update_year: int,
-            **kwargs
-    ):
-        self.to_path = to_path
-        self.node_code = node_to_update_code
-        self.node_year = node_to_update_year
+    def __init__(self, **kwargs):
+        self.parent_node_code = kwargs.pop('parent_node_code')
+        self.parent_node_year = kwargs.pop('parent_node_year')
+        self.node_code = kwargs.pop('node_to_update_code')
+        self.node_year = kwargs.pop('node_to_update_year')
         super().__init__(**kwargs)
 
     def clean_block(self):
@@ -80,8 +75,8 @@ class UpdateNodeForm(forms.Form):
 
     def _create_update_command(self) -> command.UpdateLinkCommand:
         return command.UpdateLinkCommand(
-            parent_node_year='',
-            parent_node_code='',
+            parent_node_code=self.parent_node_code,
+            parent_node_year=self.parent_node_year,
             child_node_code=self.node_code,
             child_node_year=self.node_year,
             access_condition=self.cleaned_data.get("access_condition", False),
@@ -97,27 +92,3 @@ class UpdateNodeForm(forms.Form):
 class UpdateLearningUnitForm(UpdateNodeForm):
     access_condition = None
     link_type = None
-
-
-class UpdateInMinorMajorOptionListChoiceForm(UpdateNodeForm):
-    is_mandatory = None
-    block = None
-    link_type = None
-    comment = None
-    comment_english = None
-    relative_credits = None
-
-    def _create_update_command(self) -> command.UpdateLinkCommand:
-        return command.UpdateLinkCommand(
-            parent_node_year='',
-            parent_node_code='',
-            child_node_code=self.node_code,
-            child_node_year=self.node_year,
-            access_condition=self.cleaned_data.get("access_condition", False),
-            is_mandatory=self.cleaned_data.get("is_mandatory", True),
-            block=self.cleaned_data.get("block"),
-            link_type=LinkTypes.REFERENCE,
-            comment=self.cleaned_data.get("comment", ""),
-            comment_english=self.cleaned_data.get("comment_english", ""),
-            relative_credits=self.cleaned_data.get("relative_credits"),
-        )

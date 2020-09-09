@@ -23,22 +23,21 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django import shortcuts
 from django.contrib.messages.views import SuccessMessageMixin
 from django.forms import formset_factory
 from django.utils.functional import cached_property
+from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 
+import osis_common
+from base.views.common import display_success_messages
 from base.views.mixins import AjaxTemplateMixin
-from education_group.models.group_year import GroupYear
 from osis_common.ddd.interface import BusinessException
-from program_management.ddd.command import GetNodeIdentityFromElementId
 from program_management.ddd.domain import node
 from program_management.ddd.domain.node import NodeGroupYear
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories import node as node_repository
-from program_management.ddd.service.read import node_identity_service
 from program_management.forms.tree.update import UpdateNodeForm, UpdateNodesFormset
 
 
@@ -52,25 +51,18 @@ class UpdateLinkView(AjaxTemplateMixin, SuccessMessageMixin, FormView):
 
     @cached_property
     def parent_node(self) -> dict:
-        node_parent_id = int(self.request.GET['path'].split("|")[-2])
-        get_node_cmd = GetNodeIdentityFromElementId(element_id=node_parent_id)
-        node_parent_identity = node_identity_service.get_node_identity_from_element_id(cmd=get_node_cmd)
-        if node_parent_identity:
-            return {"element_code": node_parent_identity.code, "element_year": int(node_parent_identity.year)}
+        return {"element_code": self.kwargs.get('parent_code'), "element_year": self.kwargs.get('parent_year')}
 
     @cached_property
     def node_to_update(self) -> dict:
-        node_to_update_id = int(self.request.GET['path'].split("|")[-1])
-        get_node_cmd = GetNodeIdentityFromElementId(element_id=node_to_update_id)
-        node_to_update_identity = node_identity_service.get_node_identity_from_element_id(cmd=get_node_cmd)
-        if node_to_update_identity:
-            return {"element_code": node_to_update_identity.code, "element_year": int(node_to_update_identity.year)}
+        return {"element_code": self.kwargs.get('child_code'), "element_year": self.kwargs.get('child_year')}
 
     def get_form_kwargs(self) -> dict:
         return {
+            'parent_node_code': self.parent_node["element_code"],
+            'parent_node_year': self.parent_node["element_year"],
             'node_to_update_code': self.node_to_update["element_code"],
             'node_to_update_year': self.node_to_update["element_year"],
-            'to_path': self.request.GET['path'],
         }
 
     def get_form(self, form_class=None):
@@ -98,6 +90,22 @@ class UpdateLinkView(AjaxTemplateMixin, SuccessMessageMixin, FormView):
             context_data['is_group_year_formset'] = context_data["formset"][0].is_group_year_form
 
         return context_data
+
+    def form_valid(self, formset: UpdateNodesFormset):
+        try:
+            link_identities_ids = formset.save()
+        except osis_common.ddd.interface.BusinessExceptions as business_exception:
+            formset.forms[0].add_error(field=None, error=business_exception.messages)
+            return self.form_invalid(formset)
+        messages = self._append_success_messages(link_identities_ids)
+        display_success_messages(self.request, messages)
+        return super().form_valid(formset)
+
+    def _append_success_messages(self, link_identities_ids):
+        messages = []
+        for link_identity in link_identities_ids:
+            messages.append(_("\"%(child)s\" has been successfully updated") % {"child": link_identity.child.code})
+        return messages
 
     def _get_initial_form_kwargs(self, obj):
         return {

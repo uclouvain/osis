@@ -46,6 +46,7 @@ def bulk_update_links(cmd: BulkUpdateLinkCommand) -> List['Link']:
     return links_updated
 
 
+@transaction.atomic()
 def update_link(cmd: UpdateLinkCommand) -> 'Link':
     tree_id = ProgramTreeIdentity(code=cmd.parent_node_code, year=cmd.parent_node_year)
     tree = ProgramTreeRepository.get(tree_id)
