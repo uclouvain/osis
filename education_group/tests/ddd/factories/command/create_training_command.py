@@ -39,7 +39,7 @@ class CreateTrainingCommandFactory(factory.Factory):
         model = command.CreateTrainingCommand
         abstract = False
 
-    abbreviated_title = factory.Sequence(lambda n: 'TrainingTitle%d' % n)
+    abbreviated_title = factory.Sequence(lambda n: 'TRAININGTITLE%d' % n)
     status = factory.Iterator(ActiveStatusEnum.choices(), getter=operator.itemgetter(0))
     code = factory.Sequence(lambda n: 'CODE%d' % n)
     year = 2019

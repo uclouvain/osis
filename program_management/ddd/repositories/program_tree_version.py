@@ -41,7 +41,7 @@ from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception
 from program_management.ddd.domain import program_tree
 from program_management.ddd.domain import program_tree_version
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, STANDARD
 from program_management.ddd.repositories import program_tree as program_tree_repository
 from program_management.models.education_group_version import EducationGroupVersion
 
@@ -123,7 +123,13 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
             # FIXME :: End year is not useful for Groups. For business, Group doesn't have a 'end date'.
             end_year_of_existence=Case(
                 When(
-                    offer__education_group_type__category__in={Categories.TRAINING.name, Categories.MINI_TRAINING.name},
+                    Q(
+                        offer__education_group_type__category__in={
+                            Categories.TRAINING.name, Categories.MINI_TRAINING.name
+                        }
+                    ) & Q(
+                        version_name=STANDARD
+                    ),
                     then=F('offer__education_group__end_year__year')
                 ),
                 default=F('root_group__group__end_year__year'),
@@ -170,6 +176,9 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
     def search(
             cls,
             entity_ids: Optional[List['ProgramTreeVersionIdentity']] = None,
+            version_name: str = None,
+            offer_acronym: str = None,
+            is_transition: bool = False,
             **kwargs
     ) -> List['ProgramTreeVersion']:
         qs = GroupYear.objects.all().order_by(
@@ -195,6 +204,13 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
         )
         if "element_ids" in kwargs:
             qs = qs.filter(element__in=kwargs['element_ids'])
+
+        if version_name is not None:
+            qs = qs.filter(educationgroupversion__version_name=version_name)
+        if offer_acronym is not None:
+            qs = qs.filter(educationgroupversion__offer__acronym=offer_acronym)
+        if is_transition is not None:
+            qs = qs.filter(educationgroupversion__is_transition=is_transition)
 
         results = []
         for record_dict in qs:

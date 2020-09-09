@@ -44,8 +44,7 @@ msgstr "%(start_index)s à %(end_index)s sur %(total_counts)s formations"
 
 #, python-format
 msgid "%(start_index)s to %(end_index)s of %(total_counts)s trainings"
-msgstr ""
-"%(start_index)s à %(end_index)s sur %(total_counts)s unités d'enseignement"
+msgstr "%(start_index)s à %(end_index)s sur %(total_counts)s formations"
 
 msgid "1st quadri"
 msgstr "1er quadri"
@@ -130,6 +129,9 @@ msgstr "Ent. attrib."
 
 msgid "Annual"
 msgstr "Annuel"
+
+msgid "Are you sure you want to delete %(offer_acronym)s %(version_name)s ?"
+msgstr "Êtes-vous sûr·e de vouloir supprimer %(offer_acronym)s %(version_name)s ?"
 
 #, python-format
 msgid "Are you sure you want to detach %(acronym)s%(title)s ?"
@@ -484,7 +486,7 @@ msgstr "Produire un fichier Excel avec la liste des formations"
 
 #, python-brace-format
 msgid "Program tree not found : {code} {year}"
-msgstr "Arbre non trouvé : {code} {year}"
+msgstr "Programme non trouvé : {code} {year}"
 
 msgid "Prolong"
 msgstr "Prolonger la version existante"
@@ -620,6 +622,11 @@ msgstr ""
 #, python-format
 msgid "The program %(title)s - %(academic_year)s will be published soon"
 msgstr "Le programme %(title)s - %(academic_year)s sera publié sous peu"
+
+msgid ""
+"The program tree version %(offer_acronym)s %(version_name)s has been deleted."
+msgstr ""
+"La version de programme %(offer_acronym)s %(version_name)s a été supprimée avec succès."
 
 msgid "The registration form is available at the Secretariat of"
 msgstr "Le formulaire d'inscription est disponible au Secrétariat de"
