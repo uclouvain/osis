@@ -677,7 +677,7 @@ msgid "Unable to publish sections for {code} - {year}"
 msgstr "Impossible de publier les sections pour {code} - {year}"
 
 msgid "Update Content"
-msgstr "Mis à jour Contenu"
+msgstr "Modification Contenu"
 
 msgid "Utilizations"
 msgstr "Utilisations"

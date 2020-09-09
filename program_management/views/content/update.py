@@ -13,7 +13,7 @@ from base.views.common import display_success_messages, display_error_messages
 from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import exception, group
-from education_group.ddd.service.read import get_training_service, get_group_service, get_multiple_groups_service
+from education_group.ddd.service.read import get_group_service, get_multiple_groups_service
 from education_group.forms import content as content_forms
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from learning_unit.ddd import command as command_learning_unit_year
