@@ -172,7 +172,7 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
             "code": group_obj.code,
             "active": training_obj.status.value,
             "schedule_type": training_obj.schedule_type.value,
-            "credits": training_obj.credits,
+            "credits": group_obj.credits,
             "constraint_type": group_obj.content_constraint.type.name
             if group_obj.content_constraint.type else None,
             "min_constraint": group_obj.content_constraint.minimum,

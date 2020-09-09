@@ -169,7 +169,7 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
             "code": group_obj.code,
             "status": mini_training_obj.status.value,
             "schedule_type": mini_training_obj.schedule_type.value,
-            "credits": mini_training_obj.credits,
+            "credits": group_obj.credits,
             "constraint_type": group_obj.content_constraint.type.value
             if group_obj.content_constraint.type else None,
             "min_constraint": group_obj.content_constraint.minimum,
