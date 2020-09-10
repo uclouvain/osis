@@ -26,8 +26,7 @@ from typing import List
 from django.db import transaction
 
 from education_group.ddd import command
-from education_group.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
-from education_group.ddd.service.write import postpone_training_service, postpone_group_service
+from education_group.ddd.service.write import postpone_training_service
 from program_management.ddd.command import PostponeProgramTreeCommand, PostponeProgramTreeVersionCommand
 from program_management.ddd.service.write import postpone_program_tree_service, postpone_tree_version_service
 
@@ -40,7 +39,6 @@ def report_training_with_program_tree(
         command.PostponeTrainingCommand(
             acronym=report_cmd.abbreviated_title,
             postpone_from_year=report_cmd.from_year,
-            postpone_until_year=CalculateEndPostponement.calculate_max_year_of_end_postponement()
         )
     )
 
@@ -49,7 +47,6 @@ def report_training_with_program_tree(
             from_code=report_cmd.code,
             from_year=report_cmd.from_year,
             offer_acronym=report_cmd.abbreviated_title,
-            until_year=CalculateEndPostponement.calculate_max_year_of_end_postponement()
         )
     )
 
@@ -59,7 +56,6 @@ def report_training_with_program_tree(
             from_version_name="",
             from_year=report_cmd.from_year,
             from_is_transition=False,
-            until_year=CalculateEndPostponement.calculate_max_year_of_end_postponement()
         )
     )
 

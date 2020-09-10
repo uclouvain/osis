@@ -21,27 +21,15 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from typing import List
-
-from django.db import transaction
-
-from education_group.ddd import command
-from education_group.ddd.domain import mini_training
-from education_group.ddd.repository import mini_training as mini_training_repository
-from education_group.ddd.service.write import postpone_mini_training_service
+from base.ddd.utils import business_validator
+from education_group.ddd.business_types import *
 
 
-@transaction.atomic()
-def create_and_postpone_orphan_mini_training(
-        cmd: command.CreateMiniTrainingCommand) -> List['mini_training.MiniTrainingIdentity']:
-    mini_training_object = mini_training.MiniTrainingBuilder().build_from_create_cmd(cmd)
+class CheckTrainingConsistencyValidator(business_validator.BusinessValidator):
+    def __init__(self, training_from: 'Training', training_to: 'Training'):
+        super().__init__()
+        self.training_from = training_from
+        self.training_to = training_to
 
-    mini_training_identity = mini_training_repository.MiniTrainingRepository.create(mini_training_object)
-    mini_training_identities = postpone_mini_training_service.postpone_mini_training(
-        command.PostponeMiniTrainingCommand(
-            acronym=cmd.abbreviated_title,
-            postpone_from_year=cmd.year,
-        )
-    )
-
-    return [mini_training_identity] + mini_training_identities
+    def validate(self, *args, **kwargs):
+        return True

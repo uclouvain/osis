@@ -49,13 +49,14 @@ class GroupBuilder:
     @classmethod
     def copy_to_next_year(cls, group_from: 'Group', group_repository: 'GroupRepository') -> 'Group':
         identity_next_year = GroupIdentity(code=group_from.code, year=group_from.year + 1)
-        CopyGroupValidatorList(group_from).validate()
         try:
             group_next_year = group_repository.get(identity_next_year)
             group_next_year.update_from_other_group(group_from)
         except exception.GroupNotFoundException:
             group_next_year = copy.deepcopy(group_from)
             group_next_year.entity_id = identity_next_year
+        finally:
+            CopyGroupValidatorList(group_from, group_next_year).validate()
         return group_next_year
 
     @classmethod

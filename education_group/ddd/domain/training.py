@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List, Optional
+from typing import List
 
 import attr
 
@@ -74,7 +74,6 @@ class TrainingBuilder:
 
     def copy_to_next_year(self, training_from: 'Training', training_repository: 'TrainingRepository') -> 'Training':
         identity_next_year = TrainingIdentity(acronym=training_from.acronym, year=training_from.year + 1)
-        CopyTrainingValidatorList(training_from).validate()
         try:
             training_next_year = training_repository.get(identity_next_year)
             training_next_year.update_from_other_training(training_from)
@@ -84,6 +83,8 @@ class TrainingBuilder:
                 entity_identity=identity_next_year,
                 entity_id=identity_next_year,
             )
+        finally:
+            CopyTrainingValidatorList(training_from, training_next_year).validate()
         return training_next_year
 
     def create_training(self, command: 'CreateTrainingCommand') -> 'Training':

@@ -29,9 +29,10 @@ from django.db import transaction
 
 from education_group.ddd import command
 from education_group.ddd.domain import exception
-from education_group.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
 from education_group.ddd.domain.training import TrainingIdentity
+from education_group.ddd.repository.training import TrainingRepository
 from education_group.ddd.service.write import copy_training_service
+from program_management.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
 
 
 @transaction.atomic()
@@ -40,7 +41,10 @@ def postpone_training(postpone_cmd: command.PostponeTrainingCommand) -> List['Tr
 
     # GIVEN
     from_year = postpone_cmd.postpone_from_year
-    until_year = postpone_cmd.postpone_until_year
+    until_year = CalculateEndPostponement.calculate_end_postponement_year(
+        identity=TrainingIdentity(acronym=postpone_cmd.acronym, year=from_year),
+        repository=TrainingRepository()
+    )
 
     # WHEN
     for year in range(from_year, until_year):

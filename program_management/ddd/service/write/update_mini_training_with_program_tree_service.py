@@ -29,31 +29,16 @@ from django.db import transaction
 
 from education_group.ddd import command
 from education_group.ddd.business_types import *
-from education_group.ddd.domain import group, mini_training
-from education_group.ddd.domain.service import calculate_end_postponement
-from education_group.ddd.repository import mini_training as mini_training_repository, group as group_repository
-from education_group.ddd.service.write import update_group_service, \
-    update_mini_training_service
-from program_management.ddd.command import PostponeProgramTreeVersionCommand, \
-    PostponeProgramTreeCommand
-from program_management.ddd.service.write import postpone_tree_version_service, \
-    postpone_program_tree_service
+from education_group.ddd.service.write import update_group_service, update_mini_training_service
+from program_management.ddd.command import PostponeProgramTreeVersionCommand, PostponeProgramTreeCommand
+from program_management.ddd.service.write import postpone_tree_version_service, postpone_program_tree_service
 
 
 @transaction.atomic()
 def update_and_report_mini_training_with_program_tree(
         update_command: command.UpdateMiniTrainingCommand
 ) -> List['MiniTrainingIdentity']:
-    postpone_until_year = calculate_end_postponement.CalculateEndPostponement.\
-        calculate_year_of_postponement_for_mini_training(
-            mini_training.MiniTrainingIdentity(acronym=update_command.abbreviated_title, year=update_command.year),
-            group.GroupIdentity(code=update_command.code, year=update_command.year),
-            mini_training_repository.MiniTrainingRepository,
-            group_repository.GroupRepository
-        )
-
     mini_training_identities = update_mini_training_service.update_mini_training(update_command)
-
     update_group_service.update_group(_convert_to_update_group_command(update_command))
 
     postpone_program_tree_service.postpone_program_tree(
@@ -61,7 +46,6 @@ def update_and_report_mini_training_with_program_tree(
             from_code=update_command.code,
             from_year=update_command.year,
             offer_acronym=update_command.abbreviated_title,
-            until_year=postpone_until_year
         )
     )
 
@@ -71,7 +55,6 @@ def update_and_report_mini_training_with_program_tree(
             from_version_name="",
             from_year=update_command.year,
             from_is_transition=False,
-            until_year=postpone_until_year
         )
     )
 

@@ -29,7 +29,6 @@ from django.db import transaction
 
 from education_group.ddd import command
 from education_group.ddd.business_types import *
-from education_group.ddd.domain.service import calculate_end_postponement
 from education_group.ddd.domain.training import TrainingBuilder
 from education_group.ddd.repository import training as training_repository
 from education_group.ddd.service.write import postpone_training_service
@@ -39,7 +38,6 @@ from education_group.ddd.service.write import postpone_training_service
 def create_and_postpone_orphan_training(create_training_cmd: command.CreateTrainingCommand) -> List['TrainingIdentity']:
     # GIVEN
     cmd = create_training_cmd
-    postpone_until_year = calculate_end_postponement.CalculateEndPostponement.calculate_max_year_of_end_postponement()
 
     # WHEN
     training = TrainingBuilder().create_training(cmd)
@@ -50,7 +48,6 @@ def create_and_postpone_orphan_training(create_training_cmd: command.CreateTrain
         command.PostponeTrainingCommand(
             acronym=training_id.acronym,
             postpone_from_year=training_id.year,
-            postpone_until_year=postpone_until_year
         )
     )
 

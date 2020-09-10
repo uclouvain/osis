@@ -146,7 +146,6 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         return self.get_success_url()
 
     def update_training(self) -> List['TrainingIdentity']:
-        end_year = self.training_form.cleaned_data["end_year"]
         try:
             update_command = self._convert_form_to_update_training_command(self.training_form)
             return update_training_with_program_tree_service.update_and_report_training_with_program_tree(

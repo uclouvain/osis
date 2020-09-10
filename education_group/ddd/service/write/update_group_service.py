@@ -25,54 +25,33 @@
 from django.db import transaction
 
 from base.models.enums.constraint_type import ConstraintTypeEnum
+from base.models.enums.education_group_types import MiniTrainingType, TrainingType
 from education_group.ddd import command
-from education_group.ddd.domain import training, mini_training
 from education_group.ddd.domain._campus import Campus
 from education_group.ddd.domain._content_constraint import ContentConstraint
 from education_group.ddd.domain._entity import Entity
 from education_group.ddd.domain._remark import Remark
 from education_group.ddd.domain._titles import Titles
 from education_group.ddd.domain.group import GroupIdentity, Group
-from education_group.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
-from education_group.ddd.repository import group as group_repository, training as training_repository,\
-    mini_training as mini_training_repository
+from education_group.ddd.repository import group as group_repository
 from education_group.ddd.service.write import postpone_group_service
 
 
 @transaction.atomic()
 def update_group(cmd: command.UpdateGroupCommand) -> 'GroupIdentity':
     group_identity = GroupIdentity(code=cmd.code, year=cmd.year)
-    training_identity = training.TrainingIdentity(acronym=cmd.abbreviated_title, year=cmd.year)
-    mini_training_identity = mini_training.MiniTrainingIdentity(acronym=cmd.abbreviated_title, year=cmd.year)
-
-    try:
-        postpone_until_year = CalculateEndPostponement.calculate_year_of_postponement(
-            training_identity,
-            group_identity,
-            training_repository.TrainingRepository,
-            group_repository.GroupRepository
-        )
-    except KeyError:
-        postpone_until_year = CalculateEndPostponement.calculate_year_of_postponement_for_mini_training(
-            mini_training_identity,
-            group_identity,
-            mini_training_repository.MiniTrainingRepository,
-            group_repository.GroupRepository
-        )
-
     grp = group_repository.GroupRepository.get(group_identity)
 
     _update_group(grp, cmd)
     group_repository.GroupRepository.update(grp)
 
-    postpone_group_service.postpone_group(
-        command.PostponeGroupCommand(
-            code=group_identity.code,
-            postpone_from_year=cmd.year,
-            postpone_until_year=postpone_until_year
+    if grp.type.name in MiniTrainingType.get_names() + TrainingType.get_names():
+        postpone_group_service.postpone_group(
+            command.PostponeGroupCommand(
+                code=group_identity.code,
+                postpone_from_year=cmd.year,
+            )
         )
-    )
-
     return group_identity
 
 

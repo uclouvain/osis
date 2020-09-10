@@ -32,8 +32,6 @@ from education_group.tests.ddd.factories.command.create_and_postpone_training_an
 
 
 class TestCreateAndReportTrainingWithProgramTree(TestCase):
-    @mock.patch("program_management.ddd.service.write.create_training_with_program_tree."
-                "CalculateEndPostponement.calculate_max_year_of_end_postponement", return_value=2023)
     @mock.patch("program_management.ddd.service.write.postpone_tree_version_service.postpone_program_tree_version")
     @mock.patch("program_management.ddd.service.write.create_standard_version_service.create_standard_program_version")
     @mock.patch("program_management.ddd.service.write.postpone_program_tree_service.postpone_program_tree")
@@ -47,8 +45,7 @@ class TestCreateAndReportTrainingWithProgramTree(TestCase):
             mock_create_standard_program_tree,
             mock_postpone_program_tree,
             mock_create_standard_program_version,
-            mock_postpone_program_tree_version,
-            mock_end_postponement):
+            mock_postpone_program_tree_version,):
 
         training_identities = [
             training.TrainingIdentity(acronym="ACRONYM", year=2020),

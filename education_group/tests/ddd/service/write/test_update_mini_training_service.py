@@ -36,8 +36,8 @@ from education_group.tests.factories.mini_training import MiniTrainingFactory
 from testing.mocks import MockPatcherMixin
 
 
-@patch('education_group.ddd.service.write.update_group_service.'
-       'CalculateEndPostponement.calculate_year_of_postponement_for_mini_training', return_value=2021)
+@patch('education_group.ddd.service.write.update_mini_training_service.postpone_mini_training_service.'
+       'postpone_mini_training', return_value=[])
 class TestUpdateMiniTraining(TestCase, MockPatcherMixin):
     @classmethod
     def setUpTestData(cls):
@@ -80,30 +80,28 @@ class TestUpdateMiniTraining(TestCase, MockPatcherMixin):
             self.fake_mini_training_repo
         )
 
-    def test_should_return_entity_id_of_updated_mini_trainings(self, mock_end_year_postponement):
-        result = update_mini_training_service.update_mini_training(self.cmd)
+    def test_should_return_entity_id_of_updated_mini_trainings(self, mock_postpone_mini_training_service):
+        mock_postpone_mini_training_service.return_value = [
+            mini_training.MiniTrainingIdentity(acronym=self.cmd.abbreviated_title, year=year)
+            for year in range(2019, 2022)
+        ]
 
-        expected_result = [mini_training.MiniTrainingIdentity(acronym=self.cmd.abbreviated_title, year=year)
-                           for year in range(2018, 2022)]
+        result = update_mini_training_service.update_mini_training(self.cmd)
+        expected_result = [
+            mini_training.MiniTrainingIdentity(acronym=self.cmd.abbreviated_title, year=year)
+            for year in range(2018, 2022)
+        ]
         self.assertEqual(expected_result, result)
 
-    def test_should_update_value_of_mini_trainings_based_on_command_value(self, mock_end_year_postponement):
+    def test_should_update_value_of_mini_trainings_based_on_command_value(self, mock_postpone_mini_training_service):
         entity_ids = update_mini_training_service.update_mini_training(self.cmd)
 
         mini_training_update = self.fake_mini_training_repo.get(entity_ids[0])
         self.assert_has_same_value_as_update_command(mini_training_update)
 
-    def test_should_postpone_mini_trainings_update(self, mock_end_year_postponement):
-        identities = [mini_training.MiniTrainingIdentity(acronym=self.cmd.abbreviated_title, year=year)
-                      for year in range(2018, 2022)]
-
+    def test_should_postpone_mini_trainings_update(self, mock_postpone_mini_training_service):
         update_mini_training_service.update_mini_training(self.cmd)
-
-        base_mini_training = self.fake_mini_training_repo.get(identities[0])
-        for identity in identities[1:]:
-            with self.subTest(year=identity.year):
-                postponed_mini_training = self.fake_mini_training_repo.get(identity)
-                self.assertTrue(postponed_mini_training.has_same_values_as(base_mini_training))
+        self.assertTrue(mock_postpone_mini_training_service.called)
 
     def assert_has_same_value_as_update_command(self, update_mini_training: 'mini_training.MiniTraining'):
         self.assertEqual(update_mini_training.credits, self.cmd.credits)

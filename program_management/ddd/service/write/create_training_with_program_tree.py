@@ -31,7 +31,6 @@ from django.db import transaction
 from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.command import CreateAndPostponeTrainingAndProgramTreeCommand, CreateTrainingCommand
-from education_group.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
 from education_group.ddd.service.write import create_group_service, create_orphan_training_service
 from program_management.ddd.command import CreateStandardVersionCommand, PostponeProgramTreeVersionCommand, \
     PostponeProgramTreeCommand
@@ -45,7 +44,6 @@ def create_and_report_training_with_program_tree(
 ) -> List['TrainingIdentity']:
     # GIVEN
     cmd = create_training_cmd
-    postpone_until = CalculateEndPostponement.calculate_max_year_of_end_postponement()
 
     # WHEN
     training_identities = create_orphan_training_service.create_and_postpone_orphan_training(
@@ -75,7 +73,6 @@ def create_and_report_training_with_program_tree(
             from_code=program_tree_identity.code,
             from_year=program_tree_identity.year,
             offer_acronym=create_training_cmd.abbreviated_title,
-            until_year=postpone_until
         )
     )
 
@@ -96,7 +93,6 @@ def create_and_report_training_with_program_tree(
             from_year=program_tree_version_identity.year,
             from_is_transition=program_tree_version_identity.is_transition,
             from_code=create_training_cmd.code,
-            until_year=postpone_until
         )
     )
 

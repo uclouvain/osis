@@ -29,9 +29,6 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from base.forms.utils.choice_field import BLANK_CHOICE
-from base.models.academic_year import current_academic_year
-from education_group.ddd.business_types import *
-from education_group.ddd.domain.service.calculate_end_postponement import DEFAULT_YEARS_TO_POSTPONE
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from program_management.ddd.command import GetEndPostponementYearCommand
 from program_management.ddd.domain.node import NodeIdentity

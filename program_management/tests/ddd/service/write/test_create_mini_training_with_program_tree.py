@@ -33,8 +33,6 @@ from program_management.ddd.service.write import create_training_with_program_tr
 
 
 class TestCreateAndReportMiniTrainingWithProgramTree(TestCase):
-    @mock.patch("education_group.ddd.domain.service.calculate_end_postponement.CalculateEndPostponement."
-                "calculate_max_year_of_end_postponement", return_value=2023)
     @mock.patch("program_management.ddd.service.write.postpone_tree_version_service_mini_training"
                 ".postpone_program_tree_version")
     @mock.patch("program_management.ddd.service.write.create_standard_version_service.create_standard_program_version")
@@ -52,8 +50,7 @@ class TestCreateAndReportMiniTrainingWithProgramTree(TestCase):
             mock_create_standard_program_tree,
             mock_postpone_program_tree,
             mock_create_standard_program_version,
-            mock_postpone_program_tree_version,
-            mock_end_postponement):
+            mock_postpone_program_tree_version,):
 
         mini_training_identities = [
             mini_training.MiniTrainingIdentity(acronym="ACRO", year=2020),

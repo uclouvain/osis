@@ -30,8 +30,9 @@ from django.db import transaction
 from education_group.ddd import command
 from education_group.ddd.domain import exception
 from education_group.ddd.domain.mini_training import MiniTrainingIdentity
-from education_group.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
+from education_group.ddd.repository.mini_training import MiniTrainingRepository
 from education_group.ddd.service.write import copy_mini_training_service
+from program_management.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
 
 
 @transaction.atomic()
@@ -40,7 +41,10 @@ def postpone_mini_training(postpone_cmd: command.PostponeMiniTrainingCommand) ->
 
     # GIVEN
     from_year = postpone_cmd.postpone_from_year
-    end_postponement_year = postpone_cmd.postpone_until_year
+    end_postponement_year = CalculateEndPostponement.calculate_end_postponement_year(
+        identity=MiniTrainingIdentity(acronym=postpone_cmd.acronym, year=from_year),
+        repository=MiniTrainingRepository()
+    )
 
     # WHEN
     for year in range(from_year, end_postponement_year):

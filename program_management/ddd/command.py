@@ -333,7 +333,6 @@ class PostponeProgramTreeCommand(interface.CommandRequest):
     from_code = attr.ib(type=str)
     from_year = attr.ib(type=int)
     offer_acronym = attr.ib(type=str)
-    until_year = attr.ib(type=Optional[int])
 
 
 @attr.s(frozen=True, slots=True)
@@ -348,7 +347,6 @@ class PostponeProgramTreeVersionCommand(interface.CommandRequest):
     from_version_name = attr.ib(type=str)
     from_year = attr.ib(type=int)
     from_is_transition = attr.ib(type=bool)
-    until_year = attr.ib(type=Optional[int])
 
     # FIXME :: to remove, the code can be found when converting ProgramTreeVersionIdentity to GroupIdentity
     from_code = attr.ib(type=str, default=None)
