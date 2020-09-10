@@ -26,23 +26,15 @@ from unittest import mock
 from django.http import HttpResponse, HttpResponseForbidden
 from django.test import TestCase
 from django.urls import reverse
-from mock import patch
 
 from base.tests.factories.person import PersonFactory
 from education_group.tests.factories.group_year import GroupYearFactory
 from osis_role.contrib.views import AjaxPermissionRequiredMixin
-from program_management.forms.tree.paste import PasteNodesFormset
 from program_management.forms.tree.update import UpdateNodeForm
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory, \
     NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
-
-
-def form_valid_effect(formset: PasteNodesFormset):
-    for form in formset:
-        form.cleaned_data = {}
-    return True
 
 
 class TestUpdateLinkView(TestCase):
