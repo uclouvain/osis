@@ -65,3 +65,10 @@ class SecondaryDomainsField(AutoCompleteSelectMultipleField):
     def clean(self, value):
         value = super().clean(value)
         return domain.Domain.objects.filter(pk__in=value)
+
+
+class UpperCaseCharField(forms.CharField):
+    def widget_attrs(self, widget):
+        attrs = super().widget_attrs(widget)
+        attrs['style'] = "text-transform: uppercase;"
+        return attrs

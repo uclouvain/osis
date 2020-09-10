@@ -23,23 +23,36 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
 
-from django.db.models import F
+import factory.fuzzy
 
-from osis_common.ddd import interface
-from education_group.models.group_year import GroupYear
-from program_management.ddd.domain.node import NodeIdentity
+from base.models.enums import education_group_types
+from base.models.enums.active_status import ActiveStatusEnum
+from program_management.ddd import command
 
 
-class ExistingAcademicYearSearch(interface.DomainService):
-    def search_from_code(self, group_code: str) -> List[NodeIdentity]:
-        years = GroupYear.objects.filter(
-            group__groupyear__partial_acronym=group_code,
-        ).annotate(
-            year=F('academic_year__year'),
-        ).values_list(
-            'year',
-            flat=True
-        ).distinct()
-        return [NodeIdentity(code=group_code, year=year) for year in sorted(years)]
+class UpdateTrainingVersionCommandFactory(factory.Factory):
+    class Meta:
+        model = command.UpdateTrainingVersionCommand
+        abstract = False
+
+    offer_acronym = "DROI2M"
+    version_name = "VERSIONNAME"
+    is_transition = False
+    year = 2019
+    credits = 23
+    end_year = None
+    title_fr = "fr  title"
+    title_en = "title  en"
+    teaching_campus_name = None
+    management_entity_acronym = None
+    teaching_campus_organization_name = None
+    constraint_type = None
+    min_constraint = None
+    max_constraint = None
+    remark_fr = None
+    remark_en = None
+
+
+
+

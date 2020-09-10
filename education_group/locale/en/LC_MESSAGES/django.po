@@ -357,10 +357,6 @@ msgid "Identification"
 msgstr ""
 
 #, python-format
-msgid "Imposible to put end date to %(end_year)s: %(msg)s"
-msgstr ""
-
-#, python-format
 msgid "Impossible to put end date to %(end_year)s: %(msg)s"
 msgstr ""
 

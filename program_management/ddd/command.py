@@ -80,6 +80,48 @@ class UpdateProgramTreeVersionCommand(interface.CommandRequest):
     title_fr = attr.ib(type=str)
 
 
+@attr.s(frozen=True, slots=True)
+class UpdateTrainingVersionCommand(interface.CommandRequest):
+    offer_acronym = attr.ib(type=str)
+    version_name = attr.ib(type=str)
+    year = attr.ib(type=int)
+    is_transition = attr.ib(type=bool)
+
+    title_en = attr.ib(type=str)
+    title_fr = attr.ib(type=str)
+    end_year = attr.ib(type=int)
+    management_entity_acronym = attr.ib(type=Optional[str])
+    teaching_campus_name = attr.ib(type=Optional[str])
+    teaching_campus_organization_name = attr.ib(type=Optional[str])
+    credits = attr.ib(type=int)
+    constraint_type = attr.ib(type=Optional[str])
+    min_constraint = attr.ib(type=Optional[int])
+    max_constraint = attr.ib(type=Optional[int])
+    remark_fr = attr.ib(type=Optional[str])
+    remark_en = attr.ib(type=Optional[str])
+
+
+@attr.s(frozen=True, slots=True)
+class UpdateMiniTrainingVersionCommand(interface.CommandRequest):
+    offer_acronym = attr.ib(type=str)
+    version_name = attr.ib(type=str)
+    year = attr.ib(type=int)
+    is_transition = attr.ib(type=bool)
+
+    title_en = attr.ib(type=str)
+    title_fr = attr.ib(type=str)
+    end_year = attr.ib(type=int)
+    management_entity_acronym = attr.ib(type=Optional[str])
+    teaching_campus_name = attr.ib(type=Optional[str])
+    teaching_campus_organization_name = attr.ib(type=Optional[str])
+    credits = attr.ib(type=int)
+    constraint_type = attr.ib(type=Optional[str])
+    min_constraint = attr.ib(type=Optional[int])
+    max_constraint = attr.ib(type=Optional[int])
+    remark_fr = attr.ib(type=Optional[str])
+    remark_en = attr.ib(type=Optional[str])
+
+
 class CopyElementCommand(interface.CommandRequest):
     def __init__(self, user_id: int, element_code: str, element_year: int):
         self.user_id = user_id
@@ -394,6 +436,18 @@ class DeleteTrainingWithProgramTreeCommand(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True)
+class DeleteTrainingStandardVersionCommand(interface.CommandRequest):
+    offer_acronym = attr.ib(type=str)
+    year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class DeleteMiniTrainingWithStandardVersionCommand(interface.CommandRequest):
+    mini_training_acronym = attr.ib(type=str)
+    year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
 class DeleteMiniWithProgramTreeCommand(interface.CommandRequest):
     code = attr.ib(type=str)
     offer_acronym = attr.ib(type=str)
@@ -429,6 +483,21 @@ class DeleteStandardVersionCommand(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True)
+class DeletePermanentlyTreeVersionCommand(interface.CommandRequest):
+    acronym = attr.ib(type=str)
+    version_name = attr.ib(type=str)
+    is_transition = attr.ib(type=bool)
+
+
+@attr.s(frozen=True, slots=True)
+class DeleteSpecificVersionCommand(interface.CommandRequest):
+    acronym = attr.ib(type=str)
+    year = attr.ib(type=int)
+    version_name = attr.ib(type=str)
+    is_transition = attr.ib(type=bool)
+
+
+@attr.s(frozen=True, slots=True)
 class DeleteNodeCommand(interface.CommandRequest):
     code = attr.ib(type=str)
     year = attr.ib(type=int)
@@ -438,6 +507,12 @@ class DeleteNodeCommand(interface.CommandRequest):
 
 @attr.s(frozen=True, slots=True)
 class GetProgramTreesFromNodeCommand(interface.CommandRequest):
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class GetProgramTreeVersionFromNodeCommand(interface.CommandRequest):
     code = attr.ib(type=str)
     year = attr.ib(type=int)
 
@@ -461,7 +536,13 @@ class DuplicateProgramTree(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True)
-class DeleteAllStandardVersionCommand(interface.CommandRequest):
+class DeletePermanentlyTrainingStandardVersionCommand(interface.CommandRequest):
+    acronym = attr.ib(type=str)
+    year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class DeletePermanentlyMiniTrainingStandardVersionCommand(interface.CommandRequest):
     acronym = attr.ib(type=str)
     year = attr.ib(type=int)
 

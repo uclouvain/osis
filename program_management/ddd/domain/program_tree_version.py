@@ -26,6 +26,7 @@
 
 import attr
 
+from base.ddd.utils.converters import to_upper_case_converter
 from osis_common.ddd import interface
 from program_management.ddd.business_types import *
 from program_management.ddd.command import CreateProgramTreeVersionCommand
@@ -40,10 +41,13 @@ STANDARD = ""
 
 @attr.s(frozen=True, slots=True)
 class ProgramTreeVersionIdentity(interface.EntityIdentity):
-    offer_acronym = attr.ib(type=str)
+    offer_acronym = attr.ib(type=str, converter=to_upper_case_converter)
     year = attr.ib(type=int)
-    version_name = attr.ib(type=str)
+    version_name = attr.ib(type=str, converter=to_upper_case_converter)
     is_transition = attr.ib(type=bool)
+
+    def is_standard(self):
+        return self.version_name == STANDARD and not self.is_transition
 
 
 class ProgramTreeVersionBuilder:

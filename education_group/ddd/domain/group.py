@@ -28,6 +28,7 @@ from typing import Optional
 
 import attr
 
+from base.ddd.utils.converters import to_upper_case_converter
 from base.models.enums.constraint_type import ConstraintTypeEnum
 from base.models.enums.education_group_types import EducationGroupTypesEnum, GroupType
 from education_group.ddd import command
@@ -97,7 +98,7 @@ builder = GroupBuilder()
 
 @attr.s(frozen=True, slots=True)
 class GroupIdentity(interface.EntityIdentity):
-    code = attr.ib(type=str, converter=lambda value: value.upper())
+    code = attr.ib(type=str, converter=to_upper_case_converter)
     year = attr.ib(type=int)
 
 
@@ -105,7 +106,7 @@ class GroupIdentity(interface.EntityIdentity):
 class Group(interface.RootEntity):
     entity_id = entity_identity = attr.ib(type=GroupIdentity)
     type = attr.ib(type=EducationGroupTypesEnum)
-    abbreviated_title = attr.ib(type=str, converter=lambda title: title.upper())
+    abbreviated_title = attr.ib(type=str, converter=to_upper_case_converter)
     titles = attr.ib(type=Titles)
     credits = attr.ib(type=int)
     content_constraint = attr.ib(type=ContentConstraint)
