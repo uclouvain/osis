@@ -103,7 +103,7 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         ]
 
     def get_success_url(self) -> str:
-        get_data = {'path': self.request.GET['path_to']} if self.request.GET.get('path_to') else {}
+        get_data = {'path': self.request.GET['path']} if self.request.GET.get('path') else {}
         return reverse_with_get(
             'element_identification',
             kwargs={'code': self.kwargs['code'], 'year': self.kwargs['year']},

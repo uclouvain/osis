@@ -752,7 +752,7 @@ msgid "University certificate"
 msgstr "Certificat universitaire"
 
 msgid "Update Content"
-msgstr "Mis à jour Contenu"
+msgstr "Modification Contenu"
 
 msgid "Update Training"
 msgstr "Modifier Formation"
