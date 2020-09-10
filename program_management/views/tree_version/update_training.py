@@ -240,7 +240,7 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
             "leads_to_diploma": training_obj.diploma.leads_to_diploma,
             "diploma_printing_title": training_obj.diploma.printing_title,
             "professional_title": training_obj.diploma.professional_title,
-            "certificate_aims": ','.join([str(aim) for aim in training_obj.diploma.aims])
+            "certificate_aims": ',  '.join([str(aim) for aim in training_obj.diploma.aims])
         }
         return form_initial_values
 

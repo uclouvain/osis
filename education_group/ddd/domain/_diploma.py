@@ -60,7 +60,7 @@ class DiplomaAim(interface.Entity):
         return self.entity_id.code
 
     def __str__(self):
-        return "{} {}".format(self.code, self.section)
+        return "{} - {} {}".format(self.section, self.code, self.description)
 
 
 @attr.s(frozen=True, slots=True)
