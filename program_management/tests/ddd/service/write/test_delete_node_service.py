@@ -63,7 +63,7 @@ class TestDeleteNodeService(TestCase):
         self.assertFalse(self.mocked_delete_orphan_training.called)
         self.assertFalse(self.mocked_delete_orphan_mini_training.called)
 
-    def test_assert_delete_node_of_type_mini_training_called_delete_orphan_mini_training(self):
+    def test_assert_delete_node_of_type_mini_training_not_called_delete_orphan_mini_training(self):
         cmd = command.DeleteNodeCommand(
             acronym="TEST",
             code="OPT100M",
@@ -72,11 +72,11 @@ class TestDeleteNodeService(TestCase):
         )
         delete_node_service.delete_node(cmd)
 
-        self.assertTrue(self.mocked_delete_orphan_mini_training.called)
+        self.assertFalse(self.mocked_delete_orphan_mini_training.called)
         self.assertTrue(self.mocked_delete_orphan_group.called)
         self.assertFalse(self.mocked_delete_orphan_training.called)
 
-    def test_assert_delete_node_of_type_training_called_delete_orphan_training(self):
+    def test_assert_delete_node_of_type_training_not_called_delete_orphan_training(self):
         cmd = command.DeleteNodeCommand(
             acronym="TRAINING",
             code="OPT100M",
@@ -85,6 +85,6 @@ class TestDeleteNodeService(TestCase):
         )
         delete_node_service.delete_node(cmd)
 
-        self.assertTrue(self.mocked_delete_orphan_training.called)
+        self.assertFalse(self.mocked_delete_orphan_training.called)
         self.assertFalse(self.mocked_delete_orphan_mini_training.called)
         self.assertTrue(self.mocked_delete_orphan_group.called)

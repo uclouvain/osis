@@ -45,7 +45,7 @@ from program_management.ddd.business_types import *
 from program_management.ddd.command import CreateProgramTreeVersionCommand, ExtendProgramTreeVersionCommand, \
     UpdateProgramTreeVersionCommand, PostponeProgramTreeVersionCommand
 from program_management.ddd.domain.node import NodeIdentity
-from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
+from program_management.ddd.domain.service.identity_search import NodeIdentitySearch, ProgramTreeVersionIdentitySearch
 from program_management.ddd.service.write import create_and_postpone_tree_version_service, \
     extend_existing_tree_version_service, update_program_tree_version_service, \
     postpone_tree_version_service
@@ -68,7 +68,11 @@ class CreateProgramTreeVersion(AjaxPermissionRequiredMixin, AjaxTemplateMixin, V
 
     @cached_property
     def training_identity(self) -> 'TrainingIdentity':
-        return TrainingIdentitySearch().get_from_node_identity(self.node_identity)
+        return TrainingIdentity(acronym=self.tree_version_identity.offer_acronym, year=self.tree_version_identity.year)
+
+    @cached_property
+    def tree_version_identity(self) -> 'ProgramTreeVersionIdentity':
+        return ProgramTreeVersionIdentitySearch().get_from_node_identity(self.node_identity)
 
     @cached_property
     def person(self):
@@ -84,7 +88,7 @@ class CreateProgramTreeVersion(AjaxPermissionRequiredMixin, AjaxTemplateMixin, V
 
     def get(self, request, *args, **kwargs):
         form = SpecificVersionForm(
-            training_identity=self.training_identity,
+            tree_version_identity=self.tree_version_identity,
             node_identity=self.node_identity,
         )
         return render(request, self.template_name, self.get_context_data(form))
@@ -92,7 +96,7 @@ class CreateProgramTreeVersion(AjaxPermissionRequiredMixin, AjaxTemplateMixin, V
     def post(self, request, *args, **kwargs):
         form = SpecificVersionForm(
             data=request.POST,
-            training_identity=self.training_identity,
+            tree_version_identity=self.tree_version_identity,
             node_identity=self.node_identity,
         )
         if form.is_valid():
@@ -167,9 +171,9 @@ class CreateProgramTreeVersion(AjaxPermissionRequiredMixin, AjaxTemplateMixin, V
 
 def _convert_form_to_create_command(form: SpecificVersionForm) -> CreateProgramTreeVersionCommand:
     return CreateProgramTreeVersionCommand(
-        offer_acronym=form.training_identity.acronym,
+        offer_acronym=form.tree_version_identity.offer_acronym,
         version_name=form.cleaned_data.get("version_name"),
-        year=form.training_identity.year,
+        year=form.tree_version_identity.year,
         is_transition=False,
         title_en=form.cleaned_data.get("title_english"),
         title_fr=form.cleaned_data.get("title"),
@@ -180,18 +184,18 @@ def _convert_form_to_create_command(form: SpecificVersionForm) -> CreateProgramT
 def _convert_form_to_extend_command(form: SpecificVersionForm) -> ExtendProgramTreeVersionCommand:
     return ExtendProgramTreeVersionCommand(
         end_year_of_existence=form.cleaned_data['end_year'],
-        offer_acronym=form.training_identity.acronym,
+        offer_acronym=form.tree_version_identity.offer_acronym,
         version_name=form.cleaned_data.get("version_name"),
-        year=form.training_identity.year,
+        year=form.tree_version_identity.year,
         is_transition=False,
     )
 
 
 def _convert_form_to_update_command(form: SpecificVersionForm) -> UpdateProgramTreeVersionCommand:
     return UpdateProgramTreeVersionCommand(
-        offer_acronym=form.training_identity.acronym,
+        offer_acronym=form.tree_version_identity.offer_acronym,
         version_name=form.cleaned_data.get("version_name"),
-        year=form.training_identity.year,
+        year=form.tree_version_identity.year,
         is_transition=False,
         title_en=form.cleaned_data.get("title_english"),
         title_fr=form.cleaned_data.get("title"),
@@ -203,9 +207,9 @@ def _convert_form_to_postpone_command(
         form: SpecificVersionForm, node_id: 'NodeIdentity'
 ) -> PostponeProgramTreeVersionCommand:
     return PostponeProgramTreeVersionCommand(
-        from_offer_acronym=form.training_identity.acronym,
+        from_offer_acronym=form.tree_version_identity.offer_acronym,
         from_version_name=form.cleaned_data['version_name'],
-        from_year=form.training_identity.year,
+        from_year=form.tree_version_identity.year,
         from_is_transition=False,
         until_year=form.cleaned_data['end_year'],
         from_code=node_id.code,

@@ -34,7 +34,9 @@ from program_management.views.proxy.identification import IdentificationRedirect
 from program_management.views import groupelementyear_read, element_utilization, excel, search, \
     tree, prerequisite_read, prerequisite_update
 from program_management.views.tree_version import create as create_program_tree_version
-
+from program_management.views.tree_version.delete import TreeVersionDeleteView
+from program_management.views.tree_version import create as create_program_tree_version, update_training, \
+    update_mini_training
 
 urlpatterns = [
     url(r'^group_pdf_content/(?P<year>[0-9]+)/(?P<code>[A-Za-z0-9]+)/',
@@ -105,6 +107,17 @@ urlpatterns = [
         ]))
     ])),
 
+    path(
+        'training_version/<int:year>/<str:code>/update',
+        update_training.TrainingVersionUpdateView.as_view(),
+        name="training_version_update"
+    ),
+    path(
+        'mini_training_version/<int:year>/<str:code>/update',
+        update_mini_training.MiniTrainingVersionUpdateView.as_view(),
+        name="mini_training_version_update"
+    ),
+
     path('<int:year>/<str:code>/', include([
         path('', IdentificationRedirectView.as_view(), name='element_identification'),
         path('content/', ContentRedirectView.as_view(), name='element_content'),
@@ -114,6 +127,7 @@ urlpatterns = [
             name="create_education_group_version"
         ),
         path('publish', publish_general_information.publish, name='publish_general_information'),
+        path('delete/', TreeVersionDeleteView.as_view(), name='delete_permanently_tree_version'),
     ])),
 
     path('<int:year>/<acronym:acronym>/', include([

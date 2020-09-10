@@ -42,6 +42,9 @@ urlpatterns = [
             url(r'^edit_educational_information/$',
                 manage_my_courses.edit_educational_information,
                 name='tutor_edit_educational_information'),
+            url(r'^edit_educational_information_force_majeure/$',
+                manage_my_courses.edit_educational_information_force_majeure,
+                name='tutor_edit_educational_information_force_majeure'),
             url(r'^teaching_materials/', include([
                 url(r'^create', manage_my_courses.create_teaching_material, name="tutor_teaching_material_create"),
                 url(r'^(?P<teaching_material_id>[0-9]+)/edit/', manage_my_courses.update_teaching_material,
