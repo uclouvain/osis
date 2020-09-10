@@ -49,7 +49,7 @@ from base.tests.factories.business.learning_units import LearningUnitsMixin, Gen
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearPartimFactory
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import PersonFactory, CentralManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
@@ -172,11 +172,11 @@ class TestEditLearningUnit(TestCase):
             internship_subtype=None,
         )
 
-        cls.partim_learning_unit = LearningUnitYearFactory(
+        cls.partim_learning_unit = LearningUnitYearPartimFactory(
             learning_container_year=cls.learning_container_year,
             acronym="LOSIS4512A",
             academic_year=cls.an_academic_year,
-            subtype=learning_unit_year_subtypes.PARTIM,
+            internship_subtype=None,
             credits=10,
             campus=CampusFactory(organization=OrganizationFactory(type=organization_type.MAIN))
         )
@@ -318,6 +318,22 @@ class TestEditLearningUnit(TestCase):
         msg_level = [m.level for m in get_messages(response.wsgi_request)]
         self.assertEqual(msg[0], _('The learning unit has been updated (without report).'))
         self.assertIn(messages.SUCCESS, msg_level)
+
+    def test_post_request_for_partim_do_not_change_learning_unit_start_year(self):
+        credits = 18
+        form_data = self._get_valid_form_data()
+        form_data["acronym_0"] = self.partim_learning_unit.acronym[0]
+        form_data["acronym_1"] = self.partim_learning_unit.acronym[1:-1]
+        form_data["acronym_2"] = self.partim_learning_unit.acronym[-1]
+        form_data['credits'] = credits
+        form_data['container_type'] = learning_container_year_types.COURSE
+
+        url = reverse(update_learning_unit, args=[self.partim_learning_unit.id])
+        response = self.client.post(url, data=form_data)
+
+        start_year = self.partim_learning_unit.learning_unit.start_year
+        self.partim_learning_unit.refresh_from_db()
+        self.assertEqual(start_year, self.partim_learning_unit.learning_unit.start_year)
 
     def test_valid_post_request_with_postponement(self):
         credits = 17
