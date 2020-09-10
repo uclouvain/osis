@@ -36,10 +36,10 @@
                     <th>{% trans 'Acronym/Short title' context 'abbreviation' %}</th>
                     <th>{% trans 'Code' %}</th>
                     <th>{% trans 'Title' %}</th>
-                    <th>{% trans 'Cred. rel./abs.' %}</th>
                     {% if content_formset.forms and content_formset.forms.0.is_a_parent_minor_major_option_list_choice %}
                         <th class="text-center">{% trans 'Access condition' %}</th>
                     {% else %}
+                        <th>{% trans 'Cred. rel./abs.' %}</th>
                         <th class="text-center">{% trans 'Mandatory' %}</th>
                         <th>{% trans 'Block' %}</th>
                         <th>{% trans 'Link type' %}</th>
@@ -85,10 +85,14 @@
                                 {% else %}style="width:23%"{% endif %}>
                                 {{ form.child_obj.titles.title_fr }}
                             </td>
+
+                            {% if not form.is_a_parent_minor_major_option_list_choice %}
                             <td style="width:8%">
                                 {{ form.initial.relative_credits | default_if_none:'-' }}
                                 / {{ form.child_obj.credits|floatformat:-2 | default_if_none:'-' }}
                             </td>
+                            {% endif %}
+
                         {% endif %}
 
                         {% if form.is_a_parent_minor_major_option_list_choice %}
