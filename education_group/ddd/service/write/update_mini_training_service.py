@@ -21,8 +21,6 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from typing import List
-
 from django.db import transaction
 
 from base.models.enums.active_status import ActiveStatusEnum
@@ -33,25 +31,17 @@ from education_group.ddd.domain import mini_training
 from education_group.ddd.domain._entity import Entity
 from education_group.ddd.domain._titles import Titles
 from education_group.ddd.repository import mini_training as mini_training_repository
-from education_group.ddd.service.write import postpone_mini_training_service
 
 
 @transaction.atomic()
-def update_mini_training(cmd: command.UpdateMiniTrainingCommand) -> List['MiniTrainingIdentity']:
+def update_mini_training(cmd: command.UpdateMiniTrainingCommand) -> 'MiniTrainingIdentity':
     mini_training_identity = mini_training.MiniTrainingIdentity(acronym=cmd.abbreviated_title, year=cmd.year)
     mini_training_domain_obj = mini_training_repository.MiniTrainingRepository.get(mini_training_identity)
 
     mini_training_domain_obj.update(convert_command_to_update_mini_training_data(cmd))
     mini_training_repository.MiniTrainingRepository.update(mini_training_domain_obj)
 
-    result = postpone_mini_training_service.postpone_mini_training(
-        command.PostponeMiniTrainingCommand(
-            acronym=cmd.abbreviated_title,
-            postpone_from_year=cmd.year,
-        )
-    )
-
-    return [mini_training_identity] + result
+    return mini_training_identity
 
 
 def convert_command_to_update_mini_training_data(

@@ -28,7 +28,7 @@ from django.db import transaction
 from education_group.ddd import command
 from education_group.ddd.domain import mini_training
 from education_group.ddd.repository import mini_training as mini_training_repository
-from education_group.ddd.service.write import postpone_mini_training_service
+from education_group.ddd.service.write import postpone_mini_training_modification_service
 
 
 @transaction.atomic()
@@ -37,10 +37,21 @@ def create_and_postpone_orphan_mini_training(
     mini_training_object = mini_training.MiniTrainingBuilder().build_from_create_cmd(cmd)
 
     mini_training_identity = mini_training_repository.MiniTrainingRepository.create(mini_training_object)
-    mini_training_identities = postpone_mini_training_service.postpone_mini_training(
-        command.PostponeMiniTrainingCommand(
-            acronym=cmd.abbreviated_title,
+    mini_training_identities = postpone_mini_training_modification_service.postpone_mini_training_modification(
+        command.PostponeMiniTrainingModificationCommand(
+            postpone_from_abbreviated_title=cmd.abbreviated_title,
             postpone_from_year=cmd.year,
+
+            code=cmd.code,
+            status=cmd.status,
+            credits=cmd.credits,
+            title_fr=cmd.title_fr,
+            title_en=cmd.title_en,
+            keywords=cmd.keywords,
+            management_entity_acronym=cmd.management_entity_acronym,
+            end_year=cmd.end_year,
+            organization_name=cmd.organization_name,
+            schedule_type=cmd.schedule_type,
         )
     )
 

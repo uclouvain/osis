@@ -88,14 +88,14 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 success_messages += self.get_success_msg_updated_links(update_links)
                 display_success_messages(request, success_messages, extra_tags='safe')
 
-                warning_messages = get_update_mini_training_warning_messages.get_conflicted_fields(
-                    command.GetUpdateMiniTrainingWarningMessages(
-                        acronym=self.get_mini_training_obj().acronym,
-                        code=self.get_mini_training_obj().code,
-                        year=self.get_mini_training_obj().year
-                    )
-                )
-                display_warning_messages(request, warning_messages, extra_tags='safe')
+                # warning_messages = get_update_mini_training_warning_messages.get_conflicted_fields(
+                #     command.GetUpdateMiniTrainingWarningMessages(
+                #         acronym=self.get_mini_training_obj().acronym,
+                #         code=self.get_mini_training_obj().code,
+                #         year=self.get_mini_training_obj().year
+                #     )
+                # )
+                # display_warning_messages(request, warning_messages, extra_tags='safe')
                 return HttpResponseRedirect(self.get_success_url())
 
         display_error_messages(self.request, self._get_default_error_messages())
@@ -133,7 +133,6 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         return self.get_success_url()
 
     def update_mini_training(self) -> List['MiniTrainingIdentity']:
-        end_year = self.mini_training_form.cleaned_data["end_year"]
         try:
             update_command = self._convert_form_to_update_mini_training_command(self.mini_training_form)
             return update_mini_training_with_program_tree_service.update_and_report_mini_training_with_program_tree(
@@ -145,6 +144,8 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 exception.ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum) as e:
             self.mini_training_form.add_error("min_constraint", e.message)
             self.mini_training_form.add_error("max_constraint", "")
+        except (exception.MiniTrainingCopyConsistencyException, exception.GroupCopyConsistencyException) as e:
+            display_warning_messages(self.request, e.message)
         return []
 
     def report_mini_training(self) -> List['MiniTrainingIdentity']:
@@ -368,9 +369,9 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
     def _convert_form_to_update_mini_training_command(
             self,
-            form: mini_training_forms.UpdateMiniTrainingForm) -> command.UpdateMiniTrainingCommand:
+            form: mini_training_forms.UpdateMiniTrainingForm) -> command.UpdateAndReportMiniTrainingWithProgramTree:
         cleaned_data = form.cleaned_data
-        return command.UpdateMiniTrainingCommand(
+        return command.UpdateAndReportMiniTrainingWithProgramTree(
             abbreviated_title=cleaned_data['abbreviated_title'],
             code=cleaned_data['code'],
             year=cleaned_data['academic_year'],

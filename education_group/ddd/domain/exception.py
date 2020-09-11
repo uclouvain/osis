@@ -1,3 +1,5 @@
+from typing import List
+
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from osis_common.ddd.interface import BusinessException
 from django.utils.translation import gettext_lazy as _, ngettext_lazy
@@ -224,28 +226,26 @@ class TrainingCopyConsistencyException(BusinessException):
 
 
 class MiniTrainingCopyConsistencyException(BusinessException):
-    def __init__(self, mini_training_from: 'MiniTraining', mini_training_to: 'MiniTraining', *args, **kwargs):
-        conflict_fields = mini_training_from.get_conflicted_fields(mini_training_to)
+    def __init__(self, year_from: int, year_to: int, conflict_fields: List[str], *args, **kwargs):
         message = _(
             "Cannot copy mini training from %(academic_year_from)s to %(academic_year_to)s "
             "because %(fields)s has already been modified"
         ) % {
-            "academic_year_from": mini_training_from.academic_year,
-            "academic_year_to": mini_training_to.academic_year,
+            "academic_year_from": display_as_academic_year(year_from),
+            "academic_year_to": display_as_academic_year(year_to),
             "fields": ", ".join(conflict_fields)
         }
         super().__init__(message, **kwargs)
 
 
 class GroupCopyConsistencyException(BusinessException):
-    def __init__(self, group_from: 'Group', group_to: 'Group', *args, **kwargs):
-        conflict_fields = group_from.get_conflicted_fields(group_to)
+    def __init__(self, year_from: int, year_to: int, conflict_fields: List[str], *args, **kwargs):
         message = _(
             "Cannot copy group from %(academic_year_from)s to %(academic_year_to)s "
             "because %(fields)s has already been modified"
         ) % {
-            "academic_year_from": group_from.academic_year,
-            "academic_year_to": group_to.academic_year,
+            "academic_year_from": display_as_academic_year(year_from),
+            "academic_year_to": display_as_academic_year(year_to),
             "fields": ", ".join(conflict_fields)
         }
         super().__init__(message, **kwargs)

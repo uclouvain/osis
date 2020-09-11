@@ -34,7 +34,7 @@ from program_management.ddd.service.write import update_mini_training_with_progr
 class TestUpdateAndReportMiniTrainingWithProgramTree(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.cmd = command.UpdateMiniTrainingCommand(
+        cls.cmd = command.UpdateAndReportMiniTrainingWithProgramTree(
             year=2018,
             code="LTRONC1000",
             abbreviated_title="TRONCCOMMUN",

@@ -29,17 +29,23 @@ from django.db import transaction
 
 from education_group.ddd import command
 from education_group.ddd.business_types import *
-from education_group.ddd.service.write import update_group_service, update_mini_training_service
+from education_group.ddd.service.write import postpone_mini_training_modification_service, \
+    postpone_group_modification_service
 from program_management.ddd.command import PostponeProgramTreeVersionCommand, PostponeProgramTreeCommand
 from program_management.ddd.service.write import postpone_tree_version_service, postpone_program_tree_service
 
 
 @transaction.atomic()
 def update_and_report_mini_training_with_program_tree(
-        update_command: command.UpdateMiniTrainingCommand
+        update_command: command.UpdateAndReportMiniTrainingWithProgramTree
 ) -> List['MiniTrainingIdentity']:
-    mini_training_identities = update_mini_training_service.update_mini_training(update_command)
-    update_group_service.update_group(_convert_to_update_group_command(update_command))
+
+    mini_training_identities = postpone_mini_training_modification_service.postpone_mini_training_modification(
+        _convert_to_postpone_mini_training_modification_command(update_command)
+    )
+    postpone_group_modification_service.postpone_group_modification_service(
+        _convert_to_postpone_group_modification_command(update_command)
+    )
 
     postpone_program_tree_service.postpone_program_tree(
         PostponeProgramTreeCommand(
@@ -61,11 +67,12 @@ def update_and_report_mini_training_with_program_tree(
     return mini_training_identities
 
 
-def _convert_to_update_group_command(
-        mini_training_cmd: command.UpdateMiniTrainingCommand) -> command.UpdateGroupCommand:
-    return command.UpdateGroupCommand(
+def _convert_to_postpone_group_modification_command(
+        mini_training_cmd: command.UpdateAndReportMiniTrainingWithProgramTree
+) -> command.PostponeGroupModificationCommand:
+    return command.PostponeGroupModificationCommand(
         code=mini_training_cmd.code,
-        year=mini_training_cmd.year,
+        postpone_from_year=mini_training_cmd.year,
         abbreviated_title=mini_training_cmd.abbreviated_title,
         title_fr=mini_training_cmd.title_fr,
         title_en=mini_training_cmd.title_en,
@@ -79,4 +86,23 @@ def _convert_to_update_group_command(
         remark_fr=mini_training_cmd.remark_fr,
         remark_en=mini_training_cmd.remark_en,
         end_year=mini_training_cmd.end_year
+    )
+
+
+def _convert_to_postpone_mini_training_modification_command(
+        mini_training_cmd: command.UpdateAndReportMiniTrainingWithProgramTree
+) -> command.PostponeMiniTrainingModificationCommand:
+    return command.PostponeMiniTrainingModificationCommand(
+        code=mini_training_cmd.code,
+        postpone_from_year=mini_training_cmd.year,
+        postpone_from_abbreviated_title=mini_training_cmd.abbreviated_title,
+        title_fr=mini_training_cmd.title_fr,
+        title_en=mini_training_cmd.title_en,
+        credits=mini_training_cmd.credits,
+        management_entity_acronym=mini_training_cmd.management_entity_acronym,
+        organization_name=mini_training_cmd.teaching_campus_organization_name,
+        end_year=mini_training_cmd.end_year,
+        keywords=mini_training_cmd.keywords,
+        schedule_type=mini_training_cmd.schedule_type,
+        status=mini_training_cmd.status
     )

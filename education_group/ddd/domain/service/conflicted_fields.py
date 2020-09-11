@@ -47,7 +47,8 @@ class ConflictedFields(interface.DomainService):
             try:
                 next_year_group_identity = attr.evolve(current_group.entity_id, year=current_group.entity_id.year + 1)
                 next_year_group = GroupRepository.get(next_year_group_identity)
-                conflicted_fields[year] = current_group.get_conflicted_fields(next_year_group)
+                if not current_group.has_same_values_as(next_year_group):
+                    conflicted_fields[year] = current_group.get_conflicted_fields(next_year_group)
             except GroupNotFoundException:
                 break
             if conflicted_fields:
@@ -67,7 +68,8 @@ class ConflictedFields(interface.DomainService):
                     year=current_training.entity_id.year + 1
                 )
                 next_year_training = TrainingRepository.get(next_year_training_identity)
-                conflicted_fields[year] = current_training.get_conflicted_fields(next_year_training)
+                if not current_training.has_same_values_as(next_year_training):
+                    conflicted_fields[year] = current_training.get_conflicted_fields(next_year_training)
             except TrainingNotFoundException:
                 break
             if conflicted_fields:
@@ -87,7 +89,8 @@ class ConflictedFields(interface.DomainService):
                     year=current_mini_training.entity_id.year + 1
                 )
                 next_year_mini_training = MiniTrainingRepository.get(next_year_mini_training_identity)
-                conflicted_fields[year] = current_mini_training.get_conflicted_fields(next_year_mini_training)
+                if not current_mini_training.has_same_values_as(next_year_mini_training):
+                    conflicted_fields[year] = current_mini_training.get_conflicted_fields(next_year_mini_training)
             except MiniTrainingNotFoundException:
                 break
             if conflicted_fields:

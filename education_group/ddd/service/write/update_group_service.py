@@ -25,7 +25,6 @@
 from django.db import transaction
 
 from base.models.enums.constraint_type import ConstraintTypeEnum
-from base.models.enums.education_group_types import MiniTrainingType, TrainingType
 from education_group.ddd import command
 from education_group.ddd.domain._campus import Campus
 from education_group.ddd.domain._content_constraint import ContentConstraint
@@ -34,7 +33,6 @@ from education_group.ddd.domain._remark import Remark
 from education_group.ddd.domain._titles import Titles
 from education_group.ddd.domain.group import GroupIdentity, Group
 from education_group.ddd.repository import group as group_repository
-from education_group.ddd.service.write import postpone_group_service
 
 
 @transaction.atomic()
@@ -44,14 +42,6 @@ def update_group(cmd: command.UpdateGroupCommand) -> 'GroupIdentity':
 
     _update_group(grp, cmd)
     group_repository.GroupRepository.update(grp)
-
-    if grp.type.name in MiniTrainingType.get_names() + TrainingType.get_names():
-        postpone_group_service.postpone_group(
-            command.PostponeGroupCommand(
-                code=group_identity.code,
-                postpone_from_year=cmd.year,
-            )
-        )
     return group_identity
 
 

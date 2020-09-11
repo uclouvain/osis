@@ -29,25 +29,26 @@ from django.db import transaction
 
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType
 from education_group.ddd import command
-from education_group.ddd.domain import exception
+from education_group.ddd.domain.exception import GroupCopyConsistencyException
 from education_group.ddd.domain.group import GroupIdentity
+from education_group.ddd.domain.service.conflicted_fields import ConflictedFields
 from education_group.ddd.domain.service.identity_search import TrainingIdentitySearch, MiniTrainingIdentitySearch
 from education_group.ddd.repository.mini_training import MiniTrainingRepository
 from education_group.ddd.repository.training import TrainingRepository
 from education_group.ddd.service.read import get_group_service
-from education_group.ddd.service.write import copy_group_service
+from education_group.ddd.service.write import copy_group_service, update_group_service
 from osis_common.ddd.interface import BusinessException
 from program_management.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
 
 
 @transaction.atomic()
-def postpone_group(postpone_cmd: command.PostponeGroupCommand) -> List['GroupIdentity']:
-    identities_created = []
-
+def postpone_group_modification_service(postpone_cmd: command.PostponeGroupModificationCommand) \
+        -> List['GroupIdentity']:
     from_year = postpone_cmd.postpone_from_year
 
     cmd_get = command.GetGroupCommand(code=postpone_cmd.code, year=from_year)
     group = get_group_service.get_group(cmd_get)
+    conflicted_fields = ConflictedFields().get_group_conflicted_fields(group.entity_id)
 
     if group.type.name in MiniTrainingType.get_names():
         identity = MiniTrainingIdentitySearch.get_from_group_identity(group.entity_id)
@@ -58,17 +59,37 @@ def postpone_group(postpone_cmd: command.PostponeGroupCommand) -> List['GroupIde
     else:
         raise BusinessException("Cannot postpone group other type than Mini-Training/Training")
 
+    identities_created = [
+        update_group_service.update_group(
+            command.UpdateGroupCommand(
+                code=postpone_cmd.code,
+                year=postpone_cmd.postpone_from_year,
+                abbreviated_title=postpone_cmd.abbreviated_title,
+                title_fr=postpone_cmd.title_fr,
+                title_en=postpone_cmd.title_en,
+                credits=postpone_cmd.credits,
+                constraint_type=postpone_cmd.constraint_type,
+                min_constraint=postpone_cmd.min_constraint,
+                max_constraint=postpone_cmd.max_constraint,
+                management_entity_acronym=postpone_cmd.management_entity_acronym,
+                teaching_campus_name=postpone_cmd.teaching_campus_name,
+                organization_name=postpone_cmd.organization_name,
+                remark_fr=postpone_cmd.remark_fr,
+                remark_en=postpone_cmd.remark_en,
+                end_year=postpone_cmd.end_year,
+            )
+        )
+    ]
     end_postponement_year = CalculateEndPostponement.calculate_end_postponement_year(
         identity=identity,
         repository=repository,
     )
     for year in range(from_year, end_postponement_year):
-        try:
-            identity_next_year = copy_group_service.copy_group(
-                cmd=command.CopyGroupCommand(from_code=postpone_cmd.code, from_year=year)
-            )
-            identities_created.append(identity_next_year)
-        except exception.CannotCopyGroupDueToEndDate:
-            break
+        if year in conflicted_fields:
+            raise GroupCopyConsistencyException(year, year+1, conflicted_fields[year])
 
+        identity_next_year = copy_group_service.copy_group(
+            cmd=command.CopyGroupCommand(from_code=postpone_cmd.code, from_year=year)
+        )
+        identities_created.append(identity_next_year)
     return identities_created

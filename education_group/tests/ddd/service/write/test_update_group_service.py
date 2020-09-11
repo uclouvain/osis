@@ -21,11 +21,8 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from unittest.mock import patch
-
 from django.test import TestCase
 
-from base.models.enums.education_group_types import TrainingType, MiniTrainingType
 from education_group.ddd.domain import group
 from education_group.ddd.service.write import update_group_service
 from education_group.tests.ddd.factories.group import GroupFactory
@@ -34,54 +31,29 @@ from education_group.tests.factories.factories.command import UpdateGroupCommand
 from testing.mocks import MockPatcherMixin
 
 
-@patch('education_group.ddd.service.write.update_group_service.postpone_group_service.postpone_group')
 class TestUpdateGroup(TestCase, MockPatcherMixin):
     @classmethod
     def setUpTestData(cls):
         cls.cmd = UpdateGroupCommandFactory()
-        cls.cmd_training = UpdateGroupCommandFactory(code='LDROI1200M', year=2019)
-        cls.cmd_mini_training = UpdateGroupCommandFactory(code='LMINITRAINING', year=2019)
 
     def setUp(self) -> None:
         self.group_2018 = GroupFactory(entity_identity__code=self.cmd.code, entity_identity__year=2018,)
         self.group_2019 = GroupFactory(entity_identity__code=self.cmd.code, entity_identity__year=2019,)
-        self.training_2019 = GroupFactory(
-            entity_identity__code=self.cmd_training.code,
-            entity_identity__year=self.cmd_training.year,
-            type=TrainingType.BACHELOR
-        )
-        self.mini_training_2019 = GroupFactory(
-            entity_identity__code=self.cmd_mini_training.code,
-            entity_identity__year=self.cmd_mini_training.year,
-            type=MiniTrainingType.ACCESS_MINOR
-        )
         self.groups = [self.group_2018, self.group_2019, self.training_2019, self.mini_training_2019]
         self.fake_group_repo = get_fake_group_repository(self.groups)
         self.mock_repo("education_group.ddd.repository.group.GroupRepository", self.fake_group_repo)
 
-    def test_should_return_entity_id_of_updated_group(self, mock_postpone_group_service):
+    def test_should_return_entity_id_of_updated_group(self):
         result = update_group_service.update_group(self.cmd)
 
         expected_result = group.GroupIdentity(code=self.cmd.code, year=self.cmd.year)
         self.assertEqual(expected_result, result)
 
-    def test_should_update_value_of_group_based_on_command_value(self, mock_postpone_group_service):
+    def test_should_update_value_of_group_based_on_command_value(self):
         entity_id = update_group_service.update_group(self.cmd)
 
         group_updated = self.fake_group_repo.get(entity_id)
         self.assert_has_same_value_as_update_command(group_updated)
-
-    def test_should_not_call_postpone_service_case_group_of_type_group(self, mock_postpone_group_service):
-        update_group_service.update_group(self.cmd)
-        self.assertFalse(mock_postpone_group_service.called)
-
-    def test_should_call_postpone_service_case_group_of_type_training(self, mock_postpone_group_service):
-        update_group_service.update_group(self.cmd_training)
-        self.assertTrue(mock_postpone_group_service.called)
-
-    def test_should_call_postpone_service_case_group_of_type_mini_training(self, mock_postpone_group_service):
-        update_group_service.update_group(self.cmd_mini_training)
-        self.assertTrue(mock_postpone_group_service.called)
 
     def assert_has_same_value_as_update_command(self, update_group: 'group.Group'):
         self.assertEqual(update_group.titles.title_fr, self.cmd.title_fr)

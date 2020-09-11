@@ -286,25 +286,35 @@ class UpdateMiniTrainingCommand(interface.CommandRequest):
     year = attr.ib(type=int)
     status = attr.ib(type=str)
     credits = attr.ib(type=int)
-
     title_fr = attr.ib(type=str)
     title_en = attr.ib(type=Optional[str])
-
     keywords = attr.ib(type=Optional[str])
-
     management_entity_acronym = attr.ib(type=Optional[str])
     end_year = attr.ib(type=Optional[int])
+    organization_name = attr.ib(type=str)
+    schedule_type = attr.ib(type=str)
 
+
+@attr.s(frozen=True, slots=True)
+class UpdateAndReportMiniTrainingWithProgramTree(interface.CommandRequest):
+    abbreviated_title = attr.ib(type=str)
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)
+    status = attr.ib(type=str)
+    credits = attr.ib(type=int)
+    title_fr = attr.ib(type=str)
+    title_en = attr.ib(type=Optional[str])
+    keywords = attr.ib(type=Optional[str])
+    management_entity_acronym = attr.ib(type=Optional[str])
+    end_year = attr.ib(type=Optional[int])
     teaching_campus_name = attr.ib(type=Optional[str])
     teaching_campus_organization_name = attr.ib(type=Optional[str])
-
     constraint_type = attr.ib(type=Optional[str])
     min_constraint = attr.ib(type=Optional[int])
     max_constraint = attr.ib(type=Optional[int])
     remark_fr = attr.ib(type=Optional[str])
     remark_en = attr.ib(type=Optional[str])
     organization_name = attr.ib(type=str)
-
     schedule_type = attr.ib(type=str)
 
 
@@ -410,15 +420,40 @@ class PostponeTrainingCommand(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True)
-class PostponeGroupCommand(interface.CommandRequest):
+class PostponeGroupModificationCommand(interface.CommandRequest):
     code = attr.ib(type=str)
     postpone_from_year = attr.ib(type=int)
 
+    abbreviated_title = attr.ib(type=str)
+    title_fr = attr.ib(type=str)
+    title_en = attr.ib(type=str)
+    credits = attr.ib(type=int)
+    constraint_type = attr.ib(type=str)
+    min_constraint = attr.ib(type=int)
+    max_constraint = attr.ib(type=int)
+    management_entity_acronym = attr.ib(type=str)
+    teaching_campus_name = attr.ib(type=str)
+    organization_name = attr.ib(type=str)
+    remark_fr = attr.ib(type=str)
+    remark_en = attr.ib(type=str)
+    end_year = attr.ib(type=Optional[int])
+
 
 @attr.s(frozen=True, slots=True)
-class PostponeMiniTrainingCommand(interface.CommandRequest):
-    acronym = attr.ib(type=str)
+class PostponeMiniTrainingModificationCommand(interface.CommandRequest):
+    postpone_from_abbreviated_title = attr.ib(type=str)
     postpone_from_year = attr.ib(type=int)
+
+    code = attr.ib(type=str)
+    status = attr.ib(type=str)
+    credits = attr.ib(type=int)
+    title_fr = attr.ib(type=str)
+    title_en = attr.ib(type=Optional[str])
+    keywords = attr.ib(type=Optional[str])
+    management_entity_acronym = attr.ib(type=Optional[str])
+    end_year = attr.ib(type=Optional[int])
+    organization_name = attr.ib(type=str)
+    schedule_type = attr.ib(type=str)
 
 
 @attr.s(frozen=True, slots=True)

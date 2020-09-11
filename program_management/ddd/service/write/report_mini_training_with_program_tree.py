@@ -27,7 +27,7 @@ from django.db import transaction
 
 from education_group.ddd import command
 from education_group.ddd.business_types import *
-from education_group.ddd.service.write import postpone_mini_training_service
+from education_group.ddd.service.write import postpone_mini_training_modification_service
 from program_management.ddd.command import PostponeProgramTreeCommand, PostponeProgramTreeVersionCommand
 from program_management.ddd.service.write import postpone_program_tree_service, postpone_tree_version_service
 
@@ -36,8 +36,8 @@ from program_management.ddd.service.write import postpone_program_tree_service, 
 def report_mini_training_with_program_tree(
         report_cmd: command.PostponeMiniTrainingWithProgramTreeCommand
 ) -> List['MiniTrainingIdentity']:
-    mini_training_identities = postpone_mini_training_service.postpone_mini_training(
-        command.PostponeMiniTrainingCommand(
+    mini_training_identities = postpone_mini_training_modification_service.postpone_mini_training_modification(
+        command.PostponeMiniTrainingModificationCommand(
             acronym=report_cmd.abbreviated_title,
             postpone_from_year=report_cmd.from_year,
         )
