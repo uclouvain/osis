@@ -52,7 +52,7 @@ class TestUpdateLink(SimpleTestCase):
 
         )
         self.mock_atomic_transaction_patcher = self.mock_atomic_transaction.start()
-        self.addCleanup(self.mock_atomic_transaction_patcher.stop)
+        self.addCleanup(self.mock_atomic_transaction.stop)
 
     @patch('program_management.ddd.repositories.program_tree.ProgramTreeRepository.get')
     @patch('program_management.ddd.domain.program_tree.ProgramTree.update_link')
