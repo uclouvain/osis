@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import itertools
+from typing import List
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required, permission_required
@@ -35,9 +36,10 @@ from reversion.models import Version
 from attribution.models.attribution import Attribution
 from base import models as mdl
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY_FR_ONLY, \
-    CMS_LABEL_PEDAGOGY
+    CMS_LABEL_PEDAGOGY, CMS_LABEL_PEDAGOGY_FORCE_MAJEURE
 from base.business.learning_units import perms
-from base.business.learning_units.perms import is_eligible_to_update_learning_unit_pedagogy
+from base.business.learning_units.perms import is_eligible_to_update_learning_unit_pedagogy, \
+    is_eligible_to_update_learning_unit_pedagogy_force_majeure_section
 from base.models.person import Person
 from base.models.teaching_material import TeachingMaterial
 from base.views.common import add_to_session
@@ -46,27 +48,84 @@ from base.views.learning_units.detail import SEARCH_URL_PART
 from cms.enums.entity_name import LEARNING_UNIT_YEAR
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
+from typing import Optional
 
 
 @login_required
 @permission_required('base.can_access_learningunit', raise_exception=True)
-def learning_unit_pedagogy(request, learning_unit_year_id):
+def learning_unit_pedagogy(request, learning_unit_year_id=None, code=None, year=None):
     if SEARCH_URL_PART in request.META.get('HTTP_REFERER', ''):
         add_to_session(request, 'search_url', request.META.get('HTTP_REFERER'))
-    return read_learning_unit_pedagogy(request, learning_unit_year_id, {}, "learning_unit/pedagogy.html")
+    return read_learning_unit_pedagogy(request, learning_unit_year_id, {}, "learning_unit/pedagogy.html", code,  year)
 
 
-def read_learning_unit_pedagogy(request, learning_unit_year_id, context, template):
+def read_learning_unit_pedagogy(request, learning_unit_year_id: int, context, template, code: Optional[str] = None,
+                                year: Optional[int] = None):
     person = get_object_or_404(Person, user=request.user)
-    context.update(get_common_context_learning_unit_year(learning_unit_year_id, person))
+    context.update(get_common_context_learning_unit_year(person, learning_unit_year_id, code, year))
 
     learning_unit_year = context['learning_unit_year']
     perm_to_edit = is_eligible_to_update_learning_unit_pedagogy(learning_unit_year, person)
+    perm_to_edit_force_majeure = is_eligible_to_update_learning_unit_pedagogy_force_majeure_section(
+        learning_unit_year,
+        person
+    )
     user_language = mdl.person.get_user_interface_language(request.user)
 
-    translated_labels_with_text = TranslatedTextLabel.objects.filter(
+    cms_pedagogy_labels_translated = _get_cms_pedagogy_labels_translated(learning_unit_year_id, user_language)
+    cms_force_majeure_labels_translated = _get_cms_force_majeure_labels_translated(learning_unit_year_id, user_language)
+    teaching_materials = TeachingMaterial.objects.filter(learning_unit_year=learning_unit_year).order_by('order')
+    attributions = Attribution.objects.filter(learning_unit_year=learning_unit_year).select_related(
+        "tutor__person"
+    ).order_by("tutor__person")
+
+    translated_text_ids = itertools.chain.from_iterable(
+        (*translated_label.text_label.text_fr, *translated_label.text_label.text_en)
+        for translated_label in list(cms_pedagogy_labels_translated)
+    )
+    cms_pedagogy_last_modification_qs = Q(
+            content_type=ContentType.objects.get_for_model(TranslatedText),
+            object_id__in=map(lambda obj: obj.id, translated_text_ids)
+        ) | Q(
+            content_type=ContentType.objects.get_for_model(TeachingMaterial),
+            object_id__in=map(lambda obj: obj.id, teaching_materials)
+        )
+
+    force_majeure_translated_text_ids = itertools.chain.from_iterable(
+        (*translated_label.text_label.text_fr, *translated_label.text_label.text_en)
+        for translated_label in list(cms_force_majeure_labels_translated)
+    )
+    cms_force_majeure_last_modification_qs = Q(
+        content_type=ContentType.objects.get_for_model(TranslatedText),
+        object_id__in=map(lambda obj: obj.id, force_majeure_translated_text_ids)
+    )
+
+    context['cms_labels_translated'] = cms_pedagogy_labels_translated
+    context['cms_force_majeure_labels_translated'] = cms_force_majeure_labels_translated
+    context['teaching_materials'] = teaching_materials
+    context['can_edit_information'] = perm_to_edit
+    context['can_edit_force_majeur_section'] = perm_to_edit_force_majeure
+    context['can_edit_summary_locked_field'] = perms.can_edit_summary_locked_field(learning_unit_year, person)
+    context['cms_label_pedagogy_fr_only'] = CMS_LABEL_PEDAGOGY_FR_ONLY
+    context['attributions'] = attributions
+    context["version"] = _get_modification_history(cms_pedagogy_last_modification_qs)
+    context["force_majeure_version"] = _get_modification_history(cms_force_majeure_last_modification_qs)
+    context['tab_active'] = 'learning_unit_pedagogy'  # Corresponds to url_name
+    return render(request, template, context)
+
+
+def _get_cms_pedagogy_labels_translated(learning_unit_year_id: int, user_language: str):
+    return _get_cms_labels_translated(learning_unit_year_id, CMS_LABEL_PEDAGOGY, user_language)
+
+
+def _get_cms_force_majeure_labels_translated(learning_unit_year_id: int, user_language: str):
+    return _get_cms_labels_translated(learning_unit_year_id, CMS_LABEL_PEDAGOGY_FORCE_MAJEURE, user_language)
+
+
+def _get_cms_labels_translated(learning_unit_year_id: int, text_labels: List[str], user_language: str):
+    return TranslatedTextLabel.objects.filter(
         language=user_language,
-        text_label__label__in=CMS_LABEL_PEDAGOGY
+        text_label__label__in=text_labels
     ).prefetch_related(
         Prefetch(
             "text_label__translatedtext_set",
@@ -88,8 +147,8 @@ def read_learning_unit_pedagogy(request, learning_unit_year_id, context, templat
         )
     ).annotate(
         label_ordering=Case(
-            *[When(text_label__label=label, then=Value(i)) for i, label in enumerate(CMS_LABEL_PEDAGOGY)],
-            default=Value(len(CMS_LABEL_PEDAGOGY)),
+            *[When(text_label__label=label, then=Value(i)) for i, label in enumerate(text_labels)],
+            default=Value(len(text_labels)),
             output_field=IntegerField()
         )
     ).select_related(
@@ -97,25 +156,10 @@ def read_learning_unit_pedagogy(request, learning_unit_year_id, context, templat
     ).order_by(
         "label_ordering"
     )
-    teaching_materials = TeachingMaterial.objects.filter(learning_unit_year=learning_unit_year).order_by('order')
-    attributions = Attribution.objects.filter(learning_unit_year=learning_unit_year).select_related(
-        "tutor__person"
-    ).order_by("tutor__person")
 
-    translated_text_ids = itertools.chain.from_iterable(
-        (*translated_label.text_label.text_fr, *translated_label.text_label.text_en)
-        for translated_label in translated_labels_with_text
-    )
 
-    reversion = Version.objects.filter(
-        Q(
-            content_type=ContentType.objects.get_for_model(TranslatedText),
-            object_id__in=map(lambda obj: obj.id, translated_text_ids)
-        ) | Q(
-            content_type=ContentType.objects.get_for_model(TeachingMaterial),
-            object_id__in=map(lambda obj: obj.id, teaching_materials)
-        )
-    ).select_related(
+def _get_modification_history(filter_qs):
+    return Version.objects.filter(filter_qs).select_related(
         "revision",
         "revision__user"
     ).prefetch_related(
@@ -123,17 +167,6 @@ def read_learning_unit_pedagogy(request, learning_unit_year_id, context, templat
             "revision__user__person",
             to_attr="author"
         )
-
     ).order_by(
         "-revision__date_created"
     ).first()
-
-    context['cms_labels_translated'] = translated_labels_with_text
-    context['teaching_materials'] = teaching_materials
-    context['can_edit_information'] = perm_to_edit
-    context['can_edit_summary_locked_field'] = perms.can_edit_summary_locked_field(learning_unit_year, person)
-    context['cms_label_pedagogy_fr_only'] = CMS_LABEL_PEDAGOGY_FR_ONLY
-    context['attributions'] = attributions
-    context["version"] = reversion
-    context['tab_active'] = 'learning_unit_pedagogy'  # Corresponds to url_name
-    return render(request, template, context)

@@ -29,7 +29,6 @@ from django.conf.urls import url, include
 from django.conf.urls.static import static
 from django.urls import path
 
-import base.views.education_groups.create
 import base.views.learning_units.common
 import base.views.learning_units.create
 import base.views.learning_units.delete
@@ -46,14 +45,16 @@ from attribution.views import attribution, tutor_application
 from base.views import learning_achievement, search, user_list
 from base.views import learning_unit, offer, common, institution, organization, academic_calendar, \
     my_osis, entity, student, notifications
+from base.views import geocoding
 from base.views import teaching_material
 from base.views.education_groups import urls as education_groups_urls
 from base.views.filter import filter_cities_by_country, filter_campus_by_city
-from base.views.learning_units.detail import DetailLearningUnitYearView
+from base.views.learning_units.detail import DetailLearningUnitYearView, DetailLearningUnitYearViewBySlug
 from base.views.learning_units.external import create as create_external
 from base.views.learning_units.pedagogy.publish import access_refreshed_publication
 from base.views.learning_units.pedagogy.read import learning_unit_pedagogy
-from base.views.learning_units.pedagogy.update import learning_unit_pedagogy_edit, toggle_summary_locked
+from base.views.learning_units.pedagogy.update import learning_unit_pedagogy_edit, toggle_summary_locked, \
+    learning_unit_pedagogy_force_majeure_edit
 from base.views.learning_units.proposal import create, update
 from base.views.learning_units.update import update_learning_unit, learning_unit_edition_end_date
 from base.views.organization import OrganizationAutocomplete, CountryAutocomplete, CampusAutocomplete
@@ -168,7 +169,7 @@ urlpatterns = [
             url(r'^filter_campus_by_city$', filter_campus_by_city, name="filter_campus_by_city"),
         ])),
         path("<str:code>/<int:year>/access_publication", access_refreshed_publication, name="access_publication"),
-
+        path('<str:acronym>/<int:year>', DetailLearningUnitYearViewBySlug.as_view(), name='learning_unit'),
         url(r'^(?P<learning_unit_year_id>[0-9]+)/', include([
             url(r'^$', DetailLearningUnitYearView.as_view(), name='learning_unit'),
             url(r'^formations/$', learning_unit.learning_unit_formations, name="learning_unit_formations"),
@@ -176,6 +177,11 @@ urlpatterns = [
             url(r'^pedagogy/', include([
                 url(r'^$', learning_unit_pedagogy, name="learning_unit_pedagogy"),
                 url(r'^edit/$', learning_unit_pedagogy_edit, name="learning_unit_pedagogy_edit"),
+                url(
+                    r'^edit_force_majeure/$',
+                    learning_unit_pedagogy_force_majeure_edit,
+                    name="learning_unit_pedagogy_force_majeure_edit"
+                ),
                 url(r'^toggle_summary_locked/$', toggle_summary_locked,
                     name="learning_unit_pedagogy_toggle_summary_locked")
             ])),
@@ -227,6 +233,14 @@ urlpatterns = [
                 name="learning_unit_proposal_comparison"),
             url(r'^consolidate/$', base.views.learning_units.proposal.consolidate.consolidate_proposal,
                 name="learning_unit_consolidate_proposal"),
+        ])),
+        url(r'^(?P<code>[A-Za-z0-9]+)/(?P<year>[0-9]+)/', include([
+            url(r'^components/$', learning_unit.learning_unit_components, name="learning_unit_components"),
+            url(r'^specifications/$', learning_unit.learning_unit_specifications, name="learning_unit_specifications"),
+            url(r'^formations/$', learning_unit.learning_unit_formations, name="learning_unit_formations"),
+            url(r'^pedagogy/', include([
+                url(r'^$', learning_unit_pedagogy, name="learning_unit_pedagogy"),
+            ])),
         ])),
         url(r'^check/(?P<subtype>[A-Z]+)$', base.views.learning_units.common.check_acronym, name="check_acronym"),
     ])),
@@ -293,6 +307,7 @@ urlpatterns = [
         ]))
     ])),
     url(r'^ajax_select/', include(ajax_select_urls)),
+    path('geocoding', base.views.geocoding.geocode),
     url(r'^clear_filter/$', base.views.search.clear_filter, name="clear_filter"),
     url(r'^notifications/', include([
         url(r'^clear/$', base.views.notifications.clear_user_notifications, name="clear_notifications"),
