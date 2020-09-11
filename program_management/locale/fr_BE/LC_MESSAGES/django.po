@@ -618,7 +618,7 @@ msgstr ""
 
 #, python-format
 msgid "The program %(title)s - %(academic_year)s will be published soon"
-msgstr "La formation %(title)s - %(academic_year)s sera publié sous peu"
+msgstr "La formation %(title)s - %(academic_year)s sera publiée sous peu"
 
 msgid ""
 "The program tree version %(offer_acronym)s %(version_name)s has been deleted."
