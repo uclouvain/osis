@@ -24,7 +24,7 @@
 #
 ##############################################################################
 import copy
-from typing import Optional
+from typing import Optional, List
 
 import attr
 
@@ -43,20 +43,20 @@ from education_group.ddd.domain.service.enum_converter import EducationGroupType
 from education_group.ddd.validators.validators_by_business_action import UpdateGroupValidatorList, \
     CopyGroupValidatorList, CreateGroupValidatorList
 from osis_common.ddd import interface
+from program_management.ddd.domain.academic_year import AcademicYear
 
 
 class GroupBuilder:
     @classmethod
     def copy_to_next_year(cls, group_from: 'Group', group_repository: 'GroupRepository') -> 'Group':
         identity_next_year = GroupIdentity(code=group_from.code, year=group_from.year + 1)
+        CopyGroupValidatorList(group_from).validate()
         try:
             group_next_year = group_repository.get(identity_next_year)
             group_next_year.update_from_other_group(group_from)
         except exception.GroupNotFoundException:
             group_next_year = copy.deepcopy(group_from)
             group_next_year.entity_id = identity_next_year
-        finally:
-            CopyGroupValidatorList(group_from, group_next_year).validate()
         return group_next_year
 
     @classmethod
@@ -117,6 +117,10 @@ class Group(interface.RootEntity):
     end_year = attr.ib(type=Optional[int], default=None)
 
     @property
+    def academic_year(self) -> AcademicYear:
+        return AcademicYear(self.year)
+
+    @property
     def code(self) -> str:
         return self.entity_id.code
 
@@ -152,7 +156,7 @@ class Group(interface.RootEntity):
     def has_same_values_as(self, other_group: 'Group') -> bool:
         return not bool(self.get_conflicted_fields(other_group))
 
-    def get_conflicted_fields(self, other_group: 'Group') -> bool:
+    def get_conflicted_fields(self, other_group: 'Group') -> List[str]:
         fields_not_to_consider = ("year", "entity_id", "entity_identity")
         conflicted_fields = []
         for field_name in self.__slots__:

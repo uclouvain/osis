@@ -98,20 +98,17 @@ class UpdateTrainingValidatorList(business_validator.BusinessListValidator):
 
 class CopyTrainingValidatorList(business_validator.BusinessListValidator):
 
-    def __init__(self, training_from: 'Training', training_to: 'Training'):
+    def __init__(self, training_from: 'Training'):
         self.validators = [
             CheckTrainingEndDateValidator(training_from),
-            CheckTrainingConsistencyValidator(training_from, training_from)
         ]
         super().__init__()
 
 
 class CopyGroupValidatorList(business_validator.BusinessListValidator):
 
-    def __init__(self, group_from: 'Group', group_to: 'Group'):
-        self.validators = [
-            CheckGroupConsistencyValidator(group_from, group_to)
-        ]
+    def __init__(self, group_from: 'Group'):
+        self.validators = []
         super().__init__()
 
 
@@ -120,11 +117,9 @@ class CopyMiniTrainingValidatorList(business_validator.BusinessListValidator):
     def __init__(
             self,
             mini_training_from: 'MiniTraining',
-            mini_training_to: 'MiniTraining',
     ):
         self.validators = [
             CheckMiniTrainingEndDateValidator(mini_training_from),
-            CheckMiniTrainingConsistencyValidator(mini_training_from, mini_training_to)
         ]
         super().__init__()
 

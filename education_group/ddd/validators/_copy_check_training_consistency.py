@@ -23,6 +23,7 @@
 # ############################################################################
 from base.ddd.utils import business_validator
 from education_group.ddd.business_types import *
+from education_group.ddd.domain.exception import TrainingCopyConsistencyException
 
 
 class CheckTrainingConsistencyValidator(business_validator.BusinessValidator):
@@ -32,4 +33,6 @@ class CheckTrainingConsistencyValidator(business_validator.BusinessValidator):
         self.training_to = training_to
 
     def validate(self, *args, **kwargs):
+        if not self.training_from.has_same_values_as(self.training_to):
+            raise TrainingCopyConsistencyException(self.training_to, self.training_from)
         return True

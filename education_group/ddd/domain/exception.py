@@ -207,3 +207,45 @@ class MultipleEntitiesFoundException(BusinessException):
             "Multiple entities {entity_acronym} found in {year}"
         ).format(entity_acronym=entity_acronym, year=year)
         super().__init__(message, **kwargs)
+
+
+class TrainingCopyConsistencyException(BusinessException):
+    def __init__(self, training_from: 'Training', training_to: 'Training', *args, **kwargs):
+        conflict_fields = training_from.get_conflicted_fields(training_to)
+        message = _(
+            "Cannot copy training from %(academic_year_from)s to %(academic_year_to)s "
+            "because %(fields)s has already been modified"
+        ) % {
+            "academic_year_from": training_from.academic_year,
+            "academic_year_to": training_to.academic_year,
+            "fields": ", ".join(conflict_fields)
+        }
+        super().__init__(message, **kwargs)
+
+
+class MiniTrainingCopyConsistencyException(BusinessException):
+    def __init__(self, mini_training_from: 'MiniTraining', mini_training_to: 'MiniTraining', *args, **kwargs):
+        conflict_fields = mini_training_from.get_conflicted_fields(mini_training_to)
+        message = _(
+            "Cannot copy mini training from %(academic_year_from)s to %(academic_year_to)s "
+            "because %(fields)s has already been modified"
+        ) % {
+            "academic_year_from": mini_training_from.academic_year,
+            "academic_year_to": mini_training_to.academic_year,
+            "fields": ", ".join(conflict_fields)
+        }
+        super().__init__(message, **kwargs)
+
+
+class GroupCopyConsistencyException(BusinessException):
+    def __init__(self, group_from: 'Group', group_to: 'Group', *args, **kwargs):
+        conflict_fields = group_from.get_conflicted_fields(group_to)
+        message = _(
+            "Cannot copy group from %(academic_year_from)s to %(academic_year_to)s "
+            "because %(fields)s has already been modified"
+        ) % {
+            "academic_year_from": group_from.academic_year,
+            "academic_year_to": group_to.academic_year,
+            "fields": ", ".join(conflict_fields)
+        }
+        super().__init__(message, **kwargs)

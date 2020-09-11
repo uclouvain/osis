@@ -37,6 +37,7 @@ from education_group.ddd.domain._campus import Campus
 from education_group.ddd.domain._entity import Entity
 from education_group.ddd.domain._titles import Titles
 from education_group.ddd.validators import validators_by_business_action
+from education_group.ddd.validators.validators_by_business_action import CopyMiniTrainingValidatorList
 from osis_common.ddd import interface
 from program_management.ddd.domain.academic_year import AcademicYear
 
@@ -47,6 +48,7 @@ class MiniTrainingBuilder:
             self,
             mini_training_from: 'MiniTraining',
             mini_training_repository: 'MiniTrainingRepository') -> 'MiniTraining':
+        validators_by_business_action.CopyMiniTrainingValidatorList(mini_training_from).validate()
         identity_next_year = attr.evolve(mini_training_from.entity_identity, year=mini_training_from.year + 1)
         try:
             mini_training_next_year = mini_training_repository.get(identity_next_year)
@@ -57,10 +59,6 @@ class MiniTrainingBuilder:
                 entity_identity=identity_next_year,
                 entity_id=identity_next_year,
             )
-        finally:
-            validators_by_business_action.CopyMiniTrainingValidatorList(
-                mini_training_from, mini_training_next_year
-            ).validate()
         return mini_training_next_year
 
     @classmethod

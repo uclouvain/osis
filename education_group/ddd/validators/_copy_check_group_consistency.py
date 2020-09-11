@@ -23,6 +23,7 @@
 # ############################################################################
 from base.ddd.utils import business_validator
 from education_group.ddd.business_types import *
+from education_group.ddd.domain.exception import GroupCopyConsistencyException
 
 
 class CheckGroupConsistencyValidator(business_validator.BusinessValidator):
@@ -32,4 +33,6 @@ class CheckGroupConsistencyValidator(business_validator.BusinessValidator):
         self.group_to = group_to
 
     def validate(self, *args, **kwargs):
+        if not self.group_from.has_same_values_as(self.group_to):
+            raise GroupCopyConsistencyException(self.group_from, self.group_to)
         return True
