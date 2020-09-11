@@ -23,30 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from osis_common.ddd import interface
+
+from django.test import SimpleTestCase
+
+from education_group.tests.ddd.factories.isced_domain import IscedDomainFactory
 
 
-class IscedDomainIdentity(interface.EntityIdentity):
-    def __init__(self, code: str):
-        self.code = code
+class TestIscedDomain(SimpleTestCase):
 
-    def __eq__(self, other):
-        return self.code == other.code
-
-    def __hash__(self):
-        return hash(self.code)
-
-
-class IscedDomain(interface.Entity):
-    def __init__(self, entity_id: IscedDomainIdentity, title_fr: str, title_en: str):
-        super(IscedDomain, self).__init__(entity_id=entity_id)
-        self.entity_id = entity_id
-        self.title_fr = title_fr
-        self.title_en = title_en
-
-    @property
-    def code(self) -> str:
-        return self.entity_id.code
-
-    def __str__(self):
-        return self.code + " " + self.title_fr
+    def test_str(self):
+        isced_domain = IscedDomainFactory(entity_id__code="0110", title_fr="description")
+        self.assertEqual(str(isced_domain), "0110 description")
