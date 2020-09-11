@@ -226,7 +226,7 @@ class TestPasteNodeView(TestCase):
     )
     @mock.patch('program_management.ddd.repositories.node.NodeRepository.get')
     @mock.patch('program_management.ddd.repositories.program_tree.ProgramTreeRepository.get')
-    def test_format_title_when_available(self, mock_get_tree, mock_get_node, mock_get_tree_version):
+    def test_format_title_version_when_available(self, mock_get_tree, mock_get_node, mock_get_tree_version):
         subgroup_to_attach = NodeGroupYearFactory(node_type=GroupType.SUB_GROUP)
 
         mock_get_node.return_value = subgroup_to_attach
@@ -248,7 +248,7 @@ class TestPasteNodeView(TestCase):
 
     @mock.patch('program_management.ddd.repositories.node.NodeRepository.get')
     @mock.patch('program_management.ddd.repositories.program_tree.ProgramTreeRepository.get')
-    def test_format_title_when_unavailable(self, mock_get_tree, mock_get_node):
+    def test_format_title_version_when_unavailable(self, mock_get_tree, mock_get_node):
         subgroup_to_attach = NodeGroupYearFactory(node_type=GroupType.SUB_GROUP)
 
         mock_get_node.return_value = subgroup_to_attach

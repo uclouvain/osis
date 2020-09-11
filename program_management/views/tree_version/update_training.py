@@ -167,7 +167,7 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
 
         form_initial_values = {
             'version_name': training_version.version_name,
-            'version_title_frs': training_version.title_fr,
+            'version_title_fr': training_version.title_fr,
             'version_title_en': training_version.title_en,
             'end_year': training_version.end_year_of_existence,
 
