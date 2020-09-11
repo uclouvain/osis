@@ -55,7 +55,7 @@ class SpecificVersionForm(forms.Form):
     version_name = forms.CharField(
         max_length=15,
         required=True,
-        label=_('Acronym of version'),
+        label=_('Acronym/Short title'),
         widget=TextInput(
             attrs={'onchange': 'validate_version_name()', 'style': "text-transform: uppercase;"}
         ),
@@ -154,7 +154,7 @@ class UpdateTrainingVersionForm(ValidationRuleMixin, PermissionFieldMixin, Speci
         initial=True, label=_('Web re-registration'), required=False, disabled=True
     )
     has_partial_deliberation = forms.BooleanField(
-        initial=False, label=_('Web re-registration'), required=False, disabled=True
+        initial=False, label=_('Partial deliberation'), required=False, disabled=True
     )
     has_admission_exam = forms.BooleanField(
         initial=False, label=_('Admission exam'), required=False, disabled=True

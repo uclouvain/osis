@@ -453,7 +453,7 @@ msgid ""
 "successfully created."
 msgstr ""
 "La mini-formation <a href='%(link)s'> %(code)s (%(academic_year)s) </a> a "
-"été créé avec succès"
+"été créée avec succès"
 
 msgid "Modification"
 msgstr "Modification"
@@ -701,7 +701,7 @@ msgid ""
 "successfully created."
 msgstr ""
 "La formation <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> a été "
-"créé avec succès"
+"créée avec succès"
 
 #, python-format
 msgid ""
