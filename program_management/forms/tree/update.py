@@ -37,12 +37,6 @@ from program_management.ddd.service.write import update_link_service
 from program_management.ddd.validators import _block_validator
 
 
-class UpdateNodesFormset(BaseFormSet):
-    @transaction.atomic
-    def save(self) -> List[Optional['LinkIdentity']]:
-        return [form.save() for form in self.forms]
-
-
 class UpdateNodeForm(forms.Form):
     access_condition = forms.BooleanField(required=False)
     is_mandatory = forms.BooleanField(required=False)
@@ -87,8 +81,3 @@ class UpdateNodeForm(forms.Form):
             comment_english=self.cleaned_data.get("comment_english", ""),
             relative_credits=self.cleaned_data.get("relative_credits"),
         )
-
-
-class UpdateLearningUnitForm(UpdateNodeForm):
-    access_condition = None
-    link_type = None
