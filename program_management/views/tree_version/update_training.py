@@ -205,7 +205,7 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
 
             "main_domain": "{} - {}".format(training_obj.main_domain.decree_name, training_obj.main_domain.code)
             if training_obj.main_domain else None,
-            "secondary_domains": ",".join(training_obj.secondary_domains) if training_obj.secondary_domains else '',
+            "secondary_domains": ", ".join(str(dom) for dom in (training_obj.secondary_domains or [])),
             "isced_domain": str(training_obj.isced_domain) if training_obj.isced_domain else None,
             "internal_comment": training_obj.internal_comment,
 
