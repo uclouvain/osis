@@ -55,7 +55,7 @@ class TrainingIdentityFactory(factory.Factory):
         model = TrainingIdentity
         abstract = False
 
-    acronym = factory.Sequence(lambda n: 'Acronym%02d' % n)
+    acronym = factory.Sequence(lambda n: 'ACRONYM%02d' % n)
     year = factory.fuzzy.FuzzyInteger(1999, 2099)
 
 
@@ -73,7 +73,7 @@ class TrainingFactory(factory.Factory):
         abstract = False
 
     entity_identity = factory.SubFactory(TrainingIdentityFactory)
-    code = factory.Sequence(lambda n: 'Code%02d' % n)
+    code = factory.Sequence(lambda n: 'CODE%02d' % n)
     entity_id = factory.LazyAttribute(lambda o: o.entity_identity)
     identity_through_years = factory.SubFactory(TrainingIdentityThroughYearsFactory)
     type = factory.fuzzy.FuzzyChoice(TrainingType)
@@ -102,7 +102,6 @@ class TrainingFactory(factory.Factory):
     management_entity = factory.SubFactory(EntityFactory)
     administration_entity = factory.SubFactory(EntityFactory)
     end_year = factory.LazyAttribute(generate_end_date)
-    teaching_campus = factory.SubFactory(CampusIdentityFactory)
     enrollment_campus = factory.SubFactory(CampusIdentityFactory)
     other_campus_activities = factory.fuzzy.FuzzyChoice(ActivityPresence)
     funding = factory.SubFactory(FundingFactory)

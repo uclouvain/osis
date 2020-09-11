@@ -23,14 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import copy
 from _decimal import Decimal
 from collections import OrderedDict
 from typing import List, Set, Dict, Optional
 
 import attr
 
+from base.ddd.utils.converters import to_upper_case_converter
 from base.models.enums.active_status import ActiveStatusEnum
-from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, MiniTrainingType, GroupType
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
@@ -41,10 +42,14 @@ from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.models.enums.constraint_type import ConstraintTypes
 from osis_common.ddd import interface
 from program_management.ddd.business_types import *
+from program_management.ddd.command import DO_NOT_OVERRIDE
 from program_management.ddd.domain._campus import Campus
 from program_management.ddd.domain.academic_year import AcademicYear
 from program_management.ddd.domain.link import factory as link_factory
 from program_management.ddd.domain.prerequisite import Prerequisite, NullPrerequisite
+from program_management.ddd.domain.service.generate_node_abbreviated_title import GenerateNodeAbbreviatedTitle
+from program_management.ddd.domain.service.generate_node_code import GenerateNodeCode
+from program_management.ddd.domain.service.validation_rule import FieldValidationRule
 from program_management.models.enums.node_type import NodeType
 
 
@@ -60,6 +65,7 @@ class NodeFactory:
             year=next_year,
             end_year=end_year,
             children=[],
+            node_id=None,
         )
         node_next_year._has_changed = True
         return node_next_year
@@ -73,10 +79,8 @@ class NodeFactory:
             return next_year
         return copy_from_node.end_year
 
-    def get_node(self, type: NodeType, **node_attrs):
+    def get_node(self, type: NodeType, **node_attrs) -> 'Node':
         node_cls = {
-            NodeType.EDUCATION_GROUP: NodeEducationGroupYear,   # TODO: Remove when migration is done
-
             NodeType.GROUP: NodeGroupYear,
             NodeType.LEARNING_UNIT: NodeLearningUnitYear,
             NodeType.LEARNING_CLASS: NodeLearningClassYear
@@ -91,13 +95,70 @@ class NodeFactory:
 
         return node_cls(**node_attrs)
 
+    def duplicate(
+            self,
+            duplicate_from: 'Node',
+            override_end_year_to: int = DO_NOT_OVERRIDE,
+            override_start_year_to: int = DO_NOT_OVERRIDE
+    ) -> 'Node':
+        new_code = GenerateNodeCode().generate_from_parent_node(
+            parent_node=duplicate_from,
+            child_node_type=duplicate_from.node_type,
+        )
+        start_year = duplicate_from.start_year if override_start_year_to == DO_NOT_OVERRIDE else override_start_year_to
+        copied_node = attr.evolve(
+            duplicate_from,
+            entity_id=NodeIdentity(code=new_code, year=duplicate_from.entity_id.year),
+            code=new_code,
+            end_year=duplicate_from.end_year if override_end_year_to == DO_NOT_OVERRIDE else override_end_year_to,
+            # TODO: Replace end_date by end_year
+            end_date=duplicate_from.end_date if override_end_year_to == DO_NOT_OVERRIDE else override_end_year_to,
+            start_year=start_year,
+            children=[],
+            node_id=None,
+        )
+        copied_node._has_changed = True
+        return copied_node
+
+    def generate_from_parent(self, parent_node: 'Node', child_type: 'EducationGroupTypesEnum') -> 'Node':
+        generated_child_title = FieldValidationRule.get(
+            child_type,
+            'title_fr'
+        ).initial_value
+        child = self.get_node(
+            type=NodeType.GROUP,
+            node_type=child_type,
+            code=GenerateNodeCode.generate_from_parent_node(parent_node, child_type),
+            title=GenerateNodeAbbreviatedTitle.generate(
+                parent_node=parent_node,
+                child_node_type=child_type,
+            ),
+            year=parent_node.year,
+            teaching_campus=parent_node.teaching_campus,
+            management_entity_acronym=parent_node.management_entity_acronym,
+            group_title_fr="{child_title} {parent_abbreviated_title}".format(
+                child_title=generated_child_title,
+                parent_abbreviated_title=parent_node.title
+            ),
+            start_year=parent_node.year,
+        )
+        child._has_changed = True
+        return child
+
+    def deepcopy_node_without_copy_children_recursively(self, original_node: 'Node') -> 'Node':
+        original_children = original_node.children
+        original_node.children = []  # To avoid recursive deep copy of all children behind
+        copied_node = copy.deepcopy(original_node)
+        original_node.children = original_children
+        return copied_node
+
 
 factory = NodeFactory()
 
 
 @attr.s(frozen=True, slots=True)
 class NodeIdentity(interface.EntityIdentity):
-    code = attr.ib(type=str)
+    code = attr.ib(type=str, converter=to_upper_case_converter)
     year = attr.ib(type=int)
 
 
@@ -109,6 +170,7 @@ class Node(interface.Entity):
     node_id = attr.ib(type=int, default=None)
     node_type = attr.ib(type=EducationGroupTypesEnum, default=None)
     end_date = attr.ib(type=int, default=None)
+    start_year = attr.ib(type=int, default=None)
     children = attr.ib(type=List['Link'], factory=list)
     code = attr.ib(type=str, default=None)
     title = attr.ib(type=str, default=None)
@@ -153,7 +215,7 @@ class Node(interface.Entity):
         return self.type == NodeType.LEARNING_UNIT
 
     def is_group_or_mini_or_training(self):
-        return self.type == NodeType.GROUP or self.type == NodeType.EDUCATION_GROUP
+        return self.type == NodeType.GROUP
 
     def is_finality(self) -> bool:
         return self.node_type in set(TrainingType.finality_types_enum())
@@ -176,8 +238,20 @@ class Node(interface.Entity):
     def is_minor_major_list_choice(self) -> bool:
         return self.node_type in GroupType.minor_major_list_choice_enums()
 
+    def is_option_list_choice(self):
+        return self.node_type == GroupType.OPTION_LIST_CHOICE
+
     def is_minor_or_deepening(self) -> bool:
-        return self.node_type in MiniTrainingType.minors_and_deepening()
+        return self.is_minor() or self.is_deepening()
+
+    def is_minor(self) -> bool:
+        return self.node_type in MiniTrainingType.minors_enum()
+
+    def is_deepening(self) -> bool:
+        return self.node_type == MiniTrainingType.DEEPENING
+
+    def is_major(self) -> bool:
+        return self.node_type == MiniTrainingType.FSA_SPECIALITY
 
     def get_direct_child_as_node(self, node_id: 'NodeIdentity') -> 'Node':
         return next(node for node in self.get_direct_children_as_nodes() if node.entity_id == node_id)
@@ -358,24 +432,6 @@ def _get_descendents(root_node: Node, current_path: 'Path' = None) -> Dict['Path
             **_get_descendents(link.child, current_path=child_path)
         })
     return _descendents
-
-
-# TODO: Remove this class because unused when migration is done.
-@attr.s(slots=True, hash=False)
-class NodeEducationGroupYear(Node):
-
-    type = NodeType.EDUCATION_GROUP
-
-    constraint_type = attr.ib(type=ConstraintTypes, default=None)
-    min_constraint = attr.ib(type=int, default=None)
-    max_constraint = attr.ib(type=int, default=None)
-    remark_fr = attr.ib(type=str, default=None)
-    remark_en = attr.ib(type=str, default=None)
-    offer_title_fr = attr.ib(type=str, default=None)
-    offer_title_en = attr.ib(type=str, default=None)
-    offer_partial_title_fr = attr.ib(type=str, default=None)
-    offer_partial_title_en = attr.ib(type=str, default=None)
-    category = attr.ib(type=Categories, default=None)
 
 
 @attr.s(slots=True, eq=False, hash=False)

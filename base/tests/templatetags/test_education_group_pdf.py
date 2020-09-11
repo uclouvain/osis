@@ -31,17 +31,17 @@ from mock import patch
 from base.models.enums.education_group_types import TrainingType
 from base.templatetags import education_group_pdf
 from program_management.tests.ddd.factories.link import LinkFactory
-from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory, NodeEducationGroupYearFactory
+from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory, NodeGroupYearFactory
 
 
 class TestGetVerboseLink(SimpleTestCase):
 
     def test_when_child_link_is_group(self):
         link = LinkFactory(
-            child=NodeEducationGroupYearFactory(
+            child=NodeGroupYearFactory(
                 credits=5,
-                offer_title_fr='Offer title',
-                offer_title_en='Offer title',
+                group_title_fr='Offer title',
+                group_title_en='Offer title',
                 node_type=TrainingType.BACHELOR
             ),
             relative_credits=6,

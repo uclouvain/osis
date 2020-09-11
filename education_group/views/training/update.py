@@ -146,6 +146,7 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         return self.get_success_url()
 
     def update_training(self) -> List['TrainingIdentity']:
+        end_year = self.training_form.cleaned_data["end_year"]
         try:
             update_command = self._convert_form_to_update_training_command(self.training_form)
             return update_training_with_program_tree_service.update_and_report_training_with_program_tree(
@@ -181,29 +182,16 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             delete_command = self._convert_form_to_delete_trainings_command(self.training_form)
             return delete_training_with_program_tree_service.delete_training_with_program_tree(delete_command)
 
-        except program_management_exception.ProgramTreeNotEmptyException as e:
+        except (
+            program_management_exception.ProgramTreeNonEmpty,
+            exception.TrainingHaveLinkWithEPC,
+            exception.TrainingHaveEnrollments,
+            program_management_exception.CannotDeleteStandardDueToVersionEndDate
+        ) as e:
             self.training_form.add_error("end_year", "")
             self.training_form.add_error(
                 None,
-                _("Imposible to put end date to %(end_year)s: %(msg)s") % {
-                    "msg": e.message,
-                    "end_year": end_year}
-            )
-
-        except exception.TrainingHaveLinkWithEPC as e:
-            self.training_form.add_error("end_year", "")
-            self.training_form.add_error(
-                None,
-                _("Imposible to put end date to %(end_year)s: %(msg)s") % {
-                    "msg": e.message,
-                    "end_year": end_year}
-            )
-
-        except exception.TrainingHaveEnrollments as e:
-            self.training_form.add_error("end_year", "")
-            self.training_form.add_error(
-                None,
-                _("Imposible to put end date to %(end_year)s: %(msg)s") % {
+                _("Impossible to put end date to %(end_year)s: %(msg)s") % {
                     "msg": e.message,
                     "end_year": end_year}
             )
@@ -212,7 +200,7 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
     def update_links(self) -> List['Link']:
         update_link_commands = [
-            self._convert_form_to_update_link_command(form) for form in self.content_formset.forms if form.has_changed
+            self._convert_form_to_update_link_command(form) for form in self.content_formset.forms if form.has_changed()
         ]
 
         if not update_link_commands:
@@ -396,7 +384,7 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "academic_year": training_obj.year,
             "start_year": training_obj.start_year,
             "end_year": training_obj.end_year,
-            "teaching_campus": training_obj.teaching_campus.name,
+            "teaching_campus": group_obj.teaching_campus.name,
             "enrollment_campus": training_obj.enrollment_campus.name,
             "other_campus_activities": training_obj.other_campus_activities.name
             if training_obj.other_language_activities else None,

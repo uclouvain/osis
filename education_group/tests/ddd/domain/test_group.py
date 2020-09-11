@@ -25,7 +25,7 @@
 ##############################################################################
 import collections
 
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, TestCase
 
 from base.models.enums.constraint_type import ConstraintTypeEnum
 from base.models.enums.education_group_types import GroupType
@@ -96,7 +96,7 @@ class TestGroup(SimpleTestCase):
                 self.assertTrue(self.group.is_minor_major_option_list_choice())
 
 
-class TestGroupBuilder(SimpleTestCase):
+class TestGroupBuilder(TestCase):
     def setUp(self):
         self.cmd = CreateOrphanGroupCommand(
             code="LTRONC100T",

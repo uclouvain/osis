@@ -33,7 +33,6 @@ from reversion.admin import VersionAdmin
 from base.models import entity_version
 from base.models.campus import Campus
 from base.models.entity import Entity
-from base.models.enums import active_status
 from base.models.enums.education_group_types import GroupType, MiniTrainingType
 from education_group.models.enums.constraint_type import ConstraintTypes
 from osis_common.models.osis_model_admin import OsisModelAdmin
@@ -157,13 +156,6 @@ class GroupYear(models.Model):
         on_delete=models.PROTECT
     )
 
-    active = models.CharField(
-        max_length=20,
-        choices=active_status.ACTIVE_STATUS_LIST,
-        default=active_status.ACTIVE,
-        verbose_name=_('Status')
-    )
-
     objects = GroupYearManager()
     objects_version = GroupYearVersionManager()
 
@@ -179,11 +171,6 @@ class GroupYear(models.Model):
             raise AttributeError(
                 _('Please enter an academic year greater or equal to group start year.')
             )
-        if self.group.end_year and self.academic_year.year > self.group.end_year.year:
-            raise AttributeError(
-                _('Please enter an academic year less or equal to group end year.')
-            )
-
         super().save(*args, **kwargs)
 
     def delete(self, using=None, keep_parents=False):

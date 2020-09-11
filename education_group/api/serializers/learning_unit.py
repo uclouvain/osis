@@ -33,10 +33,6 @@ from education_group.api.serializers.education_group_title import EducationGroup
 from education_group.api.views.mini_training import MiniTrainingDetail
 from education_group.api.views.training import TrainingDetail
 from program_management.models.education_group_version import EducationGroupVersion
-from education_group.api.serializers.training import TrainingHyperlinkedIdentityField
-from education_group.api.serializers.utils import TrainingHyperlinkedRelatedField
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
-from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 
 
 class EducationGroupRootHyperlinkedIdentityField(serializers.HyperlinkedIdentityField):
@@ -95,20 +91,7 @@ class EducationGroupRootsListSerializer(EducationGroupTitleSerializer, serialize
 
     def get_learning_unit_credits(self, obj):
         learning_unit_year = self.context['learning_unit_year']
-        identity = ProgramTreeVersionIdentity(
-            offer_acronym=obj.offer.acronym,
-            year=obj.offer.academic_year.year,
-            version_name=obj.version_name,
-            is_transition=obj.is_transition
-        )
-
-        tree = ProgramTreeVersionRepository().get(entity_id=identity).get_tree()
-        node = tree.get_node_by_code_and_year(
-            code=learning_unit_year.acronym, year=learning_unit_year.academic_year.year
-        )
-        link = tree.get_links_using_node(node)[0]
-
-        return link.relative_credits or (learning_unit_year and learning_unit_year.credits)
+        return obj.relative_credits or (learning_unit_year and learning_unit_year.credits)
 
 
 class LearningUnitYearPrerequisitesHyperlinkedIdentityField(serializers.HyperlinkedIdentityField):

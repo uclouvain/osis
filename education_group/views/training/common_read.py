@@ -80,6 +80,10 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             path = str(root_element.pk)
         return path
 
+    @functools.lru_cache()
+    def is_root_node(self):
+        return len(self.get_path().split('|')) <= 1
+
     @cached_property
     def node_identity(self) -> 'NodeIdentity':
         return NodeIdentity(code=self.kwargs['code'], year=self.kwargs['year'])
@@ -152,7 +156,9 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             "create_training_url": self.get_create_training_url(),
             "create_mini_training_url": self.get_create_mini_training_url(),
             "update_training_url": self.get_update_training_url(),
-            "delete_training_url": self.get_delete_training_url(),
+            "delete_permanently_training_url": self.get_delete_permanently_training_url(),
+            "delete_permanently_tree_version": self.get_delete_permanently_tree_version_url(),
+            "create_version_url": self.get_create_version_url(),
             "xls_ue_prerequisites": reverse("education_group_learning_units_prerequisites",
                                             args=[self.education_group_version.root_group.academic_year.year,
                                                   self.education_group_version.root_group.partial_acronym]
@@ -161,6 +167,11 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
                                               args=[self.education_group_version.root_group.academic_year.year,
                                                     self.education_group_version.root_group.partial_acronym]
                                               ),
+            "generate_pdf_url": reverse("group_pdf_content",
+                                        args=[self.education_group_version.root_group.academic_year.year,
+                                              self.education_group_version.root_group.partial_acronym,
+                                              ]
+                                        ),
         }
 
     def get_permission_object(self):
@@ -179,15 +190,41 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
                "?path_to={}".format(self.get_path())
 
     def get_update_training_url(self):
+        if self.current_version.is_standard_version:
+            return reverse_with_get(
+                'training_update',
+                kwargs={'code': self.kwargs['code'], 'year': self.kwargs['year'], 'title': self.get_object().title},
+                get={"path_to": self.get_path(), "tab": self.active_tab.name}
+            )
         return reverse_with_get(
-            'training_update',
-            kwargs={'code': self.kwargs['code'], 'year': self.kwargs['year'], 'title': self.get_object().title},
+            'training_version_update',
+            kwargs={'code': self.kwargs['code'], 'year': self.kwargs['year']},
             get={"path_to": self.get_path(), "tab": self.active_tab.name}
         )
 
-    def get_delete_training_url(self):
-        return reverse('training_delete', kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}) + \
-               "?path={}".format(self.get_path())
+    def get_delete_permanently_training_url(self):
+        if self.program_tree_version_identity.is_standard():
+            return reverse(
+                'training_delete',
+                kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}
+            )
+
+    def get_delete_permanently_tree_version_url(self):
+        if not self.program_tree_version_identity.is_standard():
+            return reverse(
+                'delete_permanently_tree_version',
+                kwargs={
+                    'year': self.node_identity.year,
+                    'code': self.node_identity.code,
+                }
+            )
+
+    def get_create_version_url(self):
+        if self.is_root_node():
+            return reverse(
+                'create_education_group_version',
+                kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}
+            ) + "?path={}".format(self.get_path())
 
     def get_tab_urls(self):
         node_identity = self.get_object().entity_id

@@ -29,7 +29,6 @@ from django.db import transaction
 from django.forms import BaseFormSet
 
 import osis_common.ddd.interface
-from base.ddd.utils import business_validator
 from base.forms.utils import choice_field
 from base.models.enums.link_type import LinkTypes
 from program_management.ddd import command
@@ -77,15 +76,22 @@ def _get_form_class(
 
     authorized_relationship = load_authorized_relationship.load()
 
-    if node_to_paste_into.is_minor_major_list_choice():
-        return PasteToMinorMajorListChoiceForm
+    form_class = PasteNodeForm
+
+    if node_to_paste_into.is_minor_major_list_choice() and not node_to_paste.is_minor_major_list_choice():
+        form_class = PasteToMinorMajorListChoiceForm
+    elif node_to_paste_into.is_minor_major_list_choice() and node_to_paste.is_minor_major_list_choice():
+        form_class = PasteMinorMajorListToMinorMajorListChoiceForm
+    elif node_to_paste_into.is_option_list_choice():
+        form_class = PasteToOptionListChoiceForm
     elif node_to_paste.node_type == NodeType.LEARNING_UNIT:
-        return PasteLearningUnitForm
+        form_class = PasteLearningUnitForm
     elif node_to_paste_into.is_training() and node_to_paste.is_minor_major_list_choice():
-        return PasteMinorMajorListChoiceToTrainingForm
+        form_class = PasteMinorMajorListChoiceToTrainingForm
     elif not authorized_relationship.is_authorized(node_to_paste_into.node_type, node_to_paste.node_type):
-        return PasteNotAuthorizedChildren
-    return PasteNodeForm
+        form_class = PasteNotAuthorizedChildren
+
+    return form_class
 
 
 class PasteNodeForm(forms.Form):
@@ -122,10 +128,7 @@ class PasteNodeForm(forms.Form):
     def save(self) -> Optional['LinkIdentity']:
         result = None
         if self.is_valid():
-            try:
-                result = paste_element_service.paste_element(self._create_paste_command())
-            except osis_common.ddd.interface.BusinessExceptions as business_exception:
-                self.add_error(None, business_exception.messages)
+            result = paste_element_service.paste_element(self._create_paste_command())
         return result
 
     def _create_paste_command(self) -> command.PasteElementCommand:
@@ -183,6 +186,19 @@ class PasteToMinorMajorListChoiceForm(PasteNodeForm):
             relative_credits=self.cleaned_data.get("relative_credits"),
             path_where_to_detach=self.path_to_detach
         )
+
+
+class PasteMinorMajorListToMinorMajorListChoiceForm(PasteNodeForm):
+    access_condition = forms.BooleanField(initial=False, disabled=True)
+
+
+class PasteToOptionListChoiceForm(PasteNodeForm):
+    is_mandatory = None
+    block = None
+    link_type = None
+    comment = None
+    comment_english = None
+    relative_credits = None
 
 
 class PasteNotAuthorizedChildren(PasteNodeForm):

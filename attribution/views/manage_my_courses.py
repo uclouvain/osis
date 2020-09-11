@@ -36,7 +36,9 @@ from django.views.decorators.http import require_http_methods
 from attribution.views.perms import tutor_can_view_educational_information
 from base.business import event_perms
 from base.business.learning_units.perms import is_eligible_to_update_learning_unit_pedagogy, \
-    find_educational_information_submission_dates_of_learning_unit_year, can_user_edit_educational_information
+    find_educational_information_submission_dates_of_learning_unit_year, can_user_edit_educational_information, \
+    find_educational_information_force_majeure_submission_dates_of_learning_unit_year, \
+    is_eligible_to_update_learning_unit_pedagogy_force_majeure_section
 from base.models import entity_calendar
 from base.models.enums import academic_calendar_type
 from base.models.learning_unit_year import LearningUnitYear
@@ -46,7 +48,8 @@ from base.views import teaching_material
 from base.views.learning_unit import get_specifications_context, get_achievements_group_by_language, \
     get_languages_settings
 from base.views.learning_units.pedagogy.read import read_learning_unit_pedagogy
-from base.views.learning_units.pedagogy.update import edit_learning_unit_pedagogy
+from base.views.learning_units.pedagogy.update import edit_learning_unit_pedagogy, \
+    post_method_edit_force_majeure_pedagogy
 from base.views.learning_units.perms import PermissionDecorator
 
 
@@ -103,6 +106,8 @@ def view_educational_information(request, learning_unit_year_id):
     context = {
         'submission_dates': find_educational_information_submission_dates_of_learning_unit_year(
                 learning_unit_year_id),
+        'force_majeure_submission_dates':
+            find_educational_information_force_majeure_submission_dates_of_learning_unit_year(learning_unit_year_id),
         'create_teaching_material_urlname': 'tutor_teaching_material_create',
         'update_teaching_material_urlname': 'tutor_teaching_material_edit',
         'delete_teaching_material_urlname': 'tutor_teaching_material_delete',
@@ -131,6 +136,16 @@ def _fetch_achievements_by_language(learning_unit_year: LearningUnitYear) -> Ite
 @PermissionDecorator(is_eligible_to_update_learning_unit_pedagogy, "learning_unit_year_id", LearningUnitYear)
 def edit_educational_information(request, learning_unit_year_id):
     redirect_url = reverse(view_educational_information, kwargs={'learning_unit_year_id': learning_unit_year_id})
+    return edit_learning_unit_pedagogy(request, learning_unit_year_id, redirect_url)
+
+
+@login_required
+@PermissionDecorator(is_eligible_to_update_learning_unit_pedagogy_force_majeure_section, "learning_unit_year_id",
+                     LearningUnitYear)
+def edit_educational_information_force_majeure(request, learning_unit_year_id):
+    redirect_url = reverse(view_educational_information, kwargs={'learning_unit_year_id': learning_unit_year_id})
+    if request.method == 'POST':
+        return post_method_edit_force_majeure_pedagogy(request, redirect_url)
     return edit_learning_unit_pedagogy(request, learning_unit_year_id, redirect_url)
 
 

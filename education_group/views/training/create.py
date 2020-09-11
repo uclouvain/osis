@@ -1,4 +1,5 @@
-from typing import List, Dict, Union
+import functools
+from typing import List, Dict, Union, Optional
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
@@ -9,26 +10,28 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic.base import View
 
 from base.models.academic_year import starting_academic_year, AcademicYear
-from base.models.campus import Campus
-from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import TrainingType
 from base.utils.cache import RequestCache
 from base.utils.urls import reverse_with_get
 from base.views.common import display_success_messages, display_error_messages
 from education_group.ddd import command
-from education_group.ddd.domain.exception import GroupCodeAlreadyExistException, ContentConstraintTypeMissing, \
+from education_group.ddd.business_types import *
+from education_group.ddd.domain.exception import ContentConstraintTypeMissing, \
     ContentConstraintMinimumMaximumMissing, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum, \
-    AcronymAlreadyExist, StartYearGreaterThanEndYear, MaximumCertificateAimType2Reached
+    AcronymAlreadyExist, StartYearGreaterThanEndYear, MaximumCertificateAimType2Reached, CodeAlreadyExistException
 from education_group.ddd.domain.training import TrainingIdentity
+from education_group.ddd.service.read import get_group_service
 from education_group.forms.training import CreateTrainingForm
+from education_group.models.group_year import GroupYear
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from education_group.views.proxy.read import Tab
 from osis_role.contrib.views import PermissionRequiredMixin
-from program_management.ddd import command as program_management_command
+from program_management.ddd import command as command_pgrm
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.program_tree import Path
 from program_management.ddd.domain.service.element_id_search import ElementIdSearch
 from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
+from program_management.ddd.service.read import node_identity_service
 from program_management.ddd.service.write import create_and_attach_training_service
 from program_management.ddd.service.write.create_training_with_program_tree import \
     create_and_report_training_with_program_tree
@@ -41,11 +44,6 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
     template_name = "education_group_app/training/upsert/create.html"
 
-    @cached_property
-    def parent_node_identity(self) -> Union[None, 'NodeIdentity']:
-        if self.get_attach_path():
-            return NodeIdentitySearch().get_from_element_id(int(self.get_attach_path().split('|')[-1]))
-
     def get_context(self, training_form: CreateTrainingForm):
         training_type = self.kwargs['type']
         return {
@@ -54,6 +52,7 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "type_text": str(TrainingType.get_value(training_type)),
             "is_finality_types": training_type in TrainingType.finality_types(),
             "cancel_url": self.get_cancel_url(),
+            "parent_group": self.get_parent_group(),
         }
 
     def get(self, request, *args, **kwargs):
@@ -67,28 +66,46 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         return render(request, self.template_name, self.get_context(training_form))
 
     def get_cancel_url(self) -> str:
-        if self.get_attach_path():
+        parent_group = self.get_parent_group()
+        if parent_group:
             return reverse_with_get(
                 'element_identification',
-                kwargs={'code': self.parent_node_identity.code, 'year': self.parent_node_identity.year},
+                kwargs={'code': parent_group.code, 'year': parent_group.year},
                 get={'path': self.get_attach_path()}
             )
         return reverse('version_program')
 
     def _get_initial_form(self) -> Dict:
-        default_campus = Campus.objects.filter(name='Louvain-la-Neuve').first()
-
-        request_cache = RequestCache(self.request.user, reverse('version_program'))
-        if self.get_attach_path():
-            default_academic_year = AcademicYear.objects.get(
-                year=self.parent_node_identity.year
-            ).pk
-        else:
-            default_academic_year = request_cache.get_value_cached('academic_year') or starting_academic_year()
         return {
-            'teaching_campus': default_campus,
-            'academic_year': default_academic_year
+            'academic_year': self._get_initial_academic_year_for_form(),
+            'management_entity': self._get_initial_management_entity_for_form()
         }
+
+    def _get_initial_academic_year_for_form(self):
+        parent_group = self.get_parent_group()
+        request_cache = RequestCache(self.request.user, reverse('version_program'))
+        if parent_group:
+            return parent_group.year
+        elif request_cache.get_value_cached('academic_year'):
+            return AcademicYear.objects.get(
+                id=request_cache.get_value_cached('academic_year')[0]
+            ).year
+        return starting_academic_year()
+
+    def _get_initial_management_entity_for_form(self):
+        return self.get_parent_group() and self.get_parent_group().management_entity.acronym
+
+    @functools.lru_cache()
+    def get_parent_group(self) -> Optional['Group']:
+        if self.get_attach_path():
+            cmd_get_node_id = command_pgrm.GetNodeIdentityFromElementId(
+                int(self.get_attach_path().split('|')[-1])
+            )
+            parent_id = node_identity_service.get_node_identity_from_element_id(cmd_get_node_id)
+            return get_group_service.get_group(
+                command.GetGroupCommand(code=parent_id.code, year=parent_id.year)
+            )
+        return None
 
     def post(self, request, *args, **kwargs):
         training_form = CreateTrainingForm(
@@ -103,7 +120,7 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             training_ids = []
             try:
                 training_ids = self._call_service(create_training_data)
-            except GroupCodeAlreadyExistException as e:
+            except CodeAlreadyExistException as e:
                 training_form.add_error('code', e.message)
             except AcronymAlreadyExist as e:
                 training_form.add_error('acronym', e.message)
@@ -141,14 +158,14 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
     def _call_service(self, create_training_data: dict) -> List['TrainingIdentity']:
         if self.get_attach_path():
-            cmd = program_management_command.CreateAndAttachTrainingCommand(
+            cmd = command_pgrm.CreateAndAttachTrainingCommand(
                 **create_training_data,
                 path_to_paste=self.get_attach_path(),
             )
             training_ids = create_and_attach_training_service.create_and_attach_training(cmd)
         else:
             training_ids = create_and_report_training_with_program_tree(
-                command.CreateTrainingCommand(**create_training_data)
+                command.CreateAndPostponeTrainingAndProgramTreeCommand(**create_training_data)
             )
         return training_ids
 
@@ -195,16 +212,14 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
     def get_attach_path(self) -> Union[Path, None]:
         return self.request.GET.get('path_to') or None
 
-    def get_permission_object(self) -> Union[EducationGroupYear, None]:
-        qs = EducationGroupYear.objects.select_related('academic_year', 'management_entity')
+    def get_permission_object(self) -> Optional[GroupYear]:
+        qs = GroupYear.objects.select_related('academic_year', 'management_entity')
         path = self.get_attach_path()
         if path:
             # Take parent from path (latest element)
             # Ex:  path: 4456|565|5656
             parent_id = path.split("|")[-1]
-            qs = qs.filter(
-                educationgroupversion__root_group__element__id=parent_id,
-            )
+            qs = qs.filter(element__id=parent_id,)
         else:
             qs = qs.filter(
                 partial_acronym=self.request.POST.get('code'),
@@ -212,7 +227,7 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             )
         try:
             return qs.get()
-        except EducationGroupYear.DoesNotExist:
+        except GroupYear.DoesNotExist:
             return None
 
 

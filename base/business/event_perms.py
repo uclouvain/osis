@@ -206,3 +206,9 @@ class EventPermSummaryCourseSubmission(EventPerm):
     model = LearningUnitYear
     event_reference = academic_calendar_type.SUMMARY_COURSE_SUBMISSION
     error_msg = _("Summary course submission is not allowed for tutors during this period.")
+
+
+class EventPermSummaryCourseSubmissionForceMajeure(EventPerm):
+    model = LearningUnitYear
+    event_reference = academic_calendar_type.SUMMARY_COURSE_SUBMISSION_FORCE_MAJEURE
+    error_msg = _("Summary course submission (Force majeure) is not allowed for tutors during this period.")

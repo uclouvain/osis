@@ -26,6 +26,7 @@
 
 import osis_common.ddd.interface
 from base.ddd.utils import business_validator
+from base.ddd.utils.business_validator import BusinessListValidator
 from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.validators import _validate_end_date_and_option_finality
@@ -39,18 +40,20 @@ from program_management.ddd.validators._authorized_root_type_for_prerequisite im
 from program_management.ddd.validators._block_validator import BlockValidator
 from program_management.ddd.validators._copy_check_end_date_program_tree import CheckProgramTreeEndDateValidator
 from program_management.ddd.validators._copy_check_end_date_tree_version import CheckTreeVersionEndDateValidator
+from program_management.ddd.validators._delete_check_versions_end_date import CheckVersionsEndDateValidator
 from program_management.ddd.validators._detach_option_2M import DetachOptionValidator
 from program_management.ddd.validators._detach_root import DetachRootValidator
 from program_management.ddd.validators._empty_program_tree import EmptyProgramTreeValidator
 from program_management.ddd.validators._has_or_is_prerequisite import IsPrerequisiteValidator
 from program_management.ddd.validators._infinite_recursivity import InfiniteRecursivityTreeValidator
+from program_management.ddd.validators._match_version import MatchVersionValidator
 from program_management.ddd.validators._minimum_editable_year import \
     MinimumEditableYearValidator
 from program_management.ddd.validators._node_have_link import NodeHaveLinkValidator
 from program_management.ddd.validators._prerequisite_expression_syntax import PrerequisiteExpressionSyntaxValidator
 from program_management.ddd.validators._prerequisites_items import PrerequisiteItemsValidator
-from program_management.ddd.validators._program_tree_empty import ProgramTreeEmptyValidator
 from program_management.ddd.validators._relative_credits import RelativeCreditsValidator
+from program_management.ddd.validators._version_name_exists import VersionNameExistsValidator
 from program_management.ddd.validators.link import CreateLinkValidatorList
 
 
@@ -98,6 +101,7 @@ class PasteNodeValidatorList(business_validator.BusinessListValidator):
         for validator in self.validators:
             try:
                 validator.validate()
+            # TODO : gather multiple BusinessException instead of BusinessExceptions
             except osis_common.ddd.interface.BusinessExceptions as business_exception:
                 error_messages.extend(business_exception.messages)
 
@@ -111,7 +115,7 @@ class CheckPasteNodeValidatorList(business_validator.BusinessListValidator):
             tree: 'ProgramTree',
             node_to_paste: 'Node',
             check_paste_command: command.CheckPasteNodeCommand,
-            tree_repository: 'ProgramTreeRepository'
+            tree_repository: 'ProgramTreeRepository',
     ):
         path = check_paste_command.path_to_paste
 
@@ -121,6 +125,7 @@ class CheckPasteNodeValidatorList(business_validator.BusinessListValidator):
                 MinimumEditableYearValidator(tree),
                 InfiniteRecursivityTreeValidator(tree, node_to_paste, path),
                 _validate_end_date_and_option_finality.ValidateEndDateAndOptionFinality(node_to_paste, tree_repository),
+                MatchVersionValidator(tree, node_to_paste)
             ]
 
         elif node_to_paste.is_learning_unit():
@@ -140,8 +145,9 @@ class CheckPasteNodeValidatorList(business_validator.BusinessListValidator):
         for validator in self.validators:
             try:
                 validator.validate()
-            except osis_common.ddd.interface.BusinessExceptions as business_exception:
-                error_messages.extend(business_exception.messages)
+            # TODO : gather multiple BusinessException instead of BusinessExceptions
+            except osis_common.ddd.interface.BusinessExceptions as business_exceptions:
+                error_messages.extend(business_exceptions.messages)
 
         if error_messages:
             raise osis_common.ddd.interface.BusinessExceptions(error_messages)
@@ -160,7 +166,7 @@ class DetachNodeValidatorList(business_validator.BusinessListValidator):
         if node_to_detach.is_group_or_mini_or_training():
             path_to_node_to_detach = path_to_parent + '|' + str(node_to_detach.node_id)
             self.validators = [
-                DetachRootValidator(tree, path_to_parent),
+                DetachRootValidator(tree, path_to_node_to_detach),
                 MinimumEditableYearValidator(tree),
                 DetachAuthorizedRelationshipValidator(tree, node_to_detach, detach_from),
                 IsPrerequisiteValidator(tree, path_to_parent, node_to_detach),
@@ -183,6 +189,7 @@ class DetachNodeValidatorList(business_validator.BusinessListValidator):
         for validator in self.validators:
             try:
                 validator.validate()
+            # TODO : gather multiple BusinessException instead of BusinessExceptions
             except osis_common.ddd.interface.BusinessExceptions as business_exception:
                 error_messages.extend(business_exception.messages)
 
@@ -224,19 +231,20 @@ class UpdateLinkValidatorList(business_validator.BusinessListValidator):
 class DeleteProgramTreeValidatorList(business_validator.BusinessListValidator):
     def __init__(self, program_tree: 'ProgramTree'):
         self.validators = [
-            ProgramTreeEmptyValidator(program_tree),
             EmptyProgramTreeValidator(program_tree),
             NodeHaveLinkValidator(program_tree.root_node)
         ]
         super().__init__()
 
 
-class DeleteStandardVersionValidatorList(business_validator.BusinessListValidator):
+class DeleteSpecificVersionValidatorList(business_validator.BusinessListValidator):
     def __init__(
             self,
             program_tree_version: 'ProgramTreeVersion',
     ):
-        self.validators = []
+        self.validators = [
+            CheckVersionsEndDateValidator(program_tree_version),
+        ]
         super().__init__()
 
 
@@ -252,5 +260,20 @@ class CopyProgramTreeValidatorList(business_validator.BusinessListValidator):
     def __init__(self, copy_from: 'ProgramTree'):
         self.validators = [
             CheckProgramTreeEndDateValidator(copy_from)
+        ]
+        super().__init__()
+
+
+class UpdateProgramTreeVersionValidatorList(business_validator.BusinessListValidator):
+    def __init__(self, tree_version: 'ProgramTreeVersion'):
+        self.validators = []
+        super().__init__()
+
+
+class CreateProgramTreeVersionValidatorList(BusinessListValidator):
+
+    def __init__(self, year: int, offer_acronym: str, version_name: str):
+        self.validators = [
+            VersionNameExistsValidator(year, offer_acronym, version_name),
         ]
         super().__init__()

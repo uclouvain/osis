@@ -28,12 +28,12 @@ from typing import List
 from django.db import transaction
 
 from education_group.ddd.domain.training import TrainingIdentity
+from education_group.ddd.repository.mini_training import MiniTrainingRepository
 from education_group.ddd.repository.training import TrainingRepository
 from program_management.ddd.command import PostponeProgramTreeCommand, CopyProgramTreeToNextYearCommand
 from program_management.ddd.domain import exception
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 from program_management.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
-from program_management.ddd.domain.service.identity_search import TrainingIdentitySearch
 from program_management.ddd.service.write import copy_program_tree_service
 
 
@@ -47,6 +47,13 @@ def postpone_program_tree(
     # GIVEN
     from_year = postpone_cmd.from_year
     end_postponement_year = postpone_cmd.until_year
+
+    if not end_postponement_year:
+        end_postponement_year = CalculateEndPostponement.calculate_program_tree_end_postponement(
+            identity=ProgramTreeIdentity(code=postpone_cmd.from_code, year=postpone_cmd.from_year),
+            training_repository=TrainingRepository(),
+            mini_training_repository=MiniTrainingRepository(),
+        )
 
     # WHEN
     while from_year < end_postponement_year:

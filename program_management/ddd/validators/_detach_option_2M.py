@@ -33,10 +33,6 @@ from program_management.ddd.business_types import *
 
 
 class DetachOptionValidator(business_validator.BusinessValidator):
-    """
-    In context of MA/MD/MS when we add an option [or group which contains options],
-    this options must exist in parent context (2m)
-    """
 
     def __init__(
             self,
@@ -50,12 +46,8 @@ class DetachOptionValidator(business_validator.BusinessValidator):
         self.node_to_detach = working_tree.get_node(path_to_node_to_detach)
         self.tree_repository = tree_repository
 
-    def get_options_to_detach(self):
-        result = []
-        if self.node_to_detach.is_option():
-            result.append(self.node_to_detach)
-        result += self.node_to_detach.get_option_list()
-        return result
+        from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
+        self.version_search = ProgramTreeVersionIdentitySearch()
 
     def validate(self):
         trees_2m = [
@@ -64,7 +56,7 @@ class DetachOptionValidator(business_validator.BusinessValidator):
         ]
 
         error_messages = []
-        options_to_detach = self.get_options_to_detach()
+        options_to_detach = self._get_options_to_detach()
         if options_to_detach and not self._is_inside_finality():
             for tree_2m in trees_2m:
                 counter_options = Counter(tree_2m.get_2m_option_list())
@@ -73,7 +65,12 @@ class DetachOptionValidator(business_validator.BusinessValidator):
                 if not options_to_check:
                     continue
                 for finality in tree_2m.get_all_finalities():
+                    finality_version = self.version_search.get_from_node_identity(finality.entity_id)
                     options_to_detach_used_in_finality = set(options_to_detach) & set(finality.get_option_list())
+                    options_to_detach_versions = [
+                        self.version_search.get_from_node_identity(option.entity_id)
+                        for option in options_to_detach_used_in_finality
+                    ]
                     if options_to_detach_used_in_finality:
                         error_messages.append(
                             ngettext(
@@ -83,13 +80,27 @@ class DetachOptionValidator(business_validator.BusinessValidator):
                                 " %(finality_acronym)s program.",
                                 len(options_to_detach_used_in_finality)
                             ) % {
-                                "acronym": ', '.join(option.title for option in options_to_detach_used_in_finality),
-                                "finality_acronym": finality.title
+                                "acronym": ', '.join(
+                                    [self._get_version_title(option) for option in options_to_detach_versions]
+                                ),
+                                "finality_acronym": self._get_version_title(finality_version)
                             }
                         )
         if error_messages:
             raise osis_common.ddd.interface.BusinessExceptions(error_messages)
 
+    def _get_options_to_detach(self):
+        result = []
+        if self.node_to_detach.is_option():
+            result.append(self.node_to_detach)
+        result += self.node_to_detach.get_option_list()
+        return result
+
     def _is_inside_finality(self):
         parents = self.working_tree.get_parents(self.path_to_node_to_detach)
-        return any(p.is_finality() for p in parents)
+        return self.node_to_detach.is_finality() or any(p.is_finality() for p in parents)
+
+    def _get_version_title(self, version_identity):
+        return "{}[{}]".format(
+            version_identity.offer_acronym, version_identity.version_name
+        ) if version_identity.version_name else version_identity.offer_acronym

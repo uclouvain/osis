@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ from rest_framework import serializers
 
 from base.models.education_group_type import EducationGroupType
 from education_group.models.group_year import GroupYear
+from program_management.models.education_group_version import EducationGroupVersion
 
 
 class GroupYearHyperlinkedIdentityField(serializers.HyperlinkedIdentityField):
@@ -51,9 +52,11 @@ class GroupYearSerializer(serializers.HyperlinkedModelSerializer):
     )
     management_entity = serializers.CharField(source='management_entity_version.acronym', read_only=True, default='')
     title = serializers.CharField(source="title_fr", read_only=True)
+    version_title = serializers.SerializerMethodField()
 
     # Display human readable value
     education_group_type_text = serializers.CharField(source='education_group_type.get_name_display', read_only=True)
+    version_name = serializers.CharField(source='educationgroupversion.version_name', read_only=True)
 
     class Meta:
         model = GroupYear
@@ -66,4 +69,13 @@ class GroupYearSerializer(serializers.HyperlinkedModelSerializer):
             'title',
             'academic_year',
             'management_entity',
+            'version_name',
+            'version_title'
         )
+
+    def get_version_title(self, obj):
+        version_title = obj.title_fr
+        version = EducationGroupVersion.objects.filter(root_group__pk=obj.pk).first()
+        if version and version.title_fr:
+            return "{} [{}]".format(version_title, version.title_fr)
+        return version_title

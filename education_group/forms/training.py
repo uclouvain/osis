@@ -42,11 +42,9 @@ from education_group.ddd.business_types import *
 
 from base.business.event_perms import EventPermEducationGroupEdition
 from base.forms.common import ValidationRuleMixin
-from base.forms.education_group.common import MainCampusChoiceField
-from base.forms.education_group.training import _get_section_choices
-from base.forms.utils.choice_field import BLANK_CHOICE
+from base.forms.utils.choice_field import BLANK_CHOICE, add_blank
+from base.models import campus
 from base.models.academic_year import AcademicYear
-from base.models.campus import Campus
 from base.models.certificate_aim import CertificateAim
 from base.models.enums.academic_type import AcademicTypes
 from base.models.enums.active_status import ActiveStatusEnum
@@ -60,7 +58,7 @@ from base.models.enums.internship_presence import InternshipPresence
 from base.models.enums.rate_code import RateCode
 from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.forms import fields
-from education_group.forms.fields import MainEntitiesVersionChoiceField
+from education_group.forms.fields import MainEntitiesVersionChoiceField, UpperCaseCharField
 from education_group.forms.widgets import CertificateAimsWidget
 from reference.models.domain import Domain
 from reference.models.domain_isced import DomainIsced
@@ -72,11 +70,15 @@ from rules_management.enums import TRAINING_PGRM_ENCODING_PERIOD, \
 from rules_management.mixins import PermissionFieldMixin
 
 
+def _get_section_choices():
+    return add_blank(CertificateAim.objects.values_list('section', 'section').distinct().order_by('section'))
+
+
 class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
 
     # panel_informations_form.html
-    acronym = forms.CharField(max_length=15, label=_("Acronym/Short title"))
-    code = forms.CharField(max_length=15, label=_("Code"))
+    acronym = UpperCaseCharField(max_length=15, label=_("Acronym/Short title"))
+    code = UpperCaseCharField(max_length=15, label=_("Code"))
     active = forms.ChoiceField(
         initial=ActiveStatusEnum.ACTIVE.name,
         choices=BLANK_CHOICE + list(ActiveStatusEnum.choices()),
@@ -155,7 +157,7 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     main_language = forms.ModelChoiceField(
         queryset=Language.objects.all().order_by('name'),
         label=_('Primary language'),
-        to_field_name="code",
+        to_field_name="name",
         initial=FR_CODE_LANGUAGE
     )
     english_activities = forms.ChoiceField(
@@ -169,9 +171,19 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         required=False,
     )
     main_domain = forms.ModelChoiceField(
+        queryset=Domain.objects.filter(
+            type=UNIVERSITY
+        ).select_related(
+            'decree'
+        ).annotate(
+            form_key=Concat(
+                "decree__name", Value(" - "), "code",
+                output_field=CharField()
+            )
+        ),
         label=_('main domain'),
-        queryset=Domain.objects.filter(type=UNIVERSITY).select_related('decree'),
         required=False,
+        to_field_name="form_key"
     )
     secondary_domains = fields.SecondaryDomainsField(
         'university_domains',
@@ -179,9 +191,10 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         label=_('secondary domains').title(),
     )
     isced_domain = forms.ModelChoiceField(
-        label=_('ISCED domain'),
         queryset=DomainIsced.objects.all(),
         required=False,
+        to_field_name="code",
+        label=_('ISCED domain'),
     )
     internal_comment = forms.CharField(
         max_length=500,
@@ -192,22 +205,27 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
 
     # panel_entities_form.html
     management_entity = forms.CharField()
-    administration_entity = MainEntitiesVersionChoiceField(queryset=None, label=_("Administration entity"))
+    administration_entity = MainEntitiesVersionChoiceField(
+        queryset=None,
+        to_field_name="acronym"
+    )
     academic_year = forms.ModelChoiceField(
         queryset=AcademicYear.objects.all(),
-        label=_("Start"),
-    )  # Equivalent to start_year
+        label=_('Start'),
+        to_field_name="year",
+    )
     end_year = forms.ModelChoiceField(
         queryset=AcademicYear.objects.all(),
         label=_('Last year of organization'),
         required=False,
+        to_field_name="year"
     )
-    teaching_campus = MainCampusChoiceField(
+    teaching_campus = fields.MainCampusChoiceField(
         queryset=None,
         label=_("Learning location"),
         to_field_name="name"
     )
-    enrollment_campus = MainCampusChoiceField(
+    enrollment_campus = fields.MainCampusChoiceField(
         queryset=None,
         label=_("Enrollment campus"),
         to_field_name="name"
@@ -247,8 +265,8 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     ares_authorization = forms.CharField(label=_('ARES ability'), widget=forms.TextInput(), required=False)
     code_inter_cfb = forms.CharField(max_length=8, label=_('Code co-graduation inter CfB'), required=False)
     coefficient = forms.DecimalField(
-        max_digits=5,
-        decimal_places=2,
+        max_digits=7,
+        decimal_places=4,
         label=_('Co-graduation total coefficient'),
         widget=forms.TextInput(),
         required=False,
@@ -343,11 +361,8 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         self.fields["main_language"].initial = Language.objects.all().get(code=FR_CODE_LANGUAGE)
 
     def __init_campuses(self):
-        default_campus = Campus.objects.filter(name='Louvain-la-Neuve').first()
-        if 'teaching_campus' in self.fields:
-            self.fields['teaching_campus'].initial = default_campus
-        if 'enrollment_campus' in self.fields:
-            self.fields['enrollment_campus'].initial = default_campus
+        self.fields["teaching_campus"].initial = campus.LOUVAIN_LA_NEUVE_CAMPUS_NAME
+        self.fields["enrollment_campus"].initial = campus.LOUVAIN_LA_NEUVE_CAMPUS_NAME
 
     def __init_secondary_domains(self):
         self.fields["secondary_domains"].widget.attrs['placeholder'] = _('Enter text to search')
@@ -380,58 +395,13 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
 
 
 class UpdateTrainingForm(CreateTrainingForm):
-    administration_entity = MainEntitiesVersionChoiceField(
-        queryset=None,
-        to_field_name="acronym"
-    )
 
-    academic_year = forms.ModelChoiceField(
-        queryset=AcademicYear.objects.all(),
-        label=_('Validity'),
-        to_field_name="year",
-        disabled=True,
-        required=False
-    )
     start_year = forms.ModelChoiceField(
         queryset=AcademicYear.objects.all(),
         label=_('Start academic year'),
         to_field_name="year",
         disabled=True,
         required=False
-    )
-    end_year = forms.ModelChoiceField(
-        queryset=AcademicYear.objects.all(),
-        label=_('Last year of organization'),
-        required=False,
-        to_field_name="year"
-    )
-
-    main_language = forms.ModelChoiceField(
-        queryset=Language.objects.all().order_by('name'),
-        label=_('Primary language'),
-        to_field_name="name"
-    )
-
-    main_domain = forms.ModelChoiceField(
-        queryset=Domain.objects.filter(
-            type=UNIVERSITY
-        ).select_related(
-            'decree'
-        ).annotate(
-            form_key=Concat(
-                "decree__name", Value(" - "), "code",
-                output_field=CharField()
-            )
-        ),
-        label=_('main domain'),
-        required=False,
-        to_field_name="form_key"
-    )
-    isced_domain = forms.ModelChoiceField(
-        queryset=DomainIsced.objects.all(),
-        required=False,
-        to_field_name="code",
-        label=_('ISCED domain'),
     )
 
     def __init__(self, *args, **kwargs):
