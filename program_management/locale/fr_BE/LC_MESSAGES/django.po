@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-04 14:28+0200\n"
+"POT-Creation-Date: 2020-09-11 13:40+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -25,6 +25,10 @@ msgstr "\"%(child)s\" a été retiré de \"%(parent)s\""
 #, python-format
 msgid "\"%(child)s\" has been pasted into \"%(parent)s\""
 msgstr "\"%(child)s\" a été collé dans \"%(parent)s\""
+
+#, python-format
+msgid "\"%(child)s\" has been successfully updated"
+msgstr "\"%(child)s\" a été mis à jour avec succès"
 
 #, python-format
 msgid "%(node_to_add)s version must be the same as %(root_node)s version"
@@ -127,8 +131,10 @@ msgstr "Ent. attrib."
 msgid "Annual"
 msgstr "Annuel"
 
+#, python-format
 msgid "Are you sure you want to delete %(offer_acronym)s %(version_name)s ?"
-msgstr "Êtes-vous sûr·e de vouloir supprimer %(offer_acronym)s %(version_name)s ?"
+msgstr ""
+"Êtes-vous sûr·e de vouloir supprimer %(offer_acronym)s %(version_name)s ?"
 
 #, python-format
 msgid "Are you sure you want to detach %(acronym)s ?"
@@ -620,10 +626,12 @@ msgstr ""
 msgid "The program %(title)s - %(academic_year)s will be published soon"
 msgstr "Le programme %(title)s - %(academic_year)s sera publié sous peu"
 
+#, python-format
 msgid ""
 "The program tree version %(offer_acronym)s %(version_name)s has been deleted."
 msgstr ""
-"La version de programme %(offer_acronym)s %(version_name)s a été supprimée avec succès."
+"La version de programme %(offer_acronym)s %(version_name)s a été supprimée "
+"avec succès."
 
 msgid "The registration form is available at the Secretariat of"
 msgstr "Le formulaire d'inscription est disponible au Secrétariat de"
