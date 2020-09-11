@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-10 15:50+0200\n"
+"POT-Creation-Date: 2020-09-11 14:39+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -103,9 +103,6 @@ msgstr "Condition d'accès"
 
 msgid "Acronym"
 msgstr "Sigle"
-
-msgid "Acronym of version"
-msgstr "Sigle de la version"
 
 msgid "Acronym/Short title"
 msgstr "Sigle/Intitulé abrégé"
@@ -516,6 +513,9 @@ msgstr "Autres informations"
 msgid "Other languages activities"
 msgstr "Activités dans d'autres langues"
 
+msgid "Partial deliberation"
+msgstr ""
+
 msgid "Partial title in English"
 msgstr "Intitulé partiel en anglais"
 
@@ -614,6 +614,9 @@ msgstr "Crédits relatifs"
 msgid "Relative credits must be greater or equals than 0"
 msgstr "Crédits relatifs doit être plus grand ou égal à 0"
 
+msgid "Relative credits must be lower or equals to 999"
+msgstr "Crédits relatifs doit être inférieur ou égale à 999"
+
 msgid "Remark"
 msgstr "Remarque"
 
@@ -633,6 +636,11 @@ msgid "Schedule type"
 msgstr "Type horaire"
 
 msgid "Search"
+msgstr "Recherche"
+
+#, fuzzy
+#| msgid "Search"
+msgid "Search..."
 msgstr "Recherche"
 
 msgid "Select a language"
@@ -742,7 +750,8 @@ msgstr "La formation %(title)s - %(academic_year)s sera publiée sous peu"
 msgid ""
 "The program tree version %(offer_acronym)s %(version_name)s has been deleted."
 msgstr ""
-"La version de formation %(offer_acronym)s %(version_name)s a été supprimée avec succès."
+"La version de formation %(offer_acronym)s %(version_name)s a été supprimée "
+"avec succès."
 
 msgid "The registration form is available at the Secretariat of"
 msgstr "Le formulaire d'inscription est disponible au Secrétariat de"
@@ -873,8 +882,8 @@ msgid ""
 "You can't copy the program tree version '{acronym}' from {from_year} to "
 "{to_year} because it ends in {end_year}"
 msgstr ""
-"Vous ne pouvez pas copier la version de formation '{acronym}' de "
-"{from_year} à {to_year} parce qu'elle finit en {end_year}"
+"Vous ne pouvez pas copier la version de formation '{acronym}' de {from_year} "
+"à {to_year} parce qu'elle finit en {end_year}"
 
 #, python-brace-format
 msgid ""
@@ -939,6 +948,9 @@ msgstr "email"
 msgid "faculty number"
 msgstr "n° facultaire"
 
+msgid "filter by section"
+msgstr ""
+
 msgid "group year"
 msgstr "groupement"
 
@@ -1000,3 +1012,6 @@ msgstr "Oui"
 
 msgid "yes,no"
 msgstr "oui,non"
+
+#~ msgid "Acronym of version"
+#~ msgstr "Sigle de la version"

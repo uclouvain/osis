@@ -24,7 +24,7 @@
 from typing import Optional
 
 from base.ddd.utils import business_validator
-from program_management.ddd.domain.exception import RelativeCreditShouldBeGreaterOrEqualsThanZero
+from program_management.ddd.domain import exception
 
 
 class RelativeCreditsValidator(business_validator.BusinessValidator):
@@ -37,4 +37,8 @@ class RelativeCreditsValidator(business_validator.BusinessValidator):
             return
 
         if self.relative_credits < 0:
-            raise RelativeCreditShouldBeGreaterOrEqualsThanZero
+            raise exception.RelativeCreditShouldBeGreaterOrEqualsThanZero
+
+        elif self.relative_credits > 999:
+            raise exception.RelativeCreditShouldBeLowerOrEqualThan999
+

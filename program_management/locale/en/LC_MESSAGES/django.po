@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-10 15:50+0200\n"
+"POT-Creation-Date: 2020-09-11 14:39+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -87,9 +87,6 @@ msgid "Access condition"
 msgstr ""
 
 msgid "Acronym"
-msgstr ""
-
-msgid "Acronym of version"
 msgstr ""
 
 msgid "Acronym/Short title"
@@ -488,6 +485,9 @@ msgstr ""
 msgid "Other languages activities"
 msgstr ""
 
+msgid "Partial deliberation"
+msgstr ""
+
 msgid "Partial title in English"
 msgstr ""
 
@@ -582,6 +582,9 @@ msgstr ""
 msgid "Relative credits must be greater or equals than 0"
 msgstr ""
 
+msgid "Relative credits must be lower or equals to 999"
+msgstr ""
+
 msgid "Remark"
 msgstr ""
 
@@ -601,6 +604,9 @@ msgid "Schedule type"
 msgstr ""
 
 msgid "Search"
+msgstr ""
+
+msgid "Search..."
 msgstr ""
 
 msgid "Select a language"
@@ -874,6 +880,9 @@ msgid "emails"
 msgstr ""
 
 msgid "faculty number"
+msgstr ""
+
+msgid "filter by section"
 msgstr ""
 
 msgid "group year"
