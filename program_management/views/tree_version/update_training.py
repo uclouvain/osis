@@ -5,24 +5,21 @@ from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils.functional import cached_property
-from django.views import View
 from django.utils.translation import gettext_lazy as _
+from django.views import View
 
-from base.forms.common import ValidationRuleMixin
 from base.models import entity_version
 from base.views.common import display_error_messages
+from education_group.ddd import command as command_education_group
+from education_group.ddd.business_types import *
 from education_group.ddd.domain import exception as exception_education_group
+from education_group.ddd.domain.exception import TrainingNotFoundException, GroupNotFoundException
+from education_group.ddd.service.read import get_training_service, get_group_service
 from education_group.models.group_year import GroupYear
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from osis_role.contrib.views import PermissionRequiredMixin
-
-from education_group.ddd.business_types import *
-from education_group.ddd import command as command_education_group
-from education_group.ddd.domain.exception import TrainingNotFoundException, GroupNotFoundException
-from education_group.ddd.service.read import get_training_service, get_group_service
-
-from program_management.ddd.business_types import *
 from program_management.ddd import command
+from program_management.ddd.business_types import *
 from program_management.ddd.command import UpdateTrainingVersionCommand
 from program_management.ddd.service.read import get_program_tree_version_from_node_service
 from program_management.ddd.service.write import update_training_version_service
@@ -240,7 +237,7 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
             "leads_to_diploma": training_obj.diploma.leads_to_diploma,
             "diploma_printing_title": training_obj.diploma.printing_title,
             "professional_title": training_obj.diploma.professional_title,
-            "certificate_aims": ',  '.join([str(aim) for aim in training_obj.diploma.aims])
+            "certificate_aims": [aim.code for aim in training_obj.diploma.aims]
         }
         return form_initial_values
 
