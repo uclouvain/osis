@@ -27,6 +27,7 @@ from unittest import mock
 from django.test import SimpleTestCase
 from mock import patch
 
+from program_management.ddd.command import BulkUpdateLinkCommand
 from program_management.ddd.service.write import update_link_service
 from program_management.tests.ddd.factories.commands.update_link_comand import UpdateLinkCommandFactory
 from program_management.tests.ddd.factories.link import LinkFactory
@@ -46,12 +47,17 @@ class TestUpdateLink(SimpleTestCase):
         self.tree = ProgramTreeFactory()
         self.parent = self.tree.root_node
         self.link = LinkFactory(parent=self.parent, child=NodeLearningUnitYearFactory())
+        self.mock_atomic_transaction = patch(
+            "program_management.ddd.service.write.update_link_service.transaction.atomic", return_value=mock_decorator
 
-    @patch("program_management.ddd.service.write.update_link_service.transaction.atomic", return_value=mock_decorator)
+        )
+        self.mock_atomic_transaction_patcher = self.mock_atomic_transaction.start()
+        self.addCleanup(self.mock_atomic_transaction_patcher.stop)
+
     @patch('program_management.ddd.repositories.program_tree.ProgramTreeRepository.get')
     @patch('program_management.ddd.domain.program_tree.ProgramTree.update_link')
     @patch('program_management.ddd.repositories.program_tree.ProgramTreeRepository.update')
-    def test_should_call_update_link_from_program_tree(self, mock_update_tree, mock_update_link, mock_get_tree, mock_d):
+    def test_should_call_tree_update_link_single_update(self, mock_update_tree, mock_update_link, mock_get_tree):
         mock_get_tree.return_value = self.tree
         # reload update_link_service to apply mock decorator
         reload(update_link_service)
@@ -60,5 +66,20 @@ class TestUpdateLink(SimpleTestCase):
             child_node_code=self.link.child.code, child_node_year=self.link.child.year
         )
         update_link_service.update_link(cmd=command)
+        self.assertTrue(mock_update_link.called)
+        self.assertTrue(mock_update_tree.called)
+
+    @patch('program_management.ddd.repositories.program_tree.ProgramTreeRepository.get')
+    @patch('program_management.ddd.domain.program_tree.ProgramTree.update_link')
+    @patch('program_management.ddd.repositories.program_tree.ProgramTreeRepository.update')
+    def test_should_call_tree_update_link_for_bulk_update(self, mock_update_tree, mock_update_link, mock_get_tree):
+        mock_get_tree.return_value = self.tree
+        # reload update_link_service to apply mock decorator
+        reload(update_link_service)
+        command = BulkUpdateLinkCommand(
+            parent_node_code=self.parent.code, parent_node_year=self.parent.year,
+            update_link_cmds=[UpdateLinkCommandFactory() for _ in range(0, 2)]
+        )
+        update_link_service.bulk_update_links(cmd=command)
         self.assertTrue(mock_update_link.called)
         self.assertTrue(mock_update_tree.called)
