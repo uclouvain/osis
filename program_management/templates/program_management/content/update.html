@@ -29,8 +29,17 @@
 {% block breadcrumb %}
     {{ block.super }}
     <li>
-        {{ group_obj.abbreviated_title }}
+        {% if group_obj.is_training %}
+            {{ group_obj.abbreviated_title }}
+        {% else %}
+            {{ group_obj.code }}
+        {% endif %}
     </li>
+    {% if version %}
+    <li>
+        {{ version.version_name }}
+    </li>
+    {% endif %}
     <li class="active">
         {% trans 'Update Content' %}
     </li>
@@ -38,7 +47,7 @@
 
 {% block header_content %}
     <div class="page-header">
-        <h2>{{ group_obj.abbreviated_title }} - {{ group_obj.academic_year }}</h2>
+        <h2>{{ group_obj.abbreviated_title }} {% if version %} [{{ version.version_name }} ] {% endif %}- {{ group_obj.academic_year }}</h2>
         <h3>{{ group_obj.titles.title_fr }}</h3>
     </div>
 {% endblock header_content %}

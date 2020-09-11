@@ -23,9 +23,10 @@ from learning_unit.ddd.service.read import get_multiple_learning_unit_years_serv
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command as command_program_management
 from program_management.ddd.business_types import *
-from program_management.ddd.service.read import get_program_tree_service
+from program_management.ddd.service.read import get_program_tree_service, get_program_tree_version_from_node_service
 from program_management.ddd.service.write import update_link_service
 from program_management.models.enums.node_type import NodeType
+from program_management.ddd.domain import exception as program_exception
 
 
 class ContentUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
@@ -40,8 +41,19 @@ class ContentUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "tabs": self.get_tabs(),
             "group_obj": self.get_group_obj(),
             "cancel_url": self.get_cancel_url(),
+            "version": self.get_version()
         }
         return render(request, self.template_name, context)
+
+    def get_version(self) -> Optional['ProgramTreeVersion']:
+        try:
+            get_cmd = command_program_management.GetProgramTreeVersionFromNodeCommand(
+                code=self.kwargs['code'],
+                year=self.kwargs['year']
+            )
+            return get_program_tree_version_from_node_service.get_program_tree_version_from_node(get_cmd)
+        except program_exception.ProgramTreeVersionNotFoundException:
+            return None
 
     def get_tabs(self) -> List:
         return [
@@ -108,7 +120,7 @@ class ContentUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         try:
             get_cmd = command.GetGroupCommand(code=self.kwargs["code"], year=int(self.kwargs["year"]))
             return get_group_service.get_group(get_cmd)
-        except exception.TrainingNotFoundException:
+        except exception.GroupNotFoundException:
             raise Http404
 
     @functools.lru_cache()

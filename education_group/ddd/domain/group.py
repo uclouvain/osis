@@ -30,7 +30,7 @@ import attr
 
 from base.ddd.utils.converters import to_upper_case_converter
 from base.models.enums.constraint_type import ConstraintTypeEnum
-from base.models.enums.education_group_types import EducationGroupTypesEnum, GroupType
+from base.models.enums.education_group_types import EducationGroupTypesEnum, GroupType, TrainingType
 from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import exception
@@ -130,6 +130,9 @@ class Group(interface.RootEntity):
 
     def is_minor_major_option_list_choice(self):
         return self.type.name in GroupType.minor_major_option_list_choice()
+
+    def is_training(self):
+        return self.type in TrainingType
 
     def update(
             self,
