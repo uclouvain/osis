@@ -894,7 +894,7 @@ paths:
   /mini_trainings/{year}/{acronym}/versions/{version_name}/title:
     get:
       description: Return the title of the mini training
-      operationId: minitrainings_title_version_read
+      operationId: minitrainings_title_read
       parameters:
         - in: path
           name: year
