@@ -73,7 +73,7 @@ class TestUpdateLinkView(TestCase):
             return_value=LinkFactory(parent=self.parent, child=self.child)
         )
         self.get_link_patcher_mock = get_link_patcher.start()
-        self.addCleanup(get_tree_patcher.stop)
+        self.addCleanup(get_link_patcher.stop)
 
         get_perm_object_patcher = mock.patch(
             'program_management.views.tree.update.UpdateLinkView.get_permission_object',
