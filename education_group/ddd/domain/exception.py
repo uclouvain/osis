@@ -1,3 +1,4 @@
+from abc import ABC
 from typing import List
 
 from education_group.templatetags.academic_year_display import display_as_academic_year
@@ -211,41 +212,62 @@ class MultipleEntitiesFoundException(BusinessException):
         super().__init__(message, **kwargs)
 
 
-class TrainingCopyConsistencyException(BusinessException):
-    def __init__(self, training_from: 'Training', training_to: 'Training', *args, **kwargs):
-        conflict_fields = training_from.get_conflicted_fields(training_to)
-        message = _(
-            "Cannot copy training from %(academic_year_from)s to %(academic_year_to)s "
-            "because %(fields)s has already been modified"
-        ) % {
-            "academic_year_from": training_from.academic_year,
-            "academic_year_to": training_to.academic_year,
-            "fields": ", ".join(conflict_fields)
+class AbstractConsistencyException(ABC):
+    def __init__(self, year_to: int, conflict_fields: List[str], *args, **kwargs):
+        fields_str = ", ".join([str(self.__map_field_to_label(field_name)) for field_name in conflict_fields])
+        message = _("Consistency error in %(academic_year)s: %(fields)s has already been modified") % {
+            "academic_year": display_as_academic_year(year_to),
+            "fields": fields_str
         }
         super().__init__(message, **kwargs)
 
+    def __map_field_to_label(self, field_name: str) -> str:
+        return {
+            "credits": _("Credits"),
+            "titles": _("Titles"),
+            "status": _("Status"),
+            "schedule_type": _("Schedule type"),
+            "duration": _("Duration"),
+            "duration_unit": _("duration unit"),
+            "keywords": _("Keywords"),
+            "internship_presence": _("Internship"),
+            "is_enrollment_enabled": _("Enrollment enabled"),
+            "has_online_re_registration": _("Web re-registration"),
+            "has_partial_deliberation": _("Partial deliberation"),
+            "has_admission_exam": _("Admission exam"),
+            "has_dissertation": _("dissertation"),
+            "produce_university_certificate": _("University certificate"),
+            "decree_category": _("Decree category"),
+            "rate_code": _("Rate code"),
+            "main_language": _("Primary language"),
+            "english_activities": _("activities in English").capitalize(),
+            "other_language_activities": _("Other languages activities"),
+            "internal_comment": _("comment (internal)").capitalize(),
+            "main_domain": _("main domain"),
+            "secondary_domains": _("secondary domains"),
+            "isced_domain": _("ISCED domain"),
+            "management_entity": _("Management entity"),
+            "administration_entity": _("Administration entity"),
+            "teaching_campus": _("Learning location"),
+            "enrollment_campus": _("Enrollment campus"),
+            "other_campus_activities": _("Activities on other campus"),
+            "funding": _("Funding"),
+            "hops": _("hops"),
+            "co_graduation": _("co-graduation"),
+            "academic_type": _("Academic type"),
+            "diploma": _("Diploma"),
+            "content_constraint": _("Content constraint"),
+            "remark": _("Remark")
+        }.get(field_name, field_name)
 
-class MiniTrainingCopyConsistencyException(BusinessException):
-    def __init__(self, year_from: int, year_to: int, conflict_fields: List[str], *args, **kwargs):
-        message = _(
-            "Cannot copy mini training from %(academic_year_from)s to %(academic_year_to)s "
-            "because %(fields)s has already been modified"
-        ) % {
-            "academic_year_from": display_as_academic_year(year_from),
-            "academic_year_to": display_as_academic_year(year_to),
-            "fields": ", ".join(conflict_fields)
-        }
-        super().__init__(message, **kwargs)
+
+class GroupCopyConsistencyException(AbstractConsistencyException, BusinessException):
+    pass
 
 
-class GroupCopyConsistencyException(BusinessException):
-    def __init__(self, year_from: int, year_to: int, conflict_fields: List[str], *args, **kwargs):
-        message = _(
-            "Cannot copy group from %(academic_year_from)s to %(academic_year_to)s "
-            "because %(fields)s has already been modified"
-        ) % {
-            "academic_year_from": display_as_academic_year(year_from),
-            "academic_year_to": display_as_academic_year(year_to),
-            "fields": ", ".join(conflict_fields)
-        }
-        super().__init__(message, **kwargs)
+class TrainingCopyConsistencyException(AbstractConsistencyException, BusinessException):
+    pass
+
+
+class MiniTrainingCopyConsistencyException(AbstractConsistencyException, BusinessException):
+    pass

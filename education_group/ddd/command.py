@@ -530,13 +530,6 @@ class GetUpdateTrainingWarningMessages(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True)
-class GetUpdateMiniTrainingWarningMessages(interface.CommandRequest):
-    acronym = attr.ib(type=str)
-    code = attr.ib(type=str)
-    year = attr.ib(type=int)
-
-
-@attr.s(frozen=True, slots=True)
 class PublishCommonAdmissionCommand(interface.CommandRequest):
     year = attr.ib(type=int)
 

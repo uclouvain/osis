@@ -59,7 +59,10 @@ class ConflictedFields(interface.DomainService):
     @classmethod
     def get_training_conflicted_fields(cls, training_id: 'TrainingIdentity') -> Dict:
         current_training = TrainingRepository.get(training_id)
-        conflicted_fields = {}
+        group_id = GroupIdentity(code=current_training.code, year=current_training.year)
+        conflicted_fields = {
+            **cls.get_group_conflicted_fields(group_id)
+        }
 
         for year in itertools.count(current_training.year + 1):
             try:
@@ -80,7 +83,10 @@ class ConflictedFields(interface.DomainService):
     @classmethod
     def get_mini_training_conflicted_fields(cls, mini_training_id: 'MiniTrainingIdentity') -> Dict:
         current_mini_training = MiniTrainingRepository.get(mini_training_id)
-        conflicted_fields = {}
+        group_id = GroupIdentity(code=current_mini_training.code, year=current_mini_training.year)
+        conflicted_fields = {
+            **cls.get_group_conflicted_fields(group_id)
+        }
 
         for year in itertools.count(current_mini_training.year + 1):
             try:

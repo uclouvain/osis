@@ -27,6 +27,7 @@ from typing import List
 
 from education_group.ddd import command
 from education_group.ddd.business_types import *
+from education_group.ddd.domain.exception import MiniTrainingCopyConsistencyException
 from education_group.ddd.service.write import postpone_mini_training_modification_service
 from program_management.ddd.command import PostponeProgramTreeVersionCommand, PostponeProgramTreeCommand
 from program_management.ddd.service.write import postpone_tree_version_service, postpone_program_tree_service
@@ -35,9 +36,14 @@ from program_management.ddd.service.write import postpone_tree_version_service, 
 def update_and_report_mini_training_with_program_tree(
         update_command: command.UpdateAndReportMiniTrainingWithProgramTree
 ) -> List['MiniTrainingIdentity']:
-    mini_training_identities = postpone_mini_training_modification_service.postpone_mini_training_modification(
-        _convert_to_postpone_mini_training_modification_command(update_command)
-    )
+    consistency_error = None
+    try:
+        mini_training_identities = postpone_mini_training_modification_service.postpone_mini_training_modification(
+            _convert_to_postpone_mini_training_modification_command(update_command)
+        )
+    except MiniTrainingCopyConsistencyException as e:
+        consistency_error = e
+
     postpone_program_tree_service.postpone_program_tree(
         PostponeProgramTreeCommand(
             from_code=update_command.code,
@@ -54,6 +60,8 @@ def update_and_report_mini_training_with_program_tree(
             from_is_transition=False,
         )
     )
+    if consistency_error:
+        raise consistency_error
     return mini_training_identities
 
 

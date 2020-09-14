@@ -72,8 +72,8 @@ def postpone_mini_training_modification(postpone_cmd: command.PostponeMiniTraini
     )
 
     for year in range(from_year, end_postponement_year):
-        if year in conflicted_fields:
-            raise MiniTrainingCopyConsistencyException(year, year+1, conflicted_fields[year])
+        if year + 1 in conflicted_fields:
+            continue
 
         identity_next_year = copy_mini_training_service.copy_mini_training_to_next_year(
             copy_cmd=command.CopyMiniTrainingToNextYearCommand(
@@ -83,4 +83,8 @@ def postpone_mini_training_modification(postpone_cmd: command.PostponeMiniTraini
         )
         # THEN
         identities_created.append(identity_next_year)
+
+    if conflicted_fields:
+        first_conflict_year = min(conflicted_fields.keys())
+        raise MiniTrainingCopyConsistencyException(first_conflict_year, conflicted_fields[first_conflict_year])
     return identities_created
