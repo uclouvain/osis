@@ -56,7 +56,7 @@ class Command(BaseCommand):
     def _print_rules_set(self, rules_set):
         print("{")
         for rule in sorted(rules_set.items()):
-            print("\t'{}' : {},".format(rule[0], rule[1]))
+            print("\t'{}': {},".format(rule[0], rule[1]))
         print("}")
 
     def _build_rules_set(self, perms):
