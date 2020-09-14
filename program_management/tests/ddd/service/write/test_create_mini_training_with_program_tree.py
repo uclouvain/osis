@@ -24,12 +24,10 @@
 import mock
 from django.test import TestCase
 
-from education_group.ddd.domain import training, mini_training
+from education_group.ddd.domain import mini_training
 from education_group.tests.ddd.factories.command.create_mini_training_command import CreateMiniTrainingCommandFactory
-from education_group.tests.ddd.factories.command.create_training_command import CreateTrainingCommandFactory
 from program_management.ddd.domain import program_tree, program_tree_version
-from program_management.ddd.service.write import create_training_with_program_tree, \
-    create_mini_training_with_program_tree
+from program_management.ddd.service.write import create_mini_training_with_program_tree
 
 
 class TestCreateAndReportMiniTrainingWithProgramTree(TestCase):
@@ -40,13 +38,11 @@ class TestCreateAndReportMiniTrainingWithProgramTree(TestCase):
                 "postpone_program_tree")
     @mock.patch("program_management.ddd.service.write.create_standard_program_tree_service."
                 "create_standard_program_tree")
-    @mock.patch("education_group.ddd.service.write.create_group_service.create_orphan_group")
     @mock.patch("education_group.ddd.service.write.create_orphan_mini_training_service."
                 "create_and_postpone_orphan_mini_training")
     def test_should_create_mini_trainings_until_postponement_limit(
             self,
             mock_create_and_postpone_orphan_mini_training,
-            mock_create_orphan_group,
             mock_create_standard_program_tree,
             mock_postpone_program_tree,
             mock_create_standard_program_version,
@@ -59,7 +55,6 @@ class TestCreateAndReportMiniTrainingWithProgramTree(TestCase):
         ]
 
         mock_create_and_postpone_orphan_mini_training.return_value = mini_training_identities
-        mock_create_orphan_group.return_value = None
         mock_create_standard_program_tree.return_value = program_tree.ProgramTreeIdentity(code="CODE", year=2020)
         mock_postpone_program_tree.return_value = None
         mock_create_standard_program_version.return_value = program_tree_version.ProgramTreeVersionIdentity(
@@ -75,7 +70,6 @@ class TestCreateAndReportMiniTrainingWithProgramTree(TestCase):
 
         self.assertListEqual(mini_training_identities, result)
         self.assertTrue(mock_create_and_postpone_orphan_mini_training.called)
-        self.assertTrue(mock_create_orphan_group.called)
         self.assertTrue(mock_create_standard_program_tree.called)
         self.assertTrue(mock_postpone_program_tree.called)
         self.assertTrue(mock_create_standard_program_version.called)

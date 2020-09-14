@@ -73,7 +73,7 @@ def postpone_mini_training_modification(postpone_cmd: command.PostponeMiniTraini
 
     for year in range(from_year, end_postponement_year):
         if year + 1 in conflicted_fields:
-            continue
+            continue  # Do not copy info from year to N+1 because conflict detected
 
         identity_next_year = copy_mini_training_service.copy_mini_training_to_next_year(
             copy_cmd=command.CopyMiniTrainingToNextYearCommand(

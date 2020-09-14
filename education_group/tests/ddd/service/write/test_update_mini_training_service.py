@@ -22,6 +22,7 @@
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
 from django.test import TestCase
+from mock import patch
 
 from base.models.enums.active_status import ActiveStatusEnum
 from base.models.enums.constraint_type import ConstraintTypeEnum
@@ -57,7 +58,6 @@ class TestUpdateMiniTraining(TestCase, MockPatcherMixin):
             keywords="A key",
             schedule_type=ScheduleTypeEnum.DAILY.name,
             status=ActiveStatusEnum.ACTIVE.name,
-            teaching_campus_organization_name="Fucam"
         )
 
     def setUp(self) -> None:
@@ -82,9 +82,9 @@ class TestUpdateMiniTraining(TestCase, MockPatcherMixin):
         self.assertEqual(self.mini_training_2018.entity_id, result)
 
     def test_should_update_value_of_mini_trainings_based_on_command_value(self, mock_update_group):
-        entity_ids = update_mini_training_service.update_mini_training(self.cmd)
+        entity_id = update_mini_training_service.update_mini_training(self.cmd)
 
-        mini_training_update = self.fake_mini_training_repo.get(entity_ids[0])
+        mini_training_update = self.fake_mini_training_repo.get(entity_id)
         self.assert_has_same_value_as_update_command(mini_training_update)
 
     def assert_has_same_value_as_update_command(self, update_mini_training: 'mini_training.MiniTraining'):

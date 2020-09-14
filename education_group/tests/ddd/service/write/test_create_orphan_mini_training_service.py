@@ -32,7 +32,9 @@ from testing.mocks import MockPatcherMixin
 
 
 @mock.patch("education_group.ddd.service.write.create_orphan_mini_training_service."
-            "postpone_mini_training_service.postpone_mini_training", return_value=[])
+            "create_group_service.create_orphan_group", return_value=[])
+@mock.patch("education_group.ddd.service.write.create_orphan_mini_training_service."
+            "postpone_mini_training_modification_service.postpone_mini_training_modification", return_value=[])
 class TestCreateAndPostponeOrphanMiniTraining(TestCase, MockPatcherMixin):
     def setUp(self) -> None:
         self.fake_mini_training_repository = get_fake_mini_training_repository([])
@@ -41,7 +43,7 @@ class TestCreateAndPostponeOrphanMiniTraining(TestCase, MockPatcherMixin):
             self.fake_mini_training_repository
         )
 
-    def test_should_return_mini_training_identities(self, mock_postpone_mini_training):
+    def test_should_return_mini_training_identities(self, mock_postpone_mini_training, mock_create_orphan_group):
         mock_postpone_mini_training.return_value = [
             mini_training.MiniTrainingIdentity(acronym="ACRON", year=year) for year in range(2021, 2023)
         ]
@@ -52,8 +54,14 @@ class TestCreateAndPostponeOrphanMiniTraining(TestCase, MockPatcherMixin):
         expected_result = [mini_training.MiniTrainingIdentity(acronym="ACRON", year=year) for year in range(2020, 2023)]
         self.assertListEqual(expected_result, result)
 
-    def test_should_call_postpone_mini_training_service(self, mock_postpone_mini_training):
+    def test_should_call_postpone_mini_training_service(self, mock_postpone_mini_training, mock_create_orphan_group):
         cmd = CreateMiniTrainingCommandFactory(year=2020, code="CODE", abbreviated_title="ACRON")
 
         create_orphan_mini_training_service.create_and_postpone_orphan_mini_training(cmd)
-        self.assertTrue(mock_postpone_mini_training)
+        self.assertTrue(mock_postpone_mini_training.called)
+
+    def test_should_call_create_orphan_group_service(self, mock_postpone_mini_training, mock_create_orphan_group):
+        cmd = CreateMiniTrainingCommandFactory(year=2020, code="CODE", abbreviated_title="ACRON")
+
+        create_orphan_mini_training_service.create_and_postpone_orphan_mini_training(cmd)
+        self.assertTrue(mock_create_orphan_group.called)

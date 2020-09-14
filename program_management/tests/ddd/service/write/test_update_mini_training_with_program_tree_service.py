@@ -57,21 +57,13 @@ class TestUpdateAndReportMiniTrainingWithProgramTree(TestCase):
         )
 
     def setUp(self):
-        self.update_mini_training_patcher = mock.patch(
+        self.postpone_mini_training_modification_patcher = mock.patch(
             "program_management.ddd.service.write.update_mini_training_with_program_tree_service."
-            "update_mini_training_service.update_mini_training",
+            "postpone_mini_training_modification_service.postpone_mini_training_modification",
             return_value=[]
         )
-        self.mocked_update_mini_training = self.update_mini_training_patcher.start()
-        self.addCleanup(self.update_mini_training_patcher.stop)
-
-        self.update_group_patcher = mock.patch(
-            "program_management.ddd.service.write.update_mini_training_with_program_tree_service."
-            "update_group_service.update_group",
-            return_value=[]
-        )
-        self.mocked_update_group = self.update_group_patcher.start()
-        self.addCleanup(self.update_group_patcher.stop)
+        self.mocked_postpone_mini_training_modification = self.postpone_mini_training_modification_patcher.start()
+        self.addCleanup(self.postpone_mini_training_modification_patcher.stop)
 
         self.postpone_pgrm_tree_patcher = mock.patch(
             "program_management.ddd.service.write.update_mini_training_with_program_tree_service."
@@ -92,7 +84,6 @@ class TestUpdateAndReportMiniTrainingWithProgramTree(TestCase):
     def test_assert_call_multiple_service(self):
         update_mini_training_with_program_tree_service.update_and_report_mini_training_with_program_tree(self.cmd)
 
-        self.assertTrue(self.mocked_update_mini_training.called)
-        self.assertTrue(self.mocked_update_group.called)
+        self.assertTrue(self.mocked_postpone_mini_training_modification.called)
         self.assertTrue(self.mocked_postpone_pgrm_tree.called)
         self.assertTrue(self.mocked_postpone_pgrm_tree_version.called)

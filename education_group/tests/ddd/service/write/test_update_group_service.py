@@ -39,7 +39,7 @@ class TestUpdateGroup(TestCase, MockPatcherMixin):
     def setUp(self) -> None:
         self.group_2018 = GroupFactory(entity_identity__code=self.cmd.code, entity_identity__year=2018,)
         self.group_2019 = GroupFactory(entity_identity__code=self.cmd.code, entity_identity__year=2019,)
-        self.groups = [self.group_2018, self.group_2019, self.training_2019, self.mini_training_2019]
+        self.groups = [self.group_2018, self.group_2019]
         self.fake_group_repo = get_fake_group_repository(self.groups)
         self.mock_repo("education_group.ddd.repository.group.GroupRepository", self.fake_group_repo)
 
