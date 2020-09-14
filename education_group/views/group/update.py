@@ -36,6 +36,7 @@ from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.ddd.service.read import get_program_tree_service
 from program_management.ddd.service.write import update_link_service
 from program_management.models.enums.node_type import NodeType
+from program_management.ddd.domain.service.get_program_tree_version_for_tree import get_program_tree_version_for_tree
 
 
 class GroupUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
@@ -64,7 +65,8 @@ class GroupUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "type_text": self.get_group_obj().type.value,
             "content_formset": content_formset,
             "tabs": self.get_tabs(),
-            "cancel_url": self.get_cancel_url()
+            "cancel_url": self.get_cancel_url(),
+            "tree_different_versions": get_program_tree_version_for_tree(self.get_program_tree_obj().get_all_nodes())
         })
 
     def post(self, request, *args, **kwargs):

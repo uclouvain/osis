@@ -1,5 +1,5 @@
 {% load static bootstrap3 %}
-{% load i18n %}
+{% load i18n  version_details %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
 * designed to manage the core business of higher education institutions,
@@ -7,7 +7,7 @@
 * The core business involves the administration of students, teachers,
 * courses, programs and so on.
 *
-* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+* Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -56,7 +56,7 @@
                             {{ form.id }}
                             {% if form.is_a_link_with_child_of_learning_unit %}
                                 {# Link attrs relevant for child of type learning unit #}
-                                <td style="width:8%"></td>
+                                <td style="width:12%"></td>
                                 <td>
                                     <a id="lnk_learning_unit_{{ form.child_obj.id }}"
                                        href="{% url 'learning_unit' form.child_obj.id %}">
@@ -74,7 +74,13 @@
                                 </td>
                             {% else %}
                                 {# Link attrs relevant for child of type group #}
-                                <td style="width:8%">{{ form.child_obj.abbreviated_title }}</td>
+                                <td style="width:12%">
+                                    {{ form.child_obj.abbreviated_title }}
+                                    {% version_details form.child_obj.entity_id tree_different_versions as version_infos %}
+                                    {% if version_infos %}
+                                        {{ version_infos.version_label }}
+                                    {% endif %}
+                                </td>
                                 <td>
                                     <a href="{% url 'element_identification' code=form.child_obj.code year=form.child_obj.year %}">
                                         {{ form.child_obj.code }}
@@ -83,6 +89,9 @@
                                 <td {% if form.is_a_parent_minor_major_option_list_choice %}style="width:55%"
                                     {% else %}style="width:23%"{% endif %}>
                                         {{ form.child_obj.titles.title_fr }}
+                                        {% if version_infos and version_infos.title %}
+                                            {{ version_infos.title }}
+                                        {% endif %}
                                 </td>
                                 <td style="width:8%">
                                     {{ form.initial.relative_credits | default_if_none:'-' }}
