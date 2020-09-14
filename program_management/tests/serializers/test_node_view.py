@@ -36,7 +36,8 @@ from base.utils.urls import reverse_with_get
 from program_management.models.enums.node_type import NodeType
 from program_management.serializers.node_view import _get_node_view_attribute_serializer, \
     _get_leaf_view_attribute_serializer, \
-    _leaf_view_serializer, _get_node_view_serializer, get_program_tree_version_complete_name
+    _leaf_view_serializer, _get_node_view_serializer, get_program_tree_version_complete_name, \
+    get_program_tree_version_title
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
@@ -366,3 +367,31 @@ class TestVersionNodeViewSerializerInEn(SimpleTestCase):
             'fr')
         self.assertEqual(complete_title, " - {}{}".format(self.tree_version_fr_en.title_fr,
                                                           self.tree_version_fr_en.version_label))
+
+    def test_title_without_en_title(self):
+
+        title = get_program_tree_version_title(
+            NodeIdentity(code=self.root_node_without_en_title.code, year=self.root_node_without_en_title.year),
+            [self.tree_version_fr_no_en],
+            'en')
+        self.assertEqual(title, "[{}]".format(self.tree_version_fr_no_en.title_fr))
+
+        title = get_program_tree_version_title(
+            NodeIdentity(code=self.root_node_without_en_title.code, year=self.root_node_without_en_title.year),
+            [self.tree_version_fr_no_en],
+            'fr')
+        self.assertEqual(title, "[{}]".format(self.tree_version_fr_no_en.title_fr))
+
+    def test_title_with_en_title(self):
+
+        title = get_program_tree_version_title(
+            NodeIdentity(code=self.root_node_with_fr_en_title.code, year=self.root_node_with_fr_en_title.year),
+            [self.tree_version_fr_en],
+            'en')
+        self.assertEqual(title, "[{}]".format(self.tree_version_fr_en.title_en))
+
+        title = get_program_tree_version_title(
+            NodeIdentity(code=self.root_node_with_fr_en_title.code, year=self.root_node_with_fr_en_title.year),
+            [self.tree_version_fr_en],
+            'fr')
+        self.assertEqual(title, "[{}]".format(self.tree_version_fr_en.title_fr))
