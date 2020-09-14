@@ -70,6 +70,7 @@ def postpone_mini_training_modification(postpone_cmd: command.PostponeMiniTraini
         identity=from_mini_training_id,
         repository=MiniTrainingRepository()
     )
+
     for year in range(from_year, end_postponement_year):
         if year in conflicted_fields:
             raise MiniTrainingCopyConsistencyException(year, year+1, conflicted_fields[year])

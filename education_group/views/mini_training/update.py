@@ -25,6 +25,7 @@ import functools
 from typing import List, Dict, Union, Optional
 
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db import transaction
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render
 from django.utils.functional import cached_property
@@ -61,6 +62,7 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
     template_name = "education_group_app/mini_training/upsert/update.html"
 
+    @transaction.non_atomic_requests
     def get(self, request, *args, **kwargs):
         context = {
             "tabs": self.get_tabs(),
@@ -72,6 +74,7 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         }
         return render(request, self.template_name, context)
 
+    @transaction.non_atomic_requests
     def post(self, request, *args, **kwargs):
         if self.mini_training_form.is_valid() and self.content_formset.is_valid():
             deleted_trainings = self.delete_mini_training()
@@ -134,7 +137,7 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 exception.ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum) as e:
             self.mini_training_form.add_error("min_constraint", e.message)
             self.mini_training_form.add_error("max_constraint", "")
-        except (exception.MiniTrainingCopyConsistencyException, exception.GroupCopyConsistencyException) as e:
+        except exception.MiniTrainingCopyConsistencyException as e:
             display_warning_messages(self.request, e.message)
         return []
 
@@ -144,7 +147,6 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             return []
 
         try:
-
             delete_command = self._convert_form_to_delete_mini_trainings_command(self.mini_training_form)
             return delete_mini_training_with_program_tree_service.delete_mini_training_with_program_tree(delete_command)
 
