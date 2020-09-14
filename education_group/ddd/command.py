@@ -291,7 +291,36 @@ class UpdateMiniTrainingCommand(interface.CommandRequest):
     keywords = attr.ib(type=Optional[str])
     management_entity_acronym = attr.ib(type=Optional[str])
     end_year = attr.ib(type=Optional[int])
+    teaching_campus_name = attr.ib(type=Optional[str])
     organization_name = attr.ib(type=str)
+    constraint_type = attr.ib(type=Optional[str])
+    min_constraint = attr.ib(type=Optional[int])
+    max_constraint = attr.ib(type=Optional[int])
+    remark_fr = attr.ib(type=Optional[str])
+    remark_en = attr.ib(type=Optional[str])
+    schedule_type = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class PostponeMiniTrainingModificationCommand(interface.CommandRequest):
+    postpone_from_abbreviated_title = attr.ib(type=str)
+    postpone_from_year = attr.ib(type=int)
+
+    code = attr.ib(type=str)
+    status = attr.ib(type=str)
+    credits = attr.ib(type=int)
+    title_fr = attr.ib(type=str)
+    title_en = attr.ib(type=Optional[str])
+    keywords = attr.ib(type=Optional[str])
+    management_entity_acronym = attr.ib(type=Optional[str])
+    end_year = attr.ib(type=Optional[int])
+    teaching_campus_name = attr.ib(type=Optional[str])
+    organization_name = attr.ib(type=str)
+    constraint_type = attr.ib(type=Optional[str])
+    min_constraint = attr.ib(type=Optional[int])
+    max_constraint = attr.ib(type=Optional[int])
+    remark_fr = attr.ib(type=Optional[str])
+    remark_en = attr.ib(type=Optional[str])
     schedule_type = attr.ib(type=str)
 
 
@@ -437,23 +466,6 @@ class PostponeGroupModificationCommand(interface.CommandRequest):
     remark_fr = attr.ib(type=str)
     remark_en = attr.ib(type=str)
     end_year = attr.ib(type=Optional[int])
-
-
-@attr.s(frozen=True, slots=True)
-class PostponeMiniTrainingModificationCommand(interface.CommandRequest):
-    postpone_from_abbreviated_title = attr.ib(type=str)
-    postpone_from_year = attr.ib(type=int)
-
-    code = attr.ib(type=str)
-    status = attr.ib(type=str)
-    credits = attr.ib(type=int)
-    title_fr = attr.ib(type=str)
-    title_en = attr.ib(type=Optional[str])
-    keywords = attr.ib(type=Optional[str])
-    management_entity_acronym = attr.ib(type=Optional[str])
-    end_year = attr.ib(type=Optional[int])
-    organization_name = attr.ib(type=str)
-    schedule_type = attr.ib(type=str)
 
 
 @attr.s(frozen=True, slots=True)

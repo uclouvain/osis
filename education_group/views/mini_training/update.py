@@ -37,7 +37,7 @@ from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import exception, group
 from education_group.ddd.service.read import get_group_service, get_multiple_groups_service, \
-    get_mini_training_service, get_update_mini_training_warning_messages
+    get_mini_training_service
 from education_group.enums.node_type import NodeType
 from education_group.forms import mini_training as mini_training_forms, content as content_forms
 from education_group.templatetags.academic_year_display import display_as_academic_year
@@ -52,7 +52,6 @@ from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception as program_management_exception
 from program_management.ddd.service.read import get_program_tree_service
 from program_management.ddd.service.write import update_link_service, update_mini_training_with_program_tree_service, \
-    report_mini_training_with_program_tree, \
     delete_mini_training_with_program_tree_service
 
 
@@ -78,7 +77,7 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             deleted_trainings = self.delete_mini_training()
 
             if not self.mini_training_form.errors:
-                update_trainings = list(set(self.update_mini_training() + self.report_mini_training()))
+                update_trainings = list(set(self.update_mini_training()))
                 update_trainings.sort(key=lambda identity: identity.year)
 
             if not self.mini_training_form.errors:
@@ -87,15 +86,6 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 success_messages += self.get_success_msg_deleted_mini_trainings(deleted_trainings)
                 success_messages += self.get_success_msg_updated_links(update_links)
                 display_success_messages(request, success_messages, extra_tags='safe')
-
-                # warning_messages = get_update_mini_training_warning_messages.get_conflicted_fields(
-                #     command.GetUpdateMiniTrainingWarningMessages(
-                #         acronym=self.get_mini_training_obj().acronym,
-                #         code=self.get_mini_training_obj().code,
-                #         year=self.get_mini_training_obj().year
-                #     )
-                # )
-                # display_warning_messages(request, warning_messages, extra_tags='safe')
                 return HttpResponseRedirect(self.get_success_url())
 
         display_error_messages(self.request, self._get_default_error_messages())
@@ -146,18 +136,6 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             self.mini_training_form.add_error("max_constraint", "")
         except (exception.MiniTrainingCopyConsistencyException, exception.GroupCopyConsistencyException) as e:
             display_warning_messages(self.request, e.message)
-        return []
-
-    def report_mini_training(self) -> List['MiniTrainingIdentity']:
-        if self.get_mini_training_obj().end_year:
-            return report_mini_training_with_program_tree.report_mini_training_with_program_tree(
-                command.PostponeMiniTrainingWithProgramTreeCommand(
-                    abbreviated_title=self.get_mini_training_obj().acronym,
-                    code=self.get_mini_training_obj().code,
-                    from_year=self.get_mini_training_obj().end_year
-                )
-            )
-
         return []
 
     def delete_mini_training(self) -> List['MiniTrainingIdentity']:

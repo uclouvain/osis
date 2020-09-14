@@ -25,8 +25,6 @@
 ##############################################################################
 from typing import List
 
-from django.db import transaction
-
 from education_group.ddd import command
 from education_group.ddd.domain.exception import MiniTrainingCopyConsistencyException
 from education_group.ddd.domain.mini_training import MiniTrainingIdentity
@@ -36,7 +34,6 @@ from education_group.ddd.service.write import copy_mini_training_service, update
 from program_management.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
 
 
-@transaction.atomic()
 def postpone_mini_training_modification(postpone_cmd: command.PostponeMiniTrainingModificationCommand) \
         -> List['MiniTrainingIdentity']:
     # GIVEN
@@ -58,6 +55,12 @@ def postpone_mini_training_modification(postpone_cmd: command.PostponeMiniTraini
                 keywords=postpone_cmd.keywords,
                 management_entity_acronym=postpone_cmd.management_entity_acronym,
                 end_year=postpone_cmd.end_year,
+                teaching_campus_name=postpone_cmd.teaching_campus_name,
+                constraint_type=postpone_cmd.constraint_type,
+                min_constraint=postpone_cmd.min_constraint,
+                max_constraint=postpone_cmd.max_constraint,
+                remark_fr=postpone_cmd.remark_fr,
+                remark_en=postpone_cmd.remark_en,
                 organization_name=postpone_cmd.organization_name,
                 schedule_type=postpone_cmd.schedule_type,
             )

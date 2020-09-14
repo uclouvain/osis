@@ -34,6 +34,7 @@ from education_group.tests.factories.mini_training import MiniTrainingFactory
 from testing.mocks import MockPatcherMixin
 
 
+@patch("education_group.ddd.service.write.update_group_service.update_group")
 class TestUpdateMiniTraining(TestCase, MockPatcherMixin):
     @classmethod
     def setUpTestData(cls):
@@ -76,11 +77,11 @@ class TestUpdateMiniTraining(TestCase, MockPatcherMixin):
             self.fake_mini_training_repo
         )
 
-    def test_should_return_entity_id_of_updated_mini_trainings(self):
+    def test_should_return_entity_id_of_updated_mini_trainings(self, mock_update_group):
         result = update_mini_training_service.update_mini_training(self.cmd)
         self.assertEqual(self.mini_training_2018.entity_id, result)
 
-    def test_should_update_value_of_mini_trainings_based_on_command_value(self):
+    def test_should_update_value_of_mini_trainings_based_on_command_value(self, mock_update_group):
         entity_ids = update_mini_training_service.update_mini_training(self.cmd)
 
         mini_training_update = self.fake_mini_training_repo.get(entity_ids[0])

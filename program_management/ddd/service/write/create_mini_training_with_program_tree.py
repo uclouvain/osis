@@ -29,7 +29,7 @@ from django.db import transaction
 
 from education_group.ddd import command
 from education_group.ddd.business_types import *
-from education_group.ddd.service.write import create_group_service, create_orphan_mini_training_service
+from education_group.ddd.service.write import create_orphan_mini_training_service
 from program_management.ddd.command import CreateStandardVersionCommand, PostponeProgramTreeVersionCommand, \
     PostponeProgramTreeCommand
 from program_management.ddd.service.write import create_standard_version_service, \
@@ -50,12 +50,7 @@ def create_and_report_mini_training_with_program_tree(
 
     # THEN
 
-    # 1. Create orphan root group
-    create_group_service.create_orphan_group(
-        cmd=__convert_to_group_command(mini_training_cmd=create_mini_training_cmd)
-    )
-
-    # 2. Create Program tree
+    # 1. Create Program tree
 
     program_tree_identity = create_standard_program_tree_service.create_standard_program_tree(
         CreateStandardVersionCommand(
@@ -65,7 +60,7 @@ def create_and_report_mini_training_with_program_tree(
         )
     )
 
-    # 3. Postpone Program tree
+    # 2. Postpone Program tree
     postpone_program_tree_service_mini_training.postpone_program_tree(
         PostponeProgramTreeCommand(
             from_code=program_tree_identity.code,
@@ -74,7 +69,7 @@ def create_and_report_mini_training_with_program_tree(
         )
     )
 
-    # 4. Create standard version of program tree
+    # 3. Create standard version of program tree
     program_tree_version_identity = create_standard_version_service.create_standard_program_version(
         CreateStandardVersionCommand(
             offer_acronym=create_mini_training_cmd.abbreviated_title,
@@ -83,7 +78,7 @@ def create_and_report_mini_training_with_program_tree(
         )
     )
 
-    # 5. Postpone standard version of program tree
+    # 4. Postpone standard version of program tree
     postpone_tree_version_service_mini_training.postpone_program_tree_version(
         PostponeProgramTreeVersionCommand(
             from_offer_acronym=program_tree_version_identity.offer_acronym,
@@ -95,26 +90,3 @@ def create_and_report_mini_training_with_program_tree(
     )
 
     return mini_training_identities
-
-
-def __convert_to_group_command(
-        mini_training_cmd: command.CreateMiniTrainingCommand) -> command.CreateOrphanGroupCommand:
-    return command.CreateOrphanGroupCommand(
-        code=mini_training_cmd.code,
-        year=mini_training_cmd.year,
-        type=mini_training_cmd.type,
-        abbreviated_title=mini_training_cmd.abbreviated_title,
-        title_fr=mini_training_cmd.title_fr,
-        title_en=mini_training_cmd.title_en,
-        credits=mini_training_cmd.credits,
-        constraint_type=mini_training_cmd.constraint_type,
-        min_constraint=mini_training_cmd.min_constraint,
-        max_constraint=mini_training_cmd.max_constraint,
-        management_entity_acronym=mini_training_cmd.management_entity_acronym,
-        teaching_campus_name=mini_training_cmd.teaching_campus_name,
-        organization_name=mini_training_cmd.organization_name,
-        remark_fr=mini_training_cmd.remark_fr,
-        remark_en=mini_training_cmd.remark_en,
-        start_year=mini_training_cmd.start_year,
-        end_year=mini_training_cmd.end_year,
-    )

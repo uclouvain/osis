@@ -27,7 +27,6 @@ from typing import Union
 
 from base.models import academic_year
 from education_group.ddd.business_types import *
-from education_group.ddd.domain.mini_training import MiniTrainingIdentity
 from education_group.ddd.domain.training import TrainingIdentity
 from osis_common.ddd import interface
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
@@ -45,7 +44,7 @@ class CalculateEndPostponement(interface.DomainService):
             identity: Union['TrainingIdentity', 'MiniTrainingIdentity'],
             repository: Union['TrainingRepository', 'MiniTrainingRepository']
     ) -> int:
-        max_year = _calculate_max_year_of_end_postponement()
+        max_year = cls.calculate_end_postponement_limit()
         obj = repository.get(identity)
         if obj.end_year is None:
             return max_year
@@ -64,8 +63,8 @@ class CalculateEndPostponement(interface.DomainService):
             repository=training_repository if isinstance(root_identity, TrainingIdentity) else mini_training_repository,
         )
 
-
-def _calculate_max_year_of_end_postponement() -> int:
-    default_years_to_postpone = DEFAULT_YEARS_TO_POSTPONE
-    current_year = academic_year.starting_academic_year().year
-    return default_years_to_postpone + current_year
+    @classmethod
+    def calculate_end_postponement_limit(cls) -> int:
+        default_years_to_postpone = DEFAULT_YEARS_TO_POSTPONE
+        current_year = academic_year.starting_academic_year().year
+        return default_years_to_postpone + current_year

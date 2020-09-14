@@ -33,7 +33,8 @@ from base.models.enums.internship_presence import InternshipPresence
 from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.ddd import command
 from education_group.ddd.business_types import *
-from education_group.ddd.domain import training
+from education_group.ddd.command import UpdateGroupCommand
+from education_group.ddd.domain import training, group
 from education_group.ddd.domain._campus import Campus
 from education_group.ddd.domain._co_graduation import CoGraduation
 from education_group.ddd.domain._diploma import Diploma, DiplomaAim, DiplomaAimIdentity
@@ -44,12 +45,14 @@ from education_group.ddd.domain._isced_domain import IscedDomain, IscedDomainIde
 from education_group.ddd.domain._study_domain import StudyDomain, StudyDomainIdentity
 from education_group.ddd.domain._titles import Titles
 from education_group.ddd.repository import training as training_repository, group as group_repository
-from education_group.ddd.service.write import postpone_training_service
+from education_group.ddd.service.write import postpone_training_service, update_group_service
 
 
-@transaction.atomic()
+@transaction.atomic()  # TODO :: rename UpdateTrainingCommand to UpdateTrainingAndGroupCommand
 def update_training(cmd: command.UpdateTrainingCommand) -> List['TrainingIdentity']:
     training_identity = training.TrainingIdentity(acronym=cmd.abbreviated_title, year=cmd.year)
+    group_identity = group.GroupIdentity(code=cmd.code, year=cmd.year)
+
     training_domain_obj = training_repository.TrainingRepository.get(training_identity)
 
     training_domain_obj.update(convert_command_to_update_training_data(cmd))
@@ -138,4 +141,24 @@ def convert_command_to_update_training_data(cmd: command.UpdateTrainingCommand) 
                   for code, section in (cmd.aims or [])]
         ),
         schedule_type=ScheduleTypeEnum[cmd.schedule_type]
+    )
+
+
+def __convert_to_update_group_command(training_command: command.UpdateTrainingCommand) -> 'UpdateGroupCommand':
+    return UpdateGroupCommand(
+        code=training_command.code,
+        year=training_command.year,
+        abbreviated_title=training_command.abbreviated_title,
+        title_fr=training_command.title_fr,
+        title_en=training_command.title_en,
+        credits=training_command.credits,
+        constraint_type=training_command.constraint_type,
+        min_constraint=training_command.min_constraint,
+        max_constraint=training_command.max_constraint,
+        management_entity_acronym=training_command.management_entity_acronym,
+        teaching_campus_name=training_command.teaching_campus_name,
+        organization_name=training_command.organization_name,
+        remark_fr=training_command.remark_fr,
+        remark_en=training_command.remark_en,
+        end_year=training_command.end_year,
     )

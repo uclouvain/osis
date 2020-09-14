@@ -27,15 +27,19 @@ from base.models.enums.active_status import ActiveStatusEnum
 from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.ddd import command
 from education_group.ddd.business_types import *
+from education_group.ddd.command import UpdateGroupCommand
 from education_group.ddd.domain import mini_training
 from education_group.ddd.domain._entity import Entity
 from education_group.ddd.domain._titles import Titles
 from education_group.ddd.repository import mini_training as mini_training_repository
+from education_group.ddd.service.write import update_group_service
 
 
 @transaction.atomic()
 def update_mini_training(cmd: command.UpdateMiniTrainingCommand) -> 'MiniTrainingIdentity':
     mini_training_identity = mini_training.MiniTrainingIdentity(acronym=cmd.abbreviated_title, year=cmd.year)
+    group_identity = update_group_service.update_group(__convert_to_update_group_command(cmd))
+
     mini_training_domain_obj = mini_training_repository.MiniTrainingRepository.get(mini_training_identity)
 
     mini_training_domain_obj.update(convert_command_to_update_mini_training_data(cmd))
@@ -57,4 +61,24 @@ def convert_command_to_update_mini_training_data(
         management_entity=Entity(acronym=cmd.management_entity_acronym),
         end_year=cmd.end_year,
         schedule_type=ScheduleTypeEnum[cmd.schedule_type],
+    )
+
+
+def __convert_to_update_group_command(cmd: command.UpdateMiniTrainingCommand) -> 'UpdateGroupCommand':
+    return UpdateGroupCommand(
+            code=cmd.code,
+            year=cmd.year,
+            abbreviated_title=cmd.abbreviated_title,
+            title_fr=cmd.title_fr,
+            title_en=cmd.title_en,
+            credits=cmd.credits,
+            constraint_type=cmd.constraint_type,
+            min_constraint=cmd.min_constraint,
+            max_constraint=cmd.max_constraint,
+            management_entity_acronym=cmd.management_entity_acronym,
+            teaching_campus_name=cmd.teaching_campus_name,
+            organization_name=cmd.organization_name,
+            remark_fr=cmd.remark_fr,
+            remark_en=cmd.remark_en,
+            end_year=cmd.end_year,
     )
