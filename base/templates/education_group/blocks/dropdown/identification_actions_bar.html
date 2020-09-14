@@ -57,11 +57,11 @@
             {% endif %}
             {% if update_training_url %}
                 <li>
-                    {% a_tag_has_perm update_training_url _('Modify') 'base.change_educationgroup' user group_year %}
+                    {% a_tag_has_perm update_training_url _('Modify') 'base.change_educationgroup' user education_group_version.offer %}
             {% endif %}
             {% if update_mini_training_url %}
                 <li>
-                {% a_tag_has_perm update_mini_training_url _('Modify') 'base.change_educationgroup' user group_year %}
+                {% a_tag_has_perm update_mini_training_url _('Modify') 'base.change_educationgroup' user education_group_version.offer %}
             {% endif %}
             {% if delete_group_url %}
                 <li>
