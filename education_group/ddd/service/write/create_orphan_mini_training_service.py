@@ -37,7 +37,7 @@ def create_and_postpone_orphan_mini_training(
     mini_training_object = mini_training.MiniTrainingBuilder().build_from_create_cmd(cmd)
 
     mini_training_identity = mini_training_repository.MiniTrainingRepository.create(mini_training_object)
-    group_identity = create_group_service.create_orphan_group(__convert_to_update_group_command(cmd))
+    group_identity = create_group_service.create_orphan_group(__convert_to_create_group_command(cmd))
 
     mini_training_identities = postpone_mini_training_modification_service.postpone_mini_training_modification(
         command.PostponeMiniTrainingModificationCommand(
@@ -66,7 +66,7 @@ def create_and_postpone_orphan_mini_training(
     return [mini_training_identity] + mini_training_identities
 
 
-def __convert_to_update_group_command(cmd: command.CreateMiniTrainingCommand) -> command.CreateOrphanGroupCommand:
+def __convert_to_create_group_command(cmd: command.CreateMiniTrainingCommand) -> command.CreateOrphanGroupCommand:
     return command.CreateOrphanGroupCommand(
         code=cmd.code,
         year=cmd.year,
