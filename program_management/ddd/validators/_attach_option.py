@@ -31,7 +31,6 @@ from base.models.enums.education_group_types import MiniTrainingType, TrainingTy
 from program_management.ddd.business_types import *
 
 
-# Implmented from _check_attach_options_rules
 class AttachOptionsValidator(BusinessValidator):
     """
     In context of MA/MD/MS when we add an option [or group which contains options],

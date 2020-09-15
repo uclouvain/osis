@@ -53,6 +53,7 @@ from program_management.ddd.validators._node_have_link import NodeHaveLinkValida
 from program_management.ddd.validators._prerequisite_expression_syntax import PrerequisiteExpressionSyntaxValidator
 from program_management.ddd.validators._prerequisites_items import PrerequisiteItemsValidator
 from program_management.ddd.validators._relative_credits import RelativeCreditsValidator
+from program_management.ddd.validators._validate_end_date_and_option_finality import ValidateFinalitiesEndDateAndOptions
 from program_management.ddd.validators._version_name_exists import VersionNameExistsValidator
 from program_management.ddd.validators.link import CreateLinkValidatorList
 
@@ -77,7 +78,7 @@ class PasteNodeValidatorList(business_validator.BusinessListValidator):
                 InfiniteRecursivityTreeValidator(tree, node_to_paste, path),
                 AuthorizedLinkTypeValidator(tree.root_node, node_to_paste, link_type),
                 BlockValidator(block),
-                _validate_end_date_and_option_finality.ValidateEndDateAndOptionFinality(node_to_paste, tree_repository),
+                ValidateFinalitiesEndDateAndOptions(tree.get_node(path), node_to_paste, tree_repository),
                 ValidateAuthorizedRelationshipForAllTrees(tree, node_to_paste, path, tree_repository)
             ]
 
@@ -124,7 +125,7 @@ class CheckPasteNodeValidatorList(business_validator.BusinessListValidator):
                 CreateLinkValidatorList(tree.get_node(path), node_to_paste),
                 MinimumEditableYearValidator(tree),
                 InfiniteRecursivityTreeValidator(tree, node_to_paste, path),
-                _validate_end_date_and_option_finality.ValidateEndDateAndOptionFinality(node_to_paste, tree_repository),
+                ValidateFinalitiesEndDateAndOptions(tree.get_node(path), node_to_paste, tree_repository),
                 MatchVersionValidator(tree, node_to_paste)
             ]
 

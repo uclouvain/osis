@@ -32,7 +32,6 @@ from base.models.enums.education_group_types import TrainingType
 from program_management.ddd.business_types import *
 
 
-# Implemented from _check_end_year_constraints_on_2m
 class AttachFinalityEndDateValidator(business_validator.BusinessValidator):
     """
     In context of 2M, when we add a finality [or group which contains finality], we must ensure that
@@ -64,8 +63,9 @@ class AttachFinalityEndDateValidator(business_validator.BusinessValidator):
                 )
 
     def _get_codes_where_end_date_gte_root_end_date(self):
-        root_end_date = self.tree_2m.root_node.end_date
+        root_end_year = self.tree_2m.root_node.end_year
         return [
             finality.code for finality in self.tree_from_node_to_add.get_all_finalities()
-            if all([finality.end_date, root_end_date]) and finality.end_date > root_end_date
+            if (all([finality.end_year, root_end_year]) and finality.end_year > root_end_year) or
+            (finality.end_year is None and root_end_year is not None)
         ]
