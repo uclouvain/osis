@@ -44,13 +44,13 @@ from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories import node as node_repository
 from program_management.ddd.service.read import get_program_tree_service
-from program_management.forms.tree.update import UpdateNodeForm
+from program_management.forms.tree.update import UpdateLinkForm
 
 
 class UpdateLinkView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageMixin, FormView):
     template_name = "tree/link_update_inner.html"
     permission_required = "base.change_link_data"
-    form_class = UpdateNodeForm
+    form_class = UpdateLinkForm
 
     @cached_property
     def parent_node(self) -> dict:
@@ -97,7 +97,7 @@ class UpdateLinkView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, SuccessMess
 
         return context_data
 
-    def form_valid(self, form: UpdateNodeForm):
+    def form_valid(self, form: UpdateLinkForm):
         try:
             link_identity = form.save()
         except osis_common.ddd.interface.BusinessExceptions as business_exception:

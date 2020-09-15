@@ -26,18 +26,18 @@ from django.core.exceptions import ValidationError
 from django.test import SimpleTestCase
 
 from osis_common.ddd.interface import BusinessExceptions
-from program_management.forms.tree.update import UpdateNodeForm
+from program_management.forms.tree.update import UpdateLinkForm
 from program_management.tests.ddd.factories.link import LinkFactory
 
 
-class TestUpdateNodeForm(SimpleTestCase):
+class TestUpdateLinkForm(SimpleTestCase):
     @classmethod
     def setUpClass(cls):
         cls.link = LinkFactory()
         super().setUpClass()
 
     def _get_update_node_form_instance(self, **kwargs):
-        return UpdateNodeForm(
+        return UpdateLinkForm(
             parent_node_code=self.link.parent.code, parent_node_year=self.link.parent.year,
             node_to_update_code=self.link.child.code, node_to_update_year=self.link.child.year,
             data=kwargs

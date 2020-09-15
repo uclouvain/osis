@@ -21,23 +21,22 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from typing import Optional, List
+from typing import Optional
 
 from django import forms
 from django.core.exceptions import ValidationError
-from django.db import transaction
-from django.forms import BaseFormSet
 
 import osis_common.ddd.interface
 from base.forms.utils import choice_field
 from base.models.enums.link_type import LinkTypes
 from program_management.ddd import command
 from program_management.ddd.business_types import *
+from program_management.ddd.domain.exception import RelativeCreditShouldBeGreaterOrEqualsThanZero
 from program_management.ddd.service.write import update_link_service
-from program_management.ddd.validators import _block_validator
+from program_management.ddd.validators import _block_validator, _relative_credits
 
 
-class UpdateNodeForm(forms.Form):
+class UpdateLinkForm(forms.Form):
     access_condition = forms.BooleanField(required=False)
     is_mandatory = forms.BooleanField(required=False)
     block = forms.IntegerField(required=False, widget=forms.widgets.TextInput)
@@ -60,6 +59,14 @@ class UpdateNodeForm(forms.Form):
         except osis_common.ddd.interface.BusinessExceptions as business_exception:
             raise ValidationError(business_exception.messages)
         return cleaned_block_type
+
+    def clean_relative_credits(self):
+        cleaned_relative_credits = self.cleaned_data.get('relative_credits', None)
+        try:
+            _relative_credits.RelativeCreditsValidator(cleaned_relative_credits).validate()
+        except RelativeCreditShouldBeGreaterOrEqualsThanZero as e:
+            raise ValidationError(e.message)
+        return cleaned_relative_credits
 
     def save(self) -> Optional['LinkIdentity']:
         result = None

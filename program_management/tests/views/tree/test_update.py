@@ -31,7 +31,7 @@ from base.tests.factories.person import PersonFactory
 from education_group.tests.factories.group_year import GroupYearFactory
 from osis_common.ddd.interface import BusinessExceptions
 from osis_role.contrib.views import AjaxPermissionRequiredMixin
-from program_management.forms.tree.update import UpdateNodeForm
+from program_management.forms.tree.update import UpdateLinkForm
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory, \
     NodeGroupYearFactory
@@ -39,7 +39,7 @@ from program_management.tests.ddd.factories.program_tree import ProgramTreeFacto
 from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
 
 
-def form_valid_effect(form: UpdateNodeForm):
+def form_valid_effect(form: UpdateLinkForm):
     form.cleaned_data = {}
     return True
 
@@ -110,7 +110,7 @@ class TestUpdateLinkView(TestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, 'tree/link_update_inner.html')
-        self.assertIsInstance(response.context['form'], UpdateNodeForm)
+        self.assertIsInstance(response.context['form'], UpdateLinkForm)
 
     def test_should_show_access_denied_when_user_has_not_perm(self):
         self.permission_mock.return_value = False
@@ -141,7 +141,7 @@ class TestUpdateLinkView(TestCase):
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, 'blocks/link_form_inner/minor_major_option_inner.html')
 
-    @mock.patch.object(UpdateNodeForm, 'is_valid', new=form_valid_effect)
+    @mock.patch.object(UpdateLinkForm, 'is_valid', new=form_valid_effect)
     @mock.patch('program_management.ddd.service.write.update_link_service.update_link')
     @mock.patch('program_management.ddd.repositories.program_tree.ProgramTreeRepository.get')
     def test_should_call_update_link_service_when_post_data_is_valid(self, mock_get_tree, mock_service):
@@ -149,7 +149,7 @@ class TestUpdateLinkView(TestCase):
         self.client.post(self.url, data={})
         self.assertTrue(mock_service.called, msg="View must call update node service")
 
-    @mock.patch.object(UpdateNodeForm, 'is_valid', new=form_valid_effect)
+    @mock.patch.object(UpdateLinkForm, 'is_valid', new=form_valid_effect)
     @mock.patch('program_management.ddd.service.write.update_link_service.update_link')
     @mock.patch('program_management.ddd.repositories.program_tree.ProgramTreeRepository.get')
     def test_should_invalidate_form_on_exception_with_error_msg(self, mock_get_tree, mock_service):
