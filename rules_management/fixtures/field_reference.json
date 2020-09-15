@@ -4776,5 +4776,99 @@
             ]
         },
         "model": "rules_management.fieldreference"
+    },
+    {
+        "pk": 303,
+        "fields": {
+            "field_name": "version_title_en",
+            "context": "TRAINING_DAILY_MANAGEMENT",
+            "content_type": [
+                "base",
+                "educationgroupyear"
+            ],
+            "groups": [
+                [
+                    "central_managers"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "pk": 304,
+        "fields": {
+            "field_name": "version_title_en",
+            "context": "TRAINING_PROPOSAL_MANAGEMENT",
+            "content_type": [
+                "base",
+                "educationgroupyear"
+            ],
+            "groups": []
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "pk": 305,
+        "fields": {
+            "field_name": "version_title_en",
+            "context": "TRAINING_PGRM_ENCODING_PERIOD",
+            "content_type": [
+                "base",
+                "educationgroupyear"
+            ],
+            "groups": [
+                [
+                    "central_managers"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "pk": 306,
+        "fields": {
+            "field_name": "version_title_fr",
+            "context": "TRAINING_DAILY_MANAGEMENT",
+            "content_type": [
+                "base",
+                "educationgroupyear"
+            ],
+            "groups": [
+                [
+                    "central_managers"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "pk": 307,
+        "fields": {
+            "field_name": "version_title_fr",
+            "context": "TRAINING_PROPOSAL_MANAGEMENT",
+            "content_type": [
+                "base",
+                "educationgroupyear"
+            ],
+            "groups": []
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "pk": 308,
+        "fields": {
+            "field_name": "version_title_fr",
+            "context": "TRAINING_PGRM_ENCODING_PERIOD",
+            "content_type": [
+                "base",
+                "educationgroupyear"
+            ],
+            "groups": [
+                [
+                    "central_managers"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
     }
 ]

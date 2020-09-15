@@ -167,8 +167,8 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
 
         form_initial_values = {
             'version_name': training_version.version_name,
-            'title': training_version.title_fr,
-            'title_english': training_version.title_en,
+            'version_title_fr': training_version.title_fr,
+            'version_title_en': training_version.title_en,
             'end_year': training_version.end_year_of_existence,
 
             "code": group_obj.code,
@@ -253,8 +253,8 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
             year=self.get_program_tree_version_obj().entity_id.year,
             is_transition=self.get_program_tree_version_obj().entity_id.is_transition,
 
-            title_en=form.cleaned_data["title_english"],
-            title_fr=form.cleaned_data["title"],
+            title_en=form.cleaned_data["version_title_en"],
+            title_fr=form.cleaned_data["version_title_fr"],
             end_year=form.cleaned_data["end_year"],
             management_entity_acronym=form.cleaned_data['management_entity'],
             teaching_campus_name=form.cleaned_data['teaching_campus'].name if form.cleaned_data["teaching_campus"]
