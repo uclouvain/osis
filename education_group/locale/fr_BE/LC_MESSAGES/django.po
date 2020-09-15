@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-08 13:14+0200\n"
+"POT-Creation-Date: 2020-09-15 08:53+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -314,6 +314,12 @@ msgstr "Maîtrise de la langue française"
 msgid "From"
 msgstr "De"
 
+msgid "Full title of the english version"
+msgstr "Intitulé de la version en anglais"
+
+msgid "Full title of the french version"
+msgstr "Intitulé de la version en français"
+
 msgid "Funding"
 msgstr "Finançable"
 
@@ -453,7 +459,7 @@ msgid ""
 "successfully created."
 msgstr ""
 "La mini-formation <a href='%(link)s'> %(code)s (%(academic_year)s) </a> a "
-"été créé avec succès"
+"été créée avec succès"
 
 msgid "Modification"
 msgstr "Modification"
@@ -701,7 +707,7 @@ msgid ""
 "successfully created."
 msgstr ""
 "La formation <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> a été "
-"créé avec succès"
+"créée avec succès"
 
 #, python-format
 msgid ""
@@ -743,9 +749,6 @@ msgstr "Bacheliers universitaires"
 
 msgid "University certificate"
 msgstr "Certificat universitaire"
-
-msgid "Update Content"
-msgstr "Modification Contenu"
 
 msgid "Update Training"
 msgstr "Modifier Formation"
@@ -873,9 +876,6 @@ msgstr "contrainte maximum"
 msgid "minimum constraint"
 msgstr "contrainte minimum"
 
-msgid "of version"
-msgstr "de la version"
-
 msgid "on successful completion of this program, each student is able to"
 msgstr "au terme de ce programme, le diplômé est capable de"
 
@@ -905,3 +905,4 @@ msgstr "indéfini"
 
 msgid "unspecified"
 msgstr "indéterminé"
+
