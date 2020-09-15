@@ -660,7 +660,7 @@ msgid "Start academic year"
 msgstr "Année académique de début"
 
 msgid "Status"
-msgstr "Active"
+msgstr "Statut"
 
 msgid "Student's contact information"
 msgstr "Coordonnées de l'étudiant.e"
