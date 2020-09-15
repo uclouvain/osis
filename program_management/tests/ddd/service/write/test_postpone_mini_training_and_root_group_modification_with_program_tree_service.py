@@ -24,17 +24,18 @@
 import mock
 from django.test import TestCase
 
+from program_management.ddd import command
 from base.models.enums.active_status import ActiveStatusEnum
 from base.models.enums.constraint_type import ConstraintTypeEnum
 from base.models.enums.schedule_type import ScheduleTypeEnum
-from education_group.ddd import command
-from program_management.ddd.service.write import update_mini_training_with_program_tree_service
+from program_management.ddd.service.write import \
+    postpone_mini_training_and_root_group_modification_with_program_tree_service
 
 
-class TestUpdateAndReportMiniTrainingWithProgramTree(TestCase):
+class TestPostponeMiniTrainingAndRootGroupModificationWithProgramTree(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.cmd = command.UpdateAndReportMiniTrainingWithProgramTree(
+        cls.cmd = command.PostponeMiniTrainingAndRootGroupModificationWithProgramTreeCommand(
             year=2018,
             code="LTRONC1000",
             abbreviated_title="TRONCCOMMUN",
@@ -58,15 +59,18 @@ class TestUpdateAndReportMiniTrainingWithProgramTree(TestCase):
 
     def setUp(self):
         self.postpone_mini_training_and_group_modification_patcher = mock.patch(
-            "program_management.ddd.service.write.update_mini_training_with_program_tree_service."
+            "program_management.ddd.service.write."
+            "postpone_mini_training_and_root_group_modification_with_program_tree_service."
             "postpone_mini_training_and_group_modification_service.postpone_mini_training_and_group_modification",
             return_value=[]
         )
-        self.mocked_postpone_mini_training_modification = self.postpone_mini_training_and_group_modification_patcher.start()
+        self.mocked_postpone_mini_training_and_group_modification = \
+            self.postpone_mini_training_and_group_modification_patcher.start()
         self.addCleanup(self.postpone_mini_training_and_group_modification_patcher.stop)
 
         self.postpone_pgrm_tree_patcher = mock.patch(
-            "program_management.ddd.service.write.update_mini_training_with_program_tree_service."
+            "program_management.ddd.service.write."
+            "postpone_mini_training_and_root_group_modification_with_program_tree_service."
             "postpone_program_tree_service.postpone_program_tree",
             return_value=[]
         )
@@ -74,7 +78,8 @@ class TestUpdateAndReportMiniTrainingWithProgramTree(TestCase):
         self.addCleanup(self.postpone_pgrm_tree_patcher.stop)
 
         self.postpone_pgrm_tree_version_patcher = mock.patch(
-            "program_management.ddd.service.write.update_mini_training_with_program_tree_service."
+            "program_management.ddd.service.write."
+            "postpone_mini_training_and_root_group_modification_with_program_tree_service."
             "postpone_tree_version_service.postpone_program_tree_version",
             return_value=[]
         )
@@ -82,8 +87,9 @@ class TestUpdateAndReportMiniTrainingWithProgramTree(TestCase):
         self.addCleanup(self.postpone_pgrm_tree_version_patcher.stop)
 
     def test_assert_call_multiple_service(self):
-        update_mini_training_with_program_tree_service.update_and_report_mini_training_with_program_tree(self.cmd)
+        postpone_mini_training_and_root_group_modification_with_program_tree_service.\
+            postpone_mini_training_and_root_group_modification_with_program_tree(self.cmd)
 
-        self.assertTrue(self.mocked_postpone_mini_training_modification.called)
+        self.assertTrue(self.mocked_postpone_mini_training_and_group_modification.called)
         self.assertTrue(self.mocked_postpone_pgrm_tree.called)
         self.assertTrue(self.mocked_postpone_pgrm_tree_version.called)

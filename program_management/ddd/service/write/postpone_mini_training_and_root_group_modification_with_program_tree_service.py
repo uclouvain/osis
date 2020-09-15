@@ -29,18 +29,20 @@ from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain.exception import MiniTrainingCopyConsistencyException
 from education_group.ddd.service.write import postpone_mini_training_and_group_modification_service
-from program_management.ddd.command import PostponeProgramTreeVersionCommand, PostponeProgramTreeCommand
+from program_management.ddd.command import PostponeProgramTreeVersionCommand, PostponeProgramTreeCommand, \
+    PostponeMiniTrainingAndRootGroupModificationWithProgramTreeCommand
 from program_management.ddd.service.write import postpone_tree_version_service, postpone_program_tree_service
 
 
-def update_and_report_mini_training_with_program_tree(
-        update_command: command.UpdateAndReportMiniTrainingWithProgramTree
+def postpone_mini_training_and_root_group_modification_with_program_tree(
+        update_command: PostponeMiniTrainingAndRootGroupModificationWithProgramTreeCommand
 ) -> List['MiniTrainingIdentity']:
     consistency_error = None
     try:
-        mini_training_identities = postpone_mini_training_and_group_modification_service.postpone_mini_training_and_group_modification(
-            _convert_to_postpone_mini_training_modification_command(update_command)
-        )
+        mini_training_identities = postpone_mini_training_and_group_modification_service.\
+            postpone_mini_training_and_group_modification(
+                __convert_to_postpone_mini_training_and_group_modification_command(update_command)
+            )
     except MiniTrainingCopyConsistencyException as e:
         consistency_error = e
 
@@ -65,8 +67,8 @@ def update_and_report_mini_training_with_program_tree(
     return mini_training_identities
 
 
-def _convert_to_postpone_mini_training_modification_command(
-        mini_training_cmd: command.UpdateAndReportMiniTrainingWithProgramTree
+def __convert_to_postpone_mini_training_and_group_modification_command(
+        mini_training_cmd: PostponeMiniTrainingAndRootGroupModificationWithProgramTreeCommand
 ) -> command.PostponeMiniTrainingAndGroupModificationCommand:
     return command.PostponeMiniTrainingAndGroupModificationCommand(
         code=mini_training_cmd.code,

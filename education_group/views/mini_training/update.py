@@ -52,7 +52,7 @@ from program_management.ddd import command as command_program_management
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception as program_management_exception
 from program_management.ddd.service.read import get_program_tree_service
-from program_management.ddd.service.write import update_link_service, update_mini_training_with_program_tree_service, \
+from program_management.ddd.service.write import update_link_service, postpone_mini_training_and_root_group_modification_with_program_tree_service, \
     delete_mini_training_with_program_tree_service
 
 
@@ -128,9 +128,10 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
     def update_mini_training(self) -> List['MiniTrainingIdentity']:
         try:
             update_command = self._convert_form_to_update_mini_training_command(self.mini_training_form)
-            return update_mini_training_with_program_tree_service.update_and_report_mini_training_with_program_tree(
-                update_command
-            )
+            return postpone_mini_training_and_root_group_modification_with_program_tree_service.\
+                postpone_mini_training_and_root_group_modification_with_program_tree(
+                    update_command
+                )
         except exception.ContentConstraintTypeMissing as e:
             self.mini_training_form.add_error("constraint_type", e.message)
         except (exception.ContentConstraintMinimumMaximumMissing,
@@ -349,9 +350,10 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
     def _convert_form_to_update_mini_training_command(
             self,
-            form: mini_training_forms.UpdateMiniTrainingForm) -> command.UpdateAndReportMiniTrainingWithProgramTree:
+            form: mini_training_forms.UpdateMiniTrainingForm
+    ) -> command_program_management.PostponeMiniTrainingAndRootGroupModificationWithProgramTreeCommand:
         cleaned_data = form.cleaned_data
-        return command.UpdateAndReportMiniTrainingWithProgramTree(
+        return command_program_management.PostponeMiniTrainingAndRootGroupModificationWithProgramTreeCommand(
             abbreviated_title=cleaned_data['abbreviated_title'],
             code=cleaned_data['code'],
             year=cleaned_data['academic_year'],

@@ -549,3 +549,26 @@ class DeletePermanentlyMiniTrainingStandardVersionCommand(interface.CommandReque
 class PublishProgramTreesVersionUsingNodeCommand(interface.CommandRequest):
     code = attr.ib(type=str)
     year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class PostponeMiniTrainingAndRootGroupModificationWithProgramTreeCommand(interface.CommandRequest):
+    abbreviated_title = attr.ib(type=str)
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)
+    status = attr.ib(type=str)
+    credits = attr.ib(type=int)
+    title_fr = attr.ib(type=str)
+    title_en = attr.ib(type=Optional[str])
+    keywords = attr.ib(type=Optional[str])
+    management_entity_acronym = attr.ib(type=Optional[str])
+    end_year = attr.ib(type=Optional[int])
+    teaching_campus_name = attr.ib(type=Optional[str])
+    teaching_campus_organization_name = attr.ib(type=Optional[str])
+    constraint_type = attr.ib(type=Optional[str])
+    min_constraint = attr.ib(type=Optional[int])
+    max_constraint = attr.ib(type=Optional[int])
+    remark_fr = attr.ib(type=Optional[str])
+    remark_en = attr.ib(type=Optional[str])
+    organization_name = attr.ib(type=str)
+    schedule_type = attr.ib(type=str)
