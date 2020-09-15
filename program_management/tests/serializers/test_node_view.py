@@ -411,3 +411,4 @@ class TestVersionNodeViewSerializerInEn(SimpleTestCase):
             [self.tree_version_without_fr_],
             'fr')
         self.assertEqual(title, "")
+
