@@ -34,7 +34,8 @@ from testing.mocks import MockPatcherMixin
 @mock.patch("education_group.ddd.service.write.create_orphan_mini_training_service."
             "create_group_service.create_orphan_group", return_value=[])
 @mock.patch("education_group.ddd.service.write.create_orphan_mini_training_service."
-            "postpone_mini_training_modification_service.postpone_mini_training_modification", return_value=[])
+            "postpone_mini_training_and_group_modification_service.postpone_mini_training_and_group_modification",
+            return_value=[])
 class TestCreateAndPostponeOrphanMiniTraining(TestCase, MockPatcherMixin):
     def setUp(self) -> None:
         self.fake_mini_training_repository = get_fake_mini_training_repository([])

@@ -57,13 +57,13 @@ class TestUpdateAndReportMiniTrainingWithProgramTree(TestCase):
         )
 
     def setUp(self):
-        self.postpone_mini_training_modification_patcher = mock.patch(
+        self.postpone_mini_training_and_group_modification_patcher = mock.patch(
             "program_management.ddd.service.write.update_mini_training_with_program_tree_service."
-            "postpone_mini_training_modification_service.postpone_mini_training_modification",
+            "postpone_mini_training_and_group_modification_service.postpone_mini_training_and_group_modification",
             return_value=[]
         )
-        self.mocked_postpone_mini_training_modification = self.postpone_mini_training_modification_patcher.start()
-        self.addCleanup(self.postpone_mini_training_modification_patcher.stop)
+        self.mocked_postpone_mini_training_modification = self.postpone_mini_training_and_group_modification_patcher.start()
+        self.addCleanup(self.postpone_mini_training_and_group_modification_patcher.stop)
 
         self.postpone_pgrm_tree_patcher = mock.patch(
             "program_management.ddd.service.write.update_mini_training_with_program_tree_service."

@@ -34,8 +34,10 @@ from education_group.ddd.service.write import copy_mini_training_service, update
 from program_management.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
 
 
-def postpone_mini_training_modification(postpone_cmd: command.PostponeMiniTrainingModificationCommand) \
-        -> List['MiniTrainingIdentity']:
+def postpone_mini_training_and_group_modification(
+        postpone_cmd: command.PostponeMiniTrainingAndGroupModificationCommand
+) -> List['MiniTrainingIdentity']:
+
     # GIVEN
     from_year = postpone_cmd.postpone_from_year
     from_mini_training_id = MiniTrainingIdentity(acronym=postpone_cmd.postpone_from_abbreviated_title, year=from_year)

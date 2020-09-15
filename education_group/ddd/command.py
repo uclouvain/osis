@@ -302,7 +302,7 @@ class UpdateMiniTrainingAndGroupCommand(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True)
-class PostponeMiniTrainingModificationCommand(interface.CommandRequest):
+class PostponeMiniTrainingAndGroupModificationCommand(interface.CommandRequest):
     postpone_from_abbreviated_title = attr.ib(type=str)
     postpone_from_year = attr.ib(type=int)
 
