@@ -37,7 +37,11 @@ class RelativeCreditShouldBeGreaterOrEqualsThanZero(BusinessException):
 
 
 class ProgramTreeNotFoundException(Exception):
-    pass
+    def __init__(self, *args, code: str = '', year: int = None):
+        message = ''
+        if code or year:
+            message = _("Program tree not found : {code} {year}".format(code=code, year=year))
+        super().__init__(message, *args)
 
 
 class ProgramTreeVersionNotFoundException(Exception):
@@ -89,6 +93,18 @@ class CannotCopyTreeDueToEndDate(BusinessException):
             from_year=tree.root_node.year,
             to_year=tree.root_node.year + 1,
             end_year=tree.root_node.end_year,
+        )
+        super().__init__(message, **kwargs)
+
+
+class CannotDeleteStandardDueToVersionEndDate(BusinessException):
+    def __init__(self, tree: 'ProgramTreeVersion', *args, **kwargs):
+        message = _(
+            "You can't delete the standard program tree '{code}' "
+            "in {year} as specific versions exists during this year."
+        ).format(
+            code=tree.program_tree_identity.code,
+            year=tree.entity_id.year,
         )
         super().__init__(message, **kwargs)
 

@@ -5,7 +5,11 @@ from education_group.ddd.business_types import *
 
 
 class TrainingNotFoundException(Exception):
-    pass
+    def __init__(self, *args, acronym: str = None, year: int = None):
+        message = ''
+        if acronym or year:
+            message = _("Training not found : {acronym} {year}".format(acronym=acronym, year=year))
+        super().__init__(message, *args)
 
 
 class MiniTrainingNotFoundException(Exception):
@@ -168,22 +172,38 @@ class TrainingHaveLinkWithEPC(BusinessException):
 
 
 class MiniTrainingHaveEnrollments(BusinessException):
-    def __init__(self, enrollment_count: int, **kwargs):
+    def __init__(self, abbreviated_title: str, year: int, enrollment_count: int, **kwargs):
         message = ngettext_lazy(
-            "%(count_enrollment)d student is enrolled in the mini-training.",
-            "%(count_enrollment)d students are enrolled in the mini-training.",
+            "%(count_enrollment)d student is enrolled in the mini-training %(abbreviated_title)s (%(academic_year)s).",
+            "%(count_enrollment)d students are enrolled in the mini-training %(abbreviated_title)s "
+            "(%(academic_year)s).",
             enrollment_count
-        ) % {"count_enrollment": enrollment_count}
+        ) % {
+            "count_enrollment": enrollment_count,
+            "abbreviated_title": abbreviated_title,
+            "academic_year": display_as_academic_year(year),
+        }
         super().__init__(message, **kwargs)
 
 
 class MiniTrainingHaveLinkWithEPC(BusinessException):
-    def __init__(self, *args, **kwargs):
-        message = _("Linked with EPC")
+    def __init__(self, abbreviated_title: str, year: int, **kwargs):
+        message = _("The mini-training {abbreviated_title} ({academic_year}) have links in EPC application").format(
+            abbreviated_title=abbreviated_title,
+            academic_year=display_as_academic_year(year)
+        )
         super().__init__(message, **kwargs)
 
 
 class VersionNameAlreadyExist(BusinessException):
     def __init__(self, version_name: str, *args, **kwargs):
         message = _("Version name {} already exists").format(version_name)
+        super().__init__(message, **kwargs)
+
+
+class MultipleEntitiesFoundException(BusinessException):
+    def __init__(self, entity_acronym: str, year: int, *args, **kwargs):
+        message = _(
+            "Multiple entities {entity_acronym} found in {year}"
+        ).format(entity_acronym=entity_acronym, year=year)
         super().__init__(message, **kwargs)

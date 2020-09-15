@@ -146,6 +146,7 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         return self.get_success_url()
 
     def update_training(self) -> List['TrainingIdentity']:
+        end_year = self.training_form.cleaned_data["end_year"]
         try:
             update_command = self._convert_form_to_update_training_command(self.training_form)
             return update_training_with_program_tree_service.update_and_report_training_with_program_tree(
@@ -181,8 +182,12 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             delete_command = self._convert_form_to_delete_trainings_command(self.training_form)
             return delete_training_with_program_tree_service.delete_training_with_program_tree(delete_command)
 
-        except (program_management_exception.ProgramTreeNonEmpty, exception.TrainingHaveLinkWithEPC,
-                exception.TrainingHaveEnrollments) as e:
+        except (
+            program_management_exception.ProgramTreeNonEmpty,
+            exception.TrainingHaveLinkWithEPC,
+            exception.TrainingHaveEnrollments,
+            program_management_exception.CannotDeleteStandardDueToVersionEndDate
+        ) as e:
             self.training_form.add_error("end_year", "")
             self.training_form.add_error(
                 None,
@@ -379,7 +384,7 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "academic_year": training_obj.year,
             "start_year": training_obj.start_year,
             "end_year": training_obj.end_year,
-            "teaching_campus": training_obj.teaching_campus.name,
+            "teaching_campus": group_obj.teaching_campus.name,
             "enrollment_campus": training_obj.enrollment_campus.name,
             "other_campus_activities": training_obj.other_campus_activities.name
             if training_obj.other_language_activities else None,

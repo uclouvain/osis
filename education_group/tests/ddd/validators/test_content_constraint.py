@@ -64,6 +64,24 @@ class TestContentConstraingValidator(SimpleTestCase):
         with self.assertRaises(ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum):
             validator.is_valid()
 
+    def test_when_min_is_set_but_not_max(self):
+        content_constraint = ContentConstraint(
+            type=ConstraintTypeEnum.CREDITS,
+            minimum=10,
+            maximum=None
+        )
+        validator = ContentConstraintValidator(content_constraint)
+        self.assertTrue(validator.is_valid())
+
+    def test_when_max_is_set_but_not_min(self):
+        content_constraint = ContentConstraint(
+            type=ConstraintTypeEnum.CREDITS,
+            minimum=None,
+            maximum=10
+        )
+        validator = ContentConstraintValidator(content_constraint)
+        self.assertTrue(validator.is_valid())
+
     def test_content_type_valid(self):
         content_constraint = ContentConstraint(
             type=ConstraintTypeEnum.CREDITS,

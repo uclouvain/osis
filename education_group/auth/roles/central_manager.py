@@ -32,11 +32,15 @@ class CentralManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
             'base.can_access_catalog': rules.always_allow,  # Perms Backward compibility
             'base.view_educationgroup': rules.always_allow,
             'base.add_training':
-                predicates.is_user_attached_to_management_entity,
+                predicates.is_user_attached_to_management_entity &
+                predicates.is_allowed_to_create_children_of_category_training &
+                predicates.is_element_only_inside_standard_program,
             'base.add_minitraining':
-                predicates.is_user_attached_to_management_entity,
+                predicates.is_user_attached_to_management_entity &
+                predicates.is_allowed_to_create_children_of_category_mini_training,
             'base.add_group':
-                predicates.is_user_attached_to_management_entity,
+                predicates.is_user_attached_to_management_entity &
+                predicates.is_allowed_to_create_children_of_category_group,
             # TODO : split in training, minitraining, group
             'base.change_educationgroup':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
@@ -44,11 +48,17 @@ class CentralManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
                 predicates.is_education_group_type_authorized_according_to_user_scope,
             'base.delete_all_training':
                 predicates.are_all_trainings_removable,
+            'program_management.delete_all_tree_version':
+                predicates.are_all_tree_versions_removable,
             'base.delete_all_minitraining':
                 predicates.are_all_minitrainings_removable,
             'base.delete_all_group':
                 predicates.are_all_groups_removable,
             'base.delete_training':
+                predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
+                predicates.is_user_attached_to_management_entity &
+                predicates.is_education_group_type_authorized_according_to_user_scope,
+            'program_management.delete_tree_version':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_user_attached_to_management_entity &
                 predicates.is_education_group_type_authorized_according_to_user_scope,
@@ -111,6 +121,6 @@ class CentralManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_user_attached_to_management_entity,
             'base.add_programtreeversion':
-            predicates.is_user_attached_to_management_entity &
-            predicates.is_education_group_year_older_or_equals_than_limit_settings_year,
+                predicates.is_user_attached_to_management_entity &
+                predicates.is_education_group_year_older_or_equals_than_limit_settings_year,
         })

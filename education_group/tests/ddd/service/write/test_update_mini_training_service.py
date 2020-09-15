@@ -36,6 +36,7 @@ from education_group.tests.factories.mini_training import MiniTrainingFactory
 from testing.mocks import MockPatcherMixin
 
 
+@patch("education_group.ddd.service.write.update_group_service.update_group")
 @patch('education_group.ddd.service.write.update_group_service.'
        'CalculateEndPostponement.calculate_year_of_postponement_for_mini_training', return_value=2021)
 class TestUpdateMiniTraining(TestCase, MockPatcherMixin):
@@ -80,20 +81,21 @@ class TestUpdateMiniTraining(TestCase, MockPatcherMixin):
             self.fake_mini_training_repo
         )
 
-    def test_should_return_entity_id_of_updated_mini_trainings(self, mock_end_year_postponement):
+    def test_should_return_entity_id_of_updated_mini_trainings(self, mock_end_year_postponement, mock_update_group):
         result = update_mini_training_service.update_mini_training(self.cmd)
 
         expected_result = [mini_training.MiniTrainingIdentity(acronym=self.cmd.abbreviated_title, year=year)
                            for year in range(2018, 2022)]
         self.assertEqual(expected_result, result)
+        self.assertTrue(mock_update_group.called)
 
-    def test_should_update_value_of_mini_trainings_based_on_command_value(self, mock_end_year_postponement):
+    def test_should_update_value_of_mini_trainings_based_on_command_value(self, *mocks):
         entity_ids = update_mini_training_service.update_mini_training(self.cmd)
 
         mini_training_update = self.fake_mini_training_repo.get(entity_ids[0])
         self.assert_has_same_value_as_update_command(mini_training_update)
 
-    def test_should_postpone_mini_trainings_update(self, mock_end_year_postponement):
+    def test_should_postpone_mini_trainings_update(self, *mocks):
         identities = [mini_training.MiniTrainingIdentity(acronym=self.cmd.abbreviated_title, year=year)
                       for year in range(2018, 2022)]
 
@@ -113,7 +115,4 @@ class TestUpdateMiniTraining(TestCase, MockPatcherMixin):
         self.assertEqual(update_mini_training.keywords, self.cmd.keywords)
         self.assertEqual(update_mini_training.management_entity.acronym, self.cmd.management_entity_acronym)
         self.assertEqual(update_mini_training.end_year, self.cmd.end_year)
-        self.assertEqual(update_mini_training.teaching_campus.name, self.cmd.teaching_campus_name)
-        self.assertEqual(update_mini_training.teaching_campus.university_name,
-                         self.cmd.teaching_campus_organization_name)
         self.assertEqual(update_mini_training.schedule_type.name, self.cmd.schedule_type)

@@ -33,7 +33,6 @@ from base.views.education_groups.publication_contact import CreateEducationGroup
 from base.views.education_groups.search import EducationGroupTypeAutoComplete
 from base.views.education_groups.update import CertificateAimAutocomplete
 from education_group import urls as education_group_urls
-from . import delete
 from .achievement.urls import urlpatterns as urlpatterns_achievement
 
 urlpatterns = [
@@ -59,7 +58,6 @@ urlpatterns = [
     ])),
     url(r'^(?P<offer_id>[0-9]+)/(?P<education_group_year_id>[0-9]+)/', include([
         url(r'^skills_achievements/', include(urlpatterns_achievement)),
-        url(r'^delete/$', delete.DeleteGroupEducationView.as_view(), name="delete_education_group"),
     ])),
     url(r'^(?P<year>[0-9]+)/(?P<code>[A-Za-z0-9]+)/', include([
        url(

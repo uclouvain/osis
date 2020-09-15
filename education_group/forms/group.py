@@ -37,14 +37,15 @@ from base.models import campus
 from base.models.academic_year import AcademicYear
 from base.models.enums.constraint_type import ConstraintTypeEnum
 from education_group.forms import fields
+from education_group.forms.fields import UpperCaseCharField
 from rules_management.enums import GROUP_PGRM_ENCODING_PERIOD, GROUP_DAILY_MANAGEMENT
 from rules_management.mixins import PermissionFieldMixin
 
 
 class GroupForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
-    code = forms.CharField(max_length=15, label=_("Code"), required=False)
+    code = UpperCaseCharField(max_length=15, label=_("Code"), required=False)
     academic_year = forms.ModelChoiceField(queryset=AcademicYear.objects.all(), label=_("Validity"), required=False)
-    abbreviated_title = forms.CharField(max_length=40, label=_("Acronym/Short title"), required=False)
+    abbreviated_title = UpperCaseCharField(max_length=40, label=_("Acronym/Short title"), required=False)
     title_fr = forms.CharField(max_length=240, label=_("Title in French"), required=False)
     title_en = forms.CharField(max_length=240, label=_("Title in English"), required=False)
     credits = forms.IntegerField(
@@ -99,7 +100,7 @@ class GroupForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     def __init_management_entity_field(self):
         self.fields['management_entity'] = fields.ManagementEntitiesChoiceField(
             person=self.user.person,
-            initial=self.initial['management_entity'].pk if self.initial.get('management_entity') else None,
+            initial=self.initial.get('management_entity'),
             disabled=self.fields['management_entity'].disabled,
         )
 

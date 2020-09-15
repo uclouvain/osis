@@ -40,6 +40,7 @@ from program_management.ddd.validators._authorized_root_type_for_prerequisite im
 from program_management.ddd.validators._block_validator import BlockValidator
 from program_management.ddd.validators._copy_check_end_date_program_tree import CheckProgramTreeEndDateValidator
 from program_management.ddd.validators._copy_check_end_date_tree_version import CheckTreeVersionEndDateValidator
+from program_management.ddd.validators._delete_check_versions_end_date import CheckVersionsEndDateValidator
 from program_management.ddd.validators._detach_option_2M import DetachOptionValidator
 from program_management.ddd.validators._detach_root import DetachRootValidator
 from program_management.ddd.validators._empty_program_tree import EmptyProgramTreeValidator
@@ -236,12 +237,14 @@ class DeleteProgramTreeValidatorList(business_validator.BusinessListValidator):
         super().__init__()
 
 
-class DeleteStandardVersionValidatorList(business_validator.BusinessListValidator):
+class DeleteSpecificVersionValidatorList(business_validator.BusinessListValidator):
     def __init__(
             self,
             program_tree_version: 'ProgramTreeVersion',
     ):
-        self.validators = []
+        self.validators = [
+            CheckVersionsEndDateValidator(program_tree_version),
+        ]
         super().__init__()
 
 

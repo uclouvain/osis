@@ -29,7 +29,7 @@
         <div class="col-md-12">
             {% url 'mini_training_identification' node.year node.code as url_identification %}
              <a href="{{url_identification}}"
-               id="lnk_node_{{node.pk}}">{{ node.code }} - {{ node.title }}</a>
+               id="lnk_node_{{node.pk}}">{{ node.code }} - {{ node.title }}{% if not current_version.is_standard %}[{{ current_version.version_name }}]{% endif %}</a>
             {% trans 'is using in' %} :
             <br><br>
             {% include "blocks/table_element_utilizations.html" %}

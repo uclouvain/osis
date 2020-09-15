@@ -54,7 +54,7 @@
                     </div>
                     <br>
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-6" id="status">
                             {% bootstrap_label _("Status") label_class='d-block'%}
                             <p>{{ node.offer_status.value }}</p>
                         </div>
@@ -102,7 +102,7 @@
                     {% if not current_version.is_standard or current_version.is_transition %}
                         <div class="row">
                             <div class="col-md-12" id="version_title_fr">
-                                {% bootstrap_label _("Title in French") %} {% bootstrap_label _("of version") %}
+                                {% bootstrap_label _("Full title of the french version") %}
                                 <p>{{ current_version.title_fr | default_if_none:'' }}</p>
                             </div>
                         </div>
@@ -118,7 +118,7 @@
                     {% if not current_version.is_standard  or current_version.is_transition %}
                         <div class="row">
                             <div class="col-md-12" id="version_title_en">
-                                {% bootstrap_label _("Title in English") %} {% bootstrap_label _("of version") %}
+                                {% bootstrap_label _("Full title of the english version") %}
                                 <p>{{ current_version.title_en | default_if_none:'' }}</p>
                             </div>
                         </div>
@@ -153,7 +153,13 @@
                     <div class="row">
                         <div class="col-md-12">
                             {% bootstrap_label _("Last year of organization") label_class='d-block'%}
-                            <p>{% if node.end_year %}{{ node.end_year|format_to_academic_year }}{% else %}{% trans 'unspecified' %}{% endif %}</p>
+                            <p>
+                                {% if current_version.end_year_of_existence %}
+                                    {{ current_version.end_year_of_existence|format_to_academic_year }}
+                                {% else %}
+                                    {% trans 'unspecified' %}
+                                {% endif %}
+                            </p>
                         </div>
                     </div>
                     <br>

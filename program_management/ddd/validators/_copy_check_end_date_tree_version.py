@@ -33,6 +33,6 @@ class CheckTreeVersionEndDateValidator(business_validator.BusinessValidator):
         self.tree_version = tree_version
 
     def validate(self, *args, **kwargs):
-        root_node = self.tree_version.get_tree().root_node
-        if root_node.end_year and root_node.year >= root_node.end_year:
+        end_year = self.tree_version.end_year_of_existence
+        if end_year and self.tree_version.entity_id.year >= end_year:
             raise exception.CannotCopyTreeVersionDueToEndDate(self.tree_version)

@@ -300,7 +300,7 @@ class GroupUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         ]
 
     def is_content_active_tab(self):
-        return self.request.GET.get('tab') == str(Tab.CONTENT.value)
+        return self.request.GET.get('tab') == str(Tab.CONTENT.value) and self._get_initial_content_formset()
 
     def get_permission_object(self) -> Union[GroupYear, None]:
         try:

@@ -29,10 +29,9 @@ from collections import OrderedDict
 from typing import List, Set, Dict, Optional
 
 import attr
-from _decimal import Decimal
 
+from base.ddd.utils.converters import to_upper_case_converter
 from base.models.enums.active_status import ActiveStatusEnum
-from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, MiniTrainingType, GroupType
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
@@ -48,7 +47,9 @@ from program_management.ddd.domain._campus import Campus
 from program_management.ddd.domain.academic_year import AcademicYear
 from program_management.ddd.domain.link import factory as link_factory
 from program_management.ddd.domain.prerequisite import Prerequisite, NullPrerequisite
+from program_management.ddd.domain.service.generate_node_abbreviated_title import GenerateNodeAbbreviatedTitle
 from program_management.ddd.domain.service.generate_node_code import GenerateNodeCode
+from program_management.ddd.domain.service.validation_rule import FieldValidationRule
 from program_management.models.enums.node_type import NodeType
 
 
@@ -119,6 +120,31 @@ class NodeFactory:
         copied_node._has_changed = True
         return copied_node
 
+    def generate_from_parent(self, parent_node: 'Node', child_type: 'EducationGroupTypesEnum') -> 'Node':
+        generated_child_title = FieldValidationRule.get(
+            child_type,
+            'title_fr'
+        ).initial_value
+        child = self.get_node(
+            type=NodeType.GROUP,
+            node_type=child_type,
+            code=GenerateNodeCode.generate_from_parent_node(parent_node, child_type),
+            title=GenerateNodeAbbreviatedTitle.generate(
+                parent_node=parent_node,
+                child_node_type=child_type,
+            ),
+            year=parent_node.year,
+            teaching_campus=parent_node.teaching_campus,
+            management_entity_acronym=parent_node.management_entity_acronym,
+            group_title_fr="{child_title} {parent_abbreviated_title}".format(
+                child_title=generated_child_title,
+                parent_abbreviated_title=parent_node.title
+            ),
+            start_year=parent_node.year,
+        )
+        child._has_changed = True
+        return child
+
     def deepcopy_node_without_copy_children_recursively(self, original_node: 'Node') -> 'Node':
         original_children = original_node.children
         original_node.children = []  # To avoid recursive deep copy of all children behind
@@ -132,7 +158,7 @@ factory = NodeFactory()
 
 @attr.s(frozen=True, slots=True)
 class NodeIdentity(interface.EntityIdentity):
-    code = attr.ib(type=str)
+    code = attr.ib(type=str, converter=to_upper_case_converter)
     year = attr.ib(type=int)
 
 
@@ -211,6 +237,9 @@ class Node(interface.Entity):
 
     def is_minor_major_list_choice(self) -> bool:
         return self.node_type in GroupType.minor_major_list_choice_enums()
+
+    def is_option_list_choice(self):
+        return self.node_type == GroupType.OPTION_LIST_CHOICE
 
     def is_minor_or_deepening(self) -> bool:
         return self.is_minor() or self.is_deepening()

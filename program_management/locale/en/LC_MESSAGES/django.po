@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-31 12:04+0200\n"
+"POT-Creation-Date: 2020-09-07 11:51+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,10 +20,9 @@ msgstr ""
 msgid "\"%(child)s\" has been detached from \"%(parent)s\""
 msgstr "\"%(child)s\" has been removed from \"%(parent)s\""
 
-#, fuzzy, python-format
-#| msgid "\"%(child)s\" has been detached from \"%(parent)s\""
+#, python-format
 msgid "\"%(child)s\" has been pasted into \"%(parent)s\""
-msgstr "\"%(child)s\" has been removed from \"%(parent)s\""
+msgstr ""
 
 #, python-format
 msgid "%(node_to_add)s version must be the same as %(root_node)s version"
@@ -111,6 +110,9 @@ msgid "Alloc. Ent."
 msgstr ""
 
 msgid "Annual"
+msgstr ""
+
+msgid "Are you sure you want to delete %(offer_acronym)s %(version_name)s ?"
 msgstr ""
 
 #, python-format
@@ -449,6 +451,10 @@ msgstr ""
 msgid "Produce xls with a list of trainings"
 msgstr ""
 
+#, python-brace-format
+msgid "Program tree not found : {code} {year}"
+msgstr ""
+
 msgid "Prolong"
 msgstr ""
 
@@ -489,6 +495,9 @@ msgid "Save"
 msgstr ""
 
 msgid "Search"
+msgstr ""
+
+msgid "Select a language"
 msgstr ""
 
 msgid "Session derogation"
@@ -537,9 +546,6 @@ msgid ""
 "attach."
 msgstr ""
 
-msgid "The child version must be the same as the root node version"
-msgstr ""
-
 #, python-format
 msgid "The learning unit %(acronym)s is not contained inside the formation"
 msgstr ""
@@ -551,16 +557,6 @@ msgid "The learning unit has prerequisites and is a prerequisite"
 msgstr ""
 
 msgid "The learning unit is a prerequisite"
-msgstr ""
-
-#, python-format
-msgid "The link of %(acronym)s has been updated"
-msgstr ""
-
-#, python-format
-msgid ""
-"The number of children of type(s) \"%(child_types)s\" for \"%(parent)s\" has "
-"already reached the limit."
 msgstr ""
 
 #, python-format
@@ -581,6 +577,10 @@ msgstr ""
 
 #, python-format
 msgid "The program %(title)s - %(academic_year)s will be published soon"
+msgstr ""
+
+msgid ""
+"The program tree version %(offer_acronym)s %(version_name)s has been deleted."
 msgstr ""
 
 msgid "The registration form is available at the Secretariat of"
@@ -680,16 +680,16 @@ msgid ""
 "{to_year} because it ends in {end_year}"
 msgstr ""
 
-#, python-format
+#, python-brace-format
 msgid ""
-"You cannot add \"%(child)s\" of type \"%(child_types)s\" to \"%(parent)s\" "
-"of type \"%(parent_type)s\""
+"You can't delete the standard program tree '{code}' in {year} as specific "
+"versions exists during this year."
 msgstr ""
 
 #, python-format
 msgid ""
-"You cannot add \"%(child_types)s\" to \"%(parent)s\" (type \"%(parent_type)s"
-"\")"
+"You cannot add \"%(child)s\" of type \"%(child_types)s\" to \"%(parent)s\" "
+"of type \"%(parent_type)s\""
 msgstr ""
 
 #, python-format

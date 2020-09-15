@@ -225,10 +225,10 @@ def _get_root_ids(child_element_ids: list, link_type: LinkTypes = None) -> List[
     if not qs:
         return []
     all_parents = set(obj["parent_id"] for obj in qs)
-    parent_by_child_branch = {
+    parent_by_child = {
         obj["child_id"]: obj["parent_id"] for obj in qs
     }
     return set(
         parent_id for parent_id in all_parents
-        if not parent_by_child_branch.get(parent_id)
+        if not parent_by_child.get(parent_id)
     )

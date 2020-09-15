@@ -26,8 +26,8 @@ from typing import Optional
 from base.models.enums.link_type import LinkTypes
 from program_management.ddd import command
 from program_management.ddd.domain import node
-from program_management.ddd.service.read import node_identity_service
 from program_management.ddd.repositories import node as node_repository
+from program_management.ddd.service.read import node_identity_service
 
 
 def get_default_link_type(get_command: command.GetDefaultLinkType) -> Optional[LinkTypes]:

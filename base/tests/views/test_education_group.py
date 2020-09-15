@@ -178,8 +178,6 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         cls.master_adm_cond = AdmissionConditionFactory(
             education_group_year=EducationGroupYearCommonMasterFactory(academic_year=cls.academic_year)
         )
-        GroupElementYearFactory(parent=cls.education_group_parent, child_branch=cls.education_group_child)
-
         cls.cms_label_for_child = OfferTranslatedTextFactory(reference=cls.education_group_child.id)
 
         cls.person = PersonFactory()
