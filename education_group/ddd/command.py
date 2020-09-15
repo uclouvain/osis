@@ -280,7 +280,7 @@ class UpdateTrainingCommand(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True)
-class UpdateMiniTrainingCommand(interface.CommandRequest):
+class UpdateMiniTrainingAndGroupCommand(interface.CommandRequest):
     abbreviated_title = attr.ib(type=str)
     code = attr.ib(type=str)
     year = attr.ib(type=int)

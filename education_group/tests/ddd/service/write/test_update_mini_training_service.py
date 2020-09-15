@@ -29,17 +29,17 @@ from base.models.enums.constraint_type import ConstraintTypeEnum
 from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.ddd import command
 from education_group.ddd.domain import mini_training
-from education_group.ddd.service.write import update_mini_training_service
+from education_group.ddd.service.write import update_mini_training_and_group_service
 from education_group.tests.ddd.factories.repository.fake import get_fake_mini_training_repository
 from education_group.tests.factories.mini_training import MiniTrainingFactory
 from testing.mocks import MockPatcherMixin
 
 
 @patch("education_group.ddd.service.write.update_group_service.update_group")
-class TestUpdateMiniTraining(TestCase, MockPatcherMixin):
+class TestUpdateMiniTrainingAndGroupService(TestCase, MockPatcherMixin):
     @classmethod
     def setUpTestData(cls):
-        cls.cmd = command.UpdateMiniTrainingCommand(
+        cls.cmd = command.UpdateMiniTrainingAndGroupCommand(
             year=2018,
             code="LTRONC1",
             abbreviated_title="OPT",
@@ -78,11 +78,11 @@ class TestUpdateMiniTraining(TestCase, MockPatcherMixin):
         )
 
     def test_should_return_entity_id_of_updated_mini_trainings(self, mock_update_group):
-        result = update_mini_training_service.update_mini_training(self.cmd)
+        result = update_mini_training_and_group_service.update_mini_training_and_group(self.cmd)
         self.assertEqual(self.mini_training_2018.entity_id, result)
 
     def test_should_update_value_of_mini_trainings_based_on_command_value(self, mock_update_group):
-        entity_id = update_mini_training_service.update_mini_training(self.cmd)
+        entity_id = update_mini_training_and_group_service.update_mini_training_and_group(self.cmd)
 
         mini_training_update = self.fake_mini_training_repo.get(entity_id)
         self.assert_has_same_value_as_update_command(mini_training_update)

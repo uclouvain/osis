@@ -36,7 +36,7 @@ from education_group.ddd.service.write import update_group_service
 
 
 @transaction.atomic()
-def update_mini_training(cmd: command.UpdateMiniTrainingCommand) -> 'MiniTrainingIdentity':
+def update_mini_training_and_group(cmd: command.UpdateMiniTrainingAndGroupCommand) -> 'MiniTrainingIdentity':
     mini_training_identity = mini_training.MiniTrainingIdentity(acronym=cmd.abbreviated_title, year=cmd.year)
     group_identity = update_group_service.update_group(__convert_to_update_group_command(cmd))
 
@@ -49,7 +49,7 @@ def update_mini_training(cmd: command.UpdateMiniTrainingCommand) -> 'MiniTrainin
 
 
 def convert_command_to_update_mini_training_data(
-        cmd: command.UpdateMiniTrainingCommand) -> 'mini_training.UpdateMiniTrainingData':
+        cmd: command.UpdateMiniTrainingAndGroupCommand) -> 'mini_training.UpdateMiniTrainingData':
     return mini_training.UpdateMiniTrainingData(
         credits=cmd.credits,
         titles=Titles(
@@ -64,7 +64,7 @@ def convert_command_to_update_mini_training_data(
     )
 
 
-def __convert_to_update_group_command(cmd: command.UpdateMiniTrainingCommand) -> 'UpdateGroupCommand':
+def __convert_to_update_group_command(cmd: command.UpdateMiniTrainingAndGroupCommand) -> 'UpdateGroupCommand':
     return UpdateGroupCommand(
             code=cmd.code,
             year=cmd.year,
