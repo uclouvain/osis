@@ -41,7 +41,7 @@
 {% block header_content %}
     <div class="page-header">
         <h2>
-            {{ training_obj.acronym|default_if_none:'' }} {{ training_version_obj.version_label } - {{ training_obj.academic_year }}
+            {{ training_obj.acronym|default_if_none:'' }} {{ training_version_obj.version_label }} - {{ training_obj.academic_year }}
         </h2>
         <h3>
             {% if training_obj.is_finality %}
