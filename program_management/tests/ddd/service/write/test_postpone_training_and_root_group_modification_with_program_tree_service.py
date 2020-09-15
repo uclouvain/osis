@@ -24,34 +24,34 @@
 import mock
 from django.test import TestCase
 
-from education_group.tests.ddd.factories.command.update_training_factory import UpdateTrainingCommandFactory
-from program_management.ddd.service.write import update_training_with_program_tree_service
+from program_management.ddd.service.write import postpone_training_and_root_group_modification_with_program_tree_service
+from program_management.tests.ddd.factories.commands.postpone_training_and_root_group_modification_with_program_tree import \
+    PostponeTrainingAndRootGroupModificationWithProgramTreeCommandFactory
 
 
-class TestUpdateAndReportTrainingWithProgramTree(TestCase):
+class TestPostponeTrainingAndRootGroupModificationWithProgramTree(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.cmd = UpdateTrainingCommandFactory(code="LDROI1200M", abbreviated_title="DROI2M", year=2018)
+        cls.cmd = PostponeTrainingAndRootGroupModificationWithProgramTreeCommandFactory(
+            code="LDROI1200M",
+            postpone_from_acronym="DROI2M",
+            postpone_from_year=2018
+        )
 
     def setUp(self):
-        self.update_training_patcher = mock.patch(
-            "program_management.ddd.service.write.update_training_with_program_tree_service."
-            "update_training_service.update_training",
+        self.postpone_training_and_group_modification_patcher = mock.patch(
+            "program_management.ddd.service.write"
+            ".postpone_training_and_root_group_modification_with_program_tree_service."
+            "postpone_training_and_group_modification_service.postpone_training_and_group_modification",
             return_value=[]
         )
-        self.mocked_update_training = self.update_training_patcher.start()
-        self.addCleanup(self.update_training_patcher.stop)
-
-        self.update_group_patcher = mock.patch(
-            "program_management.ddd.service.write.update_training_with_program_tree_service."
-            "update_group_service.update_group",
-            return_value=[]
-        )
-        self.mocked_update_group = self.update_group_patcher.start()
-        self.addCleanup(self.update_group_patcher.stop)
+        self.mocked_postpone_training_and_group_modification = \
+            self.postpone_training_and_group_modification_patcher.start()
+        self.addCleanup(self.postpone_training_and_group_modification_patcher.stop)
 
         self.postpone_pgrm_tree_patcher = mock.patch(
-            "program_management.ddd.service.write.update_training_with_program_tree_service."
+            "program_management.ddd.service.write."
+            "postpone_training_and_root_group_modification_with_program_tree_service."
             "postpone_program_tree_service.postpone_program_tree",
             return_value=[]
         )
@@ -59,7 +59,8 @@ class TestUpdateAndReportTrainingWithProgramTree(TestCase):
         self.addCleanup(self.postpone_pgrm_tree_patcher.stop)
 
         self.postpone_pgrm_tree_version_patcher = mock.patch(
-            "program_management.ddd.service.write.update_training_with_program_tree_service."
+            "program_management.ddd.service.write."
+            "postpone_training_and_root_group_modification_with_program_tree_service."
             "postpone_tree_version_service.postpone_program_tree_version",
             return_value=[]
         )
@@ -67,9 +68,9 @@ class TestUpdateAndReportTrainingWithProgramTree(TestCase):
         self.addCleanup(self.postpone_pgrm_tree_version_patcher.stop)
 
     def test_assert_call_multiple_service(self):
-        update_training_with_program_tree_service.update_and_report_training_with_program_tree(self.cmd)
+        postpone_training_and_root_group_modification_with_program_tree_service.\
+            postpone_training_and_root_group_modification_with_program_tree(self.cmd)
 
-        self.assertTrue(self.mocked_update_training.called)
-        self.assertTrue(self.mocked_update_group.called)
+        self.assertTrue(self.mocked_postpone_training_and_group_modification.called)
         self.assertTrue(self.mocked_postpone_pgrm_tree.called)
         self.assertTrue(self.mocked_postpone_pgrm_tree_version.called)

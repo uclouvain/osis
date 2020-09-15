@@ -257,7 +257,10 @@ class AbstractConsistencyException(ABC):
             "academic_type": _("Academic type"),
             "diploma": _("Diploma"),
             "content_constraint": _("Content constraint"),
-            "remark": _("Remark")
+            "remark": _("Remark"),
+            "professional_title": _("Professionnal title"),
+            "printing_title": _('Diploma title'),
+            "leads_to_diploma": _('Leads to diploma/certificate')
         }.get(field_name, field_name)
 
 

@@ -23,12 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Optional
+from decimal import Decimal
+from typing import Optional, List, Tuple
 
 import attr
 
 from base.models.enums.link_type import LinkTypes
 from education_group.ddd import command as education_group_command
+from education_group.ddd.command import AimCode, AimSection, DecreeName, DomainCode
 from osis_common.ddd import interface
 from program_management.ddd.business_types import *
 
@@ -565,6 +567,66 @@ class PostponeMiniTrainingAndRootGroupModificationWithProgramTreeCommand(interfa
     end_year = attr.ib(type=Optional[int])
     teaching_campus_name = attr.ib(type=Optional[str])
     teaching_campus_organization_name = attr.ib(type=Optional[str])
+    constraint_type = attr.ib(type=Optional[str])
+    min_constraint = attr.ib(type=Optional[int])
+    max_constraint = attr.ib(type=Optional[int])
+    remark_fr = attr.ib(type=Optional[str])
+    remark_en = attr.ib(type=Optional[str])
+    organization_name = attr.ib(type=str)
+    schedule_type = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class PostponeTrainingAndRootGroupModificationWithProgramTreeCommand(interface.CommandRequest):
+    postpone_from_acronym = attr.ib(type=str)
+    postpone_from_year = attr.ib(type=int)
+
+    code = attr.ib(type=str)
+    status = attr.ib(type=str)
+    credits = attr.ib(type=int)
+    duration = attr.ib(type=int)
+    title_fr = attr.ib(type=str)
+    partial_title_fr = attr.ib(type=Optional[str])
+    title_en = attr.ib(type=Optional[str])
+    partial_title_en = attr.ib(type=Optional[str])
+    keywords = attr.ib(type=Optional[str])
+    internship_presence = attr.ib(type=Optional[str])
+    is_enrollment_enabled = attr.ib(type=Optional[bool])
+    has_online_re_registration = attr.ib(type=Optional[bool])
+    has_partial_deliberation = attr.ib(type=Optional[bool])
+    has_admission_exam = attr.ib(type=Optional[bool])
+    has_dissertation = attr.ib(type=Optional[bool])
+    produce_university_certificate = attr.ib(type=Optional[bool])
+    main_language = attr.ib(type=Optional[str])
+    english_activities = attr.ib(type=Optional[str])
+    other_language_activities = attr.ib(type=Optional[str])
+    internal_comment = attr.ib(type=Optional[str])
+    main_domain_code = attr.ib(type=Optional[str])
+    main_domain_decree = attr.ib(type=Optional[str])
+    secondary_domains = attr.ib(type=Optional[List[Tuple[DecreeName, DomainCode]]])
+    isced_domain_code = attr.ib(type=Optional[str])
+    management_entity_acronym = attr.ib(type=Optional[str])
+    administration_entity_acronym = attr.ib(type=Optional[str])
+    end_year = attr.ib(type=Optional[int])
+    teaching_campus_name = attr.ib(type=Optional[str])
+    teaching_campus_organization_name = attr.ib(type=Optional[str])
+    enrollment_campus_name = attr.ib(type=Optional[str])
+    enrollment_campus_organization_name = attr.ib(type=Optional[str])
+    other_campus_activities = attr.ib(type=Optional[str])
+    can_be_funded = attr.ib(type=Optional[bool])
+    funding_orientation = attr.ib(type=Optional[str])
+    can_be_international_funded = attr.ib(type=Optional[bool])
+    international_funding_orientation = attr.ib(type=Optional[str])
+    ares_code = attr.ib(type=Optional[int])
+    ares_graca = attr.ib(type=Optional[int])
+    ares_authorization = attr.ib(type=Optional[int])
+    code_inter_cfb = attr.ib(type=Optional[str])
+    coefficient = attr.ib(type=Optional[Decimal])
+    duration_unit = attr.ib(type=Optional[str])
+    leads_to_diploma = attr.ib(type=Optional[bool])
+    printing_title = attr.ib(type=Optional[str])
+    professional_title = attr.ib(type=Optional[str])
+    aims = attr.ib(type=Optional[List[Tuple[AimCode, AimSection]]])
     constraint_type = attr.ib(type=Optional[str])
     min_constraint = attr.ib(type=Optional[int])
     max_constraint = attr.ib(type=Optional[int])

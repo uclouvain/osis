@@ -36,8 +36,8 @@ from base.views.common import display_success_messages, display_warning_messages
 from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import exception
-from education_group.ddd.service.read import get_training_service, get_group_service, \
-    get_update_training_warning_messages
+from education_group.ddd.domain.exception import TrainingCopyConsistencyException
+from education_group.ddd.service.read import get_training_service, get_group_service
 from education_group.forms import training as training_forms
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from education_group.views.proxy.read import Tab
@@ -46,7 +46,7 @@ from program_management.ddd import command as command_program_management
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception as program_management_exception
 from program_management.ddd.service.write import delete_training_with_program_tree_service, \
-    update_training_with_program_tree_service, report_training_with_program_tree
+    postpone_training_and_root_group_modification_with_program_tree_service
 
 
 class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
@@ -69,31 +69,16 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         deleted_trainings = []
         updated_trainings = []
-        created_trainings = []
 
         if self.training_form.is_valid():
             deleted_trainings = self.delete_training()
-            warning_messages = get_update_training_warning_messages.get_conflicted_fields(
-                command.GetUpdateTrainingWarningMessages(
-                    acronym=self.get_training_obj().acronym,
-                    code=self.get_training_obj().code,
-                    year=self.get_training_obj().year
-                )
-            )
-
             if not self.training_form.errors:
                 updated_trainings = self.update_training()
 
-            if warning_messages and not self.training_form.errors:
-                created_trainings = self.report_training()
-
             if not self.training_form.errors:
-
                 success_messages = self.get_success_msg_updated_trainings(updated_trainings)
-                success_messages += self.get_success_msg_updated_trainings(created_trainings)
                 success_messages += self.get_success_msg_deleted_trainings(deleted_trainings)
                 display_success_messages(request, success_messages, extra_tags='safe')
-                display_warning_messages(request, warning_messages, extra_tags='safe')
                 return HttpResponseRedirect(self.get_success_url())
         display_error_messages(self.request, self._get_default_error_messages())
         return self.get(request, *args, **kwargs)
@@ -130,40 +115,26 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
     def update_training(self) -> List['TrainingIdentity']:
         try:
-            update_command = self._convert_form_to_update_training_command(self.training_form)
-            return update_training_with_program_tree_service.update_and_report_training_with_program_tree(
-                update_command
-            )
+            postpone_modification_command = self._convert_form_to_postpone_modification_cmd(self.training_form)
+            return postpone_training_and_root_group_modification_with_program_tree_service.\
+                postpone_training_and_root_group_modification_with_program_tree(postpone_modification_command)
         except exception.ContentConstraintTypeMissing as e:
             self.training_form.add_error("constraint_type", e.message)
         except (exception.ContentConstraintMinimumMaximumMissing,
                 exception.ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum) as e:
             self.training_form.add_error("min_constraint", e.message)
             self.training_form.add_error("max_constraint", "")
-        return []
-
-    def report_training(self) -> List['TrainingIdentity']:
-        if self.get_training_obj().end_year:
-            return report_training_with_program_tree.report_training_with_program_tree(
-                command.PostponeTrainingWithProgramTreeCommand(
-                    abbreviated_title=self.get_training_obj().acronym,
-                    code=self.get_training_obj().code,
-                    from_year=self.get_training_obj().end_year
-                )
-            )
-
+        except TrainingCopyConsistencyException as e:
+            display_warning_messages(self.request, e.message)
         return []
 
     def delete_training(self) -> List['TrainingIdentity']:
         end_year = self.training_form.cleaned_data["end_year"]
         if not end_year:
             return []
-
         try:
-
             delete_command = self._convert_form_to_delete_trainings_command(self.training_form)
             return delete_training_with_program_tree_service.delete_training_with_program_tree(delete_command)
-
         except (
             program_management_exception.ProgramTreeNonEmpty,
             exception.TrainingHaveLinkWithEPC,
@@ -232,19 +203,6 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "acronym": training_identity.acronym,
             "academic_year": display_as_academic_year(training_identity.year)
         }
-
-    def get_success_msg_updated_links(self, links: List['Link']) -> List[str]:
-        messages = []
-
-        for link in links:
-            msg = _("The link of %(code)s - %(acronym)s - %(year)s has been updated.") % {
-                "acronym": link.child.title,
-                "code": link.entity_id.child_code,
-                "year": display_as_academic_year(link.entity_id.child_year)
-            }
-            messages.append(msg)
-
-        return messages
 
     def _get_default_error_messages(self) -> str:
         return _("Error(s) in form: The modifications are not saved")
@@ -330,14 +288,15 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
         return form_initial_values
 
-    def _convert_form_to_update_training_command(
+    def _convert_form_to_postpone_modification_cmd(
             self,
-            form: training_forms.UpdateTrainingForm) -> command.UpdateTrainingCommand:
+            form: training_forms.UpdateTrainingForm
+    ) -> command_program_management.PostponeTrainingAndRootGroupModificationWithProgramTreeCommand:
         cleaned_data = form.cleaned_data
-        return command.UpdateTrainingCommand(
-            abbreviated_title=cleaned_data['acronym'],
+        return command_program_management.PostponeTrainingAndRootGroupModificationWithProgramTreeCommand(
+            postpone_from_acronym=cleaned_data['acronym'],
+            postpone_from_year=cleaned_data['academic_year'].year,
             code=cleaned_data['code'],
-            year=cleaned_data['academic_year'].year,
             status=cleaned_data['active'],
             credits=cleaned_data['credits'],
             duration=cleaned_data['duration'],
@@ -412,22 +371,4 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             version_name='',
             is_transition=False,
             from_year=cleaned_data["end_year"].year+1
-        )
-
-    def convert_training_form_to_delete_training_command(
-            self,
-            training_form: training_forms.UpdateTrainingForm) -> command.DeleteTrainingCommand:
-        cleaned_data = training_form.cleaned_data
-        return command.DeleteTrainingCommand(
-            acronym=cleaned_data["acronym"],
-            from_year=cleaned_data["end_year"].year
-        )
-
-    def convert_training_form_to_delete_group_command(
-            self,
-            training_form: training_forms.UpdateTrainingForm) -> command.DeleteGroupCommand:
-        cleaned_data = training_form.cleaned_data
-        return command.DeleteGroupCommand(
-            code=cleaned_data["code"],
-            from_year=cleaned_data["end_year"].year
         )

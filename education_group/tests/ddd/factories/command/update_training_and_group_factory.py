@@ -23,8 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from decimal import Decimal
-
 import factory.fuzzy
 
 from base.models.enums.active_status import ActiveStatusEnum
@@ -32,12 +30,12 @@ from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.ddd import command
 
 
-class UpdateTrainingCommandFactory(factory.Factory):
+class UpdateTrainingAndGroupCommandFactory(factory.Factory):
     class Meta:
-        model = command.UpdateTrainingCommand
+        model = command.UpdateTrainingAndGroupCommand
         abstract = False
 
-    abbreviated_title = "Title "
+    acronym = "Title "
     status = ActiveStatusEnum.ACTIVE.name
     code = " Code "
     year = 2019
