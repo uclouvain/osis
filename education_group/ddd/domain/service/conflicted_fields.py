@@ -24,7 +24,7 @@
 #
 ##############################################################################
 import itertools
-from typing import Dict
+from typing import Dict, List
 
 import attr
 
@@ -36,10 +36,13 @@ from education_group.ddd.repository.mini_training import MiniTrainingRepository
 from education_group.ddd.repository.training import TrainingRepository
 from osis_common.ddd import interface
 
+Year = int
+FieldLabel = str
+
 
 class ConflictedFields(interface.DomainService):
     @classmethod
-    def get_group_conflicted_fields(cls, group_id: 'GroupIdentity') -> Dict:
+    def get_group_conflicted_fields(cls, group_id: 'GroupIdentity') -> Dict[Year, List[FieldLabel]]:
         current_group = GroupRepository.get(group_id)
         conflicted_fields = {}
 
@@ -57,7 +60,7 @@ class ConflictedFields(interface.DomainService):
         return conflicted_fields
 
     @classmethod
-    def get_training_conflicted_fields(cls, training_id: 'TrainingIdentity') -> Dict:
+    def get_training_conflicted_fields(cls, training_id: 'TrainingIdentity') -> Dict[Year, List[FieldLabel]]:
         current_training = TrainingRepository.get(training_id)
         group_id = GroupIdentity(code=current_training.code, year=current_training.year)
         conflicted_fields = {
@@ -81,7 +84,8 @@ class ConflictedFields(interface.DomainService):
         return conflicted_fields
 
     @classmethod
-    def get_mini_training_conflicted_fields(cls, mini_training_id: 'MiniTrainingIdentity') -> Dict:
+    def get_mini_training_conflicted_fields(cls, mini_training_id: 'MiniTrainingIdentity') \
+            -> Dict[Year, List[FieldLabel]]:
         current_mini_training = MiniTrainingRepository.get(mini_training_id)
         group_id = GroupIdentity(code=current_mini_training.code, year=current_mini_training.year)
         conflicted_fields = {
