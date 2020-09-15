@@ -334,15 +334,16 @@ class TestVersionNodeViewSerializerInEn(SimpleTestCase):
         )
         self.tree_fr_en = ProgramTreeFactory(root_node=self.root_node_with_fr_en_title)
         self.tree_version_fr_en = ProgramTreeVersionFactory(tree=self.tree_fr_en, entity_id__version_name='CEMS',
-                                                               title_fr='Title fr', title_en='Title en')
+                                                            title_fr='Title fr', title_en='Title en')
 
         self.root_node_without_fr_title = NodeGroupYearFactory(
             node_id=1, code="LCOB100A", title="COBBA", year=2018,
             node_type=random.choice(TrainingType.finality_types_enum())
         )
         self.tree_without_fr = ProgramTreeFactory(root_node=self.root_node_without_fr_title)
-        self.tree_version_without_fr_ = ProgramTreeVersionFactory(tree=self.tree_without_fr, entity_id__version_name='CEMS',
-                                                               title_fr=None)
+        self.tree_version_without_fr_ = ProgramTreeVersionFactory(tree=self.tree_without_fr,
+                                                                  entity_id__version_name='CEMS',
+                                                                  title_fr=None)
 
     def test_complete_title_for_finality_without_en_title(self):
 
@@ -411,4 +412,3 @@ class TestVersionNodeViewSerializerInEn(SimpleTestCase):
             [self.tree_version_without_fr_],
             'fr')
         self.assertEqual(title, "")
-
