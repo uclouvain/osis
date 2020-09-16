@@ -1,6 +1,7 @@
 import functools
 from typing import Dict, List
 
+from django.db import transaction
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
@@ -8,7 +9,6 @@ from django.utils.functional import cached_property
 from django.views import View
 from django.utils.translation import gettext_lazy as _
 
-from base.forms.common import ValidationRuleMixin
 from base.models import entity_version
 from base.views.common import display_error_messages, display_warning_messages
 from education_group.ddd.domain import exception as exception_education_group
@@ -45,6 +45,7 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
             return HttpResponseRedirect(redirect_url)
         return super().dispatch(request, *args, **kwargs)
 
+    @transaction.non_atomic_requests
     def get(self, request, *args, **kwargs):
         context = {
             "training_version_form": self.training_version_form,
@@ -57,6 +58,7 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
         }
         return render(request, self.template_name, context)
 
+    @transaction.non_atomic_requests
     def post(self, request, *args, **kwargs):
         if self.training_version_form.is_valid():
             self.update_training_version()
