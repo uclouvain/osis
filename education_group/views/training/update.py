@@ -25,6 +25,7 @@ import functools
 from typing import List, Dict, Optional
 
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db import transaction
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render
 from django.utils.functional import cached_property
@@ -55,6 +56,7 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
     template_name = "education_group_app/training/upsert/update.html"
 
+    @transaction.non_atomic_requests
     def get(self, request, *args, **kwargs):
         context = {
             "tabs": self.get_tabs(),
@@ -66,6 +68,7 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         }
         return render(request, self.template_name, context)
 
+    @transaction.non_atomic_requests
     def post(self, request, *args, **kwargs):
         deleted_trainings = []
         updated_trainings = []

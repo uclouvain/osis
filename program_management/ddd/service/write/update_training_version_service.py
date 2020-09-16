@@ -23,8 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from education_group.ddd.command import UpdateGroupCommand
-from education_group.ddd.service.write import update_group_service
+from education_group.ddd.command import PostponeGroupModificationCommand
+from education_group.ddd.service.write import postpone_group_modification_service
 from program_management.ddd.business_types import *
 from program_management.ddd.command import UpdateTrainingVersionCommand, UpdateProgramTreeVersionCommand
 from program_management.ddd.domain.service.identity_search import GroupIdentitySearch
@@ -39,21 +39,21 @@ def update_training_version(
         __convert_to_update_tree_version_command(command)
     )
 
-    update_group_service.update_group(
-        __convert_to_update_group_command(command, tree_version_identity)
+    postpone_group_modification_service.postpone_group_modification_service(
+        __convert_to_postpone_group_modification_command(command, tree_version_identity)
     )
 
     return tree_version_identity
 
 
-def __convert_to_update_group_command(
+def __convert_to_postpone_group_modification_command(
         cmd: 'UpdateTrainingVersionCommand',
         tree_version_identity: 'ProgramTreeVersionIdentity'
-) -> 'UpdateGroupCommand':
+) -> 'PostponeGroupModificationCommand':
     group_identity = GroupIdentitySearch().get_from_tree_version_identity(tree_version_identity)
-    return UpdateGroupCommand(
+    return PostponeGroupModificationCommand(
         code=group_identity.code,
-        year=cmd.year,
+        postpone_from_year=cmd.year,
         abbreviated_title=cmd.offer_acronym,
         title_fr=cmd.title_fr,
         title_en=cmd.title_en,

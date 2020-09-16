@@ -50,6 +50,7 @@ def postpone_group_modification_service(postpone_cmd: command.PostponeGroupModif
     group = get_group_service.get_group(cmd_get)
     conflicted_fields = ConflictedFields().get_group_conflicted_fields(group.entity_id)
 
+    # TODO : Move logic into CalculateEndPostponement
     if group.type.name in MiniTrainingType.get_names():
         identity = MiniTrainingIdentitySearch.get_from_group_identity(group.entity_id)
         repository = MiniTrainingRepository()
@@ -85,11 +86,15 @@ def postpone_group_modification_service(postpone_cmd: command.PostponeGroupModif
         repository=repository,
     )
     for year in range(from_year, end_postponement_year):
-        if year in conflicted_fields:
-            raise GroupCopyConsistencyException(year, year+1, conflicted_fields[year])
+        if year + 1 in conflicted_fields:
+            continue  # Do not copy info from year to N+1 because conflict detected
 
         identity_next_year = copy_group_service.copy_group(
             cmd=command.CopyGroupCommand(from_code=postpone_cmd.code, from_year=year)
         )
         identities_created.append(identity_next_year)
+
+    if conflicted_fields:
+        first_conflict_year = min(conflicted_fields.keys())
+        raise GroupCopyConsistencyException(first_conflict_year, conflicted_fields[first_conflict_year])
     return identities_created

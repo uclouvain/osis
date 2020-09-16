@@ -25,12 +25,10 @@ import mock
 from django.test import TestCase
 
 from education_group.tests.ddd.factories.group import GroupIdentityFactory
-from program_management.ddd import command
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
-from program_management.ddd.service.write import create_standard_version_service, update_training_version_service
+from program_management.ddd.service.write import update_training_version_service
 from program_management.tests.ddd.factories.commands.update_training_version_command import \
     UpdateTrainingVersionCommandFactory
-from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
 
 
 class TestUpdateTrainingVersion(TestCase):
@@ -38,10 +36,11 @@ class TestUpdateTrainingVersion(TestCase):
     @mock.patch(
         "program_management.ddd.domain.service.identity_search.GroupIdentitySearch.get_from_tree_version_identity")
     @mock.patch("program_management.ddd.service.write.update_program_tree_version_service.update_program_tree_version")
-    @mock.patch("education_group.ddd.service.write.update_group_service.update_group")
+    @mock.patch("program_management.ddd.service.write.update_mini_training_version_service."
+                "postpone_group_modification_service.postpone_group_modification_service")
     def test_should_call_update_group_service_and_update_tree_version_service(
             self,
-            mock_update_group_service,
+            mock_postpone_group_modification_service,
             mock_update_tree_version_service,
             mock_identity_converter
     ):
@@ -57,7 +56,7 @@ class TestUpdateTrainingVersion(TestCase):
 
         result = update_training_version_service.update_training_version(cmd)
 
-        self.assertTrue(mock_update_group_service.called)
+        self.assertTrue(mock_postpone_group_modification_service.called)
         self.assertTrue(mock_update_tree_version_service.called)
 
         self.assertEqual(result, identity_expected)

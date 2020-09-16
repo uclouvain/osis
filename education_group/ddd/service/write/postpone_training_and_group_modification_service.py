@@ -25,8 +25,6 @@
 ##############################################################################
 from typing import List
 
-from django.db import transaction
-
 from education_group.ddd import command
 from education_group.ddd.domain.exception import TrainingCopyConsistencyException
 from education_group.ddd.domain.service.conflicted_fields import ConflictedFields
@@ -36,11 +34,13 @@ from education_group.ddd.service.write import copy_training_service, update_trai
 from program_management.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
 
 
-@transaction.atomic()
 def postpone_training_and_group_modification(postpone_cmd: command.PostponeTrainingAndGroupModificationCommand) \
         -> List['TrainingIdentity']:
     # GIVEN
-    from_training_id = TrainingIdentity(acronym=postpone_cmd.postpone_from_acronym, year=postpone_cmd.postpone_from_year)
+    from_training_id = TrainingIdentity(
+        acronym=postpone_cmd.postpone_from_acronym,
+        year=postpone_cmd.postpone_from_year
+    )
     conflicted_fields = ConflictedFields().get_training_conflicted_fields(from_training_id)
 
     # WHEN
