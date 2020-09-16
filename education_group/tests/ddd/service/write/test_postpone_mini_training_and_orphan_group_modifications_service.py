@@ -24,25 +24,25 @@
 from unittest import TestCase, mock
 
 from education_group.ddd.domain.exception import MiniTrainingCopyConsistencyException
-from education_group.ddd.service.write import postpone_mini_training_and_group_modification_service
+from education_group.ddd.service.write import postpone_mini_training_and_orphan_group_modifications_service
 from education_group.tests.ddd.factories.command.postpone_mini_training_and_group_modification_command import \
     PostponeMiniTrainingAndGroupModificationCommandFactory
 
 
-class TestPostponeMiniTrainingAndGroupModificationService(TestCase):
+class TestPostponeMiniTrainingAndOrphanGroupModificationsService(TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.cmd = PostponeMiniTrainingAndGroupModificationCommandFactory(
             postpone_from_year=2020
         )
 
-    @mock.patch('education_group.ddd.service.write.postpone_mini_training_and_group_modification_service.'
+    @mock.patch('education_group.ddd.service.write.postpone_mini_training_and_orphan_group_modifications_service.'
                 'ConflictedFields.get_mini_training_conflicted_fields')
-    @mock.patch('education_group.ddd.service.write.postpone_mini_training_and_group_modification_service.'
+    @mock.patch('education_group.ddd.service.write.postpone_mini_training_and_orphan_group_modifications_service.'
                 'update_mini_training_and_group_service.update_mini_training_and_group')
-    @mock.patch('education_group.ddd.service.write.postpone_mini_training_and_group_modification_service.'
+    @mock.patch('education_group.ddd.service.write.postpone_mini_training_and_orphan_group_modifications_service.'
                 'CalculateEndPostponement.calculate_end_postponement_year')
-    @mock.patch('education_group.ddd.service.write.postpone_mini_training_and_group_modification_service.'
+    @mock.patch('education_group.ddd.service.write.postpone_mini_training_and_orphan_group_modifications_service.'
                 'copy_mini_training_service.copy_mini_training_to_next_year')
     def test_ensure_consistency_error_not_stop_creating_training_when_end_postponement_is_undefined(
             self,
@@ -55,8 +55,8 @@ class TestPostponeMiniTrainingAndGroupModificationService(TestCase):
         mock_get_conflicted_fields.return_value = {2013: ['credits', 'titles']}
 
         with self.assertRaises(MiniTrainingCopyConsistencyException):
-            postpone_mini_training_and_group_modification_service.\
-                postpone_mini_training_and_group_modification(self.cmd)
+            postpone_mini_training_and_orphan_group_modifications_service.\
+                postpone_mini_training_and_orphan_group_modifications(self.cmd)
 
         self.assertEqual(mock_update_mini_training_and_group_service.call_count, 1)
         self.assertEqual(mock_copy_mini_training_to_next_year_service.call_count, 5)

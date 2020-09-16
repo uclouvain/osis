@@ -47,7 +47,7 @@ from program_management.ddd import command as command_program_management
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception as program_management_exception
 from program_management.ddd.service.write import delete_training_with_program_tree_service, \
-    postpone_training_and_root_group_modification_with_program_tree_service
+    postpone_training_and_program_tree_modifications_service
 
 
 class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
@@ -119,8 +119,8 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
     def update_training(self) -> List['TrainingIdentity']:
         try:
             postpone_modification_command = self._convert_form_to_postpone_modification_cmd(self.training_form)
-            return postpone_training_and_root_group_modification_with_program_tree_service.\
-                postpone_training_and_root_group_modification_with_program_tree(postpone_modification_command)
+            return postpone_training_and_program_tree_modifications_service.\
+                postpone_training_and_program_tree_modifications(postpone_modification_command)
         except exception.ContentConstraintTypeMissing as e:
             self.training_form.add_error("constraint_type", e.message)
         except (exception.ContentConstraintMinimumMaximumMissing,

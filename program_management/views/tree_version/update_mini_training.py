@@ -25,7 +25,7 @@ from program_management.ddd.business_types import *
 from program_management.ddd import command
 from program_management.ddd.command import UpdateMiniTrainingVersionCommand
 from program_management.ddd.service.read import get_program_tree_version_from_node_service
-from program_management.ddd.service.write import update_mini_training_version_service
+from program_management.ddd.service.write import update_and_postpone_mini_training_version_service
 from program_management.forms import version
 
 
@@ -78,7 +78,7 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
     def update_mini_training_version(self):
         try:
             update_command = self._convert_form_to_update_mini_training_version_command(self.mini_training_version_form)
-            return update_mini_training_version_service.update_mini_training_version(update_command)
+            return update_and_postpone_mini_training_version_service.update_and_postpone_mini_training_version(update_command)
         except exception_education_group.ContentConstraintTypeMissing as e:
             self.mini_training_version_form.add_error("constraint_type", e.message)
         except (exception_education_group.ContentConstraintMinimumMaximumMissing,

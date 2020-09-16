@@ -28,19 +28,19 @@ from typing import List
 from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain.exception import MiniTrainingCopyConsistencyException
-from education_group.ddd.service.write import postpone_mini_training_and_group_modification_service
+from education_group.ddd.service.write import postpone_mini_training_and_orphan_group_modifications_service
 from program_management.ddd.command import PostponeProgramTreeVersionCommand, PostponeProgramTreeCommand, \
     PostponeMiniTrainingAndRootGroupModificationWithProgramTreeCommand
 from program_management.ddd.service.write import postpone_tree_version_service, postpone_program_tree_service
 
 
-def postpone_mini_training_and_root_group_modification_with_program_tree(
+def postpone_mini_training_and_program_tree_modifications(
         update_command: PostponeMiniTrainingAndRootGroupModificationWithProgramTreeCommand
 ) -> List['MiniTrainingIdentity']:
     consistency_error = None
     try:
-        mini_training_identities = postpone_mini_training_and_group_modification_service.\
-            postpone_mini_training_and_group_modification(
+        mini_training_identities = postpone_mini_training_and_orphan_group_modifications_service.\
+            postpone_mini_training_and_orphan_group_modifications(
                 __convert_to_postpone_mini_training_and_group_modification_command(update_command)
             )
     except MiniTrainingCopyConsistencyException as e:

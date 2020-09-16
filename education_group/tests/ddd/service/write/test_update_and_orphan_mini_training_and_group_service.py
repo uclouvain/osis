@@ -36,7 +36,7 @@ from testing.mocks import MockPatcherMixin
 
 
 @patch("education_group.ddd.service.write.update_group_service.update_group")
-class TestUpdateMiniTrainingAndGroupService(TestCase, MockPatcherMixin):
+class TestUpdateAndPostponeMiniTrainingAndGroupService(TestCase, MockPatcherMixin):
     @classmethod
     def setUpTestData(cls):
         cls.cmd = command.UpdateMiniTrainingAndGroupCommand(

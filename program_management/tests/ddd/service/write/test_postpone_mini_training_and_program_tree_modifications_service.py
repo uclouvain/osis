@@ -29,10 +29,10 @@ from base.models.enums.active_status import ActiveStatusEnum
 from base.models.enums.constraint_type import ConstraintTypeEnum
 from base.models.enums.schedule_type import ScheduleTypeEnum
 from program_management.ddd.service.write import \
-    postpone_mini_training_and_root_group_modification_with_program_tree_service
+    postpone_mini_training_and_program_tree_modifications_service
 
 
-class TestPostponeMiniTrainingAndRootGroupModificationWithProgramTree(TestCase):
+class TestPostponeMiniTrainingAndProgramTreeModifications(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.cmd = command.PostponeMiniTrainingAndRootGroupModificationWithProgramTreeCommand(
@@ -58,19 +58,20 @@ class TestPostponeMiniTrainingAndRootGroupModificationWithProgramTree(TestCase):
         )
 
     def setUp(self):
-        self.postpone_mini_training_and_group_modification_patcher = mock.patch(
+        self.postpone_mini_training_and_orphan_group_modifications_patcher = mock.patch(
             "program_management.ddd.service.write."
-            "postpone_mini_training_and_root_group_modification_with_program_tree_service."
-            "postpone_mini_training_and_group_modification_service.postpone_mini_training_and_group_modification",
+            "postpone_mini_training_and_program_tree_modifications_service."
+            "postpone_mini_training_and_orphan_group_modifications_service."
+            "postpone_mini_training_and_orphan_group_modifications",
             return_value=[]
         )
-        self.mocked_postpone_mini_training_and_group_modification = \
-            self.postpone_mini_training_and_group_modification_patcher.start()
-        self.addCleanup(self.postpone_mini_training_and_group_modification_patcher.stop)
+        self.mocked_postpone_mini_training_and_orphan_group_modifications = \
+            self.postpone_mini_training_and_orphan_group_modifications_patcher.start()
+        self.addCleanup(self.postpone_mini_training_and_orphan_group_modifications_patcher.stop)
 
         self.postpone_pgrm_tree_patcher = mock.patch(
             "program_management.ddd.service.write."
-            "postpone_mini_training_and_root_group_modification_with_program_tree_service."
+            "postpone_mini_training_and_program_tree_modifications_service."
             "postpone_program_tree_service.postpone_program_tree",
             return_value=[]
         )
@@ -79,7 +80,7 @@ class TestPostponeMiniTrainingAndRootGroupModificationWithProgramTree(TestCase):
 
         self.postpone_pgrm_tree_version_patcher = mock.patch(
             "program_management.ddd.service.write."
-            "postpone_mini_training_and_root_group_modification_with_program_tree_service."
+            "postpone_mini_training_and_program_tree_modifications_service."
             "postpone_tree_version_service.postpone_program_tree_version",
             return_value=[]
         )
@@ -87,9 +88,9 @@ class TestPostponeMiniTrainingAndRootGroupModificationWithProgramTree(TestCase):
         self.addCleanup(self.postpone_pgrm_tree_version_patcher.stop)
 
     def test_assert_call_multiple_service(self):
-        postpone_mini_training_and_root_group_modification_with_program_tree_service.\
-            postpone_mini_training_and_root_group_modification_with_program_tree(self.cmd)
+        postpone_mini_training_and_program_tree_modifications_service.\
+            postpone_mini_training_and_program_tree_modifications(self.cmd)
 
-        self.assertTrue(self.mocked_postpone_mini_training_and_group_modification.called)
+        self.assertTrue(self.mocked_postpone_mini_training_and_orphan_group_modifications.called)
         self.assertTrue(self.mocked_postpone_pgrm_tree.called)
         self.assertTrue(self.mocked_postpone_pgrm_tree_version.called)

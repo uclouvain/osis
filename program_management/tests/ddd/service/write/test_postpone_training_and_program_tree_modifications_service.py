@@ -24,12 +24,12 @@
 import mock
 from django.test import TestCase
 
-from program_management.ddd.service.write import postpone_training_and_root_group_modification_with_program_tree_service
+from program_management.ddd.service.write import postpone_training_and_program_tree_modifications_service
 from program_management.tests.ddd.factories.commands.postpone_training_and_root_group_modification_with_program_tree import \
     PostponeTrainingAndRootGroupModificationWithProgramTreeCommandFactory
 
 
-class TestPostponeTrainingAndRootGroupModificationWithProgramTree(TestCase):
+class TestPostponeTrainingAndProgramTreeModificationsService(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.cmd = PostponeTrainingAndRootGroupModificationWithProgramTreeCommandFactory(
@@ -41,7 +41,7 @@ class TestPostponeTrainingAndRootGroupModificationWithProgramTree(TestCase):
     def setUp(self):
         self.postpone_training_and_group_modification_patcher = mock.patch(
             "program_management.ddd.service.write"
-            ".postpone_training_and_root_group_modification_with_program_tree_service."
+            ".postpone_training_and_program_tree_modifications_service."
             "postpone_training_and_group_modification_service.postpone_training_and_group_modification",
             return_value=[]
         )
@@ -51,7 +51,7 @@ class TestPostponeTrainingAndRootGroupModificationWithProgramTree(TestCase):
 
         self.postpone_pgrm_tree_patcher = mock.patch(
             "program_management.ddd.service.write."
-            "postpone_training_and_root_group_modification_with_program_tree_service."
+            "postpone_training_and_program_tree_modifications_service."
             "postpone_program_tree_service.postpone_program_tree",
             return_value=[]
         )
@@ -60,7 +60,7 @@ class TestPostponeTrainingAndRootGroupModificationWithProgramTree(TestCase):
 
         self.postpone_pgrm_tree_version_patcher = mock.patch(
             "program_management.ddd.service.write."
-            "postpone_training_and_root_group_modification_with_program_tree_service."
+            "postpone_training_and_program_tree_modifications_service."
             "postpone_tree_version_service.postpone_program_tree_version",
             return_value=[]
         )
@@ -68,8 +68,8 @@ class TestPostponeTrainingAndRootGroupModificationWithProgramTree(TestCase):
         self.addCleanup(self.postpone_pgrm_tree_version_patcher.stop)
 
     def test_assert_call_multiple_service(self):
-        postpone_training_and_root_group_modification_with_program_tree_service.\
-            postpone_training_and_root_group_modification_with_program_tree(self.cmd)
+        postpone_training_and_program_tree_modifications_service.\
+            postpone_training_and_program_tree_modifications(self.cmd)
 
         self.assertTrue(self.mocked_postpone_training_and_group_modification.called)
         self.assertTrue(self.mocked_postpone_pgrm_tree.called)

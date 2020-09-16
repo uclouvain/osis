@@ -42,7 +42,7 @@ from program_management.ddd.domain.service.calculate_end_postponement import Cal
 
 
 @transaction.atomic()
-def postpone_group_modification_service(postpone_cmd: command.PostponeGroupModificationCommand) \
+def postpone_orphan_group_modification_service(postpone_cmd: command.PostponeGroupModificationCommand) \
         -> List['GroupIdentity']:
     from_year = postpone_cmd.postpone_from_year
 
