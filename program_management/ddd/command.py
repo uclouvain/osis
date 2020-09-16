@@ -32,7 +32,6 @@ from base.models.enums.link_type import LinkTypes
 from education_group.ddd import command as education_group_command
 from education_group.ddd.command import AimCode, AimSection, DecreeName, DomainCode
 from osis_common.ddd import interface
-from program_management.ddd.business_types import *
 
 
 class DetachNodeCommand(interface.CommandRequest):
@@ -345,6 +344,9 @@ class GetProgramTree(interface.CommandRequest):
 
 @attr.s(frozen=True, slots=True)
 class UpdateLinkCommand(interface.CommandRequest):
+    parent_node_code = attr.ib(type=str)
+    parent_node_year = attr.ib(type=int)
+
     child_node_code = attr.ib(type=str)
     child_node_year = attr.ib(type=int)
 
