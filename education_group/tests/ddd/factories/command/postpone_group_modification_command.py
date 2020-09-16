@@ -23,38 +23,30 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+import factory.fuzzy
 
-from django.db import transaction
-
+from base.models.enums.active_status import ActiveStatusEnum
+from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.ddd import command
-from education_group.ddd.domain import exception
-from education_group.ddd.domain.mini_training import MiniTrainingIdentity
-from education_group.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
-from education_group.ddd.service.write import copy_mini_training_service
 
 
-@transaction.atomic()
-def postpone_mini_training(postpone_cmd: command.PostponeMiniTrainingCommand) -> List['MiniTrainingIdentity']:
-    identities_created = []
+class PostponeGroupModificationCommandFactory(factory.Factory):
+    class Meta:
+        model = command.PostponeGroupModificationCommand
+        abstract = False
 
-    # GIVEN
-    from_year = postpone_cmd.postpone_from_year
-    end_postponement_year = postpone_cmd.postpone_until_year
-
-    # WHEN
-    for year in range(from_year, end_postponement_year):
-        try:
-            identity_next_year = copy_mini_training_service.copy_mini_training_to_next_year(
-                copy_cmd=command.CopyMiniTrainingToNextYearCommand(
-                    acronym=postpone_cmd.acronym,
-                    postpone_from_year=year
-                )
-            )
-
-            # THEN
-            identities_created.append(identity_next_year)
-        except exception.CannotCopyMiniTrainingDueToEndDate:
-            break
-
-    return identities_created
+    postpone_from_year = 2019
+    abbreviated_title = "Title "
+    code = "Code"
+    credits = 23
+    end_year = None
+    title_fr = "fr  title"
+    title_en = "title  en"
+    teaching_campus_name = None
+    management_entity_acronym = None
+    organization_name = None
+    constraint_type = None
+    min_constraint = None
+    max_constraint = None
+    remark_fr = None
+    remark_en = None
