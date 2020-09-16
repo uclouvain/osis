@@ -68,7 +68,7 @@ class UpdateLinkForm(forms.Form):
             raise ValidationError(e.message)
         return cleaned_relative_credits
 
-    def save(self) -> Optional['LinkIdentity']:
+    def save(self) -> Optional['Link']:
         result = None
         if self.is_valid():
             result = update_link_service.update_link(self._create_update_command())

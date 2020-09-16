@@ -99,11 +99,11 @@ class UpdateLinkView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, SuccessMess
 
     def form_valid(self, form: UpdateLinkForm):
         try:
-            link_identity = form.save()
+            link = form.save()
         except osis_common.ddd.interface.BusinessExceptions as business_exception:
             form.add_error(field=None, error=business_exception.messages)
             return self.form_invalid(form)
-        messages = self._append_success_message(link_identity.child_code)
+        messages = self._append_success_message(link.entity_id.child_code)
         display_success_messages(self.request, messages)
         return super().form_valid(form)
 
