@@ -65,7 +65,6 @@ class ProgramManager(osis_role_models.RoleModel):
         return "{} - {}".format(self.person, self.offer_year)
 
     class Meta:
-        default_related_name = 'role'
         verbose_name = _("Program manager")
         verbose_name_plural = _("Program managers")
         group_name = "program_managers"
