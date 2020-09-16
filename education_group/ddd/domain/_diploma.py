@@ -59,6 +59,9 @@ class DiplomaAim(interface.Entity):
     def code(self) -> int:
         return self.entity_id.code
 
+    def __str__(self):
+        return "{} - {} {}".format(self.section, self.code, self.description)
+
 
 @attr.s(frozen=True, slots=True)
 class Diploma(interface.ValueObject):

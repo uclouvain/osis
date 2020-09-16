@@ -21,42 +21,28 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from typing import List
 
 from django.db import transaction
 
 from program_management.ddd.business_types import *
-from program_management.ddd.command import BulkUpdateLinkCommand, UpdateLinkCommand
+from program_management.ddd.command import UpdateLinkCommand
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 
 
 @transaction.atomic()
-def bulk_update_links(cmd: BulkUpdateLinkCommand) -> List['Link']:
-    tree_id = ProgramTreeIdentity(code=cmd.parent_node_code, year=cmd.parent_node_year)
-    tree = ProgramTreeRepository.get(tree_id)
-
-    links_updated = []
-    for update_cmd in cmd.update_link_cmds:
-        child_id = NodeIdentity(code=update_cmd.child_node_code, year=update_cmd.child_node_year)
-        link_updated = _get_updated_link(child_id, tree, update_cmd)
-        links_updated.append(link_updated)
-    ProgramTreeRepository.update(tree)
-    return links_updated
-
-
 def update_link(cmd: UpdateLinkCommand) -> 'Link':
     tree_id = ProgramTreeIdentity(code=cmd.parent_node_code, year=cmd.parent_node_year)
     tree = ProgramTreeRepository.get(tree_id)
 
     child_id = NodeIdentity(code=cmd.child_node_code, year=cmd.child_node_year)
-    link_updated = _get_updated_link(child_id, tree, cmd)
+    link_updated = get_updated_link(child_id, tree, cmd)
     ProgramTreeRepository.update(tree)
     return link_updated
 
 
-def _get_updated_link(child_id, tree, update_cmd):
+def get_updated_link(child_id, tree, update_cmd):
     return tree.update_link(
         parent_path=str(tree.root_node.node_id),
         child_id=child_id,
