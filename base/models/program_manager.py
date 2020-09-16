@@ -96,6 +96,9 @@ class ProgramManager(osis_role_models.RoleModel):
             'base.change_group': osis_role_predicates.always_deny(
                 message=_("Program managers are not allowed to modify groups")
             ),
+            'base.change_link_data': osis_role_predicates.always_deny(
+                message=_("Program managers are not allowed to modify links")
+            ),
             'base.change_educationgroup': is_program_manager_for_offer,
             'base.change_educationgroupcertificateaim': is_program_manager_for_offer,
             'base.is_institution_administrator': rules.always_allow,

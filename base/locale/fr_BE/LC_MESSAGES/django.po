@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-16 11:24+0200\n"
+"POT-Creation-Date: 2020-09-16 16:23+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1958,6 +1958,9 @@ msgstr "Gestionnaires de parcours étudiant"
 
 msgid "Program managers are not allowed to modify groups"
 msgstr "Le gestionnaire de programme ne peut pas modifier un groupement"
+
+msgid "Program managers are not allowed to modify links"
+msgstr "Le gestionnaire de programme ne peut pas modifier un lien"
 
 msgid "Program master 120"
 msgstr "Master en 120 crédits (programme)"
