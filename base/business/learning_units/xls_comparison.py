@@ -94,9 +94,7 @@ def create_xls_comparison(user, learning_unit_years, filters, academic_yr_compar
     dict_styled_cells = {}
 
     if cells_modified_with_green_font:
-        parameters[xls_build.FONT_CELLS] = parameters[xls_build.FONT_CELLS].update(
-            {xls_build.STYLE_MODIFIED: cells_modified_with_green_font}
-        )
+        parameters[xls_build.FONT_CELLS] = {xls_build.STYLE_MODIFIED: cells_modified_with_green_font}
 
     if cells_with_top_border:
         parameters[xls_build.BORDER_CELLS] = dict_styled_cells.update({xls_build.BORDER_TOP: cells_with_top_border})
@@ -440,9 +438,8 @@ def create_xls_proposal_comparison(user, learning_units_with_proposal, filters):
     }
     dict_styled_cells = {}
     if cells_modified_with_green_font:
-        parameters[xls_build.FONT_CELLS] = parameters[xls_build.FONT_CELLS].update(
-            {xls_build.STYLE_MODIFIED: cells_modified_with_green_font}
-        )
+        print(cells_modified_with_green_font)
+        parameters[xls_build.FONT_CELLS] = {xls_build.STYLE_MODIFIED: cells_modified_with_green_font}
 
     if cells_with_top_border:
         dict_styled_cells[xls_build.BORDER_BOTTOM] = cells_with_top_border
