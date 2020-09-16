@@ -37,7 +37,9 @@ from base.models.entity_version import find_parent_of_type_into_entity_structure
 from base.models.enums.entity_type import FACULTY
 from osis_role.contrib import admin as osis_role_admin
 from osis_role.contrib import models as osis_role_models
+from osis_role.contrib import predicates as osis_role_predicates
 from .learning_unit_enrollment import LearningUnitEnrollment
+from ..auth.predicates import is_program_manager_for_offer
 
 
 class ProgramManagerAdmin(VersionAdmin, osis_role_admin.RoleModelAdmin):
@@ -92,8 +94,11 @@ class ProgramManager(osis_role_models.RoleModel):
             'base.can_access_learningunit': rules.always_allow,
             'base.can_access_offer': rules.always_allow,
             'base.can_access_student_path': rules.always_allow,
-            'base.change_educationgroup': rules.always_allow,
-            'base.change_educationgroupcertificateaim': rules.always_allow,
+            'base.change_group': osis_role_predicates.always_deny(
+                message=_("Program managers are not allowed to modify groups")
+            ),
+            'base.change_educationgroup': is_program_manager_for_offer,
+            'base.change_educationgroupcertificateaim': is_program_manager_for_offer,
             'base.is_institution_administrator': rules.always_allow,
             'base.view_educationgroup': rules.always_allow,
         })

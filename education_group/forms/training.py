@@ -37,7 +37,9 @@ from django.db.models import Q
 from django.db.models import Value, CharField
 from django.db.models.functions import Concat
 from django.utils.functional import lazy
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, gettext
+
+from base.models.education_group_year import EducationGroupYear
 from education_group.ddd.business_types import *
 
 from base.business.event_perms import EventPermEducationGroupEdition
@@ -57,9 +59,13 @@ from base.models.enums.funding_codes import FundingCodes
 from base.models.enums.internship_presence import InternshipPresence
 from base.models.enums.rate_code import RateCode
 from base.models.enums.schedule_type import ScheduleTypeEnum
+from education_group.ddd.command import GetTrainingCommand
+from education_group.ddd.service.read import get_training_service
 from education_group.forms import fields
 from education_group.forms.fields import MainEntitiesVersionChoiceField, UpperCaseCharField
 from education_group.forms.widgets import CertificateAimsWidget
+from osis_common.utils.models import get_object_or_none
+from osis_role.errors import get_permission_error
 from reference.models.domain import Domain
 from reference.models.domain_isced import DomainIsced
 from reference.models.enums import domain_type
@@ -303,10 +309,11 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         )
     )
 
-    def __init__(self, *args, user: User, training_type: str, attach_path: str, **kwargs):
+    def __init__(self, *args, user: User, training_type: str, attach_path: str, training: 'Training' = None,  **kwargs):
         self.user = user
         self.training_type = training_type
         self.attach_path = attach_path
+        self.training = training
 
         super().__init__(*args, **kwargs)
 
@@ -346,8 +353,14 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         )
 
     def __init_certificate_aims_field(self):
-        if not self.fields['certificate_aims'].disabled:
+        perm = 'base.change_educationgroupcertificateaim'
+        if self.user.has_perm(perm, obj=self.training):
+            self.fields['certificate_aims'].disabled = False
             self.fields['section'].disabled = False
+            self.fields['certificate_aims'].widget.attrs['title'] = _('Select one or multiple certificate aims')
+        else:
+            permission_error_msg = get_permission_error(self.user, perm)
+            self.fields['certificate_aims'].widget.attrs['title'] = permission_error_msg
 
     def __init_diploma_fields(self):
         if self.training_type in TrainingType.with_diploma_values_set_initially_as_true():
@@ -413,6 +426,16 @@ class UpdateTrainingForm(CreateTrainingForm):
         initial_academic_year_value = self.initial.get("academic_year", None)
         if initial_academic_year_value:
             self.fields["end_year"].queryset = AcademicYear.objects.filter(year__gte=initial_academic_year_value)
+
+    def __init_certificate_aims_field(self):
+        perm = 'base.change_educationgroupcertificateaim'
+        if self.user.has_perm(perm, obj=self.training):
+            self.fields['certificate_aims'].disabled = False
+            self.fields['section'].disabled = False
+            self.fields['certificate_aims'].widget.attrs['title'] = _('Select one or multiple certificate aims')
+        else:
+            permission_error_msg = get_permission_error(self.user, perm)
+            self.fields['certificate_aims'].widget.attrs['title'] = permission_error_msg
 
 
 @register('university_domains')

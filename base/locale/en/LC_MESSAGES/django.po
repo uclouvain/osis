@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-08 11:34+0200\n"
+"POT-Creation-Date: 2020-09-16 11:24+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1896,6 +1896,9 @@ msgstr ""
 msgid "Program managers"
 msgstr ""
 
+msgid "Program managers are not allowed to modify groups"
+msgstr ""
+
 msgid "Program master 120"
 msgstr ""
 
@@ -2472,6 +2475,9 @@ msgid ""
 msgstr ""
 
 msgid "The title is made up of the common part and / or any supplement"
+msgstr ""
+
+msgid "The user is not program manager for this offer"
 msgstr ""
 
 #, python-format

@@ -539,6 +539,9 @@ msgstr ""
 msgid "Search..."
 msgstr ""
 
+msgid "Select one or multiple certificate aims"
+msgstr ""
+
 msgid "Session"
 msgstr ""
 
