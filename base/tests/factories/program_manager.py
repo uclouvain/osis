@@ -32,15 +32,14 @@ from base.tests.factories.education_group import EducationGroupFactory
 from base.tests.factories.group import ProgramManagerGroupFactory
 from base.tests.factories.offer_year import OfferYearFactory
 from base.tests.factories.person import PersonFactory
+from osis_role.contrib.tests.factories import RoleModelFactory
 
 
-class ProgramManagerFactory(factory.django.DjangoModelFactory):
+class ProgramManagerFactory(RoleModelFactory):
     class Meta:
         model = "base.ProgramManager"
         django_get_or_create = ('person', 'offer_year')
-        exclude = ('group', )
 
-    group = factory.SubFactory(ProgramManagerGroupFactory)
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1), datetime.datetime(2017, 3, 1))
     person = factory.SubFactory(PersonFactory)
