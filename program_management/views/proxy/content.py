@@ -21,36 +21,35 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+from django.urls import reverse
+from django.views.generic import RedirectView
 
-from django.db import transaction
-
-from program_management.ddd.business_types import *
-from program_management.ddd.command import UpdateLinkCommand
 from program_management.ddd.domain.node import NodeIdentity
-from program_management.ddd.domain.program_tree import ProgramTreeIdentity
-from program_management.ddd.repositories.program_tree import ProgramTreeRepository
+from program_management.ddd.repositories.node import NodeRepository
 
 
-@transaction.atomic()
-def update_link(cmd: UpdateLinkCommand) -> 'Link':
-    tree_id = ProgramTreeIdentity(code=cmd.parent_node_code, year=cmd.parent_node_year)
-    tree = ProgramTreeRepository.get(tree_id)
+class ContentRedirectView(RedirectView):
+    permanent = False
+    query_string = True
 
-    child_id = NodeIdentity(code=cmd.child_node_code, year=cmd.child_node_year)
-    link_updated = get_updated_link(child_id, tree, cmd)
-    ProgramTreeRepository.update(tree)
-    return link_updated
-
-
-def get_updated_link(child_id, tree, update_cmd):
-    return tree.update_link(
-        parent_path=str(tree.root_node.node_id),
-        child_id=child_id,
-        relative_credits=update_cmd.relative_credits,
-        access_condition=update_cmd.access_condition,
-        is_mandatory=update_cmd.is_mandatory,
-        block=update_cmd.block,
-        link_type=update_cmd.link_type,
-        comment=update_cmd.comment,
-        comment_english=update_cmd.comment_english
-    )
+    def get_redirect_url(self, *args, **kwargs):
+        year = self.kwargs['year']
+        code = self.kwargs['code']
+        root_node = NodeRepository().get(NodeIdentity(code=code, year=year))
+        if root_node.is_training():
+            url_name = "training_content"
+            url_kwargs = {'year': root_node.year, 'code': root_node.code}
+        elif root_node.is_mini_training():
+            url_name = "mini_training_content"
+            url_kwargs = {'year': root_node.year, 'code': root_node.code}
+        elif root_node.is_learning_unit():
+            url_name = "learning_unit"
+            url_kwargs = {'year': root_node.year, 'acronym': root_node.code}
+        else:
+            url_name = "group_content"
+            url_kwargs = {'year': root_node.year, 'code': root_node.code}
+        self.url = reverse(
+            url_name,
+            kwargs=url_kwargs
+        )
+        return super().get_redirect_url(*args, **kwargs)
