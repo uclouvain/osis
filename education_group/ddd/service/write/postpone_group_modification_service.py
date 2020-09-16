@@ -48,8 +48,6 @@ def postpone_group_modification_service(postpone_cmd: command.PostponeGroupModif
 
     cmd_get = command.GetGroupCommand(code=postpone_cmd.code, year=from_year)
     group = get_group_service.get_group(cmd_get)
-    conflicted_fields = ConflictedFields().get_group_conflicted_fields(group.entity_id)
-
     # TODO : Move logic into CalculateEndPostponement
     if group.type.name in MiniTrainingType.get_names():
         identity = MiniTrainingIdentitySearch.get_from_group_identity(group.entity_id)
@@ -60,6 +58,7 @@ def postpone_group_modification_service(postpone_cmd: command.PostponeGroupModif
     else:
         raise BusinessException("Cannot postpone group other type than Mini-Training/Training")
 
+    conflicted_fields = ConflictedFields().get_group_conflicted_fields(group.entity_id)
     identities_created = [
         update_group_service.update_group(
             command.UpdateGroupCommand(
