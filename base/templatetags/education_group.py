@@ -34,18 +34,6 @@ register = template.Library()
 UN_VERSIONED_OF_FIELD = "of_unversioned_field"
 
 
-# TODO: Remove when migration of Program Manager is done with OSIS-Role Module
-@register.simple_tag
-def have_only_access_to_certificate_aims(user, education_group_year):
-    """
-    [Backward-compatibility] This templatetag as been created in order to allow
-    program_manager to be redirected to update_certificate_aims
-    """
-    return program_manager.is_program_manager(
-        user, education_group=education_group_year.education_group
-    ) and not any((user.is_superuser, user.person.is_faculty_manager, user.person.is_central_manager))
-
-
 @register.simple_tag(takes_context=True)
 def url_resolver_match(context):
     return context.request.resolver_match.url_name
