@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-15 08:53+0200\n"
+"POT-Creation-Date: 2020-09-17 14:16+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -47,9 +47,6 @@ msgstr[1] ""
 #, python-format
 msgid "%(max)s must be greater or equals than %(min)s"
 msgstr "%(max)s doit être plus grand ou égal à %(min)s"
-
-msgid "ARES"
-msgstr "ARES"
 
 msgid "ARES ability"
 msgstr "Habilitation ARES"
@@ -188,7 +185,7 @@ msgstr "Conditions"
 
 #, python-format
 msgid ""
-"Consistency error in %(academic_year)s: %(field)s has already been modified"
+"Consistency error in %(academic_year)s: %(fields)s has already been modified"
 msgstr ""
 "Erreur de consistance en %(academic_year)s: %(field)s a déjà été modifié"
 
@@ -621,10 +618,6 @@ msgstr ""
 #, python-format
 msgid "The group %(code)s has been deleted."
 msgstr "Le groupement %(code)s a été supprimé."
-
-#, python-format
-msgid "The link of %(code)s - %(acronym)s - %(year)s has been updated."
-msgstr "Le lien de %(code)s - %(acronym)s - %(year)s a été mis à jour."
 
 #, python-format
 msgid "The mini-training %(code)s - %(title)s has been deleted."
