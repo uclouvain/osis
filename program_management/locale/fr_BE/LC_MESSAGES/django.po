@@ -139,12 +139,9 @@ msgstr "Entité d'administration"
 msgid "Admission exam"
 msgstr "Concours"
 
-#, fuzzy
-#| msgctxt "plural"
-#| msgid "All"
 msgctxt "female plural"
 msgid "All"
-msgstr "Tous"
+msgstr "Toutes"
 
 msgid "Alloc. Ent."
 msgstr "Ent. attrib."
