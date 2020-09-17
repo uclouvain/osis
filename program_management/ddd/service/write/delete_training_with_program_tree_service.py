@@ -26,14 +26,17 @@ from typing import List
 from django.db import transaction
 
 from education_group.ddd.business_types import *
+from education_group.ddd import command as command_education_group
 from education_group.ddd.domain import training
+from education_group.ddd.service.write import delete_orphan_training_service
 from program_management.ddd import command
 from program_management.ddd.service.write import delete_standard_program_tree_version_service
 
 
 @transaction.atomic()
 def delete_training_with_program_tree(
-        delete_command: command.DeleteTrainingWithProgramTreeCommand) -> List['TrainingIdentity']:
+        delete_command: command.DeleteTrainingWithProgramTreeCommand
+) -> List['TrainingIdentity']:
     delete_program_tree_version_command = command.DeleteProgramTreeVersionCommand(
         offer_acronym=delete_command.offer_acronym,
         version_name=delete_command.version_name,
@@ -44,5 +47,15 @@ def delete_training_with_program_tree(
         delete_program_tree_version_command
     )
 
-    return [training.TrainingIdentity(acronym=identity.offer_acronym, year=identity.year)
-            for identity in delete_versions_identities]
+    training_identities = [
+        training.TrainingIdentity(acronym=identity.offer_acronym, year=identity.year)
+        for identity in delete_versions_identities
+    ]
+    for training_id in training_identities:
+        delete_orphan_training_service.delete_orphan_training(
+            command_education_group.DeleteOrphanTrainingCommand(
+                acronym=training_id.acronym,
+                year=training_id.year
+            )
+        )
+    return training_identities

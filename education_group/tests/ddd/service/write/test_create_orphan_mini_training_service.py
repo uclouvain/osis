@@ -31,9 +31,13 @@ from education_group.tests.ddd.factories.repository.fake import get_fake_mini_tr
 from testing.mocks import MockPatcherMixin
 
 
-@mock.patch("education_group.ddd.domain.service.calculate_end_postponement."
-            "CalculateEndPostponement.calculate_max_year_of_end_postponement", return_value=2022)
-class TestCreateAndPostponeOrphanTraining(TestCase, MockPatcherMixin):
+@mock.patch("education_group.ddd.service.write.create_orphan_mini_training_service."
+            "create_group_service.create_orphan_group", return_value=[])
+@mock.patch("education_group.ddd.service.write.create_orphan_mini_training_service."
+            "postpone_mini_training_and_orphan_group_modifications_service."
+            "postpone_mini_training_and_orphan_group_modifications",
+            return_value=[])
+class TestCreateAndPostponeOrphanMiniTraining(TestCase, MockPatcherMixin):
     def setUp(self) -> None:
         self.fake_mini_training_repository = get_fake_mini_training_repository([])
         self.mock_repo(
@@ -41,21 +45,25 @@ class TestCreateAndPostponeOrphanTraining(TestCase, MockPatcherMixin):
             self.fake_mini_training_repository
         )
 
-    def test_should_return_mini_training_identities(self, mock_end_year_postponement):
-        cmd = CreateMiniTrainingCommandFactory(year=2020, code="CODE", abbreviated_title="ACRON")
+    def test_should_return_mini_training_identities(self, mock_postpone_mini_training, mock_create_orphan_group):
+        mock_postpone_mini_training.return_value = [
+            mini_training.MiniTrainingIdentity(acronym="ACRON", year=year) for year in range(2021, 2023)
+        ]
 
+        cmd = CreateMiniTrainingCommandFactory(year=2020, code="CODE", abbreviated_title="ACRON")
         result = create_orphan_mini_training_service.create_and_postpone_orphan_mini_training(cmd)
 
         expected_result = [mini_training.MiniTrainingIdentity(acronym="ACRON", year=year) for year in range(2020, 2023)]
         self.assertListEqual(expected_result, result)
 
-    def test_should_postpone_values(self, mock_end_year_postponement):
+    def test_should_call_postpone_mini_training_service(self, mock_postpone_mini_training, mock_create_orphan_group):
         cmd = CreateMiniTrainingCommandFactory(year=2020, code="CODE", abbreviated_title="ACRON")
 
-        identities = create_orphan_mini_training_service.create_and_postpone_orphan_mini_training(cmd)
+        create_orphan_mini_training_service.create_and_postpone_orphan_mini_training(cmd)
+        self.assertTrue(mock_postpone_mini_training.called)
 
-        base_mini_training = self.fake_mini_training_repository.get(identities[0])
-        for identity in identities[1:]:
-            with self.subTest(year=identity.year):
-                postponed_mini_training = self.fake_mini_training_repository.get(identity)
-                self.assertTrue(postponed_mini_training.has_same_values_as(base_mini_training))
+    def test_should_call_create_orphan_group_service(self, mock_postpone_mini_training, mock_create_orphan_group):
+        cmd = CreateMiniTrainingCommandFactory(year=2020, code="CODE", abbreviated_title="ACRON")
+
+        create_orphan_mini_training_service.create_and_postpone_orphan_mini_training(cmd)
+        self.assertTrue(mock_create_orphan_group.called)

@@ -29,6 +29,7 @@ from education_group.ddd import command
 from education_group.ddd.domain import exception
 from education_group.ddd.domain.mini_training import MiniTrainingIdentity, MiniTrainingBuilder
 from education_group.ddd.repository import mini_training as mini_training_repository
+from education_group.ddd.service.write import copy_group_service
 
 
 @transaction.atomic()
@@ -41,11 +42,16 @@ def copy_mini_training_to_next_year(copy_cmd: command.CopyMiniTrainingToNextYear
 
     # WHEN
     mini_training_next_year = MiniTrainingBuilder().copy_to_next_year(existing_mini_training, repository)
-
     try:
         with transaction.atomic():
             identity = repository.create(mini_training_next_year)
     except exception.CodeAlreadyExistException:
         identity = repository.update(mini_training_next_year)
+
+    cmd_copy_group = command.CopyGroupCommand(
+        from_code=existing_mini_training.code,
+        from_year=copy_cmd.postpone_from_year
+    )
+    copy_group_service.copy_group(cmd_copy_group)
 
     return identity
