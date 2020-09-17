@@ -25,14 +25,13 @@
 ##############################################################################
 from typing import List
 
-from program_management.ddd.command import PostponeProgramTreeVersionCommand, CreateProgramTreeVersionCommand, \
-    DuplicateProgramTree, PostponeProgramTreeCommand, UpdateProgramTreeVersionCommand, ExtendProgramTreeVersionCommand
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionBuilder, ProgramTreeVersionIdentity, \
-    STANDARD
+from program_management.ddd.command import PostponeProgramTreeVersionCommand, \
+    PostponeProgramTreeCommand, UpdateProgramTreeVersionCommand, ExtendProgramTreeVersionCommand
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 from program_management.ddd.domain.service.identity_search import GroupIdentitySearch
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
-from program_management.ddd.service.write import postpone_tree_version_service, duplicate_program_tree_service, \
-    postpone_program_tree_service, update_program_tree_version_service, create_and_postpone_tree_version_service
+from program_management.ddd.service.write import postpone_tree_version_service, postpone_program_tree_service, \
+    update_program_tree_version_service
 
 
 def extend_existing_past_version(command: 'ExtendProgramTreeVersionCommand') -> List[ProgramTreeVersionIdentity]:
@@ -62,7 +61,6 @@ def extend_existing_past_version(command: 'ExtendProgramTreeVersionCommand') -> 
             from_code=last_existing_tree_version.program_tree_identity.code,
             from_year=last_existing_tree_version.program_tree_identity.year,
             offer_acronym=identity.offer_acronym,
-            until_year=command.end_year_of_existence,
         )
     )
 
@@ -72,7 +70,6 @@ def extend_existing_past_version(command: 'ExtendProgramTreeVersionCommand') -> 
             from_year=identity.year,
             from_is_transition=identity.is_transition,
             from_version_name=identity.version_name,
-            until_year=command.end_year_of_existence,
             from_code=GroupIdentitySearch().get_from_tree_version_identity(identity).code
         )
     )
