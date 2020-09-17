@@ -642,10 +642,8 @@ msgstr "Type horaire"
 msgid "Search"
 msgstr "Recherche"
 
-#, fuzzy
-#| msgid "Search"
 msgid "Search..."
-msgstr "Recherche"
+msgstr "Recherche..."
 
 msgid "Select a language"
 msgstr "Sélectionner une langue"
@@ -953,7 +951,7 @@ msgid "faculty number"
 msgstr "n° facultaire"
 
 msgid "filter by section"
-msgstr ""
+msgstr "préfiltrer par rubrique"
 
 msgid "group year"
 msgstr "groupement"
