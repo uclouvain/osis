@@ -30,6 +30,8 @@ from program_management.views.generic import LearningUnitGeneric
 from program_management.serializers.node_view import get_program_tree_version_name
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
+from program_management.serializers.node_view import get_program_tree_version_title
+from django.utils import translation
 
 
 class LearningUnitUtilization(PermissionRequiredMixin, LearningUnitGeneric):
@@ -57,7 +59,16 @@ class LearningUnitUtilization(PermissionRequiredMixin, LearningUnitGeneric):
                      'root_nodes': [tree.root_node],
                      'root_version_label': "{}".format(
                          program_tree_version.version_label if program_tree_version.version_label else ''
-                     )}
+                     ),
+                     'root_version_title': "{}".format(
+                         program_tree_version.title_fr if program_tree_version.title_fr else ''
+                     ),
+                     'link_parent_version_title': get_program_tree_version_title(
+                         parent_node_identity,
+                         ProgramTreeVersionRepository.search_all_versions_from_root_node(parent_node_identity),
+                         translation.get_language()
+                     ),
+                     }
                 )
         context['utilization_rows'] = sorted(context['utilization_rows'], key=lambda row: row['link'].parent.code)
         return context
