@@ -335,3 +335,4 @@ class UpdateMiniTrainingVersionForm(ValidationRuleMixin, PermissionFieldMixin, S
     # PermissionFieldMixin
     def get_model_permission_filter_kwargs(self) -> Dict:
         return {'context': self.get_context()}
+

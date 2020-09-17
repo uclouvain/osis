@@ -26,12 +26,14 @@
 from django.db.models import F
 
 from base.models.education_group_year import EducationGroupYear
+from education_group.ddd.business_types import *
 from education_group.ddd.domain.mini_training import MiniTrainingIdentity
 from education_group.ddd.domain.training import TrainingIdentity
 from education_group.models.group_year import GroupYear
 from osis_common.ddd import interface
 from osis_common.ddd.interface import BusinessException
 
+from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.business_types import *
 
 
@@ -51,6 +53,11 @@ class TrainingIdentitySearch(interface.DomainService):
         raise BusinessException(
             "TrainingIdentity not found from NodeIdentity = {n_id.code} - {n_id.year}".format(n_id=node_identity)
         )
+
+    @classmethod
+    def get_from_group_identity(cls, group_identity: 'GroupIdentity') -> 'TrainingIdentity':
+        node_identity = NodeIdentity(code=group_identity.code, year=group_identity.year)
+        return cls.get_from_node_identity(node_identity)
 
     def get_from_program_tree_version_identity(self, tree_version_identity) -> 'TrainingIdentity':
         return TrainingIdentity(
@@ -88,3 +95,8 @@ class MiniTrainingIdentitySearch(interface.DomainService):
         raise BusinessException(
             "MiniTrainingIdentity not found from NodeIdentity = {n_id.code} - {n_id.year}".format(n_id=node_identity)
         )
+
+    @classmethod
+    def get_from_group_identity(cls, group_identity: 'GroupIdentity') -> 'MiniTrainingIdentity':
+        node_identity = NodeIdentity(code=group_identity.code, year=group_identity.year)
+        return cls.get_from_node_identity(node_identity)

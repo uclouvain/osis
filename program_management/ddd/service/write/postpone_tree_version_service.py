@@ -46,7 +46,6 @@ def postpone_program_tree_version(
 
     # GIVEN
     from_year = postpone_cmd.from_year
-    end_postponement_year = postpone_cmd.until_year
 
     program_tree_version_identity = ProgramTreeVersionIdentity(
         offer_acronym=postpone_cmd.from_offer_acronym,
@@ -54,13 +53,11 @@ def postpone_program_tree_version(
         year=postpone_cmd.from_year,
         is_transition=postpone_cmd.from_is_transition,
     )
-
-    if not end_postponement_year:
-        end_postponement_year = CalculateEndPostponement.calculate_program_tree_end_postponement(
-            identity=ProgramTreeIdentitySearch().get_from_program_tree_version_identity(program_tree_version_identity),
-            training_repository=TrainingRepository(),
-            mini_training_repository=MiniTrainingRepository(),
-        )
+    end_postponement_year = CalculateEndPostponement.calculate_program_tree_end_postponement(
+        identity=ProgramTreeIdentitySearch().get_from_program_tree_version_identity(program_tree_version_identity),
+        training_repository=TrainingRepository(),
+        mini_training_repository=MiniTrainingRepository(),
+    )
 
     # WHEN
     while from_year < end_postponement_year:
