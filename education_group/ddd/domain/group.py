@@ -24,13 +24,13 @@
 #
 ##############################################################################
 import copy
-from typing import Optional
+from typing import Optional, List
 
 import attr
 
 from base.ddd.utils.converters import to_upper_case_converter
 from base.models.enums.constraint_type import ConstraintTypeEnum
-from base.models.enums.education_group_types import EducationGroupTypesEnum, GroupType
+from base.models.enums.education_group_types import EducationGroupTypesEnum, GroupType, TrainingType
 from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import exception
@@ -43,6 +43,7 @@ from education_group.ddd.domain.service.enum_converter import EducationGroupType
 from education_group.ddd.validators.validators_by_business_action import UpdateGroupValidatorList, \
     CopyGroupValidatorList, CreateGroupValidatorList
 from osis_common.ddd import interface
+from program_management.ddd.domain.academic_year import AcademicYear
 
 
 class GroupBuilder:
@@ -116,6 +117,10 @@ class Group(interface.RootEntity):
     end_year = attr.ib(type=Optional[int], default=None)
 
     @property
+    def academic_year(self) -> AcademicYear:
+        return AcademicYear(self.year)
+
+    @property
     def code(self) -> str:
         return self.entity_id.code
 
@@ -123,8 +128,15 @@ class Group(interface.RootEntity):
     def year(self) -> int:
         return self.entity_id.year
 
+    @property
+    def academic_year(self) -> AcademicYear:
+        return AcademicYear(self.year)
+
     def is_minor_major_option_list_choice(self):
         return self.type.name in GroupType.minor_major_option_list_choice()
+
+    def is_training(self):
+        return self.type in TrainingType
 
     def update(
             self,
@@ -151,7 +163,7 @@ class Group(interface.RootEntity):
     def has_same_values_as(self, other_group: 'Group') -> bool:
         return not bool(self.get_conflicted_fields(other_group))
 
-    def get_conflicted_fields(self, other_group: 'Group') -> bool:
+    def get_conflicted_fields(self, other_group: 'Group') -> List[str]:
         fields_not_to_consider = ("year", "entity_id", "entity_identity")
         conflicted_fields = []
         for field_name in self.__slots__:

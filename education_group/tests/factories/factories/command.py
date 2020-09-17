@@ -26,6 +26,7 @@ import operator
 import factory.fuzzy
 
 from base.models.enums import education_group_types, schedule_type as schedule_type_enum, active_status, constraint_type
+from base.models.enums.constraint_type import ConstraintTypeEnum
 from education_group.ddd import command
 
 
@@ -54,3 +55,25 @@ class CreateOrphanMiniTrainingCommandFactory(factory.Factory):
     start_year = 2018
     end_year = None
     keywords = ""
+
+
+class UpdateGroupCommandFactory(factory.Factory):
+    class Meta:
+        model = command.UpdateGroupCommand
+        abstract = False
+
+    year = 2018
+    code = "LTRONC1"
+    abbreviated_title = "TRONC-COMMUN"
+    title_fr = "Tronc commun"
+    title_en = "Common core"
+    credits = 20
+    constraint_type = ConstraintTypeEnum.CREDITS.name
+    min_constraint = 0
+    max_constraint = 10
+    management_entity_acronym = "DRT"
+    teaching_campus_name = "Mons Fucam"
+    organization_name = "UCLouvain"
+    remark_fr = "Remarque en français"
+    remark_en = "Remarque en anglais"
+    end_year = None

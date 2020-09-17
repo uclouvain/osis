@@ -45,10 +45,10 @@ class CalculateEndPostponement(interface.DomainService):
             repository: Union['TrainingRepository', 'MiniTrainingRepository']
     ) -> int:
         max_year = cls.calculate_end_postponement_limit()
-        training = repository.get(identity)
-        if training.end_year is None:
+        obj = repository.get(identity)
+        if obj.end_year is None:
             return max_year
-        return min(max_year, training.end_year)
+        return min(max_year, obj.end_year)
 
     @classmethod
     def calculate_program_tree_end_postponement(
