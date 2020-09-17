@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-09-17 14:16+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"POT-Creation-Date: 2020-09-15 08:53+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -39,9 +39,6 @@ msgstr[1] ""
 
 #, python-format
 msgid "%(max)s must be greater or equals than %(min)s"
-msgstr ""
-
-msgid "ARES"
 msgstr ""
 
 msgid "ARES ability"
@@ -179,7 +176,7 @@ msgstr ""
 
 #, python-format
 msgid ""
-"Consistency error in %(academic_year)s: %(field)s has already been modified"
+"Consistency error in %(academic_year)s: %(fields)s has already been modified"
 msgstr ""
 
 msgid "Contacts"
@@ -590,10 +587,6 @@ msgstr ""
 
 #, python-format
 msgid "The group %(code)s has been deleted."
-msgstr ""
-
-#, python-format
-msgid "The link of %(code)s - %(acronym)s - %(year)s has been updated."
 msgstr ""
 
 #, python-format
