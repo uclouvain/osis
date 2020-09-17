@@ -204,4 +204,6 @@ class ContentUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             comment=form.cleaned_data.get('comment_fr'),
             comment_english=form.cleaned_data.get('comment_en'),
             relative_credits=form.cleaned_data.get('relative_credits'),
+            parent_node_code=self.get_group_obj().code,
+            parent_node_year=self.get_group_obj().year
         )
