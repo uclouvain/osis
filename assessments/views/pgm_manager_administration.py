@@ -38,6 +38,7 @@ from django.views.generic import ListView, DeleteView, FormView
 from django.views.generic.edit import BaseUpdateView
 
 from base import models as mdl
+from base.auth.roles import program_manager
 from base.auth.roles.entity_manager import EntityManager
 from base.models.offer_type import OfferType
 from base.models.offer_year import OfferYear
@@ -309,7 +310,7 @@ def _get_programs(academic_yr, entity_list, manager_person, an_offer_type):
 
 def _get_entity_program_managers(entity, academic_yr):
     entities = get_managed_entities(entity)
-    return base.auth.roles.program_manager.find_by_management_entity(entities, academic_yr)
+    return program_manager.find_by_management_entity(entities, academic_yr)
 
 
 def find_values(key_value, json_repr):
