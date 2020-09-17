@@ -25,7 +25,7 @@
 ##############################################################################
 from typing import List
 
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils.functional import cached_property
@@ -37,7 +37,6 @@ from base.models.utils.utils import ChoiceEnum
 from base.views.common import display_success_messages
 from base.views.mixins import AjaxTemplateMixin
 from education_group.ddd.domain import exception
-from education_group.ddd.domain.service.identity_search import TrainingIdentitySearch
 from education_group.ddd.domain.training import TrainingIdentity
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from osis_role.contrib.views import AjaxPermissionRequiredMixin
@@ -211,6 +210,5 @@ def _convert_form_to_postpone_command(
         from_version_name=form.cleaned_data['version_name'],
         from_year=form.tree_version_identity.year,
         from_is_transition=False,
-        until_year=form.cleaned_data['end_year'],
         from_code=node_id.code,
     )

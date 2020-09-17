@@ -68,14 +68,16 @@ class TestCreateProgramTreeVersion(TestCase, MockPatcherMixin):
         cmd = CreateAndPostponeTrainingAndProgramTreeCommandFactory(
             abbreviated_title=self.offer_acronym,
             year=self.current_year,
+            start_year=self.current_year,
             code='LDROI200M',
-            type=TrainingType.PGRM_MASTER_120.name
+            type=TrainingType.PGRM_MASTER_120.name,
+            # TODO: Fix main_language FK....
+            main_language=LanguageFactory()
         )
 
         # TODO :: mock all DB access with fake repository
         EntityVersionFactory(acronym=cmd.management_entity_acronym)
         CampusFactory(name=cmd.teaching_campus_name, organization__name=cmd.teaching_campus_organization_name)
-        LanguageFactory(name=cmd.main_language)
         AcademicYearFactory.produce_in_future(cmd.year)
         root_type = EducationGroupTypeFactory(name=cmd.type)
         ValidationRuleFactory(

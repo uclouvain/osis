@@ -21,28 +21,25 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from unittest.mock import patch
-
 from django.test import TestCase
+from mock import patch
 
 from base.models.enums.active_status import ActiveStatusEnum
 from base.models.enums.constraint_type import ConstraintTypeEnum
 from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.ddd import command
 from education_group.ddd.domain import mini_training
-from education_group.ddd.service.write import update_mini_training_service
+from education_group.ddd.service.write import update_mini_training_and_group_service
 from education_group.tests.ddd.factories.repository.fake import get_fake_mini_training_repository
 from education_group.tests.factories.mini_training import MiniTrainingFactory
 from testing.mocks import MockPatcherMixin
 
 
 @patch("education_group.ddd.service.write.update_group_service.update_group")
-@patch('education_group.ddd.service.write.update_group_service.'
-       'CalculateEndPostponement.calculate_year_of_postponement_for_mini_training', return_value=2021)
-class TestUpdateMiniTraining(TestCase, MockPatcherMixin):
+class TestUpdateAndPostponeMiniTrainingAndGroupService(TestCase, MockPatcherMixin):
     @classmethod
     def setUpTestData(cls):
-        cls.cmd = command.UpdateMiniTrainingCommand(
+        cls.cmd = command.UpdateMiniTrainingAndGroupCommand(
             year=2018,
             code="LTRONC1",
             abbreviated_title="OPT",
@@ -61,7 +58,6 @@ class TestUpdateMiniTraining(TestCase, MockPatcherMixin):
             keywords="A key",
             schedule_type=ScheduleTypeEnum.DAILY.name,
             status=ActiveStatusEnum.ACTIVE.name,
-            teaching_campus_organization_name="Fucam"
         )
 
     def setUp(self) -> None:
@@ -81,31 +77,15 @@ class TestUpdateMiniTraining(TestCase, MockPatcherMixin):
             self.fake_mini_training_repo
         )
 
-    def test_should_return_entity_id_of_updated_mini_trainings(self, mock_end_year_postponement, mock_update_group):
-        result = update_mini_training_service.update_mini_training(self.cmd)
+    def test_should_return_entity_id_of_updated_mini_trainings(self, mock_update_group):
+        result = update_mini_training_and_group_service.update_mini_training_and_group(self.cmd)
+        self.assertEqual(self.mini_training_2018.entity_id, result)
 
-        expected_result = [mini_training.MiniTrainingIdentity(acronym=self.cmd.abbreviated_title, year=year)
-                           for year in range(2018, 2022)]
-        self.assertEqual(expected_result, result)
-        self.assertTrue(mock_update_group.called)
+    def test_should_update_value_of_mini_trainings_based_on_command_value(self, mock_update_group):
+        entity_id = update_mini_training_and_group_service.update_mini_training_and_group(self.cmd)
 
-    def test_should_update_value_of_mini_trainings_based_on_command_value(self, *mocks):
-        entity_ids = update_mini_training_service.update_mini_training(self.cmd)
-
-        mini_training_update = self.fake_mini_training_repo.get(entity_ids[0])
+        mini_training_update = self.fake_mini_training_repo.get(entity_id)
         self.assert_has_same_value_as_update_command(mini_training_update)
-
-    def test_should_postpone_mini_trainings_update(self, *mocks):
-        identities = [mini_training.MiniTrainingIdentity(acronym=self.cmd.abbreviated_title, year=year)
-                      for year in range(2018, 2022)]
-
-        update_mini_training_service.update_mini_training(self.cmd)
-
-        base_mini_training = self.fake_mini_training_repo.get(identities[0])
-        for identity in identities[1:]:
-            with self.subTest(year=identity.year):
-                postponed_mini_training = self.fake_mini_training_repo.get(identity)
-                self.assertTrue(postponed_mini_training.has_same_values_as(base_mini_training))
 
     def assert_has_same_value_as_update_command(self, update_mini_training: 'mini_training.MiniTraining'):
         self.assertEqual(update_mini_training.credits, self.cmd.credits)
