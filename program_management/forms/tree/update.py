@@ -31,7 +31,8 @@ from base.forms.utils import choice_field
 from base.models.enums.link_type import LinkTypes
 from program_management.ddd import command
 from program_management.ddd.business_types import *
-from program_management.ddd.domain.exception import RelativeCreditShouldBeGreaterOrEqualsThanZero
+from program_management.ddd.domain.exception import RelativeCreditShouldBeGreaterOrEqualsThanZero, \
+    RelativeCreditShouldBeLowerOrEqualThan999
 from program_management.ddd.service.write import update_link_service
 from program_management.ddd.validators import _block_validator, _relative_credits
 
@@ -64,7 +65,7 @@ class UpdateLinkForm(forms.Form):
         cleaned_relative_credits = self.cleaned_data.get('relative_credits', None)
         try:
             _relative_credits.RelativeCreditsValidator(cleaned_relative_credits).validate()
-        except RelativeCreditShouldBeGreaterOrEqualsThanZero as e:
+        except (RelativeCreditShouldBeGreaterOrEqualsThanZero, RelativeCreditShouldBeLowerOrEqualThan999) as e:
             raise ValidationError(e.message)
         return cleaned_relative_credits
 
