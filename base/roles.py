@@ -1,5 +1,4 @@
-from base.auth.roles import entity_manager
-from base.models import program_manager
+from base.auth.roles import entity_manager, program_manager
 from osis_role import role
 
 role.role_manager.register(entity_manager.EntityManager)

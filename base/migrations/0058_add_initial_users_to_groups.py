@@ -7,6 +7,7 @@ from django.core.management.sql import emit_post_migrate_signal
 from django.db import migrations
 
 import base.models as mdl
+from base.auth.roles import program_manager
 
 
 def add_users_to_group(apps, schema_editor):
@@ -22,7 +23,7 @@ def add_users_to_group(apps, schema_editor):
             if mdl.tutor.find_by_person(person) and tutors_group:
                 user.groups.add(tutors_group)
             # Check PgmManager
-            if mdl.program_manager.find_by_person(person) and pgm_managers_group:
+            if program_manager.find_by_person(person) and pgm_managers_group:
                 user.groups.add(pgm_managers_group)
             # Check Student
             if mdl.student.find_by_person(person) and students_group:

@@ -38,8 +38,8 @@ from base.models.enums.entity_type import FACULTY
 from osis_role.contrib import admin as osis_role_admin
 from osis_role.contrib import models as osis_role_models
 from osis_role.contrib import predicates as osis_role_predicates
-from .learning_unit_enrollment import LearningUnitEnrollment
-from ..auth.predicates import is_program_manager_for_offer
+from base.models.learning_unit_enrollment import LearningUnitEnrollment
+from base.auth.predicates import is_program_manager_for_offer
 
 
 class ProgramManagerAdmin(VersionAdmin, osis_role_admin.RoleModelAdmin):

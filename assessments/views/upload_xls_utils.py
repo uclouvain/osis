@@ -146,7 +146,7 @@ def __save_xls_scores(request, file_name, learning_unit_year_id):
     worksheet = workbook.active
     new_scores_number = 0
     learning_unit_year = mdl.learning_unit_year.get_by_id(learning_unit_year_id)
-    is_program_manager = mdl.program_manager.is_program_manager(request.user)
+    is_program_manager = base.auth.roles.program_manager.is_program_manager(request.user)
 
     data_xls = _get_all_data(worksheet)
 

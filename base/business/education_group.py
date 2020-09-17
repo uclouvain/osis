@@ -35,7 +35,7 @@ from base.models.enums.education_group_types import TrainingType
 from base.models.mandate import Mandate
 from base.models.offer_year_calendar import OfferYearCalendar
 from base.models.person import Person
-from base.models.program_manager import is_program_manager
+from base.auth.roles.program_manager import is_program_manager
 from osis_common.document import xls_build
 
 # List of key that a user can modify
