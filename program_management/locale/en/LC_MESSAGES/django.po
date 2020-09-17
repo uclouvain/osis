@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-16 17:20+0200\n"
+"POT-Creation-Date: 2020-09-17 10:23+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,19 +17,16 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #, python-format
+msgid "\"%(child)s\" has been detached from \"%(parent)s\""
+msgstr ""
+
+#, python-format
 msgid "\"%(child)s\" has been pasted into \"%(parent)s\""
 msgstr ""
 
 #, python-format
 msgid "\"%(child)s\" has been successfully updated"
 msgstr ""
-
-#, python-format
-msgid ""
-"\"%(child_year)s - %(child)s%(child_title)s\" has been detached from "
-"\"%(parent_year)s - %(parent)s%(parent_title)s\""
-msgstr "\"%(child_year)s - %(child)s%(child_title)s\" has been removed from "
-"\"%(parent_year)s - %(parent)s%(parent_title)s\""
 
 #, python-format
 msgid "%(node_to_add)s version must be the same as %(root_node)s version"
@@ -142,8 +139,8 @@ msgid "Are you sure you want to delete %(offer_acronym)s %(version_name)s ?"
 msgstr ""
 
 #, python-format
-msgid "Are you sure you want to detach %(acronym)s%(title)s ?"
-msgstr "Are you sure you want to remove %(acronym)s%(title)s ?"
+msgid "Are you sure you want to detach %(child)s ?"
+msgstr "Are you sure you want to remove %(child)s ?"
 
 msgid "Attribution entity"
 msgstr ""
