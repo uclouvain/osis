@@ -41,9 +41,10 @@ from education_group.ddd.service.read import get_group_service
 from education_group.ddd import command as command_education_group
 from learning_unit.ddd.domain.learning_unit_year import LearningUnitYear
 from learning_unit.ddd.service.read import get_learning_unit_year_service
+from osis_common.ddd import interface
 from program_management.ddd import command
 from program_management.ddd.domain import link
-from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
+from program_management.ddd.domain.service.identity_search import NodeIdentitySearch, ProgramTreeVersionIdentitySearch
 from program_management.ddd.service.write import detach_node_service
 from program_management.ddd.service.read import detach_warning_messages_service, get_program_tree_service
 from program_management.forms.tree.detach import DetachNodeForm
@@ -89,12 +90,28 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
         return get_group_service.get_group(cmd)
 
     @cached_property
+    def child_version_identity(self) -> Union['ProgramTreeVersionIdentity', None]:
+        try:
+            child_node = self.program_tree_obj.get_node("|".join([self.parent_id, self.child_id_to_detach]))
+            return ProgramTreeVersionIdentitySearch().get_from_node_identity(child_node.entity_id)
+        except interface.BusinessException:
+            return None
+
+    @cached_property
     def parent_group_obj(self) -> 'Group':
         cmd = command_education_group.GetGroupCommand(
             code=self.program_tree_obj.root_node.code,
             year=self.program_tree_obj.root_node.year
         )
         return get_group_service.get_group(cmd)
+
+    @cached_property
+    def parent_version_identity(self) -> Union['ProgramTreeVersionIdentity', None]:
+        try:
+            entity_id = self.program_tree_obj.root_node.entity_id
+            return ProgramTreeVersionIdentitySearch().get_from_node_identity(entity_id)
+        except interface.BusinessException:
+            return None
 
     def get_context_data(self, **kwargs):
         context = super(DetachNodeView, self).get_context_data(**kwargs)
@@ -145,33 +162,30 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
             element_cache.clear()
 
     def get_success_msg(self):
-        return _(
-            "\"%(child_year)s - %(child)s%(child_title)s\" has been detached from "
-            "\"%(parent_year)s - %(parent)s%(parent_title)s\""
-        ) % {
-                'child': self._get_child_obj_code(),
-                'child_year': display_as_academic_year(self.child_obj.year),
-                'child_title': self._get_child_obj_title(),
-                'parent': self.parent_group_obj.code,
-                'parent_year': self.parent_group_obj.academic_year,
-                'parent_title': " - {}".format(self.parent_group_obj.titles.title_fr)
-                                if self.parent_group_obj.titles.title_fr else "",
-            }
-
-    def get_confirmation_msg(self):
-        return _("Are you sure you want to detach %(acronym)s%(title)s ?") % {
-            "acronym": self._get_child_obj_code(),
-            "title": self._get_child_obj_title()
+        return _("\"%(child)s\" has been detached from \"%(parent)s\"") % {
+                'child': self._get_child_node_str(),
+                'parent': self._get_parent_node_str(),
         }
 
-    def _get_child_obj_title(self):
-        return " - {}".format(
-            self.child_obj.full_title_fr if isinstance(self.child_obj, LearningUnitYear) else
-            self.child_obj.titles.title_fr
-        )
+    def get_confirmation_msg(self):
+        return _("Are you sure you want to detach %(child)s ?") % {"child": self._get_child_node_str()}
 
-    def _get_child_obj_code(self):
-        return self.child_obj.acronym if isinstance(self.child_obj, LearningUnitYear) else self.child_obj.code
+    def _get_child_node_str(self):
+        return "%(acronym)s - %(title)s%(version)s - %(year)s" % {
+            "acronym": self.child_obj.acronym if isinstance(self.child_obj, LearningUnitYear) else self.child_obj.code,
+            "title": self.child_obj.full_title_fr if isinstance(self.child_obj, LearningUnitYear)
+            else self.child_obj.titles.title_fr,
+            "version": "[{}]".format(self.child_version_identity.version_name) if self.child_version_identity else "",
+            "year": display_as_academic_year(self.child_obj.year)
+        }
+
+    def _get_parent_node_str(self):
+        return "%(acronym)s - %(title)s%(version)s - %(year)s" % {
+            "acronym": self.parent_group_obj.code,
+            "title": self.parent_group_obj.titles.title_fr,
+            "version": "[{}]".format(self.parent_version_identity.version_name) if self.parent_version_identity else "",
+            "year": self.parent_group_obj.academic_year
+        }
 
     def get_success_url(self):
         # We can just reload the page
