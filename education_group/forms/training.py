@@ -349,14 +349,8 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         )
 
     def __init_certificate_aims_field(self):
-        perm = 'base.change_educationgroupcertificateaim'
-        if self.user.has_perm(perm, obj=self.training):
-            self.fields['certificate_aims'].disabled = False
+        if not self.fields['certificate_aims'].disabled:
             self.fields['section'].disabled = False
-            self.fields['certificate_aims'].widget.attrs['title'] = _('Select one or multiple certificate aims')
-        else:
-            permission_error_msg = get_permission_error(self.user, perm)
-            self.fields['certificate_aims'].widget.attrs['title'] = permission_error_msg
 
     def __init_diploma_fields(self):
         if self.training_type in TrainingType.with_diploma_values_set_initially_as_true():
@@ -417,6 +411,8 @@ class UpdateTrainingForm(CreateTrainingForm):
         super().__init__(*args, **kwargs)
         self.fields["academic_year"].label = _('Validity')
         self.__init_end_year_field()
+        self.__init_certificate_aims_field()
+        self.__init_management_entity_field()
 
     def __init_end_year_field(self):
         initial_academic_year_value = self.initial.get("academic_year", None)
@@ -432,6 +428,13 @@ class UpdateTrainingForm(CreateTrainingForm):
         else:
             permission_error_msg = get_permission_error(self.user, perm)
             self.fields['certificate_aims'].widget.attrs['title'] = permission_error_msg
+
+    def __init_management_entity_field(self):
+        self.fields['management_entity'] = fields.ManagementEntitiesChoiceField(
+            person=self.user.person,
+            initial=self.initial['management_entity'],
+            disabled=self.fields['management_entity'].disabled,
+        )
 
 
 @register('university_domains')
