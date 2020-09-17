@@ -171,19 +171,21 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
         return _("Are you sure you want to detach %(child)s ?") % {"child": self._get_child_node_str()}
 
     def _get_child_node_str(self):
-        return "%(acronym)s - %(title)s%(version)s - %(year)s" % {
-            "acronym": self.child_obj.acronym if isinstance(self.child_obj, LearningUnitYear) else self.child_obj.code,
-            "title": self.child_obj.full_title_fr if isinstance(self.child_obj, LearningUnitYear)
-            else self.child_obj.titles.title_fr,
-            "version": "[{}]".format(self.child_version_identity.version_name) if self.child_version_identity else "",
+        return "%(code)s %(abbreviated_title)s%(version)s - %(year)s" % {
+            "code": self.child_obj.acronym if isinstance(self.child_obj, LearningUnitYear) else self.child_obj.code,
+            "abbreviated_title": '' if isinstance(self.child_obj, LearningUnitYear)
+            else "- " + self.child_obj.abbreviated_title,
+            "version": "[{}]".format(self.child_version_identity.version_name)
+            if self.child_version_identity and not self.child_version_identity.is_standard else "",
             "year": display_as_academic_year(self.child_obj.year)
         }
 
     def _get_parent_node_str(self):
-        return "%(acronym)s - %(title)s%(version)s - %(year)s" % {
-            "acronym": self.parent_group_obj.code,
-            "title": self.parent_group_obj.titles.title_fr,
-            "version": "[{}]".format(self.parent_version_identity.version_name) if self.parent_version_identity else "",
+        return "%(code)s - %(abbreviated_title)s%(version)s - %(year)s" % {
+            "code": self.parent_group_obj.code,
+            "abbreviated_title": self.parent_group_obj.abbreviated_title,
+            "version": "[{}]".format(self.parent_version_identity.version_name)
+            if self.parent_version_identity and not self.parent_version_identity.is_standard else "",
             "year": self.parent_group_obj.academic_year
         }
 
