@@ -37,15 +37,15 @@ class TestDeleteAllStandardVersionsService(TestCase):
         self.training = TrainingFactory()
 
         self.delete_standard_version_service_patcher = mock.patch(
-            "program_management.ddd.service.write.delete_all_standard_versions_service."
-            "delete_standard_version_service.delete_standard_version",
+            "program_management.ddd.service.write.delete_training_standard_version_service."
+            "delete_training_standard_version",
             return_value=[]
         )
         self.mocked_delete_standard_version_service = self.delete_standard_version_service_patcher.start()
         self.addCleanup(self.delete_standard_version_service_patcher.stop)
 
-    @mock.patch("program_management.ddd.service.write.delete_all_standard_versions_service"
-                ".ProgramTreeVersionIdentitySearch.get_all_program_tree_version_identities")
+    @mock.patch("program_management.ddd.domain.service.identity_search.ProgramTreeVersionIdentitySearch."
+                "get_all_program_tree_version_identities")
     def test_assert_delete_delete_standard_version_service_called(self, mock_get_all_program_tree_version):
         mock_get_all_program_tree_version.return_value = [
             ProgramTreeVersionIdentity(year=2017, offer_acronym=self.training.acronym, version_name=STANDARD,
@@ -56,12 +56,12 @@ class TestDeleteAllStandardVersionsService(TestCase):
                                        is_transition=False),
         ]
 
-        cmd = command.DeleteAllStandardVersionCommand(acronym=self.training.acronym, year=self.training.year)
-        delete_all_standard_versions_service.delete_all_standard_versions(cmd)
+        cmd = command.DeletePermanentlyTrainingStandardVersionCommand(acronym=self.training.acronym, year=self.training.year)
+        delete_all_standard_versions_service.delete_permanently_training_standard_version(cmd)
 
         expected_calls = [
-            call(command.DeleteStandardVersionCommand(acronym=self.training.acronym, year=2017)),
-            call(command.DeleteStandardVersionCommand(acronym=self.training.acronym, year=2018)),
-            call(command.DeleteStandardVersionCommand(acronym="NEWONE", year=2019))
+            call(command.DeleteTrainingStandardVersionCommand(offer_acronym=self.training.acronym, year=2017)),
+            call(command.DeleteTrainingStandardVersionCommand(offer_acronym=self.training.acronym, year=2018)),
+            call(command.DeleteTrainingStandardVersionCommand(offer_acronym="NEWONE", year=2019))
         ]
         self.mocked_delete_standard_version_service.assert_has_calls(expected_calls)

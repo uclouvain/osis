@@ -67,7 +67,7 @@ MAXIMUM_CREDITS = 500
 # through the recursive database structure
 # ! It is a raw SQL : Use it only in last resort !
 # The returned structure is :
-# { id, gs_origin, child_branch_id, child_leaf_id, parent_id, acronym,
+# { id, gs_origin, child_element_id, parent_element_id, acronym,
 #   title, category, name, id (for education_group_type) and level }
 SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS = """\
 WITH RECURSIVE group_element_year_parent AS (
@@ -530,14 +530,6 @@ class LearningUnitYear(SerializableModel):
     def is_prerequisite(self):
         return PrerequisiteItem.objects.filter(
             Q(learning_unit=self.learning_unit) | Q(prerequisite__learning_unit_year=self)
-        ).exists()
-
-    # FIXME :: To remove with EducationGroupHierarchy
-    def has_or_is_prerequisite(self, education_group_year):
-        formations = repositories.find_roots.find_roots([education_group_year])[education_group_year.id]
-        return PrerequisiteItem.objects.filter(
-            Q(prerequisite__learning_unit_year=self, prerequisite__education_group_year__in=formations) |
-            Q(prerequisite__education_group_year__in=formations, learning_unit=self.learning_unit)
         ).exists()
 
     def get_absolute_url(self):

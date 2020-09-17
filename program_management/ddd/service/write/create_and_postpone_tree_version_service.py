@@ -46,7 +46,6 @@ def create_and_postpone(
             from_code=tree_version.program_tree_identity.code,
             from_year=tree_version.program_tree_identity.year,
             offer_acronym=identity.offer_acronym,
-            until_year=int(command.end_year) if command.end_year else None
         )
     )
 
@@ -56,7 +55,6 @@ def create_and_postpone(
             from_year=identity.year,
             from_is_transition=identity.is_transition,
             from_version_name=identity.version_name,
-            until_year=int(command.end_year) if command.end_year else None
         )
     )
 

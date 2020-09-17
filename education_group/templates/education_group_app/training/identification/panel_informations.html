@@ -27,10 +27,10 @@
 <div class="panel panel-default">
     <div class="panel-body">
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-6" id="title">
                 {% bootstrap_label _("Acronym/Short title") label_class='d-block'%}
                 <p>
-                    {{ node.title }}{% if current_version.version_label != '' %}{{ current_version.version_label }}{% endif %}
+                    {{ node.title }}{% if current_version.version_label != '' %}<span id="version_label">{{ current_version.version_label }}</span>{% endif %}
                 </p>
             </div>
             <div class="col-md-6">
@@ -51,7 +51,7 @@
         </div>
         <br>
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-6" id="status">
                 {% bootstrap_label _("Status") label_class='d-block'%}
                 <p>{{ node.offer_status.value }}</p>
             </div>
@@ -92,14 +92,14 @@
         <div class="row">
             <div class="col-md-12" id="group_title_fr">
                 {% bootstrap_label _("Title in French") label_class='d-block'%}
-                <p>{{ node.group_title_fr }}</p>
+                <p>{{ education_group_year.titles.title_fr }}</p>
             </div>
         </div>
         {% if not current_version.is_standard or current_version.is_transition %}
             <br>
             <div class="row">
                 <div class="col-md-12" id="version_title_fr">
-                    {% bootstrap_label _("Title in French") %} {% bootstrap_label _("of version") %}
+                    {% bootstrap_label _("Full title of the french version") %}
                     <p>{{ current_version.title_fr | default_if_none:'' }}</p>
                 </div>
             </div>
@@ -117,14 +117,14 @@
         <div class="row">
             <div class="col-md-12" id="group_title_en">
                 {% bootstrap_label _("Title in English") label_class='d-block'%}
-                <p>{{ node.group_title_en }}</p>
+                <p>{{ education_group_year.titles.title_en }}</p>
             </div>
         </div>
         {% if not current_version.is_standard  or current_version.is_transition %}
             <br>
             <div class="row">
                 <div class="col-md-12" id="version_title_en">
-                    {% bootstrap_label _("Title in English") %} {% bootstrap_label _("of version") %}
+                    {% bootstrap_label _("Full title of the english version") %}
                     <p>{{ current_version.title_en | default_if_none:'' }}</p>
                 </div>
             </div>

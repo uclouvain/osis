@@ -76,6 +76,10 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             path = str(root_element.pk)
         return path
 
+    @functools.lru_cache()
+    def is_root_node(self):
+        return len(self.get_path().split('|')) <= 1
+
     @cached_property
     def node_identity(self) -> 'NodeIdentity':
         return NodeIdentity(code=self.kwargs['code'], year=self.kwargs['year'])
@@ -160,7 +164,8 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             "create_training_url": self.get_create_training_url(),
             "create_mini_training_url": self.get_create_mini_training_url(),
             "update_mini_training_url": self.get_update_mini_training_url(),
-            "delete_mini_training_url": self.get_delete_mini_training_url(),
+            "delete_permanently_mini_training_url": self.get_delete_permanently_mini_training_url(),
+            "delete_permanently_tree_version": self.get_delete_permanently_tree_version_url(),
             "create_version_url": self.get_create_version_url(),
             "is_root_node": is_root_node,
         }
@@ -181,24 +186,42 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
                "?path_to={}".format(self.get_path())
 
     def get_update_mini_training_url(self) -> str:
+        if self.current_version.is_standard_version:
+            return reverse_with_get(
+                'mini_training_update',
+                kwargs={'year': self.node_identity.year, 'code': self.node_identity.code,
+                        'acronym': self.get_object().title},
+                get={"path": self.get_path(), "tab": self.active_tab.name}
+            )
         return reverse_with_get(
-            'mini_training_update',
-            kwargs={'year': self.node_identity.year, 'code': self.node_identity.code,
-                    'acronym': self.get_object().title},
+            'mini_training_version_update',
+            kwargs={'year': self.node_identity.year, 'code': self.node_identity.code},
             get={"path": self.get_path(), "tab": self.active_tab.name}
         )
 
-    def get_delete_mini_training_url(self):
-        return reverse(
-            'mini_training_delete',
-            kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}
-        ) + "?path={}".format(self.get_path())
-
     def get_create_version_url(self):
-        return reverse(
-            'create_education_group_version',
-            kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}
-        ) + "?path={}".format(self.get_path())
+        if self.is_root_node():
+            return reverse(
+                'create_education_group_version',
+                kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}
+            ) + "?path={}".format(self.get_path())
+
+    def get_delete_permanently_tree_version_url(self):
+        if not self.program_tree_version_identity.is_standard():
+            return reverse(
+                'delete_permanently_tree_version',
+                kwargs={
+                    'year': self.node_identity.year,
+                    'code': self.node_identity.code,
+                }
+            )
+
+    def get_delete_permanently_mini_training_url(self):
+        if self.program_tree_version_identity.is_standard():
+            return reverse(
+                'mini_training_delete',
+                kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}
+            )
 
     def get_tab_urls(self):
         return OrderedDict({

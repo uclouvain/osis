@@ -34,7 +34,7 @@ class ManagementEntitiesChoiceField(EntityRoleChoiceField):
     def get_queryset(self):
         qs = super().get_queryset().pedagogical_entities().order_by('acronym')
         if self.initial:
-            qs |= EntityVersion.objects.filter(pk=self.initial)
+            qs |= EntityVersion.objects.filter(acronym=self.initial)
         return qs
 
     def clean(self, value):
@@ -65,3 +65,10 @@ class SecondaryDomainsField(AutoCompleteSelectMultipleField):
     def clean(self, value):
         value = super().clean(value)
         return domain.Domain.objects.filter(pk__in=value)
+
+
+class UpperCaseCharField(forms.CharField):
+    def widget_attrs(self, widget):
+        attrs = super().widget_attrs(widget)
+        attrs['style'] = "text-transform: uppercase;"
+        return attrs

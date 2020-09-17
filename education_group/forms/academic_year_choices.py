@@ -23,13 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import contextlib
 from typing import List, Tuple
 
 from django.urls import reverse
 
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.node import NodeIdentity
-from program_management.ddd.domain.service.academic_year_search import ExistingAcademicYearSearch
+from program_management.ddd.domain.service.node_identities_search import NodeIdentitiesSearch
 from program_management.ddd.domain.service.element_id_search import ElementIdByYearSearch
 
 
@@ -43,19 +44,22 @@ def get_academic_year_choices(
     map_element_id_by_year = ElementIdByYearSearch().search_from_element_ids(
         element_ids=element_ids,
     )
-    node_ids = ExistingAcademicYearSearch().search_from_code(node_identity.code)
+    node_ids = NodeIdentitiesSearch().search_from_code(node_identity.code)
 
-    return [
-        (
-            _get_href(
-                node_identity=node_id,
-                path='|'.join(str(map_element_id_by_year[elem_id][node_id.year]) for elem_id in element_ids),
-                active_view_name=active_view_name,
-            ),
-            node_id.year
-        )
-        for node_id in node_ids
-    ]
+    result = []
+    for node_id in node_ids:
+        with contextlib.suppress(KeyError):
+            result.append(
+                (
+                    _get_href(
+                        node_identity=node_id,
+                        path='|'.join(str(map_element_id_by_year[elem_id][node_id.year]) for elem_id in element_ids),
+                        active_view_name=active_view_name,
+                    ),
+                    node_id.year
+                )
+            )
+    return result
 
 
 def _get_href(node_identity: 'NodeIdentity', path: 'Path', active_view_name: str) -> str:

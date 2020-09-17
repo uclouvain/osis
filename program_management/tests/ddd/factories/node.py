@@ -44,8 +44,8 @@ def generate_node_identity(node: Node) -> NodeIdentity:
 class NodeFactory(factory.Factory):
 
     node_id = factory.Sequence(lambda n: n+1)
-    code = factory.Sequence(lambda n: 'Code%02d' % n)
-    title = factory.Sequence(lambda n: 'Acronym%02d' % n)
+    code = factory.Sequence(lambda n: 'CODE%02d' % n)
+    title = factory.Sequence(lambda n: 'ACRONYM%02d' % n)
     year = factory.fuzzy.FuzzyInteger(low=1999, high=2099)
     end_date = factory.LazyAttribute(generate_end_date)
     entity_id = factory.LazyAttribute(generate_node_identity)
@@ -86,6 +86,9 @@ class NodeGroupYearFactory(NodeFactory):
         )
         group = factory.Trait(
             node_type=factory.fuzzy.FuzzyChoice(GroupType)
+        )
+        listchoice = factory.Trait(
+            node_type=factory.fuzzy.FuzzyChoice(GroupType.minor_major_option_list_choice_enums())
         )
 
 

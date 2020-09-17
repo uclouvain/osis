@@ -1,4 +1,4 @@
-from typing import List, Dict, Union
+from typing import List, Dict, Union, Optional
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
@@ -46,7 +46,8 @@ class GroupCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "group_form": group_form,
             "tabs": self.get_tabs(),
             "type_text": GroupType.get_value(self.kwargs['type']),
-            "cancel_url": self.get_cancel_url()
+            "cancel_url": self.get_cancel_url(),
+            "parent_group": self.get_parent_group()
         })
 
     def get_form_class(self):
@@ -159,7 +160,7 @@ class GroupCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
     def get_attach_path(self) -> Union[Path, None]:
         return self.request.GET.get('path_to') or None
 
-    def get_parent_group(self) -> Union[Group, None]:
+    def get_parent_group(self) -> Optional[Group]:
         if self.get_attach_path():
             cmd_get_node_id = command_pgrm.GetNodeIdentityFromElementId(
                 int(self.get_attach_path().split('|')[-1])

@@ -34,10 +34,10 @@ from attribution.business.perms import _is_tutor_attributed_to_the_learning_unit
 from attribution.models.tutor_application import TutorApplication
 from base.business import event_perms
 from base.business.institution import find_summary_course_submission_dates_for_entity_version
-from base.models import proposal_learning_unit, tutor
+from base.models import proposal_learning_unit, tutor, entity_calendar
 from base.models.entity import Entity
 from base.models.entity_version import EntityVersion
-from base.models.enums import learning_container_year_types
+from base.models.enums import learning_container_year_types, academic_calendar_type
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.models.learning_unit_year import LearningUnitYear
@@ -114,18 +114,20 @@ def is_eligible_for_modification(learning_unit_year, person, raise_exception=Fal
 
 def is_eligible_for_modification_end_date(learning_unit_year, person, raise_exception=False):
     return check_lu_permission(person, 'base.can_edit_learningunit_date', raise_exception) and \
-        is_year_editable(learning_unit_year, raise_exception) and \
-        not (is_learning_unit_year_in_past(learning_unit_year, person, raise_exception)) and \
-        _has_no_applications_this_year(learning_unit_year, raise_exception) and \
-        is_eligible_for_modification(learning_unit_year, person, raise_exception) and \
-        _is_person_eligible_to_modify_end_date_based_on_container_type(learning_unit_year, person,
-                                                                       raise_exception) and \
-        is_external_learning_unit_cograduation(learning_unit_year, person, raise_exception)
+           is_year_editable(learning_unit_year, raise_exception) and \
+           not (is_learning_unit_year_in_past(learning_unit_year, person, raise_exception)) and \
+           (learning_unit_year.is_partim() or _has_no_applications_in_future_years(learning_unit_year,
+                                                                                   raise_exception)) and \
+           is_eligible_for_modification(learning_unit_year, person, raise_exception) and \
+           _is_person_eligible_to_modify_end_date_based_on_container_type(learning_unit_year, person,
+                                                                          raise_exception) and \
+           is_external_learning_unit_cograduation(learning_unit_year, person, raise_exception)
 
 
-def _has_no_applications_this_year(learning_unit_year, raise_exception=False):
+def _has_no_applications_in_future_years(learning_unit_year, raise_exception=False):
     result = not TutorApplication.objects.filter(
-        learning_container_year=learning_unit_year.learning_container_year
+        learning_container_year__learning_container=learning_unit_year.learning_container_year.learning_container,
+        learning_container_year__academic_year__year__gt=learning_unit_year.learning_container_year.academic_year.year
     ).exists()
     can_raise_exception(
         raise_exception, result,
@@ -146,10 +148,10 @@ def is_eligible_to_create_partim(learning_unit_year, person, raise_exception=Fal
 def is_eligible_to_create_modification_proposal(learning_unit_year, person, raise_exception=False):
     result = \
         check_lu_permission(person, 'base.can_propose_learningunit', raise_exception) and \
-        not(is_learning_unit_year_in_past(learning_unit_year, person, raise_exception)) and \
-        not(is_learning_unit_year_a_partim(learning_unit_year, person, raise_exception)) and \
+        not (is_learning_unit_year_in_past(learning_unit_year, person, raise_exception)) and \
+        not (is_learning_unit_year_a_partim(learning_unit_year, person, raise_exception)) and \
         _is_container_type_course_dissertation_or_internship(learning_unit_year, person, raise_exception) and \
-        not(is_learning_unit_year_in_proposal(learning_unit_year, person, raise_exception)) and \
+        not (is_learning_unit_year_in_proposal(learning_unit_year, person, raise_exception)) and \
         is_person_linked_to_entity_in_charge_of_learning_unit(learning_unit_year, person) and \
         is_external_learning_unit_cograduation(learning_unit_year, person, raise_exception)
     #  TODO detail why button is disabled
@@ -233,15 +235,15 @@ def is_eligible_to_consolidate_proposal(proposal, person, raise_exception=False)
 def can_edit_summary_locked_field(learning_unit_year, person):
     flag = Flag.get('educational_information_block_action')
     return flag.is_active_for_user(person.user) and \
-        person.is_faculty_manager and \
-        person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year)
+           person.is_faculty_manager and \
+           person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year)
 
 
 def can_update_learning_achievement(learning_unit_year, person):
     flag = Flag.get('learning_achievement_update')
     return flag.is_active_for_user(person.user) and \
-        person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year) and \
-        is_year_editable(learning_unit_year, raise_exception=False)
+           person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year) and \
+           is_year_editable(learning_unit_year, raise_exception=False)
 
 
 def is_eligible_to_delete_learning_unit_year(learning_unit_year, person, raise_exception=False):
@@ -330,15 +332,15 @@ def _is_person_eligible_to_modify_end_date_based_on_container_type(learning_unit
 
 def is_eligible_to_manage_charge_repartition(learning_unit_year, person):
     return person.user.has_perm("base.can_manage_charge_repartition") and \
-        learning_unit_year.is_partim() and \
-        person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year)
+           learning_unit_year.is_partim() and \
+           person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year)
 
 
 def is_eligible_to_manage_attributions(learning_unit_year, person):
     luy_container_type = learning_unit_year.learning_container_year.container_type
     return person.user.has_perm("base.can_manage_attribution") and \
-        luy_container_type in learning_container_year_types.TYPE_ALLOWED_FOR_ATTRIBUTIONS and \
-        person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year)
+           luy_container_type in learning_container_year_types.TYPE_ALLOWED_FOR_ATTRIBUTIONS and \
+           person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year)
 
 
 def _is_person_central_manager(_, person, raise_exception):
@@ -389,7 +391,7 @@ def is_learning_unit_year_in_proposal(learning_unit_year, _, raise_exception=Fal
 
 def _is_learning_unit_year_in_state_to_create_partim(learning_unit_year, person, raise_exception=False):
     business_check = (person.is_central_manager and not is_learning_unit_year_in_past(learning_unit_year, person)) or \
-        (person.is_faculty_manager and learning_unit_year.learning_container_year)
+                     (person.is_faculty_manager and learning_unit_year.learning_container_year)
 
     calendar_check = event_perms.generate_event_perm_learning_unit_edition(
         person=person,
@@ -414,7 +416,7 @@ def _is_learning_unit_year_in_state_to_be_modified(learning_unit_year, person, r
         raise_exception,
         result,
         MSG_NOT_GOOD_RANGE_OF_YEARS,
-        )
+    )
     return result
 
 
@@ -426,7 +428,7 @@ def _can_delete_learning_unit_year_according_type(learning_unit_year, person, ra
     if not person.is_central_manager and person.is_faculty_manager:
         container_type = learning_unit_year.learning_container_year.container_type
         result = not (
-            container_type == learning_container_year_types.COURSE and learning_unit_year.is_full()
+                container_type == learning_container_year_types.COURSE and learning_unit_year.is_full()
         ) and container_type not in [learning_container_year_types.DISSERTATION,
                                      learning_container_year_types.INTERNSHIP]
     else:
@@ -527,6 +529,23 @@ def is_eligible_to_update_learning_unit_pedagogy(learning_unit_year, person):
     return False
 
 
+def is_eligible_to_update_learning_unit_pedagogy_force_majeure_section(learning_unit_year, person):
+    if not person.user.has_perm('base.can_edit_learningunit_pedagogy'):
+        return False
+    if is_year_editable(learning_unit_year, raise_exception=False):
+        # Case faculty/central: We need to check if user is linked to entity
+        if person.is_faculty_manager or person.is_central_manager:
+            return person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year)
+
+        # Case Tutor: We need to check if today is between submission date of force majeure section
+        if tutor.is_tutor(person.user):
+            return can_user_edit_educational_information_force_majeure(
+                user=person.user,
+                learning_unit_year_id=learning_unit_year.id
+            ).is_valid()
+    return False
+
+
 def _is_tutor_summary_responsible_of_learning_unit_year(*, user, learning_unit_year_id, **kwargs):
     if not _is_tutor_attributed_to_the_learning_unit(user, learning_unit_year_id):
         raise PermissionDenied(_("You are not attributed to this learning unit."))
@@ -550,7 +569,7 @@ def _is_calendar_opened_to_edit_educational_information(*, learning_unit_year_id
 
     now = datetime.datetime.now(tz=get_tzinfo())
     value = convert_date_to_datetime(submission_dates["start_date"]) <= now <= \
-        convert_date_to_datetime(submission_dates["end_date"])
+            convert_date_to_datetime(submission_dates["end_date"])
     if not value:
         raise PermissionDenied(permission_denied_msg)
 
@@ -565,6 +584,35 @@ def find_educational_information_submission_dates_of_learning_unit_year(learning
     return find_summary_course_submission_dates_for_entity_version(
         entity_version=requirement_entity_version,
         ac_year=LearningUnitYear.objects.get(pk=learning_unit_year_id).academic_year
+    )
+
+
+def _is_calendar_opened_to_edit_educational_information_force_majeure_section(*, learning_unit_year_id, **kwargs):
+    submission_dates = find_educational_information_force_majeure_submission_dates_of_learning_unit_year(
+        learning_unit_year_id
+    )
+    permission_denied_msg = _("Not in period to edit force majeure section.")
+    if not submission_dates:
+        raise PermissionDenied(permission_denied_msg)
+
+    now = datetime.datetime.now(tz=get_tzinfo())
+    value = convert_date_to_datetime(submission_dates["start_date"]) <= now <= \
+        convert_date_to_datetime(submission_dates["end_date"])
+    if not value:
+        raise PermissionDenied(permission_denied_msg)
+
+
+def find_educational_information_force_majeure_submission_dates_of_learning_unit_year(learning_unit_year_id):
+    requirement_entity_version = find_last_requirement_entity_version(
+        learning_unit_year_id=learning_unit_year_id,
+    )
+    if requirement_entity_version is None:
+        return {}
+
+    return entity_calendar.find_interval_dates_for_entity(
+        ac_year=LearningUnitYear.objects.get(pk=learning_unit_year_id).academic_year,
+        reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION_FORCE_MAJEURE,
+        entity=requirement_entity_version.entity
     )
 
 
@@ -589,6 +637,14 @@ class can_user_edit_educational_information(BasePerm):
         _is_tutor_summary_responsible_of_learning_unit_year,
         _is_learning_unit_year_summary_editable,
         _is_calendar_opened_to_edit_educational_information
+    )
+
+
+class can_user_edit_educational_information_force_majeure(BasePerm):
+    predicates = (
+        _is_tutor_summary_responsible_of_learning_unit_year,
+        _is_learning_unit_year_summary_editable,
+        _is_calendar_opened_to_edit_educational_information_force_majeure_section
     )
 
 
@@ -620,7 +676,7 @@ def is_person_linked_to_entity_in_charge_of_lu(learning_unit_year, person, raise
         raise_exception,
         result,
         MSG_ONLY_IF_YOUR_ARE_LINK_TO_ENTITY
-        )
+    )
     return result
 
 

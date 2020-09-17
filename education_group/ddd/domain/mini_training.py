@@ -37,6 +37,7 @@ from education_group.ddd.domain._campus import Campus
 from education_group.ddd.domain._entity import Entity
 from education_group.ddd.domain._titles import Titles
 from education_group.ddd.validators import validators_by_business_action
+from education_group.ddd.validators.validators_by_business_action import CopyMiniTrainingValidatorList
 from osis_common.ddd import interface
 from program_management.ddd.domain.academic_year import AcademicYear
 
@@ -65,10 +66,6 @@ class MiniTrainingBuilder:
         mini_training_id = MiniTrainingIdentity(acronym=cmd.abbreviated_title, year=cmd.year)
         titles = Titles(title_fr=cmd.title_fr, title_en=cmd.title_en)
         management_entity = Entity(acronym=cmd.management_entity_acronym)
-        teaching_campus = Campus(
-            name=cmd.teaching_campus_name,
-            university_name=cmd.organization_name,
-        )
 
         mini_training_domain_obj = MiniTraining(
             entity_identity=mini_training_id,
@@ -82,7 +79,6 @@ class MiniTrainingBuilder:
             schedule_type=ScheduleTypeEnum[cmd.schedule_type],
             credits=cmd.credits,
             management_entity=management_entity,
-            teaching_campus=teaching_campus,
             start_year=cmd.start_year,
             end_year=cmd.end_year,
 
@@ -98,6 +94,7 @@ builder = MiniTrainingBuilder()
 
 @attr.s(frozen=True, slots=True)
 class MiniTrainingIdentity(interface.EntityIdentity):
+    # TODO: Rename acronym to abbreviated_title
     acronym = attr.ib(type=str, converter=lambda code: code.upper())
     year = attr.ib(type=int)
 
@@ -107,13 +104,13 @@ class MiniTraining(interface.RootEntity):
     entity_id = entity_identity = attr.ib(type=MiniTrainingIdentity)
     code = attr.ib(type=str)
     type = attr.ib(type=EducationGroupTypesEnum)
+    # TODO: Make a computed property instead of acronym (see TODO in MiniTrainingIdentity)
     abbreviated_title = attr.ib(type=str)
     titles = attr.ib(type=Titles)
     status = attr.ib(type=ActiveStatusEnum)
     schedule_type = attr.ib(type=ScheduleTypeEnum)
     credits = attr.ib(type=int)
     management_entity = attr.ib(type=Entity)
-    teaching_campus = attr.ib(type=Campus)
     start_year = attr.ib(type=int)
     end_year = attr.ib(type=Optional[int], default=None)
     keywords = attr.ib(type=str, default="")

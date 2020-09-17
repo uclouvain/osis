@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-26 09:35+0200\n"
+"POT-Creation-Date: 2020-09-15 08:53+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,10 +17,18 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #, python-format
-msgid "%(count_enrollment)d student is enrolled in the mini-training."
-msgid_plural "%(count_enrollment)d students are enrolled in the mini-training."
-msgstr[0] "%(count_enrollment)d étudiant est inscrit à la mini-formation."
-msgstr[1] "%(count_enrollment)d étudiants sont inscrits à la mini-formation."
+msgid ""
+"%(count_enrollment)d student is enrolled in the mini-training "
+"%(abbreviated_title)s (%(academic_year)s)."
+msgid_plural ""
+"%(count_enrollment)d students are enrolled in the mini-training "
+"%(abbreviated_title)s (%(academic_year)s)."
+msgstr[0] ""
+"%(count_enrollment)d étudiant est inscrit à la mini-formation "
+"%(abbreviated_title)s (%(academic_year)s)."
+msgstr[1] ""
+"%(count_enrollment)d étudiants sont inscrits à la mini-formation "
+"%(abbreviated_title)s (%(academic_year)s)."
 
 #, python-format
 msgid ""
@@ -169,6 +177,12 @@ msgstr "Code co-diplômation intra CfB"
 msgid "Comment"
 msgstr "Commentaire"
 
+msgid "Common admission conditions will be published soon"
+msgstr "Les conditions d'admission communes seront publiées sous peu"
+
+msgid "Common general informations will be published soon"
+msgstr "Les informations générales communes seront publiées sous peu"
+
 msgid "Conditions"
 msgstr "Conditions"
 
@@ -300,6 +314,12 @@ msgstr "Maîtrise de la langue française"
 msgid "From"
 msgstr "De"
 
+msgid "Full title of the english version"
+msgstr "Intitulé de la version en anglais"
+
+msgid "Full title of the french version"
+msgstr "Intitulé de la version en français"
+
 msgid "Funding"
 msgstr "Finançable"
 
@@ -398,9 +418,6 @@ msgstr "Unité d'enseignement"
 msgid "Link type"
 msgstr "Type de lien"
 
-msgid "Linked with EPC"
-msgstr "Liens existants dans l'application EPC."
-
 msgid "Main"
 msgstr "Principale"
 
@@ -442,10 +459,14 @@ msgid ""
 "successfully created."
 msgstr ""
 "La mini-formation <a href='%(link)s'> %(code)s (%(academic_year)s) </a> a "
-"été créé avec succès"
+"été créée avec succès"
 
 msgid "Modification"
 msgstr "Modification"
+
+#, python-brace-format
+msgid "Multiple entities {entity_acronym} found in {year}"
+msgstr "Plusieurs entités '{entity_acronym}' trouvées pour l'année {year}"
 
 msgid "New Education Group"
 msgstr "Nouveau Groupement"
@@ -455,6 +476,14 @@ msgstr "Nouvelle Mini-Formation"
 
 msgid "New Training"
 msgstr "Nouvelle Formation"
+
+#, python-format
+msgid ""
+"No type of %(child_category)s can be created as child of %(category)s of "
+"type %(type)s"
+msgstr ""
+"Aucun type de %(child_category)s ne peut être créé comme enfant d'un(e) "
+"%(category)s de type %(type)s"
 
 msgid "Non university Bachelors"
 msgstr "Bacheliers non universitaires"
@@ -579,9 +608,6 @@ msgstr ""
 "Les champs concernant les données de l'ARES doivent être soit tous remplis "
 "soit tous vides"
 
-msgid "The following links has been updated"
-msgstr "Les liens suivants ont été mis à jour"
-
 #, python-brace-format
 msgid ""
 "The formation you work with doesn't exist (or is not at the same position) "
@@ -601,12 +627,16 @@ msgid "The link of %(code)s - %(acronym)s - %(year)s has been updated."
 msgstr "Le lien de %(code)s - %(acronym)s - %(year)s a été mis à jour."
 
 #, python-format
-msgid "The mini-training %(code)s has been deleted."
-msgstr "La mini-formation %(code)s a été supprimée."
+msgid "The mini-training %(code)s - %(title)s has been deleted."
+msgstr "La mini-formation %(code)s - %(title)s a été supprimée."
 
-#, python-format
-msgid "The program %(acronym)s will be published soon"
-msgstr "Le programme %(acronym)s sera publié sous peu"
+#, python-brace-format
+msgid ""
+"The mini-training {abbreviated_title} ({academic_year}) have links in EPC "
+"application"
+msgstr ""
+"La mini-formation {abbreviated_title} ({academic_year}) contient des "
+"liaisons dans l'application EPC"
 
 msgid ""
 "The scope of the user is limited and prevents this action to be performed"
@@ -677,7 +707,7 @@ msgid ""
 "successfully created."
 msgstr ""
 "La formation <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> a été "
-"créé avec succès"
+"créée avec succès"
 
 #, python-format
 msgid ""
@@ -686,6 +716,10 @@ msgid ""
 msgstr ""
 "La formation <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> a été "
 "modifiée avec succès"
+
+#, python-brace-format
+msgid "Training not found : {acronym} {year}"
+msgstr "Formation non trouvée : {acronym} {year}"
 
 msgid "Trainings"
 msgstr "Formations"
@@ -701,6 +735,14 @@ msgstr "Bacheliers UCL"
 
 msgid "UCL Diploma"
 msgstr "Diplôme avec l'UCL"
+
+#, python-brace-format
+msgid "Unable to publish common admission conditions for {year}"
+msgstr "Impossible de publier les conditions d'admission communes pour {year}"
+
+#, python-brace-format
+msgid "Unable to publish common general informations for {year}"
+msgstr "Impossible de publier les informations générales communes pour {year}"
 
 msgid "University Bachelors"
 msgstr "Bacheliers universitaires"
@@ -767,6 +809,13 @@ msgstr ""
 "Vous ne pouvez pas supprimer/modifier une formation existant avant "
 "%(limit_year)s"
 
+msgid ""
+"You must create the version of the concerned training and then attach that "
+"version inside this version"
+msgstr ""
+"Il faut créer la version correspondante dans la formation concernée et puis "
+"ajouter cette version dans cette formation"
+
 msgid "You should precise at least minimum or maximum constraint"
 msgstr "Vous devez préciser au moins la contrainte minimum ou maximum"
 
@@ -826,9 +875,6 @@ msgstr "contrainte maximum"
 
 msgid "minimum constraint"
 msgstr "contrainte minimum"
-
-msgid "of version"
-msgstr "de la version"
 
 msgid "on successful completion of this program, each student is able to"
 msgstr "au terme de ce programme, le diplômé est capable de"

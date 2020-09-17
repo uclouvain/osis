@@ -23,10 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List, Optional
+from typing import List
 
 import attr
 
+from base.ddd.utils.converters import to_upper_case_converter
 from base.models.enums.academic_type import AcademicTypes
 from base.models.enums.active_status import ActiveStatusEnum
 from base.models.enums.activity_presence import ActivityPresence
@@ -60,7 +61,7 @@ from program_management.ddd.domain.academic_year import AcademicYear
 
 @attr.s(frozen=True, slots=True)
 class TrainingIdentity(interface.EntityIdentity):
-    acronym = attr.ib(type=str)
+    acronym = attr.ib(type=str, converter=to_upper_case_converter)
     year = attr.ib(type=int)
 
 
@@ -152,10 +153,6 @@ class TrainingBuilder:
             management_entity=Entity(acronym=command.management_entity_acronym),
             administration_entity=Entity(acronym=command.administration_entity_acronym),
             end_year=command.end_year,
-            teaching_campus=Campus(
-                name=command.teaching_campus_name,
-                university_name=command.teaching_campus_organization_name,
-            ),
             enrollment_campus=Campus(
                 name=command.enrollment_campus_name,
                 university_name=command.enrollment_campus_organization_name,
@@ -237,7 +234,6 @@ class Training(interface.RootEntity):
     management_entity = attr.ib(type=Entity, default=None)
     administration_entity = attr.ib(type=Entity, default=None)
     end_year = attr.ib(type=int, default=None)
-    teaching_campus = attr.ib(type=Campus, default=None)
     enrollment_campus = attr.ib(type=Campus, default=None)
     other_campus_activities = attr.ib(type=ActivityPresence, default=None)
     funding = attr.ib(type=Funding, default=None)

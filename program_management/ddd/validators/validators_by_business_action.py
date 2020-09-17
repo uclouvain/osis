@@ -40,11 +40,13 @@ from program_management.ddd.validators._authorized_root_type_for_prerequisite im
 from program_management.ddd.validators._block_validator import BlockValidator
 from program_management.ddd.validators._copy_check_end_date_program_tree import CheckProgramTreeEndDateValidator
 from program_management.ddd.validators._copy_check_end_date_tree_version import CheckTreeVersionEndDateValidator
+from program_management.ddd.validators._delete_check_versions_end_date import CheckVersionsEndDateValidator
 from program_management.ddd.validators._detach_option_2M import DetachOptionValidator
 from program_management.ddd.validators._detach_root import DetachRootValidator
 from program_management.ddd.validators._empty_program_tree import EmptyProgramTreeValidator
 from program_management.ddd.validators._has_or_is_prerequisite import IsPrerequisiteValidator
 from program_management.ddd.validators._infinite_recursivity import InfiniteRecursivityTreeValidator
+from program_management.ddd.validators._match_version import MatchVersionValidator
 from program_management.ddd.validators._minimum_editable_year import \
     MinimumEditableYearValidator
 from program_management.ddd.validators._node_have_link import NodeHaveLinkValidator
@@ -99,6 +101,7 @@ class PasteNodeValidatorList(business_validator.BusinessListValidator):
         for validator in self.validators:
             try:
                 validator.validate()
+            # TODO : gather multiple BusinessException instead of BusinessExceptions
             except osis_common.ddd.interface.BusinessExceptions as business_exception:
                 error_messages.extend(business_exception.messages)
 
@@ -112,7 +115,7 @@ class CheckPasteNodeValidatorList(business_validator.BusinessListValidator):
             tree: 'ProgramTree',
             node_to_paste: 'Node',
             check_paste_command: command.CheckPasteNodeCommand,
-            tree_repository: 'ProgramTreeRepository'
+            tree_repository: 'ProgramTreeRepository',
     ):
         path = check_paste_command.path_to_paste
 
@@ -122,6 +125,7 @@ class CheckPasteNodeValidatorList(business_validator.BusinessListValidator):
                 MinimumEditableYearValidator(tree),
                 InfiniteRecursivityTreeValidator(tree, node_to_paste, path),
                 _validate_end_date_and_option_finality.ValidateEndDateAndOptionFinality(node_to_paste, tree_repository),
+                MatchVersionValidator(tree, node_to_paste)
             ]
 
         elif node_to_paste.is_learning_unit():
@@ -141,8 +145,9 @@ class CheckPasteNodeValidatorList(business_validator.BusinessListValidator):
         for validator in self.validators:
             try:
                 validator.validate()
-            except osis_common.ddd.interface.BusinessExceptions as business_exception:
-                error_messages.extend(business_exception.messages)
+            # TODO : gather multiple BusinessException instead of BusinessExceptions
+            except osis_common.ddd.interface.BusinessExceptions as business_exceptions:
+                error_messages.extend(business_exceptions.messages)
 
         if error_messages:
             raise osis_common.ddd.interface.BusinessExceptions(error_messages)
@@ -184,6 +189,7 @@ class DetachNodeValidatorList(business_validator.BusinessListValidator):
         for validator in self.validators:
             try:
                 validator.validate()
+            # TODO : gather multiple BusinessException instead of BusinessExceptions
             except osis_common.ddd.interface.BusinessExceptions as business_exception:
                 error_messages.extend(business_exception.messages)
 
@@ -231,12 +237,14 @@ class DeleteProgramTreeValidatorList(business_validator.BusinessListValidator):
         super().__init__()
 
 
-class DeleteStandardVersionValidatorList(business_validator.BusinessListValidator):
+class DeleteSpecificVersionValidatorList(business_validator.BusinessListValidator):
     def __init__(
             self,
             program_tree_version: 'ProgramTreeVersion',
     ):
-        self.validators = []
+        self.validators = [
+            CheckVersionsEndDateValidator(program_tree_version),
+        ]
         super().__init__()
 
 

@@ -44,11 +44,11 @@ class CalculateEndPostponement(interface.DomainService):
             identity: Union['TrainingIdentity', 'MiniTrainingIdentity'],
             repository: Union['TrainingRepository', 'MiniTrainingRepository']
     ) -> int:
-        max_year = _calculate_max_year_of_end_postponement()
-        training = repository.get(identity)
-        if training.end_year is None:
+        max_year = cls.calculate_end_postponement_limit()
+        obj = repository.get(identity)
+        if obj.end_year is None:
             return max_year
-        return min(max_year, training.end_year)
+        return min(max_year, obj.end_year)
 
     @classmethod
     def calculate_program_tree_end_postponement(
@@ -63,8 +63,8 @@ class CalculateEndPostponement(interface.DomainService):
             repository=training_repository if isinstance(root_identity, TrainingIdentity) else mini_training_repository,
         )
 
-
-def _calculate_max_year_of_end_postponement() -> int:
-    default_years_to_postpone = DEFAULT_YEARS_TO_POSTPONE
-    current_year = academic_year.starting_academic_year().year
-    return default_years_to_postpone + current_year
+    @classmethod
+    def calculate_end_postponement_limit(cls) -> int:
+        default_years_to_postpone = DEFAULT_YEARS_TO_POSTPONE
+        current_year = academic_year.starting_academic_year().year
+        return default_years_to_postpone + current_year

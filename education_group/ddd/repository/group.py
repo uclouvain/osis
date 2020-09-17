@@ -46,7 +46,7 @@ from education_group.ddd.domain._entity import Entity as EntityValueObject
 from education_group.ddd.domain._remark import Remark
 from education_group.ddd.domain._titles import Titles
 from education_group.ddd.domain.exception import AcademicYearNotFound, TypeNotFound, ManagementEntityNotFound, \
-    TeachingCampusNotFound
+    TeachingCampusNotFound, MultipleEntitiesFoundException
 from education_group.ddd.domain.group import GroupIdentity
 from education_group.ddd.domain.service.enum_converter import EducationGroupTypeConverter
 from education_group.models.group import Group as GroupModelDb
@@ -80,6 +80,8 @@ class GroupRepository(interface.AbstractRepository):
             raise ManagementEntityNotFound
         except CampusModelDb.DoesNotExist:
             raise TeachingCampusNotFound
+        except EntityVersionModelDb.MultipleObjectsReturned:
+            raise MultipleEntitiesFoundException(group.management_entity.acronym, group.year)
 
         group_qs = GroupModelDb.objects.filter(
             groupyear__partial_acronym=group.code

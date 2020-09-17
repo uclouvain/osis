@@ -26,14 +26,14 @@ from typing import List
 from django.db import transaction
 
 from program_management.ddd import command
-from program_management.ddd.domain.service.academic_year_search import ExistingAcademicYearSearch
+from program_management.ddd.domain.service import node_identities_search
 from program_management.ddd.service.write import delete_program_tree_service
 from program_management.ddd.business_types import *
 
 
 @transaction.atomic()
 def delete_all_program_tree(cmd: command.DeleteAllProgramTreeCommand) -> List['ProgramTreeIdentity']:
-    node_ids = ExistingAcademicYearSearch().search_from_code(group_code=cmd.code)
+    node_ids = node_identities_search.NodeIdentitiesSearch().search_from_code(group_code=cmd.code)
 
     program_ids = []
     for node_id in node_ids:
