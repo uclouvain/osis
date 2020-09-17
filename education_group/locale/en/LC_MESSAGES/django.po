@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-10 09:40+0200\n"
+"POT-Creation-Date: 2020-09-15 08:53+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -300,6 +300,12 @@ msgid "French language proficiency examination"
 msgstr ""
 
 msgid "From"
+msgstr ""
+
+msgid "Full title of the english version"
+msgstr ""
+
+msgid "Full title of the french version"
 msgstr ""
 
 msgid "Funding"
@@ -703,9 +709,6 @@ msgstr ""
 msgid "University certificate"
 msgstr ""
 
-msgid "Update Content"
-msgstr ""
-
 msgid "Update Training"
 msgstr ""
 
@@ -819,9 +822,6 @@ msgid "maximum constraint"
 msgstr ""
 
 msgid "minimum constraint"
-msgstr ""
-
-msgid "of version"
 msgstr ""
 
 msgid "on successful completion of this program, each student is able to"
