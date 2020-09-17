@@ -49,6 +49,7 @@ class BorrowedLearningUnitSearch(LearningUnitFilter):
         queryset=AcademicYear.objects.all(),
         required=True,
         label=_('Ac yr.'),
+        empty_label=None
     )
     faculty_borrowing_acronym = filters.CharFilter(
         method=lambda queryset, *args, **kwargs: queryset,
