@@ -41,8 +41,9 @@ def have_only_access_to_certificate_aims(user, education_group_year):
     [Backward-compatibility] This templatetag as been created in order to allow
     program_manager to be redirected to update_certificate_aims
     """
-    return program_manager.is_program_manager(user, education_group=education_group_year.education_group) \
-           and not any((user.is_superuser, user.person.is_faculty_manager, user.person.is_central_manager))
+    return program_manager.is_program_manager(
+        user, education_group=education_group_year.education_group
+    ) and not any((user.is_superuser, user.person.is_faculty_manager, user.person.is_central_manager))
 
 
 @register.simple_tag(takes_context=True)
