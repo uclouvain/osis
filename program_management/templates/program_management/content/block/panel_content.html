@@ -1,5 +1,5 @@
 {% load i18n static %}
-{% load bootstrap3 %}
+{% load bootstrap3 version_details %}
 
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
@@ -33,7 +33,7 @@
             <table class="table">
                 <thead>
                 <tr>
-                    <th>{% trans 'Acronym/Short title' context 'abbreviation' %}</th>
+                    <th>{% trans 'Acronym/Short title' context 'abbreviation' %}eeee</th>
                     <th>{% trans 'Code' %}</th>
                     <th>{% trans 'Title' %}</th>
                     {% if content_formset.forms and content_formset.forms.0.is_a_parent_minor_major_option_list_choice %}
@@ -57,7 +57,7 @@
                         {{ form.id }}
                         {% if form.is_a_link_with_child_of_learning_unit %}
                             {# Link attrs relevant for child of type learning unit #}
-                            <td style="width:8%"></td>
+                            <td style="width:12%"></td>
                             <td>
                                 <a id="lnk_learning_unit_{{ form.child_obj.id }}"
                                    href="{% url 'learning_unit' form.child_obj.id %}">
@@ -75,7 +75,13 @@
                             </td>
                         {% else %}
                             {# Link attrs relevant for child of type group #}
-                            <td style="width:8%">{{ form.child_obj.abbreviated_title }}</td>
+                            <td style="width:12%">
+                                {{ form.child_obj.abbreviated_title }}
+                                {% version_details form.child_obj.entity_id tree_different_versions as version_infos %}
+                                {% if version_infos %}
+                                    {{ version_infos.version_label }}
+                                {% endif %}
+                            </td>
                             <td>
                                 <a href="{% url 'element_identification' code=form.child_obj.code year=form.child_obj.year %}">
                                     {{ form.child_obj.code }}
@@ -84,6 +90,9 @@
                             <td {% if form.is_a_parent_minor_major_option_list_choice %}style="width:55%"
                                 {% else %}style="width:23%"{% endif %}>
                                 {{ form.child_obj.titles.title_fr }}
+                                {% if version_infos and version_infos.title %}
+                                    {{ version_infos.title }}
+                                {% endif %}
                             </td>
 
                             {% if not form.is_a_parent_minor_major_option_list_choice %}
