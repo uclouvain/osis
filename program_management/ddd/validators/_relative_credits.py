@@ -41,4 +41,3 @@ class RelativeCreditsValidator(business_validator.BusinessValidator):
 
         elif self.relative_credits > 999:
             raise exception.RelativeCreditShouldBeLowerOrEqualThan999
-
