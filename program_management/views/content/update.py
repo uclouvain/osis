@@ -172,7 +172,7 @@ class ContentUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         messages = []
 
         for link in links:
-            msg = _("The link of %(node)s has been updated.") % {"node": self.__get_node_str(link.child)}
+            msg = _("The link \"%(node)s\" has been updated.") % {"node": self.__get_node_str(link.child)}
             messages.append(msg)
         return messages
 
