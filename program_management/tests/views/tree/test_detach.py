@@ -100,6 +100,7 @@ class TestDetachNodeView(TestCase):
         response = self.client.get(self.url, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, "tree/detach_confirmation_inner.html")
+        self.assertIn('confirmation_message', response.context)
 
     @mock.patch("program_management.ddd.service.write.detach_node_service.detach_node")
     def test_detach_case_post_success(self, mock_service):

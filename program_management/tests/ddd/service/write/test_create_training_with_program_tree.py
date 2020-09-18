@@ -32,23 +32,18 @@ from education_group.tests.ddd.factories.command.create_and_postpone_training_an
 
 
 class TestCreateAndReportTrainingWithProgramTree(TestCase):
-    @mock.patch("program_management.ddd.service.write.create_training_with_program_tree."
-                "CalculateEndPostponement.calculate_max_year_of_end_postponement", return_value=2023)
     @mock.patch("program_management.ddd.service.write.postpone_tree_version_service.postpone_program_tree_version")
     @mock.patch("program_management.ddd.service.write.create_standard_version_service.create_standard_program_version")
     @mock.patch("program_management.ddd.service.write.postpone_program_tree_service.postpone_program_tree")
     @mock.patch("program_management.ddd.service.write.create_standard_program_tree_service.create_standard_program_tree")
-    @mock.patch("education_group.ddd.service.write.create_group_service.create_orphan_group")
     @mock.patch("education_group.ddd.service.write.create_orphan_training_service.create_and_postpone_orphan_training")
     def test_should_create_trainings_until_postponement_limit(
             self,
             mock_create_and_postpone_orphan_training,
-            mock_create_orphan_group,
             mock_create_standard_program_tree,
             mock_postpone_program_tree,
             mock_create_standard_program_version,
-            mock_postpone_program_tree_version,
-            mock_end_postponement):
+            mock_postpone_program_tree_version,):
 
         training_identities = [
             training.TrainingIdentity(acronym="ACRONYM", year=2020),
@@ -57,7 +52,6 @@ class TestCreateAndReportTrainingWithProgramTree(TestCase):
         ]
 
         mock_create_and_postpone_orphan_training.return_value = training_identities
-        mock_create_orphan_group.return_value = None
         mock_create_standard_program_tree.return_value = program_tree.ProgramTreeIdentity(code="CODE", year=2020)
         mock_postpone_program_tree.return_value = None
         mock_create_standard_program_version.return_value = program_tree_version.ProgramTreeVersionIdentity(
@@ -73,7 +67,6 @@ class TestCreateAndReportTrainingWithProgramTree(TestCase):
 
         self.assertListEqual(training_identities, result)
         self.assertTrue(mock_create_and_postpone_orphan_training.called)
-        self.assertTrue(mock_create_orphan_group.called)
         self.assertTrue(mock_create_standard_program_tree.called)
         self.assertTrue(mock_postpone_program_tree.called)
         self.assertTrue(mock_create_standard_program_version.called)

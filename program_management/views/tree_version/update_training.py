@@ -1,6 +1,7 @@
 import functools
 from typing import Dict, List
 
+from django.db import transaction
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
@@ -9,7 +10,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views import View
 
 from base.models import entity_version
-from base.views.common import display_error_messages
+from base.views.common import display_error_messages, display_warning_messages
 from education_group.ddd import command as command_education_group
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import exception as exception_education_group
@@ -22,7 +23,7 @@ from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.command import UpdateTrainingVersionCommand
 from program_management.ddd.service.read import get_program_tree_version_from_node_service
-from program_management.ddd.service.write import update_training_version_service
+from program_management.ddd.service.write import update_and_postpone_training_version_service
 from program_management.forms import version
 
 
@@ -42,6 +43,7 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
             return HttpResponseRedirect(redirect_url)
         return super().dispatch(request, *args, **kwargs)
 
+    @transaction.non_atomic_requests
     def get(self, request, *args, **kwargs):
         context = {
             "training_version_form": self.training_version_form,
@@ -54,6 +56,7 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
         }
         return render(request, self.template_name, context)
 
+    @transaction.non_atomic_requests
     def post(self, request, *args, **kwargs):
         if self.training_version_form.is_valid():
             self.update_training_version()
@@ -74,13 +77,15 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
     def update_training_version(self):
         try:
             update_command = self._convert_form_to_update_training_version_command(self.training_version_form)
-            return update_training_version_service.update_training_version(update_command)
+            return update_and_postpone_training_version_service.update_and_postpone_training_version(update_command)
         except exception_education_group.ContentConstraintTypeMissing as e:
             self.training_version_form.add_error("constraint_type", e.message)
         except (exception_education_group.ContentConstraintMinimumMaximumMissing,
                 exception_education_group.ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum) as e:
             self.training_version_form.add_error("min_constraint", e.message)
             self.training_version_form.add_error("max_constraint", "")
+        except exception_education_group.GroupCopyConsistencyException as e:
+            display_warning_messages(self.request, e.message)
         return []
 
     @cached_property

@@ -23,39 +23,35 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+import factory.fuzzy
 
-from django.db import transaction
-
+from base.models.enums import education_group_types
+from base.models.enums.active_status import ActiveStatusEnum
+from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.ddd import command
-from education_group.ddd.domain import exception
-from education_group.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
-from education_group.ddd.domain.training import TrainingIdentity
-from education_group.ddd.service.write import copy_training_service
 
 
-@transaction.atomic()
-def postpone_training(postpone_cmd: command.PostponeTrainingCommand) -> List['TrainingIdentity']:
-    identities_created = []
+class PostponeMiniTrainingAndGroupModificationCommandFactory(factory.Factory):
+    class Meta:
+        model = command.PostponeMiniTrainingAndGroupModificationCommand
+        abstract = False
 
-    # GIVEN
-    from_year = postpone_cmd.postpone_from_year
-    until_year = postpone_cmd.postpone_until_year
+    postpone_from_abbreviated_title = "Title "
+    postpone_from_year = 2019
 
-    # WHEN
-    for year in range(from_year, until_year):
-
-        try:
-            identity_next_year = copy_training_service.copy_training_to_next_year(
-                copy_cmd=command.CopyTrainingToNextYearCommand(
-                    acronym=postpone_cmd.acronym,
-                    postpone_from_year=year
-                )
-            )
-
-            # THEN
-            identities_created.append(identity_next_year)
-        except exception.CannotCopyTrainingDueToEndDate:
-            break
-
-    return identities_created
+    status = ActiveStatusEnum.ACTIVE.name
+    code = "Code"
+    credits = 23
+    schedule_type = ScheduleTypeEnum.DAILY.name
+    end_year = None
+    title_fr = "fr  title"
+    title_en = "title  en"
+    teaching_campus_name = None
+    management_entity_acronym = None
+    organization_name = None
+    constraint_type = None
+    min_constraint = None
+    max_constraint = None
+    remark_fr = None
+    remark_en = None
+    keywords = ""

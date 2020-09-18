@@ -55,14 +55,14 @@ class GroupFilter(FilterSet):
         queryset=AcademicYear.objects.all(),
         required=False,
         label=_('Ac yr.'),
-        empty_label=pgettext_lazy("plural", "All"),
+        empty_label=pgettext_lazy("female plural", "All"),
     )
     category = filters.ChoiceFilter(
         choices=list(Categories.choices()),
         required=False,
         label=_('Category'),
         field_name='education_group_type__category',
-        empty_label=pgettext_lazy("plural", "All")
+        empty_label=pgettext_lazy("female plural", "All")
     )
     education_group_type = filters.ModelMultipleChoiceFilter(
         queryset=EducationGroupType.objects.none(),
@@ -109,7 +109,7 @@ class GroupFilter(FilterSet):
         required=False,
         label=_('Version'),
         field_name='version',
-        empty_label=pgettext_lazy("plural", "All"),
+        empty_label=pgettext_lazy("female plural", "All"),
     )
 
     with_entity_transition = filters.BooleanFilter(
