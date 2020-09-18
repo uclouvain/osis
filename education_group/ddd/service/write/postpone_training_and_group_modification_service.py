@@ -106,7 +106,7 @@ def postpone_training_and_group_modification(postpone_cmd: command.PostponeTrain
             )
         )
     ]
-    end_postponement_year = CalculateEndPostponement.calculate_end_postponement_year(
+    end_postponement_year = CalculateEndPostponement.calculate_end_postponement_year_training(
         identity=from_training_id,
         repository=TrainingRepository()
     )

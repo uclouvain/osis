@@ -21,7 +21,9 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from unittest import TestCase, mock
+from unittest import mock
+
+from django.test import SimpleTestCase
 
 from education_group.ddd.domain.exception import MiniTrainingCopyConsistencyException
 from education_group.ddd.service.write import postpone_mini_training_and_orphan_group_modifications_service
@@ -29,10 +31,10 @@ from education_group.tests.ddd.factories.command.postpone_mini_training_and_grou
     PostponeMiniTrainingAndGroupModificationCommandFactory
 
 
-class TestPostponeMiniTrainingAndOrphanGroupModificationsService(TestCase):
-    @classmethod
-    def setUpClass(cls) -> None:
-        cls.cmd = PostponeMiniTrainingAndGroupModificationCommandFactory(
+class TestPostponeMiniTrainingAndGroupModificationService(SimpleTestCase):
+
+    def setUp(self) -> None:
+        self.cmd = PostponeMiniTrainingAndGroupModificationCommandFactory(
             postpone_from_year=2020
         )
 
@@ -41,7 +43,7 @@ class TestPostponeMiniTrainingAndOrphanGroupModificationsService(TestCase):
     @mock.patch('education_group.ddd.service.write.postpone_mini_training_and_orphan_group_modifications_service.'
                 'update_mini_training_and_group_service.update_mini_training_and_group')
     @mock.patch('education_group.ddd.service.write.postpone_mini_training_and_orphan_group_modifications_service.'
-                'CalculateEndPostponement.calculate_end_postponement_year')
+                'CalculateEndPostponement.calculate_end_postponement_year_mini_training')
     @mock.patch('education_group.ddd.service.write.postpone_mini_training_and_orphan_group_modifications_service.'
                 'copy_mini_training_service.copy_mini_training_to_next_year')
     @mock.patch('education_group.ddd.service.write.copy_group_service.copy_group')
