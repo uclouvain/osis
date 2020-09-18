@@ -20,7 +20,7 @@ msgstr ""
 
 #, python-format
 msgid "\"%(child)s\" has been %(copy_message)s into \"%(parent)s\""
-msgstr "\"%(child)s\" a été collé dans \"%(parent)s\""
+msgstr "\"%(child)s\" a été %(copy_message)s dans \"%(parent)s\""
 
 #, python-format
 msgid "\"%(child)s\" has been detached from \"%(parent)s\""
