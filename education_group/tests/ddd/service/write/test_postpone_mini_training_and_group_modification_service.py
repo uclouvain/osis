@@ -21,7 +21,9 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from unittest import TestCase, mock
+from unittest import mock
+
+from django.test import SimpleTestCase
 
 from education_group.ddd.domain.exception import MiniTrainingCopyConsistencyException
 from education_group.ddd.service.write import postpone_mini_training_and_group_modification_service
@@ -29,7 +31,7 @@ from education_group.tests.ddd.factories.command.postpone_mini_training_and_grou
     PostponeMiniTrainingAndGroupModificationCommandFactory
 
 
-class TestPostponeMiniTrainingAndGroupModificationService(TestCase):
+class TestPostponeMiniTrainingAndGroupModificationService(SimpleTestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.cmd = PostponeMiniTrainingAndGroupModificationCommandFactory(
@@ -41,7 +43,7 @@ class TestPostponeMiniTrainingAndGroupModificationService(TestCase):
     @mock.patch('education_group.ddd.service.write.postpone_mini_training_and_group_modification_service.'
                 'update_mini_training_and_group_service.update_mini_training_and_group')
     @mock.patch('education_group.ddd.service.write.postpone_mini_training_and_group_modification_service.'
-                'CalculateEndPostponement.calculate_end_postponement_year')
+                'CalculateEndPostponement.calculate_end_postponement_year_mini_training')
     @mock.patch('education_group.ddd.service.write.postpone_mini_training_and_group_modification_service.'
                 'copy_mini_training_service.copy_mini_training_to_next_year')
     def test_ensure_consistency_error_not_stop_creating_training_when_end_postponement_is_undefined(
