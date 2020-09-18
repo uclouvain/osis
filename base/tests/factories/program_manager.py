@@ -29,7 +29,6 @@ import string
 import factory.fuzzy
 
 from base.tests.factories.education_group import EducationGroupFactory
-from base.tests.factories.group import ProgramManagerGroupFactory
 from base.tests.factories.offer_year import OfferYearFactory
 from base.tests.factories.person import PersonFactory
 from osis_role.contrib.tests.factories import RoleModelFactory

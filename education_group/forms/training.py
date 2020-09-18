@@ -427,6 +427,8 @@ class UpdateTrainingForm(CreateTrainingForm):
             self.fields['certificate_aims'].widget.attrs['title'] = _('Select one or multiple certificate aims')
         else:
             permission_error_msg = get_permission_error(self.user, perm)
+            self.fields['certificate_aims'].disabled = True
+            self.fields['section'].disabled = True
             self.fields['certificate_aims'].widget.attrs['title'] = permission_error_msg
             self.fields['certificate_aims'].widget.attrs['class'] = 'cursor-not-allowed'
 

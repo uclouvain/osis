@@ -32,6 +32,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 
+from base.models.education_group_year import EducationGroupYear
 from base.utils.urls import reverse_with_get
 from base.views.common import display_success_messages, display_warning_messages, display_error_messages
 from education_group.ddd import command
@@ -55,6 +56,10 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
     raise_exception = True
 
     template_name = "education_group_app/training/upsert/update.html"
+
+    def get_permission_object(self):
+        training = self.get_training_obj()
+        return EducationGroupYear.objects.get(partial_acronym=training.code, academic_year__year=training.year)
 
     @transaction.non_atomic_requests
     def get(self, request, *args, **kwargs):
@@ -164,7 +169,8 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             user=self.request.user,
             training_type=self.get_training_obj().type.name,
             attach_path=self.get_attach_path(),
-            initial=self._get_training_form_initial_values()
+            initial=self._get_training_form_initial_values(),
+            training=self.get_permission_object(),
         )
 
     @functools.lru_cache()
