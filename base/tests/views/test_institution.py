@@ -75,7 +75,6 @@ class EntityViewTestCase(APITestCase):
             start_date=cls.start_date,
             end_date=cls.end_date
         )
-        EntityCalendarFactory(entity=cls.entity_version.entity, academic_calendar=cls.academic_calendar)
 
     def setUp(self):
         self.client.force_login(self.user)
