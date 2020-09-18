@@ -21,7 +21,9 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from unittest import TestCase, mock
+from unittest import mock
+
+from django.test import TestCase
 
 from base.models.enums.education_group_types import TrainingType
 from education_group.ddd.domain.exception import GroupCopyConsistencyException
@@ -32,9 +34,8 @@ from education_group.tests.ddd.factories.command.postpone_group_modification_com
 
 
 class TestPostponeOrphanGroupModificationService(TestCase):
-    @classmethod
-    def setUpClass(cls) -> None:
-        cls.cmd = PostponeGroupModificationCommandFactory(
+    def setUp(self) -> None:
+        self.cmd = PostponeGroupModificationCommandFactory(
             postpone_from_year=2020
         )
 

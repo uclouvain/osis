@@ -20,7 +20,7 @@ msgstr ""
 
 #, python-format
 msgid "\"%(child)s\" has been detached from \"%(parent)s\""
-msgstr "\"%(child)s\" a été retiré dans \"%(parent)s\""
+msgstr "\"%(child)s\" a été retiré de \"%(parent)s\""
 
 #, python-format
 msgid "\"%(child)s\" has been pasted into \"%(parent)s\""
@@ -139,9 +139,9 @@ msgstr "Entité d'administration"
 msgid "Admission exam"
 msgstr "Concours"
 
-msgctxt "plural"
+msgctxt "female plural"
 msgid "All"
-msgstr "Tous"
+msgstr "Toutes"
 
 msgid "Alloc. Ent."
 msgstr "Ent. attrib."

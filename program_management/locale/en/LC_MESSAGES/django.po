@@ -124,7 +124,7 @@ msgstr ""
 msgid "Admission exam"
 msgstr ""
 
-msgctxt "plural"
+msgctxt "female plural"
 msgid "All"
 msgstr ""
 

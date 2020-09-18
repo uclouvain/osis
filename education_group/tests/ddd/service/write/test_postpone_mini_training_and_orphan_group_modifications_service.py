@@ -23,7 +23,7 @@
 # ############################################################################
 from unittest import mock
 
-from django.test import SimpleTestCase
+from django.test import TestCase
 
 from education_group.ddd.domain.exception import MiniTrainingCopyConsistencyException
 from education_group.ddd.service.write import postpone_mini_training_and_orphan_group_modifications_service
@@ -31,10 +31,10 @@ from education_group.tests.ddd.factories.command.postpone_mini_training_and_grou
     PostponeMiniTrainingAndGroupModificationCommandFactory
 
 
-class TestPostponeMiniTrainingAndGroupModificationService(SimpleTestCase):
-
-    def setUp(self) -> None:
-        self.cmd = PostponeMiniTrainingAndGroupModificationCommandFactory(
+class TestPostponeMiniTrainingAndOrphanGroupModificationsService(TestCase):
+    @classmethod
+    def setUpTestData(cls) -> None:
+        cls.cmd = PostponeMiniTrainingAndGroupModificationCommandFactory(
             postpone_from_year=2020
         )
 
