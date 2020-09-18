@@ -46,7 +46,7 @@ class LearningUnitFilter(FilterSet):
         queryset=AcademicYear.objects.all(),
         required=False,
         label=_('Ac yr.'),
-        empty_label=pgettext_lazy("plural", "All"),
+        empty_label=pgettext_lazy("female plural", "All"),
     )
     acronym = filters.CharFilter(
         field_name="acronym",
@@ -81,7 +81,7 @@ class LearningUnitFilter(FilterSet):
         required=False,
         field_name="quadrimester",
         label=_('Quadri'),
-        empty_label=pgettext_lazy("plural", "All"),
+        empty_label=pgettext_lazy("male plural", "All"),
     )
 
     container_type = filters.ChoiceFilter(
@@ -89,7 +89,7 @@ class LearningUnitFilter(FilterSet):
         required=False,
         field_name="learning_container_year__container_type",
         label=_('Type'),
-        empty_label=pgettext_lazy("plural", "All"),
+        empty_label=pgettext_lazy("male plural", "All"),
         method="filter_container_type"
     )
     subtype = filters.ChoiceFilter(
@@ -97,14 +97,14 @@ class LearningUnitFilter(FilterSet):
         required=False,
         field_name="subtype",
         label=_('Subtype'),
-        empty_label=pgettext_lazy("plural", "All")
+        empty_label=pgettext_lazy("male plural", "All")
     )
     status = filters.ChoiceFilter(
         choices=active_status.ACTIVE_STATUS_LIST_FOR_FILTER,
         required=False,
         label=_('Status'),
         field_name="status",
-        empty_label=pgettext_lazy("plural", "All")
+        empty_label=pgettext_lazy("male plural", "All")
     )
     title = filters.CharFilter(
         field_name="full_title",
