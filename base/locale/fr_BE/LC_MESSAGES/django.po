@@ -2136,7 +2136,7 @@ msgid "Requirement entity"
 msgstr "Entité resp. cahier des charges"
 
 msgid "Reregistration"
-msgstr "Re inscription"
+msgstr "Actif uniquement pour réinscriptions"
 
 msgid "Research center"
 msgstr "Centre de recherche"
