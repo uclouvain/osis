@@ -32,9 +32,9 @@ from education_group.tests.ddd.factories.command.postpone_mini_training_and_grou
 
 
 class TestPostponeMiniTrainingAndGroupModificationService(SimpleTestCase):
-    @classmethod
-    def setUpClass(cls) -> None:
-        cls.cmd = PostponeMiniTrainingAndGroupModificationCommandFactory(
+
+    def setUp(self) -> None:
+        self.cmd = PostponeMiniTrainingAndGroupModificationCommandFactory(
             postpone_from_year=2020
         )
 
