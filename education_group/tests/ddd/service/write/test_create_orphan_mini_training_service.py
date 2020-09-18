@@ -46,7 +46,7 @@ class TestCreateAndPostponeOrphanMiniTraining(TestCase, MockPatcherMixin):
 
     def test_should_return_mini_training_identities(self, mock_postpone_mini_training, mock_create_orphan_group):
         mock_postpone_mini_training.return_value = [
-            mini_training.MiniTrainingIdentity(acronym="ACRON", year=year) for year in range(2021, 2023)
+            mini_training.MiniTrainingIdentity(acronym="ACRON", year=year) for year in range(2020, 2023)
         ]
 
         cmd = CreateMiniTrainingCommandFactory(year=2020, code="CODE", abbreviated_title="ACRON")

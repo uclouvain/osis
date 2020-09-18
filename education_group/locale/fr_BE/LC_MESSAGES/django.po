@@ -187,7 +187,7 @@ msgstr "Conditions"
 msgid ""
 "Consistency error in %(academic_year)s: %(fields)s has already been modified"
 msgstr ""
-"Erreur de consistance en %(academic_year)s: %(field)s a déjà été modifié"
+"Erreur de consistance en %(academic_year)s: %(fields)s a déjà été modifié"
 
 msgid "Contacts"
 msgstr "Contacts"
