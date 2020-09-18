@@ -46,8 +46,10 @@ class TestPostponeMiniTrainingAndOrphanGroupModificationsService(TestCase):
                 'CalculateEndPostponement.calculate_end_postponement_year_mini_training')
     @mock.patch('education_group.ddd.service.write.postpone_mini_training_and_orphan_group_modifications_service.'
                 'copy_mini_training_service.copy_mini_training_to_next_year')
+    @mock.patch('education_group.ddd.service.write.copy_group_service.copy_group')
     def test_ensure_consistency_error_not_stop_creating_training_when_end_postponement_is_undefined(
             self,
+            mock_copy_group_to_next_year_service,
             mock_copy_mini_training_to_next_year_service,
             mock_calculate_end_postponement_year,
             mock_update_mini_training_and_group_service,
@@ -62,3 +64,4 @@ class TestPostponeMiniTrainingAndOrphanGroupModificationsService(TestCase):
 
         self.assertEqual(mock_update_mini_training_and_group_service.call_count, 1)
         self.assertEqual(mock_copy_mini_training_to_next_year_service.call_count, 5)
+        self.assertEqual(mock_copy_group_to_next_year_service.call_count, 5)

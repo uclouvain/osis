@@ -25,13 +25,12 @@ from unittest import mock
 
 from django.test import TestCase
 
-from base.models.enums.education_group_types import TrainingType, GroupType
+from base.models.enums.education_group_types import TrainingType
 from education_group.ddd.domain.exception import GroupCopyConsistencyException
 from education_group.ddd.factories.group import GroupFactory
 from education_group.ddd.service.write import postpone_orphan_group_modification_service
 from education_group.tests.ddd.factories.command.postpone_group_modification_command import \
     PostponeGroupModificationCommandFactory
-from osis_common.ddd.interface import BusinessException
 
 
 class TestPostponeOrphanGroupModificationService(TestCase):
