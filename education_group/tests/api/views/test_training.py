@@ -173,20 +173,14 @@ class FilterTrainingTestCase(APITestCase):
         cls.user = UserFactory()
         cls.url = reverse('education_group_api_v1:training-list')
         cls.trainings = []
-        campus = CampusFactory()
+        campus = CampusFactory(name='CAMPUS BENJ')
         for year in [2018, 2019, 2020]:
             academic_year = AcademicYearFactory(year=year)
             cls.trainings.append(
-                TrainingFactory(
-                    acronym='BIR1BA', partial_acronym='LBIR1000I', academic_year=academic_year,
-                    main_teaching_campus=CampusFactory()
-                )
+                TrainingFactory(acronym='BIR1BA', partial_acronym='LBIR1000I', academic_year=academic_year)
             )
             cls.trainings.append(
-                TrainingFactory(
-                    acronym='AGRO1BA', partial_acronym='LAGRO2111C', academic_year=academic_year,
-                    main_teaching_campus=CampusFactory()
-                )
+                TrainingFactory(acronym='AGRO1BA', partial_acronym='LAGRO2111C', academic_year=academic_year)
             )
             cls.trainings.append(
                 TrainingFactory(
