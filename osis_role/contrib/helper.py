@@ -32,7 +32,7 @@ from osis_role import role
 from osis_role.contrib.models import EntityRoleModel
 
 
-class EntityRoleHelper():
+class EntityRoleHelper:
     """
        Utility class to provide role-related static methods
     """

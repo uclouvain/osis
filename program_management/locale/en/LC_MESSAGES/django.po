@@ -588,6 +588,9 @@ msgstr ""
 msgid "Relative credits must be greater or equals than 0"
 msgstr ""
 
+msgid "Relative credits must be lower or equals to 999"
+msgstr ""
+
 msgid "Remark"
 msgstr ""
 
@@ -607,6 +610,9 @@ msgid "Schedule type"
 msgstr ""
 
 msgid "Search"
+msgstr ""
+
+msgid "Search..."
 msgstr ""
 
 msgid "Select a language"
@@ -883,6 +889,9 @@ msgid "emails"
 msgstr ""
 
 msgid "faculty number"
+msgstr ""
+
+msgid "filter by section"
 msgstr ""
 
 msgid "group year"
