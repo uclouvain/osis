@@ -48,7 +48,7 @@ class QuickGroupYearFilter(FilterSet):
         to_field_name="year",
         required=False,
         label=_('Ac yr.'),
-        empty_label=pgettext_lazy("plural", "All"),
+        empty_label=pgettext_lazy("female plural", "All"),
     )
     acronym = filters.CharFilter(
         field_name="acronym",
