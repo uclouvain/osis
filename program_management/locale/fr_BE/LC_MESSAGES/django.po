@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-18 11:27+0200\n"
+"POT-Creation-Date: 2020-09-18 11:34+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -31,6 +31,8 @@ msgid ""
 "\"%(child_year)s - %(child)s\" has been %(copy_message)s into "
 "\"%(parent_year)s - %(parent)s%(parent_title)s\""
 msgstr ""
+"\"%(child_year)s - %(child)s\" a été %(copy_message)s dans \"%(parent_year)s "
+"- %(parent)s%(parent_title)s\""
 
 #, python-format
 msgid "%(node_to_add)s version must be the same as %(root_node)s version"
@@ -923,7 +925,7 @@ msgid "activities in English"
 msgstr "activités en anglais"
 
 msgid "added"
-msgstr ""
+msgstr "ajouté"
 
 msgid "bibliography"
 msgstr "bibliographie"
@@ -993,7 +995,7 @@ msgid "optional"
 msgstr "optionnel"
 
 msgid "pasted"
-msgstr ""
+msgstr "collé"
 
 #, python-format
 msgid "prerequisites-%(year)s-%(acronym)s"
@@ -1013,6 +1015,3 @@ msgstr "Oui"
 
 msgid "yes,no"
 msgstr "oui,non"
-
-#~ msgid "\"%(child)s\" has been pasted into \"%(parent)s\""
-#~ msgstr "\"%(child)s\" a été collé dans \"%(parent)s\""
