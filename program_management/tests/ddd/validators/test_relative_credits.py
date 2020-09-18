@@ -25,7 +25,8 @@
 ##############################################################################
 from django.test import SimpleTestCase
 
-from program_management.ddd.domain.exception import RelativeCreditShouldBeGreaterOrEqualsThanZero
+from program_management.ddd.domain.exception import RelativeCreditShouldBeGreaterOrEqualsThanZero, \
+    RelativeCreditShouldBeLowerOrEqualThan999
 
 from program_management.ddd.validators._relative_credits import RelativeCreditsValidator
 
@@ -39,3 +40,8 @@ class TestRelativeCreditsValidator(SimpleTestCase):
     def test_assert_relative_credits_must_be_greater_or_equals_to_zero(self):
         validator = RelativeCreditsValidator(0)
         self.assertTrue(validator.is_valid())
+
+    def test_relative_credits_must_be_lower_or_equal_to_999(self):
+        validator = RelativeCreditsValidator(1000)
+        with self.assertRaises(RelativeCreditShouldBeLowerOrEqualThan999):
+            validator.is_valid()

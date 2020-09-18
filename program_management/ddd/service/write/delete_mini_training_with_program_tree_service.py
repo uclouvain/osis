@@ -26,7 +26,9 @@ from typing import List
 from django.db import transaction
 
 from education_group.ddd.business_types import *
-from education_group.ddd.domain import training, mini_training
+from education_group.ddd.domain import mini_training
+from education_group.ddd import command as command_education_group
+from education_group.ddd.service.write import delete_orphan_mini_training_service
 from program_management.ddd import command
 from program_management.ddd.service.write import delete_standard_program_tree_version_service
 
@@ -44,5 +46,15 @@ def delete_mini_training_with_program_tree(
         delete_program_tree_version_command
     )
 
-    return [mini_training.MiniTrainingIdentity(acronym=identity.offer_acronym, year=identity.year)
-            for identity in delete_versions_identities]
+    mini_training_identities = [
+        mini_training.MiniTrainingIdentity(acronym=identity.offer_acronym, year=identity.year)
+        for identity in delete_versions_identities
+    ]
+    for mini_training_id in mini_training_identities:
+        delete_orphan_mini_training_service.delete_orphan_mini_training(
+            command_education_group.DeleteOrphanMiniTrainingCommand(
+                abbreviated_title=mini_training_id.acronym,
+                year=mini_training_id.year
+            )
+        )
+    return mini_training_identities
