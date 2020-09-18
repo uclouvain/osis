@@ -40,23 +40,22 @@ class TestTrainingUpdateView(TestCase):
     @classmethod
     def setUpTestData(cls):
         FrenchLanguageFactory()
-        cls.central_manager = CentralManagerFactory()
         cls.url = reverse_with_get(
             "training_update",
             kwargs={"code": "CODE", "year": 2020, "title": "ACRONYM"},
             get={"path_to": "1|2|3"}
         )
+        cls.training = TrainingFactory()
+        cls.egy = EducationGroupYearFactory(partial_acronym=cls.training.code, academic_year__year=cls.training.year)
+        cls.central_manager = CentralManagerFactory(entity=cls.egy.management_entity)
 
     def setUp(self):
         self.client.force_login(self.central_manager.person.user)
 
     @mock.patch("education_group.ddd.service.read.get_training_service.get_training")
     @mock.patch("education_group.ddd.service.read.get_group_service.get_group")
-    def test_should_display_forms_when_good_get_request(
-            self,
-            mock_get_group,
-            mock_get_training):
-        mock_get_training.return_value = TrainingFactory()
+    def test_should_display_forms_when_good_get_request(self, mock_get_group, mock_get_training):
+        mock_get_training.return_value = self.training
         mock_get_group.return_value = GroupFactory()
 
         response = self.client.get(self.url)
@@ -79,7 +78,7 @@ class TestTrainingUpdateView(TestCase):
             mock_get_group,
             mock_get_training
     ):
-        mock_get_training.return_value = TrainingFactory()
+        mock_get_training.return_value = self.training
         mock_get_group.return_value = GroupFactory()
         update_training.return_value = [training.TrainingIdentity(acronym="ACRONYM", year=2020)]
         delete_training.return_value = []
@@ -98,14 +97,12 @@ class TestTrainingUpdateView(TestCase):
     @mock.patch("education_group.ddd.service.read.get_training_service.get_training")
     @mock.patch("education_group.ddd.service.read.get_group_service.get_group")
     def test_should_disable_or_enable_certificate_aim_according_to_role(self, mock_get_group, mock_get_training):
-        training = TrainingFactory()
-        mock_get_training.return_value = training
+        mock_get_training.return_value = self.training
         mock_get_group.return_value = GroupFactory()
-        egy = EducationGroupYearFactory(partial_acronym=training.code, academic_year__year=training.year)
         rules = [
-            {'role': CentralManagerFactory(entity=egy.management_entity), 'is_disabled': True},
-            {'role': FacultyManagerFactory(entity=egy.management_entity), 'is_disabled': True},
-            {'role': ProgramManagerFactory(education_group=egy.education_group), 'is_disabled': False},
+            {'role': CentralManagerFactory(entity=self.egy.management_entity), 'is_disabled': True},
+            {'role': FacultyManagerFactory(entity=self.egy.management_entity), 'is_disabled': True},
+            {'role': ProgramManagerFactory(education_group=self.egy.education_group), 'is_disabled': False},
         ]
         for rule in rules:
             self._test_certificate_aim_according_to_role(role=rule['role'], is_disabled=rule['is_disabled'])
