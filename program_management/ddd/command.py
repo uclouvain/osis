@@ -636,3 +636,12 @@ class PostponeTrainingAndRootGroupModificationWithProgramTreeCommand(interface.C
     remark_en = attr.ib(type=Optional[str])
     organization_name = attr.ib(type=str)
     schedule_type = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class UpdateTrainingAndProgramTreeEndDateCommand(interface.CommandRequest):
+    from_offer_acronym = attr.ib(type=str)
+    from_version_name = attr.ib(type=str)
+    from_year = attr.ib(type=int)
+    from_is_transition = attr.ib(type=bool)
+    end_date = attr.ib(type=Optional[int])

@@ -38,6 +38,8 @@ from program_management.ddd.validators._authorized_relationship_for_all_trees im
     ValidateAuthorizedRelationshipForAllTrees
 from program_management.ddd.validators._authorized_root_type_for_prerequisite import AuthorizedRootTypeForPrerequisite
 from program_management.ddd.validators._block_validator import BlockValidator
+from program_management.ddd.validators._check_finalities_end_date_lower_or_equal_to_2M import \
+    Check2MEndDateGreaterOrEqualToItsFinalities
 from program_management.ddd.validators._copy_check_end_date_program_tree import CheckProgramTreeEndDateValidator
 from program_management.ddd.validators._copy_check_end_date_tree_version import CheckTreeVersionEndDateValidator
 from program_management.ddd.validators._delete_check_versions_end_date import CheckVersionsEndDateValidator
@@ -267,7 +269,9 @@ class CopyProgramTreeValidatorList(business_validator.BusinessListValidator):
 
 class UpdateProgramTreeVersionValidatorList(business_validator.BusinessListValidator):
     def __init__(self, tree_version: 'ProgramTreeVersion'):
-        self.validators = []
+        self.validators = [
+            Check2MEndDateGreaterOrEqualToItsFinalities(tree_version)
+        ]
         super().__init__()
 
 
