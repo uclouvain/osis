@@ -35,6 +35,7 @@ from rest_framework.test import APITestCase
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
 from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.campus import CampusFactory
 from base.tests.factories.education_group_year import TrainingFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.user import UserFactory
@@ -172,6 +173,7 @@ class FilterTrainingTestCase(APITestCase):
         cls.user = UserFactory()
         cls.url = reverse('education_group_api_v1:training-list')
         cls.trainings = []
+        campus = CampusFactory(name='CAMPUS BENJ')
         for year in [2018, 2019, 2020]:
             academic_year = AcademicYearFactory(year=year)
             cls.trainings.append(
@@ -181,7 +183,10 @@ class FilterTrainingTestCase(APITestCase):
                 TrainingFactory(acronym='AGRO1BA', partial_acronym='LAGRO2111C', academic_year=academic_year)
             )
             cls.trainings.append(
-                TrainingFactory(acronym='MED12M', partial_acronym='LMED12MA', academic_year=academic_year)
+                TrainingFactory(
+                    acronym='MED12M', partial_acronym='LMED12MA', academic_year=academic_year,
+                    main_teaching_campus=campus
+                )
             )
 
     def setUp(self):
@@ -254,11 +259,11 @@ class FilterTrainingTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         serializer = TrainingListSerializer(
-            [self.trainings[2]],
+            [self.trainings[2], self.trainings[5], self.trainings[8]],
             many=True,
             context={'request': RequestFactory().get(self.url, query_string)},
         )
-        self.assertEqual(response.data['results'], serializer.data)
+        self.assertCountEqual(response.data['results'], serializer.data)
 
     def test_get_filter_by_multiple_education_group_type(self):
         """
