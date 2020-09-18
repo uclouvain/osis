@@ -68,7 +68,7 @@ def postpone_mini_training_and_group_modification(
             )
         )
     ]
-    end_postponement_year = CalculateEndPostponement.calculate_end_postponement_year(
+    end_postponement_year = CalculateEndPostponement.calculate_end_postponement_year_mini_training(
         identity=from_mini_training_id,
         repository=MiniTrainingRepository()
     )

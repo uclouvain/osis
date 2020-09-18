@@ -27,18 +27,14 @@ from typing import List
 
 from django.db import transaction
 
-from base.models.enums.education_group_types import MiniTrainingType, TrainingType
 from education_group.ddd import command
 from education_group.ddd.domain.exception import GroupCopyConsistencyException
 from education_group.ddd.domain.group import GroupIdentity
 from education_group.ddd.domain.service.conflicted_fields import ConflictedFields
-from education_group.ddd.domain.service.identity_search import TrainingIdentitySearch, MiniTrainingIdentitySearch
-from education_group.ddd.repository.mini_training import MiniTrainingRepository
-from education_group.ddd.repository.training import TrainingRepository
 from education_group.ddd.service.read import get_group_service
 from education_group.ddd.service.write import copy_group_service, update_group_service
-from osis_common.ddd.interface import BusinessException
 from program_management.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
+from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 
 
 @transaction.atomic()
@@ -48,15 +44,6 @@ def postpone_group_modification_service(postpone_cmd: command.PostponeGroupModif
 
     cmd_get = command.GetGroupCommand(code=postpone_cmd.code, year=from_year)
     group = get_group_service.get_group(cmd_get)
-    # TODO : Move logic into CalculateEndPostponement
-    if group.type.name in MiniTrainingType.get_names():
-        identity = MiniTrainingIdentitySearch.get_from_group_identity(group.entity_id)
-        repository = MiniTrainingRepository()
-    elif group.type.name in TrainingType.get_names():
-        identity = TrainingIdentitySearch.get_from_group_identity(group.entity_id)
-        repository = TrainingRepository()
-    else:
-        raise BusinessException("Cannot postpone group other type than Mini-Training/Training")
 
     conflicted_fields = ConflictedFields().get_group_conflicted_fields(group.entity_id)
     identities_created = [
@@ -80,9 +67,9 @@ def postpone_group_modification_service(postpone_cmd: command.PostponeGroupModif
             )
         )
     ]
-    end_postponement_year = CalculateEndPostponement.calculate_end_postponement_year(
-        identity=identity,
-        repository=repository,
+    end_postponement_year = CalculateEndPostponement.calculate_end_postponement_year_group(
+        identity=group.entity_identity,
+        repository=ProgramTreeVersionRepository(),
     )
     for year in range(from_year, end_postponement_year):
         if year + 1 in conflicted_fields:
