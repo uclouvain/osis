@@ -25,18 +25,19 @@
 ##############################################################################
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from reversion.admin import VersionAdmin
 
 from base.models.enums import peps_type
-from osis_common.models.osis_model_admin import OsisModelAdmin
+from osis_common.models.serializable_model import SerializableModelAdmin, SerializableModel
 
 
-class StudentSpecificProfileAdmin(OsisModelAdmin):
+class StudentSpecificProfileAdmin(VersionAdmin, SerializableModelAdmin):
     list_display = ('student', 'guide', 'changed',)
     list_filter = ('type', 'subtype_disability', 'subtype_sport')
     search_fields = ['guide__first_name', 'guide__last_name', 'student']
 
 
-class StudentSpecificProfile(models.Model):
+class StudentSpecificProfile(SerializableModel):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     student = models.OneToOneField('Student', on_delete=models.PROTECT)
