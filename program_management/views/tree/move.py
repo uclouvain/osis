@@ -84,8 +84,7 @@ def __get_node_str(node_identity_id: 'NodeIdentity') -> str:
         cmd = command_education_group.GetGroupCommand(code=node_identity_id.code, year=node_identity_id.year)
         group_obj = get_group_service.get_group(cmd)
 
-        version_identity = __get_program_tree_version_identity(node_identity_id.code, node_identity_id.year)
-
+        version_identity = __get_program_tree_version_identity(node_identity_id)
         return "%(code)s - %(abbreviated_title)s%(version)s - %(year)s" % {
             "code": group_obj.code,
             "abbreviated_title": group_obj.abbreviated_title,
@@ -100,9 +99,8 @@ def __get_node_str(node_identity_id: 'NodeIdentity') -> str:
         }
 
 
-def __get_program_tree_version_identity(code: str, year: int) -> Union['ProgramTreeVersionIdentity', None]:
+def __get_program_tree_version_identity(node_identity: 'NodeIdentity') -> Union['ProgramTreeVersionIdentity', None]:
     try:
-        node_identity = NodeIdentity(code=code, year=year)
         return ProgramTreeVersionIdentitySearch().get_from_node_identity(node_identity)
     except interface.BusinessException:
         return None

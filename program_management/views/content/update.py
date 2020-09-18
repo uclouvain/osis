@@ -13,7 +13,10 @@ from base.views.common import display_success_messages, display_error_messages
 from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import exception, group
+from education_group.ddd.domain.exception import GroupNotFoundException
 from education_group.ddd.service.read import get_group_service, get_multiple_groups_service
+from osis_common.ddd import interface
+from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.forms import content as content_forms
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from learning_unit.ddd import command as command_learning_unit_year
@@ -169,14 +172,29 @@ class ContentUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         messages = []
 
         for link in links:
-            msg = _("The link of %(code)s - %(acronym)s - %(year)s has been updated.") % {
-                "acronym": link.child.title,
-                "code": link.entity_id.child_code,
-                "year": display_as_academic_year(link.entity_id.child_year)
-            }
+            msg = _("The link of %(node)s has been updated.") % {"node": self.__get_node_str(link.child)}
             messages.append(msg)
-
         return messages
+
+    def __get_node_str(self, node: 'Node') -> str:
+        if node.node_type == NodeType.LEARNING_UNIT:
+            return "%(code)s - %(year)s" % {"code": node.code, "year": node.academic_year}
+
+        version_identity = self.__get_program_tree_version_identity(node.entity_id)
+        return "%(code)s - %(abbreviated_title)s%(version)s - %(year)s" % {
+            "code": node.code,
+            "abbreviated_title": node.title,
+            "version": "[{}]".format(version_identity.version_name)
+            if version_identity and not version_identity.is_standard else "",
+            "year": node.academic_year
+        }
+
+    def __get_program_tree_version_identity(self, node_identity: 'NodeIdentity') \
+            -> Union['ProgramTreeVersionIdentity', None]:
+        try:
+            return ProgramTreeVersionIdentitySearch().get_from_node_identity(node_identity)
+        except interface.BusinessException:
+            return None
 
     def _get_default_error_messages(self) -> str:
         return _("Error(s) in form: The modifications are not saved")
