@@ -33,6 +33,7 @@ from django.urls import reverse
 
 from attribution.models.attribution import Attribution
 from attribution.tests.factories.attribution import AttributionFactory
+from base.models.enums import structure_type
 from base.tests.factories import structure
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.business.entities import create_entities_hierarchy
@@ -301,10 +302,10 @@ class ScoresResponsibleManagementAsProgramManagerTestCase(TestCase):
         group.permissions.add(Permission.objects.get(codename='view_scoresresponsible'))
         group.permissions.add(Permission.objects.get(codename='change_scoresresponsible'))
 
-        cls.academic_year = create_current_academic_year()
+        cls.academic_year = AcademicYearFactory(current=True)
 
         # FIXME: Old structure model [To remove]
-        cls.structure = structure.StructureFactory()
+        cls.structure = structure.StructureFactory(type=structure_type.FACULTY)
 
         entities_hierarchy = create_entities_hierarchy()
         cls.root_entity = entities_hierarchy.get('root_entity')
@@ -316,10 +317,12 @@ class ScoresResponsibleManagementAsProgramManagerTestCase(TestCase):
             learning_container_year__academic_year=cls.academic_year,
             learning_container_year__acronym="LBIR1210",
             learning_container_year__requirement_entity=cls.root_entity,
+            learning_container_year__allocation_entity=cls.root_entity
         )
         cls.education_group_year = EducationGroupYearFactory(
             academic_year=cls.academic_year,
-            administration_entity=cls.root_entity
+            administration_entity=cls.root_entity,
+            management_entity=cls.root_entity
         )
         cls.program_manager = ProgramManagerFactory(education_group=cls.education_group_year.education_group)
         cls.program_manager.person.user.groups.add(group)
@@ -329,9 +332,6 @@ class ScoresResponsibleManagementAsProgramManagerTestCase(TestCase):
     def setUp(self):
         self.client.force_login(self.program_manager.person.user)
         self.url = reverse('scores_responsible_management')
-        self.get_data = {
-            'learning_unit_year': "learning_unit_year_%d" % self.learning_unit_year.pk
-        }
 
     def test_case_user_which_cannot_managed_learning_unit_not_entity_managed(self):
         unauthorized_learning_unit_year = LearningUnitYearFactory()
@@ -343,7 +343,9 @@ class ScoresResponsibleManagementAsProgramManagerTestCase(TestCase):
 
     @override_settings(YEAR_LIMIT_LUE_MODIFICATION=2015)
     def test_assert_template_used(self):
-        response = self.client.get(self.url, data=self.get_data)
+        response = self.client.get(self.url, data={
+            'learning_unit_year': "learning_unit_year_%d" % self.learning_unit_year.pk
+        })
 
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, 'scores_responsible_edit.html')
