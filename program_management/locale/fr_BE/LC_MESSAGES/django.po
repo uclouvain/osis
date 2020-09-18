@@ -20,7 +20,7 @@ msgstr ""
 
 #, python-format
 msgid "\"%(child)s\" has been detached from \"%(parent)s\""
-msgstr "\"%(child)s\" a été retiré dans \"%(parent)s\""
+msgstr "\"%(child)s\" a été retiré de \"%(parent)s\""
 
 #, python-format
 msgid "\"%(child)s\" has been successfully updated"
