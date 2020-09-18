@@ -52,12 +52,10 @@ class EntityViewTestCase(APITestCase):
             data_year=cls.current_academic_year,
             reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
         )
-        print(cls.academic_calendar, cls.academic_calendar.data_year, cls.academic_calendar.academic_year)
         cls.entity = EntityFactory()
         cls.parent = EntityFactory()
-        cls.start_date = datetime.date.today() - datetime.timedelta(weeks=48)
+        cls.start_date = datetime.date.today() - datetime.timedelta(weeks=54)
         cls.end_date = datetime.date.today() + datetime.timedelta(weeks=54)
-
         cls.entity_version = EntityVersionFactory(
             entity=cls.entity,
             acronym="ENTITY_CHILDREN",
