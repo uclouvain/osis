@@ -297,10 +297,6 @@ class ScoresResponsibleManagementAsEntityManagerTestCase(TestCase):
 class ScoresResponsibleManagementAsProgramManagerTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        group = ProgramManagerGroupFactory()
-        group.permissions.add(Permission.objects.get(codename='view_scoresresponsible'))
-        group.permissions.add(Permission.objects.get(codename='change_scoresresponsible'))
-
         cls.academic_year = create_current_academic_year()
 
         # FIXME: Old structure model [To remove]
@@ -322,7 +318,6 @@ class ScoresResponsibleManagementAsProgramManagerTestCase(TestCase):
             administration_entity=cls.root_entity
         )
         cls.program_manager = ProgramManagerFactory(education_group=cls.education_group_year.education_group)
-        cls.program_manager.person.user.groups.add(group)
         offer_enrollment = OfferEnrollmentFactory(education_group_year=cls.education_group_year)
         LearningUnitEnrollmentFactory(offer_enrollment=offer_enrollment, learning_unit_year=cls.learning_unit_year)
 
