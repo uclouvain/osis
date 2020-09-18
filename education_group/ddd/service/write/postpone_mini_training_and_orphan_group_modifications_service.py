@@ -30,7 +30,8 @@ from education_group.ddd.domain.exception import MiniTrainingCopyConsistencyExce
 from education_group.ddd.domain.mini_training import MiniTrainingIdentity
 from education_group.ddd.domain.service.conflicted_fields import ConflictedFields
 from education_group.ddd.repository.mini_training import MiniTrainingRepository
-from education_group.ddd.service.write import copy_mini_training_service, update_mini_training_and_group_service
+from education_group.ddd.service.write import copy_mini_training_service, update_mini_training_and_group_service, \
+    copy_group_service
 from program_management.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
 
 
@@ -68,7 +69,7 @@ def postpone_mini_training_and_orphan_group_modifications(
             )
         )
     ]
-    end_postponement_year = CalculateEndPostponement.calculate_end_postponement_year(
+    end_postponement_year = CalculateEndPostponement.calculate_end_postponement_year_mini_training(
         identity=from_mini_training_id,
         repository=MiniTrainingRepository()
     )
@@ -83,6 +84,13 @@ def postpone_mini_training_and_orphan_group_modifications(
                 postpone_from_year=year
             )
         )
+        copy_group_service.copy_group(
+            cmd=command.CopyGroupCommand(
+                from_code=postpone_cmd.code,
+                from_year=year
+            )
+        )
+
         # THEN
         identities_created.append(identity_next_year)
 

@@ -219,6 +219,7 @@ class AbstractConsistencyException(ABC):
             "academic_year": display_as_academic_year(year_to),
             "fields": fields_str
         }
+        self.conflicted_fields_year = year_to
         super().__init__(message, **kwargs)
 
     def __map_field_to_label(self, field_name: str) -> str:

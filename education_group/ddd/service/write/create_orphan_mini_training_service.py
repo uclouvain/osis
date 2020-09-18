@@ -65,7 +65,7 @@ def create_and_postpone_orphan_mini_training(
             )
         )
 
-    return [mini_training_identity] + mini_training_identities
+    return mini_training_identities
 
 
 def __convert_to_create_group_command(cmd: command.CreateMiniTrainingCommand) -> command.CreateOrphanGroupCommand:

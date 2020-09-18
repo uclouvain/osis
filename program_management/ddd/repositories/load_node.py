@@ -26,7 +26,6 @@
 from typing import List
 
 from django.db.models import F, Value, CharField, QuerySet, Case, When, IntegerField, OuterRef, Subquery
-from django.db.models.functions import Concat
 
 from base.models.entity_version import EntityVersion
 from base.models.enums.active_status import ActiveStatusEnum
@@ -40,33 +39,6 @@ from program_management.ddd.domain._campus import Campus
 from program_management.models import element
 from program_management.models.enums.node_type import NodeType
 from education_group.models.enums.constraint_type import ConstraintTypes
-
-
-# TODO: Depracated, must be deleted (use load method type are determined in element)
-def load_by_type(type: NodeType, element_id: int) -> node.Node:
-    if type == NodeType.GROUP:
-        return load_node_group_year(element_id)
-    elif type == NodeType.LEARNING_UNIT:
-        return load_node_learning_unit_year(element_id)
-
-
-# TODO: Depracated, must be deleted (use load method type are determined in element)
-def load_node_group_year(node_id: int) -> node.Node:
-    try:
-        node_data = __load_multiple_node_group_year([node_id])[0]
-        node_data["node_id"] = node_data.pop("id")
-        return __instanciate_node(**node_data)
-    except IndexError:
-        raise node.NodeNotFoundException
-
-
-# TODO: Depracated, must be deleted (use load method type are determined in element)
-def load_node_learning_unit_year(node_id: int) -> node.Node:
-    try:
-        node_data = __load_multiple_node_learning_unit_year([node_id])[0]
-        return node.factory.get_node(**__convert_string_to_enum(node_data))
-    except IndexError:
-        raise node.NodeNotFoundException
 
 
 def load(element_id: int) -> node.Node:
