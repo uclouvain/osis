@@ -33,6 +33,7 @@ from django.urls import reverse
 
 from attribution.models.attribution import Attribution
 from attribution.tests.factories.attribution import AttributionFactory
+from base.models.academic_year import AcademicYear
 from base.models.enums import structure_type
 from base.tests.factories import structure
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
@@ -314,19 +315,28 @@ class ScoresResponsibleManagementAsProgramManagerTestCase(TestCase):
             academic_year=cls.academic_year,
             acronym="LBIR1210",
             structure=cls.structure,
-            learning_container_year__academic_year=cls.academic_year,
+            learning_unit__start_year__year=2010,
             learning_container_year__acronym="LBIR1210",
             learning_container_year__requirement_entity=cls.root_entity,
             learning_container_year__allocation_entity=cls.root_entity
         )
         cls.education_group_year = EducationGroupYearFactory(
             academic_year=cls.academic_year,
+            education_group__start_year__year=2010,
             administration_entity=cls.root_entity,
             management_entity=cls.root_entity
         )
-        cls.program_manager = ProgramManagerFactory(education_group=cls.education_group_year.education_group)
+        cls.program_manager = ProgramManagerFactory(
+            group=group,
+            education_group=cls.education_group_year.education_group,
+            offer_year__academic_year=cls.academic_year,
+            offer_year__corresponding_education_group_year=None
+        )
         cls.program_manager.person.user.groups.add(group)
-        offer_enrollment = OfferEnrollmentFactory(education_group_year=cls.education_group_year)
+        offer_enrollment = OfferEnrollmentFactory(
+            education_group_year=cls.education_group_year,
+            offer_year=cls.program_manager.offer_year
+        )
         LearningUnitEnrollmentFactory(offer_enrollment=offer_enrollment, learning_unit_year=cls.learning_unit_year)
 
     def setUp(self):
@@ -334,7 +344,7 @@ class ScoresResponsibleManagementAsProgramManagerTestCase(TestCase):
         self.url = reverse('scores_responsible_management')
 
     def test_case_user_which_cannot_managed_learning_unit_not_entity_managed(self):
-        unauthorized_learning_unit_year = LearningUnitYearFactory()
+        unauthorized_learning_unit_year = LearningUnitYearFactory(academic_year=self.academic_year)
 
         response = self.client.get(self.url, data={
             'learning_unit_year': "learning_unit_year_%d" % unauthorized_learning_unit_year.pk

@@ -49,7 +49,6 @@ def filter_learning_unit_year_according_person(queryset: QuerySet, person: Perso
         person.programmanager_set.all(),
         structure
     )
-
     queryset = queryset.filter(
         Q(learning_container_year__requirement_entity_id__in=entities_with_descendants)
         |
