@@ -626,6 +626,9 @@ msgstr "Crédits relatifs"
 msgid "Relative credits must be greater or equals than 0"
 msgstr "Crédits relatifs doit être plus grand ou égal à 0"
 
+msgid "Relative credits must be lower or equals to 999"
+msgstr "Crédits relatifs doit être inférieur ou égale à 999"
+
 msgid "Remark"
 msgstr "Remarque"
 
@@ -646,6 +649,9 @@ msgstr "Type horaire"
 
 msgid "Search"
 msgstr "Recherche"
+
+msgid "Search..."
+msgstr "Recherche..."
 
 msgid "Select a language"
 msgstr "Sélectionner une langue"
@@ -959,6 +965,9 @@ msgstr "email"
 
 msgid "faculty number"
 msgstr "n° facultaire"
+
+msgid "filter by section"
+msgstr "préfiltrer par rubrique"
 
 msgid "group year"
 msgstr "groupement"
