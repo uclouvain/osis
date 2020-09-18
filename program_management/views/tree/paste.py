@@ -24,7 +24,7 @@
 #
 ##############################################################################
 import itertools
-from typing import List
+from typing import List, Union
 
 from django import shortcuts
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -41,8 +41,14 @@ import program_management.ddd.command
 from base.utils.cache import ElementCache
 from base.views.common import display_warning_messages, display_success_messages, display_error_messages
 from base.views.mixins import AjaxTemplateMixin
+from education_group.templatetags.academic_year_display import display_as_academic_year
+from education_group.ddd import command as command_education_group
+from education_group.ddd.domain.exception import GroupNotFoundException
+from education_group.ddd.service.read import get_group_service
 from education_group.models.group_year import GroupYear
+from osis_common.ddd import interface
 from osis_role.contrib.views import PermissionRequiredMixin
+from program_management.ddd.business_types import *
 from program_management.ddd.domain import node
 from program_management.ddd.domain.node import NodeGroupYear
 from program_management.ddd.domain.node import NodeIdentity
@@ -169,21 +175,40 @@ class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageM
     def _append_success_messages(self, link_identities_ids):
         messages = []
         for link_identity in link_identities_ids:
-            parent = node_repository.NodeRepository.get(
-                node.NodeIdentity(link_identity.parent_code, link_identity.parent_year)
-            )
             messages.append(
-                _("\"%(child_year)s - %(child)s\" has been %(copy_message)s into "
-                  "\"%(parent_year)s - %(parent)s%(parent_title)s\"") % {
-                      "child": link_identity.child_code,
-                      "child_year": link_identity.child_year,
-                      "parent": link_identity.parent_code,
-                      "parent_year": link_identity.parent_year,
-                      "parent_title": " - {}".format(parent.title) if parent and parent.title else "",
-                      "copy_message": _("pasted") if ElementCache(self.request.user.id).cached_data else _("added")
+                _("\"%(child)s\" has been %(copy_message)s into \"%(parent)s\"") % {
+                      "child": self.__get_node_str(link_identity.child_code, link_identity.child_year),
+                      "copy_message": _("pasted") if ElementCache(self.request.user.id).cached_data else _("added"),
+                      "parent": self.__get_node_str(link_identity.parent_code, link_identity.parent_year),
                 }
             )
         return messages
+
+    def __get_node_str(self, code: str, year: int) -> str:
+        try:
+            group_obj = self.__get_group_obj(code, year)
+            version_identity = self.__get_program_tree_version_identity(code, year)
+
+            return "%(code)s - %(abbreviated_title)s%(version)s - %(year)s" % {
+                "code": group_obj.code,
+                "abbreviated_title": group_obj.abbreviated_title,
+                "version": "[{}]".format(version_identity.version_name)
+                if version_identity and not version_identity.is_standard else "",
+                "year": group_obj.academic_year
+            }
+        except GroupNotFoundException:
+            return "%(code)s - %(year)s" % {"code": code, "year": display_as_academic_year(year)}
+
+    def __get_group_obj(self, code: str, year: int) -> 'Group':
+        cmd = command_education_group.GetGroupCommand(code=code, year=year)
+        return get_group_service.get_group(cmd)
+
+    def __get_program_tree_version_identity(self, code: str, year: int) -> Union['ProgramTreeVersionIdentity', None]:
+        try:
+            node_identity = NodeIdentity(code=code, year=year)
+            return ProgramTreeVersionIdentitySearch().get_from_node_identity(node_identity)
+        except interface.BusinessException:
+            return None
 
     def _is_parent_a_minor_major_option_list_choice(self, formset):
         return any(isinstance(form, (
