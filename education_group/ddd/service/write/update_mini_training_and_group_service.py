@@ -42,13 +42,13 @@ def update_mini_training_and_group(cmd: command.UpdateMiniTrainingAndGroupComman
 
     mini_training_domain_obj = mini_training_repository.MiniTrainingRepository.get(mini_training_identity)
 
-    mini_training_domain_obj.update(convert_command_to_update_mini_training_data(cmd))
+    mini_training_domain_obj.update(__convert_command_to_update_mini_training_data(cmd))
     mini_training_repository.MiniTrainingRepository.update(mini_training_domain_obj)
 
     return mini_training_identity
 
 
-def convert_command_to_update_mini_training_data(
+def __convert_command_to_update_mini_training_data(
         cmd: command.UpdateMiniTrainingAndGroupCommand) -> 'mini_training.UpdateMiniTrainingData':
     return mini_training.UpdateMiniTrainingData(
         credits=cmd.credits,

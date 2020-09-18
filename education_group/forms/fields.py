@@ -72,3 +72,9 @@ class UpperCaseCharField(forms.CharField):
         attrs = super().widget_attrs(widget)
         attrs['style'] = "text-transform: uppercase;"
         return attrs
+
+    def to_python(self, value):
+        value = super(UpperCaseCharField, self).to_python(value)
+        if value:
+            value = value.upper()
+        return value

@@ -106,7 +106,7 @@ def create_and_postpone_orphan_training(create_training_cmd: command.CreateTrain
         )
     )
 
-    return [training_id] + training_identities
+    return training_identities
 
 
 def __convert_to_create_group_command(cmd: command.CreateTrainingCommand) -> command.CreateOrphanGroupCommand:

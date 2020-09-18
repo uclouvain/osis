@@ -11,6 +11,7 @@ from django.views import View
 
 from base.models import entity_version
 from base.views.common import display_error_messages, display_warning_messages
+from base.views.common import display_success_messages
 from education_group.ddd import command as command_education_group
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import exception as exception_education_group
@@ -22,6 +23,7 @@ from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.command import UpdateTrainingVersionCommand
+from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
 from program_management.ddd.service.read import get_program_tree_version_from_node_service
 from program_management.ddd.service.write import update_and_postpone_training_version_service
 from program_management.forms import version
@@ -59,7 +61,8 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
     @transaction.non_atomic_requests
     def post(self, request, *args, **kwargs):
         if self.training_version_form.is_valid():
-            self.update_training_version()
+            version_identities = self.update_training_version()
+            self.display_success_messages(version_identities)
             if not self.training_version_form.errors:
                 return HttpResponseRedirect(self.get_success_url())
         display_error_messages(self.request, self._get_default_error_messages())
@@ -71,10 +74,36 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
             kwargs={'code': self.kwargs['code'], 'year': self.kwargs['year']},
         )
 
+    def display_success_messages(self, identities: List['ProgramTreeVersionIdentity']) -> None:
+        success_messages = []
+        for identity in identities:
+            success_messages.append(
+                _(
+                    "Training "
+                    "<a href='%(link)s'> %(offer_acronym)s[%(acronym)s] (%(academic_year)s) </a> successfully updated."
+                ) % {
+                    "link": self.get_url_program_version(identity),
+                    "offer_acronym": identity.offer_acronym,
+                    "acronym": identity.version_name,
+                    "academic_year": display_as_academic_year(identity.year)
+                }
+            )
+        display_success_messages(self.request, success_messages, extra_tags='safe')
+
+    def get_url_program_version(self, version_id: 'ProgramTreeVersionIdentity') -> str:
+        node_identity = NodeIdentitySearch().get_from_tree_version_identity(version_id)
+        return reverse(
+            "element_identification",
+            kwargs={
+                'year': node_identity.year,
+                'code': node_identity.code,
+            }
+        )
+
     def get_cancel_url(self) -> str:
         return self.get_success_url()
 
-    def update_training_version(self):
+    def update_training_version(self) -> List['ProgramTreeVersionIdentity']:
         try:
             update_command = self._convert_form_to_update_training_version_command(self.training_version_form)
             return update_and_postpone_training_version_service.update_and_postpone_training_version(update_command)
