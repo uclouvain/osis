@@ -428,6 +428,7 @@ class UpdateTrainingForm(CreateTrainingForm):
         else:
             permission_error_msg = get_permission_error(self.user, perm)
             self.fields['certificate_aims'].widget.attrs['title'] = permission_error_msg
+            self.fields['certificate_aims'].widget.attrs['class'] = 'cursor-not-allowed'
 
     def __init_management_entity_field(self):
         self.fields['management_entity'] = fields.ManagementEntitiesChoiceField(
