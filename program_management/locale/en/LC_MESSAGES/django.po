@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-18 15:52+0200\n"
+"POT-Creation-Date: 2020-09-18 16:10+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -26,6 +26,10 @@ msgstr ""
 
 #, python-format
 msgid "\"%(child)s\" has been successfully updated"
+msgstr ""
+
+#, python-format
+msgid "%(node)s has been moved"
 msgstr ""
 
 #, python-format
@@ -656,10 +660,6 @@ msgid "Teaching material"
 msgstr ""
 
 msgid "Teaching methods"
-msgstr ""
-
-#, python-format
-msgid "The %(year)s - %(acronym)s%(title)s has been moved"
 msgstr ""
 
 #, python-format
