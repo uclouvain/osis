@@ -26,14 +26,15 @@ from mock import patch
 
 from education_group.ddd.domain import training
 from education_group.ddd.service.write import update_training_and_group_service
-from education_group.tests.ddd.factories.command.update_training_and_group_factory import UpdateTrainingAndGroupCommandFactory
+from education_group.tests.ddd.factories.command.update_training_and_group_factory import \
+    UpdateTrainingAndGroupCommandFactory
 from education_group.tests.ddd.factories.repository.fake import get_fake_training_repository
 from education_group.tests.ddd.factories.training import TrainingFactory
 from testing.mocks import MockPatcherMixin
 
 
 @patch("education_group.ddd.service.write.update_group_service.update_group")
-class TestUpdateTrainingAndGroupService(TestCase, MockPatcherMixin):
+class TestUpdateAndPostponeTrainingAndGroupService(TestCase, MockPatcherMixin):
     @classmethod
     def setUpTestData(cls):
         cls.cmd = UpdateTrainingAndGroupCommandFactory(year=2018, acronym="MERC")

@@ -28,7 +28,7 @@ from django.db import transaction
 from education_group.ddd import command
 from education_group.ddd.domain import mini_training
 from education_group.ddd.repository import mini_training as mini_training_repository
-from education_group.ddd.service.write import postpone_mini_training_and_group_modification_service, \
+from education_group.ddd.service.write import postpone_mini_training_and_orphan_group_modifications_service, \
     create_group_service
 
 
@@ -40,8 +40,8 @@ def create_and_postpone_orphan_mini_training(
     mini_training_identity = mini_training_repository.MiniTrainingRepository.create(mini_training_object)
     group_identity = create_group_service.create_orphan_group(__convert_to_create_group_command(cmd))
 
-    mini_training_identities = postpone_mini_training_and_group_modification_service.\
-        postpone_mini_training_and_group_modification(
+    mini_training_identities = postpone_mini_training_and_orphan_group_modifications_service.\
+        postpone_mini_training_and_orphan_group_modifications(
             command.PostponeMiniTrainingAndGroupModificationCommand(
                 postpone_from_abbreviated_title=cmd.abbreviated_title,
                 postpone_from_year=cmd.year,

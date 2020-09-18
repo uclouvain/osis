@@ -25,62 +25,68 @@
 ##############################################################################
 from typing import List
 
-from django.db import transaction
-
 from education_group.ddd import command
-from education_group.ddd.domain.exception import GroupCopyConsistencyException
-from education_group.ddd.domain.group import GroupIdentity
+from education_group.ddd.domain.exception import MiniTrainingCopyConsistencyException
+from education_group.ddd.domain.mini_training import MiniTrainingIdentity
 from education_group.ddd.domain.service.conflicted_fields import ConflictedFields
-from education_group.ddd.service.read import get_group_service
-from education_group.ddd.service.write import copy_group_service, update_group_service
+from education_group.ddd.repository.mini_training import MiniTrainingRepository
+from education_group.ddd.service.write import copy_mini_training_service, update_mini_training_and_group_service
 from program_management.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
-from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 
 
-@transaction.atomic()
-def postpone_group_modification_service(postpone_cmd: command.PostponeGroupModificationCommand) \
-        -> List['GroupIdentity']:
+def postpone_mini_training_and_orphan_group_modifications(
+        postpone_cmd: command.PostponeMiniTrainingAndGroupModificationCommand
+) -> List['MiniTrainingIdentity']:
+
+    # GIVEN
     from_year = postpone_cmd.postpone_from_year
+    from_mini_training_id = MiniTrainingIdentity(acronym=postpone_cmd.postpone_from_abbreviated_title, year=from_year)
+    conflicted_fields = ConflictedFields().get_mini_training_conflicted_fields(from_mini_training_id)
 
-    cmd_get = command.GetGroupCommand(code=postpone_cmd.code, year=from_year)
-    group = get_group_service.get_group(cmd_get)
-
-    conflicted_fields = ConflictedFields().get_group_conflicted_fields(group.entity_id)
+    # WHEN
     identities_created = [
-        update_group_service.update_group(
-            command.UpdateGroupCommand(
+        update_mini_training_and_group_service.update_mini_training_and_group(
+            command.UpdateMiniTrainingAndGroupCommand(
+                abbreviated_title=postpone_cmd.postpone_from_abbreviated_title,
                 code=postpone_cmd.code,
                 year=postpone_cmd.postpone_from_year,
-                abbreviated_title=postpone_cmd.abbreviated_title,
+                status=postpone_cmd.status,
+                credits=postpone_cmd.credits,
                 title_fr=postpone_cmd.title_fr,
                 title_en=postpone_cmd.title_en,
-                credits=postpone_cmd.credits,
+                keywords=postpone_cmd.keywords,
+                management_entity_acronym=postpone_cmd.management_entity_acronym,
+                end_year=postpone_cmd.end_year,
+                teaching_campus_name=postpone_cmd.teaching_campus_name,
                 constraint_type=postpone_cmd.constraint_type,
                 min_constraint=postpone_cmd.min_constraint,
                 max_constraint=postpone_cmd.max_constraint,
-                management_entity_acronym=postpone_cmd.management_entity_acronym,
-                teaching_campus_name=postpone_cmd.teaching_campus_name,
-                organization_name=postpone_cmd.organization_name,
                 remark_fr=postpone_cmd.remark_fr,
                 remark_en=postpone_cmd.remark_en,
-                end_year=postpone_cmd.end_year,
+                organization_name=postpone_cmd.organization_name,
+                schedule_type=postpone_cmd.schedule_type,
             )
         )
     ]
-    end_postponement_year = CalculateEndPostponement.calculate_end_postponement_year_group(
-        identity=group.entity_identity,
-        repository=ProgramTreeVersionRepository(),
+    end_postponement_year = CalculateEndPostponement.calculate_end_postponement_year_mini_training(
+        identity=from_mini_training_id,
+        repository=MiniTrainingRepository()
     )
+
     for year in range(from_year, end_postponement_year):
         if year + 1 in conflicted_fields:
             continue  # Do not copy info from year to N+1 because conflict detected
 
-        identity_next_year = copy_group_service.copy_group(
-            cmd=command.CopyGroupCommand(from_code=postpone_cmd.code, from_year=year)
+        identity_next_year = copy_mini_training_service.copy_mini_training_to_next_year(
+            copy_cmd=command.CopyMiniTrainingToNextYearCommand(
+                acronym=postpone_cmd.postpone_from_abbreviated_title,
+                postpone_from_year=year
+            )
         )
+        # THEN
         identities_created.append(identity_next_year)
 
     if conflicted_fields:
         first_conflict_year = min(conflicted_fields.keys())
-        raise GroupCopyConsistencyException(first_conflict_year, conflicted_fields[first_conflict_year])
+        raise MiniTrainingCopyConsistencyException(first_conflict_year, conflicted_fields[first_conflict_year])
     return identities_created

@@ -27,6 +27,7 @@ from program_management.ddd.domain import exception as program_exception
 from program_management.ddd.service.read import get_program_tree_service, get_program_tree_version_from_node_service
 from program_management.ddd.service.write import bulk_update_link_service
 from program_management.models.enums.node_type import NodeType
+from program_management.ddd.domain.service.get_program_tree_version_for_tree import get_program_tree_version_for_tree
 
 
 class ContentUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
@@ -41,7 +42,8 @@ class ContentUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "tabs": self.get_tabs(),
             "group_obj": self.get_group_obj(),
             "cancel_url": self.get_cancel_url(),
-            "version": self.get_version()
+            "version": self.get_version(),
+            "tree_different_versions": get_program_tree_version_for_tree(self.get_program_tree_obj().get_all_nodes())
         }
         return render(request, self.template_name, context)
 

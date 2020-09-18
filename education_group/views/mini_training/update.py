@@ -47,7 +47,7 @@ from program_management.ddd import command as command_program_management
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception as program_management_exception
 from program_management.ddd.service.write import delete_mini_training_with_program_tree_service, \
-    postpone_mini_training_and_root_group_modification_with_program_tree_service
+    postpone_mini_training_and_program_tree_modifications_service
 
 
 class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
@@ -106,8 +106,8 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
     def update_mini_training(self) -> List['MiniTrainingIdentity']:
         try:
             update_command = self._convert_form_to_update_mini_training_command(self.mini_training_form)
-            return postpone_mini_training_and_root_group_modification_with_program_tree_service.\
-                postpone_mini_training_and_root_group_modification_with_program_tree(
+            return postpone_mini_training_and_program_tree_modifications_service.\
+                postpone_mini_training_and_program_tree_modifications(
                     update_command
                 )
         except exception.ContentConstraintTypeMissing as e:

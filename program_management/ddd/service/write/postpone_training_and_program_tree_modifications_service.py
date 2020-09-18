@@ -35,7 +35,7 @@ from program_management.ddd.service.write import postpone_tree_version_service, 
     postpone_program_tree_service
 
 
-def postpone_training_and_root_group_modification_with_program_tree(
+def postpone_training_and_program_tree_modifications(
         update_command: PostponeTrainingAndRootGroupModificationWithProgramTreeCommand
 ) -> List['TrainingIdentity']:
     consistency_error = None

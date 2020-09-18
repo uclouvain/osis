@@ -21,34 +21,34 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from unittest import TestCase, mock
+from unittest import mock
+
+from django.test import TestCase
 
 from base.models.enums.education_group_types import TrainingType, GroupType
 from education_group.ddd.domain.exception import GroupCopyConsistencyException
-from education_group.ddd.domain.training import TrainingIdentity
 from education_group.ddd.factories.group import GroupFactory
-from education_group.ddd.service.write import postpone_group_modification_service
+from education_group.ddd.service.write import postpone_orphan_group_modification_service
 from education_group.tests.ddd.factories.command.postpone_group_modification_command import \
     PostponeGroupModificationCommandFactory
 from osis_common.ddd.interface import BusinessException
 
 
-class TestPostponeGroupModificationService(TestCase):
-    @classmethod
-    def setUpClass(cls) -> None:
-        cls.cmd = PostponeGroupModificationCommandFactory(
+class TestPostponeOrphanGroupModificationService(TestCase):
+    def setUp(self) -> None:
+        self.cmd = PostponeGroupModificationCommandFactory(
             postpone_from_year=2020
         )
 
-    @mock.patch('education_group.ddd.service.write.postpone_group_modification_service.'
+    @mock.patch('education_group.ddd.service.write.postpone_orphan_group_modification_service.'
                 'get_group_service.get_group')
-    @mock.patch('education_group.ddd.service.write.postpone_group_modification_service.'
+    @mock.patch('education_group.ddd.service.write.postpone_orphan_group_modification_service.'
                 'ConflictedFields.get_group_conflicted_fields')
-    @mock.patch('education_group.ddd.service.write.postpone_group_modification_service.'
+    @mock.patch('education_group.ddd.service.write.postpone_orphan_group_modification_service.'
                 'update_group_service.update_group')
-    @mock.patch('education_group.ddd.service.write.postpone_group_modification_service.'
+    @mock.patch('education_group.ddd.service.write.postpone_orphan_group_modification_service.'
                 'CalculateEndPostponement.calculate_end_postponement_year_group')
-    @mock.patch('education_group.ddd.service.write.postpone_group_modification_service.'
+    @mock.patch('education_group.ddd.service.write.postpone_orphan_group_modification_service.'
                 'copy_group_service.copy_group')
     def test_ensure_consistency_error_not_stop_creating_group_when_end_postponement_is_undefined(
             self,
@@ -63,7 +63,7 @@ class TestPostponeGroupModificationService(TestCase):
         mock_get_conflicted_fields.return_value = {2013: ['credits', 'titles']}
 
         with self.assertRaises(GroupCopyConsistencyException):
-            postpone_group_modification_service.postpone_group_modification_service(self.cmd)
+            postpone_orphan_group_modification_service.postpone_orphan_group_modification_service(self.cmd)
 
         self.assertEqual(mock_update_group_service.call_count, 1)
         self.assertEqual(mock_copy_group_to_next_year_service.call_count, 5)
