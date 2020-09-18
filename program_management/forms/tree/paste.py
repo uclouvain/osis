@@ -34,9 +34,11 @@ from base.models.enums.link_type import LinkTypes
 from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import node
+from program_management.ddd.domain.exception import RelativeCreditShouldBeGreaterOrEqualsThanZero, \
+    RelativeCreditShouldBeLowerOrEqualThan999
 from program_management.ddd.repositories import load_node, load_authorized_relationship, node as node_repository
 from program_management.ddd.service.write import paste_element_service
-from program_management.ddd.validators import _block_validator
+from program_management.ddd.validators import _block_validator, _relative_credits
 from program_management.models.enums.node_type import NodeType
 
 
@@ -124,6 +126,14 @@ class PasteNodeForm(forms.Form):
         except osis_common.ddd.interface.BusinessExceptions as business_exception:
             raise ValidationError(business_exception.messages)
         return cleaned_block_type
+
+    def clean_relative_credits(self):
+        cleaned_relative_credits = self.cleaned_data.get('relative_credits', None)
+        try:
+            _relative_credits.RelativeCreditsValidator(cleaned_relative_credits).validate()
+        except (RelativeCreditShouldBeGreaterOrEqualsThanZero, RelativeCreditShouldBeLowerOrEqualThan999) as e:
+            raise ValidationError(e.message)
+        return cleaned_relative_credits
 
     def save(self) -> Optional['LinkIdentity']:
         result = None
