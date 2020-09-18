@@ -157,7 +157,7 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
                                         args=[self.get_education_group_version().root_group.academic_year.year,
                                               self.get_education_group_version().root_group.partial_acronym]
                                         ),
-            # TODO: Remove when finished reoganized tempalate
+            # TODO: Remove when finished reorganized template
             "group_year": self.get_education_group_version().root_group,
 
             "create_group_url": self.get_create_group_url(),
