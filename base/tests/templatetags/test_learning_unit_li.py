@@ -247,7 +247,7 @@ class LearningUnitTagLiEditTest(TestCase):
             self.context['user'] = manager.user
             self.context['learning_unit_year'] = learning_unit_year_without_proposal
             result = li_edit_date_lu(self.context, self.url_edit, "")
-    
+
             self.assertEqual(
                 result, self._get_result_data_expected(ID_LINK_EDIT_DATE_LU, MSG_NO_ELIGIBLE_TO_MODIFY_END_DATE)
             )
