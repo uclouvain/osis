@@ -51,7 +51,7 @@ from program_management.ddd.service.write import delete_mini_training_with_progr
 
 
 class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
-    permission_required = 'base.change_educationgroup'
+    permission_required = 'base.change_minitraining'
     raise_exception = True
 
     template_name = "education_group_app/mini_training/upsert/update.html"

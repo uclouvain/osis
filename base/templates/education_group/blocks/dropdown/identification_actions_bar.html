@@ -61,7 +61,7 @@
             {% endif %}
             {% if update_mini_training_url %}
                 <li>
-                {% a_tag_has_perm update_mini_training_url _('Modify') 'base.change_educationgroup' user education_group_version.root_group %}
+                {% a_tag_has_perm update_mini_training_url _('Modify') 'base.change_minitraining' user education_group_version.root_group %}
             {% endif %}
             {% if delete_group_url %}
                 <li>
@@ -70,12 +70,12 @@
             {% endif %}
             {% if delete_permanently_training_url %}
                 <li>
-                    {% a_tag_modal_has_perm delete_permanently_training_url _('Delete permanently') 'base.delete_all_training' user education_group_version.offer %}
+                    {% a_tag_modal_has_perm delete_permanently_training_url _('Delete permanently') 'base.delete_all_training' user education_group_version.root_group %}
                 </li>
             {% endif %}
             {% if delete_permanently_mini_training_url %}
                 <li>
-                    {% a_tag_modal_has_perm delete_permanently_mini_training_url _('Delete permanently') 'base.delete_all_minitraining' user education_group_version.offer %}
+                    {% a_tag_modal_has_perm delete_permanently_mini_training_url _('Delete permanently') 'base.delete_all_minitraining' user education_group_version.root_group %}
                 </li>
             {% endif %}
             {% if delete_permanently_tree_version %}

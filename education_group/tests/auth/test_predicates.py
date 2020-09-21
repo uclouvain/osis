@@ -1,15 +1,12 @@
-from unittest import skip
 
 import mock
 from django.test import TestCase, override_settings
 from mock import patch
 
-from base.models.enums import education_group_categories
-from base.models.enums.education_group_types import TrainingType, EducationGroupTypesEnum
+from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group import EducationGroupFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory, ContinuingEducationTrainingFactory, \
-    TrainingFactory, MiniTrainingFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, ContinuingEducationTrainingFactory
+from education_group.tests.factories.group import GroupFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.person import PersonFactory
@@ -19,7 +16,6 @@ from education_group.auth.roles.faculty_manager import FacultyManager
 from education_group.auth.scope import Scope
 from education_group.tests.factories.auth.faculty_manager import FacultyManagerFactory
 from education_group.tests.factories.group_year import GroupYearFactory
-from program_management.tests.factories.element import ElementFactory, ElementGroupYearFactory
 from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory, \
     StandardEducationGroupVersionFactory
@@ -357,7 +353,7 @@ class TestIsUserLinkedToAllScopes(TestCase):
 class TestAreAllEducationGroupRemovable(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.education_group = EducationGroupFactory()
+        cls.group = GroupFactory(start_year__year=2000)
 
     def setUp(self):
         self.predicate_context_mock = mock.patch(
@@ -371,23 +367,23 @@ class TestAreAllEducationGroupRemovable(TestCase):
         self.addCleanup(self.predicate_context_mock.stop)
 
     def test_case_all_trainings_are_not_removable(self):
-        trainings = [TrainingFactory(education_group=self.education_group)]
-        person = FacultyManagerFactory(entity=trainings[0].management_entity).person
+        training_roots = [GroupYearFactory(group=self.group, academic_year__year=2020)]
+        person = FacultyManagerFactory(entity=training_roots[0].management_entity).person
         self.assertFalse(
             predicates.are_all_trainings_removable(
                 person.user,
-                trainings[0]
+                training_roots[0]
             )
         )
 
     @mock.patch('base.business.event_perms.EventPermEducationGroupEdition.is_open', return_value=True)
     def test_case_all_minitrainings_are_removable(self, mock_open):
-        minitrainings = [MiniTrainingFactory(education_group=self.education_group)]
-        person = FacultyManagerFactory(entity=minitrainings[0].management_entity).person
+        minitraining_roots = [GroupYearFactory(group=self.group, academic_year__year=2020)]
+        person = FacultyManagerFactory(entity=minitraining_roots[0].management_entity).person
         self.assertTrue(
             predicates.are_all_minitrainings_removable(
                 person.user,
-                minitrainings[0]
+                minitraining_roots[0]
             )
         )
 
