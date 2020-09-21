@@ -2484,7 +2484,7 @@ msgstr ""
 msgid "The title is made up of the common part and / or any supplement"
 msgstr ""
 
-msgid "The user is not program manager for this offer"
+msgid "The user is not linked to this offer"
 msgstr ""
 
 #, python-format

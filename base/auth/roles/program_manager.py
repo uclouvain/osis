@@ -37,16 +37,15 @@ from base.models.entity import Entity
 from base.models.entity_version import find_parent_of_type_into_entity_structure
 from base.models.enums.entity_type import FACULTY
 from base.models.learning_unit_enrollment import LearningUnitEnrollment
+from education_group.contrib.admin import EducationGroupRoleModelAdmin
 from education_group.contrib.models import EducationGroupRoleModel
-from osis_role.contrib import admin as osis_role_admin
 from osis_role.contrib import predicates as osis_role_predicates
 
 
-class ProgramManagerAdmin(VersionAdmin, osis_role_admin.RoleModelAdmin):
+class ProgramManagerAdmin(VersionAdmin, EducationGroupRoleModelAdmin):
     list_display = ('person', 'offer_year', 'changed', 'education_group')
     raw_id_fields = ('person', 'offer_year', 'education_group')
-    search_fields = ['person__first_name', 'person__last_name', 'person__global_id', 'offer_year__acronym']
-    list_filter = ('offer_year__academic_year',)
+    list_filter = ('education_group__educationgroupyear__academic_year',)
 
 
 class ProgramManager(EducationGroupRoleModel):
