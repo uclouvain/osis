@@ -1960,10 +1960,10 @@ msgstr "Gestionnaire de parcours étudiant"
 msgid "Program managers"
 msgstr "Gestionnaires de parcours étudiant"
 
-msgid "Program managers are not allowed to modify groups"
+msgid "Program manager is not allowed to modify a group"
 msgstr "Le gestionnaire de programme ne peut pas modifier un groupement"
 
-msgid "Program managers are not allowed to modify links"
+msgid "Program manager is not allowed to modify a link"
 msgstr "Le gestionnaire de programme ne peut pas modifier un lien"
 
 msgid "Program master 120"

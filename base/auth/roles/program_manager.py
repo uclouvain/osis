@@ -30,16 +30,16 @@ from django.utils.translation import gettext_lazy
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
+from base.auth.predicates import is_linked_to_offer
 from base.models.academic_year import current_academic_year
 from base.models.education_group import EducationGroup
 from base.models.entity import Entity
 from base.models.entity_version import find_parent_of_type_into_entity_structure
 from base.models.enums.entity_type import FACULTY
-from osis_role.contrib import admin as osis_role_admin
-from osis_role.contrib import models as osis_role_models
-from osis_role.contrib import predicates as osis_role_predicates
 from base.models.learning_unit_enrollment import LearningUnitEnrollment
-from base.auth.predicates import is_program_manager_for_offer
+from education_group.contrib.models import EducationGroupRoleModel
+from osis_role.contrib import admin as osis_role_admin
+from osis_role.contrib import predicates as osis_role_predicates
 
 
 class ProgramManagerAdmin(VersionAdmin, osis_role_admin.RoleModelAdmin):
@@ -49,7 +49,7 @@ class ProgramManagerAdmin(VersionAdmin, osis_role_admin.RoleModelAdmin):
     list_filter = ('offer_year__academic_year',)
 
 
-class ProgramManager(osis_role_models.RoleModel):
+class ProgramManager(EducationGroupRoleModel):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     person = models.ForeignKey('Person', on_delete=models.PROTECT, verbose_name=gettext_lazy("person"))
@@ -94,13 +94,13 @@ class ProgramManager(osis_role_models.RoleModel):
             'base.can_access_offer': rules.always_allow,
             'base.can_access_student_path': rules.always_allow,
             'base.change_group': osis_role_predicates.always_deny(
-                message=_("Program managers are not allowed to modify groups")
+                message=_("Program manager is not allowed to modify a group")
             ),
             'base.change_link_data': osis_role_predicates.always_deny(
-                message=_("Program managers are not allowed to modify links")
+                message=_("Program manager is not allowed to modify a link")
             ),
-            'base.change_educationgroup': is_program_manager_for_offer,
-            'base.change_educationgroupcertificateaim': is_program_manager_for_offer,
+            'base.change_educationgroup': is_linked_to_offer,
+            'base.change_educationgroupcertificateaim': is_linked_to_offer,
             'base.is_institution_administrator': rules.always_allow,
             'base.view_educationgroup': rules.always_allow,
         })

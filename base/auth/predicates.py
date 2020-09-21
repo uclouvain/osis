@@ -11,7 +11,10 @@ from osis_role.errors import predicate_failed_msg
 
 @predicate(bind=True)
 @predicate_failed_msg(message=_("The user is not program manager for this offer"))
-def is_program_manager_for_offer(self, user: User, egy: Union[EducationGroupYear, GroupYear]):
+def is_linked_to_offer(self, user: User, egy: Union[EducationGroupYear, GroupYear]):
     if egy:
-        return any(egy.education_group == role.education_group for role in self.context['role_qs'])
+        return any(
+            egy.education_group.pk in role.get_person_related_education_groups(role.person)
+            for role in self.context['role_qs']
+        )
     return None

@@ -1900,10 +1900,10 @@ msgstr ""
 msgid "Program managers"
 msgstr ""
 
-msgid "Program managers are not allowed to modify groups"
+msgid "Program manager is not allowed to modify a group"
 msgstr ""
 
-msgid "Program managers are not allowed to modify links"
+msgid "Program manager is not allowed to modify a link"
 msgstr ""
 
 msgid "Program master 120"

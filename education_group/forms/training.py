@@ -344,7 +344,7 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     def __init_management_entity_field(self):
         self.fields['management_entity'] = fields.ManagementEntitiesChoiceField(
             person=self.user.person,
-            initial=None,
+            initial=self.initial.get('management_entity'),
             disabled=self.fields['management_entity'].disabled,
         )
 
@@ -431,13 +431,6 @@ class UpdateTrainingForm(CreateTrainingForm):
             self.fields['section'].disabled = True
             self.fields['certificate_aims'].widget.attrs['title'] = permission_error_msg
             self.fields['certificate_aims'].widget.attrs['class'] = 'cursor-not-allowed'
-
-    def __init_management_entity_field(self):
-        self.fields['management_entity'] = fields.ManagementEntitiesChoiceField(
-            person=self.user.person,
-            initial=self.initial['management_entity'],
-            disabled=self.fields['management_entity'].disabled,
-        )
 
 
 @register('university_domains')

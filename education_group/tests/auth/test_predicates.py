@@ -167,7 +167,7 @@ class TestEducationGroupTypeAuthorizedAccordingToScope(TestCase):
         education_group_type_managed = EducationGroupYearFactory(
             education_group_type__name=TrainingType.BACHELOR.name
         )
-        FacultyManagerFactory(person=self.person, scopes=[Scope.IUFC.name],)
+        FacultyManagerFactory(person=self.person, scopes=[Scope.IUFC.name], )
 
         self.assertFalse(
             predicates.is_education_group_type_authorized_according_to_user_scope(
