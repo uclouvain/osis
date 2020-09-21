@@ -146,7 +146,7 @@
     {
         "pk": 13,
         "fields": {
-            "field_name": "title_english",
+            "field_name": "title_en",
             "context": "TRAINING_DAILY_MANAGEMENT",
             "content_type": [
                 "base",
@@ -163,7 +163,7 @@
     {
         "pk": 14,
         "fields": {
-            "field_name": "title_english",
+            "field_name": "title_en",
             "context": "TRAINING_PROPOSAL_MANAGEMENT",
             "content_type": [
                 "base",
@@ -176,7 +176,7 @@
     {
         "pk": 15,
         "fields": {
-            "field_name": "title_english",
+            "field_name": "title_en",
             "context": "TRAINING_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",
