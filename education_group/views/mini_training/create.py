@@ -62,7 +62,6 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
 
     def get_form_kwargs(self) -> Dict:
         form_kwargs = super().get_form_kwargs()
-        form_kwargs["user"] = self.request.user
         form_kwargs["mini_training_type"] = self.kwargs['type']
         form_kwargs["attach_path"] = self.get_attach_path()
         return form_kwargs
