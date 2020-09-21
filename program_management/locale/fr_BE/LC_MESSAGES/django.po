@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-18 08:59+0200\n"
+"POT-Creation-Date: 2020-09-21 13:45+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -19,16 +19,20 @@ msgstr ""
 "X-Generator: Poedit 2.2.1\n"
 
 #, python-format
+msgid "\"%(child)s\" has been %(copy_message)s into \"%(parent)s\""
+msgstr "\"%(child)s\" a été %(copy_message)s dans \"%(parent)s\""
+
+#, python-format
 msgid "\"%(child)s\" has been detached from \"%(parent)s\""
 msgstr "\"%(child)s\" a été retiré de \"%(parent)s\""
 
 #, python-format
-msgid "\"%(child)s\" has been pasted into \"%(parent)s\""
-msgstr "\"%(child)s\" a été collé dans \"%(parent)s\""
-
-#, python-format
 msgid "\"%(child)s\" has been successfully updated"
 msgstr "\"%(child)s\" a été modifié avec succès"
+
+#, python-format
+msgid "%(node)s has been moved"
+msgstr "%(node)s a été déplacé"
 
 #, python-format
 msgid "%(node_to_add)s version must be the same as %(root_node)s version"
@@ -434,13 +438,13 @@ msgstr "Min. crédits"
 msgid "Mini-Training"
 msgstr "Mini-Formation"
 
+#, python-format
 msgid ""
 "Mini-Training <a href='%(link)s'> %(offer_acronym)s[%(acronym)s] "
 "(%(academic_year)s) </a> successfully updated."
 msgstr ""
-"La mini-formation <a href='%(link)s'> "
-"%(offer_acronym)s[%(acronym)s] (%(academic_year)s) </a> a été modifiée avec "
-"succés"
+"La mini-formation <a href='%(link)s'> %(offer_acronym)s[%(acronym)s] "
+"(%(academic_year)s) </a> a été modifiée avec succés"
 
 msgid "Mobile phone"
 msgstr "Téléphone mobile (GSM)"
@@ -702,10 +706,6 @@ msgid "Teaching methods"
 msgstr "Méthodes d'enseignement"
 
 #, python-format
-msgid "The %(acronym)s has been moved"
-msgstr "%(acronym)s a été déplacé"
-
-#, python-format
 msgid ""
 "The child %(child)s you want to attach is a parent of the node you want to "
 "attach."
@@ -728,8 +728,8 @@ msgid "The learning unit is a prerequisite"
 msgstr "L'UE est un prérequis"
 
 #, python-format
-msgid "The link of %(code)s - %(acronym)s - %(year)s has been updated."
-msgstr "Le lien de %(code)s - %(acronym)s - %(year)s a été mis à jour."
+msgid "The link \"%(node)s\" has been updated."
+msgstr "Le lien \"%(node)s\" a été mis à jour."
 
 #, python-format
 msgid "The parent must have at least one child of type(s) \"%(types)s\"."
@@ -794,13 +794,13 @@ msgstr "Intitulé en français"
 msgid "Training"
 msgstr "Formation"
 
+#, python-format
 msgid ""
 "Training <a href='%(link)s'> %(offer_acronym)s[%(acronym)s] "
 "(%(academic_year)s) </a> successfully updated."
 msgstr ""
-"La formation <a href='%(link)s'> "
-"%(offer_acronym)s[%(acronym)s] (%(academic_year)s) </a> a été modifiée avec "
-"succés"
+"La formation <a href='%(link)s'> %(offer_acronym)s[%(acronym)s] "
+"(%(academic_year)s) </a> a été modifiée avec succés"
 
 msgid "Trainings"
 msgstr "Formations"
@@ -942,6 +942,9 @@ msgstr "[%(academic_year)s] Le contenu de la formation n'est pas vide."
 msgid "activities in English"
 msgstr "activités en anglais"
 
+msgid "added"
+msgstr "ajouté"
+
 msgid "bibliography"
 msgstr "bibliographie"
 
@@ -1011,6 +1014,9 @@ msgstr "le"
 
 msgid "optional"
 msgstr "optionnel"
+
+msgid "pasted"
+msgstr "collé"
 
 #, python-format
 msgid "prerequisites-%(year)s-%(acronym)s"
