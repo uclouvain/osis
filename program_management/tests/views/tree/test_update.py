@@ -36,7 +36,9 @@ from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory, \
     NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
-from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
+from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory, \
+    StandardProgramTreeVersionFactory
+from program_management.views.tree.update import UpdateLinkView
 
 
 def form_valid_effect(form: UpdateLinkForm):
@@ -142,10 +144,19 @@ class TestUpdateLinkView(TestCase):
         self.assertTemplateUsed(response, 'blocks/link_form_inner/minor_major_option_inner.html')
 
     @mock.patch.object(UpdateLinkForm, 'is_valid', new=form_valid_effect)
+    @mock.patch(
+        'program_management.ddd.domain.service.identity_search.ProgramTreeVersionIdentitySearch.get_from_node_identity'
+    )
     @mock.patch('program_management.ddd.service.write.update_link_service.update_link')
     @mock.patch('program_management.ddd.repositories.program_tree.ProgramTreeRepository.get')
-    def test_should_call_update_link_service_when_post_data_is_valid(self, mock_get_tree, mock_service):
+    def test_should_call_update_link_service_when_post_data_is_valid(
+            self,
+            mock_get_tree,
+            mock_service,
+            mock_get_tree_version
+    ):
         mock_get_tree.return_value = self.tree
+        mock_get_tree_version.return_value = StandardProgramTreeVersionFactory()
         self.client.post(self.url, data={})
         self.assertTrue(mock_service.called, msg="View must call update node service")
 
