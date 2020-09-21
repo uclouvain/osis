@@ -51,22 +51,26 @@
                     <td>{% bootstrap_label _("Marks presentation") label_class='d-block'%}</td>
                     <td>{{ administrative_dates.scores_exam_submission_dates.session1.start_date | default_if_none:'-'| date:"d/m/Y" }}</td>
                     <td>{{ administrative_dates.scores_exam_submission_dates.session2.start_date | default_if_none:'-'| date:"d/m/Y" }}</td>
-                    <td>{{ administrative_dates.scores_exam_submission_dates.session3.start_date | default_if_none:'-'| date:"d/m/Y" }}</td>
+                    <td>
+                        {{ administrative_dates.scores_exam_submission_dates.session3.start_date | default_if_none:'-'| date:"d/m/Y" }}</td>
                 </tr>
                 <tr>
                     <td><label>{% trans 'Dissertation submission' %}</label></td>
-                    <td>{{ administrative_dates.dissertations_submission_dates.session1.start_date | default_if_none:'-' |date:"d/m/Y" }}</td>
-                    <td>{{ administrative_dates.dissertations_submission_dates.session2.start_date | default_if_none:'-' |date:"d/m/Y" }}</td>
-                    <td>{{ administrative_dates.dissertations_submission_dates.session3.start_date | default_if_none:'-' |date:"d/m/Y" }}</td>
+                    <td>
+                        {{ administrative_dates.dissertations_submission_dates.session1.start_date | default_if_none:'-' |date:"d/m/Y" }}</td>
+                    <td>
+                        {{ administrative_dates.dissertations_submission_dates.session2.start_date | default_if_none:'-' |date:"d/m/Y" }}</td>
+                    <td>
+                        {{ administrative_dates.dissertations_submission_dates.session3.start_date | default_if_none:'-' |date:"d/m/Y" }}</td>
                 </tr>
                 <tr>
-                    <td>{% bootstrap_label _("Deliberation") label_class='d-block'%}</td>
-                    <td>{{ administrative_dates.deliberations_dates.session1 | dates_from_to }}</td>
-                    <td>{{ administrative_dates.deliberations_dates.session2 | dates_from_to }}</td>
-                    <td>{{ administrative_dates.deliberations_dates.session3 | dates_from_to }}</td>
+                    <td>{% bootstrap_label _("Deliberation") label_class='d-block' %}</td>
+                    <td>{{ administrative_dates.deliberations_dates.session1.start_date | datetimes_at }}</td>
+                    <td>{{ administrative_dates.deliberations_dates.session2.start_date | datetimes_at }}</td>
+                    <td>{{ administrative_dates.deliberations_dates.session3.start_date | datetimes_at }}</td>
                 </tr>
                 <tr>
-                    <td>{% bootstrap_label _("Scores diffusion") label_class='d-block'%}</td>
+                    <td>{% bootstrap_label _("Scores diffusion") label_class='d-block' %}</td>
                     <td>{{ administrative_dates.scores_exam_diffusion_dates.session1.start_date | datetimes_at }}</td>
                     <td>{{ administrative_dates.scores_exam_diffusion_dates.session2.start_date | datetimes_at }}</td>
                     <td>{{ administrative_dates.scores_exam_diffusion_dates.session3.start_date | datetimes_at }}</td>
