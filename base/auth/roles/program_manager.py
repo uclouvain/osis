@@ -23,28 +23,32 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import rules
 from django.db import models, IntegrityError
 from django.db.models import Prefetch
 from django.utils.translation import gettext_lazy
+from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
+from base.auth.predicates import is_linked_to_offer
 from base.models.academic_year import current_academic_year
 from base.models.education_group import EducationGroup
 from base.models.entity import Entity
 from base.models.entity_version import find_parent_of_type_into_entity_structure
 from base.models.enums.entity_type import FACULTY
-from osis_common.models.osis_model_admin import OsisModelAdmin
-from .learning_unit_enrollment import LearningUnitEnrollment
+from base.models.learning_unit_enrollment import LearningUnitEnrollment
+from education_group.contrib.admin import EducationGroupRoleModelAdmin
+from education_group.contrib.models import EducationGroupRoleModel
+from osis_role.contrib import predicates as osis_role_predicates
 
 
-class ProgramManagerAdmin(VersionAdmin, OsisModelAdmin):
+class ProgramManagerAdmin(VersionAdmin, EducationGroupRoleModelAdmin):
     list_display = ('person', 'offer_year', 'changed', 'education_group')
     raw_id_fields = ('person', 'offer_year', 'education_group')
-    search_fields = ['person__first_name', 'person__last_name', 'person__global_id', 'offer_year__acronym']
-    list_filter = ('offer_year__academic_year',)
+    list_filter = ('education_group__educationgroupyear__academic_year',)
 
 
-class ProgramManager(models.Model):
+class ProgramManager(EducationGroupRoleModel):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     person = models.ForeignKey('Person', on_delete=models.PROTECT, verbose_name=gettext_lazy("person"))
@@ -60,6 +64,9 @@ class ProgramManager(models.Model):
         return "{} - {}".format(self.person, self.offer_year)
 
     class Meta:
+        verbose_name = _("Program manager")
+        verbose_name_plural = _("Program managers")
+        group_name = "program_managers"
         unique_together = ('person', 'offer_year',)
 
     def save(self, **kwargs):
@@ -72,6 +79,30 @@ class ProgramManager(models.Model):
             self.education_group = corresponding_education_group
 
         super().save(**kwargs)
+
+    @classmethod
+    def rule_set(cls):
+        return rules.RuleSet({
+            'assessments.can_access_scoreencoding': rules.always_allow,
+            'assessments.change_scoresresponsible': rules.always_allow,
+            'assessments.view_scoresresponsible': rules.always_allow,
+            'base.can_access_catalog': rules.always_allow,
+            'base.can_access_evaluation': rules.always_allow,
+            'base.can_access_externallearningunityear': rules.always_allow,
+            'base.can_access_learningunit': rules.always_allow,
+            'base.can_access_offer': rules.always_allow,
+            'base.can_access_student_path': rules.always_allow,
+            'base.change_group': osis_role_predicates.always_deny(
+                message=_("Program manager is not allowed to modify a group")
+            ),
+            'base.change_link_data': osis_role_predicates.always_deny(
+                message=_("Program manager is not allowed to modify a link")
+            ),
+            'base.change_educationgroup': is_linked_to_offer,
+            'base.change_educationgroupcertificateaim': is_linked_to_offer,
+            'base.is_institution_administrator': rules.always_allow,
+            'base.view_educationgroup': rules.always_allow,
+        })
 
 
 def find_by_person(a_person):

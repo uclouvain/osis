@@ -146,7 +146,7 @@
     {
         "pk": 13,
         "fields": {
-            "field_name": "title_english",
+            "field_name": "title_en",
             "context": "TRAINING_DAILY_MANAGEMENT",
             "content_type": [
                 "base",
@@ -163,7 +163,7 @@
     {
         "pk": 14,
         "fields": {
-            "field_name": "title_english",
+            "field_name": "title_en",
             "context": "TRAINING_PROPOSAL_MANAGEMENT",
             "content_type": [
                 "base",
@@ -176,7 +176,7 @@
     {
         "pk": 15,
         "fields": {
-            "field_name": "title_english",
+            "field_name": "title_en",
             "context": "TRAINING_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",
@@ -1083,7 +1083,7 @@
     {
         "pk": 73,
         "fields": {
-            "field_name": "main_teaching_campus",
+            "field_name": "teaching_campus",
             "context": "TRAINING_DAILY_MANAGEMENT",
             "content_type": [
                 "base",
@@ -1100,7 +1100,7 @@
     {
         "pk": 74,
         "fields": {
-            "field_name": "main_teaching_campus",
+            "field_name": "teaching_campus",
             "context": "TRAINING_PROPOSAL_MANAGEMENT",
             "content_type": [
                 "base",
@@ -1113,7 +1113,7 @@
     {
         "pk": 75,
         "fields": {
-            "field_name": "main_teaching_campus",
+            "field_name": "teaching_campus",
             "context": "TRAINING_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",
@@ -2726,7 +2726,7 @@
     {
         "pk": 175,
         "fields": {
-            "field_name": "title_english",
+            "field_name": "title_en",
             "context": "MINI_TRAINING_DAILY_MANAGEMENT",
             "content_type": [
                 "base",
@@ -2743,7 +2743,7 @@
     {
         "pk": 176,
         "fields": {
-            "field_name": "title_english",
+            "field_name": "title_en",
             "context": "MINI_TRAINING_PROPOSAL_MANAGEMENT",
             "content_type": [
                 "base",
@@ -2756,7 +2756,7 @@
     {
         "pk": 177,
         "fields": {
-            "field_name": "title_english",
+            "field_name": "title_en",
             "context": "MINI_TRAINING_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",
@@ -3642,7 +3642,7 @@
     {
         "pk": 233,
         "fields": {
-            "field_name": "title_english",
+            "field_name": "title_en",
             "context": "GROUP_PROPOSAL_MANAGEMENT",
             "content_type": [
                 "base",
@@ -3838,7 +3838,7 @@
     {
         "pk": 245,
         "fields": {
-            "field_name": "main_teaching_campus",
+            "field_name": "teaching_campus",
             "context": "GROUP_PROPOSAL_MANAGEMENT",
             "content_type": [
                 "base",

@@ -1900,6 +1900,12 @@ msgstr ""
 msgid "Program managers"
 msgstr ""
 
+msgid "Program manager is not allowed to modify a group"
+msgstr ""
+
+msgid "Program manager is not allowed to modify a link"
+msgstr ""
+
 msgid "Program master 120"
 msgstr ""
 
@@ -2476,6 +2482,9 @@ msgid ""
 msgstr ""
 
 msgid "The title is made up of the common part and / or any supplement"
+msgstr ""
+
+msgid "The user is not linked to this offer"
 msgstr ""
 
 #, python-format

@@ -102,7 +102,7 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
         self.active_tab = read.get_tab_from_path_info(self.get_object(), self.request.META.get('PATH_INFO'))
 
         can_change_education_group = self.request.user.has_perm(
-            'base.change_educationgroup',
+            'base.change_group',
             self.get_permission_object()
         )
         is_root_node = self.node_identity == self.get_tree().root_node.entity_id

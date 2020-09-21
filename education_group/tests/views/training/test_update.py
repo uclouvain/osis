@@ -24,11 +24,14 @@
 import mock
 from django.test import TestCase
 
+from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.program_manager import ProgramManagerFactory
 from base.utils.urls import reverse_with_get
-from education_group.ddd.domain import training, group
+from education_group.ddd.domain import training
 from education_group.ddd.factories.group import GroupFactory
 from education_group.tests.ddd.factories.training import TrainingFactory
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
+from education_group.tests.factories.auth.faculty_manager import FacultyManagerFactory
 from reference.tests.factories.language import FrenchLanguageFactory
 from testing import mocks
 
@@ -37,23 +40,22 @@ class TestTrainingUpdateView(TestCase):
     @classmethod
     def setUpTestData(cls):
         FrenchLanguageFactory()
-        cls.central_manager = CentralManagerFactory()
         cls.url = reverse_with_get(
             "training_update",
             kwargs={"code": "CODE", "year": 2020, "title": "ACRONYM"},
             get={"path_to": "1|2|3"}
         )
+        cls.training = TrainingFactory()
+        cls.egy = EducationGroupYearFactory(partial_acronym=cls.training.code, academic_year__year=cls.training.year)
+        cls.central_manager = CentralManagerFactory(entity=cls.egy.management_entity)
 
     def setUp(self):
         self.client.force_login(self.central_manager.person.user)
 
     @mock.patch("education_group.ddd.service.read.get_training_service.get_training")
     @mock.patch("education_group.ddd.service.read.get_group_service.get_group")
-    def test_should_display_forms_when_good_get_request(
-            self,
-            mock_get_group,
-            mock_get_training):
-        mock_get_training.return_value = TrainingFactory()
+    def test_should_display_forms_when_good_get_request(self, mock_get_group, mock_get_training):
+        mock_get_training.return_value = self.training
         mock_get_group.return_value = GroupFactory()
 
         response = self.client.get(self.url)
@@ -76,7 +78,7 @@ class TestTrainingUpdateView(TestCase):
             mock_get_group,
             mock_get_training
     ):
-        mock_get_training.return_value = TrainingFactory()
+        mock_get_training.return_value = self.training
         mock_get_group.return_value = GroupFactory()
         update_training.return_value = [training.TrainingIdentity(acronym="ACRONYM", year=2020)]
         delete_training.return_value = []
@@ -92,3 +94,21 @@ class TestTrainingUpdateView(TestCase):
         )
         self.assertRedirects(response, expected_redirec_url, fetch_redirect_response=False)
 
+    @mock.patch("education_group.ddd.service.read.get_training_service.get_training")
+    @mock.patch("education_group.ddd.service.read.get_group_service.get_group")
+    def test_should_disable_or_enable_certificate_aim_according_to_role(self, mock_get_group, mock_get_training):
+        mock_get_training.return_value = self.training
+        mock_get_group.return_value = GroupFactory()
+        rules = [
+            {'role': CentralManagerFactory(entity=self.egy.management_entity), 'is_disabled': True},
+            {'role': FacultyManagerFactory(entity=self.egy.management_entity), 'is_disabled': True},
+            {'role': ProgramManagerFactory(education_group=self.egy.education_group), 'is_disabled': False},
+        ]
+        for rule in rules:
+            self._test_certificate_aim_according_to_role(role=rule['role'], is_disabled=rule['is_disabled'])
+
+    def _test_certificate_aim_according_to_role(self, role, is_disabled: bool):
+        self.client.force_login(role.person.user)
+        response = self.client.get(self.url)
+        form = response.context['training_form']
+        self.assertEqual(form.fields['certificate_aims'].disabled, is_disabled)
