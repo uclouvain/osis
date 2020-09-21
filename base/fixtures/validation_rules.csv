@@ -82,11 +82,11 @@ Examples: <i>RESE1FC, DICI1FC, PACC1FC</i>","Sigle d’un Certificat d’univers
 Exemples: <i>RESE1FC, DICI1FC, PACC1FC</i>",Ex: DICI1FC
 base.validationrule,TrainingForm.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.acronym,REQUIRED,2FC,"^([A-Za-z]{2,4})(2)([Ff])([Cc])$",,"Acronym of University second cycle certificate is composed of:
 <ul>
-<li>2-4 letters + <b>12FC</b></li>
+<li>2-4 letters + <b>2FC</b></li>
 </ul>
 Examples: <i>ANSO2FC,JDAN2FC, MAIN2FC</i>","Sigle d’un Certificat d’université 2ème cycle est composé de:
 <ul>
-<li>2-4 lettres + <b>12FC</b></li>
+<li>2-4 lettres + <b>2FC</b></li>
 </ul>
 Exemples: <i>ANSO2FC,JDAN2FC, MAIN2FC</i>",Ex: ANSO2FC
 base.validationrule,TrainingForm.ACCESS_CONTEST.acronym,REQUIRED,CA,"^([A-Za-z]{2,4})[ ]([Cc])([Aa])$",,"Acronym of Access contest is composed of:
@@ -284,7 +284,7 @@ Examples: <i>LFITN100W</i>","Code d’une Attestation de réussite est composée
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
 <li>partie numérique: 3 chiffres</li>
-<li><b>Q</b></li>
+<li><b>W</b></li>
 </ul>
 Exemples: <i>LFITN100W</i>",Ex: LFITN100W
 base.validationrule,TrainingForm.CERTIFICATE_OF_HOLDING_CREDITS.code,REQUIRED,100Q,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([QwqW])$",,"Code of Certificate of holding credits is composed of:

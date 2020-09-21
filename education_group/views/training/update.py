@@ -38,6 +38,7 @@ from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import exception
 from education_group.ddd.domain.exception import TrainingCopyConsistencyException
+from education_group.ddd.domain.training import TrainingIdentity
 from education_group.ddd.service.read import get_training_service, get_group_service
 from education_group.forms import training as training_forms
 from education_group.templatetags.academic_year_display import display_as_academic_year
@@ -129,6 +130,10 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             self.training_form.add_error("max_constraint", "")
         except TrainingCopyConsistencyException as e:
             display_warning_messages(self.request, e.message)
+            return [
+                TrainingIdentity(acronym=self.get_training_obj().acronym, year=year)
+                for year in range(self.get_training_obj().year, e.conflicted_fields_year)
+            ]
         return []
 
     def delete_training(self) -> List['TrainingIdentity']:
