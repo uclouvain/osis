@@ -36,6 +36,7 @@ from base.models.enums import academic_calendar_type
 from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.entity import EntityFactory
+from base.tests.factories.entity_calendar import EntityCalendarFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
 from base.views import institution
@@ -53,9 +54,8 @@ class EntityViewTestCase(APITestCase):
         )
         cls.entity = EntityFactory()
         cls.parent = EntityFactory()
-        cls.start_date = datetime.date.today() - datetime.timedelta(weeks=48)
-        cls.end_date = datetime.date.today() + datetime.timedelta(weeks=48)
-
+        cls.start_date = datetime.date.today() - datetime.timedelta(weeks=54)
+        cls.end_date = datetime.date.today() + datetime.timedelta(weeks=54)
         cls.entity_version = EntityVersionFactory(
             entity=cls.entity,
             acronym="ENTITY_CHILDREN",
