@@ -412,7 +412,6 @@ class UpdateTrainingForm(CreateTrainingForm):
         self.fields["academic_year"].label = _('Validity')
         self.__init_end_year_field()
         self.__init_certificate_aims_field()
-        self.__init_management_entity_field()
 
     def __init_end_year_field(self):
         initial_academic_year_value = self.initial.get("academic_year", None)
