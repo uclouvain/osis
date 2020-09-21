@@ -46,7 +46,7 @@ class TestCreateAndPostponeOrphanTraining(TestCase, MockPatcherMixin):
 
         mock_postpone_training.return_value = [
             training.TrainingIdentity(acronym=cmd.abbreviated_title, year=year)
-            for year in range(2019, 2022)
+            for year in range(2018, 2022)
         ]
 
         result = create_orphan_training_service.create_and_postpone_orphan_training(cmd)

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-17 10:23+0200\n"
+"POT-Creation-Date: 2020-09-21 13:45+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,15 +17,19 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #, python-format
+msgid "\"%(child)s\" has been %(copy_message)s into \"%(parent)s\""
+msgstr ""
+
+#, python-format
 msgid "\"%(child)s\" has been detached from \"%(parent)s\""
 msgstr ""
 
 #, python-format
-msgid "\"%(child)s\" has been pasted into \"%(parent)s\""
+msgid "\"%(child)s\" has been successfully updated"
 msgstr ""
 
 #, python-format
-msgid "\"%(child)s\" has been successfully updated"
+msgid "%(node)s has been moved"
 msgstr ""
 
 #, python-format
@@ -405,6 +409,12 @@ msgstr ""
 msgid "Mini-Training"
 msgstr ""
 
+#, python-format
+msgid ""
+"Mini-Training <a href='%(link)s'> %(offer_acronym)s[%(acronym)s] "
+"(%(academic_year)s) </a> successfully updated."
+msgstr ""
+
 msgid "Mobile phone"
 msgstr ""
 
@@ -659,10 +669,6 @@ msgid "Teaching methods"
 msgstr ""
 
 #, python-format
-msgid "The %(acronym)s has been moved"
-msgstr ""
-
-#, python-format
 msgid ""
 "The child %(child)s you want to attach is a parent of the node you want to "
 "attach."
@@ -682,7 +688,7 @@ msgid "The learning unit is a prerequisite"
 msgstr ""
 
 #, python-format
-msgid "The link of %(code)s - %(acronym)s - %(year)s has been updated."
+msgid "The link \"%(node)s\" has been updated."
 msgstr ""
 
 #, python-format
@@ -737,6 +743,12 @@ msgid "Title in French"
 msgstr ""
 
 msgid "Training"
+msgstr ""
+
+#, python-format
+msgid ""
+"Training <a href='%(link)s'> %(offer_acronym)s[%(acronym)s] "
+"(%(academic_year)s) </a> successfully updated."
 msgstr ""
 
 msgid "Trainings"
@@ -862,6 +874,9 @@ msgstr ""
 msgid "activities in English"
 msgstr ""
 
+msgid "added"
+msgstr ""
+
 msgid "bibliography"
 msgstr ""
 
@@ -930,6 +945,9 @@ msgid "on"
 msgstr ""
 
 msgid "optional"
+msgstr ""
+
+msgid "pasted"
 msgstr ""
 
 #, python-format

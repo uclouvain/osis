@@ -21,7 +21,9 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from unittest import TestCase, mock
+from unittest import mock
+
+from django.test import SimpleTestCase
 
 from education_group.ddd.domain.exception import TrainingCopyConsistencyException
 from education_group.ddd.service.write import postpone_training_and_group_modification_service
@@ -29,10 +31,9 @@ from education_group.tests.ddd.factories.command.postpone_training_and_group_mod
     PostponeTrainingAndGroupModificationCommandFactory
 
 
-class TestPostponeTrainingAndGroupModificationService(TestCase):
-    @classmethod
-    def setUpClass(cls) -> None:
-        cls.cmd = PostponeTrainingAndGroupModificationCommandFactory(
+class TestPostponeTrainingAndGroupModificationService(SimpleTestCase):
+    def setUp(self) -> None:
+        self.cmd = PostponeTrainingAndGroupModificationCommandFactory(
             postpone_from_year=2020
         )
 
@@ -41,11 +42,13 @@ class TestPostponeTrainingAndGroupModificationService(TestCase):
     @mock.patch('education_group.ddd.service.write.postpone_training_and_group_modification_service.'
                 'update_training_and_group_service.update_training_and_group')
     @mock.patch('education_group.ddd.service.write.postpone_training_and_group_modification_service.'
-                'CalculateEndPostponement.calculate_end_postponement_year')
+                'CalculateEndPostponement.calculate_end_postponement_year_training')
     @mock.patch('education_group.ddd.service.write.postpone_training_and_group_modification_service.'
                 'copy_training_service.copy_training_to_next_year')
+    @mock.patch('education_group.ddd.service.write.copy_group_service.copy_group')
     def test_ensure_consistency_error_not_stop_creating_training_when_end_postponement_is_undefined(
             self,
+            mock_copy_group_to_next_year_service,
             mock_copy_training_to_next_year_service,
             mock_calculate_end_postponement_year,
             mock_update_training_and_group_service,
@@ -60,3 +63,4 @@ class TestPostponeTrainingAndGroupModificationService(TestCase):
 
         self.assertEqual(mock_update_training_and_group_service.call_count, 1)
         self.assertEqual(mock_copy_training_to_next_year_service.call_count, 5)
+        self.assertEqual(mock_copy_group_to_next_year_service.call_count, 5)
