@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from collections import Counter
+from typing import List, Set
 
 from django.utils.translation import ngettext
 
@@ -45,62 +46,85 @@ class DetachOptionValidator(business_validator.BusinessValidator):
         self.path_to_node_to_detach = path_to_node_to_detach
         self.node_to_detach = working_tree.get_node(path_to_node_to_detach)
         self.tree_repository = tree_repository
+        self.options_to_detach = self._get_options_to_detach()
 
         from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
         self.version_search = ProgramTreeVersionIdentitySearch()
 
     def validate(self):
-        trees_2m = [
-            tree for tree in self.tree_repository.search_from_children(node_ids=[self.node_to_detach.entity_id])
-            if tree.is_master_2m()
-        ]
-
         error_messages = []
-        options_to_detach = self._get_options_to_detach()
-        if options_to_detach and not self._is_inside_finality():
+
+        parent = self.working_tree.get_node(self._get_path_to_parent(self.path_to_node_to_detach))
+        trees_2m = self._get_trees_2m_containing_parent(parent)
+
+        if self.options_to_detach and not self._is_inside_finality():
             for tree_2m in trees_2m:
-                counter_options = Counter(tree_2m.get_2m_option_list())
-                counter_options.subtract(options_to_detach)
-                options_to_check = [opt for opt, count in counter_options.items() if count == 0]
+                options_to_check = self._get_options_to_check_by_tree(tree_2m)
                 if not options_to_check:
                     continue
-                for finality in tree_2m.get_all_finalities():
-                    finality_version = self.version_search.get_from_node_identity(finality.entity_id)
-                    options_to_detach_used_in_finality = set(options_to_detach) & set(finality.get_option_list())
-                    options_to_detach_versions = [
-                        self.version_search.get_from_node_identity(option.entity_id)
-                        for option in options_to_detach_used_in_finality
-                    ]
-                    if options_to_detach_used_in_finality:
-                        error_messages.append(
-                            ngettext(
-                                "Option \"%(acronym)s\" cannot be detach because it is contained in"
-                                " %(finality_acronym)s program.",
-                                "Options \"%(acronym)s\" cannot be detach because they are contained in"
-                                " %(finality_acronym)s program.",
-                                len(options_to_detach_used_in_finality)
-                            ) % {
-                                "acronym": ', '.join(
-                                    [self._get_version_title(option) for option in options_to_detach_versions]
-                                ),
-                                "finality_acronym": self._get_version_title(finality_version)
-                            }
-                        )
+                self._validate_option_usage_in_finalities(error_messages, tree_2m)
         if error_messages:
             raise osis_common.ddd.interface.BusinessExceptions(error_messages)
 
-    def _get_options_to_detach(self):
+    def _validate_option_usage_in_finalities(self, error_messages: List[str], tree_2m: 'ProgramTree'):
+        for finality in tree_2m.get_all_finalities():
+            finality_version = self.version_search.get_from_node_identity(finality.entity_id)
+            options_to_detach_used_in_finality = set(self.options_to_detach) & set(finality.get_option_list())
+            options_to_detach_versions = self._get_options_versions(options_to_detach_used_in_finality)
+            if options_to_detach_used_in_finality:
+                error_messages.append(
+                    self._get_validation_error_message(
+                        finality_version,
+                        options_to_detach_used_in_finality,
+                        options_to_detach_versions
+                    )
+                )
+
+    def _get_path_to_parent(self, path_to_node: str) -> str:
+        return path_to_node.rsplit('|', 1)[0]
+
+    def _get_options_versions(self, options: Set['Node']) -> List['ProgramTreeVersionIdentity']:
+        return [self.version_search.get_from_node_identity(option.entity_id) for option in options]
+
+    def _get_validation_error_message(
+            self,
+            finality_version: 'ProgramTreeVersionIdentity',
+            options_to_detach: Set['Node'],
+            options_to_detach_versions: List['ProgramTreeVersionIdentity']
+    ) -> str:
+        return ngettext(
+            "Option \"%(acronym)s\" cannot be detach because it is contained in %(finality_acronym)s program.",
+            "Options \"%(acronym)s\" cannot be detach because they are contained in %(finality_acronym)s program.",
+            len(options_to_detach)
+        ) % {
+            "acronym": ', '.join([self._get_version_title(option) for option in options_to_detach_versions]),
+            "finality_acronym": self._get_version_title(finality_version)
+        }
+
+    def _get_options_to_check_by_tree(self, tree_2m: 'ProgramTree') -> List['Node']:
+        counter_options = Counter(tree_2m.get_2m_option_list())
+        counter_options.subtract(self.options_to_detach)
+        options_to_check = [opt for opt, count in counter_options.items() if count == 0]
+        return options_to_check
+
+    def _get_trees_2m_containing_parent(self, parent: 'Node') -> List['ProgramTree']:
+        return [
+            tree for tree in self.tree_repository.search_from_children(node_ids=[parent.entity_id])
+            if tree.is_master_2m()
+        ]
+
+    def _get_options_to_detach(self) -> List['Node']:
         result = []
         if self.node_to_detach.is_option():
             result.append(self.node_to_detach)
         result += self.node_to_detach.get_option_list()
         return result
 
-    def _is_inside_finality(self):
+    def _is_inside_finality(self) -> bool:
         parents = self.working_tree.get_parents(self.path_to_node_to_detach)
         return self.node_to_detach.is_finality() or any(p.is_finality() for p in parents)
 
-    def _get_version_title(self, version_identity):
+    def _get_version_title(self, version_identity: 'ProgramTreeVersionIdentity') -> str:
         return "{}[{}]".format(
             version_identity.offer_acronym, version_identity.version_name
         ) if version_identity.version_name else version_identity.offer_acronym
