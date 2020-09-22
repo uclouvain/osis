@@ -34,6 +34,7 @@ from education_group.ddd.repository.training import TrainingRepository
 from program_management.ddd.command import PostponeProgramTreeVersionCommand, CopyTreeVersionToNextYearCommand
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 from program_management.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
+from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.ddd.service.write import copy_program_version_service
 
 
@@ -46,12 +47,14 @@ def postpone_program_tree_version(
 
     # GIVEN
     from_year = postpone_cmd.from_year
-    end_postponement_year = CalculateEndPostponement.calculate_end_postponement_year(
-        identity=MiniTrainingIdentity(
-            acronym=postpone_cmd.from_offer_acronym,
-            year=postpone_cmd.from_year
+    end_postponement_year = CalculateEndPostponement.calculate_end_postponement_year_program_tree_version(
+        identity=ProgramTreeVersionIdentity(
+            offer_acronym=postpone_cmd.from_offer_acronym,
+            version_name=postpone_cmd.from_version_name,
+            year=postpone_cmd.from_year,
+            is_transition=postpone_cmd.from_is_transition,
         ),
-        repository=MiniTrainingRepository()
+        repository=ProgramTreeVersionRepository()
     )
 
     # WHEN

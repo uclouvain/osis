@@ -30,7 +30,8 @@ from education_group.ddd.domain.exception import TrainingCopyConsistencyExceptio
 from education_group.ddd.domain.service.conflicted_fields import ConflictedFields
 from education_group.ddd.domain.training import TrainingIdentity
 from education_group.ddd.repository.training import TrainingRepository
-from education_group.ddd.service.write import copy_training_service, update_training_and_group_service
+from education_group.ddd.service.write import copy_training_service, update_training_and_group_service, \
+    copy_group_service
 from program_management.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
 
 
@@ -105,7 +106,7 @@ def postpone_training_and_group_modification(postpone_cmd: command.PostponeTrain
             )
         )
     ]
-    end_postponement_year = CalculateEndPostponement.calculate_end_postponement_year(
+    end_postponement_year = CalculateEndPostponement.calculate_end_postponement_year_training(
         identity=from_training_id,
         repository=TrainingRepository()
     )
@@ -117,6 +118,12 @@ def postpone_training_and_group_modification(postpone_cmd: command.PostponeTrain
             copy_cmd=command.CopyTrainingToNextYearCommand(
                 acronym=postpone_cmd.postpone_from_acronym,
                 postpone_from_year=year
+            )
+        )
+        copy_group_service.copy_group(
+            cmd=command.CopyGroupCommand(
+                from_code=postpone_cmd.code,
+                from_year=year
             )
         )
         # THEN

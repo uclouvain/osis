@@ -37,6 +37,7 @@ from base.views.common import display_success_messages, display_warning_messages
 from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import exception
+from education_group.ddd.domain.mini_training import MiniTrainingIdentity
 from education_group.ddd.service.read import get_group_service, get_mini_training_service
 from education_group.forms import mini_training as mini_training_forms
 from education_group.templatetags.academic_year_display import display_as_academic_year
@@ -117,6 +118,10 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             self.mini_training_form.add_error("max_constraint", "")
         except exception.MiniTrainingCopyConsistencyException as e:
             display_warning_messages(self.request, e.message)
+            return [
+                MiniTrainingIdentity(acronym=self.get_mini_training_obj().acronym, year=year)
+                for year in range(self.get_mini_training_obj().year, e.conflicted_fields_year)
+            ]
         return []
 
     def delete_mini_training(self) -> List['MiniTrainingIdentity']:
