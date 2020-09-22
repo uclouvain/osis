@@ -1,6 +1,7 @@
 {% load static %}
 {% load statici18n i18n bootstrap3 %}
 {% load getattr %}
+{% load date_operations %}
 
 {% comment "License" %}
     * OSIS stands for Open Student Information System. It's an application
@@ -36,17 +37,11 @@
     <div class="tab-content">
         <div role="tabpanel" class="tab-pane active" id="educational_information_force_majeur">
             <br>
-            <div class="row">
-                <div class="col-md-4 col-md-offset-4">
-                    <label> {% trans 'Opening date' %} </label>
-                    <br>
-                    {{ force_majeure_submission_dates.start_date|date:"d/m/Y"|default:"-" }}
-                </div>
-                <div class="col-md-4">
-                    <label> {% trans 'Ending date' %} </label>
-                    <br>
-                    {{ force_majeure_submission_dates.end_date|date:"d/m/Y"|default:"-" }}
-                </div>
+            <div style="padding-left: 1em;">
+                <label> {% trans 'Editable' %} : </label>
+                {% trans 'From' context "Du" %} {{ force_majeure_submission_dates.start_date|date:"d/m/Y"|default:"-" }}
+                {% trans 'to' context "au" %} {{ force_majeure_submission_dates.end_date|shift_date:-1|date:"d/m/Y"|default:"-" }}
+                <!-- TODO :: Remove shift_date when end_date is included in period -->
             </div>
         </div>
         {% include 'learning_unit/blocks/educational_informations_force_majeure_table.html' %}
