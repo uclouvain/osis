@@ -2581,7 +2581,7 @@ msgstr ""
 "L’intitulé est composé de la partie commune et/ou de l’éventuel complément"
 
 msgid "The user is not linked to this offer"
-msgstr "L'utilisateur n'est lié à cette offre"
+msgstr "L'utilisateur n'est pas lié à cette offre"
 
 #, python-format
 msgid ""

@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('base', '0535_auto_20200908_1239'),
+        ('base', '0536_studentspecificprofile_uuid'),
     ]
 
     operations = [
