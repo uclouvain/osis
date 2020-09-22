@@ -21,6 +21,7 @@ from education_group.ddd.service.write import update_group_service
 from education_group.forms.group import GroupUpdateForm
 from education_group.models.group_year import GroupYear
 from education_group.templatetags.academic_year_display import display_as_academic_year
+from osis_common.utils.models import get_object_or_none
 from osis_role.contrib.views import PermissionRequiredMixin
 
 
@@ -161,9 +162,8 @@ class GroupUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         ]
 
     def get_permission_object(self) -> Union[GroupYear, None]:
-        try:
-            return GroupYear.objects.select_related(
-                'academic_year', 'management_entity'
-            ).get(partial_acronym=self.kwargs['code'], academic_year__year=self.kwargs['year'])
-        except GroupYear.DoesNotExist:
-            return None
+        return get_object_or_none(
+            GroupYear.objects.select_related('academic_year', 'management_entity'),
+            academic_year__year=self.kwargs['year'],
+            partial_acronym=self.kwargs['code']
+        )

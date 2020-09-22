@@ -25,6 +25,7 @@ from typing import Dict
 
 from django import forms
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
 
 from base.business.event_perms import EventPermEducationGroupEdition
@@ -105,7 +106,8 @@ class MiniTrainingForm(ValidationRuleMixin, forms.Form):
     remark_fr = forms.CharField(widget=forms.Textarea, label=_("Remark"), required=False)
     remark_en = forms.CharField(widget=forms.Textarea, label=_("remark in english"), required=False)
 
-    def __init__(self, *args, mini_training_type: str, attach_path: str, **kwargs):
+    def __init__(self, *args, user: User, mini_training_type: str, attach_path: str, **kwargs):
+        self.user = user
         self.group_type = mini_training_type
         self.attach_path = attach_path
 
@@ -185,8 +187,8 @@ class UpdateMiniTrainingForm(PermissionFieldMixin, MiniTrainingForm):
         to_field_name="year"
     )
 
-    def __init__(self, *args, user=None, **kwargs):
-        self.user = user
+    def __init__(self, *args, event_perm_obj=None, **kwargs):
+        self.event_perm_obj = event_perm_obj
 
         super().__init__(*args, **kwargs)
         self.fields["academic_year"].label = _('Validity')
@@ -200,7 +202,10 @@ class UpdateMiniTrainingForm(PermissionFieldMixin, MiniTrainingForm):
 
     # PermissionFieldMixin
     def get_context(self) -> str:
-        is_edition_period_opened = EventPermEducationGroupEdition(raise_exception=False).is_open()
+        is_edition_period_opened = EventPermEducationGroupEdition(
+            obj=self.event_perm_obj,
+            raise_exception=False
+        ).is_open()
         return MINI_TRAINING_PGRM_ENCODING_PERIOD if is_edition_period_opened else MINI_TRAINING_DAILY_MANAGEMENT
 
     # PermissionFieldMixin

@@ -22,7 +22,7 @@
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
 import functools
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Union
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
@@ -41,8 +41,10 @@ from education_group.ddd.domain.exception import TrainingCopyConsistencyExceptio
 from education_group.ddd.domain.training import TrainingIdentity
 from education_group.ddd.service.read import get_training_service, get_group_service
 from education_group.forms import training as training_forms
+from education_group.models.group_year import GroupYear
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from education_group.views.proxy.read import Tab
+from osis_common.utils.models import get_object_or_none
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command as command_program_management
 from program_management.ddd.business_types import *
@@ -167,6 +169,7 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         return training_forms.UpdateTrainingForm(
             self.request.POST or None,
             user=self.request.user,
+            event_perm_obj=self.get_permission_object(),
             training_type=self.get_training_obj().type.name,
             attach_path=self.get_attach_path(),
             initial=self._get_training_form_initial_values()
@@ -187,6 +190,13 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             return get_group_service.get_group(get_cmd)
         except exception.TrainingNotFoundException:
             raise Http404
+
+    def get_permission_object(self) -> Union[GroupYear, None]:
+        return get_object_or_none(
+            GroupYear.objects.select_related('academic_year', 'management_entity'),
+            academic_year__year=self.kwargs['year'],
+            partial_acronym=self.kwargs['code']
+        )
 
     def get_success_msg_updated_trainings(self, training_identites: List["TrainingIdentity"]) -> List[str]:
         return [self._get_success_msg_updated_training(identity) for identity in training_identites]

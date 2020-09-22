@@ -53,9 +53,8 @@ class PermissionFieldMixin(ModelFormMixin):
     context = ""
     user = None
 
-    def __init__(self, *args, user=None, **kwargs):
-        if user:
-            self.user = user
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.get('user')
 
         if not self.user:
             raise ImproperlyConfigured("This form must receive the user to determine his permissions")

@@ -164,6 +164,7 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             "create_training_url": self.get_create_training_url(),
             "create_mini_training_url": self.get_create_mini_training_url(),
             "update_mini_training_url": self.get_update_mini_training_url(),
+            "update_permission_name": self.get_update_permission_name(),
             "delete_permanently_mini_training_url": self.get_delete_permanently_mini_training_url(),
             "delete_permanently_tree_version": self.get_delete_permanently_tree_version_url(),
             "create_version_url": self.get_create_version_url(),
@@ -198,6 +199,9 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             kwargs={'year': self.node_identity.year, 'code': self.node_identity.code},
             get={"path": self.get_path(), "tab": self.active_tab.name}
         )
+
+    def get_update_permission_name(self) -> str:
+        return "base.change_minitraining"
 
     def get_create_version_url(self):
         if self.is_root_node():
