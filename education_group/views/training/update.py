@@ -22,7 +22,7 @@
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
 import functools
-from typing import List, Dict, Optional, Union
+from typing import List, Dict, Optional
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
@@ -191,7 +191,7 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         except exception.TrainingNotFoundException:
             raise Http404
 
-    def get_permission_object(self) -> Union[GroupYear, None]:
+    def get_permission_object(self) -> Optional[GroupYear]:
         return get_object_or_none(
             GroupYear.objects.select_related('academic_year', 'management_entity'),
             academic_year__year=self.kwargs['year'],

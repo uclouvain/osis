@@ -1,5 +1,5 @@
 import functools
-from typing import List, Union, Dict
+from typing import List, Dict, Optional
 
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render
@@ -161,7 +161,7 @@ class GroupUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             }
         ]
 
-    def get_permission_object(self) -> Union[GroupYear, None]:
+    def get_permission_object(self) -> Optional[GroupYear]:
         return get_object_or_none(
             GroupYear.objects.select_related('academic_year', 'management_entity'),
             academic_year__year=self.kwargs['year'],
