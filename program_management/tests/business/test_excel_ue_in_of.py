@@ -556,13 +556,13 @@ class TestRowHeight(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.root_node = NodeGroupYearFactory(node_id=1, code='c1', node_type=TrainingType.PGRM_MASTER_120)
+        cls.root_node = NodeGroupYearFactory(node_id=1, code='C1', node_type=TrainingType.PGRM_MASTER_120)
         cls.academic_year = AcademicYearFactory(year=cls.root_node.year)
-        cls.group_level_1 = NodeGroupYearFactory(node_id=2, code='c2', year=cls.academic_year.year)
+        cls.group_level_1 = NodeGroupYearFactory(node_id=2, code='C2', year=cls.academic_year.year)
         LinkFactory(parent=cls.root_node,
                     child=cls.group_level_1)
 
-        cls.group_level_1_1 = NodeGroupYearFactory(node_id=3, code='c3', year=cls.academic_year.year)
+        cls.group_level_1_1 = NodeGroupYearFactory(node_id=3, code='C3', year=cls.academic_year.year)
         LinkFactory(parent=cls.group_level_1,
                     child=cls.group_level_1_1)
 
@@ -586,7 +586,7 @@ class TestRowHeight(TestCase):
                                                    year=cls.academic_year.year)
         LinkFactory(parent=cls.group_level_2,
                     child=cls.group_level_2_1)
-        cls.ue_level_group_level_2_1 = NodeLearningUnitYearFactory(node_id=9, code='UE', year=cls.academic_year.year)
+        cls.ue_level_group_level_2_1 = NodeLearningUnitYearFactory(node_id=9, code='UE3', year=cls.academic_year.year)
         LinkFactory(parent=cls.group_level_2_1,
                     child=cls.ue_level_group_level_2_1)
         cls.group_level_2_2 = NodeGroupYearFactory(node_id=8,
