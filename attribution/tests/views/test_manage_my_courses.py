@@ -140,9 +140,9 @@ class ManageMyCoursesViewTestCase(TestCase):
         msg = get_messages_from_response(response)
         self.assertEqual(
             msg[0].get('message'),
-            _('For the academic year %(data_year)s, the summary edition period is ended since %(end_date)s.') % {
+            _('For the academic year %(data_year)s, the summary edition period ended on %(end_date)s.') % {
                 "data_year": self.academic_calendar.data_year,
-                "end_date": self.academic_calendar.end_date.strftime('%d-%m-%Y'),
+                "end_date": (self.academic_calendar.end_date - datetime.timedelta(days=1)).strftime('%d/%m/%Y'),
             }
         )
         self.assertEqual(msg[0].get('level'), messages.INFO)
@@ -150,7 +150,7 @@ class ManageMyCoursesViewTestCase(TestCase):
             msg[1].get('message'),
             _('For the academic year %(data_year)s, the summary edition period will open on %(start_date)s.') % {
                 "data_year": next_calendar.data_year,
-                "start_date": next_calendar.start_date.strftime('%d-%m-%Y'),
+                "start_date": next_calendar.start_date.strftime('%d/%m/%Y'),
             }
         )
         self.assertEqual(msg[1].get('level'), messages.INFO)

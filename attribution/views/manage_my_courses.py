@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import datetime
 import itertools
 from typing import Iterable
 
@@ -66,9 +67,10 @@ def list_my_attributions_summary_editable(request):
         messages.add_message(
             request,
             messages.INFO,
-            _('For the academic year %(data_year)s, the summary edition period is ended since %(end_date)s.') % {
+            _('For the academic year %(data_year)s, the summary edition period ended on %(end_date)s.') % {
                 "data_year": data_year,
-                "end_date": previous_opened_calendar.end_date.strftime('%d-%m-%Y'),
+                "end_date": (previous_opened_calendar.end_date - datetime.timedelta(days=1)).strftime('%d/%m/%Y'),
+                # TODO :: Remove timedelta when end_date is included in period
             }
         )
         next_opened_calendar = event_perm.get_next_opened_calendar()
@@ -78,7 +80,7 @@ def list_my_attributions_summary_editable(request):
                 messages.INFO,
                 _('For the academic year %(data_year)s, the summary edition period will open on %(start_date)s.') % {
                     "data_year": next_opened_calendar.data_year,
-                    "start_date": next_opened_calendar.start_date.strftime('%d-%m-%Y'),
+                    "start_date": next_opened_calendar.start_date.strftime('%d/%m/%Y'),
                 }
             )
 
@@ -105,7 +107,7 @@ def list_my_attributions_summary_editable(request):
 def view_educational_information(request, learning_unit_year_id):
     context = {
         'submission_dates': find_educational_information_submission_dates_of_learning_unit_year(
-                learning_unit_year_id),
+            learning_unit_year_id),
         'force_majeure_submission_dates':
             find_educational_information_force_majeure_submission_dates_of_learning_unit_year(learning_unit_year_id),
         'create_teaching_material_urlname': 'tutor_teaching_material_create',

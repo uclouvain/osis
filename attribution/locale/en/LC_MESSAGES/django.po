@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-25 15:15+0200\n"
+"POT-Creation-Date: 2020-09-22 13:19+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -97,14 +97,18 @@ msgstr ""
 
 #, python-format
 msgid ""
-"For the academic year %(data_year)s, the summary edition period is ended "
-"since %(end_date)s."
+"For the academic year %(data_year)s, the summary edition period ended on "
+"%(end_date)s."
 msgstr ""
 
 #, python-format
 msgid ""
 "For the academic year %(data_year)s, the summary edition period will open on "
 "%(start_date)s."
+msgstr ""
+
+msgctxt "Du"
+msgid "From"
 msgstr ""
 
 msgid "Function"
@@ -203,4 +207,8 @@ msgid "Yes, I confirm."
 msgstr ""
 
 msgid "delete"
+msgstr ""
+
+msgctxt "au"
+msgid "to"
 msgstr ""

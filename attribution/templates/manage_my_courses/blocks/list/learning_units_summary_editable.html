@@ -28,7 +28,7 @@
                         {% with entity_calendar=entity_calendars|get_item:requirement_entity.id %}
                             {% trans 'Editable' as title_status_true %}
                             <td {% if error.is_valid %}style="color: green" {% else %}style="color: red"{% endif %}>
-                                Du {% if entity_calendar %} {{ entity_calendar|get_item:'start_date'|date:"d/m/Y" }} {% endif %} au
+                                {% trans 'From' context "Du" %} {% if entity_calendar %} {{ entity_calendar|get_item:'start_date'|date:"d/m/Y" }} {% endif %} {% trans 'to' context "au" %}
                                 {% if entity_calendar %} {{ entity_calendar|get_item:'end_date'|shift_date:-1|date:"d/m/Y" }} {% endif %}
                                 <!-- TODO :: Remove shift_date when end_date is included in period -->
                                 {% if error.errors|length > 1 %}
