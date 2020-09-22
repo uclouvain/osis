@@ -45,7 +45,7 @@ from base.business.learning_unit import get_cms_label_data, \
 from base.business.learning_unit_proposal import _get_value_from_enum, clean_attribute_initial_value
 from base.business.learning_units import perms as business_perms
 from base.business.learning_units.comparison import FIELDS_FOR_LEARNING_UNIT_YR_COMPARISON, \
-    FIELDS_FOR_LEARNING_CONTAINER_YR_COMPARISON, DEFAULT_VALUE_FOR_NONE, FIELDS_FOR_COMMON_TITLE_COMPARISON
+    FIELDS_FOR_LEARNING_CONTAINER_YR_COMPARISON, FIELDS_FOR_COMMON_TITLE_COMPARISON
 from base.business.learning_units.perms import can_update_learning_achievement
 from base.enums.component_detail import VOLUME_TOTAL, VOLUME_Q1, VOLUME_Q2, PLANNED_CLASSES, \
     VOLUME_REQUIREMENT_ENTITY, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2
@@ -402,8 +402,8 @@ def get_common_titles_context(learning_unit_year):
     title_fr = getattr(learning_unit_year.learning_container_year, 'common_title')
     title_en = getattr(learning_unit_year.learning_container_year, 'common_title_english')
     return {
-        'fr': title_fr if title_fr is not None else DEFAULT_VALUE_FOR_NONE,
-        'en': title_en if title_en is not None else DEFAULT_VALUE_FOR_NONE,
+        'fr': title_fr,
+        'en': title_en,
     }
 
 
@@ -463,7 +463,7 @@ def get_learning_container_year_context(learning_unit_year):
             value = _get_value_from_enum(DECLARATION_TYPE, getattr(learning_unit_year.learning_container_year, field))
         else:
             value = getattr(learning_unit_year.learning_container_year, field)
-        learning_container_year_fields[field_name] = value if value is not None else DEFAULT_VALUE_FOR_NONE
+        learning_container_year_fields[field_name] = value
     return learning_container_year_fields
 
 
