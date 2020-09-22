@@ -9,8 +9,6 @@
                 <th>{% trans 'Title' %}</th>
                 <th>{% trans 'Requirement entity' %}</th>
                 <th>{% trans 'Description fiche opening' %}</th>
-                <th>{% trans 'Description fiche ending' %}</th>
-                <th>{% trans 'Editable' %}</th>
             </tr>
         </thead>
         <tbody>
@@ -27,19 +25,23 @@
                     <td>{{ requirement_entity|default_if_none:'-' }}</td>
                     {% if requirement_entity %}
                         {% with entity_calendar=entity_calendars|get_item:requirement_entity.id %}
-                            <td>{% if entity_calendar %} {{ entity_calendar|get_item:'start_date' }} {% endif %}</td>
-                            <td>{% if entity_calendar %} {{ entity_calendar|get_item:'end_date' }} {% endif %}</td>
+                            {% trans 'Editable' as title_status_true %}
+                            <td {% if error.is_valid %}style="color: green" {% else %}style="color: red"{% endif %}>
+                                Du {% if entity_calendar %} {{ entity_calendar|get_item:'start_date'|date:"d/m/Y" }} {% endif %} au
+                                {% if entity_calendar %} {{ entity_calendar|get_item:'end_date'|date:"d/m/Y" }} {% endif %}
+                                {% if error.errors|length > 1 %}
+                                    {% include "blocks/span/span_status.html" with status=error.is_valid title_status_false=error.as_ul %}
+                                {% else %}
+                                    {% include "blocks/span/span_status.html" with status=error.is_valid title_status_false=error.errors.0 %}
+                                {% endif %}
+                            </td>
                         {% endwith %}
                     {% else %}
                         <td>-</td>
                         <td>-</td>
                     {% endif %}
-                    {% trans 'Editable' as title_status_true %}
-                    {% if error.errors|length > 1 %}
-                        <td>{% include "blocks/span/span_status.html" with status=error.is_valid title_status_false=error.as_ul %}</td>
-                    {% else %}
-                        <td>{% include "blocks/span/span_status.html" with status=error.is_valid title_status_false=error.errors.0 %}</td>
-                    {% endif %}
+
+
                 </tr>
                 {% endwith %}
             {% endfor %}
