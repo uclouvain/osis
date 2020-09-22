@@ -143,6 +143,7 @@ class ManageMyCoursesViewTestCase(TestCase):
             _('For the academic year %(data_year)s, the summary edition period ended on %(end_date)s.') % {
                 "data_year": self.academic_calendar.data_year,
                 "end_date": (self.academic_calendar.end_date - datetime.timedelta(days=1)).strftime('%d/%m/%Y'),
+                # TODO :: Remove timedelta when end_date is included in period
             }
         )
         self.assertEqual(msg[0].get('level'), messages.INFO)
