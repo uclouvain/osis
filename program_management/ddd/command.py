@@ -317,6 +317,12 @@ class GetEndPostponementYearCommand(interface.CommandRequest):
     year = attr.ib(type=int)
 
 
+@attr.s(frozen=True, slots=True)
+class GetVersionMaxEndYear(interface.CommandRequest):
+    offer_acronym = attr.ib(type=str)
+    year = attr.ib(type=int)
+
+
 class GetNodeIdentityFromElementId(interface.CommandRequest):
     def __init__(self, element_id: int):
         self.element_id = element_id

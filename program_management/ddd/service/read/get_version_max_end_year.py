@@ -21,17 +21,18 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-
 from program_management.ddd import command
-from program_management.ddd.domain.program_tree import ProgramTreeIdentity
-from program_management.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
-from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
+from program_management.ddd.domain import program_tree_version
+from program_management.ddd.repositories import program_tree_version as tree_version_repository
 
 
-def calculate_program_tree_end_postponement(
-        cmd: command.GetEndPostponementYearCommand
-) -> int:
-    return CalculateEndPostponement().calculate_end_postponement_year_program_tree(
-        identity=ProgramTreeIdentity(cmd.code, cmd.year),
-        repository=ProgramTreeVersionRepository()
+def calculate_version_max_end_year(cmd: command.GetVersionMaxEndYear) -> int:
+    standard_tree_version_identity = program_tree_version.ProgramTreeVersionIdentity(
+        offer_acronym=cmd.offer_acronym,
+        year=cmd.year,
+        version_name=program_tree_version.STANDARD,
+        is_transition=False
     )
+
+    tree_version = tree_version_repository.ProgramTreeVersionRepository.get(standard_tree_version_identity)
+    return tree_version.end_year_of_existence

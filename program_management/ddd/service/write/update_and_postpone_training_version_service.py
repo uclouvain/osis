@@ -44,12 +44,12 @@ def update_and_postpone_training_version(
     )
     group_identity = GroupIdentitySearch().get_from_tree_version_identity(tree_version_identity)
 
-    postponed_tree_version_identities = postpone_tree_version_service.postpone_program_tree_version(
-        __convert_to_postpone_program_tree_version(command, group_identity)
-    )
-
     postpone_orphan_group_modification_service.postpone_orphan_group_modification_service(
         __convert_to_postpone_group_modification_command(command, group_identity)
+    )
+
+    postponed_tree_version_identities = postpone_tree_version_service.postpone_program_tree_version(
+        __convert_to_postpone_program_tree_version(command, group_identity)
     )
 
     return [tree_version_identity] + postponed_tree_version_identities

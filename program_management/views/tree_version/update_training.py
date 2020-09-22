@@ -120,13 +120,11 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
     @cached_property
     def training_version_form(self) -> 'version.UpdateTrainingVersionForm':
         training_version_identity = self.get_program_tree_version_obj().entity_id
-        node_identity = self.get_program_tree_obj().root_node.entity_id
         return version.UpdateTrainingVersionForm(
-            data=self.request.POST or None,
-            user=self.request.user,
             training_version_identity=training_version_identity,
-            node_identity=node_identity,
             training_type=self.get_training_obj().type,
+            user=self.request.user,
+            data=self.request.POST or None,
             initial=self._get_training_version_form_initial_values()
         )
 

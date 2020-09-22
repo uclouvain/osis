@@ -43,12 +43,7 @@ class TestTrainingVersionForm(TestCase):
 
     @mock.patch('program_management.forms.version.SpecificVersionForm._init_academic_year_choices')
     def test_field_reference_should_use_group_form(self, *mocks):
-        form = UpdateTrainingVersionForm(
-            self.tree_version_identity,
-            self.node_identity,
-            TrainingType.PGRM_MASTER_120,
-            self.user
-        )
+        form = UpdateTrainingVersionForm(self.tree_version_identity, TrainingType.PGRM_MASTER_120, self.user)
         self.assertEqual(form.field_reference("field"), 'GroupForm.PGRM_MASTER_120.field')
         assertion_message = "The training version form fields updatable are only fields from Group."
         self.assertNotEqual(form.field_reference("field"), 'TrainingForm.PGRM_MASTER_120.field', assertion_message)
@@ -63,12 +58,7 @@ class TestMiniTrainingVersionForm(TestCase):
 
     @mock.patch('program_management.forms.version.SpecificVersionForm._init_academic_year_choices')
     def test_field_reference_should_use_group_form(self, *mocks):
-        form = UpdateMiniTrainingVersionForm(
-            self.tree_version_identity,
-            self.node_identity,
-            MiniTrainingType.DEEPENING,
-            self.user
-        )
+        form = UpdateMiniTrainingVersionForm(self.tree_version_identity, MiniTrainingType.DEEPENING, self.user)
         self.assertEqual(form.field_reference("field"), 'GroupForm.DEEPENING.field')
         assertion_message = "The mini-training version form fields updatable are only fields from Group."
         self.assertNotEqual(form.field_reference("field"), 'MiniTrainingForm.DEEPENING.field', assertion_message)
