@@ -133,6 +133,7 @@ class LearningUnitFilter(FilterSet):
             ('credits', 'credits'),
             ('status', 'status'),
             ('has_proposal', 'has_proposal'),
+            ('summary_status', 'summary_status'),
         ),
         widget=forms.HiddenInput
     )
