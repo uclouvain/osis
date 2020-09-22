@@ -42,11 +42,7 @@
                 "base",
                 "educationgroupyear"
             ],
-            "groups": [
-                [
-                    "central_managers"
-                ]
-            ]
+            "groups": []
         },
         "model": "rules_management.fieldreference"
     },
@@ -59,14 +55,7 @@
                 "base",
                 "educationgroupyear"
             ],
-            "groups": [
-                [
-                    "central_managers"
-                ],
-                [
-                    "faculty_managers"
-                ]
-            ]
+            "groups": []
         },
         "model": "rules_management.fieldreference"
     },
@@ -156,6 +145,23 @@
         "model": "rules_management.fieldreference"
     },
     {
+        "pk": 17,
+        "fields": {
+            "field_name": "is_enrollment_enabled",
+            "context": "TRAINING_PGRM_ENCODING_PERIOD",
+            "content_type": [
+                "base",
+                "educationgroupyear"
+            ],
+            "groups": [
+                [
+                    "central_managers"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
         "pk": 18,
         "fields": {
             "field_name": "enrollment_enabled",
@@ -207,23 +213,6 @@
         "model": "rules_management.fieldreference"
     },
     {
-        "pk": 24,
-        "fields": {
-            "field_name": "default_learning_unit_enrollment",
-            "context": "TRAINING_PGRM_ENCODING_PERIOD",
-            "content_type": [
-                "base",
-                "educationgroupyear"
-            ],
-            "groups": [
-                [
-                    "central_managers"
-                ]
-            ]
-        },
-        "model": "rules_management.fieldreference"
-    },
-    {
         "pk": 25,
         "fields": {
             "field_name": "academic_year",
@@ -245,10 +234,7 @@
                 "base",
                 "educationgroupyear"
             ],
-            "groups": [
-                ["central_managers"],
-                ["faculty_managers"]
-            ]
+            "groups": []
         },
         "model": "rules_management.fieldreference"
     },
@@ -341,23 +327,6 @@
         "pk": 36,
         "fields": {
             "field_name": "has_admission_exam",
-            "context": "TRAINING_PGRM_ENCODING_PERIOD",
-            "content_type": [
-                "base",
-                "educationgroupyear"
-            ],
-            "groups": [
-                [
-                    "central_managers"
-                ]
-            ]
-        },
-        "model": "rules_management.fieldreference"
-    },
-    {
-        "pk": 39,
-        "fields": {
-            "field_name": "diploma_printing_orientation",
             "context": "TRAINING_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",
@@ -1545,11 +1514,7 @@
                 "base",
                 "educationgroup"
             ],
-            "groups": [
-                [
-                    "central_managers"
-                ]
-            ]
+            "groups": []
         },
         "model": "rules_management.fieldreference"
     },
@@ -2769,7 +2734,11 @@
                 "base",
                 "educationgroupyear"
             ],
-            "groups": []
+            "groups": [
+                [
+                    "program_managers"
+                ]
+            ]
         },
         "model": "rules_management.fieldreference"
     },
@@ -2866,125 +2835,6 @@
             "content_type": [
                 "base",
                 "educationgroupyear"
-            ],
-            "groups": [
-                [
-                    "central_managers"
-                ]
-            ]
-        },
-        "model": "rules_management.fieldreference"
-    },
-    {
-        "pk": 271,
-        "fields": {
-            "field_name": "country",
-            "context": "TRAINING_PGRM_ENCODING_PERIOD",
-            "content_type": [
-                "base",
-                "educationgrouporganization"
-            ],
-            "groups": [
-                [
-                    "central_managers"
-                ]
-            ]
-        },
-        "model": "rules_management.fieldreference"
-    },
-    {
-        "pk": 272,
-        "fields": {
-            "field_name": "organization",
-            "context": "TRAINING_PGRM_ENCODING_PERIOD",
-            "content_type": [
-                "base",
-                "educationgrouporganization"
-            ],
-            "groups": [
-                [
-                    "central_managers"
-                ]
-            ]
-        },
-        "model": "rules_management.fieldreference"
-    },
-    {
-        "pk": 273,
-        "fields": {
-            "field_name": "all_students",
-            "context": "TRAINING_PGRM_ENCODING_PERIOD",
-            "content_type": [
-                "base",
-                "educationgrouporganization"
-            ],
-            "groups": [
-                [
-                    "central_managers"
-                ]
-            ]
-        },
-        "model": "rules_management.fieldreference"
-    },
-    {
-        "pk": 274,
-        "fields": {
-            "field_name": "enrollment_place",
-            "context": "TRAINING_PGRM_ENCODING_PERIOD",
-            "content_type": [
-                "base",
-                "educationgrouporganization"
-            ],
-            "groups": [
-                [
-                    "central_managers"
-                ]
-            ]
-        },
-        "model": "rules_management.fieldreference"
-    },
-    {
-        "pk": 275,
-        "fields": {
-            "field_name": "diploma",
-            "context": "TRAINING_PGRM_ENCODING_PERIOD",
-            "content_type": [
-                "base",
-                "educationgrouporganization"
-            ],
-            "groups": [
-                [
-                    "central_managers"
-                ]
-            ]
-        },
-        "model": "rules_management.fieldreference"
-    },
-    {
-        "pk": 276,
-        "fields": {
-            "field_name": "is_producing_cerfificate",
-            "context": "TRAINING_PGRM_ENCODING_PERIOD",
-            "content_type": [
-                "base",
-                "educationgrouporganization"
-            ],
-            "groups": [
-                [
-                    "central_managers"
-                ]
-            ]
-        },
-        "model": "rules_management.fieldreference"
-    },
-    {
-        "pk": 277,
-        "fields": {
-            "field_name": "is_producing_annexe",
-            "context": "TRAINING_PGRM_ENCODING_PERIOD",
-            "content_type": [
-                "base",
-                "educationgrouporganization"
             ],
             "groups": [
                 [
