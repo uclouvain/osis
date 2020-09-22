@@ -276,13 +276,15 @@ def _concatenate_training_data(learning_unit_year: LearningUnitYear, group_eleme
                 leaf_credits,
                 nb_parents,
                 __acronym_with_version_label(training['acronym'], training['is_transition'], training['version_name']),
-                training['title_fr'] + (
-                    ' [{}]'.format(training['version_title_fr']) if training['version_title_fr'] else ''
-                ),
+                __title_with_version_title(training['title_fr'], training['version_title_fr']),
             )
             concatenated_string += training_string
 
     return concatenated_string
+
+
+def __title_with_version_title(title_fr: str, version_title_fr: str):
+    return title_fr + (' [{}]'.format(version_title_fr) if version_title_fr else '')
 
 
 def _get_data_part2(learning_unit_yr: LearningUnitYear, with_attributions: bool) -> List[str]:
