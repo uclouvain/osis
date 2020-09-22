@@ -9,7 +9,8 @@
                 <th>{% trans 'Courses' %}</th>
                 <th>{% trans 'Title' %}</th>
                 <th>{% trans 'Requirement entity' %}</th>
-                <th>{% trans 'Description fiche modification' %}</th>
+                <th>{% trans 'Description fiche edition' %}</th>
+                <th>{% trans 'Force majeure case edition' %}</th>
             </tr>
         </thead>
         <tbody>
@@ -27,7 +28,7 @@
                     {% if requirement_entity %}
                         {% with entity_calendar=entity_calendars|get_item:requirement_entity.id %}
                             {% trans 'Editable' as title_status_true %}
-                            <td {% if error.is_valid %}style="color: green" {% else %}style="color: red"{% endif %}>
+                            <td {% if event_perm_desc_fiche_open %}style="color: green" {% else %}style="color: red"{% endif %}>
                                 {% trans 'From' context "Du" %} {% if entity_calendar %} {{ entity_calendar|get_item:'start_date'|date:"d/m/Y" }} {% endif %}
                                 {% trans 'to' context "au" %} {% if entity_calendar %} {{ entity_calendar|get_item:'end_date'|shift_date:-1|date:"d/m/Y" }} {% endif %}
                                 <!-- TODO :: Remove shift_date when end_date is included in period -->
@@ -40,8 +41,12 @@
                         {% endwith %}
                     {% else %}
                         <td>-</td>
-                        <td>-</td>
                     {% endif %}
+                    <td {% if event_perm_force_majeure_open %}style="color: green"{% else %}style="color: red"{% endif %}>
+                        {% trans 'From' context "Du" %} {{ event_perm_force_majeure_start_date|date:"d/m/Y" }}
+                        {% trans 'to' context "au" %} {{ event_perm_force_majeure_end_date|shift_date:-1|date:"d/m/Y" }}
+                    </td>
+
 
 
                 </tr>

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-22 13:53+0200\n"
+"POT-Creation-Date: 2020-09-22 14:50+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -82,7 +82,7 @@ msgstr "Suppléant temporaire"
 msgid "Description fiche"
 msgstr "Fiche descriptive"
 
-msgid "Description fiche modification"
+msgid "Description fiche edition"
 msgstr "Modification des fiches descriptives"
 
 msgid "Duration"
@@ -106,6 +106,15 @@ msgid ""
 msgstr ""
 "Pour l’année académique %(data_year)s, la période de modification des fiches "
 "descriptives commencera le %(start_date)s."
+
+#, python-format
+msgid ""
+"Force majeure case : Some fields of the description fiche can be edited from "
+"%(start_date)s to %(end_date)s."
+msgstr "Cas de force majeure : certains champs de la fiche descriptive peuvent être modifiés du %(start_date)s au %(end_date)s."
+
+msgid "Force majeure case edition"
+msgstr "Modification cas de force majeure"
 
 msgctxt "Du"
 msgid "From"

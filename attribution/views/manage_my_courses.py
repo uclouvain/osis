@@ -57,12 +57,13 @@ from base.views.learning_units.perms import PermissionDecorator
 @login_required
 def list_my_attributions_summary_editable(request):
     tutor = get_object_or_404(Tutor, person__user=request.user)
-    event_perm = event_perms.EventPermSummaryCourseSubmission()
+    event_perm_desc_fiche = event_perms.EventPermSummaryCourseSubmission()
+    event_perm_force_majeure = event_perms.EventPermSummaryCourseSubmissionForceMajeure()
 
-    if event_perm.is_open():
-        data_year = event_perm.get_academic_years().get()
+    if event_perm_desc_fiche.is_open():
+        data_year = event_perm_desc_fiche.get_academic_years().get()
     else:
-        previous_opened_calendar = event_perm.get_previous_opened_calendar()
+        previous_opened_calendar = event_perm_desc_fiche.get_previous_opened_calendar()
         data_year = previous_opened_calendar.data_year
         messages.add_message(
             request,
@@ -73,7 +74,7 @@ def list_my_attributions_summary_editable(request):
                 # TODO :: Remove timedelta when end_date is included in period
             }
         )
-        next_opened_calendar = event_perm.get_next_opened_calendar()
+        next_opened_calendar = event_perm_desc_fiche.get_next_opened_calendar()
         if next_opened_calendar:
             messages.add_message(
                 request,
@@ -95,9 +96,28 @@ def list_my_attributions_summary_editable(request):
     )
     errors = (can_user_edit_educational_information(user=tutor.person.user, learning_unit_year_id=luy.id)
               for luy in learning_unit_years)
+
+    if event_perm_force_majeure.is_open():
+        force_majeure_calendar = event_perm_force_majeure.get_open_academic_calendars_queryset().get()
+        messages.add_message(
+            request,
+            messages.WARNING,
+            _('Force majeure case : Some fields of the description fiche can be edited from %(start_date)s '
+              'to %(end_date)s.') % {
+                "start_date": force_majeure_calendar.start_date.strftime('%d/%m/%Y'),
+                "end_date": (force_majeure_calendar.end_date - datetime.timedelta(days=1)).strftime('%d/%m/%Y'),
+            }
+        )
+    else:
+        force_majeure_calendar = event_perm_force_majeure.get_academic_calendars_queryset(data_year=data_year).get()
+
     context = {
         'learning_unit_years_with_errors': list(zip(learning_unit_years, errors)),
         'entity_calendars': entity_calendars,
+        'event_perm_desc_fiche_open': event_perm_desc_fiche.is_open(),
+        'event_perm_force_majeure_open': event_perm_force_majeure.is_open(),
+        'event_perm_force_majeure_start_date': force_majeure_calendar.start_date,
+        'event_perm_force_majeure_end_date': force_majeure_calendar.end_date
     }
     return render(request, 'manage_my_courses/list_my_courses_summary_editable.html', context)
 
