@@ -27,7 +27,7 @@ from osis_role.contrib.views import PermissionRequiredMixin
 
 class GroupUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
     # PermissionRequiredMixin
-    permission_required = 'base.change_educationgroup'
+    permission_required = 'base.change_group'
     raise_exception = True
 
     template_name = "education_group_app/group/upsert/update.html"

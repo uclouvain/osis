@@ -52,7 +52,7 @@
             <li class="divider"></li>
             {% if update_group_url %}
                 <li>
-                    {% a_tag_has_perm update_group_url _('Modify') update_permission_name user %}
+                    {% a_tag_has_perm update_group_url _('Modify') update_permission_name user group_year %}
                 </li>
             {% endif %}
             {% if update_training_url %}

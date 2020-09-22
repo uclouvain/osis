@@ -54,7 +54,7 @@ from program_management.ddd.service.write import delete_training_with_program_tr
 
 
 class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
-    permission_required = 'base.change_educationgroup'
+    permission_required = 'base.change_training'
     raise_exception = True
 
     template_name = "education_group_app/training/upsert/update.html"

@@ -38,8 +38,19 @@ class CentralManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
                 predicates.is_user_attached_to_management_entity,
             'base.add_group':
                 predicates.is_user_attached_to_management_entity,
-            # TODO : split in training, minitraining, group
-            'base.change_educationgroup':
+            'base.change_training':
+                predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
+                predicates.is_user_attached_to_management_entity &
+                predicates.is_education_group_type_authorized_according_to_user_scope,
+            'base.change_minitraining':
+                predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
+                predicates.is_user_attached_to_management_entity &
+                predicates.is_education_group_type_authorized_according_to_user_scope,
+            'base.change_group':
+                predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
+                predicates.is_user_attached_to_management_entity &
+                predicates.is_education_group_type_authorized_according_to_user_scope,
+            'base.change_prerequisite':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_user_attached_to_management_entity &
                 predicates.is_education_group_type_authorized_according_to_user_scope,
