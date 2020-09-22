@@ -168,6 +168,7 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             "delete_permanently_mini_training_url": self.get_delete_permanently_mini_training_url(),
             "delete_permanently_tree_version": self.get_delete_permanently_tree_version_url(),
             "create_version_url": self.get_create_version_url(),
+            "create_version_permission_name": self.get_create_version_permission_name(),
             "is_root_node": is_root_node,
         }
 
@@ -209,6 +210,9 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
                 'create_education_group_version',
                 kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}
             ) + "?path={}".format(self.get_path())
+
+    def get_create_version_permission_name(self) -> str:
+        return "base.add_minitraining_version"
 
     def get_delete_permanently_tree_version_url(self):
         if not self.program_tree_version_identity.is_standard():
