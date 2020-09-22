@@ -323,6 +323,9 @@ msgstr ""
 msgid "Include transition"
 msgstr ""
 
+msgid "Included in"
+msgstr ""
+
 msgid "Internship"
 msgstr ""
 
@@ -398,12 +401,6 @@ msgid "Main gathering"
 msgstr ""
 
 msgid "Mandatory"
-msgstr ""
-
-msgid "Max. credits"
-msgstr ""
-
-msgid "Min. credits"
 msgstr ""
 
 msgid "Mini-Training"

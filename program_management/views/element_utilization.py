@@ -23,15 +23,22 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Dict, List, Any, Optional
+
+from django.urls import reverse
+
 from osis_role.contrib.views import PermissionRequiredMixin
-from program_management.ddd import command
-from program_management.ddd.service.read import search_tree_versions_using_node_service
+
 from program_management.views.generic import LearningUnitGeneric
-from program_management.serializers.node_view import get_program_tree_version_name
-from program_management.ddd.domain.node import NodeIdentity
+
+
+from program_management.ddd.business_types import *
+from program_management.ddd.domain.node import NodeGroupYear, NodeIdentity
+from program_management.ddd.service.read import search_program_trees_using_node_service
+
+from program_management.ddd.command import GetProgramTreesFromNodeCommand
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
-from program_management.serializers.node_view import get_program_tree_version_title
-from django.utils import translation
+from program_management.serializers.node_view import get_program_tree_version_name
 
 
 class LearningUnitUtilization(PermissionRequiredMixin, LearningUnitGeneric):
@@ -42,33 +49,130 @@ class LearningUnitUtilization(PermissionRequiredMixin, LearningUnitGeneric):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        cmd = command.GetProgramTreesVersionFromNodeCommand(code=self.node.code, year=self.node.year)
-        program_trees_versions = search_tree_versions_using_node_service.search_tree_versions_using_node(cmd)
-
-        context['utilization_rows'] = []
-        for program_tree_version in program_trees_versions:
-            tree = program_tree_version.get_tree()
-            for link in tree.get_links_using_node(self.node):
-                parent_node_identity = NodeIdentity(code=link.parent.code, year=link.parent.year)
-                context['utilization_rows'].append(
-                    {'link': link,
-                     'link_parent_version_label': get_program_tree_version_name(
-                         parent_node_identity,
-                         ProgramTreeVersionRepository.search_all_versions_from_root_node(parent_node_identity)
-                     ),
-                     'root_nodes': [tree.root_node],
-                     'root_version_label': "{}".format(
-                         program_tree_version.version_label if program_tree_version.version_label else ''
-                     ),
-                     'root_version_title': "{}".format(
-                         program_tree_version.title_fr if program_tree_version.title_fr else ''
-                     ),
-                     'link_parent_version_title': get_program_tree_version_title(
-                         parent_node_identity,
-                         ProgramTreeVersionRepository.search_all_versions_from_root_node(parent_node_identity),
-                         translation.get_language()
-                     ),
-                     }
-                )
-        context['utilization_rows'] = sorted(context['utilization_rows'], key=lambda row: row['link'].parent.code)
+        context['utilization_rows'] = get_utilization_rows(NodeIdentity(code=self.node.code, year=self.node.year))
         return context
+
+
+def get_utilization_rows(node_identity: 'NodeIdentity') -> List[Dict[str, Any]]:
+    cmd = GetProgramTreesFromNodeCommand(code=node_identity.code, year=node_identity.year)
+    program_trees = search_program_trees_using_node_service.search_program_trees_using_node(cmd)
+
+    utilization_rows_dict = {}
+    parent_nodes = []
+
+    for tree in program_trees:
+        for path, child_node in tree.root_node.descendents.items():
+            if child_node.entity_id == node_identity:
+                links = tree.get_links_using_node(child_node)
+                for link in links:
+                    if link.parent not in parent_nodes:
+                        cmd = GetProgramTreesFromNodeCommand(code=link.parent.code, year=link.parent.year)
+                        parent_node_pgm_trees = search_program_trees_using_node_service.search_program_trees_using_node(
+                            cmd)
+                        if parent_node_pgm_trees:
+                            _build_parents_info(link, parent_node_pgm_trees, utilization_rows_dict)
+                        else:
+                            lk_to_update = utilization_rows_dict.get(link, [])
+                            if link.parent not in lk_to_update:
+                                utilization_rows_dict.update({link: lk_to_update})
+
+    return _buid_utilization_rows(utilization_rows_dict)
+
+
+def _buid_utilization_rows(utilization_rows_dict: Dict['Link', List['Node']]) -> List[Dict[str, Any]]:
+    utilization_rows = []
+
+    for link, training_nodes in utilization_rows_dict.items():
+        utilization_in_trainings = {}
+        # if len(training_nodes) == 0 and \
+        #         (link.parent.is_minor_or_deepening()) or \
+        #         (link.parent.is_training() and link.parent.is_finality()) or \
+        #         link.parent.is_training() or link.parent.is_mini_training():
+        #     utilization_in_trainings = {link.parent: []}
+        # else:
+        if len(training_nodes) > 0:
+            for utilization in training_nodes:
+                root_node = utilization.get('root_node')
+                direct_parent = utilization.get('parent_direct_node')
+                key = direct_parent if direct_parent else root_node
+                if key:
+                    if key not in utilization_in_trainings:
+                        utilization_in_trainings.update({key: []})
+
+                    used_trainings = utilization_in_trainings.get(key)
+                    if root_node and key != root_node and root_node not in used_trainings:
+                        used_trainings.append(root_node)
+                        utilization_in_trainings.update({key: used_trainings})
+        elif (link.parent.is_minor_or_deepening()) or (link.parent.is_training() and link.parent.is_finality()):
+            utilization_in_trainings = {link.parent: []}
+        utilization_rows.append(
+            {
+                'link': link,
+                'training_nodes': _get_training_nodes(utilization_in_trainings)
+            }
+        )
+    return sorted(utilization_rows, key=lambda row: row['link'].parent.code)
+
+
+def _get_training_nodes(dd: Dict['NodeGroupYear', List['NodeGroupYear']]) -> List[Dict[str, Any]]:
+    training_nodes = []
+    for direct_parent, main_root_nodes in dd.items():
+        root_nodes = []
+        for root_node in main_root_nodes:
+            root_nodes.append(
+                {
+                    'root': root_node,
+                    'version_name': _get_version_name(root_node),
+                    'url': _get_identification_url(root_node)
+                }
+            )
+
+        training_nodes.append(
+            {
+                'direct_gathering': {'parent': direct_parent, 'url': _get_identification_url(direct_parent)},
+                'root_nodes': sorted(root_nodes, key=lambda row: row['root'].title),
+                'version_name': _get_version_name(direct_parent)
+            }
+        )
+    return sorted(training_nodes, key=lambda row: row['direct_gathering']['parent'].title)
+
+
+def _get_version_name(direct_parent):
+    parent_node_identity = NodeIdentity(code=direct_parent.code, year=direct_parent.year)
+    version_name = get_program_tree_version_name(
+        parent_node_identity,
+        ProgramTreeVersionRepository.search_all_versions_from_root_node(parent_node_identity)
+    )
+    return version_name
+
+
+def _get_identification_url(node: 'Node'):
+    return reverse('element_identification', kwargs={'code': node.code, 'year': node.year})
+
+
+def get_explore_parents(parents: List['Node']) -> Optional[Dict[str, 'Node']]:
+    parent_direct_node = None
+    root_node = None
+    for node in parents:
+        if (node.is_minor_or_deepening()) or (node.is_training() and node.is_finality()):
+            parent_direct_node = node
+        if node.is_training() or node.is_mini_training():
+            root_node = node
+
+    if parent_direct_node is None and root_node is None:
+        return None
+    return {
+        'parent_direct_node': parent_direct_node,
+        'root_node': root_node
+    }
+
+
+def _build_parents_info(link, parent_node_pgm_trees, utilization_rows_dict):
+    for parent_tree in parent_node_pgm_trees:
+        for path, child_node in parent_tree.root_node.descendents.items():
+            if isinstance(child_node, NodeGroupYear) and child_node == link.parent:
+                gathering = get_explore_parents(parent_tree.get_parents(path))
+                lk_to_update = utilization_rows_dict.get(link, [])
+                if gathering:
+                    lk_to_update.append(gathering)
+                utilization_rows_dict.update({link: lk_to_update})
