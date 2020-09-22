@@ -51,7 +51,6 @@ def create_and_report_mini_training_with_program_tree(
     # THEN
 
     # 1. Create Program tree
-
     program_tree_identity = create_standard_program_tree_service.create_standard_program_tree(
         CreateStandardVersionCommand(
             offer_acronym=create_mini_training_cmd.abbreviated_title,
@@ -60,21 +59,21 @@ def create_and_report_mini_training_with_program_tree(
         )
     )
 
-    # 2. Postpone Program tree
-    postpone_program_tree_service_mini_training.postpone_program_tree(
-        PostponeProgramTreeCommand(
-            from_code=program_tree_identity.code,
-            from_year=program_tree_identity.year,
-            offer_acronym=create_mini_training_cmd.abbreviated_title
-        )
-    )
-
-    # 3. Create standard version of program tree
+    # 2. Create standard version of program tree
     program_tree_version_identity = create_standard_version_service.create_standard_program_version(
         CreateStandardVersionCommand(
             offer_acronym=create_mini_training_cmd.abbreviated_title,
             code=create_mini_training_cmd.code,
             year=create_mini_training_cmd.year,
+        )
+    )
+
+    # 3. Postpone Program tree
+    postpone_program_tree_service_mini_training.postpone_program_tree(
+        PostponeProgramTreeCommand(
+            from_code=program_tree_identity.code,
+            from_year=program_tree_identity.year,
+            offer_acronym=create_mini_training_cmd.abbreviated_title
         )
     )
 
