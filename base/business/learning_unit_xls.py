@@ -276,8 +276,9 @@ def _concatenate_training_data(learning_unit_year: LearningUnitYear, group_eleme
                 leaf_credits,
                 nb_parents,
                 __acronym_with_version_label(training['acronym'], training['is_transition'], training['version_name']),
-                training['title_fr'] + ' [{}]'.format(training['version_title_fr'])
-                if training['version_title_fr'] else '',
+                training['title_fr'] + (
+                    ' [{}]'.format(training['version_title_fr']) if training['version_title_fr'] else ''
+                ),
             )
             concatenated_string += training_string
 
