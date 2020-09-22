@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List, Optional
+from typing import List
 
 import attr
 
@@ -204,7 +204,7 @@ class Training(interface.RootEntity):
 
     # FIXME :: split fields into separate ValueObjects (to discuss with business people)
     entity_id = entity_identity = attr.ib(type=TrainingIdentity)
-    code = attr.ib(type=str)  # to remove
+    code = attr.ib(type=str, converter=to_upper_case_converter)  # to remove
     type = attr.ib(type=TrainingType)
     credits = attr.ib(type=int)
     start_year = attr.ib(type=int)

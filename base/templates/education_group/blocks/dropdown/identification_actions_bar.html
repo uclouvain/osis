@@ -58,10 +58,12 @@
             {% if update_training_url %}
                 <li>
                     {% a_tag_has_perm update_training_url _('Modify') 'base.change_educationgroup' user %}
+                </li>
             {% endif %}
             {% if update_mini_training_url %}
                 <li>
-                {% a_tag_has_perm update_mini_training_url _('Modify') 'base.change_educationgroup' user %}
+                    {% a_tag_has_perm update_mini_training_url _('Modify') 'base.change_educationgroup' user %}
+                </li>
             {% endif %}
             {% if delete_group_url %}
                 <li>

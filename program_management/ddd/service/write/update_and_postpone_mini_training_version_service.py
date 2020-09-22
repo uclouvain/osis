@@ -23,42 +23,48 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
+
 from django.db import transaction
 
-from education_group.ddd.command import UpdateGroupCommand
-from education_group.ddd.service.write import update_group_service
+from education_group.ddd.business_types import *
+from education_group.ddd.command import PostponeGroupModificationCommand
+from education_group.ddd.service.write import postpone_orphan_group_modification_service
 from program_management.ddd.business_types import *
-from program_management.ddd.command import UpdateProgramTreeVersionCommand, \
-    UpdateMiniTrainingVersionCommand, DeleteSpecificVersionCommand
-from program_management.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
+from program_management.ddd.command import UpdateProgramTreeVersionCommand, UpdateMiniTrainingVersionCommand, \
+    PostponeProgramTreeVersionCommand
 from program_management.ddd.domain.service.identity_search import GroupIdentitySearch
-from program_management.ddd.service.write import update_program_tree_version_service, delete_specific_version_service
+from program_management.ddd.service.write import update_program_tree_version_service, postpone_tree_version_service
 
 
 @transaction.atomic
-def update_mini_training_version(
+def update_and_postpone_mini_training_version(
         command: 'UpdateMiniTrainingVersionCommand',
-) -> 'ProgramTreeVersionIdentity':
-
+) -> List['ProgramTreeVersionIdentity']:
     tree_version_identity = update_program_tree_version_service.update_program_tree_version(
         __convert_to_update_tree_version_command(command)
     )
+    group_identity = GroupIdentitySearch().get_from_tree_version_identity(tree_version_identity)
 
-    update_group_service.update_group(
-        __convert_to_update_group_command(command, tree_version_identity)
+    postponed_tree_version_identities = postpone_tree_version_service.postpone_program_tree_version(
+        __convert_to_postpone_program_tree_version(command, group_identity)
     )
 
-    return tree_version_identity
+    postpone_orphan_group_modification_service.postpone_orphan_group_modification_service(
+        __convert_to_postpone_group_modification_command(command, group_identity)
+    )
+
+    return [tree_version_identity] + postponed_tree_version_identities
 
 
-def __convert_to_update_group_command(
+def __convert_to_postpone_group_modification_command(
         cmd: 'UpdateMiniTrainingVersionCommand',
-        tree_version_identity: 'ProgramTreeVersionIdentity'
-) -> 'UpdateGroupCommand':
-    group_identity = GroupIdentitySearch().get_from_tree_version_identity(tree_version_identity)
-    return UpdateGroupCommand(
+        group_identity: 'GroupIdentity'
+) -> 'PostponeGroupModificationCommand':
+    return PostponeGroupModificationCommand(
         code=group_identity.code,
-        year=cmd.year,
+
+        postpone_from_year=cmd.year,
         abbreviated_title=cmd.offer_acronym,
         title_fr=cmd.title_fr,
         title_en=cmd.title_en,
@@ -84,4 +90,18 @@ def __convert_to_update_tree_version_command(command: 'UpdateMiniTrainingVersion
         is_transition=command.is_transition,
         title_en=command.title_en,
         title_fr=command.title_fr,
+    )
+
+
+def __convert_to_postpone_program_tree_version(
+        cmd: 'UpdateMiniTrainingVersionCommand',
+        group_identity: 'GroupIdentity'
+) -> 'PostponeProgramTreeVersionCommand':
+
+    return PostponeProgramTreeVersionCommand(
+        from_offer_acronym=cmd.offer_acronym,
+        from_version_name=cmd.version_name,
+        from_year=cmd.year,
+        from_is_transition=cmd.is_transition,
+        from_code=group_identity.code
     )

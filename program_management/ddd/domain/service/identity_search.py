@@ -42,7 +42,9 @@ from program_management.models.education_group_version import EducationGroupVers
 
 
 class ProgramTreeVersionIdentitySearch(interface.DomainService):
-    def get_from_node_identity(self, node_identity: 'NodeIdentity') -> 'ProgramTreeVersionIdentity':
+
+    @classmethod
+    def get_from_node_identity(cls, node_identity: 'NodeIdentity') -> 'ProgramTreeVersionIdentity':
         values = GroupYear.objects.filter(
             partial_acronym=node_identity.code,
             academic_year__year=node_identity.year
@@ -55,6 +57,15 @@ class ProgramTreeVersionIdentitySearch(interface.DomainService):
         if values:
             return ProgramTreeVersionIdentity(**values[0])
         raise interface.BusinessException("Program tree version identity not found")
+
+    @classmethod
+    def get_from_program_tree_identity(cls, identity: 'ProgramTreeIdentity') -> 'ProgramTreeVersionIdentity':
+        return cls.get_from_node_identity(NodeIdentitySearch().get_from_program_tree_identity(identity))
+
+    @classmethod
+    def get_from_group_identity(cls, identity: 'GroupIdentity') -> 'ProgramTreeVersionIdentity':
+        tree_identity = ProgramTreeIdentitySearch().get_from_group_identity(identity)
+        return cls.get_from_program_tree_identity(tree_identity)
 
     @classmethod
     def get_all_program_tree_version_identities(
@@ -136,6 +147,10 @@ class ProgramTreeIdentitySearch(interface.DomainService):
             identity: 'ProgramTreeVersionIdentity'
     ) -> 'ProgramTreeIdentity':
         return self.get_from_node_identity(NodeIdentitySearch().get_from_tree_version_identity(identity))
+
+    @classmethod
+    def get_from_group_identity(cls, group_identity: 'GroupIdentity') -> 'ProgramTreeIdentity':
+        return ProgramTreeIdentity(code=group_identity.code, year=group_identity.year)
 
 
 class TrainingIdentitySearch(interface.DomainService):

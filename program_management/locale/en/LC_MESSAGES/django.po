@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-15 14:49+0200\n"
+"POT-Creation-Date: 2020-09-21 13:45+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,15 +17,19 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #, python-format
-msgid "\"%(child)s\" has been detached from \"%(parent)s\""
-msgstr "\"%(child)s\" has been removed from \"%(parent)s\""
+msgid "\"%(child)s\" has been %(copy_message)s into \"%(parent)s\""
+msgstr ""
 
 #, python-format
-msgid "\"%(child)s\" has been pasted into \"%(parent)s\""
+msgid "\"%(child)s\" has been detached from \"%(parent)s\""
 msgstr ""
 
 #, python-format
 msgid "\"%(child)s\" has been successfully updated"
+msgstr ""
+
+#, python-format
+msgid "%(node)s has been moved"
 msgstr ""
 
 #, python-format
@@ -124,7 +128,7 @@ msgstr ""
 msgid "Admission exam"
 msgstr ""
 
-msgctxt "plural"
+msgctxt "female plural"
 msgid "All"
 msgstr ""
 
@@ -139,8 +143,8 @@ msgid "Are you sure you want to delete %(offer_acronym)s %(version_name)s ?"
 msgstr ""
 
 #, python-format
-msgid "Are you sure you want to detach %(acronym)s ?"
-msgstr "Are you sure you want to remove %(acronym)s ?"
+msgid "Are you sure you want to detach %(child)s ?"
+msgstr "Are you sure you want to remove %(child)s ?"
 
 msgid "Attribution entity"
 msgstr ""
@@ -405,6 +409,12 @@ msgstr ""
 msgid "Mini-Training"
 msgstr ""
 
+#, python-format
+msgid ""
+"Mini-Training <a href='%(link)s'> %(offer_acronym)s[%(acronym)s] "
+"(%(academic_year)s) </a> successfully updated."
+msgstr ""
+
 msgid "Mobile phone"
 msgstr ""
 
@@ -586,6 +596,9 @@ msgstr ""
 msgid "Relative credits must be greater or equals than 0"
 msgstr ""
 
+msgid "Relative credits must be lower or equals to 999"
+msgstr ""
+
 msgid "Remark"
 msgstr ""
 
@@ -605,6 +618,9 @@ msgid "Schedule type"
 msgstr ""
 
 msgid "Search"
+msgstr ""
+
+msgid "Search..."
 msgstr ""
 
 msgid "Select a language"
@@ -653,10 +669,6 @@ msgid "Teaching methods"
 msgstr ""
 
 #, python-format
-msgid "The %(acronym)s has been moved"
-msgstr ""
-
-#, python-format
 msgid ""
 "The child %(child)s you want to attach is a parent of the node you want to "
 "attach."
@@ -676,7 +688,7 @@ msgid "The learning unit is a prerequisite"
 msgstr ""
 
 #, python-format
-msgid "The link of %(code)s - %(acronym)s - %(year)s has been updated."
+msgid "The link \"%(node)s\" has been updated."
 msgstr ""
 
 #, python-format
@@ -731,6 +743,12 @@ msgid "Title in French"
 msgstr ""
 
 msgid "Training"
+msgstr ""
+
+#, python-format
+msgid ""
+"Training <a href='%(link)s'> %(offer_acronym)s[%(acronym)s] "
+"(%(academic_year)s) </a> successfully updated."
 msgstr ""
 
 msgid "Trainings"
@@ -856,6 +874,9 @@ msgstr ""
 msgid "activities in English"
 msgstr ""
 
+msgid "added"
+msgstr ""
+
 msgid "bibliography"
 msgstr ""
 
@@ -878,6 +899,9 @@ msgid "emails"
 msgstr ""
 
 msgid "faculty number"
+msgstr ""
+
+msgid "filter by section"
 msgstr ""
 
 msgid "group year"
@@ -921,6 +945,9 @@ msgid "on"
 msgstr ""
 
 msgid "optional"
+msgstr ""
+
+msgid "pasted"
 msgstr ""
 
 #, python-format

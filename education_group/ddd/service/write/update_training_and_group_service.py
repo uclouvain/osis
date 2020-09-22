@@ -21,8 +21,6 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from typing import List
-
 from django.db import transaction
 
 from base.models.enums.active_status import ActiveStatusEnum
@@ -34,7 +32,7 @@ from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.command import UpdateGroupCommand
-from education_group.ddd.domain import training, group
+from education_group.ddd.domain import training
 from education_group.ddd.domain._campus import Campus
 from education_group.ddd.domain._co_graduation import CoGraduation
 from education_group.ddd.domain._diploma import Diploma, DiplomaAim, DiplomaAimIdentity
@@ -44,40 +42,24 @@ from education_group.ddd.domain._hops import HOPS
 from education_group.ddd.domain._isced_domain import IscedDomain, IscedDomainIdentity
 from education_group.ddd.domain._study_domain import StudyDomain, StudyDomainIdentity
 from education_group.ddd.domain._titles import Titles
-from education_group.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
-from education_group.ddd.repository import training as training_repository, group as group_repository
-from education_group.ddd.service.write import postpone_training_service, update_group_service
+from education_group.ddd.repository import training as training_repository
+from education_group.ddd.service.write import update_group_service
 
 
-@transaction.atomic()  # TODO :: rename UpdateTrainingCommand to UpdateTrainingAndGroupCommand
-def update_training(cmd: command.UpdateTrainingCommand) -> List['TrainingIdentity']:
-    training_identity = training.TrainingIdentity(acronym=cmd.abbreviated_title, year=cmd.year)
+@transaction.atomic()
+def update_training_and_group(cmd: command.UpdateTrainingAndGroupCommand) -> 'TrainingIdentity':
+    training_identity = training.TrainingIdentity(acronym=cmd.acronym, year=cmd.year)
     group_identity = update_group_service.update_group(__convert_to_update_group_command(cmd))
-
-    postpone_until_year = CalculateEndPostponement.calculate_year_of_postponement(
-        training_identity,
-        group_identity,
-        training_repository.TrainingRepository,
-        group_repository.GroupRepository
-    )
 
     training_domain_obj = training_repository.TrainingRepository.get(training_identity)
 
-    training_domain_obj.update(convert_command_to_update_training_data(cmd))
+    training_domain_obj.update(__convert_command_to_update_training_data(cmd))
     training_repository.TrainingRepository.update(training_domain_obj)
 
-    result = postpone_training_service.postpone_training(
-        command.PostponeTrainingCommand(
-            acronym=cmd.abbreviated_title,
-            postpone_from_year=cmd.year,
-            postpone_until_year=postpone_until_year
-        )
-    )
-
-    return [training_identity] + result
+    return training_identity
 
 
-def convert_command_to_update_training_data(cmd: command.UpdateTrainingCommand) -> 'training.UpdateTrainingData':
+def __convert_command_to_update_training_data(cmd: command.UpdateTrainingAndGroupCommand) -> 'training.UpdateTrainingData':
     return training.UpdateTrainingData(
         credits=cmd.credits,
         titles=Titles(
@@ -153,11 +135,11 @@ def convert_command_to_update_training_data(cmd: command.UpdateTrainingCommand) 
     )
 
 
-def __convert_to_update_group_command(training_command: command.UpdateTrainingCommand) -> 'UpdateGroupCommand':
+def __convert_to_update_group_command(training_command: command.UpdateTrainingAndGroupCommand) -> 'UpdateGroupCommand':
     return UpdateGroupCommand(
         code=training_command.code,
         year=training_command.year,
-        abbreviated_title=training_command.abbreviated_title,
+        abbreviated_title=training_command.acronym,
         title_fr=training_command.title_fr,
         title_en=training_command.title_en,
         credits=training_command.credits,

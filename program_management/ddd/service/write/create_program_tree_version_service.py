@@ -23,15 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
-
-from program_management.ddd.command import PostponeProgramTreeVersionCommand, CreateProgramTreeVersionCommand, \
-    DuplicateProgramTree, PostponeProgramTreeCommand
+from program_management.ddd.command import CreateProgramTreeVersionCommand, DuplicateProgramTree
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionBuilder, ProgramTreeVersionIdentity, \
     STANDARD
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
-from program_management.ddd.service.write import postpone_tree_version_service, duplicate_program_tree_service, \
-    postpone_program_tree_service
+from program_management.ddd.service.write import duplicate_program_tree_service
 
 
 def create_program_tree_version(

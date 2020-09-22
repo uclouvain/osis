@@ -25,6 +25,7 @@ import functools
 from typing import List, Dict, Optional
 
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db import transaction
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render
 from django.utils.functional import cached_property
@@ -36,8 +37,8 @@ from base.views.common import display_success_messages, display_warning_messages
 from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import exception
-from education_group.ddd.service.read import get_group_service, get_mini_training_service, \
-    get_update_mini_training_warning_messages
+from education_group.ddd.domain.mini_training import MiniTrainingIdentity
+from education_group.ddd.service.read import get_group_service, get_mini_training_service
 from education_group.forms import mini_training as mini_training_forms
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from education_group.views.proxy.read import Tab
@@ -45,9 +46,8 @@ from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command as command_program_management
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception as program_management_exception
-from program_management.ddd.service.write import update_mini_training_with_program_tree_service, \
-    report_mini_training_with_program_tree, \
-    delete_mini_training_with_program_tree_service
+from program_management.ddd.service.write import delete_mini_training_with_program_tree_service, \
+    postpone_mini_training_and_program_tree_modifications_service
 
 
 class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
@@ -56,6 +56,7 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
     template_name = "education_group_app/mini_training/upsert/update.html"
 
+    @transaction.non_atomic_requests
     def get(self, request, *args, **kwargs):
         context = {
             "tabs": self.get_tabs(),
@@ -66,29 +67,18 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         }
         return render(request, self.template_name, context)
 
+    @transaction.non_atomic_requests
     def post(self, request, *args, **kwargs):
         if self.mini_training_form.is_valid():
             deleted_trainings = self.delete_mini_training()
-
             if not self.mini_training_form.errors:
-                update_trainings = list(set(self.update_mini_training() + self.report_mini_training()))
+                update_trainings = list(set(self.update_mini_training()))
                 update_trainings.sort(key=lambda identity: identity.year)
-
             if not self.mini_training_form.errors:
                 success_messages = self.get_success_msg_updated_mini_trainings(update_trainings)
                 success_messages += self.get_success_msg_deleted_mini_trainings(deleted_trainings)
                 display_success_messages(request, success_messages, extra_tags='safe')
-
-                warning_messages = get_update_mini_training_warning_messages.get_conflicted_fields(
-                    command.GetUpdateMiniTrainingWarningMessages(
-                        acronym=self.get_mini_training_obj().acronym,
-                        code=self.get_mini_training_obj().code,
-                        year=self.get_mini_training_obj().year
-                    )
-                )
-                display_warning_messages(request, warning_messages, extra_tags='safe')
                 return HttpResponseRedirect(self.get_success_url())
-
         display_error_messages(self.request, self._get_default_error_messages())
         return self.get(request, *args, **kwargs)
 
@@ -116,39 +106,31 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
     def update_mini_training(self) -> List['MiniTrainingIdentity']:
         try:
             update_command = self._convert_form_to_update_mini_training_command(self.mini_training_form)
-            return update_mini_training_with_program_tree_service.update_and_report_mini_training_with_program_tree(
-                update_command
-            )
+            return postpone_mini_training_and_program_tree_modifications_service.\
+                postpone_mini_training_and_program_tree_modifications(
+                    update_command
+                )
         except exception.ContentConstraintTypeMissing as e:
             self.mini_training_form.add_error("constraint_type", e.message)
         except (exception.ContentConstraintMinimumMaximumMissing,
                 exception.ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum) as e:
             self.mini_training_form.add_error("min_constraint", e.message)
             self.mini_training_form.add_error("max_constraint", "")
-        return []
-
-    def report_mini_training(self) -> List['MiniTrainingIdentity']:
-        if self.get_mini_training_obj().end_year:
-            return report_mini_training_with_program_tree.report_mini_training_with_program_tree(
-                command.PostponeMiniTrainingWithProgramTreeCommand(
-                    abbreviated_title=self.get_mini_training_obj().acronym,
-                    code=self.get_mini_training_obj().code,
-                    from_year=self.get_mini_training_obj().end_year
-                )
-            )
-
+        except exception.MiniTrainingCopyConsistencyException as e:
+            display_warning_messages(self.request, e.message)
+            return [
+                MiniTrainingIdentity(acronym=self.get_mini_training_obj().acronym, year=year)
+                for year in range(self.get_mini_training_obj().year, e.conflicted_fields_year)
+            ]
         return []
 
     def delete_mini_training(self) -> List['MiniTrainingIdentity']:
         end_year = self.mini_training_form.cleaned_data["end_year"]
         if not end_year:
             return []
-
         try:
-
             delete_command = self._convert_form_to_delete_mini_trainings_command(self.mini_training_form)
             return delete_mini_training_with_program_tree_service.delete_mini_training_with_program_tree(delete_command)
-
         except (
             program_management_exception.ProgramTreeNonEmpty,
             exception.MiniTrainingHaveLinkWithEPC,
@@ -161,7 +143,6 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 None,
                 _("Impossible to put end date to %(end_year)s: %(msg)s") % {"msg": e.message, "end_year": end_year}
             )
-
         return []
 
     def get_attach_path(self) -> Optional['Path']:
@@ -256,9 +237,10 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
     def _convert_form_to_update_mini_training_command(
             self,
-            form: mini_training_forms.UpdateMiniTrainingForm) -> command.UpdateMiniTrainingCommand:
+            form: mini_training_forms.UpdateMiniTrainingForm
+    ) -> command_program_management.PostponeMiniTrainingAndRootGroupModificationWithProgramTreeCommand:
         cleaned_data = form.cleaned_data
-        return command.UpdateMiniTrainingCommand(
+        return command_program_management.PostponeMiniTrainingAndRootGroupModificationWithProgramTreeCommand(
             abbreviated_title=cleaned_data['abbreviated_title'],
             code=cleaned_data['code'],
             year=cleaned_data['academic_year'],

@@ -28,14 +28,18 @@ from typing import Dict
 from django import forms
 from django.contrib.auth.models import User
 from django.forms import TextInput
+from django.utils.functional import lazy
 from django.utils.translation import gettext_lazy as _
 
 from base.business.event_perms import EventPermEducationGroupEdition
 from base.forms.common import ValidationRuleMixin
 from base.forms.utils.choice_field import BLANK_CHOICE
+from base.models.certificate_aim import CertificateAim
 from base.models.enums.constraint_type import ConstraintTypeEnum
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType
 from education_group.forms import fields
+from education_group.forms.training import _get_section_choices
+from education_group.forms.widgets import CertificateAimsWidget
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from program_management.ddd.command import GetEndPostponementYearCommand
 from program_management.ddd.domain.node import NodeIdentity
@@ -219,6 +223,12 @@ class UpdateTrainingVersionForm(ValidationRuleMixin, PermissionFieldMixin, Speci
     coefficient = forms.CharField(label=_('Co-graduation total coefficient'), required=False, disabled=True)
 
     # Diploma tab
+    section = forms.ChoiceField(
+        label=_('filter by section').capitalize() + ':',
+        choices=lazy(_get_section_choices, list),
+        required=False,
+        disabled=True
+    )
     leads_to_diploma = forms.BooleanField(
         initial=False,
         label=_('Leads to diploma/certificate'),
@@ -227,7 +237,22 @@ class UpdateTrainingVersionForm(ValidationRuleMixin, PermissionFieldMixin, Speci
     )
     diploma_printing_title = forms.CharField(max_length=240, required=False, label=_('Diploma title'), disabled=True)
     professional_title = forms.CharField(max_length=320, required=False, label=_('Professionnal title'), disabled=True)
-    certificate_aims = forms.CharField(required=False, label=_('certificate aims').capitalize(), disabled=True)
+    certificate_aims = forms.ModelMultipleChoiceField(
+        label=_('certificate aims').capitalize(),
+        queryset=CertificateAim.objects.all(),
+        required=False,
+        disabled=True,
+        to_field_name="code",
+        widget=CertificateAimsWidget(
+            url='certificate_aim_autocomplete',
+            attrs={
+                'data-html': True,
+                'data-placeholder': _('Search...'),
+                'data-width': '100%',
+            },
+            forward=['section'],
+        )
+    )
 
     def __init__(
             self,
@@ -335,3 +360,4 @@ class UpdateMiniTrainingVersionForm(ValidationRuleMixin, PermissionFieldMixin, S
     # PermissionFieldMixin
     def get_model_permission_filter_kwargs(self) -> Dict:
         return {'context': self.get_context()}
+
