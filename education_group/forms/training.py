@@ -74,7 +74,7 @@ def _get_section_choices():
     return add_blank(CertificateAim.objects.values_list('section', 'section').distinct().order_by('section'))
 
 
-class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
+class CreateTrainingForm(ValidationRuleMixin, forms.Form):
 
     # panel_informations_form.html
     acronym = UpperCaseCharField(max_length=15, label=_("Acronym/Short title"))
@@ -385,17 +385,8 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     def field_reference(self, field_name: str) -> str:
         return '.'.join(["TrainingForm", self.training_type, field_name])
 
-    # PermissionFieldMixin
-    def get_context(self) -> str:
-        is_edition_period_opened = EventPermEducationGroupEdition(raise_exception=False).is_open()
-        return TRAINING_PGRM_ENCODING_PERIOD if is_edition_period_opened else TRAINING_DAILY_MANAGEMENT
 
-    # PermissionFieldMixin
-    def get_model_permission_filter_kwargs(self) -> Dict:
-        return {'context': self.get_context()}
-
-
-class UpdateTrainingForm(CreateTrainingForm):
+class UpdateTrainingForm(PermissionFieldMixin, CreateTrainingForm):
 
     start_year = forms.ModelChoiceField(
         queryset=AcademicYear.objects.all(),
@@ -405,7 +396,9 @@ class UpdateTrainingForm(CreateTrainingForm):
         required=False
     )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, event_perm_obj=None, **kwargs):
+        self.event_perm_obj = event_perm_obj
+
         super().__init__(*args, **kwargs)
         self.fields["academic_year"].label = _('Validity')
         self.__init_end_year_field()
@@ -414,6 +407,18 @@ class UpdateTrainingForm(CreateTrainingForm):
         initial_academic_year_value = self.initial.get("academic_year", None)
         if initial_academic_year_value:
             self.fields["end_year"].queryset = AcademicYear.objects.filter(year__gte=initial_academic_year_value)
+
+    # PermissionFieldMixin
+    def get_context(self) -> str:
+        is_edition_period_opened = EventPermEducationGroupEdition(
+            obj=self.event_perm_obj,
+            raise_exception=False
+        ).is_open()
+        return TRAINING_PGRM_ENCODING_PERIOD if is_edition_period_opened else TRAINING_DAILY_MANAGEMENT
+
+    # PermissionFieldMixin
+    def get_model_permission_filter_kwargs(self) -> Dict:
+        return {'context': self.get_context()}
 
 
 @register('university_domains')

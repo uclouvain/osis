@@ -83,6 +83,7 @@ class TestGroupReadContent(TestCase):
 
         self.assertEqual(response.context['person'], self.person)
         self.assertEqual(response.context['group_year'], self.element_group_year.group_year)
+        self.assertEqual(response.context['update_permission_name'], "base.change_link_data")
         self.assertIsInstance(response.context['tree'], str)
         self.assertIsInstance(response.context['node'], NodeGroupYear)
         self.assertIsInstance(response.context['children'], List)

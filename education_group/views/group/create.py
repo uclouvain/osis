@@ -171,7 +171,7 @@ class GroupCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             )
         return None
 
-    def get_permission_object(self) -> Union[GroupYear, None]:
+    def get_permission_object(self) -> Optional[GroupYear]:
         path = self.get_attach_path()
         if path:
             # Take parent from path (latest element)
