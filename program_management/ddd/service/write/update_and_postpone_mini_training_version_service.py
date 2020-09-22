@@ -29,6 +29,7 @@ from django.db import transaction
 
 from education_group.ddd.business_types import *
 from education_group.ddd.command import PostponeGroupModificationCommand
+from education_group.ddd.domain.exception import GroupCopyConsistencyException
 from education_group.ddd.service.write import postpone_orphan_group_modification_service
 from program_management.ddd.business_types import *
 from program_management.ddd.command import UpdateProgramTreeVersionCommand, UpdateMiniTrainingVersionCommand, \
@@ -46,13 +47,20 @@ def update_and_postpone_mini_training_version(
     )
     group_identity = GroupIdentitySearch().get_from_tree_version_identity(tree_version_identity)
 
+    exception_raised = None
+    try:
+        postpone_orphan_group_modification_service.postpone_orphan_group_modification_service(
+            __convert_to_postpone_group_modification_command(command, group_identity)
+        )
+    except GroupCopyConsistencyException as e:
+        exception_raised = e
+
     postponed_tree_version_identities = postpone_tree_version_service.postpone_program_tree_version(
         __convert_to_postpone_program_tree_version(command, group_identity)
     )
 
-    postpone_orphan_group_modification_service.postpone_orphan_group_modification_service(
-        __convert_to_postpone_group_modification_command(command, group_identity)
-    )
+    if exception_raised:
+        raise exception_raised
 
     return [tree_version_identity] + postponed_tree_version_identities
 
