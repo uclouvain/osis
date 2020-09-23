@@ -196,6 +196,19 @@ class ManageMyCoursesViewTestCase(TestCase):
             context['event_perm_force_majeure_end_date'],
             self.academic_calendar_force_majeure.end_date
         )
+        msg = get_messages_from_response(response)
+        self.assertEqual(
+            msg[0].get('message'),
+            _("Force majeure case : Some fields of the description fiche can be edited from %(start_date)s to "
+              "%(end_date)s.") % {
+                "start_date": self.academic_calendar_force_majeure.start_date.strftime('%d/%m/%Y'),
+                "end_date": (
+                        self.academic_calendar_force_majeure.end_date - datetime.timedelta(days=1)
+                ).strftime('%d/%m/%Y'),
+                # TODO :: Remove timedelta when end_date is included in period
+            }
+        )
+        self.assertEqual(msg[0].get('level'), messages.WARNING)
 
     def test_list_my_attributions_force_majeure_not_editable(self):
         self.academic_calendar_force_majeure.start_date = datetime.date.today() + datetime.timedelta(days=7)
