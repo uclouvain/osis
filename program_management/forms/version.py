@@ -61,12 +61,12 @@ class SpecificVersionForm(forms.Form):
             attrs={'onchange': 'validate_version_name()', 'style': "text-transform: uppercase;"}
         ),
     )
-    title = forms.CharField(
+    version_title_fr = forms.CharField(
         max_length=100,
         required=False,
         label=_('Full title of the french version'),
     )
-    title_english = forms.CharField(
+    version_title_en = forms.CharField(
         max_length=100,
         required=False,
         label=_('Full title of the english version'),

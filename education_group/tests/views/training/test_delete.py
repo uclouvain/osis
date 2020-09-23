@@ -31,8 +31,7 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from base.tests.factories.person import PersonFactory
-from education_group.ddd.domain.exception import TrainingNotFoundException, TrainingHaveLinkWithEPC, \
-    TrainingHaveEnrollments
+from education_group.ddd.domain.exception import TrainingNotFoundException, TrainingHaveLinkWithEPC
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from education_group.tests.ddd.factories.training import TrainingFactory
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
@@ -70,6 +69,7 @@ class TestDeleteTrainingGetMethod(TestCase):
 
             root_group__partial_acronym=cls.root_node.code,
             root_group__academic_year__year=cls.root_node.year,
+            root_group__management_entity=cls.central_manager.entity,
         )
 
     def setUp(self) -> None:
@@ -143,6 +143,7 @@ class TestDeleteTrainingPostMethod(TestCase):
 
             root_group__partial_acronym=cls.root_node.code,
             root_group__academic_year__year=cls.root_node.year,
+            root_group__management_entity=cls.central_manager.entity,
         )
 
     def setUp(self) -> None:

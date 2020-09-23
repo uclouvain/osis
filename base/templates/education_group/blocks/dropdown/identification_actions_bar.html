@@ -52,17 +52,17 @@
             <li class="divider"></li>
             {% if update_group_url %}
                 <li>
-                    {% a_tag_has_perm update_group_url _('Modify') 'base.change_educationgroup' user %}
+                    {% a_tag_has_perm update_group_url _('Modify') update_permission_name user group_year %}
                 </li>
             {% endif %}
             {% if update_training_url %}
                 <li>
-                    {% a_tag_has_perm update_training_url _('Modify') 'base.change_educationgroup' user %}
+                    {% a_tag_has_perm update_training_url _('Modify') update_permission_name user education_group_version.root_group %}
                 </li>
             {% endif %}
             {% if update_mini_training_url %}
                 <li>
-                    {% a_tag_has_perm update_mini_training_url _('Modify') 'base.change_educationgroup' user %}
+                    {% a_tag_has_perm update_mini_training_url _('Modify') update_permission_name user education_group_version.root_group %}
                 </li>
             {% endif %}
             {% if delete_group_url %}
@@ -72,12 +72,12 @@
             {% endif %}
             {% if delete_permanently_training_url %}
                 <li>
-                    {% a_tag_modal_has_perm delete_permanently_training_url _('Delete permanently') 'base.delete_all_training' user education_group_version.offer %}
+                    {% a_tag_modal_has_perm delete_permanently_training_url _('Delete permanently') 'base.delete_all_training' user education_group_version.root_group %}
                 </li>
             {% endif %}
             {% if delete_permanently_mini_training_url %}
                 <li>
-                    {% a_tag_modal_has_perm delete_permanently_mini_training_url _('Delete permanently') 'base.delete_all_minitraining' user education_group_version.offer %}
+                    {% a_tag_modal_has_perm delete_permanently_mini_training_url _('Delete permanently') 'base.delete_all_minitraining' user education_group_version.root_group %}
                 </li>
             {% endif %}
             {% if delete_permanently_tree_version %}
@@ -88,7 +88,7 @@
             {% if create_version_url %}
                 <li class="divider"></li>
                 <li>
-                    {% a_tag_modal_has_perm create_version_url _('Create specific version') 'base.add_programtreeversion' user education_group_version.offer %}
+                    {% a_tag_modal_has_perm create_version_url _('Create specific version') create_version_permission_name user education_group_version.root_group %}
                 </li>
             {% endif %}
             <li class="divider"></li>
