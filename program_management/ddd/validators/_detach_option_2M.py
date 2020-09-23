@@ -71,8 +71,8 @@ class DetachOptionValidator(business_validator.BusinessValidator):
         for finality in tree_2m.get_all_finalities():
             finality_version = self.version_search.get_from_node_identity(finality.entity_id)
             options_to_detach_used_in_finality = set(self.options_to_detach) & set(finality.get_option_list())
-            options_to_detach_versions = self._get_options_versions(options_to_detach_used_in_finality)
             if options_to_detach_used_in_finality:
+                options_to_detach_versions = self._get_options_versions(options_to_detach_used_in_finality)
                 validation_errors.append(
                     self._get_validation_error_message(
                         finality_version,
