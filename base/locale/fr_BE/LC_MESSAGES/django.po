@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-17 16:09+0200\n"
+"POT-Creation-Date: 2020-09-22 11:19+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1939,6 +1939,9 @@ msgstr "Intégration prof."
 msgid "Professional"
 msgstr "Professionnel"
 
+msgid "Professional integration"
+msgstr "Intégration professionnelle"
+
 msgid "Professional internship"
 msgstr "Stage professionnel"
 
@@ -3226,9 +3229,6 @@ msgid "please_enable_javascript"
 msgstr ""
 "Veuillez <a href='http://enable-javascript.com/fr/' target='_blank'>activer "
 "le JavaScript</a> pour utiliser l'application."
-
-msgid "professional integration"
-msgstr "intégration professionnelle"
 
 msgid "project events"
 msgstr "événements projet"

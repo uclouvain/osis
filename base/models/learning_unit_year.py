@@ -55,7 +55,6 @@ from cms.models.translated_text import TranslatedText
 from education_group import publisher
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin, SerializableModelManager, \
     SerializableQuerySet
-from program_management.ddd import repositories
 
 AUTHORIZED_REGEX_CHARS = "$*+.^"
 REGEX_ACRONYM_CHARSET = "[A-Z0-9" + AUTHORIZED_REGEX_CHARS + "]+"
@@ -239,7 +238,7 @@ class LearningUnitYear(SerializableModel):
 
     summary_locked = models.BooleanField(default=False, verbose_name=_("blocked update for tutor"))
 
-    professional_integration = models.BooleanField(default=False, verbose_name=_('professional integration'))
+    professional_integration = models.BooleanField(default=False, verbose_name=_('Professional integration'))
 
     campus = models.ForeignKey('Campus', null=True, verbose_name=_("Learning location"), on_delete=models.PROTECT)
 

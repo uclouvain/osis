@@ -64,6 +64,13 @@
                             </tr>
                         {% else %}
                             <tr{% if forloop.first %} style="border-top: groove"{% endif %}>
+
+                                {% if key == _('French title proper') %}
+                                    {% include 'learning_unit/common_title_comparison.html' with key='fr' title=_('Common title') %}
+                                {% elif key == _('English title proper') %}
+                                    {% include 'learning_unit/common_title_comparison.html' with key='en' title=_('Common English title') %}
+                                {% endif %}
+
                                 <td class="table_header">{{ key }}</td>
                                 {% if previous %}
                                     {% changed_label previous.learning_unit_year_fields|get_item:key|default:'-' other=current.learning_unit_year_fields|get_item:key|default:'-' %}
@@ -72,40 +79,13 @@
                                 {% if next %}
                                     {% changed_label next.learning_unit_year_fields|get_item:key|default:'-' other=current.learning_unit_year_fields|get_item:key|default:'-' %}
                                 {% endif %}
+
+                                {% if forloop.first %}
+                                    {% include 'learning_unit/partims_comparison.html' %}
+                                {% endif %}
                             </tr>
                         {% endif %}
-
                     {% endfor %}
-                    {% if current.learning_container_year_partims or previous.learning_container_year_partims or next.learning_container_year_partims %}
-                        <tr>
-                            <td class="table_header">{% trans 'Partims' %}</td>
-                            {% if previous %}
-                                <td>
-                                    <label>
-                                        {% for elem in previous.learning_container_year_partims %}
-                                            {{ elem }}
-                                        {% endfor %}
-                                    </label>
-                                </td>
-                            {% endif %}
-                            <td>
-                                <label>
-                                    {% for elem in current.learning_container_year_partims %}
-                                        {{ elem }}
-                                    {% endfor %}
-                                </label>
-                            </td>
-                            {% if next %}
-                                <td>
-                                    <label>
-                                        {% for elem in next.learning_container_year_partims %}
-                                            {{ elem }}
-                                        {% endfor %}
-                                    </label>
-                                </td>
-                            {% endif %}
-                        </tr>
-                    {% endif %}
                     <tr style="border-top: groove">
                         <td class="table_header">{% trans "Learning location" %}</td>
                         {% if previous %}
@@ -151,6 +131,18 @@
                                 {% endif %}
                             {% endif %}
                         </tr>
+                        {% if forloop.last %}
+                            <tr>
+                                <td class="table_header">{% trans 'Procedure' %}</td>
+                                {% if previous %}
+                                    {% changed_label previous.procedure other=current.procedure %}
+                                {% endif %}
+                                {% changed_label current.procedure %}
+                                {% if next %}
+                                    {% changed_label next.procedure other=current.procedure %}
+                                {% endif %}
+                            </tr>
+                        {% endif %}
                     {% endfor %}
                     {% include 'learning_unit/components_comparison.html' %}
                     </tbody>
