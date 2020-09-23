@@ -23,7 +23,9 @@
 # ############################################################################
 from program_management.ddd import command
 from program_management.ddd.domain import program_tree_version
+from program_management.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
 from program_management.ddd.repositories import program_tree_version as tree_version_repository
+from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 
 
 def calculate_version_max_end_year(cmd: command.GetVersionMaxEndYear) -> int:
@@ -35,4 +37,11 @@ def calculate_version_max_end_year(cmd: command.GetVersionMaxEndYear) -> int:
     )
 
     tree_version = tree_version_repository.ProgramTreeVersionRepository.get(standard_tree_version_identity)
-    return tree_version.end_year_of_existence
+    return tree_version.end_year_of_existence or _compute_max_postponement_year(standard_tree_version_identity)
+
+
+def _compute_max_postponement_year(version_identity: 'program_tree_version.ProgramTreeVersionIdentity'):
+    return CalculateEndPostponement().calculate_end_postponement_year_program_tree_version(
+        identity=version_identity,
+        repository=ProgramTreeVersionRepository()
+    )

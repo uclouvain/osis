@@ -30,7 +30,8 @@ from program_management.ddd.business_types import *
 from program_management.ddd.command import UpdateTrainingVersionCommand, UpdateProgramTreeVersionCommand, \
     PostponeGroupVersionCommand
 from program_management.ddd.domain.service.identity_search import GroupIdentitySearch
-from program_management.ddd.service.write import update_program_tree_version_service, update_and_postpone_group_version_service
+from program_management.ddd.service.write import update_program_tree_version_service, \
+    update_and_postpone_group_version_service
 
 
 def update_and_postpone_training_version(

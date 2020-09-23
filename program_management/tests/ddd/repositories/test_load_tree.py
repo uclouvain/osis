@@ -23,8 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import mock
 from django.test import TestCase
+from django.utils.translation import gettext_lazy as _
 
 from base.models.enums import prerequisite_operator
 from base.models.enums.link_type import LinkTypes
@@ -36,11 +36,9 @@ from base.tests.factories.prerequisite import PrerequisiteFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from program_management.ddd.domain import prerequisite
 from program_management.ddd.domain import program_tree, node
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionNotFoundException, ProgramTreeVersion
-from program_management.tests.factories.element import ElementGroupYearFactory, ElementLearningUnitYearFactory
-from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 from program_management.ddd.repositories import load_tree
-from django.utils.translation import gettext_lazy as _
+from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
+from program_management.tests.factories.element import ElementGroupYearFactory, ElementLearningUnitYearFactory
 
 VERSION_NAME = 'CEMS'
 EDY_ACRONYM = 'CHIM1BA'

@@ -27,6 +27,7 @@ from program_management.ddd.domain.service.identity_search import NodeIdentitySe
 from program_management.ddd.service.read import get_program_tree_version_from_node_service
 from program_management.ddd.service.write import update_and_postpone_training_version_service
 from program_management.forms import version
+from program_management.ddd.domain import program_tree_version
 
 
 class TrainingVersionUpdateView(PermissionRequiredMixin, View):
@@ -115,6 +116,14 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
             self.training_version_form.add_error("max_constraint", "")
         except exception_education_group.GroupCopyConsistencyException as e:
             display_warning_messages(self.request, e.message)
+            return [
+                program_tree_version.ProgramTreeVersionIdentity(
+                    offer_acronym=update_command.offer_acronym,
+                    year=year,
+                    version_name=update_command.version_name,
+                    is_transition=update_command.is_transition
+                ) for year in range(update_command.year, e.conflicted_fields_year)
+            ]
         return []
 
     @cached_property

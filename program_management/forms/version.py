@@ -25,6 +25,7 @@
 ##############################################################################
 from typing import Dict
 
+import attr
 from django import forms
 from django.contrib.auth.models import User
 from django.forms import TextInput
@@ -42,6 +43,7 @@ from education_group.forms.training import _get_section_choices
 from education_group.forms.widgets import CertificateAimsWidget
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from program_management.ddd.command import GetVersionMaxEndYear
+from program_management.ddd.domain import program_tree_version
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.ddd.service.read import get_version_max_end_year
@@ -92,7 +94,8 @@ class SpecificVersionForm(forms.Form):
             for year in range(self.tree_version_identity.year, max_year + 1)
         ]
 
-        if not ProgramTreeVersionRepository.get(self.tree_version_identity).end_year_of_existence:
+        standard_version_identity = attr.evolve(self.tree_version_identity, version_name=program_tree_version.STANDARD)
+        if not ProgramTreeVersionRepository.get(standard_version_identity).end_year_of_existence:
             choices_years += BLANK_CHOICE
 
         self.fields["end_year"].choices = choices_years

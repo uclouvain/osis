@@ -24,7 +24,7 @@
 from typing import List
 
 from program_management.ddd.business_types import *
-from education_group.ddd.domain.exception import GroupCopyConsistencyException
+from education_group.ddd.domain.exception import GroupCopyConsistencyException, TrainingNotFoundException
 from education_group.ddd.domain.service.conflicted_fields import ConflictedFields
 from education_group.ddd.service.read import get_group_service
 from education_group.ddd.service.write import copy_group_service, update_group_service
@@ -65,24 +65,24 @@ def update_and_postpone_group_version(
             end_year=postpone_cmd.end_year,
         )
     )
-    identities_created = [
-    ]
+
+    identities_created = []
     end_postponement_year = CalculateEndPostponement.calculate_end_postponement_year_group(
         identity=group.entity_identity,
         repository=ProgramTreeVersionRepository(),
     )
     for year in range(from_year, end_postponement_year):
-        if year + 1 in conflicted_fields:
-            continue  # Do not copy info from year to N+1 because conflict detected
-
-        copy_group_service.copy_group(
-            cmd=education_group_command.CopyGroupCommand(from_code=postpone_cmd.code, from_year=year)
-        )
-
         try:
+            if year + 1 in conflicted_fields:
+                continue  # Do not copy info from year to N+1 because conflict detected
+
+            copy_group_service.copy_group(
+                cmd=education_group_command.CopyGroupCommand(from_code=postpone_cmd.code, from_year=year)
+            )
+
             cmd_copy_from = CopyTreeVersionToNextYearCommand(
                 from_offer_acronym=postpone_cmd.from_offer_acronym,
-                from_year=from_year,
+                from_year=year,
                 from_version_name=postpone_cmd.from_version_name,
                 from_is_transition=postpone_cmd.from_is_transition,
                 from_offer_code=postpone_cmd.code
@@ -90,8 +90,8 @@ def update_and_postpone_group_version(
             identity_next_year = copy_program_version_service.copy_tree_version_to_next_year(cmd_copy_from)
             identities_created.append(identity_next_year)
 
-            from_year += 1
-        except exception.CannotCopyTreeVersionDueToEndDate:
+        #  FIXME Do the postponement until the standard version existence in reposotory
+        except (exception.CannotCopyTreeVersionDueToEndDate, TrainingNotFoundException):
             break
 
     if conflicted_fields:
