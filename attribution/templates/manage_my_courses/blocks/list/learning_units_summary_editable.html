@@ -14,7 +14,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for luy, error in learning_unit_years_with_errors %}
+            {% for luy, error, error_force_majeure in learning_unit_years_with_errors %}
                 {% with requirement_entity=luy.requirement_entity %}
                 <tr data-id="{{luy.id}}" data-value="{{luy.acronym}}">
                     <td>{{ luy.academic_year }}</td>
@@ -25,9 +25,10 @@
                     </td>
                     <td>{{ luy.complete_title|default_if_none:'' }}</td>
                     <td>{{ requirement_entity|default_if_none:'-' }}</td>
+
+                    {% trans 'Editable' as title_status_true %}
                     {% if requirement_entity %}
                         {% with entity_calendar=entity_calendars|get_item:requirement_entity.id %}
-                            {% trans 'Editable' as title_status_true %}
                             <td {% if event_perm_desc_fiche_open %}style="color: green" {% else %}style="color: red"{% endif %}>
                                 {% trans 'From' context "Du" %} {% if entity_calendar %} {{ entity_calendar|get_item:'start_date'|date:"d/m/Y" }} {% endif %}
                                 {% trans 'to' context "au" %} {% if entity_calendar %} {{ entity_calendar|get_item:'end_date'|shift_date:-1|date:"d/m/Y" }} {% endif %}
@@ -42,13 +43,17 @@
                     {% else %}
                         <td>-</td>
                     {% endif %}
+
                     <td {% if event_perm_force_majeure_open %}style="color: green"{% else %}style="color: red"{% endif %}>
                         {% trans 'From' context "Du" %} {{ event_perm_force_majeure_start_date|date:"d/m/Y" }}
                         {% trans 'to' context "au" %} {{ event_perm_force_majeure_end_date|shift_date:-1|date:"d/m/Y" }}
+                        <!-- TODO :: Remove shift_date when end_date is included in period -->
+                        {% if error_force_majeure.errors|length > 1 %}
+                            {% include "blocks/span/span_status.html" with status=error_force_majeure.is_valid title_status_false=error_force_majeure.as_ul %}
+                        {% else %}
+                            {% include "blocks/span/span_status.html" with status=error_force_majeure.is_valid title_status_false=error_force_majeure.errors.0 %}
+                        {% endif %}
                     </td>
-
-
-
                 </tr>
                 {% endwith %}
             {% endfor %}
