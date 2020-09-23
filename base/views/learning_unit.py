@@ -399,11 +399,9 @@ def get_full_context(learning_unit_year):
 
 
 def get_common_titles_context(learning_unit_year):
-    title_fr = getattr(learning_unit_year.learning_container_year, 'common_title')
-    title_en = getattr(learning_unit_year.learning_container_year, 'common_title_english')
     return {
-        'fr': title_fr,
-        'en': title_en,
+        'fr': getattr(learning_unit_year.learning_container_year, 'common_title'),
+        'en': getattr(learning_unit_year.learning_container_year, 'common_title_english'),
     }
 
 
