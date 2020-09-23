@@ -98,7 +98,8 @@ class ProgramManager(EducationGroupRoleModel):
             'base.change_link_data': osis_role_predicates.always_deny(
                 message=_("Program manager is not allowed to modify a link")
             ),
-            'base.change_educationgroup': is_linked_to_offer,
+            'base.change_training': is_linked_to_offer,
+            'base.change_minitraining': is_linked_to_offer,
             'base.change_educationgroupcertificateaim': is_linked_to_offer,
             'base.is_institution_administrator': rules.always_allow,
             'base.view_educationgroup': rules.always_allow,

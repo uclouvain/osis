@@ -40,22 +40,30 @@ class FacultyManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
             'base.add_minitraining':
                 predicates.is_user_attached_to_management_entity &
                 predicates.is_user_linked_to_all_scopes_of_management_entity &
-                predicates.is_program_edition_period_open &
-                predicates.is_allowed_to_create_children_of_category_mini_training,
+                predicates.is_program_edition_period_open,
             'base.add_group':
                 predicates.is_user_attached_to_management_entity &
                 predicates.is_user_linked_to_all_scopes_of_management_entity &
                 predicates.is_program_edition_period_open &
-                predicates.is_not_orphan_group &
-                predicates.is_allowed_to_create_children_of_category_group,
+                predicates.is_not_orphan_group,
+            'base.change_training':
+                predicates.is_user_attached_to_management_entity &
+                predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
+                predicates.is_education_group_type_authorized_according_to_user_scope,
+            'base.change_minitraining':
+                predicates.is_user_attached_to_management_entity &
+                predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
+                predicates.is_education_group_type_authorized_according_to_user_scope,
             'base.change_group':
                 predicates.is_user_attached_to_management_entity &
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
-                predicates.is_education_group_type_authorized_according_to_user_scope,
-            'base.change_educationgroup':
-                predicates.is_user_attached_to_management_entity &
+                predicates.is_education_group_type_authorized_according_to_user_scope &
+                predicates.is_program_edition_period_open,
+            'base.change_prerequisite':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
-                predicates.is_education_group_type_authorized_according_to_user_scope,
+                predicates.is_user_attached_to_management_entity &
+                predicates.is_education_group_type_authorized_according_to_user_scope &
+                predicates.is_program_edition_period_open,
             'base.delete_all_training':
                 predicates.are_all_trainings_removable,
             'base.delete_all_minitraining':

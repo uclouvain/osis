@@ -156,6 +156,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             "create_training_url": self.get_create_training_url(),
             "create_mini_training_url": self.get_create_mini_training_url(),
             "update_training_url": self.get_update_training_url(),
+            "update_permission_name": self.get_update_permission_name(),
             "delete_permanently_training_url": self.get_delete_permanently_training_url(),
             "delete_permanently_tree_version": self.get_delete_permanently_tree_version_url(),
             "create_version_url": self.get_create_version_url(),
@@ -174,8 +175,8 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
                                         ),
         }
 
-    def get_permission_object(self):
-        return self.education_group_version.offer
+    def get_permission_object(self) -> 'GroupYear':
+        return self.education_group_version.root_group
 
     def get_create_group_url(self):
         return reverse('create_element_select_type', kwargs={'category': Categories.GROUP.name}) + \
@@ -201,6 +202,9 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             kwargs={'code': self.kwargs['code'], 'year': self.kwargs['year']},
             get={"path_to": self.get_path(), "tab": self.active_tab.name}
         )
+
+    def get_update_permission_name(self) -> str:
+        return "base.change_training"
 
     def get_delete_permanently_training_url(self):
         if self.program_tree_version_identity.is_standard():

@@ -43,7 +43,7 @@ class LearningUnitPrerequisite(PermissionRequiredMixin, SuccessMessageMixin, Lea
     template_name = "learning_unit/tab_prerequisite_update.html"
     form_class = PrerequisiteForm
 
-    permission_required = 'base.change_educationgroup'
+    permission_required = 'base.change_prerequisite'
     raise_exception = True
 
     def dispatch(self, request, *args, **kwargs):
