@@ -1,3 +1,4 @@
+
 import mock
 from django.test import TestCase, override_settings
 from mock import patch
@@ -14,6 +15,7 @@ from education_group.auth import predicates
 from education_group.auth.roles.faculty_manager import FacultyManager
 from education_group.auth.scope import Scope
 from education_group.tests.factories.auth.faculty_manager import FacultyManagerFactory
+from education_group.tests.factories.group import GroupFactory
 from education_group.tests.factories.group_year import GroupYearFactory
 from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory, \
