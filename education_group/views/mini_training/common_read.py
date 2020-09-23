@@ -205,7 +205,7 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
         return "base.change_minitraining"
 
     def get_create_version_url(self):
-        if self.is_root_node():
+        if self.is_root_node() and self.program_tree_version_identity.is_standard():
             return reverse(
                 'create_education_group_version',
                 kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}
