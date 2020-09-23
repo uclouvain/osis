@@ -6,23 +6,21 @@ from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils.functional import cached_property
-from django.views import View
 from django.utils.translation import gettext_lazy as _
+from django.views import View
 
 from base.views.common import display_error_messages, display_warning_messages, display_success_messages
-from education_group.ddd.domain import exception as exception_education_group
-from education_group.models.group_year import GroupYear
-from education_group.templatetags.academic_year_display import display_as_academic_year
-from osis_role.contrib.views import PermissionRequiredMixin
-
-from education_group.ddd.business_types import *
 from education_group.ddd import command as command_education_group
+from education_group.ddd.business_types import *
+from education_group.ddd.domain import exception as exception_education_group
 from education_group.ddd.domain.exception import GroupNotFoundException, \
     MiniTrainingNotFoundException
 from education_group.ddd.service.read import get_group_service, get_mini_training_service
-
-from program_management.ddd.business_types import *
+from education_group.models.group_year import GroupYear
+from education_group.templatetags.academic_year_display import display_as_academic_year
+from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command
+from program_management.ddd.business_types import *
 from program_management.ddd.command import UpdateMiniTrainingVersionCommand
 from program_management.ddd.domain import program_tree_version
 from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
@@ -132,10 +130,11 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
     def mini_training_version_form(self) -> 'version.UpdateMiniTrainingVersionForm':
         mini_training_version_identity = self.get_program_tree_version_obj().entity_id
         return version.UpdateMiniTrainingVersionForm(
+            data=self.request.POST or None,
+            user=self.request.user,
+            event_perm_obj=self.get_permission_object(),
             mini_training_version_identity=mini_training_version_identity,
             mini_training_type=self.get_mini_training_obj().type,
-            user=self.request.user,
-            data=self.request.POST or None,
             initial=self._get_mini_training_version_form_initial_values()
         )
 
