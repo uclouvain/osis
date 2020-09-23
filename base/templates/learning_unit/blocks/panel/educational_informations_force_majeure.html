@@ -37,12 +37,9 @@
     <div class="tab-content">
         <div role="tabpanel" class="tab-pane active" id="educational_information_force_majeur">
             <br>
-            <div style="padding-left: 1em;">
-                <label> {% trans 'Editable' %} : </label>
-                {% trans 'From' context "Du" %} {{ force_majeure_submission_dates.start_date|date:"d/m/Y"|default:"-" }}
-                {% trans 'to' context "au" %} {{ force_majeure_submission_dates.end_date|shift_date:-1|date:"d/m/Y"|default:"-" }}
-                <!-- TODO :: Remove shift_date when end_date is included in period -->
-            </div>
+            {% with submission_dates=force_majeure_submission_dates %}
+                {% include "manage_my_courses/blocks/submission_dates.html" %}
+            {% endwith %}
         </div>
         {% include 'learning_unit/blocks/educational_informations_force_majeure_table.html' %}
     </div>
