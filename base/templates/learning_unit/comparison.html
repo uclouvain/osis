@@ -86,28 +86,6 @@
                             </tr>
                         {% endif %}
                     {% endfor %}
-                    <tr style="border-top: groove">
-                        <td class="table_header">{% trans "Learning location" %}</td>
-                        {% if previous %}
-                            {% changed_label previous.campus other=current.campus %}
-                        {% endif %}
-                        {% changed_label current.campus %}
-                        {% if next %}
-                            {% changed_label next.campus other=current.campus %}
-                        {% endif %}
-                    </tr>
-                    {% for key in current.entities_fields %}
-                        <tr{% if forloop.first %} style="border-top: groove"{% endif %}>
-                            <td class="table_header">{{ key }}</td>
-                            {% if previous %}
-                                {% changed_label previous.entities_fields|get_item:key|default:'-' other=current.entities_fields|get_item:key|default:'-' %}
-                            {% endif %}
-                            {% changed_label current.entities_fields|get_item:key|default:'-' %}
-                            {% if next %}
-                                {% changed_label next.entities_fields|get_item:key|default:'-' other=current.entities_fields|get_item:key|default:'-' %}
-                            {% endif %}
-                        </tr>
-                    {% endfor %}
                     {% for key_lcy in current.learning_container_year_fields %}
                         <tr{% if forloop.first %} style="border-top: groove"{% endif %}>
                             <td class="table_header">{{ key_lcy }}</td>
@@ -143,6 +121,28 @@
                                 {% endif %}
                             </tr>
                         {% endif %}
+                    {% endfor %}
+                    <tr style="border-top: groove">
+                        <td class="table_header">{% trans "Learning location" %}</td>
+                        {% if previous %}
+                            {% changed_label previous.campus other=current.campus %}
+                        {% endif %}
+                        {% changed_label current.campus %}
+                        {% if next %}
+                            {% changed_label next.campus other=current.campus %}
+                        {% endif %}
+                    </tr>
+                    {% for key in current.entities_fields %}
+                        <tr{% if forloop.first %} style="border-top: groove"{% endif %}>
+                            <td class="table_header">{{ key }}</td>
+                            {% if previous %}
+                                {% changed_label previous.entities_fields|get_item:key|default:'-' other=current.entities_fields|get_item:key|default:'-' %}
+                            {% endif %}
+                            {% changed_label current.entities_fields|get_item:key|default:'-' %}
+                            {% if next %}
+                                {% changed_label next.entities_fields|get_item:key|default:'-' other=current.entities_fields|get_item:key|default:'-' %}
+                            {% endif %}
+                        </tr>
                     {% endfor %}
                     {% include 'learning_unit/components_comparison.html' %}
                     </tbody>

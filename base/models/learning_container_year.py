@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from collections import OrderedDict
 
 from django.db import models
 from django.utils.functional import cached_property
@@ -135,12 +134,12 @@ class LearningContainerYear(SerializableModel):
 
     @staticmethod
     def get_attrs_by_entity_container_type():
-        return OrderedDict({
+        return {
             REQUIREMENT_ENTITY: 'requirement_entity',
             ALLOCATION_ENTITY: 'allocation_entity',
             ADDITIONAL_REQUIREMENT_ENTITY_1: 'additional_entity_1',
             ADDITIONAL_REQUIREMENT_ENTITY_2: 'additional_entity_2',
-        })
+        }
 
     def get_entity_from_type(self, entity_container_type):
         attr = LearningContainerYear.get_attrs_by_entity_container_type()[entity_container_type]
