@@ -5,7 +5,7 @@ from django.test import TestCase, override_settings
 from mock import patch
 
 from base.models.enums import education_group_categories
-from base.models.enums.education_group_types import TrainingType, EducationGroupTypesEnum
+from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group import EducationGroupFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory, ContinuingEducationTrainingFactory, \
@@ -19,11 +19,11 @@ from education_group.auth.roles.faculty_manager import FacultyManager
 from education_group.auth.scope import Scope
 from education_group.tests.factories.auth.faculty_manager import FacultyManagerFactory
 from education_group.tests.factories.group_year import GroupYearFactory
-from program_management.tests.factories.element import ElementFactory, ElementGroupYearFactory
 from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory, \
     StandardEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementFactory
+from program_management.tests.factories.element import ElementGroupYearFactory
 
 
 class TestUserAttachedToManagementEntity(TestCase):
@@ -268,7 +268,7 @@ class TestIsContinuingEducationGroupYear(TestCase):
         )
 
     def test_case_is_not_continuing_education_group_year(self):
-        education_group_year = MiniTrainingFactory()
+        education_group_year = EducationGroupYearFactory(education_group_type__minitraining=True)
         self.assertFalse(
             predicates.is_continuing_education_group_year(
                 self.user,
