@@ -1,5 +1,3 @@
-import random
-
 import mock
 from django.test import TestCase, override_settings
 from mock import patch
@@ -7,8 +5,7 @@ from mock import patch
 from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory, ContinuingEducationTrainingFactory, \
-    EducationGroupYearMasterFactory
-from education_group.tests.factories.group import GroupFactory
+    EducationGroupYearMasterFactory, GroupFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.person import PersonFactory

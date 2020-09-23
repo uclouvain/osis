@@ -3165,5 +3165,79 @@
             ]
         },
         "model": "rules_management.fieldreference"
+    },
+    {
+        "pk": 309,
+        "fields": {
+            "field_name": "version_title_fr",
+            "context": "MINI_TRAINING_DAILY_MANAGEMENT",
+            "content_type": [
+                "base",
+                "educationgroupyear"
+            ],
+            "groups": [
+                [
+                    "central_managers"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "pk": 310,
+        "fields": {
+            "field_name": "version_title_fr",
+            "context": "MINI_TRAINING_PGRM_ENCODING_PERIOD",
+            "content_type": [
+                "base",
+                "educationgroupyear"
+            ],
+            "groups": [
+                [
+                    "central_managers"
+                ],
+                [
+                    "faculty_managers"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "pk": 311,
+        "fields": {
+            "field_name": "version_title_en",
+            "context": "MINI_TRAINING_DAILY_MANAGEMENT",
+            "content_type": [
+                "base",
+                "educationgroupyear"
+            ],
+            "groups": [
+                [
+                    "central_managers"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "pk": 312,
+        "fields": {
+            "field_name": "version_title_en",
+            "context": "MINI_TRAINING_PGRM_ENCODING_PERIOD",
+            "content_type": [
+                "base",
+                "educationgroupyear"
+            ],
+            "groups": [
+                [
+                    "central_managers"
+                ],
+                [
+                    "faculty_managers"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
     }
 ]

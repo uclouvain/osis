@@ -90,6 +90,8 @@ class TestMiniTrainingReadIdentification(TestCase):
         self.assertEqual(response.context['person'], self.person)
         self.assertEqual(response.context['group_year'], self.mini_training_version.root_group)
         self.assertEqual(response.context['education_group_version'], self.mini_training_version)
+        self.assertEqual(response.context['update_permission_name'], "base.change_minitraining")
+        self.assertEqual(response.context['create_version_permission_name'], "base.add_minitraining_version")
         self.assertIsInstance(response.context['tree'], str)
         self.assertIsInstance(response.context['node'], NodeGroupYear)
         self.assertIsInstance(response.context['history'], QuerySet)

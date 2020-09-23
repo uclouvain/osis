@@ -124,6 +124,7 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
         return version.UpdateTrainingVersionForm(
             data=self.request.POST or None,
             user=self.request.user,
+            event_perm_obj=self.get_permission_object(),
             training_version_identity=training_version_identity,
             node_identity=node_identity,
             training_type=self.get_training_obj().type,

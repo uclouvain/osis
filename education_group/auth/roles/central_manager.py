@@ -56,17 +56,11 @@ class CentralManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
                 predicates.is_education_group_type_authorized_according_to_user_scope,
             'base.delete_all_training':
                 predicates.are_all_trainings_removable,
-            'program_management.delete_all_tree_version':
-                predicates.are_all_tree_versions_removable,
             'base.delete_all_minitraining':
                 predicates.are_all_minitrainings_removable,
             'base.delete_all_group':
                 predicates.are_all_groups_removable,
             'base.delete_training':
-                predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
-                predicates.is_user_attached_to_management_entity &
-                predicates.is_education_group_type_authorized_according_to_user_scope,
-            'program_management.delete_tree_version':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_user_attached_to_management_entity &
                 predicates.is_education_group_type_authorized_according_to_user_scope,
@@ -128,7 +122,24 @@ class CentralManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
             'base.change_link_data':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_user_attached_to_management_entity,
-            'base.add_programtreeversion':
+            'base.add_training_version':
+                predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_user_attached_to_management_entity &
-                predicates.is_education_group_year_older_or_equals_than_limit_settings_year,
+                predicates.is_user_linked_to_all_scopes_of_management_entity,
+            'program_management.delete_permanently_training_version':
+                predicates.are_all_training_versions_removable,
+            'program_management.delete_training_version':
+                predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
+                predicates.is_user_attached_to_management_entity &
+                predicates.is_user_linked_to_all_scopes_of_management_entity,
+            'base.add_minitraining_version':
+                predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
+                predicates.is_user_attached_to_management_entity &
+                predicates.is_user_linked_to_all_scopes_of_management_entity,
+            'program_management.delete_permanently_minitraining_version':
+                predicates.are_all_mini_training_versions_removable,
+            'program_management.delete_minitraining_version':
+                predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
+                predicates.is_user_attached_to_management_entity &
+                predicates.is_user_linked_to_all_scopes_of_management_entity,
         })
