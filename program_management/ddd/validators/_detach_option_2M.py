@@ -54,7 +54,7 @@ class DetachOptionValidator(business_validator.BusinessValidator):
     def validate(self):
         error_messages = []
 
-        parent = self.working_tree.get_node(self._get_path_to_parent(self.path_to_node_to_detach))
+        parent = self.working_tree.get_node(self._extract_parent_path(self.path_to_node_to_detach))
         trees_2m = self._get_trees_2m_containing_parent(parent)
 
         if self.options_to_detach and not self._is_inside_finality():
@@ -82,7 +82,7 @@ class DetachOptionValidator(business_validator.BusinessValidator):
                 )
         return validation_errors
 
-    def _get_path_to_parent(self, path_to_node: str) -> str:
+    def _extract_parent_path(self, path_to_node: str) -> str:
         return path_to_node.rsplit('|', 1)[0]
 
     def _get_options_versions(self, options: Set['Node']) -> List['ProgramTreeVersionIdentity']:
