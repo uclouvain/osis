@@ -33,7 +33,6 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.base import View
 
-from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
 from base.models.utils.utils import ChoiceEnum
 from base.views.common import display_success_messages
@@ -89,8 +88,8 @@ class CreateProgramTreeVersion(AjaxPermissionRequiredMixin, AjaxTemplateMixin, V
 
     def get_permission_required(self):
         if self.get_permission_object().education_group_type.category == education_group_categories.TRAINING:
-            return "base.add_training_version"
-        return "base.add_minitraining_version"
+            return ("base.add_training_version",)
+        return ("base.add_minitraining_version",)
 
     def get(self, request, *args, **kwargs):
         form = SpecificVersionForm(
