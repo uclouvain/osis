@@ -62,23 +62,25 @@ class DetachOptionValidator(business_validator.BusinessValidator):
                 options_to_check = self._get_options_to_check_by_tree(tree_2m)
                 if not options_to_check:
                     continue
-                self._validate_option_usage_in_finalities(error_messages, tree_2m)
+                error_messages.extend(self._validate_option_usage_in_finalities(tree_2m))
         if error_messages:
             raise osis_common.ddd.interface.BusinessExceptions(error_messages)
 
-    def _validate_option_usage_in_finalities(self, error_messages: List[str], tree_2m: 'ProgramTree'):
+    def _validate_option_usage_in_finalities(self, tree_2m: 'ProgramTree'):
+        validation_errors = []
         for finality in tree_2m.get_all_finalities():
             finality_version = self.version_search.get_from_node_identity(finality.entity_id)
             options_to_detach_used_in_finality = set(self.options_to_detach) & set(finality.get_option_list())
             options_to_detach_versions = self._get_options_versions(options_to_detach_used_in_finality)
             if options_to_detach_used_in_finality:
-                error_messages.append(
+                validation_errors.append(
                     self._get_validation_error_message(
                         finality_version,
                         options_to_detach_used_in_finality,
                         options_to_detach_versions
                     )
                 )
+        return validation_errors
 
     def _get_path_to_parent(self, path_to_node: str) -> str:
         return path_to_node.rsplit('|', 1)[0]
