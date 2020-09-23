@@ -278,7 +278,11 @@ msgstr ""
 msgid "Alert"
 msgstr ""
 
-msgctxt "plural"
+msgctxt "female plural"
+msgid "All"
+msgstr ""
+
+msgctxt "male plural"
 msgid "All"
 msgstr ""
 

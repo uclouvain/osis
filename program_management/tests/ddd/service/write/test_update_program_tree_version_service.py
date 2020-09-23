@@ -28,6 +28,7 @@ import mock
 from django.test import TestCase
 
 from base.tests.factories.academic_year import AcademicYearFactory
+from program_management.ddd.command import DeleteSpecificVersionCommand
 from program_management.ddd.service.write import update_program_tree_version_service
 from program_management.tests.ddd.factories.commands.update_program_tree_version import \
     UpdateProgramTreeVersionCommandFactory
@@ -80,6 +81,31 @@ class TestUpdateTrainingVersion(TestCase, MockPatcherMixin):
         updated_entity = self.fake_program_tree_version_repository.get(result)
         self.assertTrue(mock_delete_tree_version_service.called)
         self.assertEqual(updated_entity.end_year_of_existence, new_end_year)
+
+    def test_assert_delete_tree_version_called_right_number(self, mock_delete_tree_version_service):
+        new_end_year = self.tree_version.end_year_of_existence - 3
+        cmd = attr.evolve(self.command, end_year=new_end_year)
+        update_program_tree_version_service.update_program_tree_version(cmd)
+
+        calls = [
+            mock.call(
+                DeleteSpecificVersionCommand(
+                    acronym=self.tree_version.entity_id.offer_acronym,
+                    year=self.current_year + 3,
+                    version_name=self.tree_version.entity_id.version_name,
+                    is_transition=self.tree_version.entity_id.is_transition,
+                )
+            ),
+            mock.call(
+                DeleteSpecificVersionCommand(
+                    acronym=self.tree_version.entity_id.offer_acronym,
+                    year=self.current_year + 4,
+                    version_name=self.tree_version.entity_id.version_name,
+                    is_transition=self.tree_version.entity_id.is_transition,
+                )
+            )
+        ]
+        mock_delete_tree_version_service.assert_has_calls(calls)
 
     def test_updated_values(self, mock_delete_tree_version_service):
         result = update_program_tree_version_service.update_program_tree_version(self.command)

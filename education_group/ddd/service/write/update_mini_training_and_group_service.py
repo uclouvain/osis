@@ -21,8 +21,6 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from typing import List
-
 from django.db import transaction
 
 from base.models.enums.active_status import ActiveStatusEnum
@@ -30,45 +28,28 @@ from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.command import UpdateGroupCommand
-from education_group.ddd.domain import group, mini_training
-from education_group.ddd.domain._campus import Campus
+from education_group.ddd.domain import mini_training
 from education_group.ddd.domain._entity import Entity
 from education_group.ddd.domain._titles import Titles
-from education_group.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
-from education_group.ddd.repository import mini_training as mini_training_repository, group as group_repository
-from education_group.ddd.service.write import postpone_mini_training_service, update_group_service
+from education_group.ddd.repository import mini_training as mini_training_repository
+from education_group.ddd.service.write import update_group_service
 
 
 @transaction.atomic()
-def update_mini_training(cmd: command.UpdateMiniTrainingCommand) -> List['MiniTrainingIdentity']:
+def update_mini_training_and_group(cmd: command.UpdateMiniTrainingAndGroupCommand) -> 'MiniTrainingIdentity':
     mini_training_identity = mini_training.MiniTrainingIdentity(acronym=cmd.abbreviated_title, year=cmd.year)
     group_identity = update_group_service.update_group(__convert_to_update_group_command(cmd))
 
-    postpone_until_year = CalculateEndPostponement.calculate_year_of_postponement_for_mini_training(
-        mini_training_identity,
-        group_identity,
-        mini_training_repository.MiniTrainingRepository,
-        group_repository.GroupRepository
-    )
-
     mini_training_domain_obj = mini_training_repository.MiniTrainingRepository.get(mini_training_identity)
 
-    mini_training_domain_obj.update(convert_command_to_update_mini_training_data(cmd))
+    mini_training_domain_obj.update(__convert_command_to_update_mini_training_data(cmd))
     mini_training_repository.MiniTrainingRepository.update(mini_training_domain_obj)
 
-    result = postpone_mini_training_service.postpone_mini_training(
-        command.PostponeMiniTrainingCommand(
-            acronym=cmd.abbreviated_title,
-            postpone_from_year=cmd.year,
-            postpone_until_year=postpone_until_year
-        )
-    )
-
-    return [mini_training_identity] + result
+    return mini_training_identity
 
 
-def convert_command_to_update_mini_training_data(
-        cmd: command.UpdateMiniTrainingCommand) -> 'mini_training.UpdateMiniTrainingData':
+def __convert_command_to_update_mini_training_data(
+        cmd: command.UpdateMiniTrainingAndGroupCommand) -> 'mini_training.UpdateMiniTrainingData':
     return mini_training.UpdateMiniTrainingData(
         credits=cmd.credits,
         titles=Titles(
@@ -83,7 +64,7 @@ def convert_command_to_update_mini_training_data(
     )
 
 
-def __convert_to_update_group_command(cmd: command.UpdateMiniTrainingCommand) -> 'UpdateGroupCommand':
+def __convert_to_update_group_command(cmd: command.UpdateMiniTrainingAndGroupCommand) -> 'UpdateGroupCommand':
     return UpdateGroupCommand(
             code=cmd.code,
             year=cmd.year,

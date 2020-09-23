@@ -1,6 +1,7 @@
 import functools
 from typing import Dict, List
 
+from django.db import transaction
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
@@ -8,7 +9,7 @@ from django.utils.functional import cached_property
 from django.views import View
 from django.utils.translation import gettext_lazy as _
 
-from base.views.common import display_error_messages
+from base.views.common import display_error_messages, display_warning_messages, display_success_messages
 from education_group.ddd.domain import exception as exception_education_group
 from education_group.models.group_year import GroupYear
 from education_group.templatetags.academic_year_display import display_as_academic_year
@@ -23,8 +24,9 @@ from education_group.ddd.service.read import get_group_service, get_mini_trainin
 from program_management.ddd.business_types import *
 from program_management.ddd import command
 from program_management.ddd.command import UpdateMiniTrainingVersionCommand
+from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
 from program_management.ddd.service.read import get_program_tree_version_from_node_service
-from program_management.ddd.service.write import update_mini_training_version_service
+from program_management.ddd.service.write import update_and_postpone_mini_training_version_service
 from program_management.forms import version
 
 
@@ -44,6 +46,7 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
             return HttpResponseRedirect(redirect_url)
         return super().dispatch(request, *args, **kwargs)
 
+    @transaction.non_atomic_requests
     def get(self, request, *args, **kwargs):
         context = {
             "mini_training_version_form": self.mini_training_version_form,
@@ -55,9 +58,11 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
         }
         return render(request, self.template_name, context)
 
+    @transaction.non_atomic_requests
     def post(self, request, *args, **kwargs):
         if self.mini_training_version_form.is_valid():
-            self.update_mini_training_version()
+            version_identities = self.update_mini_training_version()
+            self.display_success_messages(version_identities)
             if not self.mini_training_version_form.errors:
                 return HttpResponseRedirect(self.get_success_url())
         display_error_messages(self.request, self._get_default_error_messages())
@@ -69,19 +74,49 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
             kwargs={'code': self.kwargs['code'], 'year': self.kwargs['year']},
         )
 
+    def display_success_messages(self, identities: List['ProgramTreeVersionIdentity']) -> None:
+        success_messages = []
+        for identity in identities:
+            success_messages.append(
+                _(
+                    "Mini-Training "
+                    "<a href='%(link)s'> %(offer_acronym)s[%(acronym)s] (%(academic_year)s) </a> successfully updated."
+                ) % {
+                    "link": self.get_url_program_version(identity),
+                    "offer_acronym": identity.offer_acronym,
+                    "acronym": identity.version_name,
+                    "academic_year": display_as_academic_year(identity.year)
+                }
+            )
+        display_success_messages(self.request, success_messages, extra_tags='safe')
+
+    def get_url_program_version(self, version_id: 'ProgramTreeVersionIdentity') -> str:
+        node_identity = NodeIdentitySearch().get_from_tree_version_identity(version_id)
+        return reverse(
+            "element_identification",
+            kwargs={
+                'year': node_identity.year,
+                'code': node_identity.code,
+            }
+        )
+
     def get_cancel_url(self) -> str:
         return self.get_success_url()
 
-    def update_mini_training_version(self):
+    def update_mini_training_version(self) -> List['ProgramTreeVersionIdentity']:
         try:
             update_command = self._convert_form_to_update_mini_training_version_command(self.mini_training_version_form)
-            return update_mini_training_version_service.update_mini_training_version(update_command)
+            return update_and_postpone_mini_training_version_service.update_and_postpone_mini_training_version(
+                update_command
+            )
         except exception_education_group.ContentConstraintTypeMissing as e:
             self.mini_training_version_form.add_error("constraint_type", e.message)
         except (exception_education_group.ContentConstraintMinimumMaximumMissing,
                 exception_education_group.ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum) as e:
             self.mini_training_version_form.add_error("min_constraint", e.message)
             self.mini_training_version_form.add_error("max_constraint", "")
+        except exception_education_group.GroupCopyConsistencyException as e:
+            display_warning_messages(self.request, e.message)
         return []
 
     @cached_property
@@ -171,7 +206,7 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
             "status": mini_training_obj.status.value,
             "schedule_type": mini_training_obj.schedule_type.value,
             "credits": group_obj.credits,
-            "constraint_type": group_obj.content_constraint.type.value
+            "constraint_type": group_obj.content_constraint.type.name
             if group_obj.content_constraint.type else None,
             "min_constraint": group_obj.content_constraint.minimum,
             "max_constraint": group_obj.content_constraint.maximum,
