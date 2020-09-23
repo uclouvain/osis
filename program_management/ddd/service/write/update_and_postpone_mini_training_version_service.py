@@ -37,7 +37,6 @@ from program_management.ddd.service.write import update_program_tree_version_ser
     update_and_postpone_group_version_service
 
 
-@transaction.atomic
 def update_and_postpone_mini_training_version(
         command: 'UpdateMiniTrainingVersionCommand',
 ) -> List['ProgramTreeVersionIdentity']:
