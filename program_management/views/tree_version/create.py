@@ -137,9 +137,6 @@ class CreateProgramTreeVersion(AjaxPermissionRequiredMixin, AjaxTemplateMixin, V
                 })
         return render(request, self.template_name, self.get_context_data(form))
 
-    # def _call_rule(self, rule):
-    #     return rule(self.person, self.get_permission_object())
-
     def get_context_data(self, form: SpecificVersionForm):
         return {
             'training_identity': self.training_identity,
