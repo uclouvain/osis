@@ -71,6 +71,11 @@ class ManageMyCoursesViewTestCase(TestCase):
             data_year=cls.current_ac_year,
             reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
         )
+        cls.academic_calendar_force_majeure = OpenAcademicCalendarFactory(
+            academic_year=cls.current_ac_year,
+            data_year=cls.current_ac_year,
+            reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION_FORCE_MAJEURE
+        )
         requirement_entity = EntityVersionFactory().entity
         # Create multiple attribution in different academic years
         for ac_year in ac_year_in_past + [cls.current_ac_year] + cls.ac_year_in_future:
@@ -111,8 +116,9 @@ class ManageMyCoursesViewTestCase(TestCase):
 
         context = response.context
         self.assertIsInstance(context['entity_calendars'], dict)
+        self.assertTrue(context['event_perm_desc_fiche_open'])
 
-        for luy, error in context["learning_unit_years_with_errors"]:
+        for luy, error, error_force_majeure in context["learning_unit_years_with_errors"]:
             self.assertEqual(luy.academic_year.year, self.current_ac_year.year)
             self.assertFalse(error.errors)
 
@@ -133,7 +139,7 @@ class ManageMyCoursesViewTestCase(TestCase):
         context = response.context
         self.assertIsInstance(context['entity_calendars'], dict)
 
-        for luy, error in context["learning_unit_years_with_errors"]:
+        for luy, error, error_force_majeure in context["learning_unit_years_with_errors"]:
             self.assertEqual(luy.academic_year.year, self.current_ac_year.year)
             self.assertEqual(error.errors[0], _("Not in period to edit description fiche."))
 
@@ -163,14 +169,41 @@ class ManageMyCoursesViewTestCase(TestCase):
         self.academic_calendar.data_year = self.ac_year_in_future[1]  # This is n+1
         self.academic_calendar.save()
 
+        AcademicCalendarFactory(
+            academic_year=self.ac_year_in_future[1],
+            data_year=self.ac_year_in_future[1],
+            reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION_FORCE_MAJEURE
+        )
+
         response = self.client.get(self.url)
         self.assertTemplateUsed(response, "manage_my_courses/list_my_courses_summary_editable.html")
 
         context = response.context
 
-        for luy, error in context["learning_unit_years_with_errors"]:
+        for luy, error, error_force_majeure in context["learning_unit_years_with_errors"]:
             self.assertEqual(luy.academic_year.year, self.ac_year_in_future[1].year)
             self.assertFalse(error.errors)
+
+    def test_list_my_attributions_force_majeure_editable(self):
+        response = self.client.get(self.url)
+        context = response.context
+        self.assertTrue(context['event_perm_force_majeure_open'])
+        self.assertEquals(
+            context['event_perm_force_majeure_start_date'],
+            self.academic_calendar_force_majeure.start_date
+        )
+        self.assertEquals(
+            context['event_perm_force_majeure_end_date'],
+            self.academic_calendar_force_majeure.end_date
+        )
+
+    def test_list_my_attributions_force_majeure_not_editable(self):
+        self.academic_calendar_force_majeure.start_date = datetime.date.today() + datetime.timedelta(days=7)
+        self.academic_calendar_force_majeure.end_date = datetime.date.today() + datetime.timedelta(days=10)
+        self.academic_calendar_force_majeure.save()
+        response = self.client.get(self.url)
+        context = response.context
+        self.assertFalse(context['event_perm_force_majeure_open'])
 
 
 @override_flag('educational_information_block_action', active=True)

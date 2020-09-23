@@ -32,4 +32,7 @@ register = template.Library()
 
 @register.filter
 def shift_date(source_date, days_to_add):
-    return source_date + datetime.timedelta(days=days_to_add)
+    try:
+        return source_date + datetime.timedelta(days=days_to_add)
+    except TypeError:
+        return None

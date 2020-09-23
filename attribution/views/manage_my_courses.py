@@ -99,7 +99,7 @@ def list_my_attributions_summary_editable(request):
             }
         )
     else:
-        force_majeure_calendar = event_perm_force_majeure.get_academic_calendars_queryset(data_year=data_year).get()
+        force_majeure_calendar = event_perm_force_majeure.get_academic_calendars_queryset(data_year=data_year).first()
 
     learning_unit_years = find_learning_unit_years_by_academic_year_tutor_attributions(
         academic_year=data_year,
@@ -120,8 +120,8 @@ def list_my_attributions_summary_editable(request):
         'entity_calendars': entity_calendars,
         'event_perm_desc_fiche_open': event_perm_desc_fiche.is_open(),
         'event_perm_force_majeure_open': event_perm_force_majeure.is_open(),
-        'event_perm_force_majeure_start_date': force_majeure_calendar.start_date,
-        'event_perm_force_majeure_end_date': force_majeure_calendar.end_date
+        'event_perm_force_majeure_start_date': force_majeure_calendar.start_date if force_majeure_calendar else None,
+        'event_perm_force_majeure_end_date': force_majeure_calendar.end_date if force_majeure_calendar else None
     }
     return render(request, 'manage_my_courses/list_my_courses_summary_editable.html', context)
 
