@@ -58,14 +58,14 @@ class CommonNodeHyperlinkedRelatedField(serializers.HyperlinkedIdentityField):
                 NodeIdentity(code=obj.child.code, year=obj.child.year),
                 _get_version_of_nodes({obj.child})
             )
-            view_name = 'education_group_api_v1:' + TrainingDetail.name
+            view_name = 'education_group_api_v1:' + (
+                TrainingDetail.name if obj.child.is_training() else MiniTrainingDetail.name
+            )
             url_kwargs = {
                 'acronym': obj.child.title,
                 'year': obj.child.year,
                 'version_name': version[1:-1]
             }
-            if obj.child.is_mini_training():
-                view_name = 'education_group_api_v1:' + MiniTrainingDetail.name
         else:
             view_name = 'education_group_api_v1:' + GroupDetail.name
             url_kwargs = {
@@ -139,9 +139,8 @@ class EducationGroupCommonNodeTreeSerializer(serializers.Serializer):
         )
         field_suffix = 'en' if self.context.get('language') == settings.LANGUAGE_CODE_EN else 'fr'
         field_prefix = 'offer' if obj.child.is_training() else 'group'
-        return getattr(obj.child, '{}_title_{}'.format(field_prefix, field_suffix)) + (
-            ' {}'.format(version_title) if version_title else ''
-        )
+        attr_name = '{}_title_{}'.format(field_prefix, field_suffix)
+        return getattr(obj.child, attr_name) + (' {}'.format(version_title) if version_title else '')
 
     def get_partial_title(self, obj):
         field_suffix = '_en' if self.context.get('language') == settings.LANGUAGE_CODE_EN else '_fr'
