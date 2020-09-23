@@ -158,7 +158,9 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             "update_training_url": self.get_update_training_url(),
             "update_permission_name": self.get_update_permission_name(),
             "delete_permanently_training_url": self.get_delete_permanently_training_url(),
-            "delete_permanently_tree_version": self.get_delete_permanently_tree_version_url(),
+            "delete_permanently_tree_version_url": self.get_delete_permanently_tree_version_url(),
+            "delete_permanently_tree_version_permission_name":
+                self.get_delete_permanently_tree_version_permission_name(),
             "create_version_url": self.get_create_version_url(),
             "create_version_permission_name": self.get_create_version_permission_name(),
             "xls_ue_prerequisites": reverse("education_group_learning_units_prerequisites",
@@ -223,6 +225,9 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
                     'code': self.node_identity.code,
                 }
             )
+
+    def get_delete_permanently_tree_version_permission_name(self):
+        return "program_management.delete_permanently_training_version"
 
     def get_create_version_url(self):
         if self.is_root_node() and self.program_tree_version_identity.is_standard():

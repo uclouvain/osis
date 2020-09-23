@@ -166,7 +166,9 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             "update_mini_training_url": self.get_update_mini_training_url(),
             "update_permission_name": self.get_update_permission_name(),
             "delete_permanently_mini_training_url": self.get_delete_permanently_mini_training_url(),
-            "delete_permanently_tree_version": self.get_delete_permanently_tree_version_url(),
+            "delete_permanently_tree_version_url": self.get_delete_permanently_tree_version_url(),
+            "delete_permanently_tree_version_permission_name":
+                self.get_delete_permanently_tree_version_permission_name(),
             "create_version_url": self.get_create_version_url(),
             "create_version_permission_name": self.get_create_version_permission_name(),
             "is_root_node": is_root_node,
@@ -223,6 +225,9 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
                     'code': self.node_identity.code,
                 }
             )
+
+    def get_delete_permanently_tree_version_permission_name(self):
+        return "program_management.delete_permanently_minitraining_version"
 
     def get_delete_permanently_mini_training_url(self):
         if self.program_tree_version_identity.is_standard():
