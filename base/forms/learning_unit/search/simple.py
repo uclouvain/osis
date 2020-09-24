@@ -37,6 +37,13 @@ from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQue
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.views.learning_units.search.common import SearchTypes
 
+COMMON_ORDERING_FIELDS = (
+    ('academic_year__year', 'academic_year'), ('acronym', 'acronym'), ('full_title', 'title'),
+    ('learning_container_year__container_type', 'type'), ('subtype', 'subtype'),
+    ('entity_requirement', 'requirement_entity'), ('entity_allocation', 'allocation_entity'),
+    ('credits', 'credits'), ('status', 'status'), ('has_proposal', 'has_proposal'),
+)
+
 MOBILITY = 'mobility'
 MOBILITY_CHOICE = ((MOBILITY, _('Mobility')),)
 
@@ -123,16 +130,7 @@ class LearningUnitFilter(FilterSet):
     order_by_field = 'ordering'
     ordering = OrderingFilter(
         fields=(
-            ('academic_year__year', 'academic_year'),
-            ('acronym', 'acronym'),
-            ('full_title', 'title'),
-            ('learning_container_year__container_type', 'type'),
-            ('subtype', 'subtype'),
-            ('entity_requirement', 'requirement_entity'),
-            ('entity_allocation', 'allocation_entity'),
-            ('credits', 'credits'),
-            ('status', 'status'),
-            ('has_proposal', 'has_proposal'),
+            COMMON_ORDERING_FIELDS
         ),
         widget=forms.HiddenInput
     )
