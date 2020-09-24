@@ -11,7 +11,7 @@ from osis_role.errors import predicate_failed_msg
 def is_linked_to_offer(self, user: User, obj: GroupYear):
     if obj:
         return any(
-            obj.educationgroupversion.offer.pk in role.get_person_related_education_groups(role.person)
+            obj.educationgroupversion.offer_id in role.get_person_related_education_groups(role.person)
             for role in self.context['role_qs']
         )
     return None
