@@ -123,18 +123,15 @@ class MiniTrainingForm(ValidationRuleMixin, forms.Form):
             self.fields['academic_year'].disabled = True
 
         if not self.fields['academic_year'].disabled and self.user.person.is_faculty_manager:
-            academic_years = EventPermEducationGroupEdition.get_academic_years().filter(
-                year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION
-            )
-            self.fields['academic_year'].queryset = academic_years
-            self.fields['end_year'].queryset = academic_years
+            working_academic_years = EventPermEducationGroupEdition.get_academic_years()
         else:
-            self.fields['academic_year'].queryset = self.fields['academic_year'].queryset.filter(
-                year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION
-            )
-            self.fields['end_year'].queryset = self.fields['end_year'].queryset.filter(
-                year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION
-            )
+            working_academic_years = AcademicYear.objects.all()
+
+        working_academic_years = working_academic_years.filter(year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION)
+        self.fields['academic_year'].queryset = working_academic_years
+        self.fields['end_year'].queryset = AcademicYear.objects.filter(
+            year__gte=working_academic_years.first().year
+        )
 
     def __init_management_entity_field(self):
         self.fields['management_entity'] = fields.ManagementEntitiesChoiceField(
