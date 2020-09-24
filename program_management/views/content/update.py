@@ -34,7 +34,7 @@ from program_management.ddd.domain.service.get_program_tree_version_for_tree imp
 
 
 class ContentUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
-    permission_required = 'base.change_educationgroup'
+    permission_required = 'base.change_link_data'
     raise_exception = True
 
     template_name = "program_management/content/update.html"

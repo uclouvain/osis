@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-18 15:22+0200\n"
+"POT-Creation-Date: 2020-09-23 10:25+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -452,12 +452,6 @@ msgstr ""
 msgid "New Training"
 msgstr ""
 
-#, python-format
-msgid ""
-"No type of %(child_category)s can be created as child of %(category)s of "
-"type %(type)s"
-msgstr ""
-
 msgid "Non university Bachelors"
 msgstr ""
 
@@ -715,6 +709,9 @@ msgid "Validity"
 msgstr ""
 
 msgid "Validity cannot be greater than last year of organization"
+msgstr ""
+
+msgid "Version can only be created by central manager"
 msgstr ""
 
 msgid "Version name {} already exists"

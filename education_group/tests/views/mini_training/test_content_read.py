@@ -86,6 +86,7 @@ class TestMiniTrainingReadContent(TestCase):
 
         self.assertEqual(response.context['person'], self.person)
         self.assertEqual(response.context['group_year'], self.mini_training_version.root_group)
+        self.assertEqual(response.context['update_permission_name'], "base.change_link_data")
         self.assertIsInstance(response.context['tree'], str)
         self.assertIsInstance(response.context['node'], NodeGroupYear)
         self.assertIsInstance(response.context['children'], List)

@@ -88,6 +88,7 @@ class TestTrainingReadContent(TestCase):
         self.assertEqual(response.context['person'], self.person)
         self.assertEqual(response.context['group_year'], self.training_version.root_group)
         self.assertEqual(response.context['education_group_version'], self.training_version)
+        self.assertEqual(response.context['update_permission_name'], "base.change_link_data")
         self.assertIsInstance(response.context['form_xls_custom'], CustomXlsForm)
         self.assertIsInstance(response.context['tree'], str)
         self.assertIsInstance(response.context['node'], NodeGroupYear)
