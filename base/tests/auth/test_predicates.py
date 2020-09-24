@@ -7,6 +7,8 @@ from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
+from education_group.tests.factories.group_year import GroupYearFactory
+from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 
 
 class TestUserIsLinkedToOffer(TestCase):
@@ -14,6 +16,11 @@ class TestUserIsLinkedToOffer(TestCase):
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(current=True)
         cls.education_group_year = EducationGroupYearFactory(academic_year=cls.academic_year)
+        cls.group_year = GroupYearFactory(academic_year=cls.academic_year)
+        cls.education_group_version = EducationGroupVersionFactory(
+            offer=cls.education_group_year,
+            root_group=cls.group_year
+        )
         cls.person = PersonFactory()
 
     def setUp(self):
@@ -30,11 +37,11 @@ class TestUserIsLinkedToOffer(TestCase):
 
     def test_user_manage_education_group(self):
         ProgramManagerFactory(person=self.person, education_group=self.education_group_year.education_group)
-        self.assertTrue(is_linked_to_offer(self.person.user, self.education_group_year))
+        self.assertTrue(is_linked_to_offer(self.person.user, self.group_year))
 
     def test_user_manager_another_education_group(self):
         ProgramManagerFactory(person=self.person, education_group=EducationGroupYearFactory().education_group)
-        self.assertFalse(is_linked_to_offer(self.person.user, self.education_group_year))
+        self.assertFalse(is_linked_to_offer(self.person.user, self.group_year))
 
     def test_predicate_without_permission_object(self):
         self.assertIsNone(is_linked_to_offer(self.person.user, None))
