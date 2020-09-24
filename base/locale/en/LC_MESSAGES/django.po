@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-17 16:09+0200\n"
+"POT-Creation-Date: 2020-09-24 15:41+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1897,13 +1897,16 @@ msgstr ""
 msgid "Program manager"
 msgstr ""
 
-msgid "Program managers"
-msgstr ""
-
 msgid "Program manager is not allowed to modify a group"
 msgstr ""
 
 msgid "Program manager is not allowed to modify a link"
+msgstr ""
+
+msgid "Program manager is not allowed to modify a minitraining"
+msgstr ""
+
+msgid "Program managers"
 msgstr ""
 
 msgid "Program master 120"
