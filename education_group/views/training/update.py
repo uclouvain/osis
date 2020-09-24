@@ -195,7 +195,7 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
     def get_permission_object(self) -> Optional[GroupYear]:
         return get_object_or_none(
-            GroupYear.objects.select_related('academic_year', 'management_entity', 'educationgroupversion'),
+            GroupYear.objects.select_related('academic_year', 'management_entity', 'educationgroupversion__offer'),
             academic_year__year=self.kwargs['year'],
             partial_acronym=self.kwargs['code']
         )
