@@ -24,6 +24,7 @@
 import mock
 from django.test import TestCase
 
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.utils.urls import reverse_with_get
 from education_group.ddd.domain import training, group
 from education_group.ddd.factories.group import GroupFactory
@@ -37,6 +38,7 @@ class TestTrainingUpdateView(TestCase):
     @classmethod
     def setUpTestData(cls):
         FrenchLanguageFactory()
+        AcademicYearFactory.produce()
         cls.central_manager = CentralManagerFactory()
         cls.url = reverse_with_get(
             "training_update",
