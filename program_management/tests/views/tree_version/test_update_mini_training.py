@@ -37,12 +37,13 @@ from education_group.tests.factories.mini_training import MiniTrainingFactory
 from program_management.forms.version import UpdateTrainingVersionForm, UpdateMiniTrainingVersionForm
 from program_management.tests.ddd.factories.program_tree_version import SpecificProgramTreeVersionFactory, \
     StandardProgramTreeVersionFactory
+from program_management.views.tree_version.update_mini_training import MiniTrainingVersionUpdateView
 
 
 class TestMiniTrainingVersionUpdateGetView(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.mini_training_version_obj = SpecificProgramTreeVersionFactory()
+        cls.mini_training_version_obj = SpecificProgramTreeVersionFactory(tree__root_node__year=2020)
         cls.group_obj = GroupFactory(
             entity_identity=GroupIdentity(
                 code=cls.mini_training_version_obj.tree.root_node.code,
@@ -86,6 +87,10 @@ class TestMiniTrainingVersionUpdateGetView(TestCase):
         self.mocked_get_mini_training_version = self.get_mini_training_version_patcher.start()
         self.addCleanup(self.get_mini_training_version_patcher.stop)
 
+    def test_assert_permission_required(self):
+        expected_permission = "program_management.change_minitraining_version"
+        self.assertEqual(MiniTrainingVersionUpdateView.permission_required, expected_permission)
+
     def test_case_when_user_not_logged(self):
         self.client.logout()
         response = self.client.get(self.url)
@@ -119,9 +124,11 @@ class TestMiniTrainingVersionUpdateGetView(TestCase):
         })
         self.assertRedirects(response, expected_redirect, fetch_redirect_response=False)
 
+    @mock.patch('program_management.forms.version.ProgramTreeVersionRepository.get', return_value=None)
     @mock.patch('program_management.forms.version.get_end_postponement_year_service.'
                 'calculate_program_tree_end_postponement', return_value=2025)
-    def test_assert_get_context(self, mock_max_postponement):
+    def test_assert_get_context(self, mock_max_postponement, mock_program_tree_version_repo):
+        mock_program_tree_version_repo.return_value = self.mini_training_version_obj
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, HttpResponse.status_code)
@@ -149,7 +156,7 @@ class TestMiniTrainingVersionUpdateGetView(TestCase):
 class TestMiniTrainingVersionUpdatePostView(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.mini_training_version_obj = SpecificProgramTreeVersionFactory()
+        cls.mini_training_version_obj = SpecificProgramTreeVersionFactory(tree__root_node__year=2020)
         cls.group_obj = GroupFactory(
             entity_identity=GroupIdentity(
                 code=cls.mini_training_version_obj.tree.root_node.code,
@@ -211,9 +218,17 @@ class TestMiniTrainingVersionUpdatePostView(TestCase):
                 '.UpdateMiniTrainingVersionForm.is_valid', return_value=True)
     @mock.patch('program_management.forms.version.get_end_postponement_year_service.'
                 'calculate_program_tree_end_postponement', return_value=2025)
-    @mock.patch('program_management.views.tree_version.update_mini_training.update_mini_training_version_service'
-                '.update_mini_training_version', return_value=None)
-    def test_assert_update_mini_training_service_called(self, mock_update_mini_training, *mock):
+    @mock.patch('program_management.forms.version.ProgramTreeVersionRepository.get', return_value=None)
+    @mock.patch('program_management.views.tree_version.update_mini_training.'
+                'update_and_postpone_mini_training_version_service.update_and_postpone_mini_training_version',
+                return_value=[])
+    def test_assert_update_mini_training_service_called(
+            self,
+            mock_update_mini_training,
+            mock_program_tree_version_repo,
+            *mock
+    ):
+        mock_program_tree_version_repo.return_value = self.mini_training_version_obj
         response = self.client.post(self.url, {})
 
         expected_redirect = reverse(

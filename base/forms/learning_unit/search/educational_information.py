@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -25,13 +25,14 @@
 ##############################################################################
 from django import forms
 from django.db.models.expressions import RawSQL
-from django_filters import filters
+from django_filters import filters, OrderingFilter
 
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY
 from base.forms.learning_unit.search.simple import LearningUnitFilter
 from base.models import academic_calendar
 from base.models.enums.academic_calendar_type import SUMMARY_COURSE_SUBMISSION
 from base.views.learning_units.search.common import SearchTypes
+from base.forms.learning_unit.search.simple import COMMON_ORDERING_FIELDS
 
 
 class LearningUnitDescriptionFicheFilter(LearningUnitFilter):
@@ -41,6 +42,13 @@ class LearningUnitDescriptionFicheFilter(LearningUnitFilter):
         widget=forms.HiddenInput,
         required=False,
         initial=SearchTypes.SUMMARY_LIST.value
+    )
+
+    ordering = OrderingFilter(
+        fields=(
+            COMMON_ORDERING_FIELDS + (('summary_status', 'summary_status'))
+        ),
+        widget=forms.HiddenInput
     )
 
     def __init__(self, *args, **kwargs):
