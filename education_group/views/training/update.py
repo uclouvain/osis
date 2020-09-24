@@ -60,10 +60,6 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
     template_name = "education_group_app/training/upsert/update.html"
 
-    def get_permission_object(self):
-        training = self.get_training_obj()
-        return EducationGroupYear.objects.get(partial_acronym=training.code, academic_year__year=training.year)
-
     @transaction.non_atomic_requests
     def get(self, request, *args, **kwargs):
         context = {
@@ -199,7 +195,7 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
     def get_permission_object(self) -> Optional[GroupYear]:
         return get_object_or_none(
-            GroupYear.objects.select_related('academic_year', 'management_entity'),
+            GroupYear.objects.select_related('academic_year', 'management_entity', 'educationgroupversion'),
             academic_year__year=self.kwargs['year'],
             partial_acronym=self.kwargs['code']
         )
