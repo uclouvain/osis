@@ -29,6 +29,7 @@ from django.test import TestCase
 
 from base.tests.factories.person import PersonFactory
 from program_management.ddd import command
+from program_management.tests.factories.element import ElementGroupYearFactory
 
 
 class TestCopyToCache(TestCase):
@@ -45,7 +46,7 @@ class TestCopyToCache(TestCase):
         self.assertEqual(response.status_code, http.HttpResponseNotAllowed.status_code)
 
     @mock.patch("program_management.ddd.service.write.copy_element_service.copy_element_service")
-    def test_should_call_copy_element_service_when_view_is_called_via_post_request(self, mock_copy_service):
+    def test_should_call_copy_element_service_when_view_is_called_via_post_request_for_ue(self, mock_copy_service):
         response = self.client.post(self.url, data={
             "element_code": "LOSIS2548",
             "element_year": 2015,
@@ -57,6 +58,32 @@ class TestCopyToCache(TestCase):
             {"success_message": "<strong>{clipboard_title}</strong><br>{object_str}".format(
                 clipboard_title=_("Copied element"),
                 object_str="LOSIS2548 - 2015"
+            )}
+        )
+
+    @mock.patch("program_management.ddd.service.write.copy_element_service.copy_element_service")
+    def test_should_call_copy_element_service_when_view_is_called_via_post_request_for_group(self, mock_copy_service):
+        root_node = ElementGroupYearFactory()
+
+        response = self.client.post(self.url, data={
+            "element_code": root_node.group_year.partial_acronym,
+            "element_year": root_node.group_year.academic_year.year,
+        })
+        copy_command = command.CopyElementCommand(self.person.user.id,
+                                                  root_node.group_year.partial_acronym,
+                                                  root_node.group_year.academic_year.year)
+
+        mock_copy_service.assert_called_with(copy_command)
+
+        self.assertEqual(
+            response.json(),
+            {"success_message": "<strong>{clipboard_title}</strong><br>{object_str}".format(
+                clipboard_title=_("Copied element"),
+                object_str="{} - {}{} - {}".format(root_node.group_year.partial_acronym,
+                                                   root_node.group_year.acronym,
+                                                   '',
+                                                   root_node.group_year.academic_year.year
+                                                   )
             )}
         )
 

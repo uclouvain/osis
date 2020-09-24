@@ -164,14 +164,18 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             "create_training_url": self.get_create_training_url(),
             "create_mini_training_url": self.get_create_mini_training_url(),
             "update_mini_training_url": self.get_update_mini_training_url(),
+            "update_permission_name": self.get_update_permission_name(),
             "delete_permanently_mini_training_url": self.get_delete_permanently_mini_training_url(),
-            "delete_permanently_tree_version": self.get_delete_permanently_tree_version_url(),
+            "delete_permanently_tree_version_url": self.get_delete_permanently_tree_version_url(),
+            "delete_permanently_tree_version_permission_name":
+                self.get_delete_permanently_tree_version_permission_name(),
             "create_version_url": self.get_create_version_url(),
+            "create_version_permission_name": self.get_create_version_permission_name(),
             "is_root_node": is_root_node,
         }
 
     def get_permission_object(self):
-        return self.get_education_group_version().offer
+        return self.get_education_group_version().root_group
 
     def get_create_group_url(self):
         return reverse('create_element_select_type', kwargs={'category': Categories.GROUP.name}) + \
@@ -199,12 +203,18 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             get={"path": self.get_path(), "tab": self.active_tab.name}
         )
 
+    def get_update_permission_name(self) -> str:
+        return "base.change_minitraining"
+
     def get_create_version_url(self):
-        if self.is_root_node():
+        if self.is_root_node() and self.program_tree_version_identity.is_standard():
             return reverse(
                 'create_education_group_version',
                 kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}
             ) + "?path={}".format(self.get_path())
+
+    def get_create_version_permission_name(self) -> str:
+        return "base.add_minitraining_version"
 
     def get_delete_permanently_tree_version_url(self):
         if not self.program_tree_version_identity.is_standard():
@@ -215,6 +225,9 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
                     'code': self.node_identity.code,
                 }
             )
+
+    def get_delete_permanently_tree_version_permission_name(self):
+        return "program_management.delete_permanently_minitraining_version"
 
     def get_delete_permanently_mini_training_url(self):
         if self.program_tree_version_identity.is_standard():

@@ -156,9 +156,13 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             "create_training_url": self.get_create_training_url(),
             "create_mini_training_url": self.get_create_mini_training_url(),
             "update_training_url": self.get_update_training_url(),
+            "update_permission_name": self.get_update_permission_name(),
             "delete_permanently_training_url": self.get_delete_permanently_training_url(),
-            "delete_permanently_tree_version": self.get_delete_permanently_tree_version_url(),
+            "delete_permanently_tree_version_url": self.get_delete_permanently_tree_version_url(),
+            "delete_permanently_tree_version_permission_name":
+                self.get_delete_permanently_tree_version_permission_name(),
             "create_version_url": self.get_create_version_url(),
+            "create_version_permission_name": self.get_create_version_permission_name(),
             "xls_ue_prerequisites": reverse("education_group_learning_units_prerequisites",
                                             args=[self.education_group_version.root_group.academic_year.year,
                                                   self.education_group_version.root_group.partial_acronym]
@@ -174,8 +178,8 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
                                         ),
         }
 
-    def get_permission_object(self):
-        return self.education_group_version.offer
+    def get_permission_object(self) -> 'GroupYear':
+        return self.education_group_version.root_group
 
     def get_create_group_url(self):
         return reverse('create_element_select_type', kwargs={'category': Categories.GROUP.name}) + \
@@ -202,6 +206,9 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             get={"path_to": self.get_path(), "tab": self.active_tab.name}
         )
 
+    def get_update_permission_name(self) -> str:
+        return "base.change_training"
+
     def get_delete_permanently_training_url(self):
         if self.program_tree_version_identity.is_standard():
             return reverse(
@@ -219,12 +226,18 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
                 }
             )
 
+    def get_delete_permanently_tree_version_permission_name(self):
+        return "program_management.delete_permanently_training_version"
+
     def get_create_version_url(self):
-        if self.is_root_node():
+        if self.is_root_node() and self.program_tree_version_identity.is_standard():
             return reverse(
                 'create_education_group_version',
                 kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}
             ) + "?path={}".format(self.get_path())
+
+    def get_create_version_permission_name(self) -> str:
+        return "base.add_training_version"
 
     def get_tab_urls(self):
         node_identity = self.get_object().entity_id
