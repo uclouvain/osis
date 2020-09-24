@@ -30,13 +30,13 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DeleteView
 
-from base.models.education_group_year import EducationGroupYear
+from base.models.enums import education_group_categories
 from base.views.common import display_success_messages, display_error_messages
 from base.views.mixins import AjaxTemplateMixin
 from education_group.ddd.domain.exception import TrainingHaveLinkWithEPC, \
     TrainingHaveEnrollments
 from education_group.models.group_year import GroupYear
-from osis_role.contrib.views import PermissionRequiredMixin
+from osis_role.contrib.views import AjaxPermissionRequiredMixin
 from program_management.ddd import command as command_program_management
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.exception import ProgramTreeNonEmpty, NodeHaveLinkException, \
@@ -47,9 +47,8 @@ from program_management.ddd.repositories.program_tree_version import ProgramTree
 from program_management.ddd.service.write import delete_all_specific_versions_service
 
 
-class TreeVersionDeleteView(PermissionRequiredMixin, AjaxTemplateMixin, DeleteView):
+class TreeVersionDeleteView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, DeleteView):
     template_name = "tree_version/delete_inner.html"
-    permission_required = 'program_management.delete_all_tree_version'
 
     def get_object(self, queryset=None) -> 'ProgramTreeVersion':
         try:
@@ -110,6 +109,11 @@ class TreeVersionDeleteView(PermissionRequiredMixin, AjaxTemplateMixin, DeleteVi
 
     def get_success_url(self) -> str:
         return reverse('version_program')
+
+    def get_permission_required(self):
+        if self.get_permission_object().education_group_type.category == education_group_categories.TRAINING:
+            return ("program_management.delete_permanently_training_version",)
+        return ("program_management.delete_permanently_minitraining_version",)
 
     def get_permission_object(self):
         return get_object_or_404(

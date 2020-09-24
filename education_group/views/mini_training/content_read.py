@@ -43,3 +43,6 @@ class MiniTrainingReadContent(MiniTrainingRead):
             kwargs={'code': self.kwargs['code'], 'year': self.kwargs['year']},
             get={"path_to": self.get_path(), "tab": self.active_tab.name}
         )
+
+    def get_update_permission_name(self) -> str:
+        return "base.change_link_data"

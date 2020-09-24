@@ -42,7 +42,7 @@ from rules_management.enums import GROUP_PGRM_ENCODING_PERIOD, GROUP_DAILY_MANAG
 from rules_management.mixins import PermissionFieldMixin
 
 
-class GroupForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
+class GroupForm(ValidationRuleMixin, forms.Form):
     code = UpperCaseCharField(max_length=15, label=_("Code"), required=False)
     academic_year = forms.ModelChoiceField(queryset=AcademicYear.objects.all(), label=_("Validity"), required=False)
     abbreviated_title = UpperCaseCharField(max_length=40, label=_("Acronym/Short title"), required=False)
@@ -111,15 +111,6 @@ class GroupForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     def field_reference(self, field_name: str) -> str:
         return '.'.join(["GroupForm", self.group_type, field_name])
 
-    # PermissionFieldMixin
-    def get_context(self) -> str:
-        is_edition_period_opened = EventPermEducationGroupEdition(raise_exception=False).is_open()
-        return GROUP_PGRM_ENCODING_PERIOD if is_edition_period_opened else GROUP_DAILY_MANAGEMENT
-
-    # PermissionFieldMixin
-    def get_model_permission_filter_kwargs(self) -> Dict:
-        return {'context': self.get_context()}
-
     def clean_academic_year(self):
         if self.cleaned_data['academic_year']:
             return self.cleaned_data['academic_year'].year
@@ -141,10 +132,24 @@ class GroupAttachForm(GroupForm):
         self.fields['academic_year'].required = False
 
 
-class GroupUpdateForm(GroupForm):
-    def __init__(self, *args, **kwargs):
+class GroupUpdateForm(PermissionFieldMixin, GroupForm):
+    def __init__(self, *args, event_perm_obj=None, **kwargs):
+        self.event_perm_obj = event_perm_obj
+
         super().__init__(*args, **kwargs)
         self.fields['academic_year'].disabled = True
         self.fields['academic_year'].required = False
         self.fields['code'].disabled = True
         self.fields['code'].required = False
+
+    # PermissionFieldMixin
+    def get_context(self) -> str:
+        is_edition_period_opened = EventPermEducationGroupEdition(
+            obj=self.event_perm_obj,
+            raise_exception=False
+        ).is_open()
+        return GROUP_PGRM_ENCODING_PERIOD if is_edition_period_opened else GROUP_DAILY_MANAGEMENT
+
+    # PermissionFieldMixin
+    def get_model_permission_filter_kwargs(self) -> Dict:
+        return {'context': self.get_context()}
