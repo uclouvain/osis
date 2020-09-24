@@ -126,15 +126,17 @@ def is_program_manager(user, offer_year=None, learning_unit_year=None, education
         return True
 
     if offer_year:
-        return ProgramManager.objects.filter(person__user=user, offer_year=offer_year).exists()
+        result = ProgramManager.objects.filter(person__user=user, offer_year=offer_year).exists()
     elif learning_unit_year:
         offers_user = ProgramManager.objects.filter(person__user=user).values('offer_year')
-        return LearningUnitEnrollment.objects.filter(learning_unit_year=learning_unit_year) \
+        result = LearningUnitEnrollment.objects.filter(learning_unit_year=learning_unit_year) \
             .filter(offer_enrollment__offer_year__in=offers_user).exists()
     elif education_group:
-        return ProgramManager.objects.filter(person__user=user, education_group=education_group).exists()
+        result = ProgramManager.objects.filter(person__user=user, education_group=education_group).exists()
     else:
-        return ProgramManager.objects.filter(person__user=user).exists()
+        result = ProgramManager.objects.filter(person__user=user).exists()
+
+    return result
 
 
 def find_by_offer_year(offer_yr):
