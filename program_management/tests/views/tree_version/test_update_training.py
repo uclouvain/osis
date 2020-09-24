@@ -37,12 +37,13 @@ from education_group.tests.factories.group_year import GroupYearFactory as Group
 from program_management.forms.version import UpdateTrainingVersionForm
 from program_management.tests.ddd.factories.program_tree_version import SpecificProgramTreeVersionFactory, \
     StandardProgramTreeVersionFactory
+from program_management.views.tree_version.update_training import TrainingVersionUpdateView
 
 
 class TestTrainingVersionUpdateGetView(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.training_version_obj = SpecificProgramTreeVersionFactory()
+        cls.training_version_obj = SpecificProgramTreeVersionFactory(tree__root_node__year=2020)
         cls.group_obj = GroupFactory(
             entity_identity=GroupIdentity(
                 code=cls.training_version_obj.tree.root_node.code,
@@ -88,6 +89,10 @@ class TestTrainingVersionUpdateGetView(TestCase):
         self.mocked_get_training_version = self.get_training_version_patcher.start()
         self.addCleanup(self.get_training_version_patcher.stop)
 
+    def test_assert_permission_required(self):
+        expected_permission = "program_management.change_training_version"
+        self.assertEqual(TrainingVersionUpdateView.permission_required, expected_permission)
+
     def test_case_when_user_not_logged(self):
         self.client.logout()
         response = self.client.get(self.url)
@@ -121,9 +126,11 @@ class TestTrainingVersionUpdateGetView(TestCase):
         })
         self.assertRedirects(response, expected_redirect, fetch_redirect_response=False)
 
+    @mock.patch('program_management.forms.version.ProgramTreeVersionRepository.get', return_value=None)
     @mock.patch('program_management.forms.version.get_end_postponement_year_service.'
                 'calculate_program_tree_end_postponement', return_value=2025)
-    def test_assert_get_context(self, mock_max_postponement):
+    def test_assert_get_context(self, mock_max_postponement, mock_program_tree_version_repo):
+        mock_program_tree_version_repo.return_value = self.training_version_obj
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, HttpResponse.status_code)
@@ -215,9 +222,11 @@ class TestTrainingVersionUpdatePostView(TestCase):
                 '.UpdateTrainingVersionForm.is_valid', return_value=True)
     @mock.patch('program_management.forms.version.get_end_postponement_year_service.'
                 'calculate_program_tree_end_postponement', return_value=2025)
-    @mock.patch('program_management.views.tree_version.update_training.update_training_version_service'
-                '.update_training_version', return_value=None)
-    def test_assert_update_training_service_called(self, mock_update_training, *mock):
+    @mock.patch('program_management.forms.version.ProgramTreeVersionRepository.get', return_value=None)
+    @mock.patch('program_management.views.tree_version.update_training.update_and_postpone_training_version_service'
+                '.update_and_postpone_training_version', return_value=[])
+    def test_assert_update_training_service_called(self, mock_update_training, mock_program_tree_version_repo, *mock):
+        mock_program_tree_version_repo.return_value = self.training_version_obj
         response = self.client.post(self.url, {})
 
         expected_redirect = reverse(

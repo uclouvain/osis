@@ -29,6 +29,7 @@ from django.http import HttpResponse, HttpResponseForbidden
 from django.test import TestCase
 from django.urls import reverse, exceptions
 
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.person import PersonFactory
 from education_group.ddd.domain.training import TrainingIdentity
@@ -45,6 +46,7 @@ class TestTrainingCreateView(TestCase):
         cls.training_type = EducationGroupTypeFactory()
         FrenchLanguageFactory()
         cls.url = reverse('training_create', kwargs={"type": cls.training_type.name})
+        AcademicYearFactory.produce()
 
     def setUp(self):
         self.client.force_login(self.central_manager.person.user)
