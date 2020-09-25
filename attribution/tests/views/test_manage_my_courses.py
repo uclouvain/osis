@@ -126,6 +126,8 @@ class ManageMyCoursesViewTestCase(TestCase):
         next_calendar = AcademicCalendarFactory(
             start_date=datetime.date.today() + datetime.timedelta(weeks=48),
             end_date=datetime.date.today() + datetime.timedelta(weeks=52),
+            academic_year=self.ac_year_in_future[1],
+            data_year=self.ac_year_in_future[1],
             reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
         )
         response = self.client.get(self.url)
