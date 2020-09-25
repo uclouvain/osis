@@ -23,26 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from collections import defaultdict
-
-from typing import Dict, List, Any
-
-from django.urls import reverse
 
 from osis_role.contrib.views import PermissionRequiredMixin
-
-from program_management.views.generic import LearningUnitGeneric
-
-
-from program_management.ddd.business_types import *
-from program_management.ddd.domain.node import NodeGroupYear, NodeIdentity
-from program_management.ddd.service.read import search_program_trees_using_node_service
-
-from program_management.ddd.command import GetProgramTreesFromNodeCommand
-from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
-from program_management.serializers.node_view import get_program_tree_version_name
-from program_management.ddd.domain.program_tree import get_nearest_parents
+from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.service.read.get_utilization_rows import get_utilizations
+from program_management.views.generic import LearningUnitGeneric
 
 
 class LearningUnitUtilization(PermissionRequiredMixin, LearningUnitGeneric):
