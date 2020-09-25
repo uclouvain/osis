@@ -40,4 +40,3 @@ class LearningUnitUtilization(PermissionRequiredMixin, LearningUnitGeneric):
         context = super().get_context_data(**kwargs)
         context['utilization_rows'] = get_utilizations(NodeIdentity(code=self.node.code, year=self.node.year))
         return context
-
