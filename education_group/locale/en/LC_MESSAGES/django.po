@@ -711,9 +711,6 @@ msgstr ""
 msgid "Validity cannot be greater than last year of organization"
 msgstr ""
 
-msgid "Version can only be created by central manager"
-msgstr ""
-
 msgid "Version name {} already exists"
 msgstr ""
 

@@ -751,10 +751,6 @@ msgid "Validity cannot be greater than last year of organization"
 msgstr ""
 "Validité ne peut pas être supérieure à la dernière année d'organisation"
 
-msgid "Version can only be created by central manager"
-msgstr ""
-"La création d'une version peut seulement être réalisée par le gestionnaire en central"
-
 msgid "Version name {} already exists"
 msgstr "Le nom de version {} existe déjà"
 
