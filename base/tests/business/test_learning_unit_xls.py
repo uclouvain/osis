@@ -104,7 +104,9 @@ class TestLearningUnitXls(TestCase):
                                                                   acronym=ROOT_ACRONYM)
         cls.a_group_year_parent = GroupYearFactory(academic_year=cls.academic_year, acronym=ROOT_ACRONYM)
         cls.a_group_year_parent_element = ElementFactory(group_year=cls.a_group_year_parent)
-        StandardEducationGroupVersionFactory(offer=cls.an_education_group_parent, root_group=cls.a_group_year_parent)
+        cls.standard_version = StandardEducationGroupVersionFactory(
+            offer=cls.an_education_group_parent, root_group=cls.a_group_year_parent
+        )
 
         cls.group_element_child = GroupElementYearFactory(
             parent_element=cls.a_group_year_parent_element,
@@ -217,7 +219,7 @@ class TestLearningUnitXls(TestCase):
         cls.particular_education_group_version = ParticularTransitionEducationGroupVersionFactory(
             offer=cls.an_education_group_parent_for_particular_version,
             root_group=cls.a_group_year_parent_for_particular_version)
-        GroupElementYearFactory(
+        cls.group_element_particular = GroupElementYearFactory(
             parent_element=cls.a_group_year_parent_element_for_particular_version,
             child_element=cls.learning_unit_yr_version_element
         )
@@ -306,9 +308,9 @@ class TestLearningUnitXls(TestCase):
         formations = _add_training_data(luy_1)
         expected = "{} ({}) - {} - {}".format(
             self.a_group_year_parent.partial_acronym,
-            "{0:.2f}".format(luy_1.credits),
+            "{0:.2f}".format(self.group_element_child.relative_credits),
             self.a_group_year_parent.acronym,
-            self.a_group_year_parent.title_fr
+            self.a_group_year_parent.title_fr + ' [{}]'.format(self.standard_version.title_fr)
         )
         self.assertEqual(formations, expected)
 
@@ -468,10 +470,12 @@ class TestLearningUnitXls(TestCase):
             luy.get_quadrimester_display() or '',
             luy.get_session_display() or '',
             luy.language or "",
-            "{} ({}) - {} - {}".format(self.a_group_year_parent.partial_acronym,
-                                         "{0:.2f}".format(luy.credits),
-                                         self.a_group_year_parent.acronym,
-                                         self.a_group_year_parent.title_fr)
+            "{} ({}) - {} - {}".format(
+                self.a_group_year_parent.partial_acronym,
+                "{0:.2f}".format(self.group_element_child.relative_credits),
+                self.a_group_year_parent.acronym,
+                self.a_group_year_parent.title_fr + ' [{}]'.format(self.standard_version.title_fr)
+            )
         ]
 
     def test_get_attribution_detail(self):
@@ -532,10 +536,12 @@ class TestLearningUnitXls(TestCase):
         formations = _add_training_data(luy)
         expected = "{} ({}) - {} - {}".format(
             self.a_group_year_parent_for_particular_version.partial_acronym,
-            "{0:.2f}".format(luy.credits),
+            "{0:.2f}".format(self.group_element_particular.relative_credits),
             "{}[{}-Transition]".format(self.a_group_year_parent_for_particular_version.acronym,
                                        self.particular_education_group_version.version_name),
-            self.a_group_year_parent_for_particular_version.title_fr
+            self.a_group_year_parent_for_particular_version.title_fr + ' [{}]'.format(
+                self.particular_education_group_version.title_fr
+            )
         )
         self.assertEqual(formations, expected)
 
