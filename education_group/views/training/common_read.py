@@ -207,7 +207,9 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
         )
 
     def get_update_permission_name(self) -> str:
-        return "base.change_training"
+        if self.current_version.is_standard_version:
+            return "base.change_training"
+        return "program_management.change_training_version"
 
     def get_delete_permanently_training_url(self):
         if self.program_tree_version_identity.is_standard():

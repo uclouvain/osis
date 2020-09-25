@@ -716,6 +716,11 @@ msgstr ""
 "La suppression d'une version de formation peut seulement être réalisée par le gestionnaire "
 "en central"
 
+msgid "Training version can only be modified by central manager"
+msgstr ""
+"La modification d'une version peut seulement être réalisée par le gestionnaire "
+"en central"
+
 msgid "Trainings"
 msgstr "Formations"
 

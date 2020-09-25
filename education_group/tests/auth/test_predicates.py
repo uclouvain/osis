@@ -263,7 +263,9 @@ class TestIsContinuingEducationGroupYear(TestCase):
         )
 
     def test_case_is_not_continuing_education_group_year(self):
-        education_group_year = EducationGroupYearFactory(education_group_type__minitraining=True)
+        education_group_year = EducationGroupYearFactory(
+            education_group_type__name=TrainingType.BACHELOR.name
+        )
         self.assertFalse(
             predicates.is_continuing_education_group_year(
                 self.user,
