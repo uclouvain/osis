@@ -38,9 +38,12 @@ from base.views.common import display_success_messages, display_warning_messages
 from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import exception
-from education_group.ddd.domain.exception import TrainingCopyConsistencyException
+from education_group.ddd.domain.exception import TrainingCopyConsistencyException, \
+    CertificateAimsCopyConsistencyException
 from education_group.ddd.domain.training import TrainingIdentity
 from education_group.ddd.service.read import get_training_service, get_group_service
+from education_group.ddd.service.write.postpone_certificate_aims_modification_service import \
+    postpone_certificate_aims_modification
 from education_group.forms import training as training_forms
 from education_group.models.group_year import GroupYear
 from education_group.templatetags.academic_year_display import display_as_academic_year
@@ -52,6 +55,8 @@ from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception as program_management_exception
 from program_management.ddd.service.write import delete_training_with_program_tree_service, \
     postpone_training_and_program_tree_modifications_service
+from program_management.ddd.service.write.postpone_training_and_program_tree_modifications_service import \
+    postpone_training_and_program_tree_modifications
 
 
 class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
@@ -121,10 +126,13 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         return self.get_success_url()
 
     def update_training(self) -> List['TrainingIdentity']:
+        updated_training_identities = []
+
         try:
             postpone_modification_command = self._convert_form_to_postpone_modification_cmd(self.training_form)
-            return postpone_training_and_program_tree_modifications_service.\
-                postpone_training_and_program_tree_modifications(postpone_modification_command)
+            updated_training_identities = postpone_training_and_program_tree_modifications(
+                postpone_modification_command
+            )
         except exception.ContentConstraintTypeMissing as e:
             self.training_form.add_error("constraint_type", e.message)
         except (exception.ContentConstraintMinimumMaximumMissing,
@@ -133,11 +141,31 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             self.training_form.add_error("max_constraint", "")
         except TrainingCopyConsistencyException as e:
             display_warning_messages(self.request, e.message)
-            return [
+            updated_training_identities = [
                 TrainingIdentity(acronym=self.get_training_obj().acronym, year=year)
                 for year in range(self.get_training_obj().year, e.conflicted_fields_year)
             ]
-        return []
+
+        updated_aims_training_identities = self._update_certificate_aims()
+
+        return sorted(list(
+            set(updated_aims_training_identities).union(updated_training_identities)
+        ), key=lambda x: x.year)
+
+    def _update_certificate_aims(self):
+        try:
+            postpone_aims_modification_command = self._convert_form_to_postpone_aims_modification_cmd(
+                self.training_form)
+            updated_aims_training_identities = postpone_certificate_aims_modification(
+                postpone_aims_modification_command
+            )
+        except CertificateAimsCopyConsistencyException as e:
+            display_warning_messages(self.request, e.message)
+            updated_aims_training_identities = [
+                TrainingIdentity(acronym=self.get_training_obj().acronym, year=year)
+                for year in range(self.get_training_obj().year, e.conflicted_fields_year)
+            ]
+        return updated_aims_training_identities
 
     def delete_training(self) -> List['TrainingIdentity']:
         end_year = self.training_form.cleaned_data["end_year"]
@@ -367,9 +395,6 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             leads_to_diploma=cleaned_data['leads_to_diploma'],
             printing_title=cleaned_data['diploma_printing_title'],
             professional_title=cleaned_data['professional_title'],
-            aims=[
-                (aim.code, aim.section) for aim in (cleaned_data['certificate_aims'] or [])
-            ],
             constraint_type=cleaned_data['constraint_type'],
             min_constraint=cleaned_data['min_constraint'],
             max_constraint=cleaned_data['max_constraint'],
@@ -378,6 +403,17 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             organization_name=cleaned_data['teaching_campus'].organization.name
             if cleaned_data["teaching_campus"] else None,
             schedule_type=cleaned_data["schedule_type"],
+        )
+
+    def _convert_form_to_postpone_aims_modification_cmd(
+            self,
+            form: training_forms.UpdateTrainingForm
+    ) -> command.PostponeCertificateAimsCommand:
+        cleaned_data = form.cleaned_data
+        return command.PostponeCertificateAimsCommand(
+            postpone_from_acronym=cleaned_data['acronym'],
+            postpone_from_year=cleaned_data['academic_year'].year,
+            aims=[(aim.code, aim.section) for aim in (cleaned_data['certificate_aims'] or [])],
         )
 
     def _convert_form_to_delete_trainings_command(

@@ -87,6 +87,13 @@ class CreateTrainingValidatorList(business_validator.BusinessListValidator):
 class UpdateTrainingValidatorList(business_validator.BusinessListValidator):
 
     def __init__(self, training: 'Training'):
+        self.validators = []
+        super().__init__()
+
+
+class UpdateCertificateAimsValidatorList(business_validator.BusinessListValidator):
+
+    def __init__(self, training: 'Training'):
         self.validators = [
             CertificateAimType2Validator(training)
         ]

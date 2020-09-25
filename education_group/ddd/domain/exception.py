@@ -275,3 +275,7 @@ class TrainingCopyConsistencyException(AbstractConsistencyException, BusinessExc
 
 class MiniTrainingCopyConsistencyException(AbstractConsistencyException, BusinessException):
     pass
+
+
+class CertificateAimsCopyConsistencyException(AbstractConsistencyException, BusinessException):
+    pass

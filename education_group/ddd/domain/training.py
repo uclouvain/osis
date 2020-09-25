@@ -86,6 +86,20 @@ class TrainingBuilder:
             )
         return training_next_year
 
+    def copy_aims_to_next_year(
+            self,
+            training_from: 'Training',
+            training_repository: 'TrainingRepository'
+    ) -> 'Training':
+        identity_next_year = TrainingIdentity(acronym=training_from.acronym, year=training_from.year + 1)
+        try:
+            training_next_year = training_repository.get(identity_next_year)
+            training_next_year.update_aims_from_other_training(training_from)
+        # TODO : should create Training when does not exist
+        except TrainingNotFoundException:
+            pass
+        return training_next_year
+
     def create_training(self, command: 'CreateTrainingCommand') -> 'Training':
         training_identity = TrainingIdentity(command.abbreviated_title, command.year)
 
@@ -294,9 +308,25 @@ class Training(interface.RootEntity):
             value = getattr(other_training, field)
             setattr(self, field, value)
 
-        if self.diploma and old_diploma:
-            self.diploma = attr.evolve(self.diploma, aims=old_diploma.aims)
-        elif self.diploma and not old_diploma:
+        # TO REMOVE ONCE AIMS ARE UPDATED SEPARATELY
+
+        # if self.diploma and old_diploma:
+        #     self.diploma = attr.evolve(self.diploma, aims=old_diploma.aims)
+        # elif self.diploma and not old_diploma:
+        #     self.diploma = attr.evolve(self.diploma, aims=[])
+
+    def update_aims(self, data: 'UpdateDiplomaData'):
+        if self.diploma and data.diploma:
+            self.diploma = attr.evolve(self.diploma, aims=data.diploma.aims)
+        elif self.diploma and not data.diploma:
+            self.diploma = attr.evolve(self.diploma, aims=[])
+        validators_by_business_action.UpdateCertificateAimsValidatorList(self)
+        return self
+
+    def update_aims_from_other_training(self, other_training: 'Training'):
+        if self.diploma and other_training.diploma:
+            self.diploma = attr.evolve(self.diploma, aims=other_training.diploma.aims)
+        elif self.diploma and not other_training.diploma:
             self.diploma = attr.evolve(self.diploma, aims=[])
 
     def has_same_values_as(self, other_training: 'Training') -> bool:
@@ -327,6 +357,9 @@ class Training(interface.RootEntity):
             conflicted_fields.append("professional_title")
 
         return conflicted_fields
+
+    def has_conflicted_certificate_aims(self, other: 'Training'):
+        return self.diploma.aims != other.diploma.aims
 
 
 @attr.s(frozen=True, slots=True, kw_only=True)
@@ -361,4 +394,9 @@ class UpdateTrainingData:
     funding = attr.ib(type=Funding, default=None)
     hops = attr.ib(type=HOPS, default=None)
     co_graduation = attr.ib(type=CoGraduation, default=None)
+    diploma = attr.ib(type=Diploma, default=None)
+
+
+@attr.s(frozen=True, slots=True, kw_only=True)
+class UpdateDiplomaData:
     diploma = attr.ib(type=Diploma, default=None)
