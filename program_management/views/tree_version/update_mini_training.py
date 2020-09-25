@@ -31,7 +31,7 @@ from program_management.forms import version
 
 
 class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
-    permission_required = 'base.change_educationgroup'
+    permission_required = 'program_management.change_minitraining_version'
     raise_exception = True
 
     template_name = "tree_version/mini_training/update.html"
@@ -126,6 +126,7 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
         return version.UpdateMiniTrainingVersionForm(
             data=self.request.POST or None,
             user=self.request.user,
+            event_perm_obj=self.get_permission_object(),
             mini_training_version_identity=mini_training_version_identity,
             node_identity=node_identity,
             initial=self._get_mini_training_version_form_initial_values(),
@@ -193,8 +194,8 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
 
         form_initial_values = {
             'version_name': mini_training_version.version_name,
-            'title': mini_training_version.title_fr,
-            'title_english': mini_training_version.title_en,
+            'version_title_fr': mini_training_version.title_fr,
+            'version_title_en': mini_training_version.title_en,
             'end_year': mini_training_version.end_year_of_existence,
 
             "category": _("Mini-Training"),
@@ -228,8 +229,8 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
             year=self.get_program_tree_version_obj().entity_id.year,
             is_transition=self.get_program_tree_version_obj().entity_id.is_transition,
 
-            title_en=form.cleaned_data["title_english"],
-            title_fr=form.cleaned_data["title"],
+            title_en=form.cleaned_data["version_title_en"],
+            title_fr=form.cleaned_data["version_title_fr"],
             end_year=form.cleaned_data["end_year"],
             management_entity_acronym=form.cleaned_data['management_entity'],
             teaching_campus_name=form.cleaned_data['teaching_campus'].name if form.cleaned_data["teaching_campus"]

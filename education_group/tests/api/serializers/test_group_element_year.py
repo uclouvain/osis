@@ -25,6 +25,7 @@
 ##############################################################################
 from unittest import skip
 
+import mock
 from django.conf import settings
 from django.test import RequestFactory, SimpleTestCase
 from rest_framework.reverse import reverse
@@ -87,6 +88,11 @@ class EducationGroupRootNodeTreeSerializerTestCase(SimpleTestCase):
                 'language': settings.LANGUAGE_CODE_EN
             }
         )
+        self.patcher = mock.patch('education_group.api.serializers.group_element_year._get_version_of_nodes')
+        self.mock_foo = self.patcher.start()
+
+    def tearDown(self):
+        self.patcher.stop()
 
     def test_root_contains_expected_fields(self):
         expected_fields = [
@@ -363,7 +369,6 @@ class EducationGroupRootNodeTreeSerializerTestCase(SimpleTestCase):
 
 
 class EducationGroupWithMasterFinalityInRootTreeSerializerTestCase(SimpleTestCase):
-
     def setUp(self) -> None:
         """
         GERM2MA
@@ -397,6 +402,11 @@ class EducationGroupWithMasterFinalityInRootTreeSerializerTestCase(SimpleTestCas
                 'language': settings.LANGUAGE_CODE_EN
             }
         )
+        self.patcher = mock.patch('education_group.api.serializers.group_element_year._get_version_of_nodes')
+        self.mock_foo = self.patcher.start()
+
+    def tearDown(self):
+        self.patcher.stop()
 
     def test_root_contains_expected_fields(self):
         expected_fields = [
@@ -440,7 +450,6 @@ class EducationGroupWithMasterFinalityInRootTreeSerializerTestCase(SimpleTestCas
 
 
 class EducationGroupWithMasterFinalityInChildTreeSerializerTestCase(SimpleTestCase):
-
     def setUp(self) -> None:
         """
         GERM2M
@@ -481,6 +490,11 @@ class EducationGroupWithMasterFinalityInChildTreeSerializerTestCase(SimpleTestCa
                 'language': settings.LANGUAGE_CODE_EN
             }
         )
+        self.patcher = mock.patch('education_group.api.serializers.group_element_year._get_version_of_nodes')
+        self.mock_foo = self.patcher.start()
+
+    def tearDown(self):
+        self.patcher.stop()
 
     def test_root_contains_expected_fields(self):
         expected_fields = [
