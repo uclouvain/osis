@@ -673,6 +673,9 @@ msgstr ""
 msgid "Training version can only be deleted by central manager"
 msgstr ""
 
+msgid "Training version can only be modified by central manager"
+msgstr ""
+
 msgid "Trainings"
 msgstr ""
 

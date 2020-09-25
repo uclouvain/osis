@@ -28,6 +28,7 @@ from django.http import HttpResponse
 from django.test import TestCase
 from django.urls import reverse
 
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_type import MiniTrainingEducationGroupTypeFactory
 from base.utils.urls import reverse_with_get
 from education_group.ddd.domain import mini_training
@@ -43,6 +44,7 @@ class TestCreate(TestCase):
 
         cls.central_manager = CentralManagerFactory()
         cls.url = reverse("mini_training_create", args=[cls.mini_training_type.name])
+        AcademicYearFactory.produce()
 
     def setUp(self) -> None:
         self.client.force_login(self.central_manager.person.user)
