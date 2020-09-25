@@ -81,7 +81,8 @@ class PasteNodeValidatorList(business_validator.BusinessListValidator):
                 AuthorizedLinkTypeValidator(tree.root_node, node_to_paste, link_type),
                 BlockValidator(block),
                 ValidateFinalitiesEndDateAndOptions(tree.get_node(path), node_to_paste, tree_repository),
-                ValidateAuthorizedRelationshipForAllTrees(tree, node_to_paste, path, tree_repository)
+                ValidateAuthorizedRelationshipForAllTrees(tree, node_to_paste, path, tree_repository),
+                MatchVersionValidator(tree, node_to_paste),
             ]
 
         elif node_to_paste.is_learning_unit():

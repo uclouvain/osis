@@ -13,8 +13,11 @@ from base.views.common import display_success_messages, display_error_messages
 from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import exception, group
+from education_group.ddd.domain.exception import GroupNotFoundException
 from education_group.ddd.service.read import get_group_service, get_multiple_groups_service
-from education_group.forms import content as content_forms
+from osis_common.ddd import interface
+from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
+from program_management.forms import content as content_forms
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from learning_unit.ddd import command as command_learning_unit_year
 from learning_unit.ddd.business_types import *
@@ -27,10 +30,11 @@ from program_management.ddd.domain import exception as program_exception
 from program_management.ddd.service.read import get_program_tree_service, get_program_tree_version_from_node_service
 from program_management.ddd.service.write import bulk_update_link_service
 from program_management.models.enums.node_type import NodeType
+from program_management.ddd.domain.service.get_program_tree_version_for_tree import get_program_tree_version_for_tree
 
 
 class ContentUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
-    permission_required = 'base.change_educationgroup'
+    permission_required = 'base.change_link_data'
     raise_exception = True
 
     template_name = "program_management/content/update.html"
@@ -41,7 +45,8 @@ class ContentUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "tabs": self.get_tabs(),
             "group_obj": self.get_group_obj(),
             "cancel_url": self.get_cancel_url(),
-            "version": self.get_version()
+            "version": self.get_version(),
+            "tree_different_versions": get_program_tree_version_for_tree(self.get_program_tree_obj().get_all_nodes())
         }
         return render(request, self.template_name, context)
 
@@ -167,14 +172,29 @@ class ContentUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         messages = []
 
         for link in links:
-            msg = _("The link of %(code)s - %(acronym)s - %(year)s has been updated.") % {
-                "acronym": link.child.title,
-                "code": link.entity_id.child_code,
-                "year": display_as_academic_year(link.entity_id.child_year)
-            }
+            msg = _("The link \"%(node)s\" has been updated.") % {"node": self.__get_node_str(link.child)}
             messages.append(msg)
-
         return messages
+
+    def __get_node_str(self, node: 'Node') -> str:
+        if node.node_type == NodeType.LEARNING_UNIT:
+            return "%(code)s - %(year)s" % {"code": node.code, "year": node.academic_year}
+
+        version_identity = self.__get_program_tree_version_identity(node.entity_id)
+        return "%(code)s - %(abbreviated_title)s%(version)s - %(year)s" % {
+            "code": node.code,
+            "abbreviated_title": node.title,
+            "version": "[{}]".format(version_identity.version_name)
+            if version_identity and not version_identity.is_standard else "",
+            "year": node.academic_year
+        }
+
+    def __get_program_tree_version_identity(self, node_identity: 'NodeIdentity') \
+            -> Union['ProgramTreeVersionIdentity', None]:
+        try:
+            return ProgramTreeVersionIdentitySearch().get_from_node_identity(node_identity)
+        except interface.BusinessException:
+            return None
 
     def _get_default_error_messages(self) -> str:
         return _("Error(s) in form: The modifications are not saved")
@@ -204,4 +224,6 @@ class ContentUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             comment=form.cleaned_data.get('comment_fr'),
             comment_english=form.cleaned_data.get('comment_en'),
             relative_credits=form.cleaned_data.get('relative_credits'),
+            parent_node_code=self.get_group_obj().code,
+            parent_node_year=self.get_group_obj().year
         )

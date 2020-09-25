@@ -36,6 +36,12 @@ class RelativeCreditShouldBeGreaterOrEqualsThanZero(BusinessException):
         super().__init__(message, **kwargs)
 
 
+class RelativeCreditShouldBeLowerOrEqualThan999(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _("Relative credits must be lower or equals to 999")
+        super().__init__(message, **kwargs)
+
+
 class ProgramTreeNotFoundException(Exception):
     def __init__(self, *args, code: str = '', year: int = None):
         message = ''

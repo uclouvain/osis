@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-09-24 14:18+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"POT-Creation-Date: 2020-09-15 08:53+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -39,9 +39,6 @@ msgstr[1] ""
 
 #, python-format
 msgid "%(max)s must be greater or equals than %(min)s"
-msgstr ""
-
-msgid "ARES"
 msgstr ""
 
 msgid "ARES ability"
@@ -179,7 +176,7 @@ msgstr ""
 
 #, python-format
 msgid ""
-"Consistency error in %(academic_year)s: %(field)s has already been modified"
+"Consistency error in %(academic_year)s: %(fields)s has already been modified"
 msgstr ""
 
 msgid "Contacts"
@@ -455,12 +452,6 @@ msgstr ""
 msgid "New Training"
 msgstr ""
 
-#, python-format
-msgid ""
-"No type of %(child_category)s can be created as child of %(category)s of "
-"type %(type)s"
-msgstr ""
-
 msgid "Non university Bachelors"
 msgstr ""
 
@@ -593,10 +584,6 @@ msgid "The group %(code)s has been deleted."
 msgstr ""
 
 #, python-format
-msgid "The link of %(code)s - %(acronym)s - %(year)s has been updated."
-msgstr ""
-
-#, python-format
 msgid "The mini-training %(code)s - %(title)s has been deleted."
 msgstr ""
 
@@ -678,6 +665,15 @@ msgstr ""
 
 #, python-brace-format
 msgid "Training not found : {acronym} {year}"
+msgstr ""
+
+msgid "Training version can only be created by central manager"
+msgstr ""
+
+msgid "Training version can only be deleted by central manager"
+msgstr ""
+
+msgid "Training version can only be modified by central manager"
 msgstr ""
 
 msgid "Trainings"

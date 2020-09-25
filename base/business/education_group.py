@@ -146,7 +146,7 @@ def prepare_xls_content(found_education_groups):
 def extract_xls_data_from_education_group(an_education_group):
     return [
         an_education_group.academic_year.name,
-        an_education_group.acronym,
+        an_education_group.complete_title_fr,
         an_education_group.title,
         an_education_group.education_group_type,
         an_education_group.management_entity_version.acronym,

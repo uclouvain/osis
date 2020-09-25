@@ -6,31 +6,31 @@ from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils.functional import cached_property
-from django.views import View
 from django.utils.translation import gettext_lazy as _
+from django.views import View
 
 from base.models import entity_version
 from base.views.common import display_error_messages, display_warning_messages
+from base.views.common import display_success_messages
+from education_group.ddd import command as command_education_group
+from education_group.ddd.business_types import *
 from education_group.ddd.domain import exception as exception_education_group
+from education_group.ddd.domain.exception import TrainingNotFoundException, GroupNotFoundException
+from education_group.ddd.service.read import get_training_service, get_group_service
 from education_group.models.group_year import GroupYear
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from osis_role.contrib.views import PermissionRequiredMixin
-
-from education_group.ddd.business_types import *
-from education_group.ddd import command as command_education_group
-from education_group.ddd.domain.exception import TrainingNotFoundException, GroupNotFoundException
-from education_group.ddd.service.read import get_training_service, get_group_service
-
-from program_management.ddd.business_types import *
 from program_management.ddd import command
+from program_management.ddd.business_types import *
 from program_management.ddd.command import UpdateTrainingVersionCommand
+from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
 from program_management.ddd.service.read import get_program_tree_version_from_node_service
 from program_management.ddd.service.write import update_and_postpone_training_version_service
 from program_management.forms import version
 
 
 class TrainingVersionUpdateView(PermissionRequiredMixin, View):
-    permission_required = 'base.change_educationgroup'
+    permission_required = 'program_management.change_training_version'
     raise_exception = True
 
     template_name = "tree_version/training/update.html"
@@ -61,7 +61,8 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
     @transaction.non_atomic_requests
     def post(self, request, *args, **kwargs):
         if self.training_version_form.is_valid():
-            self.update_training_version()
+            version_identities = self.update_training_version()
+            self.display_success_messages(version_identities)
             if not self.training_version_form.errors:
                 return HttpResponseRedirect(self.get_success_url())
         display_error_messages(self.request, self._get_default_error_messages())
@@ -73,10 +74,36 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
             kwargs={'code': self.kwargs['code'], 'year': self.kwargs['year']},
         )
 
+    def display_success_messages(self, identities: List['ProgramTreeVersionIdentity']) -> None:
+        success_messages = []
+        for identity in identities:
+            success_messages.append(
+                _(
+                    "Training "
+                    "<a href='%(link)s'> %(offer_acronym)s[%(acronym)s] (%(academic_year)s) </a> successfully updated."
+                ) % {
+                    "link": self.get_url_program_version(identity),
+                    "offer_acronym": identity.offer_acronym,
+                    "acronym": identity.version_name,
+                    "academic_year": display_as_academic_year(identity.year)
+                }
+            )
+        display_success_messages(self.request, success_messages, extra_tags='safe')
+
+    def get_url_program_version(self, version_id: 'ProgramTreeVersionIdentity') -> str:
+        node_identity = NodeIdentitySearch().get_from_tree_version_identity(version_id)
+        return reverse(
+            "element_identification",
+            kwargs={
+                'year': node_identity.year,
+                'code': node_identity.code,
+            }
+        )
+
     def get_cancel_url(self) -> str:
         return self.get_success_url()
 
-    def update_training_version(self):
+    def update_training_version(self) -> List['ProgramTreeVersionIdentity']:
         try:
             update_command = self._convert_form_to_update_training_version_command(self.training_version_form)
             return update_and_postpone_training_version_service.update_and_postpone_training_version(update_command)
@@ -97,6 +124,7 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
         return version.UpdateTrainingVersionForm(
             data=self.request.POST or None,
             user=self.request.user,
+            event_perm_obj=self.get_permission_object(),
             training_version_identity=training_version_identity,
             node_identity=node_identity,
             training_type=self.get_training_obj().type,
@@ -171,8 +199,8 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
 
         form_initial_values = {
             'version_name': training_version.version_name,
-            'title': training_version.title_fr,
-            'title_english': training_version.title_en,
+            'version_title_fr': training_version.title_fr,
+            'version_title_en': training_version.title_en,
             'end_year': training_version.end_year_of_existence,
 
             "code": group_obj.code,
@@ -244,7 +272,7 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
             "leads_to_diploma": training_obj.diploma.leads_to_diploma,
             "diploma_printing_title": training_obj.diploma.printing_title,
             "professional_title": training_obj.diploma.professional_title,
-            "certificate_aims": ',  '.join([str(aim) for aim in training_obj.diploma.aims])
+            "certificate_aims": [aim.code for aim in training_obj.diploma.aims]
         }
         return form_initial_values
 
@@ -257,8 +285,8 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
             year=self.get_program_tree_version_obj().entity_id.year,
             is_transition=self.get_program_tree_version_obj().entity_id.is_transition,
 
-            title_en=form.cleaned_data["title_english"],
-            title_fr=form.cleaned_data["title"],
+            title_en=form.cleaned_data["version_title_en"],
+            title_fr=form.cleaned_data["version_title_fr"],
             end_year=form.cleaned_data["end_year"],
             management_entity_acronym=form.cleaned_data['management_entity'],
             teaching_campus_name=form.cleaned_data['teaching_campus'].name if form.cleaned_data["teaching_campus"]

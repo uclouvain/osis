@@ -23,8 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Union
+
 from django import shortcuts
-from django.contrib.messages.views import SuccessMessageMixin
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
@@ -34,8 +35,10 @@ from base.models.enums.link_type import LinkTypes
 from base.views.common import display_success_messages
 from base.views.mixins import AjaxTemplateMixin
 from education_group.models.group_year import GroupYear
+from osis_common.ddd import interface
 from osis_common.ddd.interface import BusinessException
 from osis_role.contrib.views import AjaxPermissionRequiredMixin
+from program_management.ddd.business_types import *
 from program_management.ddd import command
 from program_management.ddd.domain import node
 from program_management.ddd.domain.node import NodeGroupYear
@@ -45,9 +48,10 @@ from program_management.ddd.domain.service.identity_search import ProgramTreeVer
 from program_management.ddd.repositories import node as node_repository
 from program_management.ddd.service.read import get_program_tree_service
 from program_management.forms.tree.update import UpdateLinkForm
+from program_management.models.enums.node_type import NodeType
 
 
-class UpdateLinkView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageMixin, FormView):
+class UpdateLinkView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, FormView):
     template_name = "tree/link_update_inner.html"
     permission_required = "base.change_link_data"
     form_class = UpdateLinkForm
@@ -103,9 +107,31 @@ class UpdateLinkView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, SuccessMess
         except osis_common.ddd.interface.BusinessExceptions as business_exception:
             form.add_error(field=None, error=business_exception.messages)
             return self.form_invalid(form)
-        messages = self._append_success_message(link.entity_id.child_code)
-        display_success_messages(self.request, messages)
+        display_success_messages(self.request, self.get_success_message(link))
         return super().form_valid(form)
+
+    def get_success_message(self, link: 'Link'):
+        return _("The link \"%(node)s\" has been updated.") % {"node": self.__get_node_str(link.child)}
+
+    def __get_node_str(self, node: 'Node') -> str:
+        if node.node_type == NodeType.LEARNING_UNIT:
+            return "%(code)s - %(year)s" % {"code": node.code, "year": node.academic_year}
+
+        version_identity = self.__get_program_tree_version_identity(node.entity_id)
+        return "%(code)s - %(abbreviated_title)s%(version)s - %(year)s" % {
+            "code": node.code,
+            "abbreviated_title": node.title,
+            "version": "[{}]".format(version_identity.version_name)
+            if version_identity and not version_identity.is_standard else "",
+            "year": node.academic_year
+        }
+
+    def __get_program_tree_version_identity(self, node_identity: 'NodeIdentity') \
+            -> Union['ProgramTreeVersionIdentity', None]:
+        try:
+            return ProgramTreeVersionIdentitySearch().get_from_node_identity(node_identity)
+        except interface.BusinessException:
+            return None
 
     def _append_success_message(self, child_code):
         messages = []
