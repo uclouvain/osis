@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-23 10:25+0200\n"
+"POT-Creation-Date: 2020-09-25 08:18+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -705,6 +705,14 @@ msgstr ""
 #, python-brace-format
 msgid "Training not found : {acronym} {year}"
 msgstr "Formation non trouvée : {acronym} {year}"
+
+msgid "Training version can only be created by central manager"
+msgstr ""
+"Les versions de formation peuvent seulement être crées par les gestionnaire centraux"
+
+msgid "Training version can only be deleted by central manager"
+msgstr ""
+"Les versions de formation peuvent seulement être supprimées par les gestionnaire centraux"
 
 msgid "Trainings"
 msgstr "Formations"
