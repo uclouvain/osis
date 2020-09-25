@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-21 13:45+0200\n"
+"POT-Creation-Date: 2020-09-25 15:02+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -267,13 +267,25 @@ msgstr ""
 msgid "Export"
 msgstr ""
 
-#, python-format
+#, fuzzy, python-format
+#| msgid ""
+#| "Option \"%(acronym)s\" cannot be detach because it is contained in "
+#| "%(finality_acronym)s program."
+#| msgid_plural ""
+#| "Options \"%(acronym)s\" cannot be detach because they are contained in "
+#| "%(finality_acronym)s program."
 msgid ""
-"Finality \"%(code)s\" has an end date greater than %(root_code)s program."
+"Finality \"%(acronym)s\" has an end date greater than %(root_acronym)s "
+"program."
 msgid_plural ""
-"Finalities \"%(code)s\" have an end date greater than %(root_code)s program."
+"Finalities \"%(acronym)s\" have an end date greater than %(root_acronym)s "
+"program."
 msgstr[0] ""
+"Option \"%(acronym)s\" cannot be removed because it is contained in "
+"%(finality_acronym)s program."
 msgstr[1] ""
+"Options \"%(acronym)s\" cannot be removed because they are contained in "
+"%(finality_acronym)s program."
 
 msgid "Firstname"
 msgstr ""
@@ -656,9 +668,6 @@ msgstr ""
 msgid "Subtype"
 msgstr ""
 
-msgid "Success"
-msgstr ""
-
 msgid "Suppression"
 msgstr ""
 
@@ -672,6 +681,10 @@ msgstr ""
 msgid ""
 "The child %(child)s you want to attach is a parent of the node you want to "
 "attach."
+msgstr ""
+
+#, python-format
+msgid "The end date must be higher or equal to finality %(acronym)s"
 msgstr ""
 
 #, python-format

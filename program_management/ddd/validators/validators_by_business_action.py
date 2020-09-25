@@ -275,6 +275,18 @@ class UpdateProgramTreeVersionValidatorList(business_validator.BusinessListValid
         ]
         super().__init__()
 
+    def validate(self):
+        error_messages = []
+        for validator in self.validators:
+            try:
+                validator.validate()
+            # TODO : gather multiple BusinessException instead of BusinessExceptions
+            except osis_common.ddd.interface.BusinessExceptions as business_exception:
+                error_messages.extend(business_exception.messages)
+
+        if error_messages:
+            raise osis_common.ddd.interface.BusinessExceptions(error_messages)
+
 
 class CreateProgramTreeVersionValidatorList(BusinessListValidator):
 
