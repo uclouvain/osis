@@ -415,7 +415,7 @@ msgid "List of teachers"
 msgstr "Liste des enseignants"
 
 msgid "List of trainings"
-msgstr "Liste des enseignants"
+msgstr "Liste des formations"
 
 msgid "List of trainings with administrative data"
 msgstr "Liste des formations avec données administratives"
