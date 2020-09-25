@@ -264,9 +264,9 @@ def _concatenate_training_data(learning_unit_year: LearningUnitYear, group_eleme
         return concatenated_string
 
     partial_acronym = group_element_year.parent_element.group_year.partial_acronym or ''
-    leaf_credits = "{0:.2f}".format(
-        group_element_year.child_element.learning_unit_year.credits)\
-        if group_element_year.child_element.learning_unit_year.credits else '-'
+    credits = group_element_year.relative_credits \
+        if group_element_year.relative_credits else group_element_year.child_element.learning_unit_year.credits
+    leaf_credits = "{0:.2f}".format(credits) if credits else '-'
     nb_parents = '-' if len(learning_unit_year.closest_trainings) > 0 else ''
 
     for training in learning_unit_year.closest_trainings:
@@ -276,11 +276,15 @@ def _concatenate_training_data(learning_unit_year: LearningUnitYear, group_eleme
                 leaf_credits,
                 nb_parents,
                 __acronym_with_version_label(training['acronym'], training['is_transition'], training['version_name']),
-                training['title_fr'],
+                __title_with_version_title(training['title_fr'], training['version_title_fr']),
             )
             concatenated_string += training_string
 
     return concatenated_string
+
+
+def __title_with_version_title(title_fr: str, version_title_fr: str):
+    return title_fr + (' [{}]'.format(version_title_fr) if version_title_fr else '')
 
 
 def _get_data_part2(learning_unit_yr: LearningUnitYear, with_attributions: bool) -> List[str]:
@@ -483,7 +487,9 @@ def __acronym_with_version_label(acronym: str, is_transition: bool, version_name
     if version_name or is_transition:
         if version_name == '':
             version_label = '[Transition]' if is_transition else ''
-        else:
+        elif is_transition:
             version_label = '[{}-Transition]'.format(version_name)
+        else:
+            version_label = '[{}]'.format(version_name)
         return "{}{}".format(acronym, version_label)
     return acronym
