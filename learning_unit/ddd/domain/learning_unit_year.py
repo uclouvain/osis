@@ -158,5 +158,3 @@ def _get_full_title(common_title, specific_title):
         common_title if common_title else '',
         specific_title
     )
-
-
