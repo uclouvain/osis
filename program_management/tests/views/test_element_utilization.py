@@ -23,8 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from random import sample
-from typing import List, Dict
 
 from django.http import HttpResponseForbidden
 from django.test import TestCase
@@ -35,13 +33,9 @@ from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory, GroupElementYearChildLeafFactory
 from base.tests.factories.person import PersonFactory
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
-from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.program_tree_version import STANDARD
-from program_management.tests.ddd.factories.node import NodeGroupYearFactory
-from program_management.tests.factories.education_group_version import EducationGroupVersionFactory, \
-    ParticularTransitionEducationGroupVersionFactory
+from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory, ElementLearningUnitYearFactory
-from program_management.views.element_utilization import get_utilization_rows, _get_training_nodes
 
 URL_ELEMENT_IDENTIFICATION = 'element_identification'
 
@@ -108,35 +102,6 @@ class TestLearningUnitUtilization(TestCase):
             }
         )
 
-        """
-           training_root_element_particular_version
-           |-- common_core_element_particular_version core
-             |--- element_luy1_particular_version
-       """
-        cls.training_root_element_particular_version = ElementGroupYearFactory(
-            group_year__education_group_type__name=TrainingType.BACHELOR.name,
-            group_year__academic_year=cls.academic_year,
-
-        )
-        cls.common_core_element_particular_version = ElementGroupYearFactory(
-            group_year__academic_year=cls.academic_year,
-            group_year__education_group_type__name=GroupType.COMMON_CORE.name,
-        )
-
-        cls.element_luy1_particular_version = ElementLearningUnitYearFactory(
-            learning_unit_year__academic_year=cls.academic_year
-        )
-
-        GroupElementYearFactory(parent_element=cls.training_root_element_particular_version,
-                                child_element=cls.common_core_element_particular_version)
-        GroupElementYearChildLeafFactory(parent_element=cls.common_core_element_particular_version,
-                                         child_element=cls.element_luy1_particular_version)
-
-        cls.education_group_particular_version = ParticularTransitionEducationGroupVersionFactory(
-            offer__academic_year=cls.academic_year,
-            root_group=cls.training_root_element_particular_version.group_year
-        )
-
     def setUp(self):
         self.client.force_login(self.central_manager.person.user)
 
@@ -159,131 +124,3 @@ class TestLearningUnitUtilization(TestCase):
     def test_assert_key_context(self):
         response = self.client.get(self.url)
         self.assertIn('utilization_rows', response.context)
-
-    def test_assert_key_context_dict(self):
-
-        node_identity = NodeIdentity(
-            code=self.element_luy3.learning_unit_year.acronym,
-            year=self.element_luy3.learning_unit_year.academic_year.year
-        )
-        utilization_rows = get_utilization_rows(node_identity)
-
-        self.assertEqual(len(utilization_rows), 1)
-
-        utilization_row = utilization_rows[0]
-        self.assertIn('link', utilization_row)
-        self.assertIn('training_nodes', utilization_row)
-
-        training_nodes = utilization_rows[0]['training_nodes']
-        self.assertIn('direct_gathering', training_nodes[0])
-        self.assertIn('root_nodes', training_nodes[0])
-        self.assertIn('version_name', training_nodes[0])
-
-        direct_gathering = training_nodes[0]['direct_gathering']
-        self.assertIn('parent', direct_gathering)
-        self.assertIn('url', direct_gathering)
-
-    def test_assert_key_context_dict_with_gathering(self):
-        node_identity = NodeIdentity(
-            code=self.element_luy3.learning_unit_year.acronym,
-            year=self.element_luy3.learning_unit_year.academic_year.year
-        )
-        utilization_rows = get_utilization_rows(node_identity)
-        root_nodes = utilization_rows[0]['training_nodes'][0]['root_nodes']
-
-        root = root_nodes[0]['root']
-        self.assertEqual(root.title, self.training_root_element.group_year.acronym)
-
-        direct_gathering = utilization_rows[0]['training_nodes'][0]['direct_gathering']
-        self.assertEqual(direct_gathering['parent'].title,
-                         self.deepening_element.group_year.acronym)
-
-        self.assertEqual(direct_gathering['url'],
-                         reverse(URL_ELEMENT_IDENTIFICATION,
-                                 kwargs={
-                                     'code': self.deepening_element.group_year.partial_acronym,
-                                     'year': self.deepening_element.group_year.academic_year.year}
-                                 )
-                         )
-        self.assertEqual(utilization_rows[0]['training_nodes'][0]['version_name'], '')
-
-        self.assertEqual(root_nodes[0]['url'],
-                         reverse(URL_ELEMENT_IDENTIFICATION,
-                                 kwargs={
-                                     'code': self.training_root_element.group_year.partial_acronym,
-                                     'year': self.training_root_element.group_year.academic_year.year
-                                 }
-                                 )
-                         )
-
-    def test_training_nodes_order_by_parent_title(self):
-        aaa = NodeGroupYearFactory(title='AAA')
-        bbb = NodeGroupYearFactory(title='BBB')
-        ccc = NodeGroupYearFactory(title='CCC')
-
-        node_group_years = [aaa, bbb, ccc]
-
-        for x in range(5):
-            ordered_list = _get_training_nodes(_build_random_list_for_training_nodes(node_group_years))
-            self.assertEqual(ordered_list[0]['direct_gathering']['parent'], aaa)
-            self.assertEqual(ordered_list[1]['direct_gathering']['parent'], bbb)
-            self.assertEqual(ordered_list[2]['direct_gathering']['parent'], ccc)
-
-    def test_root_nodes_order_by_link_parent_title(self):
-        node_aaa = NodeGroupYearFactory(title='AAA')
-
-        root_aaa = NodeGroupYearFactory(title='AAA_root')
-        root_bbb = NodeGroupYearFactory(title='BBB_root')
-        root_ccc = NodeGroupYearFactory(title='CCC_root')
-
-        node_group_years = [root_aaa, root_bbb, root_ccc]
-
-        for x in range(5):
-            ordered_list = _get_training_nodes(_build_random_list_for_root_nodes(node_aaa, node_group_years))
-            self.assertEqual(ordered_list[0]['root_nodes'][0]['root'].title, root_aaa.title)
-
-    def test_not_in_a_training(self):
-        """
-        root_element
-        |-- element_luy1
-        """
-        root_element = ElementGroupYearFactory(
-            group_year__education_group_type__name=GroupType.COMMON_CORE.name,
-            group_year__academic_year=self.academic_year,
-        )
-        luy1 = ElementLearningUnitYearFactory(learning_unit_year__academic_year=self.academic_year)
-
-        GroupElementYearChildLeafFactory(parent_element=root_element, child_element=luy1)
-        node_identity = NodeIdentity(
-            code=luy1.learning_unit_year.acronym,
-            year=luy1.learning_unit_year.academic_year.year
-        )
-        utilization_rows = get_utilization_rows(node_identity)
-        training_nodes = utilization_rows[0]['training_nodes']
-        self.assertCountEqual(training_nodes, [])
-
-    def test_assert_version_name(self):
-        node_identity = NodeIdentity(
-            code=self.element_luy1_particular_version.learning_unit_year.acronym,
-            year=self.element_luy1_particular_version.learning_unit_year.academic_year.year
-        )
-        utilization_rows = get_utilization_rows(node_identity)
-        self.assertEqual(utilization_rows[0]['training_nodes'][0]['version_name'],
-                         "[{}{}]".format(
-                             self.education_group_particular_version.version_name,
-                             '-Transition' if self.education_group_particular_version.is_transition else '')
-                         )
-
-
-def _build_random_list_for_training_nodes(original: List) -> Dict:
-    node_group_years = sample(original, len(original))
-    node_group_years_dict = {}
-
-    for i in node_group_years:
-        node_group_years_dict.update({i: []})
-    return node_group_years_dict
-
-
-def _build_random_list_for_root_nodes(key, original: List) -> Dict:
-    node_group_years = sample(original, len(original))
-    return {key: node_group_years}
