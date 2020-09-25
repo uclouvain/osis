@@ -47,6 +47,7 @@ from cms.enums import entity_name
 from cms.tests.factories.text_label import OfferTextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextRandomFactory, \
     OfferTranslatedTextFactory
+from education_group.tests.factories.group_year import GroupYearFactory
 from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementFactory
 
@@ -160,10 +161,18 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
             acronym="Parent",
             academic_year=cls.academic_year
         )
+        GroupYearFactory(
+            partial_acronym=cls.education_group_parent.partial_acronym,
+            academic_year=cls.education_group_parent.academic_year,
+        )
         cls.education_group_child = TrainingFactory(
             education_group_type__name=TrainingType.MASTER_MC.name,  # Type to match 'show_admission_conditions'
             acronym="Child_1",
             academic_year=cls.academic_year
+        )
+        GroupYearFactory(
+            partial_acronym=cls.education_group_child.partial_acronym,
+            academic_year=cls.education_group_child.academic_year,
         )
 
         cls.agregation_adm_cond = AdmissionConditionFactory(

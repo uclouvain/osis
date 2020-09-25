@@ -26,6 +26,7 @@ from unittest import mock
 from django.test import SimpleTestCase
 
 from program_management.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
+from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.service.read import get_end_postponement_year_service
 from program_management.tests.ddd.factories.commands.get_end_postponement_year_command import \
     GetEndPostponementYearCommandFactory
@@ -33,7 +34,7 @@ from program_management.tests.ddd.factories.commands.get_end_postponement_year_c
 
 class TestGetEndPostponementYearService(SimpleTestCase):
 
-    @mock.patch.object(CalculateEndPostponement, 'calculate_program_tree_end_postponement')
+    @mock.patch.object(CalculateEndPostponement, 'calculate_end_postponement_year_program_tree')
     def test_domain_service_is_called(self, mock_domain_service):
         get_end_postponement_year_service.calculate_program_tree_end_postponement(
             GetEndPostponementYearCommandFactory()

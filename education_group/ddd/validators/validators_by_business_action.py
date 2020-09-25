@@ -113,7 +113,7 @@ class CopyMiniTrainingValidatorList(business_validator.BusinessListValidator):
 
     def __init__(
             self,
-            mini_training_from: 'MiniTraining'
+            mini_training_from: 'MiniTraining',
     ):
         self.validators = [
             CheckMiniTrainingEndDateValidator(mini_training_from),

@@ -28,14 +28,19 @@ from typing import Dict
 from django import forms
 from django.contrib.auth.models import User
 from django.forms import TextInput
+from django.utils.functional import lazy
 from django.utils.translation import gettext_lazy as _
 
 from base.business.event_perms import EventPermEducationGroupEdition
 from base.forms.common import ValidationRuleMixin
 from base.forms.utils.choice_field import BLANK_CHOICE
+from base.models.certificate_aim import CertificateAim
 from base.models.enums.constraint_type import ConstraintTypeEnum
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType
 from education_group.forms import fields
+from education_group.forms.training import _get_section_choices
+from education_group.forms.widgets import CertificateAimsWidget
+from education_group.models.group_year import GroupYear as GroupYearDB
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from program_management.ddd.command import GetEndPostponementYearCommand
 from program_management.ddd.domain.node import NodeIdentity
@@ -56,12 +61,12 @@ class SpecificVersionForm(forms.Form):
             attrs={'onchange': 'validate_version_name()', 'style': "text-transform: uppercase;"}
         ),
     )
-    title = forms.CharField(
+    version_title_fr = forms.CharField(
         max_length=100,
         required=False,
         label=_('Full title of the french version'),
     )
-    title_english = forms.CharField(
+    version_title_en = forms.CharField(
         max_length=100,
         required=False,
         label=_('Full title of the english version'),
@@ -219,6 +224,12 @@ class UpdateTrainingVersionForm(ValidationRuleMixin, PermissionFieldMixin, Speci
     coefficient = forms.CharField(label=_('Co-graduation total coefficient'), required=False, disabled=True)
 
     # Diploma tab
+    section = forms.ChoiceField(
+        label=_('filter by section').capitalize() + ':',
+        choices=lazy(_get_section_choices, list),
+        required=False,
+        disabled=True
+    )
     leads_to_diploma = forms.BooleanField(
         initial=False,
         label=_('Leads to diploma/certificate'),
@@ -227,7 +238,22 @@ class UpdateTrainingVersionForm(ValidationRuleMixin, PermissionFieldMixin, Speci
     )
     diploma_printing_title = forms.CharField(max_length=240, required=False, label=_('Diploma title'), disabled=True)
     professional_title = forms.CharField(max_length=320, required=False, label=_('Professionnal title'), disabled=True)
-    certificate_aims = forms.CharField(required=False, label=_('certificate aims').capitalize(), disabled=True)
+    certificate_aims = forms.ModelMultipleChoiceField(
+        label=_('certificate aims').capitalize(),
+        queryset=CertificateAim.objects.all(),
+        required=False,
+        disabled=True,
+        to_field_name="code",
+        widget=CertificateAimsWidget(
+            url='certificate_aim_autocomplete',
+            attrs={
+                'data-html': True,
+                'data-placeholder': _('Search...'),
+                'data-width': '100%',
+            },
+            forward=['section'],
+        )
+    )
 
     def __init__(
             self,
@@ -235,9 +261,11 @@ class UpdateTrainingVersionForm(ValidationRuleMixin, PermissionFieldMixin, Speci
             node_identity: 'NodeIdentity',
             training_type: TrainingType,
             user: User,
+            event_perm_obj: GroupYearDB,
             **kwargs
     ):
         self.user = user
+        self.event_perm_obj = event_perm_obj
         self.training_type = training_type
 
         super().__init__(training_version_identity, node_identity, **kwargs)
@@ -257,7 +285,10 @@ class UpdateTrainingVersionForm(ValidationRuleMixin, PermissionFieldMixin, Speci
 
     # PermissionFieldMixin
     def get_context(self) -> str:
-        is_edition_period_opened = EventPermEducationGroupEdition(raise_exception=False).is_open()
+        is_edition_period_opened = EventPermEducationGroupEdition(
+            obj=self.event_perm_obj,
+            raise_exception=False
+        ).is_open()
         return TRAINING_PGRM_ENCODING_PERIOD if is_edition_period_opened else TRAINING_DAILY_MANAGEMENT
 
     # PermissionFieldMixin
@@ -307,9 +338,11 @@ class UpdateMiniTrainingVersionForm(ValidationRuleMixin, PermissionFieldMixin, S
             node_identity: 'NodeIdentity',
             mini_training_type: MiniTrainingType,
             user: User,
+            event_perm_obj: GroupYearDB,
             **kwargs
     ):
         self.user = user
+        self.event_perm_obj = event_perm_obj
         self.mini_training_type = mini_training_type
 
         super().__init__(mini_training_version_identity, node_identity, **kwargs)
@@ -329,9 +362,13 @@ class UpdateMiniTrainingVersionForm(ValidationRuleMixin, PermissionFieldMixin, S
 
     # PermissionFieldMixin
     def get_context(self) -> str:
-        is_edition_period_opened = EventPermEducationGroupEdition(raise_exception=False).is_open()
+        is_edition_period_opened = EventPermEducationGroupEdition(
+            obj=self.event_perm_obj,
+            raise_exception=False
+        ).is_open()
         return MINI_TRAINING_PGRM_ENCODING_PERIOD if is_edition_period_opened else MINI_TRAINING_DAILY_MANAGEMENT
 
     # PermissionFieldMixin
     def get_model_permission_filter_kwargs(self) -> Dict:
         return {'context': self.get_context()}
+

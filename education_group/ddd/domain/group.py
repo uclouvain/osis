@@ -24,7 +24,7 @@
 #
 ##############################################################################
 import copy
-from typing import Optional
+from typing import Optional, List
 
 import attr
 
@@ -117,6 +117,10 @@ class Group(interface.RootEntity):
     end_year = attr.ib(type=Optional[int], default=None)
 
     @property
+    def academic_year(self) -> AcademicYear:
+        return AcademicYear(self.year)
+
+    @property
     def code(self) -> str:
         return self.entity_id.code
 
@@ -159,7 +163,7 @@ class Group(interface.RootEntity):
     def has_same_values_as(self, other_group: 'Group') -> bool:
         return not bool(self.get_conflicted_fields(other_group))
 
-    def get_conflicted_fields(self, other_group: 'Group') -> bool:
+    def get_conflicted_fields(self, other_group: 'Group') -> List[str]:
         fields_not_to_consider = ("year", "entity_id", "entity_identity")
         conflicted_fields = []
         for field_name in self.__slots__:

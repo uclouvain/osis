@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from decimal import Decimal
+import operator
 
 import factory.fuzzy
 
@@ -32,47 +32,49 @@ from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.ddd import command
 
 
-class UpdateTrainingCommandFactory(factory.Factory):
+class PostponeTrainingAndGroupModificationCommandFactory(factory.Factory):
     class Meta:
-        model = command.UpdateTrainingCommand
+        model = command.PostponeTrainingAndGroupModificationCommand
         abstract = False
 
-    abbreviated_title = "Title "
-    status = ActiveStatusEnum.ACTIVE.name
-    code = " Code "
-    year = 2019
+    postpone_from_acronym = factory.Sequence(lambda n: 'TRAININGTITLE%d' % n)
+    postpone_from_year = 2019
+
+    status = factory.Iterator(ActiveStatusEnum.choices(), getter=operator.itemgetter(0))
+    code = factory.Sequence(lambda n: 'CODE%d' % n)
     credits = 23
+    schedule_type = ScheduleTypeEnum.DAILY.name
     duration = 3
     title_fr = "fr  title "
     title_en = "title  en "
     partial_title_fr = None
     partial_title_en = None
-    keywords = None
+    keywords = ""
     internship_presence = None
-    is_enrollment_enabled = None
-    has_online_re_registration = None
-    has_partial_deliberation = None
-    has_admission_exam = None
-    has_dissertation = None
-    produce_university_certificate = None
-    main_language = None
+    is_enrollment_enabled = False
+    has_online_re_registration = False
+    has_partial_deliberation = False
+    has_admission_exam = False
+    has_dissertation = False
+    produce_university_certificate = True
+    main_language = 'French'
     english_activities = None
     other_language_activities = None
-    internal_comment = None
+    internal_comment = ""
     main_domain_code = None
     main_domain_decree = None
-    secondary_domains = None
+    secondary_domains = factory.LazyFunction(lambda: list())
     isced_domain_code = None
-    management_entity_acronym = None
-    administration_entity_acronym = None
+    management_entity_acronym = factory.Sequence(lambda n: 'ENTITY%d' % n)
+    administration_entity_acronym = factory.SelfAttribute("management_entity_acronym")
     end_year = None
-    teaching_campus_name = None
-    teaching_campus_organization_name = None
-    enrollment_campus_name = None
-    enrollment_campus_organization_name = None
+    teaching_campus_name = factory.Sequence(lambda n: 'TeachingCampus%d' % n)
+    teaching_campus_organization_name = factory.Sequence(lambda n: 'TeachingOrganization%d' % n)
+    enrollment_campus_name = factory.SelfAttribute("teaching_campus_name")
+    enrollment_campus_organization_name = factory.SelfAttribute("teaching_campus_organization_name")
     other_campus_activities = None
     funding_orientation = None
-    can_be_international_funded = None
+    can_be_international_funded = True
     international_funding_orientation = None
     ares_code = None
     ares_graca = None
@@ -80,15 +82,14 @@ class UpdateTrainingCommandFactory(factory.Factory):
     code_inter_cfb = None
     coefficient = None
     duration_unit = None
-    leads_to_diploma = None
-    printing_title = None
-    professional_title = None
-    aims = None
+    leads_to_diploma = True
+    printing_title = ''
+    professional_title = ''
+    aims = factory.LazyFunction(lambda: list())
     constraint_type = None
     min_constraint = None
     max_constraint = None
     remark_fr = None
     remark_en = None
-    can_be_funded = None
-    organization_name = "ORG"
-    schedule_type = ScheduleTypeEnum.DAILY.name
+    can_be_funded = True
+    organization_name = factory.Sequence(lambda n: 'Organization%d' % n)

@@ -25,43 +25,32 @@
 ##############################################################################
 from typing import List
 
-from django.db import transaction
-
 from education_group.ddd import command
 from education_group.ddd.business_types import *
-from education_group.ddd.domain import group, mini_training
-from education_group.ddd.domain.service import calculate_end_postponement
-from education_group.ddd.repository import mini_training as mini_training_repository, group as group_repository
-from education_group.ddd.service.write import update_group_service, \
-    update_mini_training_service
-from program_management.ddd.command import PostponeProgramTreeVersionCommand, \
-    PostponeProgramTreeCommand
-from program_management.ddd.service.write import postpone_tree_version_service, \
-    postpone_program_tree_service
+from education_group.ddd.domain.exception import MiniTrainingCopyConsistencyException
+from education_group.ddd.service.write import postpone_mini_training_and_orphan_group_modifications_service
+from program_management.ddd.command import PostponeProgramTreeVersionCommand, PostponeProgramTreeCommand, \
+    PostponeMiniTrainingAndRootGroupModificationWithProgramTreeCommand
+from program_management.ddd.service.write import postpone_tree_version_service, postpone_program_tree_service
 
 
-@transaction.atomic()
-def update_and_report_mini_training_with_program_tree(
-        update_command: command.UpdateMiniTrainingCommand
+def postpone_mini_training_and_program_tree_modifications(
+        update_command: PostponeMiniTrainingAndRootGroupModificationWithProgramTreeCommand
 ) -> List['MiniTrainingIdentity']:
-    postpone_until_year = calculate_end_postponement.CalculateEndPostponement.\
-        calculate_year_of_postponement_for_mini_training(
-            mini_training.MiniTrainingIdentity(acronym=update_command.abbreviated_title, year=update_command.year),
-            group.GroupIdentity(code=update_command.code, year=update_command.year),
-            mini_training_repository.MiniTrainingRepository,
-            group_repository.GroupRepository
-        )
-
-    mini_training_identities = update_mini_training_service.update_mini_training(update_command)
-
-    update_group_service.update_group(_convert_to_update_group_command(update_command))
+    consistency_error = None
+    try:
+        mini_training_identities = postpone_mini_training_and_orphan_group_modifications_service.\
+            postpone_mini_training_and_orphan_group_modifications(
+                __convert_to_postpone_mini_training_and_group_modification_command(update_command)
+            )
+    except MiniTrainingCopyConsistencyException as e:
+        consistency_error = e
 
     postpone_program_tree_service.postpone_program_tree(
         PostponeProgramTreeCommand(
             from_code=update_command.code,
             from_year=update_command.year,
             offer_acronym=update_command.abbreviated_title,
-            until_year=postpone_until_year
         )
     )
 
@@ -71,29 +60,33 @@ def update_and_report_mini_training_with_program_tree(
             from_version_name="",
             from_year=update_command.year,
             from_is_transition=False,
-            until_year=postpone_until_year
         )
     )
-
+    if consistency_error:
+        raise consistency_error
     return mini_training_identities
 
 
-def _convert_to_update_group_command(
-        mini_training_cmd: command.UpdateMiniTrainingCommand) -> command.UpdateGroupCommand:
-    return command.UpdateGroupCommand(
+def __convert_to_postpone_mini_training_and_group_modification_command(
+        mini_training_cmd: PostponeMiniTrainingAndRootGroupModificationWithProgramTreeCommand
+) -> command.PostponeMiniTrainingAndGroupModificationCommand:
+    return command.PostponeMiniTrainingAndGroupModificationCommand(
         code=mini_training_cmd.code,
-        year=mini_training_cmd.year,
-        abbreviated_title=mini_training_cmd.abbreviated_title,
+        postpone_from_year=mini_training_cmd.year,
+        postpone_from_abbreviated_title=mini_training_cmd.abbreviated_title,
         title_fr=mini_training_cmd.title_fr,
         title_en=mini_training_cmd.title_en,
         credits=mini_training_cmd.credits,
+        management_entity_acronym=mini_training_cmd.management_entity_acronym,
+        organization_name=mini_training_cmd.teaching_campus_organization_name,
+        end_year=mini_training_cmd.end_year,
+        keywords=mini_training_cmd.keywords,
+        schedule_type=mini_training_cmd.schedule_type,
+        status=mini_training_cmd.status,
+        teaching_campus_name=mini_training_cmd.teaching_campus_name,
         constraint_type=mini_training_cmd.constraint_type,
         min_constraint=mini_training_cmd.min_constraint,
         max_constraint=mini_training_cmd.max_constraint,
-        management_entity_acronym=mini_training_cmd.management_entity_acronym,
-        teaching_campus_name=mini_training_cmd.teaching_campus_name,
-        organization_name=mini_training_cmd.teaching_campus_organization_name,
         remark_fr=mini_training_cmd.remark_fr,
         remark_en=mini_training_cmd.remark_en,
-        end_year=mini_training_cmd.end_year
     )
