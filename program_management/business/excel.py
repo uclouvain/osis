@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from collections import namedtuple, defaultdict
-from typing import List
+from typing import List, Dict
 
 from django.utils import translation
 from django.utils.translation import gettext as _
@@ -38,7 +38,7 @@ from backoffice.settings.base import LANGUAGE_CODE_EN
 from backoffice.settings.base import LEARNING_UNIT_PORTAL_URL
 from base.models.enums.prerequisite_operator import OR, AND
 from osis_common.document.xls_build import _build_worksheet, CONTENT_KEY, HEADER_TITLES_KEY, WORKSHEET_TITLE_KEY, \
-    FILL_NO_GRAY, FONT_CELLS, FILL_CELLS
+    FILL_NO_GRAY, FONT_CELLS, STYLED_CELLS
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import link
 from program_management.ddd.domain.node import NodeIdentity
@@ -73,7 +73,7 @@ PrerequisiteOfItemLine = namedtuple(
     ['text', 'luy_acronym', 'luy_title', 'credits', 'block', 'mandatory']
 
 )
-HeaderLinePrerequisiteOf = namedtuple('HeaderLinePrerequisiteOf', ['egy_acronym', 'egy_title', 'title_header',
+HeaderLinePrerequisiteOf = namedtuple('HeaderLinePrerequisiteOf', ['node_title', 'tree_title', 'title_header',
                                                                    'credits_header', 'block_header',
                                                                    'mandatory_header'])
 
@@ -136,7 +136,7 @@ def _build_excel_lines(tree: 'ProgramTree') -> List:
     return content
 
 
-def _first_line_content(header_line):
+def _first_line_content(header_line) -> List:
     content = list()
     content.append(
         header_line
@@ -155,7 +155,7 @@ def _get_operator(prerequisite: Prerequisite, group_number: int, position: int):
     return _(prerequisite.secondary_operator())
 
 
-def _get_item_code(prerequisite_item: PrerequisiteItem, position: int, group_len: int):
+def _get_item_code(prerequisite_item: PrerequisiteItem, position: int, group_len: int) -> str:
     acronym_format = "{acronym}"
 
     if position == 1 and group_len > 1:
@@ -165,7 +165,7 @@ def _get_item_code(prerequisite_item: PrerequisiteItem, position: int, group_len
     return acronym_format.format(acronym=prerequisite_item.code)
 
 
-def _get_fill_to_apply(excel_lines: list):
+def _get_fill_to_apply(excel_lines: list) -> Dict:
     style_to_apply_dict = defaultdict(list)
     last_luy_line_index = None
     for index, row in enumerate(excel_lines, 1):
@@ -206,7 +206,7 @@ def _get_fill_to_apply(excel_lines: list):
     return style_to_apply_dict
 
 
-def _get_font_to_apply(excel_lines: list):
+def _get_font_to_apply(excel_lines: list) -> Dict:
     font_to_apply_dict = defaultdict(list)
     for index, row in enumerate(excel_lines, 1):
         if isinstance(row, PrerequisiteItemLine):
@@ -217,7 +217,7 @@ def _get_font_to_apply(excel_lines: list):
     return font_to_apply_dict
 
 
-def _get_border_to_apply(excel_lines: list):
+def _get_border_to_apply(excel_lines: list) -> Dict:
     border_to_apply_dict = defaultdict(list)
     for index, row in enumerate(excel_lines, 1):
         if isinstance(row, OfficialTextLine):
@@ -285,7 +285,7 @@ def _get_workbook(tree: 'ProgramTree',
         WORKSHEET_TITLE_KEY: worksheet_title,
         HEADER_TITLES_KEY: header,
         CONTENT_KEY: content,
-        FILL_CELLS: fill,
+        STYLED_CELLS: fill,
         FONT_CELLS: fonts
     }
     _build_worksheet(worksheet_data, workbook, 0)
@@ -295,13 +295,16 @@ def _get_workbook(tree: 'ProgramTree',
 
 
 def _build_excel_lines_prerequisited(tree: 'ProgramTree') -> List:
-    content = _first_line_content(HeaderLinePrerequisiteOf(egy_acronym=tree.root_node.code,
-                                                           egy_title=tree.root_node.title,
-                                                           title_header=_('Title'),
-                                                           credits_header=_('Cred. rel./abs.'),
-                                                           block_header=_('Block'),
-                                                           mandatory_header=_('Mandatory'))
-                                  )
+    content = _first_line_content(
+        HeaderLinePrerequisiteOf(node_title=tree.root_node.title,
+                                 tree_title=tree.root_node.group_title_en
+                                 if translation.get_language() == LANGUAGE_CODE_EN else tree.root_node.group_title_fr,
+                                 title_header=_('Title'),
+                                 credits_header=_('Cred. rel./abs.'),
+                                 block_header=_('Block'),
+                                 mandatory_header=_('Mandatory')
+                                 )
+    )
     for child_node in tree.get_nodes_that_are_prerequisites():
         if child_node.is_prerequisite:
             content.append(
@@ -341,7 +344,7 @@ def clean_worksheet_title(title: str) -> str:
 
 def _prerequisite_item_line(tree, prerequisite_item: PrerequisiteItem, links: List[link.Link],
                             prerequisite: Prerequisite, group_number: int, position: int,
-                            number_of_prerequisite_item: int):
+                            number_of_prerequisite_item: int) -> PrerequisiteItemLine:
     item_link = links[0]
 
     text = (_("has as prerequisite") + " :") \
@@ -358,7 +361,7 @@ def _prerequisite_item_line(tree, prerequisite_item: PrerequisiteItem, links: Li
     )
 
 
-def complete_title(luy: 'NodeLearningUnitYear'):
+def complete_title(luy: 'NodeLearningUnitYear') -> str:
     if translation.get_language() == LANGUAGE_CODE_EN:
         return luy.full_title_en
     return luy.full_title_fr
