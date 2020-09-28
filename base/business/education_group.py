@@ -23,11 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List, Dict
+
 from django.core.exceptions import PermissionDenied, MultipleObjectsReturned
 from django.db.models import Prefetch
 from django.utils.translation import gettext_lazy as _, pgettext_lazy
 
+from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.business.xls import get_name_or_username, convert_boolean
+from base.models.education_group_year import EducationGroupYear
 from base.models.enums import academic_calendar_type
 from base.models.enums import education_group_categories
 from base.models.enums import mandate_type as mandate_types
@@ -36,6 +40,8 @@ from base.models.mandate import Mandate
 from base.models.offer_year_calendar import OfferYearCalendar
 from base.models.person import Person
 from base.models.program_manager import is_program_manager
+from program_management.models.education_group_version import EducationGroupVersion
+
 from osis_common.document import xls_build
 
 # List of key that a user can modify
@@ -173,7 +179,7 @@ def _get_field_value(instance, field):
     return attr
 
 
-def create_xls_administrative_data(user, education_group_years_qs, filters, order_data):
+def create_xls_administrative_data(user, education_group_years_qs, filters, order_data, language: str):
     # Make select_related/prefetch_related in order to have low DB HIT
     education_group_years = education_group_years_qs.filter(
         education_group_type__category=education_group_categories.TRAINING
@@ -192,8 +198,10 @@ def create_xls_administrative_data(user, education_group_years_qs, filters, orde
     )
     found_education_groups = ordering_data(education_group_years, order_data)
     # FIXME: should be improved with ddd usage
+
     working_sheets_data = prepare_xls_content_administrative(
-        [gy.educationgroupversion.offer for gy in found_education_groups]
+        [gy.educationgroupversion for gy in found_education_groups],
+        language
     )
     header_titles = _get_translated_header_titles()
     parameters = {
@@ -229,10 +237,11 @@ def _get_translated_header_session_columns():
     return all_headers_sessions
 
 
-def prepare_xls_content_administrative(education_group_years):
+def prepare_xls_content_administrative(education_group_versions: List[EducationGroupVersion], language: str):
     xls_data = []
-    for education_group_year in education_group_years:
-        main_data = _extract_main_data(education_group_year)
+    for education_group_version in education_group_versions:
+        education_group_year = education_group_version.offer
+        main_data = _extract_main_data(education_group_version, language)
         administrative_data = _extract_administrative_data(education_group_year)
         mandatary_data = _extract_mandatary_data(education_group_year)
 
@@ -245,18 +254,25 @@ def prepare_xls_content_administrative(education_group_years):
     return xls_data
 
 
-def _extract_main_data(an_education_group_year):
+def _extract_main_data(a_version: EducationGroupVersion, language) -> Dict:
+    an_education_group_year = a_version.offer
     return {
         MANAGEMENT_ENTITY_COL: an_education_group_year.management_entity_version.acronym,
-        TRANING_COL: an_education_group_year.acronym,
-        TYPE_COL: an_education_group_year.education_group_type,
+        TRANING_COL: "{}{}".format(
+            an_education_group_year.acronym,
+            "[{}]".format(a_version.version_name) if a_version and a_version.version_name else ''
+        ),
+        TYPE_COL: "{}{}".format(
+            an_education_group_year.education_group_type,
+            _get_title(a_version, language)
+        ),
         ACADEMIC_YEAR_COL: an_education_group_year.academic_year.name,
         WEIGHTING_COL: convert_boolean(an_education_group_year.weighting),
         DEFAULT_LEARNING_UNIT_ENROLLMENT_COL: convert_boolean(an_education_group_year.default_learning_unit_enrollment)
     }
 
 
-def _extract_administrative_data(an_education_group_year):
+def _extract_administrative_data(an_education_group_year: EducationGroupYear) -> Dict:
     course_enrollment_calendar = _get_offer_year_calendar_from_prefetched_data(
         an_education_group_year,
         academic_calendar_type.COURSE_ENROLLMENT
@@ -272,7 +288,7 @@ def _extract_administrative_data(an_education_group_year):
     return administrative_data
 
 
-def _extract_session_data(education_group_year, session_number):
+def _extract_session_data(education_group_year: EducationGroupYear, session_number: int) -> Dict:
     session_academic_cal_type = [
         academic_calendar_type.EXAM_ENROLLMENTS,
         academic_calendar_type.SCORES_EXAM_SUBMISSION,
@@ -304,7 +320,7 @@ def _extract_session_data(education_group_year, session_number):
     }
 
 
-def _extract_mandatary_data(education_group_year):
+def _extract_mandatary_data(education_group_year: EducationGroupYear) -> Dict:
     representatives = {mandate_types.PRESIDENT: [], mandate_types.SECRETARY: [], mandate_types.SIGNATORY: []}
 
     for mandate in education_group_year.education_group.mandate_set.all():
@@ -346,12 +362,14 @@ def _convert_data_to_xls_row(education_group_year_data, header_list):
 def _convert_session_data_to_xls_row(session_datas):
     xls_session_rows = []
     for session_number in range(0, SESSIONS_NUMBER):
-        session_formated = _convert_data_to_xls_row(session_datas[session_number], SESSION_HEADERS)
-        xls_session_rows.extend(session_formated)
+        session_formatted = _convert_data_to_xls_row(session_datas[session_number], SESSION_HEADERS)
+        xls_session_rows.extend(session_formatted)
     return xls_session_rows
 
 
-def _get_offer_year_calendar_from_prefetched_data(an_education_group_year, academic_calendar_type, session_number=None):
+def _get_offer_year_calendar_from_prefetched_data(an_education_group_year: EducationGroupYear,
+                                                  academic_calendar_type,
+                                                  session_number=None):
     offer_year_cals = _get_all_offer_year_calendar_from_prefetched_data(
         an_education_group_year,
         academic_calendar_type
@@ -368,37 +386,46 @@ def _get_offer_year_calendar_from_prefetched_data(an_education_group_year, acade
     return offer_year_cals[0] if offer_year_cals else None
 
 
-def _get_all_offer_year_calendar_from_prefetched_data(an_education_group_year, academic_calendar_type):
+def _get_all_offer_year_calendar_from_prefetched_data(an_education_group_year: EducationGroupYear,
+                                                      academic_calendar_type) -> List:
     return [
         offer_year_calendar for offer_year_calendar in an_education_group_year.offeryearcalendar_set.all()
         if offer_year_calendar.academic_calendar.reference == academic_calendar_type
     ]
 
 
-def _format_date(obj, date_key, date_form):
+def _format_date(obj, date_key, date_form) -> str:
     date = getattr(obj, date_key, None) if obj else None
     if date:
         return date.strftime(date_form)
     return '-'
 
 
-def _is_valid_mandate(mandate, education_group_yr):
+def _is_valid_mandate(mandate, education_group_yr: EducationGroupYear):
     return mandate.start_date <= education_group_yr.academic_year.start_date and \
            mandate.end_date >= education_group_yr.academic_year.end_date
 
 
-def names(representatives):
+def names(representatives) -> str:
     return ', '.join(sorted(str(mandatory.person.full_name) for mandatory in representatives))
 
 
-def qualification(signatories):
+def qualification(signatories) -> str:
     return ', '.join(sorted(signatory.mandate.qualification for signatory in signatories
                             if signatory.mandate.qualification))
 
 
-def has_coorganization(education_group_year):
+def has_coorganization(education_group_year: EducationGroupYear) -> bool:
     return education_group_year.education_group_type.category == "TRAINING" and \
            education_group_year.education_group_type.name not in [
                TrainingType.PGRM_MASTER_120.name,
                TrainingType.PGRM_MASTER_180_240.name
            ]
+
+
+def _get_title(a_version, language):
+    title = a_version.title_fr
+    if language == LANGUAGE_CODE_EN and a_version.title_en:
+        title = a_version.title_en
+
+    return " [{}]".format(title) if title else ''
