@@ -496,3 +496,32 @@ class TestUpdateLinkOfDirectChildNode(SimpleTestCase):
             comment_english="english"
         )
         self.assertEqual(link_updated.link_type, LinkTypes.REFERENCE)
+
+
+class TestPropertyFullTitle(SimpleTestCase):
+
+    def test_all_title_are_none(self):
+        node_learning_unit = NodeLearningUnitYearFactory(common_title_fr=None, specific_title_fr=None)
+        self.assertEqual(node_learning_unit.full_title_fr, '')
+        node_learning_unit = NodeLearningUnitYearFactory(common_title_en=None, specific_title_en=None)
+        self.assertEqual(node_learning_unit.full_title_en, '')
+
+    def test_all_only_common_title_is_none(self):
+        node_learning_unit = NodeLearningUnitYearFactory(common_title_fr=None, specific_title_fr="Titre")
+        self.assertEqual(node_learning_unit.full_title_fr, node_learning_unit.specific_title_fr)
+        node_learning_unit = NodeLearningUnitYearFactory(common_title_en=None, specific_title_en="Title")
+        self.assertEqual(node_learning_unit.full_title_en, node_learning_unit.specific_title_en)
+
+    def test_all_only_specific_title_is_none(self):
+        node_learning_unit = NodeLearningUnitYearFactory(common_title_fr="Titre", specific_title_fr=None)
+        self.assertEqual(node_learning_unit.full_title_fr, node_learning_unit.common_title_fr)
+        node_learning_unit = NodeLearningUnitYearFactory(common_title_en="Title", specific_title_en=None)
+        self.assertEqual(node_learning_unit.full_title_en, node_learning_unit.common_title_en)
+
+    def test_all_only_titles_not_none(self):
+        node_learning_unit = NodeLearningUnitYearFactory(common_title_fr="Titre", specific_title_fr="Titre spécifique")
+        self.assertEqual(node_learning_unit.full_title_fr,
+                         "{} - {}".format(node_learning_unit.common_title_fr, node_learning_unit.specific_title_fr))
+        node_learning_unit = NodeLearningUnitYearFactory(common_title_en="Title", specific_title_en="Spécific title")
+        self.assertEqual(node_learning_unit.full_title_en,
+                         "{} - {}".format(node_learning_unit.common_title_en, node_learning_unit.specific_title_en))
