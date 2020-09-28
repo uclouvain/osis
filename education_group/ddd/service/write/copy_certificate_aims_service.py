@@ -27,6 +27,7 @@ from django.db import transaction
 
 from education_group.ddd import command
 from education_group.ddd.domain import exception
+from education_group.ddd.domain.exception import TrainingNotFoundException
 from education_group.ddd.domain.training import TrainingBuilder, TrainingIdentity
 from education_group.ddd.repository import training as training_repository
 
@@ -40,7 +41,11 @@ def copy_certificate_aims_to_next_year(copy_cmd: command.CopyCertificateAimsToNe
     )
 
     # WHEN
-    training_next_year = TrainingBuilder().copy_aims_to_next_year(existing_training, repository)
+    try:
+        training_next_year = TrainingBuilder().copy_aims_to_next_year(existing_training, repository)
+    except TrainingNotFoundException:
+        # do nothing when next year has no training
+        pass
 
     # THEN
     try:

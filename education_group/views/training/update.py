@@ -82,18 +82,37 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
         if self.training_form.is_valid():
             deleted_trainings = self.delete_training()
-            if not self.training_form.errors:
+            if not self.training_form.errors and not self._changed_certificate_aims_only():
                 updated_trainings = self.update_training()
+
+            if 'certificate_aims' in self.training_form.changed_data:
                 updated_aims_trainings = self.update_certificate_aims()
 
             if not self.training_form.errors:
-                success_messages = self.get_success_msg_updated_trainings(updated_trainings)
-                success_messages += self.get_success_msg_updated_aims(updated_aims_trainings)
-                success_messages += self.get_success_msg_deleted_trainings(deleted_trainings)
+                success_messages = self.build_success_messages(
+                    deleted_trainings,
+                    updated_aims_trainings,
+                    updated_trainings
+                )
                 display_success_messages(request, success_messages, extra_tags='safe')
                 return HttpResponseRedirect(self.get_success_url())
         display_error_messages(self.request, self._get_default_error_messages())
         return self.get(request, *args, **kwargs)
+
+    def build_success_messages(self, deleted_trainings, updated_aims_trainings, updated_trainings):
+        updated_trainings_with_aims = list(set(updated_trainings).intersection(updated_aims_trainings))
+        updated_trainings = list(set(updated_trainings).difference(updated_trainings_with_aims))
+        updated_aims_trainings = list(set(updated_aims_trainings).difference(updated_trainings_with_aims))
+
+        success_messages = self.get_success_msg_updated_trainings(updated_trainings)
+        success_messages += self.get_success_msg_updated_trainings_with_aims(updated_trainings_with_aims)
+        success_messages += self.get_success_msg_updated_aims_only(updated_aims_trainings)
+        success_messages += self.get_success_msg_deleted_trainings(deleted_trainings)
+
+        return success_messages
+
+    def _changed_certificate_aims_only(self):
+        return len(self.training_form.changed_data) == 1 and 'certificate_aims' in self.training_form.changed_data
 
     def get_tabs(self) -> List:
         tab_to_display = self.request.GET.get('tab', Tab.IDENTIFICATION.name)
@@ -224,26 +243,34 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             partial_acronym=self.kwargs['code']
         )
 
-    def get_success_msg_updated_trainings(self, training_identites: List["TrainingIdentity"]) -> List[str]:
-        return [self._get_success_msg_updated_training(identity) for identity in training_identites]
+    def get_success_msg_updated_trainings_with_aims(self, training_identities: List["TrainingIdentity"]) -> List[str]:
+        training_identities = self._sort_by_year(training_identities)
+        return [self._get_success_msg_updated_training(identity, with_aims=True) for identity in training_identities]
 
-    def get_success_msg_updated_aims(self, training_identites: List["TrainingIdentity"]) -> List[str]:
-        return [self._get_success_msg_updated_aims(identity) for identity in training_identites]
+    def get_success_msg_updated_trainings(self, training_identities: List["TrainingIdentity"]) -> List[str]:
+        training_identities = self._sort_by_year(training_identities)
+        return [self._get_success_msg_updated_training(identity, with_aims=False) for identity in training_identities]
+
+    def get_success_msg_updated_aims_only(self, training_identities: List["TrainingIdentity"]) -> List[str]:
+        training_identities = self._sort_by_year(training_identities)
+        return [self._get_success_msg_updated_aims(identity) for identity in training_identities]
 
     def get_success_msg_deleted_trainings(self, trainings_identities: List['TrainingIdentity']) -> List[str]:
         return [self._get_success_msg_deleted_training(identity) for identity in trainings_identities]
 
-    def _get_success_msg_updated_training(self, training_identity: 'TrainingIdentity') -> str:
-        return self._get_success_msg_updated(
-            training_identity,
-            "Training <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> successfully updated."
-        )
+    def _sort_by_year(self, training_identites: List[TrainingIdentity]):
+        return sorted(training_identites, key=lambda x: x.year)
+
+    def _get_success_msg_updated_training(self, training_identity: 'TrainingIdentity', with_aims: bool) -> str:
+        message = _("Training <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> successfully updated")
+        if with_aims:
+            message = "{} {}".format(message, _("with certificate aims"))
+        return self._get_success_msg_updated(training_identity, message)
 
     def _get_success_msg_updated_aims(self, training_identity: 'TrainingIdentity') -> str:
-        return self._get_success_msg_updated(
-            training_identity,
-            "Certificate aims for training <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> successfully updated."
-        )
+        message = _("Certificate aims only for training <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> "
+                    "have been successfully updated.")
+        return self._get_success_msg_updated(training_identity, message)
 
     def _get_success_msg_updated(self, training_identity: 'TrainingIdentity', message: str):
         link = reverse_with_get(
@@ -251,7 +278,7 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             kwargs={'acronym': training_identity.acronym, 'year': training_identity.year},
             get={"tab": Tab.IDENTIFICATION.value}
         )
-        return _(message) % {
+        return message % {
             "link": link,
             "acronym": training_identity.acronym,
             "academic_year": display_as_academic_year(training_identity.year),

@@ -92,12 +92,8 @@ class TrainingBuilder:
             training_repository: 'TrainingRepository'
     ) -> 'Training':
         identity_next_year = TrainingIdentity(acronym=training_from.acronym, year=training_from.year + 1)
-        try:
-            training_next_year = training_repository.get(identity_next_year)
-            training_next_year.update_aims_from_other_training(training_from)
-        # TODO : should create Training when does not exist
-        except TrainingNotFoundException:
-            pass
+        training_next_year = training_repository.get(identity_next_year)
+        training_next_year.update_aims_from_other_training(training_from)
         return training_next_year
 
     def create_training(self, command: 'CreateTrainingCommand') -> 'Training':
@@ -307,7 +303,7 @@ class Training(interface.RootEntity):
             value = getattr(other_training, field)
             setattr(self, field, value)
 
-    def update_aims_from_data(self, data: 'UpdateDiplomaData'):
+    def update_aims(self, data: 'UpdateDiplomaData'):
         self._update_aims(data.diploma)
         validators_by_business_action.UpdateCertificateAimsValidatorList(self)
 

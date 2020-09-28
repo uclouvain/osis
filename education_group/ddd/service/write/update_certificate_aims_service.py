@@ -34,7 +34,7 @@ from education_group.ddd.repository import training as training_repository
 def update_certificate_aims(cmd: command.UpdateCertificateAimsCommand) -> 'TrainingIdentity':
     training_identity = training.TrainingIdentity(acronym=cmd.acronym, year=cmd.year)
     training_domain_obj = training_repository.TrainingRepository.get(training_identity)
-    training_domain_obj.update_aims_from_data(__convert_command_to_update_diploma_data(cmd))
+    training_domain_obj.update_aims(__convert_command_to_update_diploma_data(cmd))
     training_repository.TrainingRepository.update(training_domain_obj)
     return training_identity
 
