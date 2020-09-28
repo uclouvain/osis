@@ -47,16 +47,17 @@ from typing import Optional
 @register.inclusion_tag('templatetags/navigation_learning_unit.html', takes_context=False)
 def navigation_learning_unit(user, obj: LearningUnitYear, url_name: str):
     return _navigation_base(_get_learning_unit_filter_class, _reverse_learning_unit_year_url, user, obj, url_name,
-                            "acronym")
+                            "acronym", True)
 
 
 @register.inclusion_tag('templatetags/navigation_education_group.html', takes_context=False)
 def navigation_group(user, obj: GroupYear, url_name: str, current_version: Optional['ProgramTreeVersion'] = None):
     return _navigation_base(_get_group_filter_class, _reverse_group_year_url, user, obj, url_name, "partial_acronym",
+                            False,
                             current_version)
 
 
-def _navigation_base(filter_class_function, reverse_url_function, user, obj, url_name, code_field_name,
+def _navigation_base(filter_class_function, reverse_url_function, user, obj, url_name, code_field_name, is_ue=False,
                      current_version: Optional['ProgramTreeVersion'] = None):
     context = {"current_element": obj}
     if current_version:
@@ -67,9 +68,19 @@ def _navigation_base(filter_class_function, reverse_url_function, user, obj, url
 
     search_type = search_parameters.get("search_type")
     filter_form_class = filter_class_function(search_type)
+
     order_by = filter_form_class(data=search_parameters).qs.query.order_by
     order_by_expressions = convert_order_by_strings_to_expressions(order_by) or None
+
     qs = filter_form_class(data=search_parameters).qs.annotate(
+        previous_title=Window(
+            expression=Lag("acronym"),
+            order_by=order_by_expressions,
+        ),
+        next_title=Window(
+            expression=Lead("acronym"),
+            order_by=order_by_expressions,
+        ),
         previous_code=Window(
             expression=Lag(code_field_name),
             order_by=order_by_expressions,
@@ -94,26 +105,44 @@ def _navigation_base(filter_class_function, reverse_url_function, user, obj, url
             expression=Lead("id"),
             order_by=order_by_expressions,
         )
-    ).values_list(
-        "id",
-        "acronym",
-        "previous_code",
-        "previous_id",
-        "previous_year",
-        "next_code",
-        "next_id",
-        "next_year",
-        named=True
-    ).order_by(*order_by)
+    )
+
+    fields_names = [
+        "id", "acronym", "previous_code", "previous_id", "previous_year", "next_code", "next_id", "next_year",
+        "previous_title", "next_title"
+    ]
+    if is_ue:
+        qs = qs.values_list(*fields_names, named=True).order_by(*order_by)
+    else:
+        qs = qs.annotate(
+            previous_version_label=Window(
+                expression=Lag("educationgroupversion__version_name"),
+                order_by=order_by_expressions,
+            ),
+            next_version_label=Window(
+                expression=Lead("educationgroupversion__version_name"),
+                order_by=order_by_expressions,
+            )
+        ).values_list(
+            *fields_names,
+            'previous_version_label',
+            'next_version_label',
+            named=True
+        ).order_by(*order_by)
+
 
     current_row = _get_current_row(qs, obj)
 
     if current_row:
         context.update({
-            "next_element_title": current_row.next_code,
+            "next_element_title": _get_title(current_row.next_title,
+                                             current_row.next_version_label if not is_ue else None
+                                             ),
             "next_url": reverse_url_function(current_row.next_code, current_row.next_year, url_name)
             if current_row.next_id else None,
-            "previous_element_title": current_row.previous_code,
+            "previous_element_title": _get_title(current_row.previous_title,
+                                                 current_row.previous_version_label if not is_ue else None
+                                                 ),
             "previous_url": reverse_url_function(current_row.previous_code, current_row.previous_year, url_name)
             if current_row.previous_id else None
         })
@@ -148,3 +177,10 @@ def _reverse_learning_unit_year_url(acronym, year, url_name):
     return reverse(url_name, args=[acronym, year])
 
 
+def _get_title(title, version_label_o):
+    if title is None and version_label_o is None:
+        return None
+    return "{}{}".format(
+        title,
+        "[{}]".format(version_label_o) if version_label_o else ''
+    )
