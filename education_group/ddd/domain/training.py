@@ -298,7 +298,6 @@ class Training(interface.RootEntity):
         return self
 
     def update_from_other_training(self, other_training: 'Training'):
-        old_diploma = self.diploma
         fields_not_to_update = (
             "year", "acronym", "academic_year", "entity_id", "entity_identity", "identity_through_years",
         )
@@ -308,26 +307,16 @@ class Training(interface.RootEntity):
             value = getattr(other_training, field)
             setattr(self, field, value)
 
-        # TO REMOVE ONCE AIMS ARE UPDATED SEPARATELY
-
-        # if self.diploma and old_diploma:
-        #     self.diploma = attr.evolve(self.diploma, aims=old_diploma.aims)
-        # elif self.diploma and not old_diploma:
-        #     self.diploma = attr.evolve(self.diploma, aims=[])
-
-    def update_aims(self, data: 'UpdateDiplomaData'):
-        if self.diploma and data.diploma:
-            self.diploma = attr.evolve(self.diploma, aims=data.diploma.aims)
-        elif self.diploma and not data.diploma:
-            self.diploma = attr.evolve(self.diploma, aims=[])
+    def update_aims_from_data(self, data: 'UpdateDiplomaData'):
+        self._update_aims(data.diploma)
         validators_by_business_action.UpdateCertificateAimsValidatorList(self)
-        return self
 
     def update_aims_from_other_training(self, other_training: 'Training'):
-        if self.diploma and other_training.diploma:
-            self.diploma = attr.evolve(self.diploma, aims=other_training.diploma.aims)
-        elif self.diploma and not other_training.diploma:
-            self.diploma = attr.evolve(self.diploma, aims=[])
+        self._update_aims(other_training.diploma)
+
+    def _update_aims(self, diploma: Diploma):
+        if self.diploma:
+            self.diploma = attr.evolve(self.diploma, aims=diploma.aims if diploma else [])
 
     def has_same_values_as(self, other_training: 'Training') -> bool:
         return not bool(self.get_conflicted_fields(other_training))
