@@ -42,3 +42,24 @@ class TestInit(SimpleTestCase):
         self.assertEqual(obj.specific_title_fr, '')
         self.assertEqual(obj.specific_title_en, '')
 
+    def test_all_only_specific_title_is_none(self):
+        obj = LearningUnitYear(
+            common_title_fr="Titre",
+            common_title_en="Title",
+            specific_title_fr=None,
+            specific_title_en=None,
+        )
+
+        self.assertEqual(obj.full_title_fr, obj.common_title_fr)
+        self.assertEqual(obj.full_title_en, obj.common_title_en)
+
+    def test_all_only_titles_not_none(self):
+        obj = LearningUnitYear(
+            common_title_fr="Titre",
+            common_title_en="Title",
+            specific_title_fr="Titre specifique",
+            specific_title_en="Specific title",
+        )
+
+        self.assertEqual(obj.full_title_fr, "{} - {}".format(obj.common_title_fr, obj.specific_title_fr))
+        self.assertEqual(obj.full_title_en, "{} - {}".format(obj.common_title_en, obj.specific_title_en))
