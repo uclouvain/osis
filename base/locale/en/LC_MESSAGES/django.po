@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-25 12:59+0200\n"
+"POT-Creation-Date: 2020-09-28 11:59+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1885,6 +1885,9 @@ msgstr ""
 msgid "Professional"
 msgstr ""
 
+msgid "Professional integration"
+msgstr ""
+
 msgid "Professional internship"
 msgstr ""
 
@@ -3076,9 +3079,6 @@ msgid "please_enable_javascript"
 msgstr ""
 "Please <a href='http://enable-javascript.com' target='_blank'>enable "
 "JavaScript</a> to use this application."
-
-msgid "professional integration"
-msgstr ""
 
 msgid "project events"
 msgstr ""
