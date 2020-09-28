@@ -367,7 +367,8 @@ def _convert_session_data_to_xls_row(session_datas):
     return xls_session_rows
 
 
-def _get_offer_year_calendar_from_prefetched_data(an_education_group_year: EducationGroupYear, academic_calendar_type, 
+def _get_offer_year_calendar_from_prefetched_data(an_education_group_year: EducationGroupYear,
+                                                  academic_calendar_type,
                                                   session_number=None):
     offer_year_cals = _get_all_offer_year_calendar_from_prefetched_data(
         an_education_group_year,
