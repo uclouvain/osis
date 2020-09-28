@@ -72,88 +72,49 @@ def _navigation_base(filter_class_function, reverse_url_function, user, obj, url
     order_by = filter_form_class(data=search_parameters).qs.query.order_by
     order_by_expressions = convert_order_by_strings_to_expressions(order_by) or None
 
-    if is_ue:
-        qs = filter_form_class(data=search_parameters).qs.annotate(
-            previous_title=Window(
-                expression=Lag("acronym"),
-                order_by=order_by_expressions,
-            ),
-            next_title=Window(
-                expression=Lead("acronym"),
-                order_by=order_by_expressions,
-            ),
-            previous_code=Window(
-                expression=Lag(code_field_name),
-                order_by=order_by_expressions,
-            ),
-            next_code=Window(
-                expression=Lead(code_field_name),
-                order_by=order_by_expressions,
-            ),
-            previous_year=Window(
-                expression=Lag("academic_year__year"),
-                order_by=order_by_expressions,
-            ),
-            next_year=Window(
-                expression=Lead("academic_year__year"),
-                order_by=order_by_expressions,
-            ),
-            previous_id=Window(
-                expression=Lag("id"),
-                order_by=order_by_expressions,
-            ),
-            next_id=Window(
-                expression=Lead("id"),
-                order_by=order_by_expressions,
-            ),
+    qs = filter_form_class(data=search_parameters).qs.annotate(
+        previous_title=Window(
+            expression=Lag("acronym"),
+            order_by=order_by_expressions,
+        ),
+        next_title=Window(
+            expression=Lead("acronym"),
+            order_by=order_by_expressions,
+        ),
+        previous_code=Window(
+            expression=Lag(code_field_name),
+            order_by=order_by_expressions,
+        ),
+        next_code=Window(
+            expression=Lead(code_field_name),
+            order_by=order_by_expressions,
+        ),
+        previous_year=Window(
+            expression=Lag("academic_year__year"),
+            order_by=order_by_expressions,
+        ),
+        next_year=Window(
+            expression=Lead("academic_year__year"),
+            order_by=order_by_expressions,
+        ),
+        previous_id=Window(
+            expression=Lag("id"),
+            order_by=order_by_expressions,
+        ),
+        next_id=Window(
+            expression=Lead("id"),
+            order_by=order_by_expressions,
+        )
+    )
 
-        ).values_list(
-                "id",
-                "acronym",
-                "previous_code",
-                "previous_id",
-                "previous_year",
-                "next_code",
-                "next_id",
-                "next_year",
-                "previous_title",
-                "next_title",
-                named=True
-            ).order_by(*order_by)
+    fields_names = [
+        "id", "acronym", "previous_code", "previous_id", "previous_year", "next_code", "next_id", "next_year",
+        "previous_title", "next_title"
+    ]
+    if is_ue:
+        qs = qs.values_list(*fields_names, named=True).order_by(*order_by)
     else:
-        qs = filter_form_class(data=search_parameters).qs.annotate(
-            previous_title=Window(
-                expression=Lag("acronym"),
-                order_by=order_by_expressions,
-            ),
-            next_title=Window(
-                expression=Lead("acronym"),
-                order_by=order_by_expressions,
-            ),
-            previous_code=Window(
-                expression=Lag(code_field_name),
-                order_by=order_by_expressions,
-            ),
-            next_code=Window(
-                expression=Lead(code_field_name),
-                order_by=order_by_expressions,
-            ),
-            previous_year=Window(
-                expression=Lag("academic_year__year"),
-                order_by=order_by_expressions,
-            ),
-            next_year=Window(
-                expression=Lead("academic_year__year"),
-                order_by=order_by_expressions,
-            ),
-            previous_id=Window(
-                expression=Lag("id"),
-                order_by=order_by_expressions,
-            ),
-            next_id=Window(
-                expression=Lead("id"),
-                order_by=order_by_expressions,
-            ),
+        qs = qs.annotate(
             previous_version_label=Window(
                 expression=Lag("educationgroupversion__version_name"),
                 order_by=order_by_expressions,
@@ -161,23 +122,14 @@ def _navigation_base(filter_class_function, reverse_url_function, user, obj, url
             next_version_label=Window(
                 expression=Lead("educationgroupversion__version_name"),
                 order_by=order_by_expressions,
-            ),
-
+            )
         ).values_list(
-            "id",
-            "acronym",
-            "previous_code",
-            "previous_id",
-            "previous_year",
-            "next_code",
-            "next_id",
-            "next_year",
-            "previous_title",
-            "next_title",
-            "previous_version_label",
-            "next_version_label",
+            *fields_names,
+            'previous_version_label',
+            'next_version_label',
             named=True
         ).order_by(*order_by)
+
 
     current_row = _get_current_row(qs, obj)
 
