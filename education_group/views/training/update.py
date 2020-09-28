@@ -32,7 +32,6 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 
-from base.models.education_group_year import EducationGroupYear
 from base.utils.urls import reverse_with_get
 from base.views.common import display_success_messages, display_warning_messages, display_error_messages
 from education_group.ddd import command
@@ -53,8 +52,7 @@ from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command as command_program_management
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception as program_management_exception
-from program_management.ddd.service.write import delete_training_with_program_tree_service, \
-    postpone_training_and_program_tree_modifications_service
+from program_management.ddd.service.write import delete_training_with_program_tree_service
 from program_management.ddd.service.write.postpone_training_and_program_tree_modifications_service import \
     postpone_training_and_program_tree_modifications
 
@@ -79,16 +77,18 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
     @transaction.non_atomic_requests
     def post(self, request, *args, **kwargs):
-        deleted_trainings = []
         updated_trainings = []
+        updated_aims_trainings = []
 
         if self.training_form.is_valid():
             deleted_trainings = self.delete_training()
             if not self.training_form.errors:
                 updated_trainings = self.update_training()
+                updated_aims_trainings = self.update_certificate_aims()
 
             if not self.training_form.errors:
                 success_messages = self.get_success_msg_updated_trainings(updated_trainings)
+                success_messages += self.get_success_msg_updated_aims(updated_aims_trainings)
                 success_messages += self.get_success_msg_deleted_trainings(deleted_trainings)
                 display_success_messages(request, success_messages, extra_tags='safe')
                 return HttpResponseRedirect(self.get_success_url())
@@ -146,13 +146,9 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 for year in range(self.get_training_obj().year, e.conflicted_fields_year)
             ]
 
-        updated_aims_training_identities = self._update_certificate_aims()
+        return updated_training_identities
 
-        return sorted(list(
-            set(updated_aims_training_identities).union(updated_training_identities)
-        ), key=lambda x: x.year)
-
-    def _update_certificate_aims(self):
+    def update_certificate_aims(self):
         try:
             postpone_aims_modification_command = self._convert_form_to_postpone_aims_modification_cmd(
                 self.training_form)
@@ -231,16 +227,31 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
     def get_success_msg_updated_trainings(self, training_identites: List["TrainingIdentity"]) -> List[str]:
         return [self._get_success_msg_updated_training(identity) for identity in training_identites]
 
+    def get_success_msg_updated_aims(self, training_identites: List["TrainingIdentity"]) -> List[str]:
+        return [self._get_success_msg_updated_aims(identity) for identity in training_identites]
+
     def get_success_msg_deleted_trainings(self, trainings_identities: List['TrainingIdentity']) -> List[str]:
         return [self._get_success_msg_deleted_training(identity) for identity in trainings_identities]
 
     def _get_success_msg_updated_training(self, training_identity: 'TrainingIdentity') -> str:
+        return self._get_success_msg_updated(
+            training_identity,
+            "Training <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> successfully updated."
+        )
+
+    def _get_success_msg_updated_aims(self, training_identity: 'TrainingIdentity') -> str:
+        return self._get_success_msg_updated(
+            training_identity,
+            "Certificate aims for training <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> successfully updated."
+        )
+
+    def _get_success_msg_updated(self, training_identity: 'TrainingIdentity', message: str):
         link = reverse_with_get(
             'education_group_read_proxy',
             kwargs={'acronym': training_identity.acronym, 'year': training_identity.year},
             get={"tab": Tab.IDENTIFICATION.value}
         )
-        return _("Training <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> successfully updated.") % {
+        return _(message) % {
             "link": link,
             "acronym": training_identity.acronym,
             "academic_year": display_as_academic_year(training_identity.year),
