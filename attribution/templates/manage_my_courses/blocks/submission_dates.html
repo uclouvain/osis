@@ -1,5 +1,6 @@
 {% load static %}
 {% load i18n %}
+{% load date_operations %}
 
 {% comment "License" %}
  * OSIS stands for Open Student Information System. It's an application
@@ -24,15 +25,9 @@
  * at the root of the source code of this program.  If not,
  * see http://www.gnu.org/licenses/.
 {% endcomment %}
-<div class="row">
-    <div class="col-md-4 col-md-offset-4">
-        <label> {% trans 'Description fiche opening' %} </label>
-        <br>
-        {{ submission_dates.start_date|date:"d/m/Y"|default:"-" }}
-    </div>
-    <div class="col-md-4">
-        <label> {% trans 'Description fiche ending' %} </label>
-        <br>
-        {{ submission_dates.end_date|date:"d/m/Y"|default:"-" }}
-    </div>
+<div style="padding-left: 1em;">
+    <label> {% trans 'Editable' %} : </label>
+    {% trans 'From' context "Du" %} {{ submission_dates.start_date|date:"d/m/Y"|default:"-" }}
+    {% trans 'to' context "au" %} {{ submission_dates.end_date|shift_date:-1|date:"d/m/Y"|default:"-" }}
+    <!-- TODO :: Remove shift_date when end_date is included in period -->
 </div>
