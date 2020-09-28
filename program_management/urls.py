@@ -28,17 +28,15 @@ from django.urls import include, path
 
 import program_management.views.tree.copy_cut
 import program_management.views.tree_version.check_version_name
-from program_management.views import quick_search, create_element, publish_general_information, content
-from program_management.views.proxy.content import ContentRedirectView
-from program_management.views.proxy.identification import IdentificationRedirectView
+from program_management.views import content
 from program_management.views import groupelementyear_read, element_utilization, excel, search, \
     tree, prerequisite_read, prerequisite_update
 from program_management.views import quick_search, create_element, publish_general_information
+from program_management.views.proxy.content import ContentRedirectView
 from program_management.views.proxy.identification import IdentificationRedirectView
-from program_management.views.tree_version import create as create_program_tree_version
-from program_management.views.tree_version.delete import TreeVersionDeleteView
 from program_management.views.tree_version import create as create_program_tree_version, update_training, \
     update_mini_training
+from program_management.views.tree_version.delete import TreeVersionDeleteView
 
 urlpatterns = [
     url(r'^group_pdf_content/(?P<year>[0-9]+)/(?P<code>[A-Za-z0-9]+)/',

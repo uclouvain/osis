@@ -30,7 +30,7 @@ from program_management.forms import version
 
 
 class TrainingVersionUpdateView(PermissionRequiredMixin, View):
-    permission_required = 'base.change_training'
+    permission_required = 'program_management.change_training_version'
     raise_exception = True
 
     template_name = "tree_version/training/update.html"

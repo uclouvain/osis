@@ -377,7 +377,7 @@ class LearningUnitEditionTestCase(TestCase):
             next_year_learning_container_year
         )
         self.assertIsInstance(error_list, list)
-        self.assertEqual(len(error_list), 10)
+        self.assertEqual(len(error_list), 12)
 
         tests_cases = [
             {'field': VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, 'value': Decimal(10), 'next_value': Decimal(20)},

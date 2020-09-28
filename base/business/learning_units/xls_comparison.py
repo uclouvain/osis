@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -251,7 +251,6 @@ def _get_acronym(learning_unit_yr, new_line, first_data):
 def _get_volumes(component, components):
     volumes = components[component]
     return [
-        component.acronym if component.acronym else EMPTY_VALUE,
         volumes.get(VOLUME_Q1, EMPTY_VALUE),
         volumes.get(VOLUME_Q2, EMPTY_VALUE),
         volumes.get(VOLUME_TOTAL, EMPTY_VALUE),
