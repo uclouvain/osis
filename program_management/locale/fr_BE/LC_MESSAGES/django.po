@@ -109,6 +109,7 @@ msgstr "Année académique"
 msgid "Access condition"
 msgstr "Condition d'accès"
 
+msgctxt "UE acronym"
 msgid "Acronym"
 msgstr "Sigle"
 
