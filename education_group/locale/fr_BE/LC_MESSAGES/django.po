@@ -636,7 +636,7 @@ msgid ""
 msgstr ""
 "La formation avec laquelle vous travaillez n'existe pas (ou n'est pas à la "
 "même position) dans le programme de {root.title} en {root.year}.Vous avez "
-"été redirigé vers la racine du programme : {root.code} ({root.year})."
+"été redirigé vers la racine de la formation : {root.code} ({root.year})."
 
 #, python-format
 msgid "The group %(code)s has been deleted."
