@@ -94,6 +94,7 @@ msgstr ""
 msgid "Access condition"
 msgstr ""
 
+msgctxt "UE acronym"
 msgid "Acronym"
 msgstr ""
 
