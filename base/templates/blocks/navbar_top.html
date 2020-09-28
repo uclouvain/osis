@@ -48,6 +48,14 @@
                                         </a>
                                     </li>
                                 {% endif %}
+                                {% if perms.base.can_access_catalog_configuration %}
+                                    <li>
+                                        <a href="{% url 'catalog_configuration' %}" id="lnk_dropdown_learning_units">
+                                            <span class="fa fa-cog"></span>
+                                            {% trans 'Configuration' %}
+                                        </a>
+                                    </li>
+                                {% endif %}
                             </ul>
                         </li>
                     {% endif %}

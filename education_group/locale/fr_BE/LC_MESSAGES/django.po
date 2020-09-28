@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-24 14:18+0200\n"
+"POT-Creation-Date: 2020-09-25 13:10+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -48,6 +48,11 @@ msgstr[1] ""
 msgid "%(max)s must be greater or equals than %(min)s"
 msgstr "%(max)s doit être plus grand ou égal à %(min)s"
 
+#, python-format
+msgid "%(start_index)s to %(end_index)s of %(total_counts)s common topics"
+msgstr ""
+"%(start_index)s à %(end_index)s sur %(total_counts)s rubriques communes"
+
 msgid "ARES ability"
 msgstr "Habilitation ARES"
 
@@ -56,6 +61,9 @@ msgstr "Code étude ARES"
 
 msgid "ARES-GRACA"
 msgstr "ARES-GRACA"
+
+msgid "Ac yr."
+msgstr "Anac."
 
 msgid "Academic responsible"
 msgstr "Responsable académique"
@@ -121,6 +129,10 @@ msgstr "Adultes en reprise d'études"
 msgid "Alert Message"
 msgstr "Message d'alerte"
 
+msgctxt "female plural"
+msgid "All"
+msgstr "Toutes"
+
 #, python-format
 msgid "Are you sure you want to delete %(acronym)s - %(title)s ?"
 msgstr "Êtes-vous sûr·e de vouloir supprimer %(acronym)s - %(title)s ?"
@@ -137,6 +149,9 @@ msgstr "Bloc"
 
 msgid "Cancel"
 msgstr "Annuler"
+
+msgid "Catalog configuration"
+msgstr "Configuration du catalogue"
 
 msgid "Category"
 msgstr "Catégorie"
@@ -182,6 +197,9 @@ msgstr "Les informations générales communes seront publiées sous peu"
 
 msgid "Conditions"
 msgstr "Conditions"
+
+msgid "Configuration"
+msgstr "Configuration"
 
 #, python-format
 msgid ""
@@ -418,6 +436,16 @@ msgstr "Type de lien"
 msgid "Main"
 msgstr "Principale"
 
+msgid "Management common topics"
+msgstr "Gestion des rubriques communes"
+
+msgid ""
+"Management common topics in the context of training's general informations "
+"and access conditions"
+msgstr ""
+"Gestion des rubriques communes pour les informations générales et les "
+"conditions d'admission aux formations"
+
 msgid "Management entity"
 msgstr "Entité de gestion"
 
@@ -473,6 +501,9 @@ msgstr "Nouvelle Mini-Formation"
 
 msgid "New Training"
 msgstr "Nouvelle Formation"
+
+msgid "No result!"
+msgstr "Aucun résultat!"
 
 msgid "Non university Bachelors"
 msgstr "Bacheliers non universitaires"
@@ -708,18 +739,18 @@ msgstr "Formation non trouvée : {acronym} {year}"
 
 msgid "Training version can only be created by central manager"
 msgstr ""
-"La création d'une version de formation peut seulement être réalisée par le gestionnaire "
-"en central"
+"La création d'une version de formation peut seulement être réalisée par le "
+"gestionnaire en central"
 
 msgid "Training version can only be deleted by central manager"
 msgstr ""
-"La suppression d'une version de formation peut seulement être réalisée par le gestionnaire "
-"en central"
+"La suppression d'une version de formation peut seulement être réalisée par "
+"le gestionnaire en central"
 
 msgid "Training version can only be modified by central manager"
 msgstr ""
-"La modification d'une version peut seulement être réalisée par le gestionnaire "
-"en central"
+"La modification d'une version peut seulement être réalisée par le "
+"gestionnaire en central"
 
 msgid "Trainings"
 msgstr "Formations"

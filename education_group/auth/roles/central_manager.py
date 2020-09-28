@@ -30,6 +30,7 @@ class CentralManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
     def rule_set(cls):
         return rules.RuleSet({
             'base.can_access_catalog': rules.always_allow,  # Perms Backward compibility
+            'base.can_access_catalog_configuration': rules.always_allow,
             'base.view_educationgroup': rules.always_allow,
             'base.add_training':
                 predicates.is_user_attached_to_management_entity &
