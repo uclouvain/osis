@@ -23,34 +23,18 @@
 # ############################################################################
 from django.db import transaction
 
-from base.models.enums.active_status import ActiveStatusEnum
-from base.models.enums.activity_presence import ActivityPresence
-from base.models.enums.duration_unit import DurationUnitsEnum
-from base.models.enums.funding_codes import FundingCodes
-from base.models.enums.internship_presence import InternshipPresence
-from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.ddd import command
 from education_group.ddd.business_types import *
-from education_group.ddd.command import UpdateGroupCommand
 from education_group.ddd.domain import training
-from education_group.ddd.domain._campus import Campus
-from education_group.ddd.domain._co_graduation import CoGraduation
 from education_group.ddd.domain._diploma import Diploma, DiplomaAim, DiplomaAimIdentity
-from education_group.ddd.domain._entity import Entity
-from education_group.ddd.domain._funding import Funding
-from education_group.ddd.domain._hops import HOPS
-from education_group.ddd.domain._isced_domain import IscedDomain, IscedDomainIdentity
-from education_group.ddd.domain._study_domain import StudyDomain, StudyDomainIdentity
-from education_group.ddd.domain._titles import Titles
 from education_group.ddd.repository import training as training_repository
-from education_group.ddd.service.write import update_group_service
 
 
 @transaction.atomic()
 def update_certificate_aims(cmd: command.UpdateCertificateAimsCommand) -> 'TrainingIdentity':
     training_identity = training.TrainingIdentity(acronym=cmd.acronym, year=cmd.year)
     training_domain_obj = training_repository.TrainingRepository.get(training_identity)
-    training_domain_obj.update_aims(__convert_command_to_update_diploma_data(cmd))
+    training_domain_obj.update_aims_from_data(__convert_command_to_update_diploma_data(cmd))
     training_repository.TrainingRepository.update(training_domain_obj)
     return training_identity
 
