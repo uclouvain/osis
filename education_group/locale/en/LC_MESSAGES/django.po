@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-18 15:22+0200\n"
+"POT-Creation-Date: 2020-09-24 14:18+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -452,12 +452,6 @@ msgstr ""
 msgid "New Training"
 msgstr ""
 
-#, python-format
-msgid ""
-"No type of %(child_category)s can be created as child of %(category)s of "
-"type %(type)s"
-msgstr ""
-
 msgid "Non university Bachelors"
 msgstr ""
 
@@ -671,6 +665,15 @@ msgstr ""
 
 #, python-brace-format
 msgid "Training not found : {acronym} {year}"
+msgstr ""
+
+msgid "Training version can only be created by central manager"
+msgstr ""
+
+msgid "Training version can only be deleted by central manager"
+msgstr ""
+
+msgid "Training version can only be modified by central manager"
 msgstr ""
 
 msgid "Trainings"

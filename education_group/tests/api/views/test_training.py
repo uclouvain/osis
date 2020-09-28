@@ -255,7 +255,7 @@ class FilterTrainingTestCase(APITestCase):
                 'language': settings.LANGUAGE_CODE_FR
             },
         )
-        self.assertEqual(response.data['results'], serializer.data)
+        self.assertCountEqual(response.data['results'], serializer.data)
 
     def test_get_training_case_filter_to_year_params(self):
         query_string = {'to_year': 2019}

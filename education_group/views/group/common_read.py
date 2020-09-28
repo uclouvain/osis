@@ -100,18 +100,12 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
 
     def get_context_data(self, **kwargs):
         self.active_tab = read.get_tab_from_path_info(self.get_object(), self.request.META.get('PATH_INFO'))
-
-        can_change_education_group = self.request.user.has_perm(
-            'base.change_educationgroup',
-            self.get_permission_object()
-        )
         is_root_node = self.node_identity == self.get_tree().root_node.entity_id
 
         return {
             **super().get_context_data(**kwargs),
             "person": self.request.user.person,
             "enums": mdl.enums.education_group_categories,
-            "can_change_education_group": can_change_education_group,
             "form_xls_custom": CustomXlsForm(),
             "tree":  json.dumps(program_tree_view_serializer(self.get_tree())),
             "group": self.get_group(),
@@ -141,6 +135,7 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
             "group_year": self.get_group_year(),  # TODO: Should be remove and use DDD object
             "create_group_url": self.get_create_group_url(),
             "update_group_url": self.get_update_group_url(),
+            "update_permission_name": self.get_update_permission_name(),
             "delete_group_url": self.get_delete_group_url(),
             "create_training_url": self.get_create_training_url(),
             "create_mini_training_url": self.get_create_mini_training_url(),
@@ -174,6 +169,9 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
     def get_update_group_url(self):
         return reverse('group_update', kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}) + \
                "?path={}".format(self.get_path())
+
+    def get_update_permission_name(self) -> str:
+        return "base.change_group"
 
     def get_create_mini_training_url(self):
         return reverse('create_element_select_type', kwargs={'category': Categories.MINI_TRAINING.name}) + \

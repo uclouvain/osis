@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from collections import OrderedDict
+
 from django.db import models
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
@@ -35,8 +37,6 @@ from base.models.enums import vacant_declaration_type
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY, ALLOCATION_ENTITY, \
     ADDITIONAL_REQUIREMENT_ENTITY_1, ADDITIONAL_REQUIREMENT_ENTITY_2
 from base.models.enums.learning_container_year_types import LearningContainerYearType
-from base.models.learning_unit_year import LearningUnitYear
-from education_group import publisher
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
 FIELDS_FOR_COMPARISON = ['team', 'is_vacant', 'type_declaration_vacant']
@@ -135,12 +135,12 @@ class LearningContainerYear(SerializableModel):
 
     @staticmethod
     def get_attrs_by_entity_container_type():
-        return {
-            REQUIREMENT_ENTITY: 'requirement_entity',
-            ALLOCATION_ENTITY: 'allocation_entity',
-            ADDITIONAL_REQUIREMENT_ENTITY_1: 'additional_entity_1',
-            ADDITIONAL_REQUIREMENT_ENTITY_2: 'additional_entity_2',
-        }
+        return OrderedDict([
+            (REQUIREMENT_ENTITY, 'requirement_entity'),
+            (ALLOCATION_ENTITY, 'allocation_entity'),
+            (ADDITIONAL_REQUIREMENT_ENTITY_1, 'additional_entity_1'),
+            (ADDITIONAL_REQUIREMENT_ENTITY_2, 'additional_entity_2'),
+        ])
 
     def get_entity_from_type(self, entity_container_type):
         attr = LearningContainerYear.get_attrs_by_entity_container_type()[entity_container_type]

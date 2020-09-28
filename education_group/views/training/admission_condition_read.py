@@ -52,7 +52,7 @@ class TrainingReadAdmissionCondition(TrainingRead):
         context = {
             **super().get_context_data(**kwargs),
             "can_edit_information":
-                self.request.user.has_perm("base.change_admissioncondition", self.education_group_version.offer),
+                self.request.user.has_perm("base.change_admissioncondition", self.get_permission_object()),
             "training": training,
             "common_admission_condition": self.get_common_admission_condition(),
             "admission_condition": self.get_admission_condition(),
