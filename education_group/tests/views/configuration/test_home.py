@@ -21,17 +21,33 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+from django.http import HttpResponseForbidden, HttpResponse
+from django.test import TestCase
+from django.urls import reverse
 
-from program_management.ddd import command
-from program_management.ddd.domain.program_tree import ProgramTreeIdentity
-from program_management.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
-from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
+from base.tests.factories.person import PersonFactory
+from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 
 
-def calculate_program_tree_end_postponement(
-        cmd: command.GetEndPostponementYearCommand
-) -> int:
-    return CalculateEndPostponement().calculate_end_postponement_year_program_tree(
-        identity=ProgramTreeIdentity(cmd.code, cmd.year),
-        repository=ProgramTreeVersionRepository()
-    )
+class TestConfigurationHomeView(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.url = reverse('catalog_configuration')
+
+    def test_case_when_user_not_logged(self):
+        response = self.client.get(self.url)
+        self.assertRedirects(response, "/login/?next={}".format(self.url))
+
+    def test_when_user_has_no_permission(self):
+        a_person_without_permission = PersonFactory()
+        self.client.force_login(a_person_without_permission.user)
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+
+    def test_when_user_has_permission(self):
+        central_manager = CentralManagerFactory()
+        self.client.force_login(central_manager.person.user)
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, HttpResponse.status_code)

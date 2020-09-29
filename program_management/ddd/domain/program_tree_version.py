@@ -222,8 +222,3 @@ class ProgramTreeVersion(interface.RootEntity):
             setattr(self, field, new_value)
         validators_by_business_action.UpdateProgramTreeVersionValidatorList(self).validate()
         return self
-
-
-class ProgramTreeVersionNotFoundException(Exception):
-    def __init__(self, *args, **kwargs):
-        super().__init__("The program version cannot be found")

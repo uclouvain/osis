@@ -23,6 +23,7 @@ from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.command import UpdateTrainingVersionCommand
+from program_management.ddd.domain import program_tree_version
 from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
 from program_management.ddd.service.read import get_program_tree_version_from_node_service
 from program_management.ddd.service.write import update_and_postpone_training_version_service
@@ -115,18 +116,24 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
             self.training_version_form.add_error("max_constraint", "")
         except exception_education_group.GroupCopyConsistencyException as e:
             display_warning_messages(self.request, e.message)
+            return [
+                program_tree_version.ProgramTreeVersionIdentity(
+                    offer_acronym=update_command.offer_acronym,
+                    year=year,
+                    version_name=update_command.version_name,
+                    is_transition=update_command.is_transition
+                ) for year in range(update_command.year, e.conflicted_fields_year)
+            ]
         return []
 
     @cached_property
     def training_version_form(self) -> 'version.UpdateTrainingVersionForm':
         training_version_identity = self.get_program_tree_version_obj().entity_id
-        node_identity = self.get_program_tree_obj().root_node.entity_id
         return version.UpdateTrainingVersionForm(
             data=self.request.POST or None,
             user=self.request.user,
             event_perm_obj=self.get_permission_object(),
             training_version_identity=training_version_identity,
-            node_identity=node_identity,
             training_type=self.get_training_obj().type,
             initial=self._get_training_version_form_initial_values()
         )

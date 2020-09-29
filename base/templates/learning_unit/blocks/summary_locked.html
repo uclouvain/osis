@@ -1,32 +1,36 @@
 {% load bootstrap3 %}
 {% load i18n %}
+{% load waffle_tags %}
 
 <div class="col-md-6">
-    <div class="row">
-    {% if can_edit_summary_locked_field %}
-        <form method="POST"
-              action="{% url 'learning_unit_pedagogy_toggle_summary_locked' learning_unit_year_id=learning_unit_year.pk %}">
-            {% csrf_token %}
-            <button class="btn btn-primary pull-right" type="submit" data-toggle="tooltip" data-placement="left"
+    {% flag "educational_information_block_action" %}
+        <div class="row">
+        {% if can_edit_summary_locked_field %}
+            <form method="POST"
+                  action="{% url 'learning_unit_pedagogy_toggle_summary_locked' learning_unit_year_id=learning_unit_year.pk %}">
+                {% csrf_token %}
+                <button class="btn btn-primary pull-right" type="submit" data-toggle="tooltip" data-placement="left"
+                    {% if learning_unit_year.summary_locked %}
+                         title="{% trans 'unlock update for teacher'|capfirst %}">
+                        <i class="fa fa-unlock"> </i> <span>{% trans 'unlock'|capfirst %}</span>
+                    {% else %}
+                        title="{% trans 'lock update for teacher'|capfirst %}">
+                        <i class="fa fa-lock"></i> <span>{% trans 'Lock' %}</span>
+                    {% endif %}
+                </button>
+            </form>
+        {% else %}
+            <p class="pull-right">
                 {% if learning_unit_year.summary_locked %}
-                     title="{% trans 'unlock update for teacher'|capfirst %}">
-                    <i class="fa fa-unlock"> </i> <span>{% trans 'unlock'|capfirst %}</span>
+                    {% trans 'Update for teacher locked' %}
                 {% else %}
-                    title="{% trans 'lock update for teacher'|capfirst %}">
-                    <i class="fa fa-lock"></i> <span>{% trans 'Lock' %}</span>
+                    {% trans 'Update for teacher unlocked' %}
                 {% endif %}
-            </button>
-        </form>
-    {% else %}
-        <p class="pull-right">
-            {% if learning_unit_year.summary_locked %}
-                {% trans 'Update for teacher locked' %}
-            {% else %}
-                {% trans 'Update for teacher unlocked' %}
-            {% endif %}
-        </p>
-    {% endif %}
-    </div>
+            </p>
+        {% endif %}
+        </div>
+    {% endflag %}
+
     {% if version %}
         <div class="row">
             <p class="small pull-right">

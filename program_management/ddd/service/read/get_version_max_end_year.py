@@ -21,22 +21,27 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from unittest import mock
-
-from django.test import SimpleTestCase
-
+from program_management.ddd import command
+from program_management.ddd.domain import program_tree_version
 from program_management.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
-from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
-from program_management.ddd.service.read import get_end_postponement_year_service
-from program_management.tests.ddd.factories.commands.get_end_postponement_year_command import \
-    GetEndPostponementYearCommandFactory
+from program_management.ddd.repositories import program_tree_version as tree_version_repository
+from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 
 
-class TestGetEndPostponementYearService(SimpleTestCase):
+def calculate_version_max_end_year(cmd: command.GetVersionMaxEndYear) -> int:
+    standard_tree_version_identity = program_tree_version.ProgramTreeVersionIdentity(
+        offer_acronym=cmd.offer_acronym,
+        year=cmd.year,
+        version_name=program_tree_version.STANDARD,
+        is_transition=False
+    )
 
-    @mock.patch.object(CalculateEndPostponement, 'calculate_end_postponement_year_program_tree')
-    def test_domain_service_is_called(self, mock_domain_service):
-        get_end_postponement_year_service.calculate_program_tree_end_postponement(
-            GetEndPostponementYearCommandFactory()
-        )
-        self.assertTrue(mock_domain_service.called)
+    tree_version = tree_version_repository.ProgramTreeVersionRepository.get(standard_tree_version_identity)
+    return tree_version.end_year_of_existence or _compute_max_postponement_year(standard_tree_version_identity)
+
+
+def _compute_max_postponement_year(version_identity: 'program_tree_version.ProgramTreeVersionIdentity'):
+    return CalculateEndPostponement().calculate_end_postponement_year_program_tree_version(
+        identity=version_identity,
+        repository=ProgramTreeVersionRepository()
+    )

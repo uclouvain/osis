@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-22 11:19+0200\n"
+"POT-Creation-Date: 2020-09-28 11:59+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -539,6 +539,9 @@ msgid "Conditions"
 msgstr ""
 
 msgid "Configurable list of learning units"
+msgstr ""
+
+msgid "Configuration"
 msgstr ""
 
 msgid "Confirm"
@@ -1357,6 +1360,9 @@ msgid "Management entity"
 msgstr ""
 
 msgid "Management of addresses on the scoresheets."
+msgstr ""
+
+msgid "Management of catalog configuration"
 msgstr ""
 
 msgid "Management of data by entity"
