@@ -24,58 +24,60 @@
     * at the root of the source code of this program.  If not,
     * see http://www.gnu.org/licenses/.
 {% endcomment %}
-<div class="panel panel-default">
-    <div class="panel-body" id="panel_coorganization">
-        <label>{% trans 'Program organized with other institutes' %}</label>
-        {% if education_group_year.co_organizations %}
-            <table class="table" id="tbl_coorganization">
-                <thead>
-                <tr>
-                    <th>{% trans 'Institution' %}</th>
-                    <th></th>
-                    <th>{% trans 'For all students' %}</th>
-                    <th>{% trans 'Reference institution' %}</th>
-                    <th>{% trans 'UCL Diploma' %}</th>
-                    <th>{% trans 'Producing certificat' %}</th>
-                    <th>{% trans 'Producing annexe' %}</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for coorganization in education_group_year.co_organizations %}
+{% if show_coorganization %}
+    <div class="panel panel-default">
+        <div class="panel-body" id="panel_coorganization">
+            <label>{% trans 'Program organized with other institutes' %}</label>
+            {% if education_group_year.co_organizations %}
+                <table class="table" id="tbl_coorganization">
+                    <thead>
                     <tr>
-                        <td>
-                            <span id="coorganization_id_{{ coorganization.partner.name }}">
-                                {{ coorganization.partner.address.country_name }} - {{ coorganization.partner.address.city }}
-                                <br>
-                                {{ coorganization.partner.name }}
-                            </span>
-                        </td>
-                        <td>
-                            {% if coorganization.partner.logo_url %}
-                                <img src="{{ coorganization.partner.logo_url }}" width="50px"/>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {{ coorganization.is_for_all_students | yesno | title }}
-                        </td>
-                        <td>
-                            {{ coorganization.is_reference_institution | yesno | title }}
-                        </td>
-                        <td>
-                            {% if coorganization.certificate_type %}
-                                {{ coorganization.certificate_type.value }}
-                            {% endif %}
-                        </td>
-                        <td>
-                            {{ coorganization.is_producing_certificate | yesno |title }}
-                        </td>
-                        <td>
-                            {{ coorganization.is_producing_certificate_annexes | yesno | title }}
-                        </td>
+                        <th>{% trans 'Institution' %}</th>
+                        <th></th>
+                        <th>{% trans 'For all students' %}</th>
+                        <th>{% trans 'Reference institution' %}</th>
+                        <th>{% trans 'UCL Diploma' %}</th>
+                        <th>{% trans 'Producing certificat' %}</th>
+                        <th>{% trans 'Producing annexe' %}</th>
                     </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        {% endif %}
+                    </thead>
+                    <tbody>
+                    {% for coorganization in education_group_year.co_organizations %}
+                        <tr>
+                            <td>
+                                <span id="coorganization_id_{{ coorganization.partner.name }}">
+                                    {{ coorganization.partner.address.country_name }} - {{ coorganization.partner.address.city }}
+                                    <br>
+                                    {{ coorganization.partner.name }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if coorganization.partner.logo_url %}
+                                    <img src="{{ coorganization.partner.logo_url }}" width="50px"/>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{ coorganization.is_for_all_students | yesno | title }}
+                            </td>
+                            <td>
+                                {{ coorganization.is_reference_institution | yesno | title }}
+                            </td>
+                            <td>
+                                {% if coorganization.certificate_type %}
+                                    {{ coorganization.certificate_type.value }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{ coorganization.is_producing_certificate | yesno |title }}
+                            </td>
+                            <td>
+                                {{ coorganization.is_producing_certificate_annexes | yesno | title }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+        </div>
     </div>
-</div>
+{% endif %}
