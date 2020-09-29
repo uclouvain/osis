@@ -41,7 +41,7 @@ from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.person import PersonFactory
 from base.utils.cache import ElementCache
 from base.utils.urls import reverse_with_get
-from osis_role.contrib.views import PermissionRequiredMixin
+from osis_role.contrib.views import AjaxPermissionRequiredMixin
 from program_management.ddd import command
 from program_management.ddd.domain import link
 from program_management.forms.tree.paste import PasteNodesFormset, PasteNodeForm
@@ -87,7 +87,7 @@ class TestPasteNodeView(TestCase):
         self.get_form_class_patcher.start()
         self.addCleanup(self.get_form_class_patcher.stop)
 
-        permission_patcher = mock.patch.object(PermissionRequiredMixin, "has_permission")
+        permission_patcher = mock.patch.object(AjaxPermissionRequiredMixin, "has_permission")
         self.permission_mock = permission_patcher.start()
         self.permission_mock.return_value = True
         self.addCleanup(permission_patcher.stop)
