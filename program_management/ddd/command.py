@@ -645,7 +645,7 @@ class PostponeTrainingAndRootGroupModificationWithProgramTreeCommand(interface.C
 
 
 @attr.s(frozen=True, slots=True)
-class UpdateTrainingAndProgramTreeEndDateCommand(interface.CommandRequest):
+class UpdateProgramTreeVersionEndDateCommand(interface.CommandRequest):
     from_offer_acronym = attr.ib(type=str)
     from_version_name = attr.ib(type=str)
     from_year = attr.ib(type=int)

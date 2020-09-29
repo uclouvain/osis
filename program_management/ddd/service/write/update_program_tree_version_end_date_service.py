@@ -30,8 +30,8 @@ from program_management.ddd.service.write import update_program_tree_version_ser
 
 
 @transaction.atomic()
-def update_training_and_program_tree_end_date(
-        update_cmd: command.UpdateTrainingAndProgramTreeEndDateCommand
+def update_program_tree_version_end_date(
+        update_cmd: command.UpdateProgramTreeVersionEndDateCommand
 ) -> program_tree_version.ProgramTreeVersionIdentity:
     identity = program_tree_version.ProgramTreeVersionIdentity(
         offer_acronym=update_cmd.from_offer_acronym,
