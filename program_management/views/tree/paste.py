@@ -47,7 +47,7 @@ from education_group.ddd.domain.exception import GroupNotFoundException
 from education_group.ddd.service.read import get_group_service
 from education_group.models.group_year import GroupYear
 from osis_common.ddd import interface
-from osis_role.contrib.views import PermissionRequiredMixin
+from osis_role.contrib.views import AjaxPermissionRequiredMixin
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import node
 from program_management.ddd.domain.node import NodeGroupYear
@@ -59,7 +59,7 @@ from program_management.forms.tree.paste import PasteNodesFormset, paste_form_fa
     PasteToOptionListChoiceForm, PasteMinorMajorListToMinorMajorListChoiceForm
 
 
-class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageMixin, FormView):
+class PasteNodesView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageMixin, FormView):
     template_name = "tree/paste_inner.html"
     permission_required = "base.can_attach_node"
 
