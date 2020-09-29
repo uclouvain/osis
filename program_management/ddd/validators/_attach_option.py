@@ -46,32 +46,25 @@ class AttachOptionsValidator(BusinessValidator):
         self.node_to_add = tree_from_node_to_add.root_node
         self.tree_2m = tree_2m
 
-    def get_options_from_finalities(self):
-        options_from_finalities = set()
-        for finality in self.tree_from_node_to_add.get_all_finalities():
-            options_from_finalities |= finality.get_all_children_as_nodes(take_only={MiniTrainingType.OPTION})
-        if self.node_to_add.is_finality():
-            options_from_finalities |= self.node_to_add.get_all_children_as_nodes(
-                take_only={MiniTrainingType.OPTION}
-            )
-        return options_from_finalities
+    def get_options_to_attach(self):
+        options = self.tree_from_node_to_add.root_node.get_all_children_as_nodes(take_only={MiniTrainingType.OPTION})
+        if self.node_to_add.is_option():
+            options.add(self.tree_from_node_to_add.root_node)
+        return options
 
     def validate(self):
-        options_from_finalities = self.get_options_from_finalities()
-        if options_from_finalities:
-            options_from_2m = self.tree_2m.root_node.get_all_children_as_nodes(
-                take_only={MiniTrainingType.OPTION},
-                ignore_children_from=set(TrainingType.finality_types_enum())
-            )
-            missing_options = options_from_finalities - options_from_2m
-            if missing_options:
+        options_to_attach = self.get_options_to_attach()
+        if options_to_attach:
+            options_from_2m_option_list = self.tree_2m.get_2m_option_list()
+            options_to_attach_not_present_in_2m_option_list = options_to_attach - options_from_2m_option_list
+            if options_to_attach_not_present_in_2m_option_list:
                 self.add_error_message(
                     ngettext(
                         "Option \"%(code)s\" must be present in %(root_code)s program.",
                         "Options \"%(code)s\" must be present in %(root_code)s program.",
-                        len(missing_options)
+                        len(options_to_attach_not_present_in_2m_option_list)
                     ) % {
-                        "code": ', '.join(option.code for option in missing_options),
+                        "code": ', '.join(option.code for option in options_to_attach_not_present_in_2m_option_list),
                         "root_code": self.tree_2m.root_node.code
                     }
                 )

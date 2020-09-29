@@ -44,19 +44,20 @@ class ValidateFinalitiesEndDateAndOptions(business_validator.BusinessValidator):
         tree = self.tree_repository.get(tree_identity)
         finality_ids = [n.entity_id for n in tree.get_all_finalities()]
         messages = []
-        if self.node_to_paste.is_finality() or finality_ids:
-            trees_2m = [
-                tree for tree in self.tree_repository.search_from_children([self.node_to_paste_to.entity_id])
-                if tree.is_master_2m()
-            ]
-            for tree_2m in trees_2m:
+        trees_2m = [
+            tree for tree in self.tree_repository.search_from_children([self.node_to_paste_to.entity_id])
+            if tree.is_master_2m()
+        ]
+        for tree_2m in trees_2m:
+            if self.node_to_paste.is_finality() or finality_ids:
                 validator = _attach_finality_end_date.AttachFinalityEndDateValidator(tree_2m, tree)
                 if not validator.is_valid():
                     for msg in validator.error_messages:
                         messages.append(msg.message)
-                validator = _attach_option.AttachOptionsValidator(tree_2m, tree)
-                if not validator.is_valid():
-                    for msg in validator.error_messages:
-                        messages.append(msg.message)
+
+            validator = _attach_option.AttachOptionsValidator(tree_2m, tree)
+            if not validator.is_valid():
+                for msg in validator.error_messages:
+                    messages.append(msg.message)
         if messages:
             raise osis_common.ddd.interface.BusinessExceptions(messages)
