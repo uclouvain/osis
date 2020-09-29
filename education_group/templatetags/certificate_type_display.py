@@ -32,4 +32,3 @@ register = template.Library()
 @register.filter
 def certificate_type_display(certificat_type):
     return dict(COORGANIZATION_DIPLOMA_TYPE)[certificat_type]
-
