@@ -110,7 +110,8 @@ class TestLearningUnitXls(TestCase):
 
         cls.group_element_child = GroupElementYearFactory(
             parent_element=cls.a_group_year_parent_element,
-            child_element=cls.learning_unit_yr_1_element
+            child_element=cls.learning_unit_yr_1_element,
+            relative_credits=cls.learning_unit_yr_1.credits,
         )
         # Particular OF
         cls.create_version(direct_parent_type)

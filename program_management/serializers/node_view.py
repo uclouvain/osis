@@ -182,10 +182,9 @@ def __get_learning_unit_node_icon(link: 'Link') -> str:
 
 
 def __get_learning_unit_node_text(link: 'Link', context=None):
-    text = link.child.code
     if context['root'].year != link.child.year:
-        text += '|{}'.format(link.child.year)
-    return text
+        return "|{}|{}".format(link.child.year, link.child.code)
+    return link.child.code
 
 
 def get_program_tree_version_name(node_identity: 'NodeIdentity', tree_versions: List['ProgramTreeVersion']):
