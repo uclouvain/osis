@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-22 11:19+0200\n"
+"POT-Creation-Date: 2020-09-28 11:59+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -556,6 +556,9 @@ msgstr "Conditions"
 
 msgid "Configurable list of learning units"
 msgstr "Liste personnalisée des unités d'enseignement"
+
+msgid "Configuration"
+msgstr "Configuration"
 
 msgid "Confirm"
 msgstr "Confirmer"
@@ -1391,6 +1394,9 @@ msgstr "Entité de gestion"
 
 msgid "Management of addresses on the scoresheets."
 msgstr "Gestion des adresses sur les feuilles de notes."
+
+msgid "Management of catalog configuration"
+msgstr "Gestion de la configuration du catalogue"
 
 msgid "Management of data by entity"
 msgstr "Gestion des données par entité du métier"

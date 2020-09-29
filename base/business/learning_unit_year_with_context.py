@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -110,6 +110,7 @@ def append_components(learning_unit_year):
                 VOLUME_TOTAL: component.hourly_volume_total_annual,
                 VOLUME_Q1: component.hourly_volume_partial_q1,
                 VOLUME_Q2: component.hourly_volume_partial_q2,
+                VOLUME_GLOBAL: component.vol_global,
                 PLANNED_CLASSES: planned_classes,
                 VOLUME_REQUIREMENT_ENTITY: vol_req_entity,
                 VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1: vol_add_req_entity_1,
