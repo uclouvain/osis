@@ -239,7 +239,7 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             )
 
     def get_tab_urls(self):
-        return OrderedDict({
+        tab_urls = OrderedDict({
             Tab.IDENTIFICATION: {
                 'text': _('Identification'),
                 'active': Tab.IDENTIFICATION == self.active_tab,
@@ -278,23 +278,29 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             },
         })
 
+        for tab, tab_dict in tab_urls.items():
+            if not tab == Tab.IDENTIFICATION and tab_dict['active'] and tab_dict['display']:
+                return tab_urls
+        tab_urls[Tab.IDENTIFICATION]['active'] = True
+        return tab_urls
+
     def have_general_information_tab(self):
         node_category = self.get_object().category
         return self.current_version.is_standard_version and \
             node_category.name in general_information_sections.SECTIONS_PER_OFFER_TYPE and \
-            self._is_general_info_and_condition_admission_in_display_range
+            self._is_general_info_and_condition_admission_in_display_range()
 
     def have_skills_and_achievements_tab(self):
         node_category = self.get_object().category
         return self.current_version.is_standard_version and \
             node_category.name in MiniTrainingType.with_skills_achievements() and \
-            self._is_general_info_and_condition_admission_in_display_range
+            self._is_general_info_and_condition_admission_in_display_range()
 
     def have_admission_condition_tab(self):
         node_category = self.get_object().category
         return self.current_version.is_standard_version and \
             node_category.name in MiniTrainingType.with_admission_condition() and \
-            self._is_general_info_and_condition_admission_in_display_range
+            self._is_general_info_and_condition_admission_in_display_range()
 
     def _is_general_info_and_condition_admission_in_display_range(self):
         return MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION <= self.get_object().year < \
