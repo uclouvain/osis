@@ -23,30 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db import transaction
+import factory.fuzzy
 
 from education_group.ddd import command
-from education_group.ddd.domain.exception import TrainingNotFoundException
-from education_group.ddd.domain.training import TrainingBuilder, TrainingIdentity
-from education_group.ddd.repository import training as training_repository
 
 
-@transaction.atomic()
-def copy_certificate_aims_to_next_year(copy_cmd: command.CopyCertificateAimsToNextYearCommand) -> 'TrainingIdentity':
-    # GIVEN
-    repository = training_repository.TrainingRepository()
-    existing_training = repository.get(
-        entity_id=TrainingIdentity(acronym=copy_cmd.acronym, year=copy_cmd.postpone_from_year)
-    )
+class UpdateCertificateAimsCommandFactory(factory.Factory):
+    class Meta:
+        model = command.UpdateCertificateAimsCommand
+        abstract = False
 
-    try:
-        # WHEN
-        training_next_year = TrainingBuilder().copy_aims_to_next_year(existing_training, repository)
+    acronym = "Title "
+    year = 2019
 
-        # THEN
-        identity = repository.update(training_next_year)
-        return identity
-
-    except TrainingNotFoundException:
-        # do nothing when next year has no training
-        pass
+    aims = []

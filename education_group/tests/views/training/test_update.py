@@ -50,22 +50,29 @@ class TestTrainingUpdateView(TestCase):
         cls.central_manager = CentralManagerFactory(entity=cls.egy.management_entity)
 
     def setUp(self):
+        self.get_training_patcher = mock.patch(
+            "education_group.ddd.service.read.get_training_service.get_training",
+            return_value=self.training
+        )
+        self.mocked_get_training = self.get_training_patcher.start()
+        self.addCleanup(self.get_training_patcher.stop)
+
+        self.get_group_patcher = mock.patch(
+            "education_group.ddd.service.read.get_group_service.get_group",
+            return_value=GroupFactory()
+        )
+        self.mocked_get_group = self.get_group_patcher.start()
+        self.addCleanup(self.get_group_patcher.stop)
+
         self.client.force_login(self.central_manager.person.user)
 
-    @mock.patch("education_group.ddd.service.read.get_training_service.get_training")
-    @mock.patch("education_group.ddd.service.read.get_group_service.get_group")
-    def test_should_display_forms_when_good_get_request(self, mock_get_group, mock_get_training):
-        mock_get_training.return_value = self.training
-        mock_get_group.return_value = GroupFactory()
-
+    def test_should_display_forms_when_good_get_request(self):
         response = self.client.get(self.url)
 
         context = response.context
         self.assertTrue("training_form" in context)
         self.assertTemplateUsed(response, "education_group_app/training/upsert/update.html")
 
-    @mock.patch("education_group.views.training.update.TrainingUpdateView.get_training_obj")
-    @mock.patch("education_group.ddd.service.read.get_group_service.get_group")
     @mock.patch("education_group.views.training.update.TrainingUpdateView.update_training")
     @mock.patch("education_group.views.training.update.TrainingUpdateView.delete_training")
     @mock.patch("education_group.views.training.update.TrainingUpdateView.training_form",
@@ -75,11 +82,7 @@ class TestTrainingUpdateView(TestCase):
             get_training_form_mock,
             delete_training,
             update_training,
-            mock_get_group,
-            mock_get_training
     ):
-        mock_get_training.return_value = self.training
-        mock_get_group.return_value = GroupFactory()
         update_training.return_value = [training.TrainingIdentity(acronym="ACRONYM", year=2020)]
         delete_training.return_value = []
         response = self.client.post(self.url, data={})
@@ -94,11 +97,7 @@ class TestTrainingUpdateView(TestCase):
         )
         self.assertRedirects(response, expected_redirec_url, fetch_redirect_response=False)
 
-    @mock.patch("education_group.ddd.service.read.get_training_service.get_training")
-    @mock.patch("education_group.ddd.service.read.get_group_service.get_group")
-    def test_should_disable_or_enable_certificate_aim_according_to_role(self, mock_get_group, mock_get_training):
-        mock_get_training.return_value = self.training
-        mock_get_group.return_value = GroupFactory()
+    def test_should_disable_or_enable_certificate_aim_according_to_role(self):
         rules = [
             {'role': CentralManagerFactory(entity=self.egy.management_entity), 'is_disabled': True},
             {'role': FacultyManagerFactory(entity=self.egy.management_entity), 'is_disabled': True},
@@ -112,3 +111,23 @@ class TestTrainingUpdateView(TestCase):
         response = self.client.get(self.url)
         form = response.context['training_form']
         self.assertEqual(form.fields['certificate_aims'].disabled, is_disabled)
+
+    @mock.patch('django.forms.forms.BaseForm.changed_data', new_callable=mock.PropertyMock)
+    @mock.patch('education_group.forms.training.CreateTrainingForm.is_valid', return_value=True)
+    @mock.patch('education_group.views.training.update.TrainingUpdateView.delete_training', return_value=[])
+    @mock.patch('education_group.views.training.update.TrainingUpdateView.update_training')
+    @mock.patch('education_group.views.training.update.TrainingUpdateView.update_certificate_aims')
+    def test_should_update_certificate_aims_only_if_unique_field_changed(
+            self,
+            mock_update_aims,
+            mock_update_training,
+            mock_delete_training,
+            mock_form_valid,
+            mock_changed_data,
+    ):
+        mock_changed_data.return_value = ['certificate_aims']
+
+        self.client.post(self.url, data={'certificate_aims': []})
+
+        self.assertFalse(mock_update_training.called)
+        self.assertTrue(mock_update_aims.called)

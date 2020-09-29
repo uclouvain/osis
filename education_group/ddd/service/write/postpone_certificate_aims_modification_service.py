@@ -26,13 +26,11 @@
 from typing import List
 
 from education_group.ddd import command
-from education_group.ddd.domain.exception import TrainingCopyConsistencyException, \
-    CertificateAimsCopyConsistencyException
+from education_group.ddd.domain.exception import CertificateAimsCopyConsistencyException
 from education_group.ddd.domain.service.conflicted_fields import ConflictedFields
 from education_group.ddd.domain.training import TrainingIdentity
 from education_group.ddd.repository.training import TrainingRepository
-from education_group.ddd.service.write import copy_training_service, update_training_and_group_service, \
-    copy_group_service, update_certificate_aims_service, copy_certificate_aims_service
+from education_group.ddd.service.write import update_certificate_aims_service, copy_certificate_aims_service
 from program_management.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
 
 
@@ -74,7 +72,8 @@ def postpone_certificate_aims_modification(
         )
 
         # THEN
-        identities_created.append(identity_next_year)
+        if identity_next_year:
+            identities_created.append(identity_next_year)
 
     if conflicted_certificate_aims:
         first_conflict_year = min(conflicted_certificate_aims)
