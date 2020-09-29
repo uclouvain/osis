@@ -26,13 +26,12 @@
 from typing import List
 
 from education_group.ddd.business_types import *
-from education_group.ddd.command import PostponeGroupModificationCommand
-from education_group.ddd.service.write import postpone_orphan_group_modification_service
 from program_management.ddd.business_types import *
 from program_management.ddd.command import UpdateTrainingVersionCommand, UpdateProgramTreeVersionCommand, \
-    PostponeProgramTreeVersionCommand
+    PostponeGroupVersionCommand
 from program_management.ddd.domain.service.identity_search import GroupIdentitySearch
-from program_management.ddd.service.write import update_program_tree_version_service, postpone_tree_version_service
+from program_management.ddd.service.write import update_program_tree_version_service, \
+    update_and_postpone_group_version_service
 
 
 def update_and_postpone_training_version(
@@ -44,22 +43,30 @@ def update_and_postpone_training_version(
     )
     group_identity = GroupIdentitySearch().get_from_tree_version_identity(tree_version_identity)
 
-    postponed_tree_version_identities = postpone_tree_version_service.postpone_program_tree_version(
-        __convert_to_postpone_program_tree_version(command, group_identity)
-    )
-
-    postpone_orphan_group_modification_service.postpone_orphan_group_modification_service(
-        __convert_to_postpone_group_modification_command(command, group_identity)
+    postponed_tree_version_identities = update_and_postpone_group_version_service.update_and_postpone_group_version(
+        __convert_to_postpone_group_version(command, group_identity)
     )
 
     return [tree_version_identity] + postponed_tree_version_identities
 
 
-def __convert_to_postpone_group_modification_command(
+def __convert_to_update_tree_version_command(command: 'UpdateTrainingVersionCommand'):
+    return UpdateProgramTreeVersionCommand(
+        end_year=command.end_year,
+        offer_acronym=command.offer_acronym,
+        version_name=command.version_name,
+        year=command.year,
+        is_transition=command.is_transition,
+        title_en=command.title_en,
+        title_fr=command.title_fr,
+    )
+
+
+def __convert_to_postpone_group_version(
         cmd: 'UpdateTrainingVersionCommand',
         group_identity: 'GroupIdentity'
-) -> 'PostponeGroupModificationCommand':
-    return PostponeGroupModificationCommand(
+) -> 'PostponeGroupVersionCommand':
+    return PostponeGroupVersionCommand(
         code=group_identity.code,
         postpone_from_year=cmd.year,
         abbreviated_title=cmd.offer_acronym,
@@ -75,29 +82,7 @@ def __convert_to_postpone_group_modification_command(
         remark_fr=cmd.remark_fr,
         remark_en=cmd.remark_en,
         end_year=cmd.end_year,
-    )
-
-
-def __convert_to_update_tree_version_command(command: 'UpdateTrainingVersionCommand'):
-    return UpdateProgramTreeVersionCommand(
-        end_year=command.end_year,
-        offer_acronym=command.offer_acronym,
-        version_name=command.version_name,
-        year=command.year,
-        is_transition=command.is_transition,
-        title_en=command.title_en,
-        title_fr=command.title_fr,
-    )
-
-
-def __convert_to_postpone_program_tree_version(
-        cmd: 'UpdateTrainingVersionCommand',
-        group_identity: 'GroupIdentity'
-) -> 'PostponeProgramTreeVersionCommand':
-    return PostponeProgramTreeVersionCommand(
         from_offer_acronym=cmd.offer_acronym,
         from_version_name=cmd.version_name,
-        from_year=cmd.year,
         from_is_transition=cmd.is_transition,
-        from_code=group_identity.code
     )

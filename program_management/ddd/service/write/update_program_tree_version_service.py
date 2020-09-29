@@ -26,6 +26,7 @@
 from django.db import transaction
 
 from program_management.ddd.command import UpdateProgramTreeVersionCommand, DeleteSpecificVersionCommand
+from program_management.ddd.domain import exception
 from program_management.ddd.domain.program_tree_version import UpdateProgramTreeVersiongData, \
     ProgramTreeVersionIdentity, ProgramTreeVersion
 from program_management.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
@@ -73,13 +74,16 @@ def __call_delete_service(program_tree_version: 'ProgramTreeVersion', end_year_u
     end_year_updated = end_year_updated or postponement_limit
 
     if end_year > end_year_updated:
-        limit = program_tree_version.end_year_of_existence or postponement_limit + 1
+        limit = (program_tree_version.end_year_of_existence or postponement_limit) + 1
         for year_to_delete in range(end_year_updated + 1, limit):
-            delete_specific_version_service.delete_specific_version(
-                DeleteSpecificVersionCommand(
-                    acronym=identity.offer_acronym,
-                    year=year_to_delete,
-                    version_name=identity.version_name,
-                    is_transition=identity.is_transition,
+            try:
+                delete_specific_version_service.delete_specific_version(
+                    DeleteSpecificVersionCommand(
+                        acronym=identity.offer_acronym,
+                        year=year_to_delete,
+                        version_name=identity.version_name,
+                        is_transition=identity.is_transition,
+                    )
                 )
-            )
+            except exception.ProgramTreeVersionNotFoundException:
+                continue
