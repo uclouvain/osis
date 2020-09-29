@@ -57,9 +57,6 @@ msgstr ""
 msgid "Accepted value: %(justification_label_authorized)s "
 msgstr ""
 
-msgid "Acronym"
-msgstr ""
-
 msgid "Add"
 msgstr ""
 
