@@ -21,7 +21,7 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from typing import Any, Callable, List
+from typing import Any, List
 
 import mock
 
@@ -39,6 +39,10 @@ class MockFormValid(mock.Mock):
     @property
     def cleaned_data(self):
         return mock.MagicMock()
+
+    @property
+    def changed_data(self):
+        return ['dummy_field']
 
 
 class FakeRepository:
