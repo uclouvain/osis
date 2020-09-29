@@ -5,7 +5,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
-from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.base import View
 
@@ -25,9 +24,9 @@ from education_group.forms.training import CreateTrainingForm
 from education_group.models.group_year import GroupYear
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from education_group.views.proxy.read import Tab
+from osis_common.ddd.interface import BusinessExceptions
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command as command_pgrm
-from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.program_tree import Path
 from program_management.ddd.domain.service.element_id_search import ElementIdSearch
 from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
@@ -136,6 +135,9 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             except MaximumCertificateAimType2Reached as e:
                 training_form.add_error('certificate_aims', e.message)
                 training_form.add_error('section', '')
+            except BusinessExceptions as e:
+                display_error_messages(request, e.messages)
+                return render(request, self.template_name, self.get_context(training_form))
 
             if not training_form.errors:
                 self._display_success_messages(training_ids)

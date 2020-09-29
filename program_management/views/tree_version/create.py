@@ -23,22 +23,23 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import functools
 from typing import List
 
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.base import View
 
-from base.models.education_group_year import EducationGroupYear
+from base.models.enums import education_group_categories
 from base.models.utils.utils import ChoiceEnum
 from base.views.common import display_success_messages
 from base.views.mixins import AjaxTemplateMixin
 from education_group.ddd.domain import exception
-from education_group.ddd.domain.service.identity_search import TrainingIdentitySearch
 from education_group.ddd.domain.training import TrainingIdentity
+from education_group.models.group_year import GroupYear
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from osis_role.contrib.views import AjaxPermissionRequiredMixin
 from program_management.ddd.business_types import *
@@ -60,7 +61,6 @@ class CreateProgramTreeVersionType(ChoiceEnum):
 class CreateProgramTreeVersion(AjaxPermissionRequiredMixin, AjaxTemplateMixin, View):
     template_name = "tree_version/create_specific_version_inner.html"
     form_class = SpecificVersionForm
-    permission_required = 'base.add_programtreeversion'
 
     @cached_property
     def node_identity(self) -> 'NodeIdentity':
@@ -78,27 +78,25 @@ class CreateProgramTreeVersion(AjaxPermissionRequiredMixin, AjaxTemplateMixin, V
     def person(self):
         return self.request.user.person
 
-    @cached_property
-    def education_group_year(self):
+    @functools.lru_cache()
+    def get_permission_object(self) -> GroupYear:
         return get_object_or_404(
-            EducationGroupYear,
+            GroupYear,
             academic_year__year=self.kwargs['year'],
-            acronym=self.kwargs['code'],
+            partial_acronym=self.kwargs['code'],
         )
 
+    def get_permission_required(self):
+        if self.get_permission_object().education_group_type.category == education_group_categories.TRAINING:
+            return ("base.add_training_version",)
+        return ("base.add_minitraining_version",)
+
     def get(self, request, *args, **kwargs):
-        form = SpecificVersionForm(
-            tree_version_identity=self.tree_version_identity,
-            node_identity=self.node_identity,
-        )
+        form = SpecificVersionForm(tree_version_identity=self.tree_version_identity)
         return render(request, self.template_name, self.get_context_data(form))
 
     def post(self, request, *args, **kwargs):
-        form = SpecificVersionForm(
-            data=request.POST,
-            tree_version_identity=self.tree_version_identity,
-            node_identity=self.node_identity,
-        )
+        form = SpecificVersionForm(tree_version_identity=self.tree_version_identity, data=request.POST)
         if form.is_valid():
             command = _convert_form_to_create_command(form)
             save_type = self.request.POST.get("save_type")
@@ -131,9 +129,6 @@ class CreateProgramTreeVersion(AjaxPermissionRequiredMixin, AjaxTemplateMixin, V
                     'success_url': url
                 })
         return render(request, self.template_name, self.get_context_data(form))
-
-    def _call_rule(self, rule):
-        return rule(self.person, self.education_group_year)
 
     def get_context_data(self, form: SpecificVersionForm):
         return {
@@ -211,6 +206,5 @@ def _convert_form_to_postpone_command(
         from_version_name=form.cleaned_data['version_name'],
         from_year=form.tree_version_identity.year,
         from_is_transition=False,
-        until_year=form.cleaned_data['end_year'],
         from_code=node_id.code,
     )

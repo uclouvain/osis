@@ -29,6 +29,7 @@ from django.templatetags.static import static
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
+from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.models.enums import link_type
 from base.models.enums.proposal_type import ProposalType
 from base.utils.urls import reverse_with_get
@@ -37,7 +38,6 @@ from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.program_tree import PATH_SEPARATOR
 from program_management.ddd.domain.service.identity_search import ProgramTreeIdentitySearch
 from program_management.models.enums.node_type import NodeType
-from backoffice.settings.base import LANGUAGE_CODE_EN
 
 
 def serialize_children(
@@ -71,6 +71,12 @@ def _get_node_view_attribute_serializer(link: 'Link', path: 'Path', tree: 'Progr
         'title': link.child.code,
         'paste_url': reverse_with_get('tree_paste_node', get={"path": path}),
         'detach_url': reverse_with_get('tree_detach_node', args=[context['root'].pk], get={"path": path}),
+        'modify_url': reverse('tree_update_link', args=[
+            link.parent.code,
+            link.parent.year,
+            link.child.code,
+            link.child.year
+        ]),
         'search_url': reverse_with_get(
             'quick_search_learning_unit' if tree.allows_learning_unit_child(
                 link.child) else 'quick_search_education_group',
@@ -176,10 +182,9 @@ def __get_learning_unit_node_icon(link: 'Link') -> str:
 
 
 def __get_learning_unit_node_text(link: 'Link', context=None):
-    text = link.child.code
     if context['root'].year != link.child.year:
-        text += '|{}'.format(link.child.year)
-    return text
+        return "|{}|{}".format(link.child.year, link.child.code)
+    return link.child.code
 
 
 def get_program_tree_version_name(node_identity: 'NodeIdentity', tree_versions: List['ProgramTreeVersion']):
@@ -206,4 +211,18 @@ def get_program_tree_version_complete_name(node_identity: 'NodeIdentity',
                 return " - {}{}".format(program_tree_version.title_en, program_tree_version.version_label)
             else:
                 return " - {}{}".format(program_tree_version.title_fr, program_tree_version.version_label)
+    return ''
+
+
+def get_program_tree_version_title(node_identity: 'NodeIdentity',
+                                   tree_versions: List['ProgramTreeVersion'],
+                                   language: str) -> str:
+
+    for program_tree_version in tree_versions:
+        program_tree_identity = ProgramTreeIdentitySearch().get_from_node_identity(node_identity)
+        if program_tree_version.program_tree_identity == program_tree_identity:
+            if language == LANGUAGE_CODE_EN and program_tree_version.title_en:
+                return "[{}]".format(program_tree_version.title_en)
+            else:
+                return "[{}]".format(program_tree_version.title_fr) if program_tree_version.title_fr else ''
     return ''

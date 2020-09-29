@@ -29,6 +29,7 @@ from django.test import TestCase
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.user import UserFactory
+from education_group.tests.factories.group_year import GroupYearFactory
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.forms.version import UpdateTrainingVersionForm, UpdateMiniTrainingVersionForm
 from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionIdentityFactory
@@ -45,9 +46,9 @@ class TestTrainingVersionForm(TestCase):
     def test_field_reference_should_use_group_form(self, *mocks):
         form = UpdateTrainingVersionForm(
             self.tree_version_identity,
-            self.node_identity,
             TrainingType.PGRM_MASTER_120,
-            self.user
+            self.user,
+            event_perm_obj=GroupYearFactory()
         )
         self.assertEqual(form.field_reference("field"), 'GroupForm.PGRM_MASTER_120.field')
         assertion_message = "The training version form fields updatable are only fields from Group."
@@ -65,9 +66,9 @@ class TestMiniTrainingVersionForm(TestCase):
     def test_field_reference_should_use_group_form(self, *mocks):
         form = UpdateMiniTrainingVersionForm(
             self.tree_version_identity,
-            self.node_identity,
             MiniTrainingType.DEEPENING,
-            self.user
+            self.user,
+            event_perm_obj=GroupYearFactory()
         )
         self.assertEqual(form.field_reference("field"), 'GroupForm.DEEPENING.field')
         assertion_message = "The mini-training version form fields updatable are only fields from Group."

@@ -483,17 +483,11 @@ class NodeLearningUnitYear(Node):
 
     @property
     def full_title_fr(self) -> str:
-        return "{}{}".format(
-            self.common_title_fr,
-            " - {}".format(self.specific_title_fr) if self.specific_title_fr else ''
-        )
+        return _get_full_title(self.common_title_fr, self.specific_title_fr)
 
     @property
     def full_title_en(self) -> str:
-        return "{}{}".format(
-            self.common_title_en,
-            " - {}".format(self.specific_title_en) if self.specific_title_en else ''
-        )
+        return _get_full_title(self.common_title_en, self.specific_title_en)
 
     @property
     def has_prerequisite(self) -> bool:
@@ -516,6 +510,15 @@ class NodeLearningUnitYear(Node):
 
     def remove_all_prerequisite_items(self) -> None:
         self.prerequisite.remove_all_prerequisite_items()
+
+
+def _get_full_title(common_title, specific_title):
+    specific_title = "{}{}".format(" - " if common_title else '',
+                                   specific_title) if specific_title else ''
+    return "{}{}".format(
+        common_title if common_title else '',
+        specific_title
+    )
 
 
 class NodeLearningClassYear(Node):

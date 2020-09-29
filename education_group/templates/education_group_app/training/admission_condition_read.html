@@ -40,7 +40,7 @@
 {% block details %}
     <div class="row">
         <div class="col-md-12">
-            {% if training.is_bachelor or training.is_master_specialized or training.is_aggregation %}
+            {% if training.is_bachelor or training.is_master_specialized or training.is_aggregation or training.is_master_60_credits or training.is_master_120_credits or training.is_master_180_240_credits %}
                 <!-- Message d'alerte -->
                 {% include 'education_group/blocks/admission_condition_text.html' with section_name="alert_message" text=_("Alert Message") field=common_admission_condition.alert_message.text_fr field_en=common_admission_condition.alert_message.text_en can_edit=False %}
             {% endif %}

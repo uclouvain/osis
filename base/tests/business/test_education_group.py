@@ -39,8 +39,6 @@ from base.business.education_group import can_user_edit_administrative_data, pre
     CHAIR_OF_THE_EXAM_BOARD_COL, EXAM_BOARD_SECRETARY_COL, EXAM_BOARD_SIGNATORY_COL, SIGNATORY_QUALIFICATION_COL, \
     START_EXAM_REGISTRATION_COL, END_EXAM_REGISTRATION_COL, MARKS_PRESENTATION_COL, DISSERTATION_PRESENTATION_COL, \
     DELIBERATION_COL, SCORES_DIFFUSION_COL, SESSION_HEADERS, _get_translated_header_titles
-from education_group.models.group_year import GroupYear
-
 from base.models.enums import academic_calendar_type
 from base.models.enums import education_group_categories
 from base.models.enums import mandate_type as mandate_types
@@ -57,9 +55,10 @@ from base.tests.factories.person import PersonFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
 from base.tests.factories.user import UserFactory
+from education_group.models.group_year import GroupYear
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
-from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 from osis_common.document import xls_build
+from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 
 NO_SESSION_DATA = {'session1': None, 'session2': None, 'session3': None}
 
@@ -146,9 +145,11 @@ class EducationGroupXlsTestCase(TestCase):
     def setUp(self):
         self.education_group_type_group = EducationGroupTypeFactory(category=education_group_categories.GROUP)
         self.education_group_year_1 = EducationGroupYearFactory(academic_year=self.academic_year, acronym="PREMIER")
+        self.education_group_year_1.complete_title_fr = self.education_group_year_1.acronym + '[VERSION]'
         self.education_group_year_1.management_entity_version = EntityVersionFactory()
         self.education_group_year_2 = EducationGroupYearFactory(academic_year=self.academic_year, acronym="DEUXIEME")
         self.education_group_year_2.management_entity_version = EntityVersionFactory()
+        self.education_group_year_2.complete_title_fr = self.education_group_year_2.acronym
         self.user = UserFactory()
 
     def test_prepare_xls_content_no_data(self):
@@ -356,7 +357,7 @@ class EducationGroupXlsAdministrativeDataTestCase(TestCase):
 
 def get_xls_data(an_education_group_year):
     return [an_education_group_year.academic_year.name,
-            an_education_group_year.acronym,
+            an_education_group_year.complete_title_fr,
             an_education_group_year.title,
             an_education_group_year.education_group_type,
             an_education_group_year.management_entity_version.acronym,
@@ -375,6 +376,8 @@ def _generate_xls_build_parameter(xls_data, user):
             xls_build.STYLED_CELLS: None,
             xls_build.FONT_ROWS: None,
             xls_build.ROW_HEIGHT: None,
+            xls_build.FONT_CELLS: None,
+            xls_build.BORDER_CELLS: None
         }]
     }
 
@@ -391,5 +394,7 @@ def _generate_xls_administrative_data_build_parameter(xls_data, user):
             xls_build.STYLED_CELLS: None,
             xls_build.FONT_ROWS: None,
             xls_build.ROW_HEIGHT: None,
+            xls_build.FONT_CELLS: None,
+            xls_build.BORDER_CELLS: None
         }]
     }

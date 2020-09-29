@@ -23,91 +23,116 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
-from django.http import HttpResponse
+import mock
+from django.http import HttpResponse, HttpResponseForbidden
 from django.test import TestCase
 from django.urls import reverse
 
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_type import TrainingEducationGroupTypeFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory
-from base.tests.factories.person import CentralManagerForUEFactory, PersonFactory, FacultyManagerForUEFactory
-from education_group.tests.factories.group_year import GroupYearFactory
-from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
+from base.tests.factories.education_group_type import TrainingEducationGroupTypeFactory, \
+    MiniTrainingEducationGroupTypeFactory
+from base.tests.factories.user import UserFactory
+from education_group.tests.factories.auth.central_manager import CentralManagerFactory
+from education_group.tests.factories.auth.faculty_manager import FacultyManagerFactory
+from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementFactory
-from program_management.views.tree_version.create import CreateProgramTreeVersionType
 
 
-class TestCreateProgramTreeVersion(TestCase):
+class TestGetCreateProgramTreeVersion(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.current_academic_year = AcademicYearFactory(current=True)
         cls.current_year = cls.current_academic_year.year
         AcademicYearFactory.produce_in_future(cls.current_academic_year.year, 10)
-        cls.type = TrainingEducationGroupTypeFactory()
 
-        cls.group_year = GroupYearFactory(
-            academic_year=cls.current_academic_year,
-            partial_acronym="LDROI200M"
+        cls.central_manager = CentralManagerFactory()
+        cls.factulty_manager = FacultyManagerFactory(entity=cls.central_manager.entity)
+
+        cls.training_type = TrainingEducationGroupTypeFactory()
+        cls.training_version = StandardEducationGroupVersionFactory(
+            offer__acronym="DROI2M",
+            offer__partial_acronym="LDROI200M",
+            offer__academic_year=cls.current_academic_year,
+            offer__education_group_type=cls.training_type,
+            offer__management_entity=cls.central_manager.entity,
+
+            root_group__acronym="DROI2M",
+            root_group__partial_acronym="LDROI200M",
+            root_group__academic_year=cls.current_academic_year,
+            root_group__education_group_type=cls.training_type,
+            root_group__management_entity=cls.central_manager.entity
         )
-
-        cls.education_group_year = EducationGroupYearFactory(
-            academic_year=cls.current_academic_year,
-            education_group_type=cls.type,
-            acronym=cls.group_year.acronym
-        )
-
-        cls.education_group_version = EducationGroupVersionFactory(
-            offer=cls.education_group_year,
-            root_group=cls.group_year,
-            version_name=""
-        )
-
-        cls.element = ElementFactory(group_year=cls.group_year)
-
-        cls.central_manager = CentralManagerForUEFactory("view_educationgroup")
-        cls.factulty_manager = FacultyManagerForUEFactory("view_educationgroup")
-        cls.simple_user = PersonFactory()
-
-        cls.valid_data = {
-            "version_name": "CMS",
-            "title": "Titre",
-            "title_english": "Title",
-            "end_year": cls.current_year,
-            "save_type": CreateProgramTreeVersionType.NEW_VERSION.value
-        }
-        cls.url = reverse(
+        ElementFactory(group_year=cls.training_version.root_group)
+        cls.create_training_version_url = reverse(
             "create_education_group_version",
-            kwargs={"year": cls.group_year.academic_year.year, "code": cls.group_year.partial_acronym}
+            kwargs={
+                "year": cls.training_version.root_group.academic_year.year,
+                "code": cls.training_version.root_group.partial_acronym
+            }
         )
 
-    def test_get_init_form_create_program_tree_version_with_disconected_user(self):
-        response = self.client.get(self.url, data={}, follow=True)
+        cls.mini_training_type = MiniTrainingEducationGroupTypeFactory()
+        cls.mini_training_version = StandardEducationGroupVersionFactory(
+            offer__acronym="OPTDROI2M/AR",
+            offer__partial_acronym="LDROP221O",
+            offer__academic_year=cls.current_academic_year,
+            offer__education_group_type=cls.mini_training_type,
+            offer__management_entity=cls.central_manager.entity,
+
+            root_group__acronym="OPTDROI2M/AR",
+            root_group__partial_acronym="LDROP221O",
+            root_group__academic_year=cls.current_academic_year,
+            root_group__education_group_type=cls.mini_training_type,
+            root_group__management_entity=cls.central_manager.entity
+        )
+        ElementFactory(group_year=cls.mini_training_version.root_group)
+        cls.create_mini_training_version_url = reverse(
+            "create_education_group_version",
+            kwargs={
+                "year": cls.mini_training_version.root_group.academic_year.year,
+                "code": cls.mini_training_version.root_group.partial_acronym
+            }
+        )
+
+    def test_case_user_not_logged(self):
+        response = self.client.get(self.create_training_version_url, data={}, follow=True)
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, "registration/login.html")
 
-    def test_get_init_form_create_program_tree_version_for_central_manager(self):
-        self.client.force_login(self.central_manager.user)
-        response = self.client.get(self.url, data={}, follow=True)
+    def test_case_user_unauthorized(self):
+        unauthorized_user = UserFactory()
+
+        self.client.force_login(unauthorized_user)
+        response = self.client.get(self.create_training_version_url, data={}, follow=True)
+
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+        self.assertTemplateUsed(response, "access_denied.html")
+
+    def test_case_user_as_central_manager_for_create_training_version(self):
+        self.client.force_login(self.central_manager.person.user)
+
+        response = self.client.get(self.create_training_version_url, data={}, follow=True)
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, "tree_version/create_specific_version_inner.html")
 
-    def test_get_init_form_create_program_tree_version_for_faculty_manager(self):
-        self.client.force_login(self.factulty_manager.user)
-        response = self.client.get(self.url, data={}, follow=True)
-        self.assertEqual(response.status_code, 403)
+    def test_case_user_as_central_manager_for_create_mini_training_version(self):
+        self.client.force_login(self.central_manager.person.user)
+
+        response = self.client.get(self.create_mini_training_version_url, data={}, follow=True)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertTemplateUsed(response, "tree_version/create_specific_version_inner.html")
+
+    def test_case_user_as_faculty_manager_for_create_training_version(self):
+        self.client.force_login(self.factulty_manager.person.user)
+        response = self.client.get(self.create_training_version_url, data={}, follow=True)
+
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
         self.assertTemplateUsed(response, "access_denied.html")
 
-    def test_get_init_form_create_program_tree_version_for_simple_user(self):
-        self.client.force_login(self.simple_user.user)
-        response = self.client.get(self.url, data={}, follow=True)
-        self.assertEqual(response.status_code, 403)
-        self.assertTemplateUsed(response, "access_denied.html")
+    @mock.patch('base.business.event_perms.EventPermEducationGroupEdition.is_open', return_value=True)
+    def test_case_user_as_faculty_manager_for_create_mini_training_version(self, mock_perms):
+        self.client.force_login(self.factulty_manager.person.user)
+        response = self.client.get(self.create_mini_training_version_url, data={}, follow=True)
 
-    def test_get_context_form(self):
-        self.client.force_login(self.central_manager.user)
-        response = self.client.get(self.url, data={}, follow=True)
-        self.assertEqual(len(response.context['form'].fields['end_year'].choices), 8)
-        self.assertEqual(response.context['form'].fields['end_year'].choices[0][0], None)
-        self.assertEqual(response.context['form'].fields['end_year'].choices[7][0], self.current_year + 6)
-        self.assertEqual(response.context['form'].fields['end_year'].initial, None)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertTemplateUsed(response, "tree_version/create_specific_version_inner.html")

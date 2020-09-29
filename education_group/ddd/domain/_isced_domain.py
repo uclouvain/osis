@@ -47,3 +47,6 @@ class IscedDomain(interface.Entity):
     @property
     def code(self) -> str:
         return self.entity_id.code
+
+    def __str__(self):
+        return self.code + " " + self.title_fr

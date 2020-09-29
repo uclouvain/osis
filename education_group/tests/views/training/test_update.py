@@ -24,6 +24,7 @@
 import mock
 from django.test import TestCase
 
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.utils.urls import reverse_with_get
 from education_group.ddd.domain import training, group
 from education_group.ddd.factories.group import GroupFactory
@@ -37,6 +38,7 @@ class TestTrainingUpdateView(TestCase):
     @classmethod
     def setUpTestData(cls):
         FrenchLanguageFactory()
+        AcademicYearFactory.produce()
         cls.central_manager = CentralManagerFactory()
         cls.url = reverse_with_get(
             "training_update",
@@ -47,59 +49,43 @@ class TestTrainingUpdateView(TestCase):
     def setUp(self):
         self.client.force_login(self.central_manager.person.user)
 
-    @mock.patch("education_group.views.training.update.TrainingUpdateView.content_formset")
     @mock.patch("education_group.ddd.service.read.get_training_service.get_training")
     @mock.patch("education_group.ddd.service.read.get_group_service.get_group")
     def test_should_display_forms_when_good_get_request(
             self,
             mock_get_group,
-            mock_get_training,
-            mock_get_content_formset):
+            mock_get_training):
         mock_get_training.return_value = TrainingFactory()
         mock_get_group.return_value = GroupFactory()
-        mock_get_content_formset.return_value = []
 
         response = self.client.get(self.url)
 
         context = response.context
         self.assertTrue("training_form" in context)
-        self.assertTrue("content_formset" in context)
         self.assertTemplateUsed(response, "education_group_app/training/upsert/update.html")
 
-    @mock.patch("education_group.ddd.service.read.get_update_training_warning_messages.get_conflicted_fields",
-                return_value=[])
     @mock.patch("education_group.views.training.update.TrainingUpdateView.get_training_obj")
     @mock.patch("education_group.ddd.service.read.get_group_service.get_group")
-    @mock.patch("education_group.views.training.update.TrainingUpdateView.update_links")
-    @mock.patch("education_group.views.training.update.TrainingUpdateView.content_formset")
     @mock.patch("education_group.views.training.update.TrainingUpdateView.update_training")
     @mock.patch("education_group.views.training.update.TrainingUpdateView.delete_training")
-    @mock.patch("education_group.views.training.update.TrainingUpdateView.report_training")
     @mock.patch("education_group.views.training.update.TrainingUpdateView.training_form",
                 new_callable=mocks.MockFormValid)
     def test_should_call_training_and_link_services_when_forms_are_valid(
             self,
             get_training_form_mock,
-            report_training,
             delete_training,
             update_training,
-            mock_get_content_formset,
-            mock_update_links,
             mock_get_group,
-            mock_get_training,
-            mock_warning_messages):
+            mock_get_training
+    ):
         mock_get_training.return_value = TrainingFactory()
         mock_get_group.return_value = GroupFactory()
-        mock_update_links.return_value = list()
-        mock_get_content_formset.return_value = mocks.MockFormValid()
         update_training.return_value = [training.TrainingIdentity(acronym="ACRONYM", year=2020)]
         delete_training.return_value = []
-        report_training.return_value = []
         response = self.client.post(self.url, data={})
 
         self.assertTrue(update_training.called)
         self.assertTrue(delete_training.called)
-        self.assertTrue(mock_update_links.called)
 
         expected_redirec_url = reverse_with_get(
             'element_identification',

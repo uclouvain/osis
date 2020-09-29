@@ -55,7 +55,6 @@ from cms.models.translated_text import TranslatedText
 from education_group import publisher
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin, SerializableModelManager, \
     SerializableQuerySet
-from program_management.ddd import repositories
 
 AUTHORIZED_REGEX_CHARS = "$*+.^"
 REGEX_ACRONYM_CHARSET = "[A-Z0-9" + AUTHORIZED_REGEX_CHARS + "]+"
@@ -72,7 +71,8 @@ MAXIMUM_CREDITS = 500
 SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS = """\
 WITH RECURSIVE group_element_year_parent AS (
     SELECT gs.id, gs.id AS gs_origin, gy.acronym, gy.title_fr, educ_type.category, educ_type.name,
-    0 AS level, parent_element_id, child_element_id, version.is_transition, version.version_name
+    0 AS level, parent_element_id, child_element_id, version.is_transition, version.version_name, 
+    version.title_fr AS version_title_fr
     FROM base_groupelementyear AS gs
     INNER JOIN program_management_element AS element_parent ON gs.parent_element_id = element_parent.id
     INNER JOIN program_management_element AS element_child ON gs.child_element_id = element_child.id
@@ -84,7 +84,8 @@ WITH RECURSIVE group_element_year_parent AS (
     UNION ALL
     SELECT parent.id, gs_origin,  
     gy.acronym, gy.title_fr, educ_type.category, educ_type.name,
-    child.level + 1, parent.parent_element_id, parent.child_element_id, version.is_transition, version.version_name
+    child.level + 1, parent.parent_element_id, parent.child_element_id, version.is_transition, version.version_name,
+    version.title_fr AS version_title_fr
     FROM base_groupelementyear AS parent
     INNER JOIN program_management_element AS element_parent ON parent.parent_element_id = element_parent.id
     INNER JOIN program_management_element AS element_child ON parent.child_element_id = element_child.id    
@@ -239,7 +240,7 @@ class LearningUnitYear(SerializableModel):
 
     summary_locked = models.BooleanField(default=False, verbose_name=_("blocked update for tutor"))
 
-    professional_integration = models.BooleanField(default=False, verbose_name=_('professional integration'))
+    professional_integration = models.BooleanField(default=False, verbose_name=_('Professional integration'))
 
     campus = models.ForeignKey('Campus', null=True, verbose_name=_("Learning location"), on_delete=models.PROTECT)
 

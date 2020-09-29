@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-07 10:35+0200\n"
+"POT-Creation-Date: 2020-09-25 13:10+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -41,7 +41,8 @@ msgstr[1] ""
 msgid "%(max)s must be greater or equals than %(min)s"
 msgstr ""
 
-msgid "ARES"
+#, python-format
+msgid "%(start_index)s to %(end_index)s of %(total_counts)s common topics"
 msgstr ""
 
 msgid "ARES ability"
@@ -51,6 +52,9 @@ msgid "ARES study code"
 msgstr ""
 
 msgid "ARES-GRACA"
+msgstr ""
+
+msgid "Ac yr."
 msgstr ""
 
 msgid "Academic responsible"
@@ -117,6 +121,10 @@ msgstr ""
 msgid "Alert Message"
 msgstr ""
 
+msgctxt "female plural"
+msgid "All"
+msgstr ""
+
 #, python-format
 msgid "Are you sure you want to delete %(acronym)s - %(title)s ?"
 msgstr ""
@@ -132,6 +140,9 @@ msgid "Block"
 msgstr ""
 
 msgid "Cancel"
+msgstr ""
+
+msgid "Catalog configuration"
 msgstr ""
 
 msgid "Category"
@@ -177,9 +188,12 @@ msgstr ""
 msgid "Conditions"
 msgstr ""
 
+msgid "Configuration"
+msgstr ""
+
 #, python-format
 msgid ""
-"Consistency error in %(academic_year)s: %(field)s has already been modified"
+"Consistency error in %(academic_year)s: %(fields)s has already been modified"
 msgstr ""
 
 msgid "Contacts"
@@ -302,6 +316,12 @@ msgstr ""
 msgid "From"
 msgstr ""
 
+msgid "Full title of the english version"
+msgstr ""
+
+msgid "Full title of the french version"
+msgstr ""
+
 msgid "Funding"
 msgstr ""
 
@@ -399,6 +419,14 @@ msgstr ""
 msgid "Main"
 msgstr ""
 
+msgid "Management common topics"
+msgstr ""
+
+msgid ""
+"Management common topics in the context of training's general informations "
+"and access conditions"
+msgstr ""
+
 msgid "Management entity"
 msgstr ""
 
@@ -449,10 +477,7 @@ msgstr ""
 msgid "New Training"
 msgstr ""
 
-#, python-format
-msgid ""
-"No type of %(child_category)s can be created as child of %(category)s of "
-"type %(type)s"
+msgid "No result!"
 msgstr ""
 
 msgid "Non university Bachelors"
@@ -575,9 +600,6 @@ msgstr ""
 msgid "The fields concerning ARES have to be ALL filled-in or none of them"
 msgstr ""
 
-msgid "The following links has been updated"
-msgstr ""
-
 #, python-brace-format
 msgid ""
 "The formation you work with doesn't exist (or is not at the same position) "
@@ -587,10 +609,6 @@ msgstr ""
 
 #, python-format
 msgid "The group %(code)s has been deleted."
-msgstr ""
-
-#, python-format
-msgid "The link of %(code)s - %(acronym)s - %(year)s has been updated."
 msgstr ""
 
 #, python-format
@@ -675,6 +693,15 @@ msgstr ""
 
 #, python-brace-format
 msgid "Training not found : {acronym} {year}"
+msgstr ""
+
+msgid "Training version can only be created by central manager"
+msgstr ""
+
+msgid "Training version can only be deleted by central manager"
+msgstr ""
+
+msgid "Training version can only be modified by central manager"
 msgstr ""
 
 msgid "Trainings"
@@ -819,9 +846,6 @@ msgid "maximum constraint"
 msgstr ""
 
 msgid "minimum constraint"
-msgstr ""
-
-msgid "of version"
 msgstr ""
 
 msgid "on successful completion of this program, each student is able to"

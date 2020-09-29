@@ -43,8 +43,11 @@
                     </div>
                     <br>
 
+                    <label>{% trans 'certificate aims'|capfirst %}</label>
+                    <p>{% trans 'filter by section'|capfirst %} </p>
                     <div class="row">
-                        {% bootstrap_field training_version_form.certificate_aims form_group_class="col-md-12" %}
+                        {% bootstrap_field training_version_form.section form_group_class="col-md-2" show_label=False %}
+                        {% bootstrap_field training_version_form.certificate_aims form_group_class="col-md-10 osis-select" show_label=False %}
                     </div>
                     <br>
                 </div>

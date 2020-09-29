@@ -24,14 +24,12 @@
 #
 ##############################################################################
 import inspect
-from copy import copy
 from unittest import mock
 from unittest.mock import patch
 
 from django.test import SimpleTestCase
 
 import osis_common.ddd.interface
-from base.ddd.utils import business_validator
 from base.ddd.utils.validation_message import MessageLevel, BusinessValidationMessage
 from base.models.authorized_relationship import AuthorizedRelationshipList
 from base.models.enums import prerequisite_operator
@@ -53,7 +51,7 @@ from program_management.ddd.validators.validators_by_business_action import Past
     UpdatePrerequisiteValidatorList
 from program_management.models.enums import node_type
 from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipObjectFactory, \
-    AuthorizedRelationshipListFactory
+    AuthorizedRelationshipListFactory, MandatoryRelationshipObjectFactory
 from program_management.tests.ddd.factories.commands.paste_element_command import PasteElementCommandFactory
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
@@ -64,7 +62,7 @@ from program_management.tests.ddd.service.mixins import ValidatorPatcherMixin
 
 class TestProgramTreeBuilderCopyToNextYear(SimpleTestCase):
     def setUp(self) -> None:
-        self.authorized_relation = AuthorizedRelationshipObjectFactory()
+        self.authorized_relation = MandatoryRelationshipObjectFactory()
         self.authorized_relations_list = AuthorizedRelationshipListFactory(
             authorized_relationships=[self.authorized_relation]
         )
@@ -126,7 +124,7 @@ class TestProgramTreeBuilderCopyToNextYear(SimpleTestCase):
 
     def _assert_mandatory_children_are_created(self, resulted_tree):
         children = resulted_tree.root_node.children_as_nodes
-        self.assertTrue(len(children) == 1)
+        self.assertEqual(len(children), 1)
         self.assertEqual(self.authorized_relation.child_type, children[0].node_type)
 
     def _assert_mandatory_children_are_not_created(self, resulted_tree):

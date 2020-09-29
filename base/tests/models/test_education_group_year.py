@@ -55,7 +55,11 @@ class EducationGroupYearTest(TestCase):
             name=education_group_types.TrainingType.BACHELOR.name
         )
 
-        self.education_group_type_minitraining = EducationGroupTypeFactory(minitraining=True)
+        self.education_group_type_minitraining = EducationGroupTypeFactory(
+            category=education_group_categories.MINI_TRAINING,
+            name=education_group_types.MiniTrainingType.DEEPENING.name
+        )
+
         self.education_group_type_group = EducationGroupTypeFactory(group=True)
 
         self.education_group_type_finality = EducationGroupTypeFactory(

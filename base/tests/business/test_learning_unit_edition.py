@@ -604,7 +604,8 @@ class TestLearningUnitEdition(TestCase, LearningUnitsMixin):
         academic_years = [AcademicYearFactory(year=get_current_year() + i) for i in range(0, 3)]
         luy = LearningUnitYearFullFactory(
             learning_unit__end_year=None,
-            academic_year=academic_years[0]
+            academic_year=academic_years[0],
+            learning_container_year__requirement_entity=self.entity
         )
         for anac in academic_years[1:]:
             LearningUnitYearFullFactory(

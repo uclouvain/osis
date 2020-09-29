@@ -38,7 +38,6 @@ from django.db.models import Value, CharField
 from django.db.models.functions import Concat
 from django.utils.functional import lazy
 from django.utils.translation import gettext_lazy as _
-from education_group.ddd.business_types import *
 
 from base.business.event_perms import EventPermEducationGroupEdition
 from base.forms.common import ValidationRuleMixin
@@ -57,6 +56,7 @@ from base.models.enums.funding_codes import FundingCodes
 from base.models.enums.internship_presence import InternshipPresence
 from base.models.enums.rate_code import RateCode
 from base.models.enums.schedule_type import ScheduleTypeEnum
+from education_group.ddd.business_types import *
 from education_group.forms import fields
 from education_group.forms.fields import MainEntitiesVersionChoiceField, UpperCaseCharField
 from education_group.forms.widgets import CertificateAimsWidget
@@ -74,7 +74,7 @@ def _get_section_choices():
     return add_blank(CertificateAim.objects.values_list('section', 'section').distinct().order_by('section'))
 
 
-class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
+class CreateTrainingForm(ValidationRuleMixin, forms.Form):
 
     # panel_informations_form.html
     acronym = UpperCaseCharField(max_length=15, label=_("Acronym/Short title"))
@@ -207,7 +207,8 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     management_entity = forms.CharField()
     administration_entity = MainEntitiesVersionChoiceField(
         queryset=None,
-        to_field_name="acronym"
+        to_field_name="acronym",
+        label=_('Administration entity')
     )
     academic_year = forms.ModelChoiceField(
         queryset=AcademicYear.objects.all(),
@@ -323,20 +324,15 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
 
     def __init_academic_year_field(self):
         if not self.fields['academic_year'].disabled and self.user.person.is_faculty_manager:
-            academic_years = EventPermEducationGroupEdition.get_academic_years().filter(
-                year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION
-            )
-            self.fields['academic_year'].queryset = academic_years
-            self.fields['end_year'].queryset = academic_years
+            working_academic_years = EventPermEducationGroupEdition.get_academic_years()
         else:
-            self.fields['academic_year'].queryset = self.fields['academic_year'].queryset.filter(
-                year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION
-            )
-            self.fields['end_year'].queryset = self.fields['end_year'].queryset.filter(
-                year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION
-            )
+            working_academic_years = AcademicYear.objects.all()
 
-            self.fields['academic_year'].label = _('Start')
+        working_academic_years = working_academic_years.filter(year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION)
+        self.fields['academic_year'].queryset = working_academic_years
+        self.fields['end_year'].queryset = AcademicYear.objects.filter(
+            year__gte=working_academic_years.first().year
+        )
 
     def __init_management_entity_field(self):
         self.fields['management_entity'] = fields.ManagementEntitiesChoiceField(
@@ -384,17 +380,8 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     def field_reference(self, field_name: str) -> str:
         return '.'.join(["TrainingForm", self.training_type, field_name])
 
-    # PermissionFieldMixin
-    def get_context(self) -> str:
-        is_edition_period_opened = EventPermEducationGroupEdition(raise_exception=False).is_open()
-        return TRAINING_PGRM_ENCODING_PERIOD if is_edition_period_opened else TRAINING_DAILY_MANAGEMENT
 
-    # PermissionFieldMixin
-    def get_model_permission_filter_kwargs(self) -> Dict:
-        return {'context': self.get_context()}
-
-
-class UpdateTrainingForm(CreateTrainingForm):
+class UpdateTrainingForm(PermissionFieldMixin, CreateTrainingForm):
 
     start_year = forms.ModelChoiceField(
         queryset=AcademicYear.objects.all(),
@@ -404,7 +391,9 @@ class UpdateTrainingForm(CreateTrainingForm):
         required=False
     )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, event_perm_obj=None, **kwargs):
+        self.event_perm_obj = event_perm_obj
+
         super().__init__(*args, **kwargs)
         self.fields["academic_year"].label = _('Validity')
         self.__init_end_year_field()
@@ -413,6 +402,18 @@ class UpdateTrainingForm(CreateTrainingForm):
         initial_academic_year_value = self.initial.get("academic_year", None)
         if initial_academic_year_value:
             self.fields["end_year"].queryset = AcademicYear.objects.filter(year__gte=initial_academic_year_value)
+
+    # PermissionFieldMixin
+    def get_context(self) -> str:
+        is_edition_period_opened = EventPermEducationGroupEdition(
+            obj=self.event_perm_obj,
+            raise_exception=False
+        ).is_open()
+        return TRAINING_PGRM_ENCODING_PERIOD if is_edition_period_opened else TRAINING_DAILY_MANAGEMENT
+
+    # PermissionFieldMixin
+    def get_model_permission_filter_kwargs(self) -> Dict:
+        return {'context': self.get_context()}
 
 
 @register('university_domains')
