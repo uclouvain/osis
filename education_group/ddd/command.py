@@ -107,7 +107,6 @@ class CreateTrainingCommand(interface.CommandRequest):
     leads_to_diploma = attr.ib(type=Optional[bool])
     printing_title = attr.ib(type=Optional[str])
     professional_title = attr.ib(type=Optional[str])
-    aims = attr.ib(type=Optional[List[Tuple[AimCode, AimSection]]])
 
     constraint_type = attr.ib(type=Optional[str])
     min_constraint = attr.ib(type=Optional[int])
@@ -183,7 +182,6 @@ class CreateAndPostponeTrainingAndProgramTreeCommand(interface.CommandRequest):
     leads_to_diploma = attr.ib(type=Optional[bool])
     printing_title = attr.ib(type=Optional[str])
     professional_title = attr.ib(type=Optional[str])
-    aims = attr.ib(type=Optional[List[Tuple[AimCode, AimSection]]])
 
     constraint_type = attr.ib(type=Optional[str])
     min_constraint = attr.ib(type=Optional[int])
