@@ -52,15 +52,8 @@ def get_utilizations(node_identity: 'NodeIdentity') -> List[Dict[str, Any]]:
                 links = tree.get_links_using_node(child_node)
                 for link in links:
                     if link.parent not in parent_nodes:
-                        cmd = GetProgramTreesFromNodeCommand(code=link.parent.code, year=link.parent.year)
-                        parent_node_pgm_trees = search_program_trees_using_node_service.search_program_trees_using_node(
-                            cmd)
-                        if parent_node_pgm_trees:
-                            _build_parents_info(link, parent_node_pgm_trees, utilization_rows_dict)
-                        else:
-                            lk_to_update = utilization_rows_dict.get(link, [])
-                            if link.parent not in lk_to_update:
-                                utilization_rows_dict[link] = lk_to_update
+                        parent_nodes.append(link.parent)
+                        _build_parents_info(link, program_trees, utilization_rows_dict)
 
     return _buid_utilization_rows(utilization_rows_dict)
 
@@ -130,11 +123,17 @@ def _get_identification_url(node: 'Node'):
 def _build_parents_info(link: 'Link',
                         parent_node_pgm_trees:  List['ProgramTree'],
                         utilization_rows_dict: Dict['link', Dict[str, 'Node']]):
+    found = False
     for parent_tree in parent_node_pgm_trees:
         for path, child_node in parent_tree.root_node.descendents.items():
             if isinstance(child_node, NodeGroupYear) and child_node == link.parent:
+                found = True
                 gathering = get_nearest_parents(parent_tree.get_parents(path))
                 lk_to_update = utilization_rows_dict[link]
                 if gathering:
                     lk_to_update.append(gathering)
                     utilization_rows_dict[link] = lk_to_update
+    if not found:
+        lk_to_update = utilization_rows_dict.get(link, [])
+        if link.parent not in lk_to_update:
+            utilization_rows_dict[link] = lk_to_update
