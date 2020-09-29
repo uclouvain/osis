@@ -79,19 +79,19 @@ class TestATagModalHasPerm(SimpleTestCase):
 
 class TestSubmitBtnHasPerm(SimpleTestCase):
     def setUp(self):
-        self.text = "Redirect to dummy"
+        self.inner_html = "Redirect to dummy"
         self.class_btn = "btn-class"
         self.user = UserFactory.build()
 
     @mock.patch("django.contrib.auth.models.User.has_perm", return_value=True)
     def test_user_has_perm_tag(self, mock_has_perm):
         expected_context = {
-            "text": self.text,
+            "inner_html": self.inner_html,
             "class_btn": self.class_btn
         }
 
         self.assertDictEqual(
-            osis_role.submit_btn_has_perm(self.text, "dummy-perm", self.user, class_btn=self.class_btn),
+            osis_role.submit_btn_has_perm(self.inner_html, "dummy-perm", self.user, class_btn=self.class_btn),
             expected_context
         )
 
@@ -102,13 +102,13 @@ class TestSubmitBtnHasPerm(SimpleTestCase):
         mock_get_permission_error.return_value = permission_error
 
         expected_context = {
-            "text": self.text,
+            "inner_html": self.inner_html,
             "class_btn": self.class_btn,
             "error_msg": permission_error,
             "disabled": True,
         }
         self.assertDictEqual(
-            osis_role.submit_btn_has_perm(self.text, "dummy-perm", self.user, class_btn=self.class_btn),
+            osis_role.submit_btn_has_perm(self.inner_html, "dummy-perm", self.user, class_btn=self.class_btn),
             expected_context
         )
 

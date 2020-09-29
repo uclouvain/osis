@@ -29,8 +29,8 @@ def a_tag_modal_has_perm(url, text, perm, user, obj=None):
 
 
 @register.inclusion_tag('osis_role/templatetags/submit_btn_template.html')
-def submit_btn_has_perm(text, perm, user, obj=None, class_btn=''):
-    context = {"text": text, "class_btn": class_btn}
+def submit_btn_has_perm(inner_html, perm, user, obj=None, class_btn=''):
+    context = {"inner_html": inner_html, "class_btn": class_btn}
     has_perm = user.has_perm(perm, obj)
     if not has_perm:
         context.update({
