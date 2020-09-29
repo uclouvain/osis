@@ -23,14 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import functools
+import itertools
 from enum import Enum
 
 from django.http import Http404
 from django.urls import reverse
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, FormView
 from django.utils.translation import gettext_lazy as _
 
+from base.forms.education_group_pedagogy_edit import EducationGroupPedagogyEditForm
 from base.models.education_group_year import EducationGroupYear
+from base.views.mixins import AjaxTemplateMixin
 from education_group.views.serializers import general_information
 from osis_role.contrib.views import PermissionRequiredMixin
 
@@ -78,8 +82,42 @@ class CommonGeneralInformation(PermissionRequiredMixin, TemplateView):
             raise Http404
 
     def get_update_label_url(self):
-        offer_id = self.get_object().pk
-        return reverse('education_group_pedagogy_edit', args=[offer_id])
+        return reverse('update_common_general_information', kwargs={'year': self.kwargs['year']}) + "?path="
 
     def get_publish_url(self):
         return reverse('publish_common_general_information', kwargs={'year': self.kwargs['year']})
+
+
+class UpdateCommonGeneralInformation(AjaxTemplateMixin, FormView):
+    template_name = "education_group/blocks/modal/modal_pedagogy_edit_inner.html"
+    form_class = EducationGroupPedagogyEditForm
+
+    def form_valid(self, form):
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        return {
+            **super().get_context_data(**kwargs),
+            'translated_label': self.get_translated_text()['label_translated']
+        }
+
+    def get_form_kwargs(self):
+        return {
+            **super().get_form_kwargs(),
+            'initial': {
+                'label': self.get_label(),
+                'text_french': self.get_translated_text()['text_fr'],
+                'text_english': self.get_translated_text()['text_en'],
+            },
+        }
+
+    @functools.lru_cache()
+    def get_translated_text(self):
+        sections = general_information.get_sections_of_common(self.kwargs['year'], self.request.LANGUAGE_CODE)
+        return next(
+            translated_text for translated_text in itertools.chain.from_iterable(sections.values())
+            if translated_text['label_id'] == self.get_label()
+        )
+
+    def get_label(self):
+        return self.request.GET.get('label')

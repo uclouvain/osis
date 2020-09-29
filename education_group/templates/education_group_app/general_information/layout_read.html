@@ -30,25 +30,19 @@
 {% endblock %}
 
 {% block breadcrumb %}
-    {{ block.super }}
-    <li class="active"> {{ object.code }} </li>
+    <li><a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'Formation catalogue' %}</a></li>
+    <li><a href="{% url 'catalog_configuration' %}" id="lnk_catalog_configuration">{% trans 'Configuration' %}</a></li>
+    <li><a  href="{% url 'common_topics_configuration' %}" id="lnk_common_topics_configuration">{% trans 'Management common topics' %}</a></li>
+    <li class="active"> {{ object.acronym }} </li>
 {% endblock %}
 
 {% block header_content %}
     {% navigation_group request.user object request.resolver_match.url_name %}
 {% endblock %}
 
-{% block top_action_bar %}
-    {% if can_edit_information %}
-        {% include  "education_group_app/blocks/refresh_publication_button.html" %}
-    {% endif %}
-{% endblock %}
+{% block top_action_bar %}{% endblock %}
 
-{% block bottom_action_bar %}
-    {% if can_edit_information %}
-        {% include  "education_group_app/blocks/refresh_publication_button.html" %}
-    {% endif %}
-{% endblock %}
+{% block bottom_action_bar %}{% endblock %}
 
 
 {% block tabs %}
