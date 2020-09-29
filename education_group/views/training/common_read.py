@@ -59,6 +59,7 @@ from program_management.forms.custom_xls import CustomXlsForm
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.models.element import Element
 from program_management.serializers.program_tree_view import program_tree_view_serializer
+from base.business.education_group import has_coorganization
 
 Tab = read.Tab  # FIXME :: fix imports (and remove this line)
 
@@ -176,6 +177,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
                                               self.education_group_version.root_group.partial_acronym,
                                               ]
                                         ),
+            "show_coorganization": has_coorganization(self.education_group_version.offer),
         }
 
     def get_permission_object(self) -> 'GroupYear':
