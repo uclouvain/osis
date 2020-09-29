@@ -349,8 +349,8 @@ class CreateTrainingForm(ValidationRuleMixin, forms.Form):
         )
 
     def __init_certificate_aims_field(self):
-        if not self.fields['certificate_aims'].disabled:
-            self.fields['section'].disabled = False
+        self.fields['certificate_aims'].disabled = True
+        self.fields['section'].disabled = True
 
     def __init_diploma_fields(self):
         if self.training_type in TrainingType.with_diploma_values_set_initially_as_true():
