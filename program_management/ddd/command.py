@@ -317,6 +317,12 @@ class GetEndPostponementYearCommand(interface.CommandRequest):
     year = attr.ib(type=int)
 
 
+@attr.s(frozen=True, slots=True)
+class GetVersionMaxEndYear(interface.CommandRequest):
+    offer_acronym = attr.ib(type=str)
+    year = attr.ib(type=int)
+
+
 class GetNodeIdentityFromElementId(interface.CommandRequest):
     def __init__(self, element_id: int):
         self.element_id = element_id
@@ -636,3 +642,27 @@ class PostponeTrainingAndRootGroupModificationWithProgramTreeCommand(interface.C
     remark_en = attr.ib(type=Optional[str])
     organization_name = attr.ib(type=str)
     schedule_type = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class PostponeGroupVersionCommand(interface.CommandRequest):
+    code = attr.ib(type=str)
+    postpone_from_year = attr.ib(type=int)
+
+    abbreviated_title = attr.ib(type=str)
+    title_fr = attr.ib(type=str)
+    title_en = attr.ib(type=str)
+    credits = attr.ib(type=int)
+    constraint_type = attr.ib(type=str)
+    min_constraint = attr.ib(type=int)
+    max_constraint = attr.ib(type=int)
+    management_entity_acronym = attr.ib(type=str)
+    teaching_campus_name = attr.ib(type=str)
+    organization_name = attr.ib(type=str)
+    remark_fr = attr.ib(type=str)
+    remark_en = attr.ib(type=str)
+    end_year = attr.ib(type=Optional[int])
+
+    from_offer_acronym = attr.ib(type=str)
+    from_version_name = attr.ib(type=str)
+    from_is_transition = attr.ib(type=bool)
