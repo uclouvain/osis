@@ -25,6 +25,7 @@
 ##############################################################################
 from typing import Dict
 
+import attr
 from django import forms
 from django.contrib.auth.models import User
 from django.forms import TextInput
@@ -42,11 +43,11 @@ from education_group.forms.training import _get_section_choices
 from education_group.forms.widgets import CertificateAimsWidget
 from education_group.models.group_year import GroupYear as GroupYearDB
 from education_group.templatetags.academic_year_display import display_as_academic_year
-from program_management.ddd.command import GetEndPostponementYearCommand
-from program_management.ddd.domain.node import NodeIdentity
+from program_management.ddd.command import GetVersionMaxEndYear
+from program_management.ddd.domain import program_tree_version
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
-from program_management.ddd.service.read import get_end_postponement_year_service
+from program_management.ddd.service.read import get_version_max_end_year
 from rules_management.enums import MINI_TRAINING_PGRM_ENCODING_PERIOD, MINI_TRAINING_DAILY_MANAGEMENT, \
     TRAINING_PGRM_ENCODING_PERIOD, TRAINING_DAILY_MANAGEMENT
 from rules_management.mixins import PermissionFieldMixin
@@ -76,29 +77,26 @@ class SpecificVersionForm(forms.Form):
         label=_('This version exists until'),
     )
 
-    def __init__(
-            self,
-            tree_version_identity: 'ProgramTreeVersionIdentity',
-            node_identity: 'NodeIdentity',
-            *args,
-            **kwargs
-    ):
+    def __init__(self, tree_version_identity: 'ProgramTreeVersionIdentity', *args, **kwargs):
         self.tree_version_identity = tree_version_identity
-        self.node_identity = node_identity
         super().__init__(*args, **kwargs)
 
         self._init_academic_year_choices()
 
     def _init_academic_year_choices(self):
-        max_year = get_end_postponement_year_service.calculate_program_tree_end_postponement(
-            GetEndPostponementYearCommand(code=self.node_identity.code, year=self.node_identity.year)
+        max_year = get_version_max_end_year.calculate_version_max_end_year(
+            GetVersionMaxEndYear(
+                offer_acronym=self.tree_version_identity.offer_acronym,
+                year=self.tree_version_identity.year
+            )
         )
         choices_years = [
             (year, display_as_academic_year(year))
             for year in range(self.tree_version_identity.year, max_year + 1)
         ]
 
-        if not ProgramTreeVersionRepository.get(self.tree_version_identity).end_year_of_existence:
+        standard_version_identity = attr.evolve(self.tree_version_identity, version_name=program_tree_version.STANDARD)
+        if not ProgramTreeVersionRepository.get(standard_version_identity).end_year_of_existence:
             choices_years += BLANK_CHOICE
 
         self.fields["end_year"].choices = choices_years
@@ -258,7 +256,6 @@ class UpdateTrainingVersionForm(ValidationRuleMixin, PermissionFieldMixin, Speci
     def __init__(
             self,
             training_version_identity: 'ProgramTreeVersionIdentity',
-            node_identity: 'NodeIdentity',
             training_type: TrainingType,
             user: User,
             event_perm_obj: GroupYearDB,
@@ -268,7 +265,7 @@ class UpdateTrainingVersionForm(ValidationRuleMixin, PermissionFieldMixin, Speci
         self.event_perm_obj = event_perm_obj
         self.training_type = training_type
 
-        super().__init__(training_version_identity, node_identity, **kwargs)
+        super().__init__(training_version_identity, **kwargs)
         self.fields['version_name'].disabled = True
         self.__init_management_entity_field()
 
@@ -335,7 +332,6 @@ class UpdateMiniTrainingVersionForm(ValidationRuleMixin, PermissionFieldMixin, S
     def __init__(
             self,
             mini_training_version_identity: 'ProgramTreeVersionIdentity',
-            node_identity: 'NodeIdentity',
             mini_training_type: MiniTrainingType,
             user: User,
             event_perm_obj: GroupYearDB,
@@ -345,7 +341,7 @@ class UpdateMiniTrainingVersionForm(ValidationRuleMixin, PermissionFieldMixin, S
         self.event_perm_obj = event_perm_obj
         self.mini_training_type = mini_training_type
 
-        super().__init__(mini_training_version_identity, node_identity, **kwargs)
+        super().__init__(mini_training_version_identity, **kwargs)
         self.fields['version_name'].disabled = True
         self.__init_management_entity_field()
 
@@ -371,4 +367,3 @@ class UpdateMiniTrainingVersionForm(ValidationRuleMixin, PermissionFieldMixin, S
     # PermissionFieldMixin
     def get_model_permission_filter_kwargs(self) -> Dict:
         return {'context': self.get_context()}
-
