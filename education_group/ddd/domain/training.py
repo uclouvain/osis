@@ -43,7 +43,7 @@ from education_group.ddd.business_types import *
 from education_group.ddd.domain._campus import Campus
 from education_group.ddd.domain._co_graduation import CoGraduation
 from education_group.ddd.domain._co_organization import Coorganization
-from education_group.ddd.domain._diploma import Diploma, DiplomaAim, DiplomaAimIdentity
+from education_group.ddd.domain._diploma import Diploma
 from education_group.ddd.domain._entity import Entity
 from education_group.ddd.domain._funding import Funding
 from education_group.ddd.domain._hops import HOPS
@@ -105,15 +105,6 @@ class TrainingBuilder:
                 StudyDomain(
                     entity_id=StudyDomainIdentity(dom[0], dom[1]),
                     domain_name=None,
-                )
-            )
-
-        command_aims = []
-        for aim in command.aims:
-            command_aims.append(
-                DiplomaAim(
-                    entity_id=DiplomaAimIdentity(code=aim[0], section=aim[1]),
-                    description=None,
                 )
             )
 
@@ -192,7 +183,6 @@ class TrainingBuilder:
                 leads_to_diploma=command.leads_to_diploma,
                 printing_title=command.printing_title,
                 professional_title=command.professional_title,
-                aims=command_aims,
             ),
         )
         CreateTrainingValidatorList(training).validate()
