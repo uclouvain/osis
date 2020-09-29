@@ -135,7 +135,7 @@ class TestLeafViewSerializer(SimpleTestCase):
 
     def test_serializer_leaf_ensure_text_case_leaf_doesnt_have_same_year_of_root(self):
         self.link.child.year = self.root_node.year - 1
-        expected_text = self.link.child.code + "|" + str(self.link.child.year)
+        expected_text = "|" + str(self.link.child.year) + "|" + self.link.child.code
         serialized_data = _leaf_view_serializer(self.link, self.path, self.tree, context=self.context)
         self.assertEqual(serialized_data['text'], expected_text)
 
