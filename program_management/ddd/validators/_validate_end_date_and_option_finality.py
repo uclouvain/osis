@@ -29,11 +29,12 @@ from program_management.ddd.validators import _attach_finality_end_date
 from program_management.ddd.validators import _attach_option
 
 
-class ValidateEndDateAndOptionFinality(business_validator.BusinessValidator):
-    def __init__(self, node_to_paste: 'Node', tree_repository: 'ProgramTreeRepository'):
+class ValidateFinalitiesEndDateAndOptions(business_validator.BusinessValidator):
+    def __init__(self, node_to_paste_to: 'Node', node_to_paste: 'Node', tree_repository: 'ProgramTreeRepository'):
         super().__init__()
         self.node_to_paste = node_to_paste
         self.tree_repository = tree_repository
+        self.node_to_paste_to = node_to_paste_to
 
     def validate(self, *args, **kwargs):
         tree_identity = program_tree_domain.ProgramTreeIdentity(
@@ -45,7 +46,7 @@ class ValidateEndDateAndOptionFinality(business_validator.BusinessValidator):
         messages = []
         if self.node_to_paste.is_finality() or finality_ids:
             trees_2m = [
-                tree for tree in self.tree_repository.search_from_children(finality_ids)
+                tree for tree in self.tree_repository.search_from_children([self.node_to_paste_to.entity_id])
                 if tree.is_master_2m()
             ]
             for tree_2m in trees_2m:
