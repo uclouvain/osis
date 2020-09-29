@@ -66,7 +66,6 @@ msgstr "Année académique"
 msgid "Accepted value: %(justification_label_authorized)s "
 msgstr "Valeur acceptée: %(justification_label_authorized)s "
 
-msgctxt "UE acronym"
 msgid "Acronym"
 msgstr "Acronyme"
 
