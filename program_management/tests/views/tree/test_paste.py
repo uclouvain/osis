@@ -27,7 +27,7 @@ from unittest import mock
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.http import HttpResponse
-from django.test import TestCase
+from django.test import TestCase, SimpleTestCase, RequestFactory
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from waffle.testutils import override_flag
@@ -39,6 +39,7 @@ from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.person import PersonFactory
+from base.tests.factories.user import UserFactory
 from base.utils.cache import ElementCache
 from base.utils.urls import reverse_with_get
 from osis_role.contrib.views import AjaxPermissionRequiredMixin
@@ -50,6 +51,7 @@ from program_management.tests.ddd.factories.node import NodeLearningUnitYearFact
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory
+from program_management.views.tree.paste import PasteNodesView
 
 
 def form_valid_effect(formset: PasteNodesFormset):
@@ -295,7 +297,15 @@ class TestPasteWithCutView(TestCase):
         permission_patcher = mock.patch.object(User, "has_perm")
         self.permission_mock = permission_patcher.start()
         self.permission_mock.return_value = True
+
+        get_permission_error_patcher = mock.patch(
+            'program_management.views.tree.paste.errors.get_permission_error',
+            return_value=''
+        )
+        self.get_permission_error_mock = get_permission_error_patcher.start()
+
         self.addCleanup(permission_patcher.stop)
+        self.addCleanup(get_permission_error_patcher.stop)
         self.addCleanup(ElementCache(self.person.user).clear)
 
     def test_should_check_attach_and_detach_permission(self):
@@ -323,6 +333,24 @@ class TestPasteWithCutView(TestCase):
 
         )
         self.assertTrue(self.permission_mock.called)
+
+    @mock.patch('program_management.views.tree.paste.PasteNodesView._has_permission_to_detach', return_value=False)
+    def test_should_display_detach_permission_error_when_cannot_detach(self, mock_has_perm_to_detach):
+        ElementCache(self.person.user.id).save_element_selected(
+            element_year=self.academic_year.year,
+            element_code=self.group_element_year.child_element.group_year.partial_acronym,
+            path_to_detach="|".join([
+                str(self.group_element_year.parent_element.id),
+                str(self.group_element_year.child_element.id)
+            ]),
+            action=ElementCache.ElementCacheAction.CUT
+        )
+        self.client.get(self.url)
+        self.get_permission_error_mock.assert_has_calls(
+            [
+                mock.call(self.person.user, "base.can_detach_node"),
+            ]
+        )
 
     @mock.patch("program_management.ddd.service.write.paste_element_service.paste_element")
     def test_move(self, mock_paste_service):
@@ -472,3 +500,22 @@ class TestCheckPasteView(TestCase):
             HTTP_ACCEPT="application/json"
         )
         self.assertFalse(response.wsgi_request.session.get(check_key))
+
+
+# class TestPasteNodesViewGetPermissionError(TestCase):
+#     def setUp(self) -> None:
+#         self.request = RequestFactory()
+#         self.request.user = UserFactory()
+#
+#         self.view_instance = PasteNodesView()
+#         self.view_instance.request = self.request
+#
+#     @mock.patch('program_management.views.tree.paste.errors.get_permission_error', return_value='')
+#     def test_ensure_get_permission_error_when_cannot_detach(self, mock_get_permission_error):
+#         self.view_instance.get_permission_error(self.request)
+#
+#         mock_get_permission_error.assert_has_calls(
+#             [
+#                 mock.call(self.request.user, "base.can_detach_node")
+#             ]
+#         )
