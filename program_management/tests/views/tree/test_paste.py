@@ -501,21 +501,3 @@ class TestCheckPasteView(TestCase):
         )
         self.assertFalse(response.wsgi_request.session.get(check_key))
 
-
-# class TestPasteNodesViewGetPermissionError(TestCase):
-#     def setUp(self) -> None:
-#         self.request = RequestFactory()
-#         self.request.user = UserFactory()
-#
-#         self.view_instance = PasteNodesView()
-#         self.view_instance.request = self.request
-#
-#     @mock.patch('program_management.views.tree.paste.errors.get_permission_error', return_value='')
-#     def test_ensure_get_permission_error_when_cannot_detach(self, mock_get_permission_error):
-#         self.view_instance.get_permission_error(self.request)
-#
-#         mock_get_permission_error.assert_has_calls(
-#             [
-#                 mock.call(self.request.user, "base.can_detach_node")
-#             ]
-#         )
