@@ -49,6 +49,17 @@ body {
     margin: 0 !important;
 }
 
+a.disabled,
+.tooltip-wrapper.disabled{
+    color: #777;
+    cursor: not-allowed;
+}
+.tooltip-wrapper > button[disabled] {
+    color: inherit;
+    pointer-events: none;
+}
+
+
 /* Indication Status QA - DEV */
 
 .qamode {
