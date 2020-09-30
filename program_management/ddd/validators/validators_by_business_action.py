@@ -66,7 +66,8 @@ class PasteNodeValidatorList(business_validator.BusinessListValidator):
             tree: 'ProgramTree',
             node_to_paste: 'Node',
             paste_command: command.PasteElementCommand,
-            tree_repository: 'ProgramTreeRepository'
+            tree_repository: 'ProgramTreeRepository',
+            tree_version_repository: 'ProgramTreeVersionRepository'
     ):
         path = paste_command.path_where_to_paste
         link_type = paste_command.link_type
@@ -80,7 +81,12 @@ class PasteNodeValidatorList(business_validator.BusinessListValidator):
                 InfiniteRecursivityTreeValidator(tree, node_to_paste, path),
                 AuthorizedLinkTypeValidator(tree.root_node, node_to_paste, link_type),
                 BlockValidator(block),
-                ValidateFinalitiesEndDateAndOptions(tree.get_node(path), node_to_paste, tree_repository),
+                ValidateFinalitiesEndDateAndOptions(
+                    tree.get_node(path),
+                    node_to_paste,
+                    tree_repository,
+                    tree_version_repository
+                ),
                 ValidateAuthorizedRelationshipForAllTrees(tree, node_to_paste, path, tree_repository),
                 MatchVersionValidator(tree, node_to_paste),
             ]
@@ -120,6 +126,7 @@ class CheckPasteNodeValidatorList(business_validator.BusinessListValidator):
             node_to_paste: 'Node',
             check_paste_command: command.CheckPasteNodeCommand,
             tree_repository: 'ProgramTreeRepository',
+            tree_version_repository: 'ProgramTreeVersionRepository'
     ):
         path = check_paste_command.path_to_paste
 
@@ -128,7 +135,12 @@ class CheckPasteNodeValidatorList(business_validator.BusinessListValidator):
                 CreateLinkValidatorList(tree.get_node(path), node_to_paste),
                 MinimumEditableYearValidator(tree),
                 InfiniteRecursivityTreeValidator(tree, node_to_paste, path),
-                ValidateFinalitiesEndDateAndOptions(tree.get_node(path), node_to_paste, tree_repository),
+                ValidateFinalitiesEndDateAndOptions(
+                    tree.get_node(path),
+                    node_to_paste,
+                    tree_repository,
+                    tree_version_repository
+                ),
                 MatchVersionValidator(tree, node_to_paste)
             ]
 

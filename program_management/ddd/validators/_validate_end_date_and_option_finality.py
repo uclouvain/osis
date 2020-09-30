@@ -30,10 +30,17 @@ from program_management.ddd.validators import _attach_option
 
 
 class ValidateFinalitiesEndDateAndOptions(business_validator.BusinessValidator):
-    def __init__(self, node_to_paste_to: 'Node', node_to_paste: 'Node', tree_repository: 'ProgramTreeRepository'):
+    def __init__(
+            self,
+            node_to_paste_to: 'Node',
+            node_to_paste: 'Node',
+            tree_repository: 'ProgramTreeRepository',
+            tree_version_repository: 'ProgramTreeVersionRepository'
+    ):
         super().__init__()
         self.node_to_paste = node_to_paste
         self.tree_repository = tree_repository
+        self.tree_version_repository = tree_version_repository
         self.node_to_paste_to = node_to_paste_to
 
     def validate(self, *args, **kwargs):
@@ -49,12 +56,13 @@ class ValidateFinalitiesEndDateAndOptions(business_validator.BusinessValidator):
                 tree for tree in self.tree_repository.search_from_children([self.node_to_paste_to.entity_id])
                 if tree.is_master_2m()
             ]
-            for tree_2m in trees_2m:
-                validator = _attach_finality_end_date.AttachFinalityEndDateValidator(tree_2m, tree)
+            tree_versions_2m = self.tree_version_repository.search_versions_from_trees(trees_2m)
+            for tree_version_2m in tree_versions_2m:
+                validator = _attach_finality_end_date.AttachFinalityEndDateValidator(tree_version_2m, tree)
                 if not validator.is_valid():
                     for msg in validator.error_messages:
                         messages.append(msg.message)
-                validator = _attach_option.AttachOptionsValidator(tree_2m, tree)
+                validator = _attach_option.AttachOptionsValidator(tree_version_2m, tree)
                 if not validator.is_valid():
                     for msg in validator.error_messages:
                         messages.append(msg.message)

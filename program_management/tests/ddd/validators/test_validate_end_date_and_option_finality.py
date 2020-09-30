@@ -21,13 +21,16 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+from unittest import mock
 
 from django.test import SimpleTestCase
 
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
 from program_management.ddd.validators import _validate_end_date_and_option_finality
 from program_management.tests.ddd.factories.program_tree import tree_builder
-from program_management.tests.ddd.factories.repository.fake import get_fake_program_tree_repository
+from program_management.tests.ddd.factories.program_tree_version import StandardProgramTreeVersionFactory
+from program_management.tests.ddd.factories.repository.fake import get_fake_program_tree_repository, \
+    get_fake_program_tree_version_repository
 from program_management.tests.ddd.validators.mixins import TestValidatorValidateMixin
 
 
@@ -50,7 +53,29 @@ class TestValidateFinalitiesEndDateAndOptions(TestValidatorValidateMixin, Simple
             ]
         }
         self.tree = tree_builder(tree_data)
+        self.tree_version = StandardProgramTreeVersionFactory(tree=self.tree)
+
         self.fake_program_tree_repository = get_fake_program_tree_repository([self.tree])
+        self.fake_tree_version_repository = get_fake_program_tree_version_repository([self.tree_version])
+
+        self._mock_inconsistent_nodes_methods()
+
+    def _mock_inconsistent_nodes_methods(self):
+        finality_display_inconsistent_nodes_patcher = mock.patch(
+            "program_management.ddd.validators._attach_finality_end_date.AttachFinalityEndDateValidator."
+            "_display_inconsistent_nodes",
+            return_value=[]
+        )
+        mocked_finality_display_inconsistent_nodes = finality_display_inconsistent_nodes_patcher.start()
+        self.addCleanup(finality_display_inconsistent_nodes_patcher.stop)
+
+        option_display_inconsistent_nodes_patcher = mock.patch(
+            "program_management.ddd.validators._attach_option.AttachOptionsValidator."
+            "_display_inconsistent_nodes",
+            return_value=[]
+        )
+        mocked_options_display_inconsistent_nodes = option_display_inconsistent_nodes_patcher.start()
+        self.addCleanup(option_display_inconsistent_nodes_patcher.stop)
 
     def test_should_not_be_valid_when_node_to_attach_is_a_finality_having_an_end_date_greater_than_parent_program(self):
         tree_to_attach_data = {
@@ -65,6 +90,7 @@ class TestValidateFinalitiesEndDateAndOptions(TestValidatorValidateMixin, Simple
                 self.tree.root_node.children_as_nodes[0],
                 tree_to_attach.root_node,
                 self.fake_program_tree_repository,
+                self.fake_tree_version_repository
             ),
             None
         )
@@ -85,6 +111,7 @@ class TestValidateFinalitiesEndDateAndOptions(TestValidatorValidateMixin, Simple
                 self.tree.root_node.children_as_nodes[0],
                 tree_to_attach.root_node,
                 self.fake_program_tree_repository,
+                self.fake_tree_version_repository
             ),
             None
         )
@@ -104,6 +131,7 @@ class TestValidateFinalitiesEndDateAndOptions(TestValidatorValidateMixin, Simple
                 self.tree.root_node.children_as_nodes[0],
                 tree_to_attach.root_node,
                 self.fake_program_tree_repository,
+                self.fake_tree_version_repository
             ),
             None
         )
@@ -124,6 +152,7 @@ class TestValidateFinalitiesEndDateAndOptions(TestValidatorValidateMixin, Simple
                 self.tree.root_node.children_as_nodes[0],
                 tree_to_attach.root_node,
                 self.fake_program_tree_repository,
+                self.fake_tree_version_repository
             )
         )
 
@@ -149,6 +178,7 @@ class TestValidateFinalitiesEndDateAndOptions(TestValidatorValidateMixin, Simple
                 self.tree.root_node.children_as_nodes[0],
                 tree_to_attach.root_node,
                 self.fake_program_tree_repository,
+                self.fake_tree_version_repository
             ),
             None
         )
@@ -175,4 +205,5 @@ class TestValidateFinalitiesEndDateAndOptions(TestValidatorValidateMixin, Simple
                 self.tree.root_node.children_as_nodes[0],
                 tree_to_attach.root_node,
                 self.fake_program_tree_repository,
+                self.fake_tree_version_repository
             ))
