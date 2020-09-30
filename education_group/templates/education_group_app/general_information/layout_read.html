@@ -40,9 +40,17 @@
     {% navigation_group request.user object request.resolver_match.url_name %}
 {% endblock %}
 
-{% block top_action_bar %}{% endblock %}
+{% block top_action_bar %}
+    {% if can_edit_information %}
+        {% include  "education_group_app/blocks/refresh_publication_button.html" %}
+    {% endif %}
+{% endblock %}
 
-{% block bottom_action_bar %}{% endblock %}
+{% block bottom_action_bar %}
+    {% if can_edit_information %}
+        {% include  "education_group_app/blocks/refresh_publication_button.html" %}
+    {% endif %}
+{% endblock %}
 
 
 {% block tabs %}
