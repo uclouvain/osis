@@ -21,13 +21,16 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+
 import mock
+from django.http import HttpResponse
 from django.test import TestCase
 
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
 from base.utils.urls import reverse_with_get
 from education_group.ddd.domain import training
+from education_group.ddd.domain.exception import MaximumCertificateAimType2Reached
 from education_group.ddd.factories.group import GroupFactory
 from education_group.tests.ddd.factories.training import TrainingFactory
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
@@ -131,3 +134,24 @@ class TestTrainingUpdateView(TestCase):
 
         self.assertFalse(mock_update_training.called)
         self.assertTrue(mock_update_aims.called)
+
+    @mock.patch('education_group.views.training.update.TrainingUpdateView.delete_training', return_value=[])
+    @mock.patch('education_group.views.training.update.TrainingUpdateView.update_training')
+    @mock.patch('education_group.views.training.update.postpone_certificate_aims_modification')
+    @mock.patch("education_group.views.training.update.TrainingUpdateView.training_form",
+                new_callable=mocks.MockFormValid)
+    @mock.patch('education_group.views.training.update.render')
+    def test_should_not_update_certificate_aims_when_maximum_of_type_2_aims_is_reached(
+            self,
+            mock_render,
+            mock_form_valid,
+            mock_postpone_certificate_aims_modification,
+            mock_update_training,
+            mock_delete_training,
+    ):
+        mock_postpone_certificate_aims_modification.side_effect = MaximumCertificateAimType2Reached
+        mock_form_valid.changed_data = ['certificate_aims']
+        mock_render.return_value = HttpResponse()
+
+        self.client.post(self.url)
+        self.assertTrue(mock_form_valid.errors)

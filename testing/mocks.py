@@ -29,9 +29,9 @@ from osis_common.ddd import interface
 
 
 class MockFormValid(mock.Mock):
-    @property
-    def errors(self):
-        return []
+
+    errors = []
+    changed_data = ['dummy_field']
 
     def is_valid(self):
         return True
@@ -40,9 +40,8 @@ class MockFormValid(mock.Mock):
     def cleaned_data(self):
         return mock.MagicMock()
 
-    @property
-    def changed_data(self):
-        return ['dummy_field']
+    def add_error(self, field, error):
+        self.errors.append('error')
 
 
 class FakeRepository:
