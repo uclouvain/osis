@@ -43,8 +43,8 @@ class AttachOptionsValidator(BusinessValidator):
     def __init__(self, tree_version_2m: 'ProgramTreeVersion', tree_from_node_to_add: 'ProgramTree', *args):
         super(AttachOptionsValidator, self).__init__()
         if tree_from_node_to_add.root_node.is_finality() or tree_from_node_to_add.get_all_finalities():
-            assert_error_msg = "To use correctly this validator, make sure the ProgramTree root is of type 2M"
-            assert tree_version_2m.tree.root_node.node_type in TrainingType.root_master_2m_types_enum(), assert_error_msg
+            assert_msg = "To use correctly this validator, make sure the ProgramTree root is of type 2M"
+            assert tree_version_2m.tree.root_node.node_type in TrainingType.root_master_2m_types_enum(), assert_msg
         self.tree_from_node_to_add = tree_from_node_to_add
         self.node_to_add = tree_from_node_to_add.root_node
         self.tree_version_2m = tree_version_2m
