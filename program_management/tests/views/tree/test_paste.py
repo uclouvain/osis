@@ -292,7 +292,7 @@ class TestPasteWithCutView(TestCase):
     def setUp(self):
         self.client.force_login(self.person.user)
 
-        permission_patcher = mock.patch.object(User, "has_perms")
+        permission_patcher = mock.patch.object(User, "has_perm")
         self.permission_mock = permission_patcher.start()
         self.permission_mock.return_value = True
         self.addCleanup(permission_patcher.stop)
@@ -317,8 +317,8 @@ class TestPasteWithCutView(TestCase):
         self.client.get(self.url)
         self.permission_mock.assert_has_calls(
             [
-                mock.call(("base.can_detach_node",), self.group_element_year.parent_element.group_year),
-                mock.call(("base.can_attach_node",), self.selected_element.group_year)
+                mock.call("base.can_detach_node", self.group_element_year.parent_element.group_year),
+                mock.call("base.can_attach_node", self.selected_element.group_year)
             ]
 
         )
