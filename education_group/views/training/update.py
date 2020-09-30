@@ -38,7 +38,7 @@ from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import exception
 from education_group.ddd.domain.exception import TrainingCopyConsistencyException, \
-    CertificateAimsCopyConsistencyException
+    CertificateAimsCopyConsistencyException, MaximumCertificateAimType2Reached
 from education_group.ddd.domain.training import TrainingIdentity
 from education_group.ddd.service.read import get_training_service, get_group_service
 from education_group.ddd.service.write.postpone_certificate_aims_modification_service import \
@@ -168,12 +168,16 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         return updated_training_identities
 
     def update_certificate_aims(self):
+        updated_aims_training_identities = []
+
         try:
             postpone_aims_modification_command = self._convert_form_to_postpone_aims_modification_cmd(
                 self.training_form)
             updated_aims_training_identities = postpone_certificate_aims_modification(
                 postpone_aims_modification_command
             )
+        except MaximumCertificateAimType2Reached as e:
+            self.training_form.add_error("certificate_aims", e.message)
         except CertificateAimsCopyConsistencyException as e:
             display_warning_messages(self.request, e.message)
             updated_aims_training_identities = [

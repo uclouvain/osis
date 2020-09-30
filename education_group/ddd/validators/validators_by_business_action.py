@@ -79,7 +79,6 @@ class CreateTrainingValidatorList(business_validator.BusinessListValidator):
             AcronymRequiredValidator(training.acronym),
             AcronymAlreadyExistValidator(training.acronym),
             StartYearEndYearValidator(training),
-            CertificateAimType2Validator(training),
         ]
         super().__init__()
 
