@@ -351,7 +351,7 @@ msgid "General informations"
 msgstr "Infos générales"
 
 msgid "General informations have been updated"
-msgstr "Les infos générales ont été mise à jour"
+msgstr "Les informations générales ont été mise à jour"
 
 msgid "Graduates"
 msgstr "Diplômés"
@@ -930,12 +930,3 @@ msgstr "indéfini"
 
 msgid "unspecified"
 msgstr "indéterminé"
-
-#~ msgid "Detach"
-#~ msgstr "Retirer"
-
-#~ msgid "Go down"
-#~ msgstr "Descendre"
-
-#~ msgid "Go up"
-#~ msgstr "Monter"
