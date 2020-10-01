@@ -28,6 +28,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from base.models.enums.education_group_types import TrainingType
+from base.tests.factories.academic_year import get_current_year
 from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.factories.user import UserFactory
 from program_management.ddd.domain.node import NodeGroupYear
@@ -47,11 +48,11 @@ class TestTrainingReadDiplomaCertificate(TestCase):
             offer__education_group_type__name=TrainingType.PGRM_MASTER_120.name,
             root_group__acronym="DROI2M",
             root_group__partial_acronym="LDROI200M",
-            root_group__academic_year__year=2019,
+            root_group__academic_year__year=get_current_year(),
             root_group__education_group_type__name=TrainingType.PGRM_MASTER_120.name,
         )
         ElementGroupYearFactory(group_year=cls.training_version.root_group)
-        cls.url = reverse('training_diplomas', kwargs={'year': 2019, 'code': 'LDROI200M'})
+        cls.url = reverse('training_diplomas', kwargs={'year': get_current_year(), 'code': 'LDROI200M'})
 
     def setUp(self) -> None:
         self.client.force_login(self.person.user)
@@ -94,7 +95,7 @@ class TestTrainingReadDiplomaCertificate(TestCase):
         self.assertIn('versions_choices', response.context)
         self.assertIn('training', response.context)
 
-    def test_assert_active_tabs_is_diplimas_certificates_and_others_are_not_active(self):
+    def test_assert_active_tabs_is_diplomas_certificates_and_others_are_not_active(self):
         from education_group.views.training.common_read import Tab
 
         response = self.client.get(self.url)
