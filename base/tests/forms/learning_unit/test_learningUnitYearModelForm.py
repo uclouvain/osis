@@ -58,11 +58,11 @@ class TestCreditsValidation(TestCase):
         )
         cls.person = PersonFactory()
 
-    def test_credits_no_decimal_in_2018(self):
+    def test_credits_no_decimal_in_crucial_year(self):
         form = self._build_form_with_decimal(self.learning_unit_year_in_crucial_year)
         self._assert_not_valid(form)
 
-    def test_credits_no_decimal_after_2018(self):
+    def test_credits_no_decimal_after_crucial_year(self):
         form = self._build_form_with_decimal(self.learning_unit_year_after_crucial_year)
         self._assert_not_valid(form)
 
@@ -70,7 +70,7 @@ class TestCreditsValidation(TestCase):
         form = self._build_form_with_decimal(None)
         self._assert_not_valid(form)
 
-    def test_credits_decimal_accepted_before_2018(self):
+    def test_credits_decimal_accepted_before_crucial_year(self):
         form = self._build_form_with_decimal(self.learning_unit_year_before_crucial_year)
         self.assertTrue(form.is_valid())
 
