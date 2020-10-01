@@ -427,8 +427,9 @@ msgstr "Unité d'enseignement"
 msgid "Link type"
 msgstr "Type de lien"
 
+msgctxt "male"
 msgid "Main"
-msgstr "Principale"
+msgstr "Principal"
 
 msgid "Management common topics"
 msgstr "Gestion des rubriques communes"
