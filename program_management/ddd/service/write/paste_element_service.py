@@ -27,7 +27,8 @@ from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import node
 from program_management.ddd.domain.program_tree import PATH_SEPARATOR
-from program_management.ddd.repositories import load_tree, persist_tree, node as node_repository, program_tree
+from program_management.ddd.repositories import load_tree, persist_tree, node as node_repository, program_tree, \
+    program_tree_version
 
 
 @transaction.atomic()
@@ -38,7 +39,12 @@ def paste_element(paste_command: command.PasteElementCommand) -> 'LinkIdentity':
     tree = load_tree.load(root_id)
     node_to_attach = node_repository.NodeRepository.get(node_identity)
 
-    link_created = tree.paste_node(node_to_attach, paste_command, program_tree.ProgramTreeRepository())
+    link_created = tree.paste_node(
+        node_to_attach,
+        paste_command,
+        program_tree.ProgramTreeRepository(),
+        program_tree_version.ProgramTreeVersionRepository()
+    )
 
     if path_to_detach:
         root_tree_to_detach = int(path_to_detach.split(PATH_SEPARATOR)[0])
