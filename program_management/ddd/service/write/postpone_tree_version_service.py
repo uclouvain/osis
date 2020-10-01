@@ -27,6 +27,7 @@ from typing import List
 
 from django.db import transaction
 
+from education_group.ddd.domain.exception import TrainingNotFoundException
 from education_group.ddd.repository.mini_training import MiniTrainingRepository
 from education_group.ddd.repository.training import TrainingRepository
 from program_management.ddd.command import PostponeProgramTreeVersionCommand, CopyTreeVersionToNextYearCommand
@@ -73,7 +74,7 @@ def postpone_program_tree_version(
             identities_created.append(identity_next_year)
 
             from_year += 1
-        except exception.CannotCopyTreeVersionDueToEndDate:
+        except (exception.CannotCopyTreeVersionDueToEndDate, TrainingNotFoundException):
             break
 
     return identities_created

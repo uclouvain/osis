@@ -232,7 +232,12 @@ class TestNavigationGroupYear(TestNavigationMixin, TestCase):
         first_element_index = 0
         expected_context = {
             "current_element": self.elements_sorted_by_acronym[first_element_index],
-            "next_element_title": self.elements_sorted_by_acronym[first_element_index + 1].partial_acronym,
+            "next_element_title": "{}{}".format(
+                self.elements_sorted_by_acronym[first_element_index + 1].acronym,
+                "[{}]".format(
+                    self.elements_sorted_by_acronym[first_element_index + 1].educationgroupversion.version_name)
+                if self.elements_sorted_by_acronym[first_element_index + 1].educationgroupversion.version_name else ''
+            ),
             "next_url": self._get_element_url(self.query_parameters, first_element_index + 1),
             "previous_element_title": None,
             "previous_url": None,
@@ -245,7 +250,12 @@ class TestNavigationGroupYear(TestNavigationMixin, TestCase):
             "current_element": self.elements_sorted_by_acronym[last_element_index],
             "next_element_title": None,
             "next_url": None,
-            "previous_element_title": self.elements_sorted_by_acronym[last_element_index - 1].partial_acronym,
+            "previous_element_title": "{}{}".format(
+                self.elements_sorted_by_acronym[last_element_index - 1].acronym,
+                "[{}]".format(
+                    self.elements_sorted_by_acronym[last_element_index - 1].educationgroupversion.version_name) if
+                self.elements_sorted_by_acronym[last_element_index - 1].educationgroupversion.version_name else ''
+            ),
             "previous_url": self._get_element_url(self.query_parameters, last_element_index - 1),
             "current_version": None
         }
@@ -253,11 +263,22 @@ class TestNavigationGroupYear(TestNavigationMixin, TestCase):
 
     def test_inner_element_should_have_previous_and_next_element(self):
         inner_element_index = 2
+
         expected_context = {
             "current_element": self.elements_sorted_by_acronym[inner_element_index],
-            "next_element_title": self.elements_sorted_by_acronym[inner_element_index + 1].partial_acronym,
+            "next_element_title": "{}{}".format(self.elements_sorted_by_acronym[inner_element_index + 1].acronym,
+                                                "[{}]".format(
+                                                    self.elements_sorted_by_acronym[
+                                                        inner_element_index + 1].educationgroupversion.version_name) if
+                                                self.elements_sorted_by_acronym[
+                                                    inner_element_index + 1].educationgroupversion.version_name else ''
+                                                ),
             "next_url": self._get_element_url(self.query_parameters, inner_element_index + 1),
-            "previous_element_title": self.elements_sorted_by_acronym[inner_element_index - 1].partial_acronym,
+            "previous_element_title": "{}{}".format(
+                self.elements_sorted_by_acronym[inner_element_index - 1].acronym,
+                "[{}]".format(
+                    self.elements_sorted_by_acronym[inner_element_index - 1].educationgroupversion.version_name) if
+                self.elements_sorted_by_acronym[inner_element_index - 1].educationgroupversion.version_name else ''),
             "previous_url": self._get_element_url(self.query_parameters, inner_element_index - 1),
         }
         self.assertNavigationContextEquals(expected_context, inner_element_index, True)

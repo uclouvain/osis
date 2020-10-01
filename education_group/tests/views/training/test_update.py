@@ -26,6 +26,7 @@ import mock
 from django.http import HttpResponse
 from django.test import TestCase
 
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
 from base.utils.urls import reverse_with_get
@@ -43,6 +44,7 @@ class TestTrainingUpdateView(TestCase):
     @classmethod
     def setUpTestData(cls):
         FrenchLanguageFactory()
+        AcademicYearFactory.produce()
         cls.url = reverse_with_get(
             "training_update",
             kwargs={"code": "CODE", "year": 2020, "title": "ACRONYM"},

@@ -21,17 +21,10 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-
-from program_management.ddd import command
-from program_management.ddd.domain.program_tree import ProgramTreeIdentity
-from program_management.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
-from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
+from program_management.ddd.business_types import *
 
 
-def calculate_program_tree_end_postponement(
-        cmd: command.GetEndPostponementYearCommand
-) -> int:
-    return CalculateEndPostponement().calculate_end_postponement_year_program_tree(
-        identity=ProgramTreeIdentity(cmd.code, cmd.year),
-        repository=ProgramTreeVersionRepository()
-    )
+def format_program_tree_version_identity(tree_version_identity: 'ProgramTreeVersionIdentity') -> str:
+    if tree_version_identity.version_name:
+        return "{}[{}]".format(tree_version_identity.offer_acronym, tree_version_identity.version_name)
+    return tree_version_identity.offer_acronym

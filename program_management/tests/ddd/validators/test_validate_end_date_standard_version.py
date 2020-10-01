@@ -69,21 +69,20 @@ class CheckVersionEndDateValidatorForStandardTest(TestCase, TestValidatorValidat
         self.assertValidatorNotRaises(validator)
 
     def _create_version_with_inferior_end_date(self):
+        anac = AcademicYearFactory(year=self.standard_version.entity_id.year - 1)
         EducationGroupVersionFactory(
             offer__acronym=self.standard_version.entity_id.offer_acronym,
-            offer__academic_year__year=self.standard_version.entity_id.year-1,
-            offer__education_group__end_year=AcademicYearFactory(
-                year=self.standard_version.entity_id.year-1
-            ),
-            root_group__group__end_year=AcademicYearFactory(
-                year=self.standard_version.entity_id.year-1
-            ),
+            offer__academic_year=anac,
+            offer__education_group__end_year=anac,
+            root_group__group__start_year=anac,
+            root_group__group__end_year=anac,
+            root_group__academic_year=anac
         )
 
     def _create_version_with_superior_end_date(self):
         EducationGroupVersionFactory(
             offer__acronym=self.standard_version.entity_id.offer_acronym,
-            offer__academic_year__year=self.standard_version.entity_id.year+1,
+            offer__academic_year__year=self.standard_version.entity_id.year + 1,
             offer__education_group__end_year=None,
             root_group__group__end_year=None,
         )

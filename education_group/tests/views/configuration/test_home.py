@@ -21,22 +21,33 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from unittest import mock
+from django.http import HttpResponseForbidden, HttpResponse
+from django.test import TestCase
+from django.urls import reverse
 
-from django.test import SimpleTestCase
-
-from program_management.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
-from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
-from program_management.ddd.service.read import get_end_postponement_year_service
-from program_management.tests.ddd.factories.commands.get_end_postponement_year_command import \
-    GetEndPostponementYearCommandFactory
+from base.tests.factories.person import PersonFactory
+from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 
 
-class TestGetEndPostponementYearService(SimpleTestCase):
+class TestConfigurationHomeView(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.url = reverse('catalog_configuration')
 
-    @mock.patch.object(CalculateEndPostponement, 'calculate_end_postponement_year_program_tree')
-    def test_domain_service_is_called(self, mock_domain_service):
-        get_end_postponement_year_service.calculate_program_tree_end_postponement(
-            GetEndPostponementYearCommandFactory()
-        )
-        self.assertTrue(mock_domain_service.called)
+    def test_case_when_user_not_logged(self):
+        response = self.client.get(self.url)
+        self.assertRedirects(response, "/login/?next={}".format(self.url))
+
+    def test_when_user_has_no_permission(self):
+        a_person_without_permission = PersonFactory()
+        self.client.force_login(a_person_without_permission.user)
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+
+    def test_when_user_has_permission(self):
+        central_manager = CentralManagerFactory()
+        self.client.force_login(central_manager.person.user)
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, HttpResponse.status_code)

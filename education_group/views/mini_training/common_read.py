@@ -204,7 +204,9 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
         )
 
     def get_update_permission_name(self) -> str:
-        return "base.change_minitraining"
+        if self.current_version.is_standard_version:
+            return "base.change_minitraining"
+        return "program_management.change_minitraining_version"
 
     def get_create_version_url(self):
         if self.is_root_node() and self.program_tree_version_identity.is_standard():
