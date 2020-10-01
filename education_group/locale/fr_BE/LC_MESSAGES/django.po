@@ -584,6 +584,9 @@ msgstr "Diffusion des notes"
 msgid "Search..."
 msgstr "Recherche..."
 
+msgid "Select one or multiple certificate aims"
+msgstr "Choisissez un ou plusieurs attendus du diplôme"
+
 msgid "Session"
 msgstr "Session"
 
