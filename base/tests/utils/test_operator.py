@@ -41,3 +41,13 @@ class TestIsYearLower(SimpleTestCase):
         self.assertTrue(
             operator.is_year_lower(2017, 2029)
         )
+
+    def test_should_return_false_when_base_year_is_equal_to_other_year(self):
+        self.assertFalse(
+            operator.is_year_lower(2017, 2017)
+        )
+
+    def test_should_return_false_when_base_year_is_greater_to_other_year(self):
+        self.assertFalse(
+            operator.is_year_lower(2019, 2017)
+        )
