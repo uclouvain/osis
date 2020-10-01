@@ -213,11 +213,7 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
             }
         })
 
-        for tab, tab_dict in tab_urls.items():
-            if not tab == Tab.IDENTIFICATION and tab_dict['active'] and tab_dict['display']:
-                return tab_urls
-        tab_urls[Tab.IDENTIFICATION]['active'] = True
-        return tab_urls
+        return read.validate_active_tab(tab_urls)
 
     def have_general_information_tab(self):
         return self.get_object().node_type.name in general_information_sections.SECTIONS_PER_OFFER_TYPE and \

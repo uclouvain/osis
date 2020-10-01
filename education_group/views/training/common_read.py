@@ -298,11 +298,8 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
                 'url': get_tab_urls(Tab.ADMISSION_CONDITION, node_identity, self.get_path()),
             },
         })
-        for tab, tab_dict in tab_urls.items():
-            if not tab == Tab.IDENTIFICATION and tab_dict['active'] and tab_dict['display']:
-                return tab_urls
-        tab_urls[Tab.IDENTIFICATION]['active'] = True
-        return tab_urls
+
+        return read.validate_active_tab(tab_urls)
 
     @functools.lru_cache()
     def get_current_academic_year(self):

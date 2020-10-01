@@ -278,11 +278,7 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             },
         })
 
-        for tab, tab_dict in tab_urls.items():
-            if not tab == Tab.IDENTIFICATION and tab_dict['active'] and tab_dict['display']:
-                return tab_urls
-        tab_urls[Tab.IDENTIFICATION]['active'] = True
-        return tab_urls
+        return read.validate_active_tab(tab_urls)
 
     def have_general_information_tab(self):
         node_category = self.get_object().category
