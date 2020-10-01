@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-30 10:19+0200\n"
+"POT-Creation-Date: 2020-10-01 16:17+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -186,6 +186,9 @@ msgid "Code co-graduation inter CfB"
 msgstr ""
 
 msgid "Comment"
+msgstr ""
+
+msgid "Common admission conditions have been updated"
 msgstr ""
 
 msgid "Common admission conditions will be published soon"
