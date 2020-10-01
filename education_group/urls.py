@@ -9,6 +9,8 @@ from base.views.education_groups.achievement.update import EducationGroupAchieve
 from education_group.converters import GroupTypeConverter, TrainingTypeConverter, MiniTrainingTypeConverter, \
     AcronymConverter
 from education_group.views import group, training, mini_training, general_information
+from education_group.views.configuration.common_list import CommonListView
+from education_group.views.configuration.home import ConfigurationHomeView
 from education_group.views.mini_training.delete import MiniTrainingDeleteView
 from education_group.views.proxy.read import ReadEducationGroupRedirectView
 from education_group.views.training.delete import TrainingDeleteView
@@ -154,6 +156,11 @@ urlpatterns = [
     ])),
     path('general_information/<int:year>/', include([
         path('common/', general_information.CommonGeneralInformation.as_view(), name="common_general_information"),
+        path(
+            'common/update',
+            general_information.UpdateCommonGeneralInformation.as_view(),
+            name="update_common_general_information"
+        ),
         path('common/publish', general_information.publish_common_pedagogy, name="publish_common_general_information"),
         path(
             'common-bachelor/',
@@ -201,4 +208,8 @@ urlpatterns = [
         ),
     ])),
     path('<int:year>/<acronym:acronym>/', ReadEducationGroupRedirectView.as_view(), name='education_group_read_proxy'),
+    path('configuration/', include([
+        path('home/', ConfigurationHomeView.as_view(), name='catalog_configuration'),
+        path('common-topics/', CommonListView.as_view(), name='common_topics_configuration'),
+    ]))
 ]

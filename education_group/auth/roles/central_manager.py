@@ -30,6 +30,7 @@ class CentralManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
     def rule_set(cls):
         return rules.RuleSet({
             'base.can_access_catalog': rules.always_allow,  # Perms Backward compibility
+            'base.can_access_catalog_configuration': rules.always_allow,
             'base.view_educationgroup': rules.always_allow,
             'base.add_training':
                 predicates.is_user_attached_to_management_entity &
@@ -126,6 +127,10 @@ class CentralManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_user_attached_to_management_entity &
                 predicates.is_user_linked_to_all_scopes_of_management_entity,
+            'program_management.change_training_version':
+                predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
+                predicates.is_user_attached_to_management_entity &
+                predicates.is_education_group_type_authorized_according_to_user_scope,
             'program_management.delete_permanently_training_version':
                 predicates.are_all_training_versions_removable,
             'program_management.delete_training_version':
@@ -136,6 +141,10 @@ class CentralManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_user_attached_to_management_entity &
                 predicates.is_user_linked_to_all_scopes_of_management_entity,
+            'program_management.change_minitraining_version':
+                predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
+                predicates.is_user_attached_to_management_entity &
+                predicates.is_education_group_type_authorized_according_to_user_scope,
             'program_management.delete_permanently_minitraining_version':
                 predicates.are_all_mini_training_versions_removable,
             'program_management.delete_minitraining_version':

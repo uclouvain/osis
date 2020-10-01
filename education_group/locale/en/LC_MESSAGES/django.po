@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-23 10:25+0200\n"
+"POT-Creation-Date: 2020-09-30 10:19+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -41,6 +41,10 @@ msgstr[1] ""
 msgid "%(max)s must be greater or equals than %(min)s"
 msgstr ""
 
+#, python-format
+msgid "%(start_index)s to %(end_index)s of %(total_counts)s common topics"
+msgstr ""
+
 msgid "ARES ability"
 msgstr ""
 
@@ -48,6 +52,9 @@ msgid "ARES study code"
 msgstr ""
 
 msgid "ARES-GRACA"
+msgstr ""
+
+msgid "Ac yr."
 msgstr ""
 
 msgid "Academic responsible"
@@ -114,6 +121,10 @@ msgstr ""
 msgid "Alert Message"
 msgstr ""
 
+msgctxt "female plural"
+msgid "All"
+msgstr ""
+
 #, python-format
 msgid "Are you sure you want to delete %(acronym)s - %(title)s ?"
 msgstr ""
@@ -129,6 +140,9 @@ msgid "Block"
 msgstr ""
 
 msgid "Cancel"
+msgstr ""
+
+msgid "Catalog configuration"
 msgstr ""
 
 msgid "Category"
@@ -172,6 +186,9 @@ msgid "Common general informations will be published soon"
 msgstr ""
 
 msgid "Conditions"
+msgstr ""
+
+msgid "Configuration"
 msgstr ""
 
 #, python-format
@@ -225,9 +242,6 @@ msgid "Delete"
 msgstr ""
 
 msgid "Deliberation"
-msgstr ""
-
-msgid "Detach"
 msgstr ""
 
 msgid "Diploma"
@@ -323,10 +337,7 @@ msgstr ""
 msgid "General informations"
 msgstr ""
 
-msgid "Go down"
-msgstr ""
-
-msgid "Go up"
+msgid "General informations have been updated"
 msgstr ""
 
 msgid "Graduates"
@@ -402,6 +413,14 @@ msgstr ""
 msgid "Main"
 msgstr ""
 
+msgid "Management common topics"
+msgstr ""
+
+msgid ""
+"Management common topics in the context of training's general informations "
+"and access conditions"
+msgstr ""
+
 msgid "Management entity"
 msgstr ""
 
@@ -450,6 +469,9 @@ msgid "New Mini-Training"
 msgstr ""
 
 msgid "New Training"
+msgstr ""
+
+msgid "No result!"
 msgstr ""
 
 msgid "Non university Bachelors"
@@ -667,6 +689,15 @@ msgstr ""
 msgid "Training not found : {acronym} {year}"
 msgstr ""
 
+msgid "Training version can only be created by central manager"
+msgstr ""
+
+msgid "Training version can only be deleted by central manager"
+msgstr ""
+
+msgid "Training version can only be modified by central manager"
+msgstr ""
+
 msgid "Trainings"
 msgstr ""
 
@@ -709,9 +740,6 @@ msgid "Validity"
 msgstr ""
 
 msgid "Validity cannot be greater than last year of organization"
-msgstr ""
-
-msgid "Version can only be created by central manager"
 msgstr ""
 
 msgid "Version name {} already exists"

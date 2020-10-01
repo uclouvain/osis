@@ -46,7 +46,6 @@ class TestTrainingVersionForm(TestCase):
     def test_field_reference_should_use_group_form(self, *mocks):
         form = UpdateTrainingVersionForm(
             self.tree_version_identity,
-            self.node_identity,
             TrainingType.PGRM_MASTER_120,
             self.user,
             event_perm_obj=GroupYearFactory()
@@ -67,7 +66,6 @@ class TestMiniTrainingVersionForm(TestCase):
     def test_field_reference_should_use_group_form(self, *mocks):
         form = UpdateMiniTrainingVersionForm(
             self.tree_version_identity,
-            self.node_identity,
             MiniTrainingType.DEEPENING,
             self.user,
             event_perm_obj=GroupYearFactory()
