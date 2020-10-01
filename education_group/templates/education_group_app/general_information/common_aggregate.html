@@ -54,6 +54,7 @@
     {% if can_edit_information %}
         <script>
             $('a.modify-text-btn').click(function (evt) {
+                console.log("OPEN MODAL")
                 evt.preventDefault();
                 var url = $(this).data('form');
                 var modal = $("#modify_text");
