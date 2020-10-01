@@ -31,7 +31,7 @@ from base.forms.learning_unit.learning_unit_create import CRUCIAL_YEAR_FOR_CREDI
 from base.forms.learning_unit.learning_unit_create import LearningUnitYearModelForm
 from base.models.enums import learning_unit_year_subtypes
 from base.models.learning_unit_year import LearningUnitYear
-from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.academic_year import AcademicYearFactory, get_current_year
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
 from base.tests.factories.person import PersonFactory
 from base.tests.forms.test_learning_unit_create_2 import get_valid_form_data
@@ -41,7 +41,7 @@ class TestCreditsValidation(TestCase):
     @classmethod
     def setUpTestData(cls):
         start_year = AcademicYearFactory(year=CRUCIAL_YEAR_FOR_CREDITS_VALIDATION - 1)
-        end_year = AcademicYearFactory(year=CRUCIAL_YEAR_FOR_CREDITS_VALIDATION + 1)
+        end_year = AcademicYearFactory(year=get_current_year())
         cls.academic_years = GenerateAcademicYear(start_year, end_year).academic_years
         cls.learn_unit_structure = GenerateContainer(cls.academic_years[0], cls.academic_years[2])
         cls.learning_unit_year_2017 = LearningUnitYear.objects.get(
