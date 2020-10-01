@@ -38,5 +38,6 @@ class LearningUnitUtilization(PermissionRequiredMixin, LearningUnitGeneric):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['utilization_rows'] = get_utilizations(NodeIdentity(code=self.node.code, year=self.node.year))
+        context['utilization_rows'] = get_utilizations(NodeIdentity(code=self.node.code, year=self.node.year),
+                                                       context.get('language'))
         return context

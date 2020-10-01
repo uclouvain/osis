@@ -582,13 +582,19 @@ def _copy(root: 'Node', ignore_children_from: Set[EducationGroupTypesEnum] = Non
 def get_nearest_parents(parents: List['Node']) -> Optional[Dict[str, 'Node']]:
     parent_direct_node = None
     root_node = None
+    option_node = None
     for node in parents:
         if (node.is_minor_or_deepening()) or (node.is_training() and node.is_finality()):
             parent_direct_node = node
-        if node.is_training() or node.is_mini_training():
-            root_node = node
-
-    if parent_direct_node is None and root_node is None:
+        elif node.is_option():
+            option_node = node
+        if option_node:
+            if node.is_training():
+                root_node = node
+        else:
+            if node.is_training() or node.is_mini_training():
+                root_node = node
+    if (parent_direct_node is None and root_node is None) or (option_node and root_node is None):
         return None
     return {
         'parent_direct_node': parent_direct_node,

@@ -35,11 +35,12 @@ from program_management.ddd.service.read import search_program_trees_using_node_
 
 from program_management.ddd.command import GetProgramTreesFromNodeCommand
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
-from program_management.serializers.node_view import get_program_tree_version_name
+from program_management.serializers.node_view import get_program_tree_version_name, get_program_tree_version_title, \
+    get_program_tree_version_dict
 from program_management.ddd.domain.program_tree import get_nearest_parents
 
 
-def get_utilizations(node_identity: 'NodeIdentity') -> List[Dict[str, Any]]:
+def get_utilizations(node_identity: 'NodeIdentity', language: str) -> List[Dict[str, Any]]:
     cmd = GetProgramTreesFromNodeCommand(code=node_identity.code, year=node_identity.year)
     program_trees = search_program_trees_using_node_service.search_program_trees_using_node(cmd)
 
@@ -55,10 +56,10 @@ def get_utilizations(node_identity: 'NodeIdentity') -> List[Dict[str, Any]]:
                         parent_nodes.append(link.parent)
                         _build_parents_info(link, program_trees, utilization_rows_dict)
 
-    return _buid_utilization_rows(utilization_rows_dict)
+    return _buid_utilization_rows(utilization_rows_dict, language)
 
 
-def _buid_utilization_rows(utilization_rows_dict: Dict['Link', List['Node']]) -> List[Dict[str, Any]]:
+def _buid_utilization_rows(utilization_rows_dict: Dict['Link', List['Node']], language: str) -> List[Dict[str, Any]]:
     utilization_rows = []
 
     for link, training_nodes in utilization_rows_dict.items():
@@ -75,9 +76,13 @@ def _buid_utilization_rows(utilization_rows_dict: Dict['Link', List['Node']]) ->
                         utilization_in_trainings[key] = used_trainings
         elif (link.parent.is_minor_or_deepening()) or (link.parent.is_training() and link.parent.is_finality()):
             utilization_in_trainings = {link.parent: []}
+        parent_node_identity = NodeIdentity(code=link.parent.code, year=link.parent.year)
+        parent_trees = ProgramTreeVersionRepository.search_all_versions_from_root_node(parent_node_identity)
+        version_details = get_program_tree_version_dict(parent_node_identity, parent_trees, language)
         utilization_rows.append(
             {
                 'link': link,
+                'version_details': version_details,
                 'training_nodes': _get_training_nodes(utilization_in_trainings)
             }
         )
