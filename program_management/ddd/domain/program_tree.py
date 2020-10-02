@@ -586,7 +586,9 @@ def get_nearest_parents(parents: List['Node']) -> Optional[Dict[str, 'Node']]:
     for node in parents:
         if (node.is_minor_or_deepening()) or (node.is_training() and node.is_finality()):
             parent_direct_node = node
-        elif node.is_option():
+
+    for node in parents:
+        if node.is_option():
             option_node = node
         if option_node:
             if node.is_training():

@@ -38,6 +38,7 @@ from program_management.ddd.repositories.program_tree_version import ProgramTree
 from program_management.serializers.node_view import get_program_tree_version_name, get_program_tree_version_title, \
     get_program_tree_version_dict
 from program_management.ddd.domain.program_tree import get_nearest_parents
+from program_management.ddd.domain.service.identity_search import ProgramTreeIdentitySearch
 
 
 def get_utilizations(node_identity: 'NodeIdentity', language: str) -> List[Dict[str, Any]]:
@@ -76,9 +77,10 @@ def _buid_utilization_rows(utilization_rows_dict: Dict['Link', List['Node']], la
                         utilization_in_trainings[key] = used_trainings
         elif (link.parent.is_minor_or_deepening()) or (link.parent.is_training() and link.parent.is_finality()):
             utilization_in_trainings = {link.parent: []}
-        parent_node_identity = NodeIdentity(code=link.parent.code, year=link.parent.year)
-        parent_trees = ProgramTreeVersionRepository.search_all_versions_from_root_node(parent_node_identity)
-        version_details = get_program_tree_version_dict(parent_node_identity, parent_trees, language)
+
+        version_details = get_program_tree_version_dict(
+            ProgramTreeVersionRepository.search(code=link.parent.code, year=link.parent.year), language
+        )
         utilization_rows.append(
             {
                 'link': link,
