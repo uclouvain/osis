@@ -1634,7 +1634,7 @@ msgid "No. Session"
 msgstr "No. session"
 
 msgid "Non academic"
-msgstr "Non académiques"
+msgstr "Non académique"
 
 msgid "Non academic CREF"
 msgstr "Non académique CREF"
