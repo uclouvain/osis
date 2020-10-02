@@ -149,7 +149,7 @@ class EducationGroupCommonNodeTreeSerializer(serializers.Serializer):
             NodeIdentity(code=obj.child.code, year=obj.child.year),
             _get_version_of_nodes({obj.child})
         )
-        return version_name[1:-1]
+        return version_name[1:-1]  # remove [ ]
 
     def get_partial_title(self, obj):
         field_suffix = '_en' if self.context.get('language') == settings.LANGUAGE_CODE_EN else '_fr'
