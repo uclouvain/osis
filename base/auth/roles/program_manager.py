@@ -108,6 +108,12 @@ class ProgramManager(EducationGroupRoleModel):
             'base.change_educationgroupcertificateaim': is_linked_to_offer,
             'base.is_institution_administrator': rules.always_allow,
             'base.view_educationgroup': rules.always_allow,
+            'program_management.change_training_version': osis_role_predicates.always_deny(
+                message=_("Program manager is not allowed to modify a specific version")
+            ),
+            'program_management.change_minitraining_version': osis_role_predicates.always_deny(
+                message=_("Program manager is not allowed to modify a specific version")
+            ),
         })
 
 
