@@ -289,6 +289,7 @@ msgstr "Location"
 msgid "M=Justified Absence"
 msgstr "M=Absence Justifiée"
 
+msgctxt "male"
 msgid "Main"
 msgstr "Principal"
 
