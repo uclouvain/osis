@@ -7,7 +7,7 @@ from osis_role.errors import predicate_failed_msg
 
 
 @predicate(bind=True)
-@predicate_failed_msg(message=_("The user is not linked to this offer"))
+@predicate_failed_msg(message=_("The user is not linked to this training"))
 def is_linked_to_offer(self, user: User, obj: GroupYear):
     if obj:
         return any(

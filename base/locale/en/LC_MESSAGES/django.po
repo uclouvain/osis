@@ -2496,7 +2496,7 @@ msgstr ""
 msgid "The title is made up of the common part and / or any supplement"
 msgstr ""
 
-msgid "The user is not linked to this offer"
+msgid "The user is not linked to this training"
 msgstr ""
 
 #, python-format
