@@ -42,6 +42,7 @@ from program_management.tests.factories.element import ElementGroupYearFactory, 
 from program_management.ddd.service.read.get_utilization_rows import get_utilizations, _get_training_nodes
 
 URL_ELEMENT_IDENTIFICATION = 'element_identification'
+LANGUAGE_EN = "en"
 
 
 class TestGetUtilizationRows(TestCase):
@@ -141,13 +142,14 @@ class TestGetUtilizationRows(TestCase):
             code=self.element_luy3.learning_unit_year.acronym,
             year=self.element_luy3.learning_unit_year.academic_year.year
         )
-        utilization_rows = get_utilizations(node_identity)
+        utilization_rows = get_utilizations(node_identity, LANGUAGE_EN)
 
         self.assertEqual(len(utilization_rows), 1)
 
         utilization_row = utilization_rows[0]
         self.assertIn('link', utilization_row)
         self.assertIn('training_nodes', utilization_row)
+        self.assertIn('version_details', utilization_row)
 
         training_nodes = utilization_rows[0]['training_nodes']
         self.assertIn('direct_gathering', training_nodes[0])
@@ -163,7 +165,7 @@ class TestGetUtilizationRows(TestCase):
             code=self.element_luy3.learning_unit_year.acronym,
             year=self.element_luy3.learning_unit_year.academic_year.year
         )
-        utilization_rows = get_utilizations(node_identity)
+        utilization_rows = get_utilizations(node_identity, LANGUAGE_EN)
         root_nodes = utilization_rows[0]['training_nodes'][0]['root_nodes']
 
         root = root_nodes[0]['root']
@@ -233,7 +235,7 @@ class TestGetUtilizationRows(TestCase):
             code=luy1.learning_unit_year.acronym,
             year=luy1.learning_unit_year.academic_year.year
         )
-        utilization_rows = get_utilizations(node_identity)
+        utilization_rows = get_utilizations(node_identity, LANGUAGE_EN)
         training_nodes = utilization_rows[0]['training_nodes']
         self.assertCountEqual(training_nodes, [])
 
@@ -242,12 +244,53 @@ class TestGetUtilizationRows(TestCase):
             code=self.element_luy1_particular_version.learning_unit_year.acronym,
             year=self.element_luy1_particular_version.learning_unit_year.academic_year.year
         )
-        utilization_rows = get_utilizations(node_identity)
+        utilization_rows = get_utilizations(node_identity, LANGUAGE_EN)
+
         self.assertEqual(utilization_rows[0]['training_nodes'][0]['version_name'],
                          "[{}{}]".format(
                              self.education_group_particular_version.version_name,
                              '-Transition' if self.education_group_particular_version.is_transition else '')
                          )
+
+
+class TestGetUtilizationRowsWithOption(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        """
+        training_root_element
+        |-- common code
+          |--- subgroup_element
+        |-- deepening_element
+        """
+        cls.academic_year = AcademicYearFactory(current=True)
+
+        cls.training_root_element = ElementGroupYearFactory(
+            group_year__education_group_type__name=TrainingType.BACHELOR.name,
+            group_year__academic_year=cls.academic_year
+        )
+        cls.common_core_element = ElementGroupYearFactory(
+            group_year__academic_year=cls.academic_year,
+            group_year__education_group_type__name=GroupType.COMMON_CORE.name
+        )
+        cls.subgroup_element = ElementGroupYearFactory(
+            group_year__academic_year=cls.academic_year,
+            group_year__education_group_type__name=GroupType.SUB_GROUP.name
+        )
+        cls.deepening_element = ElementGroupYearFactory(
+            group_year__academic_year=cls.academic_year,
+            group_year__education_group_type__name=MiniTrainingType.DEEPENING.name
+        )
+        cls.deepening_subgroup_element = ElementGroupYearFactory(
+            group_year__academic_year=cls.academic_year,
+            group_year__education_group_type__name=GroupType.SUB_GROUP.name
+        )
+
+        GroupElementYearFactory(parent_element=cls.training_root_element, child_element=cls.common_core_element)
+        GroupElementYearFactory(parent_element=cls.common_core_element, child_element=cls.subgroup_element)
+        GroupElementYearFactory(parent_element=cls.training_root_element, child_element=cls.deepening_element)
+
+        GroupElementYearChildLeafFactory(parent_element=cls.deepening_element,
+                                         child_element=cls.deepening_subgroup_element)
 
 
 def _build_random_list_for_training_nodes(original: List) -> Dict:

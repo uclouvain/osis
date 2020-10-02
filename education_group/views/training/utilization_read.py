@@ -36,5 +36,6 @@ class TrainingReadUtilization(TrainingRead):
         context = super().get_context_data(**kwargs)
         node = self.get_object()
 
-        context['utilization_rows'] = get_utilizations(NodeIdentity(code=node.code, year=node.year))
+        context['utilization_rows'] = get_utilizations(NodeIdentity(code=node.code, year=node.year),
+                                                       context.get('language'))
         return context

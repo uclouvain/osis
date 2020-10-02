@@ -99,7 +99,6 @@ class TestTrainingReadDiplomaCertificate(TestCase):
         from education_group.views.training.common_read import Tab
 
         response = self.client.get(self.url)
-
         self.assertTrue(response.context['tab_urls'][Tab.DIPLOMAS_CERTIFICATES]['active'])
         self.assertFalse(response.context['tab_urls'][Tab.CONTENT]['active'])
         self.assertFalse(response.context['tab_urls'][Tab.IDENTIFICATION]['active'])
