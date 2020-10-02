@@ -365,7 +365,7 @@ msgid "General informations"
 msgstr "Infos générales"
 
 msgid "General informations have been updated"
-msgstr "Les informations générales ont été mise à jour"
+msgstr "Les informations générales ont été mises à jour"
 
 msgid "Graduates"
 msgstr "Diplômés"
