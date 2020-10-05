@@ -84,7 +84,6 @@ INSTALLED_APPS = (
     'ajax_select',
     'django_celery_beat',
     'django_celery_results',
-    'notifications',
     'django_filters',
     'hijack',
     'compat',
