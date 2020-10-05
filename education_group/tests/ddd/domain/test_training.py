@@ -27,7 +27,8 @@ import mock
 from django.test import SimpleTestCase
 
 from education_group.ddd.domain import training, exception
-from education_group.tests.ddd.factories.diploma import DiplomaFactory
+from education_group.ddd.domain.exception import MaximumCertificateAimType2Reached
+from education_group.tests.ddd.factories.diploma import DiplomaFactory, DiplomaAimFactory, DiplomaAimIdentityFactory
 from education_group.tests.ddd.factories.training import TrainingFactory
 
 
@@ -96,3 +97,15 @@ class TestTrainingHasConflictedCertificateAims(SimpleTestCase):
         other_training = TrainingFactory(diploma=DiplomaFactory(aims=['dummy_aim']))
 
         self.assertFalse(training_source.has_conflicted_certificate_aims(other_training))
+
+
+class TestUpdateCertificateAims(SimpleTestCase):
+    def test_should_return_max_type_2_aims_error(self):
+        training_source = TrainingFactory(
+            diploma=DiplomaFactory(
+                aims=[DiplomaAimFactory(entity_id=DiplomaAimIdentityFactory(section=2)) for _ in range(2)]
+            )
+        )
+
+        with self.assertRaises(MaximumCertificateAimType2Reached):
+            training_source.update_aims(data=training.UpdateDiplomaData(diploma=training_source.diploma))
