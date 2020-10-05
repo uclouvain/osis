@@ -71,9 +71,12 @@ def get_learning_units_is_prerequisite_for_excel(request, year, code):
 @permission_required('base.view_educationgroup', raise_exception=True)
 @set_download_cookie
 def get_learning_units_of_training_for_excel(request, year, code):
-    excel = EducationGroupYearLearningUnitsContainedToExcel(CustomXlsForm(request.POST or None),
+    excel = EducationGroupYearLearningUnitsContainedToExcel(CustomXlsForm(request.POST or None,
+                                                                          year=year,
+                                                                          code=code),
                                                             year,
                                                             code).to_excel()
+
     response = HttpResponse(excel['workbook'], content_type=CONTENT_TYPE_XLS)
     filename = "{workbook_name}.xlsx".format(
         workbook_name=str(_("LearningUnitList-%(year)s-%(acronym)s") % {

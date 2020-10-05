@@ -62,6 +62,7 @@ from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 from program_management.ddd.repositories import load_tree
 from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 from program_management.forms.custom_xls import CustomXlsForm
+from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 
 ILLEGAL_CHARACTERS_RE = re.compile(r'[\000-\010]|[\013-\014]|[\016-\037]')
 
@@ -142,7 +143,6 @@ class EducationGroupYearLearningUnitsContainedToExcel:
             self.hierarchy = load_tree.load(custom_xls_form.node)
         else:
             self.hierarchy = ProgramTreeRepository.get(ProgramTreeIdentity(code, year))
-
         self.custom_xls_form = custom_xls_form
 
     def _to_workbook(self):
