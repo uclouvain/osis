@@ -34,7 +34,6 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from base import utils
-from base.models.education_group_type import EducationGroupType
 from base.models.enums import education_group_categories
 from base.models.enums.education_group_categories import TRAINING, MINI_TRAINING, GROUP
 from base.tests.factories.academic_year import AcademicYearFactory
@@ -53,13 +52,11 @@ from education_group.tests.factories.group_year import GroupYearFactory
 from program_management.forms.education_groups import GroupFilter, STANDARD, PARTICULAR
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory, \
     StandardTransitionEducationGroupVersionFactory, ParticularTransitionEducationGroupVersionFactory, create_with_version
-from education_group.models.group_year import GroupYear
-from program_management.models.education_group_version import EducationGroupVersion
 
 URL_EDUCATION_GROUPS = "version_program"
 SEARCH_TEMPLATE = "search.html"
 
-FILTER_DATA = {"acronym": ["LBIR"], "title": ["dummy filter"]}
+FILTER_DATA = {"acronym": ["LBIR"], "full_title_fr": ["dummy filter"]}
 TITLE_EDPH2 = "Edph training 2"
 TITLE_EDPH3 = "Edph training 3 [120], sciences"
 
@@ -339,7 +336,7 @@ class TestEducationGroupDataSearchFilter(TestCase):
                           '{}$'.format(self.group_year_edph2.title_fr)
                           ]
         for search_string in search_strings:
-            response = self.client.get(self.url, data={"title_fr": search_string})
+            response = self.client.get(self.url, data={"full_title_fr": search_string})
 
             self.assertTemplateUsed(response, SEARCH_TEMPLATE)
 
@@ -363,7 +360,7 @@ class TestEducationGroupDataSearchFilter(TestCase):
         ]
 
         for idx, search_string in enumerate(search_strings):
-            response = self.client.get(self.url, data={"title_fr": search_string})
+            response = self.client.get(self.url, data={"full_title_fr": search_string})
 
             self.assertTemplateUsed(response, SEARCH_TEMPLATE)
 
