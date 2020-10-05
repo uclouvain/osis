@@ -194,7 +194,7 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             mini_trainings_identities: List['MiniTrainingIdentity']) -> List[str]:
         last_identity = mini_trainings_identities[-1]
         is_new_end_year_lower_than_initial_one = operator.is_year_lower(
-            self.mini_training_form.cleaned_data["end_year"].year
+            self.mini_training_form.cleaned_data["end_year"]
             if self.mini_training_form.cleaned_data["end_year"] else None,
             self.mini_training_form.initial['end_year']
         )
