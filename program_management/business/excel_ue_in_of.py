@@ -42,6 +42,7 @@ from base.business.learning_unit_xls import PROPOSAL_LINE_STYLES, \
 from base.business.learning_unit_xls import get_significant_volume
 from base.business.learning_units.xls_generator import hyperlinks_to_string
 from base.models.enums.education_group_types import GroupType
+from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.models.learning_unit_year import LearningUnitYear
@@ -329,7 +330,7 @@ def _get_optional_data(data: List, luy: DddLearningUnitYear, optional_data_neede
         data.append(link.relative_credits or '-')
         data.append(luy.credits.to_integral_value() or '-')
     if optional_data_needed['has_periodicity']:
-        data.append(luy.periodicity if luy.periodicity else '')
+        data.append(dict(PERIODICITY_TYPES)[luy.periodicity] if luy.periodicity else '')
     if optional_data_needed['has_active']:
         data.append(str.strip(yesno(luy.status)))
     if optional_data_needed['has_quadrimester']:
