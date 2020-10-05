@@ -296,7 +296,8 @@ class Training(interface.RootEntity):
 
     def update_aims(self, data: 'UpdateDiplomaData'):
         self._update_aims(data.diploma)
-        validators_by_business_action.UpdateCertificateAimsValidatorList(self)
+        validators = validators_by_business_action.UpdateCertificateAimsValidatorList(self)
+        validators.validate()
 
     def update_aims_from_other_training(self, other_training: 'Training'):
         self._update_aims(other_training.diploma)

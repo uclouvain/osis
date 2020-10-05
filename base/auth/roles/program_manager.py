@@ -92,6 +92,9 @@ class ProgramManager(EducationGroupRoleModel):
             'base.can_access_learningunit': rules.always_allow,
             'base.can_access_offer': rules.always_allow,
             'base.can_access_student_path': rules.always_allow,
+            'base.can_attach_node': osis_role_predicates.always_deny(
+                message=_("Program manager is not allowed to modify a link")
+            ),
             'base.can_detach_node': osis_role_predicates.always_deny(
                 message=_("Program manager is not allowed to modify a link")
             ),
