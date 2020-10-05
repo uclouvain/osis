@@ -258,7 +258,7 @@ def _fix_data(link: 'Link',  luy: 'LearningUnitYear', gathering: Dict[str, 'Node
     if translation.get_language() == LANGUAGE_CODE_EN:
         title = luy.full_title_en
     data_fix = FixLineUEContained(acronym=luy.acronym,
-                                  year=luy.year,
+                                  year=u"%s-%s" % (luy.year, str(luy.year + 1)[-2:]),
                                   title=title,
                                   type=luy.type.value if luy.type else '',
                                   subtype=luy.subtype if luy.subtype else '',
