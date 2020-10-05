@@ -541,7 +541,7 @@ def get_expected_data_new(child_node, luy, link, main_gathering=None):
         main_gathering_str = ''
 
     expected = [luy.acronym,
-                luy.year,
+                u"%s-%s" % (luy.year, str(luy.year + 1)[-2:]),
                 luy.full_title_fr,
                 luy.type.value if luy.type else '',
                 luy.subtype if luy.subtype else '',
