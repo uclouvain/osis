@@ -59,10 +59,11 @@ from program_management.business.utils import html2text
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.node import NodeLearningUnitYear
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
-from program_management.ddd.repositories import load_tree
 from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 from program_management.forms.custom_xls import CustomXlsForm
-from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
+from program_management.ddd.service.read import get_program_tree_version_from_node_service
+from program_management.ddd import command
+from program_management.ddd.domain.exception import ProgramTreeVersionNotFoundException
 
 
 ILLEGAL_CHARACTERS_RE = re.compile(r'[\000-\010]|[\013-\014]|[\016-\037]')
@@ -140,14 +141,26 @@ EXCLUDE_UE_KEY = 'exclude_ue'
 class EducationGroupYearLearningUnitsContainedToExcel:
 
     def __init__(self, custom_xls_form: CustomXlsForm, node: 'Node'):
-        program_tree_versions = ProgramTreeVersionRepository.search(element_ids=[node.pk])
-        self.program_tree_version = None
-        if program_tree_versions:
-            self.program_tree_version = program_tree_versions[0]
+        self._get_program_tree_version(node)
+        self._get_program_tree(node)
+        self.custom_xls_form = custom_xls_form
+
+    def _get_program_tree_version(self, node):
+        get_cmd = command.GetProgramTreeVersionFromNodeCommand(
+            code=node.code,
+            year=node.year
+        )
+        try:
+            self.program_tree_version = get_program_tree_version_from_node_service.get_program_tree_version_from_node(
+                get_cmd)
+        except ProgramTreeVersionNotFoundException:
+            self.program_tree_version = None
+
+    def _get_program_tree(self, node):
+        if self.program_tree_version:
             self.hierarchy = self.program_tree_version.get_tree()
         else:
             self.hierarchy = ProgramTreeRepository.get(ProgramTreeIdentity(node.code, node.year))
-        self.custom_xls_form = custom_xls_form
 
     def _to_workbook(self):
         return generate_ue_contained_for_workbook(self.custom_xls_form, self.hierarchy)
@@ -155,7 +168,12 @@ class EducationGroupYearLearningUnitsContainedToExcel:
     def to_excel(self):
         return {
             'workbook': save_virtual_workbook(self._to_workbook()),
-            'title': "{}{}".format(self.hierarchy.root_node.title, self.program_tree_version.version_label) if self.program_tree_version else self.hierarchy.root_node.title ,
+            'title':
+                "{}{}".format(
+                    self.hierarchy.root_node.title,
+                    self.program_tree_version.version_label
+                )
+                if self.program_tree_version else self.hierarchy.root_node.title,
             'year': self.hierarchy.root_node.year
         }
 
