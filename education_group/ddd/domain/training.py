@@ -180,6 +180,7 @@ class TrainingBuilder:
             ),
             academic_type=utils.get_enum_from_str(command.academic_type, AcademicTypes),
             diploma=Diploma(
+                aims=None,
                 leads_to_diploma=command.leads_to_diploma,
                 printing_title=command.printing_title,
                 professional_title=command.professional_title,
