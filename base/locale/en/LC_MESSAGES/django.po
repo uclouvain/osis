@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-05 11:32+0200\n"
+"POT-Creation-Date: 2020-10-05 09:24+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -53,10 +53,6 @@ msgstr ""
 
 #, python-format
 msgid "%(number_extended)s object(s) extended and %(number_error)s error(s)"
-msgstr ""
-
-#, python-format
-msgid "%(number_notifications)s unread notification(s)"
 msgstr ""
 
 #, python-format
@@ -489,9 +485,6 @@ msgid "City of institution"
 msgstr ""
 
 msgid "Classes"
-msgstr ""
-
-msgid "Clear notifications"
 msgstr ""
 
 msgid "Click on the map to set the location"
@@ -1631,10 +1624,6 @@ msgid "Not required"
 msgstr ""
 
 msgid "Note encoding"
-msgstr ""
-
-#, python-format
-msgid "Notification%(number_unread_notifications|pluralize)s"
 msgstr ""
 
 msgid "Number of elements"
