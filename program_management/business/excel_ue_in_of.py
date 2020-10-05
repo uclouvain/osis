@@ -340,17 +340,18 @@ def _get_optional_data(data: List, luy: DddLearningUnitYear, optional_data_neede
     if optional_data_needed['has_volume']:
         data.extend(volumes_information(luy.lecturing_volume, luy.practical_volume))
     if optional_data_needed['has_teacher_list']:
+        teachers = _get_distinct_teachers(luy)
         data.append(
             ";".join(
-                [_get_attribution_line(attribution.teacher)
-                 for attribution in luy.attributions
+                [_get_attribution_line(teacher)
+                 for teacher in teachers
                  ]
             )
         )
         data.append(
             ";".join(
-                [attribution.teacher.email
-                 for attribution in luy.attributions
+                [teacher.email
+                 for teacher in teachers
                  ]
             )
         )
@@ -505,3 +506,11 @@ def get_explore_parents(parents_of_ue: List['Node']) -> Dict[str, 'Node']:
         DIRECT_GATHERING_KEY: direct_parent,
         EXCLUDE_UE_KEY: exclude_ue_from_list
     }
+
+
+def _get_distinct_teachers(luy):
+    teachers = []
+    for attribution in luy.attributions:
+        if attribution.teacher not in teachers:
+            teachers.append(attribution.teacher)
+    return teachers
