@@ -34,9 +34,9 @@ BIENNIAL_ODD = "BIENNIAL_ODD"
 
 # FIXME :: DEPRECATED - use PeriodicityEnum instead
 PERIODICITY_TYPES = (
-    (ANNUAL, _("Annual")),
-    (BIENNIAL_EVEN, _("biennial even")),
-    (BIENNIAL_ODD, _("biennial odd")),
+    (ANNUAL, _("Annual periodicity")),
+    (BIENNIAL_EVEN, _("Biennial even")),
+    (BIENNIAL_ODD, _("Biennial odd")),
 )
 
 

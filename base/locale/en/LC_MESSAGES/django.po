@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-28 11:59+0200\n"
+"POT-Creation-Date: 2020-10-05 10:11+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -307,6 +307,9 @@ msgstr ""
 msgid "Annual"
 msgstr ""
 
+msgid "Annual periodicity"
+msgstr ""
+
 msgid "Apply postponement on learning unit year"
 msgstr ""
 
@@ -404,6 +407,12 @@ msgid "Begining of exam registration"
 msgstr ""
 
 msgid "Benefits and organization"
+msgstr ""
+
+msgid "Biennial even"
+msgstr ""
+
+msgid "Biennial odd"
 msgstr ""
 
 msgid "Birth Date"
@@ -799,9 +808,6 @@ msgid "End of cycle"
 msgstr ""
 
 msgid "End year"
-msgstr ""
-
-msgid "Ending date"
 msgstr ""
 
 msgid "Ending of course registration"
@@ -1659,9 +1665,6 @@ msgid "Open for externs"
 msgstr ""
 
 msgid "Open minor"
-msgstr ""
-
-msgid "Opening date"
 msgstr ""
 
 msgid "Operation"
