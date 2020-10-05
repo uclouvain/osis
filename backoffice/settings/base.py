@@ -118,7 +118,6 @@ MIDDLEWARE = (
     'django.middleware.security.SecurityMiddleware',
     'base.middlewares.extra_http_responses_midleware.ExtraHttpResponsesMiddleware',
     'waffle.middleware.WaffleMiddleware',
-    'base.middlewares.notification_middleware.NotificationMiddleware',
     'base.middlewares.reversion_middleware.BaseRevisionMiddleware',
 )
 
