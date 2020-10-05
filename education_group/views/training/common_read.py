@@ -140,9 +140,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             "node": self.get_object(),
             "node_path": self.get_path(),
             "tree": json.dumps(program_tree_view_serializer(self.get_tree())),
-            "form_xls_custom": CustomXlsForm(path=self.get_path(),
-                                             code=self.node_identity.code,
-                                             year=self.node_identity.year),
+            "form_xls_custom": CustomXlsForm(current_node=self.get_object()),
             "academic_year_choices": get_academic_year_choices(
                 self.node_identity,
                 self.get_path(),

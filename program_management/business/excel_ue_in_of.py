@@ -64,6 +64,7 @@ from program_management.ddd.repositories.program_tree import ProgramTreeReposito
 from program_management.forms.custom_xls import CustomXlsForm
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 
+
 ILLEGAL_CHARACTERS_RE = re.compile(r'[\000-\010]|[\013-\014]|[\016-\037]')
 
 BOLD_FONT = Font(bold=True)
@@ -138,11 +139,14 @@ EXCLUDE_UE_KEY = 'exclude_ue'
 
 class EducationGroupYearLearningUnitsContainedToExcel:
 
-    def __init__(self, custom_xls_form: CustomXlsForm, year: int, code: str):
-        if custom_xls_form.node:
-            self.hierarchy = load_tree.load(custom_xls_form.node)
+    def __init__(self, custom_xls_form: CustomXlsForm, node: 'Node'):
+        program_tree_versions = ProgramTreeVersionRepository.search(element_ids=[node.pk])
+        self.program_tree_version = None
+        if program_tree_versions:
+            self.program_tree_version = program_tree_versions[0]
+            self.hierarchy = self.program_tree_version.get_tree()
         else:
-            self.hierarchy = ProgramTreeRepository.get(ProgramTreeIdentity(code, year))
+            self.hierarchy = ProgramTreeRepository.get(ProgramTreeIdentity(node.code, node.year))
         self.custom_xls_form = custom_xls_form
 
     def _to_workbook(self):
@@ -151,7 +155,7 @@ class EducationGroupYearLearningUnitsContainedToExcel:
     def to_excel(self):
         return {
             'workbook': save_virtual_workbook(self._to_workbook()),
-            'title': self.hierarchy.root_node.title,
+            'title': "{}{}".format(self.hierarchy.root_node.title, self.program_tree_version.version_label) if self.program_tree_version else self.hierarchy.root_node.title ,
             'year': self.hierarchy.root_node.year
         }
 

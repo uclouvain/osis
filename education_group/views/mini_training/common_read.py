@@ -137,9 +137,7 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             "node_path": self.get_path(),
             "tab_urls": self.get_tab_urls(),
             "tree": json.dumps(program_tree_view_serializer(self.get_tree())),
-            "form_xls_custom": CustomXlsForm(path=self.get_path(),
-                                             year=self.get_education_group_version().root_group.academic_year.year,
-                                             code=self.get_education_group_version().root_group.partial_acronym),
+            "form_xls_custom": CustomXlsForm(current_node=self.get_object()),
             "education_group_version": self.get_education_group_version(),
             "academic_year_choices": get_academic_year_choices(
                 self.node_identity,
