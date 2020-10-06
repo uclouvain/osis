@@ -154,7 +154,7 @@ def extract_xls_data_from_education_group(an_education_group: GroupYear) -> List
     return [
         an_education_group.academic_year.name,
         an_education_group.complete_title_fr,
-        an_education_group.full_title_fr,
+        an_education_group.get_full_title_fr(),
         an_education_group.education_group_type,
         an_education_group.management_entity_version.acronym if an_education_group.management_entity_version else '',
         an_education_group.partial_acronym
