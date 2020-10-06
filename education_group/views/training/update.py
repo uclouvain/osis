@@ -101,8 +101,11 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         return self.get(request, *args, **kwargs)
 
     def build_success_messages(self, updated_aims_trainings, updated_trainings):
+        success_messages = []
+
         # get success msg on deleted trainings before splitting results
-        success_messages = self.get_success_msg_deleted_trainings(updated_trainings)
+        if updated_trainings:
+            success_messages += self.get_success_msg_deleted_trainings(updated_trainings)
 
         updated_trainings_with_aims = list(set(updated_trainings).intersection(updated_aims_trainings))
         updated_trainings = list(set(updated_trainings).difference(updated_trainings_with_aims))
@@ -114,6 +117,7 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
         return success_messages
 
+    # TODO : pull out this in a dedicated view for aims
     def _changed_certificate_aims_only(self):
         return len(self.training_form.changed_data) == 1 and 'certificate_aims' in self.training_form.changed_data
 
@@ -172,6 +176,7 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
         return updated_training_identities
 
+    # TODO : pull out this in a dedicated view for aims
     def update_certificate_aims(self):
         updated_aims_training_identities = []
 
@@ -252,6 +257,7 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             partial_acronym=self.kwargs['code']
         )
 
+    # TODO : discard this when a dedicated view for aims is available
     def get_success_msg_updated_trainings_with_aims(self, training_identities: List["TrainingIdentity"]) -> List[str]:
         training_identities = self._sort_by_year(training_identities)
         return [self._get_success_msg_updated_training(identity, with_aims=True) for identity in training_identities]
@@ -260,6 +266,7 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         training_identities = self._sort_by_year(training_identities)
         return [self._get_success_msg_updated_training(identity, with_aims=False) for identity in training_identities]
 
+    # TODO : pull out this in a dedicated view for aims
     def get_success_msg_updated_aims_only(self, training_identities: List["TrainingIdentity"]) -> List[str]:
         training_identities = self._sort_by_year(training_identities)
         return [self._get_success_msg_updated_aims(identity) for identity in training_identities]
@@ -289,6 +296,7 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             message = "{} {}".format(message, _("with certificate aims"))
         return self._get_success_msg_updated(training_identity, message)
 
+    # TODO : pull out this in a dedicated view for aims
     def _get_success_msg_updated_aims(self, training_identity: 'TrainingIdentity') -> str:
         message = _("Certificate aims only for training <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> "
                     "have been successfully updated.")
@@ -459,6 +467,7 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             schedule_type=cleaned_data["schedule_type"],
         )
 
+    # TODO : pull out this in a dedicated view for aims
     def _convert_form_to_postpone_aims_modification_cmd(
             self,
             form: training_forms.UpdateTrainingForm

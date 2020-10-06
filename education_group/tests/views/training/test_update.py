@@ -78,6 +78,8 @@ class TestTrainingUpdateView(TestCase):
         self.assertTrue("training_form" in context)
         self.assertTemplateUsed(response, "education_group_app/training/upsert/update.html")
 
+    @mock.patch("education_group.views.training.update.TrainingUpdateView."
+                "get_success_msg_deleted_trainings", return_value=[])
     @mock.patch("education_group.views.training.update.TrainingUpdateView.update_training")
     @mock.patch("education_group.views.training.update.TrainingUpdateView.delete_training")
     @mock.patch("education_group.views.training.update.TrainingUpdateView.training_form",
@@ -87,6 +89,7 @@ class TestTrainingUpdateView(TestCase):
             get_training_form_mock,
             delete_training,
             update_training,
+            *mocks
     ):
         update_training.return_value = [training.TrainingIdentity(acronym="ACRONYM", year=2020)]
         delete_training.return_value = []
