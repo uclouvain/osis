@@ -127,8 +127,8 @@ class TestTrainingVersionUpdateGetView(TestCase):
         self.assertRedirects(response, expected_redirect, fetch_redirect_response=False)
 
     @mock.patch('program_management.forms.version.ProgramTreeVersionRepository.get', return_value=None)
-    @mock.patch('program_management.forms.version.get_end_postponement_year_service.'
-                'calculate_program_tree_end_postponement', return_value=2025)
+    @mock.patch('program_management.ddd.service.read.get_version_max_end_year.'
+                'calculate_version_max_end_year', return_value=2025)
     def test_assert_get_context(self, mock_max_postponement, mock_program_tree_version_repo):
         mock_program_tree_version_repo.return_value = self.training_version_obj
         response = self.client.get(self.url)
@@ -216,12 +216,14 @@ class TestTrainingVersionUpdatePostView(TestCase):
         response = self.client.post(self.url)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
+    @mock.patch("program_management.views.tree_version.update_training.TrainingVersionUpdateView."
+                "display_delete_messages", return_vlaue=None)
     @mock.patch('program_management.views.tree_version.update_training.TrainingVersionUpdateView'
                 '._convert_form_to_update_training_version_command', return_value=None)
     @mock.patch('program_management.views.tree_version.update_training.version'
                 '.UpdateTrainingVersionForm.is_valid', return_value=True)
-    @mock.patch('program_management.forms.version.get_end_postponement_year_service.'
-                'calculate_program_tree_end_postponement', return_value=2025)
+    @mock.patch('program_management.ddd.service.read.get_version_max_end_year.'
+                'calculate_version_max_end_year', return_value=2025)
     @mock.patch('program_management.forms.version.ProgramTreeVersionRepository.get', return_value=None)
     @mock.patch('program_management.views.tree_version.update_training.update_and_postpone_training_version_service'
                 '.update_and_postpone_training_version', return_value=[])

@@ -21,17 +21,13 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-
-from program_management.ddd import command
-from program_management.ddd.domain.program_tree import ProgramTreeIdentity
-from program_management.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
-from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
+from typing import Optional
 
 
-def calculate_program_tree_end_postponement(
-        cmd: command.GetEndPostponementYearCommand
-) -> int:
-    return CalculateEndPostponement().calculate_end_postponement_year_program_tree(
-        identity=ProgramTreeIdentity(cmd.code, cmd.year),
-        repository=ProgramTreeVersionRepository()
-    )
+def is_year_lower(base_year: Optional[int], other_year: Optional[int]) -> bool:
+    if base_year is not None and other_year is None:
+        return True
+    elif base_year is not None and other_year is not None:
+        return base_year < other_year
+    else:
+        return False

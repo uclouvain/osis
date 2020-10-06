@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -68,6 +68,7 @@ from osis_common.document import xls_build
 from program_management.tests.factories.education_group_version import \
     ParticularTransitionEducationGroupVersionFactory, StandardEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementFactory
+from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
 
 COL_TEACHERS_LETTER = 'L'
 COL_PROGRAMS_LETTER = 'Z'
@@ -85,7 +86,7 @@ class TestLearningUnitXls(TestCase):
         cls.learning_container_luy1 = LearningContainerYearFactory(academic_year=cls.academic_year)
         cls.learning_unit_yr_1 = LearningUnitYearFactory(academic_year=cls.academic_year,
                                                          learning_container_year=cls.learning_container_luy1,
-                                                         credits=50)
+                                                         credits=10)
         cls.learning_unit_yr_1_element = ElementFactory(learning_unit_year=cls.learning_unit_yr_1)
         cls.learning_unit_yr_2 = LearningUnitYearFactory()
 
@@ -110,7 +111,8 @@ class TestLearningUnitXls(TestCase):
 
         cls.group_element_child = GroupElementYearFactory(
             parent_element=cls.a_group_year_parent_element,
-            child_element=cls.learning_unit_yr_1_element
+            child_element=cls.learning_unit_yr_1_element,
+            relative_credits=cls.learning_unit_yr_1.credits,
         )
         # Particular OF
         cls.create_version(direct_parent_type)
@@ -206,7 +208,7 @@ class TestLearningUnitXls(TestCase):
     def create_version(cls, direct_parent_type):
         cls.learning_unit_yr_version = LearningUnitYearFactory(academic_year=cls.academic_year,
                                                                learning_container_year=LearningContainerYearFactory(academic_year=cls.academic_year),
-                                                               credits=50)
+                                                               credits=10)
         cls.learning_unit_yr_version_element = ElementFactory(learning_unit_year=cls.learning_unit_yr_version)
         cls.an_education_group_parent_for_particular_version = EducationGroupYearFactory(
             academic_year=cls.academic_year,
@@ -221,7 +223,8 @@ class TestLearningUnitXls(TestCase):
             root_group=cls.a_group_year_parent_for_particular_version)
         cls.group_element_particular = GroupElementYearFactory(
             parent_element=cls.a_group_year_parent_element_for_particular_version,
-            child_element=cls.learning_unit_yr_version_element
+            child_element=cls.learning_unit_yr_version_element,
+            relative_credits=15
         )
 
     def test_get_wrapped_cells_with_teachers_and_programs(self):
@@ -387,7 +390,7 @@ class TestLearningUnitXls(TestCase):
             luy)
 
         expected_common = [
-            str(_(luy.periodicity.title())),
+            dict(PERIODICITY_TYPES)[luy.periodicity],
             str(_('yes')) if luy.status else str(_('no')),
             component_lecturing.hourly_volume_total_annual,
             component_lecturing.hourly_volume_partial_q1,

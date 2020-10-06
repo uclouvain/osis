@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-21 13:45+0200\n"
+"POT-Creation-Date: 2020-10-01 14:32+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -94,6 +94,7 @@ msgstr ""
 msgid "Access condition"
 msgstr ""
 
+msgctxt "UE acronym"
 msgid "Acronym"
 msgstr ""
 
@@ -269,9 +270,11 @@ msgstr ""
 
 #, python-format
 msgid ""
-"Finality \"%(code)s\" has an end date greater than %(root_code)s program."
+"Finality \"%(acronym)s\" has an end date greater than %(root_acronym)s "
+"program."
 msgid_plural ""
-"Finalities \"%(code)s\" have an end date greater than %(root_code)s program."
+"Finalities \"%(acronym)s\" have an end date greater than %(root_acronym)s "
+"program."
 msgstr[0] ""
 msgstr[1] ""
 
@@ -321,6 +324,9 @@ msgid "Include subordinate entities"
 msgstr ""
 
 msgid "Include transition"
+msgstr ""
+
+msgid "Included in"
 msgstr ""
 
 msgid "Internship"
@@ -400,13 +406,13 @@ msgstr ""
 msgid "Mandatory"
 msgstr ""
 
-msgid "Max. credits"
-msgstr ""
-
-msgid "Min. credits"
-msgstr ""
-
 msgid "Mini-Training"
+msgstr ""
+
+#, python-format
+msgid ""
+"Mini-Training %(offer_acronym)s[%(acronym)s] successfully deleted from "
+"%(academic_year)s."
 msgstr ""
 
 #, python-format
@@ -656,9 +662,6 @@ msgstr ""
 msgid "Subtype"
 msgstr ""
 
-msgid "Success"
-msgstr ""
-
 msgid "Suppression"
 msgstr ""
 
@@ -672,6 +675,10 @@ msgstr ""
 msgid ""
 "The child %(child)s you want to attach is a parent of the node you want to "
 "attach."
+msgstr ""
+
+#, python-format
+msgid "The end date must be higher or equal to finality %(acronym)s"
 msgstr ""
 
 #, python-format
@@ -743,6 +750,12 @@ msgid "Title in French"
 msgstr ""
 
 msgid "Training"
+msgstr ""
+
+#, python-format
+msgid ""
+"Training %(offer_acronym)s[%(acronym)s] successfully deleted from "
+"%(academic_year)s."
 msgstr ""
 
 #, python-format

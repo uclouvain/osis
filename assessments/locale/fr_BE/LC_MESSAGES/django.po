@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-23 08:57+0200\n"
+"POT-Creation-Date: 2020-10-05 09:53+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -66,8 +66,9 @@ msgstr "Année académique"
 msgid "Accepted value: %(justification_label_authorized)s "
 msgstr "Valeur acceptée: %(justification_label_authorized)s "
 
+msgctxt "UE acronym"
 msgid "Acronym"
-msgstr "Acronyme"
+msgstr "Sigle"
 
 msgid "Add"
 msgstr "Ajouter"
@@ -120,9 +121,6 @@ msgstr "Choisir un fichier"
 
 msgid "City"
 msgstr "Ville"
-
-msgid "Code"
-msgstr "Code"
 
 msgid "Compare"
 msgstr "Comparer"
@@ -291,6 +289,7 @@ msgstr "Location"
 msgid "M=Justified Absence"
 msgstr "M=Absence Justifiée"
 
+msgctxt "male"
 msgid "Main"
 msgstr "Principal"
 
@@ -684,7 +683,7 @@ msgstr ""
 "du fichier excel à fournir (bouton '%(button_value)s')"
 
 msgid "date_format"
-msgstr "%d%m%Y"
+msgstr "%d/%m/%Y"
 
 msgid "learning units in"
 msgstr "unités d'enseignement dans"

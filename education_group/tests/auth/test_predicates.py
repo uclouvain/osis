@@ -5,7 +5,8 @@ from mock import patch
 
 from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory, ContinuingEducationTrainingFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, ContinuingEducationTrainingFactory, \
+    GroupFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.person import PersonFactory
@@ -34,9 +35,9 @@ class TestUserAttachedToManagementEntity(TestCase):
             academic_year=cls.academic_year,
             management_entity=cls.entity_version_level_1.entity
         )
-        cls.person = PersonFactory()
 
     def setUp(self):
+        self.person = PersonFactory()
         self.predicate_context_mock = mock.patch(
             "rules.Predicate.context",
             new_callable=mock.PropertyMock,
@@ -163,7 +164,7 @@ class TestEducationGroupTypeAuthorizedAccordingToScope(TestCase):
         education_group_type_managed = EducationGroupYearFactory(
             education_group_type__name=TrainingType.BACHELOR.name
         )
-        FacultyManagerFactory(person=self.person, scopes=[Scope.IUFC.name],)
+        FacultyManagerFactory(person=self.person, scopes=[Scope.IUFC.name], )
 
         self.assertFalse(
             predicates.is_education_group_type_authorized_according_to_user_scope(
@@ -204,10 +205,10 @@ class TestEducationGroupTypeAuthorizedAccordingToScope(TestCase):
 class TestIsEditionProgramPeriodOpen(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.user = UserFactory()
         cls.group_year = GroupYearFactory()
 
     def setUp(self):
+        self.user = UserFactory()
         self.predicate_context_mock = mock.patch(
             "rules.Predicate.context",
             new_callable=mock.PropertyMock,
@@ -407,9 +408,8 @@ class TestIsElementOnlyInsideStandardProgram(TestCase):
         cls.group_year = GroupYearFactory(education_group_type__group=True)
         ElementFactory(group_year=cls.group_year)
 
-        cls.user = UserFactory.build()
-
     def setUp(self):
+        self.user = UserFactory.build()
         self.predicate_context_mock = mock.patch(
             "rules.Predicate.context",
             new_callable=mock.PropertyMock,

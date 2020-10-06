@@ -31,7 +31,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.shortcuts import get_object_or_404
 from django.utils.html import format_html
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, get_language
 from django_filters.views import FilterView
 
 from base.business.education_group import create_xls, ORDER_COL, ORDER_DIRECTION, create_xls_administrative_data
@@ -68,7 +68,7 @@ def _create_xls_administrative_data(view_obj, context, **response_kwargs):
     # FIXME: use ordering args in filter_form! Remove xls_order_col/xls_order property
     order = {ORDER_COL: view_obj.request.GET.get('xls_order_col'),
              ORDER_DIRECTION: view_obj.request.GET.get('xls_order')}
-    return create_xls_administrative_data(user, egys, filters, order)
+    return create_xls_administrative_data(user, egys, filters, order, get_language())
 
 
 @RenderToExcel("xls", _create_xls)

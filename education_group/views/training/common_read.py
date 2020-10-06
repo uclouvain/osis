@@ -59,6 +59,7 @@ from program_management.forms.custom_xls import CustomXlsForm
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.models.element import Element
 from program_management.serializers.program_tree_view import program_tree_view_serializer
+from base.business.education_group import has_coorganization
 
 Tab = read.Tab  # FIXME :: fix imports (and remove this line)
 
@@ -176,6 +177,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
                                               self.education_group_version.root_group.partial_acronym,
                                               ]
                                         ),
+            "show_coorganization": has_coorganization(self.education_group_version.offer),
         }
 
     def get_permission_object(self) -> 'GroupYear':
@@ -246,7 +248,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
 
         self.active_tab = read.get_tab_from_path_info(self.get_object(), self.request.META.get('PATH_INFO'))
 
-        return OrderedDict({
+        tab_urls = OrderedDict({
             Tab.IDENTIFICATION: {
                 'text': _('Identification'),
                 'active': Tab.IDENTIFICATION == self.active_tab,
@@ -297,6 +299,8 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             },
         })
 
+        return read.validate_active_tab(tab_urls)
+
     @functools.lru_cache()
     def get_current_academic_year(self):
         return academic_year.starting_academic_year()
@@ -308,19 +312,19 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
         node_category = self.get_object().category
         return self.current_version.is_standard_version and \
             node_category.name in general_information_sections.SECTIONS_PER_OFFER_TYPE and \
-            self._is_general_info_and_condition_admission_in_display_range
+            self._is_general_info_and_condition_admission_in_display_range()
 
     def have_skills_and_achievements_tab(self):
         node_category = self.get_object().category
         return self.current_version.is_standard_version and \
             node_category.name in TrainingType.with_skills_achievements() and \
-            self._is_general_info_and_condition_admission_in_display_range
+            self._is_general_info_and_condition_admission_in_display_range()
 
     def have_admission_condition_tab(self):
         node_category = self.get_object().category
         return self.current_version.is_standard_version and \
             node_category.name in TrainingType.with_admission_condition() and \
-            self._is_general_info_and_condition_admission_in_display_range
+            self._is_general_info_and_condition_admission_in_display_range()
 
     def _is_general_info_and_condition_admission_in_display_range(self):
         return MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION <= self.get_object().year < \

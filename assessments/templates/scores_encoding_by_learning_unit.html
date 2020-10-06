@@ -9,7 +9,7 @@
 * The core business involves the administration of students, teachers,
 * courses, programs and so on.
 *
-* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+* Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -83,7 +83,7 @@
                 </div>
                 <div class="col-md-3">
                     <label for="txt_acronym">{% trans 'Learning unit'%}</label>
-                    <input class="form-control" id="txt_acronym" placeholder="{% trans 'Code' %}"
+                    <input class="form-control" id="txt_acronym" placeholder="{% trans 'Acronym' context 'UE acronym' %}"
                            name="learning_unit_year_acronym"
                            value="{{ learning_unit_year_acronym  | default_if_none:'' }}"
                            style="text-transform:uppercase" maxlength="15">
@@ -147,7 +147,7 @@
                         <thead>
                         <tr>
                             <th id="complete">{% trans 'Complete' %}</th>
-                            <th id="code">{% trans 'Code' %}</th>
+                            <th id="code">{% trans 'Acronym' context 'UE acronym' %}</th>
                             <th id="title">{% trans 'Learning unit' %}</th>
                             <th id="responsible">{% trans 'Scores responsible' %}</th>
                             <th id="progress">{% trans 'Progress' %}</th>
@@ -222,7 +222,7 @@
                 <thead>
                 <tr>
                     <th>{% trans 'Complete' %}</th>
-                    <th>{% trans 'Code' %}</th>
+                    <th>{% trans 'Acronym' context 'UE acronym' %}</th>
                     <th>{% trans 'Learning unit' %}</th>
                     <th>{% trans 'Scores responsible' %}</th>
                     <th>{% trans 'Progress' %}</th>
@@ -309,7 +309,7 @@
                 <thead>
                 <tr>
                     <th>{% trans 'Complete' %}</th>
-                    <th id="code">{% trans 'Code' %}</th>
+                    <th id="code">{% trans 'Acronym' context 'UE acronym' %}</th>
                     <th>{% trans 'Learning unit' %}</th>
                     <th>{% trans 'Scores responsible' %}</th>
                     <th>{% trans 'Progress' %}</th>

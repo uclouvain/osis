@@ -15,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,32 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import operator
+import datetime
 
-import factory.fuzzy
-import notifications.models
-from django.contrib.contenttypes.models import ContentType
-from factory.django import DjangoModelFactory
-from faker import Faker
+from django import template
 
-from base.tests.factories.academic_calendar import AcademicCalendarFactory
-from base.tests.factories.user import UserFactory
-
-fake = Faker()
+register = template.Library()
 
 
-class NotificationFactory(DjangoModelFactory):
-    class Meta:
-        model = "notifications.Notification"
-        exclude = ['actor_obj']
-
-    level = factory.Iterator(notifications.models.Notification.LEVELS, getter=operator.itemgetter(0))
-
-    recipient = factory.SubFactory(UserFactory)
-    unread = True
-    actor_obj = factory.SubFactory(AcademicCalendarFactory)
-    actor_content_type = factory.LazyAttribute(lambda notif_obj: ContentType.objects.get_for_model(notif_obj.actor_obj))
-    actor_object_id = factory.LazyAttribute(lambda notif_obj: notif_obj.actor_obj.pk)
-
-    verb = "an action"
-    description = "a description"
+@register.filter
+def shift_date(source_date, days_to_add):
+    try:
+        return source_date + datetime.timedelta(days=days_to_add)
+    except TypeError:
+        return None

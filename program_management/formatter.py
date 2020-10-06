@@ -21,22 +21,10 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from unittest import mock
-
-from django.test import SimpleTestCase
-
-from program_management.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
-from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
-from program_management.ddd.service.read import get_end_postponement_year_service
-from program_management.tests.ddd.factories.commands.get_end_postponement_year_command import \
-    GetEndPostponementYearCommandFactory
+from program_management.ddd.business_types import *
 
 
-class TestGetEndPostponementYearService(SimpleTestCase):
-
-    @mock.patch.object(CalculateEndPostponement, 'calculate_end_postponement_year_program_tree')
-    def test_domain_service_is_called(self, mock_domain_service):
-        get_end_postponement_year_service.calculate_program_tree_end_postponement(
-            GetEndPostponementYearCommandFactory()
-        )
-        self.assertTrue(mock_domain_service.called)
+def format_program_tree_version_identity(tree_version_identity: 'ProgramTreeVersionIdentity') -> str:
+    if tree_version_identity.version_name:
+        return "{}[{}]".format(tree_version_identity.offer_acronym, tree_version_identity.version_name)
+    return tree_version_identity.offer_acronym

@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+from typing import List, Dict
 
 from django.templatetags.static import static
 from django.urls import reverse
@@ -182,10 +182,9 @@ def __get_learning_unit_node_icon(link: 'Link') -> str:
 
 
 def __get_learning_unit_node_text(link: 'Link', context=None):
-    text = link.child.code
     if context['root'].year != link.child.year:
-        text += '|{}'.format(link.child.year)
-    return text
+        return "|{}|{}".format(link.child.year, link.child.code)
+    return link.child.code
 
 
 def get_program_tree_version_name(node_identity: 'NodeIdentity', tree_versions: List['ProgramTreeVersion']):
@@ -227,3 +226,19 @@ def get_program_tree_version_title(node_identity: 'NodeIdentity',
             else:
                 return "[{}]".format(program_tree_version.title_fr) if program_tree_version.title_fr else ''
     return ''
+
+
+def get_program_tree_version_dict(tree_versions: List['ProgramTreeVersion'],
+                                  language: str) -> Dict:
+
+    version_info = {}
+    if tree_versions:
+        program_tree_version = tree_versions[0]
+        version_info['version_label'] = program_tree_version.version_label
+        if language == LANGUAGE_CODE_EN and program_tree_version.title_en:
+            version_info['title'] = "[{}]".format(program_tree_version.title_en)
+        else:
+            version_info['title'] = \
+                "[{}]".format(program_tree_version.title_fr) if program_tree_version.title_fr else ''
+
+    return version_info

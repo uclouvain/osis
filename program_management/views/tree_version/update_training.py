@@ -1,5 +1,5 @@
 import functools
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 from django.db import transaction
 from django.http import Http404, HttpResponseRedirect
@@ -10,6 +10,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views import View
 
 from base.models import entity_version
+from base.utils import operator
 from base.views.common import display_error_messages, display_warning_messages
 from base.views.common import display_success_messages
 from education_group.ddd import command as command_education_group
@@ -23,6 +24,7 @@ from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.command import UpdateTrainingVersionCommand
+from program_management.ddd.domain import program_tree_version
 from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
 from program_management.ddd.service.read import get_program_tree_version_from_node_service
 from program_management.ddd.service.write import update_and_postpone_training_version_service
@@ -63,6 +65,7 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
         if self.training_version_form.is_valid():
             version_identities = self.update_training_version()
             self.display_success_messages(version_identities)
+            self.display_delete_messages(version_identities)
             if not self.training_version_form.errors:
                 return HttpResponseRedirect(self.get_success_url())
         display_error_messages(self.request, self._get_default_error_messages())
@@ -90,6 +93,22 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
             )
         display_success_messages(self.request, success_messages, extra_tags='safe')
 
+    def display_delete_messages(self, version_identities: List['ProgramTreeVersionIdentity']):
+        last_identity = version_identities[-1]
+        is_new_end_year_lower_than_initial_one = operator.is_year_lower(
+            self.training_version_form.cleaned_data["end_year"],
+            self.training_version_form.initial['end_year']
+        )
+        if is_new_end_year_lower_than_initial_one:
+            delete_message = _(
+                "Training %(offer_acronym)s[%(acronym)s] successfully deleted from %(academic_year)s."
+            ) % {
+                "offer_acronym": last_identity.offer_acronym,
+                "acronym": last_identity.version_name,
+                "academic_year": display_as_academic_year(self.training_version_form.cleaned_data["end_year"] + 1)
+            }
+            display_success_messages(self.request, delete_message, extra_tags='safe')
+
     def get_url_program_version(self, version_id: 'ProgramTreeVersionIdentity') -> str:
         node_identity = NodeIdentitySearch().get_from_tree_version_identity(version_id)
         return reverse(
@@ -115,18 +134,24 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
             self.training_version_form.add_error("max_constraint", "")
         except exception_education_group.GroupCopyConsistencyException as e:
             display_warning_messages(self.request, e.message)
+            return [
+                program_tree_version.ProgramTreeVersionIdentity(
+                    offer_acronym=update_command.offer_acronym,
+                    year=year,
+                    version_name=update_command.version_name,
+                    is_transition=update_command.is_transition
+                ) for year in range(update_command.year, e.conflicted_fields_year)
+            ]
         return []
 
     @cached_property
     def training_version_form(self) -> 'version.UpdateTrainingVersionForm':
         training_version_identity = self.get_program_tree_version_obj().entity_id
-        node_identity = self.get_program_tree_obj().root_node.entity_id
         return version.UpdateTrainingVersionForm(
             data=self.request.POST or None,
             user=self.request.user,
             event_perm_obj=self.get_permission_object(),
             training_version_identity=training_version_identity,
-            node_identity=node_identity,
             training_type=self.get_training_obj().type,
             initial=self._get_training_version_form_initial_values()
         )

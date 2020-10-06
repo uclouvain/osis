@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-24 14:18+0200\n"
+"POT-Creation-Date: 2020-10-02 11:25+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid " with certificate aims"
+msgstr ""
 
 #, python-format
 msgid ""
@@ -41,6 +44,10 @@ msgstr[1] ""
 msgid "%(max)s must be greater or equals than %(min)s"
 msgstr ""
 
+#, python-format
+msgid "%(start_index)s to %(end_index)s of %(total_counts)s common topics"
+msgstr ""
+
 msgid "ARES ability"
 msgstr ""
 
@@ -48,6 +55,9 @@ msgid "ARES study code"
 msgstr ""
 
 msgid "ARES-GRACA"
+msgstr ""
+
+msgid "Ac yr."
 msgstr ""
 
 msgid "Academic responsible"
@@ -114,6 +124,10 @@ msgstr ""
 msgid "Alert Message"
 msgstr ""
 
+msgctxt "female plural"
+msgid "All"
+msgstr ""
+
 #, python-format
 msgid "Are you sure you want to delete %(acronym)s - %(title)s ?"
 msgstr ""
@@ -131,6 +145,9 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
+msgid "Catalog configuration"
+msgstr ""
+
 msgid "Category"
 msgstr ""
 
@@ -144,6 +161,12 @@ msgid "Central managers"
 msgstr ""
 
 msgid "Certificate aim can only be edited by program manager"
+msgstr ""
+
+#, python-format
+msgid ""
+"Certificate aims only for training <a href='%(link)s'> %(acronym)s "
+"(%(academic_year)s) </a> have been successfully updated."
 msgstr ""
 
 msgid "Clear clipboard"
@@ -165,6 +188,9 @@ msgstr ""
 msgid "Comment"
 msgstr ""
 
+msgid "Common admission conditions have been updated"
+msgstr ""
+
 msgid "Common admission conditions will be published soon"
 msgstr ""
 
@@ -172,6 +198,9 @@ msgid "Common general informations will be published soon"
 msgstr ""
 
 msgid "Conditions"
+msgstr ""
+
+msgid "Configuration"
 msgstr ""
 
 #, python-format
@@ -225,9 +254,6 @@ msgid "Delete"
 msgstr ""
 
 msgid "Deliberation"
-msgstr ""
-
-msgid "Detach"
 msgstr ""
 
 msgid "Diploma"
@@ -323,10 +349,7 @@ msgstr ""
 msgid "General informations"
 msgstr ""
 
-msgid "Go down"
-msgstr ""
-
-msgid "Go up"
+msgid "General informations have been updated"
 msgstr ""
 
 msgid "Graduates"
@@ -399,7 +422,16 @@ msgstr ""
 msgid "Link type"
 msgstr ""
 
+msgctxt "male"
 msgid "Main"
+msgstr ""
+
+msgid "Management common topics"
+msgstr ""
+
+msgid ""
+"Management common topics in the context of training's general informations "
+"and access conditions"
 msgstr ""
 
 msgid "Management entity"
@@ -421,7 +453,7 @@ msgid "Mini-Training"
 msgstr ""
 
 #, python-format
-msgid "Mini-Training %(acronym)s (%(academic_year)s) successfully deleted."
+msgid "Mini-Training %(acronym)s successfully deleted from %(academic_year)s."
 msgstr ""
 
 #, python-format
@@ -450,6 +482,9 @@ msgid "New Mini-Training"
 msgstr ""
 
 msgid "New Training"
+msgstr ""
+
+msgid "No result!"
 msgstr ""
 
 msgid "Non university Bachelors"
@@ -534,6 +569,9 @@ msgid "Scores diffusion"
 msgstr ""
 
 msgid "Search..."
+msgstr ""
+
+msgid "Select one or multiple certificate aims"
 msgstr ""
 
 msgid "Session"
@@ -648,7 +686,7 @@ msgid "Training"
 msgstr ""
 
 #, python-format
-msgid "Training %(acronym)s (%(academic_year)s) successfully deleted."
+msgid "Training %(acronym)s successfully deleted from %(academic_year)s."
 msgstr ""
 
 #, python-format
@@ -660,7 +698,7 @@ msgstr ""
 #, python-format
 msgid ""
 "Training <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> "
-"successfully updated."
+"successfully updated"
 msgstr ""
 
 #, python-brace-format
@@ -671,9 +709,6 @@ msgid "Training version can only be created by central manager"
 msgstr ""
 
 msgid "Training version can only be deleted by central manager"
-msgstr ""
-
-msgid "Training version can only be modified by central manager"
 msgstr ""
 
 msgid "Trainings"
