@@ -32,6 +32,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 
+from base.utils import operator
 from base.utils.urls import reverse_with_get
 from base.views.common import display_success_messages, display_warning_messages, display_error_messages
 from education_group.ddd import command
@@ -82,7 +83,7 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         updated_aims_trainings = []
 
         if self.training_form.is_valid():
-            deleted_trainings = self.delete_training()
+            self.delete_training()
             if not self.training_form.errors and not self._changed_certificate_aims_only():
                 updated_trainings = self.update_training()
 
@@ -91,7 +92,6 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
             if not self.training_form.errors:
                 success_messages = self.build_success_messages(
-                    deleted_trainings,
                     updated_aims_trainings,
                     updated_trainings
                 )
@@ -100,15 +100,17 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         display_error_messages(self.request, self._get_default_error_messages())
         return self.get(request, *args, **kwargs)
 
-    def build_success_messages(self, deleted_trainings, updated_aims_trainings, updated_trainings):
+    def build_success_messages(self, updated_aims_trainings, updated_trainings):
+        # get success msg on deleted trainings before splitting results
+        success_messages = self.get_success_msg_deleted_trainings(updated_trainings)
+
         updated_trainings_with_aims = list(set(updated_trainings).intersection(updated_aims_trainings))
         updated_trainings = list(set(updated_trainings).difference(updated_trainings_with_aims))
         updated_aims_trainings = list(set(updated_aims_trainings).difference(updated_trainings_with_aims))
 
-        success_messages = self.get_success_msg_updated_trainings(updated_trainings)
+        success_messages += self.get_success_msg_updated_trainings(updated_trainings)
         success_messages += self.get_success_msg_updated_trainings_with_aims(updated_trainings_with_aims)
         success_messages += self.get_success_msg_updated_aims_only(updated_aims_trainings)
-        success_messages += self.get_success_msg_deleted_trainings(deleted_trainings)
 
         return success_messages
 
@@ -263,7 +265,20 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         return [self._get_success_msg_updated_aims(identity) for identity in training_identities]
 
     def get_success_msg_deleted_trainings(self, trainings_identities: List['TrainingIdentity']) -> List[str]:
-        return [self._get_success_msg_deleted_training(identity) for identity in trainings_identities]
+        last_identity = trainings_identities[-1]
+        is_new_end_year_lower_than_initial_one = operator.is_year_lower(
+            self.training_form.cleaned_data["end_year"].year if self.training_form.cleaned_data["end_year"] else None,
+            self.training_form.initial['end_year']
+        )
+        if is_new_end_year_lower_than_initial_one:
+            delete_message = _(
+                "Training %(acronym)s successfully deleted from %(academic_year)s."
+            ) % {
+                "acronym": last_identity.acronym,
+                "academic_year": display_as_academic_year(self.training_form.cleaned_data["end_year"].year + 1)
+            }
+            return [delete_message]
+        return []
 
     def _sort_by_year(self, training_identites: List[TrainingIdentity]):
         return sorted(training_identites, key=lambda x: x.year)
@@ -289,12 +304,6 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "link": link,
             "acronym": training_identity.acronym,
             "academic_year": display_as_academic_year(training_identity.year),
-        }
-
-    def _get_success_msg_deleted_training(self, training_identity: 'TrainingIdentity') -> str:
-        return _("Training %(acronym)s (%(academic_year)s) successfully deleted.") % {
-            "acronym": training_identity.acronym,
-            "academic_year": display_as_academic_year(training_identity.year)
         }
 
     def _get_default_error_messages(self) -> str:
