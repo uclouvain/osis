@@ -52,8 +52,8 @@ from base.tests.factories.session_exam_calendar import SessionExamCalendarFactor
 from base.tests.factories.user import UserFactory
 from education_group.models.group_year import GroupYear
 from osis_common.document import xls_build
-from program_management.tests.factories.education_group_version import ParticularTransitionEducationGroupVersionFactory, \
-    StandardEducationGroupVersionFactory
+from program_management.tests.factories.education_group_version \
+    import ParticularTransitionEducationGroupVersionFactory, StandardEducationGroupVersionFactory
 
 LANGUAGE_CODE_FR = "fr-be"
 
