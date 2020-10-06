@@ -344,9 +344,9 @@ class TestEducationGroupDataSearchFilter(TestCase):
             self.assertIsInstance(context["form"], self.form_class)
             self.assertCountEqual(context["object_list"], [self.group_year_edph2])
 
-    def test_search_with_title_regex(self):
+    def test_search_with_full_title_regex(self):
         search_strings = ['^Edph training ',
-                          ', sciences$',
+                          '{}]$'.format(self.group_year_edph3.educationgroupversion.title_fr),
                           '^ph trai',
                           '120',
                           '[120]'

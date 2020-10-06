@@ -226,8 +226,7 @@ class GroupYear(models.Model):
             result = self.group.delete()
         return result
 
-    @property
-    def full_title_fr(self):
+    def get_full_title_fr(self):
         if self.education_group_type.category in Categories.training_categories():
             full_title_fr = self.educationgroupversion.offer.title
             if self.educationgroupversion.title_fr:
@@ -235,8 +234,7 @@ class GroupYear(models.Model):
             return full_title_fr
         return self.title_fr
 
-    @property
-    def full_title_en(self):
+    def get_full_title_en(self):
         if self.education_group_type.category in Categories.training_categories():
             full_title_en = self.educationgroupversion.offer.title_english
             if self.educationgroupversion.title_en:
