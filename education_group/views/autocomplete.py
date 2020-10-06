@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
 from dal import autocomplete
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils.html import format_html
