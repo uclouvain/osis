@@ -45,11 +45,10 @@ class CustomXlsForm(forms.Form):
     specifications = forms.BooleanField(required=False, label=_('Specifications'))
     description_fiche = forms.BooleanField(required=False, label=_('Description fiche'))
 
-    def __init__(self, *args, current_node: 'Node' = None, **kwargs):
+    def __init__(self, *args, year: int = None, code: str = None, **kwargs):
         super().__init__(*args, **kwargs)
-
         self.url_action = reverse('education_group_learning_units_contains',
-                                  kwargs={'node_id': current_node.pk})
+                                  kwargs={'year': year, 'code': code})
 
     def get_optional_data(self):
         data = []

@@ -107,7 +107,7 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
             "person": self.request.user.person,
             "enums": mdl.enums.education_group_categories,
             "tree":  json.dumps(program_tree_view_serializer(self.get_tree())),
-            "form_xls_custom": CustomXlsForm(current_node=self.get_object()),
+            "form_xls_custom": CustomXlsForm(year=self.get_object().year, code=self.get_object().code),
             "group": self.get_group(),
             "node": self.get_object(),
             "node_path": self.get_path(),

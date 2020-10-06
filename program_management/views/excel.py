@@ -73,13 +73,10 @@ def get_learning_units_is_prerequisite_for_excel(request, year, code):
 @login_required
 @permission_required('base.view_educationgroup', raise_exception=True)
 @set_download_cookie
-def get_learning_units_of_training_for_excel(request, node_id: int):
-    cmd_get_node_id = command_pgrm.GetNodeIdentityFromElementId(node_id)
-    node_identity = node_identity_service.get_node_identity_from_element_id(cmd_get_node_id)
-    node = NodeRepository.get(node_identity)
-    excel = EducationGroupYearLearningUnitsContainedToExcel(CustomXlsForm(request.POST or None,
-                                                                          current_node=node),
-                                                            node).to_excel()
+def get_learning_units_of_training_for_excel(request, year: int, code: str):
+    excel = EducationGroupYearLearningUnitsContainedToExcel(CustomXlsForm(request.POST or None, year=year, code=code),
+                                                            year,
+                                                            code).to_excel()
 
     response = HttpResponse(excel['workbook'], content_type=CONTENT_TYPE_XLS)
     filename = "{workbook_name}.xlsx".format(

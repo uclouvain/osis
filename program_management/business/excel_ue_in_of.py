@@ -141,15 +141,15 @@ EXCLUDE_UE_KEY = 'exclude_ue'
 
 class EducationGroupYearLearningUnitsContainedToExcel:
 
-    def __init__(self, custom_xls_form: CustomXlsForm, node: 'Node'):
-        self._get_program_tree_version(node)
-        self._get_program_tree(node)
+    def __init__(self, custom_xls_form: CustomXlsForm, year: int, code: str):
+        self._get_program_tree_version(year, code)
+        self._get_program_tree(year, code)
         self.custom_xls_form = custom_xls_form
 
-    def _get_program_tree_version(self, node):
+    def _get_program_tree_version(self, year: int, code: str):
         get_cmd = command.GetProgramTreeVersionFromNodeCommand(
-            code=node.code,
-            year=node.year
+            code=code,
+            year=year
         )
         try:
             self.program_tree_version = get_program_tree_version_from_node_service.get_program_tree_version_from_node(
@@ -157,11 +157,11 @@ class EducationGroupYearLearningUnitsContainedToExcel:
         except ProgramTreeVersionNotFoundException:
             self.program_tree_version = None
 
-    def _get_program_tree(self, node):
+    def _get_program_tree(self, year: int, code: str):
         if self.program_tree_version:
             self.hierarchy = self.program_tree_version.get_tree()
         else:
-            self.hierarchy = ProgramTreeRepository.get(ProgramTreeIdentity(node.code, node.year))
+            self.hierarchy = ProgramTreeRepository.get(ProgramTreeIdentity(code, year))
 
     def _to_workbook(self):
         return generate_ue_contained_for_workbook(self.custom_xls_form, self.hierarchy)
