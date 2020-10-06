@@ -9,8 +9,8 @@ def predicate_cache(cache_key_fn=None):
         def wrapped_function(self, user_obj, *args, **kwargs):
             if not settings.PERMISSION_CACHE_ENABLED:
                 return func(self, user_obj, *args, **kwargs)
-
-            predicate_cache_key = "_".join([func.__name__, str(cache_key_fn(*args, **kwargs))])
+            args_types = "_".join(type(arg).__name__ for arg in args)
+            predicate_cache_key = "_".join([func.__name__, args_types, str(cache_key_fn(*args, **kwargs))])
             try:
                 cached_result = get_cache_predicate_result(user_obj, predicate_cache_key)
             except CachePredicateResultNotFound:
