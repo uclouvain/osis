@@ -9,7 +9,7 @@ from base.views.education_groups.achievement.update import EducationGroupAchieve
 from education_group.converters import GroupTypeConverter, TrainingTypeConverter, MiniTrainingTypeConverter, \
     AcronymConverter
 from education_group.views import group, training, mini_training, general_information
-from education_group.views.autocomplete import EducationGroupTypeAutoComplete
+from education_group.views.autocomplete import EducationGroupTypeAutoComplete, CertificateAimAutocomplete
 from education_group.views.configuration.common_list import CommonListView
 from education_group.views.configuration.home import ConfigurationHomeView
 from education_group.views.mini_training.delete import MiniTrainingDeleteView
@@ -249,5 +249,6 @@ urlpatterns = [
             EducationGroupTypeAutoComplete.as_view(),
             name='education_group_type_autocomplete'
         ),
+        path('certificate-aims/', CertificateAimAutocomplete.as_view(), name='certificate_aim_autocomplete'),
     ])),
 ]

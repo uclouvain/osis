@@ -27,6 +27,7 @@ from dal import autocomplete
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils.html import format_html
 
+from base.models.certificate_aim import CertificateAim
 from base.models.education_group_type import EducationGroupType
 
 
@@ -50,3 +51,29 @@ class EducationGroupTypeAutoComplete(LoginRequiredMixin, autocomplete.Select2Que
 
     def get_result_label(self, result):
         return format_html('{}', result.get_name_display())
+
+
+class CertificateAimAutocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        if not self.request.user.is_authenticated:
+            return CertificateAim.objects.none()
+
+        qs = CertificateAim.objects.all()
+
+        if self.q:
+            if self.q.isdigit():
+                qs = qs.filter(code=self.q)
+            else:
+                qs = qs.filter(description__icontains=self.q)
+
+        section = self.forwarded.get('section', None)
+        if section:
+            qs = qs.filter(section=section)
+
+        return qs
+
+    def get_result_value(self, result: CertificateAim):
+        return result.code
+
+    def get_result_label(self, result: CertificateAim):
+        return format_html('{} - {} {}', result.section, result.code, result.description)
