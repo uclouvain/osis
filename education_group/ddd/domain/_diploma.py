@@ -59,10 +59,13 @@ class DiplomaAim(interface.Entity):
     def code(self) -> int:
         return self.entity_id.code
 
+    def __str__(self):
+        return "{} - {} {}".format(self.section, self.code, self.description)
+
 
 @attr.s(frozen=True, slots=True)
 class Diploma(interface.ValueObject):
+    aims = attr.ib(type=List['DiplomaAim'])
     leads_to_diploma = attr.ib(type=bool, default=False)
     printing_title = attr.ib(type=str, default='')
     professional_title = attr.ib(type=str, default='')
-    aims = attr.ib(type=List['DiplomaAim'], factory=list)

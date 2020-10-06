@@ -23,18 +23,84 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Dict
+
 import factory.fuzzy
 
 from base.models.authorized_relationship import AuthorizedRelationshipList
-from program_management.ddd.domain import program_tree
-from program_management.tests.ddd.factories import node
+from base.models.enums.education_group_types import GroupType, TrainingType
+from program_management.ddd.domain.program_tree import ProgramTree, ProgramTreeIdentity
+from program_management.tests.ddd.factories.link import LinkFactory
+from program_management.tests.ddd.factories.node import NodeGroupYearFactory
+
+
+class ProgramTreeIdentityFactory(factory.Factory):
+
+    class Meta:
+        model = ProgramTreeIdentity
+        abstract = False
+
+    code = factory.Sequence(lambda n: 'CODE%02d' % n)
+    year = factory.fuzzy.FuzzyInteger(low=1999, high=2099)
 
 
 class ProgramTreeFactory(factory.Factory):
 
     class Meta:
-        model = program_tree.ProgramTree
+        model = ProgramTree
         abstract = False
 
-    root_node = factory.SubFactory(node.NodeGroupYearFactory)
+    root_node = factory.SubFactory(NodeGroupYearFactory)
     authorized_relationships = AuthorizedRelationshipList([])
+    entity_id = factory.SubFactory(
+        ProgramTreeIdentityFactory,
+        code=factory.SelfAttribute("..root_node.code"),
+        year=factory.SelfAttribute("..root_node.year")
+    )
+
+    @staticmethod
+    def produce_standard_2M_program_tree(current_year: int, end_year: int) -> 'ProgramTree':
+        """Creates a 2M standard version"""
+
+        tree_standard = ProgramTreeFactory(
+            root_node__node_type=TrainingType.PGRM_MASTER_120,
+            root_node__end_year=end_year,
+            root_node__year=current_year,
+        )
+        link1 = LinkFactory(
+            parent=tree_standard.root_node,
+            child__node_type=GroupType.COMMON_CORE,
+            child__end_year=end_year,
+            child__year=current_year,
+        )
+        link2 = LinkFactory(
+            parent=tree_standard.root_node,
+            child__node_type=GroupType.FINALITY_120_LIST_CHOICE,
+            child__end_year=end_year,
+            child__year=current_year,
+        )
+        link3 = LinkFactory(
+            parent=tree_standard.root_node,
+            child__node_type=GroupType.OPTION_LIST_CHOICE,
+            child__end_year=end_year,
+            child__year=current_year,
+        )
+        tree_standard.root_node.children = [link1, link2, link3]
+
+        return tree_standard
+
+
+def _tree_builder(data: Dict) -> 'Node':
+    _data = data.copy()
+    children = _data.pop("children", [])
+
+    node = NodeGroupYearFactory(**_data)
+    for child_data in children:
+        child_node = _tree_builder(child_data)
+        LinkFactory(parent=node, child=child_node)
+
+    return node
+
+
+def tree_builder(data: Dict) -> 'ProgramTree':
+    return ProgramTreeFactory(root_node=_tree_builder(data))

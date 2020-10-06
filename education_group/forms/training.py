@@ -38,15 +38,12 @@ from django.db.models import Value, CharField
 from django.db.models.functions import Concat
 from django.utils.functional import lazy
 from django.utils.translation import gettext_lazy as _
-from education_group.ddd.business_types import *
 
 from base.business.event_perms import EventPermEducationGroupEdition
 from base.forms.common import ValidationRuleMixin
-from base.forms.education_group.common import MainCampusChoiceField
-from base.forms.education_group.training import _get_section_choices
-from base.forms.utils.choice_field import BLANK_CHOICE
+from base.forms.utils.choice_field import BLANK_CHOICE, add_blank
+from base.models import campus
 from base.models.academic_year import AcademicYear
-from base.models.campus import Campus
 from base.models.certificate_aim import CertificateAim
 from base.models.enums.academic_type import AcademicTypes
 from base.models.enums.active_status import ActiveStatusEnum
@@ -59,9 +56,11 @@ from base.models.enums.funding_codes import FundingCodes
 from base.models.enums.internship_presence import InternshipPresence
 from base.models.enums.rate_code import RateCode
 from base.models.enums.schedule_type import ScheduleTypeEnum
+from education_group.ddd.business_types import *
 from education_group.forms import fields
-from education_group.forms.fields import MainEntitiesVersionChoiceField
+from education_group.forms.fields import MainEntitiesVersionChoiceField, UpperCaseCharField
 from education_group.forms.widgets import CertificateAimsWidget
+from osis_role.errors import get_permission_error
 from reference.models.domain import Domain
 from reference.models.domain_isced import DomainIsced
 from reference.models.enums import domain_type
@@ -72,11 +71,15 @@ from rules_management.enums import TRAINING_PGRM_ENCODING_PERIOD, \
 from rules_management.mixins import PermissionFieldMixin
 
 
-class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
+def _get_section_choices():
+    return add_blank(CertificateAim.objects.values_list('section', 'section').distinct().order_by('section'))
+
+
+class CreateTrainingForm(ValidationRuleMixin, forms.Form):
 
     # panel_informations_form.html
-    acronym = forms.CharField(max_length=15, label=_("Acronym/Short title"))
-    code = forms.CharField(max_length=15, label=_("Code"))
+    acronym = UpperCaseCharField(max_length=15, label=_("Acronym/Short title"))
+    code = UpperCaseCharField(max_length=15, label=_("Code"))
     active = forms.ChoiceField(
         initial=ActiveStatusEnum.ACTIVE.name,
         choices=BLANK_CHOICE + list(ActiveStatusEnum.choices()),
@@ -155,7 +158,7 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     main_language = forms.ModelChoiceField(
         queryset=Language.objects.all().order_by('name'),
         label=_('Primary language'),
-        to_field_name="code",
+        to_field_name="name",
         initial=FR_CODE_LANGUAGE
     )
     english_activities = forms.ChoiceField(
@@ -169,9 +172,19 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         required=False,
     )
     main_domain = forms.ModelChoiceField(
+        queryset=Domain.objects.filter(
+            type=UNIVERSITY
+        ).select_related(
+            'decree'
+        ).annotate(
+            form_key=Concat(
+                "decree__name", Value(" - "), "code",
+                output_field=CharField()
+            )
+        ),
         label=_('main domain'),
-        queryset=Domain.objects.filter(type=UNIVERSITY).select_related('decree'),
         required=False,
+        to_field_name="form_key"
     )
     secondary_domains = fields.SecondaryDomainsField(
         'university_domains',
@@ -179,9 +192,10 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         label=_('secondary domains').title(),
     )
     isced_domain = forms.ModelChoiceField(
-        label=_('ISCED domain'),
         queryset=DomainIsced.objects.all(),
         required=False,
+        to_field_name="code",
+        label=_('ISCED domain'),
     )
     internal_comment = forms.CharField(
         max_length=500,
@@ -192,22 +206,28 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
 
     # panel_entities_form.html
     management_entity = forms.CharField()
-    administration_entity = MainEntitiesVersionChoiceField(queryset=None, label=_("Administration entity"))
+    administration_entity = MainEntitiesVersionChoiceField(
+        queryset=None,
+        to_field_name="acronym",
+        label=_('Administration entity')
+    )
     academic_year = forms.ModelChoiceField(
         queryset=AcademicYear.objects.all(),
-        label=_("Start"),
-    )  # Equivalent to start_year
+        label=_('Start'),
+        to_field_name="year",
+    )
     end_year = forms.ModelChoiceField(
         queryset=AcademicYear.objects.all(),
         label=_('Last year of organization'),
         required=False,
+        to_field_name="year"
     )
-    teaching_campus = MainCampusChoiceField(
+    teaching_campus = fields.MainCampusChoiceField(
         queryset=None,
         label=_("Learning location"),
         to_field_name="name"
     )
-    enrollment_campus = MainCampusChoiceField(
+    enrollment_campus = fields.MainCampusChoiceField(
         queryset=None,
         label=_("Enrollment campus"),
         to_field_name="name"
@@ -247,8 +267,8 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     ares_authorization = forms.CharField(label=_('ARES ability'), widget=forms.TextInput(), required=False)
     code_inter_cfb = forms.CharField(max_length=8, label=_('Code co-graduation inter CfB'), required=False)
     coefficient = forms.DecimalField(
-        max_digits=5,
-        decimal_places=2,
+        max_digits=7,
+        decimal_places=4,
         label=_('Co-graduation total coefficient'),
         widget=forms.TextInput(),
         required=False,
@@ -285,10 +305,11 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         )
     )
 
-    def __init__(self, *args, user: User, training_type: str, attach_path: str, **kwargs):
+    def __init__(self, *args, user: User, training_type: str, attach_path: str, training: 'Training' = None,  **kwargs):
         self.user = user
         self.training_type = training_type
         self.attach_path = attach_path
+        self.training = training
 
         super().__init__(*args, **kwargs)
 
@@ -305,31 +326,26 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
 
     def __init_academic_year_field(self):
         if not self.fields['academic_year'].disabled and self.user.person.is_faculty_manager:
-            academic_years = EventPermEducationGroupEdition.get_academic_years().filter(
-                year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION
-            )
-            self.fields['academic_year'].queryset = academic_years
-            self.fields['end_year'].queryset = academic_years
+            working_academic_years = EventPermEducationGroupEdition.get_academic_years()
         else:
-            self.fields['academic_year'].queryset = self.fields['academic_year'].queryset.filter(
-                year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION
-            )
-            self.fields['end_year'].queryset = self.fields['end_year'].queryset.filter(
-                year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION
-            )
+            working_academic_years = AcademicYear.objects.all()
 
-            self.fields['academic_year'].label = _('Start')
+        working_academic_years = working_academic_years.filter(year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION)
+        self.fields['academic_year'].queryset = working_academic_years
+        self.fields['end_year'].queryset = AcademicYear.objects.filter(
+            year__gte=working_academic_years.first().year
+        )
 
     def __init_management_entity_field(self):
         self.fields['management_entity'] = fields.ManagementEntitiesChoiceField(
             person=self.user.person,
-            initial=None,
+            initial=self.initial.get('management_entity'),
             disabled=self.fields['management_entity'].disabled,
         )
 
     def __init_certificate_aims_field(self):
-        if not self.fields['certificate_aims'].disabled:
-            self.fields['section'].disabled = False
+        self.fields['certificate_aims'].disabled = True
+        self.fields['section'].disabled = True
 
     def __init_diploma_fields(self):
         if self.training_type in TrainingType.with_diploma_values_set_initially_as_true():
@@ -343,11 +359,8 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         self.fields["main_language"].initial = Language.objects.all().get(code=FR_CODE_LANGUAGE)
 
     def __init_campuses(self):
-        default_campus = Campus.objects.filter(name='Louvain-la-Neuve').first()
-        if 'teaching_campus' in self.fields:
-            self.fields['teaching_campus'].initial = default_campus
-        if 'enrollment_campus' in self.fields:
-            self.fields['enrollment_campus'].initial = default_campus
+        self.fields["teaching_campus"].initial = campus.LOUVAIN_LA_NEUVE_CAMPUS_NAME
+        self.fields["enrollment_campus"].initial = campus.LOUVAIN_LA_NEUVE_CAMPUS_NAME
 
     def __init_secondary_domains(self):
         self.fields["secondary_domains"].widget.attrs['placeholder'] = _('Enter text to search')
@@ -369,29 +382,9 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     def field_reference(self, field_name: str) -> str:
         return '.'.join(["TrainingForm", self.training_type, field_name])
 
-    # PermissionFieldMixin
-    def get_context(self) -> str:
-        is_edition_period_opened = EventPermEducationGroupEdition(raise_exception=False).is_open()
-        return TRAINING_PGRM_ENCODING_PERIOD if is_edition_period_opened else TRAINING_DAILY_MANAGEMENT
 
-    # PermissionFieldMixin
-    def get_model_permission_filter_kwargs(self) -> Dict:
-        return {'context': self.get_context()}
+class UpdateTrainingForm(PermissionFieldMixin, CreateTrainingForm):
 
-
-class UpdateTrainingForm(CreateTrainingForm):
-    administration_entity = MainEntitiesVersionChoiceField(
-        queryset=None,
-        to_field_name="acronym"
-    )
-
-    academic_year = forms.ModelChoiceField(
-        queryset=AcademicYear.objects.all(),
-        label=_('Validity'),
-        to_field_name="year",
-        disabled=True,
-        required=False
-    )
     start_year = forms.ModelChoiceField(
         queryset=AcademicYear.objects.all(),
         label=_('Start academic year'),
@@ -399,50 +392,44 @@ class UpdateTrainingForm(CreateTrainingForm):
         disabled=True,
         required=False
     )
-    end_year = forms.ModelChoiceField(
-        queryset=AcademicYear.objects.all(),
-        label=_('Last year of organization'),
-        required=False,
-        to_field_name="year"
-    )
 
-    main_language = forms.ModelChoiceField(
-        queryset=Language.objects.all().order_by('name'),
-        label=_('Primary language'),
-        to_field_name="name"
-    )
+    def __init__(self, *args, event_perm_obj=None, **kwargs):
+        self.event_perm_obj = event_perm_obj
 
-    main_domain = forms.ModelChoiceField(
-        queryset=Domain.objects.filter(
-            type=UNIVERSITY
-        ).select_related(
-            'decree'
-        ).annotate(
-            form_key=Concat(
-                "decree__name", Value(" - "), "code",
-                output_field=CharField()
-            )
-        ),
-        label=_('main domain'),
-        required=False,
-        to_field_name="form_key"
-    )
-    isced_domain = forms.ModelChoiceField(
-        queryset=DomainIsced.objects.all(),
-        required=False,
-        to_field_name="code",
-        label=_('ISCED domain'),
-    )
-
-    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["academic_year"].label = _('Validity')
         self.__init_end_year_field()
+        self.__init_certificate_aims_field()
 
     def __init_end_year_field(self):
         initial_academic_year_value = self.initial.get("academic_year", None)
         if initial_academic_year_value:
             self.fields["end_year"].queryset = AcademicYear.objects.filter(year__gte=initial_academic_year_value)
+
+    def __init_certificate_aims_field(self):
+        perm = 'base.change_educationgroupcertificateaim'
+        if self.user.has_perm(perm, obj=self.training):
+            self.fields['certificate_aims'].disabled = False
+            self.fields['section'].disabled = False
+            self.fields['certificate_aims'].widget.attrs['title'] = _('Select one or multiple certificate aims')
+        else:
+            permission_error_msg = get_permission_error(self.user, perm)
+            self.fields['certificate_aims'].disabled = True
+            self.fields['section'].disabled = True
+            self.fields['certificate_aims'].widget.attrs['title'] = permission_error_msg
+            self.fields['certificate_aims'].widget.attrs['class'] = 'cursor-not-allowed'
+
+    # PermissionFieldMixin
+    def get_context(self) -> str:
+        is_edition_period_opened = EventPermEducationGroupEdition(
+            obj=self.event_perm_obj,
+            raise_exception=False
+        ).is_open()
+        return TRAINING_PGRM_ENCODING_PERIOD if is_edition_period_opened else TRAINING_DAILY_MANAGEMENT
+
+    # PermissionFieldMixin
+    def get_model_permission_filter_kwargs(self) -> Dict:
+        return {'context': self.get_context()}
 
 
 @register('university_domains')

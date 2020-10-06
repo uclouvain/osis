@@ -27,31 +27,43 @@ from django.test import TestCase
 from education_group.ddd.domain import mini_training
 from education_group.ddd.service.write import create_orphan_mini_training_service
 from education_group.tests.ddd.factories.command.create_mini_training_command import CreateMiniTrainingCommandFactory
-from education_group.tests.factories.mini_training import MiniTrainingFactory
+from education_group.tests.ddd.factories.repository.fake import get_fake_mini_training_repository
+from testing.mocks import MockPatcherMixin
 
 
-class TestCreateAndPostponeOrphanTraining(TestCase):
-    @mock.patch("education_group.ddd.service.write.postpone_mini_training_service.postpone_mini_training")
-    @mock.patch("education_group.ddd.service.write.create_orphan_mini_training_service.MiniTrainingBuilder")
-    @mock.patch("education_group.ddd.service.write.create_orphan_mini_training_service.MiniTrainingRepository")
-    def test_should_return_as_many_identities_as_postponement_range(
-            self,
-            mock_repository,
-            mock_builder,
-            mock_postpone_mini_training_service):
-        source_training = MiniTrainingFactory()
-        postponed_mini_trainings_identities = [
-            mini_training.MiniTrainingIdentity(acronym="Acron", year=2020),
-            mini_training.MiniTrainingIdentity(acronym="Acron", year=2021)
+@mock.patch("education_group.ddd.service.write.create_orphan_mini_training_service."
+            "create_group_service.create_orphan_group", return_value=[])
+@mock.patch("education_group.ddd.service.write.create_orphan_mini_training_service."
+            "postpone_mini_training_and_orphan_group_modifications_service."
+            "postpone_mini_training_and_orphan_group_modifications",
+            return_value=[])
+class TestCreateAndPostponeOrphanMiniTraining(TestCase, MockPatcherMixin):
+    def setUp(self) -> None:
+        self.fake_mini_training_repository = get_fake_mini_training_repository([])
+        self.mock_repo(
+            "education_group.ddd.repository.mini_training.MiniTrainingRepository",
+            self.fake_mini_training_repository
+        )
+
+    def test_should_return_mini_training_identities(self, mock_postpone_mini_training, mock_create_orphan_group):
+        mock_postpone_mini_training.return_value = [
+            mini_training.MiniTrainingIdentity(acronym="ACRON", year=year) for year in range(2020, 2023)
         ]
-        mock_builder.return_value.build_from_create_cmd.return_value = source_training
-        mock_repository.create.return_value = source_training.entity_id
-        mock_postpone_mini_training_service.return_value = postponed_mini_trainings_identities
 
-        cmd = CreateMiniTrainingCommandFactory()
+        cmd = CreateMiniTrainingCommandFactory(year=2020, code="CODE", abbreviated_title="ACRON")
         result = create_orphan_mini_training_service.create_and_postpone_orphan_mini_training(cmd)
 
-        self.assertListEqual(
-            [source_training.entity_id] + postponed_mini_trainings_identities,
-            result
-        )
+        expected_result = [mini_training.MiniTrainingIdentity(acronym="ACRON", year=year) for year in range(2020, 2023)]
+        self.assertListEqual(expected_result, result)
+
+    def test_should_call_postpone_mini_training_service(self, mock_postpone_mini_training, mock_create_orphan_group):
+        cmd = CreateMiniTrainingCommandFactory(year=2020, code="CODE", abbreviated_title="ACRON")
+
+        create_orphan_mini_training_service.create_and_postpone_orphan_mini_training(cmd)
+        self.assertTrue(mock_postpone_mini_training.called)
+
+    def test_should_call_create_orphan_group_service(self, mock_postpone_mini_training, mock_create_orphan_group):
+        cmd = CreateMiniTrainingCommandFactory(year=2020, code="CODE", abbreviated_title="ACRON")
+
+        create_orphan_mini_training_service.create_and_postpone_orphan_mini_training(cmd)
+        self.assertTrue(mock_create_orphan_group.called)

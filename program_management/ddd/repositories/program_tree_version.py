@@ -23,39 +23,50 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import contextlib
+import functools
+import operator
 from typing import Optional, List
 
-from django.db import transaction, IntegrityError
-from django.db.models import F
+from django.db import IntegrityError
+from django.db.models import F, Case, When, IntegerField
+from django.db.models import Q
 
+from base.models.academic_year import AcademicYear
 from base.models.education_group_year import EducationGroupYear
+from base.models.enums.education_group_categories import Categories
+from education_group.ddd.domain.exception import TrainingNotFoundException
+from education_group.models.group import Group
 from education_group.models.group_year import GroupYear
 from osis_common.ddd import interface
 from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception
-from program_management.ddd.domain.program_tree import ProgramTreeIdentity
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
+from program_management.ddd.domain import program_tree
+from program_management.ddd.domain import program_tree_version
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, STANDARD
 from program_management.ddd.repositories import program_tree as program_tree_repository
 from program_management.models.education_group_version import EducationGroupVersion
-from django.db.models import Q
 
 
 class ProgramTreeVersionRepository(interface.AbstractRepository):
-
     @classmethod
     def create(
             cls,
             program_tree_version: 'ProgramTreeVersion',
             **_
     ) -> 'ProgramTreeVersionIdentity':
-        education_group_year_id = EducationGroupYear.objects.filter(
-            acronym=program_tree_version.entity_id.offer_acronym,
-            academic_year__year=program_tree_version.entity_id.year,
-        ).values_list(
-            'pk', flat=True
-        )[0]
+        offer_acronym = program_tree_version.entity_id.offer_acronym
+        year = program_tree_version.entity_id.year
+        try:
+            education_group_year_id = EducationGroupYear.objects.filter(
+                acronym=offer_acronym,
+                academic_year__year=year,
+            ).values_list(
+                'pk', flat=True
+            )[0]
+        except IndexError:
+            raise TrainingNotFoundException(acronym=offer_acronym, year=year)
 
         group_year_id = GroupYear.objects.filter(
             partial_acronym=program_tree_version.program_tree_identity.code,
@@ -65,24 +76,38 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
         )[0]
 
         try:
-            EducationGroupVersion(
+            educ_group_version = EducationGroupVersion.objects.create(
                 version_name=program_tree_version.version_name,
                 title_fr=program_tree_version.title_fr,
                 title_en=program_tree_version.title_en,
                 offer_id=education_group_year_id,
-                is_transition=False,
+                is_transition=program_tree_version.is_transition,
                 root_group_id=group_year_id
-            ).save()
-        except IntegrityError:
+            )
+            _update_end_year_of_existence(educ_group_version, program_tree_version.end_year_of_existence)
+        except IntegrityError as ie:
             raise exception.ProgramTreeAlreadyExistsException
         return program_tree_version.entity_id
 
     @classmethod
     def update(cls, program_tree_version: 'ProgramTreeVersion', **_) -> 'ProgramTreeVersionIdentity':
+        obj = EducationGroupVersion.objects.get(
+            offer__acronym=program_tree_version.entity_identity.offer_acronym,
+            offer__academic_year__year=program_tree_version.entity_identity.year,
+            version_name=program_tree_version.entity_identity.version_name,
+            is_transition=program_tree_version.entity_identity.is_transition,
+        )
+        obj.version_name = program_tree_version.version_name
+        obj.title_fr = program_tree_version.title_fr
+        obj.title_en = program_tree_version.title_en
+        obj.save()
+
+        _update_end_year_of_existence(obj, program_tree_version.end_year_of_existence)
+
         return program_tree_version.entity_id
 
     @classmethod
-    def get(cls, entity_id: ProgramTreeVersionIdentity) -> 'ProgramTreeVersion':
+    def get(cls, entity_id: 'ProgramTreeVersionIdentity') -> 'ProgramTreeVersion':
         qs = EducationGroupVersion.objects.filter(
             version_name=entity_id.version_name,
             offer__acronym=entity_id.offer_acronym,
@@ -94,6 +119,25 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
             offer_year=F('offer__academic_year__year'),
             version_title_fr=F('title_fr'),
             version_title_en=F('title_en'),
+
+            # FIXME :: should add a field EducationgroupVersion.end_year
+            # FIXME :: and should remove GroupYear.end_year
+            # FIXME :: End_year is useful only for EducationGroupYear (training, minitraining) and programTreeVersions.
+            # FIXME :: End year is not useful for Groups. For business, Group doesn't have a 'end date'.
+            end_year_of_existence=Case(
+                When(
+                    Q(
+                        offer__education_group_type__category__in={
+                            Categories.TRAINING.name, Categories.MINI_TRAINING.name
+                        }
+                    ) & Q(
+                        version_name=STANDARD
+                    ),
+                    then=F('offer__education_group__end_year__year')
+                ),
+                default=F('root_group__group__end_year__year'),
+                output_field=IntegerField(),
+            ),
         ).values(
             'code',
             'offer_acronym',
@@ -102,6 +146,7 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
             'version_title_fr',
             'version_title_en',
             'is_transition',
+            'end_year_of_existence',
         )
         try:
             return _instanciate_tree_version(qs.get())
@@ -109,11 +154,38 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
             raise exception.ProgramTreeVersionNotFoundException()
 
     @classmethod
+    def get_last_in_past(cls, entity_id: 'ProgramTreeVersionIdentity') -> 'ProgramTreeVersion':
+        qs = EducationGroupVersion.objects.filter(
+            version_name=entity_id.version_name,
+            offer__acronym=entity_id.offer_acronym,
+            offer__academic_year__year__lt=entity_id.year,
+        ).order_by(
+            'offer__academic_year'
+        ).values_list(
+            'offer__academic_year__year',
+            flat=True,
+        )
+        if qs:
+            last_past_year = qs.last()
+            last_identity = ProgramTreeVersionIdentity(
+                offer_acronym=entity_id.offer_acronym,
+                year=last_past_year,
+                version_name=entity_id.version_name,
+                is_transition=entity_id.is_transition,
+            )
+            return cls.get(entity_id=last_identity)
+
+    @classmethod
     def search(
             cls,
             entity_ids: Optional[List['ProgramTreeVersionIdentity']] = None,
+            version_name: str = None,
+            offer_acronym: str = None,
+            is_transition: bool = False,
+            code: str = None,
+            year: int = None,
             **kwargs
-    ) -> List[ProgramTreeVersion]:
+    ) -> List['ProgramTreeVersion']:
         qs = GroupYear.objects.all().order_by(
             'educationgroupversion__version_name'
         ).annotate(
@@ -124,6 +196,7 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
             version_title_fr=F('educationgroupversion__title_fr'),
             version_title_en=F('educationgroupversion__title_en'),
             is_transition=F('educationgroupversion__is_transition'),
+            end_year_of_existence=F('group__end_year__year'),
         ).values(
             'code',
             'offer_acronym',
@@ -132,10 +205,21 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
             'version_title_fr',
             'version_title_en',
             'is_transition',
+            'end_year_of_existence',
         )
         if "element_ids" in kwargs:
             qs = qs.filter(element__in=kwargs['element_ids'])
 
+        if version_name is not None:
+            qs = qs.filter(educationgroupversion__version_name=version_name)
+        if offer_acronym is not None:
+            qs = qs.filter(educationgroupversion__offer__acronym=offer_acronym)
+        if is_transition is not None:
+            qs = qs.filter(educationgroupversion__is_transition=is_transition)
+        if year is not None:
+            qs = qs.filter(educationgroupversion__offer__academic_year__year=year)
+        if code is not None:
+            qs = qs.filter(partial_acronym=code)
         results = []
         for record_dict in qs:
             results.append(_instanciate_tree_version(record_dict))
@@ -174,21 +258,49 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
         offer_ids = _search_by_node_entities(list(node_identities))
         return _search_versions_from_offer_ids(offer_ids)
 
+    @classmethod
+    def search_versions_from_trees(cls, trees: List['ProgramTree']) -> List['ProgramTreeVersion']:
+        root_nodes = [tree.root_node for tree in trees]
+        tree_versions = cls.search_all_versions_from_root_nodes(root_nodes)
+
+        result = []
+        for tree_version in tree_versions:
+            with contextlib.suppress(StopIteration):
+                tree_version.tree = next(tree for tree in trees if tree.entity_id == tree_version.program_tree_identity)
+                result.append(tree_version)
+        return result
+
+
+def _update_end_year_of_existence(educ_group_version: EducationGroupVersion, end_year_of_existence: int):
+    # FIXME :: should add a field EducationgroupVersion.end_year
+    # FIXME :: and should remove GroupYear.end_year
+    # FIXME :: End_year is useful only for EducationGroupYear (training, minitraining) and programTreeVersions.
+    # FIXME :: End year is not useful for Groups. For business, Group doesn't have a 'end date'.
+    group = Group.objects.get(
+        groupyear__educationgroupversion__pk=educ_group_version.pk
+    )
+    end_year_id = None
+    if end_year_of_existence:
+        end_year_id = AcademicYear.objects.only('pk').get(year=end_year_of_existence).pk
+    group.end_year_id = end_year_id
+    group.save()
+
 
 def _instanciate_tree_version(record_dict: dict) -> 'ProgramTreeVersion':
-    identity = ProgramTreeVersionIdentity(
+    identity = program_tree_version.ProgramTreeVersionIdentity(
         offer_acronym=record_dict['offer_acronym'],
         year=record_dict['offer_year'],
         version_name=record_dict['version_name'],
         is_transition=record_dict['is_transition'],
     )
-    return ProgramTreeVersion(
+    return program_tree_version.ProgramTreeVersion(
         entity_identity=identity,
         entity_id=identity,
-        program_tree_identity=ProgramTreeIdentity(record_dict['code'], record_dict['offer_year']),
+        program_tree_identity=program_tree.ProgramTreeIdentity(record_dict['code'], record_dict['offer_year']),
         program_tree_repository=program_tree_repository.ProgramTreeRepository(),
         title_fr=record_dict['version_title_fr'],
         title_en=record_dict['version_title_en'],
+        end_year_of_existence=record_dict['end_year_of_existence'],
     )
 
 
@@ -227,6 +339,7 @@ def _search_versions_from_offer_ids(offer_ids: List[int]) -> List['ProgramTreeVe
         version_title_fr=F('educationgroupversion__title_fr'),
         version_title_en=F('educationgroupversion__title_en'),
         is_transition=F('educationgroupversion__is_transition'),
+        end_year_of_existence=F('group__end_year__year'),
     ).values(
         'code',
         'offer_acronym',
@@ -235,6 +348,7 @@ def _search_versions_from_offer_ids(offer_ids: List[int]) -> List['ProgramTreeVe
         'version_title_fr',
         'version_title_en',
         'is_transition',
+        'end_year_of_existence',
     )
     results = []
     for record_dict in qs:

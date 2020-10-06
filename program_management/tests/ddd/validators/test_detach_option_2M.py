@@ -21,12 +21,14 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+from types import SimpleNamespace
 from unittest import mock
 
 from django.test import SimpleTestCase
 from django.utils.translation import ngettext
+from mock import patch
 
-from base.models.enums.education_group_types import TrainingType, MiniTrainingType
+from base.models.enums.education_group_types import TrainingType, MiniTrainingType, GroupType
 from program_management.ddd.domain import program_tree
 from program_management.ddd.validators._detach_option_2M import DetachOptionValidator
 from program_management.tests.ddd.factories.link import LinkFactory
@@ -49,11 +51,19 @@ class TestDetachOptionValidator(TestValidatorValidateMixin, SimpleTestCase):
         validator = DetachOptionValidator(working_tree, path_to_detach, self.mock_repository)
         self.assertValidatorNotRaises(validator)
 
-    def test_should_raise_exception_when_node_to_detach_is_an_option_also_present_inside_finality(self):
+    @patch(
+        'program_management.ddd.domain.service.identity_search.ProgramTreeVersionIdentitySearch.get_from_node_identity'
+    )
+    def test_should_raise_exception_when_node_to_detach_is_an_option_also_present_inside_finality(self, mock_version):
         working_tree = ProgramTreeFactory(root_node__node_type=TrainingType.PGRM_MASTER_120)
         link_root_finality = LinkFactory(parent=working_tree.root_node, child__node_type=TrainingType.MASTER_MA_120)
         link_finality_option = LinkFactory(parent=link_root_finality.child, child__node_type=MiniTrainingType.OPTION)
         link_root_option = LinkFactory(parent=working_tree.root_node, child=link_finality_option.child)
+
+        mock_version.side_effect = [
+            SimpleNamespace(version_name='', offer_acronym=link_finality_option.parent.title),
+            SimpleNamespace(version_name='', offer_acronym=link_finality_option.child.title),
+        ]
 
         path_to_detach = program_tree.build_path(working_tree.root_node, link_root_option.child)
 
@@ -73,3 +83,87 @@ class TestDetachOptionValidator(TestValidatorValidateMixin, SimpleTestCase):
             "finality_acronym": link_finality_option.parent.title
         }
         self.assertValidatorRaises(validator, [expected_message])
+
+    def test_should_not_raise_exception_when_node_to_detach_is_a_finality_in_same_tree(self):
+        working_tree = ProgramTreeFactory(root_node__node_type=TrainingType.PGRM_MASTER_120)
+        link_root_finality = LinkFactory(parent=working_tree.root_node, child__node_type=TrainingType.MASTER_MA_120)
+
+        path_to_detach = program_tree.build_path(working_tree.root_node, link_root_finality.child)
+
+        self.mock_repository.configure_mock(
+            **{"search_from_children.return_value": [working_tree]}
+        )
+
+        validator = DetachOptionValidator(working_tree, path_to_detach, self.mock_repository)
+        self.assertValidatorNotRaises(validator)
+
+    @patch(
+        'program_management.ddd.domain.service.identity_search.ProgramTreeVersionIdentitySearch.get_from_node_identity'
+    )
+    def test_should_raise_exception_when_node_to_detach_is_an_option_also_present_inside_finality_in_another_tree(
+            self,
+            mock_version
+    ):
+        working_tree = ProgramTreeFactory(root_node__node_type=TrainingType.PGRM_MASTER_120)
+        link_root_option = LinkFactory(parent=working_tree.root_node, child__node_type=MiniTrainingType.OPTION)
+
+        other_tree = ProgramTreeFactory(root_node__node_type=TrainingType.PGRM_MASTER_120)
+        link_tree_finality = LinkFactory(parent=other_tree.root_node, child__node_type=TrainingType.MASTER_MA_120)
+        link_finality_option = LinkFactory(parent=link_tree_finality.child, child=link_root_option.child)
+
+        mock_version.side_effect = [
+            SimpleNamespace(version_name='', offer_acronym=link_finality_option.parent.title),
+            SimpleNamespace(version_name='', offer_acronym=link_finality_option.child.title),
+        ]
+
+        path_to_detach = program_tree.build_path(working_tree.root_node, link_root_option.child)
+
+        self.mock_repository.configure_mock(
+            **{"search_from_children.return_value": [working_tree, other_tree]}
+        )
+
+        validator = DetachOptionValidator(working_tree, path_to_detach, self.mock_repository)
+        expected_message = ngettext(
+            "Option \"%(acronym)s\" cannot be detach because it is contained in"
+            " %(finality_acronym)s program.",
+            "Options \"%(acronym)s\" cannot be detach because they are contained in"
+            " %(finality_acronym)s program.",
+            1
+        ) % {
+            "acronym": link_finality_option.child.title,
+            "finality_acronym": link_finality_option.parent.title
+        }
+        self.assertValidatorRaises(validator, [expected_message])
+
+    @patch(
+        'program_management.ddd.domain.service.identity_search.ProgramTreeVersionIdentitySearch.get_from_node_identity'
+    )
+    def test_should_not_raise_exception_when_node_present_inside_finality_in_other_tree_through_different_parent(
+            self,
+            mock_version
+    ):
+        working_tree = ProgramTreeFactory(root_node__node_type=TrainingType.PGRM_MASTER_120)
+        link_root_opt_list = LinkFactory(parent=working_tree.root_node, child__node_type=GroupType.OPTION_LIST_CHOICE)
+        link_opt_list_option = LinkFactory(parent=link_root_opt_list.child, child__node_type=MiniTrainingType.OPTION)
+
+        other_tree = ProgramTreeFactory(root_node__node_type=TrainingType.PGRM_MASTER_120)
+        link_tree_finality = LinkFactory(parent=other_tree.root_node, child__node_type=TrainingType.MASTER_MA_120)
+        link_finality_list = LinkFactory(parent=link_tree_finality.child, child__node_type=GroupType.OPTION_LIST_CHOICE)
+        LinkFactory(parent=link_finality_list.child, child=link_opt_list_option.child)
+
+        mock_version.side_effect = [
+            SimpleNamespace(version_name='', offer_acronym=link_opt_list_option.parent.title),
+            SimpleNamespace(version_name='', offer_acronym=link_opt_list_option.child.title),
+        ]
+
+        path_to_detach = program_tree.build_path(
+            working_tree.root_node,
+            link_root_opt_list.child,
+            link_opt_list_option.child
+        )
+        self.mock_repository.configure_mock(
+            **{"search_from_children.return_value": [working_tree]}
+        )
+
+        validator = DetachOptionValidator(working_tree, path_to_detach, self.mock_repository)
+        self.assertValidatorNotRaises(validator)

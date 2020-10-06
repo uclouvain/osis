@@ -49,6 +49,7 @@ from base.models.enums.activity_presence import ActivityPresence
 from base.models.enums.decree_category import DecreeCategories
 from base.models.enums.diploma_coorganization import DiplomaCoorganizationTypes
 from base.models.enums.duration_unit import DurationUnitsEnum
+from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import TrainingType
 from base.models.enums.funding_codes import FundingCodes
 from base.models.enums.internship_presence import InternshipPresence
@@ -85,7 +86,6 @@ class TrainingRepository(interface.AbstractRepository):
         education_group_year_db_obj = _create_education_group_year(training, education_group_db_obj)
         _save_secondary_domains(training, education_group_year_db_obj)
         _save_hops(training, education_group_year_db_obj)
-        _save_certificate_aims(training, education_group_year_db_obj)
         return training.entity_id
 
     @classmethod
@@ -94,7 +94,9 @@ class TrainingRepository(interface.AbstractRepository):
         education_group_year_db_obj = _update_education_group_year(training, education_group_db_obj)
         _save_secondary_domains(training, education_group_year_db_obj)
         _save_hops(training, education_group_year_db_obj)
-        _save_certificate_aims(training, education_group_year_db_obj)
+        # FIXME : certificate aims should be handled in another domain
+        if training.diploma.aims is not None:
+            _save_certificate_aims(training, education_group_year_db_obj)
         return training.entity_id
 
     @classmethod
@@ -117,7 +119,8 @@ class TrainingRepository(interface.AbstractRepository):
     def delete(cls, entity_id: 'TrainingIdentity', **_) -> None:
         EducationGroupYear.objects.filter(
             acronym=entity_id.acronym,
-            academic_year__year=entity_id.year
+            academic_year__year=entity_id.year,
+            education_group_type__category=Categories.TRAINING.name
         ).delete()
 
 
@@ -186,10 +189,6 @@ def _convert_education_group_year_to_training(
             acronym=obj.administration_entity.most_recent_acronym,
         ),
         end_year=obj.education_group.end_year.year if obj.education_group.end_year else None,
-        teaching_campus=Campus(
-            name=obj.main_teaching_campus.name,
-            university_name=obj.main_teaching_campus.organization.name,
-        ),
         enrollment_campus=Campus(
             name=obj.enrollment_campus.name,
             university_name=obj.enrollment_campus.organization.name,
@@ -297,7 +296,6 @@ def _get_queryset_to_fetch_data_for_training(entity_ids: List['TrainingIdentity'
         'administration_entity',
         'administration_entity',
         'enrollment_campus__organization',
-        'main_teaching_campus__organization',
         'isced_domain',
         'education_group__start_year',
         'education_group__end_year',
@@ -312,7 +310,7 @@ def _get_queryset_to_fetch_data_for_training(entity_ids: List['TrainingIdentity'
                     'organization__organizationaddress_set',
                     OrganizationAddress.objects.all().select_related('country')
                 )
-            ).order_by('all_students')
+            ).select_related('organization').order_by('all_students')
         ),
         Prefetch(
             'administration_entity',
@@ -404,14 +402,10 @@ def _create_education_group_year(
             acronym=training.administration_entity.acronym,
             year=training.year,
         ).entity_id if training.administration_entity else None,
-        main_teaching_campus=CampusModelDb.objects.get(
-            name=training.teaching_campus.name,
-            organization__name=training.teaching_campus.university_name,
-        ) if training.teaching_campus else None,
         enrollment_campus=CampusModelDb.objects.get(
             name=training.enrollment_campus.name,
             organization__name=training.enrollment_campus.university_name,
-        ) if training.teaching_campus else None,
+        ) if training.enrollment_campus else None,
         other_campus_activities=training.other_campus_activities.name
         if training.other_campus_activities else None,
         funding=training.funding.can_be_funded,
@@ -485,14 +479,10 @@ def _update_education_group_year(
                 acronym=training.administration_entity.acronym,
                 year=training.year,
             ).entity_id if training.administration_entity else None,
-            'main_teaching_campus': CampusModelDb.objects.get(
-                name=training.teaching_campus.name,
-                organization__name=training.teaching_campus.university_name,
-            ) if training.teaching_campus else None,
             'enrollment_campus': CampusModelDb.objects.get(
                 name=training.enrollment_campus.name,
                 organization__name=training.enrollment_campus.university_name,
-            ) if training.teaching_campus else None,
+            ) if training.enrollment_campus else None,
             'other_campus_activities': training.other_campus_activities.name
             if training.other_campus_activities else None,
             'funding': training.funding.can_be_funded,

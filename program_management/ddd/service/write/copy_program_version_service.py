@@ -28,13 +28,13 @@ from django.db import transaction
 from program_management.ddd.command import CopyTreeVersionToNextYearCommand
 from program_management.ddd.domain import exception
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionBuilder, ProgramTreeVersionIdentity
-from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
+from program_management.ddd.repositories import program_tree_version as program_tree_version_service
 
 
 @transaction.atomic()
 def copy_tree_version_to_next_year(copy_cmd: CopyTreeVersionToNextYearCommand) -> 'ProgramTreeVersionIdentity':
     # GIVEN
-    repository = ProgramTreeVersionRepository()
+    repository = program_tree_version_service.ProgramTreeVersionRepository()
     existing_program_tree_version = repository.get(
         entity_id=ProgramTreeVersionIdentity(
             offer_acronym=copy_cmd.from_offer_acronym,

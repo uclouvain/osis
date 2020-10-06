@@ -84,7 +84,6 @@ INSTALLED_APPS = (
     'ajax_select',
     'django_celery_beat',
     'django_celery_results',
-    'notifications',
     'django_filters',
     'hijack',
     'compat',
@@ -118,7 +117,6 @@ MIDDLEWARE = (
     'django.middleware.security.SecurityMiddleware',
     'base.middlewares.extra_http_responses_midleware.ExtraHttpResponsesMiddleware',
     'waffle.middleware.WaffleMiddleware',
-    'base.middlewares.notification_middleware.NotificationMiddleware',
     'base.middlewares.reversion_middleware.BaseRevisionMiddleware',
 )
 
@@ -185,6 +183,7 @@ DATABASES = {
 }
 
 AUTHENTICATION_BACKENDS = os.environ.get('AUTHENTICATION_BACKENDS', 'django.contrib.auth.backends.ModelBackend').split()
+PERMISSION_CACHE_ENABLED = os.environ.get('PERMISSION_CACHE_ENABLED', 'True').lower() == 'true'
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
@@ -487,3 +486,18 @@ LEARNING_UNIT_PORTAL_URL_WITH_UPDATED_CACHE = os.environ.get(
 
 # SITE_ID for Django "sites framework"
 SITE_ID = os.environ.get('SITE_ID', 1)
+
+# GIS-related
+MAPBOX = {
+    'ACCESS_TOKEN': os.environ.get("MAPBOX_ACCESS_TOKEN", ''),
+    'CSS_PATHS': os.environ.get(
+        "MAPBOX_CSS_PATHS",
+        'https://api.mapbox.com/mapbox-gl-js/v1.11.1/mapbox-gl.css',
+    ).split(' '),
+    'JS_PATHS': os.environ.get(
+        "MAPBOX_JS_PATHS",
+        'https://api.mapbox.com/mapbox-gl-js/v1.11.1/mapbox-gl.js',
+    ).split(' '),
+}
+GEOCODING_URL = os.environ.get("GEOCODING_URL", "")
+GEOCODING_TOKEN = os.environ.get("GEOCODING_TOKEN", "")

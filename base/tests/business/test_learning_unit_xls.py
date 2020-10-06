@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -68,6 +68,7 @@ from osis_common.document import xls_build
 from program_management.tests.factories.education_group_version import \
     ParticularTransitionEducationGroupVersionFactory, StandardEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementFactory
+from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
 
 COL_TEACHERS_LETTER = 'L'
 COL_PROGRAMS_LETTER = 'Z'
@@ -85,7 +86,7 @@ class TestLearningUnitXls(TestCase):
         cls.learning_container_luy1 = LearningContainerYearFactory(academic_year=cls.academic_year)
         cls.learning_unit_yr_1 = LearningUnitYearFactory(academic_year=cls.academic_year,
                                                          learning_container_year=cls.learning_container_luy1,
-                                                         credits=50)
+                                                         credits=10)
         cls.learning_unit_yr_1_element = ElementFactory(learning_unit_year=cls.learning_unit_yr_1)
         cls.learning_unit_yr_2 = LearningUnitYearFactory()
 
@@ -104,24 +105,17 @@ class TestLearningUnitXls(TestCase):
                                                                   acronym=ROOT_ACRONYM)
         cls.a_group_year_parent = GroupYearFactory(academic_year=cls.academic_year, acronym=ROOT_ACRONYM)
         cls.a_group_year_parent_element = ElementFactory(group_year=cls.a_group_year_parent)
-        StandardEducationGroupVersionFactory(offer=cls.an_education_group_parent, root_group=cls.a_group_year_parent)
+        cls.standard_version = StandardEducationGroupVersionFactory(
+            offer=cls.an_education_group_parent, root_group=cls.a_group_year_parent
+        )
 
         cls.group_element_child = GroupElementYearFactory(
             parent_element=cls.a_group_year_parent_element,
-            child_element=cls.learning_unit_yr_1_element
+            child_element=cls.learning_unit_yr_1_element,
+            relative_credits=cls.learning_unit_yr_1.credits,
         )
         # Particular OF
         cls.create_version(direct_parent_type)
-        #
-        cls.an_education_group = EducationGroupYearFactory(academic_year=cls.academic_year,
-                                                           acronym=PARENT_ACRONYM,
-                                                           title=PARENT_TITLE,
-                                                           partial_acronym=PARENT_PARTIAL_ACRONYM)
-
-        cls.group_element_child2 = GroupElementYearFactory(
-            parent=cls.an_education_group,
-            child_branch=cls.group_element_child.parent,
-        )
         cls.old_academic_year = AcademicYearFactory(year=datetime.date.today().year - 2)
         cls.current_academic_year = AcademicYearFactory(year=datetime.date.today().year)
         generatorContainer = GenerateContainer(cls.old_academic_year, cls.current_academic_year)
@@ -214,7 +208,7 @@ class TestLearningUnitXls(TestCase):
     def create_version(cls, direct_parent_type):
         cls.learning_unit_yr_version = LearningUnitYearFactory(academic_year=cls.academic_year,
                                                                learning_container_year=LearningContainerYearFactory(academic_year=cls.academic_year),
-                                                               credits=50)
+                                                               credits=10)
         cls.learning_unit_yr_version_element = ElementFactory(learning_unit_year=cls.learning_unit_yr_version)
         cls.an_education_group_parent_for_particular_version = EducationGroupYearFactory(
             academic_year=cls.academic_year,
@@ -227,9 +221,10 @@ class TestLearningUnitXls(TestCase):
         cls.particular_education_group_version = ParticularTransitionEducationGroupVersionFactory(
             offer=cls.an_education_group_parent_for_particular_version,
             root_group=cls.a_group_year_parent_for_particular_version)
-        GroupElementYearFactory(
+        cls.group_element_particular = GroupElementYearFactory(
             parent_element=cls.a_group_year_parent_element_for_particular_version,
-            child_element=cls.learning_unit_yr_version_element
+            child_element=cls.learning_unit_yr_version_element,
+            relative_credits=15
         )
 
     def test_get_wrapped_cells_with_teachers_and_programs(self):
@@ -316,9 +311,9 @@ class TestLearningUnitXls(TestCase):
         formations = _add_training_data(luy_1)
         expected = "{} ({}) - {} - {}".format(
             self.a_group_year_parent.partial_acronym,
-            "{0:.2f}".format(luy_1.credits),
+            "{0:.2f}".format(self.group_element_child.relative_credits),
             self.a_group_year_parent.acronym,
-            self.a_group_year_parent.title_fr
+            self.a_group_year_parent.title_fr + ' [{}]'.format(self.standard_version.title_fr)
         )
         self.assertEqual(formations, expected)
 
@@ -395,7 +390,7 @@ class TestLearningUnitXls(TestCase):
             luy)
 
         expected_common = [
-            str(_(luy.periodicity.title())),
+            dict(PERIODICITY_TYPES)[luy.periodicity],
             str(_('yes')) if luy.status else str(_('no')),
             component_lecturing.hourly_volume_total_annual,
             component_lecturing.hourly_volume_partial_q1,
@@ -478,10 +473,12 @@ class TestLearningUnitXls(TestCase):
             luy.get_quadrimester_display() or '',
             luy.get_session_display() or '',
             luy.language or "",
-            "{} ({}) - {} - {}".format(self.a_group_year_parent.partial_acronym,
-                                         "{0:.2f}".format(luy.credits),
-                                         self.a_group_year_parent.acronym,
-                                         self.a_group_year_parent.title_fr)
+            "{} ({}) - {} - {}".format(
+                self.a_group_year_parent.partial_acronym,
+                "{0:.2f}".format(self.group_element_child.relative_credits),
+                self.a_group_year_parent.acronym,
+                self.a_group_year_parent.title_fr + ' [{}]'.format(self.standard_version.title_fr)
+            )
         ]
 
     def test_get_attribution_detail(self):
@@ -542,10 +539,12 @@ class TestLearningUnitXls(TestCase):
         formations = _add_training_data(luy)
         expected = "{} ({}) - {} - {}".format(
             self.a_group_year_parent_for_particular_version.partial_acronym,
-            "{0:.2f}".format(luy.credits),
+            "{0:.2f}".format(self.group_element_particular.relative_credits),
             "{}[{}-Transition]".format(self.a_group_year_parent_for_particular_version.acronym,
                                        self.particular_education_group_version.version_name),
-            self.a_group_year_parent_for_particular_version.title_fr
+            self.a_group_year_parent_for_particular_version.title_fr + ' [{}]'.format(
+                self.particular_education_group_version.title_fr
+            )
         )
         self.assertEqual(formations, expected)
 

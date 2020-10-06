@@ -1,6 +1,7 @@
 from ajax_select.fields import AutoCompleteSelectMultipleField
 from django import forms
 from django.forms import ModelChoiceField
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from base.forms.learning_unit.entity_form import EntitiesVersionChoiceField
@@ -34,7 +35,8 @@ class ManagementEntitiesChoiceField(EntityRoleChoiceField):
     def get_queryset(self):
         qs = super().get_queryset().pedagogical_entities().order_by('acronym')
         if self.initial:
-            qs |= EntityVersion.objects.filter(pk=self.initial)
+            date = timezone.now()
+            qs |= EntityVersion.objects.current(date).filter(acronym=self.initial)
         return qs
 
     def clean(self, value):
@@ -65,3 +67,16 @@ class SecondaryDomainsField(AutoCompleteSelectMultipleField):
     def clean(self, value):
         value = super().clean(value)
         return domain.Domain.objects.filter(pk__in=value)
+
+
+class UpperCaseCharField(forms.CharField):
+    def widget_attrs(self, widget):
+        attrs = super().widget_attrs(widget)
+        attrs['style'] = "text-transform: uppercase;"
+        return attrs
+
+    def to_python(self, value):
+        value = super(UpperCaseCharField, self).to_python(value)
+        if value:
+            value = value.upper()
+        return value

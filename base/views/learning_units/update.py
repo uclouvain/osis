@@ -51,6 +51,7 @@ from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.views.common import display_error_messages, display_success_messages, display_warning_messages, \
     show_error_message_for_form_invalid
 from base.views.learning_unit import learning_unit_components
+from base.views.learning_units import perms
 from base.views.learning_units.common import get_learning_unit_identification_context, \
     get_common_context_learning_unit_year
 from learning_unit.views.utils import learning_unit_year_getter
@@ -202,48 +203,3 @@ def _save_form_and_display_messages(request, form, learning_unit_year):
                           % {'year': e.last_instance_updated.academic_year})
         display_error_messages(request, e.error_list)
     return records
-
-
-class EntityAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
-    def get_queryset(self):
-        country = self.forwarded.get('country', None)
-        qs = find_additional_requirement_entities_choices()
-        if country:
-            qs = qs.exclude(entity__organization__type=MAIN).order_by('title')
-            if country != "all":
-                qs = qs.filter(entity__country_id=country)
-        else:
-            qs = find_pedagogical_entities_version().order_by('acronym')
-        if self.q:
-            qs = qs.filter(Q(title__icontains=self.q) | Q(acronym__icontains=self.q))
-        return qs
-
-    def get_result_label(self, result):
-        return format_html(result.verbose_title)
-
-
-class AllocationEntityAutocomplete(EntityAutocomplete):
-    def get_queryset(self):
-        self.forwarded['country'] = self.forwarded.get('country_allocation_entity')
-        return super(AllocationEntityAutocomplete, self).get_queryset()
-
-
-class AdditionnalEntity1Autocomplete(EntityAutocomplete):
-    def get_queryset(self):
-        self.forwarded['country'] = self.forwarded.get('country_additional_entity_1')
-        return super(AdditionnalEntity1Autocomplete, self).get_queryset()
-
-
-class AdditionnalEntity2Autocomplete(EntityAutocomplete):
-    def get_queryset(self):
-        self.forwarded['country'] = self.forwarded.get('country_additional_entity_2')
-        return super(AdditionnalEntity2Autocomplete, self).get_queryset()
-
-
-class EntityRequirementAutocomplete(EntityAutocomplete):
-    def get_queryset(self):
-        return super(EntityRequirementAutocomplete, self).get_queryset()\
-            .filter(entity__in=self.request.user.person.linked_entities)
-
-    def get_result_label(self, result):
-        return format_html(result.verbose_title)

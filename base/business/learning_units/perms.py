@@ -25,14 +25,16 @@
 ##############################################################################
 import datetime
 
+from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.utils.translation import gettext_lazy as _
 
 from attribution.business.perms import _is_tutor_attributed_to_the_learning_unit
 from base.business.institution import find_summary_course_submission_dates_for_entity_version
-from base.models import tutor
+from base.models import proposal_learning_unit, tutor, entity_calendar
+from base.models.entity import Entity
 from base.models.entity_version import EntityVersion
-from base.models.enums import learning_container_year_types
+from base.models.enums import learning_container_year_types, academic_calendar_type
 from base.models.enums.proposal_state import ProposalState
 from base.models.learning_unit_year import LearningUnitYear
 from osis_common.utils.datetime import get_tzinfo, convert_date_to_datetime
@@ -48,7 +50,7 @@ PROPOSAL_CONSOLIDATION_ELIGIBLE_STATES = (ProposalState.ACCEPTED.name, ProposalS
 
 MSG_PERSON_NOT_IN_ACCORDANCE_WITH_PROPOSAL_STATE = _("Person not in accordance with proposal state")
 MSG_PROPOSAL_NOT_IN_CONSOLIDATION_ELIGIBLE_STATES = _("Proposal not in eligible state for consolidation")
-MSG_CAN_DELETE_ACCORDING_TO_TYPE = _("Cannot delete according to the type of the learning unit")
+MSG_CAN_DELETE_ACCORDING_TO_TYPE = _("Can delete according to the type of the learning unit")
 
 
 def learning_unit_year_permissions(learning_unit_year, person):
@@ -103,6 +105,23 @@ def is_eligible_to_update_learning_unit_pedagogy(learning_unit_year, person):
     return False
 
 
+def is_eligible_to_update_learning_unit_pedagogy_force_majeure_section(learning_unit_year, person):
+    if not person.user.has_perm('base.can_edit_learningunit_pedagogy'):
+        return False
+    if is_year_editable(learning_unit_year, raise_exception=False):
+        # Case faculty/central: We need to check if user is linked to entity
+        if person.is_faculty_manager or person.is_central_manager:
+            return person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year)
+
+        # Case Tutor: We need to check if today is between submission date of force majeure section
+        if tutor.is_tutor(person.user):
+            return can_user_edit_educational_information_force_majeure(
+                user=person.user,
+                learning_unit_year_id=learning_unit_year.id
+            ).is_valid()
+    return False
+
+
 def _is_tutor_summary_responsible_of_learning_unit_year(*, user, learning_unit_year_id, **kwargs):
     if not _is_tutor_attributed_to_the_learning_unit(user, learning_unit_year_id):
         raise PermissionDenied(_("You are not attributed to this learning unit."))
@@ -126,7 +145,7 @@ def _is_calendar_opened_to_edit_educational_information(*, learning_unit_year_id
 
     now = datetime.datetime.now(tz=get_tzinfo())
     value = convert_date_to_datetime(submission_dates["start_date"]) <= now <= \
-        convert_date_to_datetime(submission_dates["end_date"])
+            convert_date_to_datetime(submission_dates["end_date"])
     if not value:
         raise PermissionDenied(permission_denied_msg)
 
@@ -141,6 +160,35 @@ def find_educational_information_submission_dates_of_learning_unit_year(learning
     return find_summary_course_submission_dates_for_entity_version(
         entity_version=requirement_entity_version,
         ac_year=LearningUnitYear.objects.get(pk=learning_unit_year_id).academic_year
+    )
+
+
+def _is_calendar_opened_to_edit_educational_information_force_majeure_section(*, learning_unit_year_id, **kwargs):
+    submission_dates = find_educational_information_force_majeure_submission_dates_of_learning_unit_year(
+        learning_unit_year_id
+    )
+    permission_denied_msg = _("Not in period to edit force majeure section.")
+    if not submission_dates:
+        raise PermissionDenied(permission_denied_msg)
+
+    now = datetime.datetime.now(tz=get_tzinfo())
+    value = convert_date_to_datetime(submission_dates["start_date"]) <= now <= \
+            convert_date_to_datetime(submission_dates["end_date"])
+    if not value:
+        raise PermissionDenied(permission_denied_msg)
+
+
+def find_educational_information_force_majeure_submission_dates_of_learning_unit_year(learning_unit_year_id):
+    requirement_entity_version = find_last_requirement_entity_version(
+        learning_unit_year_id=learning_unit_year_id,
+    )
+    if requirement_entity_version is None:
+        return {}
+
+    return entity_calendar.find_interval_dates_for_entity(
+        ac_year=LearningUnitYear.objects.get(pk=learning_unit_year_id).academic_year,
+        reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION_FORCE_MAJEURE,
+        entity=requirement_entity_version.entity
     )
 
 
@@ -166,3 +214,22 @@ class can_user_edit_educational_information(BasePerm):
         _is_learning_unit_year_summary_editable,
         _is_calendar_opened_to_edit_educational_information
     )
+
+
+def is_year_editable(learning_unit_year, raise_exception):
+    result = learning_unit_year.academic_year.year > settings.YEAR_LIMIT_LUE_MODIFICATION
+    msg = "{}.  {}".format(
+        _("You can't modify learning unit under year : %(year)d") %
+        {"year": settings.YEAR_LIMIT_LUE_MODIFICATION + 1},
+        _("Modifications should be made in EPC for year %(year)d") %
+        {"year": learning_unit_year.academic_year.year},
+    )
+    can_raise_exception(raise_exception,
+                        result,
+                        msg)
+    return result
+
+
+def can_raise_exception(raise_exception, result, msg):
+    if raise_exception and not result:
+        raise PermissionDenied(msg)

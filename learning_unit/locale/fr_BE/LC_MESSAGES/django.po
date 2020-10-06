@@ -46,7 +46,7 @@ msgid "Not in proposal"
 msgstr "Pas en proposition"
 
 msgid "Only letters are allowed."
-msgstr "Les lettres seulement sont autorisées"
+msgstr "Seulement des lettres sont acceptées."
 
 msgid "Person not in accordance with proposal state"
 msgstr "Vous ne pouvez pas modifier une proposition dans cet état"

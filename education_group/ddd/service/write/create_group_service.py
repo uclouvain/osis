@@ -24,24 +24,13 @@
 
 from django.db import transaction
 
-from education_group import publisher
 from education_group.ddd import command
 from education_group.ddd.domain import group
-
-from education_group.ddd.domain.group import GroupIdentity
-from education_group.ddd.repository.group import GroupRepository
+from education_group.ddd.repository import group as group_repository
 
 
-from education_group.ddd.validators.validators_by_business_action import CreateGroupValidatorList
-
-
-# TODO : Implement Validator (Actually in GroupFrom via ValidationRules)
 @transaction.atomic()
-def create_orphan_group(cmd: command.CreateOrphanGroupCommand) -> 'GroupIdentity':
+def create_orphan_group(cmd: command.CreateOrphanGroupCommand) -> 'group.GroupIdentity':
     grp = group.builder.build_from_create_cmd(cmd)
 
-    CreateGroupValidatorList(grp).validate()
-    group_id = GroupRepository.create(grp)
-    # Emit group_created event
-    publisher.group_created.send(None, group_identity=group_id)
-    return group_id
+    return group_repository.GroupRepository.create(grp)

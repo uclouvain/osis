@@ -65,6 +65,13 @@ class EventPerm(ABC):
             qs = qs.filter(reference=cls.event_reference)
         return qs
 
+    @classmethod
+    def get_academic_calendars_queryset(cls, data_year) -> QuerySet:
+        qs = AcademicCalendar.objects.filter(data_year=data_year)
+        if cls.event_reference:
+            qs = qs.filter(reference=cls.event_reference)
+        return qs
+
     @cached_property
     def open_academic_calendars_for_specific_object(self) -> list:
         obj_ac_year = getattr(self.obj, self.academic_year_field)
@@ -207,3 +214,9 @@ class EventPermSummaryCourseSubmission(EventPerm):
     model = LearningUnitYear
     event_reference = academic_calendar_type.SUMMARY_COURSE_SUBMISSION
     error_msg = _("Summary course submission is not allowed for tutors during this period.")
+
+
+class EventPermSummaryCourseSubmissionForceMajeure(EventPerm):
+    model = LearningUnitYear
+    event_reference = academic_calendar_type.SUMMARY_COURSE_SUBMISSION_FORCE_MAJEURE
+    error_msg = _("Summary course submission (Force majeure) is not allowed for tutors during this period.")

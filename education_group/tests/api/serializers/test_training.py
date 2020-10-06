@@ -28,7 +28,6 @@ from django.db.models import F
 from django.test import TestCase, RequestFactory
 from django.urls import reverse
 
-from base.models.education_group_year import EducationGroupYear
 from base.models.enums import organization_type, education_group_types
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import TrainingFactory, EducationGroupYearBachelorFactory

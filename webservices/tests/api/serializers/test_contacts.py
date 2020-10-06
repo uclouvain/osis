@@ -28,17 +28,19 @@ import datetime
 from django.db.models import Case, When, F, CharField
 from django.test import TestCase
 
+from base.tests.factories.academic_year import get_current_year
 from base.tests.factories.education_group_publication_contact import EducationGroupPublicationContactFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
-from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory
+from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 from webservices.api.serializers.contacts import ContactsSerializer, ContactSerializer
 
 
 class ContactsSerializerTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
+        cls.current_year = get_current_year()
         cls.language = 'en'
         now = datetime.datetime.now()
         cls.entity = EntityFactory()
@@ -51,7 +53,7 @@ class ContactsSerializerTestCase(TestCase):
             management_entity=cls.entity,
             publication_contact_entity=cls.entity
         )
-        cls.node = NodeEducationGroupYearFactory(code=cls.egy.partial_acronym, year=now.year)
+        cls.node = NodeGroupYearFactory(code=cls.egy.partial_acronym, year=now.year)
         cls.serializer = ContactsSerializer(cls.node, context={'language': cls.language, 'offer': cls.egy})
 
     def test_contains_expected_fields(self):
@@ -65,11 +67,11 @@ class ContactsSerializerTestCase(TestCase):
 
     def test_return_none_if_no_pubication_contact_entity(self):
         egy = EducationGroupYearFactory(
-            academic_year__year=2018,
+            academic_year__year=self.current_year,
             management_entity=self.entity,
             publication_contact_entity=None
         )
-        node = NodeEducationGroupYearFactory(code=egy.partial_acronym, year=2018)
+        node = NodeGroupYearFactory(code=egy.partial_acronym, year=self.current_year)
         serializer = ContactsSerializer(node, context={'language': self.language, 'offer': egy})
         self.assertIsNone(serializer.data['entity'])
 

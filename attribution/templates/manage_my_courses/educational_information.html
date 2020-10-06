@@ -86,14 +86,18 @@
                     <br>
                     {% include "manage_my_courses/blocks/submission_dates.html" %}
                     <br>
-                    {% url 'tutor_edit_educational_information' learning_unit_year_id=learning_unit_year.id as post_url%}
+                    {% url 'tutor_edit_educational_information' learning_unit_year_id=learning_unit_year.id as post_url %}
 
                     {% include "learning_unit/blocks/panel/educational_informations.html" %}
                 </div>
             </div>
         </div>
+
+        {% url 'tutor_edit_educational_information_force_majeure' learning_unit_year_id=learning_unit_year.id as force_majeure_update_url %}
+        {% include 'learning_unit/blocks/panel/educational_informations_force_majeure.html' with post_url=force_majeure_update_url %}
     </div>
 </div>
+
 <div class="modal fade" id="pedagogy_edit" role="dialog" data-backdrop="static"></div>
 {% endblock %}
 {% block script %}
@@ -107,18 +111,15 @@
             }
         }
 
-        {% if can_edit_information %}
-        function display_refresh_message() {
-            code = this.dataset.code
-            fmts = gettext('The learning unit %(code)s will be published soon.');
-            success_message = interpolate(fmts, {code: code}, true);
-            displaySuccessMessage(success_message);
-        }
-        btn_visualize_refreshed_publication = document.getElementById("visualize_refreshed_publication_btn")
-        btn_visualize_refreshed_publication.onclick = display_refresh_message;
-
+        {% if can_edit_information or can_edit_force_majeur_section %}
+            function display_refresh_message() {
+                code = this.dataset.code
+                fmts = gettext('The learning unit %(code)s will be published soon.');
+                success_message = interpolate(fmts, {code: code}, true);
+                displaySuccessMessage(success_message);
+            }
+            btn_visualize_refreshed_publication = document.getElementById("visualize_refreshed_publication_btn")
+            btn_visualize_refreshed_publication.onclick = display_refresh_message;
         {% endif %}
-
-
     </script>
 {% endblock %}

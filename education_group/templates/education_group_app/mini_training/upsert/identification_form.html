@@ -67,10 +67,29 @@
         <div class="col-md-5">
             <div class="panel panel-default">
                 <div class="panel-body">
-                    {% bootstrap_field mini_training_form.management_entity %}
-                    {% bootstrap_field mini_training_form.academic_year %}
-                    {% bootstrap_field mini_training_form.end_year %}
-                    {% bootstrap_field mini_training_form.teaching_campus %}
+                    <div class="row">
+                        {% bootstrap_field mini_training_form.management_entity  form_group_class="col-md-12" %}
+                    </div>
+                    <br>
+
+                    <div class="row">
+                        {% bootstrap_field mini_training_form.academic_year form_group_class="col-md-12" %}
+                    </div>
+                    <br>
+
+                    <div class="row">
+                        {% if mini_training_form.start_year %}
+                            {% bootstrap_field mini_training_form.start_year form_group_class="col-md-6" %}
+                            {% bootstrap_field mini_training_form.end_year form_group_class="col-md-6" %}
+                        {% else %}
+                            {% bootstrap_field mini_training_form.end_year form_group_class="col-md-12" %}
+                        {% endif %}
+                    </div>
+                    <br>
+
+                    <div class="row">
+                        {% bootstrap_field mini_training_form.teaching_campus form_group_class="col-md-12" %}
+                    </div>
                 </div>
             </div>
         </div>

@@ -28,6 +28,7 @@ from django.http import HttpResponse
 from django.test import TestCase
 from django.urls import reverse
 
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_type import MiniTrainingEducationGroupTypeFactory
 from base.utils.urls import reverse_with_get
 from education_group.ddd.domain import mini_training
@@ -43,6 +44,7 @@ class TestCreate(TestCase):
 
         cls.central_manager = CentralManagerFactory()
         cls.url = reverse("mini_training_create", args=[cls.mini_training_type.name])
+        AcademicYearFactory.produce()
 
     def setUp(self) -> None:
         self.client.force_login(self.central_manager.person.user)
@@ -94,7 +96,7 @@ class TestCreate(TestCase):
             mock_node_identity_search):
         mini_training_identity = mini_training.MiniTrainingIdentity(acronym="ACRO", year=2020)
         mock_node_identity_search.return_value.get_from_element_id.return_value = node.NodeIdentity(
-            code='Cocode',
+            code='COCODE',
             year=2020
         )
         mock_service.return_value = [mini_training_identity]
@@ -112,7 +114,7 @@ class TestCreate(TestCase):
 
         expected_reverse = reverse_with_get(
             "element_identification",
-            kwargs={"code": "Cocode", "year": 2020},
+            kwargs={"code": "COCODE", "year": 2020},
             get={"path": "10|25"}
 
         )

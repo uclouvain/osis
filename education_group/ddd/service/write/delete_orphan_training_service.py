@@ -21,18 +21,21 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+from django.db import transaction
+
 from education_group.ddd import command
 from education_group.ddd.domain.training import TrainingIdentity
 
-from education_group.ddd.repository.training import TrainingRepository
+from education_group.ddd.repository import training as training_repository
 from education_group.ddd.validators.validators_by_business_action import DeleteOrphanTrainingValidatorList
 
 
+@transaction.atomic()
 def delete_orphan_training(cmd: command.DeleteOrphanTrainingCommand) -> 'TrainingIdentity':
     training_id = TrainingIdentity(acronym=cmd.acronym, year=cmd.year)
-    training = TrainingRepository.get(training_id)
+    training = training_repository.TrainingRepository.get(training_id)
 
     DeleteOrphanTrainingValidatorList(training).validate()
 
-    TrainingRepository.delete(training_id)
+    training_repository.TrainingRepository.delete(training_id)
     return training_id

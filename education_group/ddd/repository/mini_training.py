@@ -24,7 +24,7 @@
 from typing import Optional, List
 
 from django.db import IntegrityError
-from django.db.models import Prefetch, Subquery, OuterRef
+from django.db.models import Prefetch, Subquery, OuterRef, ProtectedError
 from django.utils import timezone
 
 from base.models.academic_year import AcademicYear as AcademicYearModelDb
@@ -35,14 +35,11 @@ from base.models.education_group_year import EducationGroupYear as EducationGrou
 from base.models.entity import Entity as EntityModelDb
 from base.models.entity_version import EntityVersion as EntityVersionModelDb
 from base.models.enums.active_status import ActiveStatusEnum
-from base.models.enums.constraint_type import ConstraintTypeEnum
 from base.models.enums.education_group_types import MiniTrainingType
 from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.ddd.domain import mini_training, exception
 from education_group.ddd.domain._campus import Campus
-from education_group.ddd.domain._content_constraint import ContentConstraint
 from education_group.ddd.domain._entity import Entity as EntityValueObject
-from education_group.ddd.domain._remark import Remark
 from education_group.ddd.domain._titles import Titles
 from osis_common.ddd import interface
 from osis_common.ddd.interface import Entity, EntityIdentity
@@ -60,23 +57,18 @@ class MiniTrainingRepository(interface.AbstractRepository):
             management_entity = EntityVersionModelDb.objects.current(timezone.now()).only('entity_id').get(
                 acronym=mini_training_obj.management_entity.acronym,
             )
-            teaching_campus = CampusModelDb.objects.only('id').get(
-                name=mini_training_obj.teaching_campus.name,
-                organization__name=mini_training_obj.teaching_campus.university_name
-            )
         except AcademicYearModelDb.DoesNotExist:
             raise exception.AcademicYearNotFound
         except EducationGroupTypeModelDb.DoesNotExist:
             raise exception.TypeNotFound
         except EntityVersionModelDb.DoesNotExist:
             raise exception.ManagementEntityNotFound
-        except CampusModelDb.DoesNotExist:
-            raise exception.TeachingCampusNotFound
 
         try:
             try:
                 education_group_db_obj = EducationGroupModelDb.objects.filter(
-                    educationgroupyear__acronym=mini_training_obj.acronym
+                    educationgroupyear__acronym=mini_training_obj.acronym,
+                    educationgroupyear__education_group_type__name=mini_training_obj.type.name
                 ).distinct().get()
             except EducationGroupModelDb.DoesNotExist:
                 education_group_db_obj = EducationGroupModelDb.objects.create(
@@ -94,20 +86,24 @@ class MiniTrainingRepository(interface.AbstractRepository):
                 title_english=mini_training_obj.titles.title_en,
                 credits=mini_training_obj.credits,
                 management_entity_id=management_entity.entity_id,
-                main_teaching_campus=teaching_campus,
                 schedule_type=mini_training_obj.schedule_type.name,
                 active=mini_training_obj.status.name,
                 keywords=mini_training_obj.keywords
             )
 
         except IntegrityError:
-            raise exception.MiniTrainingCodeAlreadyExistException()
+            raise exception.CodeAlreadyExistException(year=mini_training_obj.year)
 
         return mini_training_obj.entity_id
 
     @classmethod
-    def update(cls, entity: Entity) -> EntityIdentity:
-        pass
+    def update(cls, mini_training_obj: 'mini_training.MiniTraining', **kwargs) -> 'mini_training.MiniTrainingIdentity':
+        try:
+            _update_education_group(mini_training_obj)
+            _update_education_group_year(mini_training_obj)
+        except (EducationGroupYearModelDb.DoesNotExist, EducationGroupModelDb.DoesNotExist) as e:
+            raise exception.MiniTrainingNotFoundException()
+        return mini_training_obj.entity_id
 
     @classmethod
     def get(cls, entity_id: mini_training.MiniTrainingIdentity) -> mini_training.MiniTraining:
@@ -121,7 +117,6 @@ class MiniTrainingRepository(interface.AbstractRepository):
                 "education_group__start_year",
                 "education_group__end_year",
                 "education_group_type",
-                "main_teaching_campus__organization"
             ).prefetch_related(
                 Prefetch(
                     'management_entity',
@@ -154,13 +149,10 @@ class MiniTrainingRepository(interface.AbstractRepository):
             management_entity=EntityValueObject(
                 acronym=education_group_year_db.management_entity.most_recent_acronym,
             ),
-            teaching_campus=Campus(
-                name=education_group_year_db.main_teaching_campus.name,
-                university_name=education_group_year_db.main_teaching_campus.organization.name,
-            ),
             start_year=education_group_year_db.education_group.start_year.year,
             end_year=education_group_year_db.education_group.end_year.year
-            if education_group_year_db.education_group.end_year else None
+            if education_group_year_db.education_group.end_year else None,
+            keywords=education_group_year_db.keywords
         )
 
     @classmethod
@@ -168,11 +160,50 @@ class MiniTrainingRepository(interface.AbstractRepository):
         pass
 
     @classmethod
-    def delete(cls, entity_id: EntityIdentity) -> None:
-        pass
+    def delete(cls, entity_id: 'mini_training.MiniTrainingIdentity') -> None:
+        try:
+            EducationGroupYearModelDb.objects.get(
+                acronym=entity_id.acronym,
+                academic_year__year=entity_id.year,
+                education_group_type__name__in=MiniTrainingType.get_names()
+            ).delete()
+        except ProtectedError:
+            # FIXME :: should be in a business validator, not in the repository
+            raise exception.MiniTrainingIsBeingUsedException()
 
 
 def _convert_type(education_group_type):
     if education_group_type.name in MiniTrainingType.get_names():
         return MiniTrainingType[education_group_type.name]
     raise Exception('Unsupported group type')
+
+
+def _update_education_group(mini_training_obj: 'mini_training.MiniTraining'):
+    end_year = AcademicYearModelDb.objects.get(year=mini_training_obj.end_year) \
+        if mini_training_obj.end_year else None
+    education_group_db_obj = EducationGroupModelDb.objects.filter(
+        educationgroupyear__acronym=mini_training_obj.acronym,
+        educationgroupyear__education_group_type__name=mini_training_obj.type.name
+    ).distinct().get()
+    education_group_db_obj.end_year = end_year
+    education_group_db_obj.save()
+
+
+def _update_education_group_year(mini_training_obj: 'mini_training.MiniTraining'):
+    management_entity = EntityVersionModelDb.objects.current(timezone.now()).only('entity_id').get(
+        acronym=mini_training_obj.management_entity.acronym,
+    )
+    education_group_year_db_obj = EducationGroupYearModelDb.objects.get(
+        acronym=mini_training_obj.acronym,
+        academic_year__year=mini_training_obj.year
+    )
+
+    education_group_year_db_obj.title = mini_training_obj.titles.title_fr
+    education_group_year_db_obj.title_english = mini_training_obj.titles.title_en
+    education_group_year_db_obj.credits = mini_training_obj.credits
+    education_group_year_db_obj.management_entity_id = management_entity.entity_id
+    education_group_year_db_obj.schedule_type = mini_training_obj.schedule_type.name
+    education_group_year_db_obj.active = mini_training_obj.status.name
+    education_group_year_db_obj.keywords = mini_training_obj.keywords
+
+    education_group_year_db_obj.save()

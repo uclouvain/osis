@@ -30,8 +30,10 @@ from django.urls import reverse
 from django.views.generic import TemplateView
 from django.utils.translation import gettext_lazy as _
 
+from base.models.admission_condition import AdmissionCondition
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import TrainingType
+from education_group.views.general_information.update_common_condition import UpdateCommonCondition
 from osis_role.contrib.views import PermissionRequiredMixin
 
 
@@ -54,7 +56,9 @@ class CommonAggregateAdmissionCondition(PermissionRequiredMixin, TemplateView):
             "tab_urls": self.get_tab_urls(),
             "can_edit_information": self.request.user.has_perm(
                 "base.change_commonadmissioncondition", self.get_object()
-            )
+            ),
+            "update_text_url": self.get_update_text_url(),
+            "publish_url": self.get_publish_url()
         }
 
     def get_tab_urls(self):
@@ -76,3 +80,27 @@ class CommonAggregateAdmissionCondition(PermissionRequiredMixin, TemplateView):
             ).select_related('admissioncondition').get()
         except EducationGroupYear.DoesNotExist:
             raise Http404
+
+    def get_publish_url(self):
+        return reverse('publish_common_aggregate_admission_condition', kwargs={'year': self.kwargs['year']})
+
+    def get_update_text_url(self) -> str:
+        return reverse(
+            'update_common_aggregate_admission_condition',
+            kwargs={
+                'year': self.kwargs['year'],
+            }
+        )
+
+
+class UpdateCommonAggregateAdmissionCondition(UpdateCommonCondition):
+    def get_admission_condition(self):
+        common = EducationGroupYear.objects.look_for_common(
+            academic_year__year=self.kwargs['year'],
+            education_group_type__name=TrainingType.AGGREGATION.name,
+            admissioncondition__isnull=False
+        ).select_related('admissioncondition').get()
+        return common.admissioncondition
+
+    def get_success_url(self) -> str:
+        return reverse('common_aggregate_admission_condition', kwargs={'year': self.kwargs['year']})

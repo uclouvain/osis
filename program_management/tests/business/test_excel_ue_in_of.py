@@ -33,14 +33,13 @@ from attribution.ddd.domain.attribution import Attribution
 from attribution.tests.ddd.factories.teacher import TeacherFactory
 from base.business.learning_unit_xls import CREATION_COLOR, MODIFICATION_COLOR, TRANSFORMATION_COLOR, \
     TRANSFORMATION_AND_MODIFICATION_COLOR, SUPPRESSION_COLOR
-from base.models.enums import education_group_types
 from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import GroupType, TrainingType
 from base.models.enums.learning_unit_year_subtypes import FULL
+from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_year import GroupFactory, TrainingFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from learning_unit.tests.ddd.factories.achievement import AchievementFactory
@@ -97,29 +96,34 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
         cls.node_2 = GroupElementYearFactory(parent_element=cls.element_root, child_element=cls.child_2)
         cls.node_2_1 = GroupElementYearFactory(parent_element=cls.child_2, child_element=cls.child_2_1)
 
+        cls.root_node = NodeGroupYearFactory(node_id=cls.element_root.pk)
+
     def test_header_lines_without_optional_titles(self):
-        custom_xls_form = CustomXlsForm({})
+        custom_xls_form = CustomXlsForm({}, year=self.root_node.year, code=self.root_node.code)
         expected_headers = FIX_TITLES
 
         self.assertListEqual(_get_headers(custom_xls_form)[0], expected_headers)
 
     def test_header_lines_with_optional_titles(self):
-        custom_xls_form = CustomXlsForm({
-            'required_entity': 'on',
-            'allocation_entity': 'on',
-            'credits': 'on',
-            'periodicity': 'on',
-            'active': 'on',
-            'quadrimester': 'on',
-            'session_derogation': 'on',
-            'volume': 'on',
-            'teacher_list': 'on',
-            'proposition': 'on',
-            'english_title': 'on',
-            'language': 'on',
-            'specifications': 'on',
-            'description_fiche': 'on',
-        }
+        custom_xls_form = CustomXlsForm(
+            {
+                'required_entity': 'on',
+                'allocation_entity': 'on',
+                'credits': 'on',
+                'periodicity': 'on',
+                'active': 'on',
+                'quadrimester': 'on',
+                'session_derogation': 'on',
+                'volume': 'on',
+                'teacher_list': 'on',
+                'proposition': 'on',
+                'english_title': 'on',
+                'language': 'on',
+                'specifications': 'on',
+                'description_fiche': 'on',
+            },
+            year=self.root_node.year,
+            code=self.root_node.code
         )
 
         expected_headers = \
@@ -250,7 +254,7 @@ class TestContent(TestCase):
         self.assertListEqual(data.get(LEGEND_WB_STYLE).get(Font(color=SUPPRESSION_COLOR)), [5])
 
     def test_no_optional_data_to_add(self):
-        form = CustomXlsForm({})
+        form = CustomXlsForm({}, year=self.parent_node.year, code=self.parent_node.code)
         self.assertDictEqual(_optional_data(form),
                              {'has_required_entity': False,
                               'has_proposition': False,
@@ -284,7 +288,10 @@ class TestContent(TestCase):
                               'language': 'on',
                               'description_fiche': 'on',
                               'specifications': 'on',
-                              })
+                              },
+                             year=self.parent_node.year,
+                             code=self.parent_node.code
+                             )
         self.assertDictEqual(_optional_data(form),
                              {'has_required_entity': True,
                               'has_proposition': True,
@@ -328,7 +335,7 @@ class TestContent(TestCase):
         optional_data = initialize_optional_data()
         optional_data['has_periodicity'] = True
         self.assertCountEqual(_get_optional_data([], self.luy, optional_data, self.link_1_1),
-                              [self.luy.periodicity])
+                              [dict(PERIODICITY_TYPES)[self.luy.periodicity]])
 
     def test_get_optional_has_active(self):
         optional_data = initialize_optional_data()
@@ -413,9 +420,6 @@ class TestContent(TestCase):
                                                    teaching_material_2.title))
 
     def test_build_specifications_cols(self):
-        # lang_fr = FrenchLanguageFactory()
-        # lang_en = EnglishLanguageFactory()
-
         achievement_1 = AchievementFactory(code_name="A1", text_fr="Text fr", text_en="Text en")
         achievement_2 = AchievementFactory(code_name="A2", text_fr="Text fr", text_en=None)
         achievement_3 = AchievementFactory(code_name="A3", text_fr=None, text_en="    ")
@@ -484,72 +488,6 @@ class TestContent(TestCase):
                          "{} - {}".format(node_not_finality.title, node_not_finality.group_title_fr))
 
 
-class TestExcludeUEFromdWorkbook(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.root = TrainingFactory(
-            acronym='DROI2M',
-            education_group_type__name=education_group_types.TrainingType.PGRM_MASTER_120.name
-        )
-        academic_year = cls.root.academic_year
-        finality_list = GroupFactory(
-            acronym='LIST FINALITIES',
-            education_group_type__name=education_group_types.GroupType.FINALITY_120_LIST_CHOICE.name,
-            academic_year=academic_year
-        )
-
-        cls.formation_master_md = TrainingFactory(
-            acronym='DROI2MD',
-            education_group_type__name=education_group_types.TrainingType.MASTER_MD_120.name,
-            academic_year=academic_year
-        )
-
-        common_core = GroupFactory(
-            acronym='TC DROI2MD',
-            education_group_type__name=education_group_types.GroupType.COMMON_CORE.name,
-            academic_year=academic_year
-        )
-        options = GroupFactory(
-            acronym='TC DROI2MD',
-            education_group_type__name=education_group_types.GroupType.OPTION_LIST_CHOICE.name,
-            academic_year=academic_year
-        )
-
-        cls.luy_in_common_core = LearningUnitYearFactory()
-        cls.luy_in_finality_options = LearningUnitYearFactory()
-
-        GroupElementYearFactory(parent=cls.root, child_branch=finality_list, child_leaf=None)
-        GroupElementYearFactory(parent=finality_list, child_branch=cls.formation_master_md, child_leaf=None)
-        GroupElementYearFactory(parent=cls.formation_master_md, child_branch=common_core, child_leaf=None)
-        GroupElementYearFactory(parent=cls.formation_master_md, child_branch=options, child_leaf=None)
-        GroupElementYearFactory(parent=common_core,
-                                child_leaf=cls.luy_in_common_core,
-                                child_branch=None)
-        GroupElementYearFactory(parent=options,
-                                child_leaf=cls.luy_in_finality_options,
-                                child_branch=None)
-
-
-def get_expected_data(gey, luy, main_gathering=None):
-    gathering_str = "{} - {}".format(gey.parent.partial_acronym, gey.parent.title)
-    if main_gathering:
-        main_gathering_str = "{} - {}".format(main_gathering.acronym, main_gathering.title)
-    else:
-        main_gathering_str = gathering_str
-    expected = [luy.acronym,
-                luy.academic_year,
-                luy.complete_title_i18n,
-                luy.get_container_type_display(),
-                luy.get_subtype_display(),
-                gathering_str,
-                main_gathering_str,
-                gey.block or '',
-                _('yes')
-
-                ]
-    return expected
-
-
 def initialize_optional_data():
     return {
         'has_required_entity': False,
@@ -606,7 +544,7 @@ def get_expected_data_new(child_node, luy, link, main_gathering=None):
         main_gathering_str = ''
 
     expected = [luy.acronym,
-                luy.year,
+                u"%s-%s" % (luy.year, str(luy.year + 1)[-2:]),
                 luy.full_title_fr,
                 luy.type.value if luy.type else '',
                 luy.subtype if luy.subtype else '',
@@ -622,21 +560,21 @@ class TestRowHeight(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.root_node = NodeGroupYearFactory(node_id=1, code='c1', node_type=TrainingType.PGRM_MASTER_120)
+        cls.root_node = NodeGroupYearFactory(node_id=1, code='C1', node_type=TrainingType.PGRM_MASTER_120)
         cls.academic_year = AcademicYearFactory(year=cls.root_node.year)
-        cls.group_level_1 = NodeGroupYearFactory(node_id=2, code='c2', year=cls.academic_year.year)
+        cls.group_level_1 = NodeGroupYearFactory(node_id=2, code='C2', year=cls.academic_year.year)
         LinkFactory(parent=cls.root_node,
                     child=cls.group_level_1)
 
-        cls.group_level_1_1 = NodeGroupYearFactory(node_id=3, code='c3', year=cls.academic_year.year)
+        cls.group_level_1_1 = NodeGroupYearFactory(node_id=3, code='C3', year=cls.academic_year.year)
         LinkFactory(parent=cls.group_level_1,
                     child=cls.group_level_1_1)
 
-        cls.ue_level_group_level_1_1 = NodeLearningUnitYearFactory(node_id=4, code='ue1', year=cls.academic_year.year)
+        cls.ue_level_group_level_1_1 = NodeLearningUnitYearFactory(node_id=4, code='UE1', year=cls.academic_year.year)
         LinkFactory(parent=cls.group_level_1_1,
                     child=cls.ue_level_group_level_1_1)
         second_ue_level_group_level_1_1 = NodeLearningUnitYearFactory(node_id=5,
-                                                                      code='ue2',
+                                                                      code='UE2',
                                                                       year=cls.academic_year.year)
         LinkFactory(parent=cls.group_level_1_1,
                     child=second_ue_level_group_level_1_1)
@@ -652,7 +590,7 @@ class TestRowHeight(TestCase):
                                                    year=cls.academic_year.year)
         LinkFactory(parent=cls.group_level_2,
                     child=cls.group_level_2_1)
-        cls.ue_level_group_level_2_1 = NodeLearningUnitYearFactory(node_id=9, code='ue3', year=cls.academic_year.year)
+        cls.ue_level_group_level_2_1 = NodeLearningUnitYearFactory(node_id=9, code='UE3', year=cls.academic_year.year)
         LinkFactory(parent=cls.group_level_2_1,
                     child=cls.ue_level_group_level_2_1)
         cls.group_level_2_2 = NodeGroupYearFactory(node_id=8,
@@ -670,15 +608,15 @@ class TestRowHeight(TestCase):
 
         element_ue_1 = ElementLearningUnitYearFactory(id=cls.ue_level_group_level_1_1.node_id,
                                                       learning_unit_year=LearningUnitYearFactory(
-                                                          acronym='ue1', academic_year=cls.academic_year)
+                                                          acronym='UE1', academic_year=cls.academic_year)
                                                       )
         element_ue_2 = ElementLearningUnitYearFactory(id=second_ue_level_group_level_1_1.node_id,
                                                       learning_unit_year=LearningUnitYearFactory(
-                                                          acronym='ue2', academic_year=cls.academic_year)
+                                                          acronym='UE2', academic_year=cls.academic_year)
                                                       )
         element_ue_3 = ElementLearningUnitYearFactory(id=cls.ue_level_group_level_2_1.node_id,
                                                       learning_unit_year=LearningUnitYearFactory(
-                                                          acronym='ue3', academic_year=cls.academic_year)
+                                                          acronym='UE3', academic_year=cls.academic_year)
                                                       )
         ElementLearningUnitYearFactory(id=cls.ue_level_group_level_2_2.node_id,
                                        learning_unit_year=LearningUnitYearFactory(academic_year=cls.academic_year))
@@ -688,12 +626,12 @@ class TestRowHeight(TestCase):
         cls.luy_count = len(cls.learning_units)
 
     def test_row_height_not_populated(self):
-        custom_form = CustomXlsForm({})
+        custom_form = CustomXlsForm({}, year=self.root_node.year, code=self.root_node.code)
         data = _build_excel_lines_ues(custom_form, self.tree)
         self.assertDictEqual(data.get('row_height'), {})
 
     def test_row_height_populated(self):
-        custom_form = CustomXlsForm({'description_fiche': 'on'})
+        custom_form = CustomXlsForm({'description_fiche': 'on'}, year=self.root_node.year, code=self.root_node.code)
         data = _build_excel_lines_ues(custom_form, self.tree)
 
         self.assertDictEqual(data.get('row_height'), {
@@ -703,13 +641,13 @@ class TestRowHeight(TestCase):
         })
 
     def test_header_line(self):
-        custom_form = CustomXlsForm({})
+        custom_form = CustomXlsForm({}, year=self.root_node.year, code=self.root_node.code)
         data = _build_excel_lines_ues(custom_form, self.tree)
         # First line (Header line) is always bold
         self.assertListEqual(data.get('font_rows')[BOLD_FONT], [0])
 
     def test_exclude_options_list_for_2M(self):
-        self._assert_correct_ue_present_in_xls2(self.tree, ['ue1', 'ue2', 'ue3'])
+        self._assert_correct_ue_present_in_xls2(self.tree, ['UE1', 'UE2', 'UE3'])
 
     def test_do_not_exclude_options_list_if_not_2M(self):
         bachelor_root_node = NodeGroupYearFactory(node_type=TrainingType.BACHELOR, year=self.academic_year.year)
@@ -722,10 +660,10 @@ class TestRowHeight(TestCase):
         LinkFactory(parent=group_level_1,
                     child=group_level_1_1)
 
-        ue_level_group_level_1_1 = NodeLearningUnitYearFactory(code='ue21', node_id=100, year=self.academic_year.year)
+        ue_level_group_level_1_1 = NodeLearningUnitYearFactory(code='UE21', node_id=100, year=self.academic_year.year)
         LinkFactory(parent=group_level_1_1,
                     child=ue_level_group_level_1_1)
-        second_ue_level_group_level_1_1 = NodeLearningUnitYearFactory(code='ue22',
+        second_ue_level_group_level_1_1 = NodeLearningUnitYearFactory(code='UE22',
                                                                       node_id=101,
                                                                       year=self.academic_year.year)
         LinkFactory(parent=group_level_1_1,
@@ -737,29 +675,29 @@ class TestRowHeight(TestCase):
         LinkFactory(parent=bachelor_root_node,
                     child=group_level_2)
 
-        ue_level_group_level_2 = NodeLearningUnitYearFactory(code='ue23', node_id=102, year=self.academic_year.year)
+        ue_level_group_level_2 = NodeLearningUnitYearFactory(code='UE23', node_id=102, year=self.academic_year.year)
         LinkFactory(parent=group_level_2,
                     child=ue_level_group_level_2)
         bachelor_tree = ProgramTreeFactory(root_node=bachelor_root_node)
         # TODO : remplacer ce qui suit pour un accès plus direct
         ElementLearningUnitYearFactory(id=ue_level_group_level_1_1.node_id,
-                                       learning_unit_year=LearningUnitYearFactory(acronym='ue21',
+                                       learning_unit_year=LearningUnitYearFactory(acronym='UE21',
                                                                                   academic_year=self.academic_year))
         ElementLearningUnitYearFactory(id=second_ue_level_group_level_1_1.node_id,
                                        learning_unit_year=LearningUnitYearFactory(
-                                           acronym='ue22',
+                                           acronym='UE22',
                                            academic_year=self.academic_year
                                        )
                                        )
         ElementLearningUnitYearFactory(id=ue_level_group_level_2.node_id,
-                                       learning_unit_year=LearningUnitYearFactory(acronym='ue23',
+                                       learning_unit_year=LearningUnitYearFactory(acronym='UE23',
                                                                                   academic_year=self.academic_year)
                                        )
 
-        self._assert_correct_ue_present_in_xls2(bachelor_tree, ['ue21', 'ue22', 'ue23'])
+        self._assert_correct_ue_present_in_xls2(bachelor_tree, ['UE21', 'UE22', 'UE23'])
 
     def _assert_correct_ue_present_in_xls2(self, tree, ues):
-        data = _build_excel_lines_ues(CustomXlsForm({}), tree)
+        data = _build_excel_lines_ues(CustomXlsForm({}, year=self.root_node.year, code=self.root_node.code), tree)
         content = data['content']
         del content[0]
         self.assertEqual(len(content), len(ues))

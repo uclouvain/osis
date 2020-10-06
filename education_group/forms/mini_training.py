@@ -37,15 +37,16 @@ from base.models.enums import active_status, schedule_type as schedule_type_enum
     education_group_types
 from base.models.enums.constraint_type import ConstraintTypeEnum
 from education_group.forms import fields
+from education_group.forms.fields import UpperCaseCharField
 from rules_management.enums import MINI_TRAINING_PGRM_ENCODING_PERIOD, MINI_TRAINING_DAILY_MANAGEMENT
 from rules_management.mixins import PermissionFieldMixin
 
 
-class MiniTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
-    code = forms.CharField(max_length=15, label=_("Code"), required=False)
+class MiniTrainingForm(ValidationRuleMixin, forms.Form):
+    code = UpperCaseCharField(max_length=15, label=_("Code"), required=False)
     academic_year = forms.ModelChoiceField(
         queryset=AcademicYear.objects.all(),
-        label=_("Validity"),
+        label=_("Start"),
         to_field_name="year"
     )
     end_year = forms.ModelChoiceField(
@@ -53,7 +54,7 @@ class MiniTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         label=_('Last year of organization'),
         required=False
     )
-    abbreviated_title = forms.CharField(max_length=40, label=_("Acronym/Short title"), required=False)
+    abbreviated_title = UpperCaseCharField(max_length=40, label=_("Acronym/Short title"), required=False)
     title_fr = forms.CharField(max_length=240, label=_("Title in French"))
     title_en = forms.CharField(max_length=240, label=_("Title in English"), required=False)
     keywords = forms.CharField(max_length=320, label=_('Keywords'), required=False)
@@ -122,20 +123,15 @@ class MiniTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
             self.fields['academic_year'].disabled = True
 
         if not self.fields['academic_year'].disabled and self.user.person.is_faculty_manager:
-            academic_years = EventPermEducationGroupEdition.get_academic_years().filter(
-                year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION
-            )
-            self.fields['academic_year'].queryset = academic_years
-            self.fields['end_year'].queryset = academic_years
+            working_academic_years = EventPermEducationGroupEdition.get_academic_years()
         else:
-            self.fields['academic_year'].queryset = self.fields['academic_year'].queryset.filter(
-                year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION
-            )
-            self.fields['end_year'].queryset = self.fields['end_year'].queryset.filter(
-                year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION
-            )
+            working_academic_years = AcademicYear.objects.all()
 
-            self.fields['academic_year'].label = _('Start')
+        working_academic_years = working_academic_years.filter(year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION)
+        self.fields['academic_year'].queryset = working_academic_years
+        self.fields['end_year'].queryset = AcademicYear.objects.filter(
+            year__gte=working_academic_years.first().year
+        )
 
     def __init_management_entity_field(self):
         self.fields['management_entity'] = fields.ManagementEntitiesChoiceField(
@@ -154,15 +150,6 @@ class MiniTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     def field_reference(self, field_name: str) -> str:
         return '.'.join(["MiniTrainingForm", self.group_type, field_name])
 
-    # PermissionFieldMixin
-    def get_context(self) -> str:
-        is_edition_period_opened = EventPermEducationGroupEdition(raise_exception=False).is_open()
-        return MINI_TRAINING_PGRM_ENCODING_PERIOD if is_edition_period_opened else MINI_TRAINING_DAILY_MANAGEMENT
-
-    # PermissionFieldMixin
-    def get_model_permission_filter_kwargs(self) -> Dict:
-        return {'context': self.get_context()}
-
     def clean_academic_year(self):
         if self.cleaned_data['academic_year']:
             return self.cleaned_data['academic_year'].year
@@ -180,3 +167,44 @@ class MiniTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
                 'organization_name': self.cleaned_data['teaching_campus'].organization.name,
             }
         return None
+
+
+class UpdateMiniTrainingForm(PermissionFieldMixin, MiniTrainingForm):
+    start_year = forms.ModelChoiceField(
+        queryset=AcademicYear.objects.all(),
+        label=_('Start academic year'),
+        to_field_name="year",
+        disabled=True,
+        required=False
+    )
+    end_year = forms.ModelChoiceField(
+        queryset=AcademicYear.objects.all(),
+        label=_('Last year of organization'),
+        required=False,
+        to_field_name="year"
+    )
+
+    def __init__(self, *args, event_perm_obj=None, **kwargs):
+        self.event_perm_obj = event_perm_obj
+
+        super().__init__(*args, **kwargs)
+        self.fields["academic_year"].label = _('Validity')
+        self.fields["academic_year"].disabled = True
+        self.__init_end_year_field()
+
+    def __init_end_year_field(self):
+        initial_academic_year_value = self.initial.get("academic_year", None)
+        if initial_academic_year_value:
+            self.fields["end_year"].queryset = AcademicYear.objects.filter(year__gte=initial_academic_year_value)
+
+    # PermissionFieldMixin
+    def get_context(self) -> str:
+        is_edition_period_opened = EventPermEducationGroupEdition(
+            obj=self.event_perm_obj,
+            raise_exception=False
+        ).is_open()
+        return MINI_TRAINING_PGRM_ENCODING_PERIOD if is_edition_period_opened else MINI_TRAINING_DAILY_MANAGEMENT
+
+    # PermissionFieldMixin
+    def get_model_permission_filter_kwargs(self) -> Dict:
+        return {'context': self.get_context()}

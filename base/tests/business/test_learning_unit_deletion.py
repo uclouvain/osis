@@ -93,8 +93,8 @@ class LearningUnitYearDeletion(TestCase):
         elem_ue_1 = ElementFactory(learning_unit_year=l_unit_2)
         elem_ue_2 = ElementFactory(learning_unit_year=l_unit_2)
 
-        group_1 = GroupElementYearFactory(child_branch=None, child_leaf=None, child_element=elem_ue_1)
-        group_2 = GroupElementYearFactory(child_branch=None, child_leaf=None, child_element=elem_ue_2)
+        group_1 = GroupElementYearFactory(child_element=elem_ue_1)
+        group_2 = GroupElementYearFactory(child_element=elem_ue_2)
 
         component = LearningComponentYearFactory(learning_unit_year=l_unit_2)
 

@@ -21,14 +21,16 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+from django import forms
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.http import QueryDict
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, pgettext_lazy
+from django_filters import FilterSet, filters, OrderingFilter
 from django_filters.views import FilterView
 
-from base.forms.education_group.search.quick_search import QuickGroupYearFilter
 from base.forms.learning_unit.search.quick_search import QuickLearningUnitYearFilter
+from base.models.academic_year import AcademicYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import CacheFilterMixin
 from base.utils.search import SearchMixin
@@ -38,6 +40,68 @@ from education_group.models.group_year import GroupYear
 from learning_unit.api.serializers.learning_unit import LearningUnitSerializer
 
 CACHE_TIMEOUT = 60
+
+
+class QuickGroupYearFilter(FilterSet):
+    academic_year = filters.ModelChoiceFilter(
+        queryset=AcademicYear.objects.all(),
+        to_field_name="year",
+        required=False,
+        label=_('Ac yr.'),
+        empty_label=pgettext_lazy("female plural", "All"),
+    )
+    acronym = filters.CharFilter(
+        field_name="acronym",
+        lookup_expr='icontains',
+        max_length=40,
+        required=False,
+        label=_('Acronym/Short title'),
+    )
+    partial_acronym = filters.CharFilter(
+        field_name="partial_acronym",
+        lookup_expr='icontains',
+        max_length=40,
+        required=False,
+        label=_('Code'),
+    )
+    title = filters.CharFilter(
+        field_name="title_fr",
+        lookup_expr='icontains',
+        max_length=255,
+        required=False,
+        label=_('Title')
+    )
+
+    ordering = OrderingFilter(
+        fields=(
+            ('academic_year__year', 'academic_year'),
+            ('acronym', 'acronym'),
+            ('partial_acronym', 'code'),
+            ('title', 'title'),
+        ),
+        widget=forms.HiddenInput
+    )
+
+    class Meta:
+        model = GroupYear
+        fields = [
+            'acronym',
+            'title',
+            'academic_year',
+            'partial_acronym'
+        ]
+
+    def __init__(self, *args, initial=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.queryset = self.get_queryset()
+        if initial:
+            self.form.fields["academic_year"].initial = initial["academic_year"]
+
+    def get_queryset(self):
+        # Need this close so as to return empty query by default when form is unbound
+        if not self.data:
+            return GroupYear.objects.none()
+        return GroupYear.objects.all()
 
 
 class QuickSearchGroupYearView(PermissionRequiredMixin, CacheFilterMixin, AjaxTemplateMixin, SearchMixin,

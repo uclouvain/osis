@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -624,9 +624,8 @@ class LearningUnitViewTestCase(TestCase):
         )
         group_element1 = GroupElementYearFactory(
             child_element=learning_unit_year_element,
-            parent_element=ElementFactory(group_year=parent_1_version.root_group),
-            child_branch=None,
-            parent=None)
+            parent_element=ElementFactory(group_year=parent_1_version.root_group)
+        )
 
         parent_2 = EducationGroupYearFactory(partial_acronym='LBIOL601R', academic_year=self.current_academic_year,
                                              education_group_type=educ_group_type_matching_filters)
@@ -638,9 +637,8 @@ class LearningUnitViewTestCase(TestCase):
         )
         group_element2 = GroupElementYearFactory(
             child_element=learning_unit_year_element,
-            parent_element=ElementFactory(group_year=parent_2_version.root_group),
-            child_branch=None,
-            parent=None)
+            parent_element=ElementFactory(group_year=parent_2_version.root_group)
+        )
 
         parent_3 = EducationGroupYearFactory(partial_acronym='LBIOL608R', academic_year=self.current_academic_year,
                                              education_group_type=educ_group_type_matching_filters)
@@ -652,9 +650,8 @@ class LearningUnitViewTestCase(TestCase):
         )
         group_element3 = GroupElementYearFactory(
             child_element=learning_unit_year_element,
-            parent_element=ElementFactory(group_year=parent_3_version.root_group),
-            child_branch=None,
-            parent=None)
+            parent_element=ElementFactory(group_year=parent_3_version.root_group)
+        )
 
         response = self.client.get(reverse('learning_unit_formations', args=[learning_unit_year.id]))
         context = response.context
@@ -1087,6 +1084,8 @@ def _generate_xls_build_parameter(xls_data, user):
             xls_build.STYLED_CELLS: None,
             xls_build.FONT_ROWS: None,
             xls_build.ROW_HEIGHT: None,
+            xls_build.FONT_CELLS: None,
+            xls_build.BORDER_CELLS: None
         }]
     }
 
@@ -1105,7 +1104,7 @@ class TestLearningUnitComponents(TestCase):
     def setUp(self):
         self.client.force_login(self.a_superuser)
 
-    @mock.patch('base.models.program_manager.is_program_manager')
+    @mock.patch('base.auth.roles.program_manager.is_program_manager')
     def test_learning_unit_components(self, mock_program_manager):
         mock_program_manager.return_value = True
 
@@ -1350,7 +1349,7 @@ class TestLearningUnitProposalComparison(TestCase):
         self.assertListEqual(response.context['learning_unit_year_fields'],
                              [
                                  [_('Credits'), 5, 6.00],
-                                 [_('Periodicity'), _("biennial odd"), _("biennial even")],
+                                 [_('Periodicity'), _("Biennial odd"), _("Biennial even")],
                                  [_('Procedure'), "-", _("External")]
                              ])
 

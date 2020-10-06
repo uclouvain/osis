@@ -55,7 +55,6 @@ from cms.models.translated_text import TranslatedText
 from education_group import publisher
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin, SerializableModelManager, \
     SerializableQuerySet
-from program_management.ddd import repositories
 
 AUTHORIZED_REGEX_CHARS = "$*+.^"
 REGEX_ACRONYM_CHARSET = "[A-Z0-9" + AUTHORIZED_REGEX_CHARS + "]+"
@@ -67,12 +66,13 @@ MAXIMUM_CREDITS = 500
 # through the recursive database structure
 # ! It is a raw SQL : Use it only in last resort !
 # The returned structure is :
-# { id, gs_origin, child_branch_id, child_leaf_id, parent_id, acronym,
+# { id, gs_origin, child_element_id, parent_element_id, acronym,
 #   title, category, name, id (for education_group_type) and level }
 SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS = """\
 WITH RECURSIVE group_element_year_parent AS (
     SELECT gs.id, gs.id AS gs_origin, gy.acronym, gy.title_fr, educ_type.category, educ_type.name,
-    0 AS level, parent_element_id, child_element_id, version.is_transition, version.version_name
+    0 AS level, parent_element_id, child_element_id, version.is_transition, version.version_name, 
+    version.title_fr AS version_title_fr
     FROM base_groupelementyear AS gs
     INNER JOIN program_management_element AS element_parent ON gs.parent_element_id = element_parent.id
     INNER JOIN program_management_element AS element_child ON gs.child_element_id = element_child.id
@@ -84,7 +84,8 @@ WITH RECURSIVE group_element_year_parent AS (
     UNION ALL
     SELECT parent.id, gs_origin,  
     gy.acronym, gy.title_fr, educ_type.category, educ_type.name,
-    child.level + 1, parent.parent_element_id, parent.child_element_id, version.is_transition, version.version_name
+    child.level + 1, parent.parent_element_id, parent.child_element_id, version.is_transition, version.version_name,
+    version.title_fr AS version_title_fr
     FROM base_groupelementyear AS parent
     INNER JOIN program_management_element AS element_parent ON parent.parent_element_id = element_parent.id
     INNER JOIN program_management_element AS element_child ON parent.child_element_id = element_child.id    
@@ -239,7 +240,7 @@ class LearningUnitYear(SerializableModel):
 
     summary_locked = models.BooleanField(default=False, verbose_name=_("blocked update for tutor"))
 
-    professional_integration = models.BooleanField(default=False, verbose_name=_('professional integration'))
+    professional_integration = models.BooleanField(default=False, verbose_name=_('Professional integration'))
 
     campus = models.ForeignKey('Campus', null=True, verbose_name=_("Learning location"), on_delete=models.PROTECT)
 
@@ -530,14 +531,6 @@ class LearningUnitYear(SerializableModel):
     def is_prerequisite(self):
         return PrerequisiteItem.objects.filter(
             Q(learning_unit=self.learning_unit) | Q(prerequisite__learning_unit_year=self)
-        ).exists()
-
-    # FIXME :: To remove with EducationGroupHierarchy
-    def has_or_is_prerequisite(self, education_group_year):
-        formations = repositories.find_roots.find_roots([education_group_year])[education_group_year.id]
-        return PrerequisiteItem.objects.filter(
-            Q(prerequisite__learning_unit_year=self, prerequisite__education_group_year__in=formations) |
-            Q(prerequisite__education_group_year__in=formations, learning_unit=self.learning_unit)
         ).exists()
 
     def get_absolute_url(self):

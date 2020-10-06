@@ -86,7 +86,10 @@ class PermsTestCase(TestCase):
         previous_academic_yr = AcademicYearFactory.build(year=cls.academic_yr.year - 1)
         super(AcademicYear, previous_academic_yr).save()
 
-        cls.lunit_container_yr = LearningContainerYearFactory(academic_year=cls.academic_yr)
+        cls.lunit_container_yr = LearningContainerYearFactory(
+            academic_year=cls.academic_yr,
+            requirement_entity=EntityFactory()
+        )
         cls.luy = LearningUnitYearFactory(
             academic_year=cls.academic_yr,
             learning_container_year=cls.lunit_container_yr,
@@ -113,9 +116,18 @@ class PermsTestCase(TestCase):
 
             self.assertTrue(self.faculty_manager.person.user.has_perm('base.can_edit_learningunit_date', luy))
 
-    def test_not_eligible_if_has_application(self):
-        luy = LearningUnitYearFactory(academic_year__year=2020)
-        TutorApplicationFactory(learning_container_year=luy.learning_container_year)
+    def test_not_eligible_if_has_application_in_future(self):
+        next_luy = LearningUnitYearFactory(
+            learning_unit=self.luy.learning_unit,
+            academic_year__year=2021,
+            learning_container_year__learning_container=self.luy.learning_container_year.learning_container
+        )
+        TutorApplicationFactory(learning_container_year=next_luy.learning_container_year)
+        central_manager = CentralManagerFactory()
+        self.assertFalse(central_manager.person.user.has_perm('base.can_edit_learningunit_date', next_luy))
+
+    def test_eligible_if_has_application_but_none_in_future(self):
+        TutorApplicationFactory(learning_container_year=self.luy.learning_container_year)
         central_manager = CentralManagerFactory()
         self.assertFalse(central_manager.person.user.has_perm('base.can_edit_learningunit_date', luy))
 

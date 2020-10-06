@@ -30,7 +30,6 @@ from unittest.mock import patch
 from django.test import SimpleTestCase
 
 import osis_common.ddd.interface
-from base.ddd.utils import business_validator
 from base.ddd.utils.validation_message import MessageLevel, BusinessValidationMessage
 from base.models.authorized_relationship import AuthorizedRelationshipList
 from base.models.enums import prerequisite_operator
@@ -43,15 +42,18 @@ from program_management.ddd.domain.link import Link
 from program_management.ddd.domain.prerequisite import PrerequisiteItem
 from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.ddd.domain.program_tree import build_path
+from program_management.ddd.domain.service.generate_node_abbreviated_title import GenerateNodeAbbreviatedTitle
+from program_management.ddd.domain.service.generate_node_code import GenerateNodeCode
+from program_management.ddd.domain.service.validation_rule import FieldValidationRule
 from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 from program_management.ddd.validators.validators_by_business_action import DetachNodeValidatorList
 from program_management.ddd.validators.validators_by_business_action import PasteNodeValidatorList, \
     UpdatePrerequisiteValidatorList
 from program_management.models.enums import node_type
-from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipObjectFactory
+from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipObjectFactory, \
+    AuthorizedRelationshipListFactory, MandatoryRelationshipObjectFactory
 from program_management.tests.ddd.factories.commands.paste_element_command import PasteElementCommandFactory
 from program_management.tests.ddd.factories.link import LinkFactory
-from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 from program_management.tests.ddd.factories.prerequisite import cast_to_prerequisite
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
@@ -60,10 +62,25 @@ from program_management.tests.ddd.service.mixins import ValidatorPatcherMixin
 
 class TestProgramTreeBuilderCopyToNextYear(SimpleTestCase):
     def setUp(self) -> None:
-        self.copy_from_program_tree = ProgramTreeFactory()
+        self.authorized_relation = MandatoryRelationshipObjectFactory()
+        self.authorized_relations_list = AuthorizedRelationshipListFactory(
+            authorized_relationships=[self.authorized_relation]
+        )
+        self.copy_from_program_tree = ProgramTreeFactory(
+            authorized_relationships=self.authorized_relations_list,
+            root_node__node_type=self.authorized_relation.parent_type,
+        )
+        self.copy_from_program_tree.root_node.add_child(
+            NodeGroupYearFactory(node_type=self.authorized_relation.child_type)
+        )
         self.mock_repository = mock.create_autospec(ProgramTreeRepository)
 
-    def test_should_create_new_program_tree_when_does_not_exist_for_next_year(self):
+    @mock.patch.object(GenerateNodeCode, 'generate_from_parent_node')
+    @mock.patch.object(GenerateNodeAbbreviatedTitle, 'generate')
+    @mock.patch.object(FieldValidationRule, 'get')
+    @mock.patch('program_management.ddd.repositories.load_authorized_relationship.load')
+    def test_should_create_new_program_tree_when_does_not_exist_for_next_year(self, mock_relationships, *mocks):
+        mock_relationships.return_value = self.authorized_relations_list
         self.mock_repository.get.side_effect = exception.ProgramTreeNotFoundException
 
         resulted_tree = program_tree.ProgramTreeBuilder().copy_to_next_year(
@@ -76,9 +93,54 @@ class TestProgramTreeBuilderCopyToNextYear(SimpleTestCase):
             year=self.copy_from_program_tree.entity_id.year+1
         )
         self.assertEqual(expected_identity, resulted_tree.entity_id)
+        self._assert_mandatory_children_are_created(resulted_tree)
 
-    def test_should_return_existing_tree_when_exists_for_next_year(self):
-        program_tree_next_year = ProgramTreeFactory()
+    @mock.patch.object(GenerateNodeCode, 'generate_from_parent_node')
+    @mock.patch.object(GenerateNodeAbbreviatedTitle, 'generate')
+    @mock.patch.object(FieldValidationRule, 'get')
+    @mock.patch('program_management.ddd.repositories.load_authorized_relationship.load')
+    def test_should_not_create_mandatory_children_if_previous_year_does_not(self, mock_relationships, *mocks):
+        """If the program tree from previous year is inconsistent, it's not the responsibility of the application code
+        to fix these dirty data. To fix this, we need to create script to fix the dirty data and fix the business code
+        in charge of creating program trees."""
+        mock_relationships.return_value = self.authorized_relations_list
+        self.mock_repository.get.side_effect = exception.ProgramTreeNotFoundException
+        inconsistent_program_tree = ProgramTreeFactory(
+            root_node__children=[],
+            authorized_relationships=self.authorized_relations_list
+        )
+        self.mock_repository.update(inconsistent_program_tree)
+        resulted_tree = program_tree.ProgramTreeBuilder().copy_to_next_year(
+            inconsistent_program_tree,
+            self.mock_repository
+        )
+
+        expected_identity = program_tree.ProgramTreeIdentity(
+            code=inconsistent_program_tree.entity_id.code,
+            year=inconsistent_program_tree.entity_id.year+1
+        )
+        self.assertEqual(expected_identity, resulted_tree.entity_id)
+        self._assert_mandatory_children_are_not_created(resulted_tree)
+
+    def _assert_mandatory_children_are_created(self, resulted_tree):
+        children = resulted_tree.root_node.children_as_nodes
+        self.assertEqual(len(children), 1)
+        self.assertEqual(self.authorized_relation.child_type, children[0].node_type)
+
+    def _assert_mandatory_children_are_not_created(self, resulted_tree):
+        children = resulted_tree.root_node.children_as_nodes
+        self.assertTrue(len(children) == 0)
+
+    @mock.patch.object(GenerateNodeCode, 'generate_from_parent_node')
+    @mock.patch.object(GenerateNodeAbbreviatedTitle, 'generate')
+    @mock.patch.object(FieldValidationRule, 'get')
+    @mock.patch('program_management.ddd.repositories.load_authorized_relationship.load')
+    def test_should_return_existing_tree_when_exists_for_next_year(self, mock_relationships, *mocks):
+        mock_relationships.return_value = self.authorized_relations_list
+        program_tree_next_year = ProgramTreeFactory(
+            authorized_relationships=self.authorized_relations_list,
+            root_node__node_type=self.authorized_relation.parent_type,
+        )
         self.mock_repository.get.return_value = program_tree_next_year
 
         resulted_tree = program_tree.ProgramTreeBuilder().copy_to_next_year(
@@ -87,6 +149,7 @@ class TestProgramTreeBuilderCopyToNextYear(SimpleTestCase):
         )
 
         self.assertEqual(program_tree_next_year, resulted_tree)
+        self._assert_mandatory_children_are_created(resulted_tree)
 
 
 class TestGetNodeProgramTree(SimpleTestCase):
@@ -195,7 +258,7 @@ class TestGetCNodesByType(SimpleTestCase):
         self.tree = ProgramTreeFactory(root_node=self.root_node)
 
     def test_should_return_empty_list_if_no_matching_type(self):
-        result = self.tree.get_nodes_by_type(node_type.NodeType.EDUCATION_GROUP)
+        result = self.tree.get_nodes_by_type(node_type.NodeType.LEARNING_UNIT)
         self.assertCountEqual(
             result,
             []
@@ -242,14 +305,14 @@ class TestPasteNodeProgramTree(ValidatorPatcherMixin, SimpleTestCase):
     def test_should_paste_node_to_position_indicated_by_path_when_validator_do_not_raise_exception(self):
         self.mock_validator_validate_to_not_raise_exception(PasteNodeValidatorList)
 
-        link_created = self.tree.paste_node(self.child_to_paste, self.request, mock.Mock())
+        link_created = self.tree.paste_node(self.child_to_paste, self.request, mock.Mock(), mock.Mock())
         self.assertIn(link_created, self.tree.root_node.children)
 
     def test_should_propagate_exception_and_not_paste_node_when_validator_raises_exception(self):
         self.mock_validator_validate_to_raise_exception(PasteNodeValidatorList, ["error message text"])
 
         with self.assertRaises(osis_common.ddd.interface.BusinessExceptions):
-            self.tree.paste_node(self.child_to_paste, self.request, mock.Mock())
+            self.tree.paste_node(self.child_to_paste, self.request, mock.Mock(), mock.Mock())
 
         self.assertNotIn(self.child_to_paste, self.tree.root_node.children_as_nodes)
 
@@ -410,7 +473,7 @@ class TestCopyAndPrune(SimpleTestCase):
     def setUp(self):
         self.auth_relations = [AuthorizedRelationshipObjectFactory()]
 
-        self.original_root = NodeEducationGroupYearFactory()
+        self.original_root = NodeGroupYearFactory()
 
         self.original_link = LinkFactory(parent=self.original_root, block=0)
 

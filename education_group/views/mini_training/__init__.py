@@ -5,3 +5,4 @@ from .identification_read import MiniTrainingReadIdentification
 from .skills_achievements_read import MiniTrainingReadSkillsAchievements
 from .utilization_read import MiniTrainingReadUtilization
 from .create import MiniTrainingCreateView
+from .update import MiniTrainingUpdateView

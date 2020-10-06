@@ -24,12 +24,13 @@
 #
 ##############################################################################
 import copy
-from typing import Optional
+from typing import Optional, List
 
 import attr
 
+from base.ddd.utils.converters import to_upper_case_converter
 from base.models.enums.constraint_type import ConstraintTypeEnum
-from base.models.enums.education_group_types import EducationGroupTypesEnum, GroupType
+from base.models.enums.education_group_types import EducationGroupTypesEnum, GroupType, TrainingType
 from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import exception
@@ -40,8 +41,9 @@ from education_group.ddd.domain._titles import Titles
 from education_group.ddd.domain._campus import Campus
 from education_group.ddd.domain.service.enum_converter import EducationGroupTypeConverter
 from education_group.ddd.validators.validators_by_business_action import UpdateGroupValidatorList, \
-    CopyGroupValidatorList
+    CopyGroupValidatorList, CreateGroupValidatorList
 from osis_common.ddd import interface
+from program_management.ddd.domain.academic_year import AcademicYear
 
 
 class GroupBuilder:
@@ -73,7 +75,7 @@ class GroupBuilder:
         )
         remark = Remark(text_fr=cmd.remark_fr, text_en=cmd.remark_en)
 
-        return Group(
+        created_group = Group(
             entity_identity=group_id,
             entity_id=group_id,
             type=EducationGroupTypeConverter.convert_type_str_to_enum(cmd.type),
@@ -87,6 +89,8 @@ class GroupBuilder:
             start_year=cmd.start_year,
             end_year=cmd.end_year
         )
+        CreateGroupValidatorList(created_group).validate()
+        return created_group
 
 
 builder = GroupBuilder()
@@ -94,7 +98,7 @@ builder = GroupBuilder()
 
 @attr.s(frozen=True, slots=True)
 class GroupIdentity(interface.EntityIdentity):
-    code = attr.ib(type=str, converter=lambda value: value.upper())
+    code = attr.ib(type=str, converter=to_upper_case_converter)
     year = attr.ib(type=int)
 
 
@@ -102,7 +106,7 @@ class GroupIdentity(interface.EntityIdentity):
 class Group(interface.RootEntity):
     entity_id = entity_identity = attr.ib(type=GroupIdentity)
     type = attr.ib(type=EducationGroupTypesEnum)
-    abbreviated_title = attr.ib(type=str, converter=lambda title: title.upper())
+    abbreviated_title = attr.ib(type=str, converter=to_upper_case_converter)
     titles = attr.ib(type=Titles)
     credits = attr.ib(type=int)
     content_constraint = attr.ib(type=ContentConstraint)
@@ -113,6 +117,10 @@ class Group(interface.RootEntity):
     end_year = attr.ib(type=Optional[int], default=None)
 
     @property
+    def academic_year(self) -> AcademicYear:
+        return AcademicYear(self.year)
+
+    @property
     def code(self) -> str:
         return self.entity_id.code
 
@@ -120,8 +128,15 @@ class Group(interface.RootEntity):
     def year(self) -> int:
         return self.entity_id.year
 
+    @property
+    def academic_year(self) -> AcademicYear:
+        return AcademicYear(self.year)
+
     def is_minor_major_option_list_choice(self):
         return self.type.name in GroupType.minor_major_option_list_choice()
+
+    def is_training(self):
+        return self.type in TrainingType
 
     def update(
             self,
@@ -148,7 +163,7 @@ class Group(interface.RootEntity):
     def has_same_values_as(self, other_group: 'Group') -> bool:
         return not bool(self.get_conflicted_fields(other_group))
 
-    def get_conflicted_fields(self, other_group: 'Group') -> bool:
+    def get_conflicted_fields(self, other_group: 'Group') -> List[str]:
         fields_not_to_consider = ("year", "entity_id", "entity_identity")
         conflicted_fields = []
         for field_name in self.__slots__:

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-11 11:30+0200\n"
+"POT-Creation-Date: 2020-10-02 11:25+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,19 +17,26 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+msgid " with certificate aims"
+msgstr ""
+
 #, python-format
-msgid "%(count_enrollment)d student is enrolled in the mini-training."
-msgid_plural "%(count_enrollment)d students are enrolled in the mini-training."
+msgid ""
+"%(count_enrollment)d student is enrolled in the mini-training "
+"%(abbreviated_title)s (%(academic_year)s)."
+msgid_plural ""
+"%(count_enrollment)d students are enrolled in the mini-training "
+"%(abbreviated_title)s (%(academic_year)s)."
 msgstr[0] ""
 msgstr[1] ""
 
-#, python-format, python-brace-format
+#, python-format
 msgid ""
-"%(count_enrollment)d student is enrolled in the training {acronym} "
-"({academic_year})."
+"%(count_enrollment)d student is enrolled in the training %(acronym)s "
+"(%(academic_year)s)."
 msgid_plural ""
-"%(count_enrollment)d students are enrolled in the training {acronym} "
-"({academic_year})."
+"%(count_enrollment)d students are enrolled in the training %(acronym)s "
+"(%(academic_year)s)."
 msgstr[0] ""
 msgstr[1] ""
 
@@ -37,7 +44,8 @@ msgstr[1] ""
 msgid "%(max)s must be greater or equals than %(min)s"
 msgstr ""
 
-msgid "ARES"
+#, python-format
+msgid "%(start_index)s to %(end_index)s of %(total_counts)s common topics"
 msgstr ""
 
 msgid "ARES ability"
@@ -47,6 +55,9 @@ msgid "ARES study code"
 msgstr ""
 
 msgid "ARES-GRACA"
+msgstr ""
+
+msgid "Ac yr."
 msgstr ""
 
 msgid "Academic responsible"
@@ -113,6 +124,10 @@ msgstr ""
 msgid "Alert Message"
 msgstr ""
 
+msgctxt "female plural"
+msgid "All"
+msgstr ""
+
 #, python-format
 msgid "Are you sure you want to delete %(acronym)s - %(title)s ?"
 msgstr ""
@@ -130,6 +145,9 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
+msgid "Catalog configuration"
+msgstr ""
+
 msgid "Category"
 msgstr ""
 
@@ -145,6 +163,12 @@ msgstr ""
 msgid "Certificate aim can only be edited by program manager"
 msgstr ""
 
+#, python-format
+msgid ""
+"Certificate aims only for training <a href='%(link)s'> %(acronym)s "
+"(%(academic_year)s) </a> have been successfully updated."
+msgstr ""
+
 msgid "Clear clipboard"
 msgstr ""
 
@@ -154,7 +178,8 @@ msgstr ""
 msgid "Code"
 msgstr ""
 
-msgid "Code already exists"
+#, python-format
+msgid "Code already exists in %(academic_year)s"
 msgstr ""
 
 msgid "Code co-graduation inter CfB"
@@ -163,12 +188,24 @@ msgstr ""
 msgid "Comment"
 msgstr ""
 
+msgid "Common admission conditions have been updated"
+msgstr ""
+
+msgid "Common admission conditions will be published soon"
+msgstr ""
+
+msgid "Common general informations will be published soon"
+msgstr ""
+
 msgid "Conditions"
+msgstr ""
+
+msgid "Configuration"
 msgstr ""
 
 #, python-format
 msgid ""
-"Consistency error in %(academic_year)s: %(field)s has already been modified"
+"Consistency error in %(academic_year)s: %(fields)s has already been modified"
 msgstr ""
 
 msgid "Contacts"
@@ -217,9 +254,6 @@ msgid "Delete"
 msgstr ""
 
 msgid "Deliberation"
-msgstr ""
-
-msgid "Detach"
 msgstr ""
 
 msgid "Diploma"
@@ -291,6 +325,12 @@ msgstr ""
 msgid "From"
 msgstr ""
 
+msgid "Full title of the english version"
+msgstr ""
+
+msgid "Full title of the french version"
+msgstr ""
+
 msgid "Funding"
 msgstr ""
 
@@ -309,10 +349,7 @@ msgstr ""
 msgid "General informations"
 msgstr ""
 
-msgid "Go down"
-msgstr ""
-
-msgid "Go up"
+msgid "General informations have been updated"
 msgstr ""
 
 msgid "Graduates"
@@ -346,7 +383,7 @@ msgid "Identification"
 msgstr ""
 
 #, python-format
-msgid "Imposible to put end date to %(end_year)s: %(msg)s"
+msgid "Impossible to put end date to %(end_year)s: %(msg)s"
 msgstr ""
 
 msgid "Institution"
@@ -385,10 +422,16 @@ msgstr ""
 msgid "Link type"
 msgstr ""
 
-msgid "Linked with EPC"
+msgctxt "male"
+msgid "Main"
 msgstr ""
 
-msgid "Main"
+msgid "Management common topics"
+msgstr ""
+
+msgid ""
+"Management common topics in the context of training's general informations "
+"and access conditions"
 msgstr ""
 
 msgid "Management entity"
@@ -410,12 +453,26 @@ msgid "Mini-Training"
 msgstr ""
 
 #, python-format
+msgid "Mini-Training %(acronym)s successfully deleted from %(academic_year)s."
+msgstr ""
+
+#, python-format
+msgid ""
+"Mini-Training <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> "
+"successfully updated."
+msgstr ""
+
+#, python-format
 msgid ""
 "Mini-training <a href='%(link)s'> %(code)s (%(academic_year)s) </a> "
 "successfully created."
 msgstr ""
 
 msgid "Modification"
+msgstr ""
+
+#, python-brace-format
+msgid "Multiple entities {entity_acronym} found in {year}"
 msgstr ""
 
 msgid "New Education Group"
@@ -425,6 +482,9 @@ msgid "New Mini-Training"
 msgstr ""
 
 msgid "New Training"
+msgstr ""
+
+msgid "No result!"
 msgstr ""
 
 msgid "Non university Bachelors"
@@ -464,9 +524,6 @@ msgid "Personalized access"
 msgstr ""
 
 msgid "Please enter an academic year greater or equal to group start year."
-msgstr ""
-
-msgid "Please enter an academic year less or equal to group end year."
 msgstr ""
 
 msgid "Primary language"
@@ -514,6 +571,9 @@ msgstr ""
 msgid "Search..."
 msgstr ""
 
+msgid "Select one or multiple certificate aims"
+msgstr ""
+
 msgid "Session"
 msgstr ""
 
@@ -550,9 +610,6 @@ msgstr ""
 msgid "The fields concerning ARES have to be ALL filled-in or none of them"
 msgstr ""
 
-msgid "The following links has been updated"
-msgstr ""
-
 #, python-brace-format
 msgid ""
 "The formation you work with doesn't exist (or is not at the same position) "
@@ -565,15 +622,13 @@ msgid "The group %(code)s has been deleted."
 msgstr ""
 
 #, python-format
-msgid "The link of %(code)s - %(acronym)s - %(year)s has been updated."
+msgid "The mini-training %(code)s - %(title)s has been deleted."
 msgstr ""
 
-#, python-format
-msgid "The mini-training %(code)s has been deleted."
-msgstr ""
-
-#, python-format
-msgid "The program %(acronym)s will be published soon"
+#, python-brace-format
+msgid ""
+"The mini-training {abbreviated_title} ({academic_year}) have links in EPC "
+"application"
 msgstr ""
 
 msgid ""
@@ -581,15 +636,11 @@ msgid ""
 msgstr ""
 
 #, python-format
-msgid "The training %(code)s has been deleted."
+msgid "The training %(acronym)s - %(title)s has been deleted."
 msgstr ""
 
 #, python-brace-format
-msgid "The training {acronym} ({academic_year}) has inscriptions"
-msgstr ""
-
-#, python-brace-format
-msgid "The training {acronym} ({academic_year}) is linked to epc"
+msgid "The training {acronym} ({academic_year}) have links in EPC application"
 msgstr ""
 
 #, python-format
@@ -635,7 +686,7 @@ msgid "Training"
 msgstr ""
 
 #, python-format
-msgid "Training %(acronym)s (%(academic_year)s) successfully deleted."
+msgid "Training %(acronym)s successfully deleted from %(academic_year)s."
 msgstr ""
 
 #, python-format
@@ -647,7 +698,17 @@ msgstr ""
 #, python-format
 msgid ""
 "Training <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> "
-"successfully updated."
+"successfully updated"
+msgstr ""
+
+#, python-brace-format
+msgid "Training not found : {acronym} {year}"
+msgstr ""
+
+msgid "Training version can only be created by central manager"
+msgstr ""
+
+msgid "Training version can only be deleted by central manager"
 msgstr ""
 
 msgid "Trainings"
@@ -663,6 +724,14 @@ msgid "UCL Bachelors"
 msgstr ""
 
 msgid "UCL Diploma"
+msgstr ""
+
+#, python-brace-format
+msgid "Unable to publish common admission conditions for {year}"
+msgstr ""
+
+#, python-brace-format
+msgid "Unable to publish common general informations for {year}"
 msgstr ""
 
 msgid "University Bachelors"
@@ -684,6 +753,9 @@ msgid "Validity"
 msgstr ""
 
 msgid "Validity cannot be greater than last year of organization"
+msgstr ""
+
+msgid "Version name {} already exists"
 msgstr ""
 
 msgid "Web re-registration"
@@ -716,6 +788,11 @@ msgstr ""
 #, python-format
 msgid ""
 "You cannot change/delete a education group existing before %(limit_year)s"
+msgstr ""
+
+msgid ""
+"You must create the version of the concerned training and then attach that "
+"version inside this version"
 msgstr ""
 
 msgid "You should precise at least minimum or maximum constraint"
@@ -763,6 +840,9 @@ msgstr ""
 msgid "filter by section"
 msgstr ""
 
+msgid "hops"
+msgstr ""
+
 msgid "is using in"
 msgstr ""
 
@@ -773,9 +853,6 @@ msgid "maximum constraint"
 msgstr ""
 
 msgid "minimum constraint"
-msgstr ""
-
-msgid "of version"
 msgstr ""
 
 msgid "on successful completion of this program, each student is able to"

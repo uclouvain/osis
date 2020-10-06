@@ -1,4 +1,3 @@
-from unittest import skip
 
 import mock
 from django.test import TestCase, override_settings
@@ -6,9 +5,8 @@ from mock import patch
 
 from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group import EducationGroupFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory, ContinuingEducationTrainingFactory, \
-    TrainingFactory, MiniTrainingFactory
+    GroupFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.person import PersonFactory
@@ -17,7 +15,12 @@ from education_group.auth import predicates
 from education_group.auth.roles.faculty_manager import FacultyManager
 from education_group.auth.scope import Scope
 from education_group.tests.factories.auth.faculty_manager import FacultyManagerFactory
+from education_group.tests.factories.group import GroupFactory
 from education_group.tests.factories.group_year import GroupYearFactory
+from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
+from program_management.tests.factories.education_group_version import EducationGroupVersionFactory, \
+    StandardEducationGroupVersionFactory
+from program_management.tests.factories.element import ElementFactory
 
 
 class TestUserAttachedToManagementEntity(TestCase):
@@ -32,9 +35,9 @@ class TestUserAttachedToManagementEntity(TestCase):
             academic_year=cls.academic_year,
             management_entity=cls.entity_version_level_1.entity
         )
-        cls.person = PersonFactory()
 
     def setUp(self):
+        self.person = PersonFactory()
         self.predicate_context_mock = mock.patch(
             "rules.Predicate.context",
             new_callable=mock.PropertyMock,
@@ -161,7 +164,7 @@ class TestEducationGroupTypeAuthorizedAccordingToScope(TestCase):
         education_group_type_managed = EducationGroupYearFactory(
             education_group_type__name=TrainingType.BACHELOR.name
         )
-        FacultyManagerFactory(person=self.person, scopes=[Scope.IUFC.name],)
+        FacultyManagerFactory(person=self.person, scopes=[Scope.IUFC.name], )
 
         self.assertFalse(
             predicates.is_education_group_type_authorized_according_to_user_scope(
@@ -199,14 +202,13 @@ class TestEducationGroupTypeAuthorizedAccordingToScope(TestCase):
         )
 
 
-@skip("FIXME :: to fix in OSIS-4745")
 class TestIsEditionProgramPeriodOpen(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.user = UserFactory()
-        cls.education_group_year = EducationGroupYearFactory()
+        cls.group_year = GroupYearFactory()
 
     def setUp(self):
+        self.user = UserFactory()
         self.predicate_context_mock = mock.patch(
             "rules.Predicate.context",
             new_callable=mock.PropertyMock,
@@ -222,7 +224,7 @@ class TestIsEditionProgramPeriodOpen(TestCase):
         self.assertTrue(
             predicates.is_program_edition_period_open(
                 self.user,
-                self.education_group_year
+                self.group_year
             )
         )
 
@@ -231,7 +233,7 @@ class TestIsEditionProgramPeriodOpen(TestCase):
         self.assertFalse(
             predicates.is_program_edition_period_open(
                 self.user,
-                self.education_group_year
+                self.group_year
             )
         )
 
@@ -262,7 +264,9 @@ class TestIsContinuingEducationGroupYear(TestCase):
         )
 
     def test_case_is_not_continuing_education_group_year(self):
-        education_group_year = EducationGroupYearFactory()
+        education_group_year = EducationGroupYearFactory(
+            education_group_type__name=TrainingType.BACHELOR.name
+        )
         self.assertFalse(
             predicates.is_continuing_education_group_year(
                 self.user,
@@ -352,7 +356,7 @@ class TestIsUserLinkedToAllScopes(TestCase):
 class TestAreAllEducationGroupRemovable(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.education_group = EducationGroupFactory()
+        cls.group = GroupFactory(start_year__year=2000)
 
     def setUp(self):
         self.predicate_context_mock = mock.patch(
@@ -366,23 +370,23 @@ class TestAreAllEducationGroupRemovable(TestCase):
         self.addCleanup(self.predicate_context_mock.stop)
 
     def test_case_all_trainings_are_not_removable(self):
-        trainings = [TrainingFactory(education_group=self.education_group)]
-        person = FacultyManagerFactory(entity=trainings[0].management_entity).person
+        training_roots = [GroupYearFactory(group=self.group, academic_year__year=2020)]
+        person = FacultyManagerFactory(entity=training_roots[0].management_entity).person
         self.assertFalse(
             predicates.are_all_trainings_removable(
                 person.user,
-                trainings[0]
+                training_roots[0]
             )
         )
 
     @mock.patch('base.business.event_perms.EventPermEducationGroupEdition.is_open', return_value=True)
     def test_case_all_minitrainings_are_removable(self, mock_open):
-        minitrainings = [MiniTrainingFactory(education_group=self.education_group)]
-        person = FacultyManagerFactory(entity=minitrainings[0].management_entity).person
+        minitraining_roots = [GroupYearFactory(group=self.group, academic_year__year=2020)]
+        person = FacultyManagerFactory(entity=minitraining_roots[0].management_entity).person
         self.assertTrue(
             predicates.are_all_minitrainings_removable(
                 person.user,
-                minitrainings[0]
+                minitraining_roots[0]
             )
         )
 
@@ -395,4 +399,59 @@ class TestAreAllEducationGroupRemovable(TestCase):
                 person.user,
                 groups[0]
             )
+        )
+
+
+class TestIsElementOnlyInsideStandardProgram(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.group_year = GroupYearFactory(education_group_type__group=True)
+        ElementFactory(group_year=cls.group_year)
+
+    def setUp(self):
+        self.user = UserFactory.build()
+        self.predicate_context_mock = mock.patch(
+            "rules.Predicate.context",
+            new_callable=mock.PropertyMock,
+            return_value={
+                'perm_name': 'dummy-perm'
+            }
+        )
+        self.predicate_context_mock.start()
+        self.addCleanup(self.predicate_context_mock.stop)
+
+    def test_should_return_true_when_element_is_not_inside_tree_versions(self):
+        self.assertTrue(
+            predicates.is_element_only_inside_standard_program(self.user, self.group_year)
+        )
+
+    @mock.patch("program_management.ddd.repositories.load_tree_version.load_tree_versions_from_children")
+    def test_should_return_true_when_all_trees_are_standard(self, mock_load_tree_versions):
+        mock_load_tree_versions.return_value = [ProgramTreeVersionFactory(entity_id__version_name="")]
+        self.assertTrue(
+            predicates.is_element_only_inside_standard_program(self.user, self.group_year)
+        )
+
+    @mock.patch("program_management.ddd.repositories.load_tree_version.load_tree_versions_from_children")
+    def test_should_return_false_when_a_tree_is_non_standard(self, mock_load_tree_versions):
+        mock_load_tree_versions.return_value = [
+            ProgramTreeVersionFactory(entity_id__version_name=""),
+            ProgramTreeVersionFactory(entity_id__version_name="NON_STANDARD")
+        ]
+        self.assertFalse(
+            predicates.is_element_only_inside_standard_program(self.user, self.group_year)
+        )
+
+    def test_should_return_false_when_element_is_a_tree_version_that_is_specific(self):
+        EducationGroupVersionFactory(root_group=self.group_year)
+
+        self.assertFalse(
+            predicates.is_element_only_inside_standard_program(self.user, self.group_year)
+        )
+
+    def test_should_return_true_when_element_is_a_tree_version_that_is_standard(self):
+        StandardEducationGroupVersionFactory(root_group=self.group_year)
+
+        self.assertTrue(
+            predicates.is_element_only_inside_standard_program(self.user, self.group_year)
         )

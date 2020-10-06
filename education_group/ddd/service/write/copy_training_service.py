@@ -28,13 +28,13 @@ from django.db import transaction
 from education_group.ddd import command
 from education_group.ddd.domain import exception
 from education_group.ddd.domain.training import TrainingBuilder, TrainingIdentity
-from education_group.ddd.repository.training import TrainingRepository
+from education_group.ddd.repository import training as training_repository
 
 
 @transaction.atomic()
 def copy_training_to_next_year(copy_cmd: command.CopyTrainingToNextYearCommand) -> 'TrainingIdentity':
     # GIVEN
-    repository = TrainingRepository()
+    repository = training_repository.TrainingRepository()
     existing_training = repository.get(
         entity_id=TrainingIdentity(acronym=copy_cmd.acronym, year=copy_cmd.postpone_from_year)
     )

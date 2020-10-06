@@ -26,7 +26,6 @@
 from typing import List
 
 from django.db.models import F, Value, CharField, QuerySet, Case, When, IntegerField, OuterRef, Subquery
-from django.db.models.functions import Concat
 
 from base.models.entity_version import EntityVersion
 from base.models.enums.active_status import ActiveStatusEnum
@@ -36,36 +35,10 @@ from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.models.group_year import GroupYear
 from learning_unit.ddd.repository import load_learning_unit_year
 from program_management.ddd.domain import node
+from program_management.ddd.domain._campus import Campus
 from program_management.models import element
 from program_management.models.enums.node_type import NodeType
 from education_group.models.enums.constraint_type import ConstraintTypes
-
-
-# TODO: Depracated, must be deleted (use load method type are determined in element)
-def load_by_type(type: NodeType, element_id: int) -> node.Node:
-    if type == NodeType.GROUP:
-        return load_node_group_year(element_id)
-    elif type == NodeType.LEARNING_UNIT:
-        return load_node_learning_unit_year(element_id)
-
-
-# TODO: Depracated, must be deleted (use load method type are determined in element)
-def load_node_group_year(node_id: int) -> node.Node:
-    try:
-        node_data = __load_multiple_node_group_year([node_id])[0]
-        node_data["node_id"] = node_data.pop("id")
-        return node.factory.get_node(**__convert_string_to_enum(node_data))
-    except IndexError:
-        raise node.NodeNotFoundException
-
-
-# TODO: Depracated, must be deleted (use load method type are determined in element)
-def load_node_learning_unit_year(node_id: int) -> node.Node:
-    try:
-        node_data = __load_multiple_node_learning_unit_year([node_id])[0]
-        return node.factory.get_node(**__convert_string_to_enum(node_data))
-    except IndexError:
-        raise node.NodeNotFoundException
 
 
 def load(element_id: int) -> node.Node:
@@ -110,10 +83,19 @@ def load_multiple(element_ids: List[int]) -> List[node.Node]:
         }[node_type]
 
         nodes_objects += [
-            node.factory.get_node(**__convert_string_to_enum(node_data), node_id=elem_grouped[node_data.pop('id')])
+            __instanciate_node(**node_data, node_id=elem_grouped[node_data.pop('id')])
             for node_data in get_method(elem_grouped.keys())
         ]
     return nodes_objects
+
+
+def __instanciate_node(**node_attrs):
+    if node_attrs.get('teaching_campus_name'):
+        node_attrs['teaching_campus'] = Campus(
+            name=node_attrs.pop('teaching_campus_name'),
+            university_name=node_attrs.pop('teaching_campus_university_name'),
+        )
+    return node.factory.get_node(**__convert_string_to_enum(node_attrs))
 
 
 def __convert_string_to_enum(node_data: dict) -> dict:

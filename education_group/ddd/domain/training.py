@@ -23,10 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List, Optional
+from typing import List
 
 import attr
 
+from base.ddd.utils.converters import to_upper_case_converter
 from base.models.enums.academic_type import AcademicTypes
 from base.models.enums.active_status import ActiveStatusEnum
 from base.models.enums.activity_presence import ActivityPresence
@@ -42,7 +43,7 @@ from education_group.ddd.business_types import *
 from education_group.ddd.domain._campus import Campus
 from education_group.ddd.domain._co_graduation import CoGraduation
 from education_group.ddd.domain._co_organization import Coorganization
-from education_group.ddd.domain._diploma import Diploma, DiplomaAim, DiplomaAimIdentity
+from education_group.ddd.domain._diploma import Diploma
 from education_group.ddd.domain._entity import Entity
 from education_group.ddd.domain._funding import Funding
 from education_group.ddd.domain._hops import HOPS
@@ -60,7 +61,7 @@ from program_management.ddd.domain.academic_year import AcademicYear
 
 @attr.s(frozen=True, slots=True)
 class TrainingIdentity(interface.EntityIdentity):
-    acronym = attr.ib(type=str)
+    acronym = attr.ib(type=str, converter=to_upper_case_converter)
     year = attr.ib(type=int)
 
 
@@ -85,6 +86,16 @@ class TrainingBuilder:
             )
         return training_next_year
 
+    def copy_aims_to_next_year(
+            self,
+            training_from: 'Training',
+            training_repository: 'TrainingRepository'
+    ) -> 'Training':
+        identity_next_year = TrainingIdentity(acronym=training_from.acronym, year=training_from.year + 1)
+        training_next_year = training_repository.get(identity_next_year)
+        training_next_year.update_aims_from_other_training(training_from)
+        return training_next_year
+
     def create_training(self, command: 'CreateTrainingCommand') -> 'Training':
         training_identity = TrainingIdentity(command.abbreviated_title, command.year)
 
@@ -94,15 +105,6 @@ class TrainingBuilder:
                 StudyDomain(
                     entity_id=StudyDomainIdentity(dom[0], dom[1]),
                     domain_name=None,
-                )
-            )
-
-        command_aims = []
-        for aim in command.aims:
-            command_aims.append(
-                DiplomaAim(
-                    entity_id=DiplomaAimIdentity(code=aim[0], section=aim[1]),
-                    description=None,
                 )
             )
 
@@ -152,10 +154,6 @@ class TrainingBuilder:
             management_entity=Entity(acronym=command.management_entity_acronym),
             administration_entity=Entity(acronym=command.administration_entity_acronym),
             end_year=command.end_year,
-            teaching_campus=Campus(
-                name=command.teaching_campus_name,
-                university_name=command.teaching_campus_organization_name,
-            ),
             enrollment_campus=Campus(
                 name=command.enrollment_campus_name,
                 university_name=command.enrollment_campus_organization_name,
@@ -182,10 +180,10 @@ class TrainingBuilder:
             ),
             academic_type=utils.get_enum_from_str(command.academic_type, AcademicTypes),
             diploma=Diploma(
+                aims=None,
                 leads_to_diploma=command.leads_to_diploma,
                 printing_title=command.printing_title,
                 professional_title=command.professional_title,
-                aims=command_aims,
             ),
         )
         CreateTrainingValidatorList(training).validate()
@@ -207,7 +205,7 @@ class Training(interface.RootEntity):
 
     # FIXME :: split fields into separate ValueObjects (to discuss with business people)
     entity_id = entity_identity = attr.ib(type=TrainingIdentity)
-    code = attr.ib(type=str)  # to remove
+    code = attr.ib(type=str, converter=to_upper_case_converter)  # to remove
     type = attr.ib(type=TrainingType)
     credits = attr.ib(type=int)
     start_year = attr.ib(type=int)
@@ -237,7 +235,6 @@ class Training(interface.RootEntity):
     management_entity = attr.ib(type=Entity, default=None)
     administration_entity = attr.ib(type=Entity, default=None)
     end_year = attr.ib(type=int, default=None)
-    teaching_campus = attr.ib(type=Campus, default=None)
     enrollment_campus = attr.ib(type=Campus, default=None)
     other_campus_activities = attr.ib(type=ActivityPresence, default=None)
     funding = attr.ib(type=Funding, default=None)
@@ -288,7 +285,6 @@ class Training(interface.RootEntity):
         return self
 
     def update_from_other_training(self, other_training: 'Training'):
-        old_diploma = self.diploma
         fields_not_to_update = (
             "year", "acronym", "academic_year", "entity_id", "entity_identity", "identity_through_years",
         )
@@ -298,10 +294,17 @@ class Training(interface.RootEntity):
             value = getattr(other_training, field)
             setattr(self, field, value)
 
-        if self.diploma and old_diploma:
-            self.diploma = attr.evolve(self.diploma, aims=old_diploma.aims)
-        elif self.diploma and not old_diploma:
-            self.diploma = attr.evolve(self.diploma, aims=[])
+    def update_aims(self, data: 'UpdateDiplomaData'):
+        self._update_aims(data.diploma)
+        validators = validators_by_business_action.UpdateCertificateAimsValidatorList(self)
+        validators.validate()
+
+    def update_aims_from_other_training(self, other_training: 'Training'):
+        self._update_aims(other_training.diploma)
+
+    def _update_aims(self, diploma: Diploma):
+        if self.diploma:
+            self.diploma = attr.evolve(self.diploma, aims=diploma.aims if diploma else [])
 
     def has_same_values_as(self, other_training: 'Training') -> bool:
         return not bool(self.get_conflicted_fields(other_training))
@@ -331,6 +334,9 @@ class Training(interface.RootEntity):
             conflicted_fields.append("professional_title")
 
         return conflicted_fields
+
+    def has_conflicted_certificate_aims(self, other: 'Training'):
+        return self.diploma.aims != other.diploma.aims
 
 
 @attr.s(frozen=True, slots=True, kw_only=True)
@@ -365,4 +371,9 @@ class UpdateTrainingData:
     funding = attr.ib(type=Funding, default=None)
     hops = attr.ib(type=HOPS, default=None)
     co_graduation = attr.ib(type=CoGraduation, default=None)
+    diploma = attr.ib(type=Diploma, default=None)
+
+
+@attr.s(frozen=True, slots=True, kw_only=True)
+class UpdateDiplomaData:
     diploma = attr.ib(type=Diploma, default=None)

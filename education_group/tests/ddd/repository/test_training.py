@@ -25,8 +25,6 @@
 ##############################################################################
 from django.test import TestCase
 
-from base.models.certificate_aim import CertificateAim
-from base.models.education_group_certificate_aim import EducationGroupCertificateAim
 from base.models.education_group_year import EducationGroupYear as EducationGroupYearModelDb, EducationGroupYear
 from base.models.education_group_year_domain import EducationGroupYearDomain
 from base.models.enums.education_group_types import TrainingType
@@ -65,15 +63,10 @@ class TestTrainingRepositoryCreateMethod(TestCase):
         cls.isced_domain = DomainIscedFactoryModelDb()
         cls.entity_version = EntityVersionModelDbFactory()
         cls.campus = CampusModelDbFactory()
-        cls.certificate_aim = CertificateAimModelDbFactory()
 
         study_domain_identity = StudyDomainIdentityFactory(
             decree_name=cls.study_domain.decree.name,
             code=cls.study_domain.code
-        )
-        diploma_aim_identity = DiplomaAimIdentityFactory(
-            code=cls.certificate_aim.code,
-            section=cls.certificate_aim.section
         )
         campus_identity = CampusIdentityFactory(name=cls.campus.name, university_name=cls.campus.organization.name)
         training_identity = TrainingIdentityFactory(year=cls.year)
@@ -88,14 +81,10 @@ class TestTrainingRepositoryCreateMethod(TestCase):
             isced_domain__entity_id=IscedDomainIdentityFactory(code=cls.isced_domain.code),
             management_entity__acronym=cls.entity_version.acronym,
             administration_entity__acronym=cls.entity_version.acronym,
-            teaching_campus=campus_identity,
             enrollment_campus=campus_identity,
             secondary_domains=[
                 StudyDomainFactory(entity_id=study_domain_identity)
             ],
-            diploma__aims=[
-                DiplomaAimFactory(entity_id=diploma_aim_identity)
-            ]
         )
 
     def test_fields_mapping(self):
@@ -122,15 +111,6 @@ class TestTrainingRepositoryCreateMethod(TestCase):
                 code=self.training.secondary_domains[0].entity_id.code,
                 decree__name=self.training.secondary_domains[0].entity_id.decree_name
             )
-        )
-
-        # Certificate aims
-        qs_aims = EducationGroupCertificateAim.objects.filter(education_group_year=education_group_year)
-        self.assertEqual(1, qs_aims.count())
-        educ_group_certificate_aim = qs_aims.get()
-        self.assertEqual(
-            educ_group_certificate_aim.certificate_aim,
-            CertificateAim.objects.get(code=self.training.diploma.aims[0].entity_id.code)
         )
 
 
@@ -182,10 +162,6 @@ class TestTrainingRepositoryUpdateMethod(TestCase):
             isced_domain__entity_id__code=self.isced_domain.code,
             management_entity=self.training.management_entity,
             administration_entity=self.training.administration_entity,
-            teaching_campus=CampusIdentityFactory(
-                name=self.campus.name,
-                university_name=self.campus.organization.name
-            ),
             enrollment_campus=CampusIdentityFactory(
                 name=self.campus.name,
                 university_name=self.campus.organization.name
@@ -297,7 +273,6 @@ def assert_training_model_equals_training_domain(
     test_instance.assertEqual(education_group_year.internal_comment, training_domain_obj.internal_comment)
     test_instance.assertEqual(education_group_year.main_domain.code, training_domain_obj.main_domain.entity_id.code)
     test_instance.assertEqual(education_group_year.isced_domain.code, training_domain_obj.isced_domain.entity_id.code)
-    test_instance.assertEqual(education_group_year.main_teaching_campus.name, training_domain_obj.teaching_campus.name)
     test_instance.assertEqual(education_group_year.enrollment_campus.name, training_domain_obj.enrollment_campus.name)
     test_instance.assertEqual(
         education_group_year.other_campus_activities,

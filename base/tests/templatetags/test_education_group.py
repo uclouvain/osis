@@ -25,15 +25,13 @@
 ##############################################################################
 
 from django.test import TestCase, RequestFactory
-from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from waffle.testutils import override_switch
 
-from base.templatetags.education_group import link_pdf_content_education_group, have_only_access_to_certificate_aims
+from base.templatetags.education_group import link_pdf_content_education_group
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_year import TrainingFactory, EducationGroupYearFactory
+from base.tests.factories.education_group_year import TrainingFactory
 from base.tests.factories.person import PersonFactory
-from base.tests.factories.program_manager import ProgramManagerFactory
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 
 DELETE_MSG = _("delete education group")
@@ -55,9 +53,6 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
         cls.education_group_year = TrainingFactory(academic_year=academic_year)
         cls.person = PersonFactory()
         CentralManagerFactory(person=cls.person, entity=cls.education_group_year.management_entity)
-
-        cls.url = reverse('delete_education_group', args=[cls.education_group_year.id, cls.education_group_year.id])
-
         cls.request = RequestFactory().get("")
 
     def setUp(self):
@@ -102,32 +97,4 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
                 'id_li': 'btn_operation_pdf_content',
                 'load_modal': False
             }
-        )
-
-
-# TODO: Remove when migration of program_manager done
-class TestHaveOnlyAccessCertificateAims(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.education_group_year = EducationGroupYearFactory()
-
-    def setUp(self):
-        self.person = PersonFactory()
-
-    def test_have_only_access_certificates_aims_case_no_role(self):
-        self.assertFalse(
-            have_only_access_to_certificate_aims(self.person.user, self.education_group_year)
-        )
-
-    def test_have_only_access_certificates_aims_case_only_program_manager(self):
-        ProgramManagerFactory(education_group=self.education_group_year.education_group, person=self.person)
-        self.assertTrue(
-            have_only_access_to_certificate_aims(self.person.user, self.education_group_year)
-        )
-
-    def test_have_only_access_certificates_aims_case_program_manager_and_central_manager(self):
-        ProgramManagerFactory(education_group=self.education_group_year.education_group, person=self.person)
-        CentralManagerFactory(person=self.person)
-        self.assertFalse(
-            have_only_access_to_certificate_aims(self.person.user, self.education_group_year)
         )

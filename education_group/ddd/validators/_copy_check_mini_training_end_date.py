@@ -33,5 +33,5 @@ class CheckMiniTrainingEndDateValidator(business_validator.BusinessValidator):
         self.mini_training = mini_training
 
     def validate(self, *args, **kwargs):
-        if self.mini_training.end_year and self.mini_training.year > self.mini_training.end_year:
+        if self.mini_training.end_year and self.mini_training.year >= self.mini_training.end_year:
             raise CannotCopyMiniTrainingDueToEndDate(mini_training=self.mini_training)

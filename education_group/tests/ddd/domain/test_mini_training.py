@@ -27,7 +27,6 @@ from django.test import SimpleTestCase
 from education_group.ddd.domain import mini_training, exception
 from education_group.tests.factories.factories.command import CreateOrphanMiniTrainingCommandFactory
 from education_group.tests.factories.mini_training import MiniTrainingFactory
-from testing import mocks
 
 
 class TestMiniTrainingBuilder(SimpleTestCase):

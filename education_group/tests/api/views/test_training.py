@@ -35,6 +35,7 @@ from rest_framework.test import APITestCase
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
 from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.campus import CampusFactory
 from base.tests.factories.education_group_year import TrainingFactory
 from base.tests.factories.hops import HopsFactory
 from base.tests.factories.person import PersonFactory
@@ -255,7 +256,7 @@ class FilterTrainingTestCase(APITestCase):
                 'language': settings.LANGUAGE_CODE_FR
             },
         )
-        self.assertEqual(response.data['results'], serializer.data)
+        self.assertCountEqual(response.data['results'], serializer.data)
 
     def test_get_training_case_filter_to_year_params(self):
         query_string = {'to_year': 2019}
@@ -298,7 +299,7 @@ class FilterTrainingTestCase(APITestCase):
         self.assertEqual(response.data['results'], serializer.data)
 
     def test_get_training_case_filter_campus(self):
-        query_string = {'campus': self.offers_by_year[2018][2].main_teaching_campus.name}
+        query_string = {'campus': self.standards_by_year[2018][2].root_group.main_teaching_campus.name}
 
         response = self.client.get(self.url, data=query_string)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -308,7 +309,7 @@ class FilterTrainingTestCase(APITestCase):
             many=True,
             context={'request': RequestFactory().get(self.url, query_string)},
         )
-        self.assertEqual(response.data['results'], serializer.data)
+        self.assertCountEqual(response.data['results'], serializer.data)
 
     def test_get_filter_by_multiple_education_group_type(self):
         """

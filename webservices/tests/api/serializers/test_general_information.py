@@ -68,7 +68,8 @@ class GeneralInformationSerializerTestCase(TestCase):
         for section in cls.pertinent_sections['common']:
             TranslatedTextLabelFactory(
                 language=cls.language,
-                text_label__label=section
+                text_label__label=section,
+                text_label__entity=OFFER_YEAR
             )
             TranslatedTextFactory(
                 reference=cls.common_egy.id,
@@ -79,7 +80,8 @@ class GeneralInformationSerializerTestCase(TestCase):
         for section in cls.pertinent_sections['specific']:
             TranslatedTextLabelFactory(
                 language=cls.language,
-                text_label__label=section
+                text_label__label=section,
+                text_label__entity=OFFER_YEAR
             )
             TranslatedTextFactory(
                 reference=cls.egy.id,
@@ -149,7 +151,8 @@ class GeneralInformationSerializerTestCase(TestCase):
         ):
             TranslatedTextLabelFactory(
                 language=self.language,
-                text_label__label=WELCOME_INTRODUCTION
+                text_label__label=WELCOME_INTRODUCTION,
+                text_label__entity=OFFER_YEAR
             )
             node = NodeGroupYearFactory(
                 node_id=self.group.element.id,
@@ -236,8 +239,13 @@ class IntroOffersSectionTestCase(TestCase):
         self.assertEqual(intro_offer_section['id'], 'intro-testfina')
 
     def _get_pertinent_intro_section(self, gey):
-        entity = GROUP_YEAR if gey.child_element.group_year.education_group_type.name in GroupType.get_names() \
-            else OFFER_YEAR
+        if gey.child_element.group_year.education_group_type.name in GroupType.get_names():
+            entity = GROUP_YEAR
+            reference = gey.child_element.group_year_id
+        else:
+            entity = OFFER_YEAR
+            reference = gey.child_element.group_year.educationgroupversion.offer_id
+
         TranslatedTextLabelFactory(
             text_label__label=INTRODUCTION,
             language=self.language,
@@ -247,7 +255,7 @@ class IntroOffersSectionTestCase(TestCase):
             text_label__label=INTRODUCTION,
             language=self.language,
             entity=entity,
-            reference=gey.child_branch.id,
+            reference=reference,
             text_label__entity=entity
         )
         tree = load_tree.load(self.element.id)

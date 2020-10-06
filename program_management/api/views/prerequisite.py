@@ -29,7 +29,8 @@ from rest_framework.generics import get_object_or_404
 from backoffice.settings.rest_framework.common_views import LanguageContextSerializerMixin
 from base.models.enums import education_group_categories
 from program_management.api.serializers.prerequisite import ProgramTreePrerequisitesSerializer
-from program_management.ddd.repositories import load_tree
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
+from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.models.education_group_version import EducationGroupVersion
 
 
@@ -65,8 +66,15 @@ class ProgramTreePrerequisites(LanguageContextSerializerMixin, generics.ListAPIV
         )
 
     def get_serializer_context(self):
-        education_group_version = self.get_object()
-        self.tree = load_tree.load(education_group_version.offer.id)
+        version = self.get_object()
+        version_identity = ProgramTreeVersionIdentity(
+            offer_acronym=version.offer.acronym,
+            year=version.offer.academic_year.year,
+            version_name=version.version_name,
+            is_transition=version.is_transition
+        )
+        tree_version = ProgramTreeVersionRepository.get(version_identity)
+        self.tree = tree_version.get_tree()
         serializer_context = super().get_serializer_context()
         serializer_context.update({
             'request': self.request,
@@ -87,16 +95,3 @@ class MiniTrainingPrerequisites(ProgramTreePrerequisites):
     queryset = EducationGroupVersion.objects.filter(
         offer__education_group_type__category=education_group_categories.MINI_TRAINING
     ).select_related('offer__education_group_type', 'offer__academic_year')
-
-    def get_object(self):
-        partial_acronym = self.kwargs['partial_acronym']
-        year = self.kwargs['year']
-        version_name = self.kwargs.get('version_name', '')
-        is_transition = self.kwargs['transition']
-        return get_object_or_404(
-            self.queryset,
-            version_name=version_name,
-            is_transition=is_transition,
-            offer__partial_acronym__iexact=partial_acronym,
-            offer__academic_year__year=year
-        )
