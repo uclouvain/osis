@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
 
 from django.utils.translation import gettext_lazy as _
 
@@ -119,22 +120,29 @@ class NodeIsUsedException(Exception):
     pass
 
 
-# TODO : use BusinessException instead of BusinessExceptions
 class ProgramTreeVersionMismatch(BusinessExceptions):
     def __init__(
             self,
-            root_version_identity: 'ProgramTreeVersionIdentity',
+            parents_version_mismatched_identity: List['ProgramTreeVersionIdentity'],
             child_version_identity: 'ProgramTreeVersionIdentity',
             *args,
             **kwargs
     ):
-        root_node_version_title = self._get_version_title(root_version_identity)
-        node_to_add_version_title = self._get_version_title(child_version_identity)
         root_code = kwargs.pop('root_code')
         child_code = kwargs.pop('child_code')
-        messages = [_("%(node_to_add)s version must be the same as %(root_node)s version") % {
+
+        parents_version_titles = [
+            self._get_version_title(version_identity) for version_identity in parents_version_mismatched_identity
+        ]
+        node_to_add_version_title = self._get_version_title(child_version_identity)
+
+        messages = [_(
+            "%(node_to_add)s version must be the same as %(root_node)s "
+            "and all of it's parent's version %(parents_version_mismatched)s"
+        ) % {
             'node_to_add': '{} - {}'.format(child_code, node_to_add_version_title),
-            'root_node': '{} - {}'.format(root_code, root_node_version_title)
+            'root_node': root_code,
+            'parents_version_mismatched': ",".join(parents_version_titles)
         }]
         super().__init__(messages, **kwargs)
 
