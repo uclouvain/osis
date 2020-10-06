@@ -101,8 +101,11 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         return self.get(request, *args, **kwargs)
 
     def build_success_messages(self, updated_aims_trainings, updated_trainings):
+        success_messages = []
+
         # get success msg on deleted trainings before splitting results
-        success_messages = self.get_success_msg_deleted_trainings(updated_trainings)
+        if updated_trainings:
+            success_messages += self.get_success_msg_deleted_trainings(updated_trainings)
 
         updated_trainings_with_aims = list(set(updated_trainings).intersection(updated_aims_trainings))
         updated_trainings = list(set(updated_trainings).difference(updated_trainings_with_aims))
