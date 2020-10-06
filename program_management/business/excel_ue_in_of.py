@@ -142,20 +142,9 @@ EXCLUDE_UE_KEY = 'exclude_ue'
 class EducationGroupYearLearningUnitsContainedToExcel:
 
     def __init__(self, custom_xls_form: CustomXlsForm, year: int, code: str):
-        self._get_program_tree_version(year, code)
+        self.program_tree_version = _get_program_tree_version(year, code)
         self._get_program_tree(year, code)
         self.custom_xls_form = custom_xls_form
-
-    def _get_program_tree_version(self, year: int, code: str):
-        get_cmd = command.GetProgramTreeVersionFromNodeCommand(
-            code=code,
-            year=year
-        )
-        try:
-            self.program_tree_version = get_program_tree_version_from_node_service.get_program_tree_version_from_node(
-                get_cmd)
-        except ProgramTreeVersionNotFoundException:
-            self.program_tree_version = None
 
     def _get_program_tree(self, year: int, code: str):
         if self.program_tree_version:
@@ -463,8 +452,10 @@ def _build_direct_gathering_label(direct_gathering_node: 'NodeGroupYear') -> str
 
 
 def _build_main_gathering_label(gathering_node: 'Node') -> str:
-    return "{} - {}".format(
+    pgm_tree_version = _get_program_tree_version(gathering_node.year, gathering_node.code)
+    return "{}{} - {}".format(
         gathering_node.title,
+        pgm_tree_version.version_label if pgm_tree_version else '',
         gathering_node.offer_partial_title_fr if gathering_node.is_finality() else gathering_node.group_title_fr) \
         if gathering_node else ''
 
@@ -514,3 +505,15 @@ def _get_distinct_teachers(luy):
         if attribution.teacher not in teachers:
             teachers.append(attribution.teacher)
     return teachers
+
+
+def _get_program_tree_version(year: int, code: str):
+    get_cmd = command.GetProgramTreeVersionFromNodeCommand(
+        code=code,
+        year=year
+    )
+    try:
+        return get_program_tree_version_from_node_service.get_program_tree_version_from_node(
+            get_cmd)
+    except ProgramTreeVersionNotFoundException:
+        return None
