@@ -44,7 +44,8 @@ from base.models.enums import education_group_categories
 from base.models.enums import mandate_type as mandate_types
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.education_group import EducationGroupFactory
-from base.tests.factories.education_group_type import EducationGroupTypeFactory
+from base.tests.factories.education_group_type import EducationGroupTypeFactory, TrainingEducationGroupTypeFactory, \
+    GroupEducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
@@ -57,6 +58,7 @@ from base.tests.factories.session_exam_calendar import SessionExamCalendarFactor
 from base.tests.factories.user import UserFactory
 from education_group.models.group_year import GroupYear
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
+from education_group.tests.factories.group_year import GroupYearFactory
 from osis_common.document import xls_build
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory, \
     ParticularTransitionEducationGroupVersionFactory, StandardEducationGroupVersionFactory
@@ -140,61 +142,6 @@ def _create_entity_and_version_related_to(organization, acronym, parent=None):
 def _add_to_group(user, group_name):
     group, created = Group.objects.get_or_create(name=group_name)
     group.user_set.add(user)
-
-
-class EducationGroupXlsTestCase(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.academic_year = create_current_academic_year()
-
-    def setUp(self):
-        self.education_group_type_group = EducationGroupTypeFactory(category=education_group_categories.GROUP)
-        self.education_group_year_1 = EducationGroupYearFactory(academic_year=self.academic_year, acronym="PREMIER")
-        self.education_group_year_1.complete_title_fr = self.education_group_year_1.acronym + '[VERSION]'
-        self.education_group_year_1.management_entity_version = EntityVersionFactory()
-        self.education_group_year_2 = EducationGroupYearFactory(academic_year=self.academic_year, acronym="DEUXIEME")
-        self.education_group_year_2.management_entity_version = EntityVersionFactory()
-        self.education_group_year_2.complete_title_fr = self.education_group_year_2.acronym
-        self.user = UserFactory()
-
-    def test_prepare_xls_content_no_data(self):
-        self.assertEqual(prepare_xls_content([]), [])
-
-    def test_prepare_xls_content_with_data(self):
-        data = prepare_xls_content([self.education_group_year_1])
-        self.assertEqual(len(data), 1)
-        self.assertEqual(data[0], get_xls_data(self.education_group_year_1))
-
-    @mock.patch("osis_common.document.xls_build.generate_xls")
-    def test_generate_xls_data_with_no_data(self, mock_generate_xls):
-        create_xls(self.user, [], None, {ORDER_COL: None, ORDER_DIRECTION: None})
-
-        expected_argument = _generate_xls_build_parameter([], self.user)
-        mock_generate_xls.assert_called_with(expected_argument, None)
-
-    @mock.patch("osis_common.document.xls_build.generate_xls")
-    def test_generate_xls_data_with_asc_ordering(self, mock_generate_xls):
-        create_xls(self.user,
-                   [self.education_group_year_1, self.education_group_year_2],
-                   None,
-                   {ORDER_COL: 'acronym', ORDER_DIRECTION: None})
-
-        xls_data = [get_xls_data(self.education_group_year_2), get_xls_data(self.education_group_year_1)]
-
-        expected_argument = _generate_xls_build_parameter(xls_data, self.user)
-        mock_generate_xls.assert_called_with(expected_argument, None)
-
-    @mock.patch("osis_common.document.xls_build.generate_xls")
-    def test_generate_xls_data_with_desc_ordering(self, mock_generate_xls):
-        create_xls(self.user,
-                   [self.education_group_year_1, self.education_group_year_2],
-                   None,
-                   {ORDER_COL: 'acronym', ORDER_DIRECTION: 'desc'})
-
-        xls_data = [get_xls_data(self.education_group_year_1), get_xls_data(self.education_group_year_2)]
-
-        expected_argument = _generate_xls_build_parameter(xls_data, self.user)
-        mock_generate_xls.assert_called_with(expected_argument, None)
 
 
 class EducationGroupXlsAdministrativeDataTestCase(TestCase):
@@ -400,33 +347,6 @@ class EducationGroupXlsAdministrativeDataTestCase(TestCase):
             str(self.signatory.person.full_name),
             'Responsable'
         ]
-
-
-def get_xls_data(an_education_group_year):
-    return [an_education_group_year.academic_year.name,
-            an_education_group_year.complete_title_fr,
-            an_education_group_year.title,
-            an_education_group_year.education_group_type,
-            an_education_group_year.management_entity_version.acronym,
-            an_education_group_year.partial_acronym]
-
-
-def _generate_xls_build_parameter(xls_data, user):
-    return {
-        xls_build.LIST_DESCRIPTION_KEY: _(XLS_DESCRIPTION),
-        xls_build.FILENAME_KEY: _(XLS_FILENAME),
-        xls_build.USER_KEY: user.username,
-        xls_build.WORKSHEETS_DATA: [{
-            xls_build.CONTENT_KEY: xls_data,
-            xls_build.HEADER_TITLES_KEY: EDUCATION_GROUP_TITLES,
-            xls_build.WORKSHEET_TITLE_KEY: _(WORKSHEET_TITLE),
-            xls_build.STYLED_CELLS: None,
-            xls_build.FONT_ROWS: None,
-            xls_build.ROW_HEIGHT: None,
-            xls_build.FONT_CELLS: None,
-            xls_build.BORDER_CELLS: None
-        }]
-    }
 
 
 def _generate_xls_administrative_data_build_parameter(xls_data, user):
