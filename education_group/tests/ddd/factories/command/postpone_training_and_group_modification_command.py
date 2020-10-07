@@ -93,4 +93,4 @@ class PostponeTrainingAndGroupModificationCommandFactory(factory.Factory):
     remark_en = None
     can_be_funded = True
     organization_name = factory.Sequence(lambda n: 'Organization%d' % n)
-    decree_category = DecreeCategories["BAC"].name
+    decree_category = DecreeCategories.BAC.name

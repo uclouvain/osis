@@ -90,4 +90,4 @@ class UpdateTrainingAndGroupCommandFactory(factory.Factory):
     can_be_funded = None
     organization_name = "ORG"
     schedule_type = ScheduleTypeEnum.DAILY.name
-    decree_category = DecreeCategories["BAC"].name
+    decree_category = DecreeCategories.BAC.name
