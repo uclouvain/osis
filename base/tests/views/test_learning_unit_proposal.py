@@ -858,7 +858,7 @@ class TestEditProposal(TestCase):
         request.session = 'session'
         request._messages = FallbackStorage(request)
 
-        update_learning_unit_proposal(request, self.learning_unit_year.id)
+        update_learning_unit_proposal(request, learning_unit_year_id=self.learning_unit_year.id)
 
         msg = [m.message for m in get_messages(request)]
         msg_level = [m.level for m in get_messages(request)]
