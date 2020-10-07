@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-01 14:32+0200\n"
+"POT-Creation-Date: 2020-10-07 14:02+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -211,9 +211,6 @@ msgstr ""
 msgid "Content"
 msgstr ""
 
-msgid "Copied element"
-msgstr ""
-
 msgid "Courses not taught"
 msgstr ""
 
@@ -224,9 +221,6 @@ msgid "Cred. rel./abs."
 msgstr ""
 
 msgid "Credits"
-msgstr ""
-
-msgid "Cut element"
 msgstr ""
 
 msgid "Decree category"

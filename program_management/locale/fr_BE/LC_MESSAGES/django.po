@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-01 14:32+0200\n"
+"POT-Creation-Date: 2020-10-07 14:02+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -232,9 +232,6 @@ msgstr "Commentaire"
 msgid "Content"
 msgstr "Contenu"
 
-msgid "Copied element"
-msgstr "Elément copié"
-
 msgid "Courses not taught"
 msgstr "Activité non dispensée en"
 
@@ -246,9 +243,6 @@ msgstr "Créd. rel./abs."
 
 msgid "Credits"
 msgstr "crédits"
-
-msgid "Cut element"
-msgstr "Elément coupé"
 
 msgid "Decree category"
 msgstr "Catégorie décret"
@@ -438,12 +432,13 @@ msgstr "Obligatoire"
 msgid "Mini-Training"
 msgstr "Mini-Formation"
 
+#, python-format
 msgid ""
 "Mini-Training %(offer_acronym)s[%(acronym)s] successfully deleted from "
 "%(academic_year)s."
 msgstr ""
-"La mini-formation %(offer_acronym)s[%(acronym)s] "
-"a été supprimée avec succés à partir de %(academic_year)s."
+"La mini-formation %(offer_acronym)s[%(acronym)s] a été supprimée avec succés "
+"à partir de %(academic_year)s."
 
 #, python-format
 msgid ""
@@ -803,12 +798,13 @@ msgstr "Intitulé en français"
 msgid "Training"
 msgstr "Formation"
 
+#, python-format
 msgid ""
 "Training %(offer_acronym)s[%(acronym)s] successfully deleted from "
 "%(academic_year)s."
 msgstr ""
-"La formation %(offer_acronym)s[%(acronym)s] "
-"a été supprimée avec succés à partir de %(academic_year)s."
+"La formation %(offer_acronym)s[%(acronym)s] a été supprimée avec succés à "
+"partir de %(academic_year)s."
 
 #, python-format
 msgid ""
