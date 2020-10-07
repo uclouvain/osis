@@ -66,7 +66,11 @@ class MatchVersionValidator(business_validator.BusinessValidator):
                 )
 
     def _get_program_tree_version(self, node: 'Node') -> 'ProgramTreeVersion':
-        return self.tree_version_repository.search_all_versions_from_root_nodes([node.entity_id])[0]
+        from program_management.ddd.domain.program_tree import ProgramTreeIdentity
+
+        program_tree_identity = ProgramTreeIdentity(code=node.entity_id.code, year=node.entity_id.year)
+        tree = self.tree_repository.get(program_tree_identity)
+        return self.tree_version_repository.search_versions_from_trees([tree])[0]
 
     def _get_all_program_tree_version_using_node(self, node: 'Node') -> List['ProgramTreeVersion']:
         program_trees = self.tree_repository.search_from_children([node.entity_id])
