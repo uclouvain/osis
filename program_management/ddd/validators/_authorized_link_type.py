@@ -48,9 +48,8 @@ class AuthorizedLinkTypeValidator(BusinessValidator):
         if self.node_to_add.node_type == NodeType.LEARNING_UNIT and self.link_type == LinkTypes.REFERENCE:
             raise exception.ReferenceLinkNotAllowedWithLearningUnitException(self.node_to_add)
 
-        elif self.parent_node.node_type in education_group_types.GroupType.minor_major_list_choice_enums() and\
-                self.node_to_add.node_type in education_group_types.MiniTrainingType \
-                and self.link_type != LinkTypes.REFERENCE:
+        elif self._is_child_a_minor_major_or_option_inside_a_list_minor_major_option_choice_parent() and \
+                self.link_type != LinkTypes.REFERENCE:
             raise exception.LinkShouldBeReferenceException(parent_node=self.parent_node, child_node=self.node_to_add)
 
         elif self.link_type == LinkTypes.REFERENCE and not self._is_node_to_add_a_valid_reference_link():
@@ -60,8 +59,13 @@ class AuthorizedLinkTypeValidator(BusinessValidator):
                 reference_childrens=self._get_not_authorized_referenced_children()
             )
 
+    def _is_child_a_minor_major_or_option_inside_a_list_minor_major_option_choice_parent(self):
+        return self.parent_node.node_type in education_group_types.GroupType.minor_major_list_choice_enums() and \
+               self.node_to_add.node_type in education_group_types.MiniTrainingType
+
     def _is_node_to_add_a_valid_reference_link(self):
-        return not bool(self._get_not_authorized_referenced_children())
+        return not bool(self._get_not_authorized_referenced_children()) or \
+               self._is_child_a_minor_major_or_option_inside_a_list_minor_major_option_choice_parent()
 
     def _get_not_authorized_referenced_children(self) -> Set['Node']:
         children_of_node_to_add = self.node_to_add.children_as_nodes

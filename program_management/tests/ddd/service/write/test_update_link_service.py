@@ -152,6 +152,31 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
             LinkTypes.REFERENCE
         )
 
+    def test_reference_link_always_valid_between_minor_and_list_minor(self):
+        minor_list_choice_tree_data = {
+            "node_type": GroupType.MINOR_LIST_CHOICE,
+            "children": [
+                {
+                    "node_type": MiniTrainingType.ACCESS_MINOR,
+                    "children": [
+                        {"node_type": NodeType.LEARNING_UNIT}
+                    ]
+                }
+            ]
+        }
+        minor_list_choice_tree = tree_builder(minor_list_choice_tree_data)
+        self.fake_program_tree_repository.create(minor_list_choice_tree)
+
+        cmd = UpdateLinkCommandFactory(
+            link_type=LinkTypes.REFERENCE,
+            parent_node_code=minor_list_choice_tree.root_node.code,
+            parent_node_year=minor_list_choice_tree.root_node.year,
+            child_node_code=minor_list_choice_tree.root_node.children_as_nodes[0].code,
+            child_node_year=minor_list_choice_tree.root_node.children_as_nodes[0].year,
+        )
+
+        self.assertTrue(update_link_service.update_link(cmd))
+
     def test_failure_when_reference_but_children_of_node_to_add_are_not_valid_relationships_to_parent(self):
         cmd_with_invalid_reference_link = UpdateLinkCommandFactory(
             link_type=LinkTypes.REFERENCE.name,

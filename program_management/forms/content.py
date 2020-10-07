@@ -43,7 +43,7 @@ class LinkForm(forms.Form):
                 'comment_en',
             )
         elif self.is_a_child_minor_major_option_list_choice() and \
-                self.parent_obj.type.name in TrainingType.get_names():
+                self.parent_obj.node_type.name in TrainingType.get_names():
             fields_to_exclude = (
                 'relative_credits',
                 'is_mandatory',

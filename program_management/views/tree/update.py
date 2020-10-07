@@ -23,13 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Union
+from typing import Union, List, Dict
 
 from django import shortcuts
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 
+from base.forms.exceptions import InvalidFormException
 from base.models.enums.link_type import LinkTypes
 from base.views.common import display_success_messages
 from base.views.mixins import AjaxTemplateMixin
@@ -46,15 +47,14 @@ from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories import node as node_repository
 from program_management.ddd.service.read import get_program_tree_service
-from program_management.forms.content import LinkForm
-from base.forms.exceptions import InvalidFormException
+from program_management.forms.content import ContentFormSet
 from program_management.models.enums.node_type import NodeType
 
 
 class UpdateLinkView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, FormView):
     template_name = "tree/link_update_inner.html"
     permission_required = "base.change_link_data"
-    form_class = LinkForm
+    form_class = ContentFormSet
 
     @cached_property
     def parent_node(self) -> 'Node':
@@ -66,6 +66,10 @@ class UpdateLinkView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, FormView):
         return node_repository.NodeRepository.get(node_identity)
 
     @cached_property
+    def link(self) -> 'Link':
+        return self.program_tree.get_first_link_occurence_using_node(child_node=self.child_node)
+
+    @cached_property
     def program_tree(self) -> ProgramTree:
         return get_program_tree_service.get_program_tree(command.GetProgramTree(
             code=self.kwargs.get('parent_code'), year=self.kwargs.get('parent_year')
@@ -74,34 +78,45 @@ class UpdateLinkView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, FormView):
     def get_permission_object(self):
         return shortcuts.get_object_or_404(GroupYear, element__pk=self.program_tree.root_node.pk)
 
-    def get_form_kwargs(self) -> dict:
-        return {
-            'parent_obj': self.parent_node,
-            'child_obj': self.child_node,
-        }
+    def get_form_kwargs(self) -> List[Dict]:
+        return [{'parent_obj': self.parent_node, 'child_obj': self.child_node}]
 
     def get_form(self, form_class=None):
         if form_class is None:
             form_class = self.get_form_class()
-        return form_class(**self.get_form_kwargs(), data=self.request.POST or None)
+        return form_class(
+            form_kwargs=self.get_form_kwargs(),
+            initial=self._get_initial_form_kwargs(self.link),
+            data=self.request.POST or None
+        )
 
     def get_context_data(self, **kwargs):
         context_data = super().get_context_data(**kwargs)
-        context_data["is_parent_a_minor_major_option_list_choice"] = self._is_parent_a_minor_major_option_list_choice()
         context_data["node"] = self.child_node
+        context_data["tabs"] = self.get_tabs()
+        context_data["content_formset"] = context_data.pop("form")
+
         self._format_title_with_version(context_data["node"])
 
         node_elem = context_data["node"]
-        link = self.program_tree.get_first_link_occurence_using_node(child_node=node_elem)
-        context_data['form'].initial = self._get_initial_form_kwargs(link)
         context_data['has_group_year_form'] = isinstance(node_elem, NodeGroupYear)
 
         return context_data
 
-    def form_valid(self, form: LinkForm):
+    def get_tabs(self) -> List:
+        return [
+            {
+                "text": _("Content"),
+                "active": True,
+                "display": True,
+                "include_html": "program_management/content/block/panel_content.html"
+            },
+        ]
+
+    def form_valid(self, form: ContentFormSet):
         try:
-            link = form.save()
-            display_success_messages(self.request, self.get_success_message(link))
+            links = form.save()
+            display_success_messages(self.request, self.get_success_message(links[0]))
             return super().form_valid(form)
         except InvalidFormException:
             return self.form_invalid(form)
@@ -135,7 +150,7 @@ class UpdateLinkView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, FormView):
         return messages
 
     def _get_initial_form_kwargs(self, obj):
-        return {
+        return [{
             'comment_fr': obj.comment,
             'comment_en': obj.comment_english,
             'access_condition': obj.access_condition,
@@ -145,7 +160,7 @@ class UpdateLinkView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, FormView):
             'credits': obj.child.credits,
             'code': obj.child.code,
             'relative_credits': obj.relative_credits
-        }
+        }]
 
     def _format_title_with_version(self, node):
         node_identity = self.child_node.entity_id
@@ -155,10 +170,6 @@ class UpdateLinkView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, FormView):
             node.title = "{}[{}]".format(node.title, node.version) if node.version else node.title
         except BusinessException:
             pass
-
-    def _is_parent_a_minor_major_option_list_choice(self):
-        parent = self.program_tree.root_node
-        return parent.is_minor_major_list_choice() or parent.is_option_list_choice()
 
     def get_success_url(self):
         return
