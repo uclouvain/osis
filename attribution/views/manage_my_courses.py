@@ -37,7 +37,7 @@ from django.views.decorators.http import require_http_methods
 from attribution.views.perms import tutor_can_view_educational_information
 from base.business import event_perms
 from base.business.learning_units.perms import is_eligible_to_update_learning_unit_pedagogy, \
-    find_educational_information_submission_dates_of_learning_unit_year, can_user_edit_educational_information, \
+    find_educational_information_submission_dates_of_learning_unit_year, CanUserEditEducationalInformation, \
     find_educational_information_force_majeure_submission_dates_of_learning_unit_year, \
     is_eligible_to_update_learning_unit_pedagogy_force_majeure_section
 from base.models import entity_calendar
@@ -109,7 +109,7 @@ def list_my_attributions_summary_editable(request):
         reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
     )
 
-    errors = (can_user_edit_educational_information(
+    errors = (CanUserEditEducationalInformation(
         user=tutor.person.user, learning_unit_year_id=luy.id) for luy in learning_unit_years)
     errors_force_majeure = (can_user_edit_educational_information_force_majeure(
         user=tutor.person.user, learning_unit_year_id=luy.id) for luy in learning_unit_years)

@@ -4,7 +4,6 @@ from rules import predicate
 
 from attribution.models.tutor_application import TutorApplication
 from base.business import event_perms
-from base.business.learning_units.perms import PROPOSAL_CONSOLIDATION_ELIGIBLE_STATES
 from base.models.enums import learning_container_year_types as container_types, learning_container_year_types
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
@@ -18,6 +17,8 @@ FACULTY_EDITABLE_CONTAINER_TYPES = (
     learning_container_year_types.DISSERTATION,
     learning_container_year_types.INTERNSHIP
 )
+
+PROPOSAL_CONSOLIDATION_ELIGIBLE_STATES = (ProposalState.ACCEPTED.name, ProposalState.REFUSED.name)
 
 
 @predicate(bind=True)

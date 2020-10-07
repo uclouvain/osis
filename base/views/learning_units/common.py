@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import re
+from typing import Optional
 
 from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models import Prefetch
@@ -35,13 +36,11 @@ from base.business.learning_unit import get_organization_from_learning_unit_year
     get_components_identification
 from base.business.learning_unit_proposal import get_difference_of_proposal
 from base.business.learning_units.edition import create_learning_unit_year_creation_message
-from base.business.learning_units.perms import learning_unit_year_permissions, learning_unit_proposal_permissions
 from base.models import proposal_learning_unit
 from base.models.learning_unit import REGEX_BY_SUBTYPE
 from base.models.learning_unit_year import LearningUnitYear
 from base.views.common import display_success_messages
 from osis_common.decorators.ajax import ajax_required
-from typing import Optional
 
 
 def show_success_learning_unit_year_creation_message(request, learning_unit_year_created):
@@ -107,9 +106,17 @@ def get_learning_unit_identification_context(learning_unit_year_id, person):
         else {}
 
     # append permissions
-    context.update(learning_unit_year_permissions(learning_unit_year, person))
-    context.update(learning_unit_proposal_permissions(proposal, person, learning_unit_year))
-    context['can_manage_volume'] = person.user.has_perm('base.can_edit_learningunit', learning_unit_year)
+    luy = learning_unit_year
+    context.update({
+        'can_propose': person.user.has_perm('base.can_propose_learningunit', luy),
+        'can_edit_date': person.user.has_perm('base.can_edit_learningunit_date', luy),
+        'can_edit': person.user.has_perm('base.can_edit_learningunit', luy),
+        'can_delete': person.user.has_perm('base.can_delete_learningunit', luy),
+        'can_cancel_proposal': person.user.has_perm('base.can_cancel_proposal', luy),
+        'can_edit_learning_unit_proposal': person.user.has_perm('base.can_edit_learning_unit_proposal', luy),
+        'can_consolidate_proposal': person.user.has_perm('base.can_consolidate_learningunit_proposal', luy),
+        'can_manage_volume': person.user.has_perm('base.can_edit_learningunit', luy),
+    })
 
     return context
 

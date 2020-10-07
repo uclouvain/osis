@@ -62,6 +62,7 @@ class FacultyManager(osis_role_models.EntityRoleModel):
                 predicates.is_user_attached_to_current_requirement_entity &
                 predicates.is_external_learning_unit_with_cograduation,
             'base.can_cancel_proposal':
+                predicates.is_proposal &
                 predicates.has_faculty_proposal_state &
                 predicates.is_not_proposal_of_type_creation_with_applications &
                 (predicates.is_user_attached_to_current_requirement_entity |

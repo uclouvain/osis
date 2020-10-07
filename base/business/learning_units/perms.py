@@ -31,53 +31,15 @@ from django.utils.translation import gettext_lazy as _
 
 from attribution.business.perms import _is_tutor_attributed_to_the_learning_unit
 from base.business.institution import find_summary_course_submission_dates_for_entity_version
-from base.models import proposal_learning_unit, tutor, entity_calendar
-from base.models.entity import Entity
+from base.models import tutor, entity_calendar
 from base.models.entity_version import EntityVersion
-from base.models.enums import learning_container_year_types, academic_calendar_type
-from base.models.enums.proposal_state import ProposalState
+from base.models.enums import academic_calendar_type
 from base.models.learning_unit_year import LearningUnitYear
 from osis_common.utils.datetime import get_tzinfo, convert_date_to_datetime
 from osis_common.utils.perms import BasePerm
 
-FACULTY_UPDATABLE_CONTAINER_TYPES = (
-    learning_container_year_types.COURSE,
-    learning_container_year_types.DISSERTATION,
-    learning_container_year_types.INTERNSHIP
-)
 
-PROPOSAL_CONSOLIDATION_ELIGIBLE_STATES = (ProposalState.ACCEPTED.name, ProposalState.REFUSED.name)
-
-MSG_PERSON_NOT_IN_ACCORDANCE_WITH_PROPOSAL_STATE = _("Person not in accordance with proposal state")
-MSG_PROPOSAL_NOT_IN_CONSOLIDATION_ELIGIBLE_STATES = _("Proposal not in eligible state for consolidation")
-MSG_CAN_DELETE_ACCORDING_TO_TYPE = _("Can delete according to the type of the learning unit")
-
-
-def learning_unit_year_permissions(learning_unit_year, person):
-    return {
-        'can_propose': person.user.has_perm('base.can_propose_learningunit', learning_unit_year),
-        'can_edit_date': person.user.has_perm('base.can_edit_learningunit_date', learning_unit_year),
-        'can_edit': person.user.has_perm('base.can_edit_learningunit', learning_unit_year),
-        'can_delete': person.user.has_perm('base.can_delete_learningunit', learning_unit_year),
-    }
-
-
-def learning_unit_proposal_permissions(proposal, person, current_learning_unit_year):
-    permissions = {
-        'can_cancel_proposal': False,
-        'can_edit_learning_unit_proposal': False,
-        'can_consolidate_proposal': False
-    }
-    if not proposal or proposal.learning_unit_year != current_learning_unit_year:
-        return permissions
-    luy = proposal.learning_unit_year
-    permissions['can_cancel_proposal'] = person.user.has_perm('base.can_cancel_proposal', luy)
-    permissions['can_edit_learning_unit_proposal'] = person.user.has_perm('base.can_edit_learning_unit_proposal', luy)
-    permissions['can_consolidate_proposal'] = person.user.has_perm('base.can_consolidate_learningunit_proposal', luy)
-    return permissions
-
-
-# should be migrated with tutor role creation
+# TODO : migrate with tutor role creation
 def is_eligible_to_update_learning_unit_pedagogy(learning_unit_year, person):
     """
     Permission to edit learning unit pedagogy needs many conditions:
@@ -97,7 +59,7 @@ def is_eligible_to_update_learning_unit_pedagogy(learning_unit_year, person):
         return True
     # Case Tutor: We need to check if today is between submission date
     if tutor.is_tutor(person.user):
-        return can_user_edit_educational_information(
+        return CanUserEditEducationalInformation(
             user=person.user,
             learning_unit_year_id=learning_unit_year.id
         ).is_valid()
@@ -105,28 +67,29 @@ def is_eligible_to_update_learning_unit_pedagogy(learning_unit_year, person):
     return False
 
 
+# TODO : migrate with tutor role creation
 def is_eligible_to_update_learning_unit_pedagogy_force_majeure_section(learning_unit_year, person):
-    if not person.user.has_perm('base.can_edit_learningunit_pedagogy'):
+    if not person.user.has_perm('base.can_edit_learningunit_pedagogy', learning_unit_year):
         return False
+
     if is_year_editable(learning_unit_year, raise_exception=False):
-        # Case faculty/central: We need to check if user is linked to entity
-        if person.is_faculty_manager or person.is_central_manager:
-            return person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year)
 
         # Case Tutor: We need to check if today is between submission date of force majeure section
         if tutor.is_tutor(person.user):
-            return can_user_edit_educational_information_force_majeure(
+            return CanUserEditEducationalInformationForceMajeure(
                 user=person.user,
                 learning_unit_year_id=learning_unit_year.id
             ).is_valid()
     return False
 
 
+# TODO : migrate with tutor role creation
 def _is_tutor_summary_responsible_of_learning_unit_year(*, user, learning_unit_year_id, **kwargs):
     if not _is_tutor_attributed_to_the_learning_unit(user, learning_unit_year_id):
         raise PermissionDenied(_("You are not attributed to this learning unit."))
 
 
+# TODO : migrate with tutor role creation
 def _is_learning_unit_year_summary_editable(*, learning_unit_year_id, **kwargs):
     if isinstance(learning_unit_year_id, LearningUnitYear):
         value = True
@@ -137,6 +100,7 @@ def _is_learning_unit_year_summary_editable(*, learning_unit_year_id, **kwargs):
         raise PermissionDenied(_("The learning unit's description fiche is not editable."))
 
 
+# TODO : migrate with tutor role creation
 def _is_calendar_opened_to_edit_educational_information(*, learning_unit_year_id, **kwargs):
     submission_dates = find_educational_information_submission_dates_of_learning_unit_year(learning_unit_year_id)
     permission_denied_msg = _("Not in period to edit description fiche.")
@@ -145,11 +109,46 @@ def _is_calendar_opened_to_edit_educational_information(*, learning_unit_year_id
 
     now = datetime.datetime.now(tz=get_tzinfo())
     value = convert_date_to_datetime(submission_dates["start_date"]) <= now <= \
-            convert_date_to_datetime(submission_dates["end_date"])
+        convert_date_to_datetime(submission_dates["end_date"])
     if not value:
         raise PermissionDenied(permission_denied_msg)
 
 
+# TODO : migrate with tutor role creation
+def _is_calendar_opened_to_edit_educational_information_force_majeure_section(*, learning_unit_year_id, **kwargs):
+    submission_dates = find_educational_information_force_majeure_submission_dates_of_learning_unit_year(
+        learning_unit_year_id
+    )
+    permission_denied_msg = _("Not in period to edit force majeure section.")
+    if not submission_dates:
+        raise PermissionDenied(permission_denied_msg)
+
+    now = datetime.datetime.now(tz=get_tzinfo())
+    value = convert_date_to_datetime(submission_dates["start_date"]) <= now <= \
+        convert_date_to_datetime(submission_dates["end_date"])
+    if not value:
+        raise PermissionDenied(permission_denied_msg)
+
+
+# TODO : migrate with tutor role creation
+class CanUserEditEducationalInformation(BasePerm):
+    predicates = (
+        _is_tutor_summary_responsible_of_learning_unit_year,
+        _is_learning_unit_year_summary_editable,
+        _is_calendar_opened_to_edit_educational_information
+    )
+
+
+# TODO : migrate with tutor role creation
+class CanUserEditEducationalInformationForceMajeure(BasePerm):
+    predicates = (
+        _is_tutor_summary_responsible_of_learning_unit_year,
+        _is_learning_unit_year_summary_editable,
+        _is_calendar_opened_to_edit_educational_information_force_majeure_section
+    )
+
+
+# TODO : migrate with tutor role creation
 def find_educational_information_submission_dates_of_learning_unit_year(learning_unit_year_id):
     requirement_entity_version = find_last_requirement_entity_version(
         learning_unit_year_id=learning_unit_year_id,
@@ -163,21 +162,7 @@ def find_educational_information_submission_dates_of_learning_unit_year(learning
     )
 
 
-def _is_calendar_opened_to_edit_educational_information_force_majeure_section(*, learning_unit_year_id, **kwargs):
-    submission_dates = find_educational_information_force_majeure_submission_dates_of_learning_unit_year(
-        learning_unit_year_id
-    )
-    permission_denied_msg = _("Not in period to edit force majeure section.")
-    if not submission_dates:
-        raise PermissionDenied(permission_denied_msg)
-
-    now = datetime.datetime.now(tz=get_tzinfo())
-    value = convert_date_to_datetime(submission_dates["start_date"]) <= now <= \
-            convert_date_to_datetime(submission_dates["end_date"])
-    if not value:
-        raise PermissionDenied(permission_denied_msg)
-
-
+# TODO : migrate with tutor role creation
 def find_educational_information_force_majeure_submission_dates_of_learning_unit_year(learning_unit_year_id):
     requirement_entity_version = find_last_requirement_entity_version(
         learning_unit_year_id=learning_unit_year_id,
@@ -192,6 +177,7 @@ def find_educational_information_force_majeure_submission_dates_of_learning_unit
     )
 
 
+# TODO : migrate with tutor role creation
 def find_last_requirement_entity_version(learning_unit_year_id):
     now = datetime.datetime.now(get_tzinfo())
     # TODO :: merge code below to get only 1 hit on database
@@ -208,14 +194,7 @@ def find_last_requirement_entity_version(learning_unit_year_id):
         return None
 
 
-class can_user_edit_educational_information(BasePerm):
-    predicates = (
-        _is_tutor_summary_responsible_of_learning_unit_year,
-        _is_learning_unit_year_summary_editable,
-        _is_calendar_opened_to_edit_educational_information
-    )
-
-
+# TODO : migrate with tutor role creation
 def is_year_editable(learning_unit_year, raise_exception):
     result = learning_unit_year.academic_year.year > settings.YEAR_LIMIT_LUE_MODIFICATION
     msg = "{}.  {}".format(
@@ -224,12 +203,11 @@ def is_year_editable(learning_unit_year, raise_exception):
         _("Modifications should be made in EPC for year %(year)d") %
         {"year": learning_unit_year.academic_year.year},
     )
-    can_raise_exception(raise_exception,
-                        result,
-                        msg)
+    can_raise_exception(raise_exception, result, msg)
     return result
 
 
+# TODO : migrate with tutor role creation
 def can_raise_exception(raise_exception, result, msg):
     if raise_exception and not result:
         raise PermissionDenied(msg)

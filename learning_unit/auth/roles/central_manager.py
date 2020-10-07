@@ -55,6 +55,7 @@ class CentralManager(osis_role_models.EntityRoleModel):
                 (predicates.is_user_attached_to_current_requirement_entity |
                  predicates.is_user_attached_to_initial_requirement_entity),
             'base.can_cancel_proposal':
+                predicates.is_proposal &
                 predicates.is_not_proposal_of_type_creation_with_applications &
                 (predicates.is_user_attached_to_current_requirement_entity |
                  predicates.is_user_attached_to_initial_requirement_entity) &

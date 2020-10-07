@@ -31,7 +31,6 @@ from django.contrib.auth.models import Permission
 from django.test import TestCase
 
 from attribution.tests.factories.tutor_application import TutorApplicationFactory
-from base.business.learning_units.perms import FACULTY_UPDATABLE_CONTAINER_TYPES
 from base.business.perms import view_academicactors
 from base.models.academic_year import AcademicYear, LEARNING_UNIT_CREATION_SPAN_YEARS, MAX_ACADEMIC_YEAR_FACULTY, \
     MAX_ACADEMIC_YEAR_CENTRAL
@@ -457,7 +456,7 @@ class TestIsEligibleToCreateModificationProposal(TestCase):
         self.assertFalse(person.user.has_perm('base.can_propose_learningunit', self.luy))
 
     def test_all_requirements_are_met_to_propose_modification(self):
-        for luy_container_type in FACULTY_UPDATABLE_CONTAINER_TYPES:
+        for luy_container_type in FACULTY_EDITABLE_CONTAINER_TYPES:
             with self.subTest(luy_container_type=luy_container_type):
                 self.luy.learning_container_year.container_type = luy_container_type
                 self.luy.learning_container_year.save()

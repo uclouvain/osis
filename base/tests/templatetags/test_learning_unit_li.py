@@ -31,9 +31,6 @@ from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
-from base.business.learning_units.perms import MSG_PERSON_NOT_IN_ACCORDANCE_WITH_PROPOSAL_STATE, \
-    MSG_PROPOSAL_NOT_IN_CONSOLIDATION_ELIGIBLE_STATES, \
-    MSG_CAN_DELETE_ACCORDING_TO_TYPE
 from base.models.enums import learning_container_year_types
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.groups import CENTRAL_MANAGER_GROUP
@@ -197,7 +194,7 @@ class LearningUnitTagLiEditTest(TestCase):
         result = li_edit_proposal(self.context, self.url_edit, "")
         self.assertEqual(
             result, self._get_result_data_expected_for_proposal(
-                'link_proposal_edit', MSG_PERSON_NOT_IN_ACCORDANCE_WITH_PROPOSAL_STATE, DISABLED
+                'link_proposal_edit', _("Person not in accordance with proposal state"), DISABLED
             )
         )
 
@@ -210,7 +207,7 @@ class LearningUnitTagLiEditTest(TestCase):
         result = li_cancel_proposal(self.context, self.url_edit, "", "")
         self.assertEqual(
             result, self._get_result_data_expected_for_proposal(
-                'link_cancel_proposal', MSG_PERSON_NOT_IN_ACCORDANCE_WITH_PROPOSAL_STATE, DISABLED
+                'link_cancel_proposal', _("Person not in accordance with proposal state"), DISABLED
             )
         )
 
@@ -232,7 +229,7 @@ class LearningUnitTagLiEditTest(TestCase):
         result = li_consolidate_proposal(self.context, self.url_edit, "", "")
         self.assertEqual(
             result, self._get_result_data_expected_for_proposal(
-                'link_consolidate_proposal', MSG_PROPOSAL_NOT_IN_CONSOLIDATION_ELIGIBLE_STATES, DISABLED
+                'link_consolidate_proposal', _('Proposal not in eligible state for consolidation'), DISABLED
             )
         )
 
@@ -279,7 +276,9 @@ class LearningUnitTagLiEditTest(TestCase):
         self.context['learning_unit_year'] = learning_unit_yr
 
         result = li_delete_all_lu(self.context, self.url_edit, '', "#modalDeleteLuy")
-        expected = self._get_result_data_expected_delete("link_delete_lus", MSG_CAN_DELETE_ACCORDING_TO_TYPE)
+        expected = self._get_result_data_expected_delete(
+            "link_delete_lus", _("Can delete according to the type of the learning unit")
+        )
 
         self.assertEqual(result, expected)
 
