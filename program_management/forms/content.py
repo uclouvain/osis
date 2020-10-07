@@ -132,8 +132,8 @@ class BaseContentFormSet(BaseFormSet):
                 return bulk_update_link_service.bulk_update_links(cmd)
             except program_management.ddd.domain.exception.BulkUpdateLinkException as e:
                 for form in self.forms:
-                    if e.exceptions.get(form.child_obj.code):
-                        form.handle_save_exception(e.exceptions[form.child_obj.code])
+                    if e.exceptions.get(form.generate_update_link_command()):
+                        form.handle_save_exception(e.exceptions[form.generate_update_link_command()])
 
         raise InvalidFormException()
 
