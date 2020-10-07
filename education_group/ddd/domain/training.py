@@ -362,3 +362,4 @@ class UpdateTrainingData:
     hops = attr.ib(type=HOPS, default=None)
     co_graduation = attr.ib(type=CoGraduation, default=None)
     diploma = attr.ib(type=Diploma, default=None)
+    decree_category = attr.ib(type=DecreeCategories, default=None)
