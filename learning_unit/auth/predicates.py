@@ -268,6 +268,18 @@ def has_learning_unit_no_application_all_year(self, user, learning_unit_year):
 
 
 @predicate(bind=True)
+@predicate_failed_msg(message=_("This learning unit has application"))
+@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
+def has_learning_unit_no_application_in_future(self, user, learning_unit_year):
+    if learning_unit_year:
+        learning_container = learning_unit_year.learning_container_year.learning_container
+        return not TutorApplication.objects.filter(
+            learning_container_year__learning_container=learning_container,
+            learning_container_year__academic_year__year__gt=learning_unit_year.academic_year.year
+        ).exists()
+
+
+@predicate(bind=True)
 @predicate_failed_msg(message=_("Proposal not in eligible state for consolidation"))
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def is_proposal_in_state_to_be_consolidated(self, user, learning_unit_year):
