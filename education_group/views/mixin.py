@@ -21,29 +21,34 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-import contextlib
-
+from base.models.enums.education_group_types import GroupType
 from base.utils.cache import ElementCache
 from education_group.ddd import command as command_education_group
 from education_group.ddd.domain.exception import GroupNotFoundException
 from education_group.ddd.service.read import get_group_service
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from program_management.ddd import command as command_program_management
-from program_management.ddd.domain.exception import ProgramTreeVersionNotFoundException
 from program_management.ddd.service.read import element_selected_service
 from django.utils.translation import gettext_lazy as _
 
-from program_management.ddd.service.read.get_program_tree_version_from_node_service import \
-    get_program_tree_version_from_node
+from program_management.ddd.service.read import get_program_tree_version_from_node_service
 
 
 class ElementSelectedClipBoardMixin:
     def get_selected_element_clipboard_message(self) -> str:
+        return ElementSelectedClipBoardSerializer(self.request).get_selected_element_clipboard_message()
+
+
+class ElementSelectedClipBoardSerializer:
+    def __init__(self, request):
+        self.request = request
+
+    def get_selected_element_clipboard_message(self):
         element_selected = element_selected_service.retrieve_element_selected(self.request.user.id)
         if not element_selected:
             return ""
         return "<strong>{clipboard_title}</strong><br>{object_str}".format(
-            clipboard_title=_("Cut element") if element_selected["action"] == ElementCache.ElementCacheAction.CUT
+            clipboard_title=_("Cut element") if element_selected["action"] == ElementCache.ElementCacheAction.CUT.value
             else _("Copied element"),
             object_str=self._get_element_selected_str(element_selected)
         )
@@ -66,15 +71,15 @@ class ElementSelectedClipBoardMixin:
         )
         element_selected_str = "{} - {}".format(group.code, group.abbreviated_title)
 
-        with contextlib.suppress(ProgramTreeVersionNotFoundException):
-            version = get_program_tree_version_from_node(
+        if group.type.name not in GroupType.get_names():
+            version = get_program_tree_version_from_node_service.get_program_tree_version_from_node(
                 command_program_management.GetProgramTreeVersionFromNodeCommand(
                     code=element_selected["element_code"],
                     year=element_selected["element_year"]
                 )
             )
             if not version.is_standard:
-                element_selected_str += " [{}]".format(version.version_name)
+                element_selected_str += "[{}]".format(version.version_name)
 
-        element_selected_str += " - {}".format(display_as_academic_year(group.year))
+        element_selected_str += " - {}".format(group.academic_year)
         return element_selected_str
