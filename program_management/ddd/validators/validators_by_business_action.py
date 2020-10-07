@@ -87,7 +87,12 @@ class PasteNodeValidatorList(business_validator.BusinessListValidator):
                     tree_version_repository
                 ),
                 ValidateAuthorizedRelationshipForAllTrees(tree, node_to_paste, path, tree_repository),
-                MatchVersionValidator(tree, node_to_paste),
+                MatchVersionValidator(
+                    tree.get_node(path),
+                    node_to_paste,
+                    tree_repository,
+                    tree_version_repository
+                ),
             ]
 
         elif node_to_paste.is_learning_unit():
@@ -140,7 +145,12 @@ class CheckPasteNodeValidatorList(business_validator.BusinessListValidator):
                     tree_repository,
                     tree_version_repository
                 ),
-                MatchVersionValidator(tree, node_to_paste)
+                MatchVersionValidator(
+                    tree.get_node(path),
+                    node_to_paste,
+                    tree_repository,
+                    tree_version_repository
+                )
             ]
 
         elif node_to_paste.is_learning_unit():
