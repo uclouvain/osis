@@ -25,7 +25,7 @@
 ##############################################################################
 from typing import List, Dict
 
-from django.core.exceptions import PermissionDenied, MultipleObjectsReturned
+from django.core.exceptions import MultipleObjectsReturned
 from django.db.models import Prefetch
 from django.utils.translation import gettext_lazy as _, pgettext_lazy
 
@@ -38,12 +38,9 @@ from base.models.enums import mandate_type as mandate_types
 from base.models.enums.education_group_types import TrainingType
 from base.models.mandate import Mandate
 from base.models.offer_year_calendar import OfferYearCalendar
-from base.models.person import Person
-from base.models.program_manager import is_program_manager
 from education_group.models.group_year import GroupYear
-from program_management.models.education_group_version import EducationGroupVersion
-
 from osis_common.document import xls_build
+from program_management.models.education_group_version import EducationGroupVersion
 
 # List of key that a user can modify
 DATE_FORMAT = '%d-%m-%Y'
@@ -109,31 +106,6 @@ EDUCATION_GROUP_TITLES_ADMINISTRATIVE = [
 ]
 
 
-def can_user_edit_administrative_data(a_user, an_education_group_year, raise_exception=False):
-    """
-    Edition of administrative data is allowed for user which have permission AND
-            if CENTRAL_MANAGER: Check attached entities [person_entity]
-            else Check if user is program manager of education group
-    """
-
-    # Tricky solution to make compatible several uses
-    if isinstance(a_user, Person):
-        person = a_user
-        a_user = person.user
-
-    return a_user.has_perm("base.can_edit_education_group_administrative_data", an_education_group_year) or \
-        is_program_manager(a_user, education_group=an_education_group_year.education_group)
-
-
-def _is_management_entity_linked_to_user(person, an_education_group_year):
-    return person.is_attached_entity(an_education_group_year.management_entity)
-
-
-def assert_category_of_education_group_year(education_group_year, authorized_categories):
-    if education_group_year.education_group_type.category not in authorized_categories:
-        raise PermissionDenied("Education group category is not correct.")
-
-
 def create_xls(user, found_education_groups_param, filters, order_data):
     found_education_groups = ordering_data(found_education_groups_param, order_data)
     working_sheets_data = prepare_xls_content(found_education_groups)
@@ -150,14 +122,15 @@ def prepare_xls_content(found_education_groups: List[GroupYear]) -> List:
     return [extract_xls_data_from_education_group(eg) for eg in found_education_groups]
 
 
-def extract_xls_data_from_education_group(an_education_group: GroupYear) -> List:
+def extract_xls_data_from_education_group(group_year: GroupYear) -> List:
+    """ At this stage, the group_year has been annotated with property complete_title_fr / full_title_fr"""
     return [
-        an_education_group.academic_year.name,
-        an_education_group.complete_title_fr,
-        an_education_group.title,
-        an_education_group.education_group_type,
-        an_education_group.management_entity_version.acronym if an_education_group.management_entity_version else '',
-        an_education_group.partial_acronym
+        group_year.academic_year.name,
+        group_year.complete_title_fr,
+        group_year.full_title_fr,
+        group_year.education_group_type,
+        group_year.management_entity_version.acronym if group_year.management_entity_version else '',
+        group_year.partial_acronym
     ]
 
 

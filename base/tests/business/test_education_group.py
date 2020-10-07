@@ -26,12 +26,10 @@
 import datetime
 from unittest import mock
 
-from django.contrib.auth.models import Group
 from django.test import TestCase
 from django.utils.translation import gettext_lazy as _
 
-from base.business.education_group import can_user_edit_administrative_data, prepare_xls_content, create_xls, \
-    XLS_DESCRIPTION, XLS_FILENAME, WORKSHEET_TITLE, EDUCATION_GROUP_TITLES, ORDER_COL, ORDER_DIRECTION, \
+from base.business.education_group import ORDER_COL, ORDER_DIRECTION, \
     XLS_DESCRIPTION_ADMINISTRATIVE, XLS_FILENAME_ADMINISTRATIVE, WORKSHEET_TITLE_ADMINISTRATIVE, \
     EDUCATION_GROUP_TITLES_ADMINISTRATIVE, prepare_xls_content_administrative, create_xls_administrative_data, \
     DATE_FORMAT, MANAGEMENT_ENTITY_COL, TRANING_COL, TYPE_COL, ACADEMIC_YEAR_COL, START_COURSE_REGISTRATION_COL, \
@@ -46,155 +44,19 @@ from base.tests.factories.academic_year import create_current_academic_year, Aca
 from base.tests.factories.education_group import EducationGroupFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
-from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.mandatary import MandataryFactory
 from base.tests.factories.offer_year_calendar import OfferYearCalendarFactory
-from base.tests.factories.organization import OrganizationFactory
-from base.tests.factories.person import PersonFactory
-from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
 from base.tests.factories.user import UserFactory
 from education_group.models.group_year import GroupYear
-from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from osis_common.document import xls_build
-from program_management.tests.factories.education_group_version import EducationGroupVersionFactory, \
+from program_management.tests.factories.education_group_version import \
     ParticularTransitionEducationGroupVersionFactory, StandardEducationGroupVersionFactory
 
 LANGUAGE_CODE_FR = "fr-be"
 
 NO_SESSION_DATA = {'session1': None, 'session2': None, 'session3': None}
-
-
-class EducationGroupTestCase(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        # Create structure
-        cls._create_basic_entity_structure()
-
-        cls.academic_year = AcademicYearFactory(current=True)
-        cls.education_group_year = EducationGroupYearFactory(
-            management_entity=cls.chim_entity,
-            academic_year=cls.academic_year
-        )
-
-    def setUp(self) -> None:
-        self.person = PersonFactory()
-        self.user = self.person.user
-
-    @classmethod
-    def _create_basic_entity_structure(cls):
-        cls.organization = OrganizationFactory()
-        # Create entities UCL
-        cls.root_entity = _create_entity_and_version_related_to(cls.organization, "UCL")
-        # SST entity
-        cls.sst_entity = _create_entity_and_version_related_to(cls.organization, "SST", cls.root_entity)
-        cls.agro_entity = _create_entity_and_version_related_to(cls.organization, "AGRO", cls.sst_entity)
-        cls.chim_entity = _create_entity_and_version_related_to(cls.organization, "CHIM", cls.sst_entity)
-
-    def test_can_user_edit_administrative_data_with_permission_no_pgrm_manager(self):
-        """With permission but no program manager of education group ==> Refused"""
-        self.assertFalse(can_user_edit_administrative_data(self.user, self.education_group_year))
-
-    def test_can_user_edit_administrative_data_with_permission_and_pgrm_manager(self):
-        """With permission and program manager of education group ==> Allowed"""
-        ProgramManagerFactory(person=self.person, education_group=self.education_group_year.education_group)
-        self.assertTrue(can_user_edit_administrative_data(self.user, self.education_group_year))
-
-    def test_can_user_edit_administrative_data_group_central_manager_no_entity_linked(self):
-        """With permission + Group central manager + No linked to the right entity + Not program manager ==> Refused """
-        CentralManagerFactory(person=self.person)
-        self.assertFalse(can_user_edit_administrative_data(self.user, self.education_group_year))
-
-    def test_can_user_edit_administrative_data_group_central_manager_entity_linked(self):
-        """With permission + Group central manager + Linked to the right entity ==> Allowed """
-        CentralManagerFactory(person=self.person, entity=self.education_group_year.management_entity)
-        self.assertTrue(can_user_edit_administrative_data(self.user, self.education_group_year))
-
-    def test_can_user_edit_administrative_data_group_central_manager_parent_entity_linked_with_child(self):
-        """With permission + Group central manager + Linked to the parent entity (with child TRUE) ==> Allowed """
-        CentralManagerFactory(person=self.person, entity=self.root_entity, with_child=True)
-        self.assertTrue(can_user_edit_administrative_data(self.user, self.education_group_year))
-
-    def test_can_user_edit_administrative_data_group_central_manager_parent_entity_linked_no_child(self):
-        """With permission + Group central manager + Linked to the parent entity (with child FALSE) ==> Refused """
-        CentralManagerFactory(person=self.person, entity=self.root_entity, with_child=False)
-        self.assertFalse(can_user_edit_administrative_data(self.user, self.education_group_year))
-
-    def test_can_user_edit_administrative_data_group_central_manager_no_entity_linked_but_program_manager(self):
-        """
-        With permission + Group central manager + Linked to the parent entity (with_child FALSE) + IS
-        program manager ==> Allowed
-        """
-        CentralManagerFactory(person=self.person, entity=self.root_entity, with_child=False)
-        ProgramManagerFactory(person=self.person, education_group=self.education_group_year.education_group)
-        self.assertTrue(can_user_edit_administrative_data(self.user, self.education_group_year))
-
-
-def _create_entity_and_version_related_to(organization, acronym, parent=None):
-    entity = EntityFactory(organization=organization)
-    EntityVersionFactory(acronym=acronym, entity=entity, parent=parent, end_date=None)
-    return entity
-
-
-def _add_to_group(user, group_name):
-    group, created = Group.objects.get_or_create(name=group_name)
-    group.user_set.add(user)
-
-
-class EducationGroupXlsTestCase(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.academic_year = create_current_academic_year()
-
-    def setUp(self):
-        self.education_group_type_group = EducationGroupTypeFactory(category=education_group_categories.GROUP)
-        self.education_group_year_1 = EducationGroupYearFactory(academic_year=self.academic_year, acronym="PREMIER")
-        self.education_group_year_1.complete_title_fr = self.education_group_year_1.acronym + '[VERSION]'
-        self.education_group_year_1.management_entity_version = EntityVersionFactory()
-        self.education_group_year_2 = EducationGroupYearFactory(academic_year=self.academic_year, acronym="DEUXIEME")
-        self.education_group_year_2.management_entity_version = EntityVersionFactory()
-        self.education_group_year_2.complete_title_fr = self.education_group_year_2.acronym
-        self.user = UserFactory()
-
-    def test_prepare_xls_content_no_data(self):
-        self.assertEqual(prepare_xls_content([]), [])
-
-    def test_prepare_xls_content_with_data(self):
-        data = prepare_xls_content([self.education_group_year_1])
-        self.assertEqual(len(data), 1)
-        self.assertEqual(data[0], get_xls_data(self.education_group_year_1))
-
-    @mock.patch("osis_common.document.xls_build.generate_xls")
-    def test_generate_xls_data_with_no_data(self, mock_generate_xls):
-        create_xls(self.user, [], None, {ORDER_COL: None, ORDER_DIRECTION: None})
-
-        expected_argument = _generate_xls_build_parameter([], self.user)
-        mock_generate_xls.assert_called_with(expected_argument, None)
-
-    @mock.patch("osis_common.document.xls_build.generate_xls")
-    def test_generate_xls_data_with_asc_ordering(self, mock_generate_xls):
-        create_xls(self.user,
-                   [self.education_group_year_1, self.education_group_year_2],
-                   None,
-                   {ORDER_COL: 'acronym', ORDER_DIRECTION: None})
-
-        xls_data = [get_xls_data(self.education_group_year_2), get_xls_data(self.education_group_year_1)]
-
-        expected_argument = _generate_xls_build_parameter(xls_data, self.user)
-        mock_generate_xls.assert_called_with(expected_argument, None)
-
-    @mock.patch("osis_common.document.xls_build.generate_xls")
-    def test_generate_xls_data_with_desc_ordering(self, mock_generate_xls):
-        create_xls(self.user,
-                   [self.education_group_year_1, self.education_group_year_2],
-                   None,
-                   {ORDER_COL: 'acronym', ORDER_DIRECTION: 'desc'})
-
-        xls_data = [get_xls_data(self.education_group_year_1), get_xls_data(self.education_group_year_2)]
-
-        expected_argument = _generate_xls_build_parameter(xls_data, self.user)
-        mock_generate_xls.assert_called_with(expected_argument, None)
 
 
 class EducationGroupXlsAdministrativeDataTestCase(TestCase):
@@ -400,33 +262,6 @@ class EducationGroupXlsAdministrativeDataTestCase(TestCase):
             str(self.signatory.person.full_name),
             'Responsable'
         ]
-
-
-def get_xls_data(an_education_group_year):
-    return [an_education_group_year.academic_year.name,
-            an_education_group_year.complete_title_fr,
-            an_education_group_year.title,
-            an_education_group_year.education_group_type,
-            an_education_group_year.management_entity_version.acronym,
-            an_education_group_year.partial_acronym]
-
-
-def _generate_xls_build_parameter(xls_data, user):
-    return {
-        xls_build.LIST_DESCRIPTION_KEY: _(XLS_DESCRIPTION),
-        xls_build.FILENAME_KEY: _(XLS_FILENAME),
-        xls_build.USER_KEY: user.username,
-        xls_build.WORKSHEETS_DATA: [{
-            xls_build.CONTENT_KEY: xls_data,
-            xls_build.HEADER_TITLES_KEY: EDUCATION_GROUP_TITLES,
-            xls_build.WORKSHEET_TITLE_KEY: _(WORKSHEET_TITLE),
-            xls_build.STYLED_CELLS: None,
-            xls_build.FONT_ROWS: None,
-            xls_build.ROW_HEIGHT: None,
-            xls_build.FONT_CELLS: None,
-            xls_build.BORDER_CELLS: None
-        }]
-    }
 
 
 def _generate_xls_administrative_data_build_parameter(xls_data, user):

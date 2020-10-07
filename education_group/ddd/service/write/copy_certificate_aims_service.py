@@ -23,31 +23,30 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.db import transaction
 
-from dal import autocomplete
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.utils.html import format_html
+from education_group.ddd import command
+from education_group.ddd.domain.exception import TrainingNotFoundException
+from education_group.ddd.domain.training import TrainingBuilder, TrainingIdentity
+from education_group.ddd.repository import training as training_repository
 
-from base.models.education_group_type import EducationGroupType
 
+@transaction.atomic()
+def copy_certificate_aims_to_next_year(copy_cmd: command.CopyCertificateAimsToNextYearCommand) -> 'TrainingIdentity':
+    # GIVEN
+    repository = training_repository.TrainingRepository()
+    existing_training = repository.get(
+        entity_id=TrainingIdentity(acronym=copy_cmd.acronym, year=copy_cmd.postpone_from_year)
+    )
 
-class EducationGroupTypeAutoComplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
-    def get_queryset(self):
-        if not self.request.user.is_authenticated:
-            return EducationGroupType.objects.none()
+    try:
+        # WHEN
+        training_next_year = TrainingBuilder().copy_aims_to_next_year(existing_training, repository)
 
-        qs = EducationGroupType.objects.all()
+        # THEN
+        identity = repository.update(training_next_year)
+        return identity
 
-        category = self.forwarded.get('category', None)
-        if category:
-            qs = qs.filter(category=category)
-        if self.q:
-            # Filtering must be done in python because translated value.
-            ids_to_keep = {result.pk for result in qs if self.q.lower() in result.get_name_display().lower()}
-            qs = qs.filter(id__in=ids_to_keep)
-
-        qs = qs.order_by_translated_name()
-        return qs
-
-    def get_result_label(self, result):
-        return format_html('{}', result.get_name_display())
+    except TrainingNotFoundException:
+        # do nothing when next year has no training
+        pass
