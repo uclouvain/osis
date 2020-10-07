@@ -43,7 +43,7 @@ class TestElementSelectedClipBoardSerializer(TestCase):
 
     def setUp(self) -> None:
         self.cache_element = {
-            "action": ElementCache.ElementCacheAction.CUT,
+            "action": ElementCache.ElementCacheAction.CUT.value,
             "element_code": "LDROI200A",
             "element_year": 2020
         }
