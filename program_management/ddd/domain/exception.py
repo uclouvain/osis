@@ -123,33 +123,29 @@ class NodeIsUsedException(Exception):
 class ProgramTreeVersionMismatch(BusinessExceptions):
     def __init__(
             self,
-            parents_version_mismatched_identity: List['ProgramTreeVersionIdentity'],
+            node_to_add: 'Node',
             child_version_identity: 'ProgramTreeVersionIdentity',
+            node_to_paste_to: 'Node',
+            parents_version_mismatched_identity: List['ProgramTreeVersionIdentity'],
             *args,
             **kwargs
     ):
-        root_code = kwargs.pop('root_code')
-        child_code = kwargs.pop('child_code')
-
-        parents_version_titles = [
-            self._get_version_title(version_identity) for version_identity in parents_version_mismatched_identity
-        ]
-        node_to_add_version_title = self._get_version_title(child_version_identity)
-
+        parents_version_names = {
+            self._get_version_name(version_identity) for version_identity in parents_version_mismatched_identity
+        }
         messages = [_(
-            "%(node_to_add)s version must be the same as %(root_node)s "
-            "and all of it's parent's version %(parents_version_mismatched)s"
+            "%(node_to_add)s [%(node_to_add_version)s] version must be the same as %(node_to_paste_to)s "
+            "and all of it's parent's version [%(version_mismatched)s]"
         ) % {
-            'node_to_add': '{} - {}'.format(child_code, node_to_add_version_title),
-            'root_node': root_code,
-            'parents_version_mismatched': ",".join(parents_version_titles)
+            'node_to_add': str(node_to_add),
+            'node_to_add_version': self._get_version_name(child_version_identity),
+            'node_to_paste_to': str(node_to_paste_to),
+            'version_mismatched': ",".join(parents_version_names)
         }]
         super().__init__(messages, **kwargs)
 
-    def _get_version_title(self, version_identity):
-        return "{}[{}]".format(
-            version_identity.offer_acronym, version_identity.version_name
-        ) if version_identity.version_name else version_identity.offer_acronym
+    def _get_version_name(self, version_identity: 'ProgramTreeVersionIdentity'):
+        return str(_('Standard')) if version_identity.is_standard() else version_identity.version_name
 
 
 class Program2MEndDateShouldBeGreaterOrEqualThanItsFinalities(BusinessException):

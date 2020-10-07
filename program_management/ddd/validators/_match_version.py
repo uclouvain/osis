@@ -59,10 +59,10 @@ class MatchVersionValidator(business_validator.BusinessValidator):
             ]
             if version_mismatched:
                 raise exception.ProgramTreeVersionMismatch(
-                    version_mismatched,
+                    self.node_to_add,
                     child_version.entity_id,
-                    root_code=self.node_to_paste_to.code,
-                    child_code=self.node_to_add.code,
+                    self.node_to_paste_to,
+                    version_mismatched,
                 )
 
     def _get_program_tree_version(self, node: 'Node') -> 'ProgramTreeVersion':

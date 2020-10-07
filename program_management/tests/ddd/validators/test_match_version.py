@@ -85,17 +85,15 @@ class TestMatchVersionValidator(TestValidatorValidateMixin, SimpleTestCase):
         ])
 
         expected_message = _(
-            "%(node_to_add)s version must be the same as %(root_node)s "
-            "and all of it's parent's version %(parents_version_mismatched)s"
+            "%(node_to_add)s [%(node_to_add_version)s] version must be the same as %(node_to_paste_to)s "
+            "and all of it's parent's version [%(version_mismatched)s]"
         ) % {
-              'node_to_add': '{} - {}[{}]'.format(
-                  tree_to_attach.root_node.code,
-                  tree_to_attach_version.entity_id.offer_acronym,
-                  tree_to_attach_version.entity_id.version_name,
-              ),
-              'root_node': self.tree.root_node.code,
-              'parents_version_mismatched': self.tree_version.entity_id.offer_acronym
-          }
+            'node_to_add': str(tree_to_attach.root_node),
+            'node_to_add_version': tree_to_attach_version.version_name,
+
+            'node_to_paste_to': str(self.tree.root_node),
+            'version_mismatched': _("Standard")
+        }
 
         self.assertValidatorRaises(
             MatchVersionValidator(
