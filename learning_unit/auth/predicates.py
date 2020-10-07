@@ -300,7 +300,7 @@ def is_learning_unit_type_allowed_for_attributions(self, user, learning_unit_yea
 
 
 @predicate(bind=True)
-@predicate_failed_msg(message=_("Learning unit has no container"))
+@predicate_failed_msg(message=_("You cannot edit this type of learning unit"))
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def is_learning_unit_with_container(self, user, learning_unit_year):
     if learning_unit_year:

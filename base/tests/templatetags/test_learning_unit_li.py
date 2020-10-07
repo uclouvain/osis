@@ -277,7 +277,7 @@ class LearningUnitTagLiEditTest(TestCase):
 
         result = li_delete_all_lu(self.context, self.url_edit, '', "#modalDeleteLuy")
         expected = self._get_result_data_expected_delete(
-            "link_delete_lus", _("Can delete according to the type of the learning unit")
+            "link_delete_lus", _("Cannot delete according to the type of the learning unit")
         )
 
         self.assertEqual(result, expected)

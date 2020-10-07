@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-17 16:32+0200\n"
+"POT-Creation-Date: 2020-10-07 10:54+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -24,6 +24,10 @@ msgstr ""
 msgid "Central managers"
 msgstr ""
 
+msgid ""
+"Date creation or modification of proposal not allowed during this period."
+msgstr ""
+
 msgid "Faculty manager"
 msgstr ""
 
@@ -31,6 +35,9 @@ msgid "Faculty managers"
 msgstr ""
 
 msgid "Learning unit is not full"
+msgstr ""
+
+msgid "Learning unit type is not allowed for attributions"
 msgstr ""
 
 msgid "Learning unit type is not deletable"
@@ -52,7 +59,7 @@ msgstr ""
 msgid "Person not in accordance with proposal state"
 msgstr ""
 
-msgid "Proposal is not of modification type"
+msgid "Proposal is of modification type"
 msgstr ""
 
 msgid "Proposal not in eligible state for consolidation"
@@ -65,6 +72,9 @@ msgid "The learning unit is not a partim"
 msgstr ""
 
 msgid "This learning unit has application"
+msgstr ""
+
+msgid "This learning unit has application this year"
 msgstr ""
 
 msgid "This learning unit has no application."
@@ -94,6 +104,9 @@ msgstr ""
 msgid ""
 "You cannot delete a learning unit which is prerequisite or has "
 "prerequisite(s)"
+msgstr ""
+
+msgid "You cannot edit this type of learning unit"
 msgstr ""
 
 msgid "You cannot modify a learning unit of a previous year"
