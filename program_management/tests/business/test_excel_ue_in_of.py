@@ -42,6 +42,7 @@ from base.models.enums.proposal_type import ProposalType
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.tests.factories.learning_achievement import LearningAchievementFactory
 from learning_unit.tests.ddd.factories.achievement import AchievementFactory
 from learning_unit.tests.ddd.factories.description_fiche import DescriptionFicheFactory
 from learning_unit.tests.ddd.factories.entities import EntitiesFactory
@@ -69,6 +70,7 @@ from program_management.tests.factories.element import ElementGroupYearFactory, 
 from program_management.tests.ddd.factories.program_tree_version import StandardProgramTreeVersionFactory, \
     ProgramTreeVersionFactory
 from program_management.ddd.business_types import *
+from reference.tests.factories.language import FrenchLanguageFactory, EnglishLanguageFactory
 
 PARTIAL_ACRONYM = 'Partial'
 

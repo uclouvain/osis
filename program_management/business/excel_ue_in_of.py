@@ -66,6 +66,7 @@ from program_management.ddd.service.read import get_program_tree_version_from_no
 from program_management.ddd import command
 from program_management.ddd.domain.exception import ProgramTreeVersionNotFoundException
 from osis_common.ddd.interface import BusinessException
+from learning_unit.ddd.repository.load_achievement import load_achievements
 
 ILLEGAL_CHARACTERS_RE = re.compile(r'[\000-\010]|[\013-\014]|[\016-\037]')
 
@@ -352,7 +353,8 @@ def _get_optional_data(data: List, luy: DddLearningUnitYear, optional_data_neede
     if optional_data_needed['has_language']:
         data.append(luy.main_language)
     if optional_data_needed['has_specifications']:
-        specifications_data = _build_specifications_cols(luy.achievements, luy.specifications)
+        achievements = load_achievements(luy.acronym, luy.year)
+        specifications_data = _build_specifications_cols(achievements, luy.specifications)
         for k, v in zip(specifications_data._fields, specifications_data):
             data.append(v)
     if optional_data_needed['has_description_fiche']:
@@ -379,7 +381,7 @@ def _build_validate_html_list_to_string(value_param, method):
     return ""
 
 
-def _build_specifications_cols(achievements: List[Achievement], specifications: Specifications):
+def _build_specifications_cols(achievements: List['Achievement'], specifications: Specifications):
     dict_achievement = _build_achievements(achievements)
     return SpecificationsCols(
         themes_discussed=_build_validate_html_list_to_string(specifications.themes_discussed, html2text),
