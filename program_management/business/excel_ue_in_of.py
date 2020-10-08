@@ -64,7 +64,8 @@ from program_management.ddd.repositories.program_tree import ProgramTreeReposito
 from program_management.forms.custom_xls import CustomXlsForm
 from program_management.ddd.service.read import get_program_tree_version_from_node_service
 from program_management.ddd import command
-
+from program_management.ddd.domain.exception import ProgramTreeVersionNotFoundException
+from osis_common.ddd.interface import BusinessException
 
 ILLEGAL_CHARACTERS_RE = re.compile(r'[\000-\010]|[\013-\014]|[\016-\037]')
 
@@ -188,8 +189,8 @@ def _build_excel_lines_ues(custom_xls_form: CustomXlsForm, tree: 'ProgramTree'):
             if learning_unit_years:
                 luy = learning_unit_years[0]
 
-                link = tree.get_first_link_occurence_using_node(child_node)
                 parents_data = get_explore_parents(tree.get_parents(path))
+                link = tree.get_link(parents_data[DIRECT_GATHERING_KEY], child_node)
 
                 if not parents_data[EXCLUDE_UE_KEY]:
                     content.append(_get_optional_data(
@@ -452,8 +453,7 @@ def _build_main_gathering_label(gathering_node: 'Node') -> str:
         return "{}{} - {}".format(
             gathering_node.title,
             pgm_tree_version.version_label if pgm_tree_version else '',
-            gathering_node.offer_partial_title_fr if gathering_node.is_finality() else gathering_node.group_title_fr) \
-            if gathering_node else ''
+            gathering_node.offer_partial_title_fr if gathering_node.is_finality() else gathering_node.group_title_fr)
     return '-'
 
 
@@ -512,7 +512,7 @@ def _get_program_tree_version(year: int, code: str):
     try:
         return get_program_tree_version_from_node_service.get_program_tree_version_from_node(
             get_cmd)
-    except Exception:
+    except (BusinessException, ProgramTreeVersionNotFoundException):
         return None
 
 
