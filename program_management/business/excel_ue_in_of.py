@@ -64,7 +64,6 @@ from program_management.ddd.repositories.program_tree import ProgramTreeReposito
 from program_management.forms.custom_xls import CustomXlsForm
 from program_management.ddd.service.read import get_program_tree_version_from_node_service
 from program_management.ddd import command
-from program_management.ddd.domain.exception import ProgramTreeVersionNotFoundException
 
 
 ILLEGAL_CHARACTERS_RE = re.compile(r'[\000-\010]|[\013-\014]|[\016-\037]')
@@ -159,11 +158,7 @@ class EducationGroupYearLearningUnitsContainedToExcel:
         return {
             'workbook': save_virtual_workbook(self._to_workbook()),
             'title':
-                "{}{}".format(
-                    self.hierarchy.root_node.title,
-                    self.program_tree_version.version_label
-                )
-                if self.program_tree_version else self.hierarchy.root_node.title,
+                _get_xls_title(self.hierarchy, self.program_tree_version),
             'year': self.hierarchy.root_node.year
         }
 
@@ -452,12 +447,14 @@ def _build_direct_gathering_label(direct_gathering_node: 'NodeGroupYear') -> str
 
 
 def _build_main_gathering_label(gathering_node: 'Node') -> str:
-    pgm_tree_version = _get_program_tree_version(gathering_node.year, gathering_node.code)
-    return "{}{} - {}".format(
-        gathering_node.title,
-        pgm_tree_version.version_label if pgm_tree_version else '',
-        gathering_node.offer_partial_title_fr if gathering_node.is_finality() else gathering_node.group_title_fr) \
-        if gathering_node else ''
+    if gathering_node:
+        pgm_tree_version = _get_program_tree_version(gathering_node.year, gathering_node.code)
+        return "{}{} - {}".format(
+            gathering_node.title,
+            pgm_tree_version.version_label if pgm_tree_version else '',
+            gathering_node.offer_partial_title_fr if gathering_node.is_finality() else gathering_node.group_title_fr) \
+            if gathering_node else ''
+    return '-'
 
 
 def volumes_information(lecturing_volume, practical_volume):
@@ -515,5 +512,12 @@ def _get_program_tree_version(year: int, code: str):
     try:
         return get_program_tree_version_from_node_service.get_program_tree_version_from_node(
             get_cmd)
-    except ProgramTreeVersionNotFoundException:
+    except Exception:
         return None
+
+
+def _get_xls_title(tree: 'ProgramTree', program_tree_version: 'ProgramTreeVersion') -> str:
+    return "{}{}".format(
+        tree.root_node.title,
+        program_tree_version.version_label
+    ) if program_tree_version else tree.root_node.title

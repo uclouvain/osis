@@ -58,13 +58,17 @@ from program_management.business.excel_ue_in_of import FIX_TITLES, \
     optional_header_for_session_derogation, optional_header_for_specifications, optional_header_for_teacher_list, \
     _fix_data, _get_workbook_for_custom_xls, _build_legend_sheet, LEGEND_WB_CONTENT, LEGEND_WB_STYLE, _optional_data, \
     _build_excel_lines_ues, _get_optional_data, BOLD_FONT, _build_specifications_cols, _build_description_fiche_cols, \
-    _build_validate_html_list_to_string, _build_direct_gathering_label, _build_main_gathering_label, get_explore_parents
+    _build_validate_html_list_to_string, _build_direct_gathering_label, _build_main_gathering_label, \
+    get_explore_parents, _get_xls_title
 from program_management.business.utils import html2text
 from program_management.forms.custom_xls import CustomXlsForm
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 from program_management.tests.factories.element import ElementGroupYearFactory, ElementLearningUnitYearFactory
+from program_management.tests.ddd.factories.program_tree_version import StandardProgramTreeVersionFactory, \
+    ProgramTreeVersionFactory
+from program_management.ddd.business_types import *
 
 PARTIAL_ACRONYM = 'Partial'
 
@@ -191,8 +195,6 @@ class TestContent(TestCase):
         root_node = NodeGroupYearFactory(node_type=GroupType.COMMON_CORE)
         link = LinkFactory(parent=root_node)
         root_node = link.parent
-
-        # ProgramTreeFactory(root_node=root_node)
 
         self.assertIsNone(get_explore_parents([root_node])[MAIN_GATHERING_KEY])
 
@@ -556,7 +558,7 @@ def get_expected_data_new(child_node, luy, link, main_gathering=None):
     return expected
 
 
-class TestRowHeight(TestCase):
+class TestXlsContent(TestCase):
 
     @classmethod
     def setUpTestData(cls):
@@ -696,6 +698,18 @@ class TestRowHeight(TestCase):
 
         self._assert_correct_ue_present_in_xls2(bachelor_tree, ['UE21', 'UE22', 'UE23'])
 
+    def test_get_title_with_version_name(self):
+        tree_version = ProgramTreeVersionFactory(version_name='CEMS')
+        tree = tree_version.tree
+
+        self.assertEqual(_get_xls_title(tree_version.tree, tree_version), _assert_format_title(tree, tree_version))
+
+    def test_get_title_without_version_name(self):
+        tree_version = StandardProgramTreeVersionFactory()
+        tree = tree_version.tree
+
+        self.assertEqual(_get_xls_title(tree_version.tree, tree_version), _assert_format_title(tree, tree_version))
+
     def _assert_correct_ue_present_in_xls2(self, tree, ues):
         data = _build_excel_lines_ues(CustomXlsForm({}, year=self.root_node.year, code=self.root_node.code), tree)
         content = data['content']
@@ -703,3 +717,10 @@ class TestRowHeight(TestCase):
         self.assertEqual(len(content), len(ues))
         self.assertCountEqual([content[0][0], content[1][0],
                                content[2][0]], ues)
+
+
+def _assert_format_title(tree: 'ProgramTree', tree_version: 'ProgramTreeVersion') -> str:
+    return "{}{}".format(
+        tree.root_node.title,
+        tree_version.version_label
+    ) if tree_version else tree.root_node.title
