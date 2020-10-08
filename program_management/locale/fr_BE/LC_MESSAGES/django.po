@@ -238,9 +238,6 @@ msgstr "Commentaire"
 msgid "Content"
 msgstr "Contenu"
 
-msgid "Copied element"
-msgstr "Elément copié"
-
 msgid "Courses not taught"
 msgstr "Activité non dispensée en"
 
@@ -252,9 +249,6 @@ msgstr "Créd. rel./abs."
 
 msgid "Credits"
 msgstr "crédits"
-
-msgid "Cut element"
-msgstr "Elément coupé"
 
 msgid "Decree category"
 msgstr "Catégorie décret"
