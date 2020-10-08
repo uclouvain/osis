@@ -23,11 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import time
 from typing import List, Set, Dict
 
 from django.db import transaction
-from django.db.models import Q, F
+from django.db.models import F
 
 from base.models.enums.link_type import LinkTypes
 from base.models.group_element_year import GroupElementYear
@@ -35,7 +34,6 @@ from osis_common.decorators.deprecated import deprecated
 from program_management.ddd.business_types import *
 from program_management.ddd.repositories import _persist_prerequisite
 from program_management.models.element import Element
-
 
 ElementId = int
 
@@ -128,6 +126,7 @@ def __delete_links(tree: 'ProgramTree', node: 'Node'):
         __delete_links(tree, link.child)
 
 
+# TODO treat case when outside of mini and training. Also delete prerequisite
 def __persist_deleted_prerequisites(tree: 'ProgramTree', node: 'Node'):
     if node.is_learning_unit():
         _persist_prerequisite._persist(tree.root_node, node)

@@ -113,8 +113,10 @@ class Prerequisite:
         return all_prerequisites
 
     def remove_all_prerequisite_items(self):
-        for prerequisite_item in set(self.get_all_prerequisite_items()):
-            self.remove_prerequisite_item(prerequisite_item.code, prerequisite_item.year)
+        self.prerequisite_item_groups = []
+        self.has_changed = True
+        # for prerequisite_item in set(self.get_all_prerequisite_items()):
+        #     self.remove_prerequisite_item(prerequisite_item.code, prerequisite_item.year)
 
     def remove_prerequisite_item(self, code: str, year: int) -> None:
         self.has_changed = any(
