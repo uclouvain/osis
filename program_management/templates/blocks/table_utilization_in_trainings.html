@@ -1,0 +1,20 @@
+{% load i18n static %}
+
+{% for root in row.training_nodes %}
+    <ul style="padding-left: 15px;">
+        <li>
+            <a href="{{ root.direct_gathering.url }}">
+                {{ root.direct_gathering.parent.title }}{{ root.version_name }}
+            </a>
+            {% if root.root_nodes %}
+                <ul><li>
+                    {% for root_node in root.root_nodes %}
+                        {% if forloop.first %}{% trans 'Included in' %} : {% else %} - {% endif %}
+                        <a href="{{ root_node.url }}">{{ root_node.root.title }}{{ root_node.version_name }}</a>
+                        {% if forloop.last %}{% endif %}
+                    {% endfor %}</li>
+                </ul>
+            {% endif %}
+        </li>
+    </ul>
+{% endfor %}

@@ -37,7 +37,6 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _, get_language
 from django.views.decorators.http import require_http_methods
 
-import program_management.ddd.repositories.find_roots
 from base import models as mdl
 from base.business.learning_unit import get_cms_label_data, \
     get_same_container_year_components, CMS_LABEL_SPECIFICATIONS, get_achievements_group_by_language, \
@@ -66,6 +65,8 @@ from base.views.learning_units.common import get_common_context_learning_unit_ye
 from cms.models.text_label import TextLabel
 from cms.models.translated_text_label import TranslatedTextLabel
 from reference.models.language import find_language_in_settings
+from program_management.ddd.service.read.get_utilization_rows import get_utilizations
+from program_management.ddd.domain.node import NodeIdentity
 
 ORGANIZATION_KEYS = ['ALLOCATION_ENTITY', 'REQUIREMENT_ENTITY',
                      'ADDITIONAL_REQUIREMENT_ENTITY_1', 'ADDITIONAL_REQUIREMENT_ENTITY_2',
@@ -79,19 +80,7 @@ def learning_unit_formations(request, learning_unit_year_id=None, code=None, yea
                                                     code, year)
     learn_unit_year = context["learning_unit_year"]
 
-    if hasattr(learn_unit_year, 'element'):
-        group_elements_years = learn_unit_year.element.children_elements.select_related(
-            "parent_element", "child_element", "parent_element__group_year__education_group_type"
-        ).order_by('parent_element__group_year__partial_acronym')
-        education_groups_years = [group_element_year.child_element for group_element_year in group_elements_years]
-        formations_by_educ_group_year = program_management.ddd.repositories.find_roots.find_roots(
-            education_groups_years,
-            as_instances=True,
-            with_parents_of_parents=True
-        )
-        context['formations_by_educ_group_year'] = formations_by_educ_group_year
-        context['group_elements_years'] = group_elements_years
-
+    context['formations_by_educ_group_year'] = _get_ue_utilization_in_of(context, learn_unit_year)
     context['root_formations'] = education_group_year.find_with_enrollments_count(learn_unit_year)
     context['total_formation_enrollments'] = 0
     context['total_learning_unit_enrollments'] = 0
@@ -540,3 +529,27 @@ def proposal_is_on_future_year(proposal, base_luy):
 
 def proposal_is_on_same_year(proposal, base_luy):
     return proposal.learning_unit_year.academic_year.year == base_luy.academic_year.year
+
+
+def _get_ue_utilization_in_of(context, learn_unit_year):
+    group_elements_years_utilization = []
+    if hasattr(learn_unit_year, 'element'):
+        group_elements_years = learn_unit_year.element.children_elements.select_related(
+            "parent_element", "child_element", "parent_element__group_year__education_group_type"
+        ).order_by('parent_element__group_year__partial_acronym')
+
+        context['group_elements_years'] = group_elements_years
+
+        for group_element_year in group_elements_years:
+            if group_element_year.parent_element.group_year:
+                utilization_rows = get_utilizations(
+                    NodeIdentity(code=group_element_year.parent_element.group_year.partial_acronym,
+                                 year=group_element_year.parent_element.group_year.academic_year.year
+                                 ),
+                    context.get('language')
+                )
+
+                group_elements_years_utilization.append(
+                    {'group_element_year': group_element_year, 'utilization_rows': utilization_rows}
+                )
+    return group_elements_years_utilization
