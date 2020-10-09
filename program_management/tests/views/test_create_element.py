@@ -51,7 +51,7 @@ class TestSelectTypeCreateView(TestCase):
 
         expected_error_msg = pgettext_lazy(
             "male",
-            "It is impossible to create a %(category)s under %(parent_type)s"
+            "It is impossible to create a %(category)s under a parent type of %(parent_type)s"
         ) % {
             'category': str(Categories.GROUP.value).lower(),
             'parent_type': str(GroupType.COMMON_CORE.value).lower()
