@@ -90,12 +90,12 @@ class SelectTypeCreateElementView(LoginRequiredMixin, AjaxTemplateMixin, FormVie
         if self.kwargs['category'] == Categories.GROUP.name:
             error = pgettext_lazy(
                 "male",
-                "It is impossible to create a %(category)s under %(parent_type)s"
+                "It is impossible to create a %(category)s under a parent type of %(parent_type)s"
             )
         else:
             error = pgettext_lazy(
                 "female",
-                "It is impossible to create a %(category)s under %(parent_type)s"
+                "It is impossible to create a %(category)s under a parent type of %(parent_type)s"
             )
         return error % {
             'category': str(Categories.get_value(self.kwargs['category'])).lower(),
