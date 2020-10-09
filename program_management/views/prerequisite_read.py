@@ -52,7 +52,7 @@ class LearningUnitPrerequisiteTraining(PermissionRequiredMixin, LearningUnitGene
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
-        context["can_modify_prerequisite"] = False  # TODO: Fix with U.S. OSIS-4987
+        context["can_modify_prerequisite"] = self.request.user.has_perm('base.change_prerequisite', context.get("root"))
         context["program_links"] = self.program_tree.get_all_links()
         context["is_prerequisite_of_list"] = context["node"].get_is_prerequisite_of()
         return context
