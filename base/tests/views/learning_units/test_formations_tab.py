@@ -135,12 +135,6 @@ class TestLearningUnitFormationsTab(TestCase):
                                    self.elem_education_group_version_formation_great_parent_2.pk]
                                   )
 
-        with self.subTest('3'):
-            self.assertCountEqual(
-                list(response.context['group_elements_years']),
-                [self.group_element_year]
-            )
-
     def test_tab_active_url(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, HttpResponse.status_code)
