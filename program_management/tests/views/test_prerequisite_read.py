@@ -92,7 +92,7 @@ class TestLearningUnitPrerequisiteTraining(TestCase):
 
     def test_valid_context_permission(self):
         response = self.client.get(self.url)
-        self.assertTemplateUsed(response, "learning_unit/tab_prerequisite_training.html")
+        self.assertIn("can_modify_prerequisite", response.context)
 
 
 class TestLearningUnitPrerequisiteGroup(TestCase):
