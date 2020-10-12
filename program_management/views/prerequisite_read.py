@@ -50,9 +50,15 @@ class LearningUnitPrerequisiteTraining(PermissionRequiredMixin, LearningUnitGene
     permission_required = 'base.view_educationgroup'
     raise_exception = True
 
+    def get_permission_object(self):
+        return self.get_context_data().get("root")
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
-        context["can_modify_prerequisite"] = self.request.user.has_perm('base.change_prerequisite', context.get("root"))
+        context["can_modify_prerequisite"] = self.request.user.has_perm(
+            'base.change_prerequisite',
+            self.get_permission_object()
+        )
         context["program_links"] = self.program_tree.get_all_links()
         context["is_prerequisite_of_list"] = context["node"].get_is_prerequisite_of()
         return context
