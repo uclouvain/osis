@@ -104,13 +104,11 @@ def _get_leaf_view_attribute_serializer(link: 'Link', path: str, tree: 'ProgramT
 
 
 def __get_css_class(link: 'Link'):
-    return {
-               ProposalType.CREATION.name: "proposal proposal_creation",
-               ProposalType.MODIFICATION.name: "proposal proposal_modification",
-               ProposalType.TRANSFORMATION.name: "proposal proposal_transformation",
-               ProposalType.TRANSFORMATION_AND_MODIFICATION.name: "proposal proposal_transformation_modification",
-               ProposalType.SUPPRESSION.name: "proposal proposal_suppression"
-           }.get(link.child.proposal_type) or ""
+    return {ProposalType.CREATION.name: "proposal proposal_creation",
+            ProposalType.MODIFICATION.name: "proposal proposal_modification",
+            ProposalType.TRANSFORMATION.name: "proposal proposal_transformation",
+            ProposalType.TRANSFORMATION_AND_MODIFICATION.name: "proposal proposal_transformation_modification",
+            ProposalType.SUPPRESSION.name: "proposal proposal_suppression"}.get(link.child.proposal_type) or ""
 
 
 def __get_title(obj: 'Link') -> str:
