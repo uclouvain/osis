@@ -30,13 +30,9 @@ register = template.Library()
 
 @register.filter
 def empty(utilization_rows):
-    if utilization_rows:
-        if len(utilization_rows) <= 0:
-            return True
-        else:
-            for row in utilization_rows:
-                if len(row['training_nodes']) > 0:
-                    return False
-            return True
-    else:
-        return True
+    if isinstance(utilization_rows, list):
+        for row in utilization_rows:
+            if len(row['training_nodes']) > 0:
+                return False
+
+    return True

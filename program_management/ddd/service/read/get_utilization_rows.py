@@ -35,10 +35,8 @@ from program_management.ddd.service.read import search_program_trees_using_node_
 
 from program_management.ddd.command import GetProgramTreesFromNodeCommand
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
-from program_management.serializers.node_view import get_program_tree_version_name, get_program_tree_version_title, \
-    get_program_tree_version_dict
+from program_management.serializers.node_view import get_program_tree_version_name, get_program_tree_version_dict
 from program_management.ddd.domain.program_tree import get_nearest_parents
-from program_management.ddd.domain.service.identity_search import ProgramTreeIdentitySearch
 
 
 def get_utilizations(node_identity: 'NodeIdentity', language: str) -> List[Dict[str, Any]]:
