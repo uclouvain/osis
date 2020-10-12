@@ -57,8 +57,8 @@ from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories import node as node_repository
 from program_management.ddd.service.read import element_selected_service, check_paste_node_service
-from program_management.forms.tree.paste import PasteNodesFormset, paste_form_factory, PasteToMinorMajorListChoiceForm, \
-    PasteToOptionListChoiceForm, PasteMinorMajorListToMinorMajorListChoiceForm
+from program_management.forms.tree.paste import PasteNodesFormset, paste_form_factory, PasteToOptionListChoiceForm, \
+    PasteToMinorMajorListChoiceForm, PasteMinorMajorListToMinorMajorListChoiceForm
 
 
 class PasteNodesView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageMixin, FormView):
@@ -187,9 +187,9 @@ class PasteNodesView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, SuccessMess
         for link_identity in link_identities_ids:
             messages.append(
                 _("\"%(child)s\" has been %(copy_message)s into \"%(parent)s\"") % {
-                      "child": self.__get_node_str(link_identity.child_code, link_identity.child_year),
-                      "copy_message": _("pasted") if ElementCache(self.request.user.id).cached_data else _("added"),
-                      "parent": self.__get_node_str(link_identity.parent_code, link_identity.parent_year),
+                    "child": self.__get_node_str(link_identity.child_code, link_identity.child_year),
+                    "copy_message": _("pasted") if ElementCache(self.request.user.id).cached_data else _("added"),
+                    "parent": self.__get_node_str(link_identity.parent_code, link_identity.parent_year),
                 }
             )
         return messages
@@ -225,7 +225,7 @@ class PasteNodesView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, SuccessMess
             PasteToMinorMajorListChoiceForm,
             PasteToOptionListChoiceForm,
             PasteMinorMajorListToMinorMajorListChoiceForm
-        ))for form in formset)
+        )) for form in formset)
 
     def get_success_url(self):
         return
