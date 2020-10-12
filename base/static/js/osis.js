@@ -146,7 +146,13 @@ var browser_supported_versions = {
 
 function displayInfoMessage(jsonResponse, containerId) {
     let message_info_container = document.getElementById(containerId);
-    message_info_container.innerHTML = jsonResponse['success_message'];
+
+    let message_body_container = message_info_container.querySelector(".body");
+    if (message_body_container){
+        message_body_container.innerHTML = jsonResponse['success_message'];
+    } else{
+        message_info_container.innerHTML = jsonResponse['success_message'];
+    }
     message_info_container.style.display = "block";
     message_info_container.style.visibility = "visible";
 }
