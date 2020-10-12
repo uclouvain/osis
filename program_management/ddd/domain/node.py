@@ -354,7 +354,7 @@ class Node(interface.Entity):
         return list_child_nodes_types
 
     @property
-    def descendents(self) -> OrderedDict['Path', 'Node']:   # TODO :: add unit tests
+    def descendents(self) -> Dict['Path', 'Node']:   # TODO :: add unit tests
         return _get_descendents(self)
 
     def update_link_of_direct_child_node(
@@ -421,7 +421,7 @@ class Node(interface.Entity):
         self.children[index+1].order_up()
 
 
-def _get_descendents(root_node: Node, current_path: 'Path' = None) -> OrderedDict['Path', 'Node']:
+def _get_descendents(root_node: Node, current_path: 'Path' = None) -> Dict['Path', 'Node']:
     _descendents = OrderedDict()
     if current_path is None:
         current_path = str(root_node.pk)
