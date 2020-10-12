@@ -37,8 +37,7 @@ from program_management.tests.ddd.factories.node import NodeLearningUnitYearFact
     NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory, \
-    StandardProgramTreeVersionFactory
-from program_management.views.tree.update import UpdateLinkView
+    ProgramTreeVersionIdentityFactory
 
 
 def form_valid_effect(form: UpdateLinkForm):
@@ -156,7 +155,7 @@ class TestUpdateLinkView(TestCase):
             mock_get_tree_version
     ):
         mock_get_tree.return_value = self.tree
-        mock_get_tree_version.return_value = StandardProgramTreeVersionFactory()
+        mock_get_tree_version.return_value = ProgramTreeVersionIdentityFactory(is_transition=False, version_name='')
         self.client.post(self.url, data={})
         self.assertTrue(mock_service.called, msg="View must call update node service")
 
