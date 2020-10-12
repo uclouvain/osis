@@ -24,11 +24,13 @@
 #
 ##############################################################################
 from django.db.models import Prefetch
+from django.shortcuts import get_object_or_404
 
 import program_management.ddd.repositories.find_roots
 from base.models.education_group_year import EducationGroupYear
 from base.models.prerequisite import Prerequisite
 from base.views.common import display_business_warning_messages
+from education_group.models.group_year import GroupYear
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd.validators._prerequisites_items import PrerequisiteItemsValidator
 from program_management.views.generic import LearningUnitGeneric
@@ -51,7 +53,7 @@ class LearningUnitPrerequisiteTraining(PermissionRequiredMixin, LearningUnitGene
     raise_exception = True
 
     def get_permission_object(self):
-        return self.get_context_data().get("root")
+        return GroupYear.objects.get(element__pk=self.program_tree.root_node.pk)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
