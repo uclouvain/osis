@@ -480,15 +480,18 @@ def get_explore_parents(parents_of_ue: List['Node']) -> Dict[str, 'Node']:
             if not direct_parent:
                 direct_parent = parent
 
-            if parent.is_training() or parent.is_mini_training() or \
-                    parent.node_type in [GroupType.COMPLEMENTARY_MODULE]:
+            if option_list and parent.is_finality():
+                exclude_ue_from_list = True
+            else:
+                if parent.is_training() or parent.is_mini_training() or \
+                        parent.node_type in [GroupType.COMPLEMENTARY_MODULE]:
 
-                main_parent = parent
+                    main_parent = parent
             if parent.node_type in [GroupType.OPTION_LIST_CHOICE]:
                 option_list = True
             if option_list and parent.is_finality():
                 exclude_ue_from_list = True
-            if exclude_ue_from_list or (direct_parent and main_parent):
+            if exclude_ue_from_list:
                 break
 
     return {
