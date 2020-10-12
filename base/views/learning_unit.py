@@ -80,7 +80,7 @@ def learning_unit_formations(request, learning_unit_year_id=None, code=None, yea
                                                     code, year)
     learn_unit_year = context["learning_unit_year"]
 
-    context['formations_by_educ_group_year'] = _get_ue_utilization_in_of(learn_unit_year)
+    context['formations_by_educ_group_year'] = _get_ue_utilization_in_of(learn_unit_year, context.get('language'))
     context['root_formations'] = education_group_year.find_with_enrollments_count(learn_unit_year)
     context['total_formation_enrollments'] = 0
     context['total_learning_unit_enrollments'] = 0
@@ -531,7 +531,7 @@ def proposal_is_on_same_year(proposal, base_luy):
     return proposal.learning_unit_year.academic_year.year == base_luy.academic_year.year
 
 
-def _get_ue_utilization_in_of(learn_unit_year):
+def _get_ue_utilization_in_of(learn_unit_year, language):
     group_elements_years_utilization = []
     if hasattr(learn_unit_year, 'element'):
         group_elements_years = learn_unit_year.element.children_elements.select_related(
@@ -544,7 +544,7 @@ def _get_ue_utilization_in_of(learn_unit_year):
                     NodeIdentity(code=group_element_year.parent_element.group_year.partial_acronym,
                                  year=group_element_year.parent_element.group_year.academic_year.year
                                  ),
-                    context.get('language')
+                    language
                 )
 
                 group_elements_years_utilization.append(
