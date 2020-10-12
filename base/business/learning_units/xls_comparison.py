@@ -254,7 +254,6 @@ def _get_acronym(learning_unit_yr, new_line, first_data):
 def _get_volumes(component, components):
     volumes = components[component]
     return [
-        component.acronym if component.acronym else EMPTY_VALUE,
         volumes.get(VOLUME_Q1, EMPTY_VALUE),
         volumes.get(VOLUME_Q2, EMPTY_VALUE),
         volumes.get(VOLUME_TOTAL, EMPTY_VALUE),
