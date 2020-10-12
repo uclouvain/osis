@@ -42,11 +42,11 @@ import program_management.ddd.command
 from base.utils.cache import ElementCache
 from base.views.common import display_warning_messages, display_success_messages, display_error_messages
 from base.views.mixins import AjaxTemplateMixin
-from education_group.templatetags.academic_year_display import display_as_academic_year
 from education_group.ddd import command as command_education_group
 from education_group.ddd.domain.exception import GroupNotFoundException
 from education_group.ddd.service.read import get_group_service
 from education_group.models.group_year import GroupYear
+from education_group.templatetags.academic_year_display import display_as_academic_year
 from osis_common.ddd import interface
 from osis_role import errors
 from osis_role.contrib.views import AjaxPermissionRequiredMixin
@@ -57,7 +57,7 @@ from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories import node as node_repository
 from program_management.ddd.service.read import element_selected_service, check_paste_node_service
-from program_management.forms.tree.paste import PasteNodesFormset, paste_form_factory, PasteToMinorMajorListChoiceForm,\
+from program_management.forms.tree.paste import PasteNodesFormset, paste_form_factory, PasteToMinorMajorListChoiceForm, \
     PasteToOptionListChoiceForm, PasteMinorMajorListToMinorMajorListChoiceForm
 
 
@@ -203,7 +203,7 @@ class PasteNodesView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, SuccessMess
                 "code": group_obj.code,
                 "abbreviated_title": group_obj.abbreviated_title,
                 "version": "[{}]".format(version_identity.version_name)
-                if version_identity and not version_identity.is_standard else "",
+                if version_identity and not version_identity.is_standard() else "",
                 "year": group_obj.academic_year
             }
         except GroupNotFoundException:

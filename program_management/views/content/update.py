@@ -13,24 +13,22 @@ from base.views.common import display_success_messages, display_error_messages
 from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import exception, group
-from education_group.ddd.domain.exception import GroupNotFoundException
 from education_group.ddd.service.read import get_group_service, get_multiple_groups_service
-from osis_common.ddd import interface
-from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
-from program_management.forms import content as content_forms
-from education_group.templatetags.academic_year_display import display_as_academic_year
 from learning_unit.ddd import command as command_learning_unit_year
 from learning_unit.ddd.business_types import *
 from learning_unit.ddd.domain import learning_unit_year
 from learning_unit.ddd.service.read import get_multiple_learning_unit_years_service
+from osis_common.ddd import interface
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command as command_program_management
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception as program_exception
+from program_management.ddd.domain.service.get_program_tree_version_for_tree import get_program_tree_version_for_tree
+from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.service.read import get_program_tree_service, get_program_tree_version_from_node_service
 from program_management.ddd.service.write import bulk_update_link_service
+from program_management.forms import content as content_forms
 from program_management.models.enums.node_type import NodeType
-from program_management.ddd.domain.service.get_program_tree_version_for_tree import get_program_tree_version_for_tree
 
 
 class ContentUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
@@ -185,7 +183,7 @@ class ContentUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "code": node.code,
             "abbreviated_title": node.title,
             "version": "[{}]".format(version_identity.version_name)
-            if version_identity and not version_identity.is_standard else "",
+            if version_identity and not version_identity.is_standard() else "",
             "year": node.academic_year
         }
 

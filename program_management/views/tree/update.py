@@ -38,8 +38,8 @@ from education_group.models.group_year import GroupYear
 from osis_common.ddd import interface
 from osis_common.ddd.interface import BusinessException
 from osis_role.contrib.views import AjaxPermissionRequiredMixin
-from program_management.ddd.business_types import *
 from program_management.ddd import command
+from program_management.ddd.business_types import *
 from program_management.ddd.domain import node
 from program_management.ddd.domain.node import NodeGroupYear
 from program_management.ddd.domain.node import NodeIdentity
@@ -122,7 +122,7 @@ class UpdateLinkView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, FormView):
             "code": node.code,
             "abbreviated_title": node.title,
             "version": "[{}]".format(version_identity.version_name)
-            if version_identity and not version_identity.is_standard else "",
+            if version_identity and not version_identity.is_standard() else "",
             "year": node.academic_year
         }
 
