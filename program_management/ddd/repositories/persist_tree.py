@@ -126,7 +126,6 @@ def __delete_links(tree: 'ProgramTree', node: 'Node'):
         __delete_links(tree, link.child)
 
 
-# TODO treat case when outside of mini and training. Also delete prerequisite
 def __persist_deleted_prerequisites(tree: 'ProgramTree', node: 'Node'):
     if node.is_learning_unit():
         _persist_prerequisite._persist(tree.root_node, node)
