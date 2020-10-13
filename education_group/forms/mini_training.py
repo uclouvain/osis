@@ -136,7 +136,7 @@ class MiniTrainingForm(ValidationRuleMixin, forms.Form):
     def __init_management_entity_field(self):
         self.fields['management_entity'] = fields.ManagementEntitiesChoiceField(
             person=self.user.person,
-            initial=None,
+            initial=self.initial.get('management_entity'),
             disabled=self.fields['management_entity'].disabled,
         )
 

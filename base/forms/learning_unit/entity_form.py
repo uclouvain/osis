@@ -27,6 +27,9 @@ from django import forms
 from django.utils import timezone
 
 from base.models.entity_version import EntityVersion
+from learning_unit.auth.roles.central_manager import CentralManager
+from learning_unit.auth.roles.faculty_manager import FacultyManager
+from osis_role.contrib.forms.fields import EntityRoleChoiceField
 
 
 class EntitiesVersionChoiceField(forms.ModelChoiceField):
@@ -43,6 +46,29 @@ class EntitiesVersionChoiceField(forms.ModelChoiceField):
         ev_data = super().clean(value)
         self.entity_version = ev_data
         return ev_data.entity if ev_data else None
+
+
+class EntitiesVersionRoleChoiceField(EntityRoleChoiceField):
+    entity_version = None
+
+    def __init__(self, person=None, initial=None, *args, **kwargs):
+        group_names = (FacultyManager.group_name, CentralManager.group_name, )
+        self.initial = initial
+        super().__init__(
+            person=person,
+            group_names=group_names,
+            **kwargs,
+        )
+
+    def label_from_instance(self, obj):
+        return obj.verbose_title
+
+    def get_queryset(self):
+        qs = super().get_queryset().pedagogical_entities().order_by('acronym')
+        if self.initial:
+            date = timezone.now()
+            qs |= EntityVersion.objects.current(date).filter(acronym=self.initial)
+        return qs
 
 
 def find_additional_requirement_entities_choices():
