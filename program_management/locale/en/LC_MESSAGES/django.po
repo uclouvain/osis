@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-05 12:54+0200\n"
+"POT-Creation-Date: 2020-10-09 11:09+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -33,7 +33,10 @@ msgid "%(node)s has been moved"
 msgstr ""
 
 #, python-format
-msgid "%(node_to_add)s version must be the same as %(root_node)s version"
+msgid ""
+"%(node_to_add)s [%(node_to_add_version)s] version must be the same as "
+"%(node_to_paste_to)s and all of it's parent's version "
+"[%(version_mismatched)s]"
 msgstr ""
 
 #, python-format
@@ -211,7 +214,7 @@ msgstr ""
 msgid "Content"
 msgstr ""
 
-msgid "Copied element"
+msgid "Continue"
 msgstr ""
 
 msgid "Courses not taught"
@@ -224,9 +227,6 @@ msgid "Cred. rel./abs."
 msgstr ""
 
 msgid "Credits"
-msgstr ""
-
-msgid "Cut element"
 msgstr ""
 
 msgid "Decree category"
@@ -333,6 +333,20 @@ msgid "Internship"
 msgstr ""
 
 msgid "Invalid tree path"
+msgstr ""
+
+#, python-format
+msgctxt "female"
+msgid ""
+"It is impossible to create a %(category)s under a parent type of "
+"%(parent_type)s"
+msgstr ""
+
+#, python-format
+msgctxt "male"
+msgid ""
+"It is impossible to create a %(category)s under a parent type of "
+"%(parent_type)s"
 msgstr ""
 
 #, python-format
