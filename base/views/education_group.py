@@ -191,9 +191,11 @@ def save_form_to_admission_condition_line(education_group_year_id: int, creation
                                                      pk=admission_condition_line_id)
     else:
         section = form.cleaned_data['section']
-        education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
+        admission_condition, created = AdmissionCondition.objects.get_or_create(
+            education_group_year_id=education_group_year_id
+        )
         admission_condition_line = AdmissionConditionLine.objects.create(
-            admission_condition=education_group_year.admissioncondition,
+            admission_condition=admission_condition,
             section=section)
 
     admission_condition_line.access = form.cleaned_data['access']
