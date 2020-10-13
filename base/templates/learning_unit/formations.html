@@ -1,7 +1,7 @@
 {% extends "learning_unit/layout_detail.html" %}
 {% load static %}
 {% load i18n %}
-{% load dictionnary %}
+{% load dictionnary empty %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
 * designed to manage the core business of higher education institutions,
@@ -29,7 +29,7 @@
 {% block content_tab %}
     <div class="panel-body" id="tabs">
         <br>
-        {% if group_elements_years %}
+        {% if formations_by_educ_group_year %}
             <div class="panel panel-default">
                 <div class="panel-heading">
                     {% blocktrans with acronym=learning_unit_year.acronym %}The learning unit {{ acronym }} is included in the following education groups{% endblocktrans %}
@@ -49,7 +49,8 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {% for group_element_year in group_elements_years %}
+                                {% for elt in formations_by_educ_group_year %}
+                                    {% with utilization_rows=elt.utilization_rows group_element_year=elt.group_element_year %}
                                     {% url 'group_identification' group_element_year.parent_element.group_year.academic_year.year group_element_year.parent_element.group_year.partial_acronym as url_education_group_year %}
                                     <tr>
                                         <td>
@@ -61,37 +62,19 @@
                                         <td>{{ group_element_year.parent_element.group_year.education_group_type | default_if_none:'-' }}</td>
                                         <td>{{ group_element_year.block | default_if_none:'-' }}</td>
                                         <td>
-                                            <ul>
-                                                {% for training in formations_by_educ_group_year|get_item:group_element_year.parent_element_id %}
-                                                    {% with training.group_year.educationgroupversion.offer as offer %}
-                                                    {% url 'training_identification' offer.academic_year.year offer.partial_acronym as url_education_group_yr %}
-                                                    <li>
-                                                        <a href="{{ url_education_group_yr }}">{{ offer.acronym }}
-                                                            - {{ offer.title }}</a>
-                                                        {% if formations_by_educ_group_year|get_item:training.id %}
-                                                            <ul>
-                                                                <li>
-                                                                    {% trans 'Included in' %} :
-                                                                    {% for parent_training in formations_by_educ_group_year|get_item:training.id %}
-                                                                        {% with parent_training.group_year.educationgroupversion.offer as parent_offer %}
-                                                                        {% url 'training_identification' parent_training.group_year.academic_year.year parent_training.group_year.partial_acronym as url_parent_training %}
-                                                                        <a href="{{ url_parent_training }}">{{ parent_offer.acronym }}</a>
-                                                                        {% if not forloop.last %} - {% endif %}
-                                                                        {% endwith %}
-                                                                    {% endfor %}
-                                                                </li>
-                                                            </ul>
-                                                        {% endif %}
-                                                    </li>
-                                                    {% endwith %}
-                                                {% endfor %}
-                                            </ul>
+                                            {% for row in utilization_rows %}
+                                                {% include "blocks/table_utilization_in_trainings.html" %}
+                                            {% endfor %}
+                                            {% if utilization_rows|empty %}
+                                                -
+                                            {% endif %}
                                         </td>
                                         <td class="text-center">
                                             {{ group_element_year.relative_credits | default_if_none:'-' }}
                                             / {{ group_element_year.child_element.learning_unit_year.credits.normalize | default_if_none:'-' }}
                                         </td>
                                     </tr>
+                                    {% endwith %}
                                 {% endfor %}
                                 </tbody>
                             </table>

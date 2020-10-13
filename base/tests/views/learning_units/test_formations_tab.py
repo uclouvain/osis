@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,15 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from unittest import skip
-
 from django.http import HttpResponse
 from django.test import TestCase
 from django.urls import reverse
 
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory, TrainingFactory
+from base.tests.factories.education_group_year import TrainingFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFullFactory
@@ -123,20 +121,19 @@ class TestLearningUnitFormationsTab(TestCase):
     def test_formations_tab(self):
         response = self.client.get(self.url)
         with self.subTest('1'):
-            self.assertCountEqual(response.context['formations_by_educ_group_year'].get(self.elem_learning_unit_year.pk),
-                                  [self.elem_group_year])
+            self.assertEqual(response.context['formations_by_educ_group_year'][0]['group_element_year'],
+                             self.group_element_year)
         with self.subTest('2'):
-            self.assertCountEqual(response.context['formations_by_educ_group_year'].get(self.elem_group_year.pk),
-                                  [self.elem_education_group_version_formation_parent,
-                                   self.elem_education_group_version_formation_great_parent_1,
-                                   self.elem_education_group_version_formation_great_parent_2]
+            parents_id = []
+            utilization_rows = response.context['formations_by_educ_group_year'][0]['utilization_rows']
+            parents_id.append(utilization_rows[0]['link'].parent.pk)
+            parents_id.append(utilization_rows[1]['link'].parent.pk)
+            parents_id.append(utilization_rows[2]['link'].parent.pk)
+            self.assertCountEqual(parents_id,
+                                  [self.elem_education_group_version_formation_parent.pk,
+                                   self.elem_education_group_version_formation_great_parent_1.pk,
+                                   self.elem_education_group_version_formation_great_parent_2.pk]
                                   )
-
-        with self.subTest('3'):
-            self.assertCountEqual(
-                list(response.context['group_elements_years']),
-                [self.group_element_year]
-            )
 
     def test_tab_active_url(self):
         response = self.client.get(self.url)
