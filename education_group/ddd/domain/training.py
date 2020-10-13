@@ -281,7 +281,7 @@ class Training(interface.RootEntity):
         data_as_dict = attr.asdict(data, recurse=False)
         for field, new_value in data_as_dict.items():
             setattr(self, field, new_value)
-        validators_by_business_action.UpdateTrainingValidatorList(self)
+        validators_by_business_action.UpdateTrainingValidatorList(self).validate()
         return self
 
     def update_from_other_training(self, other_training: 'Training'):
