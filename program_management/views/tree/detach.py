@@ -25,11 +25,11 @@
 ##############################################################################
 from typing import Union
 
+import osis_common.ddd.interface
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 
-import osis_common.ddd.interface
 from base.utils.cache import ElementCache
 from base.views.common import display_error_messages, display_warning_messages
 from base.views.common import display_success_messages

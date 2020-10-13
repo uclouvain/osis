@@ -27,6 +27,7 @@ import functools
 import itertools
 from typing import List, Union
 
+import osis_common.ddd.interface
 from django import shortcuts
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
@@ -37,7 +38,6 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 from django.views.generic.base import View
 
-import osis_common.ddd.interface
 import program_management.ddd.command
 from base.utils.cache import ElementCache
 from base.views.common import display_warning_messages, display_success_messages, display_error_messages
