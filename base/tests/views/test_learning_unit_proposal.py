@@ -756,7 +756,6 @@ class TestEditProposal(TestCase):
         cls.generated_container = GenerateContainer(cls.current_academic_year, end_year)
         cls.generated_container_first_year = cls.generated_container.generated_container_years[1]
         cls.learning_unit_year = cls.generated_container_first_year.learning_unit_year_full
-        cls.learning_unit_year
         cls.requirement_entity_of_luy = cls.generated_container_first_year.requirement_entity_container_year
         cls.person = FacultyManagerFactory(entity=cls.requirement_entity_of_luy).person
 
@@ -818,10 +817,12 @@ class TestEditProposal(TestCase):
             "common_title": "Common UE title",
             "language": self.language.pk,
             "periodicity": learning_unit_year_periodicity.ANNUAL,
-            "entity": self.entity_version.id,
+            "entity": self.entity_version.acronym,
             "folder_id": 1,
-            'requirement_entity': self.entity_version.id,
-            'allocation_entity': self.entity_version.id,
+            'requirement_entity':
+                self.generated_container_first_year.requirement_entity_container_year.most_recent_acronym,
+            'allocation_entity':
+                self.generated_container_first_year.requirement_entity_container_year.most_recent_acronym,
             'additional_entity_1': '',
 
             # Learning component year data model form
@@ -855,7 +856,8 @@ class TestEditProposal(TestCase):
         request = request_factory.post(self.url, data=self.get_modify_data())
 
         request.user = self.person.user
-        request.session = 'session'
+        request.session = self.client.session
+
         request._messages = FallbackStorage(request)
 
         update_learning_unit_proposal(request, learning_unit_year_id=self.learning_unit_year.id)
@@ -910,7 +912,7 @@ class TestEditProposal(TestCase):
         request.session = 'session'
         request._messages = FallbackStorage(request)
 
-        update_learning_unit_proposal(request, self.learning_unit_year.id)
+        update_learning_unit_proposal(request, learning_unit_year_id=self.learning_unit_year.id)
 
         msg = [m.message for m in get_messages(request)]
         msg_level = [m.level for m in get_messages(request)]

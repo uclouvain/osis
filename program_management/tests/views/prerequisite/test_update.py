@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import json
 
 import mock
 from django.http import HttpResponseForbidden, HttpResponseNotFound
@@ -31,9 +30,8 @@ from django.test import TestCase
 from django.urls import reverse
 
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_year import GroupFactory, EducationGroupYearBachelorFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory, GroupElementYearChildLeafFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory, LearningUnitYearFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory

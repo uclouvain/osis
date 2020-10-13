@@ -32,6 +32,7 @@ from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.attribution_new import AttributionNew
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from attribution.tests.views.charge_repartition.common import TestChargeRepartitionMixin
+from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 
 
 class TestSelectAttributionView(TestChargeRepartitionMixin, TestCase):
@@ -91,6 +92,7 @@ class TestAddChargeRepartition(TestChargeRepartitionMixin, TestCase):
         super().setUp()
         self.clean_partim_charges()
         self.url = reverse("add_charge_repartition", args=[self.learning_unit_year.id, self.attribution_full.id])
+        self.manager = CentralManagerFactory()
 
     def test_login_required(self):
         self.client.logout()
@@ -107,16 +109,15 @@ class TestAddChargeRepartition(TestChargeRepartitionMixin, TestCase):
 
     def test_post(self):
         data = {
-            'lecturing_form-allocation_charge': 50,
-            'practical_form-allocation_charge': 10
+            'lecturing_charge_form-allocation_charge': 50,
+            'practical_charge_form-allocation_charge': 10
         }
         response = self.client.post(self.url, data=data)
-
-        AttributionChargeNew.objects.get(learning_component_year=self.lecturing_component,
-                                         allocation_charge=50)
-        AttributionChargeNew.objects.get(learning_component_year=self.practical_component,
-                                         allocation_charge=10)
-        attribution_partim = AttributionNew.objects.exclude(id=self.attribution_full.id).get(tutor=self.attribution_full.tutor)
+        AttributionChargeNew.objects.get(learning_component_year=self.lecturing_component, allocation_charge=50)
+        AttributionChargeNew.objects.get(learning_component_year=self.practical_component, allocation_charge=10)
+        attribution_partim = AttributionNew.objects.exclude(id=self.attribution_full.id).get(
+            tutor=self.attribution_full.tutor
+        )
         self.assertNotEqual(attribution_partim.external_id, self.attribution_full.external_id)
         self.assertIsNone(attribution_partim.external_id)
         self.assertRedirects(response,

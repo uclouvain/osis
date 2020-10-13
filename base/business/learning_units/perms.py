@@ -55,8 +55,8 @@ def is_eligible_to_update_learning_unit_pedagogy(learning_unit_year, person):
     :param person: Person
     :return: bool
     """
-    if person.user.has_perm('base.can_edit_learningunit_pedagogy', learning_unit_year):
-        return True
+    if not person.user.has_perm('base.can_edit_learningunit_pedagogy', learning_unit_year):
+        return False
     # Case Tutor: We need to check if today is between submission date
     if tutor.is_tutor(person.user):
         return CanUserEditEducationalInformation(
