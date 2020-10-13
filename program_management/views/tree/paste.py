@@ -203,7 +203,7 @@ class PasteNodesView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, SuccessMess
                 "code": group_obj.code,
                 "abbreviated_title": group_obj.abbreviated_title,
                 "version": "[{}]".format(version_identity.version_name)
-                if version_identity and not version_identity.is_standard() else "",
+                           if version_identity and not version_identity.is_standard() else "",
                 "year": group_obj.academic_year
             }
         except GroupNotFoundException:

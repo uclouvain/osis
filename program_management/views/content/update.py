@@ -183,7 +183,7 @@ class ContentUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "code": node.code,
             "abbreviated_title": node.title,
             "version": "[{}]".format(version_identity.version_name)
-            if version_identity and not version_identity.is_standard() else "",
+                       if version_identity and not version_identity.is_standard() else "",
             "year": node.academic_year
         }
 

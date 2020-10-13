@@ -176,7 +176,7 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
             "abbreviated_title": '' if isinstance(self.child_obj, LearningUnitYear)
             else "- " + self.child_obj.abbreviated_title,
             "version": "[{}]".format(self.child_version_identity.version_name)
-            if self.child_version_identity and not self.child_version_identity.is_standard() else "",
+                       if self.child_version_identity and not self.child_version_identity.is_standard() else "",
             "year": display_as_academic_year(self.child_obj.year)
         }
 
@@ -185,7 +185,7 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
             "code": self.parent_group_obj.code,
             "abbreviated_title": self.parent_group_obj.abbreviated_title,
             "version": "[{}]".format(self.parent_version_identity.version_name)
-            if self.parent_version_identity and not self.parent_version_identity.is_standard() else "",
+                       if self.parent_version_identity and not self.parent_version_identity.is_standard() else "",
             "year": self.parent_group_obj.academic_year
         }
 
