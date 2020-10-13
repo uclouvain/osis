@@ -45,15 +45,15 @@ class LearningUnitPrerequisite(PermissionRequiredMixin, LearningUnitGeneric):
             return LearningUnitPrerequisiteTraining.as_view()(request, *args, **kwargs)
         return LearningUnitPrerequisiteGroup.as_view()(request, *args, **kwargs)
 
+    def get_permission_object(self):
+        return GroupYear.objects.get(element__pk=self.program_tree.root_node.pk)
+
 
 class LearningUnitPrerequisiteTraining(PermissionRequiredMixin, LearningUnitGeneric):
     template_name = "learning_unit/tab_prerequisite_training.html"
 
     permission_required = 'base.view_educationgroup'
     raise_exception = True
-
-    def get_permission_object(self):
-        return GroupYear.objects.get(element__pk=self.program_tree.root_node.pk)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
@@ -76,6 +76,9 @@ class LearningUnitPrerequisiteTraining(PermissionRequiredMixin, LearningUnitGene
                 self.request,
                 validator.messages
             )
+
+    def get_permission_object(self):
+        return GroupYear.objects.get(element__pk=self.program_tree.root_node.pk)
 
 
 class LearningUnitPrerequisiteGroup(PermissionRequiredMixin, LearningUnitGeneric):
@@ -101,3 +104,6 @@ class LearningUnitPrerequisiteGroup(PermissionRequiredMixin, LearningUnitGeneric
         )
         context["formations"] = qs.prefetch_related(prefetch_prerequisites)
         return context
+
+    def get_permission_object(self):
+        return GroupYear.objects.get(element__pk=self.program_tree.root_node.pk)
