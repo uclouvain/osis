@@ -253,28 +253,28 @@ def education_group_year_admission_condition_update_text_post(request, education
     if form.is_valid():
         education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
         section = form.cleaned_data['section']
-
-        admission_condition = AdmissionCondition.objects.get_or_create(education_group_year=education_group_year)
-
-        setattr(admission_condition[0], 'text_' + section, form.cleaned_data['text_fr'])
-        setattr(admission_condition[0], 'text_' + section + '_en', form.cleaned_data['text_en'])
-        admission_condition[0].save()
+        admission_condition, created = AdmissionCondition.objects.get_or_create(
+            education_group_year=education_group_year
+        )
+        setattr(admission_condition, 'text_' + section, form.cleaned_data['text_fr'])
+        setattr(admission_condition, 'text_' + section + '_en', form.cleaned_data['text_en'])
+        admission_condition.save()
 
     training_identity = TrainingIdentitySearch().get_from_education_group_year_id(education_group_year_id)
     return redirect(_get_admission_condition_success_url(training_identity.year, training_identity.acronym))
 
 
 def education_group_year_admission_condition_update_text_get(request, education_group_year_id: int):
-    admission_condition = AdmissionCondition.objects.get_or_create(education_group_year_id=education_group_year_id)
+    admission_condition, created = AdmissionCondition.objects.get_or_create(
+        education_group_year_id=education_group_year_id
+    )
     section = request.GET['section']
     title = request.GET['title']
-
     form = UpdateTextForm(initial={
         'section': section,
-        'text_fr': getattr(admission_condition[0], 'text_' + section),
-        'text_en': getattr(admission_condition[0], 'text_' + section + '_en'),
+        'text_fr': getattr(admission_condition, 'text_' + section),
+        'text_en': getattr(admission_condition, 'text_' + section + '_en'),
     })
-
     context = {
         'form': form,
         'title': title,
