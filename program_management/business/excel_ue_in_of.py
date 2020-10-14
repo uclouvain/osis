@@ -36,7 +36,8 @@ from openpyxl.styles import Style, Font
 from openpyxl.writer.excel import save_virtual_workbook
 
 from attribution.business import attribution_charge_new
-from base.business.learning_unit import CMS_LABEL_PEDAGOGY, CMS_LABEL_PEDAGOGY_FR_AND_EN, CMS_LABEL_SPECIFICATIONS
+from base.business.learning_unit import CMS_LABEL_PEDAGOGY, CMS_LABEL_PEDAGOGY_FR_AND_EN, CMS_LABEL_SPECIFICATIONS, \
+    CMS_LABEL_PEDAGOGY_FORCE_MAJEURE
 from base.business.learning_unit_xls import volume_information, annotate_qs, PROPOSAL_LINE_STYLES, \
     prepare_proposal_legend_ws_data
 from base.business.learning_units.xls_generator import hyperlinks_to_string
@@ -91,6 +92,9 @@ optional_header_for_description_fiche = [
     _('Teaching material'),
     _('bibliography').title(),
     _('Mobility'),
+    _('Teaching methods (force majeure)'), "{} {}".format(_('Teaching methods (force majeure)'), _('in English')),
+    _('Evaluation methods (force majeure)'), "{} {}".format(_('Evaluation methods (force majeure)'), _('in English')),
+    _('Other informations (force majeure)'), "{} {}".format(_('Other informations (force majeure)'), _('in English')),
 ]
 
 optional_header_for_specifications = [
@@ -142,13 +146,17 @@ class EducationGroupYearLearningUnitsContainedToExcel:
         self._get_ordered_queryset()
         description_fiche = False
         specifications = False
+        force_majeure = False
 
         if custom_xls_form.is_valid():
             description_fiche = True if 'description_fiche' in custom_xls_form.fields else False
             specifications = True if 'specifications' in custom_xls_form.fields else False
+            force_majeure = True if 'force_majeure' in custom_xls_form.fields else False
 
-        if description_fiche or specifications:
-            self.qs = _annotate_with_description_fiche_specifications(self.qs, description_fiche, specifications)
+        if description_fiche or specifications or force_majeure:
+            self.qs = _annotate_with_description_fiche_specifications(
+                self.qs, description_fiche, specifications, force_majeure
+            )
 
     def _get_ordered_queryset(self):
         ids = []
@@ -312,8 +320,8 @@ def _get_optional_data(data, luy, optional_data_needed, gey):
         data.extend(volume_information(luys[0]))
     if optional_data_needed['has_teacher_list']:
         attribution_values = attribution_charge_new.find_attribution_charge_new_by_learning_unit_year_as_dict(
-                    luy
-                ).values()
+            luy
+        ).values()
         data.append(
             ";".join(
                 [_get_attribution_line(value.get('person'))
@@ -351,7 +359,9 @@ def _get_optional_data(data, luy, optional_data_needed, gey):
     return data
 
 
-def _annotate_with_description_fiche_specifications(group_elt_yrs_param, description_fiche=False, specifications=False):
+def _annotate_with_description_fiche_specifications(
+        group_elt_yrs_param, description_fiche=False, specifications=False, force_majeure=False
+):
     group_element_years = group_elt_yrs_param
     sq = TranslatedText.objects.filter(
         reference=OuterRef('child_leaf__pk'),
@@ -364,11 +374,14 @@ def _annotate_with_description_fiche_specifications(group_elt_yrs_param, descrip
         annotations = build_annotations(sq, CMS_LABEL_SPECIFICATIONS, CMS_LABEL_SPECIFICATIONS)
         group_element_years = group_element_years.annotate(**annotations)
 
+    if force_majeure:
+        annotations = build_annotations(sq, CMS_LABEL_PEDAGOGY_FORCE_MAJEURE, CMS_LABEL_PEDAGOGY_FORCE_MAJEURE)
+        group_element_years = group_element_years.annotate(**annotations)
+
     return group_element_years
 
 
 def _build_validate_html_list_to_string(value_param, method):
-
     if method is None or method not in (hyperlinks_to_string, html2text):
         return value_param.strip()
 
