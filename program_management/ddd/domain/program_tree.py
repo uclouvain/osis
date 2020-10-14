@@ -314,6 +314,9 @@ class ProgramTree(interface.RootEntity):
             return set(n for n in all_nodes if n.node_type in types)
         return all_nodes
 
+    def get_all_learning_unit_nodes(self) -> List['NodeLearningUnitYear']:
+        return self.root_node.get_all_children_as_learning_unit_nodes()
+
     def get_nodes_by_type(self, node_type_value) -> Set['Node']:
         return {node for node in self.get_all_nodes() if node.type == node_type_value}
 

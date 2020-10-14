@@ -482,6 +482,10 @@ class NodeLearningUnitYear(Node):
     volume_total_lecturing = attr.ib(type=Decimal, default=None)
     volume_total_practical = attr.ib(type=Decimal, default=None)
 
+    def equals(self, learning_unit_year) -> bool:
+        return learning_unit_year.entity_id.code == self.entity_id.code \
+               and learning_unit_year.entity_id.year == self.entity_id.year
+
     @property
     def full_title_fr(self) -> str:
         return _get_full_title(self.common_title_fr, self.specific_title_fr)

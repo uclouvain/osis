@@ -180,29 +180,30 @@ def _build_excel_lines_ues(custom_xls_form: CustomXlsForm, tree: 'ProgramTree'):
     font_rows = defaultdict(list)
     idx = 1
 
+    learning_unit_years = load_multiple_by_identity(
+        [
+            LearningUnitYearIdentity(code=learn_unt_child.code, year=learn_unt_child.year)
+            for learn_unt_child in tree.get_all_learning_unit_nodes()
+        ]
+    )
+
     for path, child_node in tree.root_node.descendents.items():
-        if isinstance(child_node, NodeLearningUnitYear):
-            learning_unit_years = load_multiple_by_identity([LearningUnitYearIdentity(
-                code=child_node.code,
-                year=child_node.year
-            )])
+        if child_node.is_learning_unit():
+            luy = next(child for child in learning_unit_years if child_node.equals(child))
 
-            if learning_unit_years:
-                luy = learning_unit_years[0]
+            parents_data = get_explore_parents(tree.get_parents(path))
+            link = tree.get_link(parents_data[DIRECT_GATHERING_KEY], child_node)
 
-                parents_data = get_explore_parents(tree.get_parents(path))
-                link = tree.get_link(parents_data[DIRECT_GATHERING_KEY], child_node)
-
-                if not parents_data[EXCLUDE_UE_KEY]:
-                    content.append(_get_optional_data(
-                        _fix_data(link, luy, parents_data),
-                        luy,
-                        optional_data_needed,
-                        link
-                    ))
-                    if luy.proposal and luy.proposal.type:
-                        font_rows[PROPOSAL_LINE_STYLES.get(luy.proposal.type)].append(idx)
-                    idx += 1
+            if not parents_data[EXCLUDE_UE_KEY]:
+                content.append(_get_optional_data(
+                    _fix_data(link, luy, parents_data),
+                    luy,
+                    optional_data_needed,
+                    link
+                ))
+                if luy.proposal and luy.proposal.type:
+                    font_rows[PROPOSAL_LINE_STYLES.get(luy.proposal.type)].append(idx)
+                idx += 1
     font_rows[BOLD_FONT].append(0)
     return {
         'content': content,
@@ -353,7 +354,7 @@ def _get_optional_data(data: List, luy: DddLearningUnitYear, optional_data_neede
     if optional_data_needed['has_language']:
         data.append(luy.main_language)
     if optional_data_needed['has_specifications']:
-        achievements = load_achievements(luy.acronym, luy.year)
+        achievements = load_achievements(luy.acronym, luy.year)  # TODO :: perf : load multiple before the forloop
         specifications_data = _build_specifications_cols(achievements, luy.specifications)
         for k, v in zip(specifications_data._fields, specifications_data):
             data.append(v)
