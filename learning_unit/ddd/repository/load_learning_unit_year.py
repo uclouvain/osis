@@ -77,54 +77,9 @@ def load_multiple(learning_unit_year_ids: List[int]) -> List['LearningUnitYear']
     return results
 
 
-def __convert_string_to_enum(learn_unit_data: dict) -> dict:
-    subtype_str = learn_unit_data['type']
-    learn_unit_data['type'] = LearningContainerYearType[subtype_str]
-    if learn_unit_data.get('quadrimester'):
-        learn_unit_data['quadrimester'] = DerogationQuadrimester[learn_unit_data['quadrimester']]
-    learn_unit_data['subtype'] = dict(LEARNING_UNIT_YEAR_SUBTYPES)[learn_unit_data['subtype']]
-    return learn_unit_data
-
-
-def _annotate_with_description_fiche_specifications(original_qs1):
-    original_qs = original_qs1
-    qs = TranslatedText.objects.filter(
-        reference=OuterRef('pk'),
-        entity=LEARNING_UNIT_YEAR)
-
-    annotations = build_annotations(
-        qs,
-        CMS_LABEL_PEDAGOGY+CMS_LABEL_SPECIFICATIONS,
-        CMS_LABEL_PEDAGOGY_FR_AND_EN+CMS_LABEL_SPECIFICATIONS
-    )
-    original_qs = original_qs.annotate(**annotations)
-
-    return original_qs
-
-
-def build_annotations(qs: QuerySet, fr_labels: list, en_labels: list):
-    annotations = {
-        "cms_{}".format(lbl): Subquery(
-            _build_subquery_text_label(qs, lbl, settings.LANGUAGE_CODE_FR))
-        for lbl in fr_labels
-    }
-
-    annotations.update({
-        "cms_{}_en".format(lbl): Subquery(
-            _build_subquery_text_label(qs, lbl, settings.LANGUAGE_CODE_EN))
-        for lbl in en_labels}
-    )
-    return annotations
-
-
-def _build_subquery_text_label(qs, cms_text_label, lang):
-
-    return qs.filter(text_label__label="{}".format(cms_text_label), language=lang).values(
-        'text')[:1]
-
-
-def load_multiple_by_identity(learning_unit_year_identities: List['LearningUnitYearIdentity']) \
-        -> List['LearningUnitYear']:
+def load_multiple_by_identity(
+        learning_unit_year_identities: List['LearningUnitYearIdentity']
+) -> List['LearningUnitYear']:
 
     filter_by_identity = _build_where_clause(learning_unit_year_identities[0])
 
@@ -212,6 +167,15 @@ def __instanciate_learning_unit_year(
         teaching_materials=teaching_materials,
         attributions=attributions,
     )
+
+
+def __convert_string_to_enum(learn_unit_data: dict) -> dict:
+    subtype_str = learn_unit_data['type']
+    learn_unit_data['type'] = LearningContainerYearType[subtype_str]
+    if learn_unit_data.get('quadrimester'):
+        learn_unit_data['quadrimester'] = DerogationQuadrimester[learn_unit_data['quadrimester']]
+    learn_unit_data['subtype'] = dict(LEARNING_UNIT_YEAR_SUBTYPES)[learn_unit_data['subtype']]
+    return learn_unit_data
 
 
 def __get_queryset() -> QuerySet:
@@ -302,3 +266,40 @@ def __get_queryset() -> QuerySet:
     qs = _annotate_with_description_fiche_specifications(qs)
 
     return qs
+
+
+def _annotate_with_description_fiche_specifications(original_qs1):
+    original_qs = original_qs1
+    qs = TranslatedText.objects.filter(
+        reference=OuterRef('pk'),
+        entity=LEARNING_UNIT_YEAR)
+
+    annotations = __build_annotations(
+        qs,
+        CMS_LABEL_PEDAGOGY+CMS_LABEL_SPECIFICATIONS,
+        CMS_LABEL_PEDAGOGY_FR_AND_EN+CMS_LABEL_SPECIFICATIONS
+    )
+    original_qs = original_qs.annotate(**annotations)
+
+    return original_qs
+
+
+def __build_annotations(qs: QuerySet, fr_labels: list, en_labels: list):
+    annotations = {
+        "cms_{}".format(lbl): Subquery(
+            _build_subquery_text_label(qs, lbl, settings.LANGUAGE_CODE_FR))
+        for lbl in fr_labels
+    }
+
+    annotations.update({
+        "cms_{}_en".format(lbl): Subquery(
+            _build_subquery_text_label(qs, lbl, settings.LANGUAGE_CODE_EN))
+        for lbl in en_labels}
+    )
+    return annotations
+
+
+def _build_subquery_text_label(qs, cms_text_label, lang):
+
+    return qs.filter(text_label__label="{}".format(cms_text_label), language=lang).values(
+        'text')[:1]
