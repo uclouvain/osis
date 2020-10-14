@@ -34,8 +34,10 @@ from base.business.learning_unit import CMS_LABEL_PEDAGOGY, CMS_LABEL_PEDAGOGY_F
 from base.models.entity_version import EntityVersion
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.learning_container_year_types import LearningContainerYearType
+from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from base.models.enums.learning_unit_year_subtypes import LEARNING_UNIT_YEAR_SUBTYPES
-from base.models.enums.quadrimesters import DerogationQuadrimester
+from base.models.enums.quadrimesters import DerogationQuadrimester, LearningUnitYearQuadrimester
+from base.models.learning_achievement import LearningAchievement as LearningAchievementModelDb
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import LearningUnitYear as LearningUnitYearModel
 from cms.enums.entity_name import LEARNING_UNIT_YEAR
@@ -47,20 +49,6 @@ from learning_unit.ddd.domain.proposal import Proposal
 from learning_unit.ddd.domain.specifications import Specifications
 from learning_unit.ddd.repository.load_teaching_material import bulk_load_teaching_materials
 from osis_common.decorators.deprecated import deprecated
-
-
-def __instanciate_volume_domain_object(learn_unit_data: dict) -> dict:
-    learn_unit_data['lecturing_volume'] = LecturingVolume(total_annual=learn_unit_data.pop('pm_vol_tot'),
-                                                          first_quadrimester=learn_unit_data.pop('pm_vol_q1'),
-                                                          second_quadrimester=learn_unit_data.pop('pm_vol_q2'),
-                                                          classes_count=learn_unit_data.pop('pm_classes'),
-                                                          )
-    learn_unit_data['practical_volume'] = PracticalVolume(total_annual=learn_unit_data.pop('pp_vol_tot'),
-                                                          first_quadrimester=learn_unit_data.pop('pp_vol_q1'),
-                                                          second_quadrimester=learn_unit_data.pop('pp_vol_q2'),
-                                                          classes_count=learn_unit_data.pop('pp_classes'),
-                                                          )
-    return learn_unit_data
 
 
 @deprecated  # Use :py:meth:`~learning_unit.ddd.repository.load_learning_unit_year.load_multiple_by_identity` instead !
@@ -89,14 +77,15 @@ def load_multiple_by_identity(
     qs = __get_queryset()
     qs = qs.filter(filter_by_identity)
 
+    # FIXME :: data from another domain : attributions cannot be in Learning Unit Year repository
     attributions = AttributionRepository.search(learning_unit_year_ids=learning_unit_year_identities)
     attributions_by_ue = __build_sorted_attributions_grouped_by_ue(attributions)
 
     teaching_materials_by_learning_unit_identity = bulk_load_teaching_materials(learning_unit_year_identities)
     results = []
     for learning_unit_data in qs:
-        learning_unit_identity = LearningUnitYearIdentity(code=learning_unit_data['acronym'],
-                                                          year=learning_unit_data['year'])
+        learning_unit_identity = LearningUnitYearIdentity(code=learning_unit_data.acronym,
+                                                          year=learning_unit_data.year)
         luy = __instanciate_learning_unit_year(
             learning_unit_data,
             teaching_materials=teaching_materials_by_learning_unit_identity.get(learning_unit_identity, []),
@@ -129,52 +118,85 @@ def __build_sorted_attributions_grouped_by_ue(qs_attributions: List['Attribution
 
 
 def __instanciate_learning_unit_year(
-        learning_unit_data: dict,
+        learning_unit_data: LearningUnitYearModel,
         teaching_materials=None,
         attributions=None
 ) -> LearningUnitYear:
     learning_unit_identity = LearningUnitYearIdentity(
-        code=learning_unit_data['acronym'],
-        year=learning_unit_data['year']
+        code=learning_unit_data.acronym,
+        year=learning_unit_data.year
     )
     return LearningUnitYear(
         entity_id=learning_unit_identity,
-        **__instanciate_volume_domain_object(__convert_string_to_enum(learning_unit_data)),
-        proposal=Proposal(learning_unit_data.pop('proposal_type'),
-                          learning_unit_data.pop('proposal_state')),
-        entities=Entities(requirement_entity_acronym=learning_unit_data.pop('requirement_entity_acronym'),
-                          allocation_entity_acronym=learning_unit_data.pop('allocation_entity_acronym')),
+        id=learning_unit_data.id,
+        year=learning_unit_data.year,
+        acronym=learning_unit_data.acronym,
+        type=LearningContainerYearType[learning_unit_data.type],
+        specific_title_fr=learning_unit_data.specific_title_fr,
+        specific_title_en=learning_unit_data.specific_title_en,
+        common_title_fr=learning_unit_data.common_title_fr,
+        common_title_en=learning_unit_data.common_title_en,
+        start_year=learning_unit_data.start_year,
+        end_year=learning_unit_data.end_year,
+        proposal=Proposal(
+            type=learning_unit_data.proposal_type,
+            state=learning_unit_data.proposal_state,
+        ),
+        credits=learning_unit_data.credits,
+        status=learning_unit_data.status,
+        periodicity=PeriodicityEnum[learning_unit_data.periodicity] if learning_unit_data.periodicity else None,
+        other_remark=learning_unit_data.other_remark,
+        quadrimester=LearningUnitYearQuadrimester[learning_unit_data.quadrimester]
+        if learning_unit_data.quadrimester else None,
+        lecturing_volume=LecturingVolume(
+            total_annual=learning_unit_data.pm_vol_tot,
+            first_quadrimester=learning_unit_data.pm_vol_q1,
+            second_quadrimester=learning_unit_data.pm_vol_q2,
+            classes_count=learning_unit_data.pm_classes,
+        ),
+        practical_volume=PracticalVolume(
+            total_annual=learning_unit_data.pp_vol_tot,
+            first_quadrimester=learning_unit_data.pp_vol_q1,
+            second_quadrimester=learning_unit_data.pp_vol_q2,
+            classes_count=learning_unit_data.pp_classes,
+        ),
+        achievements=[],  # FIXME :: to implement
+        entities=Entities(requirement_entity_acronym=learning_unit_data.requirement_entity_acronym,
+                          allocation_entity_acronym=learning_unit_data.allocation_entity_acronym),
         description_fiche=DescriptionFiche(
-            resume=learning_unit_data.pop('cms_resume'),
-            resume_en=learning_unit_data.pop('cms_resume_en'),
-            teaching_methods=learning_unit_data.pop('cms_teaching_methods'),
-            teaching_methods_en=learning_unit_data.pop('cms_teaching_methods_en'),
-            evaluation_methods=learning_unit_data.pop('cms_evaluation_methods'),
-            evaluation_methods_en=learning_unit_data.pop('cms_evaluation_methods_en'),
-            other_informations=learning_unit_data.pop('cms_other_informations'),
-            other_informations_en=learning_unit_data.pop('cms_other_informations_en'),
-            online_resources=learning_unit_data.pop('cms_online_resources'),
-            online_resources_en=learning_unit_data.pop('cms_online_resources_en'),
-            bibliography=learning_unit_data.pop('cms_bibliography'),
-            mobility=learning_unit_data.pop('cms_mobility')
+            resume=learning_unit_data.cms_resume,
+            resume_en=learning_unit_data.cms_resume_en,
+            teaching_methods=learning_unit_data.cms_teaching_methods,
+            teaching_methods_en=learning_unit_data.cms_teaching_methods_en,
+            evaluation_methods=learning_unit_data.cms_evaluation_methods,
+            evaluation_methods_en=learning_unit_data.cms_evaluation_methods_en,
+            other_informations=learning_unit_data.cms_other_informations,
+            other_informations_en=learning_unit_data.cms_other_informations_en,
+            online_resources=learning_unit_data.cms_online_resources,
+            online_resources_en=learning_unit_data.cms_online_resources_en,
+            bibliography=learning_unit_data.cms_bibliography,
+            mobility=learning_unit_data.cms_mobility
         ),
         specifications=Specifications(
-            themes_discussed=learning_unit_data.pop('cms_themes_discussed'),
-            themes_discussed_en=learning_unit_data.pop('cms_themes_discussed_en'),
-            prerequisite=learning_unit_data.pop('cms_prerequisite'),
-            prerequisite_en=learning_unit_data.pop('cms_prerequisite_en')
+            themes_discussed=learning_unit_data.cms_themes_discussed,
+            themes_discussed_en=learning_unit_data.cms_themes_discussed_en,
+            prerequisite=learning_unit_data.cms_prerequisite,
+            prerequisite_en=learning_unit_data.cms_prerequisite_en
         ),
         teaching_materials=teaching_materials,
+        subtype=learning_unit_data.subtype,
+        session=learning_unit_data.session,
+        main_language=learning_unit_data.main_language,
         attributions=attributions,
     )
 
 
-def __convert_string_to_enum(learn_unit_data: dict) -> dict:
-    subtype_str = learn_unit_data['type']
-    learn_unit_data['type'] = LearningContainerYearType[subtype_str]
-    if learn_unit_data.get('quadrimester'):
-        learn_unit_data['quadrimester'] = DerogationQuadrimester[learn_unit_data['quadrimester']]
-    learn_unit_data['subtype'] = dict(LEARNING_UNIT_YEAR_SUBTYPES)[learn_unit_data['subtype']]
+def __convert_string_to_enum(learn_unit_data: LearningUnitYearModel) -> LearningUnitYearModel:
+    subtype_str = learn_unit_data.type
+    learn_unit_data.type = LearningContainerYearType[subtype_str]
+    if learn_unit_data.quadrimester:
+        learn_unit_data.quadrimester = DerogationQuadrimester[learn_unit_data.quadrimester]
+    learn_unit_data.subtype = dict(LEARNING_UNIT_YEAR_SUBTYPES)[learn_unit_data.subtype]
     return learn_unit_data
 
 
@@ -228,39 +250,6 @@ def __get_queryset() -> QuerySet:
         requirement_entity_acronym=Subquery(subquery_entity_requirement),
         allocation_entity_acronym=Subquery(subquery_allocation_requirement),
 
-    ).values(
-        'id',
-        'year',
-        'acronym',
-        'type',
-        'specific_title_fr',
-        'specific_title_en',
-        'common_title_fr',
-        'common_title_en',
-        'start_year',
-        'end_year',
-        'proposal_type',
-        'proposal_state',
-        'credits',
-        'status',
-        'periodicity',
-        'other_remark',
-        'quadrimester',
-
-        'pm_vol_tot',
-        'pp_vol_tot',
-        'pm_vol_q1',
-        'pp_vol_q1',
-        'pm_vol_q2',
-        'pp_vol_q2',
-        'pm_classes',
-        'pp_classes',
-
-        'requirement_entity_acronym',
-        'allocation_entity_acronym',
-        'subtype',
-        'session',
-        'main_language',
     )
 
     qs = _annotate_with_description_fiche_specifications(qs)
