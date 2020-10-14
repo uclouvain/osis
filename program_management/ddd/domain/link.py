@@ -75,7 +75,10 @@ class Link(interface.Entity):
         return self._has_changed
 
     def __str__(self):
-        return "%(parent)s - %(child)s" % {'parent': self.parent, 'child': self.child}
+        return "{parent.code} ({parent.academic_year}) - {child.code} ({child.academic_year})".format(
+            parent=self.parent,
+            child=self.child
+        )
 
     def __eq__(self, other):
         if isinstance(other, Link):

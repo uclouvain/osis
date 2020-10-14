@@ -138,15 +138,3 @@ class TestUpdateLinkView(TestCase):
         self.client.post(self.url, data={})
         self.assertTrue(mock_form_save.called, msg="View must call form save method")
 
-    @mock.patch(
-        'program_management.ddd.domain.service.identity_search.ProgramTreeVersionIdentitySearch.get_from_node_identity'
-    )
-    @mock.patch('program_management.ddd.repositories.node.NodeRepository.get')
-    @mock.patch('program_management.ddd.repositories.program_tree.ProgramTreeRepository.get')
-    def test_format_title_version_when_available(self, mock_get_tree, mock_get_node, mock_get_tree_version):
-        node_to_update = NodeGroupYearFactory()
-        mock_get_node.return_value = node_to_update
-        mock_get_tree.return_value = self.tree
-        mock_get_tree_version.return_value = ProgramTreeVersionFactory(version_name='TEST')
-        response = self.client.get(self.url)
-        self.assertIn('[TEST]', response.context_data['node'].title)

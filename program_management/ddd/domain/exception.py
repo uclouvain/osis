@@ -25,7 +25,8 @@
 ##############################################################################
 from typing import Iterable, Dict, List
 
-from django.utils.translation import gettext_lazy as _
+from django.conf import settings
+from django.utils.translation import gettext_lazy as _, ngettext
 
 from osis_common.ddd.interface import BusinessException, BusinessExceptions
 from program_management.ddd.business_types import *
@@ -51,6 +52,10 @@ class ProgramTreeNotFoundException(Exception):
         if code or year:
             message = _("Program tree not found : {code} {year}".format(code=code, year=year))
         super().__init__(message, *args)
+
+
+class NodeNotFoundException(Exception):
+    pass
 
 
 class ProgramTreeVersionNotFoundException(Exception):
@@ -136,7 +141,7 @@ class ProgramTreeVersionMismatch(BusinessExceptions):
             self._get_version_name(version_identity) for version_identity in parents_version_mismatched_identity
         }
         messages = [_(
-            "%(node_to_add)s [%(node_to_add_version)s] version must be the same as %(node_to_paste_to)s "
+            "%(node_to_add)s version must be the same as %(node_to_paste_to)s "
             "and all of it's parent's version [%(version_mismatched)s]"
         ) % {
             'node_to_add': str(node_to_add),
@@ -153,9 +158,35 @@ class ProgramTreeVersionMismatch(BusinessExceptions):
 class Program2MEndDateShouldBeGreaterOrEqualThanItsFinalities(BusinessException):
     def __init__(self, finality: 'Node', **kwargs):
         message = _("The end date must be higher or equal to finality %(acronym)s") % {
-            "acronym": finality.title
+            "acronym": str(finality)
         }
         super().__init__(message, **kwargs)
+
+
+class CannotAttachFinalitiesWithGreaterEndDateThanProgram2M(BusinessException):
+    def __init__(self, root_node: 'Node', finalities: List['Node']):
+        message = ngettext(
+            "Finality \"%(acronym)s\" has an end date greater than %(root_acronym)s program.",
+            "Finalities \"%(acronym)s\" have an end date greater than %(root_acronym)s program.",
+            len(finalities)
+        ) % {
+            "acronym": ', '.join([str(node) for node in finalities]),
+            "root_acronym": root_node
+        }
+        super().__init__(message)
+
+
+class CannotAttachOptionIfNotPresentIn2MOptionListException(BusinessException):
+    def __init__(self, root_node: 'Node', options: List['Node']):
+        message = ngettext(
+            "Option \"%(code)s\" must be present in %(root_code)s program.",
+            "Options \"%(code)s\" must be present in %(root_code)s program.",
+            len(options)
+        ) % {
+            "code": ', '.join([str(option) for option in options]),
+            "root_code": root_node
+        }
+        super().__init__(message)
 
 
 class ReferenceLinkNotAllowedWithLearningUnitException(BusinessException):
@@ -188,7 +219,7 @@ class ReferenceLinkNotAllowedException(BusinessException):
         super().__init__(message, **kwargs)
 
     def _format_node(self, node: 'Node') -> str:
-        return "{} - {} ({})".format(node.title, node.code, node.node_type.value)
+        return "{} ({})".format(str(node), node.node_type.value)
 
 
 class InvalidBlockException(BusinessException):
@@ -203,3 +234,76 @@ class InvalidBlockException(BusinessException):
 class BulkUpdateLinkException(Exception):
     def __init__(self, exceptions: Dict[str, 'MultipleBusinessExceptions']):
         self.exceptions = exceptions
+
+
+class CannotPasteToLearningUnitException(BusinessException):
+    def __init__(self, parent_node):
+        message = _("Cannot add any element to learning unit %(parent_node)s") % {
+            "parent_node": parent_node
+        }
+        super().__init__(message)
+
+
+class CannotAttachSameChildToParentException(BusinessException):
+    def __init__(self, child_node):
+        message = _("You can not add the same child %(child_node)s several times.") % {"child_node": child_node}
+        super().__init__(message)
+
+
+class CannotAttachParentNodeException(BusinessException):
+    def __init__(self, child_node: 'Node'):
+        message = _('The child %(child)s you want to attach is a parent of the node you want to attach.') % {
+            'child': child_node
+        }
+        super().__init__(message)
+
+
+class ParentAndChildMustHaveSameAcademicYearException(BusinessException):
+    def __init__(self, parent_node, child_node):
+        message = _("It is prohibited to attach a %(child_node)s to an element of "
+                    "another academic year %(parent_node)s.") % {
+            "child_node": child_node,
+            "parent_node": parent_node
+        }
+        super().__init__(message)
+
+
+class CannotPasteNodeToHimselfException(BusinessException):
+    def __init__(self, child_node: 'Node'):
+        message = _('Cannot attach a node %(node)s to himself.') % {"node": child_node}
+        super().__init__(message)
+
+
+class ChildTypeNotAuthorizedException(BusinessException):
+    def __init__(self, parent_node: 'Node', children_nodes: List['Node']):
+        message = _(
+            "You cannot add \"%(child)s\" to \"%(parent)s\" of type \"%(parent_type)s\""
+        ) % {
+            'child': ', '.join([self._format_node(children_node) for children_node in children_nodes]),
+            'parent': parent_node,
+            'parent_type': parent_node.node_type.value,
+        }
+        super().__init__(message)
+
+    def _format_node(self, node: 'Node') -> str:
+        return "{} ({})".format(str(node), node.node_type.value)
+
+
+class MaximumChildTypesReachedException(BusinessException):
+    def __init__(self, parent_node: 'Node', child_node: 'Node', node_types):
+        message = _(
+            "Cannot add \"%(child)s\" because the number of children of type(s) \"%(child_types)s\" "
+            "for \"%(parent)s\" has already reached the limit.") % {
+            'child': child_node,
+            'child_types': ','.join([str(node_type.value) for node_type in node_types]),
+            'parent': parent_node
+        }
+        super().__init__(message)
+
+
+class MinimumEditableYearException(BusinessException):
+    def __init__(self):
+        message = _("Cannot perform action on a education group before %(limit_year)s") % {
+            "limit_year": settings.YEAR_LIMIT_EDG_MODIFICATION
+        }
+        super().__init__(message)

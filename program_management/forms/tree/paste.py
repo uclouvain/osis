@@ -21,130 +21,31 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from typing import List, Type, Optional
+from typing import List, Optional
 
-from django import forms
-from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.forms import BaseFormSet
 
-from base.forms.utils import choice_field
-from base.models.enums.link_type import LinkTypes
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
+from base.forms.exceptions import InvalidFormException
 from program_management.ddd import command
 from program_management.ddd.business_types import *
-from program_management.ddd.domain import node
-from program_management.ddd.domain.exception import RelativeCreditShouldBeGreaterOrEqualsThanZero, \
-    RelativeCreditShouldBeLowerOrEqualThan999, InvalidBlockException
-from program_management.ddd.repositories import load_node, load_authorized_relationship, node as node_repository
+from program_management.ddd.domain import exception
 from program_management.ddd.service.write import paste_element_service
-from program_management.ddd.validators import _block_validator, _relative_credits
-from program_management.models.enums.node_type import NodeType
+from program_management.forms.content import LinkForm
 
 
-class PasteNodesFormset(BaseFormSet):
+class PasteNodeForm(LinkForm):
 
-    def get_form_kwargs(self, index):
-        if self.form_kwargs:
-            return self.form_kwargs[index]
-        return {}
-
-    @transaction.atomic
-    def save(self) -> List[Optional['LinkIdentity']]:
-        return [form.save() for form in self.forms]
-
-
-def paste_form_factory(
-        self,
-        path_of_node_to_paste_into: str,
-        node_to_paste_code: str,
-        node_to_paste_year: int,
-        **kwargs
-) -> 'PasteNodeForm':
-    form_class = _get_form_class(path_of_node_to_paste_into, node_to_paste_code, node_to_paste_year)
-    return form_class(path_of_node_to_paste_into, node_to_paste_code, node_to_paste_year, **kwargs)
-
-
-def _get_form_class(
-        path_of_node_to_paste_into: str,
-        node_to_paste_code: str,
-        node_to_paste_year: int
-) -> Type['PasteNodeForm']:
-    node_to_paste_into_id = int(path_of_node_to_paste_into.split("|")[-1])
-    node_to_paste_into = load_node.load(node_to_paste_into_id)
-
-    node_identity = node.NodeIdentity(code=node_to_paste_code, year=node_to_paste_year)
-    node_to_paste = node_repository.NodeRepository.get(node_identity)
-
-    authorized_relationship = load_authorized_relationship.load()
-
-    form_class = PasteNodeForm
-
-    if node_to_paste_into.is_minor_major_list_choice() and not node_to_paste.is_minor_major_list_choice():
-        form_class = PasteToMinorMajorListChoiceForm
-    elif node_to_paste_into.is_minor_major_list_choice() and node_to_paste.is_minor_major_list_choice():
-        form_class = PasteMinorMajorListToMinorMajorListChoiceForm
-    elif node_to_paste_into.is_option_list_choice():
-        form_class = PasteToOptionListChoiceForm
-    elif node_to_paste.node_type == NodeType.LEARNING_UNIT:
-        form_class = PasteLearningUnitForm
-    elif node_to_paste_into.is_training() and node_to_paste.is_minor_major_list_choice():
-        form_class = PasteMinorMajorListChoiceToTrainingForm
-    elif not authorized_relationship.is_authorized(node_to_paste_into.node_type, node_to_paste.node_type):
-        form_class = PasteNotAuthorizedChildren
-
-    return form_class
-
-
-class PasteNodeForm(forms.Form):
-    access_condition = forms.BooleanField(required=False)
-    is_mandatory = forms.BooleanField(required=False)
-    block = forms.IntegerField(required=False, widget=forms.widgets.TextInput)
-    link_type = forms.ChoiceField(choices=choice_field.add_blank(LinkTypes.choices()), required=False)
-    comment_fr = forms.CharField(widget=forms.widgets.Textarea, required=False)
-    comment_en = forms.CharField(widget=forms.widgets.Textarea, required=False)
-    relative_credits = forms.IntegerField(widget=forms.widgets.TextInput, required=False)
-
-    def __init__(
-            self,
-            to_path: str,
-            node_to_paste_code: str,
-            node_to_paste_year: int,
-            path_to_detach: str = None,
-            **kwargs
-    ):
-        self.to_path = to_path
-        self.node_code = node_to_paste_code
-        self.node_year = node_to_paste_year
+    def __init__(self, *args, path_to_detach: str, **kwargs):
         self.path_to_detach = path_to_detach
-        super().__init__(**kwargs)
+        super().__init__(*args, **kwargs)
 
-    def clean_block(self):
-        cleaned_block_type = self.cleaned_data.get('block', None)
-        try:
-            _block_validator.BlockValidator(cleaned_block_type).validate()
-        except InvalidBlockException as e:
-            raise ValidationError(e.message)
-        return cleaned_block_type
-
-    def clean_relative_credits(self):
-        cleaned_relative_credits = self.cleaned_data.get('relative_credits', None)
-        try:
-            _relative_credits.RelativeCreditsValidator(cleaned_relative_credits).validate()
-        except (RelativeCreditShouldBeGreaterOrEqualsThanZero, RelativeCreditShouldBeLowerOrEqualThan999) as e:
-            raise ValidationError(e.message)
-        return cleaned_relative_credits
-
-    def save(self) -> Optional['LinkIdentity']:
-        result = None
-        if self.is_valid():
-            result = paste_element_service.paste_element(self._create_paste_command())
-        return result
-
-    def _create_paste_command(self) -> command.PasteElementCommand:
+    def generate_paste_command(self) -> command.PasteElementCommand:
         return command.PasteElementCommand(
-            node_to_paste_code=self.node_code,
-            node_to_paste_year=self.node_year,
-            path_where_to_paste=self.to_path,
+            node_to_paste_code=self.child_obj.code,
+            node_to_paste_year=self.child_obj.year,
+            path_where_to_paste=str(self.parent_obj.node_id),
             access_condition=self.cleaned_data.get("access_condition", False),
             is_mandatory=self.cleaned_data.get("is_mandatory", True),
             block=self.cleaned_data.get("block"),
@@ -152,64 +53,50 @@ class PasteNodeForm(forms.Form):
             comment=self.cleaned_data.get("comment_fr", ""),
             comment_english=self.cleaned_data.get("comment_en", ""),
             relative_credits=self.cleaned_data.get("relative_credits"),
-            path_where_to_detach=self.path_to_detach
+            path_where_to_detach=self.path_to_detach,
+            parent_code=self.parent_obj.code,
+            parent_year=self.parent_obj.year
         )
 
+    def save(self):
+        if self.is_valid():
+            try:
+                return paste_element_service.paste_element(self.generate_paste_command())
+            except MultipleBusinessExceptions as e:
+                self.handle_save_exception(e)
+        raise InvalidFormException()
 
-class PasteLearningUnitForm(PasteNodeForm):
-    access_condition = None
-    link_type = None
-
-
-class PasteMinorMajorListChoiceToTrainingForm(PasteNodeForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        self._disable_all_but_block_fields()
-
-    def _disable_all_but_block_fields(self):
-        for field_name, field in self.fields.items():
-            if field_name != "block":
-                field.disabled = True
-
-
-class PasteToMinorMajorListChoiceForm(PasteNodeForm):
-    is_mandatory = None
-    block = None
-    link_type = None
-    comment_fr = None
-    comment_en = None
-    relative_credits = None
-
-    def _create_paste_command(self) -> command.PasteElementCommand:
-        return command.PasteElementCommand(
-            node_to_paste_code=self.node_code,
-            node_to_paste_year=self.node_year,
-            path_where_to_paste=self.to_path,
-            access_condition=self.cleaned_data.get("access_condition", False),
-            is_mandatory=self.cleaned_data.get("is_mandatory", True),
-            block=self.cleaned_data.get("block"),
-            link_type=LinkTypes.REFERENCE,
-            comment=self.cleaned_data.get("comment", ""),
-            comment_english=self.cleaned_data.get("comment_english", ""),
-            relative_credits=self.cleaned_data.get("relative_credits"),
-            path_where_to_detach=self.path_to_detach
-        )
+    def handle_save_exception(self, business_exceptions: 'MultipleBusinessExceptions'):
+        for e in business_exceptions.exceptions:
+            if isinstance(e, exception.ReferenceLinkNotAllowedException) or \
+                    isinstance(e, exception.ReferenceLinkNotAllowedWithLearningUnitException):
+                self.add_error("link_type", e.message)
+            elif isinstance(e, exception.InvalidBlockException):
+                self.add_error("block", e.message)
+            elif isinstance(e, exception.RelativeCreditShouldBeLowerOrEqualThan999) or \
+                    isinstance(e, exception.RelativeCreditShouldBeGreaterOrEqualsThanZero):
+                self.add_error("relative_credits", e.message)
+            else:
+                self.add_error("", e.message)
 
 
-class PasteMinorMajorListToMinorMajorListChoiceForm(PasteNodeForm):
-    access_condition = forms.BooleanField(initial=False, disabled=True)
+class BasePasteNodesFormset(BaseFormSet):
+    def get_form_kwargs(self, index):
+        if self.form_kwargs:
+            return self.form_kwargs[index]
+        return {}
 
+    @transaction.atomic
+    def save(self) -> List[Optional['LinkIdentity']]:
+        results = []
+        is_a_form_invalid = False
+        for form in self.forms:
+            try:
+                results.append(form.save())
+            except InvalidFormException:
+                is_a_form_invalid = True
 
-class PasteToOptionListChoiceForm(PasteNodeForm):
-    is_mandatory = None
-    block = None
-    link_type = None
-    comment_fr = None
-    comment_en = None
-    relative_credits = None
+        if is_a_form_invalid:
+            raise InvalidFormException()
 
-
-class PasteNotAuthorizedChildren(PasteNodeForm):
-    access_condition = None
-    relative_credits = None
+        return results

@@ -42,6 +42,7 @@ def update_link(cmd: UpdateLinkCommand) -> 'Link':
     return link_updated
 
 
+# TODO rename this method
 def get_updated_link(child_id, tree, update_cmd):
     return tree.update_link(
         parent_path=str(tree.root_node.node_id),

@@ -23,16 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import sys
 from typing import List
 
-from django.utils.translation import ngettext
-
-import osis_common.ddd.interface
 from base.ddd.utils import business_validator
 from base.models.enums.education_group_types import TrainingType
-from program_management import formatter
 from program_management.ddd.business_types import *
-from program_management.ddd.domain.service import identity_search
+from program_management.ddd.domain.exception import CannotAttachFinalitiesWithGreaterEndDateThanProgram2M
 
 
 class AttachFinalityEndDateValidator(business_validator.BusinessValidator):
@@ -52,29 +49,16 @@ class AttachFinalityEndDateValidator(business_validator.BusinessValidator):
 
     def validate(self):
         if self.node_to_add.is_finality() or self.tree_from_node_to_add.get_all_finalities():
-            inconsistent_nodes = self._get_finality_nodes_where_end_date_gte_root_end_date()
-            if inconsistent_nodes:
-                raise osis_common.ddd.interface.BusinessExceptions(
-                    [ngettext(
-                        "Finality \"%(acronym)s\" has an end date greater than %(root_acronym)s program.",
-                        "Finalities \"%(acronym)s\" have an end date greater than %(root_acronym)s program.",
-                        len(inconsistent_nodes)
-                    ) % {
-                        "acronym": ', '.join(self._display_inconsistent_nodes(inconsistent_nodes)),
-                        "root_acronym": formatter.format_program_tree_version_identity(self.tree_version_2m.entity_id)
-                    }]
+            inconsistent_finalities = self._get_finalities_where_end_date_gt_root_end_date()
+            if inconsistent_finalities:
+                raise CannotAttachFinalitiesWithGreaterEndDateThanProgram2M(
+                    self.tree_version_2m.tree.root_node,
+                    inconsistent_finalities
                 )
 
-    def _get_finality_nodes_where_end_date_gte_root_end_date(self) -> List['Node']:
-        root_end_year = self.tree_version_2m.tree.root_node.end_year
+    def _get_finalities_where_end_date_gt_root_end_date(self) -> List['Node']:
+        root_end_year = self.tree_version_2m.tree.root_node.end_year or sys.maxsize
         return [
             finality for finality in self.tree_from_node_to_add.get_all_finalities()
-            if (all([finality.end_year, root_end_year]) and finality.end_year > root_end_year) or
-            (finality.end_year is None and root_end_year is not None)
+            if (finality.end_year or sys.maxsize) > root_end_year
         ]
-
-    def _display_inconsistent_nodes(self, nodes: List['Node']) -> List[str]:
-        node_identities = [node.entity_id for node in nodes]
-        version_identities = identity_search.ProgramTreeVersionIdentitySearch.get_from_node_identities(node_identities)
-        return [formatter.format_program_tree_version_identity(version_identity)
-                for version_identity in version_identities]

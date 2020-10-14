@@ -31,6 +31,7 @@ import attr
 from base.ddd.utils.converters import to_upper_case_converter
 from base.models.authorized_relationship import AuthorizedRelationshipList
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, GroupType
+from base.models.enums.link_type import LinkTypes
 from education_group.ddd.business_types import *
 from osis_common.ddd import interface
 from osis_common.decorators.deprecated import deprecated
@@ -383,23 +384,29 @@ class ProgramTree(interface.RootEntity):
         :param tree_repository: a tree repository
         :return: the created link
         """
+        path_to_paste_to = paste_command.path_where_to_paste
+        node_to_paste_to = self.get_node(path_to_paste_to)
+        if node_to_paste_to.is_minor_major_option_list_choice() and not node_to_paste.is_minor_major_option_list_choice():
+            link_type = LinkTypes.REFERENCE
+        else:
+            link_type = LinkTypes[paste_command.link_type] if paste_command.link_type else None
+
         validator = validators_by_business_action.PasteNodeValidatorList(
             self,
             node_to_paste,
             paste_command,
+            link_type,
             tree_repository,
             tree_version_repository
         )
         validator.validate()
 
-        path_to_paste_to = paste_command.path_where_to_paste
-        node_to_paste_to = self.get_node(path_to_paste_to)
         return node_to_paste_to.add_child(
                 node_to_paste,
                 access_condition=paste_command.access_condition,
                 is_mandatory=paste_command.is_mandatory,
                 block=paste_command.block,
-                link_type=paste_command.link_type,
+                link_type=link_type,
                 comment=paste_command.comment,
                 comment_english=paste_command.comment_english,
                 relative_credits=paste_command.relative_credits

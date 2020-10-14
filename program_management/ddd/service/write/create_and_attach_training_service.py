@@ -59,6 +59,8 @@ def __convert_to_paste_element_cmd(
         node_to_paste_code=create_and_attach_training.code,
         node_to_paste_year=create_and_attach_training.year,
         path_where_to_paste=create_and_attach_training.path_to_paste,
+        parent_year=None,
+        parent_code=None
     )
 
 

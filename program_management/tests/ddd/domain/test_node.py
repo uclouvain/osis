@@ -104,12 +104,13 @@ class TestStr(SimpleTestCase):
 
     def setUp(self):
         code = 'Code'
+        acronym = 'Acronym'
         year = 2019
-        self.node_group_year = NodeGroupYearFactory(code=code, year=year)
+        self.node_group_year = NodeGroupYearFactory(code=code, year=year, title=acronym)
         self.node_learning_unit = NodeLearningUnitYearFactory(code=code, year=year)
 
     def test_node_group_year_str(self):
-        self.assertEqual(str(self.node_group_year), 'Code (2019-20)')
+        self.assertEqual(str(self.node_group_year), 'Acronym - Code (2019-20)')
 
     def test_node_learning_unit_str(self):
         self.assertEqual(str(self.node_learning_unit), 'Code (2019-20)')

@@ -30,6 +30,14 @@ from program_management.ddd.domain import exception
 from testing.mocks import FakeRepository
 
 
+def get_fake_node_repository(root_entities: List['Node']) -> Type['FakeRepository']:
+    class_name = 'FakeNodeRepository'
+    return type(class_name, (FakeRepository,), {
+        "root_entities": root_entities.copy(),
+        "not_found_exception_class": exception.NodeNotFoundException
+    })
+
+
 def get_fake_program_tree_repository(root_entities: List['ProgramTree']) -> Type['FakeRepository']:
     class_name = "FakeProgramTreeRepository"
     return type(class_name, (FakeRepository,), {

@@ -24,9 +24,9 @@
 #
 ##############################################################################
 from django.test import SimpleTestCase
-from django.utils.translation import gettext as _
 
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
+from program_management.ddd.domain.exception import ProgramTreeVersionMismatch
 from program_management.ddd.validators._match_version import MatchVersionValidator
 from program_management.tests.ddd.factories.program_tree import tree_builder
 from program_management.tests.ddd.factories.program_tree_version import StandardProgramTreeVersionFactory, \
@@ -84,23 +84,10 @@ class TestMatchVersionValidator(TestValidatorValidateMixin, SimpleTestCase):
             self.tree_version, tree_to_attach_version
         ])
 
-        expected_message = _(
-            "%(node_to_add)s [%(node_to_add_version)s] version must be the same as %(node_to_paste_to)s "
-            "and all of it's parent's version [%(version_mismatched)s]"
-        ) % {
-            'node_to_add': str(tree_to_attach.root_node),
-            'node_to_add_version': tree_to_attach_version.version_name,
-
-            'node_to_paste_to': str(self.tree.root_node),
-            'version_mismatched': _("Standard")
-        }
-
-        self.assertValidatorRaises(
+        with self.assertRaises(ProgramTreeVersionMismatch):
             MatchVersionValidator(
                 node_to_paste_to=self.tree.root_node,
                 node_to_add=tree_to_attach.root_node,
                 tree_repository=fake_program_tree_repository,
                 tree_version_repository=fake_tree_version_repository
-            ),
-            [expected_message]
-        )
+            ).validate()
