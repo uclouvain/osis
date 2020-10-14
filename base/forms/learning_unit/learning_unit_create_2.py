@@ -262,9 +262,7 @@ class FullForm(LearningUnitBaseForm):
 
         instances_data = self._build_instance_data(self.data, academic_year, proposal)
         super().__init__(instances_data, *args, **kwargs)
-        if self.instance:
-            self._disable_fields()
-        else:
+        if not self.instance:
             self._restrict_academic_years_choice(postposal, proposal_type)
 
     def _restrict_academic_years_choice(self, postposal, proposal_type):

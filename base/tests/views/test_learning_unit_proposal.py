@@ -817,12 +817,12 @@ class TestEditProposal(TestCase):
             "common_title": "Common UE title",
             "language": self.language.pk,
             "periodicity": learning_unit_year_periodicity.ANNUAL,
-            "entity": self.entity_version.acronym,
+            "entity": self.entity_version.pk,
             "folder_id": 1,
             'requirement_entity':
-                self.generated_container_first_year.requirement_entity_container_year.most_recent_acronym,
+                self.generated_container_first_year.requirement_entity_container_year.pk,
             'allocation_entity':
-                self.generated_container_first_year.requirement_entity_container_year.most_recent_acronym,
+                self.generated_container_first_year.requirement_entity_container_year.pk,
             'additional_entity_1': '',
 
             # Learning component year data model form

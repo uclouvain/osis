@@ -67,7 +67,7 @@ class EntitiesVersionRoleChoiceField(EntityRoleChoiceField):
         qs = super().get_queryset().pedagogical_entities().order_by('acronym')
         if self.initial:
             date = timezone.now()
-            qs |= EntityVersion.objects.current(date).filter(acronym=self.initial)
+            qs |= EntityVersion.objects.current(date).filter(pk=self.initial)
         return qs
 
 

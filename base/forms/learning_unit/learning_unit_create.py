@@ -305,7 +305,8 @@ class LearningContainerYearModelForm(PermissionFieldMixin, forms.ModelForm):
                 },
                 forward=['country_requirement_entity'],
             ),
-            label=_('Requirement entity')
+            label=_('Requirement entity'),
+            disabled=self.fields['requirement_entity'].disabled
         )
 
     def __init_allocation_entity_field(self):
@@ -321,7 +322,8 @@ class LearningContainerYearModelForm(PermissionFieldMixin, forms.ModelForm):
                 forward=['country_allocation_entity']
             ),
             queryset=find_pedagogical_entities_version(),
-            label=_('Allocation entity')
+            label=_('Allocation entity'),
+            disabled=self.fields['requirement_entity'].disabled
         )
 
     def __init_additional_entity_1_field(self):
@@ -354,7 +356,8 @@ class LearningContainerYearModelForm(PermissionFieldMixin, forms.ModelForm):
                 forward=['country_additional_entity_1']
             ),
             queryset=find_additional_requirement_entities_choices(),
-            label=_('Additional requirement entity 1')
+            label=_('Additional requirement entity 1'),
+            disabled=self.fields['requirement_entity'].disabled
         )
 
     def __init_additional_entity_2_field(self):
@@ -377,7 +380,8 @@ class LearningContainerYearModelForm(PermissionFieldMixin, forms.ModelForm):
                 forward=['country_additional_entity_2']
             ),
             queryset=find_additional_requirement_entities_choices(),
-            label=_('Additional requirement entity 2')
+            label=_('Additional requirement entity 2'),
+            disabled=self.fields['requirement_entity'].disabled
         )
 
     class Meta:

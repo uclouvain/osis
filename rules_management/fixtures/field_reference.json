@@ -3242,5 +3242,516 @@
             ]
         },
         "model": "rules_management.fieldreference"
+    },
+    {
+        "pk": 313,
+        "fields": {
+            "field_name": "acronym",
+            "context": "",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "pk": 314,
+        "fields": {
+            "field_name": "container_type",
+            "context": "",
+            "content_type": [
+                "base",
+                "learningcontaineryear"
+            ],
+            "groups": [
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "pk": 315,
+        "fields": {
+            "field_name": "internship_subtype",
+            "context": "",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "pk": 316,
+        "fields": {
+            "field_name": "credits",
+            "context": "",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "pk": 317,
+        "fields": {
+            "field_name": "periodicity",
+            "context": "",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "pk": 318,
+        "fields": {
+            "field_name": "language",
+            "context": "",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "pk": 319,
+        "fields": {
+            "field_name": "common_title",
+            "context": "",
+            "content_type": [
+                "base",
+                "learningcontaineryear"
+            ],
+            "groups": [
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "pk": 320,
+        "fields": {
+            "field_name": "common_title_english",
+            "context": "",
+            "content_type": [
+                "base",
+                "learningcontaineryear"
+            ],
+            "groups": [
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "pk": 321,
+        "fields": {
+            "field_name": "specific_title",
+            "context": "",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "central_managers_for_ue"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "pk": 322,
+        "fields": {
+            "field_name": "specific_title_english",
+            "context": "",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "central_managers_for_ue"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "pk": 323,
+        "fields": {
+            "field_name": "quadrimester",
+            "context": "",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "central_managers_for_ue"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "pk": 324,
+        "fields": {
+            "field_name": "session",
+            "context": "",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "central_managers_for_ue"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "pk": 325,
+        "fields": {
+            "field_name": "type_declaration_vacant",
+            "context": "",
+            "content_type": [
+                "base",
+                "learningcontaineryear"
+            ],
+            "groups": [
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "pk": 326,
+        "fields": {
+            "field_name": "attribution_procedure",
+            "context": "",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "pk": 327,
+        "fields": {
+            "field_name": "campus",
+            "context": "",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "pk": 328,
+        "fields": {
+            "field_name": "requirement_entity",
+            "context": "",
+            "content_type": [
+                "base",
+                "learningcontaineryear"
+            ],
+            "groups": [
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "pk": 329,
+        "fields": {
+            "field_name": "allocation_entity",
+            "context": "",
+            "content_type": [
+                "base",
+                "learningcontaineryear"
+            ],
+            "groups": [
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "pk": 330,
+        "fields": {
+            "field_name": "additional_entity_1",
+            "context": "",
+            "content_type": [
+                "base",
+                "learningcontaineryear"
+            ],
+            "groups": [
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "pk": 331,
+        "fields": {
+            "field_name": "additional_entity_2",
+            "context": "",
+            "content_type": [
+                "base",
+                "learningcontaineryear"
+            ],
+            "groups": [
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "pk": 332,
+        "fields": {
+            "field_name": "country_additional_entity_1",
+            "context": "",
+            "content_type": [
+                "base",
+                "learningcontaineryear"
+            ],
+            "groups": [
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "pk": 333,
+        "fields": {
+            "field_name": "country_additional_entity_2",
+            "context": "",
+            "content_type": [
+                "base",
+                "learningcontaineryear"
+            ],
+            "groups": [
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "pk": 334,
+        "fields": {
+            "field_name": "team",
+            "context": "",
+            "content_type": [
+                "base",
+                "learningcontaineryear"
+            ],
+            "groups": [
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "pk": 335,
+        "fields": {
+            "field_name": "hourly_volume_partial_q1",
+            "context": "",
+            "content_type": [
+                "base",
+                "learningcomponentyear"
+            ],
+            "groups": [
+                [
+                    "central_managers_for_ue"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "pk": 336,
+        "fields": {
+            "field_name": "hourly_volume_partial_q2",
+            "context": "",
+            "content_type": [
+                "base",
+                "learningcomponentyear"
+            ],
+            "groups": [
+                [
+                    "central_managers_for_ue"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "pk": 337,
+        "fields": {
+            "field_name": "hourly_volume_total_annual",
+            "context": "",
+            "content_type": [
+                "base",
+                "learningcomponentyear"
+            ],
+            "groups": [
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "pk": 338,
+        "fields": {
+            "field_name": "planned_classes",
+            "context": "",
+            "content_type": [
+                "base",
+                "learningcomponentyear"
+            ],
+            "groups": [
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "pk": 339,
+        "fields": {
+            "field_name": "repartition_volume_requirement_entity",
+            "context": "",
+            "content_type": [
+                "base",
+                "learningcomponentyear"
+            ],
+            "groups": [
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "pk": 340,
+        "fields": {
+            "field_name": "repartition_volume_additional_entity_1",
+            "context": "",
+            "content_type": [
+                "base",
+                "learningcomponentyear"
+            ],
+            "groups": [
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "pk": 341,
+        "fields": {
+            "field_name": "repartition_volume_additional_entity_2",
+            "context": "",
+            "content_type": [
+                "base",
+                "learningcomponentyear"
+            ],
+            "groups": [
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
     }
 ]
