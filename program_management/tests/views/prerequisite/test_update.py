@@ -29,6 +29,8 @@ from django.http import HttpResponseForbidden, HttpResponseNotFound
 from django.test import TestCase
 from django.urls import reverse
 
+from base.models.enums import education_group_categories
+from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory, GroupElementYearChildLeafFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory
@@ -44,7 +46,11 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(year=2020)
-        cls.element_parent = ElementGroupYearFactory(group_year__academic_year=cls.academic_year)
+        cls.element_parent = ElementGroupYearFactory(
+            group_year__academic_year=cls.academic_year,
+            group_year__education_group_type__category=education_group_categories.TRAINING,
+            group_year__education_group_type__name=TrainingType.BACHELOR.name
+        )
         cls.learning_unit_year_child = LearningUnitYearFakerFactory(
             learning_container_year__academic_year=cls.academic_year
         )
@@ -72,7 +78,9 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
     def test_not_found_when_learning_unit_not_contained_in_training(self):
         other_element = ElementGroupYearFactory(
             group_year__academic_year=self.academic_year,
-            group_year__management_entity=self.element_parent.group_year.management_entity
+            group_year__management_entity=self.element_parent.group_year.management_entity,
+            group_year__education_group_type__category=education_group_categories.TRAINING,
+            group_year__education_group_type__name=TrainingType.BACHELOR.name
         )
         url = reverse(
             "learning_unit_prerequisite_update",

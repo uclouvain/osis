@@ -24,12 +24,8 @@
 import re
 from typing import Optional
 
-from django.utils.translation import gettext_lazy as _
-
-import osis_common.ddd.interface
 from base.ddd.utils import business_validator
-
-BLOCK_MAX_AUTHORIZED_VALUE = 6
+from program_management.ddd.domain import exception
 
 
 class BlockValidator(business_validator.BusinessValidator):
@@ -45,8 +41,4 @@ class BlockValidator(business_validator.BusinessValidator):
         match_result = re.fullmatch(block_regex, str(self.block))
 
         if not match_result:
-            error_msg = _(
-                "Please register a maximum of %(max_authorized_value)s digits in ascending order, "
-                "without any duplication. Authorized values are from 1 to 6. Examples: 12, 23, 46"
-            ) % {'max_authorized_value': BLOCK_MAX_AUTHORIZED_VALUE}
-            raise osis_common.ddd.interface.BusinessExceptions([error_msg])
+            raise exception.InvalidBlockException()

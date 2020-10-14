@@ -61,6 +61,7 @@ urlpatterns = [
     url(r'^$', search.EducationGroupSearch.as_view(), name='version_program'),
     # NEW VERSION URL - Program management
     path('<int:root_id>/', include([
+        path('tree/', tree.read.tree_json_view, name='tree_json'),
         path('create/', tree.create.CreateLinkView.as_view(), name='tree_create_link'),
         path('update/', tree.update.UpdateLinkView.as_view(), name='tree_update_link'),
         path('detach/', tree.detach.DetachNodeView.as_view(), name='tree_detach_node'),
@@ -81,6 +82,7 @@ urlpatterns = [
          tree.update.UpdateLinkView.as_view(), name='tree_update_link'),
     path('cut_element/', tree.copy_cut.cut_to_cache, name='cut_element'),
     path('copy_element/', tree.copy_cut.copy_to_cache, name='copy_element'),
+    path('clear_element_selected/', tree.copy_cut.clear_element_selected, name='clear_element_selected'),
     path('<int:year>/quick_search/', include([
         path(
             'learning_unit/',
