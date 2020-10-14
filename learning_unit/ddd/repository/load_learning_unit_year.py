@@ -27,7 +27,7 @@ import itertools
 from typing import List, Dict
 
 from django.conf import settings
-from django.db.models import F, Subquery, OuterRef, QuerySet, Q
+from django.db.models import F, Subquery, OuterRef, QuerySet, Q, Prefetch
 
 from attribution.ddd.repositories.attribution_repository import AttributionRepository
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY, CMS_LABEL_PEDAGOGY_FR_AND_EN, CMS_LABEL_SPECIFICATIONS
@@ -42,6 +42,7 @@ from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import LearningUnitYear as LearningUnitYearModel
 from cms.enums.entity_name import LEARNING_UNIT_YEAR
 from cms.models.translated_text import TranslatedText
+from learning_unit.ddd.domain.achievement import AchievementIdentity, Achievement
 from learning_unit.ddd.domain.description_fiche import DescriptionFiche
 from learning_unit.ddd.domain.learning_unit_year import LearningUnitYear, LecturingVolume, PracticalVolume, Entities
 from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYearIdentity
@@ -117,6 +118,26 @@ def __build_sorted_attributions_grouped_by_ue(qs_attributions: List['Attribution
     return attributions_grouped_by_ue
 
 
+def __build_achievements(qs):
+    ue_achievements = sorted(qs, key=lambda el: el.order)
+    achievements = []
+    for code_name, elements in itertools.groupby(ue_achievements, key=lambda el: el.order):
+        elements = list(elements)
+        first_element = elements[0]  # code_name and consistency_id have same values in french and english
+        achievement_parameters = {
+            'code_name': first_element.code_name,
+            'entity_id': AchievementIdentity(consistency_id=first_element.consistency_id)
+        }
+        for achievement in elements:
+            if achievement.language_code == settings.LANGUAGE_CODE_EN[:2].upper():
+                achievement_parameters['text_en'] = achievement.text
+            if achievement.language_code == settings.LANGUAGE_CODE_FR[:2].upper():
+                achievement_parameters['text_fr'] = achievement.text
+        achievements.append(Achievement(**achievement_parameters))
+
+    return achievements
+
+
 def __instanciate_learning_unit_year(
         learning_unit_data: LearningUnitYearModel,
         teaching_materials=None,
@@ -126,6 +147,7 @@ def __instanciate_learning_unit_year(
         code=learning_unit_data.acronym,
         year=learning_unit_data.year
     )
+    achievements = __build_achievements(learning_unit_data.learningachievement_set.all())
     return LearningUnitYear(
         entity_id=learning_unit_identity,
         id=learning_unit_data.id,
@@ -160,7 +182,7 @@ def __instanciate_learning_unit_year(
             second_quadrimester=learning_unit_data.pp_vol_q2,
             classes_count=learning_unit_data.pp_classes,
         ),
-        achievements=[],  # FIXME :: to implement
+        achievements=achievements,
         entities=Entities(requirement_entity_acronym=learning_unit_data.requirement_entity_acronym,
                           allocation_entity_acronym=learning_unit_data.allocation_entity_acronym),
         description_fiche=DescriptionFiche(
@@ -201,7 +223,17 @@ def __convert_string_to_enum(learn_unit_data: LearningUnitYearModel) -> Learning
 
 
 def __get_queryset() -> QuerySet:
-    qs = LearningUnitYearModel.objects.all()
+    qs = LearningUnitYearModel.objects.all().prefetch_related(
+        Prefetch(
+            'learningachievement_set',
+            LearningAchievementModelDb.objects.all().annotate(
+                language_code=F('language__code'),
+            ).order_by(
+                'order',
+                'language_code',
+            )
+        )
+    )
     subquery_component = LearningComponentYear.objects.filter(
         learning_unit_year_id=OuterRef('pk')
     )

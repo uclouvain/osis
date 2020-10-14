@@ -66,7 +66,6 @@ from program_management.ddd.service.read import get_program_tree_version_from_no
 from program_management.ddd import command
 from program_management.ddd.domain.exception import ProgramTreeVersionNotFoundException
 from osis_common.ddd.interface import BusinessException
-from learning_unit.ddd.repository.load_achievement import load_achievements
 
 ILLEGAL_CHARACTERS_RE = re.compile(r'[\000-\010]|[\013-\014]|[\016-\037]')
 
@@ -317,7 +316,7 @@ def _get_optional_data(data: List, luy: DddLearningUnitYear, optional_data_neede
         data.append(link.relative_credits or '-')
         data.append(luy.credits.to_integral_value() or '-')
     if optional_data_needed['has_periodicity']:
-        data.append(dict(PERIODICITY_TYPES)[luy.periodicity] if luy.periodicity else '')
+        data.append(luy.periodicity.name or '')
     if optional_data_needed['has_active']:
         data.append(str.strip(yesno(luy.status)))
     if optional_data_needed['has_quadrimester']:
@@ -354,8 +353,7 @@ def _get_optional_data(data: List, luy: DddLearningUnitYear, optional_data_neede
     if optional_data_needed['has_language']:
         data.append(luy.main_language)
     if optional_data_needed['has_specifications']:
-        achievements = load_achievements(luy.acronym, luy.year)  # TODO :: perf : load multiple before the forloop
-        specifications_data = _build_specifications_cols(achievements, luy.specifications)
+        specifications_data = _build_specifications_cols(luy)
         for k, v in zip(specifications_data._fields, specifications_data):
             data.append(v)
     if optional_data_needed['has_description_fiche']:
@@ -382,8 +380,9 @@ def _build_validate_html_list_to_string(value_param, method):
     return ""
 
 
-def _build_specifications_cols(achievements: List['Achievement'], specifications: Specifications):
-    dict_achievement = _build_achievements(achievements)
+def _build_specifications_cols(luy: 'DddLearningUnitYear'):
+    specifications = luy.specifications
+    dict_achievement = _build_achievements(luy.achievements)
     return SpecificationsCols(
         themes_discussed=_build_validate_html_list_to_string(specifications.themes_discussed, html2text),
         themes_discussed_en=_build_validate_html_list_to_string(specifications.themes_discussed_en, html2text),
@@ -450,6 +449,7 @@ def _build_direct_gathering_label(direct_gathering_node: 'NodeGroupYear') -> str
                             direct_gathering_node.group_title_fr or '') if direct_gathering_node else ''
 
 
+# FIXME :: performance : hit database on each forloop, must load all versions before the forloop
 def _build_main_gathering_label(gathering_node: 'Node') -> str:
     if gathering_node:
         pgm_tree_version = _get_program_tree_version(gathering_node.year, gathering_node.code)
@@ -471,6 +471,7 @@ def volumes_information(lecturing_volume, practical_volume):
             practical_volume.classes_count or 0]
 
 
+# FIXME :: to refactor because of cognitive complexity
 def get_explore_parents(parents_of_ue: List['Node']) -> Dict[str, 'Node']:
     main_parent = None
     direct_parent = None
