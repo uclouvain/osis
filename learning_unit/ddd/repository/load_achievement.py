@@ -24,7 +24,7 @@
 #
 ##############################################################################
 import itertools
-from typing import List
+from typing import List, Optional
 
 from django.conf import settings
 from django.db.models import F
@@ -36,10 +36,18 @@ from learning_unit.ddd.domain.achievement import Achievement
 def load_achievements(acronym: str, year: int) -> List['Achievement']:
     qs = LearningAchievement.objects.filter(
         learning_unit_year__acronym=acronym,
-        learning_unit_year__academic_year__year=year)\
-        .annotate(language_code=F('language__code'))\
-        .values('code_name', 'text', 'language_code', 'order')\
-        .order_by('order', 'language_code')
+        learning_unit_year__academic_year__year=year,
+    ).annotate(
+        language_code=F('language__code'),
+    ).values(
+        'code_name',
+        'text',
+        'language_code',
+        'order',
+    ).order_by(
+        'order',
+        'language_code',
+    )
     return _build_achievements(qs)
 
 
