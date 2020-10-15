@@ -281,3 +281,9 @@ class MiniTrainingCopyConsistencyException(AbstractConsistencyException, Busines
 
 class CertificateAimsCopyConsistencyException(AbstractConsistencyException, BusinessException):
     pass
+
+
+class HopsDataShouldBeGreaterOrEqualsThanZeroAndLessThan9999(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _("The fields concerning ARES must be greater than or equal to 1 and less than or equal to 9999")
+        super().__init__(message, **kwargs)
