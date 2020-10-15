@@ -182,7 +182,7 @@ class CreateTrainingForm(ValidationRuleMixin, forms.Form):
                 output_field=CharField()
             )
         ),
-        label=_('main domain'),
+        label=_('main domain').capitalize(),
         required=False,
         to_field_name="form_key"
     )
