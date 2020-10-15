@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import functools
 from collections import Counter
 from typing import List, Set, Optional, Dict
 
@@ -39,10 +40,7 @@ from program_management.ddd.business_types import *
 from program_management.ddd.command import DO_NOT_OVERRIDE
 from program_management.ddd.domain import prerequisite, exception
 from program_management.ddd.domain.link import factory as link_factory
-from program_management.ddd.domain.node import factory as node_factory, NodeIdentity, Node
-from program_management.ddd.domain.service.generate_node_abbreviated_title import GenerateNodeAbbreviatedTitle
-from program_management.ddd.domain.service.generate_node_code import GenerateNodeCode
-from program_management.ddd.domain.service.validation_rule import FieldValidationRule
+from program_management.ddd.domain.node import factory as node_factory, NodeIdentity, Node, NodeNotFoundException
 from program_management.ddd.repositories import load_authorized_relationship
 from program_management.ddd.validators import validators_by_business_action
 from program_management.ddd.validators._path_validator import PathValidator
@@ -169,7 +167,7 @@ class ProgramTreeBuilder:
         return children
 
 
-@attr.s(slots=True)
+@attr.s(slots=True, hash=False, eq=False)
 class ProgramTree(interface.RootEntity):
 
     root_node = attr.ib(type=Node)
@@ -244,14 +242,12 @@ class ProgramTree(interface.RootEntity):
         :param path: str
         :return: Node
         """
-        try:
-            return {
-                str(self.root_node.pk): self.root_node,
-                **self.root_node.descendents
-            }[path]
-        except KeyError:
-            from program_management.ddd.domain import node
-            raise node.NodeNotFoundException
+        if path == str(self.root_node.pk):
+            return self.root_node
+        result = self.root_node.descendents.get(path)
+        if not result:
+            raise NodeNotFoundException
+        return result
 
     @deprecated  # Please use :py:meth:`~program_management.ddd.domain.program_tree.ProgramTree.get_node` instead !
     def get_node_by_id_and_type(self, node_id: int, node_type: NodeType) -> 'Node':
@@ -362,8 +358,16 @@ class ProgramTree(interface.RootEntity):
     def get_all_links(self) -> List['Link']:
         return _links_from_root(self.root_node)
 
+    @functools.lru_cache()
+    def _links_mapped_by_child_and_parent(self) -> Dict:
+        return {
+                str(link.child.entity_id) + str(link.parent.entity_id): link
+                for link in self.get_all_links()
+        }
+
     def get_link(self, parent: 'Node', child: 'Node') -> 'Link':
-        return next((link for link in self.get_all_links() if link.parent == parent and link.child == child), None)
+        my_map = self._links_mapped_by_child_and_parent()
+        return my_map.get(str(child.entity_id) + str(parent.entity_id))
 
     def prune(self, ignore_children_from: Set[EducationGroupTypesEnum] = None) -> 'ProgramTree':
         copied_root_node = _copy(self.root_node, ignore_children_from=ignore_children_from)
