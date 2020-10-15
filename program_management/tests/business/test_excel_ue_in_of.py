@@ -42,7 +42,6 @@ from base.models.enums.proposal_type import ProposalType
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.learning_achievement import LearningAchievementFactory
 from learning_unit.tests.ddd.factories.achievement import AchievementFactory
 from learning_unit.tests.ddd.factories.description_fiche import DescriptionFicheFactory
 from learning_unit.tests.ddd.factories.entities import EntitiesFactory
@@ -70,7 +69,7 @@ from program_management.tests.factories.element import ElementGroupYearFactory, 
 from program_management.tests.ddd.factories.program_tree_version import StandardProgramTreeVersionFactory, \
     ProgramTreeVersionFactory
 from program_management.ddd.business_types import *
-from reference.tests.factories.language import FrenchLanguageFactory, EnglishLanguageFactory
+from base.models.enums.learning_unit_year_subtypes import LEARNING_UNIT_YEAR_SUBTYPES
 
 PARTIAL_ACRONYM = 'Partial'
 
@@ -166,7 +165,12 @@ class TestContent(TestCase):
         cls.teacher_2 = TeacherFactory(last_name='Marseillais', first_name="Pol", email="pm@gmail.com")
 
         cls.attribution_2 = Attribution(teacher=cls.teacher_2)
+        cls.achievement_1 = AchievementFactory(code_name="A1", text_fr="Text fr", text_en="Text en", entity_id="1")
+        cls.achievement_2 = AchievementFactory(code_name="A2", text_fr="Text fr", text_en=None, entity_id="1")
+        cls.achievement_3 = AchievementFactory(code_name="A3", text_fr=None, text_en="    ", entity_id="2")
+        cls.achievement_4 = AchievementFactory(code_name=None, text_fr=None, text_en="    ", entity_id="2")
 
+        specifications = initialize_cms_specifications_data_description_fiche()
         cls.luy = DddLearningUnitYearFactory(
             acronym=cls.lu.code,
             year=cls.lu.year,
@@ -180,6 +184,8 @@ class TestContent(TestCase):
             credits=cls.lu.credits,
             status=True,
             attributions=[cls.attribution_1, cls.attribution_2],
+            achievements=[cls.achievement_1, cls.achievement_2, cls.achievement_3, cls.achievement_4],
+            specifications=specifications
         )
 
     def test_fix_data(self):
@@ -218,6 +224,10 @@ class TestContent(TestCase):
                          group_level_1)
 
     def test_main_parent_complementary(self):
+        # - root_node (code =code 1)
+        #   |- group_level_1 (COMPLEMENTARY_MODULE) (code =code 2)
+        #      | - group_level_2 (MAJOR_LIST_CHOICE) (code =code 3)
+        #          | - ue_level_3 (code =code 4)
         root_node = NodeGroupYearFactory(category=Categories.TRAINING, node_id=1, code="code 1")
         group_level_1 = NodeGroupYearFactory(node_type=GroupType.COMPLEMENTARY_MODULE, node_id=2, code="code 2")
         LinkFactory(parent=root_node, child=group_level_1)
@@ -424,25 +434,19 @@ class TestContent(TestCase):
                                                    teaching_material_2.title))
 
     def test_build_specifications_cols(self):
-        achievement_1 = AchievementFactory(code_name="A1", text_fr="Text fr", text_en="Text en")
-        achievement_2 = AchievementFactory(code_name="A2", text_fr="Text fr", text_en=None)
-        achievement_3 = AchievementFactory(code_name="A3", text_fr=None, text_en="    ")
-        achievement_4 = AchievementFactory(code_name=None, text_fr=None, text_en="    ")
 
-        specifications = initialize_cms_specifications_data_description_fiche()
-        specifications_data = _build_specifications_cols([achievement_1, achievement_2, achievement_3, achievement_4],
-                                                         specifications)
+        specifications_data = _build_specifications_cols(self.luy)
 
         self.assertEqual(specifications_data.prerequisite, CMS_TXT_WITH_LIST_AFTER_FORMATTING)
         self.assertEqual(specifications_data.prerequisite_en, CMS_TXT_WITH_LIST_AFTER_FORMATTING)
         self.assertEqual(specifications_data.themes_discussed, CMS_TXT_WITH_LIST_AFTER_FORMATTING)
         self.assertEqual(specifications_data.themes_discussed_en, CMS_TXT_WITH_LIST_AFTER_FORMATTING)
         self.assertEqual(specifications_data.achievements_fr, "{} -{}\n{} -{}".format(
-            achievement_1.code_name, achievement_1.text_fr,
-            achievement_2.code_name, achievement_2.text_fr)
+            self.achievement_1.code_name, self.achievement_1.text_fr,
+            self.achievement_2.code_name, self.achievement_2.text_fr)
                          )
         self.assertEqual(specifications_data.achievements_en, "{} -{}".format(
-            achievement_1.code_name, achievement_1.text_en)
+            self.achievement_1.code_name, self.achievement_1.text_en)
                          )
 
     def test_build_validate_html_list_to_string(self):
@@ -551,7 +555,7 @@ def get_expected_data_new(child_node, luy, link, main_gathering=None):
                 u"%s-%s" % (luy.year, str(luy.year + 1)[-2:]),
                 luy.full_title_fr,
                 luy.type.value if luy.type else '',
-                luy.subtype if luy.subtype else '',
+                dict(LEARNING_UNIT_YEAR_SUBTYPES)[luy.subtype] if luy.subtype else '',
                 gathering_str,
                 main_gathering_str,
                 link.block or '',
@@ -564,6 +568,17 @@ class TestXlsContent(TestCase):
 
     @classmethod
     def setUpTestData(cls):
+        # - root_node (PGRM_MASTER_120) (code =C1)
+        #   |- group_level_1 (code =C2)
+        #      | - group_level_1_1 (code =C3)
+        #          | - ue1 (UE1)
+        #          | - ue2 (UE2)
+        #   | - group_level_2 (MASTER_MS_120) (code =C4)
+        #       | - group_level_2_1 (COMMON_CORE) (code =C5)
+        #           | - ue3 (UE3)
+        #       | - group_level_2_2 (OPTION_LIST_CHOICE)(code =C6)
+        #           | - ue4 (UE4)
+
         cls.root_node = NodeGroupYearFactory(node_id=1, code='C1', node_type=TrainingType.PGRM_MASTER_120)
         cls.academic_year = AcademicYearFactory(year=cls.root_node.year)
         cls.group_level_1 = NodeGroupYearFactory(node_id=2, code='C2', year=cls.academic_year.year)
@@ -574,56 +589,58 @@ class TestXlsContent(TestCase):
         LinkFactory(parent=cls.group_level_1,
                     child=cls.group_level_1_1)
 
-        cls.ue_level_group_level_1_1 = NodeLearningUnitYearFactory(node_id=4, code='UE1', year=cls.academic_year.year)
+        cls.ue1 = NodeLearningUnitYearFactory(node_id=4, code='UE1', year=cls.academic_year.year)
         LinkFactory(parent=cls.group_level_1_1,
-                    child=cls.ue_level_group_level_1_1)
-        second_ue_level_group_level_1_1 = NodeLearningUnitYearFactory(node_id=5,
-                                                                      code='UE2',
-                                                                      year=cls.academic_year.year)
+                    child=cls.ue1)
+        ue_2 = NodeLearningUnitYearFactory(node_id=5, code='UE2', year=cls.academic_year.year)
         LinkFactory(parent=cls.group_level_1_1,
-                    child=second_ue_level_group_level_1_1)
+                    child=ue_2)
 
         cls.group_level_2 = NodeGroupYearFactory(node_id=6,
                                                  node_type=TrainingType.MASTER_MS_120,
-                                                 year=cls.academic_year.year)
+                                                 year=cls.academic_year.year,
+                                                 code='C4')
         LinkFactory(parent=cls.root_node,
                     child=cls.group_level_2)
 
         cls.group_level_2_1 = NodeGroupYearFactory(node_id=7,
                                                    node_type=GroupType.COMMON_CORE,
-                                                   year=cls.academic_year.year)
+                                                   year=cls.academic_year.year,
+                                                   code='C5')
         LinkFactory(parent=cls.group_level_2,
                     child=cls.group_level_2_1)
-        cls.ue_level_group_level_2_1 = NodeLearningUnitYearFactory(node_id=9, code='UE3', year=cls.academic_year.year)
+        cls.ue3 = NodeLearningUnitYearFactory(node_id=9, code='UE3', year=cls.academic_year.year)
         LinkFactory(parent=cls.group_level_2_1,
-                    child=cls.ue_level_group_level_2_1)
+                    child=cls.ue3)
         cls.group_level_2_2 = NodeGroupYearFactory(node_id=8,
                                                    node_type=GroupType.OPTION_LIST_CHOICE,
-                                                   year=cls.academic_year.year)
+                                                   year=cls.academic_year.year,
+                                                   code='C6')
         LinkFactory(parent=cls.group_level_2,
                     child=cls.group_level_2_2)
-        cls.ue_level_group_level_2_2 = NodeLearningUnitYearFactory(node_id=10, year=cls.academic_year.year)
+        cls.ue4 = NodeLearningUnitYearFactory(node_id=10, year=cls.academic_year.year, code='UE4')
         LinkFactory(parent=cls.group_level_2_2,
-                    child=cls.ue_level_group_level_2_2)
+                    child=cls.ue4)
 
         cls.tree = ProgramTreeFactory(root_node=cls.root_node)
 
         # TODO : remplacer ce qui suit pour un accès plus direct
 
-        element_ue_1 = ElementLearningUnitYearFactory(id=cls.ue_level_group_level_1_1.node_id,
+        element_ue_1 = ElementLearningUnitYearFactory(id=cls.ue1.node_id,
                                                       learning_unit_year=LearningUnitYearFactory(
-                                                          acronym='UE1', academic_year=cls.academic_year)
+                                                          acronym=cls.ue1.code, academic_year=cls.academic_year)
                                                       )
-        element_ue_2 = ElementLearningUnitYearFactory(id=second_ue_level_group_level_1_1.node_id,
+        element_ue_2 = ElementLearningUnitYearFactory(id=ue_2.node_id,
                                                       learning_unit_year=LearningUnitYearFactory(
-                                                          acronym='UE2', academic_year=cls.academic_year)
+                                                          acronym=ue_2.code, academic_year=cls.academic_year)
                                                       )
-        element_ue_3 = ElementLearningUnitYearFactory(id=cls.ue_level_group_level_2_1.node_id,
+        element_ue_3 = ElementLearningUnitYearFactory(id=cls.ue3.node_id,
                                                       learning_unit_year=LearningUnitYearFactory(
-                                                          acronym='UE3', academic_year=cls.academic_year)
+                                                          acronym=cls.ue3.code, academic_year=cls.academic_year)
                                                       )
-        ElementLearningUnitYearFactory(id=cls.ue_level_group_level_2_2.node_id,
-                                       learning_unit_year=LearningUnitYearFactory(academic_year=cls.academic_year))
+        ElementLearningUnitYearFactory(id=cls.ue4.node_id,
+                                       learning_unit_year=LearningUnitYearFactory(acronym=cls.ue4.code,
+                                                                                  academic_year=cls.academic_year))
 
         cls.learning_units = [element_ue_1.learning_unit_year, element_ue_2.learning_unit_year,
                               element_ue_3.learning_unit_year]
@@ -717,8 +734,8 @@ class TestXlsContent(TestCase):
         content = data['content']
         del content[0]
         self.assertEqual(len(content), len(ues))
-        self.assertCountEqual([content[0][0], content[1][0],
-                               content[2][0]], ues)
+        self.assertCountEqual([content[0][0], content[1][0], content[2][0]],
+                              ues)
 
 
 def _assert_format_title(tree: 'ProgramTree', tree_version: 'ProgramTreeVersion') -> str:
