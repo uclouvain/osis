@@ -35,7 +35,8 @@ from program_management.ddd.service.read import search_program_trees_using_node_
 
 from program_management.ddd.command import GetProgramTreesFromNodeCommand
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
-from program_management.serializers.node_view import get_program_tree_version_name, get_program_tree_version_dict
+from program_management.serializers.node_view import get_program_tree_version_name, get_program_tree_version_dict, \
+    get_program_tree_version_title
 from program_management.ddd.domain.program_tree import get_nearest_parents
 
 
@@ -83,13 +84,13 @@ def _buid_utilization_rows(utilization_rows_dict: Dict['Link', List['Node']], la
             {
                 'link': link,
                 'version_details': version_details,
-                'training_nodes': _get_training_nodes(utilization_in_trainings)
+                'training_nodes': _get_training_nodes(utilization_in_trainings, language)
             }
         )
     return sorted(utilization_rows, key=lambda row: row['link'].parent.code)
 
 
-def _get_training_nodes(dd: Dict['NodeGroupYear', List['NodeGroupYear']]) -> List[Dict[str, Any]]:
+def _get_training_nodes(dd: Dict['NodeGroupYear', List['NodeGroupYear']], language: str) -> List[Dict[str, Any]]:
     training_nodes = []
     for direct_parent, main_root_nodes in dd.items():
         root_nodes = []
@@ -104,7 +105,9 @@ def _get_training_nodes(dd: Dict['NodeGroupYear', List['NodeGroupYear']]) -> Lis
 
         training_nodes.append(
             {
-                'direct_gathering': {'parent': direct_parent, 'url': _get_identification_url(direct_parent)},
+                'direct_gathering': {'parent': direct_parent,
+                                     'url': _get_identification_url(direct_parent),
+                                     'version_title': _get_program_tree_version_complete_name(direct_parent, language)},
                 'root_nodes': sorted(root_nodes, key=lambda row: row['root'].title),
                 'version_name': _get_version_name(direct_parent)
             }
@@ -142,3 +145,12 @@ def _build_parents_info(link: 'Link',
         lk_to_update = utilization_rows_dict.get(link, [])
         if link.parent not in lk_to_update:
             utilization_rows_dict[link] = lk_to_update
+
+
+def _get_program_tree_version_complete_name(direct_parent, language: str):
+    parent_node_identity = NodeIdentity(code=direct_parent.code, year=direct_parent.year)
+    return get_program_tree_version_title(
+        parent_node_identity,
+        ProgramTreeVersionRepository.search_all_versions_from_root_node(parent_node_identity),
+        language
+    )

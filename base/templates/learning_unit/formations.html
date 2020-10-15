@@ -49,6 +49,7 @@
                                 </tr>
                                 </thead>
                                 <tbody>
+                                {% with learning_unit_year_context=True %}
                                 {% for elt in formations_by_educ_group_year %}
                                     {% with utilization_rows=elt.utilization_rows group_element_year=elt.group_element_year %}
                                     {% url 'group_identification' group_element_year.parent_element.group_year.academic_year.year group_element_year.parent_element.group_year.partial_acronym as url_education_group_year %}
@@ -76,6 +77,7 @@
                                     </tr>
                                     {% endwith %}
                                 {% endfor %}
+                                {% endwith %}
                                 </tbody>
                             </table>
                         </div>

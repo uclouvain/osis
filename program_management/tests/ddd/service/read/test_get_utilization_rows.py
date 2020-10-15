@@ -201,7 +201,7 @@ class TestGetUtilizationRows(TestCase):
         node_group_years = [aaa, bbb, ccc]
 
         for x in range(5):
-            ordered_list = _get_training_nodes(_build_random_list_for_training_nodes(node_group_years))
+            ordered_list = _get_training_nodes(_build_random_list_for_training_nodes(node_group_years), 'en')
             self.assertEqual(ordered_list[0]['direct_gathering']['parent'], aaa)
             self.assertEqual(ordered_list[1]['direct_gathering']['parent'], bbb)
             self.assertEqual(ordered_list[2]['direct_gathering']['parent'], ccc)
@@ -216,7 +216,7 @@ class TestGetUtilizationRows(TestCase):
         node_group_years = [root_aaa, root_bbb, root_ccc]
 
         for x in range(5):
-            ordered_list = _get_training_nodes(_build_random_list_for_root_nodes(node_aaa, node_group_years))
+            ordered_list = _get_training_nodes(_build_random_list_for_root_nodes(node_aaa, node_group_years), 'en')
             self.assertEqual(ordered_list[0]['root_nodes'][0]['root'].title, root_aaa.title)
 
     def test_not_in_a_training(self):

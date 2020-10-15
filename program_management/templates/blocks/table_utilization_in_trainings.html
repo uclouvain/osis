@@ -1,10 +1,13 @@
 {% load i18n static %}
-
+{% get_current_language as LANGUAGE_CODE %}
 {% for root in row.training_nodes %}
     <ul style="padding-left: 15px;">
         <li>
             <a href="{{ root.direct_gathering.url }}">
                 {{ root.direct_gathering.parent.title }}{{ root.version_name }}
+                {% if learning_unit_year_context %}
+                    - {% if LANGUAGE_CODE == 'en' and root.direct_gathering.parent.offer_title_en %}{{ root.direct_gathering.parent.offer_title_en }}{% else %}{{ root.direct_gathering.parent.offer_title_fr }}{% endif %}{{ root.direct_gathering.version_title }}
+                {% endif %}
             </a>
             {% if root.root_nodes %}
                 <ul><li>
