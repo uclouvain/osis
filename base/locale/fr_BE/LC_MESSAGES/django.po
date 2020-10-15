@@ -811,9 +811,6 @@ msgstr "Courriel"
 msgid "Embassy"
 msgstr "Ambassade"
 
-msgid "Encode"
-msgstr "Encoder"
-
 msgid "End"
 msgstr "Fin"
 

@@ -789,9 +789,6 @@ msgstr ""
 msgid "Embassy"
 msgstr ""
 
-msgid "Encode"
-msgstr ""
-
 msgid "End"
 msgstr ""
 
