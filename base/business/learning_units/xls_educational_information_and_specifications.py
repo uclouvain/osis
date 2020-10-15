@@ -209,10 +209,10 @@ def _add_specifications(learning_unit_yr, line, request):
         line.append(get_html_to_text(getattr(obj_en, label_key, '')))
 
 
-def _get_translated_labels_with_text(learning_unit_year_id, user_language, CMS_LABEL):
+def _get_translated_labels_with_text(learning_unit_year_id, user_language, cms_labels):
     translated_labels_with_text = TranslatedTextLabel.objects.filter(
         language=user_language,
-        text_label__label__in=CMS_LABEL
+        text_label__label__in=cms_labels
     ).prefetch_related(
         Prefetch(
             "text_label__translatedtext_set",
@@ -234,8 +234,8 @@ def _get_translated_labels_with_text(learning_unit_year_id, user_language, CMS_L
         )
     ).annotate(
         label_ordering=Case(
-            *[When(text_label__label=label, then=Value(i)) for i, label in enumerate(CMS_LABEL)],
-            default=Value(len(CMS_LABEL)),
+            *[When(text_label__label=label, then=Value(i)) for i, label in enumerate(cms_labels)],
+            default=Value(len(cms_labels)),
             output_field=IntegerField()
         )
     ).select_related(
