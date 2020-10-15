@@ -23,20 +23,24 @@
 # ############################################################################
 
 from base.ddd.utils import business_validator
-from education_group.ddd.domain._hops import HOPS
+from base.models.enums.education_group_types import TrainingType
 from education_group.ddd.domain.exception import HopsDataShouldBeGreaterOrEqualsThanZeroAndLessThan9999
 
 
 class HopsValuesValidator(business_validator.BusinessValidator):
 
-    def __init__(self, hops: HOPS):
+    def __init__(self, training: 'Training'):
         super().__init__()
-        self.ares_code = hops.ares_code
-        self.ares_graca = hops.ares_graca
-        self.ares_authorization = hops.ares_authorization
+
+        if training.type in TrainingType.all() and training.hops:
+            self.ares_code = training.hops.ares_code
+            self.ares_graca = training.hops.ares_graca
+            self.ares_authorization = training.hops.ares_authorization
+        else:
+            self.ares_code = self.ares_graca = self.ares_authorization = None
 
     def validate(self, *args, **kwargs):
-        if not (0 < self.ares_code <= 9999) or \
-                not (0 < self.ares_graca <= 9999) or \
-                not (0 < self.ares_authorization <= 9999):
+        if (self.ares_code and not (0 < self.ares_code <= 9999)) or \
+                (self.ares_graca and not (0 < self.ares_graca <= 9999)) or \
+                (self.ares_authorization and not (0 < self.ares_authorization <= 9999)):
             raise HopsDataShouldBeGreaterOrEqualsThanZeroAndLessThan9999()

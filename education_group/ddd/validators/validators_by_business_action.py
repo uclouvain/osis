@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from base.ddd.utils import business_validator
+
 from education_group.ddd.business_types import *
 from education_group.ddd.validators._abbreviated_title_already_exist import AcronymAlreadyExistValidator
 from education_group.ddd.validators._acronym_required import AcronymRequiredValidator
@@ -80,7 +81,7 @@ class CreateTrainingValidatorList(business_validator.BusinessListValidator):
             AcronymRequiredValidator(training.acronym),
             AcronymAlreadyExistValidator(training.acronym),
             StartYearEndYearValidator(training),
-            HopsValuesValidator(training.hops)
+            HopsValuesValidator(training)
         ]
         super().__init__()
 
@@ -88,7 +89,7 @@ class CreateTrainingValidatorList(business_validator.BusinessListValidator):
 class UpdateTrainingValidatorList(business_validator.BusinessListValidator):
 
     def __init__(self, training: 'Training'):
-        self.validators = [HopsValuesValidator(training.hops)]
+        self.validators = [HopsValuesValidator(training)]
         super().__init__()
 
 
