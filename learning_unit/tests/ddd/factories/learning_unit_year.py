@@ -61,3 +61,4 @@ class LearningUnitYearFactory(factory.Factory):
     status = True
     periodicity = factory.Iterator(PeriodicityEnum.choices(), getter=operator.itemgetter(0))
     achievements = []
+    specifications = None
