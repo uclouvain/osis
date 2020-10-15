@@ -40,7 +40,7 @@ class HopsValuesValidator(business_validator.BusinessValidator):
             self.ares_code = self.ares_graca = self.ares_authorization = None
 
     def validate(self, *args, **kwargs):
-        if (self.ares_code and not (0 < self.ares_code <= 9999)) or \
-                (self.ares_graca and not (0 < self.ares_graca <= 9999)) or \
-                (self.ares_authorization and not (0 < self.ares_authorization <= 9999)):
+        if (self.ares_code and not 0 < self.ares_code <= 9999) or \
+                (self.ares_graca and not 0 < self.ares_graca <= 9999) or \
+                (self.ares_authorization and not 0 < self.ares_authorization <= 9999):
             raise HopsDataShouldBeGreaterOrEqualsThanZeroAndLessThan9999()
