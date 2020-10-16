@@ -183,7 +183,7 @@ DATABASES = {
 }
 
 AUTHENTICATION_BACKENDS = os.environ.get('AUTHENTICATION_BACKENDS', 'django.contrib.auth.backends.ModelBackend').split()
-PERMISSION_CACHE_ENABLED = os.environ.get('PERMISSION_CACHE_ENABLED', 'True').lower() == 'true'
+PERMISSION_CACHE_ENABLED = os.environ.get('PERMISSION_CACHE_ENABLED', 'False').lower() == 'true'
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/

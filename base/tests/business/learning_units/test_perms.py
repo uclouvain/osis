@@ -43,6 +43,7 @@ from learning_unit.tests.factories.central_manager import CentralManagerFactory
 from learning_unit.tests.factories.faculty_manager import FacultyManagerFactory
 
 
+@override_settings(YEAR_LIMIT_LUE_MODIFICATION=2018)
 class TestPerms(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -109,7 +110,6 @@ class TestPerms(TestCase):
         administrative_manager = AdministrativeManagerFactory()
         self.assertFalse(administrative_manager.user.has_perm('base.can_edit_learningunit', self.luy))
 
-    @override_settings(YEAR_LIMIT_LUE_MODIFICATION=2018)
     def test_is_not_eligible_to_update_learning_achievement_cause_before_2018(self):
         self.luy.academic_year = AcademicYearFactory(year=2015)
         self.assertFalse(self.central_manager.person.user.has_perm('base.can_update_learning_achievement', self.luy))
@@ -118,7 +118,6 @@ class TestPerms(TestCase):
         self.luy.academic_year = AcademicYearFactory(year=2019)
         self.assertTrue(self.central_manager.person.user.has_perm('base.can_update_learning_achievement', self.luy))
 
-    @override_settings(YEAR_LIMIT_LUE_MODIFICATION=2018)
     def test_is_not_eligible_to_update_learning_pedagogy_cause_before_2018(self):
         self.luy.academic_year = AcademicYearFactory(year=2015)
         self.assertFalse(is_eligible_to_update_learning_unit_pedagogy(self.luy, self.central_manager.person))
