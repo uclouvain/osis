@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import datetime
 import html
 import random
 from unittest import mock
@@ -36,7 +37,6 @@ from attribution.tests.factories.attribution_new import AttributionNewFactory
 from base.business.learning_unit_xls import CREATION_COLOR, MODIFICATION_COLOR, TRANSFORMATION_COLOR, \
     TRANSFORMATION_AND_MODIFICATION_COLOR, SUPPRESSION_COLOR
 from base.models.enums import education_group_types
-from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import GroupType, TrainingType
 from base.tests.factories.business.learning_units import GenerateContainer
 from base.tests.factories.education_group_year import EducationGroupYearFactory, GroupFactory, TrainingFactory, \
@@ -75,10 +75,13 @@ CMS_TXT_WITH_LIST = '<ol> ' \
                     '<li>Les diff&eacute;rentes structures mol&eacute;culaires</li> ' \
                     '</ol>'
 CMS_TXT_WITH_LIST_AFTER_FORMATTING = 'La structure atomique de la matière\n' \
-                                    'Les différentes structures moléculaires'
+                                     'Les différentes structures moléculaires'
 
 CMS_TXT_WITH_LINK = '<a href="https://moodleucl.uclouvain.be">moodle</a>'
 CMS_TXT_WITH_LINK_AFTER_FORMATTING = 'moodle - [https://moodleucl.uclouvain.be] \n'
+
+LAST_UPDATE_BY = 'User_first_name_and_name'
+LAST_UPDATE_DATE = datetime.datetime.now()
 
 
 class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
@@ -267,6 +270,7 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
                               'has_credits': False,
                               'has_allocation_entity': False,
                               'has_english_title': False,
+                              'has_force_majeure': False,
                               'has_teacher_list': False,
                               'has_periodicity': False,
                               'has_active': False,
@@ -294,6 +298,7 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
                               'language': 'on',
                               'description_fiche': 'on',
                               'specifications': 'on',
+                              'force_majeure': 'on'
                               })
         self.assertDictEqual(_optional_data(form),
                              {'has_required_entity': True,
@@ -301,6 +306,7 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
                               'has_credits': True,
                               'has_allocation_entity': True,
                               'has_english_title': True,
+                              'has_force_majeure': True,
                               'has_teacher_list': True,
                               'has_periodicity': True,
                               'has_active': True,
@@ -424,6 +430,17 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
         self.assertTrue(mock.called)
 
     @mock.patch("program_management.business.excel_ue_in_of._annotate_with_description_fiche_specifications")
+    def test_get_optional_has_force_majeure_annotate_called(self, mock):
+        optional_data = initialize_optional_data()
+        optional_data['has_force_majeure'] = True
+
+        custom_form = CustomXlsForm({'force_majeure': 'on'})
+        EducationGroupYearLearningUnitsContainedToExcel(self.education_group_yr_root,
+                                                        self.education_group_yr_root,
+                                                        custom_form)
+        self.assertTrue(mock.called)
+
+    @mock.patch("program_management.business.excel_ue_in_of._annotate_with_description_fiche_specifications")
     def test_get_optional_has_specifications_annotate_called(self, mock):
         optional_data = initialize_optional_data()
         optional_data['has_specifications'] = True
@@ -466,6 +483,8 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
                                                    teaching_material_1.title,
                                                    _('Non-mandatory'),
                                                    teaching_material_2.title))
+        self.assertEqual(description_fiche.last_update_date, LAST_UPDATE_DATE.strftime('%d/%m/%Y'))
+        self.assertEqual(description_fiche.last_update_by, LAST_UPDATE_BY)
 
     def test_build_specifications_cols(self):
 
@@ -655,6 +674,7 @@ def initialize_optional_data():
         'has_periodicity': False,
         'has_active': False,
         'has_quadrimester': False,
+        'has_force_majeure': False,
         'has_session_derogation': False,
         'has_volume': False,
         'has_teacher_list': False,
@@ -682,6 +702,8 @@ def _initialize_cms_data_description_fiche(gey):
     gey_cms.online_resources = CMS_TXT_WITH_LINK
     gey_cms.online_resources_en = CMS_TXT_WITH_LINK
 
+    gey_cms.last_update_date = LAST_UPDATE_DATE
+    gey_cms.last_update_by = LAST_UPDATE_BY
     return gey_cms
 
 
