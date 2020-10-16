@@ -88,6 +88,8 @@ def _get_titles():
     titles = titles + _add_cms_title_fr_en(CMS_LABEL_PEDAGOGY_FR_AND_EN, True)
     titles = titles + [str(_('Teaching material'))]
     titles = titles + _add_cms_title_fr_en(CMS_LABEL_PEDAGOGY_FR_ONLY, False)
+    titles = titles + [str("{}".format(_('last modificationd escription fiche by'))),
+                       str("{}".format('last modification description fiche at'))]
     titles = titles + _add_cms_title_fr_en(CMS_LABEL_PEDAGOGY_FORCE_MAJEURE, True)
     titles = titles + _add_cms_title_fr_en(CMS_LABEL_SPECIFICATIONS, True)
     titles = titles + [str("{} - {}".format(_('Learning achievements'), LANGUAGE_CODE_FR.upper())),
