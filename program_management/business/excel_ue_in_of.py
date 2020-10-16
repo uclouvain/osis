@@ -25,9 +25,12 @@
 ##############################################################################
 import html
 import re
+import unicodedata
 from collections import namedtuple, defaultdict
 from typing import Dict, List
 
+import unidecode
+from bs4 import BeautifulSoup
 from django.template.defaultfilters import yesno
 from django.utils import translation
 from django.utils.translation import gettext as _
@@ -40,7 +43,7 @@ from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.business.learning_unit_xls import PROPOSAL_LINE_STYLES, \
     prepare_proposal_legend_ws_data
 from base.business.learning_unit_xls import get_significant_volume
-from base.business.learning_units.xls_generator import hyperlinks_to_string
+from base.business.learning_units.xls_generator import hyperlinks_to_string, strip_tags
 from base.models.enums.education_group_types import GroupType
 from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
 from base.models.enums.proposal_state import ProposalState
@@ -50,6 +53,7 @@ from learning_unit.ddd.domain.achievement import Achievement
 from learning_unit.ddd.domain.description_fiche import DescriptionFiche
 from learning_unit.ddd.domain.learning_unit_year import LearningUnitYear as DddLearningUnitYear
 from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYearIdentity
+from learning_unit.ddd.domain.specifications import Specifications
 from learning_unit.ddd.domain.teaching_material import TeachingMaterial
 from learning_unit.ddd.repository.load_learning_unit_year import load_multiple_by_identity
 from osis_common.document.xls_build import _build_worksheet, CONTENT_KEY, HEADER_TITLES_KEY, WORKSHEET_TITLE_KEY, \
@@ -57,15 +61,16 @@ from osis_common.document.xls_build import _build_worksheet, CONTENT_KEY, HEADER
 from program_management.business.excel import clean_worksheet_title
 from program_management.business.utils import html2text
 from program_management.ddd.business_types import *
+from program_management.ddd.command import SearchAllVersionsFromRootNodesCommand
+from program_management.ddd.domain.node import NodeLearningUnitYear
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 from program_management.ddd.repositories.program_tree import ProgramTreeRepository
+from program_management.ddd.service.read.search_all_versions_from_root_nodes import search_all_versions_from_root_nodes
 from program_management.forms.custom_xls import CustomXlsForm
 from program_management.ddd.service.read import get_program_tree_version_from_node_service
 from program_management.ddd import command
 from program_management.ddd.domain.exception import ProgramTreeVersionNotFoundException
 from osis_common.ddd.interface import BusinessException
-from base.models.enums.learning_unit_year_subtypes import LEARNING_UNIT_YEAR_SUBTYPES
-
 
 ILLEGAL_CHARACTERS_RE = re.compile(r'[\000-\010]|[\013-\014]|[\016-\037]')
 
@@ -142,9 +147,20 @@ EXCLUDE_UE_KEY = 'exclude_ue'
 class EducationGroupYearLearningUnitsContainedToExcel:
 
     def __init__(self, custom_xls_form: CustomXlsForm, year: int, code: str):
-        self.program_tree_version = _get_program_tree_version(year, code)
+        self.program_tree_version = self._get_program_tree_version(code, year)
         self._get_program_tree(year, code)
         self.custom_xls_form = custom_xls_form
+
+    def _get_program_tree_version(self, code: str, year: int):
+        get_cmd = command.GetProgramTreeVersionFromNodeCommand(
+            code=code,
+            year=year
+        )
+        try:
+            return get_program_tree_version_from_node_service.get_program_tree_version_from_node(
+                get_cmd)
+        except (BusinessException, ProgramTreeVersionNotFoundException):
+            return None
 
     def _get_program_tree(self, year: int, code: str):
         if self.program_tree_version:
@@ -186,6 +202,13 @@ def _build_excel_lines_ues(custom_xls_form: CustomXlsForm, tree: 'ProgramTree'):
         ]
     )
 
+    tree_versions = search_all_versions_from_root_nodes(
+        [
+            SearchAllVersionsFromRootNodesCommand(code=node.code, year=node.year)
+            for node in tree.get_all_nodes() if not node.is_learning_unit()
+        ]
+    )
+
     for path, child_node in tree.root_node.descendents.items():
         if child_node.is_learning_unit():
             luy = next(child for child in learning_unit_years if child_node.equals(child))
@@ -195,7 +218,7 @@ def _build_excel_lines_ues(custom_xls_form: CustomXlsForm, tree: 'ProgramTree'):
 
             if not parents_data[EXCLUDE_UE_KEY]:
                 content.append(_get_optional_data(
-                    _fix_data(link, luy, parents_data),
+                    _fix_data(link, luy, parents_data, tree_versions),
                     luy,
                     optional_data_needed,
                     link
@@ -237,21 +260,28 @@ def _get_headers(custom_xls_form: CustomXlsForm):
     return content
 
 
-def _fix_data(link: 'Link',  luy: 'LearningUnitYear', gathering: Dict[str, 'Node']):
+def _fix_data(
+        link: 'Link',
+        luy: 'LearningUnitYear',
+        gathering: Dict[str, 'Node'],
+        tree_versions: List['ProgramTreeVersion']
+):
     data = []
 
     title = luy.full_title_fr
     if translation.get_language() == LANGUAGE_CODE_EN:
         title = luy.full_title_en
-    data_fix = FixLineUEContained(acronym=luy.acronym,
-                                  year=u"%s-%s" % (luy.year, str(luy.year + 1)[-2:]),
-                                  title=title,
-                                  type=luy.type.value if luy.type else '',
-                                  subtype=dict(LEARNING_UNIT_YEAR_SUBTYPES)[luy.subtype] if luy.subtype else '',
-                                  gathering=_build_direct_gathering_label(gathering[DIRECT_GATHERING_KEY]),
-                                  main_gathering=_build_main_gathering_label(gathering[MAIN_GATHERING_KEY]),
-                                  block=link.block or '',
-                                  mandatory=str.strip(yesno(link.is_mandatory)))
+    data_fix = FixLineUEContained(
+        acronym=luy.acronym,
+        year=u"%s-%s" % (luy.year, str(luy.year + 1)[-2:]),
+        title=title,
+        type=luy.type.value if luy.type else '',
+        subtype=luy.subtype if luy.subtype else '',
+        gathering=_build_direct_gathering_label(gathering[DIRECT_GATHERING_KEY]),
+        main_gathering=_build_main_gathering_label(gathering[MAIN_GATHERING_KEY], tree_versions),
+        block=link.block or '',
+        mandatory=str.strip(yesno(link.is_mandatory))
+    )
     for name in data_fix._fields:
         data.append(getattr(data_fix, name))
     return data
@@ -316,7 +346,7 @@ def _get_optional_data(data: List, luy: DddLearningUnitYear, optional_data_neede
         data.append(link.relative_credits or '-')
         data.append(luy.credits.to_integral_value() or '-')
     if optional_data_needed['has_periodicity']:
-        data.append(dict(PERIODICITY_TYPES)[luy.periodicity] or '')
+        data.append(luy.periodicity.name or '')
     if optional_data_needed['has_active']:
         data.append(str.strip(yesno(luy.status)))
     if optional_data_needed['has_quadrimester']:
@@ -364,20 +394,10 @@ def _get_optional_data(data: List, luy: DddLearningUnitYear, optional_data_neede
 
 
 def _build_validate_html_list_to_string(value_param, method):
-    if method is None or method not in (hyperlinks_to_string, html2text):
-        return value_param.strip()
-
-    if value_param:
-        # string must never be longer than 32,767 characters
-        # truncate if necessary
-        value = value_param.strip()
-        value = value[:32767]
-        value = method(html.unescape(value)) if value else ""
-        if next(ILLEGAL_CHARACTERS_RE.finditer(value), None):
-            return "!!! {}".format(_('IMPOSSIBLE TO DISPLAY BECAUSE OF AN ILLEGAL CHARACTER IN STRING'))
-        return value
-
-    return ""
+    return unicodedata.normalize(
+        "NFD",
+        strip_tags(value_param).encode('unicode_escape').decode('utf-8', 'ignore')
+    ).strip() if value_param else ''
 
 
 def _build_specifications_cols(luy: 'DddLearningUnitYear'):
@@ -449,10 +469,9 @@ def _build_direct_gathering_label(direct_gathering_node: 'NodeGroupYear') -> str
                             direct_gathering_node.group_title_fr or '') if direct_gathering_node else ''
 
 
-# FIXME :: performance : hit database on each forloop, must load all versions before the forloop
-def _build_main_gathering_label(gathering_node: 'Node') -> str:
+def _build_main_gathering_label(gathering_node: 'Node', tree_versions: List['ProgramTreeVersion']) -> str:
     if gathering_node:
-        pgm_tree_version = _get_program_tree_version(gathering_node.year, gathering_node.code)
+        pgm_tree_version = _get_program_tree_version(gathering_node.year, gathering_node.code, tree_versions)
         return "{}{} - {}".format(
             gathering_node.title,
             pgm_tree_version.version_label if pgm_tree_version else '',
@@ -485,10 +504,9 @@ def get_explore_parents(parents_of_ue: List['Node']) -> Dict[str, 'Node']:
             if option_list and parent.is_finality():
                 exclude_ue_from_list = True
             else:
-                if main_parent is None \
-                        and (parent.is_training()
-                             or parent.is_mini_training()
-                             or parent.node_type in [GroupType.COMPLEMENTARY_MODULE]):
+                if parent.is_training() or parent.is_mini_training() or \
+                        parent.node_type in [GroupType.COMPLEMENTARY_MODULE]:
+
                     main_parent = parent
             if parent.node_type in [GroupType.OPTION_LIST_CHOICE]:
                 option_list = True
@@ -512,16 +530,12 @@ def _get_distinct_teachers(luy):
     return teachers
 
 
-def _get_program_tree_version(year: int, code: str):
-    get_cmd = command.GetProgramTreeVersionFromNodeCommand(
-        code=code,
-        year=year
+def _get_program_tree_version(year: int, code: str, tree_versions: List['ProgramTreeVersion']):
+    program_tree_identity = ProgramTreeIdentity(code=code, year=year)
+    return next(
+        tree_version for tree_version in tree_versions
+        if tree_version.program_tree_identity == program_tree_identity
     )
-    try:
-        return get_program_tree_version_from_node_service.get_program_tree_version_from_node(
-            get_cmd)
-    except (BusinessException, ProgramTreeVersionNotFoundException):
-        return None
 
 
 def _get_xls_title(tree: 'ProgramTree', program_tree_version: 'ProgramTreeVersion') -> str:
