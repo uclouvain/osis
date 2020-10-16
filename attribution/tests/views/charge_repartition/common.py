@@ -31,8 +31,8 @@ from attribution.tests.factories.attribution_new import AttributionNewFactory
 from base.tests.factories.learning_component_year import LecturingLearningComponentYearFactory, \
     PracticalLearningComponentYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFullFactory, LearningUnitYearPartimFactory
-from base.tests.factories.person import PersonWithPermissionsFactory
 from base.views.mixins import RulesRequiredMixin
+from learning_unit.tests.factories.central_manager import CentralManagerFactory
 
 
 class TestChargeRepartitionMixin:
@@ -52,7 +52,7 @@ class TestChargeRepartitionMixin:
         cls.practical_component_full = PracticalLearningComponentYearFactory(
             learning_unit_year=cls.full_learning_unit_year
         )
-        cls.person = PersonWithPermissionsFactory('can_access_learningunit')
+        cls.person = CentralManagerFactory().person
 
     def setUp(self):
         self.attribution = AttributionNewFactory(
