@@ -49,8 +49,6 @@ class TestSelectAttributionView(TestChargeRepartitionMixin, TestCase):
 
     def test_template_used(self):
         response = self.client.get(self.url)
-
-        self.assertTrue(self.mocked_permission_function.called)
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, "attribution/charge_repartition/select_attribution.html")
 
@@ -102,15 +100,13 @@ class TestAddChargeRepartition(TestChargeRepartitionMixin, TestCase):
 
     def test_template_used_with_get(self):
         response = self.client.get(self.url)
-
-        self.assertTrue(self.mocked_permission_function.called)
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, "attribution/charge_repartition/add_charge_repartition_inner.html")
 
     def test_post(self):
         data = {
-            'lecturing_charge_form-allocation_charge': 50,
-            'practical_charge_form-allocation_charge': 10
+            'lecturing_form-allocation_charge': 50,
+            'practical_form-allocation_charge': 10
         }
         response = self.client.post(self.url, data=data)
         AttributionChargeNew.objects.get(learning_component_year=self.lecturing_component, allocation_charge=50)
