@@ -189,7 +189,7 @@ class CreateTrainingForm(ValidationRuleMixin, forms.Form):
     secondary_domains = fields.SecondaryDomainsField(
         'university_domains',
         required=False,
-        label=_('secondary domains').title(),
+        label=_('secondary domains').capitalize(),
     )
     isced_domain = forms.ModelChoiceField(
         queryset=DomainIsced.objects.all(),
