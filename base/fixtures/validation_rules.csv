@@ -1085,7 +1085,7 @@ base.validationrule,TrainingForm.CERTIFICATE_OF_SUCCESS.rate_code,FIXED,NO_ADDIT
 base.validationrule,TrainingForm.CERTIFICATE_OF_HOLDING_CREDITS.rate_code,FIXED,NO_ADDITIONAL_FEES,,,,,
 base.validationrule,TrainingForm.BACHELOR.rate_code,FIXED,MINERVAL_COMPLETE,,,,,
 base.validationrule,TrainingForm.CAPAES.rate_code,FIXED,AESS_CAPAES,,,,,
-base.validationrule,TrainingForm.CERTIFICATE.rate_code,REQUIRED,,,,,,
+base.validationrule,TrainingForm.CERTIFICATE.rate_code,NOT_REQUIRED,,,,,,
 base.validationrule,TrainingForm.RESEARCH_CERTIFICATE.rate_code,FIXED,AESS_CAPAES,,,,,
 base.validationrule,TrainingForm.UNIVERSITY_FIRST_CYCLE_CERTIFICATE.rate_code,FIXED,NO_ADDITIONAL_FEES,,,,,
 base.validationrule,TrainingForm.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.rate_code,FIXED,NO_ADDITIONAL_FEES,,,,,
