@@ -149,10 +149,8 @@ msgstr ""
 msgid "Cannot add any element to learning unit"
 msgstr ""
 
-#, fuzzy
-#| msgid "Cannot detach due to prerequisites."
 msgid "Cannot attach a node to himself."
-msgstr "Cannot remove link due to prerequisites."
+msgstr ""
 
 msgid "Cannot detach due to prerequisites."
 msgstr "Cannot remove link due to prerequisites."
