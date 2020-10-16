@@ -1,6 +1,6 @@
 from types import new_class
 
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, override_settings
 from rules import predicate
 
 from base.tests.factories.user import UserFactory
@@ -8,6 +8,7 @@ from osis_role import cache
 from osis_role.cache import CachePredicateResultNotFound, predicate_cache
 
 
+@override_settings(PERMISSION_CACHE_ENABLED=True)
 class TestGetCachePredicateResult(SimpleTestCase):
     def setUp(self):
         self.user = UserFactory.build()
@@ -26,6 +27,7 @@ class TestGetCachePredicateResult(SimpleTestCase):
         )
 
 
+@override_settings(PERMISSION_CACHE_ENABLED=True)
 class TestSetCachePredicateResult(SimpleTestCase):
     def setUp(self):
         self.user = UserFactory.build()
@@ -40,6 +42,7 @@ class TestSetCachePredicateResult(SimpleTestCase):
         )
 
 
+@override_settings(PERMISSION_CACHE_ENABLED=True)
 class TestPredicateCacheDecorator(SimpleTestCase):
     def setUp(self):
         self.user = UserFactory.build()
