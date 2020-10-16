@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-13 15:50+0200\n"
+"POT-Creation-Date: 2020-10-16 11:16+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -82,9 +82,9 @@ msgstr ""
 msgid "%(start_index)s to %(end_index)s of %(total_counts)s offers"
 msgstr "%(start_index)s à %(end_index)s sur %(total_counts)s formations"
 
+#, python-format
 msgid "%(start_index)s to %(end_index)s of %(total_counts)s trainings"
-msgstr ""
-"%(start_index)s à %(end_index)s sur %(total_counts)s formations"
+msgstr "%(start_index)s à %(end_index)s sur %(total_counts)s formations"
 
 msgid "1st quadri"
 msgstr ""
@@ -231,6 +231,9 @@ msgstr "Crédits"
 msgid "Description fiche"
 msgstr ""
 
+msgid "Description fiche (including force majeure)"
+msgstr "Fiche descriptive (cas de force majeure inclus)"
+
 msgid "Direct gathering"
 msgstr "Regroupement direct"
 
@@ -298,6 +301,18 @@ msgstr ""
 
 msgid "Language"
 msgstr ""
+
+msgid "Last update description fiche (force majeure) by"
+msgstr "Dernière modification fiche descriptive (cas de force majeure) par"
+
+msgid "Last update description fiche (force majeure) on"
+msgstr "Dernière modification fiche descriptive (cas de force majeure) le"
+
+msgid "Last update description fiche by"
+msgstr "Dernière modification fiche descriptive par"
+
+msgid "Last update description fiche on"
+msgstr "Dernière modification fiche descriptive le"
 
 msgid "Learning achievements"
 msgstr ""
@@ -427,7 +442,7 @@ msgid "Other informations"
 msgstr "Autres informations"
 
 msgid "Other informations (force majeure)"
-msgstr "Autres informations"
+msgstr "Autres informations (cas de force majeure)"
 
 msgid "Particulière"
 msgstr "Particulière"
@@ -789,4 +804,3 @@ msgstr "formation"
 
 msgid "yes"
 msgstr "oui"
-

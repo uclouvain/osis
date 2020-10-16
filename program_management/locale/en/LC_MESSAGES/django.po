@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-13 15:50+0200\n"
+"POT-Creation-Date: 2020-10-16 11:16+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -210,6 +210,9 @@ msgstr ""
 msgid "Description fiche"
 msgstr ""
 
+msgid "Description fiche (including force majeure)"
+msgstr ""
+
 msgid "Direct gathering"
 msgstr ""
 
@@ -272,6 +275,18 @@ msgid ""
 msgstr ""
 
 msgid "Language"
+msgstr ""
+
+msgid "Last update description fiche (force majeure) by"
+msgstr ""
+
+msgid "Last update description fiche (force majeure) on"
+msgstr ""
+
+msgid "Last update description fiche by"
+msgstr ""
+
+msgid "Last update description fiche on"
 msgstr ""
 
 msgid "Learning achievements"
