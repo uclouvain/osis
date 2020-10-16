@@ -22,7 +22,6 @@ from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception as program_exception
 from program_management.ddd.domain.service.get_program_tree_version_for_tree import get_program_tree_version_for_tree
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
-from program_management.ddd.service.read import get_program_tree_service, get_program_tree_version_from_node_service
 from program_management.forms import content as content_forms
 from program_management.models.enums.node_type import NodeType
 
@@ -136,7 +135,7 @@ class ContentUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "code": node.code,
             "abbreviated_title": node.title,
             "version": "[{}]".format(version_identity.version_name)
-            if version_identity and not version_identity.is_standard else "",
+                       if version_identity and not version_identity.is_standard() else "",
             "year": node.academic_year
         }
 

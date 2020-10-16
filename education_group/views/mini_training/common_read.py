@@ -44,13 +44,18 @@ from base.models.enums.education_group_types import MiniTrainingType
 from base.utils.urls import reverse_with_get
 from base.views.common import display_warning_messages
 from education_group.forms.academic_year_choices import get_academic_year_choices
+from education_group.forms.tree_version_choices import get_tree_versions_choices
 from education_group.views.mixin import ElementSelectedClipBoardMixin
 from education_group.views.proxy import read
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd.domain.node import NodeIdentity, NodeNotFoundException
+from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories import load_tree
+from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
+from program_management.forms.custom_xls import CustomXlsForm
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.models.element import Element
+from program_management.serializers.program_tree_view import program_tree_view_serializer
 from education_group.forms.tree_version_choices import get_tree_versions_choices
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
@@ -118,11 +123,16 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             return self.get_tree().get_node(self.get_path())
         except NodeNotFoundException:
             root_node = self.get_tree().root_node
+            version_identity = self.program_tree_version_identity
             message = _(
                 "The formation you work with doesn't exist (or is not at the same position) "
-                "in the tree {root.title} in {root.year}."
+                "in the tree {root.title}{version} in {root.year}."
                 "You've been redirected to the root {root.code} ({root.year})"
-            ).format(root=root_node)
+            ).format(
+                root=root_node,
+                version="[{}]".format(version_identity.version_name)
+                if version_identity and not version_identity.is_standard() else ""
+            )
             display_warning_messages(self.request, message)
             return root_node
 
