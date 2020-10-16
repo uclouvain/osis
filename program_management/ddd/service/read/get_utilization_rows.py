@@ -144,6 +144,11 @@ def _build_parents_info(link: 'Link',
     if not found:
         lk_to_update = utilization_rows_dict.get(link, [])
         if link.parent not in lk_to_update:
+            if link.parent.is_training() or (link.parent.is_mini_training() and not link.parent.is_option()):
+                lk_to_update.append({
+                    'parent_direct_node': link.parent,
+                    'root_node': None
+                })
             utilization_rows_dict[link] = lk_to_update
 
 
