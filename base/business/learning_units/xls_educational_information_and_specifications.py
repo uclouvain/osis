@@ -55,6 +55,7 @@ CMS_ALLOWED_TAGS = []
 
 
 def create_xls_educational_information_and_specifications(user, learning_units, request):
+
     titles = _get_titles()
 
     working_sheet_data = prepare_xls_educational_information_and_specifications(learning_units, request)
