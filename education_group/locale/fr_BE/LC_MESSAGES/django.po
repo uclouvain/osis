@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-10 09:40+0200\n"
+"POT-Creation-Date: 2020-10-07 14:01+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -48,8 +48,10 @@ msgstr[1] ""
 msgid "%(max)s must be greater or equals than %(min)s"
 msgstr "%(max)s doit être plus grand ou égal à %(min)s"
 
-msgid "ARES"
-msgstr "ARES"
+#, python-format
+msgid "%(start_index)s to %(end_index)s of %(total_counts)s common topics"
+msgstr ""
+"%(start_index)s à %(end_index)s sur %(total_counts)s rubriques communes"
 
 msgid "ARES ability"
 msgstr "Habilitation ARES"
@@ -59,6 +61,9 @@ msgstr "Code étude ARES"
 
 msgid "ARES-GRACA"
 msgstr "ARES-GRACA"
+
+msgid "Ac yr."
+msgstr "Anac."
 
 msgid "Academic responsible"
 msgstr "Responsable académique"
@@ -124,6 +129,10 @@ msgstr "Adultes en reprise d'études"
 msgid "Alert Message"
 msgstr "Message d'alerte"
 
+msgctxt "female plural"
+msgid "All"
+msgstr "Toutes"
+
 #, python-format
 msgid "Are you sure you want to delete %(acronym)s - %(title)s ?"
 msgstr "Êtes-vous sûr·e de vouloir supprimer %(acronym)s - %(title)s ?"
@@ -141,6 +150,9 @@ msgstr "Bloc"
 msgid "Cancel"
 msgstr "Annuler"
 
+msgid "Catalog configuration"
+msgstr "Configuration du catalogue"
+
 msgid "Category"
 msgstr "Catégorie"
 
@@ -157,6 +169,14 @@ msgid "Certificate aim can only be edited by program manager"
 msgstr ""
 "Attendus du diplôme peuvent seulement être modifiés par un gestionnaire de "
 "programme"
+
+#, python-format
+msgid ""
+"Certificate aims only for training <a href='%(link)s'> %(acronym)s "
+"(%(academic_year)s) </a> have been successfully updated."
+msgstr ""
+"Les attendus du diplôme de <a href='%(link)s'> %(acronym)s "
+"(%(academic_year)s) </a> ont été modifiés avec succès"
 
 msgid "Clear clipboard"
 msgstr "Vider le presse-papier"
@@ -177,6 +197,9 @@ msgstr "Code co-diplômation intra CfB"
 msgid "Comment"
 msgstr "Commentaire"
 
+msgid "Common admission conditions have been updated"
+msgstr "Les conditions d'admission communes ont été mises à jour"
+
 msgid "Common admission conditions will be published soon"
 msgstr "Les conditions d'admission communes seront publiées sous peu"
 
@@ -186,11 +209,14 @@ msgstr "Les informations générales communes seront publiées sous peu"
 msgid "Conditions"
 msgstr "Conditions"
 
+msgid "Configuration"
+msgstr "Configuration"
+
 #, python-format
 msgid ""
-"Consistency error in %(academic_year)s: %(field)s has already been modified"
+"Consistency error in %(academic_year)s: %(fields)s has already been modified"
 msgstr ""
-"Erreur de consistance en %(academic_year)s: %(field)s a déjà été modifié"
+"Erreur de consistance en %(academic_year)s: %(fields)s a déjà été modifié"
 
 msgid "Contacts"
 msgstr "Contacts"
@@ -240,9 +266,6 @@ msgstr "Supprimer"
 
 msgid "Deliberation"
 msgstr "Délibération"
-
-msgid "Detach"
-msgstr "Retirer"
 
 msgid "Diploma"
 msgstr "Diplôme"
@@ -314,6 +337,12 @@ msgstr "Maîtrise de la langue française"
 msgid "From"
 msgstr "De"
 
+msgid "Full title of the english version"
+msgstr "Intitulé de la version en anglais"
+
+msgid "Full title of the french version"
+msgstr "Intitulé de la version en français"
+
 msgid "Funding"
 msgstr "Finançable"
 
@@ -332,11 +361,8 @@ msgstr "Conditions Générales"
 msgid "General informations"
 msgstr "Infos générales"
 
-msgid "Go down"
-msgstr "Descendre"
-
-msgid "Go up"
-msgstr "Monter"
+msgid "General informations have been updated"
+msgstr "Les informations générales ont été mises à jour"
 
 msgid "Graduates"
 msgstr "Diplômés"
@@ -412,8 +438,19 @@ msgstr "Unité d'enseignement"
 msgid "Link type"
 msgstr "Type de lien"
 
+msgctxt "male"
 msgid "Main"
-msgstr "Principale"
+msgstr "Principal"
+
+msgid "Management common topics"
+msgstr "Gestion des rubriques communes"
+
+msgid ""
+"Management common topics in the context of training's general informations "
+"and access conditions"
+msgstr ""
+"Gestion des rubriques communes pour les informations générales et les "
+"conditions d'admission aux formations"
 
 msgid "Management entity"
 msgstr "Entité de gestion"
@@ -434,10 +471,10 @@ msgid "Mini-Training"
 msgstr "Mini-Formation"
 
 #, python-format
-msgid "Mini-Training %(acronym)s (%(academic_year)s) successfully deleted."
+msgid "Mini-Training %(acronym)s successfully deleted from %(academic_year)s."
 msgstr ""
-"La mini-formation %(acronym)s (%(academic_year)s) </a> a été supprimée avec "
-"succès"
+"La mini-formation %(acronym)s a été supprimée avec succès à partir de "
+"%(academic_year)s."
 
 #, python-format
 msgid ""
@@ -471,13 +508,8 @@ msgstr "Nouvelle Mini-Formation"
 msgid "New Training"
 msgstr "Nouvelle Formation"
 
-#, python-format
-msgid ""
-"No type of %(child_category)s can be created as child of %(category)s of "
-"type %(type)s"
-msgstr ""
-"Aucun type de %(child_category)s ne peut être créé comme enfant d'un(e) "
-"%(category)s de type %(type)s"
+msgid "No result!"
+msgstr "Aucun résultat!"
 
 msgid "Non university Bachelors"
 msgstr "Bacheliers non universitaires"
@@ -564,6 +596,9 @@ msgstr "Diffusion des notes"
 msgid "Search..."
 msgstr "Recherche..."
 
+msgid "Select one or multiple certificate aims"
+msgstr "Choisissez un ou plusieurs attendus du diplôme"
+
 msgid "Session"
 msgstr "Session"
 
@@ -602,9 +637,6 @@ msgstr ""
 "Les champs concernant les données de l'ARES doivent être soit tous remplis "
 "soit tous vides"
 
-msgid "The following links has been updated"
-msgstr "Les liens suivants ont été mis à jour"
-
 #, python-brace-format
 msgid ""
 "The formation you work with doesn't exist (or is not at the same position) "
@@ -612,16 +644,12 @@ msgid ""
 "{root.code} ({root.year})"
 msgstr ""
 "La formation avec laquelle vous travaillez n'existe pas (ou n'est pas à la "
-"même position) dans le programme de {root.title} en {root.year}.Vous avez "
-"été redirigé vers la racine du programme : {root.code} ({root.year})."
+"même position) dans la formation {root.title} en {root.year}.Vous avez été "
+"redirigé vers la racine de la formation : {root.code} ({root.year})."
 
 #, python-format
 msgid "The group %(code)s has been deleted."
 msgstr "Le groupement %(code)s a été supprimé."
-
-#, python-format
-msgid "The link of %(code)s - %(acronym)s - %(year)s has been updated."
-msgstr "Le lien de %(code)s - %(acronym)s - %(year)s a été mis à jour."
 
 #, python-format
 msgid "The mini-training %(code)s - %(title)s has been deleted."
@@ -694,9 +722,10 @@ msgid "Training"
 msgstr "Formation"
 
 #, python-format
-msgid "Training %(acronym)s (%(academic_year)s) successfully deleted."
+msgid "Training %(acronym)s successfully deleted from %(academic_year)s."
 msgstr ""
-"La formation %(acronym)s (%(academic_year)s) </a> a été supprimée avec succès"
+"La formation %(acronym)s a été supprimée avec succès à partir de "
+"%(academic_year)s."
 
 #, python-format
 msgid ""
@@ -709,7 +738,7 @@ msgstr ""
 #, python-format
 msgid ""
 "Training <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> "
-"successfully updated."
+"successfully updated"
 msgstr ""
 "La formation <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> a été "
 "modifiée avec succès"
@@ -717,6 +746,16 @@ msgstr ""
 #, python-brace-format
 msgid "Training not found : {acronym} {year}"
 msgstr "Formation non trouvée : {acronym} {year}"
+
+msgid "Training version can only be created by central manager"
+msgstr ""
+"La création d'une version de formation peut seulement être réalisée par le "
+"gestionnaire en central"
+
+msgid "Training version can only be deleted by central manager"
+msgstr ""
+"La suppression d'une version de formation peut seulement être réalisée par "
+"le gestionnaire en central"
 
 msgid "Trainings"
 msgstr "Formations"
@@ -873,9 +912,6 @@ msgstr "contrainte maximum"
 msgid "minimum constraint"
 msgstr "contrainte minimum"
 
-msgid "of version"
-msgstr "de la version"
-
 msgid "on successful completion of this program, each student is able to"
 msgstr "au terme de ce programme, le diplômé est capable de"
 
@@ -905,3 +941,6 @@ msgstr "indéfini"
 
 msgid "unspecified"
 msgstr "indéterminé"
+
+msgid "with certificate aims"
+msgstr "avec attendus du diplôme"

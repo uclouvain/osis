@@ -36,7 +36,8 @@ from base.utils.urls import reverse_with_get
 from program_management.models.enums.node_type import NodeType
 from program_management.serializers.node_view import _get_node_view_attribute_serializer, \
     _get_leaf_view_attribute_serializer, \
-    _leaf_view_serializer, _get_node_view_serializer, get_program_tree_version_complete_name
+    _leaf_view_serializer, _get_node_view_serializer, get_program_tree_version_complete_name, \
+    get_program_tree_version_title
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
@@ -134,7 +135,7 @@ class TestLeafViewSerializer(SimpleTestCase):
 
     def test_serializer_leaf_ensure_text_case_leaf_doesnt_have_same_year_of_root(self):
         self.link.child.year = self.root_node.year - 1
-        expected_text = self.link.child.code + "|" + str(self.link.child.year)
+        expected_text = "|" + str(self.link.child.year) + "|" + self.link.child.code
         serialized_data = _leaf_view_serializer(self.link, self.path, self.tree, context=self.context)
         self.assertEqual(serialized_data['text'], expected_text)
 
@@ -281,40 +282,40 @@ class TestLeafViewAttributeSerializer(SimpleTestCase):
         self.assertEqual(serialized_data['title'], expected_title)
 
     def test_serializer_node_attr_ensure_get_css_class_proposal_creation(self):
-        self.link.child.proposal_type = ProposalType.CREATION
+        self.link.child.proposal_type = ProposalType.CREATION.name
         expected_css_class = "proposal proposal_creation"
         serialized_data = _get_leaf_view_attribute_serializer(self.link, self.path, self.tree, context=self.context)
-        self.assertEqual(serialized_data['css_class'], expected_css_class)
+        self.assertEqual(serialized_data['class'], expected_css_class)
 
     def test_serializer_node_attr_ensure_get_css_class_proposal_modification(self):
-        self.link.child.proposal_type = ProposalType.MODIFICATION
+        self.link.child.proposal_type = ProposalType.MODIFICATION.name
         expected_css_class = "proposal proposal_modification"
         serialized_data = _get_leaf_view_attribute_serializer(self.link, self.path, self.tree, context=self.context)
-        self.assertEqual(serialized_data['css_class'], expected_css_class)
+        self.assertEqual(serialized_data['class'], expected_css_class)
 
     def test_serializer_node_attr_ensure_get_css_class_proposal_transformation(self):
-        self.link.child.proposal_type = ProposalType.TRANSFORMATION
+        self.link.child.proposal_type = ProposalType.TRANSFORMATION.name
         expected_css_class = "proposal proposal_transformation"
         serialized_data = _get_leaf_view_attribute_serializer(self.link, self.path, self.tree, context=self.context)
-        self.assertEqual(serialized_data['css_class'], expected_css_class)
+        self.assertEqual(serialized_data['class'], expected_css_class)
 
     def test_serializer_node_attr_ensure_get_css_class_proposal_transformation_modification(self):
-        self.link.child.proposal_type = ProposalType.TRANSFORMATION_AND_MODIFICATION
+        self.link.child.proposal_type = ProposalType.TRANSFORMATION_AND_MODIFICATION.name
         expected_css_class = "proposal proposal_transformation_modification"
         serialized_data = _get_leaf_view_attribute_serializer(self.link, self.path, self.tree, context=self.context)
-        self.assertEqual(serialized_data['css_class'], expected_css_class)
+        self.assertEqual(serialized_data['class'], expected_css_class)
 
     def test_serializer_node_attr_ensure_get_css_class_proposal_suppression(self):
-        self.link.child.proposal_type = ProposalType.SUPPRESSION
+        self.link.child.proposal_type = ProposalType.SUPPRESSION.name
         expected_css_class = "proposal proposal_suppression"
         serialized_data = _get_leaf_view_attribute_serializer(self.link, self.path, self.tree, context=self.context)
-        self.assertEqual(serialized_data['css_class'], expected_css_class)
+        self.assertEqual(serialized_data['class'], expected_css_class)
 
     def test_serializer_node_attr_ensure_get_css_class_no_proposal(self):
         self.link.child.proposal_type = None
         expected_css_class = ""
         serialized_data = _get_leaf_view_attribute_serializer(self.link, self.path, self.tree, context=self.context)
-        self.assertEqual(serialized_data['css_class'], expected_css_class)
+        self.assertEqual(serialized_data['class'], expected_css_class)
 
 
 class TestVersionNodeViewSerializerInEn(SimpleTestCase):
@@ -333,7 +334,16 @@ class TestVersionNodeViewSerializerInEn(SimpleTestCase):
         )
         self.tree_fr_en = ProgramTreeFactory(root_node=self.root_node_with_fr_en_title)
         self.tree_version_fr_en = ProgramTreeVersionFactory(tree=self.tree_fr_en, entity_id__version_name='CEMS',
-                                                               title_fr='Title fr', title_en='Title en')
+                                                            title_fr='Title fr', title_en='Title en')
+
+        self.root_node_without_fr_title = NodeGroupYearFactory(
+            node_id=1, code="LCOB100A", title="COBBA", year=2018,
+            node_type=random.choice(TrainingType.finality_types_enum())
+        )
+        self.tree_without_fr = ProgramTreeFactory(root_node=self.root_node_without_fr_title)
+        self.tree_version_without_fr_ = ProgramTreeVersionFactory(tree=self.tree_without_fr,
+                                                                  entity_id__version_name='CEMS',
+                                                                  title_fr=None)
 
     def test_complete_title_for_finality_without_en_title(self):
 
@@ -366,3 +376,39 @@ class TestVersionNodeViewSerializerInEn(SimpleTestCase):
             'fr')
         self.assertEqual(complete_title, " - {}{}".format(self.tree_version_fr_en.title_fr,
                                                           self.tree_version_fr_en.version_label))
+
+    def test_title_without_en_title(self):
+
+        title = get_program_tree_version_title(
+            NodeIdentity(code=self.root_node_without_en_title.code, year=self.root_node_without_en_title.year),
+            [self.tree_version_fr_no_en],
+            'en')
+        self.assertEqual(title, "[{}]".format(self.tree_version_fr_no_en.title_fr))
+
+        title = get_program_tree_version_title(
+            NodeIdentity(code=self.root_node_without_en_title.code, year=self.root_node_without_en_title.year),
+            [self.tree_version_fr_no_en],
+            'fr')
+        self.assertEqual(title, "[{}]".format(self.tree_version_fr_no_en.title_fr))
+
+    def test_title_with_en_title(self):
+
+        title = get_program_tree_version_title(
+            NodeIdentity(code=self.root_node_with_fr_en_title.code, year=self.root_node_with_fr_en_title.year),
+            [self.tree_version_fr_en],
+            'en')
+        self.assertEqual(title, "[{}]".format(self.tree_version_fr_en.title_en))
+
+        title = get_program_tree_version_title(
+            NodeIdentity(code=self.root_node_with_fr_en_title.code, year=self.root_node_with_fr_en_title.year),
+            [self.tree_version_fr_en],
+            'fr')
+        self.assertEqual(title, "[{}]".format(self.tree_version_fr_en.title_fr))
+
+    def test_title_without_fr_title(self):
+
+        title = get_program_tree_version_title(
+            NodeIdentity(code=self.root_node_without_fr_title.code, year=self.root_node_without_fr_title.year),
+            [self.tree_version_without_fr_],
+            'fr')
+        self.assertEqual(title, "")

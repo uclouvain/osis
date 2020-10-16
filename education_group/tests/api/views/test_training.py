@@ -35,6 +35,7 @@ from rest_framework.test import APITestCase
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
 from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.campus import CampusFactory
 from base.tests.factories.education_group_year import TrainingFactory
 from base.tests.factories.hops import HopsFactory
 from base.tests.factories.person import PersonFactory
@@ -244,7 +245,8 @@ class FilterTrainingTestCase(APITestCase):
 
         versions = EducationGroupVersion.objects.filter(
             offer__education_group_type__category=education_group_categories.TRAINING,
-            offer__academic_year__year__gte=query_string['from_year']
+            offer__academic_year__year__gte=query_string['from_year'],
+            is_transition=False
         ).order_by('-offer__academic_year__year', 'offer__acronym')
 
         serializer = TrainingListSerializer(
@@ -255,7 +257,7 @@ class FilterTrainingTestCase(APITestCase):
                 'language': settings.LANGUAGE_CODE_FR
             },
         )
-        self.assertEqual(response.data['results'], serializer.data)
+        self.assertCountEqual(response.data['results'], serializer.data)
 
     def test_get_training_case_filter_to_year_params(self):
         query_string = {'to_year': 2019}
@@ -308,7 +310,7 @@ class FilterTrainingTestCase(APITestCase):
             many=True,
             context={'request': RequestFactory().get(self.url, query_string)},
         )
-        self.assertEqual(response.data['results'], serializer.data)
+        self.assertCountEqual(response.data['results'], serializer.data)
 
     def test_get_filter_by_multiple_education_group_type(self):
         """

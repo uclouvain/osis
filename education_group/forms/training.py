@@ -60,6 +60,7 @@ from education_group.ddd.business_types import *
 from education_group.forms import fields
 from education_group.forms.fields import MainEntitiesVersionChoiceField, UpperCaseCharField
 from education_group.forms.widgets import CertificateAimsWidget
+from osis_role.errors import get_permission_error
 from reference.models.domain import Domain
 from reference.models.domain_isced import DomainIsced
 from reference.models.enums import domain_type
@@ -74,7 +75,7 @@ def _get_section_choices():
     return add_blank(CertificateAim.objects.values_list('section', 'section').distinct().order_by('section'))
 
 
-class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
+class CreateTrainingForm(ValidationRuleMixin, forms.Form):
 
     # panel_informations_form.html
     acronym = UpperCaseCharField(max_length=15, label=_("Acronym/Short title"))
@@ -304,10 +305,11 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
         )
     )
 
-    def __init__(self, *args, user: User, training_type: str, attach_path: str, **kwargs):
+    def __init__(self, *args, user: User, training_type: str, attach_path: str, training: 'Training' = None,  **kwargs):
         self.user = user
         self.training_type = training_type
         self.attach_path = attach_path
+        self.training = training
 
         super().__init__(*args, **kwargs)
 
@@ -324,31 +326,26 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
 
     def __init_academic_year_field(self):
         if not self.fields['academic_year'].disabled and self.user.person.is_faculty_manager:
-            academic_years = EventPermEducationGroupEdition.get_academic_years().filter(
-                year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION
-            )
-            self.fields['academic_year'].queryset = academic_years
-            self.fields['end_year'].queryset = academic_years
+            working_academic_years = EventPermEducationGroupEdition.get_academic_years()
         else:
-            self.fields['academic_year'].queryset = self.fields['academic_year'].queryset.filter(
-                year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION
-            )
-            self.fields['end_year'].queryset = self.fields['end_year'].queryset.filter(
-                year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION
-            )
+            working_academic_years = AcademicYear.objects.all()
 
-            self.fields['academic_year'].label = _('Start')
+        working_academic_years = working_academic_years.filter(year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION)
+        self.fields['academic_year'].queryset = working_academic_years
+        self.fields['end_year'].queryset = AcademicYear.objects.filter(
+            year__gte=working_academic_years.first().year
+        )
 
     def __init_management_entity_field(self):
         self.fields['management_entity'] = fields.ManagementEntitiesChoiceField(
             person=self.user.person,
-            initial=None,
+            initial=self.initial.get('management_entity'),
             disabled=self.fields['management_entity'].disabled,
         )
 
     def __init_certificate_aims_field(self):
-        if not self.fields['certificate_aims'].disabled:
-            self.fields['section'].disabled = False
+        self.fields['certificate_aims'].disabled = True
+        self.fields['section'].disabled = True
 
     def __init_diploma_fields(self):
         if self.training_type in TrainingType.with_diploma_values_set_initially_as_true():
@@ -385,18 +382,8 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     def field_reference(self, field_name: str) -> str:
         return '.'.join(["TrainingForm", self.training_type, field_name])
 
-    # PermissionFieldMixin
-    def get_context(self) -> str:
-        is_edition_period_opened = EventPermEducationGroupEdition(raise_exception=False).is_open()
-        return TRAINING_PGRM_ENCODING_PERIOD if is_edition_period_opened else TRAINING_DAILY_MANAGEMENT
 
-    # PermissionFieldMixin
-    def get_model_permission_filter_kwargs(self) -> Dict:
-        return {'context': self.get_context()}
-
-
-class UpdateTrainingForm(CreateTrainingForm):
-
+class UpdateTrainingForm(PermissionFieldMixin, CreateTrainingForm):
     start_year = forms.ModelChoiceField(
         queryset=AcademicYear.objects.all(),
         label=_('Start academic year'),
@@ -404,16 +391,50 @@ class UpdateTrainingForm(CreateTrainingForm):
         disabled=True,
         required=False
     )
+    academic_year = forms.ModelChoiceField(
+        queryset=AcademicYear.objects.all(),
+        label=_("Validity"),
+        required=False,
+        disabled=True,
+        to_field_name="year"
+    )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, event_perm_obj=None, **kwargs):
+        self.event_perm_obj = event_perm_obj
+
         super().__init__(*args, **kwargs)
-        self.fields["academic_year"].label = _('Validity')
         self.__init_end_year_field()
+        self.__init_certificate_aims_field()
 
     def __init_end_year_field(self):
         initial_academic_year_value = self.initial.get("academic_year", None)
         if initial_academic_year_value:
             self.fields["end_year"].queryset = AcademicYear.objects.filter(year__gte=initial_academic_year_value)
+
+    def __init_certificate_aims_field(self):
+        perm = 'base.change_educationgroupcertificateaim'
+        if self.user.has_perm(perm, obj=self.training):
+            self.fields['certificate_aims'].disabled = False
+            self.fields['section'].disabled = False
+            self.fields['certificate_aims'].widget.attrs['title'] = _('Select one or multiple certificate aims')
+        else:
+            permission_error_msg = get_permission_error(self.user, perm)
+            self.fields['certificate_aims'].disabled = True
+            self.fields['section'].disabled = True
+            self.fields['certificate_aims'].widget.attrs['title'] = permission_error_msg
+            self.fields['certificate_aims'].widget.attrs['class'] = 'cursor-not-allowed'
+
+    # PermissionFieldMixin
+    def get_context(self) -> str:
+        is_edition_period_opened = EventPermEducationGroupEdition(
+            obj=self.event_perm_obj,
+            raise_exception=False
+        ).is_open()
+        return TRAINING_PGRM_ENCODING_PERIOD if is_edition_period_opened else TRAINING_DAILY_MANAGEMENT
+
+    # PermissionFieldMixin
+    def get_model_permission_filter_kwargs(self) -> Dict:
+        return {'context': self.get_context()}
 
 
 @register('university_domains')

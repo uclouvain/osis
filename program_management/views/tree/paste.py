@@ -23,8 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import functools
 import itertools
-from typing import List
+from typing import List, Union
 
 from django import shortcuts
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -41,8 +42,15 @@ import program_management.ddd.command
 from base.utils.cache import ElementCache
 from base.views.common import display_warning_messages, display_success_messages, display_error_messages
 from base.views.mixins import AjaxTemplateMixin
+from education_group.templatetags.academic_year_display import display_as_academic_year
+from education_group.ddd import command as command_education_group
+from education_group.ddd.domain.exception import GroupNotFoundException
+from education_group.ddd.service.read import get_group_service
 from education_group.models.group_year import GroupYear
-from osis_role.contrib.views import PermissionRequiredMixin
+from osis_common.ddd import interface
+from osis_role import errors
+from osis_role.contrib.views import AjaxPermissionRequiredMixin
+from program_management.ddd.business_types import *
 from program_management.ddd.domain import node
 from program_management.ddd.domain.node import NodeGroupYear
 from program_management.ddd.domain.node import NodeIdentity
@@ -53,21 +61,29 @@ from program_management.forms.tree.paste import PasteNodesFormset, paste_form_fa
     PasteToOptionListChoiceForm, PasteMinorMajorListToMinorMajorListChoiceForm
 
 
-class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageMixin, FormView):
+class PasteNodesView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageMixin, FormView):
     template_name = "tree/paste_inner.html"
     permission_required = "base.can_attach_node"
 
     def has_permission(self):
         return self._has_permission_to_detach() & super().has_permission()
 
+    def get_permission_error(self, request) -> str:
+        if not self._has_permission_to_detach():
+            return errors.get_permission_error(request.user, "base.can_detach_node")
+        return super().get_permission_error(request)
+
+    @functools.lru_cache()
     def _has_permission_to_detach(self) -> bool:
         nodes_to_detach_from = [
             int(element_selected["path_to_detach"].split("|")[-2])
             for element_selected in self.nodes_to_paste if element_selected["path_to_detach"]
         ]
         objs_to_detach_from = GroupYear.objects.filter(element__id__in=nodes_to_detach_from)
-        return all(self.request.user.has_perms(("base.can_detach_node",), obj_to_detach)
-                   for obj_to_detach in objs_to_detach_from)
+        return all(
+            self.request.user.has_perm("base.can_detach_node", obj_to_detach)
+            for obj_to_detach in objs_to_detach_from
+        )
 
     def get_permission_object(self) -> GroupYear:
         node_to_paste_to_id = int(self.request.GET['path'].split("|")[-1])
@@ -114,8 +130,8 @@ class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageM
         context_data["nodes_by_id"] = {
             ele["element_code"]: node_repository.NodeRepository.get(
                 node.NodeIdentity(ele["element_code"], ele["element_year"])
-            ) for ele in self.nodes_to_paste}
-
+            ) for ele in self.nodes_to_paste
+        }
         self._format_title_with_version(context_data["nodes_by_id"])
 
         for form in context_data["formset"].forms:
@@ -124,7 +140,7 @@ class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageM
             form.is_group_year_form = isinstance(node_elem, NodeGroupYear)
 
         if len(context_data["formset"]) > 0:
-            context_data['is_group_year_formset'] = context_data["formset"][0].is_group_year_form
+            context_data['has_group_year_form'] = context_data["formset"][0].is_group_year_form
 
         if not self.nodes_to_paste:
             display_warning_messages(self.request, _("Please cut or copy an item before paste"))
@@ -170,12 +186,39 @@ class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageM
         messages = []
         for link_identity in link_identities_ids:
             messages.append(
-                _("\"%(child)s\" has been pasted into \"%(parent)s\"") % {
-                    "child": link_identity.child_code,
-                    "parent": link_identity.parent_code
+                _("\"%(child)s\" has been %(copy_message)s into \"%(parent)s\"") % {
+                      "child": self.__get_node_str(link_identity.child_code, link_identity.child_year),
+                      "copy_message": _("pasted") if ElementCache(self.request.user.id).cached_data else _("added"),
+                      "parent": self.__get_node_str(link_identity.parent_code, link_identity.parent_year),
                 }
             )
         return messages
+
+    def __get_node_str(self, code: str, year: int) -> str:
+        try:
+            group_obj = self.__get_group_obj(code, year)
+            version_identity = self.__get_program_tree_version_identity(code, year)
+
+            return "%(code)s - %(abbreviated_title)s%(version)s - %(year)s" % {
+                "code": group_obj.code,
+                "abbreviated_title": group_obj.abbreviated_title,
+                "version": "[{}]".format(version_identity.version_name)
+                if version_identity and not version_identity.is_standard else "",
+                "year": group_obj.academic_year
+            }
+        except GroupNotFoundException:
+            return "%(code)s - %(year)s" % {"code": code, "year": display_as_academic_year(year)}
+
+    def __get_group_obj(self, code: str, year: int) -> 'Group':
+        cmd = command_education_group.GetGroupCommand(code=code, year=year)
+        return get_group_service.get_group(cmd)
+
+    def __get_program_tree_version_identity(self, code: str, year: int) -> Union['ProgramTreeVersionIdentity', None]:
+        try:
+            node_identity = NodeIdentity(code=code, year=year)
+            return ProgramTreeVersionIdentitySearch().get_from_node_identity(node_identity)
+        except interface.BusinessException:
+            return None
 
     def _is_parent_a_minor_major_option_list_choice(self, formset):
         return any(isinstance(form, (

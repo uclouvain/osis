@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-08 11:34+0200\n"
+"POT-Creation-Date: 2020-10-05 09:24+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -53,10 +53,6 @@ msgstr ""
 
 #, python-format
 msgid "%(number_extended)s object(s) extended and %(number_error)s error(s)"
-msgstr ""
-
-#, python-format
-msgid "%(number_notifications)s unread notification(s)"
 msgstr ""
 
 #, python-format
@@ -278,7 +274,11 @@ msgstr ""
 msgid "Alert"
 msgstr ""
 
-msgctxt "plural"
+msgctxt "female plural"
+msgid "All"
+msgstr ""
+
+msgctxt "male plural"
 msgid "All"
 msgstr ""
 
@@ -300,6 +300,10 @@ msgstr ""
 msgid "And"
 msgstr ""
 
+msgid "Annual"
+msgstr ""
+
+msgctxt "female"
 msgid "Annual"
 msgstr ""
 
@@ -402,6 +406,12 @@ msgstr ""
 msgid "Benefits and organization"
 msgstr ""
 
+msgid "Biennial even"
+msgstr ""
+
+msgid "Biennial odd"
+msgstr ""
+
 msgid "Birth Date"
 msgstr ""
 
@@ -477,9 +487,6 @@ msgstr ""
 msgid "Classes"
 msgstr ""
 
-msgid "Clear notifications"
-msgstr ""
-
 msgid "Click on the map to set the location"
 msgstr ""
 
@@ -535,6 +542,9 @@ msgid "Conditions"
 msgstr ""
 
 msgid "Configurable list of learning units"
+msgstr ""
+
+msgid "Configuration"
 msgstr ""
 
 msgid "Confirm"
@@ -792,9 +802,6 @@ msgid "End of cycle"
 msgstr ""
 
 msgid "End year"
-msgstr ""
-
-msgid "Ending date"
 msgstr ""
 
 msgid "Ending of course registration"
@@ -1355,6 +1362,9 @@ msgstr ""
 msgid "Management of addresses on the scoresheets."
 msgstr ""
 
+msgid "Management of catalog configuration"
+msgstr ""
+
 msgid "Management of data by entity"
 msgstr ""
 
@@ -1616,10 +1626,6 @@ msgstr ""
 msgid "Note encoding"
 msgstr ""
 
-#, python-format
-msgid "Notification%(number_unread_notifications|pluralize)s"
-msgstr ""
-
 msgid "Number of elements"
 msgstr ""
 
@@ -1649,9 +1655,6 @@ msgid "Open for externs"
 msgstr ""
 
 msgid "Open minor"
-msgstr ""
-
-msgid "Opening date"
 msgstr ""
 
 msgid "Operation"
@@ -1875,6 +1878,9 @@ msgstr ""
 msgid "Professional"
 msgstr ""
 
+msgid "Professional integration"
+msgstr ""
+
 msgid "Professional internship"
 msgstr ""
 
@@ -1891,6 +1897,18 @@ msgid "Program commission"
 msgstr ""
 
 msgid "Program manager"
+msgstr ""
+
+msgid "Program manager is not allowed to modify a group"
+msgstr ""
+
+msgid "Program manager is not allowed to modify a link"
+msgstr ""
+
+msgid "Program manager is not allowed to modify a minitraining"
+msgstr ""
+
+msgid "Program manager is not allowed to modify a specific version"
 msgstr ""
 
 msgid "Program managers"
@@ -2472,6 +2490,9 @@ msgid ""
 msgstr ""
 
 msgid "The title is made up of the common part and / or any supplement"
+msgstr ""
+
+msgid "The user is not linked to this training"
 msgstr ""
 
 #, python-format
@@ -3066,9 +3087,6 @@ msgid "please_enable_javascript"
 msgstr ""
 "Please <a href='http://enable-javascript.com' target='_blank'>enable "
 "JavaScript</a> to use this application."
-
-msgid "professional integration"
-msgstr ""
 
 msgid "project events"
 msgstr ""

@@ -31,8 +31,7 @@ from django.db import transaction
 from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.command import CreateAndPostponeTrainingAndProgramTreeCommand, CreateTrainingCommand
-from education_group.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
-from education_group.ddd.service.write import create_group_service, create_orphan_training_service
+from education_group.ddd.service.write import create_orphan_training_service
 from program_management.ddd.command import CreateStandardVersionCommand, PostponeProgramTreeVersionCommand, \
     PostponeProgramTreeCommand
 from program_management.ddd.service.write import create_standard_version_service, postpone_tree_version_service, \
@@ -45,7 +44,6 @@ def create_and_report_training_with_program_tree(
 ) -> List['TrainingIdentity']:
     # GIVEN
     cmd = create_training_cmd
-    postpone_until = CalculateEndPostponement.calculate_max_year_of_end_postponement()
 
     # WHEN
     training_identities = create_orphan_training_service.create_and_postpone_orphan_training(
@@ -54,14 +52,17 @@ def create_and_report_training_with_program_tree(
 
     # THEN
 
-    # 1. Create orphan root group
-    create_group_service.create_orphan_group(
-        cmd=__convert_to_group_command(training_cmd=create_training_cmd)
+    # 1. Create Program tree
+    program_tree_identity = create_standard_program_tree_service.create_standard_program_tree(
+        CreateStandardVersionCommand(
+            offer_acronym=create_training_cmd.abbreviated_title,
+            code=create_training_cmd.code,
+            year=create_training_cmd.year,
+        )
     )
 
-    # 2. Create Program tree
-
-    program_tree_identity = create_standard_program_tree_service.create_standard_program_tree(
+    # 2. Create standard version of program tree
+    program_tree_version_identity = create_standard_version_service.create_standard_program_version(
         CreateStandardVersionCommand(
             offer_acronym=create_training_cmd.abbreviated_title,
             code=create_training_cmd.code,
@@ -75,20 +76,10 @@ def create_and_report_training_with_program_tree(
             from_code=program_tree_identity.code,
             from_year=program_tree_identity.year,
             offer_acronym=create_training_cmd.abbreviated_title,
-            until_year=postpone_until
         )
     )
 
-    # 4. Create standard version of program tree
-    program_tree_version_identity = create_standard_version_service.create_standard_program_version(
-        CreateStandardVersionCommand(
-            offer_acronym=create_training_cmd.abbreviated_title,
-            code=create_training_cmd.code,
-            year=create_training_cmd.year,
-        )
-    )
-
-    # 5. Postpone standard version of program tree
+    # 4. Postpone standard version of program tree
     postpone_tree_version_service.postpone_program_tree_version(
         PostponeProgramTreeVersionCommand(
             from_offer_acronym=program_tree_version_identity.offer_acronym,
@@ -96,35 +87,10 @@ def create_and_report_training_with_program_tree(
             from_year=program_tree_version_identity.year,
             from_is_transition=program_tree_version_identity.is_transition,
             from_code=create_training_cmd.code,
-            until_year=postpone_until
         )
     )
 
     return training_identities
-
-
-def __convert_to_group_command(
-        training_cmd: command.CreateAndPostponeTrainingAndProgramTreeCommand
-) -> command.CreateOrphanGroupCommand:
-    return command.CreateOrphanGroupCommand(
-        code=training_cmd.code,
-        year=training_cmd.year,
-        type=training_cmd.type,
-        abbreviated_title=training_cmd.abbreviated_title,
-        title_fr=training_cmd.title_fr,
-        title_en=training_cmd.title_en,
-        credits=training_cmd.credits,
-        constraint_type=training_cmd.constraint_type,
-        min_constraint=training_cmd.min_constraint,
-        max_constraint=training_cmd.max_constraint,
-        management_entity_acronym=training_cmd.management_entity_acronym,
-        teaching_campus_name=training_cmd.teaching_campus_name,
-        organization_name=training_cmd.teaching_campus_organization_name,
-        remark_fr=training_cmd.remark_fr,
-        remark_en=training_cmd.remark_en,
-        start_year=training_cmd.year,
-        end_year=training_cmd.end_year,
-    )
 
 
 def __convert_to_training_command(cmd: CreateAndPostponeTrainingAndProgramTreeCommand) -> 'CreateTrainingCommand':

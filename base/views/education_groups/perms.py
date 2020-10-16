@@ -27,18 +27,10 @@ from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
 
 from base.models.education_group_year import EducationGroupYear
-from base.models.enums.education_group_types import GroupType
 from cms.models import translated_text
-from osis_role.errors import get_permission_error
+from education_group.models.group_year import GroupYear
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 from program_management.ddd.repositories.program_tree import ProgramTreeRepository
-
-
-def can_change_education_group(user, education_group):
-    perm = 'base.change_link_data'
-    if not user.has_perm(perm, education_group):
-        raise PermissionDenied(get_permission_error(user, perm))
-    return True
 
 
 def can_change_general_information(view_func):
@@ -48,10 +40,7 @@ def can_change_general_information(view_func):
         tree = ProgramTreeRepository.get(identity)
         node = tree.root_node
         obj = translated_text.get_groups_or_offers_cms_reference_object(node)
-        perm_name = 'base.change_commonpedagogyinformation' \
-            if (node.node_type.name not in GroupType.get_names() and obj.is_common) \
-            else 'base.change_pedagogyinformation'
-        if not request.user.has_perm(perm_name, obj):
+        if not request.user.has_perm('base.change_pedagogyinformation', obj):
             raise PermissionDenied
         return view_func(request, *args, **kwargs)
 
@@ -60,17 +49,8 @@ def can_change_general_information(view_func):
 
 def can_change_admission_condition(view_func):
     def f_can_change_admission_condition(request, *args, **kwargs):
-        if kwargs.get('education_group_year_id'):
-            education_group_year = get_object_or_404(EducationGroupYear, pk=kwargs['education_group_year_id'])
-        else:
-            education_group_year = get_object_or_404(EducationGroupYear,
-                                                     partial_acronym=kwargs['code'],
-                                                     academic_year__year=kwargs['year'])
-
-        perm_name = 'base.change_commonadmissioncondition' if education_group_year.is_common else \
-            'base.change_admissioncondition'
-        if not request.user.has_perm(perm_name, education_group_year):
+        group_year = get_object_or_404(GroupYear, partial_acronym=kwargs['code'], academic_year__year=kwargs['year'])
+        if not request.user.has_perm('base.change_admissioncondition', group_year):
             raise PermissionDenied
         return view_func(request, *args, **kwargs)
-
     return f_can_change_admission_condition

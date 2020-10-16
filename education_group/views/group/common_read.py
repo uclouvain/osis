@@ -53,7 +53,6 @@ from program_management.ddd.domain.node import NodeIdentity, NodeNotFoundExcepti
 from program_management.ddd.repositories import load_tree
 from program_management.forms.custom_xls import CustomXlsForm
 from program_management.models.element import Element
-from program_management.serializers.program_tree_view import program_tree_view_serializer
 
 Tab = read.Tab  # FIXME :: fix imports (and remove this line)
 
@@ -77,8 +76,10 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
 
     @functools.lru_cache()
     def get_tree(self):
-        root_element_id = self.get_path().split("|")[0]
-        return load_tree.load(int(root_element_id))
+        return load_tree.load(self.get_root_id())
+
+    def get_root_id(self) -> int:
+        return int(self.get_path().split("|")[0])
 
     @cached_property
     def node_identity(self) -> 'NodeIdentity':
@@ -100,20 +101,13 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
 
     def get_context_data(self, **kwargs):
         self.active_tab = read.get_tab_from_path_info(self.get_object(), self.request.META.get('PATH_INFO'))
-
-        can_change_education_group = self.request.user.has_perm(
-            'base.change_educationgroup',
-            self.get_permission_object()
-        )
         is_root_node = self.node_identity == self.get_tree().root_node.entity_id
 
         return {
             **super().get_context_data(**kwargs),
             "person": self.request.user.person,
             "enums": mdl.enums.education_group_categories,
-            "can_change_education_group": can_change_education_group,
-            "form_xls_custom": CustomXlsForm(),
-            "tree":  json.dumps(program_tree_view_serializer(self.get_tree())),
+            "form_xls_custom": CustomXlsForm(year=self.get_object().year, code=self.get_object().code),
             "group": self.get_group(),
             "node": self.get_object(),
             "node_path": self.get_path(),
@@ -141,9 +135,11 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
             "group_year": self.get_group_year(),  # TODO: Should be remove and use DDD object
             "create_group_url": self.get_create_group_url(),
             "update_group_url": self.get_update_group_url(),
+            "update_permission_name": self.get_update_permission_name(),
             "delete_group_url": self.get_delete_group_url(),
             "create_training_url": self.get_create_training_url(),
             "create_mini_training_url": self.get_create_mini_training_url(),
+            "tree_json_url": self.get_tree_json_url(),
             "is_root_node": is_root_node,
         }
 
@@ -175,6 +171,9 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
         return reverse('group_update', kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}) + \
                "?path={}".format(self.get_path())
 
+    def get_update_permission_name(self) -> str:
+        return "base.change_group"
+
     def get_create_mini_training_url(self):
         return reverse('create_element_select_type', kwargs={'category': Categories.MINI_TRAINING.name}) + \
                "?path_to={}".format(self.get_path())
@@ -187,8 +186,11 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
         return reverse('group_delete', kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}) + \
                "?path={}".format(self.get_path())
 
+    def get_tree_json_url(self) -> str:
+        return reverse('tree_json', kwargs={'root_id': self.get_root_id()})
+
     def get_tab_urls(self):
-        return OrderedDict({
+        tab_urls = OrderedDict({
             Tab.IDENTIFICATION: {
                 'text': _('Identification'),
                 'active': Tab.IDENTIFICATION == self.active_tab,
@@ -215,9 +217,11 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
             }
         })
 
+        return read.validate_active_tab(tab_urls)
+
     def have_general_information_tab(self):
         return self.get_object().node_type.name in general_information_sections.SECTIONS_PER_OFFER_TYPE and \
-               self._is_general_info_and_condition_admission_in_display_range
+               self._is_general_info_and_condition_admission_in_display_range()
 
     def _is_general_info_and_condition_admission_in_display_range(self):
         return MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION <= self.get_object().year < \

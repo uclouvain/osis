@@ -45,7 +45,7 @@ class DiplomaAimIdentityFactory(factory.Factory):
         abstract = False
 
     section = factory.Sequence(lambda n: 'Aim section %02d' % n)
-    code = factory.Sequence(lambda n: 'Aim code %02d' % n)
+    code = factory.Sequence(lambda n: '%02d' % n)
 
 
 class DiplomaAimFactory(factory.Factory):

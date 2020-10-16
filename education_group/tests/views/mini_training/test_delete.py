@@ -69,6 +69,7 @@ class TestDeleteMiniTrainingGetMethod(TestCase):
 
             root_group__partial_acronym=cls.root_node.code,
             root_group__academic_year__year=cls.root_node.year,
+            root_group__management_entity=cls.central_manager.entity,
         )
 
     def setUp(self) -> None:
@@ -142,6 +143,7 @@ class TestDeleteMiniTrainingPostMethod(TestCase):
 
             root_group__partial_acronym=cls.root_node.code,
             root_group__academic_year__year=cls.root_node.year,
+            root_group__management_entity=cls.central_manager.entity,
         )
 
     def setUp(self) -> None:

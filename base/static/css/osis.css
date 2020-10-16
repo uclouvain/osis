@@ -49,6 +49,17 @@ body {
     margin: 0 !important;
 }
 
+a.disabled,
+.tooltip-wrapper.disabled{
+    color: #777;
+    cursor: not-allowed;
+}
+.tooltip-wrapper > button[disabled] {
+    color: inherit;
+    pointer-events: none;
+}
+
+
 /* Indication Status QA - DEV */
 
 .qamode {
@@ -592,7 +603,9 @@ table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:after, 
 .of_unversioned_field #schedule_type,
 .of_unversioned_field #group_title_fr,
 .of_unversioned_field #group_title_en,
-.of_unversioned_field #status
+.of_unversioned_field #status,
+.of_unversioned_field #partial_title_fr,
+.of_unversioned_field #partial_title_en
 {
     color: grey;
 }
@@ -646,4 +659,12 @@ table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:after, 
 /* When the lines are too long in <li> */
 .osis-select .select2-selection__rendered li {
     white-space: pre-line;
+}
+
+.cursor-not-allowed, .cursor-not-allowed * {
+    cursor: not-allowed !important;
+}
+
+.modal-xl {
+    width: 1300px;
 }

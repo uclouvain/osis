@@ -55,14 +55,14 @@ class GroupFilter(FilterSet):
         queryset=AcademicYear.objects.all(),
         required=False,
         label=_('Ac yr.'),
-        empty_label=pgettext_lazy("plural", "All"),
+        empty_label=pgettext_lazy("female plural", "All"),
     )
     category = filters.ChoiceFilter(
         choices=list(Categories.choices()),
         required=False,
         label=_('Category'),
         field_name='education_group_type__category',
-        empty_label=pgettext_lazy("plural", "All")
+        empty_label=pgettext_lazy("female plural", "All")
     )
     education_group_type = filters.ModelMultipleChoiceFilter(
         queryset=EducationGroupType.objects.none(),
@@ -89,8 +89,8 @@ class GroupFilter(FilterSet):
         required=False,
         label=_('Acronym/Short title'),
     )
-    title_fr = filters.CharFilter(
-        field_name="title_fr",
+    full_title_fr = filters.CharFilter(
+        field_name="full_title_fr",
         method='filter_education_group_year_field',
         max_length=255,
         required=False,
@@ -109,7 +109,7 @@ class GroupFilter(FilterSet):
         required=False,
         label=_('Version'),
         field_name='version',
-        empty_label=pgettext_lazy("plural", "All"),
+        empty_label=pgettext_lazy("female plural", "All"),
     )
 
     with_entity_transition = filters.BooleanFilter(
@@ -125,7 +125,7 @@ class GroupFilter(FilterSet):
             ('acronym', 'acronym'),
             ('partial_acronym', 'code'),
             ('academic_year__year', 'academic_year'),
-            ('title', 'title'),
+            ('full_title_fr', 'full_title_fr'),
             ('type_ordering', 'type'),
             ('entity_management_version', 'management_entity')
         ),
@@ -137,7 +137,7 @@ class GroupFilter(FilterSet):
         fields = [
             'acronym',
             'partial_acronym',
-            'title_fr',
+            'full_title_fr',
             'education_group_type__name',
             'management_entity',
             'with_entity_subordinated',
@@ -211,13 +211,7 @@ class GroupFilter(FilterSet):
                 default='acronym',
                 output_field=CharField()
             )
-        ).annotate(
-            title=Case(
-                When(Q(educationgroupversion__title_fr__isnull=False) & ~Q(educationgroupversion__title_fr=''),
-                     then=Concat('title_fr', Value(' ['), 'educationgroupversion__title_fr', Value(']'))),
-                default='title_fr',
-                output_field=CharField(),)
-        )
+        ).annotate_full_titles()
 
     def filter_queryset(self, queryset):
         # Order by id to always ensure same order when objects have same values for order field (ex: title)

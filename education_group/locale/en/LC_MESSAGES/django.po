@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-10 09:40+0200\n"
+"POT-Creation-Date: 2020-10-07 14:01+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -41,7 +41,8 @@ msgstr[1] ""
 msgid "%(max)s must be greater or equals than %(min)s"
 msgstr ""
 
-msgid "ARES"
+#, python-format
+msgid "%(start_index)s to %(end_index)s of %(total_counts)s common topics"
 msgstr ""
 
 msgid "ARES ability"
@@ -51,6 +52,9 @@ msgid "ARES study code"
 msgstr ""
 
 msgid "ARES-GRACA"
+msgstr ""
+
+msgid "Ac yr."
 msgstr ""
 
 msgid "Academic responsible"
@@ -117,6 +121,10 @@ msgstr ""
 msgid "Alert Message"
 msgstr ""
 
+msgctxt "female plural"
+msgid "All"
+msgstr ""
+
 #, python-format
 msgid "Are you sure you want to delete %(acronym)s - %(title)s ?"
 msgstr ""
@@ -134,6 +142,9 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
+msgid "Catalog configuration"
+msgstr ""
+
 msgid "Category"
 msgstr ""
 
@@ -147,6 +158,12 @@ msgid "Central managers"
 msgstr ""
 
 msgid "Certificate aim can only be edited by program manager"
+msgstr ""
+
+#, python-format
+msgid ""
+"Certificate aims only for training <a href='%(link)s'> %(acronym)s "
+"(%(academic_year)s) </a> have been successfully updated."
 msgstr ""
 
 msgid "Clear clipboard"
@@ -168,6 +185,9 @@ msgstr ""
 msgid "Comment"
 msgstr ""
 
+msgid "Common admission conditions have been updated"
+msgstr ""
+
 msgid "Common admission conditions will be published soon"
 msgstr ""
 
@@ -177,9 +197,12 @@ msgstr ""
 msgid "Conditions"
 msgstr ""
 
+msgid "Configuration"
+msgstr ""
+
 #, python-format
 msgid ""
-"Consistency error in %(academic_year)s: %(field)s has already been modified"
+"Consistency error in %(academic_year)s: %(fields)s has already been modified"
 msgstr ""
 
 msgid "Contacts"
@@ -228,9 +251,6 @@ msgid "Delete"
 msgstr ""
 
 msgid "Deliberation"
-msgstr ""
-
-msgid "Detach"
 msgstr ""
 
 msgid "Diploma"
@@ -302,6 +322,12 @@ msgstr ""
 msgid "From"
 msgstr ""
 
+msgid "Full title of the english version"
+msgstr ""
+
+msgid "Full title of the french version"
+msgstr ""
+
 msgid "Funding"
 msgstr ""
 
@@ -320,10 +346,7 @@ msgstr ""
 msgid "General informations"
 msgstr ""
 
-msgid "Go down"
-msgstr ""
-
-msgid "Go up"
+msgid "General informations have been updated"
 msgstr ""
 
 msgid "Graduates"
@@ -396,7 +419,16 @@ msgstr ""
 msgid "Link type"
 msgstr ""
 
+msgctxt "male"
 msgid "Main"
+msgstr ""
+
+msgid "Management common topics"
+msgstr ""
+
+msgid ""
+"Management common topics in the context of training's general informations "
+"and access conditions"
 msgstr ""
 
 msgid "Management entity"
@@ -418,7 +450,7 @@ msgid "Mini-Training"
 msgstr ""
 
 #, python-format
-msgid "Mini-Training %(acronym)s (%(academic_year)s) successfully deleted."
+msgid "Mini-Training %(acronym)s successfully deleted from %(academic_year)s."
 msgstr ""
 
 #, python-format
@@ -449,10 +481,7 @@ msgstr ""
 msgid "New Training"
 msgstr ""
 
-#, python-format
-msgid ""
-"No type of %(child_category)s can be created as child of %(category)s of "
-"type %(type)s"
+msgid "No result!"
 msgstr ""
 
 msgid "Non university Bachelors"
@@ -539,6 +568,9 @@ msgstr ""
 msgid "Search..."
 msgstr ""
 
+msgid "Select one or multiple certificate aims"
+msgstr ""
+
 msgid "Session"
 msgstr ""
 
@@ -575,9 +607,6 @@ msgstr ""
 msgid "The fields concerning ARES have to be ALL filled-in or none of them"
 msgstr ""
 
-msgid "The following links has been updated"
-msgstr ""
-
 #, python-brace-format
 msgid ""
 "The formation you work with doesn't exist (or is not at the same position) "
@@ -587,10 +616,6 @@ msgstr ""
 
 #, python-format
 msgid "The group %(code)s has been deleted."
-msgstr ""
-
-#, python-format
-msgid "The link of %(code)s - %(acronym)s - %(year)s has been updated."
 msgstr ""
 
 #, python-format
@@ -658,7 +683,7 @@ msgid "Training"
 msgstr ""
 
 #, python-format
-msgid "Training %(acronym)s (%(academic_year)s) successfully deleted."
+msgid "Training %(acronym)s successfully deleted from %(academic_year)s."
 msgstr ""
 
 #, python-format
@@ -670,11 +695,17 @@ msgstr ""
 #, python-format
 msgid ""
 "Training <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> "
-"successfully updated."
+"successfully updated"
 msgstr ""
 
 #, python-brace-format
 msgid "Training not found : {acronym} {year}"
+msgstr ""
+
+msgid "Training version can only be created by central manager"
+msgstr ""
+
+msgid "Training version can only be deleted by central manager"
 msgstr ""
 
 msgid "Trainings"
@@ -821,9 +852,6 @@ msgstr ""
 msgid "minimum constraint"
 msgstr ""
 
-msgid "of version"
-msgstr ""
-
 msgid "on successful completion of this program, each student is able to"
 msgstr ""
 
@@ -852,4 +880,7 @@ msgid "undefined"
 msgstr ""
 
 msgid "unspecified"
+msgstr ""
+
+msgid "with certificate aims"
 msgstr ""

@@ -1,4 +1,4 @@
-# ############################################################################
+#############################################################################
 #  OSIS stands for Open Student Information System. It's an application
 #  designed to manage the core business of higher education institutions,
 #  such as universities, faculties, institutes and professional schools.
@@ -22,14 +22,14 @@
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
-from django.utils.translation import gettext as _
-from django.views.decorators.http import require_http_methods
+from django.http import JsonResponse, HttpResponseBadRequest
+from django.views.decorators.http import require_http_methods, require_POST
+
+from base.utils.cache import ElementCache
+from education_group.views.mixin import ElementSelectedClipBoardSerializer
 
 from program_management.ddd import command
 from program_management.ddd.service.write import copy_element_service, cut_element_service
-
-MESSAGE_TEMPLATE = "<strong>{clipboard_title}</strong><br>{object_str}"
 
 
 @require_http_methods(['POST'])
@@ -41,11 +41,7 @@ def copy_to_cache(request):
 
     copy_element_service.copy_element_service(copy_command)
 
-    success_msg = MESSAGE_TEMPLATE.format(
-        clipboard_title=_("Copied element"),
-        object_str="{} - {}".format(element_code, element_year),
-    )
-
+    success_msg = ElementSelectedClipBoardSerializer(request).get_selected_element_clipboard_message()
     return JsonResponse({'success_message': success_msg})
 
 
@@ -58,9 +54,14 @@ def cut_to_cache(request):
 
     cut_element_service.cut_element_service(cut_command)
 
-    success_msg = MESSAGE_TEMPLATE.format(
-        clipboard_title=_("Cut element"),
-        object_str="{} - {}".format(element_code, element_year),
-    )
-
+    success_msg = ElementSelectedClipBoardSerializer(request).get_selected_element_clipboard_message()
     return JsonResponse({'success_message': success_msg})
+
+
+@login_required
+@require_POST
+def clear_element_selected(request):
+    if request.is_ajax():
+        ElementCache(request.user.pk).clear()
+        return JsonResponse({})
+    return HttpResponseBadRequest()

@@ -79,15 +79,13 @@ class TestGroupReadUtilization(TestCase):
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, "education_group_app/group/utilization_read.html")
 
-    @mock.patch('program_management.ddd.service.read.search_tree_versions_using_node_service'
-                '.search_tree_versions_using_node', return_value=[])
-    def test_assert_context_data(self, mock_tree_service):
+    def test_assert_context_data(self):
         response = self.client.get(self.url)
 
-        self.assertTrue(mock_tree_service.called)
         self.assertEqual(response.context['person'], self.person)
         self.assertEqual(response.context['group_year'], self.element_group_year.group_year)
-        self.assertIsInstance(response.context['tree'], str)
+        expected_tree_json_url = reverse('tree_json', kwargs={'root_id': self.element_group_year.pk})
+        self.assertEqual(response.context['tree_json_url'], expected_tree_json_url)
         self.assertIsInstance(response.context['node'], NodeGroupYear)
         self.assertIsInstance(response.context['utilization_rows'], List)
 

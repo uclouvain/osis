@@ -51,10 +51,10 @@ from program_management.ddd.domain.node import NodeIdentity, NodeNotFoundExcepti
 from program_management.ddd.repositories import load_tree
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.models.element import Element
-from program_management.serializers.program_tree_view import program_tree_view_serializer
 from education_group.forms.tree_version_choices import get_tree_versions_choices
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
+from program_management.forms.custom_xls import CustomXlsForm
 
 Tab = read.Tab  # FIXME :: fix imports (and remove this line)
 
@@ -107,8 +107,10 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
 
     @functools.lru_cache()
     def get_tree(self):
-        root_element_id = self.get_path().split("|")[0]
-        return load_tree.load(int(root_element_id))
+        return load_tree.load(self.get_root_id())
+
+    def get_root_id(self) -> int:
+        return int(self.get_path().split("|")[0])
 
     @functools.lru_cache()
     def get_object(self):
@@ -135,7 +137,8 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             "node": self.get_object(),
             "node_path": self.get_path(),
             "tab_urls": self.get_tab_urls(),
-            "tree": json.dumps(program_tree_view_serializer(self.get_tree())),
+            "tree_json_url": self.get_tree_json_url(),
+            "form_xls_custom": CustomXlsForm(year=self.get_object().year, code=self.get_object().code),
             "education_group_version": self.get_education_group_version(),
             "academic_year_choices": get_academic_year_choices(
                 self.node_identity,
@@ -157,21 +160,25 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
                                         args=[self.get_education_group_version().root_group.academic_year.year,
                                               self.get_education_group_version().root_group.partial_acronym]
                                         ),
-            # TODO: Remove when finished reoganized tempalate
+            # TODO: Remove when finished reorganized template
             "group_year": self.get_education_group_version().root_group,
 
             "create_group_url": self.get_create_group_url(),
             "create_training_url": self.get_create_training_url(),
             "create_mini_training_url": self.get_create_mini_training_url(),
             "update_mini_training_url": self.get_update_mini_training_url(),
+            "update_permission_name": self.get_update_permission_name(),
             "delete_permanently_mini_training_url": self.get_delete_permanently_mini_training_url(),
-            "delete_permanently_tree_version": self.get_delete_permanently_tree_version_url(),
+            "delete_permanently_tree_version_url": self.get_delete_permanently_tree_version_url(),
+            "delete_permanently_tree_version_permission_name":
+                self.get_delete_permanently_tree_version_permission_name(),
             "create_version_url": self.get_create_version_url(),
+            "create_version_permission_name": self.get_create_version_permission_name(),
             "is_root_node": is_root_node,
         }
 
     def get_permission_object(self):
-        return self.get_education_group_version().offer
+        return self.get_education_group_version().root_group
 
     def get_create_group_url(self):
         return reverse('create_element_select_type', kwargs={'category': Categories.GROUP.name}) + \
@@ -199,12 +206,23 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             get={"path": self.get_path(), "tab": self.active_tab.name}
         )
 
+    def get_tree_json_url(self) -> str:
+        return reverse('tree_json', kwargs={'root_id': self.get_root_id()})
+
+    def get_update_permission_name(self) -> str:
+        if self.current_version.is_standard_version:
+            return "base.change_minitraining"
+        return "program_management.change_minitraining_version"
+
     def get_create_version_url(self):
-        if self.is_root_node():
+        if self.is_root_node() and self.program_tree_version_identity.is_standard():
             return reverse(
                 'create_education_group_version',
                 kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}
             ) + "?path={}".format(self.get_path())
+
+    def get_create_version_permission_name(self) -> str:
+        return "base.add_minitraining_version"
 
     def get_delete_permanently_tree_version_url(self):
         if not self.program_tree_version_identity.is_standard():
@@ -216,6 +234,9 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
                 }
             )
 
+    def get_delete_permanently_tree_version_permission_name(self):
+        return "program_management.delete_permanently_minitraining_version"
+
     def get_delete_permanently_mini_training_url(self):
         if self.program_tree_version_identity.is_standard():
             return reverse(
@@ -224,7 +245,7 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             )
 
     def get_tab_urls(self):
-        return OrderedDict({
+        tab_urls = OrderedDict({
             Tab.IDENTIFICATION: {
                 'text': _('Identification'),
                 'active': Tab.IDENTIFICATION == self.active_tab,
@@ -263,23 +284,25 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             },
         })
 
+        return read.validate_active_tab(tab_urls)
+
     def have_general_information_tab(self):
         node_category = self.get_object().category
         return self.current_version.is_standard_version and \
             node_category.name in general_information_sections.SECTIONS_PER_OFFER_TYPE and \
-            self._is_general_info_and_condition_admission_in_display_range
+            self._is_general_info_and_condition_admission_in_display_range()
 
     def have_skills_and_achievements_tab(self):
         node_category = self.get_object().category
         return self.current_version.is_standard_version and \
             node_category.name in MiniTrainingType.with_skills_achievements() and \
-            self._is_general_info_and_condition_admission_in_display_range
+            self._is_general_info_and_condition_admission_in_display_range()
 
     def have_admission_condition_tab(self):
         node_category = self.get_object().category
         return self.current_version.is_standard_version and \
             node_category.name in MiniTrainingType.with_admission_condition() and \
-            self._is_general_info_and_condition_admission_in_display_range
+            self._is_general_info_and_condition_admission_in_display_range()
 
     def _is_general_info_and_condition_admission_in_display_range(self):
         return MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION <= self.get_object().year < \

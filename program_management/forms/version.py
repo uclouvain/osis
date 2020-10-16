@@ -25,23 +25,29 @@
 ##############################################################################
 from typing import Dict
 
+import attr
 from django import forms
 from django.contrib.auth.models import User
 from django.forms import TextInput
+from django.utils.functional import lazy
 from django.utils.translation import gettext_lazy as _
 
 from base.business.event_perms import EventPermEducationGroupEdition
 from base.forms.common import ValidationRuleMixin
 from base.forms.utils.choice_field import BLANK_CHOICE
+from base.models.certificate_aim import CertificateAim
 from base.models.enums.constraint_type import ConstraintTypeEnum
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType
 from education_group.forms import fields
+from education_group.forms.training import _get_section_choices
+from education_group.forms.widgets import CertificateAimsWidget
+from education_group.models.group_year import GroupYear as GroupYearDB
 from education_group.templatetags.academic_year_display import display_as_academic_year
-from program_management.ddd.command import GetEndPostponementYearCommand
-from program_management.ddd.domain.node import NodeIdentity
+from program_management.ddd.command import GetVersionMaxEndYear
+from program_management.ddd.domain import program_tree_version
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
-from program_management.ddd.service.read import get_end_postponement_year_service
+from program_management.ddd.service.read import get_version_max_end_year
 from rules_management.enums import MINI_TRAINING_PGRM_ENCODING_PERIOD, MINI_TRAINING_DAILY_MANAGEMENT, \
     TRAINING_PGRM_ENCODING_PERIOD, TRAINING_DAILY_MANAGEMENT
 from rules_management.mixins import PermissionFieldMixin
@@ -56,12 +62,12 @@ class SpecificVersionForm(forms.Form):
             attrs={'onchange': 'validate_version_name()', 'style': "text-transform: uppercase;"}
         ),
     )
-    title = forms.CharField(
+    version_title_fr = forms.CharField(
         max_length=100,
         required=False,
         label=_('Full title of the french version'),
     )
-    title_english = forms.CharField(
+    version_title_en = forms.CharField(
         max_length=100,
         required=False,
         label=_('Full title of the english version'),
@@ -71,29 +77,26 @@ class SpecificVersionForm(forms.Form):
         label=_('This version exists until'),
     )
 
-    def __init__(
-            self,
-            tree_version_identity: 'ProgramTreeVersionIdentity',
-            node_identity: 'NodeIdentity',
-            *args,
-            **kwargs
-    ):
+    def __init__(self, tree_version_identity: 'ProgramTreeVersionIdentity', *args, **kwargs):
         self.tree_version_identity = tree_version_identity
-        self.node_identity = node_identity
         super().__init__(*args, **kwargs)
 
         self._init_academic_year_choices()
 
     def _init_academic_year_choices(self):
-        max_year = get_end_postponement_year_service.calculate_program_tree_end_postponement(
-            GetEndPostponementYearCommand(code=self.node_identity.code, year=self.node_identity.year)
+        max_year = get_version_max_end_year.calculate_version_max_end_year(
+            GetVersionMaxEndYear(
+                offer_acronym=self.tree_version_identity.offer_acronym,
+                year=self.tree_version_identity.year
+            )
         )
         choices_years = [
             (year, display_as_academic_year(year))
             for year in range(self.tree_version_identity.year, max_year + 1)
         ]
 
-        if not ProgramTreeVersionRepository.get(self.tree_version_identity).end_year_of_existence:
+        standard_version_identity = attr.evolve(self.tree_version_identity, version_name=program_tree_version.STANDARD)
+        if not ProgramTreeVersionRepository.get(standard_version_identity).end_year_of_existence:
             choices_years += BLANK_CHOICE
 
         self.fields["end_year"].choices = choices_years
@@ -219,6 +222,12 @@ class UpdateTrainingVersionForm(ValidationRuleMixin, PermissionFieldMixin, Speci
     coefficient = forms.CharField(label=_('Co-graduation total coefficient'), required=False, disabled=True)
 
     # Diploma tab
+    section = forms.ChoiceField(
+        label=_('filter by section').capitalize() + ':',
+        choices=lazy(_get_section_choices, list),
+        required=False,
+        disabled=True
+    )
     leads_to_diploma = forms.BooleanField(
         initial=False,
         label=_('Leads to diploma/certificate'),
@@ -227,27 +236,43 @@ class UpdateTrainingVersionForm(ValidationRuleMixin, PermissionFieldMixin, Speci
     )
     diploma_printing_title = forms.CharField(max_length=240, required=False, label=_('Diploma title'), disabled=True)
     professional_title = forms.CharField(max_length=320, required=False, label=_('Professionnal title'), disabled=True)
-    certificate_aims = forms.CharField(required=False, label=_('certificate aims').capitalize(), disabled=True)
+    certificate_aims = forms.ModelMultipleChoiceField(
+        label=_('certificate aims').capitalize(),
+        queryset=CertificateAim.objects.all(),
+        required=False,
+        disabled=True,
+        to_field_name="code",
+        widget=CertificateAimsWidget(
+            url='certificate_aim_autocomplete',
+            attrs={
+                'data-html': True,
+                'data-placeholder': _('Search...'),
+                'data-width': '100%',
+            },
+            forward=['section'],
+        )
+    )
 
     def __init__(
             self,
             training_version_identity: 'ProgramTreeVersionIdentity',
-            node_identity: 'NodeIdentity',
             training_type: TrainingType,
             user: User,
+            event_perm_obj: GroupYearDB,
             **kwargs
     ):
         self.user = user
+        self.event_perm_obj = event_perm_obj
         self.training_type = training_type
 
-        super().__init__(training_version_identity, node_identity, **kwargs)
+        super().__init__(training_version_identity, **kwargs)
         self.fields['version_name'].disabled = True
         self.__init_management_entity_field()
 
     def __init_management_entity_field(self):
         self.fields['management_entity'] = fields.ManagementEntitiesChoiceField(
             person=self.user.person,
-            initial=None,
+            initial=self.initial.get('management_entity'),
             disabled=self.fields['management_entity'].disabled,
         )
 
@@ -257,7 +282,10 @@ class UpdateTrainingVersionForm(ValidationRuleMixin, PermissionFieldMixin, Speci
 
     # PermissionFieldMixin
     def get_context(self) -> str:
-        is_edition_period_opened = EventPermEducationGroupEdition(raise_exception=False).is_open()
+        is_edition_period_opened = EventPermEducationGroupEdition(
+            obj=self.event_perm_obj,
+            raise_exception=False
+        ).is_open()
         return TRAINING_PGRM_ENCODING_PERIOD if is_edition_period_opened else TRAINING_DAILY_MANAGEMENT
 
     # PermissionFieldMixin
@@ -304,22 +332,23 @@ class UpdateMiniTrainingVersionForm(ValidationRuleMixin, PermissionFieldMixin, S
     def __init__(
             self,
             mini_training_version_identity: 'ProgramTreeVersionIdentity',
-            node_identity: 'NodeIdentity',
             mini_training_type: MiniTrainingType,
             user: User,
+            event_perm_obj: GroupYearDB,
             **kwargs
     ):
         self.user = user
+        self.event_perm_obj = event_perm_obj
         self.mini_training_type = mini_training_type
 
-        super().__init__(mini_training_version_identity, node_identity, **kwargs)
+        super().__init__(mini_training_version_identity, **kwargs)
         self.fields['version_name'].disabled = True
         self.__init_management_entity_field()
 
     def __init_management_entity_field(self):
         self.fields['management_entity'] = fields.ManagementEntitiesChoiceField(
             person=self.user.person,
-            initial=None,
+            initial=self.initial.get('management_entity'),
             disabled=self.fields['management_entity'].disabled,
         )
 
@@ -329,7 +358,10 @@ class UpdateMiniTrainingVersionForm(ValidationRuleMixin, PermissionFieldMixin, S
 
     # PermissionFieldMixin
     def get_context(self) -> str:
-        is_edition_period_opened = EventPermEducationGroupEdition(raise_exception=False).is_open()
+        is_edition_period_opened = EventPermEducationGroupEdition(
+            obj=self.event_perm_obj,
+            raise_exception=False
+        ).is_open()
         return MINI_TRAINING_PGRM_ENCODING_PERIOD if is_edition_period_opened else MINI_TRAINING_DAILY_MANAGEMENT
 
     # PermissionFieldMixin

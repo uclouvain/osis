@@ -40,6 +40,7 @@ from base.models.enums.proposal_type import ProposalType
 from base.models.enums.quadrimesters import DerogationQuadrimester
 from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.models.enums.constraint_type import ConstraintTypes
+from education_group.templatetags.academic_year_display import display_as_academic_year
 from osis_common.ddd import interface
 from program_management.ddd.business_types import *
 from program_management.ddd.command import DO_NOT_OVERRIDE
@@ -190,7 +191,7 @@ class Node(interface.Entity):
         return NodeIdentity(self.code, self.year)
 
     def __str__(self):
-        return '%(code)s (%(year)s)' % {'code': self.code, 'year': self.year}
+        return '%(code)s (%(year)s)' % {'code': self.code, 'year': display_as_academic_year(self.year)}
 
     @property
     def pk(self):
@@ -237,6 +238,9 @@ class Node(interface.Entity):
 
     def is_minor_major_list_choice(self) -> bool:
         return self.node_type in GroupType.minor_major_list_choice_enums()
+
+    def is_minor_major_option_list_choice(self) -> bool:
+        return self.node_type in GroupType.minor_major_option_list_choice_enums()
 
     def is_option_list_choice(self):
         return self.node_type == GroupType.OPTION_LIST_CHOICE
@@ -371,13 +375,13 @@ class Node(interface.Entity):
 
         if self.is_minor_major_list_choice() and \
                 not link_to_update.child.is_minor_major_list_choice():
-            link_type = LinkTypes.REFERENCE
+            link_type = LinkTypes.REFERENCE.name
 
         link_to_update.relative_credits = relative_credits
         link_to_update.access_condition = access_condition
         link_to_update.is_mandatory = is_mandatory
         link_to_update.block = block
-        link_to_update.link_type = link_type
+        link_to_update.link_type = LinkTypes[link_type] if link_type else None
         link_to_update.comment = comment
         link_to_update.comment_english = comment_english
 
@@ -483,17 +487,11 @@ class NodeLearningUnitYear(Node):
 
     @property
     def full_title_fr(self) -> str:
-        return "{}{}".format(
-            self.common_title_fr,
-            " - {}".format(self.specific_title_fr) if self.specific_title_fr else ''
-        )
+        return _get_full_title(self.common_title_fr, self.specific_title_fr)
 
     @property
     def full_title_en(self) -> str:
-        return "{}{}".format(
-            self.common_title_en,
-            " - {}".format(self.specific_title_en) if self.specific_title_en else ''
-        )
+        return _get_full_title(self.common_title_en, self.specific_title_en)
 
     @property
     def has_prerequisite(self) -> bool:
@@ -516,6 +514,15 @@ class NodeLearningUnitYear(Node):
 
     def remove_all_prerequisite_items(self) -> None:
         self.prerequisite.remove_all_prerequisite_items()
+
+
+def _get_full_title(common_title, specific_title):
+    specific_title = "{}{}".format(" - " if common_title else '',
+                                   specific_title) if specific_title else ''
+    return "{}{}".format(
+        common_title if common_title else '',
+        specific_title
+    )
 
 
 class NodeLearningClassYear(Node):

@@ -58,7 +58,7 @@ from program_management.ddd.repositories.program_tree_version import ProgramTree
 from program_management.forms.custom_xls import CustomXlsForm
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.models.element import Element
-from program_management.serializers.program_tree_view import program_tree_view_serializer
+from base.business.education_group import has_coorganization
 
 Tab = read.Tab  # FIXME :: fix imports (and remove this line)
 
@@ -105,15 +105,17 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
         try:
             root_element_id = self.get_object().pk
             return EducationGroupVersion.objects.select_related(
-                'offer__academic_year', 'root_group'
+                'offer__academic_year', 'root_group', 'root_group__academic_year'
             ).get(root_group__element__pk=root_element_id)
         except (EducationGroupVersion.DoesNotExist, Element.DoesNotExist):
             raise Http404
 
     @functools.lru_cache()
     def get_tree(self):
-        root_element_id = self.get_path().split("|")[0]
-        return load_tree.load(int(root_element_id))
+        return load_tree.load(self.get_root_id())
+
+    def get_root_id(self) -> int:
+        return int(self.get_path().split("|")[0])
 
     @functools.lru_cache()
     def get_object(self) -> 'Node':
@@ -138,8 +140,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             "tab_urls": self.get_tab_urls(),
             "node": self.get_object(),
             "node_path": self.get_path(),
-            "tree": json.dumps(program_tree_view_serializer(self.get_tree())),
-            "form_xls_custom": CustomXlsForm(path=self.get_path()),
+            "form_xls_custom": CustomXlsForm(year=self.get_object().year, code=self.get_object().code),
             "academic_year_choices": get_academic_year_choices(
                 self.node_identity,
                 self.get_path(),
@@ -152,13 +153,18 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             # TODO: Two lines below to remove when finished reorganized templates
             "education_group_version": self.education_group_version,
             "group_year": self.education_group_version.root_group,
+            "tree_json_url": self.get_tree_json_url(),
             "create_group_url": self.get_create_group_url(),
             "create_training_url": self.get_create_training_url(),
             "create_mini_training_url": self.get_create_mini_training_url(),
             "update_training_url": self.get_update_training_url(),
+            "update_permission_name": self.get_update_permission_name(),
             "delete_permanently_training_url": self.get_delete_permanently_training_url(),
-            "delete_permanently_tree_version": self.get_delete_permanently_tree_version_url(),
+            "delete_permanently_tree_version_url": self.get_delete_permanently_tree_version_url(),
+            "delete_permanently_tree_version_permission_name":
+                self.get_delete_permanently_tree_version_permission_name(),
             "create_version_url": self.get_create_version_url(),
+            "create_version_permission_name": self.get_create_version_permission_name(),
             "xls_ue_prerequisites": reverse("education_group_learning_units_prerequisites",
                                             args=[self.education_group_version.root_group.academic_year.year,
                                                   self.education_group_version.root_group.partial_acronym]
@@ -172,10 +178,11 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
                                               self.education_group_version.root_group.partial_acronym,
                                               ]
                                         ),
+            "show_coorganization": has_coorganization(self.education_group_version.offer),
         }
 
-    def get_permission_object(self):
-        return self.education_group_version.offer
+    def get_permission_object(self) -> 'GroupYear':
+        return self.education_group_version.root_group
 
     def get_create_group_url(self):
         return reverse('create_element_select_type', kwargs={'category': Categories.GROUP.name}) + \
@@ -202,6 +209,11 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             get={"path_to": self.get_path(), "tab": self.active_tab.name}
         )
 
+    def get_update_permission_name(self) -> str:
+        if self.current_version.is_standard_version:
+            return "base.change_training"
+        return "program_management.change_training_version"
+
     def get_delete_permanently_training_url(self):
         if self.program_tree_version_identity.is_standard():
             return reverse(
@@ -219,19 +231,28 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
                 }
             )
 
+    def get_delete_permanently_tree_version_permission_name(self):
+        return "program_management.delete_permanently_training_version"
+
     def get_create_version_url(self):
-        if self.is_root_node():
+        if self.is_root_node() and self.program_tree_version_identity.is_standard():
             return reverse(
                 'create_education_group_version',
                 kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}
             ) + "?path={}".format(self.get_path())
+
+    def get_tree_json_url(self) -> str:
+        return reverse('tree_json', kwargs={'root_id': self.get_root_id()})
+
+    def get_create_version_permission_name(self) -> str:
+        return "base.add_training_version"
 
     def get_tab_urls(self):
         node_identity = self.get_object().entity_id
 
         self.active_tab = read.get_tab_from_path_info(self.get_object(), self.request.META.get('PATH_INFO'))
 
-        return OrderedDict({
+        tab_urls = OrderedDict({
             Tab.IDENTIFICATION: {
                 'text': _('Identification'),
                 'active': Tab.IDENTIFICATION == self.active_tab,
@@ -282,6 +303,8 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             },
         })
 
+        return read.validate_active_tab(tab_urls)
+
     @functools.lru_cache()
     def get_current_academic_year(self):
         return academic_year.starting_academic_year()
@@ -293,19 +316,19 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
         node_category = self.get_object().category
         return self.current_version.is_standard_version and \
             node_category.name in general_information_sections.SECTIONS_PER_OFFER_TYPE and \
-            self._is_general_info_and_condition_admission_in_display_range
+            self._is_general_info_and_condition_admission_in_display_range()
 
     def have_skills_and_achievements_tab(self):
         node_category = self.get_object().category
         return self.current_version.is_standard_version and \
             node_category.name in TrainingType.with_skills_achievements() and \
-            self._is_general_info_and_condition_admission_in_display_range
+            self._is_general_info_and_condition_admission_in_display_range()
 
     def have_admission_condition_tab(self):
         node_category = self.get_object().category
         return self.current_version.is_standard_version and \
             node_category.name in TrainingType.with_admission_condition() and \
-            self._is_general_info_and_condition_admission_in_display_range
+            self._is_general_info_and_condition_admission_in_display_range()
 
     def _is_general_info_and_condition_admission_in_display_range(self):
         return MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION <= self.get_object().year < \

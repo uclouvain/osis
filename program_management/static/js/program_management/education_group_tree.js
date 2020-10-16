@@ -12,9 +12,10 @@ $(document).ready(function () {
     if ($documentTree.length) {
         const copy_element_url = $documentTree.attr("data-copyUrl");
         const cut_element_url = $documentTree.attr("data-cutUrl");
+        const tree_json_url = $documentTree.attr("data-jsonUrl");
 
         setNavVisibility();
-        initializeJsTree($documentTree, cut_element_url, copy_element_url);
+        initializeJsTree($documentTree, tree_json_url, cut_element_url, copy_element_url);
         setResearchTimeOut($documentTree);
     }
 });
@@ -120,20 +121,24 @@ $("a[id^='quick-search']").click(function (event) {
 
 
 $("#scrollableDiv").on("scroll", function() {
-    saveScrollPosition(tree);
+    saveScrollPosition();
 });
 
-function saveScrollPosition(tree) {
-    const rootId = tree["id"];
-    const scrollPosition = $("#scrollableDiv")[0].scrollTop
-    const storageValue = {}
-    storageValue[rootId] = scrollPosition
+function getTreeRootId() {
+    return $('#panel_file_tree').attr('data-rootId');
+}
+
+function saveScrollPosition() {
+    const rootId = getTreeRootId();
+    const scrollPosition = $("#scrollableDiv")[0].scrollTop;
+    const storageValue = {};
+    storageValue[rootId] = scrollPosition;
     localStorage.setItem('scrollpos', JSON.stringify(storageValue));
 }
 
 
-function scrollToPositionSaved(tree) {
-    const rootId = tree["id"];
+function scrollToPositionSaved() {
+    const rootId = getTreeRootId();
     const storageValue = JSON.parse(localStorage.getItem('scrollpos'));
     let scrollPosition = 0;
     if (storageValue !== null && rootId in storageValue) {
@@ -204,7 +209,7 @@ function clearClipboardListener(event) {
 }
 
 
-function initializeJsTree($documentTree, cut_element_url, copy_element_url) {
+function initializeJsTree($documentTree, tree_json_url, cut_element_url, copy_element_url) {
     $documentTree.bind("state_ready.jstree", function (event, data) {
         // Bind the redirection only when the tree is ready,
         // however, it reload the page during the loading
@@ -212,7 +217,7 @@ function initializeJsTree($documentTree, cut_element_url, copy_element_url) {
             document.location.href = data.node.a_attr.href;
         });
 
-        scrollToPositionSaved(tree);
+        scrollToPositionSaved();
 
         // if the tree has never been loaded, execute close_all by default.
         if ($.vakata.storage.get(data.instance.settings.state.key) === null) {
@@ -221,7 +226,7 @@ function initializeJsTree($documentTree, cut_element_url, copy_element_url) {
     });
 
     function generateTreeKey(tree){
-        const treeRootId = tree["id"];
+        const treeRootId = getTreeRootId();
         return `progrem_tree_state_${treeRootId}`;
 
     }
@@ -229,7 +234,14 @@ function initializeJsTree($documentTree, cut_element_url, copy_element_url) {
     $documentTree.jstree({
             "core": {
                 "check_callback": true,
-                "data": tree,
+                "data": function(obj, callback) {
+                    $.ajax({
+                       url: tree_json_url,
+                       success: callback,
+                       dataType: 'json',
+                       global: false  // Prevent display spinner
+                    });
+                },
             },
             "plugins": [
                 "contextmenu",
@@ -240,7 +252,7 @@ function initializeJsTree($documentTree, cut_element_url, copy_element_url) {
             "state": {
                 // the key is important if you have multiple trees in the same domain
                 // The key includes the root_id
-                "key": generateTreeKey(tree),
+                "key": generateTreeKey(),
                 "opened": true,
                 "selected": false,
             },
@@ -317,6 +329,30 @@ function initializeJsTree($documentTree, cut_element_url, copy_element_url) {
                             }
                         },
 
+                        "modify": {
+                            "label": gettext("Modify the link"),
+                            "separator_before": true,
+                            "action": function (data) {
+                                let __ret = get_data_from_tree(data);
+
+                                $('#form-modal-ajax-content').load(__ret.modify_url, function (response, status, xhr) {
+                                    if (status === "success") {
+                                        $('#form-ajax-modal').modal('toggle');
+                                        let form = $(this).find('form').first();
+                                        formAjaxSubmit(form, '#form-ajax-modal');
+                                    } else {
+                                        window.location.href = __ret.modify_url
+                                    }
+                                });
+                            },
+                            "title": $node.a_attr.modification_msg,
+                            "_disabled": function (data) {
+                                let __ret = get_data_from_tree(data);
+                                // tree's root cannot be edit (no link with parent...)
+                                return __ret.modify_url == null;
+                            }
+                        },
+
                         "open_all": {
                             "separator_before": true,
                             "label": gettext("Open all"),
@@ -382,6 +418,7 @@ function get_data_from_tree(data) {
         view_url: obj.a_attr.href,
         paste_url: obj.a_attr.paste_url,
         detach_url: obj.a_attr.detach_url,
+        modify_url: obj.a_attr.modify_url,
         search_url: obj.a_attr.search_url,
         path: obj.a_attr.path
     };

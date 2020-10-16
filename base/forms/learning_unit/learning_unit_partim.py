@@ -126,6 +126,14 @@ class PartimForm(LearningUnitBaseForm):
         super().__init__(instances_data, *args, **kwargs)
         self.disable_fields(PARTIM_FORM_READ_ONLY_FIELD)
 
+    def _specific_title_post_clean(self):
+        if not self.learning_container_year_form.instance.common_title and \
+                not self.learning_unit_year_form.cleaned_data['specific_title']:
+            self.learning_unit_year_form.add_error(
+                "specific_title",
+                _("You must either set the common title or the specific title")
+            )
+
     @property
     def learning_unit_form(self):
         return self.forms[LearningUnitPartimModelForm]
@@ -197,11 +205,14 @@ class PartimForm(LearningUnitBaseForm):
         })
         return initial_learning_unit_year
 
-    def save(self, commit=True):
+    def _is_update(self):
+        return bool(self.instance)
 
+    def save(self, commit=True):
         learning_unit_instance = self.instance.learning_unit if self.instance else self.learning_unit_full_instance
 
-        start_year = learning_unit_instance.start_year
+        start_year = learning_unit_instance.start_year if (self._is_update() or not self.start_anac) \
+            else self.start_anac
         end_anac = learning_unit_instance.end_year
 
         # retrieve original learning unit end year if proposal
@@ -213,7 +224,7 @@ class PartimForm(LearningUnitBaseForm):
 
         # Save learning unit
         learning_unit = self.learning_unit_form.save(
-            start_year=self.start_anac if self.start_anac else start_year,
+            start_year=start_year,
             end_year=end_anac,
             learning_container=lcy.learning_container,
             commit=commit

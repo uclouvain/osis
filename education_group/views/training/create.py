@@ -5,7 +5,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
-from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.base import View
 
@@ -18,16 +17,16 @@ from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain.exception import ContentConstraintTypeMissing, \
     ContentConstraintMinimumMaximumMissing, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum, \
-    AcronymAlreadyExist, StartYearGreaterThanEndYear, MaximumCertificateAimType2Reached, CodeAlreadyExistException
+    AcronymAlreadyExist, StartYearGreaterThanEndYear, CodeAlreadyExistException
 from education_group.ddd.domain.training import TrainingIdentity
 from education_group.ddd.service.read import get_group_service
 from education_group.forms.training import CreateTrainingForm
 from education_group.models.group_year import GroupYear
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from education_group.views.proxy.read import Tab
+from osis_common.ddd.interface import BusinessExceptions
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command as command_pgrm
-from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.program_tree import Path
 from program_management.ddd.domain.service.element_id_search import ElementIdSearch
 from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
@@ -133,9 +132,9 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             except StartYearGreaterThanEndYear as e:
                 training_form.add_error('end_year', e.message)
                 training_form.add_error('academic_year', '')
-            except MaximumCertificateAimType2Reached as e:
-                training_form.add_error('certificate_aims', e.message)
-                training_form.add_error('section', '')
+            except BusinessExceptions as e:
+                display_error_messages(request, e.messages)
+                return render(request, self.template_name, self.get_context(training_form))
 
             if not training_form.errors:
                 self._display_success_messages(training_ids)
@@ -292,9 +291,6 @@ def _convert_training_form_to_data_for_service(training_form: CreateTrainingForm
         'leads_to_diploma': training_form.cleaned_data['leads_to_diploma'],
         'printing_title': training_form.cleaned_data['diploma_printing_title'],
         'professional_title': training_form.cleaned_data['professional_title'],
-        'aims': [
-            (aim.code, aim.section) for aim in (training_form.cleaned_data['certificate_aims'] or [])
-        ],
         'constraint_type': training_form.cleaned_data['constraint_type'],
         'min_constraint': training_form.cleaned_data['min_constraint'],
         'max_constraint': training_form.cleaned_data['max_constraint'],

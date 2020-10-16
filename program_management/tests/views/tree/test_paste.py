@@ -27,7 +27,7 @@ from unittest import mock
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.http import HttpResponse
-from django.test import TestCase
+from django.test import TestCase, SimpleTestCase, RequestFactory
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from waffle.testutils import override_flag
@@ -37,11 +37,13 @@ from base.models.enums.education_group_types import GroupType
 from base.models.enums.link_type import LinkTypes
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
+from base.tests.factories.education_group_type import GroupEducationGroupTypeFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.person import PersonFactory
+from base.tests.factories.user import UserFactory
 from base.utils.cache import ElementCache
 from base.utils.urls import reverse_with_get
-from osis_role.contrib.views import PermissionRequiredMixin
+from osis_role.contrib.views import AjaxPermissionRequiredMixin
 from program_management.ddd import command
 from program_management.ddd.domain import link
 from program_management.forms.tree.paste import PasteNodesFormset, PasteNodeForm
@@ -50,6 +52,7 @@ from program_management.tests.ddd.factories.node import NodeLearningUnitYearFact
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory
+from program_management.views.tree.paste import PasteNodesView
 
 
 def form_valid_effect(formset: PasteNodesFormset):
@@ -87,7 +90,7 @@ class TestPasteNodeView(TestCase):
         self.get_form_class_patcher.start()
         self.addCleanup(self.get_form_class_patcher.stop)
 
-        permission_patcher = mock.patch.object(PermissionRequiredMixin, "has_permission")
+        permission_patcher = mock.patch.object(AjaxPermissionRequiredMixin, "has_permission")
         self.permission_mock = permission_patcher.start()
         self.permission_mock.return_value = True
         self.addCleanup(permission_patcher.stop)
@@ -246,39 +249,26 @@ class TestPasteNodeView(TestCase):
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, 'tree/paste_inner.html')
 
-    @mock.patch('program_management.ddd.repositories.node.NodeRepository.get')
-    @mock.patch('program_management.ddd.repositories.program_tree.ProgramTreeRepository.get')
-    def test_format_title_version_when_unavailable(self, mock_get_tree, mock_get_node):
-        subgroup_to_attach = NodeGroupYearFactory(node_type=GroupType.SUB_GROUP)
 
-        mock_get_node.return_value = subgroup_to_attach
-        mock_get_tree.return_value = ProgramTreeFactory()
-
-        # To path :  BIR1BA ---> LBIR101G
-        path = "|".join([str(self.tree.root_node.pk), str(self.tree.root_node.children[1].child.pk)])
-        with self.assertRaises(osis_common.ddd.interface.BusinessException):
-            self.client.get(
-                self.url,
-                data={
-                    "path": path,
-                    "codes": [subgroup_to_attach.code],
-                    "year": subgroup_to_attach.year
-                }
-            )
-
-
-@override_flag('education_group_update', active=True)
 class TestPasteWithCutView(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(current=True)
-        cls.root_element = ElementGroupYearFactory(group_year__academic_year=cls.academic_year)
+        cls.group_type = GroupEducationGroupTypeFactory()
+        cls.root_element = ElementGroupYearFactory(
+            group_year__academic_year=cls.academic_year,
+            group_year__education_group_type=cls.group_type
+        )
         cls.group_element_year = GroupElementYearFactory(
             parent_element__group_year__academic_year=cls.academic_year,
-            child_element__group_year__academic_year=cls.academic_year
+            parent_element__group_year__education_group_type=cls.group_type,
+
+            child_element__group_year__academic_year=cls.academic_year,
+            child_element__group_year__education_group_type=cls.group_type,
         )
         cls.selected_element = ElementGroupYearFactory(
-            group_year__academic_year=cls.academic_year
+            group_year__academic_year=cls.academic_year,
+            group_year__education_group_type=cls.group_type
         )
         GroupElementYearFactory(
             parent_element=cls.root_element,
@@ -292,10 +282,18 @@ class TestPasteWithCutView(TestCase):
     def setUp(self):
         self.client.force_login(self.person.user)
 
-        permission_patcher = mock.patch.object(User, "has_perms")
+        permission_patcher = mock.patch.object(User, "has_perm")
         self.permission_mock = permission_patcher.start()
         self.permission_mock.return_value = True
+
+        get_permission_error_patcher = mock.patch(
+            'program_management.views.tree.paste.errors.get_permission_error',
+            return_value=''
+        )
+        self.get_permission_error_mock = get_permission_error_patcher.start()
+
         self.addCleanup(permission_patcher.stop)
+        self.addCleanup(get_permission_error_patcher.stop)
         self.addCleanup(ElementCache(self.person.user).clear)
 
     def test_should_check_attach_and_detach_permission(self):
@@ -317,12 +315,30 @@ class TestPasteWithCutView(TestCase):
         self.client.get(self.url)
         self.permission_mock.assert_has_calls(
             [
-                mock.call(("base.can_detach_node",), self.group_element_year.parent_element.group_year),
-                mock.call(("base.can_attach_node",), self.selected_element.group_year)
+                mock.call("base.can_detach_node", self.group_element_year.parent_element.group_year),
+                mock.call("base.can_attach_node", self.selected_element.group_year)
             ]
 
         )
         self.assertTrue(self.permission_mock.called)
+
+    @mock.patch('program_management.views.tree.paste.PasteNodesView._has_permission_to_detach', return_value=False)
+    def test_should_display_detach_permission_error_when_cannot_detach(self, mock_has_perm_to_detach):
+        ElementCache(self.person.user.id).save_element_selected(
+            element_year=self.academic_year.year,
+            element_code=self.group_element_year.child_element.group_year.partial_acronym,
+            path_to_detach="|".join([
+                str(self.group_element_year.parent_element.id),
+                str(self.group_element_year.child_element.id)
+            ]),
+            action=ElementCache.ElementCacheAction.CUT
+        )
+        self.client.get(self.url)
+        self.get_permission_error_mock.assert_has_calls(
+            [
+                mock.call(self.person.user, "base.can_detach_node"),
+            ]
+        )
 
     @mock.patch("program_management.ddd.service.write.paste_element_service.paste_element")
     def test_move(self, mock_paste_service):
@@ -472,3 +488,4 @@ class TestCheckPasteView(TestCase):
             HTTP_ACCEPT="application/json"
         )
         self.assertFalse(response.wsgi_request.session.get(check_key))
+

@@ -111,6 +111,7 @@ class LearningUnitTagLiEditTest(TestCase):
         self.previous_learning_unit = LearningUnitFactory()
         self.current_academic_year = create_current_academic_year()
         self.previous_academic_year = AcademicYearFactory(year=settings.YEAR_LIMIT_LUE_MODIFICATION-1)
+        self.next_academic_year = AcademicYearFactory(year=settings.YEAR_LIMIT_LUE_MODIFICATION + 1)
 
         self.learning_unit_year = LearningUnitYearFactory(
             academic_year=self.next_academic_yr,
@@ -219,11 +220,10 @@ class LearningUnitTagLiEditTest(TestCase):
             result, self._get_result_data_expected(ID_LINK_EDIT_DATE_LU, url=self.url_edit)
         )
 
-    @override_settings(YEAR_LIMIT_LUE_MODIFICATION=2018)
+    @override_settings(YEAR_LIMIT_LUE_MODIFICATION=2019)
     def test_li_edit_date_person_test_is_eligible_to_modify_end_date_based_on_container_type(self):
-        current_academic_yr = AcademicYear.objects.get(year=settings.YEAR_LIMIT_LUE_MODIFICATION+1)
         learning_unit_year_without_proposal = LearningUnitYearFactory(
-            academic_year=current_academic_yr,
+            academic_year=self.current_academic_year,
         )
         person_faculty_managers = [
             create_person_with_permission_and_group(FACULTY_MANAGER_GROUP, 'can_edit_learningunit'),

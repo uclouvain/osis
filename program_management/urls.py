@@ -28,14 +28,15 @@ from django.urls import include, path
 
 import program_management.views.tree.copy_cut
 import program_management.views.tree_version.check_version_name
-from program_management.views import quick_search, create_element, publish_general_information
-from program_management.views.proxy.identification import IdentificationRedirectView
+from program_management.views import content
 from program_management.views import groupelementyear_read, element_utilization, excel, search, \
     tree, prerequisite_read, prerequisite_update
-from program_management.views.tree_version import create as create_program_tree_version
-from program_management.views.tree_version.delete import TreeVersionDeleteView
+from program_management.views import quick_search, create_element, publish_general_information
+from program_management.views.proxy.content import ContentRedirectView
+from program_management.views.proxy.identification import IdentificationRedirectView
 from program_management.views.tree_version import create as create_program_tree_version, update_training, \
     update_mini_training
+from program_management.views.tree_version.delete import TreeVersionDeleteView
 
 urlpatterns = [
     url(r'^group_pdf_content/(?P<year>[0-9]+)/(?P<code>[A-Za-z0-9]+)/',
@@ -60,6 +61,7 @@ urlpatterns = [
     url(r'^$', search.EducationGroupSearch.as_view(), name='version_program'),
     # NEW VERSION URL - Program management
     path('<int:root_id>/', include([
+        path('tree/', tree.read.tree_json_view, name='tree_json'),
         path('create/', tree.create.CreateLinkView.as_view(), name='tree_create_link'),
         path('update/', tree.update.UpdateLinkView.as_view(), name='tree_update_link'),
         path('detach/', tree.detach.DetachNodeView.as_view(), name='tree_detach_node'),
@@ -69,14 +71,18 @@ urlpatterns = [
             path('down/', tree.move.down, name="group_element_year_down")
         ])),
     ])),
+    path('<int:year>/<str:code>/content/update/', content.update.ContentUpdateView.as_view(), name='content_update'),
     path('up/', tree.move.up, name="content_up"),
     path('down/', tree.move.down, name="content_down"),
     path('create_element/<str:category>', create_element.SelectTypeCreateElementView.as_view(),
          name='create_element_select_type'),
     path('check_paste/', tree.paste.CheckPasteView.as_view(), name="check_tree_paste_node"),
     path('paste/', tree.paste.PasteNodesView.as_view(), name='tree_paste_node'),
+    path('update/<str:parent_code>/<int:parent_year>/<str:child_code>/<int:child_year>',
+         tree.update.UpdateLinkView.as_view(), name='tree_update_link'),
     path('cut_element/', tree.copy_cut.cut_to_cache, name='cut_element'),
     path('copy_element/', tree.copy_cut.copy_to_cache, name='copy_element'),
+    path('clear_element_selected/', tree.copy_cut.clear_element_selected, name='clear_element_selected'),
     path('<int:year>/quick_search/', include([
         path(
             'learning_unit/',
@@ -118,6 +124,7 @@ urlpatterns = [
 
     path('<int:year>/<str:code>/', include([
         path('', IdentificationRedirectView.as_view(), name='element_identification'),
+        path('content/', ContentRedirectView.as_view(), name='element_content'),
         path(
             'create_education_group_version/',
             create_program_tree_version.CreateProgramTreeVersion.as_view(),

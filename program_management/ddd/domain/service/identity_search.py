@@ -23,9 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import functools
+import itertools
+import operator
 from typing import Union, List
 
-from django.db.models import F, Subquery
+from django.db.models import F, Subquery, Q
 
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType
 from education_group.ddd.domain.group import GroupIdentity
@@ -42,10 +45,23 @@ from program_management.models.education_group_version import EducationGroupVers
 
 
 class ProgramTreeVersionIdentitySearch(interface.DomainService):
-    def get_from_node_identity(self, node_identity: 'NodeIdentity') -> 'ProgramTreeVersionIdentity':
+
+    @classmethod
+    def get_from_node_identity(cls, node_identity: 'NodeIdentity') -> 'ProgramTreeVersionIdentity':
+        return cls.get_from_node_identities([node_identity])[0]
+
+    @classmethod
+    def get_from_node_identities(cls, node_identities: List['NodeIdentity']) -> List['ProgramTreeVersionIdentity']:
+        if not node_identities:
+            return []
+
+        filter_clause = functools.reduce(
+            operator.or_,
+            ((Q(partial_acronym=entity_id.code) & Q(academic_year__year=entity_id.year))
+             for entity_id in node_identities)
+        )
         values = GroupYear.objects.filter(
-            partial_acronym=node_identity.code,
-            academic_year__year=node_identity.year
+            filter_clause
         ).annotate(
             offer_acronym=F('educationgroupversion__offer__acronym'),
             year=F('academic_year__year'),
@@ -53,8 +69,17 @@ class ProgramTreeVersionIdentitySearch(interface.DomainService):
             is_transition=F('educationgroupversion__is_transition'),
         ).values('offer_acronym', 'year', 'version_name', 'is_transition')
         if values:
-            return ProgramTreeVersionIdentity(**values[0])
+            return [ProgramTreeVersionIdentity(**value) for value in values]
         raise interface.BusinessException("Program tree version identity not found")
+
+    @classmethod
+    def get_from_program_tree_identity(cls, identity: 'ProgramTreeIdentity') -> 'ProgramTreeVersionIdentity':
+        return cls.get_from_node_identity(NodeIdentitySearch().get_from_program_tree_identity(identity))
+
+    @classmethod
+    def get_from_group_identity(cls, identity: 'GroupIdentity') -> 'ProgramTreeVersionIdentity':
+        tree_identity = ProgramTreeIdentitySearch().get_from_group_identity(identity)
+        return cls.get_from_program_tree_identity(tree_identity)
 
     @classmethod
     def get_all_program_tree_version_identities(
@@ -136,6 +161,10 @@ class ProgramTreeIdentitySearch(interface.DomainService):
             identity: 'ProgramTreeVersionIdentity'
     ) -> 'ProgramTreeIdentity':
         return self.get_from_node_identity(NodeIdentitySearch().get_from_tree_version_identity(identity))
+
+    @classmethod
+    def get_from_group_identity(cls, group_identity: 'GroupIdentity') -> 'ProgramTreeIdentity':
+        return ProgramTreeIdentity(code=group_identity.code, year=group_identity.year)
 
 
 class TrainingIdentitySearch(interface.DomainService):
