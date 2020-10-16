@@ -72,7 +72,7 @@ from base.tests.factories.business.learning_units import GenerateContainer, Gene
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
-from base.tests.factories.entity import EntityFactory
+from base.tests.factories.entity import EntityFactory, EntityWithVersionFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_achievement import LearningAchievementFactory
@@ -84,7 +84,6 @@ from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollment
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearFakerFactory
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
-from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.user import SuperUserFactory, UserFactory
 from base.tests.factories.utils.get_messages import get_messages_from_response
@@ -100,6 +99,7 @@ from cms.tests.factories.text_label import LearningUnitYearTextLabelFactory
 from cms.tests.factories.translated_text import LearningUnitYearTranslatedTextFactory
 from cms.tests.factories.translated_text_label import TranslatedTextLabelFactory
 from learning_unit.api.views.learning_unit import LearningUnitFilter
+from learning_unit.tests.factories.central_manager import CentralManagerFactory
 from learning_unit.tests.factories.faculty_manager import FacultyManagerFactory
 from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
 from osis_common.document import xls_build
@@ -338,7 +338,10 @@ class LearningUnitViewTestCase(TestCase):
         cls.organization = OrganizationFactory(type=organization_type.MAIN)
         cls.country = CountryFactory()
 
+        cls.parent_entity = EntityWithVersionFactory()
         cls.entities = EntityFactory.create_batch(3, country=cls.country, organization=cls.organization)
+
+        cls.person = CentralManagerFactory(entity=cls.parent_entity, with_child=True).person
 
         today = datetime.date.today()
         cls.current_academic_year, *cls.academic_years = AcademicYearFactory.produce_in_future(quantity=8)
@@ -361,34 +364,40 @@ class LearningUnitViewTestCase(TestCase):
             learning_container_year=cls.learning_container_yr,
             learning_unit=cls.learning_unit
         )
-        cls.learning_component_yr = LearningComponentYearFactory(learning_unit_year=cls.luy,
-                                                                 hourly_volume_total_annual=10,
-                                                                 hourly_volume_partial_q1=5,
-                                                                 hourly_volume_partial_q2=5)
+        cls.learning_component_yr = LearningComponentYearFactory(
+            learning_unit_year=cls.luy,
+            hourly_volume_total_annual=10,
+            hourly_volume_partial_q1=5,
+            hourly_volume_partial_q2=5,
+        )
 
-        cls.entity_version = EntityVersionFactory(acronym="1 acronym", entity=cls.entities[0],
-                                                  entity_type=entity_type.SCHOOL,
-                                                  start_date=today - datetime.timedelta(days=1),
-                                                  end_date=today.replace(year=today.year + 1))
-        cls.entity_version_2 = EntityVersionFactory(acronym="2 acronym", entity=cls.entities[1],
-                                                    entity_type=entity_type.INSTITUTE,
-                                                    start_date=today - datetime.timedelta(days=20),
-                                                    end_date=today.replace(year=today.year + 1))
-        cls.entity_version_3 = EntityVersionFactory(acronym="3 acronym", entity=cls.entities[2],
-                                                    entity_type=entity_type.FACULTY,
-                                                    start_date=today - datetime.timedelta(days=50),
-                                                    end_date=today.replace(year=today.year + 1))
+        cls.entity_version = EntityVersionFactory(
+            acronym="1 acronym", entity=cls.entities[0],
+            entity_type=entity_type.SCHOOL,
+            start_date=today - datetime.timedelta(days=1),
+            end_date=today.replace(year=today.year + 1),
+            parent=cls.parent_entity
+        )
+        cls.entity_version_2 = EntityVersionFactory(
+            acronym="2 acronym", entity=cls.entities[1],
+            entity_type=entity_type.INSTITUTE,
+            start_date=today - datetime.timedelta(days=20),
+            end_date=today.replace(year=today.year + 1),
+            parent=cls.parent_entity
+        )
+        cls.entity_version_3 = EntityVersionFactory(
+            acronym="3 acronym", entity=cls.entities[2],
+            entity_type=entity_type.FACULTY,
+            start_date=today - datetime.timedelta(days=50),
+            end_date=today.replace(year=today.year + 1),
+            parent=cls.parent_entity
+        )
 
         cls.campus = CampusFactory(organization=cls.organization, is_administration=True)
         cls.language = FrenchLanguageFactory()
-        cls.a_superuser = SuperUserFactory()
-        cls.person = PersonFactory(user=cls.a_superuser)
-
-        for entity in cls.entities:
-            PersonEntityFactory(person=cls.person, entity=entity)
 
     def setUp(self):
-        self.client.force_login(self.a_superuser)
+        self.client.force_login(self.person.user)
 
     def test_entity_requirement_autocomplete(self):
         self.client.force_login(self.person.user)
