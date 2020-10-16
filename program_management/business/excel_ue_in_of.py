@@ -156,14 +156,13 @@ RAW_SQL_TO_GET_LAST_UPDATE_FICHE_DESCRIPTIVE = """
         and tl.label in {labels_to_check} and ct.model in ({models_to_check})
         order by revision.date_created desc limit 1
     )
-    SELECT {field_to_select} FROM last_update_info
 """
 
 LAST_UPDATE_FICHE_DESCRIPTIVE = RAW_SQL_TO_GET_LAST_UPDATE_FICHE_DESCRIPTIVE.format(
     labels_to_check=repr(tuple(map(str, CMS_LABEL_PEDAGOGY))),
     models_to_check=','.join(["'translatedtext'", "'teachingmaterial'"])
 ) + """
-
+    SELECT {field_to_select} FROM last_update_info
 """
 
 LAST_UPDATE_FORCE_MAJEURE = RAW_SQL_TO_GET_LAST_UPDATE_FICHE_DESCRIPTIVE.format(
@@ -420,7 +419,7 @@ def _annotate_with_description_fiche_specifications(
         annotations = build_annotations(sq, CMS_LABEL_PEDAGOGY, CMS_LABEL_PEDAGOGY_FR_AND_EN)
         group_element_years = group_element_years.annotate(**annotations)
         group_element_years = group_element_years.annotate(
-            last_update_by=RawSQL(RAW_SQL_TO_GET_LAST_UPDATE_FICHE_DESCRIPTIVE.format(field_to_select='author'), ()),
+            last_update_by=RawSQL(LAST_UPDATE_FICHE_DESCRIPTIVE.format(field_to_select='author'), ()),
             last_update_date=RawSQL(LAST_UPDATE_FICHE_DESCRIPTIVE.format(field_to_select='last_update'), ())
         )
 

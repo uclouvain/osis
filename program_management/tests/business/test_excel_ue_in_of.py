@@ -60,7 +60,8 @@ from program_management.business.excel_ue_in_of import EducationGroupYearLearnin
     optional_header_for_session_derogation, optional_header_for_specifications, optional_header_for_teacher_list, \
     _fix_data, _get_workbook_for_custom_xls, _build_legend_sheet, LEGEND_WB_CONTENT, LEGEND_WB_STYLE, _optional_data, \
     _build_excel_lines_ues, _get_optional_data, BOLD_FONT, _build_specifications_cols, _build_description_fiche_cols, \
-    _build_validate_html_list_to_string, _build_gathering_content, _build_main_gathering_content
+    _build_validate_html_list_to_string, _build_gathering_content, _build_main_gathering_content, \
+    _build_force_majeure_cols
 from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
 from program_management.business.utils import html2text
 from program_management.forms.custom_xls import CustomXlsForm
@@ -462,8 +463,10 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
 
         _initialize_cms_data_description_fiche(self.gey)
 
-        description_fiche = _build_description_fiche_cols(self.luy, self.gey)
+        self._assert_equal_description_fiche_fields(teaching_material_1, teaching_material_2)
 
+    def _assert_equal_description_fiche_fields(self, teaching_material_1, teaching_material_2):
+        description_fiche = _build_description_fiche_cols(self.luy, self.gey)
         self.assertEqual(description_fiche.resume, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING))
         self.assertEqual(description_fiche.resume_en, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING))
         self.assertEqual(description_fiche.teaching_methods, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING))
@@ -474,10 +477,8 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
         self.assertEqual(description_fiche.other_informations_en, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING))
         self.assertEqual(description_fiche.mobility, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING))
         self.assertEqual(description_fiche.bibliography, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING))
-
         self.assertEqual(description_fiche.online_resources, "{}".format(CMS_TXT_WITH_LINK_AFTER_FORMATTING))
         self.assertEqual(description_fiche.online_resources_en, "{}".format(CMS_TXT_WITH_LINK_AFTER_FORMATTING))
-
         self.assertEqual(description_fiche.teaching_materials,
                          "{} - {}\n{} - {}".format(_('Mandatory'),
                                                    teaching_material_1.title,
@@ -485,6 +486,39 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
                                                    teaching_material_2.title))
         self.assertEqual(description_fiche.last_update_date, LAST_UPDATE_DATE.strftime('%d/%m/%Y'))
         self.assertEqual(description_fiche.last_update_by, LAST_UPDATE_BY)
+
+    def test_build_force_majeure_cols(self):
+        teaching_material_1 = TeachingMaterialFactory(
+            learning_unit_year=self.luy, title='Title mandatory', mandatory=True
+        )
+        teaching_material_2 = TeachingMaterialFactory(
+            learning_unit_year=self.luy, title='Title non-mandatory', mandatory=False
+        )
+
+        _initialize_cms_data_description_fiche(self.gey, force_majeure=True)
+        force_majeure = _build_force_majeure_cols(self.gey)
+        self._assert_equal_description_fiche_fields(teaching_material_1, teaching_material_2)
+
+        self.assertEqual(
+            force_majeure.teaching_methods_force_majeure, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING)
+        )
+        self.assertEqual(
+            force_majeure.teaching_methods_force_majeure_en, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING)
+        )
+        self.assertEqual(
+            force_majeure.evaluation_methods_force_majeure, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING)
+        )
+        self.assertEqual(
+            force_majeure.evaluation_methods_force_majeure_en, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING)
+        )
+        self.assertEqual(
+            force_majeure.other_informations_force_majeure, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING)
+        )
+        self.assertEqual(
+            force_majeure.other_informations_force_majeure_en, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING)
+        )
+        self.assertEqual(force_majeure.last_update_date_force_majeure, LAST_UPDATE_DATE.strftime('%d/%m/%Y'))
+        self.assertEqual(force_majeure.last_update_by_force_majeure, LAST_UPDATE_BY)
 
     def test_build_specifications_cols(self):
 
@@ -686,7 +720,7 @@ def initialize_optional_data():
     }
 
 
-def _initialize_cms_data_description_fiche(gey):
+def _initialize_cms_data_description_fiche(gey, force_majeure: bool = False):
     gey_cms = gey
     gey_cms.resume = CMS_TXT_WITH_LIST
     gey_cms.resume_en = CMS_TXT_WITH_LIST
@@ -704,6 +738,18 @@ def _initialize_cms_data_description_fiche(gey):
 
     gey_cms.last_update_date = LAST_UPDATE_DATE
     gey_cms.last_update_by = LAST_UPDATE_BY
+
+    if force_majeure:
+        gey_cms.teaching_methods_force_majeure = CMS_TXT_WITH_LIST
+        gey_cms.teaching_methods_force_majeure_en = CMS_TXT_WITH_LIST
+        gey_cms.evaluation_methods_force_majeure = CMS_TXT_WITH_LIST
+        gey_cms.evaluation_methods_force_majeure_en = CMS_TXT_WITH_LIST
+        gey_cms.other_informations_force_majeure = CMS_TXT_WITH_LIST
+        gey_cms.other_informations_force_majeure_en = CMS_TXT_WITH_LIST
+
+        gey_cms.last_update_date_force_majeure = LAST_UPDATE_DATE
+        gey_cms.last_update_by_force_majeure = LAST_UPDATE_BY
+
     return gey_cms
 
 
