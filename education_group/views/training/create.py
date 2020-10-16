@@ -18,7 +18,10 @@ from education_group.ddd.business_types import *
 from education_group.ddd.domain.exception import ContentConstraintTypeMissing, \
     ContentConstraintMinimumMaximumMissing, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum, \
     AcronymAlreadyExist, StartYearGreaterThanEndYear, CodeAlreadyExistException, \
-    HopsDataShouldBeGreaterOrEqualsThanZeroAndLessThan9999
+    AresCodeShouldBeGreaterOrEqualsThanZeroAndLessThan9999, \
+    AresGracaShouldBeGreaterOrEqualsThanZeroAndLessThan9999, \
+    AresAuthorizationShouldBeGreaterOrEqualsThanZeroAndLessThan9999, \
+    HopsFieldsAllOrNone
 from education_group.ddd.domain.training import TrainingIdentity
 from education_group.ddd.service.read import get_group_service
 from education_group.forms.training import CreateTrainingForm
@@ -133,8 +136,12 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             except StartYearGreaterThanEndYear as e:
                 training_form.add_error('end_year', e.message)
                 training_form.add_error('academic_year', '')
-            except HopsDataShouldBeGreaterOrEqualsThanZeroAndLessThan9999 as e:
+            except (AresCodeShouldBeGreaterOrEqualsThanZeroAndLessThan9999, HopsFieldsAllOrNone) as e:
                 training_form.add_error('ares_code', e.message)
+            except AresGracaShouldBeGreaterOrEqualsThanZeroAndLessThan9999 as e:
+                training_form.add_error('ares_graca', e.message)
+            except AresAuthorizationShouldBeGreaterOrEqualsThanZeroAndLessThan9999 as e:
+                training_form.add_error('ares_authorization', e.message)
             except BusinessExceptions as e:
                 display_error_messages(request, e.messages)
                 return render(request, self.template_name, self.get_context(training_form))

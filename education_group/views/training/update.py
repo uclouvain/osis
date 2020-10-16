@@ -57,7 +57,9 @@ from program_management.ddd.domain.exception import Program2MEndDateShouldBeGrea
 from program_management.ddd.service.write import delete_training_with_program_tree_service
 from program_management.ddd.service.write.postpone_training_and_program_tree_modifications_service import \
     postpone_training_and_program_tree_modifications
-from education_group.ddd.domain.exception import HopsDataShouldBeGreaterOrEqualsThanZeroAndLessThan9999
+from education_group.ddd.domain.exception import AresCodeShouldBeGreaterOrEqualsThanZeroAndLessThan9999, \
+    AresGracaShouldBeGreaterOrEqualsThanZeroAndLessThan9999, \
+    AresAuthorizationShouldBeGreaterOrEqualsThanZeroAndLessThan9999, HopsFieldsAllOrNone
 
 
 class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
@@ -88,8 +90,12 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             if not self.training_form.errors and not self._changed_certificate_aims_only():
                 try:
                     updated_trainings = self.update_training()
-                except HopsDataShouldBeGreaterOrEqualsThanZeroAndLessThan9999 as e:
+                except (AresCodeShouldBeGreaterOrEqualsThanZeroAndLessThan9999, HopsFieldsAllOrNone) as e:
                     self.training_form.add_error('ares_code', e.message)
+                except AresGracaShouldBeGreaterOrEqualsThanZeroAndLessThan9999 as e:
+                    self.training_form.add_error('ares_graca', e.message)
+                except AresAuthorizationShouldBeGreaterOrEqualsThanZeroAndLessThan9999 as e:
+                    self.training_form.add_error('ares_authorization', e.message)
 
             if 'certificate_aims' in self.training_form.changed_data:
                 updated_aims_trainings = self.update_certificate_aims()
