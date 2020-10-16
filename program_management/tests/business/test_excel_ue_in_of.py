@@ -187,6 +187,8 @@ class TestContent(TestCase):
             achievements=[cls.achievement_1, cls.achievement_2, cls.achievement_3, cls.achievement_4],
             specifications=specifications
         )
+        tree = ProgramTreeFactory(root_node=cls.parent_node)
+        cls.tree_version = StandardProgramTreeVersionFactory(tree=tree)
 
     def test_fix_data(self):
         expected = get_expected_data_new(self.child_node, self.luy, self.link_1_1, self.link_1.parent)
@@ -196,7 +198,8 @@ class TestContent(TestCase):
                             DIRECT_GATHERING_KEY: self.child_node,
                             MAIN_GATHERING_KEY: self.parent_node,
                             EXCLUDE_UE_KEY: False
-                        })
+                        },
+                        [self.tree_version])
         self.assertEqual(res, expected)
 
     def test_no_main_parent_result(self):
@@ -487,12 +490,14 @@ class TestContent(TestCase):
     def test_build_main_gathering_label_finality_master(self):
         edg_finality = NodeGroupYearFactory(node_type=TrainingType.MASTER_MS_120,
                                             offer_partial_title_fr='partial_title')
-        self.assertEqual(_build_main_gathering_label(edg_finality),
+        tree_version = StandardProgramTreeVersionFactory(tree=ProgramTreeFactory(root_node=edg_finality))
+        self.assertEqual(_build_main_gathering_label(edg_finality, [tree_version]),
                          "{} - {}".format(edg_finality.title, edg_finality.offer_partial_title_fr))
 
     def test_build_main_gathering_label_not_master(self):
         node_not_finality = NodeGroupYearFactory(node_type=GroupType.COMMON_CORE)
-        self.assertEqual(_build_main_gathering_label(node_not_finality),
+        tree_version = StandardProgramTreeVersionFactory(tree=ProgramTreeFactory(root_node=node_not_finality))
+        self.assertEqual(_build_main_gathering_label(node_not_finality, [tree_version]),
                          "{} - {}".format(node_not_finality.title, node_not_finality.group_title_fr))
 
 
