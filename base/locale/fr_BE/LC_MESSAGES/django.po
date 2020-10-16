@@ -1062,6 +1062,10 @@ msgstr "Matricule FGS"
 msgid "Go"
 msgstr "Continuer"
 
+msgctxt "carousel"
+msgid "Go"
+msgstr "Accéder"
+
 msgid "Group"
 msgstr "Groupe"
 
