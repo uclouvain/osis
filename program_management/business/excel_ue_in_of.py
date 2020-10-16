@@ -43,6 +43,7 @@ from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.business.learning_unit_xls import PROPOSAL_LINE_STYLES, \
     prepare_proposal_legend_ws_data
 from base.business.learning_unit_xls import get_significant_volume
+from base.utils.excel import get_html_to_text
 from base.business.learning_units.xls_generator import hyperlinks_to_string, strip_tags
 from base.models.enums.education_group_types import GroupType
 from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
@@ -394,10 +395,7 @@ def _get_optional_data(data: List, luy: DddLearningUnitYear, optional_data_neede
 
 
 def _build_validate_html_list_to_string(value_param, method):
-    return unicodedata.normalize(
-        "NFD",
-        strip_tags(value_param).encode('unicode_escape').decode('utf-8', 'ignore')
-    ).strip() if value_param else ''
+    return get_html_to_text(value_param)
 
 
 def _build_specifications_cols(luy: 'DddLearningUnitYear'):
