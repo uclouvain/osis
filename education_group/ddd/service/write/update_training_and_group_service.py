@@ -60,7 +60,8 @@ def update_training_and_group(cmd: command.UpdateTrainingAndGroupCommand) -> 'Tr
     return training_identity
 
 
-def __convert_command_to_update_training_data(cmd: command.UpdateTrainingAndGroupCommand) -> 'training.UpdateTrainingData':
+def __convert_command_to_update_training_data(cmd: command.UpdateTrainingAndGroupCommand) \
+        -> 'training.UpdateTrainingData':
     return training.UpdateTrainingData(
         credits=cmd.credits,
         titles=Titles(
@@ -120,7 +121,7 @@ def __convert_command_to_update_training_data(cmd: command.UpdateTrainingAndGrou
             ares_code=cmd.ares_code,
             ares_graca=cmd.ares_graca,
             ares_authorization=cmd.ares_authorization
-        ) if cmd.ares_code and cmd.ares_graca and cmd.ares_authorization else None,
+        ) if cmd.ares_code or cmd.ares_graca or cmd.ares_authorization else None,
         co_graduation=CoGraduation(
             code_inter_cfb=cmd.code_inter_cfb,
             coefficient=cmd.coefficient

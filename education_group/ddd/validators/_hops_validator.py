@@ -31,10 +31,8 @@ from education_group.ddd.domain.exception import HopsFieldsAllOrNone, \
 class HopsValuesValidator(business_validator.BusinessValidator):
 
     def __init__(self, training: 'Training'):
-        print(training.hops)
         super().__init__()
-        # Si au préalable aucune donnée n'a été encodée pour hops, même si j'encode une donnée à
-        # l'écran j'ai training.hops = None
+
         if training.type in TrainingType.all() and training.hops:
             self.ares_code = training.hops.ares_code
             self.ares_graca = training.hops.ares_graca
