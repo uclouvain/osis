@@ -230,13 +230,13 @@ class TestViewEducationalInformation(TestCase):
         cls.tutor = TutorFactory()
         cls.attribution = AttributionFactory(tutor=cls.tutor, summary_responsible=True)
         cls.url = reverse(view_educational_information, args=[cls.attribution.learning_unit_year.id])
-        cls.tutor.person.user.user_permissions.add(Permission.objects.get(codename='can_edit_learningunit_pedagogy'))
 
     def setUp(self):
         self.client.force_login(self.tutor.person.user)
 
         self.patcher_perm_can_view_educational_information = mock.patch(
-            'attribution.views.perms.can_tutor_view_educational_information')
+            'attribution.views.perms.can_tutor_view_educational_information'
+        )
         self.mock_perm_view = self.patcher_perm_can_view_educational_information.start()
         self.mock_perm_view.return_value = True
 
