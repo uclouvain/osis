@@ -51,8 +51,6 @@ function setErrorMessage(text, element) {
         parent.append("<div class='help-block'>" + text + "</div>");
     }
     document.getElementById('bt_submit_specific_version_form').style.display = 'none';
-    // document.getElementById('existing_footer').style.display = 'none';
-    // document.getElementById('default_footer').style.display = 'block';
 }
 
 function setWarningMessage(text, element){
@@ -61,16 +59,11 @@ function setWarningMessage(text, element){
     parent.append("<div class='help-block'>" + text + "</div>");
     document.getElementById('bt_submit_specific_version_form').style.display = 'inline';
     document.getElementById('bt_submit_specific_version_form').textContent = trans_prolong;
-    // document.getElementById('valid_footer').style.display = 'none';
-    // document.getElementById('default_footer').style.display = 'none';
 }
 
 function setValideMessage(){
     document.getElementById('bt_submit_specific_version_form').style.display = 'inline';
     document.getElementById('bt_submit_specific_version_form').textContent = trans_new_version;
-    // document.getElementById('valid_footer').style.display = 'block';
-    // document.getElementById('existing_footer').style.display = 'none';
-    // document.getElementById('default_footer').style.display = 'none';
 }
 
 function cleanErrorMessage() {
@@ -79,9 +72,6 @@ function cleanErrorMessage() {
     parent.removeClass('has-warning');
     parent.find(".help-block").remove();
     parent.find(".has-error").removeClass('has-error');
-    // document.getElementById('valid_footer').style.display = 'none';
-    // document.getElementById('existing_footer').style.display = 'none';
-    // document.getElementById('default_footer').style.display = 'block';
 }
 
 $(document).ready(function () {
