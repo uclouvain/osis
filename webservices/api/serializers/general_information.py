@@ -97,7 +97,7 @@ class GeneralInformationSerializer(serializers.Serializer):
     def _get_section_cms(self, node, section, language, reference: int = None):
         if reference is None:
             reference = get_groups_or_offers_cms_reference_object(node).pk
-        entity = entity_name.get_offers_or_groups_entity_from_node(node)
+        entity = entity_name.get_offers_or_groups_entity_from_group(node)
         translated_text_label = TranslatedTextLabel.objects.get(
             text_label__label=section,
             language=language,

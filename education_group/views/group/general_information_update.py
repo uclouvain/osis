@@ -35,7 +35,6 @@ from cms.models.text_label import TextLabel
 from cms.models.translated_text import TranslatedText
 from education_group.views.group.common_read import Tab, GroupRead
 from osis_common.utils.models import get_object_or_none
-from program_management.ddd.domain.node import Node
 
 
 class GroupUpdateGeneralInformation(GroupRead):
@@ -67,11 +66,11 @@ class GroupUpdateGeneralInformation(GroupRead):
             self._update_cms_for_specific_lang(form, lang, label)
 
     def _update_cms_for_specific_lang(self, form: EducationGroupPedagogyEditForm, lang: str, label: str):
-        node = self.get_object()
-        entity = entity_name.get_offers_or_groups_entity_from_node(node)
-        obj = translated_text.get_groups_or_offers_cms_reference_object(node)
-        text_label = TextLabel.objects.filter(label=label, entity=entity).first()
+        group = self.get_group()
 
+        entity = entity_name.get_offers_or_groups_entity_from_group(group)
+        obj = translated_text.get_groups_or_offers_cms_reference_object(group)
+        text_label = TextLabel.objects.filter(label=label, entity=entity).first()
         record, created = TranslatedText.objects.get_or_create(
             reference=obj.pk,
             entity=entity,
@@ -82,18 +81,18 @@ class GroupUpdateGeneralInformation(GroupRead):
         record.save()
 
     def get_context_data(self, **kwargs):
-        node = self.get_object()
+        group = self.get_group()
 
         label_name = self.request.GET.get('label')
 
-        initial_values = self.get_translated_texts(node)
+        initial_values = self.get_translated_texts(group)
 
         context = {
             'label': label_name,
             'form': EducationGroupPedagogyEditForm(initial=initial_values),
             'group_to_parent': self.request.GET.get("group_to_parent") or '0',
             'translated_label': translated_text_label.get_label_translation(
-                text_entity=entity_name.get_offers_or_groups_entity_from_node(node),
+                text_entity=entity_name.get_offers_or_groups_entity_from_group(group),
                 label=label_name,
                 language=get_user_interface_language(self.request.user)
             )
@@ -104,17 +103,16 @@ class GroupUpdateGeneralInformation(GroupRead):
             **context
         }
 
-    def get_translated_texts(self, node: Node):
+    def get_translated_texts(self, group: 'Group'):
         initial_values = {'label': self.request.GET.get('label')}
         for lang in [settings.LANGUAGE_CODE_EN, settings.LANGUAGE_CODE_FR]:
-            initial_values.update(self._get_translated_text_from_lang(node, lang))
+            initial_values.update(self._get_translated_text_from_lang(group, lang))
         return initial_values
 
-    def _get_translated_text_from_lang(self, node: Node, lang: str):
-        obj = translated_text.get_groups_or_offers_cms_reference_object(node)
+    def _get_translated_text_from_lang(self, group: 'Group', lang: str):
+        obj = translated_text.get_groups_or_offers_cms_reference_object(group)
+        entity = entity_name.get_offers_or_groups_entity_from_group(group)
         label = self.request.GET.get('label')
-        node = self.get_object()
-        entity = entity_name.get_offers_or_groups_entity_from_node(node)
         text = get_object_or_none(
             TranslatedText.objects.select_related('text_label'),
             reference=str(obj.pk),
@@ -128,5 +126,5 @@ class GroupUpdateGeneralInformation(GroupRead):
         return {}
 
     def get_success_url(self):
-        node = self.get_object()
-        return reverse('group_general_information', args=[node.year, node.code]) + '?path={}'.format(self.get_path())
+        group = self.get_group()
+        return reverse('group_general_information', args=[group.year, group.code]) + '?path={}'.format(self.get_path())

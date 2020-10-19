@@ -23,9 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import functools
+from typing import List
 
 from base.utils.urls import reverse_with_get
 from education_group.views.training.common_read import TrainingRead, Tab
+from program_management.ddd.repositories import load_tree
 
 
 class TrainingReadContent(TrainingRead):
@@ -35,7 +38,7 @@ class TrainingReadContent(TrainingRead):
     def get_context_data(self, **kwargs):
         return {
             **super().get_context_data(**kwargs),
-            "children": self.get_object().children
+            "children": self.get_children()
         }
 
     def get_update_training_url(self):
@@ -47,3 +50,11 @@ class TrainingReadContent(TrainingRead):
 
     def get_update_permission_name(self) -> str:
         return "base.change_link_data"
+
+    @functools.lru_cache()
+    def get_tree(self):
+        return load_tree.load(self.get_root_id())
+
+    def get_children(self) -> List['Node']:
+        parent_node = self.get_tree().get_node(self.get_path())
+        return parent_node.children

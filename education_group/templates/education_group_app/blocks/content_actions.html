@@ -45,6 +45,6 @@
         </form>
     {% endif %}
 
-    {% url 'tree_detach_node' node.node_id as detach_url %}
+    {% url 'tree_detach_node' as detach_url %}
     {% a_tag_modal_has_perm url=detach_url|addstr:'?path='|addstr:node_path|addstr:"|"|addstr:link.child.node_id text='<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>' perm='base.change_link_data' user=user obj=group_year %}
 </div>

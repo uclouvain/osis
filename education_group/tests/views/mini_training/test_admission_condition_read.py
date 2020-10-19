@@ -32,8 +32,8 @@ from django.urls import reverse
 from base.models.enums.education_group_types import MiniTrainingType
 from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.factories.user import UserFactory
+from education_group.ddd.domain.group import Group
 from education_group.views.mini_training.common_read import Tab
-from program_management.ddd.domain.node import NodeGroupYear
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory
 
@@ -109,7 +109,7 @@ class TestMiniTrainingReadAdmissionCondition(TestCase):
             'root_id': self.mini_training_version.root_group.element.pk
         })
         self.assertEqual(response.context['tree_json_url'], expected_tree_json_url)
-        self.assertIsInstance(response.context['node'], NodeGroupYear)
+        self.assertIsInstance(response.context['group'], Group)
         self.assertIn("can_edit_information", response.context)
 
     def test_assert_admission_requirements_label_structure_on_context_data(self):

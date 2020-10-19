@@ -59,17 +59,8 @@ urlpatterns = [
         name="education_group_learning_units_contains"
     ),
     url(r'^$', search.EducationGroupSearch.as_view(), name='version_program'),
-    # NEW VERSION URL - Program management
     path('<int:root_id>/', include([
         path('tree/', tree.read.tree_json_view, name='tree_json'),
-        path('create/', tree.create.CreateLinkView.as_view(), name='tree_create_link'),
-        path('update/', tree.update.UpdateLinkView.as_view(), name='tree_update_link'),
-        path('detach/', tree.detach.DetachNodeView.as_view(), name='tree_detach_node'),
-        path('move/', tree.paste.PasteNodesView.as_view(), name='group_element_year_move'),
-        path('<int:link_id>/', include([
-            path('up/', tree.move.up, name="group_element_year_up"),
-            path('down/', tree.move.down, name="group_element_year_down")
-        ])),
     ])),
     path('<int:year>/<str:code>/content/update/', content.update.ContentUpdateView.as_view(), name='content_update'),
     path('up/', tree.move.up, name="content_up"),
@@ -82,6 +73,7 @@ urlpatterns = [
          tree.update.UpdateLinkView.as_view(), name='tree_update_link'),
     path('cut_element/', tree.copy_cut.cut_to_cache, name='cut_element'),
     path('copy_element/', tree.copy_cut.copy_to_cache, name='copy_element'),
+    path('detach/', tree.detach.DetachNodeView.as_view(), name='tree_detach_node'),
     path('clear_element_selected/', tree.copy_cut.clear_element_selected, name='clear_element_selected'),
     path('<int:year>/quick_search/', include([
         path(

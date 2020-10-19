@@ -35,8 +35,8 @@ from base.models.enums.education_group_types import MiniTrainingType
 from base.tests.factories.academic_year import get_current_year
 from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.factories.user import UserFactory
+from education_group.ddd.domain.group import Group
 from education_group.views.mini_training.common_read import Tab
-from program_management.ddd.domain.node import NodeGroupYear
 from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory, \
     ParticularTransitionEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory
@@ -98,7 +98,7 @@ class TestMiniTrainingReadIdentification(TestCase):
             'root_id': self.mini_training_version.root_group.element.pk
         })
         self.assertEqual(response.context['tree_json_url'], expected_tree_json_url)
-        self.assertIsInstance(response.context['node'], NodeGroupYear)
+        self.assertIsInstance(response.context['group'], Group)
         self.assertIsInstance(response.context['history'], QuerySet)
 
     def test_assert_active_tabs_is_identification_and_others_are_not_active(self):

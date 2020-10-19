@@ -32,8 +32,8 @@ from base.models.enums.education_group_categories import Categories
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.factories.user import UserFactory
+from education_group.ddd.domain.group import Group
 from education_group.views.group.common_read import Tab
-from program_management.ddd.domain.node import NodeGroupYear
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory
 
@@ -85,7 +85,7 @@ class TestGroupReadIdentification(TestCase):
         self.assertEqual(response.context['group_year'], self.element_group_year.group_year)
         expected_tree_json_url = reverse('tree_json', kwargs={'root_id': self.element_group_year.pk})
         self.assertEqual(response.context['tree_json_url'], expected_tree_json_url)
-        self.assertIsInstance(response.context['node'], NodeGroupYear)
+        self.assertIsInstance(response.context['group'], Group)
         self.assertIsInstance(response.context['history'], QuerySet)
 
     def test_assert_active_tabs_is_identification_and_others_are_not_active(self):
