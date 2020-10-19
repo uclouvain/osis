@@ -97,10 +97,10 @@ class TestLearningUnitPrerequisiteTraining(TestCase):
         self.assertIn("show_modify_prerequisite_button", response.context)
 
     @mock.patch('program_management.ddd.validators._authorized_root_type_for_prerequisite'
-                '.AuthorizedRootTypeForPrerequisite')
+                '.AuthorizedRootTypeForPrerequisite.validate')
     def test_validator_called(self, mock_check_validator):
         self.client.get(self.url)
-        self.assertFalse(mock_check_validator.called)
+        self.assertTrue(mock_check_validator.called)
 
 
 class TestLearningUnitPrerequisiteGroup(TestCase):

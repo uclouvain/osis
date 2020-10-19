@@ -24,7 +24,6 @@
 #
 ##############################################################################
 from django.db.models import Prefetch
-from django.shortcuts import get_object_or_404
 
 import program_management.ddd.repositories.find_roots
 from base.models.education_group_year import EducationGroupYear
