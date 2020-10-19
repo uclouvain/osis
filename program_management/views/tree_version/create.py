@@ -44,13 +44,14 @@ from education_group.templatetags.academic_year_display import display_as_academ
 from osis_role.contrib.views import AjaxPermissionRequiredMixin
 from program_management.ddd.business_types import *
 from program_management.ddd.command import CreateProgramTreeVersionCommand, ExtendProgramTreeVersionCommand, \
-    UpdateProgramTreeVersionCommand, PostponeProgramTreeVersionCommand
+    UpdateProgramTreeVersionCommand, PostponeProgramTreeVersionCommand, ProlongExistingProgramTreeVersionCommand
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.service.identity_search import NodeIdentitySearch, ProgramTreeVersionIdentitySearch
 from program_management.ddd.service.write import create_and_postpone_tree_version_service, \
     extend_existing_tree_version_service, update_program_tree_version_service, \
-    postpone_tree_version_service
+    postpone_tree_version_service, prolong_existing_tree_version_service
 from program_management.forms.version import SpecificVersionForm
+from program_management.views.tree_version.check_version_name import get_last_existing_version
 
 
 class CreateProgramTreeVersionType(ChoiceEnum):
@@ -99,23 +100,29 @@ class CreateProgramTreeVersion(AjaxPermissionRequiredMixin, AjaxTemplateMixin, V
         form = SpecificVersionForm(tree_version_identity=self.tree_version_identity, data=request.POST)
         if form.is_valid():
             command = _convert_form_to_create_command(form)
-            save_type = self.request.POST.get("save_type")
+            last_existing_version = get_last_existing_version(
+                version_name=form.cleaned_data['version_name'],
+                offer_acronym=self.tree_version_identity.offer_acronym,
+            )
 
             identities = []
-            if save_type == CreateProgramTreeVersionType.NEW_VERSION.value:
+            if not last_existing_version:
                 try:
                     identities = create_and_postpone_tree_version_service.create_and_postpone(command=command)
                 except (exception.VersionNameAlreadyExist, exception.MultipleEntitiesFoundException) as e:
                     form.add_error('version_name', e.message)
-            elif save_type == CreateProgramTreeVersionType.EXTEND.value:
-                identities = extend_existing_tree_version_service.extend_existing_past_version(
-                    _convert_form_to_extend_command(form)
-                )
-                update_program_tree_version_service.update_program_tree_version(
-                    _convert_form_to_update_command(form)
-                )
-                postpone_tree_version_service.postpone_program_tree_version(
-                    _convert_form_to_postpone_command(form, self.node_identity)
+            else:
+                # identities = self._prolong_existing_tree_version(form, identities)
+                identities = prolong_existing_tree_version_service.prolong_existing_tree_version(
+                    ProlongExistingProgramTreeVersionCommand(
+                        end_year=form.cleaned_data['end_year'],
+                        updated_year=form.tree_version_identity.year,
+                        offer_acronym=form.tree_version_identity.offer_acronym,
+                        version_name=form.cleaned_data['version_name'],
+                        is_transition=False,
+                        title_en=form.cleaned_data.get("version_title_en"),
+                        title_fr=form.cleaned_data.get("version_title_fr"),
+                    )
                 )
 
             if not form.errors:
@@ -129,6 +136,18 @@ class CreateProgramTreeVersion(AjaxPermissionRequiredMixin, AjaxTemplateMixin, V
                     'success_url': url
                 })
         return render(request, self.template_name, self.get_context_data(form))
+
+    def _prolong_existing_tree_version(self, form, identities):
+        identities = extend_existing_tree_version_service.extend_existing_past_version(
+            _convert_form_to_extend_command(form)
+        )
+        update_program_tree_version_service.update_program_tree_version(
+            _convert_form_to_update_command(form)
+        )
+        postpone_tree_version_service.postpone_program_tree_version(
+            _convert_form_to_postpone_command(form, self.node_identity)
+        )
+        return identities
 
     def get_context_data(self, form: SpecificVersionForm):
         return {
