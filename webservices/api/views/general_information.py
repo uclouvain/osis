@@ -98,7 +98,7 @@ class GeneralInformation(generics.RetrieveAPIView):
         group_db = self.get_group_db()
         get_group_cmd = command.GetGroupCommand(code=group_db.partial_acronym, year=group_db.academic_year.year)
         return get_group_service.get_group(get_group_cmd)
-        
+
     def get_offer(self):
         version = self.get_education_group_version()
         return version.offer
