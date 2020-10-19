@@ -39,7 +39,6 @@ from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.business.learning_unit_xls import PROPOSAL_LINE_STYLES, \
     prepare_proposal_legend_ws_data
 from base.business.learning_unit_xls import get_significant_volume
-from base.business.learning_units.xls_generator import hyperlinks_to_string
 from base.models.enums.education_group_types import GroupType
 from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
 from base.models.enums.learning_unit_year_subtypes import LEARNING_UNIT_YEAR_SUBTYPES
@@ -57,7 +56,6 @@ from osis_common.ddd.interface import BusinessException
 from osis_common.document.xls_build import _build_worksheet, CONTENT_KEY, HEADER_TITLES_KEY, WORKSHEET_TITLE_KEY, \
     STYLED_CELLS, ROW_HEIGHT, FONT_ROWS
 from program_management.business.excel import clean_worksheet_title
-from program_management.business.utils import html2text
 from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.command import SearchAllVersionsFromRootNodesCommand
@@ -389,7 +387,7 @@ def _get_optional_data(data: List, luy: DddLearningUnitYear, optional_data_neede
     return data
 
 
-def _build_validate_html_list_to_string(value_param, method):
+def _build_validate_html_list_to_string(value_param):
     return get_html_to_text(value_param)
 
 
@@ -397,10 +395,10 @@ def _build_specifications_cols(luy: 'DddLearningUnitYear'):
     specifications = luy.specifications
     dict_achievement = _build_achievements(luy.achievements)
     return SpecificationsCols(
-        themes_discussed=_build_validate_html_list_to_string(specifications.themes_discussed, html2text),
-        themes_discussed_en=_build_validate_html_list_to_string(specifications.themes_discussed_en, html2text),
-        prerequisite=_build_validate_html_list_to_string(specifications.prerequisite, html2text),
-        prerequisite_en=_build_validate_html_list_to_string(specifications.prerequisite_en, html2text),
+        themes_discussed=_build_validate_html_list_to_string(specifications.themes_discussed),
+        themes_discussed_en=_build_validate_html_list_to_string(specifications.themes_discussed_en),
+        prerequisite=_build_validate_html_list_to_string(specifications.prerequisite),
+        prerequisite_en=_build_validate_html_list_to_string(specifications.prerequisite_en),
         achievements_fr=dict_achievement.get('achievements_fr', ''),
         achievements_en=dict_achievement.get('achievements_en', ''),
     )
@@ -414,13 +412,13 @@ def _build_achievements(achievements: List['Achievement']) -> Dict[str, str]:
             if achievement.text_fr and achievement.text_fr.strip() != "":
                 if achievement.code_name:
                     achievements_fr += "{} -".format(achievement.code_name)
-                achievements_fr += _build_validate_html_list_to_string(achievement.text_fr, html2text).lstrip('\n')
+                achievements_fr += _build_validate_html_list_to_string(achievement.text_fr).lstrip('\n')
                 achievements_fr += '\n'
 
             if achievement.text_en and achievement.text_en.strip() != "":
                 if achievement.code_name:
                     achievements_en += "{} -".format(achievement.code_name)
-                achievements_en += _build_validate_html_list_to_string(achievement.text_en, html2text).lstrip('\n')
+                achievements_en += _build_validate_html_list_to_string(achievement.text_en).lstrip('\n')
                 achievements_en += '\n'
     return {
         'achievements_fr': achievements_fr.rstrip('\n'),
@@ -431,24 +429,22 @@ def _build_achievements(achievements: List['Achievement']) -> Dict[str, str]:
 def _build_description_fiche_cols(description_fiche: 'DescriptionFiche',
                                   teaching_materials: List['TeachingMaterial']) -> DescriptionFicheCols:
     return DescriptionFicheCols(
-        resume=_build_validate_html_list_to_string(description_fiche.resume, html2text),
-        resume_en=_build_validate_html_list_to_string(description_fiche.resume_en, html2text),
-        teaching_methods=_build_validate_html_list_to_string(description_fiche.teaching_methods, html2text),
-        teaching_methods_en=_build_validate_html_list_to_string(description_fiche.teaching_methods_en, html2text),
-        evaluation_methods=_build_validate_html_list_to_string(description_fiche.evaluation_methods, html2text),
-        evaluation_methods_en=_build_validate_html_list_to_string(description_fiche.evaluation_methods_en, html2text),
-        other_informations=_build_validate_html_list_to_string(description_fiche.other_informations, html2text),
-        other_informations_en=_build_validate_html_list_to_string(description_fiche.other_informations_en, html2text),
-        online_resources=_build_validate_html_list_to_string(description_fiche.online_resources, hyperlinks_to_string),
-        online_resources_en=_build_validate_html_list_to_string(description_fiche.online_resources_en,
-                                                                hyperlinks_to_string),
+        resume=_build_validate_html_list_to_string(description_fiche.resume),
+        resume_en=_build_validate_html_list_to_string(description_fiche.resume_en),
+        teaching_methods=_build_validate_html_list_to_string(description_fiche.teaching_methods),
+        teaching_methods_en=_build_validate_html_list_to_string(description_fiche.teaching_methods_en),
+        evaluation_methods=_build_validate_html_list_to_string(description_fiche.evaluation_methods),
+        evaluation_methods_en=_build_validate_html_list_to_string(description_fiche.evaluation_methods_en),
+        other_informations=_build_validate_html_list_to_string(description_fiche.other_informations),
+        other_informations_en=_build_validate_html_list_to_string(description_fiche.other_informations_en),
+        online_resources=_build_validate_html_list_to_string(description_fiche.online_resources),
+        online_resources_en=_build_validate_html_list_to_string(description_fiche.online_resources_en),
         teaching_materials=_build_validate_html_list_to_string(
             ''.join("<p>{} - {}</p>".format(_('Mandatory') if a.is_mandatory else _('Non-mandatory'), a.title)
-                    for a in teaching_materials),
-            html2text
+                    for a in teaching_materials)
         ),
-        bibliography=_build_validate_html_list_to_string(description_fiche.bibliography, html2text),
-        mobility=_build_validate_html_list_to_string(description_fiche.mobility, html2text)
+        bibliography=_build_validate_html_list_to_string(description_fiche.bibliography),
+        mobility=_build_validate_html_list_to_string(description_fiche.mobility)
     )
 
 
@@ -500,7 +496,8 @@ def get_explore_parents(parents_of_ue: List['Node']) -> Dict[str, 'Node']:
                 if main_parent is None \
                         and (parent.is_training()
                              or parent.is_mini_training()
-                             or parent.node_type in [GroupType.COMPLEMENTARY_MODULE]):                    main_parent = parent
+                             or parent.node_type in [GroupType.COMPLEMENTARY_MODULE]):
+                    main_parent = parent
             if parent.node_type in [GroupType.OPTION_LIST_CHOICE]:
                 option_list = True
             if option_list and parent.is_finality():
@@ -526,10 +523,9 @@ def _get_distinct_teachers(luy):
 def _get_program_tree_version(year: int, code: str, tree_versions: List['ProgramTreeVersion']):
     if tree_versions:
         program_tree_identity = ProgramTreeIdentity(code=code, year=year)
-        return next(
-            tree_version for tree_version in tree_versions
-            if tree_version.program_tree_identity == program_tree_identity
-        )
+        for tree_version in tree_versions:
+            if tree_version.program_tree_identity == program_tree_identity:
+                return tree_version
     return None
 
 

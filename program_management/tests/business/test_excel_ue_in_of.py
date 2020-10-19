@@ -48,7 +48,6 @@ from learning_unit.tests.ddd.factories.entities import EntitiesFactory
 from learning_unit.tests.ddd.factories.learning_unit_year import LearningUnitYearFactory as DddLearningUnitYearFactory
 from learning_unit.tests.ddd.factories.proposal import ProposalFactory
 from learning_unit.tests.ddd.factories.specifications import SpecificationsFactory
-from learning_unit.tests.ddd.factories.teaching_material import TeachingMaterialFactory as DddTeachingMaterialFactory
 from program_management.business.excel_ue_in_of import DIRECT_GATHERING_KEY, MAIN_GATHERING_KEY, EXCLUDE_UE_KEY
 from program_management.business.excel_ue_in_of import FIX_TITLES, \
     _get_headers, optional_header_for_proposition, optional_header_for_credits, optional_header_for_volume, \
@@ -57,8 +56,8 @@ from program_management.business.excel_ue_in_of import FIX_TITLES, \
     optional_header_for_language, optional_header_for_periodicity, optional_header_for_quadrimester, \
     optional_header_for_session_derogation, optional_header_for_specifications, optional_header_for_teacher_list, \
     _fix_data, _get_workbook_for_custom_xls, _build_legend_sheet, LEGEND_WB_CONTENT, LEGEND_WB_STYLE, _optional_data, \
-    _build_excel_lines_ues, _get_optional_data, BOLD_FONT, _build_specifications_cols, _build_description_fiche_cols, \
-    _build_validate_html_list_to_string, _build_direct_gathering_label, _build_main_gathering_label, \
+    _build_excel_lines_ues, _get_optional_data, BOLD_FONT, _build_validate_html_list_to_string, \
+    _build_direct_gathering_label, _build_main_gathering_label, \
     get_explore_parents, _get_xls_title
 from program_management.business.utils import html2text
 from program_management.forms.custom_xls import CustomXlsForm
@@ -79,11 +78,8 @@ CMS_TXT_WITH_LIST = '<ol> ' \
                     '<li>La structure atomique de la mati&egrave;re</li> ' \
                     '<li>Les diff&eacute;rentes structures mol&eacute;culaires</li> ' \
                     '</ol>'
-CMS_TXT_WITH_LIST_AFTER_FORMATTING = 'La structure atomique de la matière\n' \
-                                     'Les différentes structures moléculaires'
 
 CMS_TXT_WITH_LINK = '<a href="https://moodleucl.uclouvain.be">moodle</a>'
-CMS_TXT_WITH_LINK_AFTER_FORMATTING = 'moodle - [https://moodleucl.uclouvain.be] \n'
 
 
 class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
@@ -407,60 +403,11 @@ class TestContent(TestCase):
                          .format(self.teacher_1.email,
                                  self.teacher_2.email))
 
-    def test_build_description_fiche_cols(self):
-        teaching_material_1 = DddTeachingMaterialFactory(title='Title mandatory', is_mandatory=True)
-        teaching_material_2 = DddTeachingMaterialFactory(title='Title non-mandatory', is_mandatory=False)
-
-        ue_description_fiche = _initialize_cms_data_description_fiche()
-
-        description_fiche = _build_description_fiche_cols(ue_description_fiche,
-                                                          [teaching_material_1, teaching_material_2])
-
-        self.assertEqual(description_fiche.resume, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING))
-        self.assertEqual(description_fiche.resume_en, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING))
-        self.assertEqual(description_fiche.teaching_methods, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING))
-        self.assertEqual(description_fiche.teaching_methods_en, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING))
-        self.assertEqual(description_fiche.evaluation_methods, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING))
-        self.assertEqual(description_fiche.evaluation_methods_en, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING))
-        self.assertEqual(description_fiche.other_informations, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING))
-        self.assertEqual(description_fiche.other_informations_en, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING))
-        self.assertEqual(description_fiche.mobility, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING))
-        self.assertEqual(description_fiche.bibliography, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING))
-
-        self.assertEqual(description_fiche.online_resources, "{}".format(CMS_TXT_WITH_LINK_AFTER_FORMATTING))
-        self.assertEqual(description_fiche.online_resources_en, "{}".format(CMS_TXT_WITH_LINK_AFTER_FORMATTING))
-
-        self.assertEqual(description_fiche.teaching_materials,
-                         "{} - {}\n{} - {}".format(_('Mandatory'),
-                                                   teaching_material_1.title,
-                                                   _('Non-mandatory'),
-                                                   teaching_material_2.title))
-
-    def test_build_specifications_cols(self):
-
-        specifications_data = _build_specifications_cols(self.luy)
-
-        self.assertEqual(specifications_data.prerequisite, CMS_TXT_WITH_LIST_AFTER_FORMATTING)
-        self.assertEqual(specifications_data.prerequisite_en, CMS_TXT_WITH_LIST_AFTER_FORMATTING)
-        self.assertEqual(specifications_data.themes_discussed, CMS_TXT_WITH_LIST_AFTER_FORMATTING)
-        self.assertEqual(specifications_data.themes_discussed_en, CMS_TXT_WITH_LIST_AFTER_FORMATTING)
-        self.assertEqual(specifications_data.achievements_fr, "{} -{}\n{} -{}".format(
-            self.achievement_1.code_name, self.achievement_1.text_fr,
-            self.achievement_2.code_name, self.achievement_2.text_fr)
-                         )
-        self.assertEqual(specifications_data.achievements_en, "{} -{}".format(
-            self.achievement_1.code_name, self.achievement_1.text_en)
-                         )
-
     def test_build_validate_html_list_to_string(self):
-        self.assertEqual(_build_validate_html_list_to_string(None, html2text), "")
-
-    def test_build_validate_html_list_to_string_illegal_character(self):
-        self.assertEqual(_build_validate_html_list_to_string("", html2text),
-                         "!!! {}".format(_('IMPOSSIBLE TO DISPLAY BECAUSE OF AN ILLEGAL CHARACTER IN STRING')))
+        self.assertEqual(_build_validate_html_list_to_string(None), "")
 
     def test_build_validate_html_list_to_string_wrong_method(self):
-        self.assertEqual(_build_validate_html_list_to_string('Test', None), 'Test')
+        self.assertEqual(_build_validate_html_list_to_string('Test'), 'Test')
 
     def test_html_list_to_string(self):
         ch = '''<head></head>
