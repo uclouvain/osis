@@ -36,7 +36,6 @@ from program_management.forms.content import LinkForm
 
 
 class PasteNodeForm(LinkForm):
-
     def __init__(self, *args, path_to_detach: str, **kwargs):
         self.path_to_detach = path_to_detach
         super().__init__(*args, **kwargs)

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,20 +23,24 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.utils.translation import gettext_lazy as _
+import factory.fuzzy
 
-from base.models.utils.utils import ChoiceEnum
-
-CREDITS = "CREDITS"
-NUMBER_OF_ELEMENTS = "NUMBER_OF_ELEMENTS"
-
-# FIXME :: DEPRECATED - use ConstraintTypeEnum instead
-CONSTRAINT_TYPE = (
-    (CREDITS, _("credits")),
-    (NUMBER_OF_ELEMENTS, _("Number of elements")),
-)
+from education_group.ddd.domain._academic_partner import AcademicPartner, AcademicPartnerIdentity
 
 
-class ConstraintTypeEnum(ChoiceEnum):
-    CREDITS = _("Credits")
-    NUMBER_OF_ELEMENTS = _("Number of elements")
+class AcademicPartnerIdentityFactory(factory.Factory):
+    class Meta:
+        model = AcademicPartnerIdentity
+        abstract = False
+
+    name = factory.Sequence(lambda n: 'PARTNER_%02d' % n)
+
+
+class AcademicPartnerFactory(factory.Factory):
+    class Meta:
+        model = AcademicPartner
+        abstract = False
+
+    entity_id = factory.SubFactory(AcademicPartnerIdentityFactory)
+    address = None
+    logo_url = None
