@@ -87,7 +87,6 @@ class TestLearningUnitModificationProposal(TestCase):
     @classmethod
     def setUpTestData(cls):
         AcademicYearFactory.produce(number_past=3, number_future=10)
-        cls.person = person_factory.PersonWithPermissionsFactory("can_propose_learningunit", "can_access_learningunit")
 
         an_organization = OrganizationFactory(type=organization_type.MAIN)
         current_academic_year = create_current_academic_year()
@@ -117,11 +116,7 @@ class TestLearningUnitModificationProposal(TestCase):
             internship_subtype=None
         )
 
-        cls.person_entity = PersonEntityFactory(
-            person=cls.person,
-            entity=cls.entity_version.entity,
-            with_child=True
-        )
+        cls.person = FacultyManagerFactory(entity=cls.entity_version.entity).person
 
         cls.url = reverse(learning_unit_modification_proposal, args=[cls.learning_unit_year.id])
 
