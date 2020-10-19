@@ -185,9 +185,9 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
 
     def _get_initial_academic_year_for_form(self):
         request_cache = RequestCache(self.request.user, reverse('version_program'))
-        academic_year_cached_value = request_cache.get_value_cached('academic_year')
+        academic_year_cached_value = request_cache.get_single_value_cached('academic_year')
         if academic_year_cached_value:
-            default_academic_year = AcademicYear.objects.get(id=academic_year_cached_value[0]).year
+            default_academic_year = AcademicYear.objects.get(id=academic_year_cached_value).year
         else:
             default_academic_year = starting_academic_year()
         return default_academic_year
