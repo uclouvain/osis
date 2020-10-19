@@ -27,9 +27,7 @@ import random
 
 from django.test import SimpleTestCase
 
-from education_group.ddd.domain.exception import AresCodeShouldBeGreaterOrEqualsThanZeroAndLessThan9999, \
-    AresGracaShouldBeGreaterOrEqualsThanZeroAndLessThan9999, \
-    AresAuthorizationShouldBeGreaterOrEqualsThanZeroAndLessThan9999, HopsFieldsAllOrNone
+from education_group.ddd.domain.exception import HopsFieldsAllOrNone
 from education_group.ddd.validators._hops_validator import HopsValuesValidator
 from education_group.tests.ddd.factories.hops import HOPSFactory
 from education_group.tests.ddd.factories.training import TrainingFactory

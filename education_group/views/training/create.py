@@ -18,10 +18,7 @@ from education_group.ddd.business_types import *
 from education_group.ddd.domain.exception import ContentConstraintTypeMissing, \
     ContentConstraintMinimumMaximumMissing, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum, \
     AcronymAlreadyExist, StartYearGreaterThanEndYear, CodeAlreadyExistException, \
-    AresCodeShouldBeGreaterOrEqualsThanZeroAndLessThan9999, \
-    AresGracaShouldBeGreaterOrEqualsThanZeroAndLessThan9999, \
-    AresAuthorizationShouldBeGreaterOrEqualsThanZeroAndLessThan9999, \
-    HopsFieldsAllOrNone
+    HopsFieldsAllOrNone, HopsException, AresDataShouldBeGreaterOrEqualsThanZeroAndLessThan9999
 from education_group.ddd.domain.training import TrainingIdentity
 from education_group.ddd.service.read import get_group_service
 from education_group.forms.training import CreateTrainingForm
@@ -136,12 +133,12 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             except StartYearGreaterThanEndYear as e:
                 training_form.add_error('end_year', e.message)
                 training_form.add_error('academic_year', '')
-            except (AresCodeShouldBeGreaterOrEqualsThanZeroAndLessThan9999, HopsFieldsAllOrNone) as e:
-                training_form.add_error('ares_code', e.message)
-            except AresGracaShouldBeGreaterOrEqualsThanZeroAndLessThan9999 as e:
-                training_form.add_error('ares_graca', e.message)
-            except AresAuthorizationShouldBeGreaterOrEqualsThanZeroAndLessThan9999 as e:
-                training_form.add_error('ares_authorization', e.message)
+            except HopsException as e:
+                for field, hops_exception in e.exceptions.items():
+                    if isinstance(hops_exception, AresDataShouldBeGreaterOrEqualsThanZeroAndLessThan9999):
+                        self.training_form.add_error(field, hops_exception.message)
+                    if isinstance(hops_exception, HopsFieldsAllOrNone):
+                        self.training_form.add_error('ares_code', hops_exception.message)
             except BusinessExceptions as e:
                 display_error_messages(request, e.messages)
                 return render(request, self.template_name, self.get_context(training_form))
