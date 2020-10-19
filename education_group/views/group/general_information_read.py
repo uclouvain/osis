@@ -60,4 +60,5 @@ class GroupReadGeneralInformation(GroupRead):
 
     def get_publish_url(self):
         group = self.get_group()
-        return reverse('publish_general_information', args=[group.year, group.code]) + "?path={}".format(self.get_path())
+        return reverse('publish_general_information', args=[group.year, group.code]) + \
+            "?path={}".format(self.get_path())
