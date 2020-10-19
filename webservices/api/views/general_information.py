@@ -30,6 +30,8 @@ from django.shortcuts import get_object_or_404
 from rest_framework import generics
 
 from base.business.education_groups import general_information_sections
+from education_group.ddd import command
+from education_group.ddd.service.read import get_group_service
 from education_group.models.group_year import GroupYear
 from osis_common.utils.models import get_object_or_none
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
@@ -47,10 +49,7 @@ class GeneralInformation(generics.RetrieveAPIView):
 
     def get_object(self):
         group = self.get_group()
-        identity = ProgramTreeIdentity(
-            code=group.partial_acronym,
-            year=group.academic_year.year
-        )
+        identity = ProgramTreeIdentity(code=group.code, year=group.year)
         tree = ProgramTreeRepository.get(entity_id=identity)
         return tree.root_node
 
@@ -59,6 +58,7 @@ class GeneralInformation(generics.RetrieveAPIView):
         serializer_context['language'] = self.kwargs['language']
         serializer_context['acronym'] = self.kwargs['acronym']
         serializer_context['offer'] = self.get_offer()
+        serializer_context['group'] = self.get_group()
         return serializer_context
 
     @functools.lru_cache()
@@ -82,7 +82,7 @@ class GeneralInformation(generics.RetrieveAPIView):
             is_transition=False
         )
 
-    def get_group(self):
+    def get_group_db(self):
         version = self.get_education_group_version()
         if version:
             return version.root_group
@@ -93,6 +93,12 @@ class GeneralInformation(generics.RetrieveAPIView):
             education_group_type__name__in=general_information_sections.SECTIONS_PER_OFFER_TYPE.keys(),
         )
 
+    @functools.lru_cache()
+    def get_group(self) -> 'Group':
+        group_db = self.get_group_db()
+        get_group_cmd = command.GetGroupCommand(code=group_db.partial_acronym, year=group_db.academic_year.year)
+        return get_group_service.get_group(get_group_cmd)
+        
     def get_offer(self):
         version = self.get_education_group_version()
         return version.offer
