@@ -30,6 +30,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from base.models.enums.education_group_types import MiniTrainingType
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.factories.user import UserFactory
 from education_group.ddd.domain.group import Group
@@ -41,18 +42,23 @@ from program_management.tests.factories.element import ElementGroupYearFactory
 class TestMiniTrainingReadAdmissionCondition(TestCase):
     @classmethod
     def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory(current=True)
         cls.person = PersonWithPermissionsFactory('view_educationgroup')
         cls.mini_training_version = EducationGroupVersionFactory(
             offer__acronym="APPBIOL",
-            offer__academic_year__year=2019,
+            offer__academic_year=cls.academic_year,
             offer__education_group_type__name=MiniTrainingType.DEEPENING.name,
             root_group__partial_acronym="LBIOL100P",
-            root_group__academic_year__year=2019,
+            root_group__acronym="APPBIOL",
+            root_group__academic_year=cls.academic_year,
             root_group__education_group_type__name=MiniTrainingType.DEEPENING.name,
         )
         ElementGroupYearFactory(group_year=cls.mini_training_version.root_group)
 
-        cls.url = reverse('mini_training_admission_condition', kwargs={'year': 2019, 'code': 'LBIOL100P'})
+        cls.url = reverse('mini_training_admission_condition', kwargs={
+            'year': cls.academic_year.year,
+            'code': 'LBIOL100P'
+        })
 
     def setUp(self) -> None:
         self.client.force_login(self.person.user)
@@ -84,7 +90,10 @@ class TestMiniTrainingReadAdmissionCondition(TestCase):
             return_value=False
         ):
             response = self.client.get(self.url)
-            expected_redirect = reverse('mini_training_identification', kwargs={'year': 2019, 'code': 'LBIOL100P'})
+            expected_redirect = reverse('mini_training_identification', kwargs={
+                'year': self.academic_year.year,
+                'code': 'LBIOL100P'
+            })
             self.assertRedirects(response, expected_redirect)
 
     def test_case_mini_training_not_exists(self):

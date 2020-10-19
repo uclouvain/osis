@@ -30,6 +30,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from base.models.enums.education_group_types import MiniTrainingType
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.factories.user import UserFactory
 from education_group.ddd.domain.group import Group
@@ -41,18 +42,20 @@ from program_management.tests.factories.element import ElementGroupYearFactory
 class TestMiniTrainingReadContent(TestCase):
     @classmethod
     def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory(current=True)
         cls.person = PersonWithPermissionsFactory('view_educationgroup')
         cls.mini_training_version = EducationGroupVersionFactory(
             offer__acronym="APPBIOL",
-            offer__academic_year__year=2019,
+            offer__academic_year=cls.academic_year,
             offer__education_group_type__name=MiniTrainingType.DEEPENING.name,
             root_group__partial_acronym="LBIOL100P",
-            root_group__academic_year__year=2019,
+            root_group__acronym="APPBIOL",
+            root_group__academic_year=cls.academic_year,
             root_group__education_group_type__name=MiniTrainingType.DEEPENING.name,
         )
         ElementGroupYearFactory(group_year=cls.mini_training_version.root_group)
 
-        cls.url = reverse('mini_training_content', kwargs={'year': 2019, 'code': 'LBIOL100P'})
+        cls.url = reverse('mini_training_content', kwargs={'year': cls.academic_year.year, 'code': 'LBIOL100P'})
 
     def setUp(self) -> None:
         self.client.force_login(self.person.user)
