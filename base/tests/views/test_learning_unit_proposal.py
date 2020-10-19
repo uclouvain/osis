@@ -27,7 +27,6 @@ import datetime
 from unittest import mock
 
 from django.contrib import messages
-from django.contrib.auth.models import Permission
 from django.contrib.messages import get_messages
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.http import HttpResponseNotFound, HttpResponse, HttpResponseForbidden
@@ -68,6 +67,7 @@ from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory
 from base.tests.factories.organization import OrganizationFactory
+from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.tutor import TutorFactory
@@ -540,16 +540,13 @@ class TestLearningUnitProposalCancellation(TestCase):
     @classmethod
     def setUpTestData(cls):
         create_current_academic_year()
-        cls.person = person_factory.FacultyManagerForUEFactory("can_propose_learningunit")
-        cls.permission = Permission.objects.get(codename="can_propose_learningunit")
+        cls.learning_unit_proposal = _create_proposal_learning_unit("LOSIS1211")
+        cls.learning_unit_year = cls.learning_unit_proposal.learning_unit_year
+        cls.person = FacultyManagerFactory(
+            entity=cls.learning_unit_year.learning_container_year.requirement_entity
+        ).person
 
     def setUp(self):
-        self.learning_unit_proposal = _create_proposal_learning_unit("LOSIS1211")
-        self.learning_unit_year = self.learning_unit_proposal.learning_unit_year
-        self.person_entity = PersonEntityFactory(
-            person=self.person,
-            entity=self.learning_unit_year.learning_container_year.requirement_entity
-        )
         self.url = reverse('learning_unit_cancel_proposal', args=[self.learning_unit_year.id])
         self.client.force_login(self.person.user)
 
@@ -560,14 +557,24 @@ class TestLearningUnitProposalCancellation(TestCase):
         self.assertRedirects(response, '/login/?next={}'.format(self.url))
 
     def test_user_has_not_permission(self):
-        self.person.user.user_permissions.remove(self.permission)
+        person = PersonFactory()
+        self.client.force_login(person.user)
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
         self.assertTemplateUsed(response, "access_denied.html")
 
     def test_with_non_existent_learning_unit_year(self):
-        self.learning_unit_year.delete()
+        self.learning_unit_proposal_to_delete = _create_proposal_learning_unit("LOSIS1211D")
+        self.learning_unit_year_to_delete = self.learning_unit_proposal_to_delete.learning_unit_year
+        self.person_to_delete = FacultyManagerFactory(
+            entity=self.learning_unit_year_to_delete.learning_container_year.requirement_entity
+        ).person
+
+        self.url = reverse('learning_unit_cancel_proposal', args=[self.learning_unit_year_to_delete.id])
+        self.client.force_login(self.person_to_delete.user)
+
+        self.learning_unit_year_to_delete.delete()
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
@@ -575,19 +582,27 @@ class TestLearningUnitProposalCancellation(TestCase):
 
     def test_with_none_person(self):
         user = UserFactory()
-        user.user_permissions.add(self.permission)
         self.client.force_login(user)
         response = self.client.get(self.url)
 
-        self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
-        self.assertTemplateUsed(response, "page_not_found.html")
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+        self.assertTemplateUsed(response, "access_denied.html")
 
     def test_with_no_proposal(self):
-        self.learning_unit_proposal.delete()
+        self.learning_unit_proposal_to_delete = _create_proposal_learning_unit("LOSIS1211D")
+        self.learning_unit_year_to_delete = self.learning_unit_proposal_to_delete.learning_unit_year
+        self.person_to_delete = FacultyManagerFactory(
+            entity=self.learning_unit_year_to_delete.learning_container_year.requirement_entity
+        ).person
+
+        self.url = reverse('learning_unit_cancel_proposal', args=[self.learning_unit_year_to_delete.id])
+        self.client.force_login(self.person_to_delete.user)
+
+        self.learning_unit_proposal_to_delete.delete()
         response = self.client.get(self.url)
 
-        self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
-        self.assertTemplateUsed(response, "page_not_found.html")
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+        self.assertTemplateUsed(response, "access_denied.html")
 
     def test_with_proposal_of_state_different_than_faculty(self):
         self.learning_unit_proposal.state = proposal_state.ProposalState.CENTRAL.name
@@ -598,7 +613,8 @@ class TestLearningUnitProposalCancellation(TestCase):
         self.assertTemplateUsed(response, "access_denied.html")
 
     def test_user_not_linked_to_current_requirement_entity(self):
-        self.person_entity.delete()
+        person = PersonFactory()
+        self.client.force_login(person.user)
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
@@ -619,6 +635,9 @@ class TestLearningUnitProposalCancellation(TestCase):
     def test_models_after_cancellation_of_proposal(self):
         _modify_learning_unit_year_data(self.learning_unit_year)
         _modify_entities_linked_to_learning_container_year(self.learning_unit_year.learning_container_year)
+
+        new_entity = self.learning_unit_year.learning_container_year.requirement_entity
+        FacultyManagerFactory(entity=new_entity, person=self.person)
         self.client.get(self.url)
 
         self.learning_unit_year.refresh_from_db()
