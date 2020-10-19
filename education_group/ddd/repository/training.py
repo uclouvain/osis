@@ -536,7 +536,7 @@ def _save_hops(
 ) -> List[HopsModelDb]:
     _delete_hops(education_group_year_db_obj)
     saved_objs = []
-    if training.hops:
+    if training.hops and training.hops.ares_code and training.hops.ares_graca and training.hops.ares_authorization:
         obj, created = HopsModelDb.objects.update_or_create(
             education_group_year=education_group_year_db_obj,
             defaults={
