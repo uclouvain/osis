@@ -72,8 +72,9 @@ class TestDescendentsPropertyNode(SimpleTestCase):
         self.leaf = NodeLearningUnitYearFactory(node_id=2, code="LDROI100", title="Introduction", year=2018)
 
     def test_case_no_descendents(self):
-        self.assertIsInstance(self.root_node.descendents, dict)
-        self.assertEqual(self.root_node.descendents, {})
+        root_orphan = NodeGroupYearFactory(node_id=3, code="LBIRI200T", title="Tronc commun", year=2018)
+        self.assertIsInstance(root_orphan.descendents, dict)
+        self.assertEqual(root_orphan.descendents, {})
 
     def test_case_all_descendents_with_path_as_key(self):
         self.subgroup_node.add_child(self.leaf)
