@@ -271,10 +271,10 @@ class Node(interface.Entity):
         return children
 
     def get_option_list(self) -> Set['Node']:
-        return {l.child for l in self.get_all_children() if l.child.is_option()}
+        return {link.child for link in self.get_all_children() if link.child.is_option()}
 
     def get_finality_list(self) -> Set['Node']:
-        return {l.child for l in self.get_all_children() if l.child.is_finality()}
+        return {link.child for link in self.get_all_children() if link.child.is_finality()}
 
     def get_all_children_as_nodes(
             self,
@@ -426,7 +426,7 @@ class Node(interface.Entity):
         self.children[index+1].order_up()
 
 
-def _get_descendents(root_node: Node, current_path: 'Path' = None) -> Tuple['Path', 'Node']:
+def _get_descendents(root_node: Node, current_path: 'Path' = None) -> Tuple[Tuple['Path', 'Node']]:
     _descendents = tuple()
     if current_path is None:
         current_path = str(root_node.pk)

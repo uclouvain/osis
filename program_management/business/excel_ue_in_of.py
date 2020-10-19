@@ -40,7 +40,8 @@ from base.business.learning_unit_xls import PROPOSAL_LINE_STYLES, \
     prepare_proposal_legend_ws_data
 from base.business.learning_unit_xls import get_significant_volume
 from base.models.enums.education_group_types import GroupType
-from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
+from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES, PeriodicityEnum
+
 from base.models.enums.learning_unit_year_subtypes import LEARNING_UNIT_YEAR_SUBTYPES
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
@@ -340,7 +341,7 @@ def _get_optional_data(data: List, luy: DddLearningUnitYear, optional_data_neede
         data.append(link.relative_credits or '-')
         data.append(luy.credits.to_integral_value() or '-')
     if optional_data_needed['has_periodicity']:
-        data.append(dict(PERIODICITY_TYPES)[luy.periodicity] or '')
+        data.append(dict(PeriodicityEnum)[luy.periodicity] if luy.periodicity else '')
     if optional_data_needed['has_active']:
         data.append(str.strip(yesno(luy.status)))
     if optional_data_needed['has_quadrimester']:
@@ -460,7 +461,9 @@ def _build_direct_gathering_label(direct_gathering_node: 'NodeGroupYear') -> str
 
 def _build_main_gathering_label(gathering_node: 'Node', tree_versions: List['ProgramTreeVersion']) -> str:
     if gathering_node:
-        pgm_tree_version = _get_program_tree_version(gathering_node.year, gathering_node.code, tree_versions)
+        pgm_tree_version = _get_program_tree_version_from_tree_versions_list(gathering_node.year,
+                                                                             gathering_node.code,
+                                                                             tree_versions)
         return "{}{} - {}".format(
             gathering_node.title,
             pgm_tree_version.version_label if pgm_tree_version else '',
@@ -520,12 +523,12 @@ def _get_distinct_teachers(luy):
     return teachers
 
 
-def _get_program_tree_version(year: int, code: str, tree_versions: List['ProgramTreeVersion']):
-    if tree_versions:
-        program_tree_identity = ProgramTreeIdentity(code=code, year=year)
-        for tree_version in tree_versions:
-            if tree_version.program_tree_identity == program_tree_identity:
-                return tree_version
+def _get_program_tree_version_from_tree_versions_list(year: int, code: str, tree_versions: List['ProgramTreeVersion']):
+
+    program_tree_identity = ProgramTreeIdentity(code=code, year=year)
+    for tree_version in tree_versions:
+        if tree_version.program_tree_identity == program_tree_identity:
+            return tree_version
     return None
 
 

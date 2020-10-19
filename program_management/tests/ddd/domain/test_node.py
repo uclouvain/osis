@@ -66,17 +66,16 @@ class TestAddChildNode(SimpleTestCase):
 
 
 class TestDescendentsPropertyNode(SimpleTestCase):
-    def setUp(self):
-        self.root_node = NodeGroupYearFactory(node_id=0, code="LDROI200T", title="Tronc commun", year=2018)
-        self.subgroup_node = NodeGroupYearFactory(node_id=1, code="LDROI200G", title="Sub group", year=2018)
-        self.leaf = NodeLearningUnitYearFactory(node_id=2, code="LDROI100", title="Introduction", year=2018)
 
     def test_case_no_descendents(self):
-        root_orphan = NodeGroupYearFactory(node_id=3, code="LBIRI200T", title="Tronc commun", year=2018)
+        root_orphan = NodeGroupYearFactory()
         self.assertIsInstance(root_orphan.descendents, dict)
         self.assertEqual(root_orphan.descendents, {})
 
     def test_case_all_descendents_with_path_as_key(self):
+        self.root_node = NodeGroupYearFactory(node_id=0, code="LDROI200T", title="Tronc commun", year=2018)
+        self.subgroup_node = NodeGroupYearFactory(node_id=1, code="LDROI200G", title="Sub group", year=2018)
+        self.leaf = NodeLearningUnitYearFactory(node_id=2, code="LDROI100", title="Introduction", year=2018)
         self.subgroup_node.add_child(self.leaf)
         self.root_node.add_child(self.subgroup_node)
 
@@ -322,8 +321,8 @@ class TestDetachChild(SimpleTestCase):
     def test_when_child_is_correctly_detached(self):
         common_parent = NodeGroupYearFactory()
         link1 = LinkFactory(parent=common_parent)
-        link2 = LinkFactory(parent=common_parent)
-        link3 = LinkFactory(parent=common_parent)
+        LinkFactory(parent=common_parent)
+        LinkFactory(parent=common_parent)
 
         link_deleted = common_parent.detach_child(link1.child)
 
