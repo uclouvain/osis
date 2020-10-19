@@ -90,7 +90,6 @@ class GroupUpdateGeneralInformation(GroupRead):
         context = {
             'label': label_name,
             'form': EducationGroupPedagogyEditForm(initial=initial_values),
-            'group_to_parent': self.request.GET.get("group_to_parent") or '0',
             'translated_label': translated_text_label.get_label_translation(
                 text_entity=entity_name.get_offers_or_groups_entity_from_group(group),
                 label=label_name,

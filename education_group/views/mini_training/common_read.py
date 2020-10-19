@@ -105,8 +105,11 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
     def get_education_group_version(self):
         try:
             return EducationGroupVersion.objects.select_related(
-                'offer', 'root_group'
-            ).get(root_group__partial_acronym=self.kwargs["code"], root_group__academic_year__year=self.kwargs["year"])
+                'offer', 'root_group', 'root_group__academic_year'
+            ).get(
+                root_group__partial_acronym=self.kwargs["code"],
+                root_group__academic_year__year=self.kwargs["year"]
+            )
         except (EducationGroupVersion.DoesNotExist, Element.DoesNotExist):
             raise Http404
 
@@ -140,6 +143,7 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             "node_path": self.get_path(),
             "tab_urls": self.get_tab_urls(),
             "tree_json_url": self.get_tree_json_url(),
+            "tree_root_id": self.get_root_id(),
             "form_xls_custom": CustomXlsForm(year=self.get_group().year, code=self.get_group().code),
             "education_group_version": self.get_education_group_version(),
             "academic_year_choices": get_academic_year_choices(

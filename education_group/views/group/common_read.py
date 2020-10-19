@@ -24,7 +24,6 @@
 #
 ##############################################################################
 import functools
-import json
 from collections import OrderedDict
 
 from django.shortcuts import get_object_or_404
@@ -125,6 +124,7 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
             "create_training_url": self.get_create_training_url(),
             "create_mini_training_url": self.get_create_mini_training_url(),
             "tree_json_url": self.get_tree_json_url(),
+            "tree_root_id": self.get_root_id(),
             "is_root_node": self.is_root_node,
         }
 

@@ -159,6 +159,7 @@ class TestTrainingReadIdentification(TestCase):
         self.assertIsInstance(response.context['training'], Training)
         self.assertIsInstance(response.context['form_xls_custom'], CustomXlsForm)
         self.assertIsInstance(response.context['tree_json_url'], str)
+        self.assertIsInstance(response.context['tree_root_id'], int)
         self.assertIsInstance(response.context['group'], Group)
         self.assertIsInstance(response.context['history'], QuerySet)
         self.assertIn('current_version', response.context)

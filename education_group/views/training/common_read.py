@@ -155,6 +155,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             "education_group_version": self.education_group_version,
             "group_year": self.education_group_version.root_group,
             "tree_json_url": self.get_tree_json_url(),
+            "tree_root_id": self.get_root_id(),
             "create_group_url": self.get_create_group_url(),
             "create_training_url": self.get_create_training_url(),
             "create_mini_training_url": self.get_create_mini_training_url(),

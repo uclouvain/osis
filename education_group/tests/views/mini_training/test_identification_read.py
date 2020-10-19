@@ -102,6 +102,7 @@ class TestMiniTrainingReadIdentification(TestCase):
             'root_id': self.mini_training_version.root_group.element.pk
         })
         self.assertEqual(response.context['tree_json_url'], expected_tree_json_url)
+        self.assertIsInstance(response.context['tree_root_id'], int)
         self.assertIsInstance(response.context['group'], Group)
         self.assertIsInstance(response.context['history'], QuerySet)
 

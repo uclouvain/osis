@@ -225,7 +225,7 @@ function initializeJsTree($documentTree, tree_json_url, cut_element_url, copy_el
         }
     });
 
-    function generateTreeKey(tree){
+    function generateTreeKey(){
         const treeRootId = getTreeRootId();
         return `progrem_tree_state_${treeRootId}`;
 

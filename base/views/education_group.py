@@ -110,7 +110,6 @@ def education_group_year_pedagogy_edit_get(request, node: Node):
         initial_values['text_english'] = en_text.text
     form = EducationGroupPedagogyEditForm(initial=initial_values)
     context['form'] = form
-    context['group_to_parent'] = request.GET.get("group_to_parent") or '0'
     context['translated_label'] = translated_text_label.get_label_translation(
         text_entity=entity,
         label=label_name,
