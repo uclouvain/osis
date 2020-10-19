@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,20 +23,32 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.utils.translation import gettext_lazy as _
+import factory.fuzzy
 
-from base.models.utils.utils import ChoiceEnum
-
-CREDITS = "CREDITS"
-NUMBER_OF_ELEMENTS = "NUMBER_OF_ELEMENTS"
-
-# FIXME :: DEPRECATED - use ConstraintTypeEnum instead
-CONSTRAINT_TYPE = (
-    (CREDITS, _("credits")),
-    (NUMBER_OF_ELEMENTS, _("Number of elements")),
-)
+from base.models.enums.diploma_coorganization import DiplomaCoorganizationTypes
+from education_group.ddd.domain._co_organization import Coorganization, CoorganizationIdentity
+from education_group.tests.ddd.factories.academic_partner import AcademicPartnerFactory
 
 
-class ConstraintTypeEnum(ChoiceEnum):
-    CREDITS = _("Credits")
-    NUMBER_OF_ELEMENTS = _("Number of elements")
+class CoorganizationIdentityFactory(factory.Factory):
+    class Meta:
+        model = CoorganizationIdentity
+        abstract = False
+
+    partner_name = factory.Sequence(lambda n: 'PARTNER_%02d' % n)
+    training_acronym = factory.Sequence(lambda n: 'OFFER_%02d' % n)
+    training_year = factory.fuzzy.FuzzyInteger(1999, 2099)
+
+
+class CoorganizationFactory(factory.Factory):
+    class Meta:
+        model = Coorganization
+        abstract = False
+
+    entity_id = factory.SubFactory(CoorganizationIdentityFactory)
+    partner = factory.SubFactory(AcademicPartnerFactory)
+    is_for_all_students = False
+    is_reference_institution = False
+    certificate_type = DiplomaCoorganizationTypes.NOT_CONCERNED
+    is_producing_certificate = False
+    is_producing_certificate_annexes = False
