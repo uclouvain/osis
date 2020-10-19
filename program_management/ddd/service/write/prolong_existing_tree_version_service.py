@@ -28,10 +28,9 @@ from typing import List
 from django.db import transaction
 
 from program_management.ddd.command import PostponeProgramTreeVersionCommand, ExtendProgramTreeVersionCommand, \
-    ProlongExistingProgramTreeVersionCommand, UpdateProgramTreeVersionCommand, GetLastExistingVersionNameCommand
+    ProlongExistingProgramTreeVersionCommand, UpdateProgramTreeVersionCommand
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 from program_management.ddd.domain.service.identity_search import GroupIdentitySearch
-from program_management.ddd.service.read import get_last_existing_version_service
 from program_management.ddd.service.write import extend_existing_tree_version_service, \
     update_program_tree_version_service, postpone_tree_version_service
 
@@ -53,18 +52,11 @@ def prolong_existing_tree_version(
 
 
 def __convert_to_extend_command(command: ProlongExistingProgramTreeVersionCommand) -> ExtendProgramTreeVersionCommand:
-    last_existing_version = get_last_existing_version_service.get_last_existing_version_identity(
-        GetLastExistingVersionNameCommand(
-            version_name=command.version_name,
-            offer_acronym=command.offer_acronym,
-            is_transition=False,
-        )
-    )
     return ExtendProgramTreeVersionCommand(
         end_year_of_existence=command.end_year,
         offer_acronym=command.offer_acronym,
         version_name=command.version_name,
-        year=last_existing_version.year,
+        year=command.updated_year,
         is_transition=command.is_transition
     )
 
