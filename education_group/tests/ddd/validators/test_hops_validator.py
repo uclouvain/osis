@@ -29,7 +29,8 @@ from django.test import SimpleTestCase
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from education_group.ddd.domain.exception import HopsFieldsAllOrNone, \
-    AresDataShouldBeGreaterOrEqualsThanZeroAndLessThan9999
+    AresCodeShouldBeGreaterOrEqualsThanZeroAndLessThan9999, AresGracaShouldBeGreaterOrEqualsThanZeroAndLessThan9999, \
+    AresAuthorizationShouldBeGreaterOrEqualsThanZeroAndLessThan9999
 from education_group.ddd.validators._hops_validator import HopsValuesValidator
 from education_group.tests.ddd.factories.hops import HOPSFactory
 from education_group.tests.ddd.factories.training import TrainingFactory
@@ -67,7 +68,7 @@ class TestHopsValidator(SimpleTestCase):
             validator.is_valid()
 
         self.assertIsInstance(
-            e.exception.exceptions['hops_data'],
+            e.exception.exceptions[0],
             HopsFieldsAllOrNone
         )
 
@@ -76,29 +77,28 @@ class TestHopsValidator(SimpleTestCase):
                            ares_graca=random.randint(MIN_VALUE_FOR_HOPS_FIELD, MAX_VALUE_FOR_HOPS_FIELD),
                            ares_authorization=random.randint(MIN_VALUE_FOR_HOPS_FIELD, MAX_VALUE_FOR_HOPS_FIELD))
 
-        self.assert_hops_field_valid_value(hops, 'ares_code')
+        self.assert_hops_field_valid_value(hops, AresCodeShouldBeGreaterOrEqualsThanZeroAndLessThan9999)
 
     def test_validation_ares_graca_not_valid(self):
         hops = HOPSFactory(ares_code=random.randint(MIN_VALUE_FOR_HOPS_FIELD, MAX_VALUE_FOR_HOPS_FIELD),
                            ares_graca=-1,
                            ares_authorization=random.randint(MIN_VALUE_FOR_HOPS_FIELD, MAX_VALUE_FOR_HOPS_FIELD))
 
-        self.assert_hops_field_valid_value(hops, 'ares_graca')
+        self.assert_hops_field_valid_value(hops, AresGracaShouldBeGreaterOrEqualsThanZeroAndLessThan9999)
 
     def test_validation_ares_authorization_not_valid(self):
         hops = HOPSFactory(ares_code=random.randint(MIN_VALUE_FOR_HOPS_FIELD, MAX_VALUE_FOR_HOPS_FIELD),
                            ares_graca=random.randint(MIN_VALUE_FOR_HOPS_FIELD, MAX_VALUE_FOR_HOPS_FIELD),
                            ares_authorization=-1)
 
-        self.assert_hops_field_valid_value(hops, 'ares_authorization')
+        self.assert_hops_field_valid_value(hops, AresAuthorizationShouldBeGreaterOrEqualsThanZeroAndLessThan9999)
 
-    def assert_hops_field_valid_value(self, hops, field):
+    def assert_hops_field_valid_value(self, hops, exception_raised):
         training = TrainingFactory(hops=hops)
         validator = HopsValuesValidator(training=training)
         with self.assertRaises(MultipleBusinessExceptions) as e:
             validator.is_valid()
-
         self.assertIsInstance(
-            e.exception.exceptions[field],
-            AresDataShouldBeGreaterOrEqualsThanZeroAndLessThan9999
+            e.exception.exceptions[0],
+            exception_raised
         )

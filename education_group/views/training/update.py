@@ -41,7 +41,8 @@ from education_group.ddd.business_types import *
 from education_group.ddd.domain import exception
 from education_group.ddd.domain.exception import TrainingCopyConsistencyException, \
     CertificateAimsCopyConsistencyException, MaximumCertificateAimType2Reached, \
-    AresDataShouldBeGreaterOrEqualsThanZeroAndLessThan9999, HopsFieldsAllOrNone
+    HopsFieldsAllOrNone, AresCodeShouldBeGreaterOrEqualsThanZeroAndLessThan9999, \
+    AresGracaShouldBeGreaterOrEqualsThanZeroAndLessThan9999, AresAuthorizationShouldBeGreaterOrEqualsThanZeroAndLessThan9999
 from education_group.ddd.domain.training import TrainingIdentity
 from education_group.ddd.service.read import get_training_service, get_group_service
 from education_group.ddd.service.write.postpone_certificate_aims_modification_service import \
@@ -90,11 +91,14 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 try:
                     updated_trainings = self.update_training()
                 except MultipleBusinessExceptions as e:
-                    for field, hops_exception in e.exceptions.items():
-                        if isinstance(hops_exception, AresDataShouldBeGreaterOrEqualsThanZeroAndLessThan9999):
-                            self.training_form.add_error(field, hops_exception.message)
-                        if isinstance(hops_exception, HopsFieldsAllOrNone):
+                    for hops_exception in e.exceptions:
+                        if isinstance(hops_exception, HopsFieldsAllOrNone) or \
+                                isinstance(hops_exception, AresCodeShouldBeGreaterOrEqualsThanZeroAndLessThan9999):
                             self.training_form.add_error('ares_code', hops_exception.message)
+                        if isinstance(hops_exception, AresGracaShouldBeGreaterOrEqualsThanZeroAndLessThan9999):
+                            self.training_form.add_error('ares_graca', hops_exception.message)
+                        if isinstance(hops_exception, AresAuthorizationShouldBeGreaterOrEqualsThanZeroAndLessThan9999):
+                            self.training_form.add_error('ares_authorization', hops_exception.message)
 
             if 'certificate_aims' in self.training_form.changed_data:
                 updated_aims_trainings = self.update_certificate_aims()
