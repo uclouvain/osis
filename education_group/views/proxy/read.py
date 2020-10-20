@@ -51,7 +51,7 @@ class ReadEducationGroupRedirectView(RedirectView):
 
     def _get_current_tab(self) -> Tab:
         try:
-            return Tab(int(self.request.GET.get('tab')))
+            return Tab(int(self.request.GET.get('tab', 0)))
         except ValueError:
             return Tab.IDENTIFICATION
 
