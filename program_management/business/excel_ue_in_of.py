@@ -526,10 +526,11 @@ def _get_distinct_teachers(luy):
 def _get_program_tree_version_from_tree_versions_list(year: int, code: str, tree_versions: List['ProgramTreeVersion']):
 
     program_tree_identity = ProgramTreeIdentity(code=code, year=year)
-    for tree_version in tree_versions:
-        if tree_version.program_tree_identity == program_tree_identity:
-            return tree_version
-    return None
+    return next(
+        (tree_version for tree_version in tree_versions
+         if tree_version.program_tree_identity == program_tree_identity),
+        None
+    )
 
 
 def _get_xls_title(tree: 'ProgramTree', program_tree_version: 'ProgramTreeVersion') -> str:
