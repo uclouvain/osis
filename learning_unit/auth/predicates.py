@@ -52,12 +52,10 @@ def _is_attached_to_entity(requirement_entity, self):
 
 @predicate(bind=True)
 @predicate_failed_msg(
-    message="{}.  {}".format(
-        _("You can't modify learning unit under year : %(year)d") %
-        {"year": settings.YEAR_LIMIT_LUE_MODIFICATION + 1},
-        _("Modifications should be made in EPC under year %(year)d") %
-        {"year": settings.YEAR_LIMIT_LUE_MODIFICATION + 1},
-    )
+    message=_("You can't modify learning unit under year : %(year)d. "
+              "Modifications should be made in EPC under year  %(year)d") % {
+        "year": settings.YEAR_LIMIT_LUE_MODIFICATION + 1
+    },
 )
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def is_learning_unit_year_older_or_equals_than_limit_settings_year(self, user, learning_unit_year=None):

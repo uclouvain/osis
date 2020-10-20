@@ -275,37 +275,30 @@ class LearningUnitTagLiEditTest(TestCase):
         self.context['user'] = a_person.user
 
         lcy_master = LearningContainerYearFactory(
-            academic_year=self.current_academic_year,
+            academic_year=self.previous_academic_year,
             container_type=learning_container_year_types.MASTER_THESIS,
             requirement_entity=self.lcy.requirement_entity
         )
         learning_unit_yr = LearningUnitYearFactory(
-            academic_year=self.current_academic_year,
+            academic_year=self.previous_academic_year,
             subtype=learning_unit_year_subtypes.FULL,
             learning_unit=LearningUnitFactory(),
             learning_container_year=lcy_master
         )
         self.context['learning_unit_year'] = learning_unit_yr
 
-        limit_yr = self.context['learning_unit_year'].academic_year.year + 1
+        result = li_delete_all_lu(self.context, self.url_edit_non_editable, '', "#modalDeleteLuy")
 
-        with override_settings(YEAR_LIMIT_LUE_MODIFICATION=limit_yr):
-            result = li_delete_all_lu(self.context, self.url_edit_non_editable, '', "#modalDeleteLuy")
-
-            expected = {
-                'class_li': 'disabled',
-                'load_modal': False,
-                'url': '#',
-                'id_li': 'link_delete_lus',
-                'title': "{}.  {}".format(
-                    _("You can't modify learning unit under year : %(year)d") %
-                    {"year": limit_yr + 1},
-                    _("Modifications should be made in EPC under year %(year)d") %
-                    {"year": limit_yr + 1},
-                ),
-                'text': '',
-                'data_target': ''
-            }
+        expected = {
+            'class_li': 'disabled',
+            'load_modal': False,
+            'url': '#',
+            'id_li': 'link_delete_lus',
+            'title': "Vous ne pouvez pas modifier une unité d'enseignement avant %(year)d. "
+                     "Les modifications doivent être faites dans EPC avant l'année %(year)d" % {"year": 1},
+            'text': '',
+            'data_target': ''
+        }
 
         self.assertEqual(expected, result)
 

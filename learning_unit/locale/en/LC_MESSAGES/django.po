@@ -3,12 +3,11 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-07 10:54+0200\n"
+"POT-Creation-Date: 2020-10-20 16:45+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -44,10 +43,6 @@ msgid "Learning unit type is not deletable"
 msgstr ""
 
 msgid "Modification or transformation proposal not allowed during this period."
-msgstr ""
-
-#, python-format
-msgid "Modifications should be made in EPC under year %(year)d"
 msgstr ""
 
 msgid "Not in proposal"
@@ -98,7 +93,9 @@ msgid "You can't edit because the learning unit has proposal"
 msgstr ""
 
 #, python-format
-msgid "You can't modify learning unit under year : %(year)d"
+msgid ""
+"You can't modify learning unit under year : %(year)d. Modifications should "
+"be made in EPC under year  %(year)d"
 msgstr ""
 
 msgid ""

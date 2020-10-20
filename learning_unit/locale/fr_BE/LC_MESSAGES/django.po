@@ -3,12 +3,11 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-07 10:54+0200\n"
+"POT-Creation-Date: 2020-10-20 16:45+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -48,10 +47,6 @@ msgid "Modification or transformation proposal not allowed during this period."
 msgstr ""
 "Les propositions de modification ou de transformation ne sont pas permises "
 "durant cette période."
-
-#, python-format
-msgid "Modifications should be made in EPC under year %(year)d"
-msgstr "Les modifications doivent être faites dans EPC avant l'année %(year)d"
 
 msgid "Not in proposal"
 msgstr "Pas en proposition"
@@ -106,11 +101,11 @@ msgstr ""
 "Vous ne pouvez pas modifier l'unité d'enseignement car elle est en "
 "proposition pour cette année ou une année antérieure"
 
-#, python-format
-msgid "You can't modify learning unit under year : %(year)d"
-msgstr ""
-"Vous ne pouvez pas modifier une unité d'enseignement dont l'année est "
-"inférieure à %(year)d"
+msgid ""
+"You can't modify learning unit under year : %(year)d. Modifications should "
+"be made in EPC under year  %(year)d"
+msgstr "Vous ne pouvez pas modifier une unité d'enseignement avant %(year)d."
+" Les modifications doivent être faites dans EPC avant l'année %(year)d"
 
 msgid ""
 "You cannot delete a learning unit which is prerequisite or has "
@@ -123,4 +118,5 @@ msgid "You cannot edit this type of learning unit"
 msgstr "Vous ne pouvez pas modifier ce type d'unité d'enseignement"
 
 msgid "You cannot modify a learning unit of a previous year"
-msgstr "Vous ne pouvez pas modifier l'unité d'enseignement d'une année dans le passé"
+msgstr ""
+"Vous ne pouvez pas modifier l'unité d'enseignement d'une année dans le passé"
