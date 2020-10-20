@@ -41,15 +41,15 @@ class LearningUnitPrerequisite(PermissionRequiredMixin, LearningUnitGeneric):
     raise_exception = True
 
     def dispatch(self, request, *args, **kwargs):
-        if self.program_tree.root_node.is_training():
-            return LearningUnitPrerequisiteTraining.as_view()(request, *args, **kwargs)
-        return LearningUnitPrerequisiteGroup.as_view()(request, *args, **kwargs)
+        if self.program_tree.root_node.is_group():
+            return LearningUnitPrerequisiteGroup.as_view()(request, *args, **kwargs)
+        return LearningUnitPrerequisiteTrainingandMiniTraining.as_view()(request, *args, **kwargs)
 
     def get_permission_object(self):
         return GroupYear.objects.get(element__pk=self.program_tree.root_node.pk)
 
 
-class LearningUnitPrerequisiteTraining(PermissionRequiredMixin, LearningUnitGeneric):
+class LearningUnitPrerequisiteTrainingandMiniTraining(PermissionRequiredMixin, LearningUnitGeneric):
     template_name = "learning_unit/tab_prerequisite_training.html"
 
     permission_required = 'base.view_educationgroup'
