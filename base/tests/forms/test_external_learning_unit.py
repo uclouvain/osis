@@ -51,14 +51,15 @@ from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.organization_address import OrganizationAddressFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
-from reference.tests.factories.language import LanguageFactory, FrenchLanguageFactory
+from reference.tests.factories.language import FrenchLanguageFactory
 
 YEAR_LIMIT_LUE_MODIFICATION = 2018
 NAMEN = 'Namur'
 
 
-def get_valid_external_learning_unit_form_data(academic_year, person, learning_unit_year=None):
-    entities = create_entities_hierarchy()
+def get_valid_external_learning_unit_form_data(academic_year, entity_role, learning_unit_year=None):
+    person = entity_role.person
+    entities = create_entities_hierarchy(root_entity=entity_role.entity)
     PersonEntityFactory(person=person, entity=entities['root_entity'], with_child=True)
     requesting_entity = entities['child_one_entity_version']
     organization = OrganizationFactory(type=organization_type.MAIN)
