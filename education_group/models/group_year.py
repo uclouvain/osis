@@ -206,6 +206,9 @@ class GroupYear(models.Model):
 
     class Meta:
         unique_together = ("partial_acronym", "academic_year")
+        index_together = [
+            ("partial_acronym", "academic_year"),
+        ]
 
     def __str__(self):
         return "{} ({})".format(self.acronym,

@@ -24,21 +24,27 @@ from program_management.models.element import Element
 @predicate(bind=True)
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def are_all_training_versions_removable(self, user, group_year):
-    groups = group_year.group.groupyear_set.all().select_related('education_group_type', 'management_entity')
+    groups = group_year.group.groupyear_set.all().select_related(
+        'education_group_type', 'management_entity', 'academic_year'
+    )
     return _are_all_removable(self, user, groups, 'program_management.delete_training_version')
 
 
 @predicate(bind=True)
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def are_all_mini_training_versions_removable(self, user, group_year):
-    groups = group_year.group.groupyear_set.all().select_related('education_group_type', 'management_entity')
+    groups = group_year.group.groupyear_set.all().select_related(
+        'education_group_type', 'management_entity', 'academic_year'
+    )
     return _are_all_removable(self, user, groups, 'program_management.delete_minitraining_version')
 
 
 @predicate(bind=True)
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def are_all_trainings_removable(self, user, training_root):
-    training_roots = training_root.group.groupyear_set.all().select_related('education_group_type', 'management_entity')
+    training_roots = training_root.group.groupyear_set.all().select_related(
+        'education_group_type', 'management_entity', 'academic_year'
+    )
     return _are_all_removable(self, user, training_roots, 'base.delete_training')
 
 
@@ -47,7 +53,8 @@ def are_all_trainings_removable(self, user, training_root):
 def are_all_minitrainings_removable(self, user, minitraining_root):
     minitraining_roots = minitraining_root.group.groupyear_set.all().select_related(
         'education_group_type',
-        'management_entity'
+        'management_entity',
+        'academic_year'
     )
     return _are_all_removable(self, user, minitraining_roots, 'base.delete_minitraining')
 
@@ -55,7 +62,9 @@ def are_all_minitrainings_removable(self, user, minitraining_root):
 @predicate(bind=True)
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def are_all_groups_removable(self, user, group_year):
-    groups = group_year.group.groupyear_set.all().select_related('education_group_type', 'management_entity')
+    groups = group_year.group.groupyear_set.all().select_related(
+        'education_group_type', 'management_entity', 'academic_year'
+    )
     return _are_all_removable(self, user, groups, 'base.delete_group')
 
 

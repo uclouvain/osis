@@ -103,20 +103,6 @@ def get_tab_urls(tab: Tab, node: 'Node', path: 'Path' = None, anchor: 'str' = No
     return url
 
 
-def get_tab_from_path_info(node: 'Node', path_info: str):
-    if path_info:
-        tabs = get_group_available_tabs(node)
-
-        if node.is_training():
-            tabs = get_training_available_tabs()
-
-        if node.is_mini_training():
-            tabs = get_mini_training_available_tabs()
-
-        return next((tab for key, tab in tabs.items() if key in path_info), Tab.IDENTIFICATION)
-    return Tab.IDENTIFICATION
-
-
 def get_group_available_tabs(node: 'Node'):
     tabs = {
         SUFFIX_IDENTIFICATION: Tab.IDENTIFICATION,

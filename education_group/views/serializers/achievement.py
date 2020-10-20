@@ -34,29 +34,29 @@ from cms.models import translated_text
 from cms.models.text_label import TextLabel
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
-from program_management.ddd.domain.node import NodeGroupYear
+from education_group.ddd.domain.group import Group
 from education_group.views.proxy.read import Tab
 
 
-def get_achievements(node: NodeGroupYear, path: str):
+def get_achievements(group: Group, path: str):
     qs = EducationGroupAchievement.objects.filter(
-        education_group_year__educationgroupversion__root_group__partial_acronym=node.code,
-        education_group_year__educationgroupversion__root_group__academic_year__year=node.year
+        education_group_year__educationgroupversion__root_group__partial_acronym=group.code,
+        education_group_year__educationgroupversion__root_group__academic_year__year=group.year
     ).prefetch_related('educationgroupdetailedachievement_set')
 
     achievements = []
     for achievement in qs:
         achievements.append({
-            **__get_achievement_formated(achievement, node, path),
+            **__get_achievement_formated(achievement, group, path),
             'detailed_achievements': [
-                __get_detail_achievement_formated(achievement, d_achievement, node, path) for d_achievement
+                __get_detail_achievement_formated(achievement, d_achievement, group, path) for d_achievement
                 in achievement.educationgroupdetailedachievement_set.all()
             ]
         })
     return achievements
 
 
-def __get_achievement_formated(achievement, node, path):
+def __get_achievement_formated(achievement, group, path):
     url_names = _get_url_name_achievements(achievement)
     return {
         'pk': achievement.pk,
@@ -65,16 +65,16 @@ def __get_achievement_formated(achievement, node, path):
         'text_en': achievement.english_text,
         'url_action': reverse(
             url_names["url_action"],
-            args=[node.year, node.code, achievement.pk]
+            args=[group.year, group.code, achievement.pk]
         ) + '?path={}&tab={}'.format(path, Tab.SKILLS_ACHIEVEMENTS),
         'url_update': reverse(
-            url_names["url_update"], args=[node.year, node.code, achievement.pk]
+            url_names["url_update"], args=[group.year, group.code, achievement.pk]
         ) + '?path={}&tab={}#achievement_{}'.format(path, Tab.SKILLS_ACHIEVEMENTS, achievement.pk),
         'url_delete': reverse(
-            url_names["url_delete"], args=[node.year, node.code, achievement.pk]
+            url_names["url_delete"], args=[group.year, group.code, achievement.pk]
         ) + '?path={}&tab={}'.format(path, Tab.SKILLS_ACHIEVEMENTS),
         'url_create': reverse(
-            url_names["url_create"], args=[node.year, node.code, achievement.pk]
+            url_names["url_create"], args=[group.year, group.code, achievement.pk]
         ) + '?path={}&tab={}achievement.pk'.format(path, Tab.SKILLS_ACHIEVEMENTS, achievement.pk)
     }
 
@@ -89,7 +89,7 @@ def _get_url_name_achievements(achievement):
     }
 
 
-def __get_detail_achievement_formated(achievement, d_achievement, node, path):
+def __get_detail_achievement_formated(achievement, d_achievement, group, path):
     url_names = _get_url_name_detail_achievements(achievement)
     return {
         'pk': d_achievement.pk,
@@ -98,13 +98,13 @@ def __get_detail_achievement_formated(achievement, d_achievement, node, path):
         'text_en': d_achievement.english_text,
         'url_action': reverse(
             url_names["url_action"],
-            args=[node.year, node.code, achievement.pk, d_achievement.pk]
+            args=[group.year, group.code, achievement.pk, d_achievement.pk]
         ) + '?path={}&tab={}'.format(path, Tab.SKILLS_ACHIEVEMENTS),
         'url_update': reverse(
-            url_names["url_update"], args=[node.year, node.code, achievement.pk, d_achievement.pk]
+            url_names["url_update"], args=[group.year, group.code, achievement.pk, d_achievement.pk]
         ) + '?path={}&tab={}#detail_achievements_{}'.format(path, Tab.SKILLS_ACHIEVEMENTS, d_achievement.pk),
         'url_delete': reverse(
-            url_names["url_delete"], args=[node.year, node.code, achievement.pk, d_achievement.pk]
+            url_names["url_delete"], args=[group.year, group.code, achievement.pk, d_achievement.pk]
         ) + '?path={}&tab={}#achievement_{}'.format(path, Tab.SKILLS_ACHIEVEMENTS, achievement.pk),
     }
 
@@ -118,8 +118,8 @@ def _get_url_name_detail_achievements(achievement):
     }
 
 
-def get_skills_labels(node: NodeGroupYear, language_code: str):
-    reference_pk = translated_text.get_groups_or_offers_cms_reference_object(node).pk
+def get_skills_labels(group: Group, language_code: str):
+    reference_pk = translated_text.get_groups_or_offers_cms_reference_object(group).pk
     subqstranslated_fr = TranslatedText.objects.filter(
         reference=reference_pk, text_label=OuterRef('pk'),
         language=settings.LANGUAGE_CODE_FR, entity=entity_name.OFFER_YEAR
