@@ -38,7 +38,8 @@ class EntityRoleChoiceField(forms.ModelChoiceField):
     def __init__(self, person, group_names, **kwargs):
         self._group_names = group_names
         self._person = person
-        kwargs['queryset'] = self.get_queryset()
+        if not kwargs.get('queryset'):
+            kwargs['queryset'] = self.get_queryset()
         super().__init__(**kwargs)
 
     def get_group_names(self):
