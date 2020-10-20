@@ -23,8 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import operator
-
 import factory.fuzzy
 
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
@@ -59,6 +57,6 @@ class LearningUnitYearFactory(factory.Factory):
     proposal = factory.SubFactory(ProposalFactory)
     credits = factory.fuzzy.FuzzyDecimal(MINIMUM_CREDITS, MAXIMUM_CREDITS, precision=0)
     status = True
-    periodicity = factory.Iterator(PeriodicityEnum.choices(), getter=operator.itemgetter(0))
+    periodicity = PeriodicityEnum.ANNUAL
     achievements = []
     specifications = None

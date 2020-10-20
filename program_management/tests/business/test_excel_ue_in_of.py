@@ -36,7 +36,7 @@ from base.business.learning_unit_xls import CREATION_COLOR, MODIFICATION_COLOR, 
 from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import GroupType, TrainingType
 from base.models.enums.learning_unit_year_subtypes import FULL
-from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
+from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES, PeriodicityEnum
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.tests.factories.academic_year import AcademicYearFactory
@@ -347,8 +347,10 @@ class TestContent(TestCase):
     def test_get_optional_has_periodicity(self):
         optional_data = initialize_optional_data()
         optional_data['has_periodicity'] = True
+        print(type(self.luy.periodicity))
+        # data.append(PeriodicityEnum[luy.periodicity.name].value if luy.periodicity else '')
         self.assertCountEqual(_get_optional_data([], self.luy, optional_data, self.link_1_1),
-                              [dict(PERIODICITY_TYPES)[self.luy.periodicity]])
+                              [PeriodicityEnum[self.luy.periodicity.name].value if self.luy.periodicity else ''])
 
     def test_get_optional_has_active(self):
         optional_data = initialize_optional_data()
