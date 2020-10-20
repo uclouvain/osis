@@ -27,28 +27,28 @@
         <div class="row">
             <div id="funding_can_be_funded" class="col-md-12">
                 {% bootstrap_label _("Funding") label_class='d-block'%}
-                <p>{{ education_group_year.funding.can_be_funded | yesno | title }}</p>
+                <p>{{ training.funding.can_be_funded | yesno | title }}</p>
             </div>
         </div>
         <br>
         <div class="row">
             <div id="funding_orientation" class="col-md-12">
                 {% bootstrap_label _("Funding direction") label_class='d-block'%}
-                <p>{{ education_group_year.funding.funding_orientation.value | title }}</p>
+                <p>{{ training.funding.funding_orientation.value | title }}</p>
             </div>
         </div>
         <br>
         <div class="row">
             <div id="funding_can_be_international_funded" class="col-md-12">
                 {% bootstrap_label _("Funding international cooperation CCD/CUD") label_class='d-block'%}
-                <p>{{ education_group_year.funding.can_be_international_funded | yesno | title }}</p>
+                <p>{{ training.funding.can_be_international_funded | yesno | title }}</p>
             </div>
         </div>
         <br>
         <div class="row">
             <div id="international_funding_orientation" class="col-md-12">
                 {% bootstrap_label _("Funding international cooperation CCD/CUD direction") label_class='d-block'%}
-                <p>{{ education_group_year.funding.international_funding_orientation.value | title }}</p>
+                <p>{{ training.funding.international_funding_orientation.value | title }}</p>
             </div>
         </div>
         <br>

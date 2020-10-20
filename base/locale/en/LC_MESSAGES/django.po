@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-07 10:46+0200\n"
+"POT-Creation-Date: 2020-10-19 15:06+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -184,6 +184,10 @@ msgstr ""
 msgid "Access with additional training"
 msgstr ""
 
+msgid "Acronym"
+msgstr ""
+
+msgctxt "OF acronym"
 msgid "Acronym"
 msgstr ""
 
@@ -433,6 +437,9 @@ msgstr ""
 msgid "Campus"
 msgstr ""
 
+msgid "Can delete according to the type of the learning unit"
+msgstr ""
+
 msgid "Cancel"
 msgstr ""
 
@@ -440,9 +447,6 @@ msgid "Cancel proposal"
 msgstr ""
 
 msgid "Cancel the proposal"
-msgstr ""
-
-msgid "Cannot delete according to the type of the learning unit"
 msgstr ""
 
 msgid "Catalogue"
@@ -787,9 +791,6 @@ msgid "Email"
 msgstr ""
 
 msgid "Embassy"
-msgstr ""
-
-msgid "Encode"
 msgstr ""
 
 msgid "End"
@@ -1605,6 +1606,9 @@ msgstr ""
 msgid "Not defined"
 msgstr ""
 
+msgid "Not eligible to delete learning units"
+msgstr ""
+
 msgid "Not enrolled"
 msgstr ""
 
@@ -1612,6 +1616,9 @@ msgid "Not in period to edit description fiche."
 msgstr ""
 
 msgid "Not in period to edit force majeure section."
+msgstr ""
+
+msgid "Not in range of years which can be edited by you"
 msgstr ""
 
 msgid "Not modified"
@@ -2557,7 +2564,7 @@ msgstr ""
 msgid "This field is required."
 msgstr ""
 
-msgid "This learning unit has application"
+msgid "This learning unit has application."
 msgstr ""
 
 msgid ""
@@ -2566,6 +2573,9 @@ msgstr ""
 
 msgid ""
 "This learning unit is not editable by faculty managers during this period."
+msgstr ""
+
+msgid "This learning unit isn't eligible for modification because of it's type"
 msgstr ""
 
 #, python-format
@@ -2784,7 +2794,41 @@ msgstr ""
 msgid "Yes, I confirm."
 msgstr ""
 
+msgid ""
+"You are faculty manager and the proposal state is not 'Faculty', so you "
+"can't edit"
+msgstr ""
+
+msgid "You are not allowed to change the end year for this academic year"
+msgstr ""
+
+msgid "You are not allowed to put in proposal for this academic year"
+msgstr ""
+
+msgid ""
+"You are not attached to initial or current requirement entity, so you can't "
+"edit proposal"
+msgstr ""
+
 msgid "You are not attributed to this learning unit."
+msgstr ""
+
+msgid "You are not eligible to cancel proposal"
+msgstr ""
+
+msgid "You are not eligible to create/modify proposal"
+msgstr ""
+
+msgid "You are not eligible to edit proposal"
+msgstr ""
+
+msgid "You are not eligible to manage learning units"
+msgstr ""
+
+msgid ""
+"You are not eligible to modify the end date of this learning unit. You "
+"should be central manager or the learning unit has to be a partim or the "
+"learning unit as to be a course/dissertation/internship"
 msgstr ""
 
 msgid "You are succesfully logout."
@@ -2793,8 +2837,25 @@ msgstr ""
 msgid "You can not delete this object because some dependencies are protected"
 msgstr ""
 
+msgid "You can only edit co-graduation external learning units"
+msgstr ""
+
+msgid ""
+"You can only modify a learning unit when your are linked to its requirement "
+"entity"
+msgstr ""
+
+msgid "You can't edit because the learning unit has proposal"
+msgstr ""
+
+msgid "You can't modify learning unit of a previous year"
+msgstr ""
+
 #, python-format
 msgid "You can't modify learning unit under year : %(year)d"
+msgstr ""
+
+msgid "You can't modify proposal which is on an other year"
 msgstr ""
 
 #, python-format
@@ -2806,12 +2867,20 @@ msgid ""
 "You cannot delete a learning unit which is existing before %(limit_year)s"
 msgstr ""
 
+msgid ""
+"You cannot delete a learning unit which is prerequisite or has "
+"prerequisite(s)"
+msgstr ""
+
 msgid "You cannot have a specific summary course submission event."
 msgstr ""
 
 msgid ""
 "You cannot put in proposal for ending date on the first year of the learning "
 "unit."
+msgstr ""
+
+msgid "You don't have the rights to consolidate"
 msgstr ""
 
 msgid "You have the choice between"

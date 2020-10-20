@@ -23,12 +23,32 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib.messages.views import SuccessMessageMixin
-from django.views.generic import CreateView
+import factory.fuzzy
 
-from base.views.mixins import AjaxTemplateMixin
+from base.models.enums.diploma_coorganization import DiplomaCoorganizationTypes
+from education_group.ddd.domain._co_organization import Coorganization, CoorganizationIdentity
+from education_group.tests.ddd.factories.academic_partner import AcademicPartnerFactory
 
 
-class CreateLinkView(SuccessMessageMixin, AjaxTemplateMixin, CreateView):
-    pass
-    # SEE : CreateGroupElementYearView
+class CoorganizationIdentityFactory(factory.Factory):
+    class Meta:
+        model = CoorganizationIdentity
+        abstract = False
+
+    partner_name = factory.Sequence(lambda n: 'PARTNER_%02d' % n)
+    training_acronym = factory.Sequence(lambda n: 'OFFER_%02d' % n)
+    training_year = factory.fuzzy.FuzzyInteger(1999, 2099)
+
+
+class CoorganizationFactory(factory.Factory):
+    class Meta:
+        model = Coorganization
+        abstract = False
+
+    entity_id = factory.SubFactory(CoorganizationIdentityFactory)
+    partner = factory.SubFactory(AcademicPartnerFactory)
+    is_for_all_students = False
+    is_reference_institution = False
+    certificate_type = DiplomaCoorganizationTypes.NOT_CONCERNED
+    is_producing_certificate = False
+    is_producing_certificate_annexes = False

@@ -28,7 +28,7 @@
     <div class="panel panel-default">
         <div class="panel-body" id="panel_coorganization">
             <label>{% trans 'Program organized with other institutes' %}</label>
-            {% if education_group_year.co_organizations %}
+            {% if training.co_organizations %}
                 <table class="table" id="tbl_coorganization">
                     <thead>
                     <tr>
@@ -42,7 +42,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    {% for coorganization in education_group_year.co_organizations %}
+                    {% for coorganization in training.co_organizations %}
                         <tr>
                             <td>
                                 <span id="coorganization_id_{{ coorganization.partner.name }}">

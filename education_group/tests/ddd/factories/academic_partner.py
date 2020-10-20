@@ -23,38 +23,24 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import functools
-from typing import List
+import factory.fuzzy
 
-from base.utils.urls import reverse_with_get
-from education_group.views.mini_training.common_read import MiniTrainingRead, Tab
-from program_management.ddd.repositories import load_tree
+from education_group.ddd.domain._academic_partner import AcademicPartner, AcademicPartnerIdentity
 
 
-class MiniTrainingReadContent(MiniTrainingRead):
-    template_name = "education_group_app/mini_training/content_read.html"
-    active_tab = Tab.CONTENT
+class AcademicPartnerIdentityFactory(factory.Factory):
+    class Meta:
+        model = AcademicPartnerIdentity
+        abstract = False
 
-    def get_context_data(self, **kwargs):
-        return {
-            **super().get_context_data(**kwargs),
-            "children": self.get_children(),
-        }
+    name = factory.Sequence(lambda n: 'PARTNER_%02d' % n)
 
-    def get_update_mini_training_url(self) -> str:
-        return reverse_with_get(
-            'content_update',
-            kwargs={'code': self.kwargs['code'], 'year': self.kwargs['year']},
-            get={"path_to": self.get_path(), "tab": self.active_tab.name}
-        )
 
-    def get_update_permission_name(self) -> str:
-        return "base.change_link_data"
+class AcademicPartnerFactory(factory.Factory):
+    class Meta:
+        model = AcademicPartner
+        abstract = False
 
-    @functools.lru_cache()
-    def get_tree(self):
-        return load_tree.load(self.get_root_id())
-
-    def get_children(self) -> List['Node']:
-        parent_node = self.get_tree().get_node(self.get_path())
-        return parent_node.children
+    entity_id = factory.SubFactory(AcademicPartnerIdentityFactory)
+    address = None
+    logo_url = None
