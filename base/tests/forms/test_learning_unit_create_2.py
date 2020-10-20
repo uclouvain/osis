@@ -51,7 +51,7 @@ from base.tests.factories.academic_year import create_current_academic_year, Aca
 from base.tests.factories.business.entities import create_entities_hierarchy
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
 from base.tests.factories.campus import CampusFactory
-from base.tests.factories.entity import EntityFactory
+from base.tests.factories.entity import EntityFactory, EntityWithVersionFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.group import FacultyManagerGroupFactory
 from base.tests.factories.learning_container import LearningContainerFactory
@@ -60,7 +60,6 @@ from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import PersonFactory
-from base.tests.factories.person_entity import PersonEntityFactory
 from learning_unit.tests.factories.central_manager import CentralManagerFactory
 from learning_unit.tests.factories.faculty_manager import FacultyManagerFactory
 from reference.tests.factories.language import FrenchLanguageFactory
@@ -74,9 +73,8 @@ def _instanciate_form(academic_year, person=None, post_data=None, learning_unit_
                     start_year=start_year, proposal_type=proposal_type)
 
 
-def get_valid_form_data(academic_year, person, learning_unit_year=None):
-    entities = create_entities_hierarchy()
-    PersonEntityFactory(person=person, entity=entities['root_entity'], with_child=True)
+def get_valid_form_data(academic_year, entity_role, learning_unit_year=None):
+    entities = create_entities_hierarchy(root_entity=entity_role.entity)
     requirement_entity_version = entities['child_one_entity_version']
     organization = OrganizationFactory(type=organization_type.MAIN)
     campus = CampusFactory(organization=organization)
@@ -167,8 +165,10 @@ class LearningUnitFullFormContextMixin(TestCase):
         cls.initial_language = FrenchLanguageFactory()
         cls.initial_campus = CampusFactory(name='Louvain-la-Neuve', organization__type=organization_type.MAIN)
         cls.current_academic_year = create_current_academic_year()
+
+        cls.entity = EntityWithVersionFactory()
         # Creation of a LearningContainerYear and all related models
-        cls.learn_unit_structure = GenerateContainer(cls.current_academic_year, cls.current_academic_year)
+        cls.learn_unit_structure = GenerateContainer(cls.current_academic_year, cls.current_academic_year, cls.entity)
 
         start_year = AcademicYearFactory(year=cls.current_academic_year.year - 3)
         end_year = AcademicYearFactory(year=cls.current_academic_year.year + 7)
@@ -182,10 +182,12 @@ class LearningUnitFullFormContextMixin(TestCase):
         for ac in cls.acs:
             LearningUnitYearFactory(academic_year=ac, learning_unit=cls.learning_unit_year.learning_unit)
         cls.acs.insert(3, cls.current_academic_year)
-        cls.faculty_person = FacultyManagerFactory().person
-        cls.central_person = CentralManagerFactory().person
+        cls.faculty_manager = FacultyManagerFactory(entity=cls.entity, with_child=True)
+        cls.faculty_person = cls.faculty_manager.person
+        cls.central_manager = CentralManagerFactory(entity=cls.entity, with_child=True)
+        cls.central_person = cls.central_manager.person
 
-        cls.post_data = get_valid_form_data(cls.current_academic_year, person=cls.faculty_person)
+        cls.post_data = get_valid_form_data(cls.current_academic_year, entity_role=cls.faculty_manager)
 
     def setUp(self):
         pass
@@ -449,7 +451,7 @@ class TestFullFormSave(LearningUnitFullFormContextMixin):
         })
 
     def test_when_update_instance(self):
-        self.post_data = get_valid_form_data(self.current_academic_year, self.faculty_person, self.learning_unit_year)
+        self.post_data = get_valid_form_data(self.current_academic_year, self.faculty_manager, self.learning_unit_year)
 
         self.learning_unit_year.learning_container_year.additional_entity_1 = None
         self.learning_unit_year.learning_container_year.additional_entity_2 = None
@@ -470,7 +472,7 @@ class TestFullFormSave(LearningUnitFullFormContextMixin):
             self.assertEqual(current_count, initial_count, model_class.objects.all())
 
     def test_when_delete_additionnal_entity(self):
-        post_data = get_valid_form_data(self.current_academic_year, self.faculty_person, self.learning_unit_year)
+        post_data = get_valid_form_data(self.current_academic_year, self.faculty_manager, self.learning_unit_year)
         # Assert additionnal entity exists exists
         if not self.learning_unit_year.learning_container_year.additional_entity_1:
             self.learning_unit_year.learning_container_year.additional_entity_1 = EntityFactory()
@@ -524,7 +526,7 @@ class TestFullFormSave(LearningUnitFullFormContextMixin):
             learning_container_year__container_type=learning_container_year_types.COURSE,
             campus=self.initial_campus
         )
-        post_data = get_valid_form_data(self.current_academic_year, person=self.faculty_person,
+        post_data = get_valid_form_data(self.current_academic_year, entity_role=self.faculty_manager,
                                         learning_unit_year=new_learning_unit_year)
         form = _instanciate_form(self.current_academic_year, post_data=post_data, person=self.faculty_person,
                                  start_year=self.current_academic_year)
@@ -650,7 +652,7 @@ class TestFullFormValidateSameEntitiesContainer(LearningUnitFullFormContextMixin
         learning_unit_year = LearningUnitYearFactory.build(academic_year=self.current_academic_year,
                                                            learning_container_year=container_year,
                                                            subtype=learning_unit_year_subtypes.FULL)
-        post_data = get_valid_form_data(self.current_academic_year, person=self.faculty_person,
+        post_data = get_valid_form_data(self.current_academic_year, entity_role=self.faculty_manager,
                                         learning_unit_year=learning_unit_year)
         post_data['allocation_entity-entity'] = EntityVersionFactory().id
         return post_data

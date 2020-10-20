@@ -33,8 +33,8 @@ from base.models.enums import learning_unit_year_subtypes
 from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.academic_year import AcademicYearFactory, get_current_year
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
-from base.tests.factories.person import PersonFactory
 from base.tests.forms.test_learning_unit_create_2 import get_valid_form_data
+from learning_unit.tests.factories.central_manager import CentralManagerFactory
 
 
 class TestCreditsValidation(TestCase):
@@ -56,7 +56,8 @@ class TestCreditsValidation(TestCase):
             learning_unit=cls.learn_unit_structure.learning_unit_full,
             academic_year=cls.academic_years[2]
         )
-        cls.person = PersonFactory()
+        cls.manager = CentralManagerFactory()
+        cls.person = cls.manager.person
 
     def test_credits_no_decimal_in_crucial_year(self):
         form = self._build_form_with_decimal(self.learning_unit_year_in_crucial_year)
@@ -78,9 +79,7 @@ class TestCreditsValidation(TestCase):
         ac = self.academic_years[1]
         if luy:
             ac = luy.academic_year
-        data = get_valid_form_data(ac,
-                                   self.person,
-                                   learning_unit_year=luy)
+        data = get_valid_form_data(ac, self.manager, learning_unit_year=luy)
         data.update({'credits': 2.5})
         form = LearningUnitYearModelForm(data=data, person=self.person, subtype=learning_unit_year_subtypes.FULL,
                                          instance=luy)
