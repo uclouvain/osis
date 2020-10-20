@@ -20,7 +20,8 @@ from education_group.ddd.domain.exception import ContentConstraintTypeMissing, \
     ContentConstraintMinimumMaximumMissing, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum, \
     AcronymAlreadyExist, StartYearGreaterThanEndYear, CodeAlreadyExistException, \
     HopsFieldsAllOrNone, AresCodeShouldBeGreaterOrEqualsThanZeroAndLessThan9999, \
-    AresGracaShouldBeGreaterOrEqualsThanZeroAndLessThan9999, AresAuthorizationShouldBeGreaterOrEqualsThanZeroAndLessThan9999
+    AresGracaShouldBeGreaterOrEqualsThanZeroAndLessThan9999, \
+    AresAuthorizationShouldBeGreaterOrEqualsThanZeroAndLessThan9999
 from education_group.ddd.domain.training import TrainingIdentity
 from education_group.ddd.service.read import get_group_service
 from education_group.forms.training import CreateTrainingForm

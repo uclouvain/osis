@@ -42,7 +42,8 @@ from education_group.ddd.domain import exception
 from education_group.ddd.domain.exception import TrainingCopyConsistencyException, \
     CertificateAimsCopyConsistencyException, MaximumCertificateAimType2Reached, \
     HopsFieldsAllOrNone, AresCodeShouldBeGreaterOrEqualsThanZeroAndLessThan9999, \
-    AresGracaShouldBeGreaterOrEqualsThanZeroAndLessThan9999, AresAuthorizationShouldBeGreaterOrEqualsThanZeroAndLessThan9999
+    AresGracaShouldBeGreaterOrEqualsThanZeroAndLessThan9999, \
+    AresAuthorizationShouldBeGreaterOrEqualsThanZeroAndLessThan9999
 from education_group.ddd.domain.training import TrainingIdentity
 from education_group.ddd.service.read import get_training_service, get_group_service
 from education_group.ddd.service.write.postpone_certificate_aims_modification_service import \
