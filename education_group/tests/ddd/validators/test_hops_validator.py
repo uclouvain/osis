@@ -27,8 +27,9 @@ import random
 
 from django.test import SimpleTestCase
 
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from education_group.ddd.domain.exception import HopsFieldsAllOrNone, \
-    AresDataShouldBeGreaterOrEqualsThanZeroAndLessThan9999, HopsException
+    AresDataShouldBeGreaterOrEqualsThanZeroAndLessThan9999
 from education_group.ddd.validators._hops_validator import HopsValuesValidator
 from education_group.tests.ddd.factories.hops import HOPSFactory
 from education_group.tests.ddd.factories.training import TrainingFactory
@@ -62,7 +63,7 @@ class TestHopsValidator(SimpleTestCase):
         training = TrainingFactory(hops=hops)
         validator = HopsValuesValidator(training=training)
 
-        with self.assertRaises(HopsException) as e:
+        with self.assertRaises(MultipleBusinessExceptions) as e:
             validator.is_valid()
 
         self.assertIsInstance(
@@ -94,7 +95,7 @@ class TestHopsValidator(SimpleTestCase):
     def assert_hops_field_valid_value(self, hops, field):
         training = TrainingFactory(hops=hops)
         validator = HopsValuesValidator(training=training)
-        with self.assertRaises(HopsException) as e:
+        with self.assertRaises(MultipleBusinessExceptions) as e:
             validator.is_valid()
 
         self.assertIsInstance(

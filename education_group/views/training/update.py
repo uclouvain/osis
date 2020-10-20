@@ -32,6 +32,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.utils import operator
 from base.utils.urls import reverse_with_get
 from base.views.common import display_success_messages, display_warning_messages, display_error_messages
@@ -40,7 +41,7 @@ from education_group.ddd.business_types import *
 from education_group.ddd.domain import exception
 from education_group.ddd.domain.exception import TrainingCopyConsistencyException, \
     CertificateAimsCopyConsistencyException, MaximumCertificateAimType2Reached, \
-    AresDataShouldBeGreaterOrEqualsThanZeroAndLessThan9999, HopsException, HopsFieldsAllOrNone
+    AresDataShouldBeGreaterOrEqualsThanZeroAndLessThan9999, HopsFieldsAllOrNone
 from education_group.ddd.domain.training import TrainingIdentity
 from education_group.ddd.service.read import get_training_service, get_group_service
 from education_group.ddd.service.write.postpone_certificate_aims_modification_service import \
@@ -88,7 +89,7 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             if not self.training_form.errors and not self._changed_certificate_aims_only():
                 try:
                     updated_trainings = self.update_training()
-                except HopsException as e:
+                except MultipleBusinessExceptions as e:
                     for field, hops_exception in e.exceptions.items():
                         if isinstance(hops_exception, AresDataShouldBeGreaterOrEqualsThanZeroAndLessThan9999):
                             self.training_form.add_error(field, hops_exception.message)

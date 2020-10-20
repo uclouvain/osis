@@ -8,6 +8,7 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.base import View
 
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models.academic_year import starting_academic_year, AcademicYear
 from base.models.enums.education_group_types import TrainingType
 from base.utils.cache import RequestCache
@@ -18,7 +19,7 @@ from education_group.ddd.business_types import *
 from education_group.ddd.domain.exception import ContentConstraintTypeMissing, \
     ContentConstraintMinimumMaximumMissing, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum, \
     AcronymAlreadyExist, StartYearGreaterThanEndYear, CodeAlreadyExistException, \
-    HopsFieldsAllOrNone, HopsException, AresDataShouldBeGreaterOrEqualsThanZeroAndLessThan9999
+    HopsFieldsAllOrNone, AresDataShouldBeGreaterOrEqualsThanZeroAndLessThan9999
 from education_group.ddd.domain.training import TrainingIdentity
 from education_group.ddd.service.read import get_group_service
 from education_group.forms.training import CreateTrainingForm
@@ -133,7 +134,7 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             except StartYearGreaterThanEndYear as e:
                 training_form.add_error('end_year', e.message)
                 training_form.add_error('academic_year', '')
-            except HopsException as e:
+            except MultipleBusinessExceptions as e:
                 for field, hops_exception in e.exceptions.items():
                     if isinstance(hops_exception, AresDataShouldBeGreaterOrEqualsThanZeroAndLessThan9999):
                         self.training_form.add_error(field, hops_exception.message)

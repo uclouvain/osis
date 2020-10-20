@@ -23,9 +23,10 @@
 # ############################################################################
 
 from base.ddd.utils import business_validator
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models.enums.education_group_types import TrainingType
 from education_group.ddd.domain.exception import HopsFieldsAllOrNone, \
-    AresDataShouldBeGreaterOrEqualsThanZeroAndLessThan9999, HopsException
+    AresDataShouldBeGreaterOrEqualsThanZeroAndLessThan9999
 
 
 class HopsValuesValidator(business_validator.BusinessValidator):
@@ -57,4 +58,4 @@ class HopsValuesValidator(business_validator.BusinessValidator):
                 exceptions['ares_authorization'] = AresDataShouldBeGreaterOrEqualsThanZeroAndLessThan9999()
 
         if exceptions:
-            raise HopsException(exceptions=exceptions)
+            raise MultipleBusinessExceptions(exceptions=exceptions)
