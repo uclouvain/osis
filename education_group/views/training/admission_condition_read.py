@@ -53,7 +53,6 @@ class TrainingReadAdmissionCondition(TrainingRead):
             **super().get_context_data(**kwargs),
             "can_edit_information":
                 self.request.user.has_perm("base.change_admissioncondition", self.get_permission_object()),
-            "training": training,
             "update_text_url": self.get_update_text_url(),
             "common_admission_condition": self.get_common_admission_condition(),
             "admission_condition": self.get_admission_condition(),
@@ -81,10 +80,6 @@ class TrainingReadAdmissionCondition(TrainingRead):
             {'text': "en", 'url': reverse('tab_lang_edit', args=[self.node_identity.year,
                                                                  self.node_identity.code, 'en'])}
         ]
-
-    @functools.lru_cache()
-    def get_training(self):
-        return TrainingRepository.get(TrainingIdentity(acronym=self.get_object().title, year=self.get_object().year))
 
     def get_common_admission_condition(self):
         training = self.get_training()
