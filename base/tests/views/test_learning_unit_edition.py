@@ -68,10 +68,6 @@ class TestLearningUnitEditionView(TestCase, LearningUnitsMixin):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        cls.user = UserFactory(username="YodaTheJediMaster")
-        cls.person = CentralManagerForUEFactory(user=cls.user)
-        cls.permission = Permission.objects.get(codename="can_edit_learningunit_date")
-        cls.person.user.user_permissions.add(cls.permission)
         cls.setup_academic_years()
         cls.learning_unit = cls.setup_learning_unit(cls.starting_academic_year)
         cls.learning_container_year = cls.setup_learning_container_year(
@@ -85,15 +81,14 @@ class TestLearningUnitEditionView(TestCase, LearningUnitsMixin):
             learning_unit_year_subtypes.FULL,
             learning_unit_year_periodicity.ANNUAL
         )
-
-        cls.a_superuser = SuperUserFactory()
-        cls.a_superperson = PersonFactory(user=cls.a_superuser)
+        cls.person = CentralManagerFactory(entity=cls.learning_container_year.requirement_entity).person
         generate_learning_unit_edition_calendars(cls.list_of_academic_years)
 
     def setUp(self):
-        self.client.force_login(self.user)
+        self.client.force_login(self.person.user)
 
     def test_view_learning_unit_edition_permission_denied(self):
+        self.client.force_login(PersonFactory().user)
         response = self.client.get(reverse(learning_unit_edition_end_date, args=[self.learning_unit_year.id]))
         self.assertEqual(response.status_code, 403)
 
