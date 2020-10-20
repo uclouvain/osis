@@ -34,7 +34,7 @@ from assessments.views.pgm_manager_administration import ProgramManagerListView,
 from assessments.views.scores_responsible import ScoresResponsibleSearch
 
 js_info_dict = {
-    'packages': ('assessments',)
+    'packages': ('assessments', 'base')
 }
 
 urlpatterns = [
