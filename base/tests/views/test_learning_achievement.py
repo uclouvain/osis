@@ -27,7 +27,6 @@ import itertools
 from unittest import mock
 
 from django.contrib import messages
-from django.contrib.auth.models import Permission
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.core.exceptions import PermissionDenied
 from django.http import JsonResponse
@@ -59,6 +58,7 @@ from base.tests.factories.utils.get_messages import get_messages_from_response
 from base.views.learning_achievement import management, create, create_first
 from cms.tests.factories.text_label import TextLabelFactory
 from learning_unit.tests.factories.central_manager import CentralManagerFactory
+from learning_unit.tests.factories.faculty_manager import FacultyManagerFactory
 from reference.models.language import FR_CODE_LANGUAGE
 from reference.tests.factories.language import FrenchLanguageFactory, EnglishLanguageFactory
 
@@ -166,7 +166,8 @@ class TestLearningAchievementView(TestCase):
             create_first(request, learning_unit_year_id=self.learning_unit_year.id)
 
     def test_check_achievement_code(self):
-        self.user.user_permissions.add(Permission.objects.get(codename="can_access_learningunit"))
+        manager = FacultyManagerFactory(entity=self.learning_unit_year.learning_container_year.requirement_entity)
+        self.client.force_login(user=manager.person.user)
         url = reverse('achievement_check_code', args=[self.learning_unit_year.id])
         response = self.client.get(url, data={'code': self.achievement_fr.code_name})
         self.assertEqual(type(response), JsonResponse)
