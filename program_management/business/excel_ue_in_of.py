@@ -341,7 +341,7 @@ def _get_optional_data(data: List, luy: DddLearningUnitYear, optional_data_neede
         data.append(link.relative_credits or '-')
         data.append(luy.credits.to_integral_value() or '-')
     if optional_data_needed['has_periodicity']:
-        data.append(dict(PeriodicityEnum)[luy.periodicity] if luy.periodicity else '')
+        data.append(PeriodicityEnum[luy.periodicity.name].value if luy.periodicity else '')
     if optional_data_needed['has_active']:
         data.append(str.strip(yesno(luy.status)))
     if optional_data_needed['has_quadrimester']:
