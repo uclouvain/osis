@@ -167,6 +167,7 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
                 'parent': self._get_parent_node_str(),
         }
 
+    #  TODO use groupYear property
     def get_confirmation_msg(self):
         return _("Are you sure you want to detach %(child)s ?") % {"child": self._get_child_node_str()}
 
