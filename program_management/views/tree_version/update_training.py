@@ -262,8 +262,9 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
             "english_activities": training_obj.english_activities.value if training_obj.english_activities else None,
             "other_language_activities": training_obj.other_language_activities.value
             if training_obj.other_language_activities else None,
-
-            "main_domain": "{} - {}".format(training_obj.main_domain.decree_name, training_obj.main_domain.code)
+            "main_domain": "{} - {} {}".format(training_obj.main_domain.decree_name,
+                                               training_obj.main_domain.code,
+                                               training_obj.main_domain.name)
             if training_obj.main_domain else None,
             "secondary_domains": ", ".join(str(dom) for dom in (training_obj.secondary_domains or [])),
             "isced_domain": str(training_obj.isced_domain) if training_obj.isced_domain else None,
@@ -276,7 +277,8 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
             "academic_year": training_obj.academic_year,
             "start_year": display_as_academic_year(group_obj.start_year),
             "teaching_campus": group_obj.teaching_campus.name,
-            "enrollment_campus": training_obj.enrollment_campus.name,
+            "enrollment_campus": "{} - {}".format(training_obj.enrollment_campus.name,
+                                                  training_obj.enrollment_campus.university_name),
             "other_campus_activities": training_obj.other_campus_activities.value
             if training_obj.other_campus_activities else None,
 
