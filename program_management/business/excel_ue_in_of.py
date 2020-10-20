@@ -28,13 +28,15 @@ import re
 from collections import namedtuple, defaultdict
 
 from django.conf import settings
-from django.db.models import QuerySet, Subquery, OuterRef, Case, When
-from django.db.models.expressions import RawSQL
+from django.contrib.contenttypes.models import ContentType
+from django.db.models import QuerySet, Subquery, OuterRef, Case, When, Q, CharField, F, Value
+from django.db.models.functions import Cast, Concat, Upper
 from django.template.defaultfilters import yesno
 from django.utils.translation import gettext as _
 from openpyxl import Workbook
 from openpyxl.styles import Style, Font
 from openpyxl.writer.excel import save_virtual_workbook
+from reversion.models import Version
 
 from attribution.business import attribution_charge_new
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY, CMS_LABEL_PEDAGOGY_FR_AND_EN, CMS_LABEL_SPECIFICATIONS, \
@@ -139,38 +141,6 @@ FixLineUEContained = namedtuple('FixLineUEContained', ['acronym', 'year', 'title
 
 LEGEND_WB_STYLE = 'colored_cells'
 LEGEND_WB_CONTENT = 'content'
-
-RAW_SQL_TO_GET_LAST_UPDATE_FICHE_DESCRIPTIVE = """
-    WITH last_update_info AS (
-        SELECT upper(person.last_name) || ' ' || person.first_name as author, revision.date_created AS last_update
-        FROM reversion_version version
-        JOIN reversion_revision revision ON version.revision_id = revision.id
-        JOIN auth_user users ON revision.user_id = users.id
-        JOIN base_person person ON person.user_id = users.id
-        join django_content_type ct on version.content_type_id = ct.id
-        left join cms_translatedtext tt on cast(version.object_id as integer) = tt.id and ct.model = 'translatedtext'
-        left join cms_textlabel tl on tt.text_label_id = tl.id
-        left join base_teachingmaterial tm on cast(version.object_id as integer) = tm.id and ct.model = 'teachingmaterial'
-        join base_learningunityear luy on luy.id = tm.learning_unit_year_id or luy.id = tt.reference
-        where "base_groupelementyear"."child_leaf_id" = luy.id
-        and tl.label in {labels_to_check} and ct.model in ({models_to_check})
-        order by revision.date_created desc limit 1
-    )
-"""
-
-LAST_UPDATE_FICHE_DESCRIPTIVE = RAW_SQL_TO_GET_LAST_UPDATE_FICHE_DESCRIPTIVE.format(
-    labels_to_check=repr(tuple(map(str, CMS_LABEL_PEDAGOGY))),
-    models_to_check=','.join(["'translatedtext'", "'teachingmaterial'"])
-) + """
-    SELECT {field_to_select} FROM last_update_info
-"""
-
-LAST_UPDATE_FORCE_MAJEURE = RAW_SQL_TO_GET_LAST_UPDATE_FICHE_DESCRIPTIVE.format(
-    labels_to_check=repr(tuple(map(str, CMS_LABEL_PEDAGOGY_FORCE_MAJEURE))),
-    models_to_check=','.join(["'translatedtext'"])
-) + """
-SELECT {field_to_select} FROM last_update_info
-"""
 
 
 class EducationGroupYearLearningUnitsContainedToExcel:
@@ -418,26 +388,59 @@ def _annotate_with_description_fiche_specifications(
     if description_fiche or force_majeure:
         annotations = build_annotations(sq, CMS_LABEL_PEDAGOGY, CMS_LABEL_PEDAGOGY_FR_AND_EN)
         group_element_years = group_element_years.annotate(**annotations)
-        group_element_years = group_element_years.annotate(
-            last_update_by=RawSQL(LAST_UPDATE_FICHE_DESCRIPTIVE.format(field_to_select='author'), ()),
-            last_update_date=RawSQL(LAST_UPDATE_FICHE_DESCRIPTIVE.format(field_to_select='last_update'), ())
-        )
+        last_updated_annotations = _annotate_with_last_updated_informations()
+        group_element_years = group_element_years.annotate(**last_updated_annotations)
 
         if force_majeure:
             annotations = build_annotations(sq, CMS_LABEL_PEDAGOGY_FORCE_MAJEURE, CMS_LABEL_PEDAGOGY_FORCE_MAJEURE)
             group_element_years = group_element_years.annotate(**annotations)
-            group_element_years = group_element_years.annotate(
-                last_update_by_force_majeure=RawSQL(LAST_UPDATE_FORCE_MAJEURE.format(field_to_select='author'), ()),
-                last_update_date_force_majeure=RawSQL(
-                    LAST_UPDATE_FORCE_MAJEURE.format(field_to_select='last_update'), ()
-                )
-            )
+            last_updated_annotations = _annotate_with_last_updated_informations(force_majeure=True)
+            group_element_years = group_element_years.annotate(**last_updated_annotations)
 
     if specifications:
         annotations = build_annotations(sq, CMS_LABEL_SPECIFICATIONS, CMS_LABEL_SPECIFICATIONS)
         group_element_years = group_element_years.annotate(**annotations)
-
+    print(group_element_years)
+    print(group_element_years[0])
     return group_element_years
+
+
+def _annotate_with_last_updated_informations(force_majeure: bool = False):
+    translated_texts = TranslatedText.objects.filter(
+        reference=OuterRef(OuterRef('child_leaf__pk')),
+        entity=LEARNING_UNIT_YEAR,
+        text_label__label__in=CMS_LABEL_PEDAGOGY_FORCE_MAJEURE if force_majeure else CMS_LABEL_PEDAGOGY
+    )
+    if force_majeure:
+        version_filter = Q(
+            content_type=ContentType.objects.get_for_model(TranslatedText),
+            object_id__in=Cast(Subquery(translated_texts.values('pk')), output_field=CharField())
+        )
+    else:
+        teaching_materials = TeachingMaterial.objects.filter(
+            learning_unit_year_id=OuterRef(OuterRef('child_leaf__pk'))
+        ).order_by('order')
+        version_filter = Q(
+            content_type=ContentType.objects.get_for_model(TranslatedText),
+            object_id__in=Cast(Subquery(translated_texts.values('pk')), output_field=CharField())
+        ) | Q(
+            content_type=ContentType.objects.get_for_model(TeachingMaterial),
+            object_id__in=Cast(Subquery(teaching_materials.values('pk')), output_field=CharField())
+        )
+    versions_qs = Version.objects.filter(version_filter).select_related(
+        "revision",
+        "revision__user__person"
+    ).annotate(
+        author=Concat(
+            Upper(F('revision__user__person__last_name')), Value(' '), F('revision__user__person__first_name'),
+            output_field=CharField()
+        )
+    ).order_by("-revision__date_created")
+    field_suffix = '_force_majeure' if force_majeure else ''
+    return {
+        'last_update_by' + field_suffix: Subquery(versions_qs.values('author')[:1], output_field=CharField()),
+        'last_update_date' + field_suffix: Subquery(versions_qs.values('revision__date_created')[:1])
+    }
 
 
 def _build_validate_html_list_to_string(value_param, method):
