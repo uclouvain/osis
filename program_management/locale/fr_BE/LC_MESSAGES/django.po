@@ -949,7 +949,6 @@ msgstr ""
 "Vous ne pouvez pas supprimer la formation standard '{code}' en {year} parce "
 "qu'il existe une version particiulière durant cette année."
 
-#, python-format
 msgid ""
 "You cannot add \"%(child)s\" to \"%(parent)s\" of type \"%(parent_type)s\""
 msgstr ""
