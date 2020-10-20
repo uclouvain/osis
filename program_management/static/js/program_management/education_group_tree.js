@@ -1,14 +1,14 @@
 const PANEL_TREE_MIN_WIDTH = 300;
 const PANEL_TREE_MAX_WIDTH = 1000;
 const PANEL_TREE_MAIN_MIN_WIDTH = 600;
-
+const PANEL_TREE_ID = '#panel_file_tree';
 
 $(document).ready(function () {
     setListenerForCopyElements();
     setListenerForCutElements();
     setListnerForClearClipboard();
 
-    let $documentTree = $('#panel_file_tree');
+    let $documentTree = $(PANEL_TREE_ID);
     if ($documentTree.length) {
         const copy_element_url = $documentTree.attr("data-copyUrl");
         const cut_element_url = $documentTree.attr("data-cutUrl");
@@ -125,7 +125,7 @@ $("#scrollableDiv").on("scroll", function() {
 });
 
 function getTreeRootId() {
-    return $('#panel_file_tree').attr('data-rootId');
+    return $(PANEL_TREE_ID).attr('data-rootId');
 }
 
 function saveScrollPosition() {
@@ -208,15 +208,59 @@ function clearClipboardListener(event) {
     });
 }
 
+function getStoreKeyTreeData() {
+    const treeRootId = getTreeRootId();
+    return `progrem_tree_data_${treeRootId}`;
+}
+
+function getTreeDataUrl() {
+    return $(PANEL_TREE_ID).attr('data-jsonUrl');
+}
+
+function fetchTreeData(){
+    const tree_json_url = getTreeDataUrl();
+    $.ajax({
+       url: tree_json_url,
+       success: function(treeData){
+           cacheTreeData(treeData);
+           restoreTreeDataFromCache();
+       },
+       dataType: 'json',
+       global: false  // Prevent display spinner
+    });
+}
+
+function cacheTreeData(treeData) {
+    const key = getStoreKeyTreeData();
+    localStorage.setItem(key, JSON.stringify(treeData));
+}
+
+function hasTreeCacheData() {
+    const key = getStoreKeyTreeData();
+    return localStorage.getItem(key) !== null;
+}
+
+function getTreeCacheData() {
+    if (hasTreeCacheData()) {
+        const key = getStoreKeyTreeData();
+        return JSON.parse(localStorage.getItem(key));
+    }
+    return [];
+}
+
+function restoreTreeDataFromCache() {
+    const $documentTree = $(PANEL_TREE_ID);
+    $documentTree.jstree(true).settings.core.data = getTreeCacheData();
+    $documentTree.jstree(true).refresh(skip_loading=true);
+}
+
 
 function initializeJsTree($documentTree, tree_json_url, cut_element_url, copy_element_url) {
-    $documentTree.bind("state_ready.jstree", function (event, data) {
-        // Bind the redirection only when the tree is ready,
-        // however, it reload the page during the loading
-        $documentTree.bind("select_node.jstree", function (event, data) {
-            document.location.href = data.node.a_attr.href;
-        });
+    $documentTree.bind("activate_node.jstree", function (event, data) {
+        document.location.href = data.node.a_attr.href;
+    });
 
+    $documentTree.bind("state_ready.jstree", function (event, data) {
         scrollToPositionSaved();
 
         // if the tree has never been loaded, execute close_all by default.
@@ -233,15 +277,12 @@ function initializeJsTree($documentTree, tree_json_url, cut_element_url, copy_el
 
     $documentTree.jstree({
             "core": {
+                "animation": 0,
                 "check_callback": true,
                 "data": function(obj, callback) {
-                    $.ajax({
-                       url: tree_json_url,
-                       success: callback,
-                       dataType: 'json',
-                       global: false  // Prevent display spinner
-                    });
-                },
+                    const treeCachedData = getTreeCacheData();
+                    callback(treeCachedData);
+                }
             },
             "plugins": [
                 "contextmenu",
@@ -400,6 +441,7 @@ function initializeJsTree($documentTree, tree_json_url, cut_element_url, copy_el
             }
         }
     );
+    fetchTreeData();
 }
 
 
