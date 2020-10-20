@@ -25,13 +25,17 @@ from django.db import transaction
 
 from program_management.ddd import command
 from program_management.ddd.business_types import *
+from program_management.ddd.domain import node
+from program_management.ddd.domain.exception import ProgramTreeNotFoundException
 from program_management.ddd.domain.program_tree import PATH_SEPARATOR, ProgramTreeIdentity
 from program_management.ddd.repositories import load_tree, program_tree, \
-    program_tree_version
+    program_tree_version, node as node_repository
 
 
 @transaction.atomic()
 def paste_element(paste_command: command.PasteElementCommand) -> 'LinkIdentity':
+    node_identity = node.NodeIdentity(code=paste_command.node_to_paste_code, year=paste_command.node_to_paste_year)
+
     path_to_detach = paste_command.path_where_to_detach
 
     # FIXME should take tree only from parent code and parent year and not from path
@@ -43,9 +47,13 @@ def paste_element(paste_command: command.PasteElementCommand) -> 'LinkIdentity':
         root_id = int(paste_command.path_where_to_paste.split("|")[0])
         tree = load_tree.load(root_id)
 
-    node_to_attach = program_tree.ProgramTreeRepository.get(
-        ProgramTreeIdentity(code=paste_command.node_to_paste_code, year=paste_command.node_to_paste_year)
-    ).root_node
+    #  Search program tree if possible to fetch also children of node to paste
+    try:
+        node_to_attach = program_tree.ProgramTreeRepository.get(
+            ProgramTreeIdentity(code=paste_command.node_to_paste_code, year=paste_command.node_to_paste_year)
+        ).root_node
+    except ProgramTreeNotFoundException:
+        node_to_attach = node_repository.NodeRepository.get(node_identity)
 
     link_created = tree.paste_node(
         node_to_attach,

@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import functools
+import sys
 from collections import Counter
 from typing import List, Set, Optional
 
@@ -109,7 +110,7 @@ def get_node_types_that_are_full(
     result = set()
     for node_type, count in node_type_counter.items():
         max_count_authorized = authorized_relationships.get_authorized_relationship(parent_node.node_type, node_type)
-        if count > max_count_authorized.max_count_authorized:
+        if count > (max_count_authorized.max_count_authorized or sys.maxsize):
             result.add(node_type)
     return result
 
@@ -165,7 +166,7 @@ class PasteAuthorizedRelationshipValidator(business_validator.BusinessValidator)
         counter = Counter(parent_node.get_children_types(include_nodes_used_as_reference=True))
         current_count = counter[child_node.node_type]
         relation = self.auth_relations.get_authorized_relationship(parent_node.node_type, child_node.node_type)
-        return current_count >= relation.max_count_authorized
+        return current_count >= (relation.max_count_authorized or sys.maxsize)
 
 
 class AuthorizedRelationshipLearningUnitValidator(business_validator.BusinessValidator):

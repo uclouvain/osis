@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-14 09:11+0200\n"
+"POT-Creation-Date: 2020-10-20 10:55+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -25,18 +25,13 @@ msgid "\"%(child)s\" has been detached from \"%(parent)s\""
 msgstr ""
 
 #, python-format
-msgid "\"%(child)s\" has been successfully updated"
-msgstr ""
-
-#, python-format
 msgid "%(node)s has been moved"
 msgstr ""
 
 #, python-format
 msgid ""
-"%(node_to_add)s [%(node_to_add_version)s] version must be the same as "
-"%(node_to_paste_to)s and all of it's parent's version "
-"[%(version_mismatched)s]"
+"%(node_to_add)s or its children must have the same version as "
+"%(node_to_paste_to)s and all of it's parent's [%(version_mismatched)s]"
 msgstr ""
 
 #, python-format
@@ -864,12 +859,6 @@ msgstr ""
 msgid "You can not add the same child %(child_node)s several times."
 msgstr ""
 
-#, python-format
-msgid ""
-"You can not attach a learning unit like %(node)s to element %(parent)s of "
-"type %(type)s."
-msgstr ""
-
 #, python-brace-format
 msgid ""
 "You can't copy the program tree '{code}' from {from_year} to {to_year} "
@@ -890,8 +879,7 @@ msgstr ""
 
 #, python-format
 msgid ""
-"You cannot add \"%(child)s\" of type \"%(child_types)s\" to \"%(parent)s\" "
-"of type \"%(parent_type)s\""
+"You cannot add \"%(child)s\" to \"%(parent)s\" of type \"%(parent_type)s\""
 msgstr ""
 
 #, python-format

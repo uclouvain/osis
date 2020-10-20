@@ -68,7 +68,9 @@ class PasteNodeForm(LinkForm):
     def handle_save_exception(self, business_exceptions: 'MultipleBusinessExceptions'):
         for e in business_exceptions.exceptions:
             if isinstance(e, exception.ReferenceLinkNotAllowedException) or \
-                    isinstance(e, exception.ReferenceLinkNotAllowedWithLearningUnitException):
+                    isinstance(e, exception.ReferenceLinkNotAllowedWithLearningUnitException) or\
+                    isinstance(e, exception.ChildTypeNotAuthorizedException) or \
+                    isinstance(e, exception.MaximumChildTypesReachedException):
                 self.add_error("link_type", e.message)
             elif isinstance(e, exception.InvalidBlockException):
                 self.add_error("block", e.message)

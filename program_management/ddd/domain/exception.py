@@ -127,11 +127,10 @@ class NodeIsUsedException(Exception):
     pass
 
 
-class ProgramTreeVersionMismatch(BusinessExceptions):
+class ProgramTreeVersionMismatch(BusinessException):
     def __init__(
             self,
             node_to_add: 'Node',
-            child_version_identity: 'ProgramTreeVersionIdentity',
             node_to_paste_to: 'Node',
             parents_version_mismatched_identity: List['ProgramTreeVersionIdentity'],
             *args,
@@ -140,15 +139,14 @@ class ProgramTreeVersionMismatch(BusinessExceptions):
         parents_version_names = {
             self._get_version_name(version_identity) for version_identity in parents_version_mismatched_identity
         }
-        messages = [_(
-            "%(node_to_add)s version must be the same as %(node_to_paste_to)s "
-            "and all of it's parent's version [%(version_mismatched)s]"
+        messages = _(
+            "%(node_to_add)s or its children must have the same version as %(node_to_paste_to)s "
+            "and all of it's parent's [%(version_mismatched)s]"
         ) % {
             'node_to_add': str(node_to_add),
-            'node_to_add_version': self._get_version_name(child_version_identity),
             'node_to_paste_to': str(node_to_paste_to),
             'version_mismatched': ",".join(parents_version_names)
-        }]
+        }
         super().__init__(messages, **kwargs)
 
     def _get_version_name(self, version_identity: 'ProgramTreeVersionIdentity'):
