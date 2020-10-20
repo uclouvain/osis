@@ -36,15 +36,15 @@ from base.models.enums import education_group_types
 from base.models.enums.education_group_types import EducationGroupTypesEnum
 from base.models.enums.link_type import LinkTypes
 from program_management.ddd.business_types import *
-from program_management.ddd.domain.exception import ReferenceLinkNotAllowedException, ChildTypeNotAuthorizedException, \
+from program_management.ddd.domain.exception import ChildTypeNotAuthorizedException, \
     MaximumChildTypesReachedException
 
 
 class UpdateLinkAuthorizedRelationshipValidator(business_validator.BusinessValidator):
-    def __init__(self, tree: 'ProgramTree', node_to_add: 'Node', link_type: Optional[LinkTypes]):
+    def __init__(self, tree: 'ProgramTree', node_to_update_link_with: 'Node', link_type: Optional[LinkTypes]):
         self.tree = tree
         self.parent_node = tree.root_node
-        self.node_to_add = node_to_add
+        self.node_to_update_link_with = node_to_update_link_with
         self.link_type = link_type
 
         super().__init__()
@@ -60,14 +60,14 @@ class UpdateLinkAuthorizedRelationshipValidator(business_validator.BusinessValid
         if self.get_children_node_types_that_surpass_maximum_allowed():
             raise MaximumChildTypesReachedException(
                 self.parent_node,
-                self.node_to_add,
+                self.node_to_update_link_with,
                 self.get_children_node_types_that_surpass_maximum_allowed()
             )
 
     @property
     def children_nodes(self) -> List['Node']:
-        return [self.node_to_add] if not self.is_link_type_reference() \
-            else self.node_to_add.children_as_nodes_with_respect_to_reference_link
+        return [self.node_to_update_link_with] if not self.is_link_type_reference() \
+            else self.node_to_update_link_with.children_as_nodes_with_respect_to_reference_link
 
     @functools.lru_cache()
     def get_children_node_types_that_surpass_maximum_allowed(self) -> Set[EducationGroupTypesEnum]:
@@ -84,7 +84,7 @@ class UpdateLinkAuthorizedRelationshipValidator(business_validator.BusinessValid
 
     def _is_child_a_minor_major_or_option_inside_a_list_minor_major_option_choice_parent(self):
         return self.parent_node.node_type in education_group_types.GroupType.minor_major_list_choice_enums() and \
-               self.node_to_add.node_type in education_group_types.MiniTrainingType
+               self.node_to_update_link_with.node_type in education_group_types.MiniTrainingType
 
     @functools.lru_cache()
     def get_not_authorized_children_nodes(self) -> Set['Node']:
@@ -126,7 +126,8 @@ class PasteAuthorizedRelationshipValidator(business_validator.BusinessValidator)
             else self.node_to_paste.children_as_nodes_with_respect_to_reference_link
 
     def validate(self):
-        if self.parent.is_minor_major_option_list_choice() and not self.node_to_paste.is_minor_major_option_list_choice():
+        if self.parent.is_minor_major_option_list_choice() and\
+                not self.node_to_paste.is_minor_major_option_list_choice():
             return
         if self.are_types_not_authorized():
             raise ChildTypeNotAuthorizedException(self.parent, self._get_not_authorized_children())

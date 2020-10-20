@@ -75,10 +75,13 @@ class Link(interface.Entity):
         return self._has_changed
 
     def __str__(self):
-        return "{parent.code} ({parent.academic_year}) - {child.code} ({child.academic_year})".format(
-            parent=self.parent,
-            child=self.child
-        )
+        return self.__format_node(self.parent) + " - " + self.__format_node(self.child)
+
+    def __format_node(self, node: 'Node') -> str:
+        node_str = "{node.code} ({node.academic_year})"
+        if node.is_group_or_mini_or_training() and node.version_name:
+            node_str = "{node.code}[{node.version_name}] ({node.academic_year})"
+        return node_str.format(node=node)
 
     def __eq__(self, other):
         if isinstance(other, Link):

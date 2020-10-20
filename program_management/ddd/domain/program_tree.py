@@ -386,7 +386,8 @@ class ProgramTree(interface.RootEntity):
         """
         path_to_paste_to = paste_command.path_where_to_paste
         node_to_paste_to = self.get_node(path_to_paste_to)
-        if node_to_paste_to.is_minor_major_option_list_choice() and not node_to_paste.is_minor_major_option_list_choice():
+        if node_to_paste_to.is_minor_major_option_list_choice() and\
+                not node_to_paste.is_minor_major_option_list_choice():
             link_type = LinkTypes.REFERENCE
         else:
             link_type = LinkTypes[paste_command.link_type] if paste_command.link_type else None
