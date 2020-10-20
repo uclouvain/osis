@@ -36,20 +36,18 @@ from base.business.learning_unit_xls import CREATION_COLOR, MODIFICATION_COLOR, 
 from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import GroupType, TrainingType
 from base.models.enums.learning_unit_year_subtypes import FULL
-from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
+from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES, PeriodicityEnum
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.learning_achievement import LearningAchievementFactory
 from learning_unit.tests.ddd.factories.achievement import AchievementFactory
 from learning_unit.tests.ddd.factories.description_fiche import DescriptionFicheFactory
 from learning_unit.tests.ddd.factories.entities import EntitiesFactory
 from learning_unit.tests.ddd.factories.learning_unit_year import LearningUnitYearFactory as DddLearningUnitYearFactory
 from learning_unit.tests.ddd.factories.proposal import ProposalFactory
 from learning_unit.tests.ddd.factories.specifications import SpecificationsFactory
-from learning_unit.tests.ddd.factories.teaching_material import TeachingMaterialFactory as DddTeachingMaterialFactory
 from program_management.business.excel_ue_in_of import DIRECT_GATHERING_KEY, MAIN_GATHERING_KEY, EXCLUDE_UE_KEY
 from program_management.business.excel_ue_in_of import FIX_TITLES, \
     _get_headers, optional_header_for_proposition, optional_header_for_credits, optional_header_for_volume, \
@@ -58,8 +56,8 @@ from program_management.business.excel_ue_in_of import FIX_TITLES, \
     optional_header_for_language, optional_header_for_periodicity, optional_header_for_quadrimester, \
     optional_header_for_session_derogation, optional_header_for_specifications, optional_header_for_teacher_list, \
     _fix_data, _get_workbook_for_custom_xls, _build_legend_sheet, LEGEND_WB_CONTENT, LEGEND_WB_STYLE, _optional_data, \
-    _build_excel_lines_ues, _get_optional_data, BOLD_FONT, _build_specifications_cols, _build_description_fiche_cols, \
-    _build_validate_html_list_to_string, _build_direct_gathering_label, _build_main_gathering_label, \
+    _build_excel_lines_ues, _get_optional_data, BOLD_FONT, _build_validate_html_list_to_string, \
+    _build_direct_gathering_label, _build_main_gathering_label, \
     get_explore_parents, _get_xls_title
 from program_management.business.utils import html2text
 from program_management.forms.custom_xls import CustomXlsForm
@@ -70,7 +68,7 @@ from program_management.tests.factories.element import ElementGroupYearFactory, 
 from program_management.tests.ddd.factories.program_tree_version import StandardProgramTreeVersionFactory, \
     ProgramTreeVersionFactory
 from program_management.ddd.business_types import *
-from reference.tests.factories.language import FrenchLanguageFactory, EnglishLanguageFactory
+from base.models.enums.learning_unit_year_subtypes import LEARNING_UNIT_YEAR_SUBTYPES
 
 PARTIAL_ACRONYM = 'Partial'
 
@@ -80,11 +78,8 @@ CMS_TXT_WITH_LIST = '<ol> ' \
                     '<li>La structure atomique de la mati&egrave;re</li> ' \
                     '<li>Les diff&eacute;rentes structures mol&eacute;culaires</li> ' \
                     '</ol>'
-CMS_TXT_WITH_LIST_AFTER_FORMATTING = 'La structure atomique de la matière\n' \
-                                     'Les différentes structures moléculaires'
 
 CMS_TXT_WITH_LINK = '<a href="https://moodleucl.uclouvain.be">moodle</a>'
-CMS_TXT_WITH_LINK_AFTER_FORMATTING = 'moodle - [https://moodleucl.uclouvain.be] \n'
 
 
 class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
@@ -166,7 +161,12 @@ class TestContent(TestCase):
         cls.teacher_2 = TeacherFactory(last_name='Marseillais', first_name="Pol", email="pm@gmail.com")
 
         cls.attribution_2 = Attribution(teacher=cls.teacher_2)
+        cls.achievement_1 = AchievementFactory(code_name="A1", text_fr="Text fr", text_en="Text en", entity_id="1")
+        cls.achievement_2 = AchievementFactory(code_name="A2", text_fr="Text fr", text_en=None, entity_id="1")
+        cls.achievement_3 = AchievementFactory(code_name="A3", text_fr=None, text_en="    ", entity_id="2")
+        cls.achievement_4 = AchievementFactory(code_name=None, text_fr=None, text_en="    ", entity_id="2")
 
+        specifications = initialize_cms_specifications_data_description_fiche()
         cls.luy = DddLearningUnitYearFactory(
             acronym=cls.lu.code,
             year=cls.lu.year,
@@ -180,7 +180,11 @@ class TestContent(TestCase):
             credits=cls.lu.credits,
             status=True,
             attributions=[cls.attribution_1, cls.attribution_2],
+            achievements=[cls.achievement_1, cls.achievement_2, cls.achievement_3, cls.achievement_4],
+            specifications=specifications
         )
+        tree = ProgramTreeFactory(root_node=cls.parent_node)
+        cls.tree_version = StandardProgramTreeVersionFactory(tree=tree)
 
     def test_fix_data(self):
         expected = get_expected_data_new(self.child_node, self.luy, self.link_1_1, self.link_1.parent)
@@ -190,7 +194,8 @@ class TestContent(TestCase):
                             DIRECT_GATHERING_KEY: self.child_node,
                             MAIN_GATHERING_KEY: self.parent_node,
                             EXCLUDE_UE_KEY: False
-                        })
+                        },
+                        [self.tree_version])
         self.assertEqual(res, expected)
 
     def test_no_main_parent_result(self):
@@ -218,6 +223,10 @@ class TestContent(TestCase):
                          group_level_1)
 
     def test_main_parent_complementary(self):
+        # - root_node (code =code 1)
+        #   |- group_level_1 (COMPLEMENTARY_MODULE) (code =code 2)
+        #      | - group_level_2 (MAJOR_LIST_CHOICE) (code =code 3)
+        #          | - ue_level_3 (code =code 4)
         root_node = NodeGroupYearFactory(category=Categories.TRAINING, node_id=1, code="code 1")
         group_level_1 = NodeGroupYearFactory(node_type=GroupType.COMPLEMENTARY_MODULE, node_id=2, code="code 2")
         LinkFactory(parent=root_node, child=group_level_1)
@@ -338,8 +347,10 @@ class TestContent(TestCase):
     def test_get_optional_has_periodicity(self):
         optional_data = initialize_optional_data()
         optional_data['has_periodicity'] = True
+        print(type(self.luy.periodicity))
+        # data.append(PeriodicityEnum[luy.periodicity.name].value if luy.periodicity else '')
         self.assertCountEqual(_get_optional_data([], self.luy, optional_data, self.link_1_1),
-                              [dict(PERIODICITY_TYPES)[self.luy.periodicity]])
+                              [PeriodicityEnum[self.luy.periodicity.name].value if self.luy.periodicity else ''])
 
     def test_get_optional_has_active(self):
         optional_data = initialize_optional_data()
@@ -394,66 +405,11 @@ class TestContent(TestCase):
                          .format(self.teacher_1.email,
                                  self.teacher_2.email))
 
-    def test_build_description_fiche_cols(self):
-        teaching_material_1 = DddTeachingMaterialFactory(title='Title mandatory', is_mandatory=True)
-        teaching_material_2 = DddTeachingMaterialFactory(title='Title non-mandatory', is_mandatory=False)
-
-        ue_description_fiche = _initialize_cms_data_description_fiche()
-
-        description_fiche = _build_description_fiche_cols(ue_description_fiche,
-                                                          [teaching_material_1, teaching_material_2])
-
-        self.assertEqual(description_fiche.resume, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING))
-        self.assertEqual(description_fiche.resume_en, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING))
-        self.assertEqual(description_fiche.teaching_methods, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING))
-        self.assertEqual(description_fiche.teaching_methods_en, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING))
-        self.assertEqual(description_fiche.evaluation_methods, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING))
-        self.assertEqual(description_fiche.evaluation_methods_en, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING))
-        self.assertEqual(description_fiche.other_informations, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING))
-        self.assertEqual(description_fiche.other_informations_en, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING))
-        self.assertEqual(description_fiche.mobility, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING))
-        self.assertEqual(description_fiche.bibliography, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING))
-
-        self.assertEqual(description_fiche.online_resources, "{}".format(CMS_TXT_WITH_LINK_AFTER_FORMATTING))
-        self.assertEqual(description_fiche.online_resources_en, "{}".format(CMS_TXT_WITH_LINK_AFTER_FORMATTING))
-
-        self.assertEqual(description_fiche.teaching_materials,
-                         "{} - {}\n{} - {}".format(_('Mandatory'),
-                                                   teaching_material_1.title,
-                                                   _('Non-mandatory'),
-                                                   teaching_material_2.title))
-
-    def test_build_specifications_cols(self):
-        achievement_1 = AchievementFactory(code_name="A1", text_fr="Text fr", text_en="Text en")
-        achievement_2 = AchievementFactory(code_name="A2", text_fr="Text fr", text_en=None)
-        achievement_3 = AchievementFactory(code_name="A3", text_fr=None, text_en="    ")
-        achievement_4 = AchievementFactory(code_name=None, text_fr=None, text_en="    ")
-
-        specifications = initialize_cms_specifications_data_description_fiche()
-        specifications_data = _build_specifications_cols([achievement_1, achievement_2, achievement_3, achievement_4],
-                                                         specifications)
-
-        self.assertEqual(specifications_data.prerequisite, CMS_TXT_WITH_LIST_AFTER_FORMATTING)
-        self.assertEqual(specifications_data.prerequisite_en, CMS_TXT_WITH_LIST_AFTER_FORMATTING)
-        self.assertEqual(specifications_data.themes_discussed, CMS_TXT_WITH_LIST_AFTER_FORMATTING)
-        self.assertEqual(specifications_data.themes_discussed_en, CMS_TXT_WITH_LIST_AFTER_FORMATTING)
-        self.assertEqual(specifications_data.achievements_fr, "{} -{}\n{} -{}".format(
-            achievement_1.code_name, achievement_1.text_fr,
-            achievement_2.code_name, achievement_2.text_fr)
-                         )
-        self.assertEqual(specifications_data.achievements_en, "{} -{}".format(
-            achievement_1.code_name, achievement_1.text_en)
-                         )
-
     def test_build_validate_html_list_to_string(self):
-        self.assertEqual(_build_validate_html_list_to_string(None, html2text), "")
-
-    def test_build_validate_html_list_to_string_illegal_character(self):
-        self.assertEqual(_build_validate_html_list_to_string("", html2text),
-                         "!!! {}".format(_('IMPOSSIBLE TO DISPLAY BECAUSE OF AN ILLEGAL CHARACTER IN STRING')))
+        self.assertEqual(_build_validate_html_list_to_string(None), "")
 
     def test_build_validate_html_list_to_string_wrong_method(self):
-        self.assertEqual(_build_validate_html_list_to_string('Test', None), 'Test')
+        self.assertEqual(_build_validate_html_list_to_string('Test'), 'Test')
 
     def test_html_list_to_string(self):
         ch = '''<head></head>
@@ -483,12 +439,14 @@ class TestContent(TestCase):
     def test_build_main_gathering_label_finality_master(self):
         edg_finality = NodeGroupYearFactory(node_type=TrainingType.MASTER_MS_120,
                                             offer_partial_title_fr='partial_title')
-        self.assertEqual(_build_main_gathering_label(edg_finality),
+        tree_version = StandardProgramTreeVersionFactory(tree=ProgramTreeFactory(root_node=edg_finality))
+        self.assertEqual(_build_main_gathering_label(edg_finality, [tree_version]),
                          "{} - {}".format(edg_finality.title, edg_finality.offer_partial_title_fr))
 
     def test_build_main_gathering_label_not_master(self):
         node_not_finality = NodeGroupYearFactory(node_type=GroupType.COMMON_CORE)
-        self.assertEqual(_build_main_gathering_label(node_not_finality),
+        tree_version = StandardProgramTreeVersionFactory(tree=ProgramTreeFactory(root_node=node_not_finality))
+        self.assertEqual(_build_main_gathering_label(node_not_finality, [tree_version]),
                          "{} - {}".format(node_not_finality.title, node_not_finality.group_title_fr))
 
 
@@ -551,7 +509,7 @@ def get_expected_data_new(child_node, luy, link, main_gathering=None):
                 u"%s-%s" % (luy.year, str(luy.year + 1)[-2:]),
                 luy.full_title_fr,
                 luy.type.value if luy.type else '',
-                luy.subtype if luy.subtype else '',
+                dict(LEARNING_UNIT_YEAR_SUBTYPES)[luy.subtype] if luy.subtype else '',
                 gathering_str,
                 main_gathering_str,
                 link.block or '',
@@ -564,6 +522,17 @@ class TestXlsContent(TestCase):
 
     @classmethod
     def setUpTestData(cls):
+        # - root_node (PGRM_MASTER_120) (code =C1)
+        #   |- group_level_1 (code =C2)
+        #      | - group_level_1_1 (code =C3)
+        #          | - ue1 (UE1)
+        #          | - ue2 (UE2)
+        #   | - group_level_2 (MASTER_MS_120) (code =C4)
+        #       | - group_level_2_1 (COMMON_CORE) (code =C5)
+        #           | - ue3 (UE3)
+        #       | - group_level_2_2 (OPTION_LIST_CHOICE)(code =C6)
+        #           | - ue4 (UE4)
+
         cls.root_node = NodeGroupYearFactory(node_id=1, code='C1', node_type=TrainingType.PGRM_MASTER_120)
         cls.academic_year = AcademicYearFactory(year=cls.root_node.year)
         cls.group_level_1 = NodeGroupYearFactory(node_id=2, code='C2', year=cls.academic_year.year)
@@ -574,56 +543,58 @@ class TestXlsContent(TestCase):
         LinkFactory(parent=cls.group_level_1,
                     child=cls.group_level_1_1)
 
-        cls.ue_level_group_level_1_1 = NodeLearningUnitYearFactory(node_id=4, code='UE1', year=cls.academic_year.year)
+        cls.ue1 = NodeLearningUnitYearFactory(node_id=4, code='UE1', year=cls.academic_year.year)
         LinkFactory(parent=cls.group_level_1_1,
-                    child=cls.ue_level_group_level_1_1)
-        second_ue_level_group_level_1_1 = NodeLearningUnitYearFactory(node_id=5,
-                                                                      code='UE2',
-                                                                      year=cls.academic_year.year)
+                    child=cls.ue1)
+        ue_2 = NodeLearningUnitYearFactory(node_id=5, code='UE2', year=cls.academic_year.year)
         LinkFactory(parent=cls.group_level_1_1,
-                    child=second_ue_level_group_level_1_1)
+                    child=ue_2)
 
         cls.group_level_2 = NodeGroupYearFactory(node_id=6,
                                                  node_type=TrainingType.MASTER_MS_120,
-                                                 year=cls.academic_year.year)
+                                                 year=cls.academic_year.year,
+                                                 code='C4')
         LinkFactory(parent=cls.root_node,
                     child=cls.group_level_2)
 
         cls.group_level_2_1 = NodeGroupYearFactory(node_id=7,
                                                    node_type=GroupType.COMMON_CORE,
-                                                   year=cls.academic_year.year)
+                                                   year=cls.academic_year.year,
+                                                   code='C5')
         LinkFactory(parent=cls.group_level_2,
                     child=cls.group_level_2_1)
-        cls.ue_level_group_level_2_1 = NodeLearningUnitYearFactory(node_id=9, code='UE3', year=cls.academic_year.year)
+        cls.ue3 = NodeLearningUnitYearFactory(node_id=9, code='UE3', year=cls.academic_year.year)
         LinkFactory(parent=cls.group_level_2_1,
-                    child=cls.ue_level_group_level_2_1)
+                    child=cls.ue3)
         cls.group_level_2_2 = NodeGroupYearFactory(node_id=8,
                                                    node_type=GroupType.OPTION_LIST_CHOICE,
-                                                   year=cls.academic_year.year)
+                                                   year=cls.academic_year.year,
+                                                   code='C6')
         LinkFactory(parent=cls.group_level_2,
                     child=cls.group_level_2_2)
-        cls.ue_level_group_level_2_2 = NodeLearningUnitYearFactory(node_id=10, year=cls.academic_year.year)
+        cls.ue4 = NodeLearningUnitYearFactory(node_id=10, year=cls.academic_year.year, code='UE4')
         LinkFactory(parent=cls.group_level_2_2,
-                    child=cls.ue_level_group_level_2_2)
+                    child=cls.ue4)
 
         cls.tree = ProgramTreeFactory(root_node=cls.root_node)
 
         # TODO : remplacer ce qui suit pour un accès plus direct
 
-        element_ue_1 = ElementLearningUnitYearFactory(id=cls.ue_level_group_level_1_1.node_id,
+        element_ue_1 = ElementLearningUnitYearFactory(id=cls.ue1.node_id,
                                                       learning_unit_year=LearningUnitYearFactory(
-                                                          acronym='UE1', academic_year=cls.academic_year)
+                                                          acronym=cls.ue1.code, academic_year=cls.academic_year)
                                                       )
-        element_ue_2 = ElementLearningUnitYearFactory(id=second_ue_level_group_level_1_1.node_id,
+        element_ue_2 = ElementLearningUnitYearFactory(id=ue_2.node_id,
                                                       learning_unit_year=LearningUnitYearFactory(
-                                                          acronym='UE2', academic_year=cls.academic_year)
+                                                          acronym=ue_2.code, academic_year=cls.academic_year)
                                                       )
-        element_ue_3 = ElementLearningUnitYearFactory(id=cls.ue_level_group_level_2_1.node_id,
+        element_ue_3 = ElementLearningUnitYearFactory(id=cls.ue3.node_id,
                                                       learning_unit_year=LearningUnitYearFactory(
-                                                          acronym='UE3', academic_year=cls.academic_year)
+                                                          acronym=cls.ue3.code, academic_year=cls.academic_year)
                                                       )
-        ElementLearningUnitYearFactory(id=cls.ue_level_group_level_2_2.node_id,
-                                       learning_unit_year=LearningUnitYearFactory(academic_year=cls.academic_year))
+        ElementLearningUnitYearFactory(id=cls.ue4.node_id,
+                                       learning_unit_year=LearningUnitYearFactory(acronym=cls.ue4.code,
+                                                                                  academic_year=cls.academic_year))
 
         cls.learning_units = [element_ue_1.learning_unit_year, element_ue_2.learning_unit_year,
                               element_ue_3.learning_unit_year]
@@ -717,8 +688,8 @@ class TestXlsContent(TestCase):
         content = data['content']
         del content[0]
         self.assertEqual(len(content), len(ues))
-        self.assertCountEqual([content[0][0], content[1][0],
-                               content[2][0]], ues)
+        self.assertCountEqual([content[0][0], content[1][0], content[2][0]],
+                              ues)
 
 
 def _assert_format_title(tree: 'ProgramTree', tree_version: 'ProgramTreeVersion') -> str:
