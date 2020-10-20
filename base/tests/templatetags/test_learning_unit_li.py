@@ -33,21 +33,18 @@ from django.utils.translation import gettext_lazy as _
 
 from base.models.enums import learning_container_year_types
 from base.models.enums import learning_unit_year_subtypes
-from base.models.enums.groups import CENTRAL_MANAGER_GROUP
 from base.models.enums.proposal_state import ProposalState
 from base.templatetags.learning_unit_li import is_valid_proposal, MSG_IS_NOT_A_PROPOSAL, \
     MSG_PROPOSAL_NOT_ON_CURRENT_LU, DISABLED, li_cancel_proposal, li_edit_proposal, li_consolidate_proposal, \
     li_delete_all_lu
-from base.tests.business.test_perms import create_person_with_permission_and_group
 from base.tests.factories import academic_calendar as acad_calendar_factory
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
+from base.tests.factories.entity import EntityWithVersionFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
-from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
-from base.tests.factories.user import UserFactory
 from learning_unit.tests.factories.central_manager import CentralManagerFactory
 from learning_unit.tests.factories.faculty_manager import FacultyManagerFactory
 
@@ -60,17 +57,8 @@ ID_LINK_EDIT_DATE_LU = "link_edit_date_lu"
 class LearningUnitTagLiEditTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.user = UserFactory()
-        cls.central_manager_person = create_person_with_permission_and_group(
-            CENTRAL_MANAGER_GROUP,
-            'can_edit_learningunit'
-        )
-        cls.central_manager_person.user.user_permissions.add(
-            Permission.objects.get(codename='can_propose_learningunit'),
-            Permission.objects.get(codename='can_edit_learningunit_date'),
-            Permission.objects.get(codename='can_delete_learningunit')
-        )
-        cls.person_entity = PersonEntityFactory(person=cls.central_manager_person)
+        cls.manager = CentralManagerFactory(entity=EntityWithVersionFactory(), with_child=True)
+        cls.person = cls.manager.person
 
         cls.previous_learning_unit = LearningUnitFactory()
         cls.current_academic_year = create_current_academic_year()
@@ -88,14 +76,13 @@ class LearningUnitTagLiEditTest(TestCase):
         acad_calendar_factory.generate_modification_transformation_proposal_calendars(academic_years)
         acad_calendar_factory.generate_learning_unit_edition_calendars(academic_years)
 
+        cls.requirement_entity = cls.manager.entity
+
         cls.lcy = LearningContainerYearFactory(
             academic_year=cls.next_academic_yr,
             container_type=learning_container_year_types.COURSE,
-            requirement_entity=cls.person_entity.entity
+            requirement_entity=cls.requirement_entity
         )
-
-        cls.requirement_entity = cls.person_entity.entity
-
         cls.request = RequestFactory().get("")
 
     def setUp(self):
@@ -115,7 +102,7 @@ class LearningUnitTagLiEditTest(TestCase):
         self.previous_learning_unit_year = LearningUnitYearFactory(
             academic_year=self.previous_academic_year,
             learning_unit=self.learning_unit,
-            learning_container_year__requirement_entity=self.person_entity.entity
+            learning_container_year__requirement_entity=self.manager.entity
         )
         self.previous_luy_2 = LearningUnitYearFactory(
             academic_year=self.previous_academic_year,
@@ -125,7 +112,7 @@ class LearningUnitTagLiEditTest(TestCase):
                                                                  container_type=learning_container_year_types.COURSE)
         )
 
-        self.client.force_login(user=self.central_manager_person.user)
+        self.client.force_login(user=self.person.user)
 
         self.proposal = ProposalLearningUnitFactory(
             learning_unit_year=self.learning_unit_year,
@@ -142,7 +129,7 @@ class LearningUnitTagLiEditTest(TestCase):
         self.context = {
             "learning_unit_year": self.learning_unit_year,
             "request": self.request,
-            "user": self.central_manager_person.user,
+            "user": self.person.user,
             "proposal": self.proposal
         }
 
@@ -248,9 +235,7 @@ class LearningUnitTagLiEditTest(TestCase):
         )
 
     def test_li_consolidate_proposal(self):
-        self.central_manager_person.user.user_permissions \
-            .add(Permission.objects.get(codename="can_consolidate_learningunit_proposal"))
-        self.context['user'] = self.central_manager_person.user
+        self.context['user'] = self.manager.person.user
         self.proposal.state = ProposalState.ACCEPTED.name
         self.proposal.save()
         self.context['proposal'] = self.proposal
@@ -265,8 +250,11 @@ class LearningUnitTagLiEditTest(TestCase):
         a_person = FacultyManagerFactory(entity=self.lcy.requirement_entity).person
         self.context['user'] = a_person.user
 
-        lcy_master = LearningContainerYearFactory(academic_year=self.current_academic_year,
-                                                  container_type=learning_container_year_types.COURSE)
+        lcy_master = LearningContainerYearFactory(
+            academic_year=self.current_academic_year,
+            container_type=learning_container_year_types.COURSE,
+            requirement_entity=self.lcy.requirement_entity
+        )
         learning_unit_yr = LearningUnitYearFactory(
             academic_year=self.current_academic_year,
             subtype=learning_unit_year_subtypes.FULL,
@@ -277,13 +265,29 @@ class LearningUnitTagLiEditTest(TestCase):
 
         result = li_delete_all_lu(self.context, self.url_edit, '', "#modalDeleteLuy")
         expected = self._get_result_data_expected_delete(
-            "link_delete_lus", _("Cannot delete according to the type of the learning unit")
+            "link_delete_lus", _("Learning unit type is not deletable")
         )
 
         self.assertEqual(result, expected)
 
-    def test_li_delete_all_lu_everything_ok(self):
-        limit_yr = self.context['learning_unit_year'].academic_year.year - 1
+    def test_li_delete_all_lu_cannot_delete_existing_before_limit(self):
+        a_person = FacultyManagerFactory(entity=self.lcy.requirement_entity).person
+        self.context['user'] = a_person.user
+
+        lcy_master = LearningContainerYearFactory(
+            academic_year=self.current_academic_year,
+            container_type=learning_container_year_types.MASTER_THESIS,
+            requirement_entity=self.lcy.requirement_entity
+        )
+        learning_unit_yr = LearningUnitYearFactory(
+            academic_year=self.current_academic_year,
+            subtype=learning_unit_year_subtypes.FULL,
+            learning_unit=LearningUnitFactory(),
+            learning_container_year=lcy_master
+        )
+        self.context['learning_unit_year'] = learning_unit_yr
+
+        limit_yr = self.context['learning_unit_year'].academic_year.year + 1
 
         with override_settings(YEAR_LIMIT_LUE_MODIFICATION=limit_yr):
             result = li_delete_all_lu(self.context, self.url_edit_non_editable, '', "#modalDeleteLuy")
@@ -293,8 +297,12 @@ class LearningUnitTagLiEditTest(TestCase):
                 'load_modal': False,
                 'url': '#',
                 'id_li': 'link_delete_lus',
-                'title': _("You cannot delete a learning unit which is existing before %(limit_year)s") % {
-                    "limit_year": settings.YEAR_LIMIT_LUE_MODIFICATION},
+                'title': "{}.  {}".format(
+                    _("You can't modify learning unit under year : %(year)d") %
+                    {"year": limit_yr + 1},
+                    _("Modifications should be made in EPC under year %(year)d") %
+                    {"year": limit_yr + 1},
+                ),
                 'text': '',
                 'data_target': ''
             }

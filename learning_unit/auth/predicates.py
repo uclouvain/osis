@@ -62,7 +62,7 @@ def _is_attached_to_entity(requirement_entity, self):
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def is_learning_unit_year_older_or_equals_than_limit_settings_year(self, user, learning_unit_year=None):
     if learning_unit_year:
-        return learning_unit_year.academic_year.year > settings.YEAR_LIMIT_LUE_MODIFICATION
+        return learning_unit_year.academic_year.year >= settings.YEAR_LIMIT_LUE_MODIFICATION
     return None
 
 

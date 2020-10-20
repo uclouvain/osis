@@ -26,7 +26,6 @@
 from django import template
 from django.utils.translation import gettext_lazy as _
 
-from base.business.learning_unit_proposal import can_delete_learningunit
 from base.models.person import find_by_user
 from osis_role.errors import get_permission_error
 
@@ -99,7 +98,7 @@ def li_consolidate_proposal(context, url, message, data_target, url_id="link_con
 @register.inclusion_tag('blocks/button/li_template_lu.html', takes_context=True)
 def li_delete_all_lu(context, url, message, data_target, url_id="link_delete_lus"):
     data = _get_common_data(context, message, url, url_id)
-    data['permission'] = can_delete_learningunit
+    data['permission'] = 'base.can_delete_learningunit'
     data['load_modal'] = True
     data['data_target'] = data_target
     return li_with_permission(data)

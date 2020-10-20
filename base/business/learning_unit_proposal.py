@@ -248,11 +248,6 @@ def can_cancel_proposal(proposal, author, raise_exception):
     return perm, author.user.has_perm(perm, proposal.learning_unit_year)
 
 
-def can_delete_learningunit(learning_unit_year, author, raise_exception):
-    perm = 'base.can_delete_learningunit'
-    return perm, author.user.has_perm(perm, learning_unit_year)
-
-
 def consolidate_proposals_and_send_report(
         proposals: List[proposal_learning_unit.ProposalLearningUnit],
         author: person.Person,
