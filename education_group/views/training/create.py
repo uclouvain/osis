@@ -83,12 +83,11 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
     def _get_initial_academic_year_for_form(self):
         parent_group = self.get_parent_group()
         request_cache = RequestCache(self.request.user, reverse('version_program'))
+        academic_year_id_cached = request_cache.get_single_value_cached('academic_year')
         if parent_group:
             return parent_group.year
-        elif request_cache.get_value_cached('academic_year'):
-            return AcademicYear.objects.get(
-                id=request_cache.get_value_cached('academic_year')[0]
-            ).year
+        elif academic_year_id_cached:
+            return AcademicYear.objects.get(id=academic_year_id_cached).year
         return starting_academic_year()
 
     def _get_initial_management_entity_for_form(self):
