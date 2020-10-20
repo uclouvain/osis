@@ -767,11 +767,11 @@ class TestEditProposal(TestCase):
                                                   start_date=today.replace(year=1900),
                                                   end_date=None)
 
-        cls.generated_container = GenerateContainer(cls.current_academic_year, end_year)
+        cls.generated_container = GenerateContainer(cls.current_academic_year, end_year, parent_entity=cls.entity)
         cls.generated_container_first_year = cls.generated_container.generated_container_years[1]
         cls.learning_unit_year = cls.generated_container_first_year.learning_unit_year_full
         cls.requirement_entity_of_luy = cls.generated_container_first_year.requirement_entity_container_year
-        cls.person = FacultyManagerFactory(entity=cls.requirement_entity_of_luy).person
+        cls.person = FacultyManagerFactory(entity=cls.entity, with_child=True).person
 
         cls.url = reverse(update_learning_unit_proposal, args=[cls.learning_unit_year.id])
         cls.academic_year_for_suppression_proposal = AcademicYear.objects.filter(
@@ -834,9 +834,9 @@ class TestEditProposal(TestCase):
             "entity": self.entity_version.pk,
             "folder_id": 1,
             'requirement_entity':
-                self.generated_container_first_year.requirement_entity_container_year.pk,
+                self.entity_version.pk,
             'allocation_entity':
-                self.generated_container_first_year.requirement_entity_container_year.pk,
+                self.entity_version.pk,
             'additional_entity_1': '',
 
             # Learning component year data model form
@@ -978,16 +978,17 @@ class TestLearningUnitProposalDisplay(TestCase):
         cls.initial_periodicity = learning_unit_year_periodicity.ANNUAL
         cls.initial_data_learning_unit_year = {'credits': cls.initial_credits, 'periodicity': cls.initial_periodicity}
 
-        cls.initial_language_en = cls.language_it
-        end_year = AcademicYearFactory(year=cls.academic_year.year + 1)
-        cls.generator_learning_container = GenerateContainer(start_year=cls.academic_year, end_year=end_year)
-        cls.l_container_year_with_entities = cls.generator_learning_container.generated_container_years[0]
         organization_main = OrganizationFactory(type=organization_type.MAIN)
         cls.entity_from_main_organization = EntityFactory(organization=organization_main)
         cls.entity_version = EntityVersionFactory(entity=cls.entity_from_main_organization)
         organization_not_main = OrganizationFactory(type=organization_type.ACADEMIC_PARTNER)
         cls.entity_from_not_main_organization = EntityFactory(organization=organization_not_main)
         cls.entity_version_not_main = EntityVersionFactory(entity=cls.entity_from_not_main_organization)
+
+        cls.initial_language_en = cls.language_it
+        end_year = AcademicYearFactory(year=cls.academic_year.year + 1)
+        cls.generator_learning_container = GenerateContainer(start_year=cls.academic_year, end_year=end_year)
+        cls.l_container_year_with_entities = cls.generator_learning_container.generated_container_years[0]
 
     def test_is_foreign_key(self):
         current_data = {"language{}".format(proposal_business.END_FOREIGN_KEY_NAME): self.language_it.pk}

@@ -225,7 +225,8 @@ def generate_academic_years(range=2):
 
 
 class GenerateContainer:
-    def __init__(self, start_year, end_year):
+    def __init__(self, start_year, end_year, parent_entity=None):
+        self.parent_entity = parent_entity
         self.start_year = start_year
         self.end_year = end_year
         self.learning_container = LearningContainerFactory()
@@ -258,7 +259,8 @@ class GenerateContainer:
                 start_date=datetime.datetime(1900, 1, 1),
                 end_date=None,
                 entity_type=entity_type.FACULTY,
-                entity__organization__type=organization_type.MAIN
+                entity__organization__type=organization_type.MAIN,
+                parent=self.parent_entity
             ).entity for _ in range(4)
         ]
         for entity in self.entities:
