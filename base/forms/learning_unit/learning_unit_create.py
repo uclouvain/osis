@@ -37,7 +37,7 @@ from base.forms.learning_unit.entity_form import find_additional_requirement_ent
 from base.forms.utils.acronym_field import AcronymField, PartimAcronymField, split_acronym
 from base.forms.utils.choice_field import add_blank, add_all
 from base.models.campus import find_main_campuses
-from base.models.entity_version import find_pedagogical_entities_version, get_last_version
+from base.models.entity_version import get_last_version
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITIES
 from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_YEAR_TYPES_FOR_FACULTY, EXTERNAL, \
@@ -321,7 +321,6 @@ class LearningContainerYearModelForm(PermissionFieldMixin, forms.ModelForm):
                 },
                 forward=['country_allocation_entity']
             ),
-            queryset=find_pedagogical_entities_version(),
             label=_('Allocation entity'),
             disabled=self.fields['requirement_entity'].disabled
         )

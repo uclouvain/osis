@@ -47,6 +47,7 @@ from base.tests.factories.academic_calendar import AcademicCalendarFactory, \
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.business.learning_units import LearningUnitsMixin, GenerateContainer
 from base.tests.factories.campus import CampusFactory
+from base.tests.factories.entity import EntityWithVersionFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearPartimFactory
@@ -123,15 +124,19 @@ class TestEditLearningUnit(TestCase):
         cls.an_academic_year = create_current_academic_year()
         generate_learning_unit_edition_calendars([cls.an_academic_year])
 
+        cls.parent_entity = EntityWithVersionFactory()
+
         cls.requirement_entity = EntityVersionFactory(
             entity_type=entity_type.SCHOOL,
             start_date=today.replace(year=1900),
             entity__organization__type=organization_type.MAIN,
+            parent=cls.parent_entity
         )
         cls.allocation_entity = EntityVersionFactory(
             start_date=today.replace(year=1900),
             entity__organization__type=organization_type.MAIN,
-            entity_type=entity_type.FACULTY
+            entity_type=entity_type.FACULTY,
+            parent=cls.parent_entity
         )
         cls.additional_entity_1 = EntityVersionFactory(
             start_date=today.replace(year=1900),
@@ -172,7 +177,7 @@ class TestEditLearningUnit(TestCase):
             campus=CampusFactory(organization=OrganizationFactory(type=organization_type.MAIN))
         )
 
-        central_manager = CentralManagerFactory(entity=cls.requirement_entity.entity)
+        central_manager = CentralManagerFactory(entity=cls.parent_entity, with_child=True)
         cls.user = central_manager.person.user
         cls.url = reverse(update_learning_unit, args=[cls.learning_unit_year.id])
 
