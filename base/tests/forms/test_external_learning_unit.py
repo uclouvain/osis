@@ -43,6 +43,7 @@ from base.tests.factories.academic_year import create_current_academic_year, Aca
 from base.tests.factories.business.entities import create_entities_hierarchy
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.campus import CampusFactory
+from base.tests.factories.entity import EntityWithVersionFactory
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
@@ -51,6 +52,7 @@ from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.organization_address import OrganizationAddressFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
+from learning_unit.tests.factories.central_manager import CentralManagerFactory
 from reference.tests.factories.language import FrenchLanguageFactory
 
 YEAR_LIMIT_LUE_MODIFICATION = 2018
@@ -131,9 +133,11 @@ class TestExternalLearningUnitForm(TestCase):
         cls.academic_years = GenerateAcademicYear(starting_year, end_year).academic_years
         cls.academic_year = cls.academic_years[1]
         cls.language = FrenchLanguageFactory()
+        cls.manager = CentralManagerFactory(entity=EntityWithVersionFactory(), with_child=True)
+        cls.person = cls.manager.person
 
     def setUp(self):
-        self.person = PersonFactory()
+        pass
 
     @override_settings(YEAR_LIMIT_LUE_MODIFICATION=YEAR_LIMIT_LUE_MODIFICATION)
     def test_external_learning_unit_form_init(self):
@@ -148,12 +152,12 @@ class TestExternalLearningUnitForm(TestCase):
 
     @override_settings(YEAR_LIMIT_LUE_MODIFICATION=YEAR_LIMIT_LUE_MODIFICATION)
     def test_external_learning_unit_form_is_valid(self):
-        data = get_valid_external_learning_unit_form_data(self.academic_year, self.person)
+        data = get_valid_external_learning_unit_form_data(self.academic_year, self.manager)
         form = ExternalLearningUnitBaseForm(person=self.person, academic_year=self.academic_year, data=data)
         self.assertTrue(form.is_valid(), form.errors)
 
     def test_external_learning_unit_form_save(self):
-        data = get_valid_external_learning_unit_form_data(self.academic_year, self.person)
+        data = get_valid_external_learning_unit_form_data(self.academic_year, self.manager)
         form = ExternalLearningUnitBaseForm(person=self.person, academic_year=self.academic_year, data=data,
                                             start_year=self.academic_year)
         self.assertTrue(form.is_valid(), form.errors)
@@ -167,15 +171,19 @@ class TestExternalLearningUnitForm(TestCase):
 
     @override_settings(YEAR_LIMIT_LUE_MODIFICATION=YEAR_LIMIT_LUE_MODIFICATION)
     def test_creation(self):
-        data = get_valid_external_learning_unit_form_data(self.academic_year, self.person)
-        form = LearningUnitYearForExternalModelForm(person=self.person, data=data, subtype=learning_unit_year_subtypes.FULL, initial={})
+        data = get_valid_external_learning_unit_form_data(self.academic_year, self.manager)
+        form = LearningUnitYearForExternalModelForm(
+            person=self.person, data=data, subtype=learning_unit_year_subtypes.FULL, initial={}
+        )
         self.assertCountEqual(list(form.fields['academic_year'].queryset), self.academic_years[1:])
 
 
 class TestExternalPartimForm(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.person = PersonFactory()
+        cls.manager = CentralManagerFactory(entity=EntityWithVersionFactory(), with_child=True)
+        cls.person = cls.manager.person
+
         starting_year = AcademicYearFactory(year=YEAR_LIMIT_LUE_MODIFICATION)
         end_year = AcademicYearFactory(year=YEAR_LIMIT_LUE_MODIFICATION + 6)
         academic_years = GenerateAcademicYear(starting_year, end_year).academic_years
@@ -216,13 +224,13 @@ class TestExternalPartimForm(TestCase):
         self.assertIsInstance(context['learning_unit_external_form'], CograduationExternalLearningUnitModelForm)
 
     def test_external_learning_unit_form_is_valid(self):
-        data = get_valid_external_learning_unit_form_data(self.academic_year, self.person)
+        data = get_valid_external_learning_unit_form_data(self.academic_year, self.manager)
         form = ExternalPartimForm(person=self.person, academic_year=self.academic_year, data=data,
                                   learning_unit_full_instance=self.learning_unit_year.learning_unit)
         self.assertTrue(form.is_valid(), form.errors)
 
     def test_external_learning_unit_form_save(self):
-        data = get_valid_external_learning_unit_form_data(self.academic_year, self.person)
+        data = get_valid_external_learning_unit_form_data(self.academic_year, self.manager)
         form = ExternalPartimForm(person=self.person, academic_year=self.academic_year, data=data,
                                   start_year=self.academic_year.year,
                                   learning_unit_full_instance=self.learning_unit_year.learning_unit)
