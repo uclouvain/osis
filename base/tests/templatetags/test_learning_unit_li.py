@@ -334,7 +334,7 @@ class LearningUnitTagLiEditTest(TestCase):
             learning_container_year=lcy
         )
         learning_unit_yr.initial_data = {"learning_container_year": lcy}
-        ProposalLearningUnitFactory(learning_unit_year=learning_unit_yr)
+        ProposalLearningUnitFactory(learning_unit_year=learning_unit_yr, state=ProposalState.FACULTY.name)
         faculty_manager = FacultyManagerFactory(entity=lcy.requirement_entity)
         self.assertTrue(faculty_manager.person.user.has_perm('base.can_edit_learning_unit_proposal', learning_unit_yr))
         central_manager = CentralManagerFactory(entity=lcy.requirement_entity)
