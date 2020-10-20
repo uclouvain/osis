@@ -211,7 +211,7 @@ def __load_multiple_node_learning_unit_year(node_learning_unit_year_ids: List[in
             'common_title_en': lu.common_title_en,
             'specific_title_en': lu.specific_title_en,
             'other_remark': lu.other_remark,
-            'quadrimester': lu.quadrimester.name,
+            'quadrimester': lu.quadrimester.name if lu.quadrimester else None,
             'volume_total_lecturing': lu.lecturing_volume.total_annual,
             'volume_total_practical': lu.practical_volume.total_annual,
         }
