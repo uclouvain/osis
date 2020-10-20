@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,19 +23,32 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib.auth.decorators import login_required, permission_required
-from django.http import HttpResponseBadRequest, JsonResponse
-from django.views.decorators.http import require_POST
+import factory.fuzzy
 
-from base.utils.cache import ElementCache
+from base.models.enums.diploma_coorganization import DiplomaCoorganizationTypes
+from education_group.ddd.domain._co_organization import Coorganization, CoorganizationIdentity
+from education_group.tests.ddd.factories.academic_partner import AcademicPartnerFactory
 
 
-#  FIXME move to program management
-@login_required
-@require_POST
-@permission_required('base.view_educationgroup', raise_exception=True)
-def clear_clipboard(request):
-    if request.is_ajax():
-        ElementCache(request.user).clear()
-        return JsonResponse({})
-    return HttpResponseBadRequest()
+class CoorganizationIdentityFactory(factory.Factory):
+    class Meta:
+        model = CoorganizationIdentity
+        abstract = False
+
+    partner_name = factory.Sequence(lambda n: 'PARTNER_%02d' % n)
+    training_acronym = factory.Sequence(lambda n: 'OFFER_%02d' % n)
+    training_year = factory.fuzzy.FuzzyInteger(1999, 2099)
+
+
+class CoorganizationFactory(factory.Factory):
+    class Meta:
+        model = Coorganization
+        abstract = False
+
+    entity_id = factory.SubFactory(CoorganizationIdentityFactory)
+    partner = factory.SubFactory(AcademicPartnerFactory)
+    is_for_all_students = False
+    is_reference_institution = False
+    certificate_type = DiplomaCoorganizationTypes.NOT_CONCERNED
+    is_producing_certificate = False
+    is_producing_certificate_annexes = False

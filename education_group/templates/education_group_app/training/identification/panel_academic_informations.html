@@ -29,100 +29,104 @@
         <div class="row">
             <div id="academic_type" class="col-md-12">
                 {% bootstrap_label _("Academic type") label_class='d-block'%}
-                <p>{{ education_group_year.academic_type.value }}</p>
+                <p>{{ training.academic_type.value }}</p>
             </div>
         </div>
         <br>
         <div class="row">
             <div id="duration" class="col-md-6">
                 {% bootstrap_label _("Duration") label_class='d-block'%}
-                {% if education_group_year.duration and education_group_year.duration_unit.value %}
-                <p>{{ education_group_year.duration }} {{ education_group_year.duration_unit.value }}</p>
+                {% if training.duration and training.duration_unit.value %}
+                <p>{{ training.duration }} {{ training.duration_unit.value }}</p>
                 {% else %}
                 <p></p>
                 {% endif %}
             </div>
             <div id="internship" class="col-md-6">
                 {% bootstrap_label _("Stage") label_class='d-block'%}
-                <p>{{ education_group_year.internship_presence.value | title }}</p>
+                <p>{{ training.internship_presence.value | title }}</p>
             </div>
         </div>
         <br>
         <div class="row">
             <div id="is_enrollment_enabled" class="col-md-6">
                 {% bootstrap_label _("Enrollment enabled") label_class='d-block'%}
-                <p>{{ education_group_year.is_enrollment_enabled | yesno | title }}</p>
+                <p>{{ training.is_enrollment_enabled | yesno | title }}</p>
             </div>
             <div id="has_online_re_registration" class="col-md-6">
                 {% bootstrap_label _("Web re-registration") label_class='d-block'%}
-                <p>{{ education_group_year.has_online_re_registration | yesno | title }}</p>
+                <p>{{ training.has_online_re_registration | yesno | title }}</p>
             </div>
         </div>
         <br>
         <div class="row">
             <div id="has_partial_deliberation" class="col-md-6">
                 {% bootstrap_label _("Partial deliberation") label_class='d-block'%}
-                <p>{{ education_group_year.has_partial_deliberation | yesno | title }}</p>
+                <p>{{ training.has_partial_deliberation | yesno | title }}</p>
             </div>
             <div id="has_admission_exam" class="col-md-6">
                 {% bootstrap_label _("Admission exam") label_class='d-block'%}
-                <p>{{ education_group_year.has_admission_exam | yesno | title }}</p>
+                <p>{{ training.has_admission_exam | yesno | title }}</p>
             </div>
         </div>
         <br>
         <div class="row">
             <div id="has_dissertation" class="col-md-12">
                 {% bootstrap_label _("Dissertation") label_class='d-block'%}
-                <p>{{ education_group_year.has_dissertation | yesno | title }}</p>
+                <p>{{ training.has_dissertation | yesno | title }}</p>
             </div>
         </div>
         <br>
         <div class="row">
             <div id="produce_university_certificate" class="col-md-12">
                 {% bootstrap_label _("University certificate") label_class='d-block'%}
-                <p>{{ education_group_year.produce_university_certificate | yesno | title }}</p>
+                <p>{{ training.produce_university_certificate | yesno | title }}</p>
             </div>
         </div>
         <br>
         <div class="row">
             <div id="decree_category" class="col-md-12">
                 {% bootstrap_label _("Decree category") label_class='d-block'%}
-                <p>{{ education_group_year.decree_category.name }} - {{ education_group_year.decree_category.value }}</p>
+                <p>
+                    {% if training.decree_category.value %}
+                        {{ training.decree_category.name }} - {{ training.decree_category.value }}
+                    {% endif %}
+                </p>
             </div>
         </div>
         <br>
         <div class="row">
             <div id="rate_code" class="col-md-12">
                 {% bootstrap_label _("Rate code") label_class='d-block'%}
-                <p>{{ education_group_year.rate_code.value }}</p>
+                <p>{{ training.rate_code.value }}</p>
             </div>
         </div>
         <br>
         <div class="row">
             <div id="main_language" class="col-md-12">
                 {% bootstrap_label _("Primary language") label_class='d-block'%}
-                <p>{{ education_group_year.main_language.name }}</p>
+                <p>{{ training.main_language.name }}</p>
             </div>
         </div>
         <br>
         <div class="row">
             <div id="english_activities" class="col-md-12">
                 {% bootstrap_label _("activities in English") label_class='d-block'%}
-                <p>{{ education_group_year.english_activities.value | title }}</p>
+                <p>{{ training.english_activities.value | title }}</p>
             </div>
         </div>
         <br>
         <div class="row">
             <div id="other_language_activities" class="col-md-12">
                 {% bootstrap_label _("Other languages activities") label_class='d-block'%}
-                <p>{{ education_group_year.other_language_activities.value | title }}</p>
+                <p>{{ training.other_language_activities.value | title }}</p>
             </div>
         </div>
         <br>
         <div class="row">
             <div id="main_domain" class="col-md-12">
                 {% bootstrap_label _("main domain") label_class='d-block'%}
-                <p>{{ education_group_year.main_domain|default_if_none:"" }}</p>
+                <p>{{ training.main_domain|default_if_none:"" }}</p>
             </div>
         </div>
         <br>
@@ -130,21 +134,21 @@
             <div id="secondary_domains" class="col-md-12">
                 {% bootstrap_label _("secondary domains") label_class='d-block'%}
                 <br>
-                <ul>{{ education_group_year.secondary_domains | unordered_list }}</ul>
+                <ul>{{ training.secondary_domains | unordered_list }}</ul>
             </div>
         </div>
         <br>
         <div class="row">
             <div id="isced_domain" class="col-md-12">
                 {% bootstrap_label _("ISCED domain") label_class='d-block'%}
-                <p>{{ education_group_year.isced_domain.code }} {{ education_group_year.isced_domain.title_fr }}</p>
+                <p>{{ training.isced_domain.code }} {{ training.isced_domain.title_fr }}</p>
             </div>
         </div>
         <br>
         <div class="row">
             <div id="internal_comment" class="col-md-12">
                 {% bootstrap_label _("comment (internal)") label_class='d-block'%}
-                <p>{{ education_group_year.internal_comment }}</p>
+                <p>{{ training.internal_comment }}</p>
             </div>
         </div>
         <br>

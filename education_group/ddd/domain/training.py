@@ -287,6 +287,7 @@ class Training(interface.RootEntity):
     def update_from_other_training(self, other_training: 'Training'):
         fields_not_to_update = (
             "year", "acronym", "academic_year", "entity_id", "entity_identity", "identity_through_years",
+            "co_organizations"
         )
         for field in other_training.__slots__:
             if field in fields_not_to_update:
@@ -310,7 +311,8 @@ class Training(interface.RootEntity):
         return not bool(self.get_conflicted_fields(other_training))
 
     def get_conflicted_fields(self, other_training: 'Training') -> List[str]:
-        fields_not_to_compare = ("year", "entity_id", "entity_identity", "identity_through_years", "diploma")
+        fields_not_to_compare = ("year", "entity_id", "entity_identity", "identity_through_years", "diploma",
+                                 "co_organizations")
         conflicted_fields = []
         for field_name in other_training.__slots__:
             if field_name in fields_not_to_compare:
@@ -372,6 +374,8 @@ class UpdateTrainingData:
     hops = attr.ib(type=HOPS, default=None)
     co_graduation = attr.ib(type=CoGraduation, default=None)
     diploma = attr.ib(type=Diploma, default=None)
+    decree_category = attr.ib(type=DecreeCategories, default=None)
+    rate_code = attr.ib(type=RateCode, default=None)
 
 
 @attr.s(frozen=True, slots=True, kw_only=True)

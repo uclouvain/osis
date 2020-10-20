@@ -23,11 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Iterable, Dict, List
 
 from django.utils.translation import gettext_lazy as _
 
 from osis_common.ddd.interface import BusinessException, BusinessExceptions
 from program_management.ddd.business_types import *
+
+BLOCK_MAX_AUTHORIZED_VALUE = 6
 
 
 class RelativeCreditShouldBeGreaterOrEqualsThanZero(BusinessException):
@@ -119,29 +122,32 @@ class NodeIsUsedException(Exception):
     pass
 
 
-# TODO : use BusinessException instead of BusinessExceptions
 class ProgramTreeVersionMismatch(BusinessExceptions):
     def __init__(
             self,
-            root_version_identity: 'ProgramTreeVersionIdentity',
+            node_to_add: 'Node',
             child_version_identity: 'ProgramTreeVersionIdentity',
+            node_to_paste_to: 'Node',
+            parents_version_mismatched_identity: List['ProgramTreeVersionIdentity'],
             *args,
             **kwargs
     ):
-        root_node_version_title = self._get_version_title(root_version_identity)
-        node_to_add_version_title = self._get_version_title(child_version_identity)
-        root_code = kwargs.pop('root_code')
-        child_code = kwargs.pop('child_code')
-        messages = [_("%(node_to_add)s version must be the same as %(root_node)s version") % {
-            'node_to_add': '{} - {}'.format(child_code, node_to_add_version_title),
-            'root_node': '{} - {}'.format(root_code, root_node_version_title)
+        parents_version_names = {
+            self._get_version_name(version_identity) for version_identity in parents_version_mismatched_identity
+        }
+        messages = [_(
+            "%(node_to_add)s [%(node_to_add_version)s] version must be the same as %(node_to_paste_to)s "
+            "and all of it's parent's version [%(version_mismatched)s]"
+        ) % {
+            'node_to_add': str(node_to_add),
+            'node_to_add_version': self._get_version_name(child_version_identity),
+            'node_to_paste_to': str(node_to_paste_to),
+            'version_mismatched': ",".join(parents_version_names)
         }]
         super().__init__(messages, **kwargs)
 
-    def _get_version_title(self, version_identity):
-        return "{}[{}]".format(
-            version_identity.offer_acronym, version_identity.version_name
-        ) if version_identity.version_name else version_identity.offer_acronym
+    def _get_version_name(self, version_identity: 'ProgramTreeVersionIdentity'):
+        return str(_('Standard')) if version_identity.is_standard() else version_identity.version_name
 
 
 class Program2MEndDateShouldBeGreaterOrEqualThanItsFinalities(BusinessException):
@@ -150,3 +156,50 @@ class Program2MEndDateShouldBeGreaterOrEqualThanItsFinalities(BusinessException)
             "acronym": finality.title
         }
         super().__init__(message, **kwargs)
+
+
+class ReferenceLinkNotAllowedWithLearningUnitException(BusinessException):
+    def __init__(self, learning_unit_node: 'Node', **kwargs):
+        message = _("You are not allowed to create a reference with a learning unit %(child_node)s") % {
+            "child_node": learning_unit_node
+        }
+        super().__init__(message, **kwargs)
+
+
+class LinkShouldBeReferenceException(BusinessException):
+    def __init__(self, parent_node: 'Node', child_node: 'Node', **kwargs):
+        message = _("Link type should be reference between %(parent)s and %(child)s") % {
+            "parent": parent_node,
+            "child": child_node
+        }
+        super().__init__(message, **kwargs)
+
+
+class ReferenceLinkNotAllowedException(BusinessException):
+    def __init__(self, parent_node: 'Node', child_node: 'Node', reference_childrens: Iterable['Node'], **kwargs):
+        message = _(
+            "Link between %(parent)s and %(child)s cannot be of reference type "
+            "because of its children: %(children)s"
+        ) % {
+            "parent": self._format_node(parent_node),
+            "child": self._format_node(child_node),
+            "children": ", ".join([self._format_node(reference_children) for reference_children in reference_childrens])
+        }
+        super().__init__(message, **kwargs)
+
+    def _format_node(self, node: 'Node') -> str:
+        return "{} - {} ({})".format(node.title, node.code, node.node_type.value)
+
+
+class InvalidBlockException(BusinessException):
+    def __init__(self):
+        message = _(
+            "Please register a maximum of %(max_authorized_value)s digits in ascending order, "
+            "without any duplication. Authorized values are from 1 to 6. Examples: 12, 23, 46"
+        ) % {'max_authorized_value': BLOCK_MAX_AUTHORIZED_VALUE}
+        super().__init__(message)
+
+
+class BulkUpdateLinkException(Exception):
+    def __init__(self, exceptions: Dict[str, 'MultipleBusinessExceptions']):
+        self.exceptions = exceptions

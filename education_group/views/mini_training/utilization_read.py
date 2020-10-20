@@ -24,7 +24,6 @@
 #
 ##############################################################################
 from education_group.views.mini_training.common_read import MiniTrainingRead, Tab
-from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.service.read.get_utilization_rows import get_utilizations
 
 
@@ -34,7 +33,7 @@ class MiniTrainingReadUtilization(MiniTrainingRead):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        node = self.get_object()
-        context['utilization_rows'] = get_utilizations(NodeIdentity(code=node.code, year=node.year),
-                                                       context.get('language'))
-        return context
+        return {
+            **context,
+            'utilization_rows': get_utilizations(self.node_identity, context.get('language'))
+        }

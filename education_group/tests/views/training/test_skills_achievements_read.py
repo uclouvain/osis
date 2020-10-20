@@ -33,8 +33,8 @@ from django.urls import reverse
 from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.factories.user import UserFactory
+from education_group.ddd.domain.group import Group
 from education_group.views.proxy.read import Tab
-from program_management.ddd.domain.node import NodeGroupYear
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory
 
@@ -112,8 +112,8 @@ class TestTrainingReadSkillAchievementsRead(TestCase):
         self.assertEqual(response.context['person'], self.person)
         self.assertEqual(response.context['group_year'], self.training_version.root_group)
         self.assertEqual(response.context['education_group_version'], self.training_version)
-        self.assertIsInstance(response.context['tree'], str)
-        self.assertIsInstance(response.context['node'], NodeGroupYear)
+        self.assertIsInstance(response.context['tree_json_url'], str)
+        self.assertIsInstance(response.context['group'], Group)
         self.assertIsInstance(response.context['achievements'], List)
         self.assertIn("can_edit_information", response.context)
 

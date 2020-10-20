@@ -82,6 +82,17 @@ class UpdateProgramTreeVersionCommand(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True)
+class ProlongExistingProgramTreeVersionCommand(interface.CommandRequest):
+    end_year = attr.ib(type=int)
+    updated_year = attr.ib(type=int)
+    offer_acronym = attr.ib(type=str)
+    version_name = attr.ib(type=str)
+    is_transition = attr.ib(type=bool)
+    title_en = attr.ib(type=str)
+    title_fr = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
 class UpdateTrainingVersionCommand(interface.CommandRequest):
     offer_acronym = attr.ib(type=str)
     version_name = attr.ib(type=str)
@@ -641,6 +652,8 @@ class PostponeTrainingAndRootGroupModificationWithProgramTreeCommand(interface.C
     remark_en = attr.ib(type=Optional[str])
     organization_name = attr.ib(type=str)
     schedule_type = attr.ib(type=str)
+    decree_category = attr.ib(type=str)
+    rate_code = attr.ib(type=Optional[str])
 
 
 @attr.s(frozen=True, slots=True)

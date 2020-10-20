@@ -32,7 +32,7 @@ from django.urls import reverse
 from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.factories.user import UserFactory
-from program_management.ddd.domain.node import NodeGroupYear
+from education_group.ddd.domain.group import Group
 from program_management.forms.custom_xls import CustomXlsForm
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory
@@ -90,8 +90,9 @@ class TestTrainingReadContent(TestCase):
         self.assertEqual(response.context['education_group_version'], self.training_version)
         self.assertEqual(response.context['update_permission_name'], "base.change_link_data")
         self.assertIsInstance(response.context['form_xls_custom'], CustomXlsForm)
-        self.assertIsInstance(response.context['tree'], str)
-        self.assertIsInstance(response.context['node'], NodeGroupYear)
+        expected_tree_json_url = reverse('tree_json', kwargs={'root_id': self.training_version.root_group.element.pk})
+        self.assertEqual(response.context['tree_json_url'], expected_tree_json_url)
+        self.assertIsInstance(response.context['group'], Group)
         self.assertIsInstance(response.context['children'], List)
         self.assertIn('current_version', response.context)
         self.assertIn('academic_year_choices', response.context)

@@ -55,7 +55,7 @@ from program_management.ddd.repositories.program_tree import ProgramTreeReposito
 def education_group_year_pedagogy_edit_post(request, node: Node):
     form = EducationGroupPedagogyEditForm(request.POST)
     obj = translated_text.get_groups_or_offers_cms_reference_object(node)
-    entity = entity_name.get_offers_or_groups_entity_from_node(node)
+    entity = entity_name.get_offers_or_groups_entity_from_group(node)
 
     redirect_url = _get_admission_condition_success_url(node.year, node.title)
     if form.is_valid():
@@ -83,7 +83,7 @@ def education_group_year_pedagogy_edit_post(request, node: Node):
 
 def education_group_year_pedagogy_edit_get(request, node: Node):
     obj = translated_text.get_groups_or_offers_cms_reference_object(node)
-    entity = entity_name.get_offers_or_groups_entity_from_node(node)
+    entity = entity_name.get_offers_or_groups_entity_from_group(node)
     context = {
         'education_group_year': obj,
     }
@@ -110,7 +110,6 @@ def education_group_year_pedagogy_edit_get(request, node: Node):
         initial_values['text_english'] = en_text.text
     form = EducationGroupPedagogyEditForm(initial=initial_values)
     context['form'] = form
-    context['group_to_parent'] = request.GET.get("group_to_parent") or '0'
     context['translated_label'] = translated_text_label.get_label_translation(
         text_entity=entity,
         label=label_name,
@@ -191,9 +190,11 @@ def save_form_to_admission_condition_line(education_group_year_id: int, creation
                                                      pk=admission_condition_line_id)
     else:
         section = form.cleaned_data['section']
-        education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
+        admission_condition, created = AdmissionCondition.objects.get_or_create(
+            education_group_year_id=education_group_year_id
+        )
         admission_condition_line = AdmissionConditionLine.objects.create(
-            admission_condition=education_group_year.admissioncondition,
+            admission_condition=admission_condition,
             section=section)
 
     admission_condition_line.access = form.cleaned_data['access']
@@ -253,9 +254,9 @@ def education_group_year_admission_condition_update_text_post(request, education
     if form.is_valid():
         education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
         section = form.cleaned_data['section']
-
-        admission_condition = education_group_year.admissioncondition
-
+        admission_condition, created = AdmissionCondition.objects.get_or_create(
+            education_group_year=education_group_year
+        )
         setattr(admission_condition, 'text_' + section, form.cleaned_data['text_fr'])
         setattr(admission_condition, 'text_' + section + '_en', form.cleaned_data['text_en'])
         admission_condition.save()
@@ -265,16 +266,16 @@ def education_group_year_admission_condition_update_text_post(request, education
 
 
 def education_group_year_admission_condition_update_text_get(request, education_group_year_id: int):
-    education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
+    admission_condition, created = AdmissionCondition.objects.get_or_create(
+        education_group_year_id=education_group_year_id
+    )
     section = request.GET['section']
     title = request.GET['title']
-
     form = UpdateTextForm(initial={
         'section': section,
-        'text_fr': getattr(education_group_year.admissioncondition, 'text_' + section),
-        'text_en': getattr(education_group_year.admissioncondition, 'text_' + section + '_en'),
+        'text_fr': getattr(admission_condition, 'text_' + section),
+        'text_en': getattr(admission_condition, 'text_' + section + '_en'),
     })
-
     context = {
         'form': form,
         'title': title,

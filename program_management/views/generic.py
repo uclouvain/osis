@@ -23,8 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import json
-
 from django.contrib.auth.decorators import login_required
 from django.contrib.messages.views import SuccessMessageMixin
 from django.http import Http404
@@ -32,7 +30,6 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
-from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 
 from base.models.education_group_year import EducationGroupYear
@@ -40,15 +37,14 @@ from base.models.enums.education_group_types import TrainingType, MiniTrainingTy
 from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
-from base.utils.cache import ElementCache
 from base.views.mixins import FlagMixin, AjaxTemplateMixin
 from education_group.models.group_year import GroupYear
+from education_group.views.mixin import ElementSelectedClipBoardMixin
 from osis_common.utils.models import get_object_or_none
 from osis_role.contrib.views import AjaxPermissionRequiredMixin
 from program_management.ddd.repositories import load_tree
 from program_management.models.enums.node_type import NodeType
 from program_management.ddd.business_types import *
-from program_management.serializers.program_tree_view import program_tree_view_serializer
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.domain.node import NodeIdentity
@@ -57,47 +53,6 @@ NO_PREREQUISITES = TrainingType.finality_types() + [
     MiniTrainingType.OPTION.name,
     MiniTrainingType.MOBILITY_PARTNERSHIP.name,
 ] + GroupType.get_names()
-
-
-LEARNING_UNIT_YEAR = LearningUnitYear._meta.db_table
-EDUCATION_GROUP_YEAR = EducationGroupYear._meta.db_table
-
-
-def get_clipboard_content_display(obj, action):
-    msg_template = "<strong>{clipboard_title}</strong><br>{object_str}"
-    return msg_template.format(
-        clipboard_title=_get_clipboard_title(action),
-        object_str=str(obj),
-    )
-
-
-def _get_clipboard_title(action):
-    if action == ElementCache.ElementCacheAction.CUT.value:
-        return _("Cut element")
-    elif action == ElementCache.ElementCacheAction.COPY.value:
-        return _("Copied element")
-    else:
-        return ""
-
-
-class CatalogGenericDetailView:
-    def get_selected_element_for_clipboard(self):
-        cached_data = ElementCache(self.request.user).cached_data
-        if cached_data:
-            obj = self._get_instance_object_from_cache(cached_data)
-            return get_clipboard_content_display(obj, cached_data['action'])
-        return None
-
-    @staticmethod
-    def _get_instance_object_from_cache(cached_data):
-        model_name = cached_data.get('modelname')
-        cached_obj_id = cached_data.get('id')
-        obj = None
-        if model_name == LEARNING_UNIT_YEAR:
-            obj = LearningUnitYear.objects.get(id=cached_obj_id)
-        elif model_name == EDUCATION_GROUP_YEAR:
-            obj = EducationGroupYear.objects.get(id=cached_obj_id)
-        return obj
 
 
 @method_decorator(login_required, name='dispatch')
@@ -122,13 +77,16 @@ class GenericGroupElementYearMixin(FlagMixin, AjaxPermissionRequiredMixin, Succe
         return self.get_object().parent_element.group_year
 
 
-class LearningUnitGeneric(CatalogGenericDetailView, TemplateView):
+class LearningUnitGeneric(ElementSelectedClipBoardMixin, TemplateView):
     def get_person(self):
         return get_object_or_404(Person, user=self.request.user)
 
     @cached_property
     def program_tree(self):
-        return load_tree.load(int(self.kwargs['root_element_id']))
+        return load_tree.load(self.get_root_id())
+
+    def get_root_id(self) -> int:
+        return int(self.kwargs['root_element_id'])
 
     @cached_property
     def node(self):
@@ -159,10 +117,10 @@ class LearningUnitGeneric(CatalogGenericDetailView, TemplateView):
         context['root_id'] = self.program_tree.root_node.pk
         context['parent'] = self.program_tree.root_node
         context['node'] = self.node
-        context['tree'] = json.dumps(program_tree_view_serializer(self.current_version.get_tree()))
-        context['group_to_parent'] = self.request.GET.get("group_to_parent") or '0'
+        context['tree_json_url'] = self.get_tree_json_url()
+        context['tree_root_id'] = self.get_root_id()
         context['show_prerequisites'] = self.show_prerequisites(self.program_tree.root_node)
-        context['selected_element_clipboard'] = self.get_selected_element_for_clipboard()
+        context['selected_element_clipboard'] = self.get_selected_element_clipboard_message()
         context['xls_ue_prerequisites'] = reverse("education_group_learning_units_prerequisites",
                                                   args=[root.academic_year.year, root.partial_acronym]
                                                   )
@@ -181,3 +139,6 @@ class LearningUnitGeneric(CatalogGenericDetailView, TemplateView):
 
     def get_permission_object(self):
         return GroupYear.objects.get(element__pk=self.program_tree.root_node.pk)
+
+    def get_tree_json_url(self) -> str:
+        return reverse('tree_json', kwargs={'root_id': self.get_root_id()})

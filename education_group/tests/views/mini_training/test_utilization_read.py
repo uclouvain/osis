@@ -30,29 +30,32 @@ from django.test import TestCase
 from django.urls import reverse
 
 from base.models.enums.education_group_types import MiniTrainingType
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.factories.user import UserFactory
+from education_group.ddd.domain.group import Group
 from education_group.views.mini_training.common_read import Tab
-from program_management.ddd.domain.node import NodeGroupYear
-from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
+from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory
 
 
 class TestMiniTrainingReadUtilization(TestCase):
     @classmethod
     def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory(current=True)
         cls.person = PersonWithPermissionsFactory('view_educationgroup')
-        cls.mini_training_version = EducationGroupVersionFactory(
+        cls.mini_training_version = StandardEducationGroupVersionFactory(
             offer__acronym="APPBIOL",
-            offer__academic_year__year=2019,
+            offer__academic_year=cls.academic_year,
             offer__education_group_type__name=MiniTrainingType.DEEPENING.name,
             root_group__partial_acronym="LBIOL100P",
-            root_group__academic_year__year=2019,
+            root_group__acronym="APPBIOL",
+            root_group__academic_year=cls.academic_year,
             root_group__education_group_type__name=MiniTrainingType.DEEPENING.name,
         )
         ElementGroupYearFactory(group_year=cls.mini_training_version.root_group)
 
-        cls.url = reverse('mini_training_utilization', kwargs={'year': 2019, 'code': 'LBIOL100P'})
+        cls.url = reverse('mini_training_utilization', kwargs={'year': cls.academic_year.year, 'code': 'LBIOL100P'})
 
     def setUp(self) -> None:
         self.client.force_login(self.person.user)
@@ -86,8 +89,11 @@ class TestMiniTrainingReadUtilization(TestCase):
 
         self.assertEqual(response.context['person'], self.person)
         self.assertEqual(response.context['group_year'], self.mini_training_version.root_group)
-        self.assertIsInstance(response.context['tree'], str)
-        self.assertIsInstance(response.context['node'], NodeGroupYear)
+        expected_tree_json_url = reverse('tree_json', kwargs={
+            'root_id': self.mini_training_version.root_group.element.pk
+        })
+        self.assertEqual(response.context['tree_json_url'], expected_tree_json_url)
+        self.assertIsInstance(response.context['group'], Group)
         self.assertIsInstance(response.context['utilization_rows'], List)
 
     def test_assert_active_tabs_is_utilization_and_others_are_not_active(self):

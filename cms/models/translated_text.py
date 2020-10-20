@@ -36,9 +36,9 @@ from reversion.admin import VersionAdmin
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import GroupType
 from cms.enums.entity_name import ENTITY_NAME, OFFER_YEAR
+from education_group.ddd.domain.group import Group
 from education_group.models.group_year import GroupYear
 from osis_common.models import osis_model_admin
-from program_management.ddd.domain.node import Node
 from .text_label import TextLabel
 
 
@@ -100,10 +100,11 @@ def update_or_create(entity, reference, text_label, language, defaults):
     return translated_text
 
 
-def get_groups_or_offers_cms_reference_object(node: Node):
-    is_group = node.node_type.name in GroupType.get_names()
+def get_groups_or_offers_cms_reference_object(group: Group):
+    is_group = group.type.name in GroupType.get_names()
     object_model = GroupYear if is_group else EducationGroupYear
-    filter_kwargs = {'element__pk' if is_group else 'educationgroupversion__root_group__element__pk': node.pk}
+
+    filter_kwargs = {'partial_acronym': group.code, 'academic_year__year': group.year}
     return get_object_or_404(
         object_model,
         **filter_kwargs

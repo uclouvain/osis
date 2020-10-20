@@ -7,10 +7,10 @@
 {% block breadcrumb %}
     {{ block.super }}
     <li class="active">
-        {% if node.is_training %}
-            {{ node.title }}
+        {% if group.is_training %}
+            {{ training.acronym }}
         {% else %}
-            {{ node.code }}
+            {{ group.code }}
         {% endif %}
     </li>
 {% endblock %}
@@ -31,11 +31,10 @@
                 <input class="form-control" id="search_jstree" type="text" placeholder="Search" aria-label="Search">
             </div>
             <div class="panel-body">
-                <div class="row" id="panel_file_tree" data-rootId= "{{ root.id }}" data-copyUrl="{% url "copy_element" %}" data-cutUrl="{% url "cut_element" %}"></div>
+                <div class="row" id="panel_file_tree" data-jsonUrl="{{ tree_json_url }}" data-rootId= "{{ tree_root_id }}" data-copyUrl="{% url "copy_element" %}" data-cutUrl="{% url "cut_element" %}"></div>
             </div>
         </div>
         <div id="split-bar"></div>
-
     </div>
 {% endblock %}
 
@@ -54,7 +53,7 @@
                         </div>
                         {% if is_root_node %}
                             <div class="col-md-4">
-                            {% if not node.is_learning_unit and academic_year_choices %}
+                            {% if academic_year_choices %}
                                 <select id="slt_academic_year" name="select_academic_year" class="form-control" onchange="location = this.value;">
                                     {% for choice in academic_year_choices %}
                                         <option value="{{ choice.0 }}"
@@ -108,31 +107,25 @@
                 </div>
             </div>
         </div>
+        {% include "education_group/blocks/modal/custom_xls.html" %}
         <div class="panel-footer text-right" style="padding-right: 30px;">
             {% block bottom_action_bar %}
-                {% include 'education_group/blocks/dropdown/identification_actions_bar.html' %}
+                {% include 'education_group/blocks/dropdown/identification_actions_bar.html' with dropdirection="dropup"%}
             {% endblock %}
         </div>
     </div>
     <div id="clipboard" class="alert alert-info " role="alert" {% if not selected_element_clipboard %}hidden="hidden"{% endif %}>
         <div style="display: inline-block;">
             <div class="pull-right">
-                <button type="button" class="close clear-clipboard" data-url="{% url "education_group_clear_clipboard" %}"  id="clear_clipboard" data-toggle="tooltip" data-placement="right" title="{% trans "Clear clipboard" %}">
+                <button type="button" class="close clear-clipboard" data-url="{% url "clear_element_selected" %}"  id="clear_clipboard" data-toggle="tooltip" data-placement="right" title="{% trans "Clear clipboard" %}">
                     <span aria-hidden="true" style="font-size: 0.8em;">&nbsp;<em class="fa fa-trash"></em></span>
                 </button>
             </div>
-            <div id="clipboard_content" class="pull-left">
+            <div class="body pull-left">
                 {{ selected_element_clipboard | safe }}
             </div>
         </div>
     </div>
-    {% if education_group_year %}
-        {% include "education_group/blocks/modal/custom_xls.html" %}
-    {% endif %}
-    <script>
-        const tree = JSON.parse('{{ tree | escapejs }}');
-    </script>
-    <script type="text/javascript" src="{% static 'js/program_management/education_group_tree.js' %}">
-    </script>
 
+    <script type="text/javascript" src="{% static 'js/program_management/education_group_tree.js' %}"></script>
 {% endblock content %}

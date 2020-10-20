@@ -24,7 +24,6 @@
 #
 ##############################################################################
 import functools
-import json
 from collections import OrderedDict
 
 from django.http import Http404
@@ -42,23 +41,24 @@ from base.models import academic_year
 from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import TrainingType
 from base.utils.urls import reverse_with_get
-from base.views.common import display_warning_messages
+from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain.service.identity_search import TrainingIdentitySearch
+from education_group.ddd.service.read import get_group_service, get_training_service
 from education_group.forms.academic_year_choices import get_academic_year_choices
 from education_group.forms.tree_version_choices import get_tree_versions_choices
 from education_group.views.mixin import ElementSelectedClipBoardMixin
 from education_group.views.proxy import read
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd.business_types import *
-from program_management.ddd.domain.node import NodeIdentity, NodeNotFoundException
+from program_management.ddd import command as command_program_management
+from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
-from program_management.ddd.repositories import load_tree
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
+from program_management.ddd.service.read import node_identity_service
 from program_management.forms.custom_xls import CustomXlsForm
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.models.element import Element
-from program_management.serializers.program_tree_view import program_tree_view_serializer
 from base.business.education_group import has_coorganization
 
 Tab = read.Tab  # FIXME :: fix imports (and remove this line)
@@ -83,7 +83,10 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
 
     @functools.lru_cache()
     def is_root_node(self):
-        return len(self.get_path().split('|')) <= 1
+        node_identity = node_identity_service.get_node_identity_from_element_id(
+            command_program_management.GetNodeIdentityFromElementId(element_id=self.get_root_id())
+        )
+        return node_identity == self.node_identity
 
     @cached_property
     def node_identity(self) -> 'NodeIdentity':
@@ -104,55 +107,55 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
     @cached_property
     def education_group_version(self):
         try:
-            root_element_id = self.get_object().pk
             return EducationGroupVersion.objects.select_related(
-                'offer__academic_year', 'root_group'
-            ).get(root_group__element__pk=root_element_id)
+                'offer', 'root_group__academic_year', 'root_group__education_group_type'
+            ).get(
+                root_group__partial_acronym=self.kwargs["code"],
+                root_group__academic_year__year=self.kwargs["year"]
+            )
         except (EducationGroupVersion.DoesNotExist, Element.DoesNotExist):
             raise Http404
 
     @functools.lru_cache()
-    def get_tree(self):
-        root_element_id = self.get_path().split("|")[0]
-        return load_tree.load(int(root_element_id))
+    def get_group(self) -> 'Group':
+        get_group_cmd = command.GetGroupCommand(year=self.kwargs['year'], code=self.kwargs['code'])
+        return get_group_service.get_group(get_group_cmd)
 
     @functools.lru_cache()
-    def get_object(self) -> 'Node':
-        try:
-            return self.get_tree().get_node(self.get_path())
-        except NodeNotFoundException:
-            root_node = self.get_tree().root_node
-            message = _(
-                "The formation you work with doesn't exist (or is not at the same position) "
-                "in the tree {root.title} in {root.year}."
-                "You've been redirected to the root {root.code} ({root.year})"
-            ).format(root=root_node)
-            display_warning_messages(self.request, message)
-            return root_node
+    def get_training(self) -> 'Training':
+        get_training_cmd = command.GetTrainingCommand(
+            year=self.kwargs['year'],
+            acronym=self.training_identity.acronym
+        )
+        return get_training_service.get_training(get_training_cmd)
+
+    def get_root_id(self) -> int:
+        return int(self.get_path().split("|")[0])
 
     def get_context_data(self, **kwargs):
-        is_root_node = self.node_identity == self.get_tree().root_node.entity_id
         return {
             **super().get_context_data(**kwargs),
             "person": self.request.user.person,
             "enums": mdl.enums.education_group_categories,
             "tab_urls": self.get_tab_urls(),
-            "node": self.get_object(),
+            "group": self.get_group(),
+            "training": self.get_training(),  # TODO: Rename to training (DDD concept)
             "node_path": self.get_path(),
-            "tree": json.dumps(program_tree_view_serializer(self.get_tree())),
-            "form_xls_custom": CustomXlsForm(path=self.get_path()),
+            "form_xls_custom": CustomXlsForm(year=self.node_identity.year, code=self.node_identity.code),
             "academic_year_choices": get_academic_year_choices(
                 self.node_identity,
                 self.get_path(),
                 _get_view_name_from_tab(self.active_tab),
-            ) if is_root_node else None,
+            ) if self.is_root_node() else None,
             "selected_element_clipboard": self.get_selected_element_clipboard_message(),
             "current_version": self.current_version,
             "versions_choices": get_tree_versions_choices(self.node_identity, _get_view_name_from_tab(self.active_tab)),
-            "is_root_node": is_root_node,
+            "is_root_node": self.is_root_node(),
             # TODO: Two lines below to remove when finished reorganized templates
             "education_group_version": self.education_group_version,
             "group_year": self.education_group_version.root_group,
+            "tree_json_url": self.get_tree_json_url(),
+            "tree_root_id": self.get_root_id(),
             "create_group_url": self.get_create_group_url(),
             "create_training_url": self.get_create_training_url(),
             "create_mini_training_url": self.get_create_mini_training_url(),
@@ -199,7 +202,8 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
         if self.current_version.is_standard_version:
             return reverse_with_get(
                 'training_update',
-                kwargs={'code': self.kwargs['code'], 'year': self.kwargs['year'], 'title': self.get_object().title},
+                kwargs={'code': self.kwargs['code'], 'year': self.kwargs['year'],
+                        'title': self.training_identity.acronym},
                 get={"path_to": self.get_path(), "tab": self.active_tab.name}
             )
         return reverse_with_get(
@@ -240,62 +244,61 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
                 kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}
             ) + "?path={}".format(self.get_path())
 
+    def get_tree_json_url(self) -> str:
+        return reverse('tree_json', kwargs={'root_id': self.get_root_id()})
+
     def get_create_version_permission_name(self) -> str:
         return "base.add_training_version"
 
     def get_tab_urls(self):
-        node_identity = self.get_object().entity_id
-
-        self.active_tab = read.get_tab_from_path_info(self.get_object(), self.request.META.get('PATH_INFO'))
-
         tab_urls = OrderedDict({
             Tab.IDENTIFICATION: {
                 'text': _('Identification'),
                 'active': Tab.IDENTIFICATION == self.active_tab,
                 'display': True,
-                'url': get_tab_urls(Tab.IDENTIFICATION, node_identity, self.get_path()),
+                'url': get_tab_urls(Tab.IDENTIFICATION, self.node_identity, self.get_path()),
             },
             Tab.DIPLOMAS_CERTIFICATES: {
                 'text': _('Diplomas /  Certificates'),
                 'active': Tab.DIPLOMAS_CERTIFICATES == self.active_tab,
                 'display': self.current_version.is_standard_version,
-                'url': get_tab_urls(Tab.DIPLOMAS_CERTIFICATES, node_identity, self.get_path()),
+                'url': get_tab_urls(Tab.DIPLOMAS_CERTIFICATES, self.node_identity, self.get_path()),
             },
             Tab.ADMINISTRATIVE_DATA: {
                 'text': _('Administrative data'),
                 'active': Tab.ADMINISTRATIVE_DATA == self.active_tab,
                 'display': self.have_administrative_data_tab(),
-                'url': get_tab_urls(Tab.ADMINISTRATIVE_DATA, node_identity, self.get_path()),
+                'url': get_tab_urls(Tab.ADMINISTRATIVE_DATA, self.node_identity, self.get_path()),
             },
             Tab.CONTENT: {
                 'text': _('Content'),
                 'active': Tab.CONTENT == self.active_tab,
                 'display': True,
-                'url': get_tab_urls(Tab.CONTENT, node_identity, self.get_path()),
+                'url': get_tab_urls(Tab.CONTENT, self.node_identity, self.get_path()),
             },
             Tab.UTILIZATION: {
                 'text': _('Utilizations'),
                 'active': Tab.UTILIZATION == self.active_tab,
                 'display': True,
-                'url': get_tab_urls(Tab.UTILIZATION, node_identity, self.get_path()),
+                'url': get_tab_urls(Tab.UTILIZATION, self.node_identity, self.get_path()),
             },
             Tab.GENERAL_INFO: {
                 'text': _('General informations'),
                 'active': Tab.GENERAL_INFO == self.active_tab,
                 'display': self.have_general_information_tab(),
-                'url': get_tab_urls(Tab.GENERAL_INFO, node_identity, self.get_path()),
+                'url': get_tab_urls(Tab.GENERAL_INFO, self.node_identity, self.get_path()),
             },
             Tab.SKILLS_ACHIEVEMENTS: {
                 'text': capfirst(_('skills and achievements')),
                 'active': Tab.SKILLS_ACHIEVEMENTS == self.active_tab,
                 'display': self.have_skills_and_achievements_tab(),
-                'url': get_tab_urls(Tab.SKILLS_ACHIEVEMENTS, node_identity, self.get_path()),
+                'url': get_tab_urls(Tab.SKILLS_ACHIEVEMENTS, self.node_identity, self.get_path()),
             },
             Tab.ADMISSION_CONDITION: {
                 'text': _('Conditions'),
                 'active': Tab.ADMISSION_CONDITION == self.active_tab,
                 'display': self.have_admission_condition_tab(),
-                'url': get_tab_urls(Tab.ADMISSION_CONDITION, node_identity, self.get_path()),
+                'url': get_tab_urls(Tab.ADMISSION_CONDITION, self.node_identity, self.get_path()),
             },
         })
 
@@ -306,28 +309,26 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
         return academic_year.starting_academic_year()
 
     def have_administrative_data_tab(self):
-        return not self.get_object().is_master_2m() and self.current_version.is_standard_version
+        return not self.get_group().type.name in TrainingType.root_master_2m_types_enum() and \
+               self.current_version.is_standard_version
 
     def have_general_information_tab(self):
-        node_category = self.get_object().category
         return self.current_version.is_standard_version and \
-            node_category.name in general_information_sections.SECTIONS_PER_OFFER_TYPE and \
+            self.get_group().type.name in general_information_sections.SECTIONS_PER_OFFER_TYPE and \
             self._is_general_info_and_condition_admission_in_display_range()
 
     def have_skills_and_achievements_tab(self):
-        node_category = self.get_object().category
         return self.current_version.is_standard_version and \
-            node_category.name in TrainingType.with_skills_achievements() and \
+            self.get_group().type.name in TrainingType.with_skills_achievements() and \
             self._is_general_info_and_condition_admission_in_display_range()
 
     def have_admission_condition_tab(self):
-        node_category = self.get_object().category
         return self.current_version.is_standard_version and \
-            node_category.name in TrainingType.with_admission_condition() and \
+            self.get_group().type.name in TrainingType.with_admission_condition() and \
             self._is_general_info_and_condition_admission_in_display_range()
 
     def _is_general_info_and_condition_admission_in_display_range(self):
-        return MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION <= self.get_object().year < \
+        return MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION <= self.get_group().year < \
                self.get_current_academic_year().year + 2
 
 

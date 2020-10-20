@@ -30,29 +30,35 @@ from django.test import TestCase
 from django.urls import reverse
 
 from base.models.enums.education_group_types import MiniTrainingType
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.factories.user import UserFactory
+from education_group.ddd.domain.group import Group
 from education_group.views.mini_training.common_read import Tab
-from program_management.ddd.domain.node import NodeGroupYear
-from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
+from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory
 
 
 class TestMiniTrainingReadGeneralInformation(TestCase):
     @classmethod
     def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory(current=True)
         cls.person = PersonWithPermissionsFactory('view_educationgroup')
-        cls.mini_training_version = EducationGroupVersionFactory(
+        cls.mini_training_version = StandardEducationGroupVersionFactory(
             offer__acronym="APPBIOL",
-            offer__academic_year__year=2019,
+            offer__academic_year=cls.academic_year,
             offer__education_group_type__name=MiniTrainingType.DEEPENING.name,
             root_group__partial_acronym="LBIOL100P",
-            root_group__academic_year__year=2019,
+            root_group__acronym="APPBIOL",
+            root_group__academic_year=cls.academic_year,
             root_group__education_group_type__name=MiniTrainingType.DEEPENING.name,
         )
         ElementGroupYearFactory(group_year=cls.mini_training_version.root_group)
 
-        cls.url = reverse('mini_training_general_information', kwargs={'year': 2019, 'code': 'LBIOL100P'})
+        cls.url = reverse('mini_training_general_information', kwargs={
+            'year': cls.academic_year.year,
+            'code': 'LBIOL100P'
+        })
 
     def setUp(self) -> None:
         self.client.force_login(self.person.user)
@@ -90,7 +96,10 @@ class TestMiniTrainingReadGeneralInformation(TestCase):
                 return_value=False
         ):
             response = self.client.get(self.url)
-            expected_redirect = reverse('mini_training_identification', kwargs={'year': 2019, 'code': 'LBIOL100P'})
+            expected_redirect = reverse('mini_training_identification', kwargs={
+                'year': self.academic_year.year,
+                'code': 'LBIOL100P'
+            })
             self.assertRedirects(response, expected_redirect)
 
     def test_assert_template_used(self):
@@ -110,11 +119,14 @@ class TestMiniTrainingReadGeneralInformation(TestCase):
         ]) + "?path=" + str(self.mini_training_version.root_group.element.pk)
         self.assertEqual(response.context['update_label_url'], expected_update_label_url)
         expected_publish_url = reverse(
-            'publish_general_information', args=["2019", "LBIOL100P"]
+            'publish_general_information', args=[self.academic_year.year, "LBIOL100P"]
         ) + "?path=" + str(self.mini_training_version.root_group.element.pk)
         self.assertEqual(response.context['publish_url'], expected_publish_url)
-        self.assertIsInstance(response.context['tree'], str)
-        self.assertIsInstance(response.context['node'], NodeGroupYear)
+        expected_tree_json_url = reverse('tree_json', kwargs={
+            'root_id': self.mini_training_version.root_group.element.pk
+        })
+        self.assertEqual(response.context['tree_json_url'], expected_tree_json_url)
+        self.assertIsInstance(response.context['group'], Group)
         self.assertFalse(response.context['can_edit_information'])
 
         self.assertTrue(mock_get_sections.called)

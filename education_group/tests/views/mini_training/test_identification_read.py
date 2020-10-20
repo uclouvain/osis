@@ -32,11 +32,11 @@ from django.urls import reverse
 
 from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import MiniTrainingType
-from base.tests.factories.academic_year import get_current_year
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.factories.user import UserFactory
+from education_group.ddd.domain.group import Group
 from education_group.views.mini_training.common_read import Tab
-from program_management.ddd.domain.node import NodeGroupYear
 from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory, \
     ParticularTransitionEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory
@@ -45,19 +45,20 @@ from program_management.tests.factories.element import ElementGroupYearFactory
 class TestMiniTrainingReadIdentification(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.current_year = get_current_year()
+        cls.academic_year = AcademicYearFactory(current=True)
         cls.person = PersonWithPermissionsFactory('view_educationgroup')
         cls.mini_training_version = StandardEducationGroupVersionFactory(
             offer__acronym="APPBIOL",
-            offer__academic_year__year=cls.current_year,
+            offer__academic_year=cls.academic_year,
             offer__education_group_type__name=MiniTrainingType.DEEPENING.name,
             root_group__partial_acronym="LBIOL100P",
-            root_group__academic_year__year=cls.current_year,
+            root_group__acronym="APPBIOL",
+            root_group__academic_year=cls.academic_year,
             root_group__education_group_type__name=MiniTrainingType.DEEPENING.name,
         )
         cls.root_group_element = ElementGroupYearFactory(group_year=cls.mini_training_version.root_group)
 
-        cls.url = reverse('mini_training_identification', kwargs={'year': cls.current_year, 'code': 'LBIOL100P'})
+        cls.url = reverse('mini_training_identification', kwargs={'year': cls.academic_year.year, 'code': 'LBIOL100P'})
 
     def setUp(self) -> None:
         self.client.force_login(self.person.user)
@@ -75,7 +76,10 @@ class TestMiniTrainingReadIdentification(TestCase):
         self.assertTemplateUsed(response, "access_denied.html")
 
     def test_case_mini_training_not_exists(self):
-        dummy_url = reverse('mini_training_identification', kwargs={'year': self.current_year, 'code': 'DUMMY100B'})
+        dummy_url = reverse('mini_training_identification', kwargs={
+            'year': self.academic_year.year,
+            'code': 'DUMMY100B'
+        })
         response = self.client.get(dummy_url)
 
         self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
@@ -94,8 +98,12 @@ class TestMiniTrainingReadIdentification(TestCase):
         self.assertEqual(response.context['education_group_version'], self.mini_training_version)
         self.assertEqual(response.context['update_permission_name'], "base.change_minitraining")
         self.assertEqual(response.context['create_version_permission_name'], "base.add_minitraining_version")
-        self.assertIsInstance(response.context['tree'], str)
-        self.assertIsInstance(response.context['node'], NodeGroupYear)
+        expected_tree_json_url = reverse('tree_json', kwargs={
+            'root_id': self.mini_training_version.root_group.element.pk
+        })
+        self.assertEqual(response.context['tree_json_url'], expected_tree_json_url)
+        self.assertIsInstance(response.context['tree_root_id'], int)
+        self.assertIsInstance(response.context['group'], Group)
         self.assertIsInstance(response.context['history'], QuerySet)
 
     def test_assert_active_tabs_is_identification_and_others_are_not_active(self):
@@ -177,7 +185,7 @@ class TestMiniTrainingReadIdentification(TestCase):
     def test_assert_delete_url_correctly_computed(self):
         expected_delete_mini_training_url = reverse(
             'mini_training_delete',
-            kwargs={'year': self.current_year, 'code': 'LBIOL100P'}
+            kwargs={'year': self.academic_year.year, 'code': 'LBIOL100P'}
         )
 
         response = self.client.get(self.url)
@@ -187,29 +195,39 @@ class TestMiniTrainingReadIdentification(TestCase):
 class TestMiniTrainingReadIdentificationTabs(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.current_year = get_current_year()
+        cls.academic_year = AcademicYearFactory(current=True)
         cls.person = PersonWithPermissionsFactory('view_educationgroup')
         cls.standard_mini_training_version = StandardEducationGroupVersionFactory(
-            offer__academic_year__year=cls.current_year,
+            offer__acronym="APPBIOL",
+            offer__academic_year=cls.academic_year,
             offer__education_group_type__name=MiniTrainingType.DEEPENING.name,
             root_group__partial_acronym="LBIOL100P",
-            root_group__academic_year__year=cls.current_year,
+            root_group__acronym="APPBIOL",
+            root_group__academic_year=cls.academic_year,
             root_group__education_group_type__name=MiniTrainingType.DEEPENING.name,
         )
         ElementGroupYearFactory(group_year=cls.standard_mini_training_version.root_group)
 
-        cls.url_standard = reverse('mini_training_identification', kwargs={'year': cls.current_year, 'code': 'LBIOL100P'})
+        cls.url_standard = reverse('mini_training_identification', kwargs={
+            'year': cls.academic_year.year,
+            'code': 'LBIOL100P'
+        })
 
         cls.non_standard_mini_training_version = ParticularTransitionEducationGroupVersionFactory(
-            offer__academic_year__year=cls.current_year,
+            offer__acronym="APPDRT",
+            offer__academic_year=cls.academic_year,
             offer__education_group_type__name=MiniTrainingType.DEEPENING.name,
             root_group__partial_acronym="LDRT100P",
-            root_group__academic_year__year=cls.current_year,
+            root_group__acronym="APPDRT",
+            root_group__academic_year=cls.academic_year,
             root_group__education_group_type__name=MiniTrainingType.DEEPENING.name,
         )
         ElementGroupYearFactory(group_year=cls.non_standard_mini_training_version.root_group)
 
-        cls.url_non_particular = reverse('mini_training_identification', kwargs={'year': cls.current_year, 'code': 'LDRT100P'})
+        cls.url_non_particular = reverse('mini_training_identification', kwargs={
+            'year': cls.academic_year.year,
+            'code': 'LDRT100P'
+        })
 
     def setUp(self) -> None:
         self.client.force_login(self.person.user)

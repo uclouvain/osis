@@ -32,8 +32,6 @@ from django.conf import settings
 from django.core.cache import cache
 from django.http import QueryDict
 
-from osis_common.decorators.deprecated import deprecated
-
 CACHE_FILTER_TIMEOUT = None
 PREFIX_CACHE_KEY = 'cache_filter'
 
@@ -120,9 +118,15 @@ class RequestCache(OsisCache):
                 new_get_request[key] = value
         return new_get_request
 
-    def get_value_cached(self, key: str):
+    def get_single_value_cached(self, key: str):
+        values_cached = self.get_values_list_cached(key)
+        if not values_cached:
+            return
+        return values_cached[0]
+
+    def get_values_list_cached(self, key: str) -> list:
         cached_data = self.cached_data or {}
-        return cached_data.get(key)
+        return cached_data.get(key) or []
 
 
 class SearchParametersCache(OsisCache):

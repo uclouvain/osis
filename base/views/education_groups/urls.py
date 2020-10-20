@@ -26,32 +26,13 @@
 from django.conf.urls import url, include
 
 from base.views import education_group
-from base.views.education_groups.clear_clipboard import clear_clipboard
 from base.views.education_groups.publication_contact import CreateEducationGroupPublicationContactView, \
     UpdateEducationGroupPublicationContactView, EducationGroupPublicationContactDeleteView, \
     UpdateEducationGroupEntityPublicationContactView
-from base.views.education_groups.search import EducationGroupTypeAutoComplete
-from base.views.education_groups.update import CertificateAimAutocomplete
 from education_group import urls as education_group_urls
 from .achievement.urls import urlpatterns as urlpatterns_achievement
 
 urlpatterns = [
-    url(
-        r'^certificate_aim_autocomplete/$',
-        CertificateAimAutocomplete.as_view(),
-        name='certificate_aim_autocomplete',
-    ),
-    url(
-        r'^education_group_type_autocomplete/$',
-        EducationGroupTypeAutoComplete.as_view(),
-        name='education_group_type_autocomplete'
-    ),
-
-    url(
-        r'^clear_clipboard/$',
-        clear_clipboard,
-        name='education_group_clear_clipboard'
-    ),
     url(r'^(?P<education_group_year_id>[0-9]+)/', include([
         url(r'^informations/edit/$', education_group.education_group_year_pedagogy_edit,
             name="education_group_pedagogy_edit"),

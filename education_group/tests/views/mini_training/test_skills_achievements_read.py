@@ -31,11 +31,11 @@ from django.test import TestCase
 from django.urls import reverse
 
 from base.models.enums.education_group_types import MiniTrainingType
-from base.tests.factories.academic_year import get_current_year
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.factories.user import UserFactory
+from education_group.ddd.domain.group import Group
 from education_group.views.mini_training.common_read import Tab
-from program_management.ddd.domain.node import NodeGroupYear
 from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory
 
@@ -43,20 +43,21 @@ from program_management.tests.factories.element import ElementGroupYearFactory
 class TestMiniTrainingReadSkillAchievementsRead(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.current_year = get_current_year()
+        cls.academic_year = AcademicYearFactory(current=True)
         cls.person = PersonWithPermissionsFactory('view_educationgroup')
         cls.mini_training_version = StandardEducationGroupVersionFactory(
             offer__acronym="APPBIOL",
-            offer__academic_year__year=cls.current_year,
+            offer__academic_year=cls.academic_year,
             offer__education_group_type__name=MiniTrainingType.DEEPENING.name,
             root_group__partial_acronym="LBIOL100P",
-            root_group__academic_year__year=cls.current_year,
+            root_group__acronym="APPBIOL",
+            root_group__academic_year=cls.academic_year,
             root_group__education_group_type__name=MiniTrainingType.DEEPENING.name,
         )
         cls.element_group_year = ElementGroupYearFactory(group_year=cls.mini_training_version.root_group)
 
         cls.url = reverse(
-            'mini_training_skills_achievements', kwargs={'year': cls.current_year, 'code': 'LBIOL100P'}
+            'mini_training_skills_achievements', kwargs={'year': cls.academic_year.year, 'code': 'LBIOL100P'}
         ) + '?path={}&tab={}'.format(cls.element_group_year.id, Tab.SKILLS_ACHIEVEMENTS)
 
     def setUp(self) -> None:
@@ -74,7 +75,9 @@ class TestMiniTrainingReadSkillAchievementsRead(TestCase):
         self.client.logout()
         response = self.client.get(self.url)
         self.assertTrue(
-            '/login/?next=/educationgroups/mini_trainings/{}/LBIOL100P/skills_achievements/'.format(self.current_year)
+            '/login/?next=/educationgroups/mini_trainings/{}/LBIOL100P/skills_achievements/'.format(
+                self.academic_year.year
+            )
             in response.url
         )
 
@@ -93,13 +96,13 @@ class TestMiniTrainingReadSkillAchievementsRead(TestCase):
         ):
             response = self.client.get(self.url)
             expected_redirect = reverse('mini_training_identification', kwargs={
-                'year': self.current_year, 'code': 'LBIOL100P'
+                'year': self.academic_year.year, 'code': 'LBIOL100P'
             })
             self.assertRedirects(response, expected_redirect)
 
     def test_case_mini_training_not_exists(self):
         dummy_url = reverse('mini_training_skills_achievements', kwargs={
-            'year': self.current_year, 'code': 'DUMMY100B'
+            'year': self.academic_year.year, 'code': 'DUMMY100B'
         })
         response = self.client.get(dummy_url)
 
@@ -117,8 +120,11 @@ class TestMiniTrainingReadSkillAchievementsRead(TestCase):
         self.assertEqual(response.context['person'], self.person)
         self.assertEqual(response.context['group_year'], self.mini_training_version.root_group)
         self.assertEqual(response.context['education_group_version'], self.mini_training_version)
-        self.assertIsInstance(response.context['tree'], str)
-        self.assertIsInstance(response.context['node'], NodeGroupYear)
+        expected_tree_json_url = reverse('tree_json', kwargs={
+            'root_id': self.mini_training_version.root_group.element.pk
+        })
+        self.assertEqual(response.context['tree_json_url'], expected_tree_json_url)
+        self.assertIsInstance(response.context['group'], Group)
         self.assertIsInstance(response.context['achievements'], List)
         self.assertIn("can_edit_information", response.context)
 

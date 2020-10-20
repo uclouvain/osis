@@ -86,7 +86,7 @@ class TestNodeViewAttributeSerializer(SimpleTestCase):
         self.serialized_data = _get_node_view_attribute_serializer(self.link, '1|2|6', tree, context=self.context)
 
     def test_serialize_node_attr_ensure_detach_url(self):
-        expected_url = reverse_with_get('tree_detach_node', args=[self.root_node.pk], get={"path": "1|2|6"})
+        expected_url = reverse_with_get('tree_detach_node', get={"path": "1|2|6"})
         self.assertEqual(self.serialized_data['detach_url'], expected_url)
 
     def test_serialize_node_attr_ensure_paste_url(self):
@@ -282,40 +282,40 @@ class TestLeafViewAttributeSerializer(SimpleTestCase):
         self.assertEqual(serialized_data['title'], expected_title)
 
     def test_serializer_node_attr_ensure_get_css_class_proposal_creation(self):
-        self.link.child.proposal_type = ProposalType.CREATION
+        self.link.child.proposal_type = ProposalType.CREATION.name
         expected_css_class = "proposal proposal_creation"
         serialized_data = _get_leaf_view_attribute_serializer(self.link, self.path, self.tree, context=self.context)
-        self.assertEqual(serialized_data['css_class'], expected_css_class)
+        self.assertEqual(serialized_data['class'], expected_css_class)
 
     def test_serializer_node_attr_ensure_get_css_class_proposal_modification(self):
-        self.link.child.proposal_type = ProposalType.MODIFICATION
+        self.link.child.proposal_type = ProposalType.MODIFICATION.name
         expected_css_class = "proposal proposal_modification"
         serialized_data = _get_leaf_view_attribute_serializer(self.link, self.path, self.tree, context=self.context)
-        self.assertEqual(serialized_data['css_class'], expected_css_class)
+        self.assertEqual(serialized_data['class'], expected_css_class)
 
     def test_serializer_node_attr_ensure_get_css_class_proposal_transformation(self):
-        self.link.child.proposal_type = ProposalType.TRANSFORMATION
+        self.link.child.proposal_type = ProposalType.TRANSFORMATION.name
         expected_css_class = "proposal proposal_transformation"
         serialized_data = _get_leaf_view_attribute_serializer(self.link, self.path, self.tree, context=self.context)
-        self.assertEqual(serialized_data['css_class'], expected_css_class)
+        self.assertEqual(serialized_data['class'], expected_css_class)
 
     def test_serializer_node_attr_ensure_get_css_class_proposal_transformation_modification(self):
-        self.link.child.proposal_type = ProposalType.TRANSFORMATION_AND_MODIFICATION
+        self.link.child.proposal_type = ProposalType.TRANSFORMATION_AND_MODIFICATION.name
         expected_css_class = "proposal proposal_transformation_modification"
         serialized_data = _get_leaf_view_attribute_serializer(self.link, self.path, self.tree, context=self.context)
-        self.assertEqual(serialized_data['css_class'], expected_css_class)
+        self.assertEqual(serialized_data['class'], expected_css_class)
 
     def test_serializer_node_attr_ensure_get_css_class_proposal_suppression(self):
-        self.link.child.proposal_type = ProposalType.SUPPRESSION
+        self.link.child.proposal_type = ProposalType.SUPPRESSION.name
         expected_css_class = "proposal proposal_suppression"
         serialized_data = _get_leaf_view_attribute_serializer(self.link, self.path, self.tree, context=self.context)
-        self.assertEqual(serialized_data['css_class'], expected_css_class)
+        self.assertEqual(serialized_data['class'], expected_css_class)
 
     def test_serializer_node_attr_ensure_get_css_class_no_proposal(self):
         self.link.child.proposal_type = None
         expected_css_class = ""
         serialized_data = _get_leaf_view_attribute_serializer(self.link, self.path, self.tree, context=self.context)
-        self.assertEqual(serialized_data['css_class'], expected_css_class)
+        self.assertEqual(serialized_data['class'], expected_css_class)
 
 
 class TestVersionNodeViewSerializerInEn(SimpleTestCase):

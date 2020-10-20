@@ -24,7 +24,6 @@
 #
 ##############################################################################
 import functools
-import json
 from collections import OrderedDict
 
 from django.shortcuts import get_object_or_404
@@ -39,7 +38,6 @@ from base.business.education_groups.general_information_sections import \
     MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION
 from base.models import academic_year
 from base.models.enums.education_group_categories import Categories
-from base.views.common import display_warning_messages
 from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.service.read import get_group_service
@@ -49,11 +47,11 @@ from education_group.views.mixin import ElementSelectedClipBoardMixin
 from education_group.views.proxy import read
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd.business_types import *
-from program_management.ddd.domain.node import NodeIdentity, NodeNotFoundException
-from program_management.ddd.repositories import load_tree
+from program_management.ddd import command as command_program_management
+from program_management.ddd.domain.node import NodeIdentity
+from program_management.ddd.service.read import node_identity_service
 from program_management.forms.custom_xls import CustomXlsForm
 from program_management.models.element import Element
-from program_management.serializers.program_tree_view import program_tree_view_serializer
 
 Tab = read.Tab  # FIXME :: fix imports (and remove this line)
 
@@ -75,48 +73,34 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
             path = str(root_element.pk)
         return path
 
-    @functools.lru_cache()
-    def get_tree(self):
-        root_element_id = self.get_path().split("|")[0]
-        return load_tree.load(int(root_element_id))
+    def get_root_id(self) -> int:
+        return int(self.get_path().split("|")[0])
+
+    @cached_property
+    def is_root_node(self) -> bool:
+        node_identity = node_identity_service.get_node_identity_from_element_id(
+            command_program_management.GetNodeIdentityFromElementId(element_id=self.get_root_id())
+        )
+        return node_identity == self.node_identity
 
     @cached_property
     def node_identity(self) -> 'NodeIdentity':
         return NodeIdentity(code=self.kwargs['code'], year=self.kwargs['year'])
 
-    @functools.lru_cache()
-    def get_object(self) -> 'Node':
-        try:
-            return self.get_tree().get_node(self.get_path())
-        except NodeNotFoundException:
-            root_node = self.get_tree().root_node
-            message = _(
-                "The formation you work with doesn't exist (or is not at the same position) "
-                "in the tree {root.title} in {root.year}."
-                "You've been redirected to the root {root.code} ({root.year})"
-            ).format(root=root_node)
-            display_warning_messages(self.request, message)
-            return root_node
-
     def get_context_data(self, **kwargs):
-        self.active_tab = read.get_tab_from_path_info(self.get_object(), self.request.META.get('PATH_INFO'))
-        is_root_node = self.node_identity == self.get_tree().root_node.entity_id
-
         return {
             **super().get_context_data(**kwargs),
             "person": self.request.user.person,
             "enums": mdl.enums.education_group_categories,
-            "form_xls_custom": CustomXlsForm(),
-            "tree":  json.dumps(program_tree_view_serializer(self.get_tree())),
+            "form_xls_custom": CustomXlsForm(year=self.get_group().year, code=self.get_group().code),
             "group": self.get_group(),
-            "node": self.get_object(),
             "node_path": self.get_path(),
             "tab_urls": self.get_tab_urls(),
             "academic_year_choices": get_academic_year_choices(
                 self.node_identity,
                 self.get_path(),
                 _get_view_name_from_tab(self.active_tab)
-            ) if is_root_node else None,
+            ) if self.is_root_node else None,
             "xls_ue_prerequisites": reverse("education_group_learning_units_prerequisites",
                                             args=[self.get_group_year().academic_year.year,
                                                   self.get_group_year().partial_acronym]
@@ -139,7 +123,9 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
             "delete_group_url": self.get_delete_group_url(),
             "create_training_url": self.get_create_training_url(),
             "create_mini_training_url": self.get_create_mini_training_url(),
-            "is_root_node": is_root_node,
+            "tree_json_url": self.get_tree_json_url(),
+            "tree_root_id": self.get_root_id(),
+            "is_root_node": self.is_root_node,
         }
 
     @functools.lru_cache()
@@ -185,6 +171,9 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
         return reverse('group_delete', kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}) + \
                "?path={}".format(self.get_path())
 
+    def get_tree_json_url(self) -> str:
+        return reverse('tree_json', kwargs={'root_id': self.get_root_id()})
+
     def get_tab_urls(self):
         tab_urls = OrderedDict({
             Tab.IDENTIFICATION: {
@@ -216,11 +205,11 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
         return read.validate_active_tab(tab_urls)
 
     def have_general_information_tab(self):
-        return self.get_object().node_type.name in general_information_sections.SECTIONS_PER_OFFER_TYPE and \
+        return self.get_group().type.name in general_information_sections.SECTIONS_PER_OFFER_TYPE and \
                self._is_general_info_and_condition_admission_in_display_range()
 
     def _is_general_info_and_condition_admission_in_display_range(self):
-        return MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION <= self.get_object().year < \
+        return MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION <= self.get_group().year < \
                self.get_current_academic_year().year + 2
 
 

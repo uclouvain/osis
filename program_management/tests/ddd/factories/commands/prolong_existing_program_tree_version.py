@@ -23,25 +23,21 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.test import SimpleTestCase
 
-from program_management.ddd.domain.exception import RelativeCreditShouldBeGreaterOrEqualsThanZero, \
-    RelativeCreditShouldBeLowerOrEqualThan999
+import factory.fuzzy
 
-from program_management.ddd.validators._relative_credits import RelativeCreditsValidator
+from program_management.ddd import command
 
 
-class TestRelativeCreditsValidator(SimpleTestCase):
-    def test_assert_raise_exception_case_relative_credits_lower_than_zero(self):
-        validator = RelativeCreditsValidator(-1)
-        with self.assertRaises(RelativeCreditShouldBeGreaterOrEqualsThanZero):
-            validator.is_valid()
+class ProlongExistingProgramTreeVersionCommandFactory(factory.Factory):
+    class Meta:
+        model = command.ProlongExistingProgramTreeVersionCommand
+        abstract = False
 
-    def test_assert_relative_credits_must_be_greater_or_equals_to_zero(self):
-        validator = RelativeCreditsValidator(0)
-        self.assertTrue(validator.is_valid())
-
-    def test_relative_credits_must_be_lower_or_equal_to_999(self):
-        validator = RelativeCreditsValidator(1000)
-        with self.assertRaises(RelativeCreditShouldBeLowerOrEqualThan999):
-            validator.is_valid()
+    offer_acronym = "CHIM1BA"
+    version_name = "VERSIONNAME"
+    is_transition = False
+    updated_year = 2019
+    end_year = None
+    title_fr = "fr  title"
+    title_en = "title  en"
