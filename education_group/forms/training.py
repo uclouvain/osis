@@ -261,7 +261,6 @@ class CreateTrainingForm(ValidationRuleMixin, forms.Form):
     remark_english = forms.CharField(widget=forms.Textarea, label=_("remark in english").capitalize(), required=False)
 
     # HOPS panel
-    hops_fields = ('ares_code', 'ares_graca', 'ares_authorization')
     ares_code = forms.IntegerField(label=_('ARES study code'), widget=forms.TextInput(), required=False,
                                    max_value=9999)
     ares_graca = forms.IntegerField(label=_('ARES-GRACA'), widget=forms.TextInput(), required=False,
