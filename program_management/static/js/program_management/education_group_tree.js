@@ -210,7 +210,7 @@ function clearClipboardListener(event) {
 
 function getStoreKeyTreeData() {
     const treeRootId = getTreeRootId();
-    return `progrem_tree_data_${treeRootId}`;
+    return `program_tree_data_${treeRootId}`;
 }
 
 function getTreeDataUrl() {
@@ -271,7 +271,7 @@ function initializeJsTree($documentTree, tree_json_url, cut_element_url, copy_el
 
     function generateTreeKey(){
         const treeRootId = getTreeRootId();
-        return `progrem_tree_state_${treeRootId}`;
+        return `program_tree_state_${treeRootId}`;
 
     }
 
