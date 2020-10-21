@@ -70,7 +70,7 @@ def _get_node_view_attribute_serializer(link: 'Link', path: 'Path', tree: 'Progr
         'element_year': link.child.year,
         'title': link.child.code,
         'paste_url': reverse_with_get('tree_paste_node', get={"path": path}),
-        'detach_url': reverse_with_get('tree_detach_node', args=[context['root'].pk], get={"path": path}),
+        'detach_url': reverse_with_get('tree_detach_node', get={"path": path}),
         'modify_url': reverse('tree_update_link', args=[
             link.parent.code,
             link.parent.year,

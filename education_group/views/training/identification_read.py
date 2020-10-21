@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.http import Http404
 from reversion.models import Version
 
 from base.models.education_group_achievement import EducationGroupAchievement
@@ -31,21 +30,18 @@ from base.models.education_group_certificate_aim import EducationGroupCertificat
 from base.models.education_group_detailed_achievement import EducationGroupDetailedAchievement
 from base.models.education_group_organization import EducationGroupOrganization
 from base.models.education_group_year_domain import EducationGroupYearDomain
-from education_group.ddd.domain.exception import TrainingNotFoundException
-from education_group.ddd.repository.training import TrainingRepository
 from education_group.models.group_year import GroupYear
-from education_group.views.training.common_read import TrainingRead
+from education_group.views.training.common_read import TrainingRead, Tab
 from program_management.models.education_group_version import EducationGroupVersion
 
 
 class TrainingReadIdentification(TrainingRead):
     template_name = "education_group_app/training/identification_read.html"
-    active_tab = None
+    active_tab = Tab.IDENTIFICATION
 
     def get_context_data(self, **kwargs):
         return {
             **super().get_context_data(**kwargs),
-            "education_group_year": self.get_training(),  # TODO: Rename to training (DDD concept)
             "permission_object": self.get_permission_object(),
             "history": self.get_related_history(),
         }
@@ -75,12 +71,3 @@ class TrainingReadIdentification(TrainingRead):
         )
 
         return versions.order_by('-revision__date_created').distinct('revision__date_created')
-
-    def get_training(self):
-        try:
-            # FIXME :: create a service to return the TrainingIdentity
-            return TrainingRepository.get(
-                self.training_identity
-            )
-        except TrainingNotFoundException:
-            raise Http404

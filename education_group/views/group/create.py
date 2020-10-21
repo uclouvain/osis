@@ -57,7 +57,7 @@ class GroupCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
     def _get_initial_form(self) -> Dict:
         request_cache = RequestCache(self.request.user, reverse('version_program'))
-        default_academic_year = request_cache.get_value_cached('academic_year') or starting_academic_year()
+        default_academic_year = request_cache.get_single_value_cached('academic_year') or starting_academic_year()
 
         default_management_entity = None
         parent_group = self.get_parent_group()

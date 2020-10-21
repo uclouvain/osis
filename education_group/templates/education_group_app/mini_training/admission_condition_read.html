@@ -45,7 +45,7 @@
                      <h3>
                         {{ admission_requirements_label.label_translated }}
                         {% if can_edit_information %}
-                            {% url 'education_group_year_admission_condition_update_text' node.year node.code as update_text_url %}
+                            {% url 'education_group_year_admission_condition_update_text' group.year group.code as update_text_url %}
                             <a href="#" role="button"
                                class="button modify-text-btn"
                                data-form="{{ update_text_url }}?section=free&title={{ admission_requirements_label.label_translated.split|join:"%20" }}">

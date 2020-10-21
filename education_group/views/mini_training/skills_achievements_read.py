@@ -48,7 +48,7 @@ class MiniTrainingReadSkillsAchievements(MiniTrainingRead):
             "year": kwargs['year'],
             "code": kwargs['code'],
             **super().get_context_data(**kwargs),
-            "achievements": achievement.get_achievements(self.get_object(), self.request.GET['path']),
+            "achievements": achievement.get_achievements(self.get_group(), self.request.GET['path']),
             "can_edit_information": self.request.user.has_perm(edition_perm_name, self.get_permission_object()),
             "program_aims_label": self.get_program_aims_label(),
             "program_aims_update_url": self.get_program_aims_update_url(),
@@ -88,4 +88,4 @@ class MiniTrainingReadSkillsAchievements(MiniTrainingRead):
 
     @functools.lru_cache()
     def get_translated_labels(self):
-        return achievement.get_skills_labels(self.get_object(), self.request.LANGUAGE_CODE)
+        return achievement.get_skills_labels(self.get_group(), self.request.LANGUAGE_CODE)
