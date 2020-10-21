@@ -84,8 +84,6 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
                 is_transition=program_tree_version.is_transition,
                 root_group_id=group_year_id
             )
-            if program_tree_version.start_year != 2020:
-                raise Exception('rollback')
             _update_start_year_and_end_year(
                 educ_group_version,
                 program_tree_version.start_year,
