@@ -32,7 +32,8 @@ from program_management.tests.ddd.factories.commands.update_mini_training_versio
 
 
 class TestUpdateMiniTrainingVersion(TestCase):
-
+    @mock.patch("program_management.ddd.service.write.postpone_tree_version_service.postpone_program_tree_version")
+    @mock.patch("program_management.ddd.service.write.postpone_program_tree_service.postpone_program_tree")
     @mock.patch(
         "program_management.ddd.domain.service.identity_search.GroupIdentitySearch.get_from_tree_version_identity")
     @mock.patch("program_management.ddd.service.write.update_program_tree_version_service.update_program_tree_version")
@@ -42,7 +43,9 @@ class TestUpdateMiniTrainingVersion(TestCase):
             self,
             mock_postpone_group_version_service,
             mock_update_tree_version_service,
-            mock_identity_converter
+            mock_identity_converter,
+            mock_postpone_program_tree,
+            mock_postpone_program_tree_version
     ):
         cmd = UpdateMiniTrainingVersionCommandFactory()
         identity_expected = ProgramTreeVersionIdentity(
@@ -59,5 +62,7 @@ class TestUpdateMiniTrainingVersion(TestCase):
 
         self.assertTrue(mock_postpone_group_version_service.called)
         self.assertTrue(mock_update_tree_version_service.called)
+        self.assertTrue(mock_postpone_program_tree.called)
+        self.assertTrue(mock_postpone_program_tree_version.called)
 
         self.assertEqual(result, [identity_expected])
