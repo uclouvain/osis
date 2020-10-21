@@ -2575,14 +2575,11 @@ msgstr "Succès"
 msgid "Summary course submission"
 msgstr "Soumission des fiches descriptives"
 
-#, fuzzy
-#| msgid ""
-#| "Summary course submission is not allowed for tutors during this period."
 msgid ""
 "Summary course submission (Force majeure) is not allowed for tutors during "
 "this period."
 msgstr ""
-"La modification des fiches descriptives n'est pas autorisée pour les "
+"La modification des fiches descriptives (Cas de force majeure) n'est pas autorisée pour les "
 "enseignants durant cette période."
 
 msgid "Summary course submission force majeure"
@@ -3797,9 +3794,3 @@ msgstr "oui"
 
 msgid "yes,no"
 msgstr "oui,non"
-
-#~ msgid "Ending date"
-#~ msgstr "Date de fermeture"
-
-#~ msgid "Opening date"
-#~ msgstr "Date d'ouverture"
