@@ -44,7 +44,7 @@ class TestCreateStandardProgramTree(TestCase):
         mock_tree_builder.return_value.build_from_orphan_group_as_root.return_value = standard_program_tree
         mock_tree_repository.return_value.create.return_value = standard_program_tree.entity_id
 
-        cmd = command.CreateStandardVersionCommand(offer_acronym="Offer", code="Code", year=2025)
+        cmd = command.CreateStandardVersionCommand(offer_acronym="Offer", code="Code", start_year=2025)
         result = create_standard_program_tree_service.create_standard_program_tree(cmd)
 
         self.assertEqual(standard_program_tree.entity_id, result)
