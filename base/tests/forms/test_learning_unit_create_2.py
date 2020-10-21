@@ -453,14 +453,10 @@ class TestFullFormSave(LearningUnitFullFormContextMixin):
     def test_when_update_instance(self):
         self.post_data = get_valid_form_data(self.current_academic_year, self.faculty_manager, self.learning_unit_year)
 
-        self.learning_unit_year.learning_container_year.additional_entity_1 = None
-        self.learning_unit_year.learning_container_year.additional_entity_2 = None
-        self.learning_unit_year.learning_container_year.save()
-
         initial_counts = self._get_initial_counts()
         self.post_data['credits'] = 99
 
-        form = FullForm(self.faculty_person, self.learning_unit_year.academic_year,
+        form = FullForm(self.central_person, self.learning_unit_year.academic_year,
                         learning_unit_instance=self.learning_unit_year.learning_unit, data=self.post_data)
 
         self.assertTrue(form.is_valid(), form.errors)
@@ -472,7 +468,7 @@ class TestFullFormSave(LearningUnitFullFormContextMixin):
             self.assertEqual(current_count, initial_count, model_class.objects.all())
 
     def test_when_delete_additionnal_entity(self):
-        post_data = get_valid_form_data(self.current_academic_year, self.faculty_manager, self.learning_unit_year)
+        post_data = get_valid_form_data(self.current_academic_year, self.central_manager, self.learning_unit_year)
         # Assert additionnal entity exists exists
         if not self.learning_unit_year.learning_container_year.additional_entity_1:
             self.learning_unit_year.learning_container_year.additional_entity_1 = EntityFactory()
@@ -489,7 +485,7 @@ class TestFullFormSave(LearningUnitFullFormContextMixin):
         self.assertEqual(component_queryset.count(), 4)  # Assert we are testing for Full AND Partim (2 components each)
 
         form = FullForm(
-            self.faculty_person,
+            self.central_person,
             self.learning_unit_year.academic_year,
             learning_unit_instance=self.learning_unit_year.learning_unit,
             data=post_data
@@ -526,9 +522,9 @@ class TestFullFormSave(LearningUnitFullFormContextMixin):
             learning_container_year__container_type=learning_container_year_types.COURSE,
             campus=self.initial_campus
         )
-        post_data = get_valid_form_data(self.current_academic_year, entity_role=self.faculty_manager,
+        post_data = get_valid_form_data(self.current_academic_year, entity_role=self.central_manager,
                                         learning_unit_year=new_learning_unit_year)
-        form = _instanciate_form(self.current_academic_year, post_data=post_data, person=self.faculty_person,
+        form = _instanciate_form(self.current_academic_year, post_data=post_data, person=self.central_person,
                                  start_year=self.current_academic_year)
         self.assertTrue(form.is_valid(), form.errors)
         saved_luy = form.save()
@@ -548,15 +544,11 @@ class TestFullFormSave(LearningUnitFullFormContextMixin):
                 learning_unit_year=saved_luy, type=PRACTICAL_EXERCISES).acronym, "PP")
 
     def test_when_type_is_internship(self):
-        self.learning_unit_year.learning_container_year.additional_entity_1 = None
-        self.learning_unit_year.learning_container_year.additional_entity_2 = None
-        self.learning_unit_year.learning_container_year.save()
-
         self.post_data['credits'] = 99
         self.post_data['container_type'] = INTERNSHIP
         self.post_data['internship_subtype'] = TEACHING_INTERNSHIP
 
-        form = FullForm(self.faculty_person,
+        form = FullForm(self.central_person,
                         self.learning_unit_year.academic_year,
                         start_year=self.current_academic_year,
                         data=self.post_data)
@@ -579,14 +571,10 @@ class TestFullFormSave(LearningUnitFullFormContextMixin):
                 learning_unit_year=saved_luy, type=PRACTICAL_EXERCISES).acronym, "PP")
 
     def test_when_type_is_dissertation(self):
-        self.learning_unit_year.learning_container_year.additional_entity_1 = None
-        self.learning_unit_year.learning_container_year.additional_entity_2 = None
-        self.learning_unit_year.learning_container_year.save()
-
         self.post_data['credits'] = 99
         self.post_data['container_type'] = DISSERTATION
 
-        form = FullForm(self.faculty_person,
+        form = FullForm(self.central_person,
                         self.learning_unit_year.academic_year,
                         start_year=self.current_academic_year,
                         data=self.post_data)
