@@ -127,9 +127,7 @@ class TestLearningAchievementView(TestCase):
     def test_delete_permission_denied(self):
         self.person_entity.delete()
         request = self.request_factory.post(
-            reverse('achievement_management',
-            args=[self.achievement_fr.learning_unit_year.id]),
-            data={
+            reverse('achievement_management', args=[self.achievement_fr.learning_unit_year.id]), data={
                 'achievement_id': self.achievement_fr.id,
                 'action': DELETE
             }

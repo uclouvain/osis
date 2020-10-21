@@ -103,7 +103,7 @@ msgstr ""
 
 msgid ""
 "You can't modify learning unit under year : %(year)d. Modifications should "
-"be made in EPC under year  %(year)d"
+"be made in EPC under year %(year)d"
 msgstr "Vous ne pouvez pas modifier une unité d'enseignement avant %(year)d."
 " Les modifications doivent être faites dans EPC avant l'année %(year)d"
 
