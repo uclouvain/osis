@@ -44,7 +44,7 @@
                                 {% trans 'Modify prerequisites' %}
                             </a>
                         {% else %}
-                            <button class="btn btn-default" disabled>{% trans 'Modify prerequisites' %}</button>
+                            <button class="btn btn-default" title="{% trans 'This education group is not editable during this period.' %}" disabled>{% trans 'Modify prerequisites' %}</button>
                         {% endif %}
                     </div>
                 {% endif %}
