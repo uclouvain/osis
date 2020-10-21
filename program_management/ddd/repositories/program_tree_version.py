@@ -118,47 +118,11 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
 
     @classmethod
     def get(cls, entity_id: 'ProgramTreeVersionIdentity') -> 'ProgramTreeVersion':
-        qs = EducationGroupVersion.objects.filter(
+        qs = _get_common_queryset().filter(
             version_name=entity_id.version_name,
             offer__acronym=entity_id.offer_acronym,
             offer__academic_year__year=entity_id.year,
             is_transition=entity_id.is_transition,
-        ).annotate(
-            code=F('root_group__partial_acronym'),
-            offer_acronym=F('offer__acronym'),
-            offer_year=F('offer__academic_year__year'),
-            version_title_fr=F('title_fr'),
-            version_title_en=F('title_en'),
-
-            # FIXME :: should add a field EducationgroupVersion.end_year
-            # FIXME :: and should remove GroupYear.end_year
-            # FIXME :: End_year is useful only for EducationGroupYear (training, minitraining) and programTreeVersions.
-            # FIXME :: End year is not useful for Groups. For business, Group doesn't have a 'end date'.
-            end_year_of_existence=Case(
-                When(
-                    Q(
-                        offer__education_group_type__category__in={
-                            Categories.TRAINING.name, Categories.MINI_TRAINING.name
-                        }
-                    ) & Q(
-                        version_name=STANDARD
-                    ),
-                    then=F('offer__education_group__end_year__year')
-                ),
-                default=F('root_group__group__end_year__year'),
-                output_field=IntegerField(),
-            ),
-            start_year=F('root_group__group__start_year__year'),
-        ).values(
-            'code',
-            'offer_acronym',
-            'offer_year',
-            'version_name',
-            'version_title_fr',
-            'version_title_en',
-            'is_transition',
-            'end_year_of_existence',
-            'start_year',
         )
         try:
             return _instanciate_tree_version(qs.get())
@@ -200,18 +164,18 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
     ) -> List['ProgramTreeVersion']:
         qs = _get_common_queryset()
         if "element_ids" in kwargs:
-            qs = qs.filter(element__in=kwargs['element_ids'])
+            qs = qs.filter(root_group__element__in=kwargs['element_ids'])
 
         if version_name is not None:
-            qs = qs.filter(educationgroupversion__version_name=version_name)
+            qs = qs.filter(version_name=version_name)
         if offer_acronym is not None:
-            qs = qs.filter(educationgroupversion__offer__acronym=offer_acronym)
+            qs = qs.filter(offer__acronym=offer_acronym)
         if is_transition is not None:
-            qs = qs.filter(educationgroupversion__is_transition=is_transition)
+            qs = qs.filter(is_transition=is_transition)
         if year is not None:
-            qs = qs.filter(educationgroupversion__offer__academic_year__year=year)
+            qs = qs.filter(offer__academic_year__year=year)
         if code is not None:
-            qs = qs.filter(partial_acronym=code)
+            qs = qs.filter(root_group__partial_acronym=code)
         results = []
         for record_dict in qs:
             results.append(_instanciate_tree_version(record_dict))
@@ -327,7 +291,7 @@ def _build_where_clause(node_identity: 'NodeIdentity') -> Q:
 def _search_versions_from_offer_ids(offer_ids: List[int]) -> List['ProgramTreeVersion']:
     qs = _get_common_queryset()
     qs = qs.filter(
-        educationgroupversion__offer_id__in=offer_ids,
+        offer_id__in=offer_ids,
     )
     results = []
     for record_dict in qs:
@@ -336,18 +300,34 @@ def _search_versions_from_offer_ids(offer_ids: List[int]) -> List['ProgramTreeVe
 
 
 def _get_common_queryset() -> QuerySet:
-    return GroupYear.objects.all().order_by(
-        'educationgroupversion__version_name'
+    return EducationGroupVersion.objects.all().order_by(
+        'version_name'
     ).annotate(
-        code=F('partial_acronym'),
-        offer_acronym=F('educationgroupversion__offer__acronym'),
-        offer_year=F('educationgroupversion__offer__academic_year__year'),
-        version_name=F('educationgroupversion__version_name'),
-        version_title_fr=F('educationgroupversion__title_fr'),
-        version_title_en=F('educationgroupversion__title_en'),
-        is_transition=F('educationgroupversion__is_transition'),
-        end_year_of_existence=F('group__end_year__year'),
-        start_year=F('group__start_year__year'),
+        code=F('root_group__partial_acronym'),
+        offer_acronym=F('offer__acronym'),
+        offer_year=F('offer__academic_year__year'),
+        version_title_fr=F('title_fr'),
+        version_title_en=F('title_en'),
+
+        # FIXME :: should add a field EducationgroupVersion.end_year
+        # FIXME :: and should remove GroupYear.end_year
+        # FIXME :: End_year is useful only for EducationGroupYear (training, minitraining) and programTreeVersions.
+        # FIXME :: End year is not useful for Groups. For business, Group doesn't have a 'end date'.
+        end_year_of_existence=Case(
+            When(
+                Q(
+                    offer__education_group_type__category__in={
+                        Categories.TRAINING.name, Categories.MINI_TRAINING.name
+                    }
+                ) & Q(
+                    version_name=STANDARD
+                ),
+                then=F('offer__education_group__end_year__year')
+            ),
+            default=F('root_group__group__end_year__year'),
+            output_field=IntegerField(),
+        ),
+        start_year=F('root_group__group__start_year__year'),
     ).values(
         'code',
         'offer_acronym',
