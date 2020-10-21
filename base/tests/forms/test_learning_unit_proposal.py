@@ -85,8 +85,8 @@ class TestSave(TestCase):
         cls.language = EnglishLanguageFactory()
         cls.campus = CampusFactory(name="OSIS Campus", organization=OrganizationFactory(type=organization_type.MAIN),
                                    is_administration=True)
-        cls.faculty_person = FacultyManagerFactory(entity=cls.an_entity).person
-        cls.central_person = CentralManagerFactory(entity=cls.an_entity).person
+        cls.faculty_person = FacultyManagerFactory(entity=cls.an_entity, with_child=True).person
+        cls.central_person = CentralManagerFactory(entity=cls.an_entity, with_child=True).person
         cls.learning_unit_year = LearningUnitYearFactory(
             credits=Decimal(5),
             subtype=learning_unit_year_subtypes.FULL,
@@ -287,12 +287,14 @@ class TestSave(TestCase):
         self.entity_version.entity_type = SCHOOL
         self.entity_version.save()
         form = ProposalBaseForm(self.form_data, self.faculty_person, self.learning_unit_year)
-        self.assertTrue('entity' in str(form.errors[0]))
+        erroneous_fields = [key for error in form.errors for key in error.keys()]
+        self.assertTrue('entity' in erroneous_fields)
 
     def test_creation_proposal_learning_unit_with_not_linked_entity(self):
         person = PersonFactory()
         form = ProposalBaseForm(self.form_data, person, self.learning_unit_year)
-        self.assertTrue('entity' in str(form.errors[0]))
+        erroneous_fields = [key for error in form.errors for key in error.keys()]
+        self.assertTrue('entity' in erroneous_fields)
 
     def test_academic_year_range_creation_proposal_central_manager(self):
         FrenchLanguageFactory()

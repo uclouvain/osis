@@ -38,8 +38,6 @@ from base.models import academic_year
 from base.models.academic_year import MAX_ACADEMIC_YEAR_FACULTY, MAX_ACADEMIC_YEAR_CENTRAL, AcademicYear
 from base.models.campus import Campus
 from base.models.enums import learning_unit_year_subtypes
-from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_YEAR_TYPES_FOR_FACULTY, \
-    LCY_TYPES_WITH_FIXED_ACRONYM
 from base.models.enums.proposal_type import ProposalType
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import LearningUnitYear
@@ -276,28 +274,6 @@ class FullForm(LearningUnitBaseForm):
             )
         else:
             self._restrict_academic_years_choice_for_proposal_creation_suppression(proposal_type)
-
-    def _disable_fields(self):
-        if self.person.is_faculty_manager and not self.person.is_central_manager:
-            self._disable_fields_as_faculty_manager()
-        else:
-            self._disable_fields_as_central_manager()
-
-    def _disable_fields_as_faculty_manager(self):
-        faculty_type_not_restricted = [t[0] for t in LEARNING_CONTAINER_YEAR_TYPES_FOR_FACULTY]
-        if self.proposal or self.instance.learning_container_year.container_type not in LCY_TYPES_WITH_FIXED_ACRONYM:
-            self.disable_fields(PROPOSAL_READ_ONLY_FIELDS)
-        elif self.instance.learning_container_year and \
-                self.instance.learning_container_year.container_type not in faculty_type_not_restricted:
-            self.disable_fields(self.fields.keys() - set(FACULTY_OPEN_FIELDS))
-        else:
-            self.disable_fields(FULL_READ_ONLY_FIELDS)
-
-    def _disable_fields_as_central_manager(self):
-        if self.proposal or self.instance.learning_container_year.container_type not in LCY_TYPES_WITH_FIXED_ACRONYM:
-            self.disable_fields(FULL_PROPOSAL_READ_ONLY_FIELDS)
-        else:
-            self.disable_fields(FULL_READ_ONLY_FIELDS)
 
     def _build_instance_data(self, data, default_ac_year, proposal):
         return {

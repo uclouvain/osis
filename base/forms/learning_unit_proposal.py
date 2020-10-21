@@ -31,7 +31,7 @@ from django.db import transaction
 
 from base.business.learning_unit_proposal import compute_proposal_type, \
     compute_proposal_state, copy_learning_unit_data
-from base.forms.learning_unit.entity_form import EntitiesVersionRoleChoiceField
+from base.forms.learning_unit.entity_form import EntitiesVersionRoleChoiceField, find_attached_faculty_entities_version
 from base.forms.learning_unit.learning_unit_create_2 import FullForm
 from base.forms.learning_unit.learning_unit_partim import PartimForm
 from base.forms.utils.choice_field import BLANK_CHOICE_DISPLAY
@@ -50,7 +50,7 @@ class ProposalLearningUnitForm(forms.ModelForm):
     def __init__(self, data, person, *args, initial=None, **kwargs):
         super().__init__(data, *args, initial=initial, **kwargs)
         self.fields['entity'] = EntitiesVersionRoleChoiceField(person=person, initial=data and data.get('entity'))
-        self.fields['entity'].queryset |= person.find_attached_faculty_entities_version(acronym_exceptions=['ILV'])
+        self.fields['entity'].queryset = find_attached_faculty_entities_version(person, acronym_exceptions=['ILV'])
 
         if initial:
             for key, value in initial.items():

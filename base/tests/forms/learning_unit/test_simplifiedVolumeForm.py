@@ -34,6 +34,7 @@ from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.business.learning_units import GenerateContainer
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.person import PersonFactory
+from learning_unit.tests.factories.central_manager import CentralManagerFactory
 
 
 class TestSimplifiedVolumeManagementForm(TestCase):
@@ -56,7 +57,7 @@ class TestSimplifiedVolumeManagementForm(TestCase):
         generator = GenerateContainer(current_academic_year, current_academic_year)
         cls.learning_unit_year = generator[0].learning_unit_year_full
         cls.entity_container_years = generator[0].list_repartition_volume_entities
-        cls.person = PersonFactory()
+        cls.person = CentralManagerFactory().person
 
     def test_save(self):
         formset = SimplifiedVolumeManagementForm(self.data, self.person, queryset=LearningComponentYear.objects.none())

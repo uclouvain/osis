@@ -187,7 +187,7 @@ class LearningUnitFullFormContextMixin(TestCase):
         cls.central_manager = CentralManagerFactory(entity=cls.entity, with_child=True)
         cls.central_person = cls.central_manager.person
 
-        cls.post_data = get_valid_form_data(cls.current_academic_year, entity_role=cls.faculty_manager)
+        cls.post_data = get_valid_form_data(cls.current_academic_year, entity_role=cls.central_manager)
 
     def setUp(self):
         pass
