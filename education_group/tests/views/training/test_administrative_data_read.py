@@ -32,7 +32,7 @@ from django.urls import reverse
 from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.factories.user import UserFactory
-from program_management.ddd.domain.node import NodeGroupYear
+from education_group.ddd.domain.group import Group
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory
 
@@ -107,8 +107,7 @@ class TestTrainingReadAdministrativeData(TestCase):
         self.assertEqual(response.context['education_group_version'], self.training_version)
         expected_tree_json_url = reverse('tree_json', kwargs={'root_id': self.training_version.root_group.element.pk})
         self.assertEqual(response.context['tree_json_url'], expected_tree_json_url)
-        self.assertIsInstance(response.context['node'], NodeGroupYear)
-        self.assertIn("children", response.context)
+        self.assertIsInstance(response.context['group'], Group)
         self.assertIn("learning_unit_enrollment_dates", response.context)
         self.assertIn("administrative_dates", response.context)
         self.assertIn("additional_informations", response.context)

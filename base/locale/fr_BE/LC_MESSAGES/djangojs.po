@@ -59,6 +59,9 @@ msgstr "Chargement en cours..."
 msgid "Modify the link"
 msgstr "Modifier le lien"
 
+msgid "New version"
+msgstr "Nouvelle version"
+
 msgid "Open"
 msgstr "Ouvrir"
 
@@ -82,6 +85,9 @@ msgstr "Veuillez entrer une valeur qui est un multiple de 0,5."
 
 msgid "Please use the Ctrl+v shortcut to paste content."
 msgstr "Vous devez utiliser le raccourci Ctrl+V pour coller."
+
+msgid "Prolong"
+msgstr "Prolonger"
 
 msgid "Search"
 msgstr "Rechercher"
