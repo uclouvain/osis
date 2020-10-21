@@ -327,7 +327,20 @@ def _get_common_queryset() -> QuerySet:
             default=F('root_group__group__end_year__year'),
             output_field=IntegerField(),
         ),
-        start_year=F('root_group__group__start_year__year'),
+        start_year=Case(
+            When(
+                Q(
+                    offer__education_group_type__category__in={
+                        Categories.TRAINING.name, Categories.MINI_TRAINING.name
+                    }
+                ) & Q(
+                    version_name=STANDARD
+                ),
+                then=F('offer__education_group__start_year__year')
+            ),
+            default=F('root_group__group__start_year__year'),
+            output_field=IntegerField(),
+        ),
     ).values(
         'code',
         'offer_acronym',
