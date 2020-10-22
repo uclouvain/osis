@@ -607,6 +607,25 @@ msgstr ""
 msgid "The fields concerning ARES have to be ALL filled-in or none of them"
 msgstr ""
 
+#, python-brace-format
+msgid ""
+"The formation you work with doesn't exist (or is not at the same position) "
+"in the tree {root.title} in {root.year}.You've been redirected to the root "
+"{root.code} ({root.year})"
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The formation you work with doesn't exist (or is not at the same position) "
+"in the tree {root.title}{version} in {root.year}.You've been redirected to "
+"the root {root.code} ({root.year})"
+msgstr ""
+
+msgid ""
+"The fields concerning ARES must be greater than or equal to 1 and less than "
+"or equal to 9999"
+msgstr ""
+
 #, python-format
 msgid "The group %(code)s has been deleted."
 msgstr ""

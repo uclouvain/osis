@@ -23,16 +23,21 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+
 import factory.fuzzy
 
-from education_group.ddd.domain._hops import HOPS
+from program_management.ddd import command
 
 
-class HOPSFactory(factory.Factory):
+class ProlongExistingProgramTreeVersionCommandFactory(factory.Factory):
     class Meta:
-        model = HOPS
+        model = command.ProlongExistingProgramTreeVersionCommand
         abstract = False
 
-    ares_code = factory.fuzzy.FuzzyInteger(1, 9999)
-    ares_graca = factory.fuzzy.FuzzyInteger(1, 9999)
-    ares_authorization = factory.fuzzy.FuzzyInteger(1, 9999)
+    offer_acronym = "CHIM1BA"
+    version_name = "VERSIONNAME"
+    is_transition = False
+    updated_year = 2019
+    end_year = None
+    title_fr = "fr  title"
+    title_en = "title  en"
