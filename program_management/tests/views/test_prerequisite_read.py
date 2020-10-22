@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import mock
 from django.http import HttpResponseForbidden
 from django.test import TestCase
 from django.urls import reverse
@@ -89,6 +90,17 @@ class TestLearningUnitPrerequisiteTraining(TestCase):
     def test_assert_template_used(self):
         response = self.client.get(self.url)
         self.assertTemplateUsed(response, "learning_unit/tab_prerequisite_training.html")
+
+    def test_valid_context_permission(self):
+        response = self.client.get(self.url)
+        self.assertIn("can_modify_prerequisite", response.context)
+        self.assertIn("show_modify_prerequisite_button", response.context)
+
+    @mock.patch('program_management.ddd.validators._authorized_root_type_for_prerequisite'
+                '.AuthorizedRootTypeForPrerequisite.validate')
+    def test_validator_called(self, mock_check_validator):
+        self.client.get(self.url)
+        self.assertTrue(mock_check_validator.called)
 
 
 class TestLearningUnitPrerequisiteGroup(TestCase):

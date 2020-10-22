@@ -55,7 +55,7 @@ class PrerequisiteForm(forms.Form):
         self.node = node
 
     def clean_prerequisite_string(self):
-        prerequisite_string = self.cleaned_data["prerequisite_string"]
+        prerequisite_string = self.cleaned_data["prerequisite_string"].upper()
         validator = UpdatePrerequisiteValidatorList(prerequisite_string, self.node, self.program_tree)
         if not validator.is_valid():
             for error_message in validator.error_messages:
