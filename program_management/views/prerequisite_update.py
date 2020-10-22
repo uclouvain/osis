@@ -31,6 +31,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 
 from base.ddd.utils.validation_message import MessageLevel
+from education_group.models.group_year import GroupYear
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd.repositories import persist_tree
 from program_management.ddd.validators._authorized_root_type_for_prerequisite import AuthorizedRootTypeForPrerequisite
@@ -101,3 +102,6 @@ class LearningUnitPrerequisite(PermissionRequiredMixin, SuccessMessageMixin, Lea
                 'child_element_id': self.kwargs["child_element_id"]
             }
         )
+
+    def get_permission_object(self):
+        return GroupYear.objects.get(element__pk=self.program_tree.root_node.pk)
