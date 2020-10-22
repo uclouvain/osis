@@ -8,6 +8,7 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.base import View
 
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models.academic_year import starting_academic_year, AcademicYear
 from base.models.enums.education_group_types import TrainingType
 from base.utils.cache import RequestCache
@@ -17,7 +18,10 @@ from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain.exception import ContentConstraintTypeMissing, \
     ContentConstraintMinimumMaximumMissing, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum, \
-    AcronymAlreadyExist, StartYearGreaterThanEndYear, CodeAlreadyExistException
+    AcronymAlreadyExist, StartYearGreaterThanEndYear, CodeAlreadyExistException, \
+    HopsFieldsAllOrNone, AresCodeShouldBeGreaterOrEqualsThanZeroAndLessThan9999, \
+    AresGracaShouldBeGreaterOrEqualsThanZeroAndLessThan9999, \
+    AresAuthorizationShouldBeGreaterOrEqualsThanZeroAndLessThan9999
 from education_group.ddd.domain.training import TrainingIdentity
 from education_group.ddd.service.read import get_group_service
 from education_group.forms.training import CreateTrainingForm
@@ -131,6 +135,15 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             except StartYearGreaterThanEndYear as e:
                 training_form.add_error('end_year', e.message)
                 training_form.add_error('academic_year', '')
+            except MultipleBusinessExceptions as e:
+                for hops_exception in e.exceptions:
+                    if isinstance(hops_exception, HopsFieldsAllOrNone) or \
+                            isinstance(hops_exception, AresCodeShouldBeGreaterOrEqualsThanZeroAndLessThan9999):
+                        training_form.add_error('ares_code', hops_exception.message)
+                    if isinstance(hops_exception, AresGracaShouldBeGreaterOrEqualsThanZeroAndLessThan9999):
+                        training_form.add_error('ares_graca', hops_exception.message)
+                    if isinstance(hops_exception, AresAuthorizationShouldBeGreaterOrEqualsThanZeroAndLessThan9999):
+                        training_form.add_error('ares_authorization', hops_exception.message)
             except BusinessExceptions as e:
                 display_error_messages(request, e.messages)
                 return render(request, self.template_name, self.get_context(training_form))

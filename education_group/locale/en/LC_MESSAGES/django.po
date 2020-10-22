@@ -621,6 +621,11 @@ msgid ""
 "the root {root.code} ({root.year})"
 msgstr ""
 
+msgid ""
+"The fields concerning ARES must be greater than or equal to 1 and less than "
+"or equal to 9999"
+msgstr ""
+
 #, python-format
 msgid "The group %(code)s has been deleted."
 msgstr ""
