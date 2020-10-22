@@ -21,17 +21,49 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+import requests
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
+from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
+
+from base.models.learning_unit_year import LearningUnitYear
+from base.views.common import display_error_messages
 
 
 @login_required
-def access_refreshed_publication(request, code: str, year: int):
-    redirect_url = get_learning_unit_portal_updated_cache_url(code, year)
+def publish_and_access_publication(request, code: str, year: int):
+    try:
+        __publish_pedagogy(code, year)
+        redirect_url = settings.LEARNING_UNIT_PORTAL_URL.format(code=code, year=year)
+    except LearningUnitPedagogyPublishException:
+        error_msg = _("Unable to publish pedagogy information for the learning unit %(code)s - %(year)s") % {
+            'code': code,
+            'year': year
+        }
+        display_error_messages(request, error_msg)
+        redirect_url = reverse(
+            'view_educational_information',
+            kwargs={'learning_unit_year_id': LearningUnitYear.objects.get(acronym=code, academic_year__year=year).pk}
+        )
     return HttpResponseRedirect(redirect_url)
 
 
-def get_learning_unit_portal_updated_cache_url(code: str, year: int):
-    url = settings.LEARNING_UNIT_PORTAL_URL_WITH_UPDATED_CACHE
-    return url.format(year=year, acronym=code)
+def __publish_pedagogy(code: str, year: int):
+    publish_endpoint = settings.ESB_REFRESH_LEARNING_UNIT_PEDAGOGY_ENDPOINT.format(code=code, year=year)
+    try:
+        response = requests.get(
+            "{esb_api}/{endpoint}".format(esb_api=settings.ESB_API_URL, endpoint=publish_endpoint),
+            headers={"Authorization": settings.ESB_AUTHORIZATION},
+            timeout=settings.REQUESTS_TIMEOUT
+        )
+        if response.status_code != HttpResponse.status_code:
+            raise LearningUnitPedagogyPublishException()
+        return True
+    except Exception:
+        raise LearningUnitPedagogyPublishException()
+
+
+class LearningUnitPedagogyPublishException(Exception):
+    pass
