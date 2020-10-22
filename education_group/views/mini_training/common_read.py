@@ -151,7 +151,7 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             display_warning_messages(self.request, message)
             return root_node
 
-    @functools.lru_cache()      
+    @functools.lru_cache()
     def get_mini_training_identity(self) -> 'MiniTrainingIdentity':
         return MiniTrainingIdentitySearch.get_from_group_identity(self.get_group().entity_identity)
 
