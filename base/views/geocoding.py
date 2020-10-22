@@ -16,10 +16,12 @@ def geocode(request):
     if not search:
         return JsonResponse({'error': _("Missing search address")})
 
-    response = requests.get(settings.GEOCODING_URL, {
-        'address': search,
-    }, headers={
-        'Authorization': 'Bearer {}'.format(settings.GEOCODING_TOKEN),
+    url = "{esb_api}/{endpoint}".format(
+        esb_api=settings.ESB_API_URL,
+        endpoint=settings.ESB_GEOCODING_ENDPOINT,
+    )
+    response = requests.get(url, {'address': search}, headers={
+        'Authorization': settings.ESB_AUTHORIZATION,
     })
     if response.status_code != 200:
         return JsonResponse({'error': _("No result!")})

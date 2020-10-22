@@ -405,6 +405,8 @@ ESB_STUDENT_API = os.environ.get('ESB_STUDENT_API')
 ESB_REFRESH_PEDAGOGY_ENDPOINT = os.environ.get('ESB_REFRESH_PEDAGOGY_ENDPOINT')
 ESB_REFRESH_COMMON_PEDAGOGY_ENDPOINT = os.environ.get('ESB_REFRESH_COMMON_PEDAGOGY_ENDPOINT')
 ESB_REFRESH_COMMON_ADMISSION_ENDPOINT = os.environ.get('ESB_REFRESH_COMMON_ADMISSION_ENDPOINT')
+ESB_REFRESH_LEARNING_UNIT_PEDAGOGY_ENDPOINT = os.environ.get('ESB_REFRESH_LEARNING_UNIT_PEDAGOGY_ENDPOINT')
+ESB_GEOCODING_ENDPOINT = os.environ.get('ESB_GEOCODING_ENDPOINT')
 
 RELEASE_TAG = os.environ.get('RELEASE_TAG')
 
@@ -478,11 +480,7 @@ YEAR_LIMIT_EDG_MODIFICATION = int(os.environ.get("YEAR_LIMIT_EDG_MODIFICATION", 
 
 STAFF_FUNDING_URL = os.environ.get('STAFF_FUNDING_URL', '')
 VIRTUAL_DESKTOP_URL = os.environ.get('VIRTUAL_DESKTOP_URL', '')
-LEARNING_UNIT_PORTAL_URL = os.environ.get('LEARNING_UNIT_PORTAL_URL', 'https://uclouvain.be/cours-{year}-{acronym}')
-LEARNING_UNIT_PORTAL_URL_WITH_UPDATED_CACHE = os.environ.get(
-    'LEARNING_UNIT_PORTAL_URL_WITH_UPDATED_CACHE',
-    'https://uclouvain.be/cours-{year}-{acronym}'
-)
+LEARNING_UNIT_PORTAL_URL = os.environ.get('LEARNING_UNIT_PORTAL_URL', 'https://uclouvain.be/cours-{year}-{code}')
 
 # SITE_ID for Django "sites framework"
 SITE_ID = os.environ.get('SITE_ID', 1)
@@ -499,5 +497,3 @@ MAPBOX = {
         'https://api.mapbox.com/mapbox-gl-js/v1.11.1/mapbox-gl.js',
     ).split(' '),
 }
-GEOCODING_URL = os.environ.get("GEOCODING_URL", "")
-GEOCODING_TOKEN = os.environ.get("GEOCODING_TOKEN", "")

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-07 14:01+0200\n"
+"POT-Creation-Date: 2020-10-19 15:39+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -612,6 +612,18 @@ msgid ""
 "The formation you work with doesn't exist (or is not at the same position) "
 "in the tree {root.title} in {root.year}.You've been redirected to the root "
 "{root.code} ({root.year})"
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The formation you work with doesn't exist (or is not at the same position) "
+"in the tree {root.title}{version} in {root.year}.You've been redirected to "
+"the root {root.code} ({root.year})"
+msgstr ""
+
+msgid ""
+"The fields concerning ARES must be greater than or equal to 1 and less than "
+"or equal to 9999"
 msgstr ""
 
 #, python-format

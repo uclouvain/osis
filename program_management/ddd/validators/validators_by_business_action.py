@@ -57,6 +57,7 @@ from program_management.ddd.validators._relative_credits import RelativeCreditsV
 from program_management.ddd.validators._validate_end_date_and_option_finality import ValidateFinalitiesEndDateAndOptions
 from program_management.ddd.validators._version_name_exists import VersionNameExistsValidator
 from program_management.ddd.validators.link import CreateLinkValidatorList
+from education_group.ddd.validators._hops_validator import HopsValuesValidator
 
 
 class PasteNodeValidatorList(MultipleExceptionBusinessListValidator):

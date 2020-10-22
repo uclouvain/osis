@@ -26,44 +26,44 @@ from django.test import TestCase
 
 from education_group.tests.ddd.factories.group import GroupIdentityFactory
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
-from program_management.ddd.service.write import update_and_postpone_training_version_service
-from program_management.tests.ddd.factories.commands.update_training_version_command import \
-    UpdateTrainingVersionCommandFactory
+from program_management.ddd.service.write import update_and_postpone_mini_training_version_service, \
+    prolong_existing_tree_version_service
+from program_management.tests.ddd.factories.commands.prolong_existing_program_tree_version import \
+    ProlongExistingProgramTreeVersionCommandFactory
+from program_management.tests.ddd.factories.commands.update_mini_training_version_command import \
+    UpdateMiniTrainingVersionCommandFactory
 
 
-class TestUpdateTrainingVersion(TestCase):
+class TestProlongExistingTreeVersion(TestCase):
 
-    @mock.patch("program_management.ddd.service.write.postpone_tree_version_service.postpone_program_tree_version")
-    @mock.patch("program_management.ddd.service.write.postpone_program_tree_service.postpone_program_tree")
     @mock.patch(
         "program_management.ddd.domain.service.identity_search.GroupIdentitySearch.get_from_tree_version_identity")
+    @mock.patch(
+        "program_management.ddd.service.write.extend_existing_tree_version_service.extend_existing_past_version")
     @mock.patch("program_management.ddd.service.write.update_program_tree_version_service.update_program_tree_version")
-    @mock.patch("program_management.ddd.service.write.update_and_postpone_group_version_service."
-                "update_and_postpone_group_version")
+    @mock.patch("program_management.ddd.service.write.postpone_tree_version_service.postpone_program_tree_version")
     def test_should_call_update_group_service_and_update_tree_version_service(
             self,
-            mock_postpone_group_version_service,
-            mock_update_tree_version_service,
-            mock_identity_converter,
-            mock_postpone_program_tree,
-            mock_postpone_program_tree_version
+            mock_postpone_program_tree_version,
+            mock_update_program_tree_version,
+            mock_extend_existing_past_version,
+            mock_get_from_tree_version_identity
     ):
-        cmd = UpdateTrainingVersionCommandFactory()
+        cmd = ProlongExistingProgramTreeVersionCommandFactory()
         identity_expected = ProgramTreeVersionIdentity(
-            offer_acronym=cmd.offer_acronym,
-            year=cmd.year,
             version_name=cmd.version_name,
+            offer_acronym=cmd.offer_acronym,
+            year=cmd.updated_year,
             is_transition=cmd.is_transition,
         )
-        mock_update_tree_version_service.return_value = identity_expected
-        mock_identity_converter.return_value = GroupIdentityFactory()
-        mock_postpone_group_version_service.return_value = []
 
-        result = update_and_postpone_training_version_service.update_and_postpone_training_version(cmd)
+        mock_extend_existing_past_version.return_value = [identity_expected]
+        mock_get_from_tree_version_identity.return_value = GroupIdentityFactory(year=cmd.updated_year)
 
-        self.assertTrue(mock_postpone_group_version_service.called)
-        self.assertTrue(mock_update_tree_version_service.called)
-        self.assertTrue(mock_postpone_program_tree.called)
+        result = prolong_existing_tree_version_service.prolong_existing_tree_version(cmd)
+
+        self.assertTrue(mock_extend_existing_past_version.called)
+        self.assertTrue(mock_update_program_tree_version.called)
         self.assertTrue(mock_postpone_program_tree_version.called)
 
         self.assertEqual(result, [identity_expected])

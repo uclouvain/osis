@@ -2,6 +2,9 @@ const trans_existing_version_name = gettext('Existing name version');
 const trans_existed_version_name = gettext('Existed name version in ');
 const trans_invalid_version_name = gettext('Invalid name version');
 
+const trans_new_version = gettext('New version');
+const trans_prolong = gettext('Prolong');
+
 function validate_version_name() {
     cleanErrorMessage();
     let newVersionName = extractValue($('#id_version_name'));
@@ -47,24 +50,20 @@ function setErrorMessage(text, element) {
         parent.addClass('has-error');
         parent.append("<div class='help-block'>" + text + "</div>");
     }
-    document.getElementById('valid_footer').style.display = 'none';
-    document.getElementById('existing_footer').style.display = 'none';
-    document.getElementById('default_footer').style.display = 'block';
+    document.getElementById('bt_submit_specific_version_form').style.display = 'none';
 }
 
 function setWarningMessage(text, element){
     parent = $(element).closest(".version_name-group");
     parent.addClass('has-warning');
     parent.append("<div class='help-block'>" + text + "</div>");
-    document.getElementById('existing_footer').style.display = 'block';
-    document.getElementById('valid_footer').style.display = 'none';
-    document.getElementById('default_footer').style.display = 'none';
+    document.getElementById('bt_submit_specific_version_form').style.display = 'inline';
+    document.getElementById('bt_submit_specific_version_form').textContent = trans_prolong;
 }
 
 function setValideMessage(){
-    document.getElementById('valid_footer').style.display = 'block';
-    document.getElementById('existing_footer').style.display = 'none';
-    document.getElementById('default_footer').style.display = 'none';
+    document.getElementById('bt_submit_specific_version_form').style.display = 'inline';
+    document.getElementById('bt_submit_specific_version_form').textContent = trans_new_version;
 }
 
 function cleanErrorMessage() {
@@ -73,9 +72,6 @@ function cleanErrorMessage() {
     parent.removeClass('has-warning');
     parent.find(".help-block").remove();
     parent.find(".has-error").removeClass('has-error');
-    document.getElementById('valid_footer').style.display = 'none';
-    document.getElementById('existing_footer').style.display = 'none';
-    document.getElementById('default_footer').style.display = 'block';
 }
 
 $(document).ready(function () {

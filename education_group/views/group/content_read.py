@@ -23,9 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import functools
+from typing import List
+
 from base.utils.urls import reverse_with_get
 from education_group.views.group.common_read import Tab, GroupRead
 from program_management.ddd.domain.service.get_program_tree_version_for_tree import get_program_tree_version_for_tree
+from program_management.ddd.repositories import load_tree
 
 
 class GroupReadContent(GroupRead):
@@ -33,10 +37,9 @@ class GroupReadContent(GroupRead):
     active_tab = Tab.CONTENT
 
     def get_context_data(self, **kwargs):
-
         return {
             **super().get_context_data(**kwargs),
-            "children": self.get_object().children,
+            "children": self.get_children(),
             "tree_different_versions": get_program_tree_version_for_tree(self.get_tree().get_all_nodes())
         }
 
@@ -49,3 +52,11 @@ class GroupReadContent(GroupRead):
 
     def get_update_permission_name(self) -> str:
         return "base.change_link_data"
+
+    @functools.lru_cache()
+    def get_tree(self):
+        return load_tree.load(self.get_root_id())
+
+    def get_children(self) -> List['Node']:
+        parent_node = self.get_tree().get_node(self.get_path())
+        return parent_node.children
