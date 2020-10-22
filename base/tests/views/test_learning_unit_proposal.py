@@ -265,7 +265,6 @@ class TestLearningUnitSuppressionProposal(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_years = AcademicYearFactory.produce(number_past=3, number_future=10)
-        cls.person = person_factory.CentralManagerForUEFactory("can_propose_learningunit", "can_access_learningunit")
         an_organization = OrganizationFactory(type=organization_type.MAIN)
         cls.current_academic_year = cls.academic_years[4]
         cls.next_academic_year = cls.academic_years[5]
@@ -316,11 +315,7 @@ class TestLearningUnitSuppressionProposal(TestCase):
             periodicity=learning_unit_year_periodicity.ANNUAL
         )
 
-        cls.person_entity = PersonEntityFactory(
-            person=cls.person,
-            entity=cls.entity_version.entity,
-            with_child=True
-        )
+        cls.person = CentralManagerFactory(entity=cls.entity_version.entity).person
 
         cls.url = reverse(learning_unit_suppression_proposal, args=[cls.learning_unit_year.id])
 
