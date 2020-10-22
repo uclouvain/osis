@@ -85,6 +85,4 @@ def _get_paste_element_command_from_create_mini_training_and_paste_command(
         node_to_paste_year=cmd.year,
         path_where_to_paste=cmd.path_to_paste,
         link_type=default_link_type,
-        parent_year=None,
-        parent_code=None
     )

@@ -33,8 +33,6 @@ class PasteElementCommandFactory(factory.Factory):
 
     node_to_paste_code = "LSINF2547"
     node_to_paste_year = factory.Faker("random_int")
-    parent_code = "LGROUP258"
-    parent_year = factory.Faker("random_int")
     path_where_to_paste = factory.LazyFunction(lambda: str(factory.Faker("random_int")))
     access_condition = None
     is_mandatory = None

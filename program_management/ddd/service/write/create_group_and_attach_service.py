@@ -82,6 +82,4 @@ def __get_paste_cmd(group_id: GroupIdentity, path_to_paste: Path) -> command_pro
         node_to_paste_code=group_id.code,
         node_to_paste_year=group_id.year,
         path_where_to_paste=path_to_paste,
-        parent_year=None,
-        parent_code=None
     )

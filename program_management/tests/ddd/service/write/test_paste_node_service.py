@@ -106,12 +106,20 @@ class TestPasteLearningUnitNodeService(DDDTestCase, MockPatcherMixin):
             self.fake_node_repository
         )
 
+        self.mocked_get_from_element_id = self.mock_get_program_tree_identity_from_element_id()
+        self.mocked_get_from_element_id.return_value = self.tree.entity_id
+
+    def mock_get_program_tree_identity_from_element_id(self):
+        pacher = mock.patch("program_management.ddd.domain.service."
+                            "identity_search.ProgramTreeIdentitySearch.get_from_element_id")
+        mocked_method = pacher.start()
+        self.addCleanup(pacher.stop)
+        return mocked_method
+
     def test_cannot_paste_to_learning_unit_node(self):
         invalid_where_to_paste_path_command = PasteElementCommandFactory(
             node_to_paste_code=self.node_to_paste.code,
             node_to_paste_year=self.node_to_paste.year,
-            parent_code=self.tree.root_node.code,
-            parent_year=self.tree.root_node.year,
             path_where_to_paste="1|4",
         )
         self.assertRaisesBusinessException(
@@ -124,8 +132,6 @@ class TestPasteLearningUnitNodeService(DDDTestCase, MockPatcherMixin):
         invalid_block_command = PasteElementCommandFactory(
             node_to_paste_code=self.node_to_paste.code,
             node_to_paste_year=self.node_to_paste.year,
-            parent_code=self.tree.root_node.code,
-            parent_year=self.tree.root_node.year,
             path_where_to_paste="1",
             block="1298"
         )
@@ -140,8 +146,6 @@ class TestPasteLearningUnitNodeService(DDDTestCase, MockPatcherMixin):
         invalid_command = PasteElementCommandFactory(
             node_to_paste_code=self.node_to_paste.code,
             node_to_paste_year=self.node_to_paste.year,
-            parent_code=self.tree.root_node.code,
-            parent_year=self.tree.root_node.year,
             path_where_to_paste="1",
             link_type=LinkTypes.REFERENCE.name
         )
@@ -156,8 +160,6 @@ class TestPasteLearningUnitNodeService(DDDTestCase, MockPatcherMixin):
         invalid_command = PasteElementCommandFactory(
             node_to_paste_code=self.node_to_paste.code,
             node_to_paste_year=self.node_to_paste.year,
-            parent_code=self.tree.root_node.code,
-            parent_year=self.tree.root_node.year,
             path_where_to_paste="1|2",
         )
 
@@ -189,8 +191,6 @@ class TestPasteLearningUnitNodeService(DDDTestCase, MockPatcherMixin):
         invalid_command = PasteElementCommandFactory(
             node_to_paste_code=self.node_to_paste.code,
             node_to_paste_year=self.node_to_paste.year,
-            parent_code=self.tree.root_node.code,
-            parent_year=self.tree.root_node.year,
             path_where_to_paste="1|3|5",
         )
 
@@ -263,6 +263,16 @@ class TestPasteGroupNodeService(DDDTestCase, MockPatcherMixin):
             self.fake_node_repository
         )
 
+        self.mocked_get_from_element_id = self.mock_get_program_tree_identity_from_element_id()
+        self.mocked_get_from_element_id.return_value = self.tree.entity_id
+
+    def mock_get_program_tree_identity_from_element_id(self):
+        pacher = mock.patch("program_management.ddd.domain.service."
+                            "identity_search.ProgramTreeIdentitySearch.get_from_element_id")
+        mocked_method = pacher.start()
+        self.addCleanup(pacher.stop)
+        return mocked_method
+
     def test_can_not_attach_the_same_node_to_same_parent(self):
         node_attached_to_root = self.tree.get_node("1|2")
         tree_to_attach = ProgramTreeFactory(root_node=node_attached_to_root)
@@ -272,8 +282,6 @@ class TestPasteGroupNodeService(DDDTestCase, MockPatcherMixin):
         invalid_where_to_paste_path_command = PasteElementCommandFactory(
             node_to_paste_code=node_attached_to_root.code,
             node_to_paste_year=node_attached_to_root.year,
-            parent_code=self.tree.root_node.code,
-            parent_year=self.tree.root_node.year,
             path_where_to_paste="1|2",
         )
 
@@ -287,8 +295,6 @@ class TestPasteGroupNodeService(DDDTestCase, MockPatcherMixin):
         invalid_block_command = PasteElementCommandFactory(
             node_to_paste_code=self.node_to_paste.code,
             node_to_paste_year=self.node_to_paste.year,
-            parent_code=self.tree.root_node.code,
-            parent_year=self.tree.root_node.year,
             path_where_to_paste="1|3",
             block="1298"
         )
@@ -303,8 +309,6 @@ class TestPasteGroupNodeService(DDDTestCase, MockPatcherMixin):
         invalid_command = PasteElementCommandFactory(
             node_to_paste_code=self.node_to_paste.code,
             node_to_paste_year=self.node_to_paste.year,
-            parent_code=self.tree.root_node.code,
-            parent_year=self.tree.root_node.year,
             path_where_to_paste="1|2",
         )
 
@@ -335,8 +339,6 @@ class TestPasteGroupNodeService(DDDTestCase, MockPatcherMixin):
         invalid_command = PasteElementCommandFactory(
             node_to_paste_code=self.node_to_paste.code,
             node_to_paste_year=self.node_to_paste.year,
-            parent_code=self.tree.root_node.code,
-            parent_year=self.tree.root_node.year,
             path_where_to_paste="1|3",
         )
 
@@ -355,8 +357,6 @@ class TestPasteGroupNodeService(DDDTestCase, MockPatcherMixin):
         invalid_command = PasteElementCommandFactory(
             node_to_paste_code=self.node_to_paste.code,
             node_to_paste_year=self.node_to_paste.year,
-            parent_code=self.tree.root_node.code,
-            parent_year=self.tree.root_node.year,
             path_where_to_paste="1|3",
         )
 
@@ -383,8 +383,6 @@ class TestPasteGroupNodeService(DDDTestCase, MockPatcherMixin):
         invalid_command = PasteElementCommandFactory(
             node_to_paste_code=tree_to_paste.root_node.code,
             node_to_paste_year=tree_to_paste.root_node.year,
-            parent_code=self.tree.root_node.code,
-            parent_year=self.tree.root_node.year,
             path_where_to_paste="1",
             link_type=LinkTypes.REFERENCE.name
         )
@@ -412,8 +410,6 @@ class TestPasteGroupNodeService(DDDTestCase, MockPatcherMixin):
         valid_command = PasteElementCommandFactory(
             node_to_paste_code=tree_to_paste.root_node.code,
             node_to_paste_year=tree_to_paste.root_node.year,
-            parent_code=self.tree.root_node.code,
-            parent_year=self.tree.root_node.year,
             path_where_to_paste="1",
             link_type=LinkTypes.REFERENCE.name
         )
@@ -435,8 +431,6 @@ class TestPasteGroupNodeService(DDDTestCase, MockPatcherMixin):
         invalid_command = PasteElementCommandFactory(
             node_to_paste_code=node_to_paste.code,
             node_to_paste_year=node_to_paste.year,
-            parent_code=self.tree.root_node.code,
-            parent_year=self.tree.root_node.year,
             path_where_to_paste="1",
         )
 

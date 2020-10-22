@@ -154,8 +154,6 @@ class CutElementCommand(interface.CommandRequest):
 class PasteElementCommand(interface.CommandRequest):
     node_to_paste_code = attr.ib(type=str)
     node_to_paste_year = attr.ib(type=int)
-    parent_code = attr.ib(type=str)
-    parent_year = attr.ib(type=int)
     path_where_to_paste = attr.ib(type='Path')
     access_condition = attr.ib(type=bool, default=False)
     is_mandatory = attr.ib(type=bool, default=True)

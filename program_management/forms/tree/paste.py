@@ -53,8 +53,6 @@ class PasteNodeForm(LinkForm):
             comment_english=self.cleaned_data.get("comment_en", ""),
             relative_credits=self.cleaned_data.get("relative_credits"),
             path_where_to_detach=self.path_to_detach,
-            parent_code=self.parent_obj.code,
-            parent_year=self.parent_obj.year
         )
 
     def save(self):

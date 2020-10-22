@@ -28,6 +28,7 @@ from program_management.ddd.business_types import *
 from program_management.ddd.domain import node
 from program_management.ddd.domain.exception import ProgramTreeNotFoundException
 from program_management.ddd.domain.program_tree import PATH_SEPARATOR, ProgramTreeIdentity
+from program_management.ddd.domain.service import identity_search
 from program_management.ddd.repositories import load_tree, program_tree, \
     program_tree_version, node as node_repository
 
@@ -38,14 +39,9 @@ def paste_element(paste_command: command.PasteElementCommand) -> 'LinkIdentity':
 
     path_to_detach = paste_command.path_where_to_detach
 
-    # FIXME should take tree only from parent code and parent year and not from path
-    if paste_command.parent_code and paste_command.parent_year:
-        tree = program_tree.ProgramTreeRepository.get(
-            ProgramTreeIdentity(code=paste_command.parent_code, year=paste_command.parent_year)
-        )
-    else:
-        root_id = int(paste_command.path_where_to_paste.split("|")[0])
-        tree = load_tree.load(root_id)
+    root_id = int(paste_command.path_where_to_paste.split("|")[0])
+    program_tree_identity = identity_search.ProgramTreeIdentitySearch().get_from_element_id(root_id)
+    tree = program_tree.ProgramTreeRepository.get(program_tree_identity)
 
     #  Search program tree if possible to fetch also children of node to paste
     try:
