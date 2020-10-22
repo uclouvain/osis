@@ -133,7 +133,7 @@ def _build_parents_info(link: 'Link',
                         utilization_rows_dict: Dict['link', Dict[str, 'Node']]):
     found = False
     for parent_tree in parent_node_pgm_trees:
-        for path, child_node in parent_tree.root_node.descendents.items():
+        for path, child_node in parent_tree.root_node.descendents_with_reference_children.items():
             if isinstance(child_node, NodeGroupYear) and child_node == link.parent:
                 found = True
                 gathering = get_nearest_parents(parent_tree.get_parents(path))
