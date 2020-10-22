@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-19 15:06+0200\n"
+"POT-Creation-Date: 2020-10-22 11:34+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2779,6 +2779,14 @@ msgstr "UE complète"
 
 msgid "URL of the learning unit"
 msgstr "URL de l'unité d'enseignement"
+
+#, python-format
+msgid ""
+"Unable to publish pedagogy information for the learning unit %(code)s - "
+"%(year)s"
+msgstr ""
+"Impossible de publier les informations relatives à la fiche descriptive pour "
+"l'unité d'enseignement %(code)s - %(year)s"
 
 msgid "Undefined"
 msgstr "Indéfini"

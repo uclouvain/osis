@@ -237,13 +237,13 @@ def _add_hyperlink(excel_lines, workbook: Workbook, year):
     for index, row in enumerate(excel_lines, 1):
         if isinstance(row, LearningUnitYearLine):
             cell = worksheet.cell(row=index, column=1)
-            cell.hyperlink = LEARNING_UNIT_PORTAL_URL.format(year=year, acronym=row.luy_acronym)
+            cell.hyperlink = LEARNING_UNIT_PORTAL_URL.format(year=year, code=row.luy_acronym)
             cell.font = FONT_HYPERLINK
 
         if isinstance(row, PrerequisiteItemLine) or isinstance(row, PrerequisiteOfItemLine):
             column_nb = 3 if isinstance(row, PrerequisiteItemLine) else 2
             cell = worksheet.cell(row=index, column=column_nb)
-            cell.hyperlink = LEARNING_UNIT_PORTAL_URL.format(year=year, acronym=row.luy_acronym.strip("()"))
+            cell.hyperlink = LEARNING_UNIT_PORTAL_URL.format(year=year, code=row.luy_acronym.strip("()"))
             cell.font = FONT_HYPERLINK
 
 
