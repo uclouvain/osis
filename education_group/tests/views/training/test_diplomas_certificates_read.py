@@ -31,7 +31,7 @@ from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.academic_year import get_current_year
 from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.factories.user import UserFactory
-from program_management.ddd.domain.node import NodeGroupYear
+from education_group.ddd.domain.group import Group
 from program_management.forms.custom_xls import CustomXlsForm
 from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory
@@ -90,7 +90,7 @@ class TestTrainingReadDiplomaCertificate(TestCase):
         self.assertIsInstance(response.context['form_xls_custom'], CustomXlsForm)
         expected_tree_json_url = reverse('tree_json', kwargs={'root_id': self.training_version.root_group.element.pk})
         self.assertEqual(response.context['tree_json_url'], expected_tree_json_url)
-        self.assertIsInstance(response.context['node'], NodeGroupYear)
+        self.assertIsInstance(response.context['group'], Group)
         self.assertIn('current_version', response.context)
         self.assertIn('academic_year_choices', response.context)
         self.assertIn('versions_choices', response.context)

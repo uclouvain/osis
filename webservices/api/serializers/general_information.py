@@ -37,12 +37,15 @@ from cms.enums import entity_name
 from cms.models import translated_text
 from cms.models.translated_text import TranslatedText, get_groups_or_offers_cms_reference_object
 from cms.models.translated_text_label import TranslatedTextLabel
+from education_group.ddd import command
+from education_group.ddd.service.read import get_group_service
 from webservices.api.serializers.section import SectionSerializer, AchievementSectionSerializer, \
     AdmissionConditionSectionSerializer, ContactsSectionSerializer
 
 WS_SECTIONS_TO_SKIP = [CONTACT_INTRO]
 
 
+# TODO: Fix me use group instead of node and hierarchy to get data representation
 class GeneralInformationSerializer(serializers.Serializer):
     language = serializers.CharField(read_only=True)
     acronym = serializers.CharField(source='title', read_only=True)
@@ -68,7 +71,7 @@ class GeneralInformationSerializer(serializers.Serializer):
         language = settings.LANGUAGE_CODE_FR \
             if self.instance.language == settings.LANGUAGE_CODE_FR[:2] else self.instance.language
         pertinent_sections = general_information_sections.SECTIONS_PER_OFFER_TYPE[obj.node_type.name]
-        reference = translated_text.get_groups_or_offers_cms_reference_object(obj).pk
+        reference = translated_text.get_groups_or_offers_cms_reference_object(self.context['group']).pk
 
         cms_serializers = {
             SKILLS_AND_ACHIEVEMENTS: AchievementSectionSerializer,
@@ -96,8 +99,12 @@ class GeneralInformationSerializer(serializers.Serializer):
 
     def _get_section_cms(self, node, section, language, reference: int = None):
         if reference is None:
-            reference = get_groups_or_offers_cms_reference_object(node).pk
-        entity = entity_name.get_offers_or_groups_entity_from_node(node)
+            get_group_cmd = command.GetGroupCommand(code=node.code, year=node.year)
+            group = get_group_service.get_group(get_group_cmd)
+            reference = get_groups_or_offers_cms_reference_object(group).pk
+            entity = entity_name.get_offers_or_groups_entity_from_group(group)
+        else:
+            entity = entity_name.get_offers_or_groups_entity_from_group(node)
         translated_text_label = TranslatedTextLabel.objects.get(
             text_label__label=section,
             language=language,
