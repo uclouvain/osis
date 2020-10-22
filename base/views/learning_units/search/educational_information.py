@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ from learning_unit.api.serializers.learning_unit import LearningUnitDetailedSeri
 
 
 def _create_xls_teaching_material(view_obj, context, **response_kwargs):
-    return generate_xls_teaching_material(view_obj.request.user, context["object_list"])
+    return generate_xls_teaching_material(view_obj.request.user, context['filter'].qs)
 
 
 @RenderToExcel("xls_teaching_material", _create_xls_teaching_material)

@@ -502,6 +502,10 @@ class EducationGroupYear(SerializableModel):
             ('partial_acronym', 'academic_year'),
             ('acronym', 'academic_year'),
         )
+        index_together = [
+            ("acronym", "academic_year"),
+            ('partial_acronym', 'academic_year'),
+        ]
 
     def __str__(self):
         return "{} - {} - {}".format(
