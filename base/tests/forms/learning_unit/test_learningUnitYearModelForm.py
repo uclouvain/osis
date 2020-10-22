@@ -33,7 +33,7 @@ from base.models.enums import learning_unit_year_subtypes
 from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.academic_year import AcademicYearFactory, get_current_year
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
-from base.tests.forms.test_learning_unit_create_2 import get_valid_form_data
+from base.tests.forms.learning_unit.test_a_learning_unit_create_2 import get_valid_form_data
 from learning_unit.tests.factories.central_manager import CentralManagerFactory
 
 
