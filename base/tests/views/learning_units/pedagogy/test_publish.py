@@ -21,27 +21,51 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+import mock
 from django.conf import settings
-from django.test import TestCase
+from django.http import HttpResponse, HttpResponseNotFound
+from django.test import TestCase, override_settings
 from django.urls import reverse
 
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 
 
-class TestPublish(TestCase):
+@override_settings(
+    ESB_API_URL="api.esb.com",
+    ESB_REFRESH_LEARNING_UNIT_PEDAGOGY_ENDPOINT="learningUnits/{year}/{code}/resetCache",
+    LEARNING_UNIT_PORTAL_URL="https://dummy-site.be/cours-{year}-{code}"
+)
+class TestPublishLearningPedagogy(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.person = PersonFactory()
+        cls.learning_unit_year = LearningUnitYearFactory(acronym="LOSIS1452", academic_year__year=2020)
+
+        cls.url = reverse(
+            "publish_and_access_learning_unit_pedagogy",
+            kwargs={"code": cls.learning_unit_year.acronym, "year": cls.learning_unit_year.academic_year.year}
+        )
 
     def setUp(self) -> None:
         self.client.force_login(self.person.user)
 
-    def test_should_redirect_to_learning_unit_portal_with_updated_cache_url_when_accessed(self):
-        code = "LOSIS1452"
-        year = 2020
-        url = reverse("access_publication", kwargs={"code": code, "year": 2020})
-        response = self.client.get(url, follow=False)
+    @mock.patch('requests.get', return_value=HttpResponse)
+    def test_should_redirect_to_learning_unit_portal_when_refresh_succeed(self, mock_request_get):
+        response = self.client.get(self.url, follow=False)
 
-        expected_url = settings.LEARNING_UNIT_PORTAL_URL_WITH_UPDATED_CACHE.format(year=year, acronym=code)
+        expected_url = settings.LEARNING_UNIT_PORTAL_URL.format(
+            code=self.learning_unit_year.acronym,
+            year=self.learning_unit_year.academic_year.year
+        )
         self.assertRedirects(response, expected_url, fetch_redirect_response=False)
 
+    @mock.patch('requests.get', return_value=HttpResponseNotFound)
+    def test_should_redirect_to_learning_unit_pedagogy_when_refresh_failed(self, mock_request_get):
+        response = self.client.get(self.url, follow=False)
+
+        expected_url = reverse(
+            'view_educational_information',
+            kwargs={'learning_unit_year_id': self.learning_unit_year.pk}
+        )
+        self.assertRedirects(response, expected_url, fetch_redirect_response=False)
