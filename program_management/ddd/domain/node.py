@@ -425,7 +425,8 @@ class Node(interface.Entity):
         self.children[index+1].order_up()
 
 
-def _get_descendents(root_node: Node, current_path: 'Path' = None, with_reference_children=False) -> Dict['Path', 'Node']:
+def _get_descendents(root_node: Node, current_path: 'Path' = None, with_reference_children=False) \
+        -> Dict['Path', 'Node']:
     _descendents = OrderedDict()
     if current_path is None:
         current_path = str(root_node.pk)
