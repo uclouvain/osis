@@ -34,7 +34,6 @@ from program_management.ddd.command import CreateStandardVersionCommand
 from program_management.ddd.domain import exception, academic_year
 from program_management.ddd.domain import program_tree
 from program_management.ddd.validators import validators_by_business_action
-from program_management.ddd.validators.validators_by_business_action import CreateProgramTreeVersionValidatorList
 
 STANDARD = ""
 
@@ -47,7 +46,7 @@ class ProgramTreeVersionIdentity(interface.EntityIdentity):
     is_transition = attr.ib(type=bool)
 
     def is_standard(self):
-        return self.version_name == STANDARD and not self.is_transition
+        return (self.version_name == STANDARD or self.version_name is None) and not self.is_transition
 
 
 class ProgramTreeVersionBuilder:
