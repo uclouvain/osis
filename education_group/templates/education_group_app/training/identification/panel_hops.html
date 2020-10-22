@@ -29,26 +29,26 @@
         <div class="row">
             <div id="hops_ares_code" class="col-md-4">
                 {% bootstrap_label _("ARES study code") label_class='d-block' %}
-                {{ education_group_year.hops.ares_code | default_if_none:'' }}
+                {{ training.hops.ares_code | default_if_none:'' }}
             </div>
             <div id="hops_ares_graca" class="col-md-4">
                 {% bootstrap_label _("ARES-GRACA") label_class='d-block' %}
-                {{ education_group_year.hops.ares_graca | default_if_none:'' }}
+                {{ training.hops.ares_graca | default_if_none:'' }}
             </div>
             <div id="hops_ares_authorization" class="col-md-4">
                 {% bootstrap_label _("ARES ability") label_class='d-block' %}
-                {{ education_group_year.hops.ares_authorization | default_if_none:'' }}
+                {{ training.hops.ares_authorization | default_if_none:'' }}
             </div>
         </div>
         <br>
         <div class="row">
             <div id="co_graduation_inter_cfb" class="col-md-4">
                 {% bootstrap_label _("Code co-graduation inter CfB") label_class='d-block' %}
-                {{ education_group_year.co_graduation.code_inter_cfb | default_if_none:'' }}
+                {{ training.co_graduation.code_inter_cfb | default_if_none:'' }}
             </div>
             <div id="co_graduation_coefficient" class="col-md-4">
                 {% bootstrap_label _("Co-graduation total coefficient") label_class='d-block' %}
-                {{ education_group_year.co_graduation.coefficient.normalize | default_if_none:'' }}
+                {{ training.co_graduation.coefficient.normalize | default_if_none:'' }}
             </div>
         </div>
     </div>

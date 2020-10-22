@@ -29,7 +29,6 @@ from django.shortcuts import redirect
 from django.urls import reverse
 
 from base.business.education_groups import general_information_sections
-from education_group.ddd.domain.training import TrainingIdentity
 from education_group.ddd.repository.training import TrainingRepository
 from education_group.views.serializers import achievement
 from education_group.views.training.common_read import TrainingRead, Tab
@@ -50,7 +49,7 @@ class TrainingReadSkillsAchievements(TrainingRead):
             **super().get_context_data(**kwargs),
             "year": kwargs['year'],
             "code": kwargs['code'],
-            "achievements": achievement.get_achievements(self.get_object(), self.request.GET['path']),
+            "achievements": achievement.get_achievements(self.get_group(), self.request.GET['path']),
             "can_edit_information": self.request.user.has_perm(edition_perm_name, self.get_permission_object()),
             "program_aims_label": self.get_program_aims_label(),
             "program_aims_update_url": self.get_program_aims_update_url(),
@@ -90,8 +89,8 @@ class TrainingReadSkillsAchievements(TrainingRead):
 
     @functools.lru_cache()
     def get_translated_labels(self):
-        return achievement.get_skills_labels(self.get_object(), self.request.LANGUAGE_CODE)
+        return achievement.get_skills_labels(self.get_group(), self.request.LANGUAGE_CODE)
 
     @functools.lru_cache()
     def get_training(self):
-        return TrainingRepository.get(TrainingIdentity(acronym=self.get_object().title, year=self.get_object().year))
+        return TrainingRepository.get(self.training_identity)

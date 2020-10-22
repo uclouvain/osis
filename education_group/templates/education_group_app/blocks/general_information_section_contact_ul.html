@@ -40,8 +40,8 @@
 
            {% if can_edit_information %}
                 <div class="pull-right">
-                   {% url 'publication_contact_edit' year=node.year code=node.code publication_contact_id=contact.pk as update_url %}
-                   {% url 'publication_contact_delete' year=node.year code=node.code publication_contact_id=contact.pk  as delete_url %}
+                   {% url 'publication_contact_edit' year=group.year code=group.code publication_contact_id=contact.pk as update_url %}
+                   {% url 'publication_contact_delete' year=group.year code=group.code publication_contact_id=contact.pk  as delete_url %}
 
                    <a class="trigger_modal pull-right" style="margin-right: 15px;" data-url="{{ delete_url }}" title={% trans 'Delete' %}>
                         <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>

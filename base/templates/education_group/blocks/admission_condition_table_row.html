@@ -22,7 +22,7 @@
 * at the root of the source code of this program.  If not,
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
-{% url 'education_group_year_admission_condition_update_line' node.year node.code as update_line_url %}
+{% url 'education_group_year_admission_condition_update_line' group.year group.code as update_line_url %}
 <tr id="{{ section_name }}">
     <td colspan="5" class="info">
         {{ header_text }}
@@ -71,7 +71,7 @@
                         <i class="fa fa-arrow-down"></i>
                     </button>
 
-                    <a href="{% url 'education_group_year_admission_condition_remove_line' node.year node.code %}?id={{ record.id }}"
+                    <a href="{% url 'education_group_year_admission_condition_remove_line' group.year group.code %}?id={{ record.id }}"
                        role="button" class="button" title="{% trans 'delete' %}">
                         <span class="glyphicon glyphicon-remove"></span>
                     </a>

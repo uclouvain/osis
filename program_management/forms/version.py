@@ -174,10 +174,16 @@ class UpdateTrainingVersionForm(ValidationRuleMixin, PermissionFieldMixin, Speci
     english_activities = forms.CharField(label=_("activities in English").capitalize(), disabled=True, required=False)
     other_language_activities = forms.CharField(label=_("Other languages activities"), disabled=True, required=False)
     main_domain = forms.CharField(label=_('main domain').capitalize(), disabled=True, required=False)
-    secondary_domains = forms.CharField(label=_('secondary domains').title(), disabled=True, required=False)
+    secondary_domains = forms.CharField(label=_('secondary domains').capitalize(), disabled=True, required=False)
     isced_domain = forms.CharField(label=_('ISCED domain'), disabled=True, required=False)
-    internal_comment = forms.CharField(label=_("comment (internal)").capitalize(), disabled=True, required=False)
 
+    internal_comment = forms.CharField(
+        max_length=500,
+        label=_("comment (internal)").capitalize(),
+        disabled=True,
+        required=False,
+        widget=forms.Textarea,
+    )
     # panel_entities_form.html
     management_entity = forms.CharField()
     administration_entity = forms.CharField(label=_("Administration entity"), disabled=True, required=False)

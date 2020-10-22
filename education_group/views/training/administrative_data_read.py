@@ -47,11 +47,10 @@ class TrainingReadAdministrativeData(TrainingRead):
         return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        offer_acronym = self.get_object().title
-        year = self.get_object().year
+        offer_acronym = self.training_identity.acronym
+        year = self.training_identity.year
         return {
             **super().get_context_data(**kwargs),
-            "children": self.get_object().children,
             "learning_unit_enrollment_dates": self.__get_learning_unit_enrollment_date(),
             "administrative_dates": serializer.get_session_dates(offer_acronym, year),
             "additional_informations": self.__get_complementary_informations(),
@@ -61,8 +60,8 @@ class TrainingReadAdministrativeData(TrainingRead):
 
     def __get_learning_unit_enrollment_date(self) -> OfferYearCalendar:
         return OfferYearCalendar.objects.filter(
-            education_group_year__acronym=self.get_object().title,
-            education_group_year__academic_year__year=self.get_object().year,
+            education_group_year__acronym=self.training_identity.acronym,
+            education_group_year__academic_year__year=self.training_identity.year,
             academic_calendar__reference=academic_calendar_type.COURSE_ENROLLMENT,
         ).first()
 
@@ -77,8 +76,8 @@ class TrainingReadAdministrativeData(TrainingRead):
 
     def __get_mandataries(self):
         qs = Mandatary.objects.filter(
-            mandate__education_group__educationgroupyear__acronym=self.get_object().title,
-            mandate__education_group__educationgroupyear__academic_year__year=self.get_object().year,
+            mandate__education_group__educationgroupyear__acronym=self.training_identity.acronym,
+            mandate__education_group__educationgroupyear__academic_year__year=self.training_identity.year,
             start_date__lte=F('mandate__education_group__educationgroupyear__academic_year__end_date'),
             end_date__gte=F('mandate__education_group__educationgroupyear__academic_year__start_date')
         ).order_by(
@@ -105,6 +104,6 @@ class TrainingReadAdministrativeData(TrainingRead):
 
     def __get_program_managers(self):
         return ProgramManager.objects.filter(
-            education_group__educationgroupyear__acronym=self.get_object().title,
-            education_group__educationgroupyear__academic_year__year=self.get_object().year,
+            education_group__educationgroupyear__acronym=self.training_identity.acronym,
+            education_group__educationgroupyear__academic_year__year=self.training_identity.year,
         ).order_by("person__last_name", "person__first_name")

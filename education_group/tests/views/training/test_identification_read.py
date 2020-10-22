@@ -35,9 +35,9 @@ from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.academic_year import get_current_year
 from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.factories.user import UserFactory
+from education_group.ddd.domain.group import Group
 from education_group.ddd.domain.training import Training
 from education_group.views.training.common_read import Tab
-from program_management.ddd.domain.node import NodeGroupYear
 from program_management.forms.custom_xls import CustomXlsForm
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory, \
     StandardEducationGroupVersionFactory, ParticularTransitionEducationGroupVersionFactory, \
@@ -156,10 +156,11 @@ class TestTrainingReadIdentification(TestCase):
         self.assertEqual(response.context['education_group_version'], self.training_version)
         self.assertEqual(response.context['update_permission_name'], "base.change_training")
         self.assertEqual(response.context['create_version_permission_name'], "base.add_training_version")
-        self.assertIsInstance(response.context['education_group_year'], Training)
+        self.assertIsInstance(response.context['training'], Training)
         self.assertIsInstance(response.context['form_xls_custom'], CustomXlsForm)
         self.assertIsInstance(response.context['tree_json_url'], str)
-        self.assertIsInstance(response.context['node'], NodeGroupYear)
+        self.assertIsInstance(response.context['tree_root_id'], int)
+        self.assertIsInstance(response.context['group'], Group)
         self.assertIsInstance(response.context['history'], QuerySet)
         self.assertIn('current_version', response.context)
         self.assertIn('academic_year_choices', response.context)

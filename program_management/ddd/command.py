@@ -82,6 +82,17 @@ class UpdateProgramTreeVersionCommand(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True)
+class ProlongExistingProgramTreeVersionCommand(interface.CommandRequest):
+    end_year = attr.ib(type=int)
+    updated_year = attr.ib(type=int)
+    offer_acronym = attr.ib(type=str)
+    version_name = attr.ib(type=str)
+    is_transition = attr.ib(type=bool)
+    title_en = attr.ib(type=str)
+    title_fr = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
 class UpdateTrainingVersionCommand(interface.CommandRequest):
     offer_acronym = attr.ib(type=str)
     version_name = attr.ib(type=str)

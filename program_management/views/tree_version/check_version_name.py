@@ -21,7 +21,7 @@ def check_version_name(request, year, acronym):
     existed_version_name = False
     valid = bool(re.match("^[A-Z]{0,15}$", version_name.upper()))
     if version_name != "":
-        existing_version = __get_last_existing_version(version_name, acronym)
+        existing_version = get_last_existing_version(version_name, acronym)
         if existing_version and existing_version.year < year:
             last_using = display_as_academic_year(existing_version.year)
             existed_version_name = True
@@ -33,7 +33,7 @@ def check_version_name(request, year, acronym):
         "version_name": version_name}, safe=False)
 
 
-def __get_last_existing_version(version_name: str, offer_acronym: str) -> ProgramTreeVersionIdentity:
+def get_last_existing_version(version_name: str, offer_acronym: str) -> ProgramTreeVersionIdentity:
     return get_last_existing_version_service.get_last_existing_version_identity(
         GetLastExistingVersionNameCommand(
             version_name=version_name.upper(),

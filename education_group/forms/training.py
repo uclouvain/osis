@@ -182,14 +182,14 @@ class CreateTrainingForm(ValidationRuleMixin, forms.Form):
                 output_field=CharField()
             )
         ),
-        label=_('main domain'),
+        label=_('main domain').capitalize(),
         required=False,
         to_field_name="form_key"
     )
     secondary_domains = fields.SecondaryDomainsField(
         'university_domains',
         required=False,
-        label=_('secondary domains').title(),
+        label=_('secondary domains').capitalize(),
     )
     isced_domain = forms.ModelChoiceField(
         queryset=DomainIsced.objects.all(),
@@ -261,10 +261,12 @@ class CreateTrainingForm(ValidationRuleMixin, forms.Form):
     remark_english = forms.CharField(widget=forms.Textarea, label=_("remark in english").capitalize(), required=False)
 
     # HOPS panel
-    hops_fields = ('ares_code', 'ares_graca', 'ares_authorization')
-    ares_code = forms.CharField(label=_('ARES study code'), widget=forms.TextInput(), required=False)
-    ares_graca = forms.CharField(label=_('ARES-GRACA'), widget=forms.TextInput(), required=False)
-    ares_authorization = forms.CharField(label=_('ARES ability'), widget=forms.TextInput(), required=False)
+    ares_code = forms.IntegerField(label=_('ARES study code'), widget=forms.TextInput(), required=False,
+                                   max_value=9999)
+    ares_graca = forms.IntegerField(label=_('ARES-GRACA'), widget=forms.TextInput(), required=False,
+                                    max_value=9999)
+    ares_authorization = forms.IntegerField(label=_('ARES ability'), widget=forms.TextInput(), required=False,
+                                            max_value=9999)
     code_inter_cfb = forms.CharField(max_length=8, label=_('Code co-graduation inter CfB'), required=False)
     coefficient = forms.DecimalField(
         max_digits=7,
@@ -365,25 +367,17 @@ class CreateTrainingForm(ValidationRuleMixin, forms.Form):
     def __init_secondary_domains(self):
         self.fields["secondary_domains"].widget.attrs['placeholder'] = _('Enter text to search')
 
-    def is_valid(self):
-        valid = super().is_valid()
-
-        hops_fields_values = [self.cleaned_data.get(hops_field) for hops_field in self.hops_fields]
-        if any(hops_fields_values) and not all(hops_fields_values):
-            self.add_error(
-                self.hops_fields[0],
-                _('The fields concerning ARES have to be ALL filled-in or none of them')
-            )
-            valid = False
-
-        return valid
-
     # ValidationRuleMixin
     def field_reference(self, field_name: str) -> str:
         return '.'.join(["TrainingForm", self.training_type, field_name])
 
 
 class UpdateTrainingForm(PermissionFieldMixin, CreateTrainingForm):
+    acronym = UpperCaseCharField(
+        max_length=15,
+        label=_("Acronym/Short title"),
+        disabled=True,
+    )
     start_year = forms.ModelChoiceField(
         queryset=AcademicYear.objects.all(),
         label=_('Start academic year'),

@@ -58,9 +58,7 @@ class TestDetachNodeView(TestCase):
             str(cls.group_element_year.parent_element_id),
             str(cls.group_element_year.child_element_id)
         ])
-        cls.url = reverse("tree_detach_node", args=[
-            element.id,
-        ]) + "?path={}".format(cls.path_to_detach)
+        cls.url = reverse("tree_detach_node") + "?path={}".format(cls.path_to_detach)
 
     def setUp(self):
         self.client.force_login(self.person.user)

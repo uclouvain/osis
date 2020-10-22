@@ -23,12 +23,21 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib.messages.views import SuccessMessageMixin
-from django.views.generic import CreateView
 
-from base.views.mixins import AjaxTemplateMixin
+import factory.fuzzy
+
+from program_management.ddd import command
 
 
-class CreateLinkView(SuccessMessageMixin, AjaxTemplateMixin, CreateView):
-    pass
-    # SEE : CreateGroupElementYearView
+class ProlongExistingProgramTreeVersionCommandFactory(factory.Factory):
+    class Meta:
+        model = command.ProlongExistingProgramTreeVersionCommand
+        abstract = False
+
+    offer_acronym = "CHIM1BA"
+    version_name = "VERSIONNAME"
+    is_transition = False
+    updated_year = 2019
+    end_year = None
+    title_fr = "fr  title"
+    title_en = "title  en"
