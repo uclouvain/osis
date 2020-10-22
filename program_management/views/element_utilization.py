@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
+from education_group.models.group_year import GroupYear
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.service.read.get_utilization_rows import get_utilizations
@@ -41,3 +41,6 @@ class LearningUnitUtilization(PermissionRequiredMixin, LearningUnitGeneric):
         context['utilization_rows'] = get_utilizations(NodeIdentity(code=self.node.code, year=self.node.year),
                                                        context.get('language'))
         return context
+
+    def get_permission_object(self):
+        return GroupYear.objects.get(element__pk=self.program_tree.root_node.pk)
