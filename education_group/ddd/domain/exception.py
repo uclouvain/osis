@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import List
+from typing import List, Dict
 
 from django.utils.translation import gettext_lazy as _, ngettext_lazy
 
@@ -281,3 +281,41 @@ class MiniTrainingCopyConsistencyException(AbstractConsistencyException, Busines
 
 class CertificateAimsCopyConsistencyException(AbstractConsistencyException, BusinessException):
     pass
+
+
+class HopsDataShouldBeGreaterOrEqualsThanZeroAndLessThan9999(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _("The fields concerning ARES must be greater than or equal to 1 and less than or equal to 9999")
+        super().__init__(message, **kwargs)
+
+
+class HopsFieldsAllOrNone(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _('The fields concerning ARES have to be ALL filled-in or none of them')
+        super().__init__(message, **kwargs)
+
+
+class AresCodeShouldBeGreaterOrEqualsThanZeroAndLessThan9999(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _("The fields concerning ARES must be greater than or equal to 1 and less than or equal to 9999")
+        super().__init__(message, **kwargs)
+
+
+class AresGracaShouldBeGreaterOrEqualsThanZeroAndLessThan9999(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _(
+            "The fields concerning ARES must be greater than or equal to 1 and less than or equal to 9999")
+        super().__init__(message, **kwargs)
+
+
+class AresAuthorizationShouldBeGreaterOrEqualsThanZeroAndLessThan9999(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _(
+            "The fields concerning ARES must be greater than or equal to 1 and less than or equal to 9999")
+        super().__init__(message, **kwargs)
+
+
+class AresDataShouldBeGreaterOrEqualsThanZeroAndLessThan9999(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _("The fields concerning ARES must be greater than or equal to 1 and less than or equal to 9999")
+        super().__init__(message, **kwargs)
