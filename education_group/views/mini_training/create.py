@@ -155,7 +155,7 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
     def _get_success_msg(self, mini_training_identity: mini_training.MiniTrainingIdentity, code: str) -> str:
         return _("Mini-training <a href='%(link)s'> %(code)s (%(academic_year)s) </a> successfully created.") % {
             "link": self._generate_success_url(mini_training_identity, code),
-            "code": code,
+            "code": mini_training_identity.acronym,
             "academic_year": display_as_academic_year(mini_training_identity.year),
         }
 

@@ -29,6 +29,7 @@ from django import shortcuts
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
+from osis_common.ddd.interface import BusinessException
 
 from base.forms.exceptions import InvalidFormException
 from base.models.enums.link_type import LinkTypes
@@ -36,7 +37,6 @@ from base.views.common import display_success_messages
 from base.views.mixins import AjaxTemplateMixin
 from education_group.models.group_year import GroupYear
 from osis_common.ddd import interface
-from osis_common.ddd.interface import BusinessException
 from osis_role.contrib.views import AjaxPermissionRequiredMixin
 from program_management.ddd import command
 from program_management.ddd.business_types import *
@@ -133,7 +133,7 @@ class UpdateLinkView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, FormView):
             "code": node.code,
             "abbreviated_title": node.title,
             "version": "[{}]".format(version_identity.version_name)
-            if version_identity and not version_identity.is_standard else "",
+                       if version_identity and not version_identity.is_standard() else "",
             "year": node.academic_year
         }
 
