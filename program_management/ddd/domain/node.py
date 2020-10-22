@@ -260,6 +260,9 @@ class Node(interface.Entity):
     def get_direct_child_as_node(self, node_id: 'NodeIdentity') -> 'Node':
         return next(node for node in self.get_direct_children_as_nodes() if node.entity_id == node_id)
 
+    def get_direct_child(self, node_id: 'NodeIdentity') -> 'Link':
+        return next(link for link in self.children if link.child.entity_id == node_id)
+
     def get_all_children(
             self,
             ignore_children_from: Set[EducationGroupTypesEnum] = None,
@@ -305,6 +308,16 @@ class Node(interface.Entity):
     @property
     def children_as_nodes(self) -> List['Node']:
         return [link.child for link in self.children]
+
+    @property
+    def children_as_nodes_with_respect_to_reference_link(self) -> List['Node']:
+        children = []
+        for link in self.children:
+            if link.is_reference():
+                children.extend(link.child.children_as_nodes_with_respect_to_reference_link)
+            else:
+                children.append(link.child)
+        return children
 
     def get_direct_children_as_nodes(
             self,
@@ -456,12 +469,30 @@ class NodeGroupYear(Node):
     group_title_en = attr.ib(type=str, default=None)
     offer_partial_title_fr = attr.ib(type=str, default=None)
     offer_partial_title_en = attr.ib(type=str, default=None)
+    version_name = attr.ib(type=str, default=None)
+    version_title_fr = attr.ib(type=str, default=None)
+    version_title_en = attr.ib(type=str, default=None)
     category = attr.ib(type=GroupType, default=None)
     management_entity_acronym = attr.ib(type=str, default=None)
     teaching_campus = attr.ib(type=Campus, default=None)
     schedule_type = attr.ib(type=ScheduleTypeEnum, default=None)
     offer_status = attr.ib(type=ActiveStatusEnum, default=None)
     keywords = attr.ib(type=str, default=None)
+
+    def __str__(self):
+        if self.version_name:
+            return "{}[{}] - {} ({})".format(self.title, self.version_name, self.code, self.academic_year)
+        return "{} - {} ({})".format(self.title, self.code, self.academic_year)
+
+    def full_title(self) -> str:
+        if self.version_name:
+            return "{}[{}]".format(self.title, self.version_name)
+        return self.title
+
+    def full_group_title_fr(self) -> str:
+        if self.version_name:
+            return "{}[{}]".format(self.group_title_fr, self.version_title_fr)
+        return self.group_title_fr
 
 
 @attr.s(slots=True, hash=False, eq=False)

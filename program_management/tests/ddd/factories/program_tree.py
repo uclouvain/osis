@@ -99,8 +99,9 @@ def _tree_builder(data: Dict) -> 'Node':
     node = _node_builder(_data)
 
     for child_data in children:
+        link_data = child_data.pop("link_data", {})
         child_node = _tree_builder(child_data)
-        LinkFactory(parent=node, child=child_node)
+        LinkFactory(parent=node, child=child_node, **link_data)
 
     return node
 
@@ -115,7 +116,12 @@ def _node_builder(data: Dict) -> 'Node':
 def _build_authorized_relationships(root_node: 'Node') -> 'AuthorizedRelationshipList':
     all_links = root_node.get_all_children()
     relationships = [
-        AuthorizedRelationshipObjectFactory(parent_type=link.parent.node_type, child_type=link.child.node_type)
+        AuthorizedRelationshipObjectFactory(
+            parent_type=link.parent.node_type,
+            child_type=link.child.node_type,
+            min_constraint=0,
+            max_constraint=10
+        )
         for link in all_links
     ]
     return AuthorizedRelationshipList(relationships)

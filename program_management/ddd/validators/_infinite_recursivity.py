@@ -23,12 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.utils.translation import gettext as _
 
-import osis_common.ddd.interface
 from base.ddd.utils import business_validator
-from base.ddd.utils.business_validator import BusinessValidator
 from program_management.ddd.business_types import *
+from program_management.ddd.domain.exception import CannotPasteNodeToHimselfException, CannotAttachParentNodeException
 
 
 class InfiniteRecursivityTreeValidator(business_validator.BusinessValidator):
@@ -41,10 +39,7 @@ class InfiniteRecursivityTreeValidator(business_validator.BusinessValidator):
 
     def validate(self):
         if self.node_to_add in self.tree.get_parents(self.path):
-            error_msg = _('The child %(child)s you want to attach is a parent of the node you want to attach.') % {
-                'child': self.node_to_add
-            }
-            raise osis_common.ddd.interface.BusinessExceptions([error_msg])
+            raise CannotAttachParentNodeException(self.node_to_add)
 
 
 class InfiniteRecursivityLinkValidator(business_validator.BusinessValidator):
@@ -56,6 +51,4 @@ class InfiniteRecursivityLinkValidator(business_validator.BusinessValidator):
 
     def validate(self):
         if self.node_to_add == self.parent_node:
-            raise osis_common.ddd.interface.BusinessExceptions(
-                [_('Cannot attach a node %(node)s to himself.') % {"node": self.node_to_add}]
-            )
+            raise CannotPasteNodeToHimselfException(self.parent_node)

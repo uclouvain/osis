@@ -26,6 +26,7 @@
 from typing import List
 
 from base.ddd.utils import business_validator
+from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception
 
 
@@ -46,24 +47,34 @@ class MatchVersionValidator(business_validator.BusinessValidator):
         self.tree_version_repository = tree_version_repository
 
     def validate(self):
-        if self.node_to_add.is_training():
-            child_version = self._get_program_tree_version(self.node_to_add)
+        try:
+            child_version_name = self.get_node_to_add_version()
+        except StopIteration:
+            return
 
-            parent_versions = self._get_all_program_tree_version_using_node(self.node_to_paste_to)
-            if not self.node_to_paste_to.is_group():
-                parent_versions.append(self._get_program_tree_version(self.node_to_paste_to))
+        parent_versions = self._get_all_program_tree_version_using_node(self.node_to_paste_to)
+        if not self.node_to_paste_to.is_group():
+            parent_versions.append(self._get_program_tree_version(self.node_to_paste_to))
 
-            version_mismatched = [
-                parent_version.entity_id for parent_version in parent_versions
-                if parent_version.version_name != child_version.version_name
-            ]
-            if version_mismatched:
-                raise exception.ProgramTreeVersionMismatch(
-                    self.node_to_add,
-                    child_version.entity_id,
-                    self.node_to_paste_to,
-                    version_mismatched,
-                )
+        version_mismatched = [
+            parent_version.entity_id for parent_version in parent_versions
+            if parent_version.version_name != child_version_name
+        ]
+        if version_mismatched:
+            raise exception.ProgramTreeVersionMismatch(
+                self.node_to_add,
+                self.node_to_paste_to,
+                version_mismatched,
+            )
+
+    def get_node_to_add_version(self) -> str:
+        if self.node_to_add.is_training() or self.node_to_add.is_mini_training():
+            return self.node_to_add.version_name
+
+        training_and_mini_training_children = (
+            node for node in self.node_to_add.children_as_nodes if node.is_training() or node.is_mini_training()
+        )
+        return next(node.version_name for node in training_and_mini_training_children)
 
     def _get_program_tree_version(self, node: 'Node') -> 'ProgramTreeVersion':
         from program_management.ddd.domain.program_tree import ProgramTreeIdentity

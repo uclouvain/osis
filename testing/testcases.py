@@ -21,34 +21,15 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from typing import List
 
-from django.db import transaction
+from django.test import TestCase
 
-from program_management.ddd.command import BulkUpdateLinkCommand
-from program_management.ddd.domain.exception import BulkUpdateLinkException
-from program_management.ddd.domain.node import NodeIdentity
-from program_management.ddd.domain.program_tree import ProgramTreeIdentity
-from program_management.ddd.repositories.program_tree import ProgramTreeRepository
-from program_management.ddd.service.write import update_link_service
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 
 
-@transaction.atomic()
-def bulk_update_links(cmd: BulkUpdateLinkCommand) -> List['Link']:
-    tree_id = ProgramTreeIdentity(code=cmd.parent_node_code, year=cmd.parent_node_year)
-    tree = ProgramTreeRepository.get(tree_id)
-
-    links_updated = []
-    exceptions = dict()
-    for update_cmd in cmd.update_link_cmds:
-        try:
-            child_id = NodeIdentity(code=update_cmd.child_node_code, year=update_cmd.child_node_year)
-            link_updated = update_link_service._update_link(child_id, tree, update_cmd)
-            links_updated.append(link_updated)
-        except MultipleBusinessExceptions as e:
-            exceptions[update_cmd] = e
-    if exceptions:
-        raise BulkUpdateLinkException(exceptions=exceptions)
-    ProgramTreeRepository.update(tree)
-    return links_updated
+class DDDTestCase(TestCase):
+    def assertRaisesBusinessException(self, exception, func, *args, **kwargs):
+        with self.assertRaises(MultipleBusinessExceptions) as e:
+            func(*args, **kwargs)
+        class_exceptions = [exc.__class__ for exc in e.exception.exceptions]
+        self.assertIn(exception, class_exceptions)

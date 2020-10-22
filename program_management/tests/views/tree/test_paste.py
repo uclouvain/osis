@@ -27,12 +27,13 @@ from unittest import mock
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.http import HttpResponse
-from django.test import TestCase, SimpleTestCase, RequestFactory
+from django.test import TestCase
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from waffle.testutils import override_flag
 
 import osis_common.ddd.interface
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models.enums.education_group_types import GroupType
 from base.models.enums.link_type import LinkTypes
 from base.tests.factories.academic_year import AcademicYearFactory
@@ -40,22 +41,19 @@ from base.tests.factories.authorized_relationship import AuthorizedRelationshipF
 from base.tests.factories.education_group_type import GroupEducationGroupTypeFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.person import PersonFactory
-from base.tests.factories.user import UserFactory
 from base.utils.cache import ElementCache
 from base.utils.urls import reverse_with_get
 from osis_role.contrib.views import AjaxPermissionRequiredMixin
 from program_management.ddd import command
 from program_management.ddd.domain import link
-from program_management.forms.tree.paste import PasteNodesFormset, PasteNodeForm
+from program_management.forms.tree.paste import BasePasteNodesFormset, PasteNodeForm
 from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory, \
     NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
-from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory
-from program_management.views.tree.paste import PasteNodesView
 
 
-def form_valid_effect(formset: PasteNodesFormset):
+def form_valid_effect(formset: BasePasteNodesFormset):
     for form in formset:
         form.cleaned_data = {}
     return True
@@ -78,14 +76,14 @@ class TestPasteNodeView(TestCase):
 
         self.fetch_from_cache_patcher = mock.patch(
             'program_management.ddd.service.read.element_selected_service.retrieve_element_selected',
-            return_value=[]
+            return_value=None
         )
         self.fetch_from_cache_patcher.start()
         self.addCleanup(self.fetch_from_cache_patcher.stop)
 
         self.get_form_class_patcher = mock.patch(
-            'program_management.forms.tree.paste._get_form_class',
-            return_value=PasteNodeForm
+            'program_management.views.tree.paste.PasteNodesView.get_form_class',
+            return_value=BasePasteNodesFormset
         )
         self.get_form_class_patcher.start()
         self.addCleanup(self.get_form_class_patcher.stop)
@@ -116,7 +114,7 @@ class TestPasteNodeView(TestCase):
         path = "|".join([str(self.tree.root_node.pk), str(self.tree.root_node.children[0].child.pk)])
         response = self.client.get(self.url, data={"path": path})
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, 'tree/paste_inner.html')
+        self.assertTemplateUsed(response, 'tree/link_update_inner.html')
 
         msgs = [m.message for m in messages.get_messages(response.wsgi_request)]
         self.assertEqual(msgs, [_("Please cut or copy an item before paste")])
@@ -152,13 +150,12 @@ class TestPasteNodeView(TestCase):
             }
         )
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, 'tree/paste_inner.html')
+        self.assertTemplateUsed(response, 'tree/link_update_inner.html')
 
-        self.assertIsInstance(response.context['formset'], PasteNodesFormset)
-        self.assertEqual(len(response.context['formset'].forms), 2)
+        self.assertIsInstance(response.context['content_formset'], BasePasteNodesFormset)
 
     @mock.patch('program_management.ddd.service.read.element_selected_service.retrieve_element_selected')
-    @mock.patch('program_management.forms.tree.paste.PasteNodesFormset.is_valid')
+    @mock.patch('program_management.forms.tree.paste.BasePasteNodesFormset.is_valid')
     @mock.patch('program_management.ddd.service.read.check_paste_node_service.check_paste')
     @mock.patch(
         'program_management.ddd.domain.service.identity_search.ProgramTreeVersionIdentitySearch.get_from_node_identity'
@@ -187,67 +184,8 @@ class TestPasteNodeView(TestCase):
         path = "|".join([str(self.tree.root_node.pk), str(self.tree.root_node.children[1].child.pk)])
         response = self.client.post(self.url + "?path=" + path)
 
-        self.assertTemplateUsed(response, 'tree/paste_inner.html')
-        self.assertIsInstance(response.context['formset'], PasteNodesFormset)
-
-    @mock.patch('program_management.ddd.service.write.paste_element_service.paste_element')
-    @mock.patch.object(PasteNodesFormset, 'is_valid', new=form_valid_effect)
-    @mock.patch.object(PasteNodeForm, 'is_valid')
-    @mock.patch('program_management.ddd.service.read.element_selected_service.retrieve_element_selected')
-    def test_should_call_paste_node_service_when_post_data_are_valid(
-            self,
-            mock_cache_elems,
-            mock_form_valid,
-            mock_service
-    ):
-        subgroup_to_attach = NodeGroupYearFactory(node_type=GroupType.SUB_GROUP, )
-        mock_cache_elems.return_value = {
-            "element_code": subgroup_to_attach.code,
-            "element_year": subgroup_to_attach.year,
-            "path_to_detach": None
-        }
-        mock_form_valid.return_value = True
-        mock_service.return_value = link.LinkIdentity(
-            parent_code=self.tree.root_node.children[1].child.code,
-            child_code=subgroup_to_attach.code,
-            parent_year=self.tree.root_node.children[1].child.year,
-            child_year=subgroup_to_attach.year
-        )
-
-        # To path :  BIR1BA ---> LBIR101G
-        path = "|".join([str(self.tree.root_node.pk), str(self.tree.root_node.children[1].child.pk)])
-        self.client.post(self.url + "?path=" + path)
-
-        self.assertTrue(
-            mock_service.called,
-            msg="View must call attach node service (and not another layer) "
-                "because the 'attach node' action uses multiple domain objects"
-        )
-
-    @mock.patch(
-        'program_management.ddd.domain.service.identity_search.ProgramTreeVersionIdentitySearch.get_from_node_identity'
-    )
-    @mock.patch('program_management.ddd.repositories.node.NodeRepository.get')
-    @mock.patch('program_management.ddd.repositories.program_tree.ProgramTreeRepository.get')
-    def test_format_title_version_when_available(self, mock_get_tree, mock_get_node, mock_get_tree_version):
-        subgroup_to_attach = NodeGroupYearFactory(node_type=GroupType.SUB_GROUP)
-
-        mock_get_node.return_value = subgroup_to_attach
-        mock_get_tree.return_value = ProgramTreeFactory()
-        mock_get_tree_version.return_value = ProgramTreeVersionFactory()
-
-        # To path :  BIR1BA ---> LBIR101G
-        path = "|".join([str(self.tree.root_node.pk), str(self.tree.root_node.children[1].child.pk)])
-        response = self.client.get(
-            self.url,
-            data={
-                "path": path,
-                "codes": [subgroup_to_attach.code],
-                "year": subgroup_to_attach.year
-            }
-        )
-        self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, 'tree/paste_inner.html')
+        self.assertTemplateUsed(response, 'tree/link_update_inner.html')
+        self.assertIsInstance(response.context['content_formset'], BasePasteNodesFormset)
 
 
 class TestPasteWithCutView(TestCase):
@@ -295,32 +233,6 @@ class TestPasteWithCutView(TestCase):
         self.addCleanup(permission_patcher.stop)
         self.addCleanup(get_permission_error_patcher.stop)
         self.addCleanup(ElementCache(self.person.user).clear)
-
-    def test_should_check_attach_and_detach_permission(self):
-        AuthorizedRelationshipFactory(
-            parent_type=self.selected_element.group_year.education_group_type,
-            child_type=self.group_element_year.child_element.group_year.education_group_type,
-            min_count_authorized=0,
-            max_count_authorized=None
-        )
-        ElementCache(self.person.user.id).save_element_selected(
-            element_year=self.academic_year.year,
-            element_code=self.group_element_year.child_element.group_year.partial_acronym,
-            path_to_detach="|".join([
-                str(self.group_element_year.parent_element.id),
-                str(self.group_element_year.child_element.id)
-            ]),
-            action=ElementCache.ElementCacheAction.CUT
-        )
-        self.client.get(self.url)
-        self.permission_mock.assert_has_calls(
-            [
-                mock.call("base.can_detach_node", self.group_element_year.parent_element.group_year),
-                mock.call("base.can_attach_node", self.selected_element.group_year)
-            ]
-
-        )
-        self.assertTrue(self.permission_mock.called)
 
     @mock.patch('program_management.views.tree.paste.PasteNodesView._has_permission_to_detach', return_value=False)
     def test_should_display_detach_permission_error_when_cannot_detach(self, mock_has_perm_to_detach):
@@ -426,7 +338,10 @@ class TestCheckPasteView(TestCase):
     def test_should_return_error_messages_when_check_paste_service_raises_exception(
             self
     ):
-        self.mock_check_paste.side_effect = osis_common.ddd.interface.BusinessExceptions(["Not valid"])
+        self.mock_check_paste.side_effect = MultipleBusinessExceptions(
+            [osis_common.ddd.interface.BusinessException("Not valid")]
+        )
+
         response = self.client.get(
             self.url,
             data={
@@ -488,4 +403,3 @@ class TestCheckPasteView(TestCase):
             HTTP_ACCEPT="application/json"
         )
         self.assertFalse(response.wsgi_request.session.get(check_key))
-

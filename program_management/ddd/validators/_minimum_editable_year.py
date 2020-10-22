@@ -24,11 +24,10 @@
 #
 ##############################################################################
 from django.conf import settings
-from django.utils.translation import gettext_lazy as _
 
-import osis_common.ddd.interface
 from base.ddd.utils import business_validator
 from program_management.ddd.business_types import *
+from program_management.ddd.domain.exception import MinimumEditableYearException
 
 
 class MinimumEditableYearValidator(business_validator.BusinessValidator):
@@ -38,8 +37,4 @@ class MinimumEditableYearValidator(business_validator.BusinessValidator):
 
     def validate(self):
         if self.tree.root_node.year < settings.YEAR_LIMIT_EDG_MODIFICATION:
-            raise osis_common.ddd.interface.BusinessExceptions(
-                [_("Cannot perform action on a education group before %(limit_year)s") % {
-                    "limit_year": settings.YEAR_LIMIT_EDG_MODIFICATION
-                }]
-            )
+            raise MinimumEditableYearException()

@@ -153,18 +153,22 @@ class NodeIdentitySearch(interface.DomainService):
 
 
 class ProgramTreeIdentitySearch(interface.DomainService):
-    def get_from_node_identity(self, node_identity: 'NodeIdentity') -> 'ProgramTreeIdentity':
+    @classmethod
+    def get_from_node_identity(cls, node_identity: 'NodeIdentity') -> 'ProgramTreeIdentity':
         return ProgramTreeIdentity(code=node_identity.code, year=node_identity.year)
 
-    def get_from_program_tree_version_identity(
-            self,
-            identity: 'ProgramTreeVersionIdentity'
-    ) -> 'ProgramTreeIdentity':
-        return self.get_from_node_identity(NodeIdentitySearch().get_from_tree_version_identity(identity))
+    @classmethod
+    def get_from_program_tree_version_identity(cls, identity: 'ProgramTreeVersionIdentity') -> 'ProgramTreeIdentity':
+        return cls.get_from_node_identity(NodeIdentitySearch().get_from_tree_version_identity(identity))
 
     @classmethod
     def get_from_group_identity(cls, group_identity: 'GroupIdentity') -> 'ProgramTreeIdentity':
         return ProgramTreeIdentity(code=group_identity.code, year=group_identity.year)
+
+    @classmethod
+    def get_from_element_id(cls, element_id: 'int') -> 'ProgramTreeIdentity':
+        node_identity = NodeIdentitySearch.get_from_element_id(element_id)
+        return cls.get_from_node_identity(node_identity)
 
 
 class TrainingIdentitySearch(interface.DomainService):
