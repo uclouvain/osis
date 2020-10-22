@@ -34,7 +34,4 @@ class Campus(interface.ValueObject):
     university_name = attr.ib(type=str)
 
     def __str__(self):
-        return self.name + " - " + self.university_name
-
-    def __str__(self):
         return "{name} - {university_name}".format(name=self.name, university_name=self.university_name)
