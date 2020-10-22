@@ -208,8 +208,9 @@ def _build_excel_lines_ues(custom_xls_form: CustomXlsForm, tree: 'ProgramTree'):
         if child_node.is_learning_unit():
             luy = next(child for child in learning_unit_years if child_node.equals(child))
 
-            parents_data = get_explore_parents(tree.get_parents(path))
-            link = tree.get_link(parents_data[DIRECT_GATHERING_KEY], child_node)
+            parents = tree.get_parents(path)
+            parents_data = get_explore_parents(parents)
+            link = tree.get_link(parents[0], child_node)
 
             if not parents_data[EXCLUDE_UE_KEY]:
                 content.append(_get_optional_data(

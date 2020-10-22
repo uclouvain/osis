@@ -36,7 +36,7 @@ from base.business.learning_unit_xls import CREATION_COLOR, MODIFICATION_COLOR, 
 from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import GroupType, TrainingType
 from base.models.enums.learning_unit_year_subtypes import FULL
-from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES, PeriodicityEnum
+from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.tests.factories.academic_year import AcademicYearFactory
@@ -69,6 +69,7 @@ from program_management.tests.ddd.factories.program_tree_version import Standard
     ProgramTreeVersionFactory
 from program_management.ddd.business_types import *
 from base.models.enums.learning_unit_year_subtypes import LEARNING_UNIT_YEAR_SUBTYPES
+from django.template.defaultfilters import yesno
 
 PARTIAL_ACRONYM = 'Partial'
 
@@ -347,8 +348,6 @@ class TestContent(TestCase):
     def test_get_optional_has_periodicity(self):
         optional_data = initialize_optional_data()
         optional_data['has_periodicity'] = True
-        print(type(self.luy.periodicity))
-        # data.append(PeriodicityEnum[luy.periodicity.name].value if luy.periodicity else '')
         self.assertCountEqual(_get_optional_data([], self.luy, optional_data, self.link_1_1),
                               [PeriodicityEnum[self.luy.periodicity.name].value if self.luy.periodicity else ''])
 
@@ -544,11 +543,9 @@ class TestXlsContent(TestCase):
                     child=cls.group_level_1_1)
 
         cls.ue1 = NodeLearningUnitYearFactory(node_id=4, code='UE1', year=cls.academic_year.year)
-        LinkFactory(parent=cls.group_level_1_1,
-                    child=cls.ue1)
+        cls.link_group_level_1_1_and_ue1 = LinkFactory(parent=cls.group_level_1_1, child=cls.ue1)
         ue_2 = NodeLearningUnitYearFactory(node_id=5, code='UE2', year=cls.academic_year.year)
-        LinkFactory(parent=cls.group_level_1_1,
-                    child=ue_2)
+        cls.link_group_level_1_1_and_ue2 = LinkFactory(parent=cls.group_level_1_1, child=ue_2)
 
         cls.group_level_2 = NodeGroupYearFactory(node_id=6,
                                                  node_type=TrainingType.MASTER_MS_120,
@@ -564,8 +561,7 @@ class TestXlsContent(TestCase):
         LinkFactory(parent=cls.group_level_2,
                     child=cls.group_level_2_1)
         cls.ue3 = NodeLearningUnitYearFactory(node_id=9, code='UE3', year=cls.academic_year.year)
-        LinkFactory(parent=cls.group_level_2_1,
-                    child=cls.ue3)
+        cls.link_group_level_2_1_and_ue3 = LinkFactory(parent=cls.group_level_2_1, child=cls.ue3)
         cls.group_level_2_2 = NodeGroupYearFactory(node_id=8,
                                                    node_type=GroupType.OPTION_LIST_CHOICE,
                                                    year=cls.academic_year.year,
@@ -580,15 +576,15 @@ class TestXlsContent(TestCase):
 
         # TODO : remplacer ce qui suit pour un accès plus direct
 
-        element_ue_1 = ElementLearningUnitYearFactory(id=cls.ue1.node_id,
+        cls.element_ue_1 = ElementLearningUnitYearFactory(id=cls.ue1.node_id,
                                                       learning_unit_year=LearningUnitYearFactory(
                                                           acronym=cls.ue1.code, academic_year=cls.academic_year)
                                                       )
-        element_ue_2 = ElementLearningUnitYearFactory(id=ue_2.node_id,
+        cls.element_ue_2 = ElementLearningUnitYearFactory(id=ue_2.node_id,
                                                       learning_unit_year=LearningUnitYearFactory(
                                                           acronym=ue_2.code, academic_year=cls.academic_year)
                                                       )
-        element_ue_3 = ElementLearningUnitYearFactory(id=cls.ue3.node_id,
+        cls.element_ue_3 = ElementLearningUnitYearFactory(id=cls.ue3.node_id,
                                                       learning_unit_year=LearningUnitYearFactory(
                                                           acronym=cls.ue3.code, academic_year=cls.academic_year)
                                                       )
@@ -596,8 +592,8 @@ class TestXlsContent(TestCase):
                                        learning_unit_year=LearningUnitYearFactory(acronym=cls.ue4.code,
                                                                                   academic_year=cls.academic_year))
 
-        cls.learning_units = [element_ue_1.learning_unit_year, element_ue_2.learning_unit_year,
-                              element_ue_3.learning_unit_year]
+        cls.learning_units = [cls.element_ue_1.learning_unit_year, cls.element_ue_2.learning_unit_year,
+                              cls.element_ue_3.learning_unit_year]
         cls.luy_count = len(cls.learning_units)
 
     def test_row_height_not_populated(self):
@@ -683,6 +679,22 @@ class TestXlsContent(TestCase):
 
         self.assertEqual(_get_xls_title(tree_version.tree, tree_version), _assert_format_title(tree, tree_version))
 
+    def test_link_data(self):
+
+        custom_form = CustomXlsForm({'credits': 'on'}, year=self.tree.root_node.year, code=self.tree.root_node.code)
+        data = _build_excel_lines_ues(custom_form, self.tree)
+        content = data['content']
+
+        self._assert_correct_data_from_link(content[1],
+                                            self.link_group_level_1_1_and_ue1,
+                                            self.element_ue_1.learning_unit_year)
+        self._assert_correct_data_from_link(content[2],
+                                            self.link_group_level_1_1_and_ue2,
+                                            self.element_ue_2.learning_unit_year)
+        self._assert_correct_data_from_link(content[3],
+                                            self.link_group_level_2_1_and_ue3,
+                                            self.element_ue_3.learning_unit_year)
+
     def _assert_correct_ue_present_in_xls2(self, tree, ues):
         data = _build_excel_lines_ues(CustomXlsForm({}, year=self.root_node.year, code=self.root_node.code), tree)
         content = data['content']
@@ -690,6 +702,12 @@ class TestXlsContent(TestCase):
         self.assertEqual(len(content), len(ues))
         self.assertCountEqual([content[0][0], content[1][0], content[2][0]],
                               ues)
+
+    def _assert_correct_data_from_link(self, ue_content, link, learning_unit_year):
+        self.assertEqual(ue_content[7], link.block or '')
+        self.assertEqual(ue_content[8], str.strip(yesno(link.is_mandatory)))
+        self.assertEqual(ue_content[9], link.relative_credits or '-')
+        self.assertEqual(ue_content[10], learning_unit_year.credits or '')
 
 
 def _assert_format_title(tree: 'ProgramTree', tree_version: 'ProgramTreeVersion') -> str:
