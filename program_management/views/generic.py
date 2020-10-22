@@ -23,8 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import json
-
 from django.contrib.auth.decorators import login_required
 from django.contrib.messages.views import SuccessMessageMixin
 from django.http import Http404
@@ -125,7 +123,7 @@ class LearningUnitGeneric(ElementSelectedClipBoardMixin, TemplateView):
         context['parent'] = self.program_tree.root_node
         context['node'] = self.node
         context['tree_json_url'] = self.get_tree_json_url()
-        context['group_to_parent'] = self.request.GET.get("group_to_parent") or '0'
+        context['tree_root_id'] = self.get_root_id()
         context['show_prerequisites'] = self.show_prerequisites(self.program_tree.root_node)
         context['selected_element_clipboard'] = self.get_selected_element_clipboard_message()
         context['xls_ue_prerequisites'] = reverse("education_group_learning_units_prerequisites",

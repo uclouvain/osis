@@ -25,28 +25,28 @@
 ##############################################################################
 from typing import Union
 
+import osis_common.ddd.interface
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 
-import osis_common.ddd.interface
 from base.utils.cache import ElementCache
-from base.views.common import display_success_messages
 from base.views.common import display_error_messages, display_warning_messages
+from base.views.common import display_success_messages
 from base.views.mixins import AjaxTemplateMixin
+from education_group.ddd import command as command_education_group
 from education_group.ddd.domain.group import Group
+from education_group.ddd.service.read import get_group_service
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from learning_unit.ddd import command as command_learning_unit
-from education_group.ddd.service.read import get_group_service
-from education_group.ddd import command as command_education_group
 from learning_unit.ddd.domain.learning_unit_year import LearningUnitYear
 from learning_unit.ddd.service.read import get_learning_unit_year_service
 from osis_common.ddd import interface
 from program_management.ddd import command
 from program_management.ddd.domain import link
 from program_management.ddd.domain.service.identity_search import NodeIdentitySearch, ProgramTreeVersionIdentitySearch
-from program_management.ddd.service.write import detach_node_service
 from program_management.ddd.service.read import detach_warning_messages_service, get_program_tree_service
+from program_management.ddd.service.write import detach_node_service
 from program_management.forms.tree.detach import DetachNodeForm
 from program_management.models.enums.node_type import NodeType
 from program_management.views.generic import GenericGroupElementYearMixin
@@ -176,7 +176,7 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
             "abbreviated_title": '' if isinstance(self.child_obj, LearningUnitYear)
             else "- " + self.child_obj.abbreviated_title,
             "version": "[{}]".format(self.child_version_identity.version_name)
-            if self.child_version_identity and not self.child_version_identity.is_standard else "",
+                       if self.child_version_identity and not self.child_version_identity.is_standard() else "",
             "year": display_as_academic_year(self.child_obj.year)
         }
 
@@ -185,7 +185,7 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
             "code": self.parent_group_obj.code,
             "abbreviated_title": self.parent_group_obj.abbreviated_title,
             "version": "[{}]".format(self.parent_version_identity.version_name)
-            if self.parent_version_identity and not self.parent_version_identity.is_standard else "",
+                       if self.parent_version_identity and not self.parent_version_identity.is_standard() else "",
             "year": self.parent_group_obj.academic_year
         }
 

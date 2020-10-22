@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-05 09:24+0200\n"
+"POT-Creation-Date: 2020-10-22 11:34+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -184,6 +184,10 @@ msgstr ""
 msgid "Access with additional training"
 msgstr ""
 
+msgid "Acronym"
+msgstr ""
+
+msgctxt "OF acronym"
 msgid "Acronym"
 msgstr ""
 
@@ -2655,6 +2659,12 @@ msgid "UE full"
 msgstr ""
 
 msgid "URL of the learning unit"
+msgstr ""
+
+#, python-format
+msgid ""
+"Unable to publish pedagogy information for the learning unit %(code)s - "
+"%(year)s"
 msgstr ""
 
 msgid "Undefined"

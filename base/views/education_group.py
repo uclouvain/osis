@@ -55,7 +55,7 @@ from program_management.ddd.repositories.program_tree import ProgramTreeReposito
 def education_group_year_pedagogy_edit_post(request, node: Node):
     form = EducationGroupPedagogyEditForm(request.POST)
     obj = translated_text.get_groups_or_offers_cms_reference_object(node)
-    entity = entity_name.get_offers_or_groups_entity_from_node(node)
+    entity = entity_name.get_offers_or_groups_entity_from_group(node)
 
     redirect_url = _get_admission_condition_success_url(node.year, node.title)
     if form.is_valid():
@@ -83,7 +83,7 @@ def education_group_year_pedagogy_edit_post(request, node: Node):
 
 def education_group_year_pedagogy_edit_get(request, node: Node):
     obj = translated_text.get_groups_or_offers_cms_reference_object(node)
-    entity = entity_name.get_offers_or_groups_entity_from_node(node)
+    entity = entity_name.get_offers_or_groups_entity_from_group(node)
     context = {
         'education_group_year': obj,
     }
@@ -110,7 +110,6 @@ def education_group_year_pedagogy_edit_get(request, node: Node):
         initial_values['text_english'] = en_text.text
     form = EducationGroupPedagogyEditForm(initial=initial_values)
     context['form'] = form
-    context['group_to_parent'] = request.GET.get("group_to_parent") or '0'
     context['translated_label'] = translated_text_label.get_label_translation(
         text_entity=entity,
         label=label_name,
