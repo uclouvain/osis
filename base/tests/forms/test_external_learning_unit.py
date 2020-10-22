@@ -44,6 +44,7 @@ from base.tests.factories.business.entities import create_entities_hierarchy
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.entity import EntityWithVersionFactory
+from base.tests.factories.entity_version import MainEntityVersionFactory
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
@@ -58,8 +59,8 @@ YEAR_LIMIT_LUE_MODIFICATION = 2018
 NAMEN = 'Namur'
 
 
-def get_valid_external_learning_unit_form_data(academic_year, entity_role, learning_unit_year=None):
-    entities = create_entities_hierarchy(root_entity=entity_role.entity)
+def get_valid_external_learning_unit_form_data(academic_year, entity_role, learning_unit_year=None, root_entity=None):
+    entities = create_entities_hierarchy(root_entity=root_entity)
     requesting_entity = entities['child_one_entity_version']
     organization = OrganizationFactory(type=organization_type.MAIN)
     campus = CampusFactory(organization=organization)
@@ -130,7 +131,8 @@ class TestExternalLearningUnitForm(TestCase):
         cls.academic_years = GenerateAcademicYear(starting_year, end_year).academic_years
         cls.academic_year = cls.academic_years[1]
         cls.language = FrenchLanguageFactory()
-        cls.manager = CentralManagerFactory(entity=EntityWithVersionFactory(), with_child=True)
+        cls.entity = MainEntityVersionFactory().entity
+        cls.manager = CentralManagerFactory(entity=cls.entity, with_child=True)
         cls.person = cls.manager.person
 
     def setUp(self):
@@ -149,12 +151,12 @@ class TestExternalLearningUnitForm(TestCase):
 
     @override_settings(YEAR_LIMIT_LUE_MODIFICATION=YEAR_LIMIT_LUE_MODIFICATION)
     def test_external_learning_unit_form_is_valid(self):
-        data = get_valid_external_learning_unit_form_data(self.academic_year, self.manager)
+        data = get_valid_external_learning_unit_form_data(self.academic_year, self.manager, root_entity=self.entity)
         form = ExternalLearningUnitBaseForm(person=self.person, academic_year=self.academic_year, data=data)
         self.assertTrue(form.is_valid(), form.errors)
 
     def test_external_learning_unit_form_save(self):
-        data = get_valid_external_learning_unit_form_data(self.academic_year, self.manager)
+        data = get_valid_external_learning_unit_form_data(self.academic_year, self.manager, root_entity=self.entity)
         form = ExternalLearningUnitBaseForm(person=self.person, academic_year=self.academic_year, data=data,
                                             start_year=self.academic_year)
         self.assertTrue(form.is_valid(), form.errors)

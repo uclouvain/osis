@@ -166,22 +166,20 @@ class LearningUnitFullFormContextMixin(TestCase):
         cls.initial_campus = CampusFactory(name='Louvain-la-Neuve', organization__type=organization_type.MAIN)
         cls.current_academic_year = create_current_academic_year()
 
-        cls.entity = EntityWithVersionFactory()
-        # Creation of a LearningContainerYear and all related models
-        cls.learn_unit_structure = GenerateContainer(cls.current_academic_year, cls.current_academic_year, cls.entity)
-
         start_year = AcademicYearFactory(year=cls.current_academic_year.year - 3)
         end_year = AcademicYearFactory(year=cls.current_academic_year.year + 7)
         cls.acs = GenerateAcademicYear(start_year=start_year, end_year=end_year).academic_years
+
+        cls.entity = EntityWithVersionFactory()
+
+        # Creation of a LearningContainerYear and all related models
+        cls.learn_unit_structure = GenerateContainer(cls.current_academic_year, cls.current_academic_year, cls.entity)
 
         cls.learning_unit_year = LearningUnitYear.objects.get(
             learning_unit=cls.learn_unit_structure.learning_unit_full,
             academic_year=cls.current_academic_year
         )
-        del cls.acs[3]
-        for ac in cls.acs:
-            LearningUnitYearFactory(academic_year=ac, learning_unit=cls.learning_unit_year.learning_unit)
-        cls.acs.insert(3, cls.current_academic_year)
+
         cls.faculty_manager = FacultyManagerFactory(entity=cls.entity, with_child=True)
         cls.faculty_person = cls.faculty_manager.person
         cls.central_manager = CentralManagerFactory(entity=cls.entity, with_child=True)
@@ -190,7 +188,10 @@ class LearningUnitFullFormContextMixin(TestCase):
         cls.post_data = get_valid_form_data(cls.current_academic_year, entity_role=cls.central_manager)
 
     def setUp(self):
-        pass
+        del self.acs[3]
+        for ac in self.acs:
+            LearningUnitYearFactory(academic_year=ac, learning_unit=self.learning_unit_year.learning_unit)
+        self.acs.insert(3, self.current_academic_year)
 
 
 class TestFullFormInit(LearningUnitFullFormContextMixin):
@@ -610,7 +611,7 @@ class TestFullFormValidateSameEntitiesContainer(LearningUnitFullFormContextMixin
     """Unit tests for FullForm._validate_same_entities_container()"""
 
     def test_when_same_entities_container(self):
-        form = _instanciate_form(self.current_academic_year, post_data=self.post_data, person=self.faculty_person,
+        form = _instanciate_form(self.current_academic_year, post_data=self.post_data, person=self.central_person,
                                  start_year=self.current_academic_year.year)
         self.assertTrue(form.is_valid(), form.errors)
 
@@ -623,14 +624,14 @@ class TestFullFormValidateSameEntitiesContainer(LearningUnitFullFormContextMixin
 
     def test_when_not_same_entities_container_case_container_type_internship(self):
         post_data = self._get_post_data_with_different_entities_container_year(learning_container_year_types.INTERNSHIP)
-        form = _instanciate_form(self.current_academic_year, post_data=post_data, person=self.faculty_person,
+        form = _instanciate_form(self.current_academic_year, post_data=post_data, person=self.central_person,
                                  start_year=self.current_academic_year.year)
         self.assertFalse(form.is_valid())
 
     def test_when_not_same_entities_container_case_container_type_dissertation(self):
         post_data = self._get_post_data_with_different_entities_container_year(
             learning_container_year_types.DISSERTATION)
-        form = _instanciate_form(self.current_academic_year, post_data=post_data, person=self.faculty_person,
+        form = _instanciate_form(self.current_academic_year, post_data=post_data, person=self.central_person,
                                  start_year=self.current_academic_year.year)
         self.assertFalse(form.is_valid())
 
@@ -649,11 +650,11 @@ class TestFullFormValidateSameEntitiesContainer(LearningUnitFullFormContextMixin
         self.post_data['additional_entity_1'] = self.post_data['requirement_entity']
         self.post_data['component-0-repartition_volume_requirement_entity'] = 5
         self.post_data['component-0-repartition_volume_additional_entity_1'] = 10
-        form = _instanciate_form(self.current_academic_year, post_data=self.post_data, person=self.faculty_person,
+        form = _instanciate_form(self.current_academic_year, post_data=self.post_data, person=self.central_person,
                                  start_year=self.current_academic_year.year)
         self.assertFalse(form.is_valid())
         self.post_data['component-0-repartition_volume_requirement_entity'] = 10
         self.post_data['component-0-repartition_volume_additional_entity_1'] = 10
-        form = _instanciate_form(self.current_academic_year, post_data=self.post_data, person=self.faculty_person,
+        form = _instanciate_form(self.current_academic_year, post_data=self.post_data, person=self.central_person,
                                  start_year=self.current_academic_year.year)
         self.assertTrue(form.is_valid(), form.errors)
