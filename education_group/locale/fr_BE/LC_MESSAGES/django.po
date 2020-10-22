@@ -637,6 +637,13 @@ msgstr ""
 "Les champs concernant les données de l'ARES doivent être soit tous remplis "
 "soit tous vides"
 
+msgid ""
+"The fields concerning ARES must be greater than or equal to 1 and less than "
+"or equal to 9999"
+msgstr ""
+"Les valeurs des champs concernant les données de l'ARES doivent être supérieures ou égales à 1 et inférieures ou "
+"égales à 9999"
+
 #, python-format
 msgid "The group %(code)s has been deleted."
 msgstr "Le groupement %(code)s a été supprimé."
