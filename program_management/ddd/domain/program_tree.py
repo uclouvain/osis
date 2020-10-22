@@ -404,14 +404,14 @@ class ProgramTree(interface.RootEntity):
         validator.validate()
 
         return node_to_paste_to.add_child(
-                node_to_paste,
-                access_condition=paste_command.access_condition,
-                is_mandatory=paste_command.is_mandatory,
-                block=paste_command.block,
-                link_type=link_type,
-                comment=paste_command.comment,
-                comment_english=paste_command.comment_english,
-                relative_credits=paste_command.relative_credits
+            node_to_paste,
+            access_condition=paste_command.access_condition,
+            is_mandatory=paste_command.is_mandatory,
+            block=paste_command.block,
+            link_type=link_type,
+            comment=paste_command.comment,
+            comment_english=paste_command.comment_english,
+            relative_credits=paste_command.relative_credits
         )
 
     def set_prerequisite(

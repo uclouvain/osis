@@ -258,8 +258,10 @@ class CannotAttachParentNodeException(BusinessException):
 
 class ParentAndChildMustHaveSameAcademicYearException(BusinessException):
     def __init__(self, parent_node, child_node):
-        message = _("It is prohibited to attach a %(child_node)s to an element of "
-                    "another academic year %(parent_node)s.") % {
+        message = _(
+            "It is prohibited to attach a %(child_node)s to an element of "
+            "another academic year %(parent_node)s."
+        ) % {
             "child_node": child_node,
             "parent_node": parent_node
         }
