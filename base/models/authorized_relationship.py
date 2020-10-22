@@ -132,3 +132,6 @@ class AuthorizedRelationshipList:
             and authorized_type.parent_type == parent_type
             and authorized_type.min_count_authorized > 0
         )
+
+    def __copy__(self) -> 'AuthorizedRelationshipList':
+        return self.__class__(authorized_relationships=self.authorized_relationships.copy())

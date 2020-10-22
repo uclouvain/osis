@@ -44,8 +44,8 @@ class ValidateAuthorizedRelationshipForAllTrees(BusinessValidator):
         self.tree_repository = tree_repository
 
     def validate(self, *args, **kwargs):
-        child_node = self.tree.get_node(self.path)
-        trees = self.tree_repository.search_from_children([child_node.entity_id], link_type=LinkTypes.REFERENCE)
+        node_to_paste_to = self.tree.get_node(self.path)
+        trees = self.tree_repository.search_from_children([node_to_paste_to.entity_id], link_type=LinkTypes.REFERENCE)
         for tree in trees:
-            for parent_from_reference_link in tree.get_parents_using_node_as_reference(child_node):
+            for parent_from_reference_link in tree.get_parents_using_node_as_reference(node_to_paste_to):
                 PasteAuthorizedRelationshipValidator(tree, self.node_to_paste, parent_from_reference_link).validate()

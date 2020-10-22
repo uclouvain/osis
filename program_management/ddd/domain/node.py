@@ -260,6 +260,9 @@ class Node(interface.Entity):
     def get_direct_child_as_node(self, node_id: 'NodeIdentity') -> 'Node':
         return next(node for node in self.get_direct_children_as_nodes() if node.entity_id == node_id)
 
+    def get_direct_child(self, node_id: 'NodeIdentity') -> 'Link':
+        return next(link for link in self.children if link.child.entity_id == node_id)
+
     def get_all_children(
             self,
             ignore_children_from: Set[EducationGroupTypesEnum] = None,

@@ -27,7 +27,6 @@
 import osis_common.ddd.interface
 from base.ddd.utils import business_validator
 from base.ddd.utils.business_validator import BusinessListValidator, MultipleExceptionBusinessListValidator
-from base.models.enums.link_type import LinkTypes
 from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.validators._authorized_link_type import AuthorizedLinkTypeValidator
@@ -112,7 +111,7 @@ class UpdateLinkValidatorList(MultipleExceptionBusinessListValidator):
     ):
         self.validators = [
             AuthorizedLinkTypeValidator(tree, child_node, link.link_type),
-            UpdateLinkAuthorizedRelationshipValidator(tree, child_node, link.link_type),
+            UpdateLinkAuthorizedRelationshipValidator(tree, child_node),
             BlockValidator(link.block),
             RelativeCreditsValidator(link.relative_credits)
         ]

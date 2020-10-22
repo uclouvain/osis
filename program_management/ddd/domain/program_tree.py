@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import copy
 from collections import Counter
 from typing import List, Set, Optional, Dict
 
@@ -459,7 +460,10 @@ class ProgramTree(interface.RootEntity):
         return parent.detach_child(node_to_detach)
 
     def __copy__(self) -> 'ProgramTree':
-        return ProgramTree(root_node=_copy(self.root_node))
+        return ProgramTree(
+            root_node=_copy(self.root_node),
+            authorized_relationships=copy.copy(self.authorized_relationships)
+        )
 
     def remove_prerequisites(self, detached_node: 'Node', parent_path):
         pruned_tree = ProgramTree(root_node=_copy(self.root_node))
