@@ -34,6 +34,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 
 from base import models as mdl
+from base.business.education_group import has_coorganization
 from base.business.education_groups import general_information_sections
 from base.business.education_groups.general_information_sections import \
     MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION
@@ -59,6 +60,7 @@ from program_management.ddd.service.read import node_identity_service
 from program_management.forms.custom_xls import CustomXlsForm
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.models.element import Element
+from program_management.serializers.program_tree_view import program_tree_view_serializer
 from base.business.education_group import has_coorganization
 
 Tab = read.Tab  # FIXME :: fix imports (and remove this line)
@@ -131,6 +133,25 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
 
     def get_root_id(self) -> int:
         return int(self.get_path().split("|")[0])
+
+    @functools.lru_cache()
+    def get_object(self) -> 'Node':
+        try:
+            return self.get_tree().get_node(self.get_path())
+        except NodeNotFoundException:
+            root_node = self.get_tree().root_node
+            version_identity = self.program_tree_version_identity
+            message = _(
+                "The formation you work with doesn't exist (or is not at the same position) "
+                "in the tree {root.title}{version} in {root.year}."
+                "You've been redirected to the root {root.code} ({root.year})"
+            ).format(
+                root=root_node,
+                version="[{}]".format(version_identity.version_name)
+                if version_identity and not version_identity.is_standard() else ""
+            )
+            display_warning_messages(self.request, message)
+            return root_node
 
     def get_context_data(self, **kwargs):
         return {
