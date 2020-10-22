@@ -29,7 +29,9 @@ import program_management.ddd.repositories.find_roots
 from base.models.education_group_year import EducationGroupYear
 from base.models.prerequisite import Prerequisite
 from base.views.common import display_business_warning_messages
+from education_group.models.group_year import GroupYear
 from osis_role.contrib.views import PermissionRequiredMixin
+from program_management.ddd.validators._authorized_root_type_for_prerequisite import AuthorizedRootTypeForPrerequisite
 from program_management.ddd.validators._prerequisites_items import PrerequisiteItemsValidator
 from program_management.views.generic import LearningUnitGeneric
 
@@ -39,12 +41,15 @@ class LearningUnitPrerequisite(PermissionRequiredMixin, LearningUnitGeneric):
     raise_exception = True
 
     def dispatch(self, request, *args, **kwargs):
-        if self.program_tree.root_node.is_training():
-            return LearningUnitPrerequisiteTraining.as_view()(request, *args, **kwargs)
-        return LearningUnitPrerequisiteGroup.as_view()(request, *args, **kwargs)
+        if self.program_tree.root_node.is_group():
+            return LearningUnitPrerequisiteGroup.as_view()(request, *args, **kwargs)
+        return LearningUnitPrerequisiteTrainingandMiniTraining.as_view()(request, *args, **kwargs)
+
+    def get_permission_object(self):
+        return GroupYear.objects.get(element__pk=self.program_tree.root_node.pk)
 
 
-class LearningUnitPrerequisiteTraining(PermissionRequiredMixin, LearningUnitGeneric):
+class LearningUnitPrerequisiteTrainingandMiniTraining(PermissionRequiredMixin, LearningUnitGeneric):
     template_name = "learning_unit/tab_prerequisite_training.html"
 
     permission_required = 'base.view_educationgroup'
@@ -52,7 +57,13 @@ class LearningUnitPrerequisiteTraining(PermissionRequiredMixin, LearningUnitGene
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
-        context["can_modify_prerequisite"] = False  # TODO: Fix with U.S. OSIS-4987
+        context["can_modify_prerequisite"] = self.request.user.has_perm(
+            'base.change_prerequisite',
+            self.get_permission_object()
+        )
+        context["show_modify_prerequisite_button"] = AuthorizedRootTypeForPrerequisite(
+            self.program_tree.root_node
+        ).is_valid()
         context["program_links"] = self.program_tree.get_all_links()
         context["is_prerequisite_of_list"] = context["node"].get_is_prerequisite_of()
         return context
@@ -68,6 +79,9 @@ class LearningUnitPrerequisiteTraining(PermissionRequiredMixin, LearningUnitGene
                 self.request,
                 validator.messages
             )
+
+    def get_permission_object(self):
+        return GroupYear.objects.get(element__pk=self.program_tree.root_node.pk)
 
 
 class LearningUnitPrerequisiteGroup(PermissionRequiredMixin, LearningUnitGeneric):
@@ -93,3 +107,6 @@ class LearningUnitPrerequisiteGroup(PermissionRequiredMixin, LearningUnitGeneric
         )
         context["formations"] = qs.prefetch_related(prefetch_prerequisites)
         return context
+
+    def get_permission_object(self):
+        return GroupYear.objects.get(element__pk=self.program_tree.root_node.pk)
