@@ -52,7 +52,7 @@ from base.views.education_groups import urls as education_groups_urls
 from base.views.filter import filter_cities_by_country, filter_campus_by_city
 from base.views.learning_units.detail import DetailLearningUnitYearView, DetailLearningUnitYearViewBySlug
 from base.views.learning_units.external import create as create_external
-from base.views.learning_units.pedagogy.publish import access_refreshed_publication
+from base.views.learning_units.pedagogy.publish import publish_and_access_publication
 from base.views.learning_units.pedagogy.read import learning_unit_pedagogy
 from base.views.learning_units.pedagogy.update import learning_unit_pedagogy_edit, toggle_summary_locked, \
     learning_unit_pedagogy_force_majeure_edit
