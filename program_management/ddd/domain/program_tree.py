@@ -358,7 +358,6 @@ class ProgramTree(interface.RootEntity):
     def get_all_links(self) -> List['Link']:
         return _links_from_root(self.root_node)
 
-    @functools.lru_cache()
     def _links_mapped_by_child_and_parent(self) -> Dict:
         return {
                 str(link.child.entity_id) + str(link.parent.entity_id): link
