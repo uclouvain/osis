@@ -805,7 +805,7 @@ msgid "Themes discussed"
 msgstr "Thèmes abordés"
 
 msgid "This education group is not editable during this period."
-msgstr ""
+msgstr "Cette organisation de formation n'est pas éditable durant cette période."
 
 msgid ""
 "This form must be signed by the designated authority and delivered to the "
