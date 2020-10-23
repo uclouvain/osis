@@ -58,7 +58,7 @@ class TestCreateProgramTreeVersion(TestCase, MockPatcherMixin):
             end_year=self.end_year_standard_version,
             offer_acronym=self.offer_acronym,
             version_name='CEMS',
-            year=self.standard_version.entity_identity.year,
+            start_year=self.standard_version.entity_identity.year,
             is_transition=False,
             title_en='Title in English',
             title_fr='Intitulé en français',
@@ -150,8 +150,10 @@ class TestCreateProgramTreeVersion(TestCase, MockPatcherMixin):
         tree_version_created = ProgramTreeVersionRepository().get(identity)
 
         self.assertEqual(tree_version_created.entity_id.offer_acronym, self.command.offer_acronym)
-        self.assertEqual(tree_version_created.entity_id.year, self.command.year)
+        self.assertEqual(tree_version_created.entity_id.year, self.command.start_year)
         self.assertEqual(tree_version_created.entity_id.version_name, self.command.version_name)
         self.assertEqual(tree_version_created.entity_id.is_transition, self.command.is_transition)
         self.assertEqual(tree_version_created.title_fr, self.command.title_fr)
         self.assertEqual(tree_version_created.title_en, self.command.title_en)
+        self.assertEqual(tree_version_created.end_year_of_existence, self.command.end_year)
+        self.assertEqual(tree_version_created.start_year, self.command.start_year)

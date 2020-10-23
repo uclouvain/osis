@@ -40,7 +40,7 @@ class TestCreateStandardProgramVersion(TestCase):
         mock_version_builder.return_value.build_standard_version.return_value = standard_program_version
         mock_version_repository.return_value.create.return_value = standard_program_version.entity_id
 
-        cmd = command.CreateStandardVersionCommand(offer_acronym="Offer", code="Code", year=2018)
+        cmd = command.CreateStandardVersionCommand(offer_acronym="Offer", code="Code", start_year=2018)
         result = create_standard_version_service.create_standard_program_version(cmd)
 
         self.assertEqual(standard_program_version.entity_id, result)

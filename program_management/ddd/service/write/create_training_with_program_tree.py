@@ -57,7 +57,7 @@ def create_and_report_training_with_program_tree(
         CreateStandardVersionCommand(
             offer_acronym=create_training_cmd.abbreviated_title,
             code=create_training_cmd.code,
-            year=create_training_cmd.year,
+            start_year=create_training_cmd.year,
         )
     )
 
@@ -66,7 +66,7 @@ def create_and_report_training_with_program_tree(
         CreateStandardVersionCommand(
             offer_acronym=create_training_cmd.abbreviated_title,
             code=create_training_cmd.code,
-            year=create_training_cmd.year,
+            start_year=create_training_cmd.year,
         )
     )
 
