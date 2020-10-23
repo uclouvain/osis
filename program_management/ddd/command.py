@@ -55,7 +55,7 @@ class CreateProgramTreeVersionCommand(interface.CommandRequest):
     end_year = attr.ib(type=int)
     offer_acronym = attr.ib(type=str)
     version_name = attr.ib(type=str)
-    year = attr.ib(type=int)
+    start_year = attr.ib(type=int)
     is_transition = attr.ib(type=bool)
     title_en = attr.ib(type=str)
     title_fr = attr.ib(type=str)
@@ -388,7 +388,7 @@ class BulkUpdateLinkCommand(interface.CommandRequest):
 class CreateStandardVersionCommand(interface.CommandRequest):
     offer_acronym = attr.ib(type=str)
     code = attr.ib(type=str)
-    year = attr.ib(type=int)
+    start_year = attr.ib(type=int)
 
 
 @attr.s(frozen=True, slots=True)
