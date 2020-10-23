@@ -51,6 +51,7 @@ class ProgramTreeVersionFactory(factory.Factory):
     tree = factory.SubFactory(ProgramTreeFactory)
     program_tree_identity = factory.SelfAttribute("tree.entity_id")
     program_tree_repository = None
+    start_year = factory.SelfAttribute("tree.root_node.start_year")
     entity_id = factory.SubFactory(
         ProgramTreeVersionIdentityFactory,
         offer_acronym=factory.SelfAttribute("..tree.root_node.title"),
