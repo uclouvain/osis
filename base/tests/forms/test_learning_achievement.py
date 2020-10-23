@@ -30,7 +30,7 @@ from base.forms.learning_achievement import LearningAchievementEditForm
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.learning_achievement import LearningAchievementFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from reference.tests.factories.language import FrenchLanguageFactory, EnglishLanguageFactory
+from reference.tests.factories.language import LanguageFactory, FrenchLanguageFactory, EnglishLanguageFactory
 
 
 class TestLearningAchievementForm(TestCase):
