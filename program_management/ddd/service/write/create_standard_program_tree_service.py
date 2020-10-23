@@ -40,7 +40,7 @@ from program_management.ddd.repositories.program_tree import ProgramTreeReposito
 def create_standard_program_tree(create_standard_cmd: command.CreateStandardVersionCommand) -> 'ProgramTreeIdentity':
 
     # GIVEN
-    group_identity = GroupIdentity(code=create_standard_cmd.code, year=create_standard_cmd.year)
+    group_identity = GroupIdentity(code=create_standard_cmd.code, year=create_standard_cmd.start_year)
     root_group = GroupRepository().get(entity_id=group_identity)
 
     # WHEN
