@@ -51,11 +51,3 @@ class EntityWithVersionFactory(EntityFactory):
         factory_related_name='entity',
         parent=None
     )
-
-
-class MainEntityWithVersionFactory(EntityFactory):
-    version = factory.RelatedFactory(
-        "base.tests.factories.entity_version.MainEntityVersionFactory",
-        factory_related_name='entity',
-        parent=None
-    )

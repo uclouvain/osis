@@ -51,7 +51,7 @@ from base.tests.factories.academic_year import create_current_academic_year, Aca
 from base.tests.factories.business.entities import create_entities_hierarchy
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
 from base.tests.factories.campus import CampusFactory
-from base.tests.factories.entity import EntityFactory, MainEntityWithVersionFactory
+from base.tests.factories.entity import EntityFactory, EntityWithVersionFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.group import FacultyManagerGroupFactory
 from base.tests.factories.learning_container import LearningContainerFactory
@@ -170,7 +170,7 @@ class LearningUnitFullFormContextMixin(TestCase):
         end_year = AcademicYearFactory(year=cls.current_academic_year.year + 7)
         cls.acs = GenerateAcademicYear(start_year=start_year, end_year=end_year).academic_years
 
-        cls.entity = MainEntityWithVersionFactory()
+        cls.entity = EntityWithVersionFactory()
 
         # Creation of a LearningContainerYear and all related models
         cls.learn_unit_structure = GenerateContainer(cls.current_academic_year, cls.current_academic_year, cls.entity)
@@ -294,7 +294,7 @@ class TestFullFormIsValid(LearningUnitFullFormContextMixin):
 
     def test_creation_case_correct_post_data(self):
         form = _instanciate_form(self.current_academic_year, post_data=self.post_data,
-                                 start_year=self.current_academic_year.year, person=self.central_person)
+                                 start_year=self.current_academic_year.year, person=self.faculty_person)
         self.assertTrue(form.is_valid(), form.errors)
         self._test_learning_unit_model_form_instance(form)
         self._test_learning_unit_year_model_form_instance(form)
