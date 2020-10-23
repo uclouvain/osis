@@ -294,8 +294,8 @@ class LearningUnitTagLiEditTest(TestCase):
             'load_modal': False,
             'url': '#',
             'id_li': 'link_delete_lus',
-            'title': "Vous ne pouvez pas modifier une unité d'enseignement avant %(year)d. "
-                     "Les modifications doivent être faites dans EPC avant l'année %(year)d" % {"year": 1},
+            'title': _("You can't modify learning unit under year : %(year)d. "
+                       "Modifications should be made in EPC under year %(year)d" % {"year": 1}),
             'text': '',
             'data_target': ''
         }
@@ -329,7 +329,9 @@ class LearningUnitTagLiEditTest(TestCase):
         learning_unit_yr.initial_data = {"learning_container_year": lcy}
         ProposalLearningUnitFactory(learning_unit_year=learning_unit_yr, state=ProposalState.FACULTY.name)
         faculty_manager = FacultyManagerFactory(entity=lcy.requirement_entity)
-        self.assertTrue(faculty_manager.person.user.has_perm('base.can_edit_learning_unit_proposal', learning_unit_yr))
+        self.assertTrue(faculty_manager.person.user.has_perm(
+            'base.can_edit_learning_unit_proposal', learning_unit_yr
+        ))
         central_manager = CentralManagerFactory(entity=lcy.requirement_entity)
         self.assertTrue(central_manager.person.user.has_perm(
             'base.can_edit_learning_unit_proposal_date', learning_unit_yr
@@ -346,9 +348,11 @@ class LearningUnitTagLiEditTest(TestCase):
             learning_unit=LearningUnitFactory(),
             learning_container_year=lcy
         )
-        ProposalLearningUnitFactory(learning_unit_year=learning_unit_yr)
+        ProposalLearningUnitFactory(learning_unit_year=learning_unit_yr, state=ProposalState.CENTRAL.name)
         faculty_manager = FacultyManagerFactory(entity=lcy.requirement_entity)
-        self.assertFalse(faculty_manager.person.user.has_perm('base.can_edit_learning_unit_proposal', learning_unit_yr))
+        self.assertFalse(faculty_manager.person.user.has_perm(
+            'base.can_edit_learning_unit_proposal_date', learning_unit_yr)
+        )
 
     def test_central_mgr_can_modify_end_year_by_proposal_n_year(self):
         lcy = LearningContainerYearFactory(
