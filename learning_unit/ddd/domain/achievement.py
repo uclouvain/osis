@@ -23,17 +23,20 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import attr
+
+from osis_common.ddd import interface
 
 
-class Achievement:
+@attr.s(frozen=True, slots=True)
+class AchievementIdentity(interface.EntityIdentity):
+    consistency_id = attr.ib(type=int)
 
-    def __init__(
-        self,
-        code_name: str = None,
-        text_fr: str = None,
-        text_en: str = None,
-    ):
 
-        self.code_name = code_name
-        self.text_fr = text_fr
-        self.text_en = text_en
+@attr.s(slots=True)
+class Achievement(interface.Entity):
+    entity_id = attr.ib(type=AchievementIdentity)
+
+    code_name = attr.ib(type=str)
+    text_fr = attr.ib(type=str)
+    text_en = attr.ib(type=str)
