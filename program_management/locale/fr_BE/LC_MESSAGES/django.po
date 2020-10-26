@@ -636,9 +636,6 @@ msgstr "Titre professionnel"
 msgid "Program tree not found : {code} {year}"
 msgstr "Programme non trouvé : {code} {year}"
 
-msgid "Prolong"
-msgstr "Prolonger la version existante"
-
 msgid "Proposal status"
 msgstr "Légende proposition"
 

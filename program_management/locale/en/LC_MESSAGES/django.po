@@ -592,9 +592,6 @@ msgstr ""
 msgid "Program tree not found : {code} {year}"
 msgstr ""
 
-msgid "Prolong"
-msgstr ""
-
 msgid "Proposal status"
 msgstr ""
 
