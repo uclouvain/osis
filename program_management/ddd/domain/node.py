@@ -26,7 +26,7 @@
 import copy
 from _decimal import Decimal
 from collections import OrderedDict
-from typing import List, Set, Dict, Optional
+from typing import List, Set, Dict, Optional, Iterator
 
 import attr
 
@@ -251,6 +251,9 @@ class Node(interface.Entity):
     def is_minor(self) -> bool:
         return self.node_type in MiniTrainingType.minors_enum()
 
+    def is_minor_major_deepening(self) -> bool:
+        return self.is_minor() or self.is_major() or self.is_deepening()
+
     def is_deepening(self) -> bool:
         return self.node_type == MiniTrainingType.DEEPENING
 
@@ -369,6 +372,9 @@ class Node(interface.Entity):
                 list_child_nodes_types.append(link.child.node_type)
         return list_child_nodes_types
 
+    def get_training_children(self) -> Iterator['Node']:
+        return (node for node in self.children_as_nodes if node.is_training())
+
     @property
     def descendents(self) -> Dict['Path', 'Node']:   # TODO :: add unit tests
         return _get_descendents(self)
@@ -484,15 +490,20 @@ class NodeGroupYear(Node):
             return "{}[{}] - {} ({})".format(self.title, self.version_name, self.code, self.academic_year)
         return "{} - {} ({})".format(self.title, self.code, self.academic_year)
 
-    def full_title(self) -> str:
+    def full_acronym(self) -> str:
         if self.version_name:
             return "{}[{}]".format(self.title, self.version_name)
         return self.title
 
-    def full_group_title_fr(self) -> str:
-        if self.version_name:
-            return "{}[{}]".format(self.group_title_fr, self.version_title_fr)
-        return self.group_title_fr
+    def full_title(self) -> str:
+        title = self.offer_title_fr
+        if self.is_group():
+            title = self.group_title_fr
+        elif self.is_finality():
+            title = self.offer_partial_title_fr
+        if self.version_title_fr:
+            return "{}[{}]".format(title, self.version_title_fr)
+        return title
 
 
 @attr.s(slots=True, hash=False, eq=False)

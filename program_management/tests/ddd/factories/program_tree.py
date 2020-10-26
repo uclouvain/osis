@@ -119,8 +119,8 @@ def _build_authorized_relationships(root_node: 'Node') -> 'AuthorizedRelationshi
         AuthorizedRelationshipObjectFactory(
             parent_type=link.parent.node_type,
             child_type=link.child.node_type,
-            min_constraint=0,
-            max_constraint=10
+            min_count_authorized=0,
+            max_count_authorized=10
         )
         for link in all_links
     ]

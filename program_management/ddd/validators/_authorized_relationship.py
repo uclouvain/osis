@@ -73,7 +73,7 @@ class AuthorizedRelationshipValidator(business_validator.BusinessValidator):
 
     def validate(self, *args, **kwargs):
         if self.link.is_reference() and \
-                self._is_child_a_minor_major_or_option_inside_a_list_minor_major_option_choice_parent():
+                self._is_child_a_minor_major_or_deepening_inside_a_list_minor_major_choice_parent():
             return
 
         if self.get_not_authorized_children_nodes():
@@ -105,9 +105,8 @@ class AuthorizedRelationshipValidator(business_validator.BusinessValidator):
     def get_not_authorized_children_nodes(self) -> Set['Node']:
         return get_unauthorized_children(self.tree.authorized_relationships, self.link.parent, self.children_nodes)
 
-    def _is_child_a_minor_major_or_option_inside_a_list_minor_major_option_choice_parent(self):
-        return self.link.parent.node_type in education_group_types.GroupType.minor_major_list_choice_enums() and \
-               self.link.child.node_type in education_group_types.MiniTrainingType
+    def _is_child_a_minor_major_or_deepening_inside_a_list_minor_major_choice_parent(self):
+        return self.link.parent.is_minor_major_list_choice() and self.link.child.is_minor_major_deepening()
 
 
 def get_unauthorized_children(
@@ -127,8 +126,9 @@ def get_node_types_that_are_full(
     node_type_counter = Counter([node.node_type for node in nodes])
     result = set()
     for node_type, count in node_type_counter.items():
-        max_count_authorized = authorized_relationships.get_authorized_relationship(parent_node.node_type, node_type)
-        if count > (max_count_authorized.max_count_authorized or sys.maxsize):
+        relationship = authorized_relationships.get_authorized_relationship(parent_node.node_type, node_type)
+        max_count_authorized = relationship.max_count_authorized if relationship else 0
+        if count > max_count_authorized:
             result.add(node_type)
     return result
 

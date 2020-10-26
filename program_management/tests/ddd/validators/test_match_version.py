@@ -116,3 +116,22 @@ class TestMatchVersionValidator(TestValidatorValidateMixin, SimpleTestCase):
                 tree_repository=fake_program_tree_repository,
                 tree_version_repository=fake_tree_version_repository
             ).validate()
+
+    def test_should_not_raise_exception_when_minitraining_version_mismatch(self):
+        tree_to_attach = tree_builder(
+            {"node_type": MiniTrainingType.OPEN_MINOR, "version_name": "SPECIFIC", "end_year": 2019}
+        )
+        tree_to_attach_version = SpecificProgramTreeVersionFactory(tree=tree_to_attach)
+
+        fake_program_tree_repository = get_fake_program_tree_repository([self.tree, tree_to_attach])
+        fake_tree_version_repository = get_fake_program_tree_version_repository([
+            self.tree_version, tree_to_attach_version
+        ])
+        self.assertValidatorNotRaises(
+            MatchVersionValidator(
+                node_to_paste_to=self.tree.root_node,
+                node_to_add=tree_to_attach.root_node,
+                tree_repository=fake_program_tree_repository,
+                tree_version_repository=fake_tree_version_repository
+            )
+        )

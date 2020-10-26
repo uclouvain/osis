@@ -418,7 +418,9 @@ class TestPasteGroupNodeService(DDDTestCase, MockPatcherMixin):
         self.assertTrue(result)
 
     def test_cannot_paste_if_maximum_child_of_type_reached(self):
-        self._update_authorized_relationship(TrainingType.BACHELOR, GroupType.COMMON_CORE, 1)
+        self.tree.authorized_relationships.update(
+            TrainingType.BACHELOR, GroupType.COMMON_CORE, max_count_authorized=1
+        )
         tree_to_paste_data = {
             "node_type": GroupType.COMMON_CORE,
             "year": 2020
@@ -439,13 +441,6 @@ class TestPasteGroupNodeService(DDDTestCase, MockPatcherMixin):
             paste_element_service.paste_element,
             invalid_command
         )
-
-    def _update_authorized_relationship(self, parent_type, children_type, maximum_child):
-        authorized_object = next(
-            obj for obj in self.tree.authorized_relationships.authorized_relationships
-            if obj.parent_type == parent_type and obj.child_type == children_type
-        )
-        authorized_object.max_count_authorized = maximum_child
 
 
 class TestCheckPaste(SimpleTestCase, ValidatorPatcherMixin):

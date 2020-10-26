@@ -77,7 +77,7 @@
                 {% else %}
                     {# Link attrs relevant for child of type group #}
                     <td style="width:12%">
-                        {{ form.child_obj.full_title }}
+                        {{ form.child_obj.full_acronym }}
                     </td>
                     <td>
                         <a href="{% url 'element_identification' code=form.child_obj.code year=form.child_obj.year %}">
@@ -86,7 +86,7 @@
                     </td>
                     <td {% if form.is_a_parent_minor_major_option_list_choice %}style="width:55%"
                         {% else %}style="width:15%"{% endif %}>
-                        {{ form.child_obj.full_group_title_fr }}
+                        {{ form.child_obj.full_title }}
                     </td>
 
                     {% if not form.is_a_parent_minor_major_option_list_choice %}

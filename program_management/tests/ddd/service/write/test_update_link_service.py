@@ -263,7 +263,12 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
         }
         tree = tree_builder(tree_data)
         self.fake_program_tree_repository.create(tree)
-        self._update_authorized_relationship(tree, TrainingType.BACHELOR, GroupType.MINOR_LIST_CHOICE, 1)
+        tree.authorized_relationships.update(
+            TrainingType.BACHELOR,
+            GroupType.MINOR_LIST_CHOICE,
+            max_count_authorized=1
+
+        )
 
         invalid_command = UpdateLinkCommandFactory(
             link_type=LinkTypes.REFERENCE.name,
@@ -280,10 +285,3 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
             e.exception.exceptions[0],
             exception.MaximumChildTypesReachedException
         )
-
-    def _update_authorized_relationship(self, tree, parent_type, children_type, maximum_child):
-        authorized_object = next(
-            obj for obj in tree.authorized_relationships.authorized_relationships
-            if obj.parent_type == parent_type and obj.child_type == children_type
-        )
-        authorized_object.max_count_authorized = maximum_child

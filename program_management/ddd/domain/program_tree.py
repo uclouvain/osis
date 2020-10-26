@@ -208,13 +208,22 @@ class ProgramTree(interface.RootEntity):
         except AttributeError:
             return False
 
-    def get_parents_using_node_as_reference(self, child_node: 'Node') -> List['Node']:
-        result = []
-        for tree_node in self.get_all_nodes():
-            for link in tree_node.children:
-                if link.child == child_node and link.is_reference():
-                    result.append(link.parent)
-        return result
+    def get_parents_using_node_with_respect_to_reference(self, child_node: 'Node') -> List['Node']:
+        links = _links_from_root(self.root_node)
+
+        def _get_parents(child_node: 'Node') -> List['Node']:
+            result = []
+            reference_links = [link_obj for link_obj in links
+                               if link_obj.child == child_node and link_obj.is_reference()]
+            for link_obj in reference_links:
+                reference_parents = _get_parents(link_obj.parent)
+                if reference_parents:
+                    result.extend(reference_parents)
+                else:
+                    result.append(link_obj.parent)
+            return result
+
+        return _get_parents(child_node)
 
     def get_2m_option_list(self):  # TODO :: unit tests
         tree_without_finalities = self.prune(
@@ -387,8 +396,7 @@ class ProgramTree(interface.RootEntity):
         """
         path_to_paste_to = paste_command.path_where_to_paste
         node_to_paste_to = self.get_node(path_to_paste_to)
-        if node_to_paste_to.is_minor_major_option_list_choice() and\
-                not node_to_paste.is_minor_major_option_list_choice():
+        if node_to_paste_to.is_minor_major_list_choice() and node_to_paste.is_minor_major_deepening():
             link_type = LinkTypes.REFERENCE
         else:
             link_type = LinkTypes[paste_command.link_type] if paste_command.link_type else None
