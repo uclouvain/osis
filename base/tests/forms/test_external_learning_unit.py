@@ -33,6 +33,7 @@ from base.forms.learning_unit.external_learning_unit import ExternalLearningUnit
 from base.forms.learning_unit.learning_unit_create import LearningUnitYearModelForm, \
     LearningUnitModelForm
 from base.forms.learning_unit.search.external import ExternalLearningUnitFilter
+from base.models.entity_version import EntityVersion
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums import organization_type
 from base.models.enums.learning_container_year_types import EXTERNAL
@@ -59,9 +60,9 @@ YEAR_LIMIT_LUE_MODIFICATION = 2018
 NAMEN = 'Namur'
 
 
-def get_valid_external_learning_unit_form_data(academic_year, entity_role, learning_unit_year=None, root_entity=None):
-    entities = create_entities_hierarchy(root_entity=root_entity)
-    requesting_entity = entities['child_one_entity_version']
+def get_valid_external_learning_unit_form_data(academic_year, learning_unit_year=None, entity=None):
+    create_entities_hierarchy(root_entity=entity)
+    requirement_entity_version = EntityVersion.objects.filter(entity=entity.id).first()
     organization = OrganizationFactory(type=organization_type.MAIN)
     campus = CampusFactory(organization=organization)
     language = FrenchLanguageFactory()
@@ -103,8 +104,8 @@ def get_valid_external_learning_unit_form_data(academic_year, entity_role, learn
         'is_vacant': learning_unit_year.learning_container_year.is_vacant,
 
         # External learning unit model form
-        'requirement_entity': requesting_entity.id,
-        'allocation_entity': requesting_entity.id,
+        'requirement_entity': requirement_entity_version.id,
+        'allocation_entity': requirement_entity_version.id,
         'external_acronym': 'Gorzyne',
         'external_credits': '5',
 
@@ -151,12 +152,12 @@ class TestExternalLearningUnitForm(TestCase):
 
     @override_settings(YEAR_LIMIT_LUE_MODIFICATION=YEAR_LIMIT_LUE_MODIFICATION)
     def test_external_learning_unit_form_is_valid(self):
-        data = get_valid_external_learning_unit_form_data(self.academic_year, self.manager, root_entity=self.entity)
+        data = get_valid_external_learning_unit_form_data(self.academic_year, entity=self.entity)
         form = ExternalLearningUnitBaseForm(person=self.person, academic_year=self.academic_year, data=data)
         self.assertTrue(form.is_valid(), form.errors)
 
     def test_external_learning_unit_form_save(self):
-        data = get_valid_external_learning_unit_form_data(self.academic_year, self.manager, root_entity=self.entity)
+        data = get_valid_external_learning_unit_form_data(self.academic_year, entity=self.entity)
         form = ExternalLearningUnitBaseForm(person=self.person, academic_year=self.academic_year, data=data,
                                             start_year=self.academic_year)
         self.assertTrue(form.is_valid(), form.errors)
@@ -170,7 +171,7 @@ class TestExternalLearningUnitForm(TestCase):
 
     @override_settings(YEAR_LIMIT_LUE_MODIFICATION=YEAR_LIMIT_LUE_MODIFICATION)
     def test_creation(self):
-        data = get_valid_external_learning_unit_form_data(self.academic_year, self.manager)
+        data = get_valid_external_learning_unit_form_data(self.academic_year, entity=self.entity)
         form = LearningUnitYearForExternalModelForm(
             person=self.person, data=data, subtype=learning_unit_year_subtypes.FULL, initial={}
         )
@@ -223,13 +224,13 @@ class TestExternalPartimForm(TestCase):
         self.assertIsInstance(context['learning_unit_external_form'], CograduationExternalLearningUnitModelForm)
 
     def test_external_learning_unit_form_is_valid(self):
-        data = get_valid_external_learning_unit_form_data(self.academic_year, self.manager)
+        data = get_valid_external_learning_unit_form_data(self.academic_year, entity=self.manager.entity)
         form = ExternalPartimForm(person=self.person, academic_year=self.academic_year, data=data,
                                   learning_unit_full_instance=self.learning_unit_year.learning_unit)
         self.assertTrue(form.is_valid(), form.errors)
 
     def test_external_learning_unit_form_save(self):
-        data = get_valid_external_learning_unit_form_data(self.academic_year, self.manager)
+        data = get_valid_external_learning_unit_form_data(self.academic_year, entity=self.manager.entity)
         form = ExternalPartimForm(person=self.person, academic_year=self.academic_year, data=data,
                                   start_year=self.academic_year.year,
                                   learning_unit_full_instance=self.learning_unit_year.learning_unit)

@@ -31,7 +31,9 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from waffle.testutils import override_flag
 
+from base.models.enums.entity_type import FACULTY
 from base.models.enums.learning_container_year_types import EXTERNAL
+from base.models.enums.organization_type import MAIN
 from base.tests.factories.academic_calendar import AcademicCalendarLearningUnitCentralEditionFactory
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.entity import EntityWithVersionFactory
@@ -47,7 +49,8 @@ from learning_unit.tests.factories.central_manager import CentralManagerFactory
 class TestUpdateExternalLearningUnitView(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.manager = CentralManagerFactory(entity=EntityWithVersionFactory(), with_child=True)
+        cls.entity = EntityWithVersionFactory(organization__type=MAIN, version__entity_type=FACULTY)
+        cls.manager = CentralManagerFactory(entity=cls.entity, with_child=True)
         cls.person = cls.manager.person
 
         cls.academic_year = create_current_academic_year()
@@ -62,10 +65,10 @@ class TestUpdateExternalLearningUnitView(TestCase):
             internship_subtype=None,
             acronym="EFAC1000",
             learning_container_year__container_type=EXTERNAL,
-            learning_container_year__requirement_entity=cls.manager.entity,
-            learning_container_year__allocation_entity=cls.manager.entity,
+            learning_container_year__requirement_entity=cls.entity,
+            learning_container_year__allocation_entity=cls.entity,
         )
-        cls.data = get_valid_external_learning_unit_form_data(cls.academic_year, cls.manager, cls.luy)
+        cls.data = get_valid_external_learning_unit_form_data(cls.academic_year, cls.luy, cls.entity)
 
         cls.url = reverse(update_learning_unit, args=[cls.luy.pk])
 

@@ -52,7 +52,7 @@ class TestCreateExternalLearningUnitView(TestCase):
         cls.academic_years = GenerateAcademicYear(starting_year, end_year).academic_years
         cls.academic_year = cls.academic_years[1]
         cls.language = FrenchLanguageFactory()
-        cls.data = get_valid_external_learning_unit_form_data(cls.academic_year, cls.manager)
+        cls.data = get_valid_external_learning_unit_form_data(cls.academic_year, entity=self.manager.entity)
         cls.url = reverse(get_external_learning_unit_creation_form, args=[cls.academic_year.pk])
 
     def setUp(self):
