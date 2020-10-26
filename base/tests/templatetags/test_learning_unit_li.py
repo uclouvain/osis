@@ -30,6 +30,7 @@ from django.test import TestCase, RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from mock import patch
 
 from base.models.enums import learning_container_year_types
 from base.models.enums import learning_unit_year_subtypes
@@ -393,7 +394,8 @@ class LearningUnitTagLiEditTest(TestCase):
             'base.can_edit_learning_unit_proposal_date', learning_unit_yr
         ))
 
-    def test_can_modify_by_proposal_previous_n_year(self):
+    @patch('learning_unit.auth.predicates.has_faculty_proposal_state', return_value=True)
+    def test_can_modify_by_proposal_previous_n_year(self, mock_proposal_state):
         lcy = LearningContainerYearFactory(
             academic_year=self.previous_academic_year,
             container_type=learning_container_year_types.COURSE
@@ -404,6 +406,7 @@ class LearningUnitTagLiEditTest(TestCase):
             learning_unit=LearningUnitFactory(),
             learning_container_year=lcy
         )
+
         ProposalLearningUnitFactory(learning_unit_year=learning_unit_yr, state=ProposalState.FACULTY.name)
 
         faculty_manager = FacultyManagerFactory(entity=lcy.requirement_entity)
