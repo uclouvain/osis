@@ -178,7 +178,8 @@ def _save_form_and_display_messages(request, form, learning_unit_year):
         records = form.save()
         display_warning_messages(request, getattr(form, 'warnings', []))
 
-        is_postponement = bool(int(request.POST.get('postponement', 1))) and len(form._forms_to_upsert) > 1
+        is_postponement = bool(int(request.POST.get('postponement', 1))) and (
+                    isinstance(form, LearningUnitPostponementForm) and len(form._forms_to_upsert) > 1)
 
         if is_postponement and existing_proposal:
             display_success_messages(
