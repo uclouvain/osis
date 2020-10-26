@@ -166,7 +166,7 @@ def _convert_form_to_create_command(form: SpecificVersionForm) -> CreateProgramT
     return CreateProgramTreeVersionCommand(
         offer_acronym=form.tree_version_identity.offer_acronym,
         version_name=form.cleaned_data.get("version_name"),
-        year=form.tree_version_identity.year,
+        start_year=form.tree_version_identity.year,
         is_transition=False,
         title_en=form.cleaned_data.get("version_title_en"),
         title_fr=form.cleaned_data.get("version_title_fr"),

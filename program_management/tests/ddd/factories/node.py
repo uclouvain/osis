@@ -47,6 +47,7 @@ class NodeFactory(factory.Factory):
     code = factory.Sequence(lambda n: 'CODE%02d' % n)
     title = factory.Sequence(lambda n: 'ACRONYM%02d' % n)
     year = factory.fuzzy.FuzzyInteger(low=1999, high=2099)
+    start_year = factory.SelfAttribute("year")
     end_date = factory.LazyAttribute(generate_end_date)
     entity_id = factory.LazyAttribute(generate_node_identity)
 
