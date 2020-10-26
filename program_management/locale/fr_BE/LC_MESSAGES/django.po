@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-20 10:55+0200\n"
+"POT-Creation-Date: 2020-10-26 09:46+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -30,12 +30,13 @@ msgstr "\"%(child)s\" a été retiré de \"%(parent)s\""
 msgid "%(node)s has been moved"
 msgstr "%(node)s a été déplacé"
 
+#, python-format
 msgid ""
 "%(node_to_add)s or its children must have the same version as "
 "%(node_to_paste_to)s and all of it's parent's [%(version_mismatched)s]"
 msgstr ""
-"La version de %(node_to_add)s ou de ses enfants doit être identique à celle de"
-" %(node_to_paste_to)s et de tous ses parents [%(version_mismatched)s]"
+"La version de %(node_to_add)s ou de ses enfants doit être identique à celle "
+"de %(node_to_paste_to)s et de tous ses parents [%(version_mismatched)s]"
 
 #, python-format
 msgid "%(start_index)s to %(end_index)s of %(total_counts)s learning units"
@@ -636,9 +637,6 @@ msgstr "Titre professionnel"
 msgid "Program tree not found : {code} {year}"
 msgstr "Programme non trouvé : {code} {year}"
 
-msgid "Prolong"
-msgstr "Prolonger la version existante"
-
 msgid "Proposal status"
 msgstr "Légende proposition"
 
@@ -807,6 +805,9 @@ msgstr "Le formulaire d'inscription est disponible au Secrétariat de"
 msgid "Themes discussed"
 msgstr "Thèmes abordés"
 
+msgid "This education group is not editable during this period."
+msgstr "Cette formation n'est pas modifiable durant cette période."
+
 msgid ""
 "This form must be signed by the designated authority and delivered to the "
 "secretariat of your faculty."
@@ -949,6 +950,7 @@ msgstr ""
 "Vous ne pouvez pas supprimer la formation standard '{code}' en {year} parce "
 "qu'il existe une version particiulière durant cette année."
 
+#, python-format
 msgid ""
 "You cannot add \"%(child)s\" to \"%(parent)s\" of type \"%(parent_type)s\""
 msgstr ""
@@ -1072,3 +1074,4 @@ msgstr "Oui"
 
 msgid "yes,no"
 msgstr "oui,non"
+
