@@ -38,6 +38,7 @@ from base.models.enums.proposal_type import ProposalType
 from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.views.learning_units.search.common import SearchTypes
+from base.forms.utils.filter_field import filter_field_by_regex
 
 
 def _get_sorted_choices(tuple_of_choices):
@@ -63,7 +64,7 @@ class ProposalLearningUnitFilter(FilterSet):
     )
     acronym = filters.CharFilter(
         field_name="acronym",
-        lookup_expr="iregex",
+        method="filter_acronym_field",
         max_length=40,
         required=False,
         label=_('Code'),
@@ -229,6 +230,10 @@ class ProposalLearningUnitFilter(FilterSet):
         queryset = LearningUnitYearQuerySet.annotate_entities_allocation_and_requirement_acronym(queryset)
 
         return queryset
+
+    @staticmethod
+    def filter_acronym_field(queryset, name, value):
+        return filter_field_by_regex(queryset, name, value)
 
 
 class ProposalStateModelForm(forms.ModelForm):
