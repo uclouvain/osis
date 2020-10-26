@@ -50,7 +50,7 @@ class LearningUnitFilter(FilterSet):
     )
     acronym = filters.CharFilter(
         field_name="acronym",
-        lookup_expr="iregex",
+        method="filter_learning_unit_year_field",
         max_length=40,
         required=False,
         label=_('Code'),
