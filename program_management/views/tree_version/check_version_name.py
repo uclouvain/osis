@@ -15,11 +15,13 @@ from program_management.ddd.service.read import get_last_existing_version_servic
 @ajax_required
 @require_http_methods(['GET'])
 def check_version_name(request, year, acronym):
-    version_name = request.GET['version_name']
+    version_name_get = request.GET['version_name']
     last_using = None
     existing_version = False
     existed_version_name = False
-    valid = bool(re.match("^[A-Z]{0,15}$", version_name.upper()))
+    version_name = version_name_get.upper()
+
+    valid = bool(re.match("^[A-Z]{0,15}$", version_name))
     if version_name != "":
         existing_version = get_last_existing_version(version_name, acronym)
         if existing_version and existing_version.year < year:
