@@ -117,20 +117,19 @@
     </table>
 
     <div class="panel">
-        <div class="panel-heading">
-            <label>{% trans "Mobility" %}</label>
-            {% if can_edit_information %}
-                <a class="trigger_modal pull-right"
-                   data-url="{{ post_url }}?language=fr-be&label=mobility"
-                   data-modal_class="modal-lg">
-                    <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
-                </a>
-            {% endif %}
-        </div>
-
         <div class="panel-body">
             <div class="row">
-                <div class="col-md-12">
+                <div class="col-md-2">
+                    <label>{% trans "Mobility" %}</label>
+                </div>
+                <div class="col-md-10">
+                    {% if can_edit_information %}
+                        <a class="trigger_modal pull-right"
+                           data-url="{{ post_url }}?language=fr-be&label=mobility"
+                           data-modal_class="modal-lg">
+                            <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+                        </a>
+                    {% endif %}
                     {% for translated_label in  cms_labels_translated %}
                         {% if translated_label.text_label.label == "mobility" %}
                             {{ translated_label.text_label.text_fr.0.text|default_if_none:""|safe }}
