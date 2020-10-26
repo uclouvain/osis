@@ -57,7 +57,6 @@ from program_management.ddd.validators._relative_credits import RelativeCreditsV
 from program_management.ddd.validators._validate_end_date_and_option_finality import ValidateFinalitiesEndDateAndOptions
 from program_management.ddd.validators._version_name_exists import VersionNameExistsValidator
 from program_management.ddd.validators.link import CreateLinkValidatorList
-from education_group.ddd.validators._hops_validator import HopsValuesValidator
 
 
 class PasteNodeValidatorList(MultipleExceptionBusinessListValidator):
@@ -73,6 +72,7 @@ class PasteNodeValidatorList(MultipleExceptionBusinessListValidator):
         path = paste_command.path_where_to_paste
         parent_node = tree.get_node(path)
         block = paste_command.block
+        relative_credits = paste_command.relative_credits
 
         if node_to_paste.is_group_or_mini_or_training():
             self.validators = [
@@ -85,6 +85,7 @@ class PasteNodeValidatorList(MultipleExceptionBusinessListValidator):
                 ValidateFinalitiesEndDateAndOptions(parent_node, node_to_paste, tree_repository, version_repository),
                 ValidateAuthorizedRelationshipForAllTrees(tree, node_to_paste, path, tree_repository),
                 MatchVersionValidator(parent_node, node_to_paste, tree_repository, version_repository),
+                RelativeCreditsValidator(relative_credits),
             ]
 
         elif node_to_paste.is_learning_unit():
@@ -95,7 +96,8 @@ class PasteNodeValidatorList(MultipleExceptionBusinessListValidator):
                 InfiniteRecursivityTreeValidator(tree, node_to_paste, path),
                 AuthorizedLinkTypeValidator(tree, node_to_paste, link_type),
                 BlockValidator(block),
-                ValidateAuthorizedRelationshipForAllTrees(tree, node_to_paste, path, tree_repository)
+                ValidateAuthorizedRelationshipForAllTrees(tree, node_to_paste, path, tree_repository),
+                RelativeCreditsValidator(relative_credits),
             ]
 
         else:

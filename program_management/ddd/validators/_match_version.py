@@ -68,13 +68,13 @@ class MatchVersionValidator(business_validator.BusinessValidator):
             )
 
     def get_node_to_add_version(self) -> str:
-        if self.node_to_add.is_training() or self.node_to_add.is_mini_training():
+        if self.node_to_add.is_training():
             return self.node_to_add.version_name
 
-        training_and_mini_training_children = (
-            node for node in self.node_to_add.children_as_nodes if node.is_training() or node.is_mini_training()
+        training_children = (
+            node for node in self.node_to_add.children_as_nodes if node.is_training()
         )
-        return next(node.version_name for node in training_and_mini_training_children)
+        return next(node.version_name for node in training_children)
 
     def _get_program_tree_version(self, node: 'Node') -> 'ProgramTreeVersion':
         from program_management.ddd.domain.program_tree import ProgramTreeIdentity

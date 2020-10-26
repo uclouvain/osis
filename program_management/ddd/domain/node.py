@@ -251,6 +251,9 @@ class Node(interface.Entity):
     def is_minor(self) -> bool:
         return self.node_type in MiniTrainingType.minors_enum()
 
+    def is_minor_major_deepening(self) -> bool:
+        return self.is_minor() or self.is_major() or self.is_deepening()
+
     def is_deepening(self) -> bool:
         return self.node_type == MiniTrainingType.DEEPENING
 
@@ -490,9 +493,10 @@ class NodeGroupYear(Node):
         return self.title
 
     def full_group_title_fr(self) -> str:
-        if self.version_name:
-            return "{}[{}]".format(self.group_title_fr, self.version_title_fr)
-        return self.group_title_fr
+        title = self.offer_partial_title_fr if self.is_finality() else self.offer_title_fr
+        if self.version_title_fr:
+            return "{}[{}]".format(title, self.version_title_fr)
+        return title
 
 
 @attr.s(slots=True, hash=False, eq=False)
