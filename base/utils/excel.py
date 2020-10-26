@@ -21,26 +21,16 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-import mock
-from django.test import TestCase
+import html
 
-from program_management.ddd import command
-from program_management.ddd.service.write import create_standard_version_service
-from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
+import bleach
 
 
-class TestCreateStandardProgramVersion(TestCase):
-    @mock.patch("program_management.ddd.service.write.create_standard_version_service.ProgramTreeVersionBuilder")
-    @mock.patch("program_management.ddd.service.write.create_standard_version_service.ProgramTreeVersionRepository")
-    def test_create_program_tree_version_and_persist_it(
-            self,
-            mock_version_repository,
-            mock_version_builder):
-        standard_program_version = ProgramTreeVersionFactory()
-        mock_version_builder.return_value.build_standard_version.return_value = standard_program_version
-        mock_version_repository.return_value.create.return_value = standard_program_version.entity_id
-
-        cmd = command.CreateStandardVersionCommand(offer_acronym="Offer", code="Code", start_year=2018)
-        result = create_standard_version_service.create_standard_program_version(cmd)
-
-        self.assertEqual(standard_program_version.entity_id, result)
+def get_html_to_text(text_to_convert, tags=None):
+    tags = tags or []
+    text_to_convert = text_to_convert or ''
+    return bleach.clean(
+        html.unescape(text_to_convert),
+        strip=True,
+        tags=tags
+    ).lstrip()

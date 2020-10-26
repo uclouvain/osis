@@ -241,7 +241,7 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
             "remark_fr": group_obj.remark.text_fr,
             "remark_en": group_obj.remark.text_en,
             "management_entity": group_obj.management_entity.acronym,
-            "start_year": display_as_academic_year(mini_training_obj.start_year),
+            "start_year": display_as_academic_year(group_obj.start_year),
             "teaching_campus": group_obj.teaching_campus.name,
         }
         return form_initial_values
