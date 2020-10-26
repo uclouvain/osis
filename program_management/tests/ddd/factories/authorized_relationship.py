@@ -37,13 +37,13 @@ class AuthorizedRelationshipObjectFactory(factory.Factory):
 
     parent_type = factory.fuzzy.FuzzyChoice(TrainingType)
     child_type = factory.fuzzy.FuzzyChoice(TrainingType)
-    min_constraint = factory.fuzzy.FuzzyInteger(0, 10)
-    max_constraint = factory.fuzzy.FuzzyInteger(0, 10)
+    min_count_authorized = factory.fuzzy.FuzzyInteger(0, 10)
+    max_count_authorized = factory.fuzzy.FuzzyInteger(0, 10)
 
 
 class MandatoryRelationshipObjectFactory(AuthorizedRelationshipObjectFactory):
-    min_constraint = 1
-    max_constraint = 1
+    min_count_authorized = 1
+    max_count_authorized = 1
 
 
 def generate_auth_relation(obj):

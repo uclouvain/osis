@@ -28,6 +28,7 @@ from typing import List
 
 from base.ddd.utils import business_validator
 from base.models.enums.education_group_types import TrainingType
+from base.utils.constants import INFINITE_VALUE
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.exception import CannotAttachFinalitiesWithGreaterEndDateThanProgram2M
 
@@ -57,8 +58,8 @@ class AttachFinalityEndDateValidator(business_validator.BusinessValidator):
                 )
 
     def _get_finalities_where_end_date_gt_root_end_date(self) -> List['Node']:
-        root_end_year = self.tree_version_2m.tree.root_node.end_year or sys.maxsize
+        root_end_year = self.tree_version_2m.tree.root_node.end_year or INFINITE_VALUE
         return [
             finality for finality in self.tree_from_node_to_add.get_all_finalities()
-            if (finality.end_year or sys.maxsize) > root_end_year
+            if (finality.end_year or INFINITE_VALUE) > root_end_year
         ]

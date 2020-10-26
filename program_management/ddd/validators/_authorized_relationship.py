@@ -127,7 +127,7 @@ def get_node_types_that_are_full(
     result = set()
     for node_type, count in node_type_counter.items():
         relationship = authorized_relationships.get_authorized_relationship(parent_node.node_type, node_type)
-        max_count_authorized = (relationship.max_count_authorized or sys.maxsize) if relationship else 0
+        max_count_authorized = relationship.max_count_authorized if relationship else 0
         if count > max_count_authorized:
             result.add(node_type)
     return result

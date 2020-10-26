@@ -57,17 +57,17 @@ class TestDetachAuthorizedRelationshipValidator(TestValidatorValidateMixin, Simp
             AuthorizedRelationshipObjectFactory(
                 parent_type=self.authorized_parent.node_type,
                 child_type=self.authorized_child.node_type,
-                min_constraint=1,
+                min_count_authorized=1,
             ),
             AuthorizedRelationshipObjectFactory(
                 parent_type=self.authorized_child.node_type,
                 child_type=GroupType.SUB_GROUP,
-                min_constraint=1,
+                min_count_authorized=1,
             ),
             AuthorizedRelationshipObjectFactory(
                 parent_type=self.authorized_child.node_type,
                 child_type=NodeType.LEARNING_UNIT,
-                min_constraint=0,
+                min_count_authorized=0,
             ),
         ])
         self.tree = ProgramTreeFactory(
