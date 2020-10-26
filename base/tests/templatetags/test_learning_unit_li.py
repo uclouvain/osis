@@ -53,7 +53,6 @@ ID_LINK_EDIT_DATE_LU = "link_edit_date_lu"
 
 
 @override_settings(YEAR_LIMIT_LUE_MODIFICATION=2018)
-@override_settings(LANGUAGES=[('en', 'English'), ], LANGUAGE_CODE='en')
 class LearningUnitTagLiEditTest(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -167,7 +166,7 @@ class LearningUnitTagLiEditTest(TestCase):
         self.assertEqual(
             result, self._get_result_data_expected_for_proposal(
                 'link_proposal_edit',
-                "You can only modify a learning unit when your are linked to its requirement entity",
+                _("You can only modify a learning unit when your are linked to its requirement entity"),
                 DISABLED
             )
         )
@@ -229,7 +228,7 @@ class LearningUnitTagLiEditTest(TestCase):
         self.assertEqual(
             result, self._get_result_data_expected_for_proposal(
                 'link_consolidate_proposal',
-                "You can only modify a learning unit when your are linked to its requirement entity",
+                _("You can only modify a learning unit when your are linked to its requirement entity"),
                 DISABLED
             )
         )
