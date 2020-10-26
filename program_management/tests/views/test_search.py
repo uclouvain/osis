@@ -97,6 +97,20 @@ class TestEducationGroupSearchView(TestCase):
         cached_data = RequestCache(self.user, self.url).cached_data
         self.assertEqual(cached_data, FILTER_DATA)
 
+    def test_get_single_value_cached(self):
+        self.client.get(self.url, data=FILTER_DATA)
+        cached_data = RequestCache(self.user, self.url)
+        result = cached_data.get_single_value_cached("acronym")
+        self.assertIsInstance(result, str)
+        self.assertEqual(result, "LBIR")
+
+    def test_get_values_list_cached(self):
+        self.client.get(self.url, data=FILTER_DATA)
+        cached_data = RequestCache(self.user, self.url)
+        result = cached_data.get_values_list_cached("acronym")
+        self.assertIsInstance(result, list)
+        self.assertListEqual(result, ["LBIR"])
+
 
 class TestEducationGroupDataSearchFilter(TestCase):
     """

@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import copy
 from collections import Counter
 from typing import List, Set, Optional, Dict
 
@@ -31,6 +32,7 @@ import attr
 from base.ddd.utils.converters import to_upper_case_converter
 from base.models.authorized_relationship import AuthorizedRelationshipList
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, GroupType
+from base.models.enums.link_type import LinkTypes
 from education_group.ddd.business_types import *
 from osis_common.ddd import interface
 from osis_common.decorators.deprecated import deprecated
@@ -206,13 +208,22 @@ class ProgramTree(interface.RootEntity):
         except AttributeError:
             return False
 
-    def get_parents_using_node_as_reference(self, child_node: 'Node') -> List['Node']:
-        result = []
-        for tree_node in self.get_all_nodes():
-            for link in tree_node.children:
-                if link.child == child_node and link.is_reference():
-                    result.append(link.parent)
-        return result
+    def get_parents_using_node_with_respect_to_reference(self, child_node: 'Node') -> List['Node']:
+        links = _links_from_root(self.root_node)
+
+        def _get_parents(child_node: 'Node') -> List['Node']:
+            result = []
+            reference_links = [link_obj for link_obj in links
+                               if link_obj.child == child_node and link_obj.is_reference()]
+            for link_obj in reference_links:
+                reference_parents = _get_parents(link_obj.parent)
+                if reference_parents:
+                    result.extend(reference_parents)
+                else:
+                    result.append(link_obj.parent)
+            return result
+
+        return _get_parents(child_node)
 
     def get_2m_option_list(self):  # TODO :: unit tests
         tree_without_finalities = self.prune(
@@ -383,26 +394,32 @@ class ProgramTree(interface.RootEntity):
         :param tree_repository: a tree repository
         :return: the created link
         """
+        path_to_paste_to = paste_command.path_where_to_paste
+        node_to_paste_to = self.get_node(path_to_paste_to)
+        if node_to_paste_to.is_minor_major_list_choice() and node_to_paste.is_minor_major_deepening():
+            link_type = LinkTypes.REFERENCE
+        else:
+            link_type = LinkTypes[paste_command.link_type] if paste_command.link_type else None
+
         validator = validators_by_business_action.PasteNodeValidatorList(
             self,
             node_to_paste,
             paste_command,
+            link_type,
             tree_repository,
             tree_version_repository
         )
         validator.validate()
 
-        path_to_paste_to = paste_command.path_where_to_paste
-        node_to_paste_to = self.get_node(path_to_paste_to)
         return node_to_paste_to.add_child(
-                node_to_paste,
-                access_condition=paste_command.access_condition,
-                is_mandatory=paste_command.is_mandatory,
-                block=paste_command.block,
-                link_type=paste_command.link_type,
-                comment=paste_command.comment,
-                comment_english=paste_command.comment_english,
-                relative_credits=paste_command.relative_credits
+            node_to_paste,
+            access_condition=paste_command.access_condition,
+            is_mandatory=paste_command.is_mandatory,
+            block=paste_command.block,
+            link_type=link_type,
+            comment=paste_command.comment,
+            comment_english=paste_command.comment_english,
+            relative_credits=paste_command.relative_credits
         )
 
     def set_prerequisite(
@@ -451,7 +468,10 @@ class ProgramTree(interface.RootEntity):
         return parent.detach_child(node_to_detach)
 
     def __copy__(self) -> 'ProgramTree':
-        return ProgramTree(root_node=_copy(self.root_node))
+        return ProgramTree(
+            root_node=_copy(self.root_node),
+            authorized_relationships=copy.copy(self.authorized_relationships)
+        )
 
     def remove_prerequisites(self, detached_node: 'Node', parent_path):
         pruned_tree = ProgramTree(root_node=_copy(self.root_node))

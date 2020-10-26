@@ -26,11 +26,9 @@
 
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
-from django.utils.translation import gettext as _
 
-from base.ddd.utils import business_validator
+from program_management.ddd.domain.exception import MinimumEditableYearException
 from program_management.ddd.validators._minimum_editable_year import MinimumEditableYearValidator
-from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 from program_management.tests.ddd.validators.mixins import TestValidatorValidateMixin
 
@@ -41,11 +39,8 @@ class TestMinimumEditableYearValidator(TestValidatorValidateMixin, SimpleTestCas
     def test_shoudl_raise_exception_when_root_year_is_lower_than_settings(self):
         year = 2010
         tree = ProgramTreeFactory(root_node__year=year)
-        msg_expected = _("Cannot perform action on a education group before %(limit_year)s") % {
-            "limit_year": 2019
-        }
-
-        self.assertValidatorRaises(MinimumEditableYearValidator(tree), [msg_expected])
+        with self.assertRaises(MinimumEditableYearException):
+            MinimumEditableYearValidator(tree).validate()
 
     @override_settings(YEAR_LIMIT_EDG_MODIFICATION=2019)
     def test_should_not_raise_exception_when_root_year_is_equal_to_settings(self):

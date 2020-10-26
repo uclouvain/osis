@@ -34,7 +34,6 @@ from program_management.ddd.command import CreateStandardVersionCommand
 from program_management.ddd.domain import exception, academic_year
 from program_management.ddd.domain import program_tree
 from program_management.ddd.validators import validators_by_business_action
-from program_management.ddd.validators.validators_by_business_action import CreateProgramTreeVersionValidatorList
 
 STANDARD = ""
 
@@ -47,7 +46,7 @@ class ProgramTreeVersionIdentity(interface.EntityIdentity):
     is_transition = attr.ib(type=bool)
 
     def is_standard(self):
-        return self.version_name == STANDARD and not self.is_transition
+        return (self.version_name == STANDARD or self.version_name is None) and not self.is_transition
 
 
 class ProgramTreeVersionBuilder:
@@ -90,16 +89,17 @@ class ProgramTreeVersionBuilder:
     ) -> 'ProgramTreeVersion':
         tree_version_identity = ProgramTreeVersionIdentity(
             offer_acronym=cmd.offer_acronym,
-            year=cmd.year,
+            year=cmd.start_year,
             version_name=STANDARD,
             is_transition=False,
         )
-        tree_identity = program_tree.ProgramTreeIdentity(code=cmd.code, year=cmd.year)
+        tree_identity = program_tree.ProgramTreeIdentity(code=cmd.code, year=cmd.start_year)
         return ProgramTreeVersion(
             entity_identity=tree_version_identity,
             entity_id=tree_version_identity,
             program_tree_identity=tree_identity,
             program_tree_repository=tree_repository,
+            start_year=cmd.start_year,
             title_fr=None,
             title_en=None,
         )
@@ -111,7 +111,7 @@ class ProgramTreeVersionBuilder:
             command: 'CreateProgramTreeVersionCommand',
     ) -> 'ProgramTreeVersion':
         validator = validators_by_business_action.CreateProgramTreeVersionValidatorList(
-            command.year,
+            command.start_year,
             command.offer_acronym,
             command.version_name
         )
@@ -154,6 +154,7 @@ class ProgramTreeVersionBuilder:
         return ProgramTreeVersion(
             program_tree_identity=new_tree_identity,
             program_tree_repository=from_tree_version.program_tree_repository,
+            start_year=command.start_year,
             entity_identity=tree_version_identity,
             entity_id=tree_version_identity,
             title_en=command.title_en,
@@ -176,6 +177,7 @@ class ProgramTreeVersion(interface.RootEntity):
     entity_identity = entity_id = attr.ib(type=ProgramTreeVersionIdentity)
     program_tree_identity = attr.ib(type='ProgramTreeIdentity')
     program_tree_repository = attr.ib(type=interface.AbstractRepository)
+    start_year = attr.ib(type=int)
     version_name = attr.ib(type=str)
     title_fr = attr.ib(type=str, default=None)
     title_en = attr.ib(type=str, default=None)

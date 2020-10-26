@@ -23,25 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.utils.translation import gettext_lazy as _
-
-import osis_common.ddd.interface
 from base.ddd.utils import business_validator
 from program_management.ddd.business_types import *
-from program_management.ddd.domain import node
+from program_management.ddd.domain import exception
 
 
 class ParentIsNotLeafValidator(business_validator.BusinessValidator):
 
-    def __init__(self, parent_node: 'Node', node_to_add: 'Node'):
-        super(ParentIsNotLeafValidator, self).__init__()
+    def __init__(self, parent_node: 'Node'):
         self.parent_node = parent_node
-        self.node_to_add = node_to_add
+
+        super().__init__()
 
     def validate(self):
-        if isinstance(self.parent_node, node.NodeLearningUnitYear):
-            raise osis_common.ddd.interface.BusinessExceptions(
-                [_("Cannot add any element to learning unit %(parent_node)s") % {
-                    "parent_node": self.parent_node
-                }]
-            )
+        if self.parent_node.is_learning_unit():
+            raise exception.CannotPasteToLearningUnitException(self.parent_node)

@@ -206,7 +206,11 @@ def _convert_education_group_year_to_training(
             ares_code=obj.hops.ares_study,
             ares_graca=obj.hops.ares_graca,
             ares_authorization=obj.hops.ares_ability,
-        ) if hasattr(obj, 'hops') else None,
+        ) if hasattr(obj, 'hops') else HOPS(
+            ares_code=None,
+            ares_graca=None,
+            ares_authorization=None,
+        ),
         co_graduation=CoGraduation(
             code_inter_cfb=obj.co_graduation,
             coefficient=obj.co_graduation_coefficient,
@@ -532,7 +536,7 @@ def _save_hops(
 ) -> List[HopsModelDb]:
     _delete_hops(education_group_year_db_obj)
     saved_objs = []
-    if training.hops:
+    if training.hops and training.hops.ares_code and training.hops.ares_graca and training.hops.ares_authorization:
         obj, created = HopsModelDb.objects.update_or_create(
             education_group_year=education_group_year_db_obj,
             defaults={

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-09 11:09+0200\n"
+"POT-Creation-Date: 2020-10-26 09:46+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -27,21 +27,16 @@ msgid "\"%(child)s\" has been detached from \"%(parent)s\""
 msgstr "\"%(child)s\" a été retiré de \"%(parent)s\""
 
 #, python-format
-msgid "\"%(child)s\" has been successfully updated"
-msgstr "\"%(child)s\" a été modifié avec succès"
-
-#, python-format
 msgid "%(node)s has been moved"
 msgstr "%(node)s a été déplacé"
 
 #, python-format
 msgid ""
-"%(node_to_add)s [%(node_to_add_version)s] version must be the same as "
-"%(node_to_paste_to)s and all of it's parent's version "
-"[%(version_mismatched)s]"
+"%(node_to_add)s or its children must have the same version as "
+"%(node_to_paste_to)s and all of it's parent's [%(version_mismatched)s]"
 msgstr ""
-"La version %(node_to_add)s [%(node_to_add_version)s] doit être identique à "
-"celle de %(node_to_paste_to)s et de tous ses parents [%(version_mismatched)s]"
+"La version de %(node_to_add)s ou de ses enfants doit être identique à celle "
+"de %(node_to_paste_to)s et de tous ses parents [%(version_mismatched)s]"
 
 #, python-format
 msgid "%(start_index)s to %(end_index)s of %(total_counts)s learning units"
@@ -401,11 +396,17 @@ msgstr "Mène à diplôme/certificat"
 msgid "Learning achievements"
 msgstr "Unités d'enseignement"
 
+msgid "Learning class"
+msgstr "Classe"
+
 msgid "Learning class year"
 msgstr "Classe"
 
 msgid "Learning location"
 msgstr "Lieu d'enseignement"
+
+msgid "Learning unit"
+msgstr "Unité d'enseignement"
 
 msgid "Learning unit year"
 msgstr "Unités d'enseignement"
@@ -636,9 +637,6 @@ msgstr "Titre professionnel"
 msgid "Program tree not found : {code} {year}"
 msgstr "Programme non trouvé : {code} {year}"
 
-msgid "Prolong"
-msgstr "Prolonger la version existante"
-
 msgid "Proposal status"
 msgstr "Légende proposition"
 
@@ -807,6 +805,9 @@ msgstr "Le formulaire d'inscription est disponible au Secrétariat de"
 msgid "Themes discussed"
 msgstr "Thèmes abordés"
 
+msgid "This education group is not editable during this period."
+msgstr "Cette formation n'est pas modifiable durant cette période."
+
 msgid ""
 "This form must be signed by the designated authority and delivered to the "
 "secretariat of your faculty."
@@ -925,14 +926,6 @@ msgid "You can not add the same child %(child_node)s several times."
 msgstr ""
 "Vous ne pouvez pas ajouter plusieurs fois le même enfant %(child_node)s."
 
-#, python-format
-msgid ""
-"You can not attach a learning unit like %(node)s to element %(parent)s of "
-"type %(type)s."
-msgstr ""
-"Vous ne pouvez pas ajouter une unité d'enseignement comme %(node)s à "
-"l'élément %(parent)s de type %(type)s."
-
 #, python-brace-format
 msgid ""
 "You can't copy the program tree '{code}' from {from_year} to {to_year} "
@@ -959,11 +952,10 @@ msgstr ""
 
 #, python-format
 msgid ""
-"You cannot add \"%(child)s\" of type \"%(child_types)s\" to \"%(parent)s\" "
-"of type \"%(parent_type)s\""
+"You cannot add \"%(child)s\" to \"%(parent)s\" of type \"%(parent_type)s\""
 msgstr ""
-"Vous ne pouvez pas attacher \"%(child)s\" de type \"%(child_types)s\" à "
-"\"%(parent)s\" de type \"%(parent_type)s\""
+"Vous ne pouvez pas attacher \"%(child)s\" à \"%(parent)s\" de type "
+"\"%(parent_type)s\""
 
 #, python-format
 msgid ""
@@ -1082,3 +1074,4 @@ msgstr "Oui"
 
 msgid "yes,no"
 msgstr "oui,non"
+

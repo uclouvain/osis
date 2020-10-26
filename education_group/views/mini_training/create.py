@@ -22,6 +22,7 @@
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
 import collections
+import functools
 from typing import List, Dict, Optional
 
 from django.http import response
@@ -154,7 +155,7 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
     def _get_success_msg(self, mini_training_identity: mini_training.MiniTrainingIdentity, code: str) -> str:
         return _("Mini-training <a href='%(link)s'> %(code)s (%(academic_year)s) </a> successfully created.") % {
             "link": self._generate_success_url(mini_training_identity, code),
-            "code": code,
+            "code": mini_training_identity.acronym,
             "academic_year": display_as_academic_year(mini_training_identity.year),
         }
 
@@ -185,16 +186,19 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
 
     def _get_initial_academic_year_for_form(self):
         request_cache = RequestCache(self.request.user, reverse('version_program'))
-        academic_year_cached_value = request_cache.get_value_cached('academic_year')
-        if academic_year_cached_value:
-            default_academic_year = AcademicYear.objects.get(id=academic_year_cached_value[0]).year
-        else:
-            default_academic_year = starting_academic_year()
-        return default_academic_year
+        academic_year_cached_value = request_cache.get_single_value_cached('academic_year')
+
+        if self.get_parent_group():
+            return self.get_parent_group().year
+        elif academic_year_cached_value:
+            return AcademicYear.objects.get(id=academic_year_cached_value).year
+
+        return starting_academic_year().year
 
     def _get_initial_management_entity_for_form(self):
         return self.get_parent_group() and self.get_parent_group().management_entity.acronym
 
+    @functools.lru_cache()
     def get_parent_group(self) -> Optional['Group']:
         if self.get_attach_path():
             cmd_get_node_id = command_pgrm.GetNodeIdentityFromElementId(
