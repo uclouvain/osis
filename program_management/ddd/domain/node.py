@@ -24,9 +24,10 @@
 #
 ##############################################################################
 import copy
+import functools
 from _decimal import Decimal
 from collections import OrderedDict
-from typing import List, Set, Dict, Optional, Iterator
+from typing import List, Set, Dict, Optional, Iterator, Tuple
 
 import attr
 
@@ -279,10 +280,10 @@ class Node(interface.Entity):
         return children
 
     def get_option_list(self) -> Set['Node']:
-        return {l.child for l in self.get_all_children() if l.child.is_option()}
+        return {link.child for link in self.get_all_children() if link.child.is_option()}
 
     def get_finality_list(self) -> Set['Node']:
-        return {l.child for l in self.get_all_children() if l.child.is_finality()}
+        return {link.child for link in self.get_all_children() if link.child.is_finality()}
 
     def get_all_children_as_nodes(
             self,
@@ -376,8 +377,12 @@ class Node(interface.Entity):
         return (node for node in self.children_as_nodes if node.is_training())
 
     @property
+    @functools.lru_cache()
     def descendents(self) -> Dict['Path', 'Node']:   # TODO :: add unit tests
-        return _get_descendents(self)
+        result = OrderedDict()
+        for path, value in _get_descendents(self):
+            result[path] = value
+        return result
 
     def update_link_of_direct_child_node(
             self,
@@ -443,17 +448,16 @@ class Node(interface.Entity):
         self.children[index+1].order_up()
 
 
-def _get_descendents(root_node: Node, current_path: 'Path' = None) -> Dict['Path', 'Node']:
-    _descendents = OrderedDict()
+def _get_descendents(root_node: Node, current_path: 'Path' = None) -> Tuple[Tuple['Path', 'Node']]:
+    _descendents = tuple()
     if current_path is None:
         current_path = str(root_node.pk)
 
     for link in root_node.children:
         child_path = "|".join([current_path, str(link.child.pk)])
-        _descendents.update({
-            **{child_path: link.child},
-            **_get_descendents(link.child, current_path=child_path)
-        })
+        _descendents += ((child_path, link.child),)
+
+        _descendents += _get_descendents(link.child, current_path=child_path)
     return _descendents
 
 
@@ -526,6 +530,10 @@ class NodeLearningUnitYear(Node):
     quadrimester = attr.ib(type=DerogationQuadrimester, default=None)
     volume_total_lecturing = attr.ib(type=Decimal, default=None)
     volume_total_practical = attr.ib(type=Decimal, default=None)
+
+    def equals(self, learning_unit_year) -> bool:
+        return learning_unit_year.entity_id.code == self.entity_id.code \
+               and learning_unit_year.entity_id.year == self.entity_id.year
 
     @property
     def full_title_fr(self) -> str:
