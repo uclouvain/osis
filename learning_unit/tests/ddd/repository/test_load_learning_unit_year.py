@@ -35,6 +35,7 @@ from base.models.enums import learning_unit_year_subtypes
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.entity_version import EntityVersionFactory
+from base.tests.factories.learning_achievement import LearningAchievementFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_component_year import LecturingLearningComponentYearFactory, \
     PracticalLearningComponentYearFactory
@@ -44,6 +45,7 @@ from cms.tests.factories.text_label import LearningUnitYearTextLabelFactory
 from cms.tests.factories.translated_text import LearningUnitYearTranslatedTextFactory
 from learning_unit.ddd.repository.load_learning_unit_year import load_multiple, load_multiple_by_identity
 from learning_unit.tests.ddd.factories.learning_unit_year_identity import LearningUnitYearIdentityFactory
+from reference.tests.factories.language import EnglishLanguageFactory, FrenchLanguageFactory
 
 LANGUAGE_EN = "en"
 LANGUAGE_FR = "fr-be"
@@ -245,3 +247,33 @@ def _build_attributions(component):
                                                 attribution__tutor__person__first_name='Cali',
                                                 attribution__tutor__person__email='cali@gmail.com')
     return [attribution_1, attribution_2]
+
+
+class TestLoadLearningUnitYearWithAchievements(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.l_unit_1 = LearningUnitYearFactory()
+        cls.en_language = EnglishLanguageFactory()
+        cls.fr_language = FrenchLanguageFactory()
+        # /!\ An achievement have the same code_name in EN and in FR
+        cls.achievements_en = [LearningAchievementFactory(code_name='A_{}'.format(idx),
+                                                          language=cls.en_language,
+                                                          text="English text {}".format(idx),
+                                                          learning_unit_year=cls.l_unit_1) for idx in range(5)]
+        cls.achievements_fr = [LearningAchievementFactory(code_name='A_{}'.format(idx),
+                                                          language=cls.fr_language,
+                                                          text="French text {}".format(idx),
+                                                          learning_unit_year=cls.l_unit_1) for idx in range(5)]
+
+    def test_load_achievements(self):
+        results = load_multiple([self.l_unit_1.id])
+        ue = results[0]
+        self.assertEqual(len(ue.achievements), 5)
+
+    def test_load_achievements_check_order(self):
+        results = load_multiple([self.l_unit_1.id])
+        ue = results[0]
+        for idx in range(5):
+            self.assertEqual(ue.achievements[idx].text_fr, "French text {}".format(idx))
+            self.assertEqual(ue.achievements[idx].text_en, "English text {}".format(idx))
