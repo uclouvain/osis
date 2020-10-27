@@ -32,6 +32,8 @@ import osis_common.ddd.interface
 from base.ddd.utils import business_validator
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import program_tree, node
+from program_management.ddd.domain.exception import CannotDetachLearningWhoIsPrerequisiteException, \
+    CannotDetachChildrenWhoArePrerequisiteException
 
 
 class IsPrerequisiteValidator(business_validator.BusinessValidator):
@@ -47,20 +49,13 @@ class IsPrerequisiteValidator(business_validator.BusinessValidator):
         if nodes_that_are_prerequisites:
             codes_that_are_prerequisite = [node.code for node in nodes_that_are_prerequisites]
             if self.node_to_detach.is_learning_unit():
-                raise osis_common.ddd.interface.BusinessExceptions([
-                    _("Cannot detach learning unit %(acronym)s as it has a prerequisite or it is a prerequisite.") % {
-                        "acronym": self.node_to_detach.code
-                    }
-                ])
+                raise CannotDetachLearningWhoIsPrerequisiteException(self.node_to_detach)
             else:
-                raise osis_common.ddd.interface.BusinessExceptions([
-                    _("Cannot detach education group year %(acronym)s as the following learning units "
-                      "are prerequisite in %(formation)s: %(learning_units)s") % {
-                        "acronym": self.node_to_detach.title,
-                        "formation": self.tree.root_node.title,
-                        "learning_units": ", ".join(codes_that_are_prerequisite)
-                    }
-                ])
+                raise CannotDetachChildrenWhoArePrerequisiteException(
+                    self.tree.root_node,
+                    self.node_to_detach,
+                    codes_that_are_prerequisite
+                )
 
     def _get_nodes_that_are_prerequisite(self):
         remaining_children_after_detach = self._get_all_remaining_children_after_detach()

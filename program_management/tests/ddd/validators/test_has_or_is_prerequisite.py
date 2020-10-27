@@ -28,6 +28,8 @@ from django.test import SimpleTestCase
 from django.utils.translation import gettext as _
 
 from base.models.enums.education_group_types import TrainingType, GroupType
+from program_management.ddd.domain.exception import CannotDetachChildrenWhoArePrerequisiteException, \
+    CannotDetachLearningWhoIsPrerequisiteException
 from program_management.ddd.domain.program_tree import build_path
 from program_management.ddd.validators._has_or_is_prerequisite import IsPrerequisiteValidator, HasPrerequisiteValidator
 from program_management.tests.ddd.factories.link import LinkFactory
@@ -67,14 +69,8 @@ class TestIsPrerequisiteValidator(TestValidatorValidateMixin, SimpleTestCase):
             child=NodeLearningUnitYearFactory(is_prerequisite_of=[link.child])
         )
 
-        validator = IsPrerequisiteValidator(self.tree, path_parent_of_node_to_detach, node_to_detach)
-        expected_message = _("Cannot detach education group year %(acronym)s as the following learning units "
-                             "are prerequisite in %(formation)s: %(learning_units)s") % {
-                               "acronym": node_to_detach.title,
-                               "formation": self.tree.root_node.title,
-                               "learning_units": link_with_child_that_is_prerequisite.child.code
-                           }
-        self.assertValidatorRaises(validator, [expected_message])
+        with self.assertRaises(CannotDetachChildrenWhoArePrerequisiteException):
+            IsPrerequisiteValidator(self.tree, path_parent_of_node_to_detach, node_to_detach).validate()
 
     def test_should_raise_exception_when_node_to_detach_is_prerequisite(self):
         path_parent_of_node_to_detach = "|".join([str(self.tree.root_node.node_id), str(self.common_core.node_id)])
@@ -84,12 +80,8 @@ class TestIsPrerequisiteValidator(TestValidatorValidateMixin, SimpleTestCase):
         )
         node_to_detach = link_with_child_is_prerequisite.child
 
-        validator = IsPrerequisiteValidator(self.tree, path_parent_of_node_to_detach, node_to_detach)
-        expected_message = _(
-            "Cannot detach learning unit %(acronym)s as it has a prerequisite or it is a prerequisite.") % {
-                "acronym": node_to_detach.code
-            }
-        self.assertValidatorRaises(validator, [expected_message])
+        with self.assertRaises(CannotDetachLearningWhoIsPrerequisiteException):
+            IsPrerequisiteValidator(self.tree, path_parent_of_node_to_detach, node_to_detach).validate()
 
     def test_should_not_raise_exception_when_child_of_node_to_detach_is_prerequisite_but_reused_in_tree(self):
         #  As the node is reused somewhere else in the tree, we can detach the node without checking prerequisites

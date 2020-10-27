@@ -29,6 +29,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 
 import osis_common.ddd.interface
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.utils.cache import ElementCache
 from base.views.common import display_error_messages, display_warning_messages
 from base.views.common import display_success_messages
@@ -84,8 +85,9 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
         detach_node_command = command.DetachNodeCommand(path_where_to_detach=self.request.GET.get('path'), commit=False)
         try:
             link_to_detach_id = detach_node_service.detach_node(detach_node_command)
-        except osis_common.ddd.interface.BusinessExceptions as business_exception:
-            display_error_messages(self.request, business_exception.messages)
+        except MultipleBusinessExceptions as multiple_exceptions:
+            messages = [e.message for e in multiple_exceptions.exceptions]
+            display_error_messages(self.request, messages)
         else:
             warning_messages = detach_warning_messages_service.detach_warning_messages(detach_node_command)
             display_warning_messages(self.request, warning_messages)
