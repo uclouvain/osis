@@ -97,12 +97,13 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
         display_success_messages(self.request, success_messages, extra_tags='safe')
 
     def display_delete_messages(self, version_identities: List['ProgramTreeVersionIdentity']):
-        last_identity = version_identities[-1]
+
         is_new_end_year_lower_than_initial_one = operator.is_year_lower(
             self.training_version_form.cleaned_data["end_year"],
             self.training_version_form.initial['end_year']
         )
         if is_new_end_year_lower_than_initial_one:
+            last_identity = version_identities[-1]
             delete_message = _(
                 "Training %(offer_acronym)s[%(acronym)s] successfully deleted from %(academic_year)s."
             ) % {
