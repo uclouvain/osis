@@ -32,7 +32,7 @@ class CentralManager(osis_role_models.EntityRoleModel):
                 predicates.is_user_attached_to_current_requirement_entity &
                 predicates.is_learning_unit_year_older_or_equals_than_limit_settings_year &
                 predicates.is_learning_unit_year_not_prerequisite &
-                predicates.has_learning_unit_no_application_all_year,
+                predicates.has_learning_unit_no_application_all_years,
             'base.can_edit_learningunit':
                 predicates.is_user_attached_to_current_requirement_entity &
                 predicates.is_learning_unit_year_older_or_equals_than_limit_settings_year &
@@ -57,7 +57,8 @@ class CentralManager(osis_role_models.EntityRoleModel):
                  predicates.is_user_attached_to_initial_requirement_entity),
             'base.can_cancel_proposal':
                 predicates.is_proposal &
-                predicates.is_not_proposal_of_type_creation_with_applications &
+                predicates.is_not_proposal_of_type_creation &
+                predicates.has_learning_unit_no_application_this_year &
                 (predicates.is_user_attached_to_current_requirement_entity |
                  predicates.is_user_attached_to_initial_requirement_entity) &
                 predicates.is_external_learning_unit_with_cograduation,
@@ -77,7 +78,8 @@ class CentralManager(osis_role_models.EntityRoleModel):
                 predicates.is_proposal_in_state_to_be_consolidated &
                 (predicates.is_user_attached_to_current_requirement_entity |
                  predicates.is_user_attached_to_initial_requirement_entity) &
-                predicates.is_not_proposal_of_type_suppression_with_applications,
+                predicates.is_not_proposal_of_type_suppression &
+                predicates.has_learning_unit_no_application_this_year,
             'base.can_manage_charge_repartition':
                 predicates.is_learning_unit_year_a_partim &
                 predicates.is_user_attached_to_current_requirement_entity,

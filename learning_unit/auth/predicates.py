@@ -25,7 +25,6 @@ PROPOSAL_CONSOLIDATION_ELIGIBLE_STATES = (ProposalState.ACCEPTED.name, ProposalS
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def is_user_attached_to_initial_requirement_entity(self, user, learning_unit_year=None):
     if learning_unit_year:
-        # initial_container_year = learning_unit_year.initial_data.get("learning_container_year")
         initial_container_year = learning_unit_year.learning_container_year
         requirement_entity_id = initial_container_year.requirement_entity
         return _is_attached_to_entity(requirement_entity_id, self)
@@ -217,26 +216,20 @@ def has_faculty_proposal_state(self, user, learning_unit_year):
 
 
 @predicate(bind=True)
-@predicate_failed_msg(message=_("This learning unit has application"))
+@predicate_failed_msg(message=_("This learning unit is not of type creation"))
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
-def is_not_proposal_of_type_creation_with_applications(self, user, learning_unit_year):
+def is_not_proposal_of_type_creation(self, user, learning_unit_year):
     if learning_unit_year and hasattr(learning_unit_year, 'learningunitproposal'):
-        proposal = learning_unit_year.learningunitproposal
-        return proposal.type != ProposalType.CREATION.name or not TutorApplication.objects.filter(
-            learning_container_year=proposal.learning_unit_year.learning_container_year
-        ).exists()
+        return learning_unit_year.learningunitproposal.type != ProposalType.CREATION.name
     return None
 
 
 @predicate(bind=True)
-@predicate_failed_msg(message=_("This learning unit has application"))
+@predicate_failed_msg(message=_("This learning unit is not of type suppression"))
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
-def is_not_proposal_of_type_suppression_with_applications(self, user, learning_unit_year):
+def is_not_proposal_of_type_suppression(self, user, learning_unit_year):
     if learning_unit_year and hasattr(learning_unit_year, 'learningunitproposal'):
-        proposal = learning_unit_year.learningunitproposal
-        return proposal.type != ProposalType.SUPPRESSION.name or not TutorApplication.objects.filter(
-            learning_container_year=proposal.learning_unit_year.learning_container_year
-        ).exists()
+        return learning_unit_year.learningunitproposal.type != ProposalType.SUPPRESSION.name
     return None
 
 
@@ -252,7 +245,7 @@ def has_learning_unit_no_application_this_year(self, user, learning_unit_year):
 @predicate(bind=True)
 @predicate_failed_msg(message=_("This learning unit has application"))
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
-def has_learning_unit_no_application_all_year(self, user, learning_unit_year):
+def has_learning_unit_no_application_all_years(self, user, learning_unit_year):
     if learning_unit_year:
         learning_container = learning_unit_year.learning_container_year.learning_container
         return not TutorApplication.objects.filter(
