@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-20 16:45+0200\n"
+"POT-Creation-Date: 2020-10-27 14:03+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -76,6 +76,12 @@ msgid "This learning unit has no application."
 msgstr ""
 
 msgid "This learning unit is not editable this period."
+msgstr ""
+
+msgid "This learning unit is not of type creation"
+msgstr ""
+
+msgid "This learning unit is not of type suppression"
 msgstr ""
 
 msgid "This learning unit isn't eligible for modification because of it's type"

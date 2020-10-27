@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-22 14:43+0200\n"
+"POT-Creation-Date: 2020-10-27 13:59+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2923,11 +2923,24 @@ msgstr ""
 "Vous ne pouvez pas supprimer cet objet car certaines dépendances sont "
 "protégées"
 
+msgid ""
+"You can only modify a learning unit when your are linked to its requirement "
+"entity"
+msgstr ""
+
 #, python-format
 msgid "You can't modify learning unit under year : %(year)d"
 msgstr ""
 "Vous ne pouvez pas modifier une unité d'enseignement dont l'année est "
 "inférieure à %(year)d"
+
+#, python-format
+msgid ""
+"You can't modify learning unit under year : %(year)d. Modifications should "
+"be made in EPC under year %(year)d"
+msgstr ""
+"Vous ne pouvez pas modifier une unité d'enseignement dont l'année est "
+"inférieure à %(year)d. Les modifications doivent être faites dans EPC avant %(year)d"
 
 #, python-format
 msgid "You cannot create/update an education group before %(limit_year)s"
