@@ -60,12 +60,10 @@ class OrganizationAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetV
 
 class CountryAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
     def get_queryset(self):
-        qs = Country.objects.filter(organizationaddress__isnull=False).distinct()
-
+        qs = Country.objects.all()
         if self.q:
             qs = qs.filter(name__icontains=self.q)
-
-        return qs.distinct().order_by('name')
+        return qs.order_by('name')
 
 
 class CampusAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):

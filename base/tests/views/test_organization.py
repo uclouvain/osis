@@ -23,17 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase
 from django.urls import reverse
 
-from base.models import organization_address
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.organization import OrganizationFactory
-from base.tests.factories.organization_address import OrganizationAddressFactory
 from base.tests.factories.user import SuperUserFactory
-from base.views.organization import organization_address_delete
 
 
 class OrganizationViewTestCase(TestCase):
@@ -46,22 +42,6 @@ class OrganizationViewTestCase(TestCase):
 
     def setUp(self):
         self.client.force_login(self.a_superuser)
-
-    def test_organization_address_delete(self):
-        address = OrganizationAddressFactory(organization=self.organization)
-
-        response = self.client.post(reverse(organization_address_delete, args=[address.id]))
-        self.assertRedirects(response, reverse("organization_read", args=[self.organization.pk]))
-        with self.assertRaises(ObjectDoesNotExist):
-            organization_address.OrganizationAddress.objects.get(id=address.id)
-
-    def test_organization_address_edit(self):
-        from base.views.organization import organization_address_edit
-        address = OrganizationAddressFactory(organization=self.organization)
-        response = self.client.get(reverse(organization_address_edit, args=[address.id]))
-
-        self.assertTemplateUsed(response, "organization/organization_address_form.html")
-        self.assertEqual(response.context.get("organization_address"), address)
 
     def test_organizations_search(self):
         response = self.client.get(reverse('organizations_search'), data={

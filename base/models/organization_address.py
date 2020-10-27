@@ -26,13 +26,6 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from osis_common.models.osis_model_admin import OsisModelAdmin
-
-
-class OrganizationAddressAdmin(OsisModelAdmin):
-    list_display = ('organization', 'label', 'location', 'postal_code', 'city', 'country')
-    search_fields = ['organization__name', 'label', 'country__name']
-
 
 class OrganizationAddress(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
@@ -47,10 +40,6 @@ class OrganizationAddress(models.Model):
     city = models.CharField(max_length=255, verbose_name=_("City"))
     country = models.ForeignKey('reference.Country', verbose_name=_("Country"), on_delete=models.CASCADE)
     is_main = models.BooleanField(default=False)
-
-
-def find_by_organization(organization):
-    return OrganizationAddress.objects.filter(organization=organization).order_by('label')
 
 
 def find_distinct_by_country(a_country):

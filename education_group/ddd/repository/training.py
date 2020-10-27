@@ -25,6 +25,7 @@
 ##############################################################################
 import functools
 import operator
+from datetime import datetime
 from typing import Optional, List
 
 from django.db import IntegrityError
@@ -43,6 +44,7 @@ from base.models.education_group_year import EducationGroupYear as EducationGrou
 from base.models.education_group_year_domain import EducationGroupYearDomain as EducationGroupYearDomainModelDb
 from base.models.entity import Entity
 from base.models.entity_version import EntityVersion
+from base.models.entity_version_address import EntityVersionAddress
 from base.models.enums.academic_type import AcademicTypes
 from base.models.enums.active_status import ActiveStatusEnum
 from base.models.enums.activity_presence import ActivityPresence
@@ -260,7 +262,7 @@ def __convert_coorganizations_from_db(
 ) -> List['Coorganization']:
     coorganizations = []
     for coorg in obj.educationgrouporganization_set.all():
-        first_address = coorg.organization.organizationaddress_set.all()[0]
+        main_address = coorg.organization.main_address
         coorganizations.append(
             Coorganization(
                 entity_id=CoorganizationIdentity(
@@ -271,9 +273,9 @@ def __convert_coorganizations_from_db(
                 partner=AcademicPartner(
                     entity_id=AcademicPartnerIdentity(name=coorg.organization.name),
                     address=Address(
-                        country_name=first_address.country.name,
-                        city=first_address.city,
-                    ),
+                        country_name=main_address.country.name,
+                        city=main_address.city,
+                    ) if main_address else None,
                     logo_url=coorg.organization.logo.url if coorg.organization.logo else None,
                 ),
                 is_for_all_students=coorg.all_students,
@@ -309,12 +311,7 @@ def _get_queryset_to_fetch_data_for_training(entity_ids: List['TrainingIdentity'
         'secondary_domains',
         Prefetch(
             'educationgrouporganization_set',
-            EducationGroupOrganizationModelDb.objects.all().prefetch_related(
-                Prefetch(
-                    'organization__organizationaddress_set',
-                    OrganizationAddress.objects.all().select_related('country')
-                )
-            ).select_related('organization').order_by('all_students')
+            EducationGroupOrganizationModelDb.objects.all().select_related('organization').order_by('all_students')
         ),
         Prefetch(
             'administration_entity',
