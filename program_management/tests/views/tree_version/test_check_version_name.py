@@ -13,9 +13,6 @@ from program_management.models.education_group_version import EducationGroupVers
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionIdentityFactory, \
     ProgramTreeVersionFactory
-from program_management.tests.factories.education_group_version import EducationGroupVersionFactory, \
-    ParticularTransitionEducationGroupVersionFactory
-from program_management.tests.factories.element import ElementFactory
 
 KWARGS = {'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
 
@@ -117,6 +114,9 @@ class TestCheckVersionName(TestCase):
         )
 
     def test_invalid_version_name(self):
+        invalid_version_names = "[@_!#$%^&*()<>?/|}{~:]".split()
+        invalid_version_names.append('0123456')
+
         self.url = reverse(
             'check_version_name',
             kwargs={
@@ -124,18 +124,19 @@ class TestCheckVersionName(TestCase):
                 'acronym': self.education_group_version_db_object.root_group.acronym
             }
         )
-        get_data = {'version_name': "0123456"}
-        response = self.client.get(self.url, get_data, **KWARGS)
-        self.assertJSONEqual(
-            str(response.content, encoding='utf8'),
-            {
-                "existed_version_name": False,
-                "existing_version_name": False,
-                "last_using": None,
-                "valid": False,
-                "version_name": '0123456'
-            }
-        )
+        for invalid_version_name in invalid_version_names:
+            get_data = {'version_name': invalid_version_name}
+            response = self.client.get(self.url, get_data, **KWARGS)
+            self.assertJSONEqual(
+                str(response.content, encoding='utf8'),
+                {
+                    "existed_version_name": False,
+                    "existing_version_name": False,
+                    "last_using": None,
+                    "valid": False,
+                    "version_name": invalid_version_name
+                }
+            )
 
     def test_valid_version_name(self):
         self.url = reverse(
