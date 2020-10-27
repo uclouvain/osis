@@ -31,6 +31,7 @@ from base.models.authorized_relationship import AuthorizedRelationshipList
 from base.models.enums.education_group_types import TrainingType, GroupType
 from base.models.enums.link_type import LinkTypes
 from base.tests.factories.academic_year import AcademicYearFactory
+from program_management.ddd.domain.exception import MinimumChildTypesNotRespectedException
 from program_management.ddd.validators._authorized_relationship import DetachAuthorizedRelationshipValidator
 from program_management.models.enums.node_type import NodeType
 from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipObjectFactory
@@ -108,11 +109,8 @@ class TestDetachAuthorizedRelationshipValidator(TestValidatorValidateMixin, Simp
         node_to_detach = self.authorized_child
         detach_from = self.authorized_parent
         LinkFactory(parent=detach_from, child=node_to_detach)
-        validator = DetachAuthorizedRelationshipValidator(self.tree, node_to_detach, detach_from)
-        expected_error_msg = _("The parent must have at least one child of type(s) \"%(types)s\".") % {
-            "types": str(node_to_detach.node_type.value)
-        }
-        self.assertValidatorRaises(validator, [expected_error_msg])
+        with self.assertRaises(MinimumChildTypesNotRespectedException):
+            DetachAuthorizedRelationshipValidator(self.tree, node_to_detach, detach_from).validate()
 
     def test_should_not_raise_exception_when_link_to_detach_is_learning_unit(self):
         """
@@ -141,9 +139,5 @@ class TestDetachAuthorizedRelationshipValidator(TestValidatorValidateMixin, Simp
 
         node_to_detach = reference_link.child
         detach_from = reference_link.parent
-        validator = DetachAuthorizedRelationshipValidator(self.tree, node_to_detach, detach_from)
-
-        expected_error_msg = _("The parent must have at least one child of type(s) \"%(types)s\".") % {
-            "types": str(child_type_under_reference.value)
-        }
-        self.assertValidatorRaises(validator, [expected_error_msg])
+        with self.assertRaises(MinimumChildTypesNotRespectedException):
+            DetachAuthorizedRelationshipValidator(self.tree, node_to_detach, detach_from).validate()

@@ -38,7 +38,7 @@ from base.models.enums import education_group_types
 from base.models.enums.education_group_types import EducationGroupTypesEnum
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.exception import ChildTypeNotAuthorizedException, \
-    MaximumChildTypesReachedException
+    MaximumChildTypesReachedException, MinimumChildTypesNotRespectedException
 
 
 class UpdateLinkAuthorizedRelationshipValidator(business_validator.BusinessValidator):
@@ -161,11 +161,7 @@ class DetachAuthorizedRelationshipValidator(business_validator.BusinessValidator
     def validate(self):
         minimum_children_types_reached = self._get_minimum_children_types_reached(self.detach_from, self.node_to_detach)
         if minimum_children_types_reached:
-            raise osis_common.ddd.interface.BusinessExceptions([
-                _("The parent must have at least one child of type(s) \"%(types)s\".") % {
-                    "types": ','.join(str(node_type.value) for node_type in minimum_children_types_reached)
-                }
-            ])
+            raise MinimumChildTypesNotRespectedException(self.tree.root_node, minimum_children_types_reached)
 
     def _get_minimum_children_types_reached(self, parent_node: 'Node', child_node: 'Node'):
         children_types_to_check = [child_node.node_type]
