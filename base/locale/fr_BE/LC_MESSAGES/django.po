@@ -2926,7 +2926,7 @@ msgstr ""
 msgid ""
 "You can only modify a learning unit when your are linked to its requirement "
 "entity"
-msgstr ""
+msgstr "Vous ne pouvez modifier une unité d'enseignement que si vous êtes lié à l'entité responsable"
 
 #, python-format
 msgid "You can't modify learning unit under year : %(year)d"
