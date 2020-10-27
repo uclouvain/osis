@@ -353,7 +353,7 @@ class CannotDetachOptionsException(BusinessException):
             "Options \"%(acronym)s\" cannot be detach because they are contained in %(finality_acronym)s program.",
             len(options_to_detach)
         ) % {
-                      "acronym": ', '.join(str(n) for n in options_to_detach),
-                      "finality_acronym": finality
-                  }
+            "acronym": ', '.join(str(n) for n in options_to_detach),
+            "finality_acronym": finality
+        }
         super().__init__(message)
