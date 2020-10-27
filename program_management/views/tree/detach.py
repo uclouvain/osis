@@ -23,32 +23,23 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Union
 
-import osis_common.ddd.interface
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 
+import osis_common.ddd.interface
 from base.utils.cache import ElementCache
 from base.views.common import display_error_messages, display_warning_messages
 from base.views.common import display_success_messages
 from base.views.mixins import AjaxTemplateMixin
-from education_group.ddd import command as command_education_group
-from education_group.ddd.domain.group import Group
-from education_group.ddd.service.read import get_group_service
-from education_group.templatetags.academic_year_display import display_as_academic_year
-from learning_unit.ddd import command as command_learning_unit
-from learning_unit.ddd.domain.learning_unit_year import LearningUnitYear
-from learning_unit.ddd.service.read import get_learning_unit_year_service
-from osis_common.ddd import interface
 from program_management.ddd import command
+from program_management.ddd.business_types import *
 from program_management.ddd.domain import link
-from program_management.ddd.domain.service.identity_search import NodeIdentitySearch, ProgramTreeVersionIdentitySearch
+from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
 from program_management.ddd.service.read import detach_warning_messages_service, get_program_tree_service
 from program_management.ddd.service.write import detach_node_service
 from program_management.forms.tree.detach import DetachNodeForm
-from program_management.models.enums.node_type import NodeType
 from program_management.views.generic import GenericGroupElementYearMixin
 
 
@@ -80,38 +71,13 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
         cmd = command.GetProgramTree(code=node_identity.code, year=node_identity.year)
         return get_program_tree_service.get_program_tree(cmd)
 
-    @cached_property
-    def child_obj(self) -> Union['Group', 'LearningUnitYear']:
-        child_node = self.program_tree_obj.get_node("|".join([self.parent_id, self.child_id_to_detach]))
-        if child_node.node_type == NodeType.LEARNING_UNIT:
-            cmd = command_learning_unit.GetLearningUnitYearCommand(code=child_node.code, year=child_node.year)
-            return get_learning_unit_year_service.get_learning_unit_year(cmd)
-        cmd = command_education_group.GetGroupCommand(code=child_node.code, year=child_node.year)
-        return get_group_service.get_group(cmd)
+    @property
+    def parent_node(self) -> 'Node':
+        return self.program_tree_obj.get_node("|".join([self.parent_id]))
 
-    @cached_property
-    def child_version_identity(self) -> Union['ProgramTreeVersionIdentity', None]:
-        try:
-            child_node = self.program_tree_obj.get_node("|".join([self.parent_id, self.child_id_to_detach]))
-            return ProgramTreeVersionIdentitySearch().get_from_node_identity(child_node.entity_id)
-        except interface.BusinessException:
-            return None
-
-    @cached_property
-    def parent_group_obj(self) -> 'Group':
-        cmd = command_education_group.GetGroupCommand(
-            code=self.program_tree_obj.root_node.code,
-            year=self.program_tree_obj.root_node.year
-        )
-        return get_group_service.get_group(cmd)
-
-    @cached_property
-    def parent_version_identity(self) -> Union['ProgramTreeVersionIdentity', None]:
-        try:
-            entity_id = self.program_tree_obj.root_node.entity_id
-            return ProgramTreeVersionIdentitySearch().get_from_node_identity(entity_id)
-        except interface.BusinessException:
-            return None
+    @property
+    def child_node(self) -> 'Node':
+        return self.program_tree_obj.get_node("|".join([self.parent_id, self.child_id_to_detach]))
 
     def get_context_data(self, **kwargs):
         context = super(DetachNodeView, self).get_context_data(**kwargs)
@@ -124,7 +90,6 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
             warning_messages = detach_warning_messages_service.detach_warning_messages(detach_node_command)
             display_warning_messages(self.request, warning_messages)
 
-            link_to_detach = self.get_object()
             context['confirmation_message'] = self.get_confirmation_msg()
         return context
 
@@ -163,31 +128,12 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
 
     def get_success_msg(self):
         return _("\"%(child)s\" has been detached from \"%(parent)s\"") % {
-                'child': self._get_child_node_str(),
-                'parent': self._get_parent_node_str(),
+                'child': self.child_node,
+                'parent': self.parent_node,
         }
 
     def get_confirmation_msg(self):
-        return _("Are you sure you want to detach %(child)s ?") % {"child": self._get_child_node_str()}
-
-    def _get_child_node_str(self):
-        return "%(code)s %(abbreviated_title)s%(version)s - %(year)s" % {
-            "code": self.child_obj.acronym if isinstance(self.child_obj, LearningUnitYear) else self.child_obj.code,
-            "abbreviated_title": '' if isinstance(self.child_obj, LearningUnitYear)
-            else "- " + self.child_obj.abbreviated_title,
-            "version": "[{}]".format(self.child_version_identity.version_name)
-                       if self.child_version_identity and not self.child_version_identity.is_standard() else "",
-            "year": display_as_academic_year(self.child_obj.year)
-        }
-
-    def _get_parent_node_str(self):
-        return "%(code)s - %(abbreviated_title)s%(version)s - %(year)s" % {
-            "code": self.parent_group_obj.code,
-            "abbreviated_title": self.parent_group_obj.abbreviated_title,
-            "version": "[{}]".format(self.parent_version_identity.version_name)
-                       if self.parent_version_identity and not self.parent_version_identity.is_standard() else "",
-            "year": self.parent_group_obj.academic_year
-        }
+        return _("Are you sure you want to detach %(child)s ?") % {"child": self.child_node}
 
     def get_success_url(self):
         # We can just reload the page

@@ -31,6 +31,7 @@ from django.utils.translation import gettext_lazy as _
 import osis_common.ddd.interface
 from base.ddd.utils import business_validator
 from program_management.ddd.business_types import *
+from program_management.ddd.domain import program_tree
 
 
 class IsPrerequisiteValidator(business_validator.BusinessValidator):
@@ -82,15 +83,21 @@ class IsPrerequisiteValidator(business_validator.BusinessValidator):
 
 class HasPrerequisiteValidator(business_validator.BusinessValidator):
 
-    def __init__(self, tree: 'ProgramTree', node_to_detach: 'Node'):
+    def __init__(self, tree: 'ProgramTree', path_of_node_to_detach: 'Path'):
         super(HasPrerequisiteValidator, self).__init__()
-        self.node_to_detach = node_to_detach
+        self.node_to_detach = tree.get_node(path_of_node_to_detach)
+        self.path_to_parent, *__ = path_of_node_to_detach.rsplit(program_tree.PATH_SEPARATOR, 1)
         self.tree = tree
 
     def validate(self):
-        nodes_that_has_prerequisites = self._get_nodes_that_has_prerequisite()
-        if nodes_that_has_prerequisites:
-            codes_that_have_prerequisites = [node.code for node in nodes_that_has_prerequisites]
+        nodes_detached_that_have_prerequisites = self._get_nodes_detached_that_have_prerequisite()
+        learning_unit_nodes_remaining = self._get_learning_unit_nodes_remaining_if_node_is_detached()
+
+        nodes_that_have_prerequisite_and_not_anymore_present_in_tree = nodes_detached_that_have_prerequisites - \
+            learning_unit_nodes_remaining
+        if nodes_that_have_prerequisite_and_not_anymore_present_in_tree:
+            codes_that_have_prerequisites = [node.code
+                                             for node in nodes_that_have_prerequisite_and_not_anymore_present_in_tree]
             raise osis_common.ddd.interface.BusinessExceptions([
                 _("The prerequisites for the following learning units contained in education group year "
                   "%(acronym)s will we deleted: %(learning_units)s") % {
@@ -99,14 +106,16 @@ class HasPrerequisiteValidator(business_validator.BusinessValidator):
                 }
             ])
 
-    def _get_nodes_that_has_prerequisite(self):
+    def _get_nodes_detached_that_have_prerequisite(self) -> Set['Node']:
         search_under_node = self.node_to_detach
-        nodes_that_has_prerequisites = []
-        learning_units_children = search_under_node.get_all_children_as_learning_unit_nodes()
-        if search_under_node.is_learning_unit() and search_under_node.has_prerequisite:
-            nodes_that_has_prerequisites.append(search_under_node)
-        nodes_that_has_prerequisites += [
-            n for n in learning_units_children
-            if n.has_prerequisite
-        ]
-        return nodes_that_has_prerequisites
+        learning_unit_nodes = search_under_node.get_all_children_as_learning_unit_nodes()
+
+        if search_under_node.is_learning_unit():
+            learning_unit_nodes.append(search_under_node)
+
+        return {node for node in learning_unit_nodes if node.has_prerequisite}
+
+    def _get_learning_unit_nodes_remaining_if_node_is_detached(self) -> Set['Node']:
+        pruned_tree = copy.copy(self.tree)
+        pruned_tree.get_node(self.path_to_parent).detach_child(self.node_to_detach)
+        return set(pruned_tree.root_node.get_all_children_as_learning_unit_nodes())
