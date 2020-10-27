@@ -34,7 +34,7 @@ from base.views.mixins import AjaxTemplateMixin, MultiFormsSuccessMessageMixin, 
 
 
 class UpdateAttributionView(AttributionBaseViewMixin, AjaxTemplateMixin, MultiFormsSuccessMessageMixin, MultiFormsView):
-    permission_required = ['base.can_manage_attribution']
+    permission_required = 'base.can_change_attribution'
     template_name = "attribution/learning_unit/attribution_inner.html"
     form_classes = {
         "attribution_form": AttributionForm,

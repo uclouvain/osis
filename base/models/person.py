@@ -173,7 +173,7 @@ class Person(SerializableModel):
             ("is_institution_administrator", "Is institution administrator "),
             ("can_edit_education_group_administrative_data", "Can edit education group administrative data"),
             ("can_manage_charge_repartition", "Can manage charge repartition"),
-            ("can_manage_attribution", "Can manage attribution"),
+            ("can_change_attribution", "Can change attribution"),
             ('can_read_persons_roles', 'Can read persons roles'),
         )
 

@@ -54,7 +54,7 @@ class TestEditAttributionGet(TestCase):
         cls.practical_component = PracticalLearningComponentYearFactory(
             learning_unit_year=cls.learning_unit_year)
         cls.attribution = AttributionNewFactory(
-            learning_container_year=cls.learning_unit_year.learning_container_year,
+            learning_container_year=cls.learning_container_year,
         )
         cls.charge_lecturing = AttributionChargeNewFactory(
             attribution=cls.attribution,

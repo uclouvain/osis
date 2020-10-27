@@ -33,7 +33,7 @@ from base.views.mixins import AjaxTemplateMixin
 
 
 class DeleteAttribution(AttributionBaseViewMixin, AjaxTemplateMixin, DeleteView):
-    permission_required = ['base.can_manage_charge_repartition', 'base.can_manage_attribution']
+    permission_required = 'base.can_delete_attribution'
 
     model = AttributionNew
     template_name = "attribution/learning_unit/remove_charge_repartition_confirmation_inner.html"
