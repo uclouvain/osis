@@ -27,10 +27,14 @@ import html
 
 import bleach
 from django.conf import settings
-from django.db.models import Prefetch, Case, When, Value, IntegerField
+from django.contrib.contenttypes.models import ContentType
+from django.db.models import Prefetch, Case, When, Value, IntegerField, Subquery, CharField, Q
+from django.db.models.expressions import RawSQL, F, OuterRef
+from django.db.models.functions import Cast, Concat, Upper
 from django.utils.translation import gettext_lazy as _
 from openpyxl.styles import Alignment, Style
 from openpyxl.utils import get_column_letter
+from reversion.models import Version
 
 from backoffice.settings.base import LANGUAGE_CODE_FR, LANGUAGE_CODE_EN
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY_FR_ONLY, \
@@ -38,6 +42,7 @@ from base.business.learning_unit import CMS_LABEL_PEDAGOGY_FR_ONLY, \
 from base.business.learning_unit import CMS_LABEL_SPECIFICATIONS, get_achievements_group_by_language
 from base.business.learning_unit_xls import annotate_qs
 from base.business.xls import get_name_or_username
+from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import get_user_interface_language
 from base.models.teaching_material import TeachingMaterial
 from base.views.learning_unit import get_specifications_context
@@ -46,6 +51,7 @@ from cms.models.text_label import TextLabel
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
 from osis_common.document import xls_build
+from program_management.business.excel_ue_in_of import build_annotations
 
 XLS_DESCRIPTION = _('Learning units list')
 XLS_FILENAME = _('LearningUnitsList')
@@ -53,9 +59,33 @@ WORKSHEET_TITLE = _('Learning units list')
 WRAP_TEXT_STYLE = Style(alignment=Alignment(wrapText=True, vertical="top"), )
 CMS_ALLOWED_TAGS = []
 
+RAW_SQL_TO_GET_LAST_UPDATE_FICHE_DESCRIPTIVE = """
+    WITH last_update_info AS (
+        SELECT upper(person.last_name) || ' ' || person.first_name as author, revision.date_created AS last_update
+        FROM reversion_version version
+        JOIN reversion_revision revision ON version.revision_id = revision.id
+        JOIN auth_user users ON revision.user_id = users.id
+        JOIN base_person person ON person.user_id = users.id
+        join django_content_type ct on version.content_type_id = ct.id
+        left join cms_translatedtext tt on cast(version.object_id as integer) = tt.id and ct.model = 'translatedtext'
+        left join cms_textlabel tl on tt.text_label_id = tl.id
+        left join base_teachingmaterial tm on cast(version.object_id as integer) = tm.id and ct.model = 'teachingmaterial'
+        join base_learningunityear luy on luy.id = tm.learning_unit_year_id or luy.id = tt.reference
+        where "base_groupelementyear"."child_leaf_id" = luy.id
+        and tl.label in {labels_to_check} and ct.model in ({models_to_check})
+        order by revision.date_created desc limit 1
+    )
+"""
+
+LAST_UPDATE_FORCE_MAJEURE = RAW_SQL_TO_GET_LAST_UPDATE_FICHE_DESCRIPTIVE.format(
+    labels_to_check=repr(tuple(map(str, CMS_LABEL_PEDAGOGY_FORCE_MAJEURE))),
+    models_to_check=','.join(["'translatedtext'"])
+) + """
+SELECT {field_to_select} FROM last_update_info
+"""
+
 
 def create_xls_educational_information_and_specifications(user, learning_units, request):
-
     titles = _get_titles()
 
     working_sheet_data = prepare_xls_educational_information_and_specifications(learning_units, request)
@@ -88,8 +118,8 @@ def _get_titles():
     titles = titles + _add_cms_title_fr_en(CMS_LABEL_PEDAGOGY_FR_AND_EN, True)
     titles = titles + [str(_('Teaching material'))]
     titles = titles + _add_cms_title_fr_en(CMS_LABEL_PEDAGOGY_FR_ONLY, False)
-    titles = titles + [str("{}".format(_('last modificationd escription fiche by'))),
-                       str("{}".format('last modification description fiche at'))]
+    titles = titles + [str("{}".format(_('Last update description fiche by'))),
+                       str("{}".format(_('Last update description fiche on')))]
     titles = titles + _add_cms_title_fr_en(CMS_LABEL_PEDAGOGY_FORCE_MAJEURE, True)
     titles = titles + _add_cms_title_fr_en(CMS_LABEL_SPECIFICATIONS, True)
     titles = titles + [str("{} - {}".format(_('Learning achievements'), LANGUAGE_CODE_FR.upper())),
@@ -162,6 +192,29 @@ def prepare_xls_educational_information_and_specifications(learning_unit_years, 
         )
         for label_key in CMS_LABEL_PEDAGOGY_FORCE_MAJEURE:
             _add_pedagogies_forces_major(label_key, line, translated_labels_force_majeure_with_text)
+
+        translated_texts = TranslatedText.objects.filter(
+            reference=learning_unit_yr.id,
+            entity=LEARNING_UNIT_YEAR,
+            text_label__label__in=CMS_LABEL_PEDAGOGY_FORCE_MAJEURE
+        )
+
+        version_filter = Q(
+            content_type=ContentType.objects.get_for_model(TranslatedText),
+            object_id__in=Cast(Subquery(translated_texts.values('pk')), output_field=CharField())
+        )
+
+        versions_qs = Version.objects.filter(version_filter).select_related(
+            "revision",
+            "revision__user__person"
+        ).annotate(
+            author=Concat(
+                Upper(F('revision__user__person__last_name')), Value(' '), F('revision__user__person__first_name'),
+                output_field=CharField()
+            )
+        ).order_by("-revision__date_created")
+        line.append(Subquery(versions_qs.values('author')[:1], output_field=CharField()))
+        line.append(Subquery(versions_qs.values('revision__date_created')[:1]))
 
         _add_specifications(learning_unit_yr, line, request)
         line.extend(_add_achievements(learning_unit_yr))
