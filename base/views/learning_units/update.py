@@ -179,8 +179,8 @@ def _save_form_and_display_messages(request, form, learning_unit_year):
         display_warning_messages(request, getattr(form, 'warnings', []))
 
         is_postponement = bool(int(request.POST.get('postponement', 1))) and (
-                    not isinstance(form, LearningUnitPostponementForm) or (
-                        isinstance(form, LearningUnitPostponementForm) and not form.start_postponement.is_past))
+                not isinstance(form, LearningUnitPostponementForm) or (
+                    isinstance(form, LearningUnitPostponementForm) and not form.start_postponement.is_past))
 
         if is_postponement and existing_proposal:
             display_success_messages(
