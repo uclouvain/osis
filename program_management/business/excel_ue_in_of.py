@@ -29,6 +29,7 @@ from collections import namedtuple, defaultdict
 
 from django.conf import settings
 from django.db.models import QuerySet, Subquery, OuterRef, Case, When
+from django.db.models.expressions import RawSQL
 from django.template.defaultfilters import yesno
 from django.utils.translation import gettext as _
 from openpyxl import Workbook
@@ -36,7 +37,8 @@ from openpyxl.styles import Style, Font
 from openpyxl.writer.excel import save_virtual_workbook
 
 from attribution.business import attribution_charge_new
-from base.business.learning_unit import CMS_LABEL_PEDAGOGY, CMS_LABEL_PEDAGOGY_FR_AND_EN, CMS_LABEL_SPECIFICATIONS
+from base.business.learning_unit import CMS_LABEL_PEDAGOGY, CMS_LABEL_PEDAGOGY_FR_AND_EN, CMS_LABEL_SPECIFICATIONS, \
+    CMS_LABEL_PEDAGOGY_FORCE_MAJEURE
 from base.business.learning_unit_xls import volume_information, annotate_qs, PROPOSAL_LINE_STYLES, \
     prepare_proposal_legend_ws_data
 from base.business.learning_units.xls_generator import hyperlinks_to_string
@@ -91,8 +93,17 @@ optional_header_for_description_fiche = [
     _('Teaching material'),
     _('bibliography').title(),
     _('Mobility'),
+    _('Last update description fiche by'),
+    _('Last update description fiche on')
 ]
 
+optional_header_for_force_majeure = optional_header_for_description_fiche + [
+    _('Teaching methods (force majeure)'), "{} {}".format(_('Teaching methods (force majeure)'), _('in English')),
+    _('Evaluation methods (force majeure)'), "{} {}".format(_('Evaluation methods (force majeure)'), _('in English')),
+    _('Other informations (force majeure)'), "{} {}".format(_('Other informations (force majeure)'), _('in English')),
+    _('Last update description fiche (force majeure) by'),
+    _('Last update description fiche (force majeure) on')
+]
 optional_header_for_specifications = [
     _('Themes discussed'), "{} {}".format(_('Themes discussed'), _('in English')),
     _('Pre-condition'), "{} {}".format(_('Pre-condition'), _('in English')),
@@ -103,9 +114,15 @@ DescriptionFicheCols = namedtuple(
     'DescriptionFicheCols',
     ['resume', 'resume_en', 'teaching_methods', 'teaching_methods_en', 'evaluation_methods', 'evaluation_methods_en',
      'other_informations', 'other_informations_en', 'online_resources', 'online_resources_en', 'teaching_materials',
-     'bibliography', 'mobility']
+     'bibliography', 'mobility', 'last_update_by', 'last_update_date']
 )
 
+ForceMajeureCols = namedtuple(
+    'ForceMajeureCols',
+    ['teaching_methods_force_majeure', 'teaching_methods_force_majeure_en', 'evaluation_methods_force_majeure',
+     'evaluation_methods_force_majeure_en', 'other_informations_force_majeure', 'other_informations_force_majeure_en',
+     'last_update_by_force_majeure', 'last_update_date_force_majeure']
+)
 SpecificationsCols = namedtuple(
     'SpecificationsLine', [
         'themes_discussed', 'themes_discussed_en',
@@ -122,6 +139,38 @@ FixLineUEContained = namedtuple('FixLineUEContained', ['acronym', 'year', 'title
 
 LEGEND_WB_STYLE = 'colored_cells'
 LEGEND_WB_CONTENT = 'content'
+
+RAW_SQL_TO_GET_LAST_UPDATE_FICHE_DESCRIPTIVE = """
+    WITH last_update_info AS (
+        SELECT upper(person.last_name) || ' ' || person.first_name as author, revision.date_created AS last_update
+        FROM reversion_version version
+        JOIN reversion_revision revision ON version.revision_id = revision.id
+        JOIN auth_user users ON revision.user_id = users.id
+        JOIN base_person person ON person.user_id = users.id
+        join django_content_type ct on version.content_type_id = ct.id
+        left join cms_translatedtext tt on cast(version.object_id as integer) = tt.id and ct.model = 'translatedtext'
+        left join cms_textlabel tl on tt.text_label_id = tl.id
+        left join base_teachingmaterial tm on cast(version.object_id as integer) = tm.id and ct.model = 'teachingmaterial'
+        join base_learningunityear luy on luy.id = tm.learning_unit_year_id or luy.id = tt.reference
+        where "base_groupelementyear"."child_leaf_id" = luy.id
+        and tl.label in {labels_to_check} and ct.model in ({models_to_check})
+        order by revision.date_created desc limit 1
+    )
+"""
+
+LAST_UPDATE_FICHE_DESCRIPTIVE = RAW_SQL_TO_GET_LAST_UPDATE_FICHE_DESCRIPTIVE.format(
+    labels_to_check=repr(tuple(map(str, CMS_LABEL_PEDAGOGY))),
+    models_to_check=','.join(["'translatedtext'", "'teachingmaterial'"])
+) + """
+    SELECT {field_to_select} FROM last_update_info
+"""
+
+LAST_UPDATE_FORCE_MAJEURE = RAW_SQL_TO_GET_LAST_UPDATE_FICHE_DESCRIPTIVE.format(
+    labels_to_check=repr(tuple(map(str, CMS_LABEL_PEDAGOGY_FORCE_MAJEURE))),
+    models_to_check=','.join(["'translatedtext'"])
+) + """
+SELECT {field_to_select} FROM last_update_info
+"""
 
 
 class EducationGroupYearLearningUnitsContainedToExcel:
@@ -142,13 +191,17 @@ class EducationGroupYearLearningUnitsContainedToExcel:
         self._get_ordered_queryset()
         description_fiche = False
         specifications = False
+        force_majeure = False
 
         if custom_xls_form.is_valid():
             description_fiche = True if 'description_fiche' in custom_xls_form.fields else False
             specifications = True if 'specifications' in custom_xls_form.fields else False
+            force_majeure = True if 'force_majeure' in custom_xls_form.fields else False
 
-        if description_fiche or specifications:
-            self.qs = _annotate_with_description_fiche_specifications(self.qs, description_fiche, specifications)
+        if description_fiche or specifications or force_majeure:
+            self.qs = _annotate_with_description_fiche_specifications(
+                self.qs, description_fiche, specifications, force_majeure
+            )
 
     def _get_ordered_queryset(self):
         ids = []
@@ -312,8 +365,8 @@ def _get_optional_data(data, luy, optional_data_needed, gey):
         data.extend(volume_information(luys[0]))
     if optional_data_needed['has_teacher_list']:
         attribution_values = attribution_charge_new.find_attribution_charge_new_by_learning_unit_year_as_dict(
-                    luy
-                ).values()
+            luy
+        ).values()
         data.append(
             ";".join(
                 [_get_attribution_line(value.get('person'))
@@ -344,21 +397,41 @@ def _get_optional_data(data, luy, optional_data_needed, gey):
         specifications_data = _build_specifications_cols(luy, gey)
         for k, v in zip(specifications_data._fields, specifications_data):
             data.append(v)
-    if optional_data_needed['has_description_fiche']:
+    if optional_data_needed['has_description_fiche'] or optional_data_needed['has_force_majeure']:
         description_fiche = _build_description_fiche_cols(luy, gey)
         for k, v in zip(description_fiche._fields, description_fiche):
             data.append(v)
+        if optional_data_needed['has_force_majeure']:
+            force_majeure = _build_force_majeure_cols(gey)
+            for k, v in zip(force_majeure._fields, force_majeure):
+                data.append(v)
     return data
 
 
-def _annotate_with_description_fiche_specifications(group_elt_yrs_param, description_fiche=False, specifications=False):
+def _annotate_with_description_fiche_specifications(
+        group_elt_yrs_param, description_fiche=False, specifications=False, force_majeure=False
+):
     group_element_years = group_elt_yrs_param
     sq = TranslatedText.objects.filter(
         reference=OuterRef('child_leaf__pk'),
         entity=LEARNING_UNIT_YEAR)
-    if description_fiche:
+    if description_fiche or force_majeure:
         annotations = build_annotations(sq, CMS_LABEL_PEDAGOGY, CMS_LABEL_PEDAGOGY_FR_AND_EN)
         group_element_years = group_element_years.annotate(**annotations)
+        group_element_years = group_element_years.annotate(
+            last_update_by=RawSQL(LAST_UPDATE_FICHE_DESCRIPTIVE.format(field_to_select='author'), ()),
+            last_update_date=RawSQL(LAST_UPDATE_FICHE_DESCRIPTIVE.format(field_to_select='last_update'), ())
+        )
+
+        if force_majeure:
+            annotations = build_annotations(sq, CMS_LABEL_PEDAGOGY_FORCE_MAJEURE, CMS_LABEL_PEDAGOGY_FORCE_MAJEURE)
+            group_element_years = group_element_years.annotate(**annotations)
+            group_element_years = group_element_years.annotate(
+                last_update_by_force_majeure=RawSQL(LAST_UPDATE_FORCE_MAJEURE.format(field_to_select='author'), ()),
+                last_update_date_force_majeure=RawSQL(
+                    LAST_UPDATE_FORCE_MAJEURE.format(field_to_select='last_update'), ()
+                )
+            )
 
     if specifications:
         annotations = build_annotations(sq, CMS_LABEL_SPECIFICATIONS, CMS_LABEL_SPECIFICATIONS)
@@ -368,7 +441,6 @@ def _annotate_with_description_fiche_specifications(group_elt_yrs_param, descrip
 
 
 def _build_validate_html_list_to_string(value_param, method):
-
     if method is None or method not in (hyperlinks_to_string, html2text):
         return value_param.strip()
 
@@ -434,7 +506,37 @@ def _build_description_fiche_cols(luy, gey):
             html2text
         ),
         bibliography=_build_validate_html_list_to_string(gey.bibliography, html2text),
-        mobility=_build_validate_html_list_to_string(gey.mobility, html2text)
+        mobility=_build_validate_html_list_to_string(gey.mobility, html2text),
+        last_update_by=_build_validate_html_list_to_string(gey.last_update_by, html2text),
+        last_update_date=gey.last_update_date.strftime('%d/%m/%Y') if gey.last_update_date else None
+    )
+
+
+def _build_force_majeure_cols(gey):
+    return ForceMajeureCols(
+        teaching_methods_force_majeure=_build_validate_html_list_to_string(
+            gey.teaching_methods_force_majeure, html2text
+        ),
+        teaching_methods_force_majeure_en=_build_validate_html_list_to_string(
+            gey.teaching_methods_force_majeure_en, html2text
+        ),
+        evaluation_methods_force_majeure=_build_validate_html_list_to_string(
+            gey.evaluation_methods_force_majeure, html2text
+        ),
+        evaluation_methods_force_majeure_en=_build_validate_html_list_to_string(
+            gey.evaluation_methods_force_majeure_en, html2text
+        ),
+        other_informations_force_majeure=_build_validate_html_list_to_string(
+            gey.other_informations_force_majeure, html2text
+        ),
+        other_informations_force_majeure_en=_build_validate_html_list_to_string(
+            gey.other_informations_force_majeure_en, html2text
+        ),
+        last_update_by_force_majeure=_build_validate_html_list_to_string(
+            gey.last_update_by_force_majeure, html2text
+        ),
+        last_update_date_force_majeure=gey.last_update_date_force_majeure.strftime('%d/%m/%Y')
+        if gey.last_update_date_force_majeure else None,
     )
 
 
