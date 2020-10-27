@@ -31,7 +31,7 @@ from django.utils.translation import gettext_lazy as _
 import osis_common.ddd.interface
 from base.ddd.utils import business_validator
 from program_management.ddd.business_types import *
-from program_management.ddd.domain import program_tree
+from program_management.ddd.domain import program_tree, node
 
 
 class IsPrerequisiteValidator(business_validator.BusinessValidator):
@@ -77,6 +77,7 @@ class IsPrerequisiteValidator(business_validator.BusinessValidator):
 
     def _get_all_remaining_children_after_detach(self) -> Set['Node']:
         pruned_tree = copy.copy(self.tree)
+        node.Node.descendents.fget.cache_clear()  # Invalidate cache so as recompute value for copy
         pruned_tree.get_node(self.path_to_parent).detach_child(self.node_to_detach)
         return pruned_tree.get_all_nodes()
 
