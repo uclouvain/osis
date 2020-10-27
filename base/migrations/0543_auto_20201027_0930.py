@@ -12,6 +12,15 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterModelOptions(
             name='person',
-            options={'permissions': (('is_administrator', 'Is administrator'), ('is_institution_administrator', 'Is institution administrator '), ('can_edit_education_group_administrative_data', 'Can edit education group administrative data'), ('can_manage_charge_repartition', 'Can manage charge repartition'), ('can_change_attribution', 'Can change attribution'), ('can_read_persons_roles', 'Can read persons roles'))},
+            options={
+                'permissions': (
+                    ('is_administrator', 'Is administrator'),
+                    ('is_institution_administrator', 'Is institution administrator '),
+                    ('can_edit_education_group_administrative_data', 'Can edit education group administrative data'),
+                    ('can_manage_charge_repartition', 'Can manage charge repartition'),
+                    ('can_change_attribution', 'Can change attribution'),
+                    ('can_read_persons_roles', 'Can read persons roles')
+                )
+            },
         ),
     ]

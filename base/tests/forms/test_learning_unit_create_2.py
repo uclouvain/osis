@@ -527,7 +527,11 @@ class TestFullFormSave(LearningUnitFullFormContextMixin):
             learning_container_year__container_type=learning_container_year_types.COURSE,
             campus=self.initial_campus
         )
-        post_data = get_valid_form_data(self.current_academic_year, learning_unit_year=new_learning_unit_year, entity=self.entity)
+        post_data = get_valid_form_data(
+            self.current_academic_year,
+            learning_unit_year=new_learning_unit_year,
+            entity=self.entity
+        )
         self.post_data['requirement_entity'] = self.entity.most_recent_entity_version.pk
 
         form = _instanciate_form(self.current_academic_year, post_data=post_data, person=self.central_person,
@@ -646,7 +650,11 @@ class TestFullFormValidateSameEntitiesContainer(LearningUnitFullFormContextMixin
         learning_unit_year = LearningUnitYearFactory.build(academic_year=self.current_academic_year,
                                                            learning_container_year=container_year,
                                                            subtype=learning_unit_year_subtypes.FULL)
-        post_data = get_valid_form_data(self.current_academic_year, learning_unit_year=learning_unit_year, entity=self.entity)
+        post_data = get_valid_form_data(
+            self.current_academic_year,
+            learning_unit_year=learning_unit_year,
+            entity=self.entity
+        )
         post_data['allocation_entity-entity'] = EntityVersionFactory().id
         return post_data
 
