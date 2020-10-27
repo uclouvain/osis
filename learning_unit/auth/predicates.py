@@ -8,7 +8,6 @@ from base.models.enums import learning_container_year_types as container_types, 
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.models.proposal_learning_unit import ProposalLearningUnit
-from osis_common.utils.models import get_object_or_none
 from osis_role.cache import predicate_cache
 from osis_role.errors import predicate_failed_msg
 
@@ -212,10 +211,8 @@ def is_not_proposal(self, user, learning_unit_year):
 @predicate_failed_msg(message=_("Person not in accordance with proposal state"))
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def has_faculty_proposal_state(self, user, learning_unit_year):
-    if learning_unit_year:
-        learning_unit_proposal = get_object_or_none(ProposalLearningUnit, learning_unit_year__id=learning_unit_year.pk)
-        if learning_unit_proposal:
-            return learning_unit_proposal.state == ProposalState.FACULTY.name
+    if learning_unit_year and hasattr(learning_unit_year, 'learningunitproposal'):
+        return learning_unit_year.learningunitproposal.state == ProposalState.FACULTY.name
     return None
 
 
@@ -223,12 +220,11 @@ def has_faculty_proposal_state(self, user, learning_unit_year):
 @predicate_failed_msg(message=_("This learning unit has application"))
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def is_not_proposal_of_type_creation_with_applications(self, user, learning_unit_year):
-    if learning_unit_year:
-        proposal = get_object_or_none(ProposalLearningUnit, learning_unit_year__id=learning_unit_year.pk)
-        if proposal:
-            return proposal.type != ProposalType.CREATION.name or not TutorApplication.objects.filter(
-                learning_container_year=proposal.learning_unit_year.learning_container_year
-            ).exists()
+    if learning_unit_year and hasattr(learning_unit_year, 'learningunitproposal'):
+        proposal = learning_unit_year.learningunitproposal
+        return proposal.type != ProposalType.CREATION.name or not TutorApplication.objects.filter(
+            learning_container_year=proposal.learning_unit_year.learning_container_year
+        ).exists()
     return None
 
 
@@ -236,12 +232,11 @@ def is_not_proposal_of_type_creation_with_applications(self, user, learning_unit
 @predicate_failed_msg(message=_("This learning unit has application"))
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def is_not_proposal_of_type_suppression_with_applications(self, user, learning_unit_year):
-    if learning_unit_year:
-        proposal = get_object_or_none(ProposalLearningUnit, learning_unit_year__id=learning_unit_year.pk)
-        if proposal:
-            return proposal.type != ProposalType.SUPPRESSION.name or not TutorApplication.objects.filter(
-                learning_container_year=proposal.learning_unit_year.learning_container_year
-            ).exists()
+    if learning_unit_year and hasattr(learning_unit_year, 'learningunitproposal'):
+        proposal = learning_unit_year.learningunitproposal
+        return proposal.type != ProposalType.SUPPRESSION.name or not TutorApplication.objects.filter(
+            learning_container_year=proposal.learning_unit_year.learning_container_year
+        ).exists()
     return None
 
 
@@ -281,10 +276,8 @@ def has_learning_unit_no_application_in_future(self, user, learning_unit_year):
 @predicate_failed_msg(message=_("Proposal not in eligible state for consolidation"))
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def is_proposal_in_state_to_be_consolidated(self, user, learning_unit_year):
-    if learning_unit_year:
-        learning_unit_proposal = get_object_or_none(ProposalLearningUnit, learning_unit_year__id=learning_unit_year.pk)
-        if learning_unit_proposal:
-            return learning_unit_proposal.state in PROPOSAL_CONSOLIDATION_ELIGIBLE_STATES
+    if learning_unit_year and hasattr(learning_unit_year, 'learningunitproposal'):
+        return learning_unit_year.learningunitproposal.state in PROPOSAL_CONSOLIDATION_ELIGIBLE_STATES
     return None
 
 
@@ -292,10 +285,8 @@ def is_proposal_in_state_to_be_consolidated(self, user, learning_unit_year):
 @predicate_failed_msg(message=_("Proposal is of modification type"))
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def is_not_modification_proposal_type(self, user, learning_unit_year):
-    if learning_unit_year:
-        learning_unit_proposal = get_object_or_none(ProposalLearningUnit, learning_unit_year__id=learning_unit_year.pk)
-        if learning_unit_proposal:
-            return learning_unit_proposal.type != ProposalType.MODIFICATION.name
+    if learning_unit_year and hasattr(learning_unit_year, 'learningunitproposal'):
+        return learning_unit_year.learningunitproposal.type != ProposalType.MODIFICATION.name
     return None
 
 
@@ -309,6 +300,7 @@ def is_learning_unit_type_allowed_for_attributions(self, user, learning_unit_yea
     return None
 
 
+# TODO : remove this predicate after class refactoring because a learning unit will always have a container
 @predicate(bind=True)
 @predicate_failed_msg(message=_("You cannot edit this type of learning unit"))
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
