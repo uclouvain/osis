@@ -29,7 +29,7 @@ import bleach
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Prefetch, Case, When, Value, IntegerField, Subquery, CharField, Q
-from django.db.models.expressions import RawSQL, F, OuterRef
+from django.db.models.expressions import F
 from django.db.models.functions import Cast, Concat, Upper
 from django.utils.translation import gettext_lazy as _
 from openpyxl.styles import Alignment, Style
@@ -42,7 +42,6 @@ from base.business.learning_unit import CMS_LABEL_PEDAGOGY_FR_ONLY, \
 from base.business.learning_unit import CMS_LABEL_SPECIFICATIONS, get_achievements_group_by_language
 from base.business.learning_unit_xls import annotate_qs
 from base.business.xls import get_name_or_username
-from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import get_user_interface_language
 from base.models.teaching_material import TeachingMaterial
 from base.views.learning_unit import get_specifications_context
@@ -51,7 +50,6 @@ from cms.models.text_label import TextLabel
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
 from osis_common.document import xls_build
-from program_management.business.excel_ue_in_of import build_annotations
 
 XLS_DESCRIPTION = _('Learning units list')
 XLS_FILENAME = _('LearningUnitsList')
@@ -121,6 +119,8 @@ def _get_titles():
     titles = titles + [str("{}".format(_('Last update description fiche by'))),
                        str("{}".format(_('Last update description fiche on')))]
     titles = titles + _add_cms_title_fr_en(CMS_LABEL_PEDAGOGY_FORCE_MAJEURE, True)
+    titles = titles + [str("{}".format(_('Last update description fiche (force majeure) by'))),
+                       str("{}".format(_('Last update description fiche (force majeure) on')))]
     titles = titles + _add_cms_title_fr_en(CMS_LABEL_SPECIFICATIONS, True)
     titles = titles + [str("{} - {}".format(_('Learning achievements'), LANGUAGE_CODE_FR.upper())),
                        str("{} - {}".format('Learning achievements', LANGUAGE_CODE_EN.upper()))]
@@ -185,6 +185,8 @@ def prepare_xls_educational_information_and_specifications(learning_unit_years, 
             else:
                 line.append('')
 
+        _add_revision_informations(learning_unit_yr, line, CMS_LABEL_PEDAGOGY)
+
         translated_labels_force_majeure_with_text = _get_translated_labels_with_text(
             learning_unit_yr.id,
             user_language,
@@ -193,35 +195,38 @@ def prepare_xls_educational_information_and_specifications(learning_unit_years, 
         for label_key in CMS_LABEL_PEDAGOGY_FORCE_MAJEURE:
             _add_pedagogies_forces_major(label_key, line, translated_labels_force_majeure_with_text)
 
-        translated_texts = TranslatedText.objects.filter(
-            reference=learning_unit_yr.id,
-            entity=LEARNING_UNIT_YEAR,
-            text_label__label__in=CMS_LABEL_PEDAGOGY_FORCE_MAJEURE
-        )
-
-        version_filter = Q(
-            content_type=ContentType.objects.get_for_model(TranslatedText),
-            object_id__in=Cast(Subquery(translated_texts.values('pk')), output_field=CharField())
-        )
-
-        versions_qs = Version.objects.filter(version_filter).select_related(
-            "revision",
-            "revision__user__person"
-        ).annotate(
-            author=Concat(
-                Upper(F('revision__user__person__last_name')), Value(' '), F('revision__user__person__first_name'),
-                output_field=CharField()
-            )
-        ).order_by("-revision__date_created")
-        line.append(Subquery(versions_qs.values('author')[:1], output_field=CharField()))
-        line.append(Subquery(versions_qs.values('revision__date_created')[:1]))
+        _add_revision_informations(learning_unit_yr, line, CMS_LABEL_PEDAGOGY_FORCE_MAJEURE)
 
         _add_specifications(learning_unit_yr, line, request)
+
         line.extend(_add_achievements(learning_unit_yr))
 
         result.append(line)
 
     return result
+
+
+def _add_revision_informations(learning_unit_yr, line, cms_label):
+    translated_texts = TranslatedText.objects.filter(
+        reference=learning_unit_yr.id,
+        entity=LEARNING_UNIT_YEAR,
+        text_label__label__in=cms_label
+    )
+    version_filter = Q(
+        content_type=ContentType.objects.get_for_model(TranslatedText),
+        object_id__in=Cast(Subquery(translated_texts.values('pk')), output_field=CharField())
+    )
+    versions_qs = Version.objects.filter(version_filter).select_related(
+        "revision",
+        "revision__user__person"
+    ).annotate(
+        author=Concat(
+            Upper(F('revision__user__person__last_name')), Value(' '), F('revision__user__person__first_name'),
+            output_field=CharField()
+        )
+    ).order_by("-revision__date_created")
+    line.append(versions_qs.values('author')[:1] or "")
+    line.append(versions_qs.values('revision__date_created')[:1] or "")
 
 
 def _add_pedagogies_forces_major(label_key, line, translated_labels_force_majeure_with_text):
