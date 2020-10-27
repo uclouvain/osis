@@ -201,6 +201,6 @@ def _save_form_and_display_messages(request, form, learning_unit_year):
 
 def is_not_past(form):
     return (
-            not isinstance(form, LearningUnitPostponementForm) or
-            (isinstance(form, LearningUnitPostponementForm) and not form.start_postponement.is_past)
+        not isinstance(form, LearningUnitPostponementForm) or
+        (isinstance(form, LearningUnitPostponementForm) and not form.start_postponement.is_past)
     )
