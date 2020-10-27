@@ -461,6 +461,7 @@ class ProgramTree(interface.RootEntity):
 
         node_to_detach = self.get_node(path_to_node_to_detach)
         parent_path, *__ = path_to_node_to_detach.rsplit(PATH_SEPARATOR, 1)
+        parent = self.get_node(parent_path)
         validators_by_business_action.DetachNodeValidatorList(
             self,
             node_to_detach,
@@ -469,7 +470,6 @@ class ProgramTree(interface.RootEntity):
         ).validate()
 
         self.remove_prerequisites(node_to_detach, parent_path)
-        parent = self.get_node(parent_path)
         return parent.detach_child(node_to_detach)
 
     def __copy__(self) -> 'ProgramTree':
@@ -480,6 +480,7 @@ class ProgramTree(interface.RootEntity):
 
     def remove_prerequisites(self, detached_node: 'Node', parent_path):
         pruned_tree = ProgramTree(root_node=_copy(self.root_node))
+        Node.descendents.fget.cache_clear()  # Invalidate cache so as recompute value for copy
         pruned_tree.get_node(parent_path).detach_child(detached_node)
         pruned_tree_children = pruned_tree.get_all_nodes()
 
