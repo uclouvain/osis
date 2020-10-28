@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -56,6 +56,8 @@ from cms.enums import entity_name
 from cms.enums.entity_name import LEARNING_UNIT_YEAR
 from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory
+from base.business.learning_units.xls_generator import generate_xls_teaching_material
+from base.forms.learning_unit.search.educational_information import LearningUnitDescriptionFicheFilter
 
 
 class LearningUnitPedagogyTestCase(TestCase):
@@ -305,11 +307,17 @@ class LearningUnitPedagogyExportXLSTestCase(TestCase):
             next(data)
 
     def test_learning_units_summary_list_by_client_xls_empty(self):
-        response = self.client.get(self.url, data={
+
+        form_data = {
             'acronym': self.learning_unit_year_without_mandatory_teaching_materials.acronym,
-            'academic_year': self.academic_year,
+            'academic_year': self.academic_year.id,
             'xls_status': 'xls_teaching_material'
-        })
+        }
+
+        service_course_filter = LearningUnitDescriptionFicheFilter(form_data)
+        self.assertTrue(service_course_filter.is_valid())
+
+        response = generate_xls_teaching_material(self.faculty_person.user, service_course_filter.qs)
 
         self.assertEqual(response.status_code, HttpResponse.status_code)
 

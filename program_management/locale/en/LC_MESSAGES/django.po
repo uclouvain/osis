@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-12 11:28+0100\n"
+"POT-Creation-Date: 2020-10-16 11:16+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -67,6 +67,16 @@ msgid "%(start_index)s to %(end_index)s of %(total_counts)s offers"
 msgstr ""
 
 #, python-format
+msgid "%(start_index)s to %(end_index)s of %(total_counts)s trainings"
+msgstr ""
+
+msgid "1st quadri"
+msgstr ""
+
+msgid "2nd quadri"
+msgstr ""
+
+#, python-format
 msgid "A learning unit cannot be prerequisite to itself : %(acronym)s"
 msgstr ""
 
@@ -92,10 +102,26 @@ msgctxt "abbreviation"
 msgid "Acronym/Short title"
 msgstr ""
 
+msgid "Active"
+msgstr ""
+
 msgid "Activities with prerequisites (in preparation)"
 msgstr ""
 
+msgid "Add"
+msgstr ""
+
 msgid "Add potential courses"
+msgstr ""
+
+msgctxt "plural"
+msgid "All"
+msgstr ""
+
+msgid "Alloc. Ent."
+msgstr ""
+
+msgid "Annual"
 msgstr ""
 
 #, python-format
@@ -106,13 +132,24 @@ msgstr "Are you sure you want to remove %(acronym)s ?"
 msgid "Are you sure you want to postpone the content in %(root)s?"
 msgstr ""
 
-msgid "At least an education group year, a group year, a learning unit year or a learning class year has to be set"
+msgid ""
+"At least an education group year, a group year, a learning unit year or a "
+"learning class year has to be set"
+msgstr ""
+
+msgid "Attribution entity"
 msgstr ""
 
 msgid "Block"
 msgstr ""
 
 msgid "Cancel"
+msgstr ""
+
+msgid "Cannot add any element to learning unit"
+msgstr ""
+
+msgid "Cannot attach a node to himself."
 msgstr ""
 
 msgid "Cannot detach due to prerequisites."
@@ -134,9 +171,6 @@ msgstr ""
 "Cannot remove learning unit %(acronym)s as it has a prerequisite or it is a "
 "prerequisite."
 
-msgid "Cannot add any element to learning unit"
-msgstr ""
-
 #, python-format
 msgid "Cannot perform action on a education group before %(limit_year)s"
 msgstr ""
@@ -145,6 +179,9 @@ msgid "Cannot perform detach action on root."
 msgstr "Cannot perform remove action on root."
 
 msgid "Cannot perform modification action on root."
+msgstr ""
+
+msgid "Category"
 msgstr ""
 
 msgid "Code"
@@ -159,7 +196,19 @@ msgstr ""
 msgid "Courses not taught"
 msgstr ""
 
+msgid "Creation"
+msgstr ""
+
 msgid "Cred. rel./abs."
+msgstr ""
+
+msgid "Credits"
+msgstr ""
+
+msgid "Description fiche"
+msgstr ""
+
+msgid "Description fiche (including force majeure)"
 msgstr ""
 
 msgid "Direct gathering"
@@ -172,7 +221,19 @@ msgstr ""
 msgid "English comment"
 msgstr ""
 
+msgid "Entity"
+msgstr ""
+
+msgid "Error attach option message"
+msgstr ""
+
+msgid "Error end date finality message"
+msgstr ""
+
 msgid "Evaluation methods"
+msgstr ""
+
+msgid "Evaluation methods (force majeure)"
 msgstr ""
 
 #, python-format
@@ -194,7 +255,39 @@ msgstr ""
 msgid "Formation catalogue"
 msgstr ""
 
+msgid "IMPOSSIBLE TO DISPLAY BECAUSE OF AN ILLEGAL CHARACTER IN STRING"
+msgstr ""
+
+msgid "Include subordinate entities"
+msgstr ""
+
 msgid "Include transition"
+msgstr ""
+
+msgid "Invalid tree path"
+msgstr ""
+
+msgid ""
+"It is prohibited to attach a group, mini-training or training to an element "
+"of another academic year."
+msgstr ""
+
+msgid "Language"
+msgstr ""
+
+msgid "Last update description fiche (force majeure) by"
+msgstr ""
+
+msgid "Last update description fiche (force majeure) on"
+msgstr ""
+
+msgid "Last update description fiche by"
+msgstr ""
+
+msgid "Last update description fiche on"
+msgstr ""
+
+msgid "Learning achievements"
 msgstr ""
 
 #, python-format
@@ -211,13 +304,22 @@ msgstr ""
 msgid "LearningUnitList-%(year)s-%(acronym)s"
 msgstr ""
 
+msgid "Lecturing planned classes"
+msgstr ""
+
+msgid "Lecturing vol."
+msgstr ""
+
 msgid "Legend"
+msgstr ""
+
+msgid "Link type"
 msgstr ""
 
 msgid "List UE"
 msgstr ""
 
-msgid "Link type"
+msgid "List of teachers"
 msgstr ""
 
 msgid "Made in"
@@ -230,6 +332,12 @@ msgid "Mandatory"
 msgstr ""
 
 msgid "Mobile phone"
+msgstr ""
+
+msgid "Mobility"
+msgstr ""
+
+msgid "Modification"
 msgstr ""
 
 msgid "Modify prerequisites"
@@ -264,7 +372,8 @@ msgid "Online resources"
 msgstr ""
 
 msgid ""
-"Only one of the following has to be set : an education group year, a group year, a learning unit year or a learning class"
+"Only one of the following has to be set : an education group year, a group "
+"year, a learning unit year or a learning class"
 msgstr ""
 
 #, python-format
@@ -294,10 +403,10 @@ msgstr ""
 msgid "Other informations"
 msgstr ""
 
-msgid "Particular"
+msgid "Other informations (force majeure)"
 msgstr ""
 
-msgid "Paste"
+msgid "Particulière"
 msgstr ""
 
 msgid "Periodic courses not taught"
@@ -306,10 +415,19 @@ msgstr ""
 msgid "Periodic courses taught during"
 msgstr ""
 
+msgid "Periodicity"
+msgstr ""
+
 msgid "Please cut or copy an item before attach it"
 msgstr ""
 
 msgid "Please select an item before adding it"
+msgstr ""
+
+msgid "Practical planned classes"
+msgstr ""
+
+msgid "Practical vol."
 msgstr ""
 
 msgid "Pre-condition"
@@ -323,7 +441,16 @@ msgstr[1] ""
 msgid "Prerequisites saved."
 msgstr ""
 
-msgid "Proposal legend"
+msgid "Proposal status"
+msgstr ""
+
+msgid "Proposal type"
+msgstr ""
+
+msgid "Proposals"
+msgstr ""
+
+msgid "Quadrimester"
 msgstr ""
 
 msgid "Registration ID"
@@ -350,17 +477,50 @@ msgstr ""
 msgid "Search"
 msgstr ""
 
+msgid "Session derogation"
+msgstr ""
+
+msgid "Specifications"
+msgstr ""
+
+msgid "Standard"
+msgstr ""
+
 msgid "Student's contact information"
 msgstr ""
 
 msgid "Student's signature"
 msgstr ""
 
+msgid "Subtype"
+msgstr ""
+
+msgid "Success"
+msgstr ""
+
+msgid "Success message"
+msgstr ""
+
+msgid "Suppression"
+msgstr ""
+
+msgid "Teaching material"
+msgstr ""
+
 msgid "Teaching methods"
+msgstr ""
+
+msgid "Teaching methods (force majeure)"
 msgstr ""
 
 #, python-format
 msgid "The %(acronym)s has been moved"
+msgstr ""
+
+#, python-format
+msgid ""
+"The child %(child)s you want to attach is a parent of the node you want to "
+"attach."
 msgstr ""
 
 msgid "The content has already been postponed."
@@ -469,6 +629,9 @@ msgstr ""
 msgid "Utilizations"
 msgstr ""
 
+msgid "Version"
+msgstr ""
+
 msgid "Version name"
 msgstr ""
 
@@ -505,13 +668,13 @@ msgid "You can not add the same child several times."
 msgstr ""
 
 #, python-format
-msgid "You cannot modify content for %(education_group_types)s"
+msgid ""
+"You cannot add \"%(child_types)s\" to \"%(parent)s\" (type \"%(parent_type)s"
+"\")"
 msgstr ""
 
 #, python-format
-msgid ""
-"You cannot add \"%(child_types)s\" to \"%(parent)s\" (type "
-"\"%(parent_type)s\")"
+msgid "You cannot modify content for %(education_group_types)s"
 msgstr ""
 
 #, python-format
@@ -520,13 +683,25 @@ msgid ""
 "learning unit (current context: %(partial_acronym)s - %(acronym)s)"
 msgstr ""
 
+msgid "bibliography"
+msgstr ""
+
 msgid "credits"
+msgstr ""
+
+msgid "education group year"
 msgstr ""
 
 msgid "email"
 msgstr ""
 
+msgid "emails"
+msgstr ""
+
 msgid "faculty number"
+msgstr ""
+
+msgid "group year"
 msgstr ""
 
 msgid "has as prerequisite"
@@ -548,6 +723,12 @@ msgstr ""
 msgid "is_prerequisite_of-%(year)s-%(acronym)s"
 msgstr ""
 
+msgid "learning class year"
+msgstr ""
+
+msgid "learning unit year"
+msgstr ""
+
 msgid "on"
 msgstr ""
 
@@ -559,4 +740,7 @@ msgid "prerequisites-%(year)s-%(acronym)s"
 msgstr ""
 
 msgid "training"
+msgstr ""
+
+msgid "yes"
 msgstr ""

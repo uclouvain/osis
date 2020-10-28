@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-21 11:01+0200\n"
+"POT-Creation-Date: 2020-10-21 15:19+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -901,9 +901,6 @@ msgid "End of cycle"
 msgstr ""
 
 msgid "End year"
-msgstr ""
-
-msgid "Ending date"
 msgstr ""
 
 msgid "Ending of course registration"
@@ -1823,9 +1820,6 @@ msgstr ""
 msgid "Open minor"
 msgstr ""
 
-msgid "Opening date"
-msgstr ""
-
 msgid "Opening to Adults"
 msgstr ""
 
@@ -2487,6 +2481,11 @@ msgstr ""
 msgid "Summary course submission"
 msgstr ""
 
+msgid ""
+"Summary course submission (Force majeure) is not allowed for tutors during "
+"this period."
+msgstr ""
+
 msgid "Summary course submission force majeure"
 msgstr ""
 
@@ -2958,6 +2957,12 @@ msgid "UE full"
 msgstr ""
 
 msgid "URL of the learning unit"
+msgstr ""
+
+#, python-format
+msgid ""
+"Unable to publish pedagogy information for the learning unit %(code)s - "
+"%(year)s"
 msgstr ""
 
 msgid "Undefined"

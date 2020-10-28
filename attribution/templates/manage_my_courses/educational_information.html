@@ -52,11 +52,11 @@
                class="btn btn-default"
                data-code="{{ learning_unit_year.acronym }}"
                role="button"
-               {% if can_edit_information %}
-               href="{% url "access_publication" code=learning_unit_year.acronym year=learning_unit_year.academic_year.year %}"
+               {% if can_edit_information or can_edit_force_majeur_section %}
+               href="{% url "publish_and_access_learning_unit_pedagogy" code=learning_unit_year.acronym year=learning_unit_year.academic_year.year %}"
                target="_blank"
                {% endif %}
-               {% if not can_edit_information %}disabled{% endif %}>
+               {% if not can_edit_information and not can_edit_force_majeur_section %}disabled{% endif %}>
                 {% trans 'Refresh and visualize publication' %}
             </a>
         </div>

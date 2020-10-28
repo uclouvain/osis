@@ -26,11 +26,11 @@
     * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-<tr>
-    <td style="padding: 20px;">
+<tr style="border: sandybrown;">
+    <td style="padding: 20px;" {% if translated_label.text_label.label in cms_label_pedagogy_fr_only %}class="col-md-2"{% endif %}>
         <label>{{ translated_label.label }}</label>
     </td>
-    <td style="padding: 20px;" {% if translated_label.text_label.label in cms_label_pedagogy_fr_only %}colspan="2"{% endif %}>
+    <td style="padding: 20px;" {% if translated_label.text_label.label in cms_label_pedagogy_fr_only %}class="col-md-10"{% else %}class="col-md-5"{% endif %}>
         {% if can_edit_information %}
             <a class="trigger_modal pull-right"
                data-url="{{ post_url }}?language=fr-be&label={{ translated_label.text_label.label }}"
@@ -57,7 +57,7 @@
         {% endif %}
     </td>
     {% if translated_label.text_label.label not in cms_label_pedagogy_fr_only %}
-        <td style="padding: 20px;">
+        <td style="padding: 20px;" class="col-md-5">
             {% if can_edit_information %}
                 <a class="trigger_modal pull-right"
                    data-url="{{ post_url }}?language=en&label={{ translated_label.text_label.label }}"
