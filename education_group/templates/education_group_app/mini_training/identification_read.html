@@ -146,7 +146,7 @@
                     <div class="row">
                         <div class="col-md-12">
                             {% bootstrap_label _("Start") label_class='d-block'%}
-                            <p>{{ education_group_version.offer.education_group.start_year.year|format_to_academic_year }}</p>
+                            <p>{{ current_version.start_year|format_to_academic_year }}</p>
                         </div>
                     </div>
                     <br>
@@ -166,7 +166,7 @@
                     <div class="row">
                         <div class="col-md-12">
                             {% bootstrap_label _("Learning location") label_class='d-block'%}
-                            <p>{{ group.teaching_campus.name }} </p>
+                            <p>{{ group.teaching_campus.name }}{% if group.teaching_campus.university_name %} - {{ group.teaching_campus.university_name }}{% endif %}</p>
                         </div>
                     </div>
                 </div>

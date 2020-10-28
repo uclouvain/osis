@@ -77,7 +77,7 @@ class QuickGroupYearFilter(FilterSet):
             ('academic_year__year', 'academic_year'),
             ('acronym', 'acronym'),
             ('partial_acronym', 'code'),
-            ('title', 'title'),
+            ('title_fr', 'title'),
         ),
         widget=forms.HiddenInput
     )

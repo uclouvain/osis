@@ -32,9 +32,9 @@ function validateVersionNameAjax(url, version_name, callback) {
     /**
      * This function will check if the acronym exist or have already existed
      **/
-    queryString = "?version_name=" + version_name;
     $.ajax({
-        url: url + queryString
+        url: url ,
+        data: {'version_name': version_name},
     }).done(function (data) {
         callback(data);
     });

@@ -37,7 +37,7 @@ def create_program_tree_version(
     # GIVEN
     identity_standard = ProgramTreeVersionIdentity(
         offer_acronym=command.offer_acronym,
-        year=command.year,
+        year=command.start_year,
         version_name=STANDARD,
         is_transition=False
     )
@@ -49,7 +49,7 @@ def create_program_tree_version(
             from_root_code=program_tree_version_standard.program_tree_identity.code,
             from_root_year=program_tree_version_standard.program_tree_identity.year,
             override_end_year_to=command.end_year,
-            override_start_year_to=command.year
+            override_start_year_to=command.start_year
         )
     )
     new_program_tree_version = ProgramTreeVersionBuilder().create_from_standard_version(
