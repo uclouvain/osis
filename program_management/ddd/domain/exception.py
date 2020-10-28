@@ -363,7 +363,7 @@ class DeletePrerequisitesException(BusinessException):
     def __init__(self, root_node: 'Node', learning_unit_codes: List['str']):
         message = _(
             "The prerequisites for the following learning units contained in education group year "
-            "%(acronym)s will we deleted: %(learning_units)s"
+            "%(acronym)s will be deleted: %(learning_units)s"
         ) % {
             "acronym": root_node,
             "learning_units": ", ".join(learning_unit_codes)
