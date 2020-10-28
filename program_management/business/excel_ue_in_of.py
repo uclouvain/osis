@@ -25,6 +25,7 @@
 ##############################################################################
 import re
 from collections import namedtuple, defaultdict
+from contextlib import contextmanager
 from typing import Dict, List
 
 from django.template.defaultfilters import yesno
@@ -204,13 +205,13 @@ def _build_excel_lines_ues(custom_xls_form: CustomXlsForm, tree: 'ProgramTree'):
         ]
     )
 
-    for path, child_node in tree.root_node.descendents.items():
+    for path, child_node in tree.root_node.descendents:
         if child_node.is_learning_unit():
             luy = next(child for child in learning_unit_years if child_node.equals(child))
 
             parents = tree.get_parents(path)
             parents_data = get_explore_parents(parents)
-            link = tree.get_link(parents[0], child_node)
+            link = parents[0].get_direct_child(child_node.entity_id)
 
             if not parents_data[EXCLUDE_UE_KEY]:
                 content.append(_get_optional_data(
@@ -222,6 +223,7 @@ def _build_excel_lines_ues(custom_xls_form: CustomXlsForm, tree: 'ProgramTree'):
                 if luy.proposal and luy.proposal.type:
                     font_rows[PROPOSAL_LINE_STYLES.get(luy.proposal.type)].append(idx)
                 idx += 1
+
     font_rows[BOLD_FONT].append(0)
     return {
         'content': content,

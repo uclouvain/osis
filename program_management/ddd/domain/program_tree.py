@@ -233,7 +233,7 @@ class ProgramTree(interface.RootEntity):
         str_nodes = path.split(PATH_SEPARATOR)
         if len(str_nodes) > 1:
             str_nodes = str_nodes[:-1]
-            path = '{}'.format(PATH_SEPARATOR).join(str_nodes)
+            path = PATH_SEPARATOR.join(str_nodes)
             result.append(self.get_node(path))
             result += self.get_parents(PATH_SEPARATOR.join(str_nodes))
         return result
@@ -252,12 +252,21 @@ class ProgramTree(interface.RootEntity):
         :param path: str
         :return: Node
         """
-        if path == str(self.root_node.pk):
-            return self.root_node
-        result = self.root_node.descendents.get(path)
-        if not result:
+
+        def _get_node(root_node: 'Node', path: 'Path') -> 'Node':
+            direct_child_id, separator, remaining_path = path.partition(PATH_SEPARATOR)
+            direct_child = next(child for child in root_node.children_as_nodes if str(child.pk) == direct_child_id)
+
+            if not remaining_path:
+                return direct_child
+            return _get_node(direct_child, remaining_path)
+
+        try:
+            if path == str(self.root_node.pk):
+                return self.root_node
+            return _get_node(self.root_node, path.split(PATH_SEPARATOR, maxsplit=1)[1])
+        except (StopIteration, IndexError):
             raise NodeNotFoundException
-        return result
 
     @deprecated  # Please use :py:meth:`~program_management.ddd.domain.program_tree.ProgramTree.get_node` instead !
     def get_node_by_id_and_type(self, node_id: int, node_type: NodeType) -> 'Node':
@@ -289,9 +298,8 @@ class ProgramTree(interface.RootEntity):
         if node == self.root_node:
             return build_path(self.root_node)
 
-        nodes_by_path = self.root_node.descendents
         return next(
-            (path for path, node_obj in nodes_by_path.items() if node_obj == node),
+            (path for path, node_obj in self.root_node.descendents if node_obj == node),
             None
         )
 

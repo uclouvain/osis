@@ -83,9 +83,11 @@ class DetachNodeView(GenericGroupElementYearMixin, FormView):
         context = super().get_context_data(**kwargs)
         detach_node_command = command.DetachNodeCommand(path_where_to_detach=self.request.GET.get('path'), commit=False)
         try:
+            detach_node_service.detach_node(detach_node_command)
+
             warning_messages = detach_warning_messages_service.detach_warning_messages(detach_node_command)
-            link_to_detach_id = detach_node_service.detach_node(detach_node_command)
             display_warning_messages(self.request, warning_messages)
+
             context['confirmation_message'] = self.get_confirmation_msg()
         except MultipleBusinessExceptions as multiple_exceptions:
             messages = [e.message for e in multiple_exceptions.exceptions]

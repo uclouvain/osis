@@ -390,11 +390,6 @@ class TestGetParents(SimpleTestCase):
             [self.link_with_root.child, self.link_with_root.parent]
         )
 
-    def test_when_infinite_loop(self):
-        LinkFactory(parent=self.link_with_child.child, child=self.link_with_root.parent)
-        with self.assertRaises(RecursionError):
-            self.tree.get_parents(self.path)
-
 
 class TestGetAllNodes(SimpleTestCase):
 
