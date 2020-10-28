@@ -212,11 +212,11 @@ def _add_revision_informations(learning_unit_yr, line, cms_label):
         entity=LEARNING_UNIT_YEAR,
         text_label__label__in=cms_label
     )
-    version_filter = Q(
+    ids = [translated_text.id for translated_text in translated_texts]
+    version = Version.objects.filter(
         content_type=ContentType.objects.get_for_model(TranslatedText),
-        object_id__in=Cast(Subquery(translated_texts.values('pk')), output_field=CharField())
-    )
-    versions_qs = Version.objects.filter(version_filter).select_related(
+        object_id__in=ids
+    ).select_related(
         "revision",
         "revision__user__person"
     ).annotate(
@@ -225,8 +225,8 @@ def _add_revision_informations(learning_unit_yr, line, cms_label):
             output_field=CharField()
         )
     ).order_by("-revision__date_created")
-    line.append(versions_qs.values('author')[:1] or "")
-    line.append(versions_qs.values('revision__date_created')[:1] or "")
+    line.append(version.values('author')[:1][0]["author"])
+    line.append(version.values('revision__date_created')[:1][0]["revision__date_created"])
 
 
 def _add_pedagogies_forces_major(label_key, line, translated_labels_force_majeure_with_text):
