@@ -20,7 +20,7 @@ class LinkForm(forms.Form):
     is_mandatory = forms.BooleanField(required=False)
     access_condition = forms.BooleanField(required=False)
     link_type = forms.ChoiceField(choices=choice_field.add_blank(LinkTypes.choices()), required=False)
-    block = forms.CharField(required=False, widget=forms.TextInput)
+    block = forms.CharField(required=False, widget=forms.TextInput, empty_value=None)
     comment_fr = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows': 3}))
     comment_en = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows': 3}))
 

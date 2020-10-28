@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import collections
 import copy
 import functools
 from _decimal import Decimal
@@ -302,6 +303,9 @@ class Node(interface.Entity):
             return set(link.child for link in children_links if link.child.node_type in take_only)
         return set(link.child for link in children_links)
 
+    def get_all_children_with_counter(self) -> collections.Counter:
+        return collections.Counter(self.descendents.values())
+
     def get_all_children_as_learning_unit_nodes(self) -> List['NodeLearningUnitYear']:
         sorted_links = sorted(
             [link for link in self.get_all_children() if isinstance(link.child, NodeLearningUnitYear)],
@@ -377,7 +381,7 @@ class Node(interface.Entity):
         return (node for node in self.children_as_nodes if node.is_training())
 
     @property
-    @functools.lru_cache()
+    # @functools.lru_cache()
     def descendents(self) -> Dict['Path', 'Node']:   # TODO :: add unit tests
         result = OrderedDict()
         for path, value in _get_descendents(self):

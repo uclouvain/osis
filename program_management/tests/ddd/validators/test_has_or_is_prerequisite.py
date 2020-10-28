@@ -29,7 +29,7 @@ from django.utils.translation import gettext as _
 
 from base.models.enums.education_group_types import TrainingType, GroupType
 from program_management.ddd.domain.exception import CannotDetachChildrenWhoArePrerequisiteException, \
-    CannotDetachLearningWhoIsPrerequisiteException
+    CannotDetachLearningWhoIsPrerequisiteException, DeletePrerequisitesException
 from program_management.ddd.domain.program_tree import build_path
 from program_management.ddd.validators._has_or_is_prerequisite import IsPrerequisiteValidator, HasPrerequisiteValidator
 from program_management.tests.ddd.factories.link import LinkFactory
@@ -123,13 +123,8 @@ class TestHasPrerequisiteValidator(TestValidatorValidateMixin, SimpleTestCase):
         tree = ProgramTreeFactory(root_node=link.parent)
 
         path_of_node_to_detach = build_path(tree.root_node, node_to_detach)
-        validator = HasPrerequisiteValidator(tree, path_of_node_to_detach)
-        expected_message = _("The prerequisites for the following learning units contained in education group year "
-                             "%(acronym)s will we deleted: %(learning_units)s") % {
-                               "acronym": tree.root_node.title,
-                               "learning_units": self.node_has_prerequisite.code
-                           }
-        self.assertValidatorRaises(validator, [expected_message])
+        with self.assertRaises(DeletePrerequisitesException):
+            HasPrerequisiteValidator(tree, path_of_node_to_detach).validate()
 
     def test_should_raise_exception_when_node_to_detach_is_learning_unit_that_has_prerequisite(self):
         node_to_detach_has_prerequisite = self.node_has_prerequisite
@@ -139,14 +134,8 @@ class TestHasPrerequisiteValidator(TestValidatorValidateMixin, SimpleTestCase):
         tree = ProgramTreeFactory(root_node=link.parent)
 
         path_of_node_to_detach = build_path(tree.root_node, node_to_detach_has_prerequisite)
-        validator = HasPrerequisiteValidator(tree, path_of_node_to_detach)
-        expected_message = _("The prerequisites for the following learning units contained in education group year "
-                             "%(acronym)s will we deleted: %(learning_units)s") % {
-                               "acronym": tree.root_node.title,
-                               "learning_units": node_to_detach_has_prerequisite.code
-                           }
-
-        self.assertValidatorRaises(validator, [expected_message])
+        with self.assertRaises(DeletePrerequisitesException):
+            HasPrerequisiteValidator(tree, path_of_node_to_detach).validate()
 
     def test_should_not_raise_exception_when_node_to_detach_is_learning_unit_that_has_no_prerequisite(self):
         node_to_detach_without_prerequisite = NodeLearningUnitYearFactory()

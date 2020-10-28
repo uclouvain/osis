@@ -25,7 +25,7 @@
 ##############################################################################
 import copy
 from collections import Counter
-from typing import List, Set, Optional, Dict
+from typing import List, Set, Optional, Dict, Hashable
 
 import attr
 
@@ -450,6 +450,17 @@ class ProgramTree(interface.RootEntity):
         validator = validators_by_business_action.UpdatePrerequisiteValidatorList(prerequisite_expression, node, self)
         return validator.is_valid(), validator.messages
 
+    def get_remaining_children_after_detach(self, path_node_to_detach: 'Path'):
+        children_with_counter = self.root_node.get_all_children_with_counter()
+        children_with_counter.update([self.root_node])
+
+        node_to_detach = self.get_node(path_node_to_detach)
+        nodes_detached = node_to_detach.get_all_children_with_counter()
+        nodes_detached.update([node_to_detach])
+        children_with_counter.subtract(nodes_detached)
+
+        return {node_obj for node_obj, number in children_with_counter.items() if number > 0}
+
     def detach_node(self, path_to_node_to_detach: Path, tree_repository: 'ProgramTreeRepository') -> 'Link':
         """
         Detach a node from tree
@@ -469,7 +480,7 @@ class ProgramTree(interface.RootEntity):
             tree_repository
         ).validate()
 
-        self.remove_prerequisites(node_to_detach, parent_path)
+        self.remove_prerequisites(path_to_node_to_detach)
         return parent.detach_child(node_to_detach)
 
     def __copy__(self) -> 'ProgramTree':
@@ -478,11 +489,9 @@ class ProgramTree(interface.RootEntity):
             authorized_relationships=copy.copy(self.authorized_relationships)
         )
 
-    def remove_prerequisites(self, detached_node: 'Node', parent_path):
-        pruned_tree = ProgramTree(root_node=_copy(self.root_node))
-        Node.descendents.fget.cache_clear()  # Invalidate cache so as recompute value for copy
-        pruned_tree.get_node(parent_path).detach_child(detached_node)
-        pruned_tree_children = pruned_tree.get_all_nodes()
+    def remove_prerequisites(self, path_node_to_detach: 'Path'):
+        children_remaining = self.get_remaining_children_after_detach(path_node_to_detach)
+        detached_node = self.get_node(path_node_to_detach)
 
         if detached_node.is_learning_unit():
             to_remove = [detached_node] if detached_node.has_prerequisite else []
@@ -490,7 +499,7 @@ class ProgramTree(interface.RootEntity):
             to_remove = ProgramTree(root_node=detached_node).get_nodes_that_have_prerequisites()
 
         for n in to_remove:
-            if n not in pruned_tree_children:
+            if n not in children_remaining:
                 n.remove_all_prerequisite_items()
 
     def get_relative_credits_values(self, child_node: 'NodeIdentity'):

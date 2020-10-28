@@ -33,7 +33,6 @@ from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.utils.cache import ElementCache
 from base.views.common import display_error_messages, display_warning_messages
 from base.views.common import display_success_messages
-from base.views.mixins import AjaxTemplateMixin
 from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import link
@@ -44,7 +43,7 @@ from program_management.forms.tree.detach import DetachNodeForm
 from program_management.views.generic import GenericGroupElementYearMixin
 
 
-class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
+class DetachNodeView(GenericGroupElementYearMixin, FormView):
     template_name = "tree/detach_confirmation_inner.html"
     form_class = DetachNodeForm
 
@@ -81,18 +80,17 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
         return self.program_tree_obj.get_node("|".join([self.parent_id, self.child_id_to_detach]))
 
     def get_context_data(self, **kwargs):
-        context = super(DetachNodeView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         detach_node_command = command.DetachNodeCommand(path_where_to_detach=self.request.GET.get('path'), commit=False)
         try:
+            warning_messages = detach_warning_messages_service.detach_warning_messages(detach_node_command)
             link_to_detach_id = detach_node_service.detach_node(detach_node_command)
+            display_warning_messages(self.request, warning_messages)
+            context['confirmation_message'] = self.get_confirmation_msg()
         except MultipleBusinessExceptions as multiple_exceptions:
             messages = [e.message for e in multiple_exceptions.exceptions]
             display_error_messages(self.request, messages)
-        else:
-            warning_messages = detach_warning_messages_service.detach_warning_messages(detach_node_command)
-            display_warning_messages(self.request, warning_messages)
 
-            context['confirmation_message'] = self.get_confirmation_msg()
         return context
 
     def get_initial(self):
