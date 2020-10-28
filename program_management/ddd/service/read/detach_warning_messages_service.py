@@ -40,7 +40,7 @@ def detach_warning_messages(detach_command: command.DetachNodeCommand) -> List[s
     messages = []
     try:
         _has_or_is_prerequisite.HasPrerequisiteValidator(working_tree, path_to_detach).validate()
-    except osis_common.ddd.interface.BusinessExceptions as e:
-        messages = e.messages
+    except osis_common.ddd.interface.BusinessException as e:
+        messages = [e.message]
 
     return messages
