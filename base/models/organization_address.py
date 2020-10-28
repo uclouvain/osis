@@ -40,7 +40,3 @@ class OrganizationAddress(models.Model):
     city = models.CharField(max_length=255, verbose_name=_("City"))
     country = models.ForeignKey('reference.Country', verbose_name=_("Country"), on_delete=models.CASCADE)
     is_main = models.BooleanField(default=False)
-
-
-def find_distinct_by_country(a_country):
-    return OrganizationAddress.objects.filter(country=a_country).distinct('city').order_by('city').values('city')

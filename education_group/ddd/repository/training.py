@@ -25,7 +25,6 @@
 ##############################################################################
 import functools
 import operator
-from datetime import datetime
 from typing import Optional, List
 
 from django.db import IntegrityError
@@ -44,7 +43,6 @@ from base.models.education_group_year import EducationGroupYear as EducationGrou
 from base.models.education_group_year_domain import EducationGroupYearDomain as EducationGroupYearDomainModelDb
 from base.models.entity import Entity
 from base.models.entity_version import EntityVersion
-from base.models.entity_version_address import EntityVersionAddress
 from base.models.enums.academic_type import AcademicTypes
 from base.models.enums.active_status import ActiveStatusEnum
 from base.models.enums.activity_presence import ActivityPresence
@@ -58,7 +56,6 @@ from base.models.enums.internship_presence import InternshipPresence
 from base.models.enums.rate_code import RateCode
 from base.models.enums.schedule_type import ScheduleTypeEnum
 from base.models.hops import Hops as HopsModelDb
-from base.models.organization_address import OrganizationAddress
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import training, exception
 from education_group.ddd.domain._academic_partner import AcademicPartner, AcademicPartnerIdentity

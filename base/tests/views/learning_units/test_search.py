@@ -33,7 +33,7 @@ from django.utils.translation import gettext_lazy as _
 
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.campus import CampusFactory
-from base.tests.factories.entity_version_address import EntityVersionAddressFactory
+from base.tests.factories.entity_version_address import EntityVersionAddressFactory, MainRootEntityVersionAddressFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from base.views.learning_units.search.common import SearchTypes
@@ -142,19 +142,15 @@ class TestGetCampusListAccordingToCityForExternalLearningUnitsSearch(TestCase):
         cls.url = reverse("get_campuses_related_to_city")
 
         cls.campus_1 = CampusFactory(name="Campus 1")
-        cls.main_address_campus_1 = EntityVersionAddressFactory(
+        cls.main_address_campus_1 = MainRootEntityVersionAddressFactory(
             city="Dinant",
             entity_version__entity__organization=cls.campus_1.organization,
-            entity_version__parent=None,
-            is_main=True
         )
 
         cls.campus_2 = CampusFactory(name="Campus 2")
-        cls.main_address_campus_2 = EntityVersionAddressFactory(
+        cls.main_address_campus_2 = MainRootEntityVersionAddressFactory(
             city="La Louvière",
             entity_version__entity__organization=cls.campus_2.organization,
-            entity_version__parent=None,
-            is_main=True
         )
         cls.secondary_address_campus_2 = EntityVersionAddressFactory(
             city="Dinant",

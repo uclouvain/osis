@@ -37,10 +37,10 @@ from base.models.enums import learning_container_year_types
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.campus import CampusFactory
+from base.tests.factories.entity_version_address import MainRootEntityVersionAddressFactory
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.organization import OrganizationFactory
-from base.tests.factories.organization_address import OrganizationAddressFactory
 from reference.tests.factories.country import CountryFactory
 
 CINEY = "Ciney"
@@ -139,11 +139,21 @@ class TestSearchForm(TestCase):
         organization_2 = OrganizationFactory(name="organization 2")
         organization_3 = OrganizationFactory(name="organization 3")
 
-        OrganizationAddressFactory(organization=organization_1, country=country, city=NAMUR)
-        OrganizationAddressFactory(organization=organization_2, country=country, city=NAMUR)
-
-        OrganizationAddressFactory(organization=organization_3, country=country, city=CINEY)
-
+        MainRootEntityVersionAddressFactory(
+            entity_version__entity__organization=organization_1,
+            country=country,
+            city=NAMUR
+        )
+        MainRootEntityVersionAddressFactory(
+            entity_version__entity__organization=organization_2,
+            country=country,
+            city=NAMUR
+        )
+        MainRootEntityVersionAddressFactory(
+            entity_version__entity__organization=organization_3,
+            country=country,
+            city=CINEY
+        )
         CampusFactory(organization=organization_1)
         campus_2 = CampusFactory(organization=organization_1)
         campus_3 = CampusFactory(organization=organization_2)
