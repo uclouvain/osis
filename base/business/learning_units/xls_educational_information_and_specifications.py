@@ -225,8 +225,10 @@ def _add_revision_informations(learning_unit_yr, line, cms_label):
             output_field=CharField()
         )
     ).order_by("-revision__date_created")
-    line.append(version.values('author')[:1][0]["author"])
-    line.append(version.values('revision__date_created')[:1][0]["revision__date_created"])
+    if version:
+        line.append(version.values('author')[:1][0]["author"])
+        line.append(
+            version.values('revision__date_created')[:1][0]["revision__date_created"].date())
 
 
 def _add_pedagogies_forces_major(label_key, line, translated_labels_force_majeure_with_text):

@@ -61,7 +61,7 @@ from reference.tests.factories.language import LanguageFactory
 
 INDEX_FIRST_CMS_LABEL_PEDAGOGY_FR_AND_EN_COLUMN = 3
 INDEX_FIRST_CMS_LABEL_PEDAGOGY_FR_ONLY_COLUMN = 14
-INDEX_FIRST_CMS_LABEL_SPECIFICATIONS_COLUMN = 16
+INDEX_FIRST_CMS_LABEL_SPECIFICATIONS_COLUMN = 22
 
 ENTITY_ACRONYM = 'ESPO'
 ACRONYM_ALLOCATION = 'INFO'
@@ -163,6 +163,16 @@ class TestXlsEducationalInformationSpecificationXls(TestCase):
             str(_('Teaching material')),
             str("cms_bibliography - FR-BE"),
             str("cms_mobility - FR-BE"),
+            str(_('Last update description fiche by')),
+            str(_('Last update description fiche on')),
+            str(' - FR-BE'),
+            str(' - EN'),
+            str(' - FR-BE'),
+            str(' - EN'),
+            str(' - FR-BE'),
+            str(' - EN'),
+            str(_('Last update description fiche (force majeure) by')),
+            str(_('Last update description fiche (force majeure) on')),
             str('cms_themes_discussed - FR-BE'),
             str('cms_themes_discussed - EN'),
             str('cms_prerequisite - FR-BE'),
