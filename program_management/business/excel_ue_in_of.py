@@ -25,7 +25,6 @@
 ##############################################################################
 import re
 from collections import namedtuple, defaultdict
-from contextlib import contextmanager
 from typing import Dict, List
 
 from django.template.defaultfilters import yesno
@@ -41,8 +40,7 @@ from base.business.learning_unit_xls import PROPOSAL_LINE_STYLES, \
     prepare_proposal_legend_ws_data
 from base.business.learning_unit_xls import get_significant_volume
 from base.models.enums.education_group_types import GroupType
-from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES, PeriodicityEnum
-
+from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from base.models.enums.learning_unit_year_subtypes import LEARNING_UNIT_YEAR_SUBTYPES
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
