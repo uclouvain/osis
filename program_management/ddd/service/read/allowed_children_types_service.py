@@ -25,7 +25,7 @@ from typing import Set
 
 from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import GroupType, TrainingType, MiniTrainingType, EducationGroupTypesEnum
-from osis_common.ddd.interface import BusinessExceptions
+from osis_common.ddd.interface import BusinessException
 from program_management.ddd import command
 from program_management.ddd.domain.node import Node
 from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
@@ -57,7 +57,7 @@ def get_allowed_child_types(cmd: command.GetAllowedChildTypeCommand) -> Set[Educ
                     Node(node_type=child_type),
                     tree.root_node
                 ).validate()
-            except BusinessExceptions:
+            except BusinessException:
                 return False
             return True
         allowed_child_types = filter(check_paste_validator, allowed_child_types)

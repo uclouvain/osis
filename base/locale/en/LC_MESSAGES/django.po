@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-22 11:34+0200\n"
+"POT-Creation-Date: 2020-10-27 13:37+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -944,6 +944,9 @@ msgstr ""
 msgid "Finality 180 list choice"
 msgstr ""
 
+msgid "First name"
+msgstr ""
+
 msgid "Firstname"
 msgstr ""
 
@@ -1165,6 +1168,9 @@ msgstr ""
 msgid "Jury members"
 msgstr ""
 
+msgid "Justification"
+msgstr ""
+
 msgid "Keywords"
 msgstr ""
 
@@ -1181,6 +1187,9 @@ msgid "Language classes"
 msgstr ""
 
 msgid "Last modifications"
+msgstr ""
+
+msgid "Last name"
 msgstr ""
 
 msgid "Last year of organization"
@@ -1894,6 +1903,10 @@ msgstr ""
 msgid "Profile"
 msgstr ""
 
+msgctxt "Submission email table header"
+msgid "Program"
+msgstr ""
+
 msgid "Program Managers"
 msgstr ""
 
@@ -2061,6 +2074,10 @@ msgstr ""
 msgid "Registration Id"
 msgstr ""
 
+msgctxt "Submission email table header"
+msgid "Registration number"
+msgstr ""
+
 msgid "Relative / Absolute <br>credits"
 msgstr ""
 
@@ -2130,6 +2147,9 @@ msgstr ""
 msgid "School"
 msgstr ""
 
+msgid "Score"
+msgstr ""
+
 msgid "Scores diffusion"
 msgstr ""
 
@@ -2179,6 +2199,10 @@ msgid "Service courses"
 msgstr ""
 
 msgid "Session derogation"
+msgstr ""
+
+msgctxt "Submission email table header"
+msgid "Session number"
 msgstr ""
 
 msgid "Shifted"

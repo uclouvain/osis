@@ -30,6 +30,7 @@ from base.models.enums.learning_container_year_types import LearningContainerYea
 from program_management.ddd.domain.node import NodeLearningUnitYear, NodeGroupYear, Node, \
     NodeIdentity
 from program_management.ddd.domain._campus import Campus
+from program_management.ddd.domain.program_tree_version import STANDARD
 from program_management.models.enums.node_type import NodeType
 
 
@@ -80,6 +81,7 @@ class NodeGroupYearFactory(NodeFactory):
     end_year = factory.SelfAttribute('.end_date')
     children = factory.LazyFunction(list)
     teaching_campus = factory.SubFactory(CampusFactory)
+    version_name = STANDARD
 
     class Params:
         minitraining = factory.Trait(
