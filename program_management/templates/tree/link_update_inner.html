@@ -31,13 +31,14 @@
         </div>
 
         <div id="form-modal-body" class="modal-body">
-            <form method="post" id="form_attach_node" action="{{ request.path }}?{{ request.GET.urlencode }}" data-formset-prefix="{{ formset.prefix }}">
+            <form method="post" id="form_attach_node" action="{{ request.path }}?{{ request.GET.urlencode }}" data-formset-prefix="{{ formset.prefix }}" class="validate">
                 {% csrf_token %}
                 {% bootstrap_formset_errors content_formset %}
 
                 {% include "program_management/content/block/content_form_table.html" %}
 
                 {% include "blocks/modal/confirmation_modal.html" %}
+
             </form>
 
             <script src="{% static 'js/jquery.formset.js' %}"></script>
