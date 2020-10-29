@@ -231,7 +231,9 @@ def prepare_xls_content_administrative(education_group_versions: List[EducationG
 def _extract_main_data(a_version: EducationGroupVersion, language) -> Dict:
     an_education_group_year = a_version.offer
     return {
-        MANAGEMENT_ENTITY_COL: an_education_group_year.management_entity_version.acronym,
+        MANAGEMENT_ENTITY_COL:
+            an_education_group_year.management_entity_version.acronym
+            if an_education_group_year.management_entity_version else '',
         TRANING_COL: "{}{}".format(
             an_education_group_year.acronym,
             "[{}]".format(a_version.version_name) if a_version and a_version.version_name else ''
