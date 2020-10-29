@@ -29,6 +29,9 @@ from education_group.ddd.domain.exception import ContentConstraintTypeMissing, C
     ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum, ContentConstraintMinimumInvalid, \
     ContentConstraintMaximumInvalid
 
+MIN_CONSTRAINT_VALUE = 1
+MAX_CONSTRAINT_VALUE = 99999999999999
+
 
 class ContentConstraintValidator(business_validator.BusinessValidator):
     def __init__(self, content_constraint: Optional[ContentConstraint]):
@@ -53,10 +56,14 @@ class ContentConstraintValidator(business_validator.BusinessValidator):
 
         if self.content_constraint.type and \
                 (self.content_constraint.minimum and (
-                        self.content_constraint.minimum < 1 or self.content_constraint.minimum > 99999999999999)):
+                        self.content_constraint.minimum < MIN_CONSTRAINT_VALUE or
+                        self.content_constraint.minimum > MAX_CONSTRAINT_VALUE
+                )):
             raise ContentConstraintMinimumInvalid
 
         if self.content_constraint.type and \
                 (self.content_constraint.maximum and (
-                        self.content_constraint.maximum < 1 or self.content_constraint.maximum > 99999999999999)):
+                        self.content_constraint.maximum < MIN_CONSTRAINT_VALUE or
+                        self.content_constraint.maximum > MAX_CONSTRAINT_VALUE
+                )):
             raise ContentConstraintMaximumInvalid

@@ -32,9 +32,7 @@ from education_group.ddd.domain.exception import ContentConstraintTypeMissing, C
     ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum, ContentConstraintMinimumInvalid, \
     ContentConstraintMaximumInvalid
 from education_group.ddd.validators._content_constraint import ContentConstraintValidator
-
-MIN_CONSTRAINT_VALUE = 1
-MAX_CONSTRAINT_VALUE = 99999999999999
+from education_group.ddd.validators._content_constraint import MIN_CONSTRAINT_VALUE, MAX_CONSTRAINT_VALUE
 
 
 class TestContentConstraintValidator(SimpleTestCase):
