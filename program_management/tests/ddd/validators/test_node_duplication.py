@@ -25,8 +25,8 @@
 ##############################################################################
 
 from django.test import SimpleTestCase
-from django.utils.translation import gettext as _
 
+from program_management.ddd.domain.exception import CannotAttachSameChildToParentException
 from program_management.ddd.validators._node_duplication import NodeDuplicationValidator
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory
@@ -42,14 +42,8 @@ class TestNodeDuplicationValidator(TestValidatorValidateMixin, SimpleTestCase):
         self.child = link.child
 
     def test_should_raise_exception_when_node_to_attach_is_already_a_child_of_parent_node(self):
-        expected_result = _("You can not add the same child %(child_node)s several times.") % {
-            "child_node": self.child
-        }
-
-        self.assertValidatorRaises(
-            NodeDuplicationValidator(self.tree_with_child.root_node, self.child),
-            [expected_result]
-        )
+        with self.assertRaises(CannotAttachSameChildToParentException):
+            NodeDuplicationValidator(self.tree_with_child.root_node, self.child).validate()
 
     def test_should_not_raise_exception_when_node_to_attach_is_not_a_direct_child_of_parent_node(self):
         node_to_attach = NodeGroupYearFactory()

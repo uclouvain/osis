@@ -23,13 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import sys
 from typing import List, Set, Union
 
+import attr
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from base.models.education_group_type import EducationGroupType
 from base.models.enums.education_group_types import EducationGroupTypesEnum, GroupType
+from base.utils.constants import INFINITE_VALUE
 from osis_common.models.osis_model_admin import OsisModelAdmin
 from program_management.models.enums.node_type import NodeType
 
@@ -59,19 +62,12 @@ class AuthorizedRelationship(models.Model):
         return '{} - {}'.format(self.parent_type, self.child_type)
 
 
+@attr.s(slots=True, frozen=True)
 class AuthorizedRelationshipObject:
-    # Object used for typing 'parent_type' and 'child_type' as Enum
-    def __init__(
-            self,
-            parent_type: EducationGroupTypesEnum,
-            child_type: Union[EducationGroupTypesEnum, NodeType],
-            min_constraint: int,
-            max_constraint: int,
-    ):
-        self.parent_type = parent_type
-        self.child_type = child_type
-        self.min_count_authorized = min_constraint
-        self.max_count_authorized = max_constraint
+    parent_type = attr.ib(type=EducationGroupTypesEnum)
+    child_type = attr.ib(type=Union[EducationGroupTypesEnum, NodeType])
+    min_count_authorized = attr.ib(type=int)
+    max_count_authorized = attr.ib(type=int, converter=lambda value: INFINITE_VALUE if value is None else value)
 
 
 class AuthorizedRelationshipList:
@@ -132,3 +128,23 @@ class AuthorizedRelationshipList:
             and authorized_type.parent_type == parent_type
             and authorized_type.min_count_authorized > 0
         )
+
+    def update(
+            self,
+            parent_type: EducationGroupTypesEnum,
+            child_type: Union[EducationGroupTypesEnum, NodeType],
+            min_count_authorized: int = 0,
+            max_count_authorized: int = INFINITE_VALUE):
+        current_relationship_object = self.get_authorized_relationship(parent_type, child_type)
+        self.authorized_relationships.remove(current_relationship_object)
+
+        self.authorized_relationships.append(
+            AuthorizedRelationshipObject(
+                parent_type=parent_type,
+                child_type=child_type,
+                min_count_authorized=min_count_authorized,
+                max_count_authorized=max_count_authorized)
+        )
+
+    def __copy__(self) -> 'AuthorizedRelationshipList':
+        return self.__class__(authorized_relationships=self.authorized_relationships.copy())
