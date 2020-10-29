@@ -38,7 +38,7 @@ from osis_role.contrib.views import PermissionRequiredMixin
 class AttributionBaseViewMixin(PermissionRequiredMixin):
     """ Generic Mixin for the update/create of Attribution """
 
-    permission_required = 'base.can_manage_charge_repartition'
+    permission_required = 'base.can_add_charge_repartition'
 
     @cached_property
     def luy(self):

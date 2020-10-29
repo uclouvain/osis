@@ -89,7 +89,7 @@ class FacultyManager(osis_role_models.EntityRoleModel):
                  predicates.is_user_attached_to_requirement_entity) &
                 predicates.is_not_proposal_of_type_suppression &
                 predicates.has_learning_unit_no_application_this_year,
-            'base.can_manage_charge_repartition':
+            'base.can_add_charge_repartition':
                 predicates.is_learning_unit_year_a_partim &
                 predicates.is_user_attached_to_current_requirement_entity,
             'base.can_change_attribution':

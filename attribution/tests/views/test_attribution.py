@@ -104,7 +104,7 @@ class TestViewAttributions(TestCase):
 
         context = response.context
         self.assertQuerysetEqual(context["attributions"], [])
-        self.assertFalse(context["can_manage_charge_repartition"])
+        self.assertFalse(context["can_add_charge_repartition"])
         self.assertFalse(context["can_change_attribution"])
         self.assertEqual(context["learning_unit_year"], self.luy_without_attribution)
 

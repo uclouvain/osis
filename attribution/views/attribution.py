@@ -64,7 +64,7 @@ def learning_unit_attributions(request, learning_unit_year_id=None, code=None, y
     context = get_common_context_learning_unit_year(request.user.person, learning_unit_year_id, code, year)
     luy = context["learning_unit_year"]
     context['attributions'] = attribution_charge_new.find_attributions_with_charges(learning_unit_year_id)
-    context["can_manage_charge_repartition"] = request.user.has_perm('base.can_manage_charge_repartition', luy)
+    context["can_add_charge_repartition"] = request.user.has_perm('base.can_add_charge_repartition', luy)
     context["can_change_attribution"] = request.user.has_perm('base.can_change_attribution', luy)
     context["tab_active"] = "learning_unit_attributions"  # Corresponds to url_name
     warning_msgs = get_charge_repartition_warning_messages(context["learning_unit_year"].learning_container_year)

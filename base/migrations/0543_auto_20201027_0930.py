@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
                     ('is_administrator', 'Is administrator'),
                     ('is_institution_administrator', 'Is institution administrator '),
                     ('can_edit_education_group_administrative_data', 'Can edit education group administrative data'),
-                    ('can_manage_charge_repartition', 'Can manage charge repartition'),
+                    ('can_add_charge_repartition', 'Can add charge repartition'),
                     ('can_change_attribution', 'Can change attribution'),
                     ('can_read_persons_roles', 'Can read persons roles')
                 )

@@ -30,7 +30,7 @@ from attribution.views.learning_unit.update import UpdateAttributionView
 
 
 class EditChargeRepartition(UpdateAttributionView):
-    permission_required = 'base.can_manage_charge_repartition'
+    permission_required = 'base.can_add_charge_repartition'
     template_name = "attribution/charge_repartition/add_charge_repartition_inner.html"
     form_classes = {
         "lecturing_charge_form": LecturingAttributionChargeForm,

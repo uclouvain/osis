@@ -71,7 +71,7 @@
                                 <span class="glyphicon glyphicon-trash"></span>
                             </a>
                         {% endif %}
-                        {% if can_manage_charge_repartition %}
+                        {% if can_add_charge_repartition %}
                             <a class="trigger_modal"
                                data-url="{% url "edit_charge_repartition" learning_unit_year.id attribution.pk %}"
                                data-modal_class="modal-lg">
@@ -102,7 +102,7 @@
         {% endif %}
         {% if learning_unit_year.is_partim %}
             <a href="{% url "select_attribution" learning_unit_year.id %}" id="manage_repartition"
-               class="btn btn-default {% if not can_manage_charge_repartition %}disabled{% endif %}"
+               class="btn btn-default {% if not can_add_charge_repartition %}disabled{% endif %}"
                role="button">
                 {% trans "Manage repartition" %}
             </a>
