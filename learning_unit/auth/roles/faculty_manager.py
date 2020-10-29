@@ -43,14 +43,14 @@ class FacultyManager(osis_role_models.EntityRoleModel):
             'base.can_edit_learning_unit_proposal':
                 predicates.is_proposal &
                 (predicates.is_user_attached_to_current_requirement_entity |
-                 predicates.is_user_attached_to_initial_requirement_entity) &
+                 predicates.is_user_attached_to_requirement_entity) &
                 predicates.has_faculty_proposal_state &
                 (predicates.is_not_modification_proposal_type |
                  predicates.is_proposal_edition_period_open),
             'base.can_edit_learning_unit_proposal_date':
                 predicates.is_proposal &
                 (predicates.is_user_attached_to_current_requirement_entity |
-                 predicates.is_user_attached_to_initial_requirement_entity) &
+                 predicates.is_user_attached_to_requirement_entity) &
                 predicates.has_faculty_proposal_state &
                 (predicates.is_not_modification_proposal_type |
                  predicates.is_proposal_date_edition_period_open),
@@ -68,7 +68,7 @@ class FacultyManager(osis_role_models.EntityRoleModel):
                 predicates.is_not_proposal_of_type_creation &
                 predicates.has_learning_unit_no_application_this_year &
                 (predicates.is_user_attached_to_current_requirement_entity |
-                 predicates.is_user_attached_to_initial_requirement_entity) &
+                 predicates.is_user_attached_to_requirement_entity) &
                 predicates.is_external_learning_unit_with_cograduation,
             'base.can_edit_learningunit_date':
                 predicates.is_learning_unit_year_older_or_equals_than_limit_settings_year &
@@ -86,7 +86,7 @@ class FacultyManager(osis_role_models.EntityRoleModel):
             'base.can_consolidate_learningunit_proposal':
                 predicates.is_proposal_in_state_to_be_consolidated &
                 (predicates.is_user_attached_to_current_requirement_entity |
-                 predicates.is_user_attached_to_initial_requirement_entity) &
+                 predicates.is_user_attached_to_requirement_entity) &
                 predicates.is_not_proposal_of_type_suppression &
                 predicates.has_learning_unit_no_application_this_year,
             'base.can_manage_charge_repartition':
