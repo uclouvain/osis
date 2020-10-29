@@ -25,6 +25,7 @@
 ##############################################################################
 from base.models import entity
 from base.models import entity_version, offer_year_entity
+from base.models.entity_version_address import EntityVersionAddress
 
 SERVICE_COURSE = 'SERVICE_COURSE'
 
@@ -55,9 +56,11 @@ def create_versions_of_existing_entity(entityversion_data, same_entity):
         identical_versions_count = entity_version.count_identical_versions(same_entity, version)
         if not identical_versions_count:
             parent = entity.get_by_internal_id(version.pop('parent'))
-            res = create_version(version, same_entity, parent)
-            if res is None:
+            addresses_versions = version.pop('entityversionaddress_set')
+            entity_v = create_version(version, same_entity, parent)
+            if entity_v is None:
                 continue
+            [create_address_version(address_row, entity_v) for address_row in addresses_versions]
             new_versions_count += 1
 
     return new_versions_count
@@ -81,3 +84,11 @@ def create_version(version, same_entity, parent):
     except AttributeError:
         new_version = None
     return new_version
+
+
+def create_address_version(address_version, entity_version):
+    try:
+        new_address_version = EntityVersionAddress.objects.create(entity_version=entity_version, **address_version)
+    except AttributeError:
+        new_address_version = None
+    return new_address_version

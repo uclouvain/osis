@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.db.models import Case, When, Q, F
 from django.utils import timezone
@@ -129,3 +131,12 @@ def find_versions_from_entites(entities, date):
 
 def find_by_id(an_id):
     return get_object_or_none(Entity, pk=an_id)
+
+
+def _synchronize():
+    if not all([settings.ESB_API_URL, settings.ESB_REFRESH_COMMON_ADMISSION_ENDPOINT]):
+        raise ImproperlyConfigured('ESB_API_URL / ESB_REFRESH_COMMON_ADMISSION_ENDPOINT'
+                                   'must be set in configuration')
+
+    endpoint = settings.ESB_REFRESH_COMMON_ADMISSION_ENDPOINT
+    return "{esb_api}/{endpoint}".format(esb_api=settings.ESB_API_URL, endpoint=endpoint)

@@ -27,12 +27,30 @@ from rest_framework import serializers
 
 from base.models.entity import Entity
 from base.models.entity_version import EntityVersion
+from base.models.entity_version_address import EntityVersionAddress
+
+
+class EntityVersionAddressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EntityVersionAddress
+        fields = ('location', 'postal_code', 'city', 'country')
 
 
 class EntityVersionSerializer(serializers.ModelSerializer):
+    entityversionaddress_set = EntityVersionAddressSerializer(many=True)
+
     class Meta:
         model = EntityVersion
-        fields = ('acronym', 'title', 'entity_type', 'parent', 'start_date', 'end_date', 'external_id')
+        fields = ('acronym', 'title', 'entity_type', 'parent', 'start_date', 'end_date', 'external_id',
+                  'entityversionaddress_set')
+
+    def create(self, validated_data):
+        addresses_data = validated_data.pop('entityversionaddress_set')
+
+        entity_version = EntityVersion.objects.create(**validated_data)
+        for address_data in addresses_data:
+            EntityVersionAddress.objects.create(entity_version=entity_version, **address_data)
+        return entity_version
 
 
 class EntitySerializer(serializers.ModelSerializer):
