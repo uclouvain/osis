@@ -46,7 +46,7 @@ msgid ""
 "has the following type: %(types)s"
 msgstr ""
 "L'unité d'enseignement ne peut pas être supprimée car il s'agit soit d'un "
-"cours complet, soit d'un des types suivants: "
+"cours complet, soit d'un des types suivants: %(types)s"
 
 msgid "Modification or transformation proposal not allowed during this period."
 msgstr ""
