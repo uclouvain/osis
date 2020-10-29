@@ -26,7 +26,8 @@ from typing import Optional
 from base.ddd.utils import business_validator
 from education_group.ddd.domain._content_constraint import ContentConstraint
 from education_group.ddd.domain.exception import ContentConstraintTypeMissing, ContentConstraintMinimumMaximumMissing, \
-    ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum
+    ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum, ContentConstraintMinimumInvalid, \
+    ContentConstraintMaximumInvalid
 
 
 class ContentConstraintValidator(business_validator.BusinessValidator):
@@ -49,3 +50,11 @@ class ContentConstraintValidator(business_validator.BusinessValidator):
         if self.content_constraint.minimum is not None and self.content_constraint.maximum is not None and \
                 self.content_constraint.minimum > self.content_constraint.maximum:
             raise ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum
+
+        if self.content_constraint.type and \
+           (self.content_constraint.minimum and (self.content_constraint.minimum < 1 or self.content_constraint.minimum > 99999999999999)):
+            raise ContentConstraintMinimumInvalid
+
+        if self.content_constraint.type and \
+           (self.content_constraint.maximum and (self.content_constraint.maximum < 1 or self.content_constraint.maximum > 99999999999999)):
+            raise ContentConstraintMaximumInvalid
