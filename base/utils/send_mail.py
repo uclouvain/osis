@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -307,8 +307,6 @@ def send_message_after_all_encoded_by_manager(persons, enrollments, learning_uni
                                                                 [table], [receiver], template_base_data, subject_data,
                                                                 attachment)
         message_service.send_messages(message_content)
-
-    return None
 
 
 def build_scores_sheet_attachment(list_exam_enrollments):
