@@ -166,7 +166,7 @@
                     <div class="row">
                         <div class="col-md-12">
                             {% bootstrap_label _("Learning location") label_class='d-block'%}
-                            <p>{{ group.teaching_campus.name }} </p>
+                            <p>{{ group.teaching_campus.name }}{% if group.teaching_campus.university_name %} - {{ group.teaching_campus.university_name }}{% endif %}</p>
                         </div>
                     </div>
                 </div>

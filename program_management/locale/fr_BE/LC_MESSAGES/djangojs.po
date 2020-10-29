@@ -36,7 +36,7 @@ msgid "Existing name version"
 msgstr "Cette version existe déjà"
 
 msgid "Invalid name version"
-msgstr "Nom de version invalide"
+msgstr "Sigle de version invalide"
 
 msgid "Modify the link"
 msgstr "Modifier le lien"
