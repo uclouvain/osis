@@ -203,6 +203,9 @@ def _add_revision_informations(learning_unit_yr, line, cms_label):
     if version:
         line.append(version.values('author')[:1][0]["author"])
         line.append(version.values('revision__date_created')[:1][0]["revision__date_created"].date())
+    else:
+        line.append('')
+        line.append('')
 
 
 def _add_pedagogies_translated_labels_with_text(label_key, line, translated_labels_with_text):
