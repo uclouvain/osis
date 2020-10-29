@@ -138,7 +138,6 @@ class ExternalLearningUnitFilter(FilterSet):
     def _init_campus_choices(self):
         self.form.fields['campus'].choices = Campus.objects.filter(
             organization__entity__entityversion__entityversionaddress__city=self.data['city'],
-            organization__entity__entityversion__entityversionaddress__is_main=True,
             organization__entity__entityversion__parent__isnull=True
         ).distinct('organization__name').order_by('organization__name').values_list('pk', 'organization__name')
 
@@ -176,15 +175,17 @@ class ExternalLearningUnitFilter(FilterSet):
         return filter_field_by_regex(queryset, name, value)
 
     def filter_country_field(self, queryset, name, value):
-        return queryset.filter(
-            campus__organization__entity__entityversion__entityversionaddress__country=value,
-            campus__organization__entity__entityversion__entityversionaddress__is_main=True,
-            campus__organization__entity__entityversion__parent__isnull=True
-        )
+        if value:
+            queryset = queryset.filter(
+                campus__organization__entity__entityversion__entityversionaddress__country=value,
+                campus__organization__entity__entityversion__parent__isnull=True
+            )
+        return queryset
 
     def filter_city_field(self, queryset, name, value):
-        return queryset.filter(
-            campus__organization__entity__entityversion__entityversionaddress__city=value,
-            campus__organization__entity__entityversion__entityversionaddress__is_main=True,
-            campus__organization__entity__entityversion__parent__isnull=True
-        )
+        if value:
+            queryset = queryset.filter(
+                campus__organization__entity__entityversion__entityversionaddress__city=value,
+                campus__organization__entity__entityversion__parent__isnull=True
+            )
+        return queryset

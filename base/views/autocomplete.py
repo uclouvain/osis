@@ -46,7 +46,6 @@ class OrganizationAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetV
         if country:
             qs = qs.filter(
                 entity__entityversion__parent__isnull=True,
-                entity__entityversion__entityversionaddress__is_main=True,
                 entity__entityversion__entityversionaddress__country=country,
             )
 
@@ -84,7 +83,6 @@ class CampusAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
         if country:
             qs = qs.filter(
                 organization__entity__entityversion__parent__isnull=True,
-                organization__entity__entityversion__entityversionaddress__is_main=True,
                 organization__entity__entityversion__entityversionaddress__country=country,
             )
 

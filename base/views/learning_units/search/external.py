@@ -37,7 +37,6 @@ def get_campuses_related_to_city(request):
     city = request.GET.get('city')
     campuses = Campus.objects.filter(
         organization__entity__entityversion__entityversionaddress__city=city,
-        organization__entity__entityversion__entityversionaddress__is_main=True,
         organization__entity__entityversion__parent__isnull=True
     ).distinct('organization__name').order_by('organization__name').values('pk', 'organization__name')
     return JsonResponse(list(campuses), safe=False)
