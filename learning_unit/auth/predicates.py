@@ -13,9 +13,9 @@ from osis_role.cache import predicate_cache
 from osis_role.errors import predicate_failed_msg
 
 FACULTY_EDITABLE_CONTAINER_TYPES = (
-    learning_container_year_types.COURSE,
-    learning_container_year_types.DISSERTATION,
-    learning_container_year_types.INTERNSHIP
+    LearningContainerYearType.COURSE,
+    LearningContainerYearType.DISSERTATION,
+    LearningContainerYearType.INTERNSHIP
 )
 
 PROPOSAL_CONSOLIDATION_ELIGIBLE_STATES = (ProposalState.ACCEPTED.name, ProposalState.REFUSED.name)
@@ -67,7 +67,7 @@ def is_learning_unit_year_older_or_equals_than_limit_settings_year(self, user, l
 @predicate(bind=True)
 @predicate_failed_msg(message=_("You cannot delete a learning unit which is prerequisite or has prerequisite(s)"))
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
-def is_learning_unit_year_not_prerequisite(self, user, learning_unit_year):
+def has_learning_unit_prerequisite_dependencies(self, user, learning_unit_year):
     if learning_unit_year:
         return not learning_unit_year.is_prerequisite()
     return None
@@ -101,12 +101,17 @@ def is_learning_unit_container_type_deletable(self, user, learning_unit_year):
 
 
 @predicate(bind=True)
-@predicate_failed_msg(message=_("This learning unit isn't eligible for modification because of it's type"))
+@predicate_failed_msg(
+    message=_(
+        "This learning unit isn't eligible for modification because of its type which is not among those types:"
+        " %(types)s"
+    ) % {"types": [type.value for type in FACULTY_EDITABLE_CONTAINER_TYPES]}
+)
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def is_learning_unit_container_type_editable(self, user, learning_unit_year):
     if learning_unit_year:
         container = learning_unit_year.learning_container_year
-        return container and container.container_type in FACULTY_EDITABLE_CONTAINER_TYPES
+        return container and container.container_type in [type.name for type in FACULTY_EDITABLE_CONTAINER_TYPES]
     return None
 
 
@@ -190,9 +195,9 @@ def is_learning_unit_year_a_partim(self, user, learning_unit_year):
 
 
 @predicate(bind=True)
-@predicate_failed_msg(message=_("Not in proposal"))
+@predicate_failed_msg(message=_("The learning unit is not in proposal state"))
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
-def is_proposal(self, user, learning_unit_year):
+def is_in_proposal_state(self, user, learning_unit_year):
     if learning_unit_year:
         return ProposalLearningUnit.objects.filter(
             learning_unit_year__learning_unit=learning_unit_year.learning_unit,
@@ -202,9 +207,9 @@ def is_proposal(self, user, learning_unit_year):
 
 
 @predicate(bind=True)
-@predicate_failed_msg(message=_("You can't edit because the learning unit has proposal"))
+@predicate_failed_msg(message=_("The learning unit has proposal"))
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
-def is_not_proposal(self, user, learning_unit_year):
+def is_not_in_proposal_state(self, user, learning_unit_year):
     if learning_unit_year:
         return not ProposalLearningUnit.objects.filter(
             learning_unit_year__learning_unit=learning_unit_year.learning_unit,

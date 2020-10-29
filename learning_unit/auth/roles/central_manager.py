@@ -31,20 +31,20 @@ class CentralManager(osis_role_models.EntityRoleModel):
             'base.can_delete_learningunit':
                 predicates.is_user_attached_to_current_requirement_entity &
                 predicates.is_learning_unit_year_older_or_equals_than_limit_settings_year &
-                predicates.is_learning_unit_year_not_prerequisite &
+                predicates.has_learning_unit_prerequisite_dependencies &
                 predicates.has_learning_unit_no_application_all_years,
             'base.can_edit_learningunit':
                 predicates.is_user_attached_to_current_requirement_entity &
                 predicates.is_learning_unit_year_older_or_equals_than_limit_settings_year &
                 predicates.is_learning_unit_edition_period_open &
                 predicates.is_external_learning_unit_with_cograduation &
-                predicates.is_not_proposal,
+                predicates.is_not_in_proposal_state,
             'base.add_externallearningunityear': rules.always_allow,
             'base.can_propose_learningunit':
                 predicates.is_learning_unit_year_not_in_past &
                 predicates.is_learning_unit_year_not_a_partim &
                 predicates.is_learning_unit_container_type_editable &
-                predicates.is_not_proposal &
+                predicates.is_not_in_proposal_state &
                 predicates.is_user_attached_to_current_requirement_entity &
                 predicates.is_external_learning_unit_with_cograduation,
             'base.can_edit_learning_unit_proposal':
@@ -69,7 +69,7 @@ class CentralManager(osis_role_models.EntityRoleModel):
                 predicates.is_learning_unit_edition_period_open &
                 predicates.is_user_attached_to_current_requirement_entity &
                 predicates.is_external_learning_unit_with_cograduation &
-                predicates.is_not_proposal,
+                predicates.is_not_in_proposal_state,
             'base.can_edit_learningunit_pedagogy':
                 predicates.is_learning_unit_year_older_or_equals_than_limit_settings_year &
                 predicates.is_user_attached_to_current_requirement_entity,

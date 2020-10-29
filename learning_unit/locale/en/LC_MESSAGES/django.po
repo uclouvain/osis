@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-29 15:59+0100\n"
+"POT-Creation-Date: 2020-10-29 16:34+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -48,9 +48,6 @@ msgstr ""
 msgid "Modification or transformation proposal not allowed during this period."
 msgstr ""
 
-msgid "Not in proposal"
-msgstr ""
-
 msgid "Only letters are allowed."
 msgstr ""
 
@@ -63,10 +60,16 @@ msgstr ""
 msgid "Proposal not in eligible state for consolidation"
 msgstr ""
 
+msgid "The learning unit has proposal"
+msgstr ""
+
 msgid "The learning unit is a partim"
 msgstr ""
 
 msgid "The learning unit is not a partim"
+msgstr ""
+
+msgid "The learning unit is not in proposal state"
 msgstr ""
 
 msgid "This learning unit has application"
@@ -87,7 +90,10 @@ msgstr ""
 msgid "This learning unit is not of type suppression"
 msgstr ""
 
-msgid "This learning unit isn't eligible for modification because of it's type"
+#, python-format
+msgid ""
+"This learning unit isn't eligible for modification because of its type which "
+"is not among those types: %(types)s"
 msgstr ""
 
 msgid "You can only edit co-graduation external learning units"
@@ -96,9 +102,6 @@ msgstr ""
 msgid ""
 "You can only modify a learning unit when your are linked to its requirement "
 "entity"
-msgstr ""
-
-msgid "You can't edit because the learning unit has proposal"
 msgstr ""
 
 #, python-format
