@@ -97,7 +97,7 @@ optional_header_for_description_fiche = [
     _('Last update description fiche on')
 ]
 
-optional_header_for_force_majeure = optional_header_for_description_fiche + [
+optional_header_for_force_majeure = [
     _('Teaching methods (force majeure)'), "{} {}".format(_('Teaching methods (force majeure)'), _('in English')),
     _('Evaluation methods (force majeure)'), "{} {}".format(_('Evaluation methods (force majeure)'), _('in English')),
     _('Other informations (force majeure)'), "{} {}".format(_('Other informations (force majeure)'), _('in English')),
@@ -194,9 +194,9 @@ class EducationGroupYearLearningUnitsContainedToExcel:
         force_majeure = False
 
         if custom_xls_form.is_valid():
-            description_fiche = True if 'description_fiche' in custom_xls_form.fields else False
-            specifications = True if 'specifications' in custom_xls_form.fields else False
-            force_majeure = True if 'force_majeure' in custom_xls_form.fields else False
+            description_fiche = custom_xls_form.cleaned_data['description_fiche']
+            specifications = custom_xls_form.cleaned_data['specifications']
+            force_majeure = custom_xls_form.cleaned_data['force_majeure']
 
         if description_fiche or specifications or force_majeure:
             self.qs = _annotate_with_description_fiche_specifications(
@@ -330,6 +330,8 @@ def _add_optional_titles(custom_xls_form):
     if custom_xls_form.is_valid():
         for field in custom_xls_form.fields:
             if custom_xls_form.cleaned_data[field]:
+                if field == 'force_majeure' and not custom_xls_form.cleaned_data['description_fiche']:
+                    data = data + globals().get("optional_header_for_description_fiche")
                 data = data + globals().get("optional_header_for_{}".format(field), [])
     return data
 
