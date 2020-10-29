@@ -82,9 +82,11 @@ class TestOrganizationAutocomplete(TestCase):
             self.url,
             data={'forward': '{"country": "%s"}' % self.main_address.country.pk}
         )
-        expected_results = [{'text': self.partner_academic_organization.name,
-                             'selected_text': self.partner_academic_organization.name,
-                             'id': str(self.partner_academic_organization.pk)}]
+        expected_results = [{
+            'text': self.partner_academic_organization.name,
+            'selected_text': self.partner_academic_organization.name,
+            'id': str(self.partner_academic_organization.pk)
+        }]
 
         self.assertEqual(response.status_code, 200)
         results = _get_results_from_autocomplete_response(response)
@@ -101,7 +103,7 @@ class TestOrganizationAutocomplete(TestCase):
         results = _get_results_from_autocomplete_response(response)
         self.assertListEqual(results, [])
 
-    def test_when_filter_with_country_data_forwarded_no_result_found_case_not_main(self):
+    def test_when_filter_with_country_data_forwarded_result_found_case_not_main(self):
         self.main_address.is_main = False
         self.main_address.save()
         response = self.client.get(
@@ -109,9 +111,14 @@ class TestOrganizationAutocomplete(TestCase):
             data={'forward': '{"country": "%s"}' % self.main_address.country.pk}
         )
 
+        expected_results = [{
+            'text': self.partner_academic_organization.name,
+            'selected_text': self.partner_academic_organization.name,
+            'id': str(self.partner_academic_organization.pk)
+        }]
         self.assertEqual(response.status_code, 200)
         results = _get_results_from_autocomplete_response(response)
-        self.assertListEqual(results, [])
+        self.assertListEqual(results, expected_results)
 
 
 class TestCountryAutocomplete(TestCase):
