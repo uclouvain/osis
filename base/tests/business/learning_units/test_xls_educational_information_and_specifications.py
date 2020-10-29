@@ -94,6 +94,7 @@ class TestXlsEducationalInformationSpecificationXls(TestCase):
     def _create_cms_data(cls):
         cls._create_needed_cms_label(CMS_LABEL_PEDAGOGY_FR_AND_EN + CMS_LABEL_SPECIFICATIONS, True)
         cls._create_needed_cms_label(CMS_LABEL_PEDAGOGY_FR_ONLY, False)
+        cls._create_needed_cms_label(CMS_LABEL_PEDAGOGY_FORCE_MAJEURE, True)
 
     @classmethod
     def _create_needed_cms_label(cls, cms_labels, with_en):
@@ -165,12 +166,12 @@ class TestXlsEducationalInformationSpecificationXls(TestCase):
             str("cms_mobility - FR-BE"),
             str(_('Last update description fiche by')),
             str(_('Last update description fiche on')),
-            str(' - FR-BE'),
-            str(' - EN'),
-            str(' - FR-BE'),
-            str(' - EN'),
-            str(' - FR-BE'),
-            str(' - EN'),
+            str('cms_teaching_methods_force_majeure - FR-BE'),
+            str('cms_teaching_methods_force_majeure - EN'),
+            str('cms_evaluation_methods_force_majeure - FR-BE'),
+            str('cms_evaluation_methods_force_majeure - EN'),
+            str('cms_other_informations_force_majeure - FR-BE'),
+            str('cms_other_informations_force_majeure - EN'),
             str(_('Last update description fiche (force majeure) by')),
             str(_('Last update description fiche (force majeure) on')),
             str('cms_themes_discussed - FR-BE'),
