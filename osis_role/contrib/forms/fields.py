@@ -71,5 +71,3 @@ class EntityRoleModelChoiceField(EntityRoleChoiceFieldMixin, forms.ModelChoiceFi
 class EntityRoleAutocompleteField(LoginRequiredMixin, autocomplete.Select2QuerySetView, EntityRoleChoiceFieldMixin):
     def get_result_label(self, result):
         return format_html(result.verbose_title)
-
-
