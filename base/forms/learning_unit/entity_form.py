@@ -33,7 +33,7 @@ from base.models.enums.entity_type import FACULTY
 from base.models.person import Person
 from learning_unit.auth.roles.central_manager import CentralManager
 from learning_unit.auth.roles.faculty_manager import FacultyManager
-from osis_role.contrib.forms.fields import EntityRoleChoiceField
+from osis_role.contrib.forms.fields import EntityRoleModelChoiceField
 from osis_role.contrib.helper import EntityRoleHelper
 
 
@@ -53,7 +53,7 @@ class EntitiesVersionChoiceField(forms.ModelChoiceField):
         return ev_data.entity if ev_data else None
 
 
-class EntitiesVersionRoleChoiceField(EntityRoleChoiceField):
+class EntitiesVersionRoleModelChoiceField(EntityRoleModelChoiceField):
     entity_version = None
 
     def __init__(self, person=None, initial=None, *args, **kwargs):

@@ -35,7 +35,9 @@ from base.models.entity_version import find_pedagogical_entities_version
 from base.models.enums.organization_type import ACADEMIC_PARTNER, MAIN
 from base.models.organization import Organization
 from base.models.person import Person
-from osis_role.contrib.helper import EntityRoleHelper
+from learning_unit.auth.roles.central_manager import CentralManager
+from learning_unit.auth.roles.faculty_manager import FacultyManager
+from osis_role.contrib.forms.fields import EntityRoleAutocompleteField
 from reference.models.country import Country
 
 
@@ -131,16 +133,10 @@ class AdditionnalEntity2Autocomplete(EntityAutocomplete):
         return super(AdditionnalEntity2Autocomplete, self).get_queryset()
 
 
-class EntityRequirementAutocomplete(EntityAutocomplete):
-    def get_queryset(self):
-        person = self.request.user.person
-        group_names = list(self.request.user.groups.values_list('name', flat=True))
-        return super(EntityRequirementAutocomplete, self).get_queryset().filter(
-            entity__in=EntityRoleHelper.get_all_entities(person=person, group_names=group_names)
-        )
-
-    def get_result_label(self, result):
-        return format_html(result.verbose_title)
+class EntityRequirementAutocomplete(EntityRoleAutocompleteField):
+    def __init__(self):
+        super().__init__()
+        self.group_names = (FacultyManager.group_name, CentralManager.group_name, )
 
 
 class EmployeeAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):

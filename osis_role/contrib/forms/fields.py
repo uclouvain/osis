@@ -23,16 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from dal import autocomplete
 from django import forms
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils import timezone
+from django.utils.html import format_html
 
 from base.models.entity_version import EntityVersion
 from osis_role.contrib.helper import EntityRoleHelper
 
 
-class EntityRoleChoiceField(forms.ModelChoiceField):
+class EntityRoleChoiceFieldMixin:
     """
-       ModelChoiceField which allow to display entities which have a link with person according to all
+       Mixin which allows to display entities which have a link with person according to all
        EntityRoleModel declared in OSIS Role Manager
     """
     def __init__(self, person, group_names, **kwargs):
@@ -42,22 +45,31 @@ class EntityRoleChoiceField(forms.ModelChoiceField):
             kwargs['queryset'] = self.get_queryset()
         super().__init__(**kwargs)
 
+    def get_queryset(self):
+        entities_link_to_user = EntityRoleHelper.get_all_entities(self.get_person(), self.get_group_names())
+        date = timezone.now()
+        return EntityVersion.objects.current(date).filter(
+            entity__in=entities_link_to_user
+        ).select_related('entity__organization')
+
     def get_group_names(self):
         return self._group_names
 
     def get_person(self):
         return self._person
 
-    def get_queryset(self):
-        entities_link_to_user = EntityRoleHelper.get_all_entities(self._person, self._group_names)
-        date = timezone.now()
-        return EntityVersion.objects.current(date).filter(
-            entity__in=entities_link_to_user
-        ).select_related('entity__organization')
 
+class EntityRoleModelChoiceField(EntityRoleChoiceFieldMixin, forms.ModelChoiceField):
     def label_from_instance(self, obj):
         return obj.verbose_title
 
     def clean(self, value):
         entity_version = super().clean(value)
         return entity_version.entity if entity_version else None
+
+
+class EntityRoleAutocompleteField(LoginRequiredMixin, autocomplete.Select2QuerySetView, EntityRoleChoiceFieldMixin):
+    def get_result_label(self, result):
+        return format_html(result.verbose_title)
+
+

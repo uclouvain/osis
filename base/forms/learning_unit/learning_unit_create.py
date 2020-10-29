@@ -33,7 +33,7 @@ from django.utils.translation import gettext_lazy as _
 
 from base.business.learning_units.edition import update_partim_acronym
 from base.forms.learning_unit.entity_form import find_additional_requirement_entities_choices, \
-    EntitiesVersionRoleChoiceField
+    EntitiesVersionRoleModelChoiceField
 from base.forms.utils.acronym_field import AcronymField, PartimAcronymField, split_acronym
 from base.forms.utils.choice_field import add_blank, add_all
 from base.models.campus import find_main_campuses
@@ -288,7 +288,7 @@ class LearningContainerYearModelForm(PermissionFieldMixin, forms.ModelForm):
                 qs.update(**{attr_name: None})
 
     def __init_requirement_entity_field(self):
-        self.fields['requirement_entity'] = EntitiesVersionRoleChoiceField(
+        self.fields['requirement_entity'] = EntitiesVersionRoleModelChoiceField(
             person=self.user.person,
             initial=self.initial.get('requirement_entity'),
             widget=autocomplete.ModelSelect2(
@@ -310,7 +310,7 @@ class LearningContainerYearModelForm(PermissionFieldMixin, forms.ModelForm):
         )
 
     def __init_allocation_entity_field(self):
-        self.fields['allocation_entity'] = EntitiesVersionRoleChoiceField(
+        self.fields['allocation_entity'] = EntitiesVersionRoleModelChoiceField(
             person=self.user.person,
             initial=self.initial.get('allocation_entity'),
             widget=autocomplete.ModelSelect2(
@@ -326,7 +326,7 @@ class LearningContainerYearModelForm(PermissionFieldMixin, forms.ModelForm):
         )
 
     def __init_additional_entity_1_field(self):
-        self.fields['additional_entity_1'] = EntitiesVersionRoleChoiceField(
+        self.fields['additional_entity_1'] = EntitiesVersionRoleModelChoiceField(
             person=self.user.person,
             initial=self.initial.get('additional_entity_1'),
             required=False,
@@ -360,7 +360,7 @@ class LearningContainerYearModelForm(PermissionFieldMixin, forms.ModelForm):
         )
 
     def __init_additional_entity_2_field(self):
-        self.fields['additional_entity_2'] = EntitiesVersionRoleChoiceField(
+        self.fields['additional_entity_2'] = EntitiesVersionRoleModelChoiceField(
             person=self.user.person,
             initial=self.initial.get('additional_entity_2'),
             required=False,
