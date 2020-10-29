@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -140,14 +140,14 @@ class TestSendMessage(TestCase):
     @patch("osis_common.messaging.message_config.create_table")
     def test_with_one_enrollment(self, mock_create_table, mock_send_messages):
         send_mail.send_message_after_all_encoded_by_manager(
-            self.persons,
+            [self.person_1],
             [self.exam_enrollment_1],
             self.learning_unit_year.acronym,
             self.offer_year.acronym
         )
         args = mock_create_table.call_args[0]
         self.assertEqual(args[0], 'enrollments')
-        self.assertCountEqual(list(args[1]), send_mail.get_enrollment_headers())
+
         self.assertListEqual(
             list(args[2][0]),
             [self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.offer_year.acronym,
@@ -161,9 +161,8 @@ class TestSendMessage(TestCase):
         args = mock_send_messages.call_args[0][0]
         self.assertEqual(self.learning_unit_year.acronym, args.get('subject_data').get('learning_unit_acronym'))
         self.assertEqual(self.offer_year.acronym, args.get('subject_data').get('offer_acronym'))
-        self.assertEqual(len(args.get('receivers')), 2)
+        self.assertEqual(len(args.get('receivers')), 1)
         self.assertEqual(args.get('receivers')[0].get('receiver_lang'), LANGUAGE_CODE_FR)
-        self.assertEqual(args.get('receivers')[1].get('receiver_lang'), LANGUAGE_CODE_EN)
         self.assertIsNotNone(args.get('attachment'))
         self.assertEqual(args.get('html_template_ref'),
                          "{}_html".format(send_mail.ASSESSMENTS_ALL_SCORES_BY_PGM_MANAGER))
@@ -191,7 +190,7 @@ class TestSendMessage(TestCase):
             )
             args = mock_create_table.call_args[0]
             self.assertEqual(args[0], 'submitted_enrollments')
-            self.assertCountEqual(list(args[1]), send_mail.get_enrollment_headers())
+            self.assertCountEqual(list(args[1]), send_mail.get_enrollment_headers(person.language))
             self.assertListEqual(
                 list(args[2][0]),
                 [self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.offer_year.acronym,
@@ -222,6 +221,14 @@ class TestSendMessage(TestCase):
         self.assertEqual(send_mail._get_encoding_status(LANGUAGE_CODE_EN, True), 'All the scores are encoded.')
         self.assertEqual(send_mail._get_encoding_status(LANGUAGE_CODE_FR, True),
                          'Toutes les notes ont été soumises.')
+
+    def test_check_table_headers_fr_be(self):
+        expected = ['Sigle', 'Session', 'Noma', 'Nom', 'Prénom', 'Note', 'Justification']
+        self.assertListEqual(expected, send_mail.get_enrollment_headers('fr-be'))
+
+    def test_check_table_headers_en(self):
+        expected = ['Program', 'Session number', 'Registration number', 'Last name', 'First name', 'Score', 'Justification']
+        self.assertListEqual(expected, send_mail.get_enrollment_headers('en'))
 
 
 def add_message_template_txt():
