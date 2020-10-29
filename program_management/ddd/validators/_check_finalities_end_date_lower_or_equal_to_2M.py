@@ -25,6 +25,7 @@ import sys
 from typing import Set
 
 from base.ddd.utils import business_validator
+from base.utils.constants import INFINITE_VALUE
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception
 
@@ -47,7 +48,7 @@ class Check2MEndDateGreaterOrEqualToItsFinalities(business_validator.BusinessVal
             raise exception.Program2MEndDateShouldBeGreaterOrEqualThanItsFinalities(finality_with_greatest_end_date)
 
     def _get_finality_with_greatest_end_date(self, finalities: Set['Node']) -> 'Node':
-        return sorted((finality for finality in finalities), key=lambda node: node.end_year or sys.maxsize)[-1]
+        return sorted((finality for finality in finalities), key=lambda node: node.end_year or INFINITE_VALUE)[-1]
 
     def _is_tree_version_end_year_inferior(self, finality: 'Node') -> bool:
         tree_version_end_year = self.tree_version.end_year_of_existence

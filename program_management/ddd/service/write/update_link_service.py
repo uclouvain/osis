@@ -37,12 +37,12 @@ def update_link(cmd: UpdateLinkCommand) -> 'Link':
     tree = ProgramTreeRepository.get(tree_id)
 
     child_id = NodeIdentity(code=cmd.child_node_code, year=cmd.child_node_year)
-    link_updated = get_updated_link(child_id, tree, cmd)
+    link_updated = _update_link(child_id, tree, cmd)
     ProgramTreeRepository.update(tree)
     return link_updated
 
 
-def get_updated_link(child_id, tree, update_cmd):
+def _update_link(child_id, tree, update_cmd):
     return tree.update_link(
         parent_path=str(tree.root_node.node_id),
         child_id=child_id,

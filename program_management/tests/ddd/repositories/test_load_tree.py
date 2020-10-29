@@ -70,6 +70,9 @@ class TestLoadTree(TestCase):
         group_year = self.root_node.group_year
         tree = load_tree.load(self.root_node.pk)
         self.assertEqual(tree.root_node.credits, group_year.credits, "Field used to load prerequisites excel")
+        self.assertEqual(tree.root_node.version_name, self.education_group_version.version_name)
+        self.assertEqual(tree.root_node.version_title_fr, self.education_group_version.title_fr)
+        self.assertEqual(tree.root_node.version_title_en, self.education_group_version.title_en)
 
     def test_case_tree_root_with_multiple_level(self):
         education_group_program_tree = load_tree.load(self.root_node.pk)

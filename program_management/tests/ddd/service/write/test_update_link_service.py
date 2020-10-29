@@ -168,7 +168,7 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
         self.fake_program_tree_repository.create(minor_list_choice_tree)
 
         cmd = UpdateLinkCommandFactory(
-            link_type=LinkTypes.REFERENCE,
+            link_type=LinkTypes.REFERENCE.name,
             parent_node_code=minor_list_choice_tree.root_node.code,
             parent_node_year=minor_list_choice_tree.root_node.year,
             child_node_code=minor_list_choice_tree.root_node.children_as_nodes[0].code,
@@ -191,7 +191,42 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
 
         self.assertIsInstance(
             e.exception.exceptions[0],
-            exception.ReferenceLinkNotAllowedException
+            exception.ChildTypeNotAuthorizedException
+        )
+
+    def test_failure_when_successive_reference_links_and_reference_children_type_not_valid_for_parent(self):
+        successive_reference_link_tree_data = {
+            "node_type": GroupType.COMPLEMENTARY_MODULE,
+            "children": [
+                {
+                    "node_type": GroupType.SUB_GROUP,
+                    "children": [
+                        {
+                            "node_type": GroupType.SUB_GROUP,
+                            "link_data": {"link_type": LinkTypes.REFERENCE},
+                            "children": [{"node_type": NodeType.LEARNING_UNIT}]
+                        }
+                    ]
+                }
+            ]
+        }
+        tree_with_successive_reference_link = tree_builder(successive_reference_link_tree_data)
+        self.fake_program_tree_repository.create(tree_with_successive_reference_link)
+
+        invalid_command = UpdateLinkCommandFactory(
+            link_type=LinkTypes.REFERENCE.name,
+            parent_node_code=tree_with_successive_reference_link.root_node.code,
+            parent_node_year=tree_with_successive_reference_link.root_node.year,
+            child_node_code=tree_with_successive_reference_link.root_node.children_as_nodes[0].code,
+            child_node_year=tree_with_successive_reference_link.root_node.children_as_nodes[0].year,
+        )
+
+        with self.assertRaises(MultipleBusinessExceptions) as e:
+            update_link_service.update_link(invalid_command)
+
+        self.assertIsInstance(
+            e.exception.exceptions[0],
+            exception.ChildTypeNotAuthorizedException
         )
 
     def test_update_link_properties(self):
@@ -212,3 +247,41 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
         self.assertEqual(result.comment, valid_cmd.comment)
         self.assertEqual(result.comment_english, valid_cmd.comment_english)
         self.assertEqual(result.relative_credits, valid_cmd.relative_credits)
+
+    def test_failure_if_maximum_children_reached(self):
+        tree_data = {
+            "node_type": TrainingType.BACHELOR,
+            "end_year": 2018,
+            "children": [
+                {
+                    "node_type": GroupType.COMMON_CORE,
+                    "children": [{"node_type": GroupType.MINOR_LIST_CHOICE}]
+                },
+
+                {"node_type": GroupType.MINOR_LIST_CHOICE}
+            ]
+        }
+        tree = tree_builder(tree_data)
+        self.fake_program_tree_repository.create(tree)
+        tree.authorized_relationships.update(
+            TrainingType.BACHELOR,
+            GroupType.MINOR_LIST_CHOICE,
+            max_count_authorized=1
+
+        )
+
+        invalid_command = UpdateLinkCommandFactory(
+            link_type=LinkTypes.REFERENCE.name,
+            parent_node_code=tree.root_node.code,
+            parent_node_year=tree.root_node.year,
+            child_node_code=tree.root_node.children_as_nodes[0].code,
+            child_node_year=tree.root_node.children_as_nodes[0].year,
+        )
+
+        with self.assertRaises(MultipleBusinessExceptions) as e:
+            update_link_service.update_link(invalid_command)
+
+        self.assertIsInstance(
+            e.exception.exceptions[0],
+            exception.MaximumChildTypesReachedException
+        )

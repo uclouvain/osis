@@ -25,9 +25,8 @@
 ##############################################################################
 import functools
 import itertools
-from typing import List, Union
+from typing import List
 
-import osis_common.ddd.interface
 from django import shortcuts
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
@@ -39,30 +38,23 @@ from django.views.generic import FormView
 from django.views.generic.base import View
 
 import program_management.ddd.command
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
+from base.forms.exceptions import InvalidFormException
 from base.utils.cache import ElementCache
 from base.views.common import display_warning_messages, display_success_messages, display_error_messages
 from base.views.mixins import AjaxTemplateMixin
-from education_group.ddd import command as command_education_group
-from education_group.ddd.domain.exception import GroupNotFoundException
-from education_group.ddd.service.read import get_group_service
 from education_group.models.group_year import GroupYear
-from education_group.templatetags.academic_year_display import display_as_academic_year
-from osis_common.ddd import interface
 from osis_role import errors
 from osis_role.contrib.views import AjaxPermissionRequiredMixin
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import node
-from program_management.ddd.domain.node import NodeGroupYear
-from program_management.ddd.domain.node import NodeIdentity
-from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
-from program_management.ddd.repositories import node as node_repository
+from program_management.ddd.repositories import node as node_repository, load_node
 from program_management.ddd.service.read import element_selected_service, check_paste_node_service
-from program_management.forms.tree.paste import PasteNodesFormset, paste_form_factory, PasteToOptionListChoiceForm, \
-    PasteToMinorMajorListChoiceForm, PasteMinorMajorListToMinorMajorListChoiceForm
+from program_management.forms.tree.paste import PasteNodeForm, BasePasteNodesFormset
 
 
 class PasteNodesView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageMixin, FormView):
-    template_name = "tree/paste_inner.html"
+    template_name = "tree/link_update_inner.html"
     permission_required = "base.can_attach_node"
 
     def has_permission(self):
@@ -75,11 +67,10 @@ class PasteNodesView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, SuccessMess
 
     @functools.lru_cache()
     def _has_permission_to_detach(self) -> bool:
-        nodes_to_detach_from = [
-            int(element_selected["path_to_detach"].split("|")[-2])
-            for element_selected in self.nodes_to_paste if element_selected["path_to_detach"]
-        ]
-        objs_to_detach_from = GroupYear.objects.filter(element__id__in=nodes_to_detach_from)
+        if not self.path_to_detach_from:
+            return True
+        node_to_detach_from = int(self.path_to_detach_from.split("|")[-2])
+        objs_to_detach_from = GroupYear.objects.filter(element__id=node_to_detach_from)
         return all(
             self.request.user.has_perm("base.can_detach_node", obj_to_detach)
             for obj_to_detach in objs_to_detach_from
@@ -89,143 +80,94 @@ class PasteNodesView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, SuccessMess
         node_to_paste_to_id = int(self.request.GET['path'].split("|")[-1])
         return shortcuts.get_object_or_404(GroupYear, element__pk=node_to_paste_to_id)
 
-    @cached_property
-    def nodes_to_paste(self) -> List[dict]:
-        year = self.request.GET.get("year")
-        codes = self.request.GET.getlist("codes", [])
-        if codes and year:
-            return [{"element_code": code, "element_year": int(year), "path_to_detach": None} for code in codes]
-        node_to_paste = element_selected_service.retrieve_element_selected(self.request.user.id)
-        return [node_to_paste] if node_to_paste else []
-
-    def get_form_class(self):
-        return formset_factory(form=paste_form_factory, formset=PasteNodesFormset, extra=len(self.nodes_to_paste))
-
-    def get_form_kwargs(self) -> List[dict]:
-        return [self._get_form_kwargs(element_selected)
-                for element_selected in self.nodes_to_paste]
-
-    def _get_form_kwargs(
-            self,
-            element_selected: dict,
-    ) -> dict:
-        return {
-            'node_to_paste_code': element_selected["element_code"],
-            'node_to_paste_year': element_selected["element_year"],
-            'path_of_node_to_paste_into': self.request.GET['path'],
-            'path_to_detach': element_selected["path_to_detach"],
-        }
-
-    def get_form(self, form_class=None):
-        if form_class is None:
-            form_class = self.get_form_class()
-        return form_class(form_kwargs=self.get_form_kwargs(), data=self.request.POST or None)
-
     def get_context_data(self, **kwargs):
         context_data = super().get_context_data(**kwargs)
-        context_data["formset"] = context_data.pop("form")
-        context_data["is_parent_a_minor_major_option_list_choice"] = self._is_parent_a_minor_major_option_list_choice(
-            context_data["formset"]
-        )
-        context_data["nodes_by_id"] = {
-            ele["element_code"]: node_repository.NodeRepository.get(
-                node.NodeIdentity(ele["element_code"], ele["element_year"])
-            ) for ele in self.nodes_to_paste
-        }
-        self._format_title_with_version(context_data["nodes_by_id"])
-
-        for form in context_data["formset"].forms:
-            node_elem = context_data["nodes_by_id"][form.node_code]
-            form.initial = self._get_initial_form_kwargs(node_elem)
-            form.is_group_year_form = isinstance(node_elem, NodeGroupYear)
-
-        if len(context_data["formset"]) > 0:
-            context_data['has_group_year_form'] = context_data["formset"][0].is_group_year_form
+        context_data["content_formset"] = context_data.pop("form")
 
         if not self.nodes_to_paste:
             display_warning_messages(self.request, _("Please cut or copy an item before paste"))
 
         error_messages = list(itertools.chain.from_iterable(
-            check_paste(self.request, element) for element in self.nodes_to_paste
+            check_paste(
+                self.request,
+                {
+                    "element_code": node_to_paste.code,
+                    "element_year": node_to_paste.year,
+                    "path_to_detach": self.path_to_detach_from
+                }
+            )
+            for node_to_paste in self.nodes_to_paste
         ))
         if error_messages:
             display_error_messages(self.request, error_messages)
 
         return context_data
 
-    def _get_initial_form_kwargs(self, obj):
-        return {
-            'credits': obj.credits,
-            'code': obj.code,
-            'relative_credits': "%d" % (obj.credits or 0)
-        }
+    @cached_property
+    def nodes_to_paste(self) -> List['Node']:
+        year = self.request.GET.get("year")
+        codes = self.request.GET.getlist("codes", [])
+        if codes and year:
+            nodes_to_paste = [{"element_code": code, "element_year": int(year)} for code in codes]
+        else:
+            element_selected = element_selected_service.retrieve_element_selected(self.request.user.id)
+            if not element_selected:
+                return []
+            nodes_to_paste = [element_selected]
+        node_identities = [node.NodeIdentity(ele["element_code"], ele["element_year"]) for ele in nodes_to_paste]
+        return node_repository.NodeRepository.search(node_identities)
 
-    def _format_title_with_version(self, nodes_by_id):
-        for ele in self.nodes_to_paste:
-            node_ele = nodes_by_id[ele['element_code']]
-            node_identity = NodeIdentity(code=ele["element_code"], year=ele["element_year"])
-            try:
-                tree_version = ProgramTreeVersionIdentitySearch().get_from_node_identity(node_identity)
-            except osis_common.ddd.interface.BusinessException:
-                continue
-            node_ele.version = tree_version.version_name
-            node_ele.title = "{}[{}]".format(node_ele.title, node_ele.version) if node_ele.version else node_ele.title
+    @cached_property
+    def parent_node(self) -> 'Node':
+        node_to_paste_into_id = int(self.request.GET['path'].split("|")[-1])
+        return load_node.load(node_to_paste_into_id)
 
-    def form_valid(self, formset: PasteNodesFormset):
+    @property
+    def path_to_detach_from(self) -> str:
+        cached_element_selected = element_selected_service.retrieve_element_selected(self.request.user.id)
+        if cached_element_selected:
+            return cached_element_selected['path_to_detach']
+        return ''
+
+    def get_form_class(self):
+        return formset_factory(form=PasteNodeForm, formset=BasePasteNodesFormset, extra=len(self.nodes_to_paste))
+
+    def get_form(self, form_class=None):
+        if form_class is None:
+            form_class = self.get_form_class()
+        return form_class(form_kwargs=self.get_form_kwargs(), data=self.request.POST or None)
+
+    def get_form_kwargs(self) -> List[dict]:
+        return [
+            {'parent_obj': self.parent_node, 'child_obj': node_to_paste, 'path_to_detach': self.path_to_detach_from}
+            for node_to_paste in self.nodes_to_paste
+        ]
+
+    def form_valid(self, formset: BasePasteNodesFormset):
         try:
-            link_identities_ids = formset.save()
-        except osis_common.ddd.interface.BusinessExceptions as business_exception:
-            formset.forms[0].add_error(field=None, error=business_exception.messages)
-            return self.form_invalid(formset)
-        messages = self._append_success_messages(link_identities_ids)
-        display_success_messages(self.request, messages)
-        ElementCache(self.request.user.id).clear()
-        return super().form_valid(formset)
+            formset.save()
 
-    def _append_success_messages(self, link_identities_ids):
+            messages = self.get_success_messages()
+            display_success_messages(self.request, messages)
+
+            ElementCache(self.request.user.id).clear()
+
+            return super().form_valid(formset)
+        except InvalidFormException:
+            return self.form_invalid(formset)
+
+    def get_success_messages(self) -> List['str']:
         messages = []
-        for link_identity in link_identities_ids:
+        paste_action_message = _("pasted") if ElementCache(self.request.user.id).cached_data else _("added")
+        for child_node in self.nodes_to_paste:
             messages.append(
                 _("\"%(child)s\" has been %(copy_message)s into \"%(parent)s\"") % {
-                    "child": self.__get_node_str(link_identity.child_code, link_identity.child_year),
-                    "copy_message": _("pasted") if ElementCache(self.request.user.id).cached_data else _("added"),
-                    "parent": self.__get_node_str(link_identity.parent_code, link_identity.parent_year),
+                    "child": child_node,
+                    "copy_message": paste_action_message,
+                    "parent": self.parent_node,
                 }
             )
         return messages
-
-    def __get_node_str(self, code: str, year: int) -> str:
-        try:
-            group_obj = self.__get_group_obj(code, year)
-            version_identity = self.__get_program_tree_version_identity(code, year)
-
-            return "%(code)s - %(abbreviated_title)s%(version)s - %(year)s" % {
-                "code": group_obj.code,
-                "abbreviated_title": group_obj.abbreviated_title,
-                "version": "[{}]".format(version_identity.version_name)
-                           if version_identity and not version_identity.is_standard() else "",
-                "year": group_obj.academic_year
-            }
-        except GroupNotFoundException:
-            return "%(code)s - %(year)s" % {"code": code, "year": display_as_academic_year(year)}
-
-    def __get_group_obj(self, code: str, year: int) -> 'Group':
-        cmd = command_education_group.GetGroupCommand(code=code, year=year)
-        return get_group_service.get_group(cmd)
-
-    def __get_program_tree_version_identity(self, code: str, year: int) -> Union['ProgramTreeVersionIdentity', None]:
-        try:
-            node_identity = NodeIdentity(code=code, year=year)
-            return ProgramTreeVersionIdentitySearch().get_from_node_identity(node_identity)
-        except interface.BusinessException:
-            return None
-
-    def _is_parent_a_minor_major_option_list_choice(self, formset):
-        return any(isinstance(form, (
-            PasteToMinorMajorListChoiceForm,
-            PasteToOptionListChoiceForm,
-            PasteMinorMajorListToMinorMajorListChoiceForm
-        )) for form in formset)
 
     def get_success_url(self):
         return
@@ -267,8 +209,8 @@ def check_paste(request, node_to_paste) -> List[str]:
     try:
         if not request.session.get(check_key):
             check_paste_node_service.check_paste(check_command)
-    except osis_common.ddd.interface.BusinessExceptions as business_exception:
-        return business_exception.messages
+    except MultipleBusinessExceptions as exceptions:
+        return [business_exception.message for business_exception in exceptions.exceptions]
 
     # cache result to avoid double check
     if request.session.get(check_key):
