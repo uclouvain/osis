@@ -35,7 +35,7 @@ from django.utils.translation import gettext_lazy as _
 
 from backoffice.settings.base import LANGUAGE_CODE_FR, LANGUAGE_CODE_EN
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY_FR_ONLY, \
-    CMS_LABEL_PEDAGOGY_FR_AND_EN, CMS_LABEL_SPECIFICATIONS
+    CMS_LABEL_PEDAGOGY_FR_AND_EN, CMS_LABEL_SPECIFICATIONS, CMS_LABEL_PEDAGOGY_FORCE_MAJEURE
 from base.business.learning_units.xls_educational_information_and_specifications import _get_titles, \
     _add_cms_title_fr_en, prepare_xls_educational_information_and_specifications
 from base.models.entity_version import EntityVersion

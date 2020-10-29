@@ -28,9 +28,9 @@ import html
 import bleach
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
-from django.db.models import Prefetch, Case, When, Value, IntegerField, Subquery, CharField, Q
+from django.db.models import Prefetch, Case, When, Value, IntegerField, CharField
 from django.db.models.expressions import F
-from django.db.models.functions import Cast, Concat, Upper
+from django.db.models.functions import Concat, Upper
 from django.utils.translation import gettext_lazy as _
 from openpyxl.styles import Alignment, Style
 from openpyxl.utils import get_column_letter
@@ -56,31 +56,6 @@ XLS_FILENAME = _('LearningUnitsList')
 WORKSHEET_TITLE = _('Learning units list')
 WRAP_TEXT_STYLE = Style(alignment=Alignment(wrapText=True, vertical="top"), )
 CMS_ALLOWED_TAGS = []
-
-RAW_SQL_TO_GET_LAST_UPDATE_FICHE_DESCRIPTIVE = """
-    WITH last_update_info AS (
-        SELECT upper(person.last_name) || ' ' || person.first_name as author, revision.date_created AS last_update
-        FROM reversion_version version
-        JOIN reversion_revision revision ON version.revision_id = revision.id
-        JOIN auth_user users ON revision.user_id = users.id
-        JOIN base_person person ON person.user_id = users.id
-        join django_content_type ct on version.content_type_id = ct.id
-        left join cms_translatedtext tt on cast(version.object_id as integer) = tt.id and ct.model = 'translatedtext'
-        left join cms_textlabel tl on tt.text_label_id = tl.id
-        left join base_teachingmaterial tm on cast(version.object_id as integer) = tm.id and ct.model = 'teachingmaterial'
-        join base_learningunityear luy on luy.id = tm.learning_unit_year_id or luy.id = tt.reference
-        where "base_groupelementyear"."child_leaf_id" = luy.id
-        and tl.label in {labels_to_check} and ct.model in ({models_to_check})
-        order by revision.date_created desc limit 1
-    )
-"""
-
-LAST_UPDATE_FORCE_MAJEURE = RAW_SQL_TO_GET_LAST_UPDATE_FICHE_DESCRIPTIVE.format(
-    labels_to_check=repr(tuple(map(str, CMS_LABEL_PEDAGOGY_FORCE_MAJEURE))),
-    models_to_check=','.join(["'translatedtext'"])
-) + """
-SELECT {field_to_select} FROM last_update_info
-"""
 
 
 def create_xls_educational_information_and_specifications(user, learning_units, request):
@@ -164,7 +139,7 @@ def prepare_xls_educational_information_and_specifications(learning_unit_years, 
         ]
 
         for label_key in CMS_LABEL_PEDAGOGY_FR_AND_EN:
-            _add_pedagogies_forces_major(label_key, line, translated_labels_with_text)
+            _add_pedagogies_translated_labels_with_text(label_key, line, translated_labels_with_text)
 
         if teaching_materials:
             line.append("\n".join(
@@ -193,7 +168,7 @@ def prepare_xls_educational_information_and_specifications(learning_unit_years, 
             CMS_LABEL_PEDAGOGY_FORCE_MAJEURE
         )
         for label_key in CMS_LABEL_PEDAGOGY_FORCE_MAJEURE:
-            _add_pedagogies_forces_major(label_key, line, translated_labels_force_majeure_with_text)
+            _add_pedagogies_translated_labels_with_text(label_key, line, translated_labels_force_majeure_with_text)
 
         _add_revision_informations(learning_unit_yr, line, CMS_LABEL_PEDAGOGY_FORCE_MAJEURE)
 
@@ -230,8 +205,8 @@ def _add_revision_informations(learning_unit_yr, line, cms_label):
         line.append(version.values('revision__date_created')[:1][0]["revision__date_created"].date())
 
 
-def _add_pedagogies_forces_major(label_key, line, translated_labels_force_majeure_with_text):
-    translated_label = translated_labels_force_majeure_with_text.filter(text_label__label=label_key).first()
+def _add_pedagogies_translated_labels_with_text(label_key, line, translated_labels_with_text):
+    translated_label = translated_labels_with_text.filter(text_label__label=label_key).first()
     if translated_label:
         line.append(
             get_html_to_text(translated_label.text_label.text_fr[0].text)
