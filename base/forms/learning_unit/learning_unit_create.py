@@ -215,7 +215,6 @@ class CountryEntityField(forms.ChoiceField):
 
 
 class LearningContainerYearModelForm(PermissionFieldMixin, forms.ModelForm):
-    # TODO :: Refactor code redundant code below for entity fields (requirement - allocation - additionnals)
     requirement_entity = forms.CharField()
     country_requirement_entity = CountryEntityField()
 
@@ -287,6 +286,7 @@ class LearningContainerYearModelForm(PermissionFieldMixin, forms.ModelForm):
                     learning_unit_year__learning_container_year=self.instance)
                 qs.update(**{attr_name: None})
 
+    # TODO :: Refactor code redundant code below for entity fields (requirement - allocation - additionnals)
     def __init_requirement_entity_field(self):
         self.fields['requirement_entity'] = EntitiesVersionRoleModelChoiceField(
             person=self.user.person,
