@@ -52,9 +52,11 @@ class ContentConstraintValidator(business_validator.BusinessValidator):
             raise ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum
 
         if self.content_constraint.type and \
-           (self.content_constraint.minimum and (self.content_constraint.minimum < 1 or self.content_constraint.minimum > 99999999999999)):
+                (self.content_constraint.minimum and (
+                        self.content_constraint.minimum < 1 or self.content_constraint.minimum > 99999999999999)):
             raise ContentConstraintMinimumInvalid
 
         if self.content_constraint.type and \
-           (self.content_constraint.maximum and (self.content_constraint.maximum < 1 or self.content_constraint.maximum > 99999999999999)):
+                (self.content_constraint.maximum and (
+                        self.content_constraint.maximum < 1 or self.content_constraint.maximum > 99999999999999)):
             raise ContentConstraintMaximumInvalid
