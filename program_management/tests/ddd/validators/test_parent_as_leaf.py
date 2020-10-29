@@ -28,6 +28,7 @@ import random
 from django.test import SimpleTestCase
 from django.utils.translation import gettext as _
 
+from program_management.ddd.domain.exception import CannotPasteToLearningUnitException
 from program_management.ddd.validators._parent_as_leaf import ParentIsNotLeafValidator
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
@@ -45,15 +46,11 @@ class TestParentIsNotLeafValidator(TestValidatorValidateMixin, SimpleTestCase):
     def test_should_raise_exception_when_trying_to_add_node_to_learning_unit_node(self):
         for node_factory in (NodeGroupYearFactory, NodeLearningUnitYearFactory):
             with self.subTest(node_factory=node_factory):
-                validator = ParentIsNotLeafValidator(self.child, node_factory())
-                expected_result = _("Cannot add any element to learning unit %(parent_node)s") % {
-                    "parent_node": self.child
-                }
-                self.assertValidatorRaises(validator, [expected_result])
+                with self.assertRaises(CannotPasteToLearningUnitException):
+                    ParentIsNotLeafValidator(self.child).validate()
 
     def test_should_not_raise_exception_when_trying_to_add_node_to_node_other_than_learning_unit(self):
         validator = ParentIsNotLeafValidator(
-            self.tree_with_child.root_node,
-            NodeLearningUnitYearFactory()
+            self.tree_with_child.root_node
         )
         self.assertValidatorNotRaises(validator)

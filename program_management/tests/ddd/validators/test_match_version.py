@@ -24,9 +24,9 @@
 #
 ##############################################################################
 from django.test import SimpleTestCase
-from django.utils.translation import gettext as _
 
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
+from program_management.ddd.domain.exception import ProgramTreeVersionMismatch
 from program_management.ddd.validators._match_version import MatchVersionValidator
 from program_management.tests.ddd.factories.program_tree import tree_builder
 from program_management.tests.ddd.factories.program_tree_version import StandardProgramTreeVersionFactory, \
@@ -76,7 +76,9 @@ class TestMatchVersionValidator(TestValidatorValidateMixin, SimpleTestCase):
         )
 
     def test_should_raise_exception_when_versions_mismatch(self):
-        tree_to_attach = tree_builder({"node_type": TrainingType.MASTER_MA_120, "end_year": 2019})
+        tree_to_attach = tree_builder(
+            {"node_type": TrainingType.MASTER_MA_120, "version_name": "SPECIFIC", "end_year": 2019}
+        )
         tree_to_attach_version = SpecificProgramTreeVersionFactory(tree=tree_to_attach)
 
         fake_program_tree_repository = get_fake_program_tree_repository([self.tree, tree_to_attach])
@@ -84,23 +86,52 @@ class TestMatchVersionValidator(TestValidatorValidateMixin, SimpleTestCase):
             self.tree_version, tree_to_attach_version
         ])
 
-        expected_message = _(
-            "%(node_to_add)s [%(node_to_add_version)s] version must be the same as %(node_to_paste_to)s "
-            "and all of it's parent's version [%(version_mismatched)s]"
-        ) % {
-            'node_to_add': str(tree_to_attach.root_node),
-            'node_to_add_version': tree_to_attach_version.version_name,
-
-            'node_to_paste_to': str(self.tree.root_node),
-            'version_mismatched': _("Standard")
-        }
-
-        self.assertValidatorRaises(
+        with self.assertRaises(ProgramTreeVersionMismatch):
             MatchVersionValidator(
                 node_to_paste_to=self.tree.root_node,
                 node_to_add=tree_to_attach.root_node,
                 tree_repository=fake_program_tree_repository,
                 tree_version_repository=fake_tree_version_repository
-            ),
-            [expected_message]
+            ).validate()
+
+    def test_should_raise_exception_when_children_version_mismatch(self):
+        tree_to_attach = tree_builder(
+            {
+                "node_type": GroupType.FINALITY_120_LIST_CHOICE,
+                "end_year": 2019,
+                "children": [{"node_type": TrainingType.MASTER_MA_120, "version_name": "SPECIFIC", "end_year": 2019}]
+            }
+        )
+        tree_to_attach_version = SpecificProgramTreeVersionFactory(tree=tree_to_attach)
+
+        fake_program_tree_repository = get_fake_program_tree_repository([self.tree, tree_to_attach])
+        fake_tree_version_repository = get_fake_program_tree_version_repository([
+            self.tree_version, tree_to_attach_version
+        ])
+
+        with self.assertRaises(ProgramTreeVersionMismatch):
+            MatchVersionValidator(
+                node_to_paste_to=self.tree.root_node,
+                node_to_add=tree_to_attach.root_node,
+                tree_repository=fake_program_tree_repository,
+                tree_version_repository=fake_tree_version_repository
+            ).validate()
+
+    def test_should_not_raise_exception_when_minitraining_version_mismatch(self):
+        tree_to_attach = tree_builder(
+            {"node_type": MiniTrainingType.OPEN_MINOR, "version_name": "SPECIFIC", "end_year": 2019}
+        )
+        tree_to_attach_version = SpecificProgramTreeVersionFactory(tree=tree_to_attach)
+
+        fake_program_tree_repository = get_fake_program_tree_repository([self.tree, tree_to_attach])
+        fake_tree_version_repository = get_fake_program_tree_version_repository([
+            self.tree_version, tree_to_attach_version
+        ])
+        self.assertValidatorNotRaises(
+            MatchVersionValidator(
+                node_to_paste_to=self.tree.root_node,
+                node_to_add=tree_to_attach.root_node,
+                tree_repository=fake_program_tree_repository,
+                tree_version_repository=fake_tree_version_repository
+            )
         )

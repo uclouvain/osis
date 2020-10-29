@@ -29,6 +29,7 @@ from django.utils.translation import gettext as _
 
 from base.ddd.utils import business_validator
 from base.tests.factories.academic_year import AcademicYearFactory
+from program_management.ddd.domain.exception import CannotPasteNodeToHimselfException, CannotAttachParentNodeException
 from program_management.ddd.domain.program_tree import build_path
 from program_management.ddd.validators._infinite_recursivity import InfiniteRecursivityTreeValidator, \
     InfiniteRecursivityLinkValidator
@@ -59,15 +60,9 @@ class TestInfiniteRecursivityTreeValidator(TestValidatorValidateMixin, SimpleTes
         )
         self.node_to_attach.add_child(child)
         path = build_path(self.node_to_attach, child)
-        expected_message = _(
-            'The child %(child)s you want to attach '
-            'is a parent of the node you want to attach.'
-        ) % {'child': self.node_to_attach}
 
-        self.assertValidatorRaises(
-            InfiniteRecursivityTreeValidator(self.tree, self.node_to_attach, path),
-            [expected_message]
-        )
+        with self.assertRaises(CannotAttachParentNodeException):
+            InfiniteRecursivityTreeValidator(self.tree, self.node_to_attach, path).validate()
 
     def test_should_raise_exception_when_adding_node_as_parent_level_2(self):
         child_lvl1 = NodeGroupYearFactory(
@@ -80,14 +75,8 @@ class TestInfiniteRecursivityTreeValidator(TestValidatorValidateMixin, SimpleTes
         child_lvl1.add_child(child_lvl2)
 
         path = build_path(self.node_to_attach, child_lvl1, child_lvl2)
-        expected_message = _(
-            'The child %(child)s you want to attach '
-            'is a parent of the node you want to attach.'
-        ) % {'child': self.node_to_attach}
-        self.assertValidatorRaises(
-            InfiniteRecursivityTreeValidator(self.tree, self.node_to_attach, path),
-            [expected_message]
-        )
+        with self.assertRaises(CannotAttachParentNodeException):
+            InfiniteRecursivityTreeValidator(self.tree, self.node_to_attach, path).validate()
 
 
 class TestInfiniteRecursivityLinkValidator(TestValidatorValidateMixin, SimpleTestCase):
@@ -100,9 +89,5 @@ class TestInfiniteRecursivityLinkValidator(TestValidatorValidateMixin, SimpleTes
         self.assertValidatorNotRaises(InfiniteRecursivityLinkValidator(self.tree.root_node, node_to_attach))
 
     def test_should_raise_exception_when_adding_node_to_himself(self):
-        error_msg = _('Cannot attach a node %(node)s to himself.') % {"node": self.tree.root_node}
-
-        self.assertValidatorRaises(
-            InfiniteRecursivityLinkValidator(self.tree.root_node, self.tree.root_node),
-            [error_msg]
-        )
+        with self.assertRaises(CannotPasteNodeToHimselfException):
+            InfiniteRecursivityLinkValidator(self.tree.root_node, self.tree.root_node).validate()

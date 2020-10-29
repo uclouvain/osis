@@ -31,6 +31,7 @@ from base.ddd.utils.business_validator import BusinessValidator
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType
 from program_management import formatter
 from program_management.ddd.business_types import *
+from program_management.ddd.domain.exception import CannotAttachOptionIfNotPresentIn2MOptionListException
 from program_management.ddd.domain.service import identity_search
 
 
@@ -71,24 +72,10 @@ class AttachOptionsValidator(BusinessValidator):
             options_from_2m_option_list = self.tree_version_2m.tree.get_2m_option_list()
             options_to_attach_not_present_in_2m_option_list = options_to_attach - options_from_2m_option_list
             if options_to_attach_not_present_in_2m_option_list:
-                self.add_error_message(
-                    ngettext(
-                        "Option \"%(code)s\" must be present in %(root_code)s program.",
-                        "Options \"%(code)s\" must be present in %(root_code)s program.",
-                        len(options_to_attach_not_present_in_2m_option_list)
-                    ) % {
-                        "code": ', '.join(
-                            self._display_inconsistent_nodes(options_to_attach_not_present_in_2m_option_list)
-                        ),
-                        "root_code": formatter.format_program_tree_version_identity(self.tree_version_2m.entity_id)
-                    }
+                raise CannotAttachOptionIfNotPresentIn2MOptionListException(
+                    self.tree_version_2m.tree.root_node,
+                    options_to_attach_not_present_in_2m_option_list
                 )
-
-    def _display_inconsistent_nodes(self, nodes: Iterable['Node']) -> List[str]:
-        node_identities = [node.entity_id for node in nodes]
-        version_identities = identity_search.ProgramTreeVersionIdentitySearch.get_from_node_identities(node_identities)
-        return [formatter.format_program_tree_version_identity(version_identity)
-                for version_identity in version_identities]
 
     def _is_node_to_paste_to_inside_a_finality(self) -> bool:
         finalities = self.tree_version_2m.get_tree().root_node.get_finality_list()

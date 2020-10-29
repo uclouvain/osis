@@ -44,7 +44,7 @@ def bulk_update_links(cmd: BulkUpdateLinkCommand) -> List['Link']:
     for update_cmd in cmd.update_link_cmds:
         try:
             child_id = NodeIdentity(code=update_cmd.child_node_code, year=update_cmd.child_node_year)
-            link_updated = update_link_service.get_updated_link(child_id, tree, update_cmd)
+            link_updated = update_link_service._update_link(child_id, tree, update_cmd)
             links_updated.append(link_updated)
         except MultipleBusinessExceptions as e:
             exceptions[update_cmd] = e
