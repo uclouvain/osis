@@ -3,7 +3,7 @@
 {% load format %}
 {% load waffle_tags %}
 {% load feature_flag %}
-{% load learning_unit learning_unit_li %}
+{% load learning_unit %}
 {% load osis_role %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
@@ -112,13 +112,11 @@
                         {% endflag %}
 
                         {% flag "learning_unit_proposal_delete" %}
-                            {% has_perm 'base.can_cancel_proposal' user learning_unit_year as can_cancel_proposal %}
                             <li>
-                                <a href="#" {% if not can_cancel_proposal %} class="disabled" {% else %} data-toggle="modal" data-target="#modalConfirmToCancel" {% endif  %}>{% trans 'Cancel the proposal' %}</a>
+                                {% a_tag_modal_target_has_perm "#modalConfirmToCancel" _('Cancel the proposal') 'base.can_cancel_proposal' user learning_unit_year %}
                             </li>
-                            {% has_perm 'base.can_consolidate_learningunit_proposal' user learning_unit_year as can_consolidate_learningunit_proposal %}
                             <li>
-                                <a href="#" {% if not can_consolidate_learningunit_proposal %} class="disabled" {% else %} data-toggle="modal" data-target="#modalConsolidateLuy" {% endif  %}>{% trans 'Consolidate the proposal' %}</a>
+                                {% a_tag_modal_target_has_perm "#modalConsolidateLuy" _('Consolidate the proposal') 'base.can_consolidate_learningunit_proposal' user learning_unit_year %}
                             </li>
 
                             <li class="divider"></li>
@@ -126,9 +124,8 @@
 
 
                         {% flag "learning_unit_delete" %}
-                            {% has_perm 'base.can_delete_learningunit' user learning_unit_year as can_delete_learningunit %}
                             <li>
-                                <a href="#" {% if not can_delete_learningunit %} class="disabled" {% else %} data-toggle="modal" data-target="#modalDeleteLuy" {% endif  %}>{% trans 'Delete learning unit year definitively' %}</a>
+                                {% a_tag_modal_target_has_perm "#modalDeleteLuy" _('Delete learning unit year definitively') 'base.can_delete_learningunit' user learning_unit_year %}
                             </li>
                         {% endflag %}
                     </ul>
