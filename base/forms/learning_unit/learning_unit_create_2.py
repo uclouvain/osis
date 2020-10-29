@@ -27,6 +27,7 @@ from abc import ABCMeta
 from collections import OrderedDict
 
 from django.db import transaction
+from django.db.models import Case, When, Value, IntegerField
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
@@ -37,7 +38,7 @@ from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm,
 from base.models import academic_year
 from base.models.academic_year import MAX_ACADEMIC_YEAR_FACULTY, MAX_ACADEMIC_YEAR_CENTRAL, AcademicYear
 from base.models.campus import Campus
-from base.models.enums import learning_unit_year_subtypes
+from base.models.enums import learning_unit_year_subtypes, learning_component_year_type
 from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_YEAR_TYPES_FOR_FACULTY, \
     LCY_TYPES_WITH_FIXED_ACRONYM
 from base.models.enums.proposal_type import ProposalType
@@ -315,6 +316,15 @@ class FullForm(LearningUnitBaseForm):
                 'proposal': proposal,
                 'queryset': LearningComponentYear.objects.filter(
                     learning_unit_year=self.instance
+                ).annotate(
+                    order_value=Case(
+                        When(type=learning_component_year_type.LECTURING, then=Value(1)),
+                        When(type=learning_component_year_type.PRACTICAL_EXERCISES, then=Value(2)),
+                        default=Value(3),
+                        output_field=IntegerField()
+                    )
+                ).order_by(
+                    "order_value"
                 ) if self.instance else LearningComponentYear.objects.none(),
                 'person': self.person
             }
