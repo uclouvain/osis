@@ -63,7 +63,6 @@ def create_learning_unit(request, academic_year_id):
 
 @login_required
 @waffle_flag("learning_unit_create")
-@permission_required('base.can_create_learningunit', raise_exception=True)
 @permission_required('base.can_create_partim', raise_exception=True, fn=learning_unit_year_getter)
 @require_http_methods(["POST", "GET"])
 def create_partim_form(request, learning_unit_year_id):

@@ -131,7 +131,6 @@ def _has_same_order_in_future(achievement, current_order, next_luy_achievement):
 
 
 @login_required
-@permission_required('base.can_access_learningunit', fn=learning_unit_year_getter, raise_exception=True)
 @permission_required('base.can_update_learning_achievement', fn=learning_unit_year_getter, raise_exception=True)
 @require_http_methods(['POST'])
 def management(request, learning_unit_year_id):
@@ -146,7 +145,6 @@ def get_action(request):
 
 
 @login_required
-@permission_required('base.can_access_learningunit', fn=learning_unit_year_getter, raise_exception=True)
 @permission_required('base.can_update_learning_achievement', fn=learning_unit_year_getter, raise_exception=True)
 @require_http_methods(["GET", "POST"])
 def update(request, learning_unit_year_id, learning_achievement_id):
@@ -171,7 +169,6 @@ def update(request, learning_unit_year_id, learning_achievement_id):
 
 
 @login_required
-@permission_required('base.can_access_learningunit', fn=learning_unit_year_getter, raise_exception=True)
 @permission_required('base.can_update_learning_achievement', fn=learning_unit_year_getter, raise_exception=True)
 @require_http_methods(['POST', 'GET'])
 def create(request, learning_unit_year_id, learning_achievement_id):
@@ -218,7 +215,6 @@ def _save_and_redirect(request, form, learning_unit_year_id):
 
 
 @login_required
-@permission_required('base.can_access_learningunit', fn=learning_unit_year_getter, raise_exception=True)
 @permission_required('base.can_update_learning_achievement', fn=learning_unit_year_getter, raise_exception=True)
 @require_http_methods(['POST', 'GET'])
 def create_first(request, learning_unit_year_id):
@@ -241,7 +237,6 @@ def create_first(request, learning_unit_year_id):
 
 
 @login_required
-@permission_required('base.can_access_learningunit', fn=learning_unit_year_getter, raise_exception=True)
 @permission_required('base.can_update_learning_achievement', fn=learning_unit_year_getter, raise_exception=True)
 @require_http_methods(['GET'])
 def check_code(request, learning_unit_year_id):
