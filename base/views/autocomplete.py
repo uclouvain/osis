@@ -45,8 +45,8 @@ class OrganizationAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetV
         country = self.forwarded.get('country', None)
         if country:
             qs = qs.filter(
-                organizationaddress__is_main=True,
-                organizationaddress__country=country,
+                entity__entityversion__parent__isnull=True,
+                entity__entityversion__entityversionaddress__country=country,
             )
 
         if self.q:
@@ -60,12 +60,10 @@ class OrganizationAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetV
 
 class CountryAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
     def get_queryset(self):
-        qs = Country.objects.filter(organizationaddress__isnull=False).distinct()
-
+        qs = Country.objects.all()
         if self.q:
             qs = qs.filter(name__icontains=self.q)
-
-        return qs.distinct().order_by('name')
+        return qs.order_by('name')
 
 
 class CampusAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
@@ -83,7 +81,10 @@ class CampusAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
         country = self.forwarded.get('country_external_institution', None)
 
         if country:
-            qs = qs.filter(organization__organizationaddress__country=country)
+            qs = qs.filter(
+                organization__entity__entityversion__parent__isnull=True,
+                organization__entity__entityversion__entityversionaddress__country=country,
+            )
 
         if self.q:
             qs = qs.filter(Q(organization__name__icontains=self.q) | Q(name__icontains=self.q))
