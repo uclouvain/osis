@@ -54,7 +54,7 @@ from base.tests.factories.person_entity import PersonEntityFactory
 from reference.tests.factories.language import FrenchLanguageFactory
 
 YEAR_LIMIT_LUE_MODIFICATION = 2018
-NAMEN = 'Namur'
+NAMUR = 'Namur'
 
 
 def get_valid_external_learning_unit_form_data(academic_year, person, learning_unit_year=None):
@@ -278,7 +278,7 @@ class TestExternalLearningUnitSearchForm(TestCase):
         cls.be_organization_adr_city1 = MainRootEntityVersionAddressFactory(
             entity_version__entity__organization=cls.organization_1,
             country__iso_code="BE",
-            city=NAMEN
+            city=NAMUR
         )
         cls.external_lu_1 = ExternalLearningUnitYearFactory(
             co_graduation=True,
@@ -334,7 +334,7 @@ class TestExternalLearningUnitSearchForm(TestCase):
     def test_search_learning_units_by_city(self):
         form_data = {
             "country": self.external_lu_1.learning_unit_year.campus.organization.country.id,
-            "city": NAMEN,
+            "city": NAMUR,
         }
 
         external_filter = ExternalLearningUnitFilter(form_data)
@@ -344,7 +344,7 @@ class TestExternalLearningUnitSearchForm(TestCase):
     def test_search_learning_units_by_campus(self):
         form_data = {
             "country": self.external_lu_1.learning_unit_year.campus.organization.country.id,
-            "city": NAMEN,
+            "city": NAMUR,
             "campus": self.external_lu_1.learning_unit_year.campus.id,
         }
 

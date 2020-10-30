@@ -133,4 +133,4 @@ class Organization(SerializableModel):
                     'entityversionaddress_set',
                     queryset=EntityVersionAddress.objects.all().select_related('country')
                 )
-            ) .order_by('-start_date').first()
+            ).order_by('-start_date').first()
