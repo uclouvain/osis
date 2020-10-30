@@ -38,5 +38,5 @@ class Achievement(interface.Entity):
     entity_id = attr.ib(type=AchievementIdentity)
 
     code_name = attr.ib(type=str)
-    text_fr = attr.ib(type=str)
-    text_en = attr.ib(type=str)
+    text_fr = attr.ib(type=str, default='')
+    text_en = attr.ib(type=str, default='')
