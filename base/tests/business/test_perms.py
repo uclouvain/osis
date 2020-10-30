@@ -131,7 +131,7 @@ class PermsTestCase(TestCase):
         self.assertTrue(central_manager.person.user.has_perm('base.can_edit_learningunit_date', self.luy))
 
     def test_can_faculty_manager_modify_end_date_full(self):
-        for direct_edit_permitted_container_type in FACULTY_EDITABLE_CONTAINER_TYPES:
+        for direct_edit_permitted_container_type in [type.name for type in FACULTY_EDITABLE_CONTAINER_TYPES]:
             lunit_container_yr = LearningContainerYearFactory(
                 academic_year=self.academic_yr,
                 container_type=direct_edit_permitted_container_type,
@@ -281,7 +281,7 @@ class PermsTestCase(TestCase):
         luy = generated_container_first_year.learning_unit_year_full
         faculty_manager = FacultyManagerFactory(entity=an_requirement_entity)
 
-        a_proposal = ProposalLearningUnitFactory(
+        ProposalLearningUnitFactory(
             state=proposal_state.ProposalState.FACULTY.name,
             type=proposal_type.ProposalType.CREATION.name,
             learning_unit_year=luy
@@ -291,8 +291,6 @@ class PermsTestCase(TestCase):
             [self.academic_yr, self.academic_yr_1, self.academic_yr_2, self.academic_yr_6]
         )
 
-        a_proposal.state = proposal_state.ProposalState.FACULTY.name
-        a_proposal.type = ProposalType.MODIFICATION.name
         self.assertTrue(faculty_manager.person.user.has_perm('base.can_edit_learning_unit_proposal', luy))
 
     def test_is_not_eligible_for_cancel_of_proposal(self):
@@ -492,7 +490,7 @@ class TestIsEligibleToCreateModificationProposal(TestCase):
         self.assertFalse(person.user.has_perm('base.can_propose_learningunit', self.luy))
 
     def test_all_requirements_are_met_to_propose_modification(self):
-        for luy_container_type in FACULTY_EDITABLE_CONTAINER_TYPES:
+        for luy_container_type in [type.name for type in FACULTY_EDITABLE_CONTAINER_TYPES]:
             with self.subTest(luy_container_type=luy_container_type):
                 self.luy.learning_container_year.container_type = luy_container_type
                 self.luy.learning_container_year.save()

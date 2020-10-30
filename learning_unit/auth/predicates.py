@@ -222,8 +222,8 @@ def is_not_in_proposal_state(self, user, learning_unit_year):
 @predicate_failed_msg(message=_("Person not in accordance with proposal state"))
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def has_faculty_proposal_state(self, user, learning_unit_year):
-    if learning_unit_year and hasattr(learning_unit_year, 'learningunitproposal'):
-        return learning_unit_year.learningunitproposal.state == ProposalState.FACULTY.name
+    if learning_unit_year and hasattr(learning_unit_year, 'proposallearningunit'):
+        return learning_unit_year.proposallearningunit.state == ProposalState.FACULTY.name
     return None
 
 
@@ -231,8 +231,8 @@ def has_faculty_proposal_state(self, user, learning_unit_year):
 @predicate_failed_msg(message=_("This learning unit is not of type creation"))
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def is_not_proposal_of_type_creation(self, user, learning_unit_year):
-    if learning_unit_year and hasattr(learning_unit_year, 'learningunitproposal'):
-        return learning_unit_year.learningunitproposal.type != ProposalType.CREATION.name
+    if learning_unit_year and hasattr(learning_unit_year, 'proposallearningunit'):
+        return learning_unit_year.proposallearningunit.type != ProposalType.CREATION.name
     return None
 
 
@@ -240,8 +240,8 @@ def is_not_proposal_of_type_creation(self, user, learning_unit_year):
 @predicate_failed_msg(message=_("This learning unit is not of type suppression"))
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def is_not_proposal_of_type_suppression(self, user, learning_unit_year):
-    if learning_unit_year and hasattr(learning_unit_year, 'learningunitproposal'):
-        return learning_unit_year.learningunitproposal.type != ProposalType.SUPPRESSION.name
+    if learning_unit_year and hasattr(learning_unit_year, 'proposallearningunit'):
+        return learning_unit_year.proposallearningunit.type != ProposalType.SUPPRESSION.name
     return None
 
 
@@ -281,8 +281,8 @@ def has_learning_unit_no_application_in_future(self, user, learning_unit_year):
 @predicate_failed_msg(message=_("Proposal not in eligible state for consolidation"))
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def is_proposal_in_state_to_be_consolidated(self, user, learning_unit_year):
-    if learning_unit_year and hasattr(learning_unit_year, 'learningunitproposal'):
-        return learning_unit_year.learningunitproposal.state in PROPOSAL_CONSOLIDATION_ELIGIBLE_STATES
+    if learning_unit_year and hasattr(learning_unit_year, 'proposallearningunit'):
+        return learning_unit_year.proposallearningunit.state in PROPOSAL_CONSOLIDATION_ELIGIBLE_STATES
     return None
 
 
@@ -290,8 +290,8 @@ def is_proposal_in_state_to_be_consolidated(self, user, learning_unit_year):
 @predicate_failed_msg(message=_("Proposal is of modification type"))
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def is_not_modification_proposal_type(self, user, learning_unit_year):
-    if learning_unit_year and hasattr(learning_unit_year, 'learningunitproposal'):
-        return learning_unit_year.learningunitproposal.type != ProposalType.MODIFICATION.name
+    if learning_unit_year and hasattr(learning_unit_year, 'proposallearningunit'):
+        return learning_unit_year.proposallearningunit.type != ProposalType.MODIFICATION.name
     return None
 
 

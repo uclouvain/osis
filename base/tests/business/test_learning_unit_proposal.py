@@ -282,7 +282,7 @@ class TestConsolidateProposals(TestCase):
             proposals_with_results[0],
             (
                 proposal,
-                {ERROR: _("This learning unit has application")}
+                {ERROR: _("This learning unit has application this year")}
             )
         )
 
