@@ -1258,7 +1258,7 @@ base.validationrule,GroupForm.COMPLEMENTARY_MODULE.title_fr,REQUIRED,Enseignemen
 base.validationrule,GroupForm.COMPLEMENTARY_MODULE.teaching_campus,REQUIRED,,,,,,
 base.validationrule,GroupForm.COMPLEMENTARY_MODULE.academic_year,REQUIRED,,,,,,
 base.validationrule,GroupForm.COMPLEMENTARY_MODULE.management_entity,REQUIRED,,,,,,
-base.validationrule,GroupForm.MINOR_LIST_CHOICE.code,REQUIRED,100G,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Gg])$",,"Code of Minor list choice is composed of:
+base.validationrule,GroupForm.MINOR_LIST_CHOICE.code,REQUIRED,120G,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Gg])$",,"Code of Minor list choice is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
