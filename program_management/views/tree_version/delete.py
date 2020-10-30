@@ -90,15 +90,17 @@ class TreeVersionDeleteView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, Dele
         }
 
     def get_confirmation_message(self) -> str:
-        return _("Are you sure you want to delete %(offer_acronym)s %(version_name)s ?") % {
+        return _("Are you sure you want to delete %(offer_acronym)s %(version_name)s%(title)s ?") % {
             'offer_acronym': self.tree_version_identity.offer_acronym,
             'version_name': self._get_version_name_verbose(),
+            'title': self._buid_title(),
         }
 
     def _get_version_name_verbose(self) -> str:
         version_name_verbose = self.tree_version_identity.version_name
         if version_name_verbose:
-            version_name_verbose = "[" + version_name_verbose + "]"
+            transition = "-Transition" if self.tree_version_identity.is_transition else ''
+            version_name_verbose = "[" + version_name_verbose + transition + "]"
         return version_name_verbose
 
     def get_success_message(self):
@@ -121,3 +123,10 @@ class TreeVersionDeleteView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, Dele
             academic_year__year=self.node_identity.year,
             partial_acronym=self.node_identity.code,
         )
+
+    def _buid_title(self):
+        offer_title = " - {}".format(
+            self.get_object().get_tree().root_node.offer_title_fr
+        ) if self.get_object().get_tree().root_node.offer_title_fr else ''
+        version_title = "[{}]".format(self.get_object().title_fr) if self.get_object().title_fr else ''
+        return "{}{}".format(offer_title, version_title)

@@ -99,8 +99,8 @@ class MiniTrainingDeleteView(PermissionRequiredMixin, AjaxTemplateMixin, DeleteV
         }
 
     def get_confirmation_message(self) -> str:
-        return _("Are you sure you want to delete %(code)s - %(title)s ?") % {
-            'code': self.kwargs['code'],
+        return _("Are you sure you want to delete %(acronym)s - %(title)s ?") % {
+            'acronym': self.get_mini_training().acronym,
             'title': self.get_mini_training().titles.title_fr
         }
 

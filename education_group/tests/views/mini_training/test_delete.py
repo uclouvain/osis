@@ -107,8 +107,8 @@ class TestDeleteMiniTrainingGetMethod(TestCase):
     def test_assert_context(self):
         response = self.client.get(self.url)
 
-        expected_confirmation_msg = _("Are you sure you want to delete %(code)s - %(title)s ?") % {
-            'code': self.root_node.code,
+        expected_confirmation_msg = _("Are you sure you want to delete %(acronym)s - %(title)s ?") % {
+            'acronym': self.mini_training.acronym,
             'title': self.mini_training.titles.title_fr
         }
         self.assertEqual(

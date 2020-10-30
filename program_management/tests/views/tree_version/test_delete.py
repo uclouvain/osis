@@ -35,7 +35,8 @@ from education_group.tests.factories.auth.central_manager import CentralManagerF
 from education_group.tests.factories.group_year import GroupYearFactory as GroupYearDBFactory
 from program_management.ddd.domain.exception import ProgramTreeVersionNotFoundException
 from program_management.ddd.domain.node import NodeIdentity
-from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionIdentityFactory
+from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionIdentityFactory,  \
+    ProgramTreeVersionFactory, StandardProgramTreeVersionFactory, SpecificProgramTreeVersionFactory
 
 
 class TestDeleteVersionGetMethod(TestCase):
@@ -103,19 +104,41 @@ class TestDeleteVersionGetMethod(TestCase):
 
     @mock.patch('program_management.ddd.repositories.program_tree_version.ProgramTreeVersionRepository.get')
     def test_assert_template_used(self, mock_repo):
-        mock_repo.return_value = self.tree_version_identity
+        program_tree_version = ProgramTreeVersionFactory()
+        mock_repo.return_value = program_tree_version
         response = self.client.get(self.url)
         self.assertTemplateUsed(response, "tree_version/delete_inner.html")
 
     @mock.patch('program_management.ddd.repositories.program_tree_version.ProgramTreeVersionRepository.get')
-    def test_assert_context(self, mock_repo):
-        mock_repo.return_value = self.tree_version_identity
+    def test_assert_context_confirmation_message(self, mock_repo):
+        program_tree_version = StandardProgramTreeVersionFactory(tree__root_node__offer_title_fr='Titre fr')
+        mock_repo.return_value = program_tree_version
         response = self.client.get(self.url)
 
-        expected_confirmation_msg = _("Are you sure you want to delete %(offer_acronym)s %(version_name)s ?") % {
-            'offer_acronym': self.tree_version_identity.offer_acronym,
-            'version_name': "[" + self.tree_version_identity.version_name + "]",
-        }
+        expected_confirmation_msg = \
+            _("Are you sure you want to delete %(offer_acronym)s %(version_name)s%(title)s ?") % {
+                'offer_acronym': self.tree_version_identity.offer_acronym,
+                'version_name': "[" + self.tree_version_identity.version_name + "]",
+                'title': " - {}".format('Titre fr'),
+            }
+        self.assertEqual(
+            response.context['confirmation_message'],
+            expected_confirmation_msg
+        )
+
+    @mock.patch('program_management.ddd.repositories.program_tree_version.ProgramTreeVersionRepository.get')
+    def test_assert_context_confirmation_message_version_label_and_title(self, mock_repo):
+        program_tree_version = SpecificProgramTreeVersionFactory(tree__root_node__offer_title_fr='Titre fr',
+                                                                 title_fr='Version title')
+        mock_repo.return_value = program_tree_version
+        response = self.client.get(self.url)
+
+        expected_confirmation_msg = \
+            _("Are you sure you want to delete %(offer_acronym)s %(version_name)s%(title)s ?") % {
+                'offer_acronym': self.tree_version_identity.offer_acronym,
+                'version_name': "[" + self.tree_version_identity.version_name + "]",
+                'title': " - Titre fr[Version title]",
+            }
         self.assertEqual(
             response.context['confirmation_message'],
             expected_confirmation_msg
@@ -177,7 +200,9 @@ class TestDeleteTreeVersionPostMethod(TestCase):
         response = self.client.post(self.url)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
-    @mock.patch("program_management.ddd.service.write.delete_all_specific_versions_service.delete_permanently_tree_version")
+    @mock.patch(
+        "program_management.ddd.service.write.delete_all_specific_versions_service.delete_permanently_tree_version"
+    )
     def test_ensure_post_call_delete_all_group_service(self, mock_service):
         response = self.client.post(self.url)
 

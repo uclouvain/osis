@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-28 14:17+0100\n"
+"POT-Creation-Date: 2020-10-30 10:05+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -154,10 +154,16 @@ msgstr "Ent. attrib."
 msgid "Annual"
 msgstr "Annuel"
 
-#, python-format
 msgid "Are you sure you want to delete %(offer_acronym)s %(version_name)s ?"
 msgstr ""
 "Êtes-vous sûr·e de vouloir supprimer %(offer_acronym)s %(version_name)s ?"
+
+#, python-format
+msgid ""
+"Are you sure you want to delete %(offer_acronym)s %(version_name)s%(title)s ?"
+msgstr ""
+"Êtes-vous sûr·e de vouloir supprimer %(offer_acronym)s %(version_name)s"
+"%(title)s ?"
 
 #, python-format
 msgid "Are you sure you want to detach %(child)s ?"
@@ -778,6 +784,7 @@ msgstr ""
 "Les prérequis %(prerequisites)s pour l'unité d'enseignement "
 "%(learning_unit)s ne sont pas dans la formation sélectionnée %(root)s"
 
+#, python-format
 msgid ""
 "The prerequisites for the following learning units contained in education "
 "group year %(acronym)s will be deleted: %(learning_units)s"
