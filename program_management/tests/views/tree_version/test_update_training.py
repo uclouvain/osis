@@ -22,8 +22,9 @@
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
 import mock
+from django.conf import settings
 from django.http import HttpResponseForbidden, HttpResponse
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
@@ -157,6 +158,7 @@ class TestTrainingVersionUpdateGetView(TestCase):
         self.assertEqual(response.context['tabs'], expected_tabs)
 
 
+@override_settings(YEAR_LIMIT_EDG_MODIFICATION=0)
 class TestTrainingVersionUpdatePostView(TestCase):
     @classmethod
     def setUpTestData(cls):

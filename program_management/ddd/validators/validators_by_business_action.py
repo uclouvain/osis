@@ -32,7 +32,7 @@ from program_management.ddd.business_types import *
 from program_management.ddd.validators._authorized_link_type import AuthorizedLinkTypeValidator
 from program_management.ddd.validators._authorized_relationship import \
     AuthorizedRelationshipLearningUnitValidator, PasteAuthorizedRelationshipValidator, \
-    DetachAuthorizedRelationshipValidator
+    DetachAuthorizedRelationshipValidator, UpdateLinkAuthorizedRelationshipValidator
 from program_management.ddd.validators._authorized_relationship_for_all_trees import \
     ValidateAuthorizedRelationshipForAllTrees
 from program_management.ddd.validators._authorized_root_type_for_prerequisite import AuthorizedRootTypeForPrerequisite
@@ -57,74 +57,71 @@ from program_management.ddd.validators._relative_credits import RelativeCreditsV
 from program_management.ddd.validators._validate_end_date_and_option_finality import ValidateFinalitiesEndDateAndOptions
 from program_management.ddd.validators._version_name_exists import VersionNameExistsValidator
 from program_management.ddd.validators.link import CreateLinkValidatorList
-from education_group.ddd.validators._hops_validator import HopsValuesValidator
 
 
-class PasteNodeValidatorList(business_validator.BusinessListValidator):
+class PasteNodeValidatorList(MultipleExceptionBusinessListValidator):
     def __init__(
             self,
             tree: 'ProgramTree',
             node_to_paste: 'Node',
             paste_command: command.PasteElementCommand,
+            link_type,
             tree_repository: 'ProgramTreeRepository',
-            tree_version_repository: 'ProgramTreeVersionRepository'
+            version_repository: 'ProgramTreeVersionRepository'
     ):
         path = paste_command.path_where_to_paste
-        link_type = paste_command.link_type
+        parent_node = tree.get_node(path)
         block = paste_command.block
+        relative_credits = paste_command.relative_credits
 
         if node_to_paste.is_group_or_mini_or_training():
             self.validators = [
-                CreateLinkValidatorList(tree.get_node(path), node_to_paste),
-                PasteAuthorizedRelationshipValidator(tree, node_to_paste, tree.get_node(path)),
+                CreateLinkValidatorList(parent_node, node_to_paste),
+                PasteAuthorizedRelationshipValidator(tree, node_to_paste, parent_node, link_type=link_type),
                 MinimumEditableYearValidator(tree),
                 InfiniteRecursivityTreeValidator(tree, node_to_paste, path),
                 AuthorizedLinkTypeValidator(tree, node_to_paste, link_type),
                 BlockValidator(block),
-                ValidateFinalitiesEndDateAndOptions(
-                    tree.get_node(path),
-                    node_to_paste,
-                    tree_repository,
-                    tree_version_repository
-                ),
+                ValidateFinalitiesEndDateAndOptions(parent_node, node_to_paste, tree_repository, version_repository),
                 ValidateAuthorizedRelationshipForAllTrees(tree, node_to_paste, path, tree_repository),
-                MatchVersionValidator(
-                    tree.get_node(path),
-                    node_to_paste,
-                    tree_repository,
-                    tree_version_repository
-                ),
+                MatchVersionValidator(parent_node, node_to_paste, tree_repository, version_repository),
+                RelativeCreditsValidator(relative_credits),
             ]
 
         elif node_to_paste.is_learning_unit():
             self.validators = [
-                CreateLinkValidatorList(tree.get_node(path), node_to_paste),
-                AuthorizedRelationshipLearningUnitValidator(tree, node_to_paste, tree.get_node(path)),
+                CreateLinkValidatorList(parent_node, node_to_paste),
+                AuthorizedRelationshipLearningUnitValidator(tree, node_to_paste, parent_node),
                 MinimumEditableYearValidator(tree),
                 InfiniteRecursivityTreeValidator(tree, node_to_paste, path),
                 AuthorizedLinkTypeValidator(tree, node_to_paste, link_type),
                 BlockValidator(block),
-                ValidateAuthorizedRelationshipForAllTrees(tree, node_to_paste, path, tree_repository)
+                ValidateAuthorizedRelationshipForAllTrees(tree, node_to_paste, path, tree_repository),
+                RelativeCreditsValidator(relative_credits),
             ]
 
         else:
             raise AttributeError("Unknown instance of node")
         super().__init__()
 
-    def validate(self):
-        error_messages = []
-        for validator in self.validators:
-            try:
-                validator.validate()
-            # TODO : gather multiple BusinessException instead of BusinessExceptions
-            except osis_common.ddd.interface.BusinessExceptions as business_exception:
-                error_messages.extend(business_exception.messages)
 
-        if error_messages:
-            raise osis_common.ddd.interface.BusinessExceptions(error_messages)
+class UpdateLinkValidatorList(MultipleExceptionBusinessListValidator):
+    def __init__(
+            self,
+            tree: 'ProgramTree',
+            child_node: 'Node',
+            link: 'Link',
+    ):
+        self.validators = [
+            AuthorizedLinkTypeValidator(tree, child_node, link.link_type),
+            UpdateLinkAuthorizedRelationshipValidator(tree, child_node),
+            BlockValidator(link.block),
+            RelativeCreditsValidator(link.relative_credits)
+        ]
+        super().__init__()
 
 
-class CheckPasteNodeValidatorList(business_validator.BusinessListValidator):
+class CheckPasteNodeValidatorList(MultipleExceptionBusinessListValidator):
     def __init__(
             self,
             tree: 'ProgramTree',
@@ -166,20 +163,8 @@ class CheckPasteNodeValidatorList(business_validator.BusinessListValidator):
             raise AttributeError("Unknown instance of node")
         super().__init__()
 
-    def validate(self):
-        error_messages = []
-        for validator in self.validators:
-            try:
-                validator.validate()
-            # TODO : gather multiple BusinessException instead of BusinessExceptions
-            except osis_common.ddd.interface.BusinessExceptions as business_exceptions:
-                error_messages.extend(business_exceptions.messages)
 
-        if error_messages:
-            raise osis_common.ddd.interface.BusinessExceptions(error_messages)
-
-
-class DetachNodeValidatorList(business_validator.BusinessListValidator):
+class DetachNodeValidatorList(MultipleExceptionBusinessListValidator):
 
     def __init__(
             self,
@@ -210,18 +195,6 @@ class DetachNodeValidatorList(business_validator.BusinessListValidator):
             raise AttributeError("Unknown instance of node")
         super().__init__()
 
-    def validate(self):
-        error_messages = []
-        for validator in self.validators:
-            try:
-                validator.validate()
-            # TODO : gather multiple BusinessException instead of BusinessExceptions
-            except osis_common.ddd.interface.BusinessExceptions as business_exception:
-                error_messages.extend(business_exception.messages)
-
-        if error_messages:
-            raise osis_common.ddd.interface.BusinessExceptions(error_messages)
-
 
 class UpdatePrerequisiteValidatorList(business_validator.BusinessListValidator):
 
@@ -235,21 +208,6 @@ class UpdatePrerequisiteValidatorList(business_validator.BusinessListValidator):
             AuthorizedRootTypeForPrerequisite(program_tree.root_node),
             PrerequisiteExpressionSyntaxValidator(prerequisite_string),
             PrerequisiteItemsValidator(prerequisite_string, node, program_tree)
-        ]
-        super().__init__()
-
-
-class UpdateLinkValidatorList(MultipleExceptionBusinessListValidator):
-    def __init__(
-            self,
-            tree: 'ProgramTree',
-            child_node: 'Node',
-            link: 'Link',
-    ):
-        self.validators = [
-            AuthorizedLinkTypeValidator(tree, child_node, link.link_type),
-            BlockValidator(link.block),
-            RelativeCreditsValidator(link.relative_credits)
         ]
         super().__init__()
 

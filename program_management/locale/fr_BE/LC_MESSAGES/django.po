@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-23 14:23+0200\n"
+"POT-Creation-Date: 2020-10-28 14:17+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -27,21 +27,16 @@ msgid "\"%(child)s\" has been detached from \"%(parent)s\""
 msgstr "\"%(child)s\" a été retiré de \"%(parent)s\""
 
 #, python-format
-msgid "\"%(child)s\" has been successfully updated"
-msgstr "\"%(child)s\" a été modifié avec succès"
-
-#, python-format
 msgid "%(node)s has been moved"
 msgstr "%(node)s a été déplacé"
 
 #, python-format
 msgid ""
-"%(node_to_add)s [%(node_to_add_version)s] version must be the same as "
-"%(node_to_paste_to)s and all of it's parent's version "
-"[%(version_mismatched)s]"
+"%(node_to_add)s or its children must have the same version as "
+"%(node_to_paste_to)s and all of it's parent's [%(version_mismatched)s]"
 msgstr ""
-"La version %(node_to_add)s [%(node_to_add_version)s] doit être identique à "
-"celle de %(node_to_paste_to)s et de tous ses parents [%(version_mismatched)s]"
+"La version de %(node_to_add)s ou de ses enfants doit être identique à celle "
+"de %(node_to_paste_to)s et de tous ses parents [%(version_mismatched)s]"
 
 #, python-format
 msgid "%(start_index)s to %(end_index)s of %(total_counts)s learning units"
@@ -339,9 +334,6 @@ msgstr "Orientation coopération internationale CCD/CUD"
 msgid "Group"
 msgstr "Groupement"
 
-msgid "IMPOSSIBLE TO DISPLAY BECAUSE OF AN ILLEGAL CHARACTER IN STRING"
-msgstr "IMPOSSIBLE D'AFFICHER A CAUSE D'UN CARACTERE IRREGULIER"
-
 msgid "ISCED domain"
 msgstr "Domaine ISCED/CITE"
 
@@ -401,11 +393,17 @@ msgstr "Mène à diplôme/certificat"
 msgid "Learning achievements"
 msgstr "Unités d'enseignement"
 
+msgid "Learning class"
+msgstr "Classe"
+
 msgid "Learning class year"
 msgstr "Classe"
 
 msgid "Learning location"
 msgstr "Lieu d'enseignement"
+
+msgid "Learning unit"
+msgstr "Unité d'enseignement"
 
 msgid "Learning unit year"
 msgstr "Unités d'enseignement"
@@ -767,8 +765,10 @@ msgid "The link \"%(node)s\" has been updated."
 msgstr "Le lien \"%(node)s\" a été mis à jour."
 
 #, python-format
-msgid "The parent must have at least one child of type(s) \"%(types)s\"."
-msgstr "Le parent doit au moins avoir un enfant de type(s) \"%(types)s\"."
+msgid ""
+"The parent %(parent)s must have at least one child of type(s) \"%(types)s\"."
+msgstr ""
+"Le parent %(parent)s doit au moins avoir un enfant de type(s) \"%(types)s\"."
 
 #, python-format
 msgid ""
@@ -778,10 +778,9 @@ msgstr ""
 "Les prérequis %(prerequisites)s pour l'unité d'enseignement "
 "%(learning_unit)s ne sont pas dans la formation sélectionnée %(root)s"
 
-#, python-format
 msgid ""
 "The prerequisites for the following learning units contained in education "
-"group year %(acronym)s will we deleted: %(learning_units)s"
+"group year %(acronym)s will be deleted: %(learning_units)s"
 msgstr ""
 "Les prérequis des unités d'enseignement suivantes contenues dans "
 "l'organisation de formation annualisée %(acronym)s seront supprimés: "
@@ -927,14 +926,6 @@ msgid "You can not add the same child %(child_node)s several times."
 msgstr ""
 "Vous ne pouvez pas ajouter plusieurs fois le même enfant %(child_node)s."
 
-#, python-format
-msgid ""
-"You can not attach a learning unit like %(node)s to element %(parent)s of "
-"type %(type)s."
-msgstr ""
-"Vous ne pouvez pas ajouter une unité d'enseignement comme %(node)s à "
-"l'élément %(parent)s de type %(type)s."
-
 #, python-brace-format
 msgid ""
 "You can't copy the program tree '{code}' from {from_year} to {to_year} "
@@ -961,11 +952,10 @@ msgstr ""
 
 #, python-format
 msgid ""
-"You cannot add \"%(child)s\" of type \"%(child_types)s\" to \"%(parent)s\" "
-"of type \"%(parent_type)s\""
+"You cannot add \"%(child)s\" to \"%(parent)s\" of type \"%(parent_type)s\""
 msgstr ""
-"Vous ne pouvez pas attacher \"%(child)s\" de type \"%(child_types)s\" à "
-"\"%(parent)s\" de type \"%(parent_type)s\""
+"Vous ne pouvez pas attacher \"%(child)s\" à \"%(parent)s\" de type "
+"\"%(parent_type)s\""
 
 #, python-format
 msgid ""
