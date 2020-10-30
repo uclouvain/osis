@@ -407,7 +407,7 @@ class LearningUnitYear(SerializableModel):
     @property
     def periodicity_verbose(self):
         if self.periodicity:
-            return dict(PERIODICITY_TYPES)[self.periodicity]
+            return dict(PERIODICITY_TYPES)[self.periodicity].lower()
         return None
 
     def find_gt_learning_units_year(self):
@@ -494,13 +494,13 @@ class LearningUnitYear(SerializableModel):
         if self.parent:
             if self.parent.periodicity in [BIENNIAL_EVEN, BIENNIAL_ODD] and self.periodicity != self.parent.periodicity:
                 warnings.append(_("This partim is %(partim_periodicity)s and the parent is %(parent_periodicty)s")
-                                % {'partim_periodicity': self.periodicity_verbose.lower,
+                                % {'partim_periodicity': self.periodicity_verbose,
                                    'parent_periodicty': self.parent.periodicity_verbose})
         else:
             if self.periodicity in [BIENNIAL_EVEN, BIENNIAL_ODD] and \
                     find_partims_with_different_periodicity(self).exists():
                 warnings.append(_("The parent is %(parent_periodicty)s and there is at least one partim which is not "
-                                  "%(parent_periodicty)s") % {'parent_periodicty': self.periodicity_verbose.lower()})
+                                  "%(parent_periodicty)s") % {'parent_periodicty': self.periodicity_verbose})
         return warnings
 
     def _check_learning_component_year_warnings(self):
