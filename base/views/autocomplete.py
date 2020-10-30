@@ -148,6 +148,9 @@ class EntityRequirementAutocomplete(LoginRequiredMixin, EntityRoleChoiceFieldMix
             qs = qs.filter(Q(acronym__icontains=self.q) | Q(title__icontains=self.q))
         return qs
 
+    def get_result_label(self, result):
+        return format_html(result.verbose_title)
+
 
 class EmployeeAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
     def get_queryset(self):
