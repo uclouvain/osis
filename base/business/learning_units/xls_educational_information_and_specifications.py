@@ -202,7 +202,7 @@ def _add_revision_informations(learning_unit_yr, line, cms_label):
     ).order_by("-revision__date_created")
     if version:
         line.append(version.values('author')[:1][0]["author"])
-        line.append(version.values('revision__date_created')[:1][0]["revision__date_created"].date())
+        line.append(version.values('revision__date_created')[:1][0]["revision__date_created"].strftime("%d/%m/%Y"))
     else:
         line.append('')
         line.append('')
