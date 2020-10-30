@@ -23,20 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.db.models import Prefetch
-from django.http import HttpResponseRedirect
-from django.shortcuts import render, get_object_or_404
-from django.urls import reverse
-from django.views.decorators.http import require_POST
 from django.views.generic import DetailView
 from django_filters.views import FilterView
 
 from base.forms.organization import OrganizationFilter
-from base.forms.organization_address import OrganizationAddressForm
 from base.models.organization import Organization
-from base.models.organization_address import OrganizationAddress
 
 
 class OrganizationSearch(PermissionRequiredMixin, FilterView):
@@ -63,54 +55,4 @@ class DetailOrganization(PermissionRequiredMixin, DetailView):
     pk_url_kwarg = "organization_id"
 
     def get_queryset(self):
-        return super().get_queryset().prefetch_related(
-            Prefetch(
-                "organizationaddress_set",
-                queryset=OrganizationAddress.objects.select_related("country")
-            ),
-            "campus_set",
-        )
-
-
-@login_required
-@permission_required('base.can_access_organization', raise_exception=True)
-def organization_address_read(request, organization_address_id):
-    organization_address = get_object_or_404(
-        OrganizationAddress.objects.select_related('organization', 'country'),
-        id=organization_address_id
-    )
-    return render(request, "organization/organization_address.html", {
-            'organization_address': organization_address,
-        }
-    )
-
-
-@login_required
-@permission_required('base.can_access_organization', raise_exception=True)
-def organization_address_edit(request, organization_address_id):
-    organization_address = get_object_or_404(
-        OrganizationAddress.objects.select_related('organization'),
-        id=organization_address_id
-    )
-    form = OrganizationAddressForm(request.POST or None, instance=organization_address)
-    if form.is_valid():
-        form.save()
-        return HttpResponseRedirect(reverse("organization_address_read", args=[organization_address.pk]))
-
-    return render(request, "organization/organization_address_form.html", {
-            'organization_address': organization_address,
-            'form': form
-        }
-    )
-
-
-@login_required
-@require_POST
-@permission_required('base.can_access_organization', raise_exception=True)
-def organization_address_delete(request, organization_address_id):
-    organization_address = get_object_or_404(
-        OrganizationAddress.objects.select_related('organization'),
-        id=organization_address_id
-    )
-    organization_address.delete()
-    return HttpResponseRedirect(reverse("organization_read", args=[organization_address.organization.pk]))
+        return super().get_queryset().prefetch_related("campus_set")

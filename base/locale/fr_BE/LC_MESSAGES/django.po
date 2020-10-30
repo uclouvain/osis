@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-22 11:34+0200\n"
+"POT-Creation-Date: 2020-10-27 13:37+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -970,6 +970,9 @@ msgstr "Liste au choix de Finalités (120)"
 msgid "Finality 180 list choice"
 msgstr "Liste au choix de Finalités (180)"
 
+msgid "First name"
+msgstr "Prénom"
+
 msgid "Firstname"
 msgstr "Prénom"
 
@@ -1195,6 +1198,9 @@ msgstr "Membre du jury"
 msgid "Jury members"
 msgstr "Membres du jury"
 
+msgid "Justification"
+msgstr "Justification"
+
 msgid "Keywords"
 msgstr "Mots clés"
 
@@ -1212,6 +1218,9 @@ msgstr "Cours de langue"
 
 msgid "Last modifications"
 msgstr "Dernières modifications"
+
+msgid "Last name"
+msgstr "Nom"
 
 msgid "Last year of organization"
 msgstr "Dernière année d'organisation"
@@ -1954,6 +1963,10 @@ msgstr "Titre professionnel"
 msgid "Profile"
 msgstr "Profil"
 
+msgctxt "Submission email table header"
+msgid "Program"
+msgstr "Sigle"
+
 msgid "Program Managers"
 msgstr "Gestionnaires de parcours étudiant"
 
@@ -2127,6 +2140,10 @@ msgstr "Refusé"
 msgid "Registration Id"
 msgstr "Noma"
 
+msgctxt "Submission email table header"
+msgid "Registration number"
+msgstr "Noma"
+
 msgid "Relative / Absolute <br>credits"
 msgstr "Crédits<br>relatifs / absolus"
 
@@ -2196,6 +2213,9 @@ msgstr "Type horaire"
 msgid "School"
 msgstr "École"
 
+msgid "Score"
+msgstr "Note"
+
 msgid "Scores diffusion"
 msgstr "Diffusion des notes"
 
@@ -2246,6 +2266,10 @@ msgstr "Cours de service"
 
 msgid "Session derogation"
 msgstr "Session dérogation"
+
+msgctxt "Submission email table header"
+msgid "Session number"
+msgstr "Session"
 
 msgid "Shifted"
 msgstr "Horaire décalé"

@@ -25,8 +25,6 @@
 ##############################################################################
 import random
 
-import random
-
 from django.test import TestCase
 from django.urls import reverse
 
