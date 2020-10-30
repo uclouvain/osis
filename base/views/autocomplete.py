@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Set
+
 from dal import autocomplete
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Subquery, OuterRef, BooleanField, Q, Value
@@ -37,7 +39,7 @@ from base.models.organization import Organization
 from base.models.person import Person
 from learning_unit.auth.roles.central_manager import CentralManager
 from learning_unit.auth.roles.faculty_manager import FacultyManager
-from osis_role.contrib.forms.fields import EntityRoleAutocompleteField
+from osis_role.contrib.forms.fields import EntityRoleChoiceFieldMixin
 from reference.models.country import Country
 
 
@@ -133,10 +135,18 @@ class AdditionnalEntity2Autocomplete(EntityAutocomplete):
         return super(AdditionnalEntity2Autocomplete, self).get_queryset()
 
 
-class EntityRequirementAutocomplete(EntityRoleAutocompleteField):
-    def __init__(self):
-        super().__init__()
-        self.group_names = (FacultyManager.group_name, CentralManager.group_name, )
+class EntityRequirementAutocomplete(LoginRequiredMixin, EntityRoleChoiceFieldMixin, autocomplete.Select2QuerySetView):
+    def get_person(self) -> Person:
+        return self.request.user.person
+
+    def get_group_names(self) -> Set[str]:
+        return {FacultyManager.group_name, CentralManager.group_name}
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        if self.q:
+            qs = qs.filter(Q(acronym__icontains=self.q) | Q(title__icontains=self.q))
+        return qs
 
 
 class EmployeeAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):

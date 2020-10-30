@@ -23,13 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from dal import autocomplete
+from typing import Set
+
 from django import forms
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import ImproperlyConfigured
 from django.utils import timezone
-from django.utils.html import format_html
 
 from base.models.entity_version import EntityVersion
+from base.models.person import Person
 from osis_role.contrib.helper import EntityRoleHelper
 
 
@@ -38,13 +39,6 @@ class EntityRoleChoiceFieldMixin:
        Mixin which allows to display entities which have a link with person according to all
        EntityRoleModel declared in OSIS Role Manager
     """
-    def __init__(self, person, group_names, **kwargs):
-        self._group_names = group_names
-        self._person = person
-        if not kwargs.get('queryset'):
-            kwargs['queryset'] = self.get_queryset()
-        super().__init__(**kwargs)
-
     def get_queryset(self):
         entities_link_to_user = EntityRoleHelper.get_all_entities(self.get_person(), self.get_group_names())
         date = timezone.now()
@@ -52,14 +46,21 @@ class EntityRoleChoiceFieldMixin:
             entity__in=entities_link_to_user
         ).select_related('entity__organization')
 
-    def get_group_names(self):
-        return self._group_names
+    def get_person(self) -> Person:
+        raise ImproperlyConfigured('You must set a get_person method')
 
-    def get_person(self):
-        return self._person
+    def get_group_names(self) -> Set[str]:
+        raise ImproperlyConfigured('You must set a get_group_names method')
 
 
 class EntityRoleModelChoiceField(EntityRoleChoiceFieldMixin, forms.ModelChoiceField):
+    def __init__(self, person=None, group_names=None, **kwargs):
+        self._group_names = group_names
+        self._person = person
+        if 'queryset' not in kwargs:
+            kwargs['queryset'] = self.get_queryset()
+        super().__init__(**kwargs)
+
     def label_from_instance(self, obj):
         return obj.verbose_title
 
@@ -67,7 +68,8 @@ class EntityRoleModelChoiceField(EntityRoleChoiceFieldMixin, forms.ModelChoiceFi
         entity_version = super().clean(value)
         return entity_version.entity if entity_version else None
 
+    def get_group_names(self) -> Set[str]:
+        return self._group_names
 
-class EntityRoleAutocompleteField(LoginRequiredMixin, autocomplete.Select2QuerySetView, EntityRoleChoiceFieldMixin):
-    def get_result_label(self, result):
-        return format_html(result.verbose_title)
+    def get_person(self) -> Person:
+        return self._person

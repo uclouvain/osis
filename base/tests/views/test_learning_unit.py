@@ -383,7 +383,6 @@ class LearningUnitViewTestCase(TestCase):
             entity_type=entity_type.INSTITUTE,
             start_date=today - datetime.timedelta(days=20),
             end_date=today.replace(year=today.year + 1),
-            parent=cls.parent_entity
         )
         cls.entity_version_3 = EntityVersionFactory(
             acronym="3 acronym", entity=cls.entities[2],
@@ -408,8 +407,9 @@ class LearningUnitViewTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         json_response = str(response.content, encoding='utf8')
         results = json.loads(json_response)['results']
-        self.assertEqual(results[0]['text'], self.entity_version.verbose_title)
-        self.assertEqual(results[1]['text'], self.entity_version_3.verbose_title)
+        self.assertEqual(results[0]['text'], self.parent_entity.entityversion_set.first().verbose_title)
+        self.assertEqual(results[1]['text'], self.entity_version.verbose_title)
+        self.assertEqual(results[2]['text'], self.entity_version_3.verbose_title)
 
     def test_entity_requirement_autocomplete_with_q(self):
         self.client.force_login(self.person.user)
@@ -431,6 +431,7 @@ class LearningUnitViewTestCase(TestCase):
         results = json.loads(json_response)['results']
         self.assertEqual(results[0]['text'], self.entity_version.verbose_title)
         self.assertEqual(results[1]['text'], self.entity_version_3.verbose_title)
+        self.assertEqual(results[2]['text'], self.parent_entity.entityversion_set.first().verbose_title)
 
     def test_entity_autocomplete_with_q(self):
         self.client.force_login(self.person.user)
