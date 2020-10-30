@@ -30,6 +30,7 @@ from mock import patch
 
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType, GroupType
 from program_management.ddd.domain import program_tree
+from program_management.ddd.domain.exception import CannotDetachOptionsException
 from program_management.ddd.validators._detach_option_2M import DetachOptionValidator
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
@@ -71,18 +72,8 @@ class TestDetachOptionValidator(TestValidatorValidateMixin, SimpleTestCase):
             **{"search_from_children.return_value": [working_tree]}
         )
 
-        validator = DetachOptionValidator(working_tree, path_to_detach, self.mock_repository)
-        expected_message = ngettext(
-            "Option \"%(acronym)s\" cannot be detach because it is contained in"
-            " %(finality_acronym)s program.",
-            "Options \"%(acronym)s\" cannot be detach because they are contained in"
-            " %(finality_acronym)s program.",
-            1
-        ) % {
-            "acronym": link_finality_option.child.title,
-            "finality_acronym": link_finality_option.parent.title
-        }
-        self.assertValidatorRaises(validator, [expected_message])
+        with self.assertRaises(CannotDetachOptionsException):
+            DetachOptionValidator(working_tree, path_to_detach, self.mock_repository).validate()
 
     def test_should_not_raise_exception_when_node_to_detach_is_a_finality_in_same_tree(self):
         working_tree = ProgramTreeFactory(root_node__node_type=TrainingType.PGRM_MASTER_120)
@@ -122,18 +113,8 @@ class TestDetachOptionValidator(TestValidatorValidateMixin, SimpleTestCase):
             **{"search_from_children.return_value": [working_tree, other_tree]}
         )
 
-        validator = DetachOptionValidator(working_tree, path_to_detach, self.mock_repository)
-        expected_message = ngettext(
-            "Option \"%(acronym)s\" cannot be detach because it is contained in"
-            " %(finality_acronym)s program.",
-            "Options \"%(acronym)s\" cannot be detach because they are contained in"
-            " %(finality_acronym)s program.",
-            1
-        ) % {
-            "acronym": link_finality_option.child.title,
-            "finality_acronym": link_finality_option.parent.title
-        }
-        self.assertValidatorRaises(validator, [expected_message])
+        with self.assertRaises(CannotDetachOptionsException):
+            DetachOptionValidator(working_tree, path_to_detach, self.mock_repository).validate()
 
     @patch(
         'program_management.ddd.domain.service.identity_search.ProgramTreeVersionIdentitySearch.get_from_node_identity'

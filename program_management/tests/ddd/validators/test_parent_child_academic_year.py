@@ -25,8 +25,8 @@
 ##############################################################################
 
 from django.test import SimpleTestCase
-from django.utils.translation import gettext as _
 
+from program_management.ddd.domain.exception import ParentAndChildMustHaveSameAcademicYearException
 from program_management.ddd.validators._parent_child_academic_year import ParentChildSameAcademicYearValidator
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
@@ -44,15 +44,8 @@ class TestParentChildSameAcademicYearValidator(TestValidatorValidateMixin, Simpl
         ]
         for node_to_add in nodes_to_add:
             with self.subTest(base_year=self.tree.root_node.year, year=node_to_add.year):
-                expected_result = _("It is prohibited to attach a %(child_node)s to an element of "
-                                    "another academic year %(parent_node)s.") % {
-                    "child_node": node_to_add,
-                    "parent_node": self.tree.root_node
-                }
-                self.assertValidatorRaises(
-                    ParentChildSameAcademicYearValidator(self.tree.root_node, node_to_add),
-                    [expected_result]
-                )
+                with self.assertRaises(ParentAndChildMustHaveSameAcademicYearException):
+                    ParentChildSameAcademicYearValidator(self.tree.root_node, node_to_add).validate()
 
     def test_should_not_raise_exception_when_year_of_parent_differs_and_node_is_learning_unit(self):
         node_to_paste = NodeLearningUnitYearFactory(year=self.tree.root_node.year - 1)

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-23 14:23+0200\n"
+"POT-Creation-Date: 2020-10-28 14:17+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -25,18 +25,13 @@ msgid "\"%(child)s\" has been detached from \"%(parent)s\""
 msgstr ""
 
 #, python-format
-msgid "\"%(child)s\" has been successfully updated"
-msgstr ""
-
-#, python-format
 msgid "%(node)s has been moved"
 msgstr ""
 
 #, python-format
 msgid ""
-"%(node_to_add)s [%(node_to_add_version)s] version must be the same as "
-"%(node_to_paste_to)s and all of it's parent's version "
-"[%(version_mismatched)s]"
+"%(node_to_add)s or its children must have the same version as "
+"%(node_to_paste_to)s and all of it's parent's [%(version_mismatched)s]"
 msgstr ""
 
 #, python-format
@@ -311,9 +306,6 @@ msgstr ""
 msgid "Group"
 msgstr ""
 
-msgid "IMPOSSIBLE TO DISPLAY BECAUSE OF AN ILLEGAL CHARACTER IN STRING"
-msgstr ""
-
 msgid "ISCED domain"
 msgstr ""
 
@@ -367,10 +359,16 @@ msgstr ""
 msgid "Learning achievements"
 msgstr ""
 
+msgid "Learning class"
+msgstr ""
+
 msgid "Learning class year"
 msgstr ""
 
 msgid "Learning location"
+msgstr ""
+
+msgid "Learning unit"
 msgstr ""
 
 msgid "Learning unit year"
@@ -716,7 +714,8 @@ msgid "The link \"%(node)s\" has been updated."
 msgstr ""
 
 #, python-format
-msgid "The parent must have at least one child of type(s) \"%(types)s\"."
+msgid ""
+"The parent %(parent)s must have at least one child of type(s) \"%(types)s\"."
 msgstr ""
 
 #, python-format
@@ -728,7 +727,7 @@ msgstr ""
 #, python-format
 msgid ""
 "The prerequisites for the following learning units contained in education "
-"group year %(acronym)s will we deleted: %(learning_units)s"
+"group year %(acronym)s will be deleted: %(learning_units)s"
 msgstr ""
 
 #, python-format
@@ -858,12 +857,6 @@ msgstr ""
 msgid "You can not add the same child %(child_node)s several times."
 msgstr ""
 
-#, python-format
-msgid ""
-"You can not attach a learning unit like %(node)s to element %(parent)s of "
-"type %(type)s."
-msgstr ""
-
 #, python-brace-format
 msgid ""
 "You can't copy the program tree '{code}' from {from_year} to {to_year} "
@@ -884,8 +877,7 @@ msgstr ""
 
 #, python-format
 msgid ""
-"You cannot add \"%(child)s\" of type \"%(child_types)s\" to \"%(parent)s\" "
-"of type \"%(parent_type)s\""
+"You cannot add \"%(child)s\" to \"%(parent)s\" of type \"%(parent_type)s\""
 msgstr ""
 
 #, python-format

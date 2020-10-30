@@ -36,12 +36,11 @@ def detach_warning_messages(detach_command: command.DetachNodeCommand) -> List[s
 
     root_id = int(path_to_detach.split(PATH_SEPARATOR)[0])
     working_tree = load_tree.load(root_id)
-    node_to_detach = working_tree.get_node(path_to_detach)
 
     messages = []
     try:
-        _has_or_is_prerequisite.HasPrerequisiteValidator(working_tree, node_to_detach).validate()
-    except osis_common.ddd.interface.BusinessExceptions as e:
-        messages = e.messages
+        _has_or_is_prerequisite.HasPrerequisiteValidator(working_tree, path_to_detach).validate()
+    except osis_common.ddd.interface.BusinessException as e:
+        messages = [e.message]
 
     return messages

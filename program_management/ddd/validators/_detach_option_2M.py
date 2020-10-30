@@ -24,14 +24,11 @@
 #
 ##############################################################################
 from collections import Counter
-from typing import List, Set
+from typing import List
 
-from django.utils.translation import ngettext
-
-import osis_common.ddd.interface
 from base.ddd.utils import business_validator
-from program_management import formatter
 from program_management.ddd.business_types import *
+from program_management.ddd.domain.exception import CannotDetachOptionsException
 
 
 class DetachOptionValidator(business_validator.BusinessValidator):
@@ -49,12 +46,7 @@ class DetachOptionValidator(business_validator.BusinessValidator):
         self.tree_repository = tree_repository
         self.options_to_detach = self._get_options_to_detach()
 
-        from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
-        self.version_search = ProgramTreeVersionIdentitySearch()
-
     def validate(self):
-        error_messages = []
-
         parent = self.working_tree.get_node(self._extract_parent_path(self.path_to_node_to_detach))
         trees_2m = self._get_trees_2m_containing_parent(parent)
 
@@ -63,47 +55,16 @@ class DetachOptionValidator(business_validator.BusinessValidator):
                 options_to_check = self._get_options_to_check_by_tree(tree_2m)
                 if not options_to_check:
                     continue
-                error_messages.extend(self._validate_option_usage_in_finalities(tree_2m))
-        if error_messages:
-            raise osis_common.ddd.interface.BusinessExceptions(error_messages)
+                self._validate_option_usage_in_finalities(tree_2m)
 
     def _validate_option_usage_in_finalities(self, tree_2m: 'ProgramTree'):
-        validation_errors = []
         for finality in tree_2m.get_all_finalities():
-            finality_version = self.version_search.get_from_node_identity(finality.entity_id)
             options_to_detach_used_in_finality = set(self.options_to_detach) & set(finality.get_option_list())
             if options_to_detach_used_in_finality:
-                options_to_detach_versions = self._get_options_versions(options_to_detach_used_in_finality)
-                validation_errors.append(
-                    self._get_validation_error_message(
-                        finality_version,
-                        options_to_detach_used_in_finality,
-                        options_to_detach_versions
-                    )
-                )
-        return validation_errors
+                raise CannotDetachOptionsException(finality, options_to_detach_used_in_finality)
 
     def _extract_parent_path(self, path_to_node: str) -> str:
         return path_to_node.rsplit('|', 1)[0]
-
-    def _get_options_versions(self, options: Set['Node']) -> List['ProgramTreeVersionIdentity']:
-        return [self.version_search.get_from_node_identity(option.entity_id) for option in options]
-
-    def _get_validation_error_message(
-            self,
-            finality_version: 'ProgramTreeVersionIdentity',
-            options_to_detach: Set['Node'],
-            options_to_detach_versions: List['ProgramTreeVersionIdentity']
-    ) -> str:
-        return ngettext(
-            "Option \"%(acronym)s\" cannot be detach because it is contained in %(finality_acronym)s program.",
-            "Options \"%(acronym)s\" cannot be detach because they are contained in %(finality_acronym)s program.",
-            len(options_to_detach)
-        ) % {
-            "acronym": ', '.join([formatter.format_program_tree_version_identity(option)
-                                  for option in options_to_detach_versions]),
-            "finality_acronym": formatter.format_program_tree_version_identity(finality_version)
-        }
 
     def _get_options_to_check_by_tree(self, tree_2m: 'ProgramTree') -> List['Node']:
         counter_options = Counter(tree_2m.get_2m_option_list())

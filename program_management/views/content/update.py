@@ -1,5 +1,5 @@
 import functools
-from typing import List, Dict, Union, Optional
+from typing import List, Dict, Optional
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404, HttpResponseRedirect
@@ -15,16 +15,13 @@ from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import exception
 from education_group.ddd.service.read import get_group_service
-from osis_common.ddd import interface
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command as command_program_management
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception as program_exception
 from program_management.ddd.domain.service.get_program_tree_version_for_tree import get_program_tree_version_for_tree
-from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.service.read import get_program_tree_service, get_program_tree_version_from_node_service
 from program_management.forms import content as content_forms
-from program_management.models.enums.node_type import NodeType
 
 
 class ContentUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
@@ -67,8 +64,8 @@ class ContentUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         if self.content_formset.is_valid():
             try:
-                updated_links = self.content_formset.save()
-                success_messages = self.get_success_msg_updated_links(updated_links)
+                self.content_formset.save()
+                success_messages = self.get_success_msg_updated_links()
                 display_success_messages(request, success_messages, extra_tags='safe')
                 return HttpResponseRedirect(self.get_success_url())
             except InvalidFormException:
@@ -119,33 +116,8 @@ class ContentUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         program_tree = self.get_program_tree_obj()
         return program_tree.root_node.children_as_nodes
 
-    def get_success_msg_updated_links(self, links: List['Link']) -> List[str]:
-        messages = []
-
-        for link in links:
-            msg = _("The link \"%(node)s\" has been updated.") % {"node": self.__get_node_str(link.child)}
-            messages.append(msg)
-        return messages
-
-    def __get_node_str(self, node: 'Node') -> str:
-        if node.node_type == NodeType.LEARNING_UNIT:
-            return "%(code)s - %(year)s" % {"code": node.code, "year": node.academic_year}
-
-        version_identity = self.__get_program_tree_version_identity(node.entity_id)
-        return "%(code)s - %(abbreviated_title)s%(version)s - %(year)s" % {
-            "code": node.code,
-            "abbreviated_title": node.title,
-            "version": "[{}]".format(version_identity.version_name)
-                       if version_identity and not version_identity.is_standard() else "",
-            "year": node.academic_year
-        }
-
-    def __get_program_tree_version_identity(self, node_identity: 'NodeIdentity') \
-            -> Union['ProgramTreeVersionIdentity', None]:
-        try:
-            return ProgramTreeVersionIdentitySearch().get_from_node_identity(node_identity)
-        except interface.BusinessException:
-            return None
+    def get_success_msg_updated_links(self) -> List[str]:
+        return [_("The link \"%(node)s\" has been updated.") % {"node": child} for child in self.get_children()]
 
     def _get_default_error_messages(self) -> str:
         return _("Error(s) in form: The modifications are not saved")
