@@ -21,31 +21,6 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+import math
 
-import osis_common.ddd.interface
-from base.ddd.utils.business_validator import BusinessValidator
-from base.models.enums.link_type import LinkTypes
-from program_management.ddd.business_types import *
-from program_management.ddd.validators._authorized_relationship import PasteAuthorizedRelationshipValidator
-
-
-class ValidateAuthorizedRelationshipForAllTrees(BusinessValidator):
-    def __init__(
-            self,
-            tree: 'ProgramTree',
-            node_to_paste: 'Node',
-            path: 'Path',
-            tree_repository: 'ProgramTreeRepository'
-    ) -> None:
-        super().__init__()
-        self.tree = tree
-        self.node_to_paste = node_to_paste
-        self.path = path
-        self.tree_repository = tree_repository
-
-    def validate(self, *args, **kwargs):
-        node_to_paste_to = self.tree.get_node(self.path)
-        trees = self.tree_repository.search_from_children([node_to_paste_to.entity_id], link_type=LinkTypes.REFERENCE)
-        for tree in trees:
-            for parent_from_reference_link in tree.get_parents_using_node_with_respect_to_reference(node_to_paste_to):
-                PasteAuthorizedRelationshipValidator(tree, self.node_to_paste, parent_from_reference_link).validate()
+INFINITE_VALUE = math.inf

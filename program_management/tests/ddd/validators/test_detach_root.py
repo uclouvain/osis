@@ -24,6 +24,7 @@
 from django.test import SimpleTestCase
 from django.utils.translation import gettext_lazy as _
 
+from program_management.ddd.domain.exception import CannotDetachRootException
 from program_management.ddd.validators._detach_root import DetachRootValidator
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
@@ -37,8 +38,8 @@ class TestDetachRoot(TestValidatorValidateMixin, SimpleTestCase):
 
     def test_should_raise_exception_when_node_to_detach_is_root(self):
         root_path = str(self.tree.root_node.node_id)
-        validator = DetachRootValidator(self.tree, root_path)
-        self.assertValidatorRaises(validator, [_("Cannot perform detach action on root.")])
+        with self.assertRaises(CannotDetachRootException):
+            DetachRootValidator(self.tree, root_path).validate()
 
     def test_should_not_raise_exception_when_node_to_detach_is_not_root(self):
         child_root_path = "|".join([str(self.tree.root_node.node_id), str(self.link.child.node_id)])

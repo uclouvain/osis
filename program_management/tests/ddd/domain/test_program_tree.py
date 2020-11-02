@@ -330,11 +330,11 @@ class TestGetParentsUsingNodeAsReference(SimpleTestCase):
 
     def test_when_node_is_not_used_as_reference(self):
         link_without_ref = LinkFactory(parent=self.link_with_root.child, link_type=None)
-        result = self.tree.get_parents_using_node_as_reference(link_without_ref.child)
+        result = self.tree.get_parents_using_node_with_respect_to_reference(link_without_ref.child)
         self.assertListEqual(result, [])
 
     def test_when_node_is_used_as_reference(self):
-        result = self.tree.get_parents_using_node_as_reference(self.link_with_ref.child)
+        result = self.tree.get_parents_using_node_with_respect_to_reference(self.link_with_ref.child)
         self.assertListEqual(
             result,
             [self.link_with_ref.parent]
@@ -350,7 +350,7 @@ class TestGetParentsUsingNodeAsReference(SimpleTestCase):
             link_type=LinkTypes.REFERENCE
         )
 
-        result = self.tree.get_parents_using_node_as_reference(child_used_twice)
+        result = self.tree.get_parents_using_node_with_respect_to_reference(child_used_twice)
 
         self.assertCountEqual(result, [self.link_with_ref.parent, another_link_with_ref.parent])
 
@@ -389,11 +389,6 @@ class TestGetParents(SimpleTestCase):
             result,
             [self.link_with_root.child, self.link_with_root.parent]
         )
-
-    def test_when_infinite_loop(self):
-        LinkFactory(parent=self.link_with_child.child, child=self.link_with_root.parent)
-        with self.assertRaises(RecursionError):
-            self.tree.get_parents(self.path)
 
 
 class TestGetAllNodes(SimpleTestCase):
@@ -916,8 +911,8 @@ class TestProgramTreeIsEmpty(SimpleTestCase):
                 AuthorizedRelationshipObjectFactory(
                     parent_type=root_node.node_type,
                     child_type=child_node.node_type,
-                    min_constraint=1,
-                    max_constraint=1
+                    min_count_authorized=1,
+                    max_count_authorized=1
                 )
             ])
         )
@@ -941,8 +936,8 @@ class TestIsEmpty(SimpleTestCase):
         auth_relation = AuthorizedRelationshipObjectFactory(
             parent_type=root_node.node_type,
             child_type=child_node.node_type,
-            min_constraint=1,
-            max_constraint=1
+            min_count_authorized=1,
+            max_count_authorized=1
         )
         program_tree = ProgramTreeFactory(
             root_node=root_node,
@@ -966,14 +961,14 @@ class TestIsEmpty(SimpleTestCase):
         auth_relation_child = AuthorizedRelationshipObjectFactory(
             parent_type=root_node.node_type,
             child_type=child_node.node_type,
-            min_constraint=1,
-            max_constraint=1
+            min_count_authorized=1,
+            max_count_authorized=1
         )
         auth_relation_child_2 = AuthorizedRelationshipObjectFactory(
             parent_type=root_node.node_type,
             child_type=child_node_2.node_type,
-            min_constraint=0,
-            max_constraint=1
+            min_count_authorized=0,
+            max_count_authorized=1
         )
         program_tree = ProgramTreeFactory(
             root_node=root_node,

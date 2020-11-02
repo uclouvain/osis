@@ -71,17 +71,13 @@
                     </td>
                     <td style="width:10%">
                         {% with form.child_obj.credits|floatformat:-2|default_if_none:'-' as absolute_credits %}
-                            {% bootstrap_field form.relative_credits show_label=False addon_after='/'|add:absolute_credits %}
+                            {% bootstrap_field form.relative_credits show_label=False addon_after='/'|add:absolute_credits field_class='without_arrow' %}
                         {% endwith %}
                     </td>
                 {% else %}
                     {# Link attrs relevant for child of type group #}
                     <td style="width:12%">
-                        {{ form.child_obj.title }}
-                        {% version_details form.child_obj.entity_id tree_different_versions as version_infos %}
-                        {% if version_infos %}
-                            {{ version_infos.version_label }}
-                        {% endif %}
+                        {{ form.child_obj.full_acronym }}
                     </td>
                     <td>
                         <a href="{% url 'element_identification' code=form.child_obj.code year=form.child_obj.year %}">
@@ -90,10 +86,7 @@
                     </td>
                     <td {% if form.is_a_parent_minor_major_option_list_choice %}style="width:55%"
                         {% else %}style="width:15%"{% endif %}>
-                        {{ form.child_obj.group_title_fr }}
-                        {% if version_infos and version_infos.title %}
-                            {{ version_infos.title }}
-                        {% endif %}
+                        {{ form.child_obj.full_title }}
                     </td>
 
                     {% if not form.is_a_parent_minor_major_option_list_choice %}
@@ -115,7 +108,7 @@
                     </td>
                     <td style="width:8%">
                         {% if form.block %}
-                            {% bootstrap_field form.block show_label=False %}
+                            {% bootstrap_field form.block show_label=False field_class='without_arrow' %}
                         {% endif %}
                     </td>
                     <td style="width:12%">

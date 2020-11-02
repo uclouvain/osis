@@ -22,30 +22,14 @@
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
 
-import osis_common.ddd.interface
-from base.ddd.utils.business_validator import BusinessValidator
-from base.models.enums.link_type import LinkTypes
-from program_management.ddd.business_types import *
-from program_management.ddd.validators._authorized_relationship import PasteAuthorizedRelationshipValidator
+from django.test import TestCase
+
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
 
 
-class ValidateAuthorizedRelationshipForAllTrees(BusinessValidator):
-    def __init__(
-            self,
-            tree: 'ProgramTree',
-            node_to_paste: 'Node',
-            path: 'Path',
-            tree_repository: 'ProgramTreeRepository'
-    ) -> None:
-        super().__init__()
-        self.tree = tree
-        self.node_to_paste = node_to_paste
-        self.path = path
-        self.tree_repository = tree_repository
-
-    def validate(self, *args, **kwargs):
-        node_to_paste_to = self.tree.get_node(self.path)
-        trees = self.tree_repository.search_from_children([node_to_paste_to.entity_id], link_type=LinkTypes.REFERENCE)
-        for tree in trees:
-            for parent_from_reference_link in tree.get_parents_using_node_with_respect_to_reference(node_to_paste_to):
-                PasteAuthorizedRelationshipValidator(tree, self.node_to_paste, parent_from_reference_link).validate()
+class DDDTestCase(TestCase):
+    def assertRaisesBusinessException(self, exception, func, *args, **kwargs):
+        with self.assertRaises(MultipleBusinessExceptions) as e:
+            func(*args, **kwargs)
+        class_exceptions = [exc.__class__ for exc in e.exception.exceptions]
+        self.assertIn(exception, class_exceptions)

@@ -179,6 +179,10 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 exception.ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum) as e:
             self.training_form.add_error("min_constraint", e.message)
             self.training_form.add_error("max_constraint", "")
+        except exception.ContentConstraintMinimumInvalid as e:
+            self.training_form.add_error("min_constraint", e.message)
+        except exception.ContentConstraintMaximumInvalid as e:
+            self.training_form.add_error("max_constraint", e.message)
         except Program2MEndDateShouldBeGreaterOrEqualThanItsFinalities as e:
             self.training_form.add_error("end_year", e.message)
         except TrainingCopyConsistencyException as e:

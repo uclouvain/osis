@@ -16,11 +16,11 @@ from base.ddd.utils.business_validator import MultipleBusinessExceptions
 
 
 class LinkForm(forms.Form):
-    relative_credits = forms.IntegerField(required=False, widget=forms.TextInput)
+    relative_credits = forms.IntegerField(required=False)
     is_mandatory = forms.BooleanField(required=False)
     access_condition = forms.BooleanField(required=False)
     link_type = forms.ChoiceField(choices=choice_field.add_blank(LinkTypes.choices()), required=False)
-    block = forms.IntegerField(required=False, widget=forms.TextInput)
+    block = forms.IntegerField(required=False)
     comment_fr = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows': 3}))
     comment_en = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows': 3}))
 
@@ -73,6 +73,14 @@ class LinkForm(forms.Form):
     def is_a_child_minor_major_option_list_choice(self):
         return self.child_obj.is_minor_major_option_list_choice()
 
+    def save(self):
+        if self.is_valid():
+            try:
+                return update_link_service.update_link(self.generate_update_link_command())
+            except MultipleBusinessExceptions as e:
+                self.handle_save_exception(e)
+        raise InvalidFormException()
+
     def generate_update_link_command(self) -> 'command.UpdateLinkCommand':
         return command.UpdateLinkCommand(
             child_node_code=self.child_obj.code,
@@ -88,18 +96,11 @@ class LinkForm(forms.Form):
             parent_node_year=self.parent_obj.year
         )
 
-    def save(self):
-        if self.is_valid():
-            try:
-                return update_link_service.update_link(self.generate_update_link_command())
-            except MultipleBusinessExceptions as e:
-                self.handle_save_exception(e)
-        raise InvalidFormException()
-
     def handle_save_exception(self, business_exceptions: 'MultipleBusinessExceptions'):
         for e in business_exceptions.exceptions:
             if isinstance(e, exception.ReferenceLinkNotAllowedException) or \
-                    isinstance(e, exception.ReferenceLinkNotAllowedWithLearningUnitException):
+                    isinstance(e, exception.ChildTypeNotAuthorizedException) or\
+                    isinstance(e, exception.MaximumChildTypesReachedException):
                 self.add_error("link_type", e.message)
             elif isinstance(e, exception.InvalidBlockException):
                 self.add_error("block", e.message)
@@ -114,17 +115,6 @@ class BaseContentFormSet(BaseFormSet):
             return self.form_kwargs[index]
         return {}
 
-    def generate_bulk_update_link_command(self) -> 'command.BulkUpdateLinkCommand':
-        changed_forms = [form for form in self.forms if form.has_changed()]
-        update_link_commands = [form.generate_update_link_command() for form in changed_forms]
-
-        bulk_command = command.BulkUpdateLinkCommand(
-            parent_node_year=self.forms[0].parent_obj.year,
-            parent_node_code=self.forms[0].parent_obj.code,
-            update_link_cmds=update_link_commands
-        )
-        return bulk_command
-
     def save(self) -> List['Link']:
         if self.is_valid():
             try:
@@ -136,6 +126,17 @@ class BaseContentFormSet(BaseFormSet):
                         form.handle_save_exception(e.exceptions[form.generate_update_link_command()])
 
         raise InvalidFormException()
+
+    def generate_bulk_update_link_command(self) -> 'command.BulkUpdateLinkCommand':
+        changed_forms = [form for form in self.forms if form.has_changed()]
+        update_link_commands = [form.generate_update_link_command() for form in changed_forms]
+
+        bulk_command = command.BulkUpdateLinkCommand(
+            parent_node_year=self.forms[0].parent_obj.year,
+            parent_node_code=self.forms[0].parent_obj.code,
+            update_link_cmds=update_link_commands
+        )
+        return bulk_command
 
 
 ContentFormSet = formset_factory(form=LinkForm, formset=BaseContentFormSet, extra=0)
