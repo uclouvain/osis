@@ -68,6 +68,7 @@ class IsPrerequisiteValidator(business_validator.BusinessValidator):
         nodes_that_are_prerequisites = [
             n for n in learning_unit_children_removed_after_detach
             if n.is_prerequisite and n not in remaining_children_after_detach
+            and set(n.is_prerequisite_of).intersection(remaining_children_after_detach)
         ]
         return sorted(nodes_that_are_prerequisites, key=lambda n: n.code)
 
