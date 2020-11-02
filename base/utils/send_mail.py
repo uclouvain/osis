@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -83,12 +83,13 @@ def send_mail_after_scores_submission(persons, learning_unit_name, submitted_enr
             justifications[enrollment.justification_final] if enrollment.justification_final else '',
         ) for enrollment in submitted_enrollments]
 
-    table = message_config.create_table('submitted_enrollments',
-                                        get_enrollment_headers(),
-                                        submitted_enrollments_data,
-                                        data_translatable=['Justification'])
     receivers = [message_config.create_receiver(person.id, person.email, person.language) for person in persons]
+
     for receiver in receivers:
+        table = message_config.create_table('submitted_enrollments',
+                                            get_enrollment_headers(receiver['receiver_lang']),
+                                            submitted_enrollments_data,
+                                            data_translatable=['Justification'])
         template_base_data.update(
             {'encoding_status': _get_encoding_status(receiver['receiver_lang'], all_encoded)
              }
@@ -295,15 +296,17 @@ def send_message_after_all_encoded_by_manager(persons, enrollments, learning_uni
             enrollment.score_final if enrollment.score_final is not None else '',
             justifications[enrollment.justification_final] if enrollment.justification_final else '',
         ) for enrollment in enrollments]
+    for receiver in receivers:
+        table = message_config.create_table('enrollments',
+                                            get_enrollment_headers(receiver['receiver_lang']),
+                                            enrollments_data,
+                                            data_translatable=['Justification'])
 
-    table = message_config.create_table('enrollments', get_enrollment_headers(), enrollments_data,
-                                        data_translatable=['Justification'])
-
-    attachment = build_scores_sheet_attachment(enrollments)
-    message_content = message_config.create_message_content(html_template_ref, txt_template_ref,
-                                                            [table], receivers, template_base_data, subject_data,
-                                                            attachment)
-    return message_service.send_messages(message_content)
+        attachment = build_scores_sheet_attachment(enrollments)
+        message_content = message_config.create_message_content(html_template_ref, txt_template_ref,
+                                                                [table], [receiver], template_base_data, subject_data,
+                                                                attachment)
+        message_service.send_messages(message_content)
 
 
 def build_scores_sheet_attachment(list_exam_enrollments):
@@ -325,16 +328,17 @@ def send_mail_for_educational_information_update(teachers, learning_units_years)
     return message_service.send_messages(message_content)
 
 
-def get_enrollment_headers():
-    return (
-        'Acronym enrollment header',
-        'Session enrollment header',
-        'Registration number header',
-        'Last name',
-        'First name',
-        'Score',
-        'Justification'
-    )
+def get_enrollment_headers(lang_code):
+    with translation.override(lang_code):
+        return [
+            translation.pgettext('Submission email table header', 'Program'),
+            translation.pgettext('Submission email table header', 'Session number'),
+            translation.pgettext('Submission email table header', 'Registration number'),
+            _('Last name'),
+            _('First name'),
+            _('Score'),
+            _('Justification')
+        ]
 
 
 def _get_encoding_status(language, all_encoded):

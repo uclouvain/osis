@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-19 15:39+0200\n"
+"POT-Creation-Date: 2020-10-29 13:17+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -443,6 +443,11 @@ msgstr ""
 msgid "Masters"
 msgstr ""
 
+msgid ""
+"Maximum constraint must be greater or equals than 1, and less or equals than "
+"99999999999999"
+msgstr ""
+
 msgid "Mini training"
 msgstr ""
 
@@ -463,6 +468,11 @@ msgstr ""
 msgid ""
 "Mini-training <a href='%(link)s'> %(code)s (%(academic_year)s) </a> "
 "successfully created."
+msgstr ""
+
+msgid ""
+"Minimum constraint must be greater or equals than 1, and less or equals than "
+"99999999999999"
 msgstr ""
 
 msgid "Modification"
@@ -607,11 +617,9 @@ msgstr ""
 msgid "The fields concerning ARES have to be ALL filled-in or none of them"
 msgstr ""
 
-#, python-brace-format
 msgid ""
-"The formation you work with doesn't exist (or is not at the same position) "
-"in the tree {root.title} in {root.year}.You've been redirected to the root "
-"{root.code} ({root.year})"
+"The fields concerning ARES must be greater than or equal to 1 and less than "
+"or equal to 9999"
 msgstr ""
 
 #, python-brace-format
@@ -619,11 +627,6 @@ msgid ""
 "The formation you work with doesn't exist (or is not at the same position) "
 "in the tree {root.title}{version} in {root.year}.You've been redirected to "
 "the root {root.code} ({root.year})"
-msgstr ""
-
-msgid ""
-"The fields concerning ARES must be greater than or equal to 1 and less than "
-"or equal to 9999"
 msgstr ""
 
 #, python-format

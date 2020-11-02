@@ -72,6 +72,18 @@ class ContentConstraintMinimumMaximumMissing(BusinessException):
         super().__init__(message, **kwargs)
 
 
+class ContentConstraintMinimumInvalid(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _("Minimum constraint must be greater or equals than 1, and less or equals than 99999999999999")
+        super().__init__(message, **kwargs)
+
+
+class ContentConstraintMaximumInvalid(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _("Maximum constraint must be greater or equals than 1, and less or equals than 99999999999999")
+        super().__init__(message, **kwargs)
+
+
 class ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum(BusinessException):
     def __init__(self, *args, **kwargs):
         message = _("%(max)s must be greater or equals than %(min)s") % {
