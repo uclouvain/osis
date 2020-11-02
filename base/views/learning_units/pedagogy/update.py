@@ -25,6 +25,7 @@
 ##############################################################################
 from django.contrib.auth.decorators import login_required
 from django.db.models import Prefetch
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -81,7 +82,7 @@ def learning_unit_pedagogy_force_majeure_edit(request, learning_unit_year_id):
 def edit_learning_unit_pedagogy(request, learning_unit_year_id, redirect_url):
     if request.method == 'POST':
         _post_learning_unit_pedagogy_form(request)
-        return redirect(redirect_url)
+        return HttpResponse()
 
     context = get_common_context_learning_unit_year(get_object_or_404(Person, user=request.user), learning_unit_year_id,
                                                     None, None)
