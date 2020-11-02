@@ -31,6 +31,7 @@ from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.campus import CampusFactory as CampusModelDbFactory
 from base.tests.factories.certificate_aim import CertificateAimFactory as CertificateAimModelDbFactory
+from base.tests.factories.education_group_certificate_aim import EducationGroupCertificateAimFactory
 from base.tests.factories.education_group_type import TrainingEducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.education_group_year import TrainingFactory as TrainingDBFactory
@@ -200,6 +201,31 @@ class TestTrainingRepositoryGetMethod(TestCase):
 
         result = TrainingRepository.get(training_identity)
         self.assertIsInstance(result, Training)
+
+    def test_check_aims_order_by_section_code(self):
+        egy = EducationGroupYearFactory()
+        first_aim = CertificateAimModelDbFactory(section=1, code=1)
+        second_aim = CertificateAimModelDbFactory(section=1, code=2)
+        third_aim = CertificateAimModelDbFactory(section=2, code=3)
+
+        EducationGroupCertificateAimFactory(education_group_year=egy, certificate_aim=first_aim)
+        EducationGroupCertificateAimFactory(education_group_year=egy, certificate_aim=second_aim)
+        EducationGroupCertificateAimFactory(education_group_year=egy, certificate_aim=third_aim)
+        training_identity = generate_training_identity_from_education_group_year(egy)
+
+        result = TrainingRepository.get(training_identity)
+        expected_order = [first_aim, second_aim, third_aim]
+        for idx, aims in enumerate(expected_order):
+            self.assertEqual(result.diploma.aims[idx].section, aims.section)
+            self.assertEqual(result.diploma.aims[idx].code, aims.code)
+
+        new_aim = CertificateAimModelDbFactory(section=1, code=4)
+        EducationGroupCertificateAimFactory(education_group_year=egy, certificate_aim=new_aim)
+        result = TrainingRepository.get(training_identity)
+        expected_order = [first_aim, second_aim, new_aim, third_aim]
+        for idx, aims in enumerate(expected_order):
+            self.assertEqual(result.diploma.aims[idx].section, aims.section)
+            self.assertEqual(result.diploma.aims[idx].code, aims.code)
 
 
 class TestTrainingRepositorySearchMethod(TestCase):
