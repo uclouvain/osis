@@ -463,6 +463,6 @@ function get_data_from_tree(data) {
         detach_url: obj.a_attr.detach_url,
         modify_url: obj.a_attr.modify_url,
         search_url: obj.a_attr.search_url,
-        path: obj.a_attr.path,
+        path: obj.a_attr.path
     };
 }
