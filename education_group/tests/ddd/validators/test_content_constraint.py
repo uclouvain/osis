@@ -29,11 +29,13 @@ from django.test import SimpleTestCase
 from base.models.enums.constraint_type import ConstraintTypeEnum
 from education_group.ddd.domain._content_constraint import ContentConstraint
 from education_group.ddd.domain.exception import ContentConstraintTypeMissing, ContentConstraintMinimumMaximumMissing, \
-    ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum
+    ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum, ContentConstraintMinimumInvalid, \
+    ContentConstraintMaximumInvalid
 from education_group.ddd.validators._content_constraint import ContentConstraintValidator
+from education_group.ddd.validators._content_constraint import MIN_CONSTRAINT_VALUE, MAX_CONSTRAINT_VALUE
 
 
-class TestContentConstraingValidator(SimpleTestCase):
+class TestContentConstraintValidator(SimpleTestCase):
     def test_assert_type_missing_exception_when_type_is_not_defined_but_min_and_max_set(self):
         content_constraint = ContentConstraint(
             type=None,
@@ -90,3 +92,23 @@ class TestContentConstraingValidator(SimpleTestCase):
         )
         validator = ContentConstraintValidator(content_constraint)
         self.assertTrue(validator.is_valid())
+
+    def test_when_min_is_set_but_invalid(self):
+        content_constraint = ContentConstraint(
+            type=ConstraintTypeEnum.CREDITS,
+            minimum=MIN_CONSTRAINT_VALUE - 9,
+            maximum=None
+        )
+        validator = ContentConstraintValidator(content_constraint)
+        with self.assertRaises(ContentConstraintMinimumInvalid):
+            validator.is_valid()
+
+    def test_when_max_is_set_but_invalid(self):
+        content_constraint = ContentConstraint(
+            type=ConstraintTypeEnum.CREDITS,
+            minimum=None,
+            maximum=MAX_CONSTRAINT_VALUE + 1
+        )
+        validator = ContentConstraintValidator(content_constraint)
+        with self.assertRaises(ContentConstraintMaximumInvalid):
+            validator.is_valid()

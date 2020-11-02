@@ -164,7 +164,7 @@ class CheckPasteNodeValidatorList(MultipleExceptionBusinessListValidator):
         super().__init__()
 
 
-class DetachNodeValidatorList(business_validator.BusinessListValidator):
+class DetachNodeValidatorList(MultipleExceptionBusinessListValidator):
 
     def __init__(
             self,
@@ -194,18 +194,6 @@ class DetachNodeValidatorList(business_validator.BusinessListValidator):
         else:
             raise AttributeError("Unknown instance of node")
         super().__init__()
-
-    def validate(self):
-        error_messages = []
-        for validator in self.validators:
-            try:
-                validator.validate()
-            # TODO : gather multiple BusinessException instead of BusinessExceptions
-            except osis_common.ddd.interface.BusinessExceptions as business_exception:
-                error_messages.extend(business_exception.messages)
-
-        if error_messages:
-            raise osis_common.ddd.interface.BusinessExceptions(error_messages)
 
 
 class UpdatePrerequisiteValidatorList(business_validator.BusinessListValidator):

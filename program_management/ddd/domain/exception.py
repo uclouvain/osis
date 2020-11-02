@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Iterable, Dict, List
+from typing import Iterable, Dict, List, Set
 
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _, ngettext
@@ -301,9 +301,71 @@ class MaximumChildTypesReachedException(BusinessException):
         super().__init__(message)
 
 
+class MinimumChildTypesNotRespectedException(BusinessException):
+    def __init__(self, parent_node: 'Node', minimum_children_types_reached):
+        message = _("The parent %(parent)s must have at least one child of type(s) \"%(types)s\".") % {
+            "types": ','.join(str(node_type.value) for node_type in minimum_children_types_reached),
+            "parent": parent_node
+        }
+        super().__init__(message)
+
+
 class MinimumEditableYearException(BusinessException):
     def __init__(self):
         message = _("Cannot perform action on a education group before %(limit_year)s") % {
             "limit_year": settings.YEAR_LIMIT_EDG_MODIFICATION
+        }
+        super().__init__(message)
+
+
+class CannotDetachRootException(BusinessException):
+    def __init__(self):
+        message = _("Cannot perform detach action on root.")
+        super().__init__(message)
+
+
+class CannotDetachLearningWhoIsPrerequisiteException(BusinessException):
+    def __init__(self, node_to_detach: 'Node'):
+        message = _("Cannot detach learning unit %(acronym)s as it has a prerequisite or it is a prerequisite.") % {
+            "acronym": node_to_detach.code
+        }
+        super().__init__(message)
+
+
+class CannotDetachChildrenWhoArePrerequisiteException(BusinessException):
+    def __init__(self, root_node: 'Node', node_to_detach: 'Node', codes_that_are_prerequisite: List['str']):
+        message = _(
+            "Cannot detach education group year %(acronym)s as the following learning units "
+            "are prerequisite in %(formation)s: %(learning_units)s"
+        ) % {
+            "acronym": node_to_detach.title,
+            "formation": root_node.title,
+            "learning_units": ", ".join(codes_that_are_prerequisite)
+        }
+
+        super().__init__(message)
+
+
+class CannotDetachOptionsException(BusinessException):
+    def __init__(self, finality: 'Node', options_to_detach: Set['Node']):
+        message = ngettext(
+            "Option \"%(acronym)s\" cannot be detach because it is contained in %(finality_acronym)s program.",
+            "Options \"%(acronym)s\" cannot be detach because they are contained in %(finality_acronym)s program.",
+            len(options_to_detach)
+        ) % {
+            "acronym": ', '.join(str(n) for n in options_to_detach),
+            "finality_acronym": finality
+        }
+        super().__init__(message)
+
+
+class DeletePrerequisitesException(BusinessException):
+    def __init__(self, root_node: 'Node', learning_unit_codes: List['str']):
+        message = _(
+            "The prerequisites for the following learning units contained in education group year "
+            "%(acronym)s will be deleted: %(learning_units)s"
+        ) % {
+            "acronym": root_node,
+            "learning_units": ", ".join(learning_unit_codes)
         }
         super().__init__(message)

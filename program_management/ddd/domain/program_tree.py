@@ -25,7 +25,7 @@
 ##############################################################################
 import copy
 from collections import Counter
-from typing import List, Set, Optional, Dict
+from typing import List, Set, Optional, Dict, Hashable
 
 import attr
 
@@ -233,7 +233,7 @@ class ProgramTree(interface.RootEntity):
         str_nodes = path.split(PATH_SEPARATOR)
         if len(str_nodes) > 1:
             str_nodes = str_nodes[:-1]
-            path = '{}'.format(PATH_SEPARATOR).join(str_nodes)
+            path = PATH_SEPARATOR.join(str_nodes)
             result.append(self.get_node(path))
             result += self.get_parents(PATH_SEPARATOR.join(str_nodes))
         return result
@@ -252,12 +252,21 @@ class ProgramTree(interface.RootEntity):
         :param path: str
         :return: Node
         """
-        if path == str(self.root_node.pk):
-            return self.root_node
-        result = self.root_node.descendents.get(path)
-        if not result:
+
+        def _get_node(root_node: 'Node', path: 'Path') -> 'Node':
+            direct_child_id, separator, remaining_path = path.partition(PATH_SEPARATOR)
+            direct_child = next(child for child in root_node.children_as_nodes if str(child.pk) == direct_child_id)
+
+            if not remaining_path:
+                return direct_child
+            return _get_node(direct_child, remaining_path)
+
+        try:
+            if path == str(self.root_node.pk):
+                return self.root_node
+            return _get_node(self.root_node, path.split(PATH_SEPARATOR, maxsplit=1)[1])
+        except (StopIteration, IndexError):
             raise NodeNotFoundException
-        return result
 
     @deprecated  # Please use :py:meth:`~program_management.ddd.domain.program_tree.ProgramTree.get_node` instead !
     def get_node_by_id_and_type(self, node_id: int, node_type: NodeType) -> 'Node':
@@ -289,9 +298,8 @@ class ProgramTree(interface.RootEntity):
         if node == self.root_node:
             return build_path(self.root_node)
 
-        nodes_by_path = self.root_node.descendents
         return next(
-            (path for path, node_obj in nodes_by_path.items() if node_obj == node),
+            (path for path, node_obj in self.root_node.descendents if node_obj == node),
             None
         )
 
@@ -450,6 +458,17 @@ class ProgramTree(interface.RootEntity):
         validator = validators_by_business_action.UpdatePrerequisiteValidatorList(prerequisite_expression, node, self)
         return validator.is_valid(), validator.messages
 
+    def get_remaining_children_after_detach(self, path_node_to_detach: 'Path'):
+        children_with_counter = self.root_node.get_all_children_with_counter()
+        children_with_counter.update([self.root_node])
+
+        node_to_detach = self.get_node(path_node_to_detach)
+        nodes_detached = node_to_detach.get_all_children_with_counter()
+        nodes_detached.update([node_to_detach])
+        children_with_counter.subtract(nodes_detached)
+
+        return {node_obj for node_obj, number in children_with_counter.items() if number > 0}
+
     def detach_node(self, path_to_node_to_detach: Path, tree_repository: 'ProgramTreeRepository') -> 'Link':
         """
         Detach a node from tree
@@ -461,6 +480,7 @@ class ProgramTree(interface.RootEntity):
 
         node_to_detach = self.get_node(path_to_node_to_detach)
         parent_path, *__ = path_to_node_to_detach.rsplit(PATH_SEPARATOR, 1)
+        parent = self.get_node(parent_path)
         validators_by_business_action.DetachNodeValidatorList(
             self,
             node_to_detach,
@@ -468,8 +488,7 @@ class ProgramTree(interface.RootEntity):
             tree_repository
         ).validate()
 
-        self.remove_prerequisites(node_to_detach, parent_path)
-        parent = self.get_node(parent_path)
+        self.remove_prerequisites(path_to_node_to_detach)
         return parent.detach_child(node_to_detach)
 
     def __copy__(self) -> 'ProgramTree':
@@ -478,10 +497,9 @@ class ProgramTree(interface.RootEntity):
             authorized_relationships=copy.copy(self.authorized_relationships)
         )
 
-    def remove_prerequisites(self, detached_node: 'Node', parent_path):
-        pruned_tree = ProgramTree(root_node=_copy(self.root_node))
-        pruned_tree.get_node(parent_path).detach_child(detached_node)
-        pruned_tree_children = pruned_tree.get_all_nodes()
+    def remove_prerequisites(self, path_node_to_detach: 'Path'):
+        children_remaining = self.get_remaining_children_after_detach(path_node_to_detach)
+        detached_node = self.get_node(path_node_to_detach)
 
         if detached_node.is_learning_unit():
             to_remove = [detached_node] if detached_node.has_prerequisite else []
@@ -489,7 +507,7 @@ class ProgramTree(interface.RootEntity):
             to_remove = ProgramTree(root_node=detached_node).get_nodes_that_have_prerequisites()
 
         for n in to_remove:
-            if n not in pruned_tree_children:
+            if n not in children_remaining:
                 n.remove_all_prerequisite_items()
 
     def get_relative_credits_values(self, child_node: 'NodeIdentity'):

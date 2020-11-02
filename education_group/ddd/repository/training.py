@@ -338,7 +338,9 @@ def _get_queryset_to_fetch_data_for_training(entity_ids: List['TrainingIdentity'
         ),
         Prefetch(
             'educationgroupcertificateaim_set',
-            EducationGroupCertificateAimModelDb.objects.all().select_related('certificate_aim')
+            EducationGroupCertificateAimModelDb.objects.all().select_related(
+                'certificate_aim'
+            ).order_by('certificate_aim')
         ),
     )
 

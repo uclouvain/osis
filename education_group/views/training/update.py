@@ -172,6 +172,10 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                         isinstance(e, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum):
                     self.training_form.add_error('min_constraint', e.message)
                     self.training_form.add_error('max_constraint', '')
+                elif isinstance(e, exception.ContentConstraintMinimumInvalid):
+                    self.training_form.add_error("min_constraint", e.message)
+                elif isinstance(e, exception.ContentConstraintMaximumInvalid):
+                    self.training_form.add_error("max_constraint", e.message)
                 elif isinstance(e, HopsFieldsAllOrNone) or \
                         isinstance(e, AresCodeShouldBeGreaterOrEqualsThanZeroAndLessThan9999):
                     self.training_form.add_error('ares_code', e.message)

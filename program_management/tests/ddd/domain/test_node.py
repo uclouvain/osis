@@ -69,8 +69,8 @@ class TestDescendentsPropertyNode(SimpleTestCase):
 
     def test_case_no_descendents(self):
         root_orphan = NodeGroupYearFactory()
-        self.assertIsInstance(root_orphan.descendents, dict)
-        self.assertEqual(root_orphan.descendents, {})
+
+        self.assertEqual(list(root_orphan.descendents), [])
 
     def test_case_all_descendents_with_path_as_key(self):
         self.root_node = NodeGroupYearFactory(node_id=0, code="LDROI200T", title="Tronc commun", year=2018)
@@ -79,12 +79,11 @@ class TestDescendentsPropertyNode(SimpleTestCase):
         self.subgroup_node.add_child(self.leaf)
         self.root_node.add_child(self.subgroup_node)
 
-        self.assertIsInstance(self.root_node.descendents, dict)
-        expected_keys = [
-            "|".join([str(self.root_node.pk), str(self.subgroup_node.pk)]),   # First level
-            "|".join([str(self.root_node.pk), str(self.subgroup_node.pk), str(self.leaf.pk)]),  # Second level
-        ]
-        self.assertTrue(all(k in expected_keys for k in self.root_node.descendents.keys()))
+        self.assertCountEqual(
+            list(self.root_node.descendents),
+            [("|".join([str(self.root_node.pk), str(self.subgroup_node.pk)]), self.subgroup_node),
+             ("|".join([str(self.root_node.pk), str(self.subgroup_node.pk), str(self.leaf.pk)]), self.leaf)]
+        )
 
 
 class TestEq(SimpleTestCase):

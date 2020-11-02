@@ -183,7 +183,7 @@ def _update_education_group(mini_training_obj: 'mini_training.MiniTraining'):
         if mini_training_obj.end_year else None
     education_group_db_obj = EducationGroupModelDb.objects.filter(
         educationgroupyear__acronym=mini_training_obj.acronym,
-        educationgroupyear__education_group_type__name=mini_training_obj.type.name
+        educationgroupyear__academic_year__year=mini_training_obj.year,
     ).distinct().get()
     education_group_db_obj.end_year = end_year
     education_group_db_obj.save()

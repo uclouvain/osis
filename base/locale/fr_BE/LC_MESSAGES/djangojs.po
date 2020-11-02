@@ -48,7 +48,7 @@ msgid "Invalid code"
 msgstr "Code non valide"
 
 msgid "Invalid name version"
-msgstr "Nom de version invalide"
+msgstr "Sigle de version invalide"
 
 msgid "Link to CDN Doc"
 msgstr "Lien vers document du CDN"
