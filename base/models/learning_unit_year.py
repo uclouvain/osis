@@ -407,7 +407,7 @@ class LearningUnitYear(SerializableModel):
     @property
     def periodicity_verbose(self):
         if self.periodicity:
-            return _(self.periodicity)
+            return dict(PERIODICITY_TYPES)[self.periodicity].lower()
         return None
 
     def find_gt_learning_units_year(self):
