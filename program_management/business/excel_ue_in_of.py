@@ -150,7 +150,7 @@ RAW_SQL_TO_GET_LAST_UPDATE_FICHE_DESCRIPTIVE = """
         join django_content_type ct on version.content_type_id = ct.id
         left join cms_translatedtext tt on cast(version.object_id as integer) = tt.id and ct.model = 'translatedtext'
         left join cms_textlabel tl on tt.text_label_id = tl.id
-        left join base_teachingmaterial tm on cast(version.object_id as integer) = tm.id 
+        left join base_teachingmaterial tm on cast(version.object_id as integer) = tm.id
         and ct.model = 'teachingmaterial'
         join base_learningunityear luy on luy.id = tm.learning_unit_year_id or luy.id = tt.reference
         where "base_groupelementyear"."child_leaf_id" = luy.id
