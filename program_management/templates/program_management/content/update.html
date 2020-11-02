@@ -59,7 +59,7 @@
 {% endblock header_content %}
 
 {% block content %}
-    <form id="UpdateContentForm" class="education_group_form" method="POST" novalidate>
+    <form id="UpdateContentForm" class="education_group_form" method="POST">
         {% csrf_token %}
         {% bootstrap_formset_errors content_formset %}
         <div class="panel panel-default">
