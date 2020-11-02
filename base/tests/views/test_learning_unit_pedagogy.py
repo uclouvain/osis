@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@ from base.tests.factories.academic_year import create_current_academic_year, Aca
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.person import FacultyManagerFactory
+from base.tests.factories.person import FacultyManagerForUEFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.teaching_material import TeachingMaterialFactory
@@ -55,7 +55,9 @@ from base.views.learning_units.search.common import SearchTypes
 from cms.enums import entity_name
 from cms.enums.entity_name import LEARNING_UNIT_YEAR
 from cms.tests.factories.text_label import TextLabelFactory
-from cms.tests.factories.translated_text import TranslatedTextFactory
+from cms.tests.factories.translated_text import TranslatedTextFactory, LearningUnitYearTranslatedTextFactory
+from base.business.learning_units.xls_generator import generate_xls_teaching_material
+from base.forms.learning_unit.search.educational_information import LearningUnitDescriptionFicheFilter
 
 
 class LearningUnitPedagogyTestCase(TestCase):
@@ -91,7 +93,7 @@ class LearningUnitPedagogyTestCase(TestCase):
             learning_container_year__requirement_entity=cls.requirement_entity_version.entity
         )
         cls.url = reverse('learning_units_summary')
-        cls.faculty_person = FacultyManagerFactory('can_access_learningunit', 'can_edit_learningunit_pedagogy')
+        cls.faculty_person = FacultyManagerForUEFactory('can_access_learningunit', 'can_edit_learningunit_pedagogy')
         PersonEntityFactory(person=cls.faculty_person, entity=cls.requirement_entity_version.entity)
 
     def setUp(self):
@@ -201,7 +203,7 @@ class LearningUnitPedagogyExportXLSTestCase(TestCase):
         )
 
         cls.url = reverse('learning_units_summary')
-        cls.faculty_person = FacultyManagerFactory('can_access_learningunit', 'can_edit_learningunit_pedagogy')
+        cls.faculty_person = FacultyManagerForUEFactory('can_access_learningunit', 'can_edit_learningunit_pedagogy')
         PersonEntityFactory(person=cls.faculty_person, entity=cls.requirement_entity_version.entity)
 
         # Generate data for XLS export
@@ -305,11 +307,17 @@ class LearningUnitPedagogyExportXLSTestCase(TestCase):
             next(data)
 
     def test_learning_units_summary_list_by_client_xls_empty(self):
-        response = self.client.get(self.url, data={
+
+        form_data = {
             'acronym': self.learning_unit_year_without_mandatory_teaching_materials.acronym,
-            'academic_year': self.academic_year,
+            'academic_year': self.academic_year.id,
             'xls_status': 'xls_teaching_material'
-        })
+        }
+
+        service_course_filter = LearningUnitDescriptionFicheFilter(form_data)
+        self.assertTrue(service_course_filter.is_valid())
+
+        response = generate_xls_teaching_material(self.faculty_person.user, service_course_filter.qs)
 
         self.assertEqual(response.status_code, HttpResponse.status_code)
 
@@ -342,12 +350,11 @@ class LearningUnitPedagogyEditTestCase(TestCase):
             learning_container_year__requirement_entity=cls.requirement_entity_version.entity
         )
         cls.url = reverse(learning_unit_pedagogy_edit, kwargs={'learning_unit_year_id': cls.learning_unit_year.pk})
-        cls.faculty_person = FacultyManagerFactory('can_access_learningunit', 'can_edit_learningunit_pedagogy')
+        cls.faculty_person = FacultyManagerForUEFactory('can_access_learningunit', 'can_edit_learningunit_pedagogy')
         PersonEntityFactory(person=cls.faculty_person, entity=cls.requirement_entity_version.entity)
 
     def setUp(self):
-        self.cms = TranslatedTextFactory(
-            entity=entity_name.LEARNING_UNIT_YEAR,
+        self.cms = LearningUnitYearTranslatedTextFactory(
             reference=self.learning_unit_year.pk,
             language='fr-be',
             text='Some random text',
@@ -360,7 +367,6 @@ class LearningUnitPedagogyEditTestCase(TestCase):
         response = self.client.get(self.url, data={'label': 'bibliography', 'language': 'fr-be'})
 
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, 'learning_unit/pedagogy_edit.html')
         self.assertTemplateUsed(response, 'learning_unit/blocks/modal/modal_pedagogy_edit.html')
         self.assertEqual(response.context["cms_label_pedagogy_fr_only"], CMS_LABEL_PEDAGOGY_FR_ONLY)
         self.assertEqual(response.context["label_name"], 'bibliography')
@@ -471,7 +477,7 @@ class LearningUnitPedagogySummaryLockedTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.current_academic_year = create_current_academic_year()
-        cls.faculty_person = FacultyManagerFactory('can_access_learningunit')
+        cls.faculty_person = FacultyManagerForUEFactory('can_access_learningunit')
         cls.learning_unit_year = LearningUnitYearFactory(
             academic_year=cls.current_academic_year,
             learning_container_year__academic_year=cls.current_academic_year,
