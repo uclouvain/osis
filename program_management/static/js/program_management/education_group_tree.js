@@ -304,7 +304,8 @@ function initializeJsTree($documentTree, tree_json_url, cut_element_url, copy_el
                         "cut": {
                             "label": gettext("Cut"),
                             "_disabled": function (data) {
-                                return !get_data_from_tree(data).group_element_year_id;
+                                let __ret = get_data_from_tree(data);
+                                return !__ret.group_element_year_id || __ret.is_prerequisite === true;
                             },
                             "action": function (data) {
                                 const node_data = get_data_from_tree(data);
@@ -366,7 +367,7 @@ function initializeJsTree($documentTree, tree_json_url, cut_element_url, copy_el
                             "title": $node.a_attr.detach_msg,
                             "_disabled": function (data) {
                                 let __ret = get_data_from_tree(data);
-                                return __ret.detach_url == null;
+                                return __ret.detach_url == null || __ret.is_prerequisite === true;
                             }
                         },
 
