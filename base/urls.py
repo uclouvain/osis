@@ -46,10 +46,9 @@ from attribution.views import attribution, tutor_application
 from base.views import geocoding
 from base.views import learning_achievement, search, user_list
 from base.views import learning_unit, offer, common, institution, organization, academic_calendar, \
-    my_osis, entity, student
+    my_osis, student
 from base.views import teaching_material
 from base.views.education_groups import urls as education_groups_urls
-from base.views.learning_units.search.external import get_cities_related_to_country, get_campuses_related_to_city
 from base.views.learning_units.detail import DetailLearningUnitYearView, DetailLearningUnitYearViewBySlug
 from base.views.learning_units.external import create as create_external
 from base.views.learning_units.pedagogy.publish import publish_and_access_publication
@@ -109,7 +108,6 @@ urlpatterns = [
     ])),
 
     url(r'^api/v1/', include([
-        url(r'^entities/$', entity.post_entities, name='post_entities'),
         url(r'^tutor_application/recompute_portal$', tutor_application.recompute_portal,
             name='recompute_tutor_application_portal'),
         url(r'^attribution/recompute_portal$', attribution.recompute_portal, name='recompute_attribution_portal'),

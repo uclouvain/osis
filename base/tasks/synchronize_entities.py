@@ -1,4 +1,5 @@
 import datetime
+import logging
 
 import requests
 from django.conf import settings
@@ -6,23 +7,28 @@ from django.core.exceptions import ImproperlyConfigured
 from backoffice.celery import app as celery_app
 from base.models.entity import Entity
 from base.models.entity_version import EntityVersion
+from base.models.entity_version_address import EntityVersionAddress
 from base.models.enums import organization_type, entity_type
 from base.models.organization import Organization
 
-# DOCKER: sudo docker run --net=host --rm -e RABBITMQ_DEFAULT_USER=guest -e RABBITMQ_DEFAULT_PASS=guest rabbitmq
-# CELERY: celery -A backoffice worker -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler
+from reference.models.country import Country
+
+logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 
 @celery_app.task
-def run():
-    raw_entities = _fetch_entities_from_esb()
+def run() -> dict:
+    try:
+        raw_entities = __fetch_entities_from_esb()
+        raw_root_entity = next(entity for entity in raw_entities if __is_root_entity(entity))
+        __upsert_entity(raw_root_entity)
+        __save_children_entities(raw_root_entity, raw_entities)
+        return {'Entities synchronized': 'OK'}
+    except FetchEntitiesException:
+        return {'Entities synchronized': 'Unable to fetch data from ESB'}
 
-    raw_root_entity = next(entity for entity in raw_entities if entity['parent_entity_id'] == {"@nil": "true"})
-    _upsert_entity(raw_root_entity)
-    _save_children_entities(raw_root_entity, raw_entities)
 
-
-def _fetch_entities_from_esb():
+def __fetch_entities_from_esb():
     if not all([settings.ESB_API_URL, settings.ESB_ENTITIES_HISTORY_ENDPOINT]):
         raise ImproperlyConfigured('ESB_API_URL / ESB_ENTITIES_HISTORY_ENDPOINT must be set in configuration')
 
@@ -34,38 +40,89 @@ def _fetch_entities_from_esb():
             headers={"Authorization": settings.ESB_AUTHORIZATION},
             timeout=settings.REQUESTS_TIMEOUT or 20
         )
-        return entities_wrapped.json()['entities']
+        return entities_wrapped.json()['entities']['entity']
     except Exception:
+        logger.info("[Synchronize entities] An error occured during fetching entities on ESB")
         raise FetchEntitiesException
 
 
-def _save_children_entities(raw_entity, all_raw_entities):
-    for child_entity in filter(lambda entity: entity['parent_entity_id'] == raw_entity, all_raw_entities):
-        _upsert_entity(child_entity)
-        _save_children_entities(child_entity, all_raw_entities)
+def __fetch_address_from_esb(raw_entity):
+    if not all([settings.ESB_API_URL, settings.ESB_ENTITY_ADDRESS_ENDPOINT]):
+        raise ImproperlyConfigured('ESB_API_URL / ESB_ENTITY_ADDRESS_ENDPOINT must be set in configuration')
+
+    endpoint = settings.ESB_ENTITY_ADDRESS_ENDPOINT.format(entity_id=raw_entity['entity_id'])
+    url = "{esb_api}/{endpoint}".format(esb_api=settings.ESB_API_URL, endpoint=endpoint)
+    try:
+        entity_address_wrapper = requests.get(
+            url,
+            headers={"Authorization": settings.ESB_AUTHORIZATION},
+            timeout=settings.REQUESTS_TIMEOUT or 20
+        )
+        return entity_address_wrapper.json()['address']
+    except Exception:
+        logger.info("[Synchronize entities] An error occured during fetching address on ESB "
+                    "of entity" + raw_entity['acronym'])
+        raise FetchEntitiesException
 
 
-def _upsert_entity(raw_entity):
-    entity = Entity.objects.update_or_create(
-        external_id='osis.entity_{}'.format(raw_entity['entity_id']),
+def __save_children_entities(raw_entity, all_raw_entities):
+    for child_entity in filter(lambda entity: entity['parent_entity_id'] == raw_entity['entity_id'], all_raw_entities):
+        __upsert_entity(child_entity)
+        __save_children_entities(child_entity, all_raw_entities)
+
+
+def __upsert_entity(raw_entity):
+    raw_address = __fetch_address_from_esb(raw_entity)
+
+    entity, _ = Entity.objects.update_or_create(
+        external_id=__build_entity_external_id(raw_entity['entity_id']),
         defaults={
             'website': raw_entity['web'] or '',
-            'organization_id': Organization.objects.only('pk').get(type=organization_type.MAIN)
+            'organization': Organization.objects.only('pk').get(type=organization_type.MAIN),
+            'fax': raw_address['fax'] or '',
+            'phone': raw_address['phone'] or ''
         }
     )
 
-    EntityVersion.objects.get_or_create(
-        entity=entity,
-        acronym=raw_entity['acronym'],
-        parent_id=Entity.objects.only('pk').get(external_id='osis.entity_{}'.format(raw_entity['parent_entity_id'])),
-        title=raw_entity['name_fr'],
-        entity_type=__get_entity_type(raw_entity),
-        start_date=ESBDate(raw_entity['begin']).to_date(),
-        end_date=ESBDate(raw_entity['end']).to_date(),
-    )
+    parent = Entity.objects.only('pk').get(external_id=__build_entity_external_id(raw_entity['parent_entity_id'])) \
+        if not __is_root_entity(raw_entity) else None
+    try:
+        entity_version, _ = EntityVersion.objects.update_or_create(
+            entity=entity,
+            acronym=raw_entity['acronym'],
+            parent=parent,
+            title=raw_entity['name_fr'],
+            entity_type=__get_entity_type(raw_entity),
+            start_date=ESBDate(raw_entity['begin']).to_date(),
+            defaults={
+                'end_date': ESBDate(raw_entity['end']).to_date()
+            }
+        )
+
+        EntityVersionAddress.objects.update_or_create(
+            entity_version=entity_version,
+            is_main=True,
+            defaults={
+                'city': raw_address['town'] or '',
+                'street': raw_address['streetName'] or '',
+                'street_number': raw_address['streetNumber'] or '',
+                'postal_code': raw_address['postCode'] or '',
+                'country': Country.objects.only('pk').get(iso_code='BE'),
+            }
+        )
+    except AttributeError:
+        logger.info("[Synchronize entities] Overlapping found for " + raw_entity['acronym'])
 
 
-def __get_entity_type(raw_entity):
+def __build_entity_external_id(esb_id) -> str:
+    return 'osis.entity_{}'.format(esb_id)
+
+
+def __is_root_entity(raw_entity) -> bool:
+    return raw_entity['parent_entity_id'] == {"@nil": "true"}
+
+
+def __get_entity_type(raw_entity) -> str:
     return {
         'S': entity_type.SECTOR,
         'F': entity_type.FACULTY,
@@ -75,7 +132,7 @@ def __get_entity_type(raw_entity):
         'D': entity_type.DOCTORAL_COMMISSION,
         'T': entity_type.PLATFORM,
         'L': entity_type.LOGISTICS_ENTITY,
-        'N': None,
+        'N': '',
     }.get(raw_entity['departmentType'])
 
 
