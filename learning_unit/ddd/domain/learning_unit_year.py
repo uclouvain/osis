@@ -31,7 +31,7 @@ from base.models.enums.learning_container_year_types import LearningContainerYea
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from base.models.enums.quadrimesters import DerogationQuadrimester
 from learning_unit.ddd.domain.achievement import Achievement
-from learning_unit.ddd.domain.description_fiche import DescriptionFiche
+from learning_unit.ddd.domain.description_fiche import DescriptionFiche, DescriptionFicheForceMajeure
 from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYearIdentity
 from learning_unit.ddd.domain.proposal import Proposal
 from learning_unit.ddd.domain.specifications import Specifications
@@ -104,6 +104,7 @@ class LearningUnitYear:
             entities: Entities = None,
 
             description_fiche: DescriptionFiche = None,
+            force_majeure: DescriptionFicheForceMajeure = None,
             specifications: Specifications = None,
 
             teaching_materials: List[TeachingMaterial] = None,
@@ -135,6 +136,7 @@ class LearningUnitYear:
         self.achievements = achievements or []
         self.entities = entities
         self.description_fiche = description_fiche
+        self.force_majeure = force_majeure
         self.specifications = specifications
         self.teaching_materials = teaching_materials or []
         self.subtype = subtype
