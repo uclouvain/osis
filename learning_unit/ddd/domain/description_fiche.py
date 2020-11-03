@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import datetime
 
 
 class DescriptionFiche:
@@ -41,6 +42,8 @@ class DescriptionFiche:
             online_resources_en: str = None,
             bibliography: str = None,
             mobility: str = None,
+            last_update: datetime.datetime = None,
+            author: str = None
     ):
         self.resume = resume
         self.resume_en = resume_en
@@ -54,3 +57,28 @@ class DescriptionFiche:
         self.online_resources_en = online_resources_en
         self.bibliography = bibliography
         self.mobility = mobility
+        self.last_update = last_update
+        self.author = author
+
+
+class DescriptionFicheForceMajeure:
+
+    def __init__(
+            self,
+            teaching_methods: str = None,
+            teaching_methods_en: str = None,
+            evaluation_methods: str = None,
+            evaluation_methods_en: str = None,
+            other_informations: str = None,
+            other_informations_en: str = None,
+            last_update: datetime.datetime = None,
+            author: str = None
+    ):
+        self.teaching_methods = teaching_methods
+        self.teaching_methods_en = teaching_methods_en
+        self.evaluation_methods = evaluation_methods
+        self.evaluation_methods_en = evaluation_methods_en
+        self.other_informations = other_informations
+        self.other_informations_en = other_informations_en
+        self.last_update = last_update
+        self.author = author

@@ -24,8 +24,8 @@
 #
 ##############################################################################
 from django import forms
-from django.utils.translation import gettext_lazy as _
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 
 
 class CustomXlsForm(forms.Form):
@@ -44,6 +44,7 @@ class CustomXlsForm(forms.Form):
     language = forms.BooleanField(required=False, label=_('Language'))
     specifications = forms.BooleanField(required=False, label=_('Specifications'))
     description_fiche = forms.BooleanField(required=False, label=_('Description fiche'))
+    force_majeure = forms.BooleanField(required=False, label=_('Description fiche (including force majeure)'))
 
     def __init__(self, *args, year: int = None, code: str = None, **kwargs):
         super().__init__(*args, **kwargs)
