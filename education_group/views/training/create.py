@@ -122,28 +122,30 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             training_ids = []
             try:
                 training_ids = self._call_service(create_training_data)
-            except CodeAlreadyExistException as e:
-                training_form.add_error('code', e.message)
-            except AcronymAlreadyExist as e:
-                training_form.add_error('acronym', e.message)
-            except ContentConstraintTypeMissing as e:
-                training_form.add_error('constraint_type', e.message)
-            except (ContentConstraintMinimumMaximumMissing, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum)\
-                    as e:
-                training_form.add_error('min_constraint', e.message)
-                training_form.add_error('max_constraint', '')
-            except StartYearGreaterThanEndYear as e:
-                training_form.add_error('end_year', e.message)
-                training_form.add_error('academic_year', '')
-            except MultipleBusinessExceptions as e:
-                for hops_exception in e.exceptions:
-                    if isinstance(hops_exception, HopsFieldsAllOrNone) or \
-                            isinstance(hops_exception, AresCodeShouldBeGreaterOrEqualsThanZeroAndLessThan9999):
-                        training_form.add_error('ares_code', hops_exception.message)
-                    if isinstance(hops_exception, AresGracaShouldBeGreaterOrEqualsThanZeroAndLessThan9999):
-                        training_form.add_error('ares_graca', hops_exception.message)
-                    if isinstance(hops_exception, AresAuthorizationShouldBeGreaterOrEqualsThanZeroAndLessThan9999):
-                        training_form.add_error('ares_authorization', hops_exception.message)
+            except MultipleBusinessExceptions as multiple_exceptions:
+                for e in multiple_exceptions.exceptions:
+                    if isinstance(e, CodeAlreadyExistException):
+                        training_form.add_error('code', e.message)
+                    elif isinstance(e, AcronymAlreadyExist):
+                        training_form.add_error('acronym', e.message)
+                    elif isinstance(e, ContentConstraintTypeMissing):
+                        training_form.add_error('constraint_type', e.message)
+                    elif isinstance(e, ContentConstraintMinimumMaximumMissing) or\
+                            isinstance(e, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum):
+                        training_form.add_error('min_constraint', e.message)
+                        training_form.add_error('max_constraint', '')
+                    elif isinstance(e, StartYearGreaterThanEndYear):
+                        training_form.add_error('end_year', e.message)
+                        training_form.add_error('academic_year', '')
+                    elif isinstance(e, HopsFieldsAllOrNone) or \
+                            isinstance(e, AresCodeShouldBeGreaterOrEqualsThanZeroAndLessThan9999):
+                        training_form.add_error('ares_code', e.message)
+                    elif isinstance(e, AresGracaShouldBeGreaterOrEqualsThanZeroAndLessThan9999):
+                        training_form.add_error('ares_graca', e.message)
+                    elif isinstance(e, AresAuthorizationShouldBeGreaterOrEqualsThanZeroAndLessThan9999):
+                        training_form.add_error('ares_authorization', e.message)
+                    else:
+                        training_form.add_error('', e.message)
             except BusinessExceptions as e:
                 display_error_messages(request, e.messages)
                 return render(request, self.template_name, self.get_context(training_form))
