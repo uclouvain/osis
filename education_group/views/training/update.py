@@ -43,7 +43,8 @@ from education_group.ddd.domain.exception import TrainingCopyConsistencyExceptio
     CertificateAimsCopyConsistencyException, MaximumCertificateAimType2Reached, \
     HopsFieldsAllOrNone, AresCodeShouldBeGreaterOrEqualsThanZeroAndLessThan9999, \
     AresGracaShouldBeGreaterOrEqualsThanZeroAndLessThan9999, \
-    AresAuthorizationShouldBeGreaterOrEqualsThanZeroAndLessThan9999
+    AresAuthorizationShouldBeGreaterOrEqualsThanZeroAndLessThan9999, ContentConstraintTypeMissing, \
+    ContentConstraintMinimumMaximumMissing, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum
 from education_group.ddd.domain.training import TrainingIdentity
 from education_group.ddd.service.read import get_training_service, get_group_service
 from education_group.ddd.service.write.postpone_certificate_aims_modification_service import \
@@ -89,17 +90,7 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         if self.training_form.is_valid():
             self.delete_training()
             if not self.training_form.errors and not self._changed_certificate_aims_only():
-                try:
-                    updated_trainings = self.update_training()
-                except MultipleBusinessExceptions as e:
-                    for hops_exception in e.exceptions:
-                        if isinstance(hops_exception, HopsFieldsAllOrNone) or \
-                                isinstance(hops_exception, AresCodeShouldBeGreaterOrEqualsThanZeroAndLessThan9999):
-                            self.training_form.add_error('ares_code', hops_exception.message)
-                        if isinstance(hops_exception, AresGracaShouldBeGreaterOrEqualsThanZeroAndLessThan9999):
-                            self.training_form.add_error('ares_graca', hops_exception.message)
-                        if isinstance(hops_exception, AresAuthorizationShouldBeGreaterOrEqualsThanZeroAndLessThan9999):
-                            self.training_form.add_error('ares_authorization', hops_exception.message)
+                updated_trainings = self.update_training()
 
             if 'certificate_aims' in self.training_form.changed_data:
                 updated_aims_trainings = self.update_certificate_aims()
@@ -173,16 +164,27 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             updated_training_identities = postpone_training_and_program_tree_modifications(
                 postpone_modification_command
             )
-        except exception.ContentConstraintTypeMissing as e:
-            self.training_form.add_error("constraint_type", e.message)
-        except (exception.ContentConstraintMinimumMaximumMissing,
-                exception.ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum) as e:
-            self.training_form.add_error("min_constraint", e.message)
-            self.training_form.add_error("max_constraint", "")
-        except exception.ContentConstraintMinimumInvalid as e:
-            self.training_form.add_error("min_constraint", e.message)
-        except exception.ContentConstraintMaximumInvalid as e:
-            self.training_form.add_error("max_constraint", e.message)
+        except MultipleBusinessExceptions as multiple_exceptions:
+            for e in multiple_exceptions.exceptions:
+                if isinstance(e, ContentConstraintTypeMissing):
+                    self.training_form.add_error('constraint_type', e.message)
+                elif isinstance(e, ContentConstraintMinimumMaximumMissing) or \
+                        isinstance(e, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum):
+                    self.training_form.add_error('min_constraint', e.message)
+                    self.training_form.add_error('max_constraint', '')
+                elif isinstance(e, exception.ContentConstraintMinimumInvalid):
+                    self.training_form.add_error("min_constraint", e.message)
+                elif isinstance(e, exception.ContentConstraintMaximumInvalid):
+                    self.training_form.add_error("max_constraint", e.message)
+                elif isinstance(e, HopsFieldsAllOrNone) or \
+                        isinstance(e, AresCodeShouldBeGreaterOrEqualsThanZeroAndLessThan9999):
+                    self.training_form.add_error('ares_code', e.message)
+                elif isinstance(e, AresGracaShouldBeGreaterOrEqualsThanZeroAndLessThan9999):
+                    self.training_form.add_error('ares_graca', e.message)
+                elif isinstance(e, AresAuthorizationShouldBeGreaterOrEqualsThanZeroAndLessThan9999):
+                    self.training_form.add_error('ares_authorization', e.message)
+                else:
+                    self.training_form.add_error('', e.message)
         except Program2MEndDateShouldBeGreaterOrEqualThanItsFinalities as e:
             self.training_form.add_error("end_year", e.message)
         except TrainingCopyConsistencyException as e:
