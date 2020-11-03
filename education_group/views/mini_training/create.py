@@ -31,6 +31,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 from rules.contrib.views import LoginRequiredMixin
 
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models.academic_year import starting_academic_year, AcademicYear
 from base.utils.cache import RequestCache
 from base.utils.urls import reverse_with_get
@@ -87,19 +88,23 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
                 extra_tags='safe')
             return super().form_valid(form)
 
-        except exception.CodeAlreadyExistException as e:
-            form.add_error("code", e.message)
-        except exception.AcronymAlreadyExist as e:
-            form.add_error('abbreviated_title', e.message)
-        except exception.ContentConstraintTypeMissing as e:
-            form.add_error('constraint_type', e.message)
-        except (exception.ContentConstraintMinimumMaximumMissing,
-                exception.ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum) as e:
-            form.add_error('min_constraint', e.message)
-            form.add_error('max_constraint', '')
-        except exception.StartYearGreaterThanEndYearException as e:
-            form.add_error('academic_year', e.message)
-            form.add_error('end_year', '')
+        except MultipleBusinessExceptions as multiple_exceptions:
+            for e in multiple_exceptions.exceptions:
+                if isinstance(e, exception.CodeAlreadyExistException):
+                    form.add_error("code", e.message)
+                elif isinstance(e, exception.AcronymAlreadyExist):
+                    form.add_error('abbreviated_title', e.message)
+                elif isinstance(e, exception.ContentConstraintTypeMissing):
+                    form.add_error('constraint_type', e.message)
+                elif isinstance(e, exception.ContentConstraintMinimumMaximumMissing) or \
+                        isinstance(e, exception.ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum):
+                    form.add_error('min_constraint', e.message)
+                    form.add_error('max_constraint', '')
+                elif isinstance(e, exception.StartYearGreaterThanEndYearException):
+                    form.add_error('academic_year', e.message)
+                    form.add_error('end_year', '')
+                else:
+                    form.add_error('', e.message)
 
         return self.form_invalid(form)
 

@@ -7,6 +7,7 @@ from django.test import TestCase
 from django.urls import reverse, exceptions
 from django.utils.translation import gettext_lazy as _
 
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models.enums import education_group_types
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group_type import GroupEducationGroupTypeFactory
@@ -134,7 +135,7 @@ class TestCreateOrphanGroupPostMethod(TestCase):
         mock_form_is_valid.return_value = True
         mock_form_clean_data.return_value = defaultdict(lambda: None)
 
-        mock_service_create_group.side_effect = CodeAlreadyExistException(year=2018)
+        mock_service_create_group.side_effect = MultipleBusinessExceptions([CodeAlreadyExistException(year=2018)])
 
         response = self.client.post(self.url)
         self.assertIsInstance(response.context['group_form'], GroupForm)
@@ -151,7 +152,7 @@ class TestCreateOrphanGroupPostMethod(TestCase):
         mock_form_is_valid.return_value = True
         mock_form_clean_data.return_value = defaultdict(lambda: None)
 
-        mock_service_create_group.side_effect = ContentConstraintTypeMissing
+        mock_service_create_group.side_effect = MultipleBusinessExceptions([ContentConstraintTypeMissing()])
 
         response = self.client.post(self.url)
         self.assertIsInstance(response.context['group_form'], GroupForm)
