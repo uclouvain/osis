@@ -7,6 +7,7 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.base import View
 
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models import academic_year
 from base.models.academic_year import starting_academic_year
 from base.models.enums.education_group_types import GroupType
@@ -107,14 +108,18 @@ class GroupCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                         end_year=None
                     )
                     group_id = create_group_service.create_orphan_group(cmd_create)
-            except CodeAlreadyExistException as e:
-                group_form.add_error('code', e.message)
-            except ContentConstraintTypeMissing as e:
-                group_form.add_error('constraint_type', e.message)
-            except (ContentConstraintMinimumMaximumMissing, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum)\
-                    as e:
-                group_form.add_error('min_constraint', e.message)
-                group_form.add_error('max_constraint', '')
+            except MultipleBusinessExceptions as multiple_exceptions:
+                for e in multiple_exceptions.exceptions:
+                    if isinstance(e, CodeAlreadyExistException):
+                        group_form.add_error('code', e.message)
+                    elif isinstance(e, ContentConstraintTypeMissing):
+                        group_form.add_error('constraint_type', e.message)
+                    elif isinstance(e, ContentConstraintMinimumMaximumMissing) or\
+                            isinstance(e, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum):
+                        group_form.add_error('min_constraint', e.message)
+                        group_form.add_error('max_constraint', '')
+                    else:
+                        group_form.add_error('', e.message)
             if not group_form.errors:
                 display_success_messages(request, self.get_success_msg(group_id), extra_tags='safe')
                 return HttpResponseRedirect(self.get_success_url(group_id))

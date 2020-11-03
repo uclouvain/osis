@@ -8,6 +8,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views import View
 from rules.contrib.views import LoginRequiredMixin
 
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models import entity_version, academic_year, campus
 from base.views.common import display_success_messages, display_error_messages
 from education_group.ddd import command
@@ -93,14 +94,18 @@ class GroupUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         )
         try:
             return update_group_service.update_group(cmd_update)
-        except CreditShouldBeGreaterOrEqualsThanZero as e:
-            group_form.add_error('credits', e.message)
-        except ContentConstraintTypeMissing as e:
-            group_form.add_error('constraint_type', e.message)
-        except (ContentConstraintMinimumMaximumMissing, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum) \
-                as e:
-            group_form.add_error('min_constraint', e.message)
-            group_form.add_error('max_constraint', '')
+        except MultipleBusinessExceptions as multiple_exceptions:
+            for e in multiple_exceptions.exceptions:
+                if isinstance(e, CreditShouldBeGreaterOrEqualsThanZero):
+                    group_form.add_error('credits', e.message)
+                elif isinstance(e, ContentConstraintTypeMissing):
+                    group_form.add_error('constraint_type', e.message)
+                elif isinstance(e, ContentConstraintMinimumMaximumMissing) or \
+                        isinstance(e, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum):
+                    group_form.add_error('min_constraint', e.message)
+                    group_form.add_error('max_constraint', '')
+                else:
+                    group_form.add_error('', e.message)
 
     @functools.lru_cache()
     def get_group_obj(self) -> 'Group':

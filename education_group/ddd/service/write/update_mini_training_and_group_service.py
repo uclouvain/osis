@@ -23,6 +23,7 @@
 # ############################################################################
 from django.db import transaction
 
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models.enums.active_status import ActiveStatusEnum
 from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.ddd import command
@@ -37,13 +38,23 @@ from education_group.ddd.service.write import update_group_service
 
 @transaction.atomic()
 def update_mini_training_and_group(cmd: command.UpdateMiniTrainingAndGroupCommand) -> 'MiniTrainingIdentity':
-    mini_training_identity = mini_training.MiniTrainingIdentity(acronym=cmd.abbreviated_title, year=cmd.year)
-    group_identity = update_group_service.update_group(__convert_to_update_group_command(cmd))
+    errors = []
+    try:
+        update_group_service.update_group(__convert_to_update_group_command(cmd))
+    except MultipleBusinessExceptions as e:
+        errors = e.exceptions
 
-    mini_training_domain_obj = mini_training_repository.MiniTrainingRepository.get(mini_training_identity)
+    try:
+        mini_training_identity = mini_training.MiniTrainingIdentity(acronym=cmd.abbreviated_title, year=cmd.year)
+        mini_training_domain_obj = mini_training_repository.MiniTrainingRepository.get(mini_training_identity)
 
-    mini_training_domain_obj.update(__convert_command_to_update_mini_training_data(cmd))
-    mini_training_repository.MiniTrainingRepository.update(mini_training_domain_obj)
+        mini_training_domain_obj.update(__convert_command_to_update_mini_training_data(cmd))
+        mini_training_repository.MiniTrainingRepository.update(mini_training_domain_obj)
+    except MultipleBusinessExceptions as e:
+        errors += e.exceptions
+
+    if errors:
+        raise MultipleBusinessExceptions(exceptions=errors)
 
     return mini_training_identity
 
