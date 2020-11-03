@@ -26,9 +26,12 @@ from unittest import mock
 from django.test import SimpleTestCase
 
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
-from program_management.ddd.validators import _validate_end_date_and_option_finality
+from program_management.ddd.validators import _validate_end_date_and_option_finality, \
+    _check_finalities_end_date_lower_or_equal_to_2M
+from program_management.ddd.validators._attach_finality_end_date import AttachFinalityEndDateValidator
 from program_management.tests.ddd.factories.program_tree import tree_builder
-from program_management.tests.ddd.factories.program_tree_version import StandardProgramTreeVersionFactory
+from program_management.tests.ddd.factories.program_tree_version import StandardProgramTreeVersionFactory, \
+    ProgramTreeVersionFactory
 from program_management.tests.ddd.factories.repository.fake import get_fake_program_tree_repository, \
     get_fake_program_tree_version_repository
 from program_management.tests.ddd.validators.mixins import TestValidatorValidateMixin
@@ -247,4 +250,76 @@ class TestValidateFinalitiesEndDateAndOptions(TestValidatorValidateMixin, Simple
                 self.fake_program_tree_repository,
                 self.fake_tree_version_repository
             )
+        )
+
+    def test_should_raise_exception_when_end_year_is_inferior_to_one_of_its_finality(self):
+        tree_data = {
+            "node_type": TrainingType.PGRM_MASTER_120,
+            "end_year": 2018,
+            "children": [
+                {
+                    "node_type": GroupType.FINALITY_120_LIST_CHOICE,
+                    "children": [
+                        {"node_type": TrainingType.MASTER_MA_120, "end_year": 2019},
+                        {"node_type": TrainingType.MASTER_MA_120, "end_year": 2018}
+                    ]
+                }
+            ]
+        }
+        tree = tree_builder(tree_data)
+        tree_version = ProgramTreeVersionFactory(
+            tree=tree,
+            end_year_of_existence=2018,
+            program_tree_repository=self.fake_program_tree_repository
+        )
+
+        self.assertValidatorRaises(
+            AttachFinalityEndDateValidator(tree_version),
+            None
+        )
+
+    def test_should_be_valid_when_program_tree_is_not_a_program_2M(self):
+        tree_data = {
+            "node_type": TrainingType.RESEARCH_CERTIFICATE,
+            "end_year": 2018,
+            "children": [
+                {
+                    "node_type": GroupType.FINALITY_120_LIST_CHOICE,
+                    "children": [
+                        {"node_type": TrainingType.MASTER_MA_120, "end_year": 2019},
+                    ]
+                }
+            ]
+        }
+        tree = tree_builder(tree_data)
+        self.fake_program_tree_repository.root_entities.append(tree)
+        tree_version = ProgramTreeVersionFactory(
+            tree=tree,
+            end_year_of_existence=2018,
+            program_tree_repository=self.fake_program_tree_repository
+        )
+
+        self.assertValidatorNotRaises(
+            AttachFinalityEndDateValidator(tree_version)
+        )
+
+    def test_valid_if_program_has_end_date_greater_or_equal_than_its_finalities(self):
+        tree_data = {
+            "node_type": TrainingType.PGRM_MASTER_120,
+            "end_year": 2019,
+            "children": [
+                {
+                    "node_type": GroupType.FINALITY_120_LIST_CHOICE,
+                    "children": [
+                        {"node_type": TrainingType.MASTER_MA_120, "end_year": 2019},
+                        {"node_type": TrainingType.MASTER_MA_120, "end_year": 2018}
+                    ]
+                }
+            ]
+        }
+        tree = tree_builder(tree_data)
+        tree_version = ProgramTreeVersionFactory(tree=tree, end_year_of_existence=2019, program_tree_repository=self.fake_program_tree_repository)
+
+        self.assertValidatorNotRaises(
+            AttachFinalityEndDateValidator(tree_version)
         )
