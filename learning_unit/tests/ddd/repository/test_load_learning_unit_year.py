@@ -30,7 +30,8 @@ from django.test import TestCase
 from django.test.utils import override_settings
 
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
-from base.business.learning_unit import CMS_LABEL_PEDAGOGY, CMS_LABEL_PEDAGOGY_FR_AND_EN, CMS_LABEL_SPECIFICATIONS
+from base.business.learning_unit import CMS_LABEL_PEDAGOGY, CMS_LABEL_PEDAGOGY_FR_AND_EN, CMS_LABEL_SPECIFICATIONS, \
+    CMS_LABEL_PEDAGOGY_FORCE_MAJEURE
 from base.models.enums import learning_unit_year_subtypes
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.academic_year import create_current_academic_year
@@ -110,15 +111,19 @@ class TestLoadLearningUnitDescriptionFiche(TestCase):
     def setUpTestData(cls):
         cls.l_unit_1 = LearningUnitYearFactory()
         dict_labels = {}
-        for cms_label in CMS_LABEL_PEDAGOGY + CMS_LABEL_SPECIFICATIONS:
+        for cms_label in CMS_LABEL_PEDAGOGY + CMS_LABEL_SPECIFICATIONS + CMS_LABEL_PEDAGOGY_FORCE_MAJEURE:
             dict_labels.update(
                 {cms_label: LearningUnitYearTextLabelFactory(order=1, label=cms_label)}
             )
 
-        cls.fr_cms_label = _build_cms_translated_text(cls.l_unit_1.id, dict_labels, LANGUAGE_FR,
-                                                      CMS_LABEL_PEDAGOGY + CMS_LABEL_SPECIFICATIONS)
-        cls.en_cms_label = _build_cms_translated_text(cls.l_unit_1.id, dict_labels, LANGUAGE_EN,
-                                                      CMS_LABEL_PEDAGOGY_FR_AND_EN + CMS_LABEL_SPECIFICATIONS)
+        cls.fr_cms_label = _build_cms_translated_text(
+            cls.l_unit_1.id, dict_labels, LANGUAGE_FR,
+            CMS_LABEL_PEDAGOGY + CMS_LABEL_SPECIFICATIONS + CMS_LABEL_PEDAGOGY_FORCE_MAJEURE
+        )
+        cls.en_cms_label = _build_cms_translated_text(
+            cls.l_unit_1.id, dict_labels, LANGUAGE_EN,
+            CMS_LABEL_PEDAGOGY_FR_AND_EN + CMS_LABEL_SPECIFICATIONS + CMS_LABEL_PEDAGOGY_FORCE_MAJEURE
+        )
 
     @override_settings(LANGUAGES=[('fr-be', 'French'), ('en', 'English'), ], LANGUAGE_CODE='fr-be')
     def test_load_description_fiche(self):
@@ -139,6 +144,9 @@ class TestLoadLearningUnitDescriptionFiche(TestCase):
         self.assertEqual(description_fiche.other_informations_en, self.en_cms_label.get('other_informations').text)
         self.assertEqual(description_fiche.online_resources_en, self.en_cms_label.get('online_resources').text)
 
+        self.assertIsNone(description_fiche.last_update)
+        self.assertIsNone(description_fiche.author)
+
     @override_settings(LANGUAGES=[('fr-be', 'French'), ('en', 'English'), ], LANGUAGE_CODE='fr-be')
     def test_load_specifications(self):
         results = load_multiple([self.l_unit_1.id])
@@ -149,6 +157,32 @@ class TestLoadLearningUnitDescriptionFiche(TestCase):
 
         self.assertEqual(description_fiche.themes_discussed_en, self.en_cms_label.get('themes_discussed').text)
         self.assertEqual(description_fiche.prerequisite_en, self.en_cms_label.get('prerequisite').text)
+
+    @override_settings(LANGUAGES=[('fr-be', 'French'), ('en', 'English'), ], LANGUAGE_CODE='fr-be')
+    def test_load_force_majeure(self):
+        results = load_multiple([self.l_unit_1.id])
+        force_majeure = results[0].force_majeure
+
+        self.assertEqual(force_majeure.teaching_methods, self.fr_cms_label.get('teaching_methods_force_majeure').text)
+        self.assertEqual(
+            force_majeure.evaluation_methods, self.fr_cms_label.get('evaluation_methods_force_majeure').text
+        )
+        self.assertEqual(
+            force_majeure.other_informations, self.fr_cms_label.get('other_informations_force_majeure').text
+        )
+
+        self.assertEqual(
+            force_majeure.teaching_methods_en, self.en_cms_label.get('teaching_methods_force_majeure').text
+        )
+        self.assertEqual(
+            force_majeure.evaluation_methods_en, self.en_cms_label.get('evaluation_methods_force_majeure').text
+        )
+        self.assertEqual(
+            force_majeure.other_informations_en, self.en_cms_label.get('other_informations_force_majeure').text
+        )
+
+        self.assertIsNone(force_majeure.last_update)
+        self.assertIsNone(force_majeure.author)
 
 
 def _build_cms_translated_text(l_unit_id, dict_labels, language, cms_labels):
