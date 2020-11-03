@@ -25,6 +25,7 @@
 ##############################################################################
 import html
 
+from django.template.defaultfilters import yesno
 from django.test import TestCase
 from django.utils.translation import gettext_lazy as _
 from openpyxl.styles import Font
@@ -35,8 +36,9 @@ from base.business.learning_unit_xls import CREATION_COLOR, MODIFICATION_COLOR, 
     TRANSFORMATION_AND_MODIFICATION_COLOR, SUPPRESSION_COLOR
 from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import GroupType, TrainingType
-from base.models.enums.learning_unit_year_subtypes import FULL
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
+from base.models.enums.learning_unit_year_subtypes import FULL
+from base.models.enums.learning_unit_year_subtypes import LEARNING_UNIT_YEAR_SUBTYPES
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.tests.factories.academic_year import AcademicYearFactory
@@ -60,16 +62,14 @@ from program_management.business.excel_ue_in_of import FIX_TITLES, \
     _build_direct_gathering_label, _build_main_gathering_label, \
     get_explore_parents, _get_xls_title
 from program_management.business.utils import html2text
+from program_management.ddd.business_types import *
 from program_management.forms.custom_xls import CustomXlsForm
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
-from program_management.tests.factories.element import ElementGroupYearFactory, ElementLearningUnitYearFactory
 from program_management.tests.ddd.factories.program_tree_version import StandardProgramTreeVersionFactory, \
     ProgramTreeVersionFactory
-from program_management.ddd.business_types import *
-from base.models.enums.learning_unit_year_subtypes import LEARNING_UNIT_YEAR_SUBTYPES
-from django.template.defaultfilters import yesno
+from program_management.tests.factories.element import ElementGroupYearFactory, ElementLearningUnitYearFactory
 
 PARTIAL_ACRONYM = 'Partial'
 
@@ -284,6 +284,7 @@ class TestContent(TestCase):
                               'has_language': False,
                               'has_description_fiche': False,
                               'has_specifications': False,
+                              'has_force_majeure': False
                               }
                              )
 
@@ -302,6 +303,7 @@ class TestContent(TestCase):
                               'language': 'on',
                               'description_fiche': 'on',
                               'specifications': 'on',
+                              'force_majeure': 'on'
                               },
                              year=self.parent_node.year,
                              code=self.parent_node.code
@@ -321,6 +323,7 @@ class TestContent(TestCase):
                               'has_language': True,
                               'has_description_fiche': True,
                               'has_specifications': True,
+                              'has_force_majeure': True
                               }
                              )
 
@@ -465,6 +468,7 @@ def initialize_optional_data():
         'has_language': False,
         'has_description_fiche': False,
         'has_specifications': False,
+        'has_force_majeure': False
     }
 
 
