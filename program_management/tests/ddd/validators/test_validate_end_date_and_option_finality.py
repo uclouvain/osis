@@ -53,9 +53,12 @@ class TestValidateFinalitiesEndDateAndOptions(TestValidatorValidateMixin, Simple
             ]
         }
         self.tree = tree_builder(tree_data)
-        self.tree_version = StandardProgramTreeVersionFactory(tree=self.tree)
-
         self.fake_program_tree_repository = get_fake_program_tree_repository([self.tree])
+
+        self.tree_version = StandardProgramTreeVersionFactory(
+            tree=self.tree,
+            program_tree_repository=self.fake_program_tree_repository
+        )
         self.fake_tree_version_repository = get_fake_program_tree_version_repository([self.tree_version])
 
     def test_should_not_be_valid_when_node_to_attach_is_a_finality_having_an_end_date_greater_than_parent_program(self):
@@ -65,6 +68,12 @@ class TestValidateFinalitiesEndDateAndOptions(TestValidatorValidateMixin, Simple
         }
         tree_to_attach = tree_builder(tree_to_attach_data)
         self.fake_program_tree_repository.root_entities.append(tree_to_attach)
+        self.fake_tree_version_repository.root_entities.append(
+            StandardProgramTreeVersionFactory(
+                tree=tree_to_attach,
+                program_tree_repository=self.fake_program_tree_repository,
+            )
+        )
 
         self.assertValidatorRaises(
             _validate_end_date_and_option_finality.ValidateFinalitiesEndDateAndOptions(
@@ -86,6 +95,12 @@ class TestValidateFinalitiesEndDateAndOptions(TestValidatorValidateMixin, Simple
         }
         tree_to_attach = tree_builder(tree_to_attach_data)
         self.fake_program_tree_repository.root_entities.append(tree_to_attach)
+        self.fake_tree_version_repository.root_entities.append(
+            StandardProgramTreeVersionFactory(
+                tree=tree_to_attach,
+                program_tree_repository=self.fake_program_tree_repository,
+            )
+        )
 
         self.assertValidatorRaises(
             _validate_end_date_and_option_finality.ValidateFinalitiesEndDateAndOptions(
@@ -106,6 +121,12 @@ class TestValidateFinalitiesEndDateAndOptions(TestValidatorValidateMixin, Simple
         }
         tree_to_attach = tree_builder(tree_to_attach_data)
         self.fake_program_tree_repository.root_entities.append(tree_to_attach)
+        self.fake_tree_version_repository.root_entities.append(
+            StandardProgramTreeVersionFactory(
+                tree=tree_to_attach,
+                program_tree_repository=self.fake_program_tree_repository,
+            )
+        )
 
         self.assertValidatorRaises(
             _validate_end_date_and_option_finality.ValidateFinalitiesEndDateAndOptions(
@@ -127,6 +148,12 @@ class TestValidateFinalitiesEndDateAndOptions(TestValidatorValidateMixin, Simple
         }
         tree_to_attach = tree_builder(tree_to_attach_data)
         self.fake_program_tree_repository.root_entities.append(tree_to_attach)
+        self.fake_tree_version_repository.root_entities.append(
+            StandardProgramTreeVersionFactory(
+                tree=tree_to_attach,
+                program_tree_repository=self.fake_program_tree_repository,
+            )
+        )
 
         self.assertValidatorNotRaises(
             _validate_end_date_and_option_finality.ValidateFinalitiesEndDateAndOptions(
@@ -153,6 +180,12 @@ class TestValidateFinalitiesEndDateAndOptions(TestValidatorValidateMixin, Simple
         }
         tree_to_attach = tree_builder(tree_to_attach_data)
         self.fake_program_tree_repository.root_entities.append(tree_to_attach)
+        self.fake_tree_version_repository.root_entities.append(
+            StandardProgramTreeVersionFactory(
+                tree=tree_to_attach,
+                program_tree_repository=self.fake_program_tree_repository,
+            )
+        )
 
         self.assertValidatorRaises(
             _validate_end_date_and_option_finality.ValidateFinalitiesEndDateAndOptions(
@@ -180,6 +213,12 @@ class TestValidateFinalitiesEndDateAndOptions(TestValidatorValidateMixin, Simple
         }
         tree_to_attach = tree_builder(tree_to_attach_data)
         self.fake_program_tree_repository.root_entities.append(tree_to_attach)
+        self.fake_tree_version_repository.root_entities.append(
+            StandardProgramTreeVersionFactory(
+                tree=tree_to_attach,
+                program_tree_repository=self.fake_program_tree_repository,
+            )
+        )
 
         self.assertValidatorNotRaises(
             _validate_end_date_and_option_finality.ValidateFinalitiesEndDateAndOptions(
@@ -194,6 +233,12 @@ class TestValidateFinalitiesEndDateAndOptions(TestValidatorValidateMixin, Simple
 
         tree_to_attach = tree_builder(tree_to_attach_data)
         self.fake_program_tree_repository.root_entities.append(tree_to_attach)
+        self.fake_tree_version_repository.root_entities.append(
+            StandardProgramTreeVersionFactory(
+                tree=tree_to_attach,
+                program_tree_repository=self.fake_program_tree_repository,
+            )
+        )
 
         self.assertValidatorNotRaises(
             _validate_end_date_and_option_finality.ValidateFinalitiesEndDateAndOptions(

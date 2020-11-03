@@ -75,7 +75,7 @@ def load_trees(tree_root_ids: List[int]) -> List['ProgramTree']:
     return trees
 
 
-# FIXME :: to move into ProgramTreeRepository.search()
+# FIXME :: to rename to private function
 def load_trees_from_children(
         child_element_ids: list,
         link_type: LinkTypes = None

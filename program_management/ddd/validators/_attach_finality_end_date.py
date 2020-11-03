@@ -43,15 +43,24 @@ class AttachFinalityEndDateValidator(business_validator.BusinessValidator):
 
     def __init__(
             self,
-            updated_tree_version: 'ProgramTreeVersion'
+            updated_tree_version: 'ProgramTreeVersion',
+            # FIXME :: The kwarg below is only useful because the validation is performed BEFORE the "Paste" action.
+            # FIXME :: To remove this param, we need to call this Validator AFTER the action "paste" is Done.
+            # FIXME :: (like the "update program tree version" action that uses this validator too)
+            trees_2m: List['ProgramTree'] = None
     ):
         super(AttachFinalityEndDateValidator, self).__init__()
+        if trees_2m:
+            assert_msg = "To use correctly this validator, make sure the ProgramTree root is of type 2M"
+            for tree_2m in trees_2m:
+                assert tree_2m.root_node.node_type in TrainingType.root_master_2m_types_enum(), assert_msg
         self.updated_tree_version = updated_tree_version
         self.updated_tree = updated_tree_version.get_tree()
         self.program_tree_repository = updated_tree_version.program_tree_repository
+        self.trees_2m = trees_2m
 
     def validate(self):
-        if self.updated_tree.root_node.is_finality() or self.updated_tree.root_node.get_all_finalities():
+        if self.updated_tree.root_node.is_finality() or self.updated_tree.get_all_finalities():
             if self.updated_tree.root_node.is_master_2m():
                 self._check_master_2M_end_year_greater_or_equal_to_its_finalities()
             else:
@@ -84,6 +93,8 @@ class AttachFinalityEndDateValidator(business_validator.BusinessValidator):
         return inconsistent_finalities
 
     def _search_master_2m_trees(self) -> List['ProgramTree']:
+        if self.trees_2m:
+            return self.trees_2m
         root_identity = self.updated_tree.root_node.entity_id
         trees_2m = [
             tree for tree in self.program_tree_repository.search_from_children([root_identity])

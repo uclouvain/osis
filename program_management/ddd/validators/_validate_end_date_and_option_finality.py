@@ -52,10 +52,17 @@ class ValidateFinalitiesEndDateAndOptions(business_validator.BusinessValidator):
         tree_version_from_node_to_paste = self.tree_version_repository.search_versions_from_trees(
             [tree_from_node_to_paste]
         )[0]
-        _attach_finality_end_date.AttachFinalityEndDateValidator(
-            updated_tree_version=tree_version_from_node_to_paste,
-        ).validate()
-        _attach_option.AttachOptionsValidator(
-            program_tree_repository=self.tree_repository,
-            tree_from_node_to_paste=tree_from_node_to_paste,
-        ).validate()
+        if tree_from_node_to_paste.get_all_finalities():
+            trees_2m = [
+                tree for tree in self.tree_repository.search_from_children([self.node_to_paste_to.entity_id])
+                if tree.is_master_2m()
+            ]
+            _attach_finality_end_date.AttachFinalityEndDateValidator(
+                updated_tree_version=tree_version_from_node_to_paste,
+                trees_2m=trees_2m,
+            ).validate()
+            _attach_option.AttachOptionsValidator(
+                program_tree_repository=self.tree_repository,
+                tree_from_node_to_paste=tree_from_node_to_paste,
+                trees_2m=trees_2m,
+            ).validate()

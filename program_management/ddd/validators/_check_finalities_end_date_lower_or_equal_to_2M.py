@@ -21,35 +21,43 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-import sys
-from typing import Set
 
 from base.ddd.utils import business_validator
+from base.models.enums.education_group_types import TrainingType
 from base.utils.constants import INFINITE_VALUE
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception
 
 
+#  TODO :: to remove
 class Check2MEndDateGreaterOrEqualToItsFinalities(business_validator.BusinessValidator):
-    def __init__(self, tree_version: 'ProgramTreeVersion'):
+    def __init__(self, repository: 'ProgramTreeVersionRepository', tree_version: 'ProgramTreeVersion'):
         self.tree_version = tree_version
+        self.repository = repository
 
     def validate(self, *args, **kwargs):
-        if not self.tree_version.get_tree().is_master_2m():
-            return
-
         finalities = self.tree_version.get_tree().get_all_finalities()
         if not finalities:
             return
 
         finality_with_greatest_end_date = self._get_finality_with_greatest_end_date(finalities)
 
-        if self._is_tree_version_end_year_inferior(finality_with_greatest_end_date):
-            raise exception.Program2MEndDateShouldBeGreaterOrEqualThanItsFinalities(finality_with_greatest_end_date)
+        trees_2m = [
+            tree for tree in self.tree_version.program_tree_repository.search_from_children(
+                [self.tree_version.get_tree().root_node.entity_id],
+            ) if tree.is_master_2m()
+        ]
+        tree_versions_2m = self.repository.search_versions_from_trees(trees_2m)
+        for tree_version_2m in tree_versions_2m:
+            root_end_year = tree_version_2m.end_year_of_existence or INFINITE_VALUE
+            if (self.tree_version.end_year_of_existence or INFINITE_VALUE) > root_end_year:
+                raise exception.Program2MEndDateShouldBeGreaterOrEqualThanItsFinalities(finality_with_greatest_end_date)
 
-    def _get_finality_with_greatest_end_date(self, finalities: Set['Node']) -> 'Node':
-        return sorted((finality for finality in finalities), key=lambda node: node.end_year or INFINITE_VALUE)[-1]
+    def _get_finalities_where_end_date_gt_root_end_date(self, tree_2m: 'ProgramTree') -> List['Node']:
+        inconsistent_finalities = []
+        for finality in self.updated_tree.get_all_finalities():
+            root_end_year = tree_2m.root_node.end_date or INFINITE_VALUE
+            if (finality.end_year or INFINITE_VALUE) > root_end_year:
+                inconsistent_finalities.append(finality)
 
-    def _is_tree_version_end_year_inferior(self, finality: 'Node') -> bool:
-        tree_version_end_year = self.tree_version.end_year_of_existence
-        return tree_version_end_year and (finality.end_year is None or tree_version_end_year < finality.end_year)
+        return inconsistent_finalities

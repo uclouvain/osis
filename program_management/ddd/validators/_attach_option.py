@@ -45,12 +45,17 @@ class AttachOptionsValidator(BusinessValidator):
     def __init__(
             self,
             program_tree_repository: 'ProgramTreeRepository',
-            tree_from_node_to_paste: 'ProgramTree'
+            tree_from_node_to_paste: 'ProgramTree',
+            trees_2m: List['ProgramTree']
     ):
         super(AttachOptionsValidator, self).__init__()
+        assert_msg = "To use correctly this validator, make sure the ProgramTree root is of type 2M"
+        for tree_2m in trees_2m:
+            assert tree_2m.root_node.node_type in TrainingType.root_master_2m_types_enum(), assert_msg
         self.program_tree_repository = program_tree_repository
         self.tree_from_node_to_paste = tree_from_node_to_paste
         self.node_to_paste = self.tree_from_node_to_paste.root_node
+        self.trees_2m = trees_2m
 
     def get_options_to_paste(self):
         options = self.tree_from_node_to_paste.root_node.get_all_children_as_nodes(take_only={MiniTrainingType.OPTION})
@@ -61,7 +66,7 @@ class AttachOptionsValidator(BusinessValidator):
     def validate(self):
         options_to_attach = self.get_options_to_paste()
         if options_to_attach:
-            for tree_2m in self._search_master_2m_trees():
+            for tree_2m in self.trees_2m:
                 if self._is_node_to_paste_a_finality() or self._is_node_to_paste_to_inside_a_finality(tree_2m):
                     options_from_2m_option_list = tree_2m.get_2m_option_list()
                     options_to_attach_not_present_in_2m_option_list = options_to_attach - options_from_2m_option_list
@@ -80,12 +85,3 @@ class AttachOptionsValidator(BusinessValidator):
 
     def _is_node_to_paste_a_finality(self):
         return self.node_to_paste.is_finality()
-
-    def _search_master_2m_trees(self) -> List['ProgramTree']:
-        root_identity = self.tree_from_node_to_paste.root_node.entity_id
-        trees_2m = [
-            tree for tree in self.program_tree_repository.search_from_children([root_identity])
-            if tree.is_master_2m()
-        ]
-        return trees_2m
-
