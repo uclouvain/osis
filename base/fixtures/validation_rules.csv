@@ -1108,7 +1108,7 @@ base.validationrule,TrainingForm.MASTER_MA_180_240.rate_code,FIXED,MINERVAL_COMP
 base.validationrule,TrainingForm.MASTER_MD_180_240.rate_code,FIXED,MINERVAL_COMPLETE,,,,,
 base.validationrule,TrainingForm.MASTER_MS_180_240.rate_code,FIXED,MINERVAL_COMPLETE,,,,,
 base.validationrule,TrainingForm.MASTER_M1.rate_code,FIXED,MINERVAL_COMPLETE,,,,,
-base.validationrule,TrainingForm.MASTER_MC.rate_code,REQUIRED,AESS_CAPAES,^(MINERVAL_COMPLETE|ADVANCED_MASTER_IN_MEDICAL_SPECIALIZATION)$,,,,
+base.validationrule,TrainingForm.MASTER_MC.rate_code,REQUIRED,,^(MINERVAL_COMPLETE|ADVANCED_MASTER_IN_MEDICAL_SPECIALIZATION)$,,,,
 base.validationrule,TrainingForm.INTERNSHIP.rate_code,FIXED,NO_ADDITIONAL_FEES,,,,,
 base.validationrule,TrainingForm.AGGREGATION.leads_to_diploma,REQUIRED,True,,,,,
 base.validationrule,TrainingForm.CERTIFICATE_OF_PARTICIPATION.leads_to_diploma,REQUIRED,False,,,,,
