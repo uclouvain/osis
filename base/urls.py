@@ -119,7 +119,6 @@ urlpatterns = [
         url(r'^$', institution.entities_search, name='entities'),
         url(r'^(?P<entity_version_id>[0-9]+)/', include([
             url(r'^$', institution.entity_read, name='entity_read'),
-            url(r'^address/$', institution.get_entity_address, name='entity_address'),
             url(r'^diagram/$', institution.entity_diagram, name='entity_diagram'),
             url(r'^versions/$', institution.entities_version, name='entities_version'),
         ]))

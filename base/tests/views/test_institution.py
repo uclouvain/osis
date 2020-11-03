@@ -24,8 +24,6 @@
 #
 ##############################################################################
 import datetime
-import json
-from unittest import mock
 
 from django.http import HttpResponseForbidden, HttpResponse
 from django.test import TestCase
@@ -35,8 +33,6 @@ from rest_framework.test import APITestCase
 from base.models.enums import academic_calendar_type
 from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.entity import EntityFactory
-from base.tests.factories.entity_calendar import EntityCalendarFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
 from base.views import institution
@@ -105,46 +101,6 @@ class EntityViewTestCase(APITestCase):
         url = reverse('entity_diagram', args=[self.entity_version.id])
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-
-    @mock.patch('base.models.entity_version.find_by_id')
-    @mock.patch('django.contrib.auth.decorators')
-    def test_get_entity_address(self, mock_decorators, mock_find_by_id):
-        mock_decorators.login_required = lambda x: x
-        mock_decorators.permission_required = lambda *args, **kwargs: lambda func: func
-        entity = EntityFactory()
-        entity_version = EntityVersionFactory(entity=entity, acronym='SSH', title='Sector of sciences', end_date=None)
-        mock_find_by_id.return_value = entity_version
-        request = mock.Mock(method='GET')
-        response = institution.get_entity_address(request, entity_version.id)
-        address_data = ['location', 'postal_code', 'city', 'country_id', 'phone', 'fax']
-        self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content.decode('utf-8'))
-        self.assertTrue(data.get('entity_version_exists_now'))
-        self.assertIsNotNone(data.get('recipient'))
-        for field_name in address_data:
-            self.assertEqual(getattr(entity, field_name), data['address'].get(field_name))
-
-    @mock.patch('base.models.entity_version.find_by_id')
-    @mock.patch('django.contrib.auth.decorators')
-    def test_get_entity_address_case_no_current_entity_version_exists(self, mock_decorators, mock_find_by_id):
-        mock_decorators.login_required = lambda x: x
-        mock_decorators.permission_required = lambda *args, **kwargs: lambda func: func
-        entity = EntityFactory()
-        entity_version = EntityVersionFactory(entity=entity,
-                                              acronym='SSH',
-                                              title='Sector of sciences',
-                                              start_date=datetime.datetime(year=2004, month=1, day=1).date(),
-                                              end_date=datetime.datetime(year=2010, month=1, day=1).date())
-        mock_find_by_id.return_value = entity_version
-        request = mock.Mock(method='GET')
-        response = institution.get_entity_address(request, entity_version.id)
-        address_data = ['location', 'postal_code', 'city', 'country_id', 'phone', 'fax']
-        self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content.decode('utf-8'))
-        self.assertFalse(data.get('entity_version_exists_now'))
-        self.assertIsNotNone(data.get('recipient'))
-        for field_name in address_data:
-            self.assertEqual(getattr(entity, field_name), data['address'].get(field_name))
 
 
 class InstitutionViewTestCase(TestCase):
