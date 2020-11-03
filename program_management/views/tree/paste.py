@@ -124,6 +124,10 @@ class PasteNodesView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, SuccessMess
 
     @property
     def path_to_detach_from(self) -> str:
+        codes = self.request.GET.getlist("codes", [])
+        if codes:
+            return ""
+
         cached_element_selected = element_selected_service.retrieve_element_selected(self.request.user.id)
         if cached_element_selected:
             return cached_element_selected['path_to_detach']
