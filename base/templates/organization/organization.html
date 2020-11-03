@@ -98,6 +98,24 @@
                     </table>
                 </div>
             </div>
+            {% if addresses %}
+                <label>{% trans 'Address(es)' %}</label>
+                <div class="row">
+                    {% for address in addresses %}
+                        <div class="col-md-3">
+                            <div class="list-group">
+                                <a class="list-group-item">
+                                    <address>
+                                        {{ address.street_number | default_if_none:'' }} {{ address.street | default_if_none:'' }}<br>
+                                        {{ address.postal_code | default_if_none:'' }} {{ address.city | default_if_none:'' }} <br>
+                                        {{ address.country | default_if_none:'' }}
+                                    </address>
+                                </a>
+                            </div>
+                        </div>
+                    {%endfor%}
+                </div>
+            {%endif%}
         </div>
     </div>
 {% endblock %}

@@ -23,11 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from datetime import datetime
+from typing import List
+
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.db.models import Prefetch
 from django.views.generic import DetailView
 from django_filters.views import FilterView
 
 from base.forms.organization import OrganizationFilter
+from base.models.entity_version import EntityVersion
+from base.models.entity_version_address import EntityVersionAddress
 from base.models.organization import Organization
 
 
@@ -56,3 +62,22 @@ class DetailOrganization(PermissionRequiredMixin, DetailView):
 
     def get_queryset(self):
         return super().get_queryset().prefetch_related("campus_set")
+
+    def get_context_data(self, **kwargs):
+        return {
+            **super().get_context_data(**kwargs),
+            "addresses": self.get_addresses()
+        }
+
+    def get_addresses(self) -> List[EntityVersionAddress]:
+        root_entity_version = EntityVersion.objects.current(datetime.now()).filter(
+            entity__organization=self.kwargs['organization_id']
+        ).only_roots().prefetch_related(
+            Prefetch(
+                'entityversionaddress_set',
+                queryset=EntityVersionAddress.objects.all().select_related('country')
+            )
+        ).first()
+        if root_entity_version:
+            return root_entity_version.entityversionaddress_set.all()
+        return []
