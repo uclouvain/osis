@@ -45,7 +45,8 @@ from program_management.ddd.validators._delete_check_versions_end_date import Ch
 from program_management.ddd.validators._detach_option_2M import DetachOptionValidator
 from program_management.ddd.validators._detach_root import DetachRootValidator
 from program_management.ddd.validators._empty_program_tree import EmptyProgramTreeValidator
-from program_management.ddd.validators._has_or_is_prerequisite import IsPrerequisiteValidator
+from program_management.ddd.validators._has_or_is_prerequisite import IsPrerequisiteValidator, \
+    IsTrullyPrerequisiteValidator
 from program_management.ddd.validators._infinite_recursivity import InfiniteRecursivityTreeValidator
 from program_management.ddd.validators._match_version import MatchVersionValidator
 from program_management.ddd.validators._minimum_editable_year import \
@@ -180,7 +181,7 @@ class DetachNodeValidatorList(MultipleExceptionBusinessListValidator):
                 DetachRootValidator(tree, path_to_node_to_detach),
                 MinimumEditableYearValidator(tree),
                 DetachAuthorizedRelationshipValidator(tree, node_to_detach, detach_from),
-                IsPrerequisiteValidator(tree, path_to_parent, node_to_detach),
+                IsTrullyPrerequisiteValidator(detach_from, node_to_detach, tree_repository),
                 DetachOptionValidator(tree, path_to_node_to_detach, tree_repository),
             ]
 
@@ -188,7 +189,7 @@ class DetachNodeValidatorList(MultipleExceptionBusinessListValidator):
             self.validators = [
                 AuthorizedRelationshipLearningUnitValidator(tree, node_to_detach, detach_from),
                 MinimumEditableYearValidator(tree),
-                IsPrerequisiteValidator(tree, path_to_parent, node_to_detach),
+                IsTrullyPrerequisiteValidator(detach_from, node_to_detach, tree_repository),
             ]
 
         else:
