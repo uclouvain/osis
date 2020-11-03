@@ -27,6 +27,7 @@ from typing import List
 
 from django.db import transaction
 
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain.training import TrainingBuilder
@@ -38,10 +39,21 @@ from education_group.ddd.service.write import postpone_training_and_group_modifi
 def create_and_postpone_orphan_training(create_training_cmd: command.CreateTrainingCommand) -> List['TrainingIdentity']:
     # GIVEN
     cmd = create_training_cmd
+    errors = []
 
     # WHEN
-    training = TrainingBuilder().create_training(cmd)
-    group_identity = create_group_service.create_orphan_group(__convert_to_create_group_command(create_training_cmd))
+    try:
+        training = TrainingBuilder().create_training(cmd)
+    except MultipleBusinessExceptions as e:
+        errors = e.exceptions
+
+    try:
+        create_group_service.create_orphan_group(__convert_to_create_group_command(create_training_cmd))
+    except MultipleBusinessExceptions as e:
+        errors += e.exceptions
+
+    if errors:
+        raise MultipleBusinessExceptions(exceptions=errors)
 
     # THEN
     training_id = training_repository.TrainingRepository.create(training)
