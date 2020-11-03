@@ -24,42 +24,69 @@
 #
 ##############################################################################
 import sys
-from typing import List
+from typing import List, Set
 
 from base.ddd.utils import business_validator
 from base.models.enums.education_group_types import TrainingType
 from base.utils.constants import INFINITE_VALUE
 from program_management.ddd.business_types import *
-from program_management.ddd.domain.exception import CannotAttachFinalitiesWithGreaterEndDateThanProgram2M
+from program_management.ddd.domain.exception import CannotAttachFinalitiesWithGreaterEndDateThanProgram2M, \
+    Program2MEndDateShouldBeGreaterOrEqualThanItsFinalities
 
 
+#  TODO : to rename into CheckEndDateBetweenFinalitiesAndMasters2M + rename file
 class AttachFinalityEndDateValidator(business_validator.BusinessValidator):
     """
     In context of 2M, when we add a finality [or group which contains finality], we must ensure that
     the end date of all 2M is greater or equals of all finalities.
     """
 
-    def __init__(self, tree_version_2m: 'ProgramTreeVersion', tree_from_node_to_add: 'ProgramTree', *args):
+    def __init__(
+            self,
+            updated_tree_version: 'ProgramTreeVersion'
+    ):
         super(AttachFinalityEndDateValidator, self).__init__()
-        if tree_from_node_to_add.root_node.is_finality() or tree_from_node_to_add.get_all_finalities():
-            assert_msg = "To use correctly this validator, make sure the ProgramTree root is of type 2M"
-            assert tree_version_2m.tree.root_node.node_type in TrainingType.root_master_2m_types_enum(), assert_msg
-        self.tree_from_node_to_add = tree_from_node_to_add
-        self.node_to_add = tree_from_node_to_add.root_node
-        self.tree_version_2m = tree_version_2m
+        self.updated_tree_version = updated_tree_version
+        self.updated_tree = updated_tree_version.get_tree()
+        self.program_tree_repository = updated_tree_version.program_tree_repository
 
     def validate(self):
-        if self.node_to_add.is_finality() or self.tree_from_node_to_add.get_all_finalities():
-            inconsistent_finalities = self._get_finalities_where_end_date_gt_root_end_date()
+        if self.updated_tree.root_node.is_finality() or self.updated_tree.root_node.get_all_finalities():
+            if self.updated_tree.root_node.is_master_2m():
+                self._check_master_2M_end_year_greater_or_equal_to_its_finalities()
+            else:
+                self._check_finalities_end_year_greater_or_equal_to_their_masters_2M()
+
+    def _check_master_2M_end_year_greater_or_equal_to_its_finalities(self):
+        inconsistent_finalities = self._get_finalities_where_end_year_gt_root_end_year(self.updated_tree)
+        if inconsistent_finalities:
+            #  TODO :: to rename into Program2MEndDateLowerThanItsFinalities
+            raise Program2MEndDateShouldBeGreaterOrEqualThanItsFinalities(self.updated_tree.root_node)
+
+    def _check_finalities_end_year_greater_or_equal_to_their_masters_2M(self):
+        trees_2m = self._search_master_2m_trees()
+        for tree_2m in trees_2m:
+            inconsistent_finalities = self._get_finalities_where_end_year_gt_root_end_year(tree_2m)
             if inconsistent_finalities:
+                #  TODO :: to rename into FinalitiesEndDateGreaterThanTheirMasters2M
                 raise CannotAttachFinalitiesWithGreaterEndDateThanProgram2M(
-                    self.tree_version_2m.tree.root_node,
+                    tree_2m.root_node,
                     inconsistent_finalities
                 )
 
-    def _get_finalities_where_end_date_gt_root_end_date(self) -> List['Node']:
-        root_end_year = self.tree_version_2m.tree.root_node.end_year or INFINITE_VALUE
-        return [
-            finality for finality in self.tree_from_node_to_add.get_all_finalities()
-            if (finality.end_year or INFINITE_VALUE) > root_end_year
+    def _get_finalities_where_end_year_gt_root_end_year(self, tree_2m: 'ProgramTree') -> List['Node']:
+        inconsistent_finalities = []
+        for finality in self.updated_tree.get_all_finalities():
+            root_end_year = tree_2m.root_node.end_year or INFINITE_VALUE
+            if (finality.end_year or INFINITE_VALUE) > root_end_year:
+                inconsistent_finalities.append(finality)
+
+        return inconsistent_finalities
+
+    def _search_master_2m_trees(self) -> List['ProgramTree']:
+        root_identity = self.updated_tree.root_node.entity_id
+        trees_2m = [
+            tree for tree in self.program_tree_repository.search_from_children([root_identity])
+            if tree.is_master_2m()
         ]
+        return trees_2m
