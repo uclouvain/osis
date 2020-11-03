@@ -30,12 +30,11 @@ from base.ddd.utils import business_validator
 from base.models.enums.education_group_types import TrainingType
 from base.utils.constants import INFINITE_VALUE
 from program_management.ddd.business_types import *
-from program_management.ddd.domain.exception import CannotAttachFinalitiesWithGreaterEndDateThanProgram2M, \
-    Program2MEndDateShouldBeGreaterOrEqualThanItsFinalities
+from program_management.ddd.domain.exception import FinalitiesEndDateGreaterThanTheirMasters2MException, \
+    Program2MEndDateLowerThanItsFinalitiesException
 
 
-#  TODO : to rename into CheckEndDateBetweenFinalitiesAndMasters2M + rename file
-class AttachFinalityEndDateValidator(business_validator.BusinessValidator):
+class CheckEndDateBetweenFinalitiesAndMasters2M(business_validator.BusinessValidator):
     """
     In context of 2M, when we add a finality [or group which contains finality], we must ensure that
     the end date of all 2M is greater or equals of all finalities.
@@ -49,7 +48,7 @@ class AttachFinalityEndDateValidator(business_validator.BusinessValidator):
             # FIXME :: (like the "update program tree version" action that uses this validator too)
             trees_2m: List['ProgramTree'] = None
     ):
-        super(AttachFinalityEndDateValidator, self).__init__()
+        super(CheckEndDateBetweenFinalitiesAndMasters2M, self).__init__()
         if trees_2m:
             assert_msg = "To use correctly this validator, make sure the ProgramTree root is of type 2M"
             for tree_2m in trees_2m:
@@ -69,16 +68,14 @@ class AttachFinalityEndDateValidator(business_validator.BusinessValidator):
     def _check_master_2M_end_year_greater_or_equal_to_its_finalities(self):
         inconsistent_finalities = self._get_finalities_where_end_year_gt_root_end_year(self.updated_tree)
         if inconsistent_finalities:
-            #  TODO :: to rename into Program2MEndDateLowerThanItsFinalities
-            raise Program2MEndDateShouldBeGreaterOrEqualThanItsFinalities(self.updated_tree.root_node)
+            raise Program2MEndDateLowerThanItsFinalitiesException(self.updated_tree.root_node)
 
     def _check_finalities_end_year_greater_or_equal_to_their_masters_2M(self):
         trees_2m = self._search_master_2m_trees()
         for tree_2m in trees_2m:
             inconsistent_finalities = self._get_finalities_where_end_year_gt_root_end_year(tree_2m)
             if inconsistent_finalities:
-                #  TODO :: to rename into FinalitiesEndDateGreaterThanTheirMasters2M
-                raise CannotAttachFinalitiesWithGreaterEndDateThanProgram2M(
+                raise FinalitiesEndDateGreaterThanTheirMasters2MException(
                     tree_2m.root_node,
                     inconsistent_finalities
                 )

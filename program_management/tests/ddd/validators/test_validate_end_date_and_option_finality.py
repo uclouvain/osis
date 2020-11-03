@@ -28,7 +28,7 @@ from django.test import SimpleTestCase
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
 from program_management.ddd.validators import _validate_end_date_and_option_finality, \
     _check_finalities_end_date_lower_or_equal_to_2M
-from program_management.ddd.validators._attach_finality_end_date import AttachFinalityEndDateValidator
+from program_management.ddd.validators._end_date_between_finalities_and_masters import CheckEndDateBetweenFinalitiesAndMasters2M
 from program_management.tests.ddd.factories.program_tree import tree_builder
 from program_management.tests.ddd.factories.program_tree_version import StandardProgramTreeVersionFactory, \
     ProgramTreeVersionFactory
@@ -274,7 +274,7 @@ class TestValidateFinalitiesEndDateAndOptions(TestValidatorValidateMixin, Simple
         )
 
         self.assertValidatorRaises(
-            AttachFinalityEndDateValidator(tree_version),
+            CheckEndDateBetweenFinalitiesAndMasters2M(tree_version),
             None
         )
 
@@ -300,7 +300,7 @@ class TestValidateFinalitiesEndDateAndOptions(TestValidatorValidateMixin, Simple
         )
 
         self.assertValidatorNotRaises(
-            AttachFinalityEndDateValidator(tree_version)
+            CheckEndDateBetweenFinalitiesAndMasters2M(tree_version)
         )
 
     def test_valid_if_program_has_end_date_greater_or_equal_than_its_finalities(self):
@@ -321,5 +321,5 @@ class TestValidateFinalitiesEndDateAndOptions(TestValidatorValidateMixin, Simple
         tree_version = ProgramTreeVersionFactory(tree=tree, end_year_of_existence=2019, program_tree_repository=self.fake_program_tree_repository)
 
         self.assertValidatorNotRaises(
-            AttachFinalityEndDateValidator(tree_version)
+            CheckEndDateBetweenFinalitiesAndMasters2M(tree_version)
         )

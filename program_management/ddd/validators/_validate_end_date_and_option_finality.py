@@ -25,8 +25,8 @@ import osis_common.ddd.interface
 from base.ddd.utils import business_validator
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import program_tree as program_tree_domain
-from program_management.ddd.validators import _attach_finality_end_date
-from program_management.ddd.validators import _attach_option
+from program_management.ddd.validators import _end_date_between_finalities_and_masters
+from program_management.ddd.validators import _paste_option
 
 
 class ValidateFinalitiesEndDateAndOptions(business_validator.BusinessValidator):
@@ -57,11 +57,11 @@ class ValidateFinalitiesEndDateAndOptions(business_validator.BusinessValidator):
                 tree for tree in self.tree_repository.search_from_children([self.node_to_paste_to.entity_id])
                 if tree.is_master_2m()
             ]
-            _attach_finality_end_date.AttachFinalityEndDateValidator(
+            _end_date_between_finalities_and_masters.CheckEndDateBetweenFinalitiesAndMasters2M(
                 updated_tree_version=tree_version_from_node_to_paste,
                 trees_2m=trees_2m,
             ).validate()
-            _attach_option.AttachOptionsValidator(
+            _paste_option.PasteOptionsValidator(
                 program_tree_repository=self.tree_repository,
                 tree_from_node_to_paste=tree_from_node_to_paste,
                 trees_2m=trees_2m,

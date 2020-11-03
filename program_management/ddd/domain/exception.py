@@ -153,7 +153,7 @@ class ProgramTreeVersionMismatch(BusinessException):
         return str(_('Standard')) if version_identity.is_standard() else version_identity.version_name
 
 
-class Program2MEndDateShouldBeGreaterOrEqualThanItsFinalities(BusinessException):
+class Program2MEndDateLowerThanItsFinalitiesException(BusinessException):
     def __init__(self, finality: 'Node', **kwargs):
         message = _("The end date must be higher or equal to finality %(acronym)s") % {
             "acronym": str(finality)
@@ -161,7 +161,7 @@ class Program2MEndDateShouldBeGreaterOrEqualThanItsFinalities(BusinessException)
         super().__init__(message, **kwargs)
 
 
-class CannotAttachFinalitiesWithGreaterEndDateThanProgram2M(BusinessException):
+class FinalitiesEndDateGreaterThanTheirMasters2MException(BusinessException):
     def __init__(self, root_node: 'Node', finalities: List['Node']):
         message = ngettext(
             "Finality \"%(acronym)s\" has an end date greater than %(root_acronym)s program.",

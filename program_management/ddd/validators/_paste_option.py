@@ -35,8 +35,7 @@ from program_management.ddd.domain.exception import CannotAttachOptionIfNotPrese
 from program_management.ddd.domain.service import identity_search
 
 
-# FIXME :: to rename into PasteOptionsValidator
-class AttachOptionsValidator(BusinessValidator):
+class PasteOptionsValidator(BusinessValidator):
     """
     In context of MA/MD/MS when we add an option [or group which contains options],
     this options must exist in parent context (2m)
@@ -48,7 +47,7 @@ class AttachOptionsValidator(BusinessValidator):
             tree_from_node_to_paste: 'ProgramTree',
             trees_2m: List['ProgramTree']
     ):
-        super(AttachOptionsValidator, self).__init__()
+        super(PasteOptionsValidator, self).__init__()
         assert_msg = "To use correctly this validator, make sure the ProgramTree root is of type 2M"
         for tree_2m in trees_2m:
             assert tree_2m.root_node.node_type in TrainingType.root_master_2m_types_enum(), assert_msg

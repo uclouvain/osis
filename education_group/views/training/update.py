@@ -58,8 +58,8 @@ from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command as command_program_management
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception as program_management_exception
-from program_management.ddd.domain.exception import Program2MEndDateShouldBeGreaterOrEqualThanItsFinalities, \
-    CannotAttachFinalitiesWithGreaterEndDateThanProgram2M
+from program_management.ddd.domain.exception import Program2MEndDateLowerThanItsFinalitiesException, \
+    FinalitiesEndDateGreaterThanTheirMasters2MException
 from program_management.ddd.service.write import delete_training_with_program_tree_service
 from program_management.ddd.service.write.postpone_training_and_program_tree_modifications_service import \
     postpone_training_and_program_tree_modifications
@@ -184,11 +184,11 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                     self.training_form.add_error('ares_graca', e.message)
                 elif isinstance(e, AresAuthorizationShouldBeGreaterOrEqualsThanZeroAndLessThan9999):
                     self.training_form.add_error('ares_authorization', e.message)
-                elif isinstance(e, CannotAttachFinalitiesWithGreaterEndDateThanProgram2M):
+                elif isinstance(e, FinalitiesEndDateGreaterThanTheirMasters2MException):
                     self.training_form.add_error('end_year', e.message)
                 else:
                     self.training_form.add_error('', e.message)
-        except Program2MEndDateShouldBeGreaterOrEqualThanItsFinalities as e:
+        except Program2MEndDateLowerThanItsFinalitiesException as e:
             self.training_form.add_error("end_year", e.message)
         except TrainingCopyConsistencyException as e:
             display_warning_messages(self.request, e.message)
