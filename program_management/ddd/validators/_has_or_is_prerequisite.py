@@ -35,7 +35,7 @@ from program_management.ddd.domain.exception import CannotDetachLearningWhoIsPre
     CannotDetachChildrenWhoArePrerequisiteException, DeletePrerequisitesException
 
 
-class IsTrullyPrerequisiteValidator(business_validator.BusinessValidator):
+class IsPrerequisiteForAllTreesValidator(business_validator.BusinessValidator):
     def __init__(self, parent_node: 'Node', node_to_detach: 'Node', program_tree_repository: 'ProgramTreeRepository'):
         super().__init__()
         self.node_to_detach = node_to_detach
