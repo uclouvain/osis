@@ -60,7 +60,7 @@ class ProgramTreeVersionFactory(factory.Factory):
     )
     entity_identity = factory.SelfAttribute("entity_id")
     version_name = factory.SelfAttribute("entity_id.version_name")
-    end_year_of_existence = None
+    end_year_of_existence = factory.SelfAttribute("tree.root_node.end_year")
 
     @staticmethod
     def produce_standard_2M_program_tree(current_year: int, end_year: int) -> 'ProgramTreeVersion':
