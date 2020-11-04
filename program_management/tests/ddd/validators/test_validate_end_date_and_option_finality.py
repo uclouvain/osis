@@ -26,8 +26,7 @@ from unittest import mock
 from django.test import SimpleTestCase
 
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
-from program_management.ddd.validators import _validate_end_date_and_option_finality, \
-    _check_finalities_end_date_lower_or_equal_to_2M
+from program_management.ddd.validators import _validate_end_date_and_option_finality
 from program_management.ddd.validators._end_date_between_finalities_and_masters import CheckEndDateBetweenFinalitiesAndMasters2M
 from program_management.tests.ddd.factories.program_tree import tree_builder
 from program_management.tests.ddd.factories.program_tree_version import StandardProgramTreeVersionFactory, \
