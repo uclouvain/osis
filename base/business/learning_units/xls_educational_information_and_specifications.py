@@ -142,6 +142,17 @@ def prepare_xls_educational_information_and_specifications(learning_unit_years, 
         else:
             line.append('')
 
+        for label_key in CMS_LABEL_PEDAGOGY_FR_ONLY:
+            translated_label = translated_labels_with_text.filter(text_label__label=label_key).first()
+            if translated_label:
+                line.append(
+                    get_html_to_text(translated_label.text_label.text_fr[0].text)
+                    if translated_label.text_label.text_fr and translated_label.text_label.text_fr[0].text else ''
+                )
+
+            else:
+                line.append('')
+
         _add_revision_informations(learning_unit_yr, line)
 
         translated_labels_force_majeure_with_text = _get_translated_labels_with_text(
