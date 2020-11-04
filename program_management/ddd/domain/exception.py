@@ -325,9 +325,12 @@ class CannotDetachRootException(BusinessException):
 
 
 class CannotDetachLearningWhoIsPrerequisiteException(BusinessException):
-    def __init__(self, node_to_detach: 'Node'):
-        message = _("Cannot detach learning unit %(acronym)s as it has a prerequisite or it is a prerequisite.") % {
-            "acronym": node_to_detach.code
+    def __init__(self, root_node: 'Node', node_to_detach: 'Node'):
+        message = _(
+            "Cannot detach learning unit %(acronym)s as it has a prerequisite or it is a prerequisite in %(root_node)s."
+        ) % {
+            "acronym": node_to_detach.code,
+            "root_node": root_node
         }
         super().__init__(message)
 
