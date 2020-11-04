@@ -28,7 +28,7 @@ import html
 import bleach
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
-from django.db.models import Prefetch, Case, When, Value, IntegerField, CharField
+from django.db.models import Prefetch, Case, When, Value, IntegerField, CharField, Q
 from django.db.models.expressions import F
 from django.db.models.functions import Concat, Upper
 from django.utils.translation import gettext_lazy as _
@@ -160,7 +160,7 @@ def prepare_xls_educational_information_and_specifications(learning_unit_years, 
             else:
                 line.append('')
 
-        _add_revision_informations(learning_unit_yr, line, CMS_LABEL_PEDAGOGY)
+        _add_revision_informations(learning_unit_yr, line)
 
         translated_labels_force_majeure_with_text = _get_translated_labels_with_text(
             learning_unit_yr.id,
@@ -170,7 +170,7 @@ def prepare_xls_educational_information_and_specifications(learning_unit_years, 
         for label_key in CMS_LABEL_PEDAGOGY_FORCE_MAJEURE:
             _add_pedagogies_translated_labels_with_text(label_key, line, translated_labels_force_majeure_with_text)
 
-        _add_revision_informations(learning_unit_yr, line, CMS_LABEL_PEDAGOGY_FORCE_MAJEURE)
+        _add_revision_informations(learning_unit_yr, line, is_force_majeure=True)
 
         _add_specifications(learning_unit_yr, line, request)
 
@@ -181,17 +181,27 @@ def prepare_xls_educational_information_and_specifications(learning_unit_years, 
     return result
 
 
-def _add_revision_informations(learning_unit_yr, line, cms_label):
+def _add_revision_informations(learning_unit_yr, line, is_force_majeure=False):
     translated_texts = TranslatedText.objects.filter(
         reference=learning_unit_yr.id,
         entity=LEARNING_UNIT_YEAR,
-        text_label__label__in=cms_label
+        text_label__label__in=CMS_LABEL_PEDAGOGY_FORCE_MAJEURE if is_force_majeure else CMS_LABEL_PEDAGOGY
     )
-    ids = [translated_text.id for translated_text in translated_texts]
-    version = Version.objects.filter(
-        content_type=ContentType.objects.get_for_model(TranslatedText),
-        object_id__in=ids
-    ).select_related(
+    translated_texts_ids = [translated_text.id for translated_text in translated_texts]
+
+    if is_force_majeure:
+        version = Version.objects.filter(
+            content_type=ContentType.objects.get_for_model(TranslatedText), object_id__in=translated_texts_ids
+        )
+    else:
+        teaching_materials = TeachingMaterial.objects.filter(learning_unit_year_id=learning_unit_yr.id)
+        teaching_materials_ids = [teaching_material.id for teaching_material in teaching_materials]
+        version = Version.objects.filter(
+            Q(content_type=ContentType.objects.get_for_model(TranslatedText), object_id__in=translated_texts_ids) |
+            Q(content_type=ContentType.objects.get_for_model(TeachingMaterial), object_id__in=teaching_materials_ids)
+        )
+
+    version = version.select_related(
         "revision",
         "revision__user__person"
     ).annotate(
