@@ -43,13 +43,12 @@ from education_group.models.group_year import GroupYear
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from osis_role.contrib.views import AjaxPermissionRequiredMixin
 from program_management.ddd.business_types import *
-from program_management.ddd.command import CreateProgramTreeVersionCommand, ExtendProgramTreeVersionCommand, \
-    UpdateProgramTreeVersionCommand, PostponeProgramTreeVersionCommand, ProlongExistingProgramTreeVersionCommand
+from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
+from program_management.ddd.command import CreateProgramTreeVersionCommand, ProlongExistingProgramTreeVersionCommand
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.service.identity_search import NodeIdentitySearch, ProgramTreeVersionIdentitySearch
 from program_management.ddd.service.write import create_and_postpone_tree_version_service, \
-    extend_existing_tree_version_service, update_program_tree_version_service, \
-    postpone_tree_version_service, prolong_existing_tree_version_service
+    prolong_existing_tree_version_service
 from program_management.forms.version import SpecificVersionForm
 from program_management.views.tree_version.check_version_name import get_last_existing_version
 
@@ -113,7 +112,7 @@ class CreateProgramTreeVersion(AjaxPermissionRequiredMixin, AjaxTemplateMixin, V
                     form.add_error('version_name', e.message)
             else:
                 identities = prolong_existing_tree_version_service.prolong_existing_tree_version(
-                    _convert_form_to_prolong_command(form)
+                    _convert_form_to_prolong_command(form, last_existing_version)
                 )
 
             if not form.errors:
@@ -174,13 +173,19 @@ def _convert_form_to_create_command(form: SpecificVersionForm) -> CreateProgramT
     )
 
 
-def _convert_form_to_prolong_command(form: SpecificVersionForm) -> ProlongExistingProgramTreeVersionCommand:
+def _convert_form_to_prolong_command(
+        form: SpecificVersionForm,
+        last_existing_version_identity: 'ProgramTreeVersionIdentity'
+) -> ProlongExistingProgramTreeVersionCommand:
+    last_program_tree_version = ProgramTreeVersionRepository.get(
+        last_existing_version_identity
+    )
     return ProlongExistingProgramTreeVersionCommand(
         end_year=form.cleaned_data.get("end_year"),
         updated_year=form.tree_version_identity.year,
         offer_acronym=form.tree_version_identity.offer_acronym,
         version_name=form.cleaned_data['version_name'],
         is_transition=False,
-        title_en=form.cleaned_data.get("version_title_en"),
-        title_fr=form.cleaned_data.get("version_title_fr"),
+        title_en=form.cleaned_data.get("version_title_en") or last_program_tree_version.title_en,
+        title_fr=form.cleaned_data.get("version_title_fr") or last_program_tree_version.title_fr,
     )
