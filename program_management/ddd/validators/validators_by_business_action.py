@@ -24,12 +24,12 @@
 #
 ##############################################################################
 
-import osis_common.ddd.interface
 from base.ddd.utils import business_validator
 from base.ddd.utils.business_validator import BusinessListValidator, MultipleExceptionBusinessListValidator
 from program_management.ddd import command
 from program_management.ddd.business_types import *
-from program_management.ddd.validators._end_date_between_finalities_and_masters import CheckEndDateBetweenFinalitiesAndMasters2M
+from program_management.ddd.validators._end_date_between_finalities_and_masters import \
+    CheckEndDateBetweenFinalitiesAndMasters2M
 from program_management.ddd.validators._authorized_link_type import AuthorizedLinkTypeValidator
 from program_management.ddd.validators._authorized_relationship import \
     AuthorizedRelationshipLearningUnitValidator, PasteAuthorizedRelationshipValidator, \
