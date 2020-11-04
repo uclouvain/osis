@@ -82,9 +82,14 @@ class CheckEndDateBetweenFinalitiesAndMasters2M(business_validator.BusinessValid
 
     def _get_finalities_where_end_year_gt_root_end_year(self, tree_2m: 'ProgramTree') -> List['Node']:
         inconsistent_finalities = []
+        master_2m_end_year = tree_2m.root_node.end_year or INFINITE_VALUE
+        updated_node = self.updated_tree_version.get_tree().root_node
+        if updated_node.is_finality():
+            end_year_of_finality = (self.updated_tree_version.end_year_of_existence or INFINITE_VALUE)
+            if end_year_of_finality > master_2m_end_year:
+                inconsistent_finalities.append(updated_node)
         for finality in self.updated_tree.get_all_finalities():
-            root_end_year = tree_2m.root_node.end_year or INFINITE_VALUE
-            if (finality.end_year or INFINITE_VALUE) > root_end_year:
+            if (finality.end_year or INFINITE_VALUE) > master_2m_end_year:
                 inconsistent_finalities.append(finality)
 
         return inconsistent_finalities
