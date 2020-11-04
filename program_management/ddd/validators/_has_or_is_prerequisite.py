@@ -65,7 +65,7 @@ class IsPrerequisiteValidator(business_validator.BusinessValidator):
         if nodes_that_are_prerequisites:
             codes_that_are_prerequisite = [node.code for node in nodes_that_are_prerequisites]
             if self.node_to_detach.is_learning_unit():
-                raise CannotDetachLearningWhoIsPrerequisiteException(self.node_to_detach)
+                raise CannotDetachLearningWhoIsPrerequisiteException(self.tree.root_node, self.node_to_detach)
             else:
                 raise CannotDetachChildrenWhoArePrerequisiteException(
                     self.tree.root_node,
