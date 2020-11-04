@@ -35,6 +35,21 @@ from program_management.ddd.domain.exception import CannotDetachLearningWhoIsPre
     CannotDetachChildrenWhoArePrerequisiteException, DeletePrerequisitesException
 
 
+class IsPrerequisiteForAllTreesValidator(business_validator.BusinessValidator):
+    def __init__(self, parent_node: 'Node', node_to_detach: 'Node', program_tree_repository: 'ProgramTreeRepository'):
+        super().__init__()
+        self.node_to_detach = node_to_detach
+        self.parent_node = parent_node
+        self.program_tree_repository = program_tree_repository
+
+    def validate(self, *args, **kwargs):
+        trees = self.program_tree_repository.search_from_children([self.parent_node.entity_id])
+        for tree in trees:
+            parent_path = tree.get_node_smallest_ordered_path(self.parent_node)
+            node_to_detach = tree.get_node_by_code_and_year(self.node_to_detach.code, self.node_to_detach.year)
+            IsPrerequisiteValidator(tree, parent_path, node_to_detach).validate()
+
+
 class IsPrerequisiteValidator(business_validator.BusinessValidator):
 
     def __init__(self, tree: 'ProgramTree', path_to_parent: 'Path', node_to_detach: 'Node'):
