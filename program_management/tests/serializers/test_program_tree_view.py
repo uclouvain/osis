@@ -114,8 +114,8 @@ class TestProgramTreeViewSerializer(TestCase):
         self.assertEqual(serialized_data['text'],
                          "{} - {}".format(self.root_node.code, self.root_node.title))
 
-    @patch("program_management.serializers.program_tree_view.__get_tree_version_label", return_value='[CEMS]')
-    def test_serialize_program_tree_for_version_text(self, mock):
+    def test_serialize_program_tree_for_version_text(self):
+        self.tree.root_node.version_name = 'CEMS'
         serialized_data = program_tree_view_serializer(self.tree)
         self.assertEqual(serialized_data['text'],
                          "{} - {}{}".format(self.root_node.code, self.root_node.title, "[CEMS]"))
