@@ -21,10 +21,22 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+from backoffice.settings.base import LANGUAGE_CODE_EN
 from program_management.ddd.business_types import *
 
 
-def format_program_tree_version_identity(tree_version_identity: 'ProgramTreeVersionIdentity') -> str:
-    if tree_version_identity.version_name:
-        return "{}[{}]".format(tree_version_identity.offer_acronym, tree_version_identity.version_name)
-    return tree_version_identity.offer_acronym
+def format_version_title(node: 'NodeGroupYear', language: str) -> str:
+    if language == LANGUAGE_CODE_EN and node.version_title_en:
+        return "[{}]".format(node.version_title_en)
+    return "[{}]".format(node.version_title_fr) if node.version_title_fr else ''
+
+
+def format_version_name(node: 'NodeGroupYear') -> str:
+    return "[{}]".format(node.version_name) if node.version_name else ""
+
+
+def format_version_complete_name(node: 'NodeGroupYear', language: str) -> str:
+    version_name = format_version_name(node)
+    if language == LANGUAGE_CODE_EN and node.version_title_en:
+        return " - {}{}".format(node.version_title_en, version_name)
+    return " - {}{}".format(node.version_title_fr, version_name) if node.version_title_fr else ""
