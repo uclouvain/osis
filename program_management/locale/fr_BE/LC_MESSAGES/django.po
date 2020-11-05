@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-28 14:17+0100\n"
+"POT-Creation-Date: 2020-11-04 14:10+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -253,6 +253,9 @@ msgstr "Catégorie décret"
 msgid "Description fiche"
 msgstr "Fiche descriptive"
 
+msgid "Description fiche (including force majeure)"
+msgstr "Fiche descriptive (inclut force majeure)"
+
 msgid "Diploma title"
 msgstr "Intitulé du diplôme/du certificat"
 
@@ -283,6 +286,9 @@ msgstr ""
 
 msgid "Evaluation methods"
 msgstr "Mode d'évaluation des acquis des étudiants"
+
+msgid "Evaluation methods (force majeure)"
+msgstr "Mode d'évaluation des acquis des étudiants ((force majeure)"
 
 msgid "Export"
 msgstr "Exporter"
@@ -386,6 +392,18 @@ msgstr "Mots clés"
 
 msgid "Language"
 msgstr "Langue"
+
+msgid "Last update description fiche (force majeure) by"
+msgstr "Dernière modification fiche descriptive (force majeure) par"
+
+msgid "Last update description fiche (force majeure) on"
+msgstr "Dernière modification fiche descriptive (force majeure) le"
+
+msgid "Last update description fiche by"
+msgstr "Dernière modification fiche descriptive par"
+
+msgid "Last update description fiche on"
+msgstr "Dernière modification fiche descriptive le"
 
 msgid "Leads to diploma/certificate"
 msgstr "Mène à diplôme/certificat"
@@ -560,6 +578,9 @@ msgstr "Au choix"
 msgid "Other informations"
 msgstr "Autres informations"
 
+msgid "Other informations (force majeure)"
+msgstr "Autres informations (force majeure)"
+
 msgid "Other languages activities"
 msgstr "Activités dans d'autres langues"
 
@@ -733,6 +754,9 @@ msgstr "Méthodes d'enseignement"
 msgid "Teaching methods"
 msgstr "Méthodes d'enseignement"
 
+msgid "Teaching methods (force majeure)"
+msgstr "Méthodes d'enseignement (force majeure)7"
+
 #, python-format
 msgid ""
 "The child %(child)s you want to attach is a parent of the node you want to "
@@ -778,6 +802,7 @@ msgstr ""
 "Les prérequis %(prerequisites)s pour l'unité d'enseignement "
 "%(learning_unit)s ne sont pas dans la formation sélectionnée %(root)s"
 
+#, python-format
 msgid ""
 "The prerequisites for the following learning units contained in education "
 "group year %(acronym)s will be deleted: %(learning_units)s"

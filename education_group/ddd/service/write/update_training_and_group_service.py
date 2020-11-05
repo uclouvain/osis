@@ -23,6 +23,7 @@
 # ############################################################################
 from django.db import transaction
 
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models.enums.active_status import ActiveStatusEnum
 from base.models.enums.activity_presence import ActivityPresence
 from base.models.enums.decree_category import DecreeCategories
@@ -50,13 +51,22 @@ from education_group.ddd.service.write import update_group_service
 
 @transaction.atomic()
 def update_training_and_group(cmd: command.UpdateTrainingAndGroupCommand) -> 'TrainingIdentity':
-    training_identity = training.TrainingIdentity(acronym=cmd.acronym, year=cmd.year)
-    group_identity = update_group_service.update_group(__convert_to_update_group_command(cmd))
+    errors = []
+    try:
+        update_group_service.update_group(__convert_to_update_group_command(cmd))
+    except MultipleBusinessExceptions as e:
+        errors = e.exceptions
 
-    training_domain_obj = training_repository.TrainingRepository.get(training_identity)
+    try:
+        training_identity = training.TrainingIdentity(acronym=cmd.acronym, year=cmd.year)
+        training_domain_obj = training_repository.TrainingRepository.get(training_identity)
+        training_domain_obj.update(__convert_command_to_update_training_data(cmd))
+        training_repository.TrainingRepository.update(training_domain_obj)
+    except MultipleBusinessExceptions as e:
+        errors.extend(e.exceptions)
 
-    training_domain_obj.update(__convert_command_to_update_training_data(cmd))
-    training_repository.TrainingRepository.update(training_domain_obj)
+    if errors:
+        raise MultipleBusinessExceptions(exceptions=errors)
 
     return training_identity
 
