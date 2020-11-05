@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
@@ -31,6 +30,7 @@ from django.views.generic import FormView
 import osis_common.ddd.interface
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.utils.cache import ElementCache
+from base.utils.urls import reverse_with_get
 from base.views.common import display_error_messages, display_warning_messages
 from base.views.common import display_success_messages
 from program_management.ddd import command
@@ -138,5 +138,11 @@ class DetachNodeView(GenericGroupElementYearMixin, FormView):
         return _("Are you sure you want to detach %(child)s ?") % {"child": self.child_node}
 
     def get_success_url(self):
-        # We can just reload the page
-        return
+        queryparams = {
+            'path': self.path_to_detach[:self.path_to_detach.rfind("|")]
+        }
+        return reverse_with_get(
+            'element_identification',
+            kwargs={'code': self.parent_node.code, 'year': self.parent_node.year},
+            get=queryparams
+        )

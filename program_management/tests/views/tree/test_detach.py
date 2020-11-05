@@ -36,6 +36,7 @@ from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.person import PersonFactory
 from base.utils.cache import ElementCache
+from base.utils.urls import reverse_with_get
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from program_management.ddd.domain import link
 from program_management.ddd.validators._authorized_relationship import DetachAuthorizedRelationshipValidator
@@ -117,7 +118,18 @@ class TestDetachNodeView(TestCase):
         )
 
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertJSONEqual(str(response.content, encoding='utf8'), {'success': True})
+        expected_redirect = reverse_with_get(
+            'element_identification',
+            kwargs={
+                'code': self.group_element_year.parent_element.group_year.partial_acronym,
+                'year': self.group_element_year.parent_element.group_year.academic_year.year
+            },
+            get={'path': self.group_element_year.parent_element.pk}
+        )
+        self.assertJSONEqual(str(response.content, encoding='utf8'), {
+            'success': True,
+            'success_url': expected_redirect
+        })
         self.assertEqual(list(get_messages(response.wsgi_request))[0].level, MSG.SUCCESS)
         self.assertTrue(mock_service.called)
 
