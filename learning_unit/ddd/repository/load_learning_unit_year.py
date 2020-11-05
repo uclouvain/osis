@@ -87,19 +87,6 @@ SELECT {field_to_select} FROM last_update_info
 """
 
 
-@deprecated  # Use :py:meth:`~learning_unit.ddd.repository.load_learning_unit_year.load_multiple_by_identity` instead !
-def load_multiple(learning_unit_year_ids: List[int]) -> List['LearningUnitYear']:
-    qs = __get_queryset()
-    qs = qs.filter(pk__in=learning_unit_year_ids)
-
-    results = []
-
-    for learning_unit_data in qs:
-        luy = __instanciate_learning_unit_year(learning_unit_data)
-        results.append(luy)
-    return results
-
-
 def load_multiple_by_identity(
         learning_unit_year_identities: List['LearningUnitYearIdentity']
 ) -> List['LearningUnitYear']:
