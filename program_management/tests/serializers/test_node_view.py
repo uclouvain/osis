@@ -211,7 +211,11 @@ class TestLeafViewAttributeSerializer(SimpleTestCase):
         self.tree = ProgramTreeFactory(root_node=self.root_node)
 
     def test_serializer_node_attr_ensure_get_href(self):
-        expected_url = reverse('learning_unit_utilization', args=[self.root_node.pk, self.link.child.pk])
+        expected_url = reverse_with_get(
+            'learning_unit_utilization',
+            args=[self.root_node.pk, self.link.child.pk],
+            get={"path": self.path}
+        )
         serialized_data = _get_leaf_view_attribute_serializer(self.link, self.path, self.tree, context=self.context)
         self.assertEqual(serialized_data['href'], expected_url)
 
