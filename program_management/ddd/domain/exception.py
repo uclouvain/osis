@@ -154,9 +154,9 @@ class ProgramTreeVersionMismatch(BusinessException):
 
 
 class Program2MEndDateLowerThanItsFinalitiesException(BusinessException):
-    def __init__(self, finality: 'Node', **kwargs):
-        message = _("The end date must be higher or equal to finality %(acronym)s") % {
-            "acronym": str(finality)
+    def __init__(self, node_2m: 'Node', **kwargs):
+        message = _("The end date of %(acronym)s must be higher or equal to its finalities") % {
+            "acronym": node_2m.title
         }
         super().__init__(message, **kwargs)
 
@@ -168,8 +168,8 @@ class FinalitiesEndDateGreaterThanTheirMasters2MException(BusinessException):
             "Finalities \"%(acronym)s\" have an end date greater than %(root_acronym)s program.",
             len(finalities)
         ) % {
-            "acronym": ', '.join([str(node) for node in finalities]),
-            "root_acronym": root_node
+            "acronym": ', '.join([node.title for node in finalities]),
+            "root_acronym": root_node.title
         }
         super().__init__(message)
 
