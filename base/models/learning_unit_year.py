@@ -71,34 +71,34 @@ MAXIMUM_CREDITS = 500
 SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS = """\
 WITH RECURSIVE group_element_year_parent AS (
     SELECT gs.id, gs.id AS gs_origin, gy.acronym, gy.title_fr, educ_type.category, educ_type.name,
-    0 AS level, parent_element_id, child_element_id, version.is_transition, version.version_name, 
+    0 AS level, parent_element_id, child_element_id, version.is_transition, version.version_name,
     version.title_fr AS version_title_fr
     FROM base_groupelementyear AS gs
     INNER JOIN program_management_element AS element_parent ON gs.parent_element_id = element_parent.id
     INNER JOIN program_management_element AS element_child ON gs.child_element_id = element_child.id
     INNER JOIN education_group_groupyear AS gy ON element_parent.group_year_id = gy.id
     INNER JOIN base_educationgrouptype AS educ_type on gy.education_group_type_id = educ_type.id
-    LEFT JOIN program_management_educationgroupversion AS version on gy.id = version.root_group_id        
+    LEFT JOIN program_management_educationgroupversion AS version on gy.id = version.root_group_id
     LEFT JOIN base_learningunityear bl on element_child.learning_unit_year_id = bl.id
-    WHERE element_child.learning_unit_year_id = "base_learningunityear"."id" 
+    WHERE element_child.learning_unit_year_id = "base_learningunityear"."id"
     UNION ALL
-    SELECT parent.id, gs_origin,  
+    SELECT parent.id, gs_origin,
     gy.acronym, gy.title_fr, educ_type.category, educ_type.name,
     child.level + 1, parent.parent_element_id, parent.child_element_id, version.is_transition, version.version_name,
     version.title_fr AS version_title_fr
     FROM base_groupelementyear AS parent
     INNER JOIN program_management_element AS element_parent ON parent.parent_element_id = element_parent.id
-    INNER JOIN program_management_element AS element_child ON parent.child_element_id = element_child.id    
+    INNER JOIN program_management_element AS element_child ON parent.child_element_id = element_child.id
     INNER JOIN education_group_groupyear AS gy ON element_parent.group_year_id = gy.id
     INNER JOIN base_educationgrouptype AS educ_type on gy.education_group_type_id = educ_type.id
     INNER JOIN education_group_groupyear AS gy_child ON element_child.group_year_id = gy_child.id
-    INNER JOIN base_educationgrouptype AS educ_type_child on gy_child.education_group_type_id = educ_type_child.id    
+    INNER JOIN base_educationgrouptype AS educ_type_child on gy_child.education_group_type_id = educ_type_child.id 
     INNER JOIN group_element_year_parent AS child on parent.child_element_id = child.parent_element_id
-    left JOIN program_management_educationgroupversion AS version on gy.id = version.root_group_id    
+    left JOIN program_management_educationgroupversion AS version on gy.id = version.root_group_id
     WHERE not(educ_type_child.name != 'OPTION' AND educ_type_child.category IN ('MINI_TRAINING', 'TRAINING'))
 )
 SELECT to_jsonb(array_agg(row_to_json(group_element_year_parent))) FROM group_element_year_parent
-WHERE name != 'OPTION' AND category IN ('MINI_TRAINING', 'TRAINING')  
+WHERE name != 'OPTION' AND category IN ('MINI_TRAINING', 'TRAINING')
 """
 
 
