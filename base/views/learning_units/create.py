@@ -25,6 +25,7 @@
 ##############################################################################
 from django.contrib.auth.decorators import login_required, permission_required
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
 from waffle.decorators import waffle_flag
 
@@ -32,9 +33,10 @@ from base.forms.learning_unit.learning_unit_postponement import LearningUnitPost
 from base.models.academic_year import AcademicYear
 from base.models.learning_unit_year import LearningUnitYear, find_latest_by_learning_unit
 from base.models.person import Person
-from base.views.common import show_error_message_for_form_invalid
+from base.views.common import show_error_message_for_form_invalid, display_error_messages
 from base.views.learning_units import perms
 from base.views.learning_units.common import show_success_learning_unit_year_creation_message
+from education_group.templatetags.academic_year_display import display_as_academic_year
 
 
 @login_required
@@ -81,6 +83,15 @@ def create_partim_form(request, learning_unit_year_id):
 
     if postponement_form.is_valid():
         return _save_and_redirect(postponement_form, request)
+    else:
+        for i in range(len(postponement_form.errors)):
+            if postponement_form.errors[i] and "specific_title" in postponement_form.errors[i][0]:
+                msg = _("The learning unit %(code)s doesn't have any Title - Common part in %(ac)s, "
+                        "it is then neccessary to specify a Title - Specific complement on the partim.") % {
+                    "code": learning_unit_year_full.acronym,
+                    "ac": display_as_academic_year(postponement_form.start_postponement.year+i)
+                }
+                display_error_messages(request, msg)
 
     context = postponement_form.get_context()
     context.update({'learning_unit_year': learning_unit_year_full, 'partim_creation': True})
