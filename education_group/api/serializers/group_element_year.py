@@ -32,10 +32,8 @@ from education_group.api.views.mini_training import MiniTrainingDetail
 from education_group.api.views.training import TrainingDetail
 from education_group.enums.node_type import NodeType
 from learning_unit.api.views.learning_unit import LearningUnitDetailed
+from program_management import formatter
 from program_management.ddd.business_types import *
-from program_management.ddd.domain.node import NodeIdentity
-from program_management.serializers.node_view import get_program_tree_version_name, get_program_tree_version_title
-from program_management.serializers.program_tree_view import _get_version_of_nodes
 
 
 class RecursiveField(serializers.Serializer):
@@ -54,17 +52,13 @@ class CommonNodeHyperlinkedRelatedField(serializers.HyperlinkedIdentityField):
                 'year': obj.child.year,
             }
         elif obj.child.is_training() or obj.child.is_mini_training():
-            version = get_program_tree_version_name(
-                NodeIdentity(code=obj.child.code, year=obj.child.year),
-                _get_version_of_nodes({obj.child})
-            )
             view_name = 'education_group_api_v1:' + (
                 TrainingDetail.name if obj.child.is_training() else MiniTrainingDetail.name
             )
             url_kwargs = {
                 'acronym': obj.child.title,
                 'year': obj.child.year,
-                'version_name': version[1:-1]
+                'version_name': obj.child.version_name
             }
         else:
             view_name = 'education_group_api_v1:' + GroupDetail.name
@@ -133,11 +127,7 @@ class EducationGroupCommonNodeTreeSerializer(serializers.Serializer):
         return getattr(obj.child, 'remark' + field_suffix)
 
     def get_title(self, obj):
-        version_title = get_program_tree_version_title(
-            NodeIdentity(code=obj.child.code, year=obj.child.year),
-            _get_version_of_nodes({obj.child}),
-            self.context.get('language')
-        )
+        version_title = formatter.format_version_title(obj.child, self.context.get('language'))
         field_suffix = 'en' if self.context.get('language') == settings.LANGUAGE_CODE_EN else 'fr'
         field_prefix = 'offer' if obj.child.is_training() else 'group'
         attr_name = '{}_title_{}'.format(field_prefix, field_suffix)
@@ -145,11 +135,7 @@ class EducationGroupCommonNodeTreeSerializer(serializers.Serializer):
 
     @staticmethod
     def get_version_name(obj):
-        version_name = get_program_tree_version_name(
-            NodeIdentity(code=obj.child.code, year=obj.child.year),
-            _get_version_of_nodes({obj.child})
-        )
-        return version_name[1:-1]  # remove [ ]
+        return obj.child.version_name
 
     def get_partial_title(self, obj):
         field_suffix = '_en' if self.context.get('language') == settings.LANGUAGE_CODE_EN else '_fr'
