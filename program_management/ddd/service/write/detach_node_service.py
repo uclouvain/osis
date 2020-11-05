@@ -35,13 +35,22 @@ from program_management.ddd.repositories import load_tree, persist_tree, program
 def detach_node(detach_command: command.DetachNodeCommand) -> link.LinkIdentity:
     path_to_detach = detach_command.path
     commit = detach_command.commit
+    program_tree_repositoy = program_tree.ProgramTreeRepository()
 
     root_id = int(path_to_detach.split(PATH_SEPARATOR)[0])
     working_tree = load_tree.load(root_id)
 
-    deleted_link = working_tree.detach_node(path_to_detach, program_tree.ProgramTreeRepository())
+    deleted_link = working_tree.detach_node(path_to_detach, program_tree_repositoy)
 
     if commit:
+        trees_containing_parent = program_tree_repositoy.search_from_children([deleted_link.parent.entity_id])
+        if working_tree in trees_containing_parent:
+            trees_containing_parent.remove(working_tree)
+
+        for tree in trees_containing_parent:
+            tree.remove_prerequisites(deleted_link.parent, deleted_link.child)
+            persist_tree.persist(tree)
+
         persist_tree.persist(working_tree)
 
     return deleted_link.entity_id

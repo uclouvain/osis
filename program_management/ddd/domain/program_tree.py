@@ -488,7 +488,7 @@ class ProgramTree(interface.RootEntity):
             tree_repository
         ).validate()
 
-        self.remove_prerequisites(path_to_node_to_detach)
+        self.remove_prerequisites(parent, node_to_detach)
         return parent.detach_child(node_to_detach)
 
     def __copy__(self) -> 'ProgramTree':
@@ -497,7 +497,10 @@ class ProgramTree(interface.RootEntity):
             authorized_relationships=copy.copy(self.authorized_relationships)
         )
 
-    def remove_prerequisites(self, path_node_to_detach: 'Path'):
+    def remove_prerequisites(self, parent_node: 'Node', child_node: 'Node'):
+        path_node_to_detach = PATH_SEPARATOR.join(
+            [self.get_node_smallest_ordered_path(parent_node), str(child_node.node_id)]
+        )
         children_remaining = self.get_remaining_children_after_detach(path_node_to_detach)
         detached_node = self.get_node(path_node_to_detach)
 
