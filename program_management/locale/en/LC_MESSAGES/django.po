@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-04 11:19+0100\n"
+"POT-Creation-Date: 2020-11-04 14:10+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -229,6 +229,9 @@ msgstr ""
 msgid "Description fiche"
 msgstr ""
 
+msgid "Description fiche (including force majeure)"
+msgstr ""
+
 msgid "Diploma title"
 msgstr ""
 
@@ -257,6 +260,9 @@ msgid "Error(s) in form: The modifications are not saved"
 msgstr ""
 
 msgid "Evaluation methods"
+msgstr ""
+
+msgid "Evaluation methods (force majeure)"
 msgstr ""
 
 msgid "Export"
@@ -350,6 +356,18 @@ msgid "Keywords"
 msgstr ""
 
 msgid "Language"
+msgstr ""
+
+msgid "Last update description fiche (force majeure) by"
+msgstr ""
+
+msgid "Last update description fiche (force majeure) on"
+msgstr ""
+
+msgid "Last update description fiche by"
+msgstr ""
+
+msgid "Last update description fiche on"
 msgstr ""
 
 msgid "Leads to diploma/certificate"
@@ -519,6 +537,9 @@ msgstr ""
 msgid "Other informations"
 msgstr ""
 
+msgid "Other informations (force majeure)"
+msgstr ""
+
 msgid "Other languages activities"
 msgstr ""
 
@@ -683,6 +704,9 @@ msgid "Teaching material"
 msgstr ""
 
 msgid "Teaching methods"
+msgstr ""
+
+msgid "Teaching methods (force majeure)"
 msgstr ""
 
 #, python-format
