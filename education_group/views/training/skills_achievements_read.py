@@ -49,7 +49,7 @@ class TrainingReadSkillsAchievements(TrainingRead):
             **super().get_context_data(**kwargs),
             "year": kwargs['year'],
             "code": kwargs['code'],
-            "achievements": achievement.get_achievements(self.get_group(), self.request.GET['path']),
+            "achievements": achievement.get_achievements(self.group, self.request.GET['path']),
             "can_edit_information": self.request.user.has_perm(edition_perm_name, self.get_permission_object()),
             "program_aims_label": self.get_program_aims_label(),
             "program_aims_update_url": self.get_program_aims_update_url(),
@@ -89,8 +89,8 @@ class TrainingReadSkillsAchievements(TrainingRead):
 
     @functools.lru_cache()
     def get_translated_labels(self):
-        return achievement.get_skills_labels(self.get_group(), self.request.LANGUAGE_CODE)
+        return achievement.get_skills_labels(self.group, self.request.LANGUAGE_CODE)
 
     @functools.lru_cache()
-    def get_training(self):
+    def training(self):
         return TrainingRepository.get(self.training_identity)

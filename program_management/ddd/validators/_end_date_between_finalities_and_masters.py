@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import sys
 from typing import List, Set
 
 from base.ddd.utils import business_validator
@@ -80,7 +79,7 @@ class CheckEndDateBetweenFinalitiesAndMasters2M(business_validator.BusinessValid
                     inconsistent_finalities
                 )
 
-    def _get_finalities_where_end_year_gt_root_end_year(self, tree_2m: 'ProgramTree') -> List['Node']:
+    def _get_finalities_where_end_year_gt_root_end_year(self, tree_2m: 'ProgramTree') -> Set['Node']:
         inconsistent_finalities = []
         master_2m_end_year = tree_2m.root_node.end_year or INFINITE_VALUE
         updated_node = self.updated_tree_version.get_tree().root_node
@@ -92,7 +91,7 @@ class CheckEndDateBetweenFinalitiesAndMasters2M(business_validator.BusinessValid
             if (finality.end_year or INFINITE_VALUE) > master_2m_end_year:
                 inconsistent_finalities.append(finality)
 
-        return inconsistent_finalities
+        return set(inconsistent_finalities)
 
     def _search_master_2m_trees(self) -> List['ProgramTree']:
         if self.trees_2m:

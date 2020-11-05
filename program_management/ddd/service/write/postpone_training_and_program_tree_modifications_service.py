@@ -25,6 +25,8 @@
 ##############################################################################
 from typing import List
 
+from django.db import transaction
+
 from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain.exception import TrainingCopyConsistencyException

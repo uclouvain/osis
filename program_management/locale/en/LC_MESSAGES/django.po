@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-04 14:10+0100\n"
+"POT-Creation-Date: 2020-11-05 14:14+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -717,7 +717,7 @@ msgid ""
 msgstr ""
 
 #, python-format
-msgid "The end date must be higher or equal to finality %(acronym)s"
+msgid "The end date of %(acronym)s must be higher or equal to its finalities"
 msgstr ""
 
 #, python-format
