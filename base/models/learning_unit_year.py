@@ -92,7 +92,7 @@ WITH RECURSIVE group_element_year_parent AS (
     INNER JOIN education_group_groupyear AS gy ON element_parent.group_year_id = gy.id
     INNER JOIN base_educationgrouptype AS educ_type on gy.education_group_type_id = educ_type.id
     INNER JOIN education_group_groupyear AS gy_child ON element_child.group_year_id = gy_child.id
-    INNER JOIN base_educationgrouptype AS educ_type_child on gy_child.education_group_type_id = educ_type_child.id 
+    INNER JOIN base_educationgrouptype AS educ_type_child on gy_child.education_group_type_id = educ_type_child.id
     INNER JOIN group_element_year_parent AS child on parent.child_element_id = child.parent_element_id
     left JOIN program_management_educationgroupversion AS version on gy.id = version.root_group_id
     WHERE not(educ_type_child.name != 'OPTION' AND educ_type_child.category IN ('MINI_TRAINING', 'TRAINING'))
