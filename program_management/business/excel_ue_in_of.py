@@ -101,6 +101,16 @@ optional_header_for_description_fiche = [
     _('Teaching material'),
     _('bibliography').title(),
     _('Mobility'),
+    _('Last update description fiche by'),
+    _('Last update description fiche on')
+]
+
+optional_header_for_force_majeure = [
+    _('Teaching methods (force majeure)'), "{} {}".format(_('Teaching methods (force majeure)'), _('in English')),
+    _('Evaluation methods (force majeure)'), "{} {}".format(_('Evaluation methods (force majeure)'), _('in English')),
+    _('Other informations (force majeure)'), "{} {}".format(_('Other informations (force majeure)'), _('in English')),
+    _('Last update description fiche (force majeure) by'),
+    _('Last update description fiche (force majeure) on')
 ]
 
 optional_header_for_specifications = [
@@ -113,7 +123,14 @@ DescriptionFicheCols = namedtuple(
     'DescriptionFicheCols',
     ['resume', 'resume_en', 'teaching_methods', 'teaching_methods_en', 'evaluation_methods', 'evaluation_methods_en',
      'other_informations', 'other_informations_en', 'online_resources', 'online_resources_en', 'teaching_materials',
-     'bibliography', 'mobility']
+     'bibliography', 'mobility', 'last_update_by', 'last_update_date']
+)
+
+ForceMajeureCols = namedtuple(
+    'ForceMajeureCols',
+    ['teaching_methods_force_majeure', 'teaching_methods_force_majeure_en', 'evaluation_methods_force_majeure',
+     'evaluation_methods_force_majeure_en', 'other_informations_force_majeure', 'other_informations_force_majeure_en',
+     'last_update_by_force_majeure', 'last_update_date_force_majeure']
 )
 
 SpecificationsCols = namedtuple(
@@ -175,7 +192,7 @@ class EducationGroupYearLearningUnitsContainedToExcel:
 
 
 def generate_ue_contained_for_workbook(custom_xls_form: CustomXlsForm, hierarchy: 'ProgramTree'):
-    data = _build_excel_lines_ues(custom_xls_form,  hierarchy)
+    data = _build_excel_lines_ues(custom_xls_form, hierarchy)
     need_proposal_legend = custom_xls_form.is_valid() and custom_xls_form.cleaned_data['proposition']
     return _get_workbook_for_custom_xls(data.get('content'),
                                         need_proposal_legend,
@@ -319,6 +336,8 @@ def _add_optional_titles(custom_xls_form: CustomXlsForm):
     if custom_xls_form.is_valid():
         for field in custom_xls_form.fields:
             if custom_xls_form.cleaned_data[field]:
+                if field == 'force_majeure' and not custom_xls_form.cleaned_data['description_fiche']:
+                    data = data + globals().get("optional_header_for_description_fiche")
                 data = data + globals().get("optional_header_for_{}".format(field), [])
     return data
 
@@ -382,11 +401,42 @@ def _get_optional_data(data: List, luy: DddLearningUnitYear, optional_data_neede
         specifications_data = _build_specifications_cols(luy)
         for k, v in zip(specifications_data._fields, specifications_data):
             data.append(v)
-    if optional_data_needed['has_description_fiche']:
+    if optional_data_needed['has_description_fiche'] or optional_data_needed['has_force_majeure']:
         description_fiche = _build_description_fiche_cols(luy.description_fiche, luy.teaching_materials)
         for k, v in zip(description_fiche._fields, description_fiche):
             data.append(v)
+        if optional_data_needed['has_force_majeure']:
+            force_majeure = _build_force_majeure_cols(luy)
+            for k, v in zip(force_majeure._fields, force_majeure):
+                data.append(v)
     return data
+
+
+def _build_force_majeure_cols(luy: 'DddLearningUnitYear'):
+    force_majeure = luy.force_majeure
+    return ForceMajeureCols(
+        teaching_methods_force_majeure=_build_validate_html_list_to_string(
+            force_majeure.teaching_methods
+        ),
+        teaching_methods_force_majeure_en=_build_validate_html_list_to_string(
+            force_majeure.teaching_methods_en
+        ),
+        evaluation_methods_force_majeure=_build_validate_html_list_to_string(
+            force_majeure.evaluation_methods
+        ),
+        evaluation_methods_force_majeure_en=_build_validate_html_list_to_string(
+            force_majeure.evaluation_methods_en
+        ),
+        other_informations_force_majeure=_build_validate_html_list_to_string(
+            force_majeure.other_informations
+        ),
+        other_informations_force_majeure_en=_build_validate_html_list_to_string(
+            force_majeure.other_informations_en
+        ),
+        last_update_by_force_majeure=_build_validate_html_list_to_string(force_majeure.author),
+        last_update_date_force_majeure=force_majeure.last_update.strftime('%d/%m/%Y')
+        if force_majeure.last_update else None,
+    )
 
 
 def _build_validate_html_list_to_string(value_param):
@@ -446,7 +496,10 @@ def _build_description_fiche_cols(description_fiche: 'DescriptionFiche',
                     for a in teaching_materials)
         ),
         bibliography=_build_validate_html_list_to_string(description_fiche.bibliography),
-        mobility=_build_validate_html_list_to_string(description_fiche.mobility)
+        mobility=_build_validate_html_list_to_string(description_fiche.mobility),
+        last_update_by=_build_validate_html_list_to_string(description_fiche.author),
+        last_update_date=description_fiche.last_update.strftime('%d/%m/%Y')
+        if description_fiche.last_update else None
     )
 
 
@@ -525,7 +578,6 @@ def _get_distinct_teachers(luy):
 
 
 def _get_program_tree_version_from_tree_versions_list(year: int, code: str, tree_versions: List['ProgramTreeVersion']):
-
     program_tree_identity = ProgramTreeIdentity(code=code, year=year)
     return next(
         (tree_version for tree_version in tree_versions

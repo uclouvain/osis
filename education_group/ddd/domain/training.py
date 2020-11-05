@@ -173,7 +173,7 @@ class TrainingBuilder:
                 ares_code=command.ares_code,
                 ares_graca=command.ares_graca,
                 ares_authorization=command.ares_authorization,
-            ) if all((command.ares_code, command.ares_graca, command.ares_authorization)) else None,
+            ),
             co_graduation=CoGraduation(
                 code_inter_cfb=command.code_inter_cfb,
                 coefficient=command.coefficient,

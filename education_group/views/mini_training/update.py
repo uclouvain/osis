@@ -32,6 +32,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.utils import operator
 from base.utils.urls import reverse_with_get
 from base.views.common import display_success_messages, display_warning_messages, display_error_messages
@@ -113,12 +114,16 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 postpone_mini_training_and_program_tree_modifications(
                     update_command
                 )
-        except exception.ContentConstraintTypeMissing as e:
-            self.mini_training_form.add_error("constraint_type", e.message)
-        except (exception.ContentConstraintMinimumMaximumMissing,
-                exception.ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum) as e:
-            self.mini_training_form.add_error("min_constraint", e.message)
-            self.mini_training_form.add_error("max_constraint", "")
+        except MultipleBusinessExceptions as multiple_exceptions:
+            for e in multiple_exceptions.exceptions:
+                if isinstance(e, exception.ContentConstraintTypeMissing):
+                    self.mini_training_form.add_error("constraint_type", e.message)
+                elif isinstance(e, exception.ContentConstraintMinimumMaximumMissing) or\
+                        isinstance(e, exception.ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum):
+                    self.mini_training_form.add_error("min_constraint", e.message)
+                    self.mini_training_form.add_error("max_constraint", "")
+                else:
+                    self.mini_training_form.add_error('', e.message)
         except exception.MiniTrainingCopyConsistencyException as e:
             display_warning_messages(self.request, e.message)
             return [

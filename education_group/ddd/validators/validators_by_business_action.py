@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from base.ddd.utils import business_validator
+from base.ddd.utils.business_validator import MultipleExceptionBusinessListValidator
 
 from education_group.ddd.business_types import *
 from education_group.ddd.validators._abbreviated_title_already_exist import AcronymAlreadyExistValidator
@@ -41,7 +42,7 @@ from education_group.ddd.validators.start_and_end_year_validator import StartAnd
 from education_group.ddd.validators._hops_validator import HopsValuesValidator
 
 
-class CreateGroupValidatorList(business_validator.BusinessListValidator):
+class CreateGroupValidatorList(MultipleExceptionBusinessListValidator):
 
     def __init__(self, group: 'Group'):
         self.validators = [
@@ -52,7 +53,7 @@ class CreateGroupValidatorList(business_validator.BusinessListValidator):
         super().__init__()
 
 
-class UpdateGroupValidatorList(business_validator.BusinessListValidator):
+class UpdateGroupValidatorList(MultipleExceptionBusinessListValidator):
 
     def __init__(self, group: 'Group'):
         self.validators = [
@@ -62,7 +63,7 @@ class UpdateGroupValidatorList(business_validator.BusinessListValidator):
         super().__init__()
 
 
-class CreateMiniTrainingValidatorList(business_validator.BusinessListValidator):
+class CreateMiniTrainingValidatorList(MultipleExceptionBusinessListValidator):
     def __init__(self, mini_training_domain_obj: 'MiniTraining'):
         self.validators = [
             UniqueCodeValidator(mini_training_domain_obj.code),
@@ -73,7 +74,14 @@ class CreateMiniTrainingValidatorList(business_validator.BusinessListValidator):
         super().__init__()
 
 
-class CreateTrainingValidatorList(business_validator.BusinessListValidator):
+class UpdateMiniTrainingValidatorList(MultipleExceptionBusinessListValidator):
+
+    def __init__(self, mini_training: 'MiniTraining'):
+        self.validators = []
+        super().__init__()
+
+
+class CreateTrainingValidatorList(MultipleExceptionBusinessListValidator):
 
     def __init__(self, training: 'Training'):
         self.validators = [
@@ -86,7 +94,7 @@ class CreateTrainingValidatorList(business_validator.BusinessListValidator):
         super().__init__()
 
 
-class UpdateTrainingValidatorList(business_validator.BusinessListValidator):
+class UpdateTrainingValidatorList(MultipleExceptionBusinessListValidator):
 
     def __init__(self, training: 'Training'):
         self.validators = [HopsValuesValidator(training)]

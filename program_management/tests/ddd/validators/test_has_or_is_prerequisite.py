@@ -63,7 +63,7 @@ class TestIsPrerequisiteValidator(TestValidatorValidateMixin, SimpleTestCase):
     def test_should_raise_exception_when_children_of_node_to_detach_are_prerequisites(self):
         node_to_detach = self.common_core
         path_parent_of_node_to_detach = "|".join([str(self.tree.root_node.node_id)])
-        link = LinkFactory(parent=self.common_core, child=NodeLearningUnitYearFactory(is_prerequisite_of=[]))
+        link = LinkFactory(parent=self.tree.root_node, child=NodeLearningUnitYearFactory(is_prerequisite_of=[]))
         link_with_child_that_is_prerequisite = LinkFactory(
             parent=self.common_core,
             child=NodeLearningUnitYearFactory(is_prerequisite_of=[link.child])
@@ -93,6 +93,17 @@ class TestIsPrerequisiteValidator(TestValidatorValidateMixin, SimpleTestCase):
         path_parent_of_node_to_detach = "|".join([str(self.tree.root_node.node_id)])
         validator = IsPrerequisiteValidator(self.tree, path_parent_of_node_to_detach, node_to_detach)
         self.assertValidatorNotRaises(validator)
+
+    def test_should_not_raise_exception_when_prerequisite_is_detached_also(self):
+        node_to_detach = self.common_core
+        path_parent_of_node_to_detach = "|".join([str(self.tree.root_node.node_id)])
+        link = LinkFactory(parent=self.common_core, child=NodeLearningUnitYearFactory(is_prerequisite_of=[]))
+        link_with_child_that_is_prerequisite = LinkFactory(
+            parent=self.common_core,
+            child=NodeLearningUnitYearFactory(is_prerequisite_of=[link.child])
+        )
+
+        self.assertValidatorNotRaises(IsPrerequisiteValidator(self.tree, path_parent_of_node_to_detach, node_to_detach))
 
 
 class TestHasPrerequisiteValidator(TestValidatorValidateMixin, SimpleTestCase):

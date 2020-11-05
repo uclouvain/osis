@@ -124,6 +124,10 @@ class PasteNodesView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, SuccessMess
 
     @property
     def path_to_detach_from(self) -> str:
+        codes = self.request.GET.getlist("codes", [])
+        if codes:
+            return ""
+
         cached_element_selected = element_selected_service.retrieve_element_selected(self.request.user.id)
         if cached_element_selected:
             return cached_element_selected['path_to_detach']
@@ -139,7 +143,16 @@ class PasteNodesView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, SuccessMess
 
     def get_form_kwargs(self) -> List[dict]:
         return [
-            {'parent_obj': self.parent_node, 'child_obj': node_to_paste, 'path_to_detach': self.path_to_detach_from}
+            {
+                'parent_obj': self.parent_node,
+                'child_obj': node_to_paste,
+                'path_to_detach': self.path_to_detach_from,
+                'initial': {
+                    "is_mandatory": True,
+                    "relative_credits": int(node_to_paste.credits)
+                    if node_to_paste.credits is not None else node_to_paste.credits
+                }
+            }
             for node_to_paste in self.nodes_to_paste
         ]
 
