@@ -24,21 +24,17 @@
 #
 ##############################################################################
 from collections import defaultdict
-
 from typing import Dict, List, Any
 
 from django.urls import reverse
 
 from program_management.ddd.business_types import *
-from program_management.ddd.domain.node import NodeGroupYear, NodeIdentity
-from program_management.ddd.service.read import search_program_trees_using_node_service
-
 from program_management.ddd.command import GetProgramTreesFromNodeCommand
-from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
-from program_management.serializers.node_view import get_program_tree_version_name, get_program_tree_version_title, \
-    get_program_tree_version_dict
+from program_management.ddd.domain.node import NodeGroupYear, NodeIdentity
 from program_management.ddd.domain.program_tree import get_nearest_parents
-from program_management.ddd.domain.service.identity_search import ProgramTreeIdentitySearch
+from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
+from program_management.ddd.service.read import search_program_trees_using_node_service
+from program_management.serializers.node_view import get_program_tree_version_name, get_program_tree_version_dict
 
 
 def get_utilizations(node_identity: 'NodeIdentity', language: str) -> List[Dict[str, Any]]:
