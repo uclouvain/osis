@@ -27,6 +27,7 @@ import functools
 
 from django.shortcuts import redirect
 from django.urls import reverse
+from django.utils.functional import cached_property
 
 from base.business.education_groups import general_information_sections
 from education_group.ddd.repository.training import TrainingRepository
@@ -91,6 +92,6 @@ class TrainingReadSkillsAchievements(TrainingRead):
     def get_translated_labels(self):
         return achievement.get_skills_labels(self.group, self.request.LANGUAGE_CODE)
 
-    @functools.lru_cache()
+    @cached_property
     def training(self):
         return TrainingRepository.get(self.training_identity)
