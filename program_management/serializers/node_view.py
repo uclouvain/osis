@@ -187,6 +187,7 @@ def get_program_tree_version_name(node_identity: 'NodeIdentity', tree_versions: 
         )
     return ''
 
+
 #  TODO suppress these methods as not needed anymore because node contains the version name
 def get_program_tree_version_complete_name(node_identity: 'NodeIdentity',
                                            tree_versions: List['ProgramTreeVersion'],
