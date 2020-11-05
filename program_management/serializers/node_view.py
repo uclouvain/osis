@@ -90,7 +90,11 @@ def _get_leaf_view_attribute_serializer(link: 'Link', path: str, tree: 'ProgramT
     attrs.update({
         'path': path,
         'icon': None,
-        'href': reverse('learning_unit_utilization', args=[context['root'].pk, link.child.pk]),
+        'href': reverse_with_get(
+            'learning_unit_utilization',
+            args=[context['root'].pk, link.child.pk],
+            get={"path": path}
+        ),
         'paste_url': None,
         'search_url': None,
         'has_prerequisite': link.child.has_prerequisite,
