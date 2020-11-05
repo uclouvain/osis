@@ -35,7 +35,6 @@ from attribution.ddd.domain.attribution import Attribution
 from attribution.tests.ddd.factories.teacher import TeacherFactory
 from base.business.learning_unit_xls import CREATION_COLOR, MODIFICATION_COLOR, TRANSFORMATION_COLOR, \
     TRANSFORMATION_AND_MODIFICATION_COLOR, SUPPRESSION_COLOR
-from base.models.enums import education_group_types
 from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import GroupType, TrainingType
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
@@ -61,10 +60,6 @@ from program_management.business.excel_ue_in_of import FIX_TITLES, \
     optional_header_for_language, optional_header_for_periodicity, optional_header_for_quadrimester, \
     optional_header_for_session_derogation, optional_header_for_specifications, optional_header_for_teacher_list, \
     _fix_data, _get_workbook_for_custom_xls, _build_legend_sheet, LEGEND_WB_CONTENT, LEGEND_WB_STYLE, _optional_data, \
-    _build_excel_lines_ues, _get_optional_data, BOLD_FONT, _build_specifications_cols, _build_description_fiche_cols, \
-    _build_validate_html_list_to_string, _build_gathering_content, _build_main_gathering_content, \
-    _build_force_majeure_cols
-from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
     _build_excel_lines_ues, _get_optional_data, BOLD_FONT, _build_validate_html_list_to_string, \
     _build_direct_gathering_label, _build_main_gathering_label, \
     get_explore_parents, _get_xls_title
