@@ -117,7 +117,7 @@ class AjaxTemplateMixin:
 
 
 class DeleteViewWithDependencies(FlagMixin, RulesRequiredMixin, AjaxTemplateMixin, DeleteView):
-    success_message = "The objects are been deleted successfully"
+    success_message = _("The objects are been deleted successfully")
     protected_template = None
     protected_messages = None
 

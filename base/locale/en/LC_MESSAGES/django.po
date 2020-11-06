@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-21 15:19+0200\n"
+"POT-Creation-Date: 2020-11-06 10:43+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1332,6 +1332,18 @@ msgid "Language classes"
 msgstr ""
 
 msgid "Last modifications"
+msgstr ""
+
+msgid "Last update description fiche (force majeure) by"
+msgstr ""
+
+msgid "Last update description fiche (force majeure) on"
+msgstr ""
+
+msgid "Last update description fiche by"
+msgstr ""
+
+msgid "Last update description fiche on"
 msgstr ""
 
 msgid "Last year of organization"
@@ -2707,6 +2719,9 @@ msgstr ""
 msgid ""
 "The number of children of type \"%(child_type)s\" for \"%(parent)s\" has "
 "already reached the limit."
+msgstr ""
+
+msgid "The objects are been deleted successfully"
 msgstr ""
 
 #, python-format
