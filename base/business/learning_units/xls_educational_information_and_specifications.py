@@ -87,17 +87,17 @@ def _get_titles():
         str(_('Title')),
         str(_('Req. Entity')),
     ]
-    titles = titles + _add_cms_title_fr_en(CMS_LABEL_PEDAGOGY_FR_AND_EN, True)
-    titles = titles + [str(_('Teaching material'))]
-    titles = titles + _add_cms_title_fr_en(CMS_LABEL_PEDAGOGY_FR_ONLY, False)
-    titles = titles + [str("{}".format(_('Last update description fiche by'))),
-                       str("{}".format(_('Last update description fiche on')))]
-    titles = titles + _add_cms_title_fr_en(CMS_LABEL_PEDAGOGY_FORCE_MAJEURE, True)
-    titles = titles + [str("{}".format(_('Last update description fiche (force majeure) by'))),
-                       str("{}".format(_('Last update description fiche (force majeure) on')))]
-    titles = titles + _add_cms_title_fr_en(CMS_LABEL_SPECIFICATIONS, True)
-    titles = titles + [str("{} - {}".format(_('Learning achievements'), LANGUAGE_CODE_FR.upper())),
-                       str("{} - {}".format('Learning achievements', LANGUAGE_CODE_EN.upper()))]
+    titles += _add_cms_title_fr_en(CMS_LABEL_PEDAGOGY_FR_AND_EN, True)
+    titles += [str(_('Teaching material'))]
+    titles += _add_cms_title_fr_en(CMS_LABEL_PEDAGOGY_FR_ONLY, False)
+    titles += [str("{}".format(_('Last update description fiche by'))),
+               str("{}".format(_('Last update description fiche on')))]
+    titles += _add_cms_title_fr_en(CMS_LABEL_PEDAGOGY_FORCE_MAJEURE, True)
+    titles += [str("{}".format(_('Last update description fiche (force majeure) by'))),
+               str("{}".format(_('Last update description fiche (force majeure) on')))]
+    titles += _add_cms_title_fr_en(CMS_LABEL_SPECIFICATIONS, True)
+    titles += [str("{} - {}".format(_('Learning achievements'), LANGUAGE_CODE_FR.upper())),
+               str("{} - {}".format('Learning achievements', LANGUAGE_CODE_EN.upper()))]
     return titles
 
 
@@ -143,7 +143,6 @@ def prepare_xls_educational_information_and_specifications(learning_unit_years, 
 
         for label_key in CMS_LABEL_PEDAGOGY_FR_ONLY:
             translated_label = translated_labels_with_text.filter(text_label__label=label_key).first()
-
             if translated_label:
                 line.append(
                     get_html_to_text(translated_label.text_label.text_fr[0].text)
@@ -164,7 +163,6 @@ def prepare_xls_educational_information_and_specifications(learning_unit_years, 
             _add_pedagogies_translated_labels_with_text(label_key, line, translated_labels_force_majeure_with_text)
 
         _add_revision_informations(learning_unit_yr, line, is_force_majeure=True)
-
         _add_specifications(learning_unit_yr, line, request)
 
         line.extend(_add_achievements(learning_unit_yr))
