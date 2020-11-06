@@ -264,10 +264,10 @@ def _build_worksheet_parameters(workbook, a_user, operation, research_criteria):
     return worksheet_parameters
 
 
-def send_message_after_all_encoded_by_manager(persons, enrollments, learning_unit_acronym, offer_acronym):
+def send_message_after_all_encoded_by_manager(receivers, enrollments, learning_unit_acronym, offer_acronym):
     """
     Send a message to all tutor from a learning unit when all scores are submitted by program manager
-    :param persons: The list of the tutor (person) of the learning unit
+    :param receivers: The list of the tutor (person) of the learning unit
     :param enrollments: The enrollments that are encoded and submitted
     :param learning_unit_acronym The learning unit encoded
     :param offer_acronym: The offer which is managed
@@ -276,7 +276,7 @@ def send_message_after_all_encoded_by_manager(persons, enrollments, learning_uni
 
     html_template_ref = '{}_html'.format(ASSESSMENTS_ALL_SCORES_BY_PGM_MANAGER)
     txt_template_ref = '{}_txt'.format(ASSESSMENTS_ALL_SCORES_BY_PGM_MANAGER)
-    receivers = [message_config.create_receiver(person.id, person.email, person.language) for person in persons]
+    receivers = [message_config.create_receiver(person.id, person.email, person.language) for person in receivers]
     subject_data = {
         'learning_unit_acronym': learning_unit_acronym,
         'offer_acronym': offer_acronym
