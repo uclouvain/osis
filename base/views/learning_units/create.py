@@ -95,11 +95,13 @@ def create_partim_form(request, learning_unit_year_id):
 def _manage_future_specific_title_error(learning_unit_year_full, postponement_form, request):
     for i in range(1, len(postponement_form.errors)):
         if postponement_form.errors[i] and "specific_title" in postponement_form.errors[i][0]:
-            msg = _("The learning unit %(code)s doesn't have any Title - Common part in %(ac)s, "
-                    "it is then neccessary to specify a Title - Specific complement on the partim.") % {
-                      "code": learning_unit_year_full.acronym,
-                      "ac": display_as_academic_year(postponement_form.start_postponement.year + i)
-                  }
+            msg = _(
+                "The learning unit %(code)s doesn't have any Title - Common part in %(ac)s, "
+                "it is then neccessary to specify a Title - Specific complement on the partim."
+            ) % {
+                "code": learning_unit_year_full.acronym,
+                "ac": display_as_academic_year(postponement_form.start_postponement.year + i)
+            }
             display_error_messages(request, msg)
 
 
