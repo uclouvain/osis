@@ -6,7 +6,7 @@
 {% block navbar %}
     <ul class="nav nav-tabs" role="tablist">
         <li role="presentation">
-            <a id="link-quick-search-educationgroup" class="trigger_modal" data-url="{% url "quick_search_education_group" year %}?{{ request.GET.urlencode }}">
+            <a id="link-quick-search-educationgroup" class="trigger_modal" data-url="{{ quick_search_education_group_url }}">
                 {% trans 'Trainings' %}
             </a>
         </li>
