@@ -472,10 +472,13 @@ def __send_message_for_offer_year(
     sent_error_message = None
     if progress == 100:
         receivers = list(set([tutor.person for tutor in mdl.tutor.find_by_learning_unit(learning_unit_year)]))
-        receivers += [pgm_manager]
-        sent_error_message = send_mail.send_message_after_all_encoded_by_manager(receivers, enrollments,
-                                                                                 learning_unit_year.acronym,
-                                                                                 offer_acronym)
+        sent_error_message = send_mail.send_message_after_all_encoded_by_manager(
+            receivers,
+            enrollments,
+            learning_unit_year.acronym,
+            offer_acronym,
+            cc=[pgm_manager]
+        )
     return sent_error_message
 
 
