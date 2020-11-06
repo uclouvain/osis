@@ -58,7 +58,6 @@ CMS_ALLOWED_TAGS = []
 
 
 def create_xls_educational_information_and_specifications(user, learning_units, request):
-
     titles = _get_titles()
 
     working_sheet_data = prepare_xls_educational_information_and_specifications(learning_units, request)
@@ -88,17 +87,17 @@ def _get_titles():
         str(_('Title')),
         str(_('Req. Entity')),
     ]
-    titles = titles + _add_cms_title_fr_en(CMS_LABEL_PEDAGOGY_FR_AND_EN, True)
-    titles = titles + [str(_('Teaching material'))]
-    titles = titles + _add_cms_title_fr_en(CMS_LABEL_PEDAGOGY_FR_ONLY, False)
-    titles = titles + [str("{}".format(_('Last update description fiche by'))),
-                       str("{}".format(_('Last update description fiche on')))]
-    titles = titles + _add_cms_title_fr_en(CMS_LABEL_PEDAGOGY_FORCE_MAJEURE, True)
-    titles = titles + [str("{}".format(_('Last update description fiche (force majeure) by'))),
-                       str("{}".format(_('Last update description fiche (force majeure) on')))]
-    titles = titles + _add_cms_title_fr_en(CMS_LABEL_SPECIFICATIONS, True)
-    titles = titles + [str("{} - {}".format(_('Learning achievements'), LANGUAGE_CODE_FR.upper())),
-                       str("{} - {}".format('Learning achievements', LANGUAGE_CODE_EN.upper()))]
+    titles += _add_cms_title_fr_en(CMS_LABEL_PEDAGOGY_FR_AND_EN, True)
+    titles += [str(_('Teaching material'))]
+    titles += _add_cms_title_fr_en(CMS_LABEL_PEDAGOGY_FR_ONLY, False)
+    titles += [str("{}".format(_('Last update description fiche by'))),
+               str("{}".format(_('Last update description fiche on')))]
+    titles += _add_cms_title_fr_en(CMS_LABEL_PEDAGOGY_FORCE_MAJEURE, True)
+    titles += [str("{}".format(_('Last update description fiche (force majeure) by'))),
+               str("{}".format(_('Last update description fiche (force majeure) on')))]
+    titles += _add_cms_title_fr_en(CMS_LABEL_SPECIFICATIONS, True)
+    titles += [str("{} - {}".format(_('Learning achievements'), LANGUAGE_CODE_FR.upper())),
+               str("{} - {}".format('Learning achievements', LANGUAGE_CODE_EN.upper()))]
     return titles
 
 
