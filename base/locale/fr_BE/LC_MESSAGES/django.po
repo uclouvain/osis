@@ -1388,18 +1388,6 @@ msgstr "Cours de langue"
 msgid "Last modifications"
 msgstr "Dernières modifications"
 
-msgid "Last update description fiche (force majeure) by"
-msgstr "Dernière modification fiche descriptive (cas de force majeure) par"
-
-msgid "Last update description fiche (force majeure) on"
-msgstr "Dernière modification fiche descriptive (cas de force majeure) le"
-
-msgid "Last update description fiche by"
-msgstr "Dernière modification fiche descriptive par"
-
-msgid "Last update description fiche on"
-msgstr "Dernière modification fiche descriptive le"
-
 msgid "Last year of organization"
 msgstr "Dernière année d'organisation"
 
@@ -2591,8 +2579,8 @@ msgid ""
 "Summary course submission (Force majeure) is not allowed for tutors during "
 "this period."
 msgstr ""
-"La modification des fiches descriptives (Cas de force majeure) n'est pas "
-"autorisée pour les enseignants durant cette période."
+"La modification des fiches descriptives (Cas de force majeure) n'est pas autorisée pour les "
+"enseignants durant cette période."
 
 msgid "Summary course submission force majeure"
 msgstr "Adaptation des fiches descriptives (Cas de force majeure)"
@@ -2844,9 +2832,6 @@ msgid ""
 msgstr ""
 "Le nombre d'enfants de type \"%(child_type)s\" pour \"%(parent)s\" a atteint "
 "la limite maximum."
-
-msgid "The objects are been deleted successfully"
-msgstr "Les compétences acquises ont bien été supprimées."
 
 #, python-format
 msgid ""

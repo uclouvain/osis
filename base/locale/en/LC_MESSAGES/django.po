@@ -1334,18 +1334,6 @@ msgstr ""
 msgid "Last modifications"
 msgstr ""
 
-msgid "Last update description fiche (force majeure) by"
-msgstr ""
-
-msgid "Last update description fiche (force majeure) on"
-msgstr ""
-
-msgid "Last update description fiche by"
-msgstr ""
-
-msgid "Last update description fiche on"
-msgstr ""
-
 msgid "Last year of organization"
 msgstr ""
 
@@ -2719,9 +2707,6 @@ msgstr ""
 msgid ""
 "The number of children of type \"%(child_type)s\" for \"%(parent)s\" has "
 "already reached the limit."
-msgstr ""
-
-msgid "The objects are been deleted successfully"
 msgstr ""
 
 #, python-format
