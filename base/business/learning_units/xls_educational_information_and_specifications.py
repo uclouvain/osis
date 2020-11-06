@@ -98,17 +98,6 @@ def _get_titles():
     titles += _add_cms_title_fr_en(CMS_LABEL_SPECIFICATIONS, True)
     titles += [str("{} - {}".format(_('Learning achievements'), LANGUAGE_CODE_FR.upper())),
                str("{} - {}".format('Learning achievements', LANGUAGE_CODE_EN.upper()))]
-    titles = titles + _add_cms_title_fr_en(CMS_LABEL_PEDAGOGY_FR_AND_EN, True)
-    titles = titles + [str(_('Teaching material'))]
-    titles = titles + _add_cms_title_fr_en(CMS_LABEL_PEDAGOGY_FR_ONLY, False)
-    titles = titles + [str("{}".format(_('Last update description fiche by'))),
-                       str("{}".format(_('Last update description fiche on')))]
-    titles = titles + _add_cms_title_fr_en(CMS_LABEL_PEDAGOGY_FORCE_MAJEURE, True)
-    titles = titles + [str("{}".format(_('Last update description fiche (force majeure) by'))),
-                       str("{}".format(_('Last update description fiche (force majeure) on')))]
-    titles = titles + _add_cms_title_fr_en(CMS_LABEL_SPECIFICATIONS, True)
-    titles = titles + [str("{} - {}".format(_('Learning achievements'), LANGUAGE_CODE_FR.upper())),
-                       str("{} - {}".format('Learning achievements', LANGUAGE_CODE_EN.upper()))]
     return titles
 
 
