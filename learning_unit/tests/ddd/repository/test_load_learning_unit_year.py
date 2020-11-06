@@ -44,7 +44,7 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from cms.tests.factories.text_label import LearningUnitYearTextLabelFactory
 from cms.tests.factories.translated_text import LearningUnitYearTranslatedTextFactory
-from learning_unit.ddd.repository.load_learning_unit_year import load_multiple, load_multiple_by_identity
+from learning_unit.ddd.repository.load_learning_unit_year import load_multiple_by_identity
 from learning_unit.tests.ddd.factories.learning_unit_year_identity import LearningUnitYearIdentityFactory
 from reference.tests.factories.language import EnglishLanguageFactory, FrenchLanguageFactory
 
@@ -57,6 +57,10 @@ class TestLoadLearningUnitVolumes(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.l_unit_1 = LearningUnitYearFactory()
+        cls.l_identity = LearningUnitYearIdentityFactory(
+            code=cls.l_unit_1.acronym,
+            year=cls.l_unit_1.academic_year.year
+        )
         cls.practical_volume = PracticalLearningComponentYearFactory(learning_unit_year=cls.l_unit_1,
                                                                      hourly_volume_total_annual=20,
                                                                      hourly_volume_partial_q1=15,
@@ -71,7 +75,7 @@ class TestLoadLearningUnitVolumes(TestCase):
                                                                      )
 
     def test_load_learning_unit_year_init_volumes(self):
-        results = load_multiple([self.l_unit_1.id])
+        results = load_multiple_by_identity([self.l_identity])
         self._assert_volume(results[0].practical_volume, self.practical_volume)
         self._assert_volume(results[0].lecturing_volume, self.lecturing_volume)
 
@@ -98,9 +102,13 @@ class TestLoadLearningUnitEntities(TestCase):
             learning_container_year__requirement_entity=cls.requirement_entity_version.entity,
             learning_container_year__allocation_entity=cls.allocation_entity_version.entity,
         )
+        cls.l_identity = LearningUnitYearIdentityFactory(
+            code=cls.l_unit_1.acronym,
+            year=cls.l_unit_1.academic_year.year
+        )
 
     def test_load_learning_unit_year_init_entities(self):
-        results = load_multiple([self.l_unit_1.id])
+        results = load_multiple_by_identity([self.l_identity])
         self.assertEqual(results[0].entities.requirement_entity_acronym, self.requirement_entity_version.acronym)
         self.assertEqual(results[0].entities.allocation_entity_acronym, self.allocation_entity_version.acronym)
 
@@ -110,6 +118,10 @@ class TestLoadLearningUnitDescriptionFiche(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.l_unit_1 = LearningUnitYearFactory()
+        cls.l_identity = LearningUnitYearIdentityFactory(
+            code=cls.l_unit_1.acronym,
+            year=cls.l_unit_1.academic_year.year
+        )
         dict_labels = {}
         for cms_label in CMS_LABEL_PEDAGOGY + CMS_LABEL_SPECIFICATIONS + CMS_LABEL_PEDAGOGY_FORCE_MAJEURE:
             dict_labels.update(
@@ -127,7 +139,7 @@ class TestLoadLearningUnitDescriptionFiche(TestCase):
 
     @override_settings(LANGUAGES=[('fr-be', 'French'), ('en', 'English'), ], LANGUAGE_CODE='fr-be')
     def test_load_description_fiche(self):
-        results = load_multiple([self.l_unit_1.id])
+        results = load_multiple_by_identity([self.l_identity])
         description_fiche = results[0].description_fiche
 
         self.assertEqual(description_fiche.resume, self.fr_cms_label.get('resume').text)
@@ -149,7 +161,7 @@ class TestLoadLearningUnitDescriptionFiche(TestCase):
 
     @override_settings(LANGUAGES=[('fr-be', 'French'), ('en', 'English'), ], LANGUAGE_CODE='fr-be')
     def test_load_specifications(self):
-        results = load_multiple([self.l_unit_1.id])
+        results = load_multiple_by_identity([self.l_identity])
         description_fiche = results[0].specifications
 
         self.assertEqual(description_fiche.themes_discussed, self.fr_cms_label.get('themes_discussed').text)
@@ -160,7 +172,7 @@ class TestLoadLearningUnitDescriptionFiche(TestCase):
 
     @override_settings(LANGUAGES=[('fr-be', 'French'), ('en', 'English'), ], LANGUAGE_CODE='fr-be')
     def test_load_force_majeure(self):
-        results = load_multiple([self.l_unit_1.id])
+        results = load_multiple_by_identity([self.l_identity])
         force_majeure = results[0].force_majeure
 
         self.assertEqual(force_majeure.teaching_methods, self.fr_cms_label.get('teaching_methods_force_majeure').text)
@@ -205,10 +217,14 @@ class TestLoadLearningUnitProposal(TestCase):
         cls.academic_year = create_current_academic_year()
 
         cls.l_unit_1 = LearningUnitYearFactory()
+        cls.l_identity = LearningUnitYearIdentityFactory(
+            code=cls.l_unit_1.acronym,
+            year=cls.l_unit_1.academic_year.year
+        )
         cls.proposal = ProposalLearningUnitFactory(learning_unit_year=cls.l_unit_1)
 
     def test_load_learning_unit_year_init_proposal(self):
-        results = load_multiple([self.l_unit_1.id])
+        results = load_multiple_by_identity([self.l_identity])
         self.assertEqual(results[0].proposal.type, self.proposal.type)
         self.assertEqual(results[0].proposal.state, self.proposal.state)
 
@@ -288,6 +304,10 @@ class TestLoadLearningUnitYearWithAchievements(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.l_unit_1 = LearningUnitYearFactory()
+        cls.l_identity = LearningUnitYearIdentityFactory(
+            code=cls.l_unit_1.acronym,
+            year=cls.l_unit_1.academic_year.year
+        )
         cls.en_language = EnglishLanguageFactory()
         cls.fr_language = FrenchLanguageFactory()
         # /!\ An achievement have the same code_name in EN and in FR
@@ -301,12 +321,12 @@ class TestLoadLearningUnitYearWithAchievements(TestCase):
                                                           learning_unit_year=cls.l_unit_1) for idx in range(5)]
 
     def test_load_achievements(self):
-        results = load_multiple([self.l_unit_1.id])
+        results = load_multiple_by_identity([self.l_identity])
         ue = results[0]
         self.assertEqual(len(ue.achievements), 5)
 
     def test_load_achievements_check_order(self):
-        results = load_multiple([self.l_unit_1.id])
+        results = load_multiple_by_identity([self.l_identity])
         ue = results[0]
         for idx in range(5):
             self.assertEqual(ue.achievements[idx].text_fr, "French text {}".format(idx))
