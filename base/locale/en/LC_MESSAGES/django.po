@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-30 17:47+0100\n"
+"POT-Creation-Date: 2020-11-05 16:57+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2436,6 +2436,12 @@ msgstr ""
 
 #, python-format
 msgid "The learning unit %(acronym)s is not included in any education group"
+msgstr ""
+
+#, python-format
+msgid ""
+"The learning unit %(code)s doesn't have any Title - Common part in %(ac)s, "
+"it is then neccessary to specify a Title - Specific complement on the partim."
 msgstr ""
 
 #, python-format
