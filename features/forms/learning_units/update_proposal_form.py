@@ -29,4 +29,3 @@ def accept_proposal(page: pages.EditLearningUnitProposalPage):
     proposal_state_value = proposal_state.ProposalState.ACCEPTED.value
     page.etat = proposal_state_value
     return {"proposal_state": proposal_state_value}
-

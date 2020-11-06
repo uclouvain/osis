@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-04 20:01+0100\n"
+"POT-Creation-Date: 2020-11-05 17:11+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1225,18 +1225,6 @@ msgstr "Dernières modifications"
 
 msgid "Last name"
 msgstr "Nom"
-
-msgid "Last update description fiche (force majeure) by"
-msgstr "Dernière modification fiche descriptive (force majeure) par"
-
-msgid "Last update description fiche (force majeure) on"
-msgstr "Dernière modification fiche descriptive (force majeure) le"
-
-msgid "Last update description fiche by"
-msgstr "Dernière modification fiche descriptive par"
-
-msgid "Last update description fiche on"
-msgstr "Dernière modification fiche descriptive le"
 
 msgid "Last year of organization"
 msgstr "Dernière année d'organisation"
