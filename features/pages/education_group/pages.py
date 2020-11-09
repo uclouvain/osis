@@ -6,8 +6,8 @@ from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 
-from features.fields.fields import InputField, ButtonField, Link, SelectField, Field, SelectEntityVersionField, LinkBis, \
-    Checkbox
+from features.fields.fields import InputField, ButtonField, Link, SelectField, Field, \
+    SelectEntityVersionField, LinkBis, Checkbox
 from features.pages.common import AjaxModal, CommonPageMixin
 
 

@@ -150,7 +150,7 @@ class PasteNodesView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, SuccessMess
                 'initial': {
                     "is_mandatory": True,
                     "relative_credits": int(node_to_paste.credits)
-                    if node_to_paste.credits is not None else node_to_paste.credits
+                    if node_to_paste.is_learning_unit() and node_to_paste.credits is not None else None
                 }
             }
             for node_to_paste in self.nodes_to_paste

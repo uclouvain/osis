@@ -773,31 +773,6 @@ class TestDetachNode(SimpleTestCase):
             tree.detach_node(path_to_detach, mock.Mock())
 
     @patch.object(DetachNodeValidatorList, 'validate')
-    def test_should_remove_prerequisites_and_delete_link_when_validator_do_not_raise_exception(
-            self,
-            mock_validate,
-    ):
-        mock_validate.return_value = True
-
-        node_that_has_prerequisite = NodeLearningUnitYearFactory()
-        node_that_is_prerequisite = NodeLearningUnitYearFactory(is_prerequisite_of=[node_that_has_prerequisite])
-        node_that_has_prerequisite.set_prerequisite(cast_to_prerequisite(node_that_is_prerequisite))
-        initial_items = node_that_has_prerequisite.prerequisite.get_all_prerequisite_items()
-        self.assertListEqual(
-            initial_items,
-            [PrerequisiteItem(node_that_is_prerequisite.code, node_that_is_prerequisite.year)]
-        )
-
-        tree = ProgramTreeFactory()
-        LinkFactory(parent=tree.root_node, child=node_that_is_prerequisite)
-        link = LinkFactory(parent=tree.root_node, child=node_that_has_prerequisite)
-        path_to_detach = build_path(link.parent, link.child)
-        deleted_link = tree.detach_node(path_to_detach, mock.Mock())
-
-        self.assertNotIn(deleted_link, tree.root_node.children)
-        self.assertListEqual(node_that_has_prerequisite.prerequisite.get_all_prerequisite_items(), [])
-
-    @patch.object(DetachNodeValidatorList, 'validate')
     def test_should_propagate_exception_when_validator_raises_exception(self, mock_validate):
         mock_validate.side_effect = osis_common.ddd.interface.BusinessExceptions(["error occured", "an other error"])
 

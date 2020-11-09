@@ -70,9 +70,10 @@ CHILD_LEAF = """\
             <img src="{icon_list_1}" height="14" width="17">
             <img src="{icon_list_2}" height="10" width="10">
             <img src="{icon_list_5}" height="10" width="10">
-            {value} <br>
+            {value}
             <img src="{icon_list_3}" height="10" width="10">
             <img src="{icon_list_4}" height="10" width="10">
+            <br>
             {comment}
             {sublist}
         </div>
