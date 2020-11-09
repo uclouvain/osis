@@ -28,6 +28,7 @@ from django.test import TestCase
 from django.urls import reverse
 from waffle.testutils import override_flag
 
+from base.models.enums.organization_type import MAIN
 from base.tests.factories.academic_year import AcademicYearFactory, get_current_year
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.entity import EntityWithVersionFactory
@@ -44,7 +45,8 @@ YEAR_LIMIT_LUE_MODIFICATION = 2018
 class TestCreateExternalLearningUnitView(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.manager = CentralManagerFactory(entity=EntityWithVersionFactory(), with_child=True)
+        cls.entity = EntityWithVersionFactory(organization__type=MAIN)
+        cls.manager = CentralManagerFactory(entity=cls.entity, with_child=True)
         cls.person = cls.manager.person
 
         starting_year = AcademicYearFactory(year=YEAR_LIMIT_LUE_MODIFICATION)
@@ -52,7 +54,7 @@ class TestCreateExternalLearningUnitView(TestCase):
         cls.academic_years = GenerateAcademicYear(starting_year, end_year).academic_years
         cls.academic_year = cls.academic_years[1]
         cls.language = FrenchLanguageFactory()
-        cls.data = get_valid_external_learning_unit_form_data(cls.academic_year, entity=cls.manager.entity)
+        cls.data = get_valid_external_learning_unit_form_data(cls.academic_year, entity=cls.entity)
         cls.url = reverse(get_external_learning_unit_creation_form, args=[cls.academic_year.pk])
 
     def setUp(self):
