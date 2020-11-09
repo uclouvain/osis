@@ -300,16 +300,22 @@ function initializeJsTree($documentTree, tree_json_url, cut_element_url, copy_el
             "contextmenu": {
                 "select_node": false,
                 "items": function ($node) {
+                    let has_or_is_prerequisite = $node.a_attr.is_prerequisite === true || $node.a_attr.has_prerequisite === true;
+                    let detach_msg = has_or_is_prerequisite ? gettext('Forbidden because of prerequisites') : null;
+                    let cut_msg = has_or_is_prerequisite ?  gettext('Forbidden because of prerequisites') : null;
+
                     return {
                         "cut": {
                             "label": gettext("Cut"),
                             "_disabled": function (data) {
-                                return !get_data_from_tree(data).group_element_year_id;
+                                let __ret = get_data_from_tree(data);
+                                return !__ret.group_element_year_id || has_or_is_prerequisite;
                             },
                             "action": function (data) {
                                 const node_data = get_data_from_tree(data);
                                 handleCutAction(cut_element_url, node_data.element_code, node_data.element_year, node_data.path)
-                            }
+                            },
+                            "title": cut_msg
                         },
 
                         "copy": {
@@ -363,10 +369,10 @@ function initializeJsTree($documentTree, tree_json_url, cut_element_url, copy_el
 
                                 });
                             },
-                            "title": $node.a_attr.detach_msg,
+                            "title": detach_msg,
                             "_disabled": function (data) {
                                 let __ret = get_data_from_tree(data);
-                                return __ret.detach_url == null;
+                                return __ret.detach_url == null || has_or_is_prerequisite;
                             }
                         },
 
