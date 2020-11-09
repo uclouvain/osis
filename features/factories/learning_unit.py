@@ -69,7 +69,9 @@ class LearningUnitGenerator:
         return self._create_learning_units(n=n)
 
     def create_learning_units_in_creation_proposal(self, proposal_academic_year):
-        proposal_academic_year_obj = next(acy for acy in self.academic_years_range if acy.year == proposal_academic_year)
+        proposal_academic_year_obj = next(
+            acy for acy in self.academic_years_range if acy.year == proposal_academic_year
+        )
         learning_units = LearningUnitFactoryWithAnnualizedData.create_batch(
             5,
             start_year__year=proposal_academic_year,
