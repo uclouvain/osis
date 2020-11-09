@@ -112,7 +112,6 @@ optional_header_for_force_majeure = [
     _('Last update description fiche (force majeure) by'),
     _('Last update description fiche (force majeure) on')
 ]
-
 optional_header_for_specifications = [
     _('Themes discussed'), "{} {}".format(_('Themes discussed'), _('in English')),
     _('Pre-condition'), "{} {}".format(_('Pre-condition'), _('in English')),
@@ -132,7 +131,6 @@ ForceMajeureCols = namedtuple(
      'evaluation_methods_force_majeure_en', 'other_informations_force_majeure', 'other_informations_force_majeure_en',
      'last_update_by_force_majeure', 'last_update_date_force_majeure']
 )
-
 SpecificationsCols = namedtuple(
     'SpecificationsLine', [
         'themes_discussed', 'themes_discussed_en',
@@ -371,7 +369,9 @@ def _get_optional_data(data: List, luy: DddLearningUnitYear, optional_data_neede
     if optional_data_needed['has_volume']:
         data.extend(volumes_information(luy.lecturing_volume, luy.practical_volume))
     if optional_data_needed['has_teacher_list']:
-        teachers = _get_distinct_teachers(luy)
+        teachers = _get_distinct_teachers(
+            luy
+        )
         data.append(
             ";".join(
                 [_get_attribution_line(teacher)
