@@ -61,6 +61,8 @@ class TestDetachNode(TestCase, ValidatorPatcherMixin):
         self.detach_command = DetachNodeCommandFactory(path_where_to_detach=self.path_to_detach, commit=True)
 
         self._patch_persist_tree()
+        self._patch_search_tree_identity()
+        self._patch_get_tree()
         self._patch_load_tree()
         self._patch_load_trees_from_children()
 
@@ -68,6 +70,19 @@ class TestDetachNode(TestCase, ValidatorPatcherMixin):
         patcher_persist = patch("program_management.ddd.repositories.persist_tree.persist")
         self.addCleanup(patcher_persist.stop)
         self.mock_persist = patcher_persist.start()
+
+    def _patch_search_tree_identity(self):
+        patcher_search_identity = patch("program_management.ddd.domain.service.identity_search."
+                                        "ProgramTreeIdentitySearch.get_from_element_id")
+        self.addCleanup(patcher_search_identity.stop)
+        self.mock_search_identity = patcher_search_identity.start()
+        self.mock_search_identity.return_value = self.tree.entity_id
+
+    def _patch_get_tree(self):
+        patcher_load = patch("program_management.ddd.repositories.program_tree.ProgramTreeRepository.get")
+        self.addCleanup(patcher_load.stop)
+        self.mock_get = patcher_load.start()
+        self.mock_get.return_value = self.tree
 
     def _patch_load_tree(self):
         patcher_load = patch("program_management.ddd.repositories.load_tree.load")
