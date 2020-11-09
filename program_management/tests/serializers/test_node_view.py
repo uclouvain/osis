@@ -113,7 +113,7 @@ class TestNodeViewAttributeSerializer(SimpleTestCase):
         expected_url = reverse_with_get(
             'element_identification',
             args=[self.link.child.year, self.link.child.code],
-            get={"path": self.context.current_path, 'redirect_path': self.context.view_path}
+            get={"path": self.context.current_path}
         )
         self.assertEqual(self.serialized_data['href'], expected_url)
 
@@ -217,7 +217,7 @@ class TestLeafViewAttributeSerializer(SimpleTestCase):
         expected_url = reverse_with_get(
             'learning_unit_utilization',
             args=[self.root_node.pk, self.link.child.pk],
-            get={"path": self.context.current_path, 'redirect_path': self.context.view_path}
+            get={"path": self.context.current_path}
         )
         serialized_data = _get_leaf_view_attribute_serializer(self.link, self.tree, self.context)
         self.assertEqual(serialized_data['href'], expected_url)

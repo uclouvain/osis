@@ -71,7 +71,7 @@ def _get_node_view_attribute_serializer(link: 'Link', tree: 'ProgramTree', conte
         'href': reverse_with_get(
             'element_identification',
             args=[link.child.year, link.child.code],
-            get=querystring_params
+            get={"path": context.current_path}
         ),
         'root': context.root_node.pk,
         'group_element_year': link.pk,
@@ -106,7 +106,7 @@ def _get_leaf_view_attribute_serializer(link: 'Link', tree: 'ProgramTree', conte
         'href': reverse_with_get(
             'learning_unit_utilization',
             args=[context.root_node.pk, link.child.pk],
-            get=querystring_params
+            get={"path": context.current_path}
         ),
         'paste_url': None,
         'search_url': None,
