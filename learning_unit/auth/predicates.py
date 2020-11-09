@@ -228,7 +228,7 @@ def has_faculty_proposal_state(self, user, learning_unit_year):
 
 
 @predicate(bind=True)
-@predicate_failed_msg(message=_("This learning unit is not of type creation"))
+@predicate_failed_msg(message=_("This learning unit is of type creation"))
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def is_not_proposal_of_type_creation(self, user, learning_unit_year):
     if learning_unit_year and hasattr(learning_unit_year, 'proposallearningunit'):
@@ -237,7 +237,7 @@ def is_not_proposal_of_type_creation(self, user, learning_unit_year):
 
 
 @predicate(bind=True)
-@predicate_failed_msg(message=_("This learning unit is not of type suppression"))
+@predicate_failed_msg(message=_("This learning unit is of type suppression"))
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def is_not_proposal_of_type_suppression(self, user, learning_unit_year):
     if learning_unit_year and hasattr(learning_unit_year, 'proposallearningunit'):
