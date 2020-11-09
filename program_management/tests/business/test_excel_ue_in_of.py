@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import datetime
 import html
 import random
 from unittest import mock
@@ -36,7 +37,6 @@ from attribution.tests.factories.attribution_new import AttributionNewFactory
 from base.business.learning_unit_xls import CREATION_COLOR, MODIFICATION_COLOR, TRANSFORMATION_COLOR, \
     TRANSFORMATION_AND_MODIFICATION_COLOR, SUPPRESSION_COLOR
 from base.models.enums import education_group_types
-from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import GroupType, TrainingType
 from base.tests.factories.business.learning_units import GenerateContainer
 from base.tests.factories.education_group_year import EducationGroupYearFactory, GroupFactory, TrainingFactory, \
@@ -60,7 +60,8 @@ from program_management.business.excel_ue_in_of import EducationGroupYearLearnin
     optional_header_for_session_derogation, optional_header_for_specifications, optional_header_for_teacher_list, \
     _fix_data, _get_workbook_for_custom_xls, _build_legend_sheet, LEGEND_WB_CONTENT, LEGEND_WB_STYLE, _optional_data, \
     _build_excel_lines_ues, _get_optional_data, BOLD_FONT, _build_specifications_cols, _build_description_fiche_cols, \
-    _build_validate_html_list_to_string, _build_gathering_content, _build_main_gathering_content
+    _build_validate_html_list_to_string, _build_gathering_content, _build_main_gathering_content, \
+    _build_force_majeure_cols
 from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
 from program_management.business.utils import html2text
 from program_management.forms.custom_xls import CustomXlsForm
@@ -75,10 +76,13 @@ CMS_TXT_WITH_LIST = '<ol> ' \
                     '<li>Les diff&eacute;rentes structures mol&eacute;culaires</li> ' \
                     '</ol>'
 CMS_TXT_WITH_LIST_AFTER_FORMATTING = 'La structure atomique de la matière\n' \
-                                    'Les différentes structures moléculaires'
+                                     'Les différentes structures moléculaires'
 
 CMS_TXT_WITH_LINK = '<a href="https://moodleucl.uclouvain.be">moodle</a>'
 CMS_TXT_WITH_LINK_AFTER_FORMATTING = 'moodle - [https://moodleucl.uclouvain.be] \n'
+
+LAST_UPDATE_BY = 'User_first_name_and_name'
+LAST_UPDATE_DATE = datetime.datetime.now()
 
 
 class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
@@ -267,6 +271,7 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
                               'has_credits': False,
                               'has_allocation_entity': False,
                               'has_english_title': False,
+                              'has_force_majeure': False,
                               'has_teacher_list': False,
                               'has_periodicity': False,
                               'has_active': False,
@@ -294,6 +299,7 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
                               'language': 'on',
                               'description_fiche': 'on',
                               'specifications': 'on',
+                              'force_majeure': 'on'
                               })
         self.assertDictEqual(_optional_data(form),
                              {'has_required_entity': True,
@@ -301,6 +307,7 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
                               'has_credits': True,
                               'has_allocation_entity': True,
                               'has_english_title': True,
+                              'has_force_majeure': True,
                               'has_teacher_list': True,
                               'has_periodicity': True,
                               'has_active': True,
@@ -424,6 +431,17 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
         self.assertTrue(mock.called)
 
     @mock.patch("program_management.business.excel_ue_in_of._annotate_with_description_fiche_specifications")
+    def test_get_optional_has_force_majeure_annotate_called(self, mock):
+        optional_data = initialize_optional_data()
+        optional_data['has_force_majeure'] = True
+
+        custom_form = CustomXlsForm({'force_majeure': 'on'})
+        EducationGroupYearLearningUnitsContainedToExcel(self.education_group_yr_root,
+                                                        self.education_group_yr_root,
+                                                        custom_form)
+        self.assertTrue(mock.called)
+
+    @mock.patch("program_management.business.excel_ue_in_of._annotate_with_description_fiche_specifications")
     def test_get_optional_has_specifications_annotate_called(self, mock):
         optional_data = initialize_optional_data()
         optional_data['has_specifications'] = True
@@ -445,8 +463,10 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
 
         _initialize_cms_data_description_fiche(self.gey)
 
-        description_fiche = _build_description_fiche_cols(self.luy, self.gey)
+        self._assert_equal_description_fiche_fields(teaching_material_1, teaching_material_2)
 
+    def _assert_equal_description_fiche_fields(self, teaching_material_1, teaching_material_2):
+        description_fiche = _build_description_fiche_cols(self.luy, self.gey)
         self.assertEqual(description_fiche.resume, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING))
         self.assertEqual(description_fiche.resume_en, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING))
         self.assertEqual(description_fiche.teaching_methods, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING))
@@ -457,15 +477,48 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
         self.assertEqual(description_fiche.other_informations_en, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING))
         self.assertEqual(description_fiche.mobility, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING))
         self.assertEqual(description_fiche.bibliography, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING))
-
         self.assertEqual(description_fiche.online_resources, "{}".format(CMS_TXT_WITH_LINK_AFTER_FORMATTING))
         self.assertEqual(description_fiche.online_resources_en, "{}".format(CMS_TXT_WITH_LINK_AFTER_FORMATTING))
-
         self.assertEqual(description_fiche.teaching_materials,
                          "{} - {}\n{} - {}".format(_('Mandatory'),
                                                    teaching_material_1.title,
                                                    _('Non-mandatory'),
                                                    teaching_material_2.title))
+        self.assertEqual(description_fiche.last_update_date, LAST_UPDATE_DATE.strftime('%d/%m/%Y'))
+        self.assertEqual(description_fiche.last_update_by, LAST_UPDATE_BY)
+
+    def test_build_force_majeure_cols(self):
+        teaching_material_1 = TeachingMaterialFactory(
+            learning_unit_year=self.luy, title='Title mandatory', mandatory=True
+        )
+        teaching_material_2 = TeachingMaterialFactory(
+            learning_unit_year=self.luy, title='Title non-mandatory', mandatory=False
+        )
+
+        _initialize_cms_data_description_fiche(self.gey, force_majeure=True)
+        force_majeure = _build_force_majeure_cols(self.gey)
+        self._assert_equal_description_fiche_fields(teaching_material_1, teaching_material_2)
+
+        self.assertEqual(
+            force_majeure.teaching_methods_force_majeure, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING)
+        )
+        self.assertEqual(
+            force_majeure.teaching_methods_force_majeure_en, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING)
+        )
+        self.assertEqual(
+            force_majeure.evaluation_methods_force_majeure, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING)
+        )
+        self.assertEqual(
+            force_majeure.evaluation_methods_force_majeure_en, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING)
+        )
+        self.assertEqual(
+            force_majeure.other_informations_force_majeure, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING)
+        )
+        self.assertEqual(
+            force_majeure.other_informations_force_majeure_en, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING)
+        )
+        self.assertEqual(force_majeure.last_update_date_force_majeure, LAST_UPDATE_DATE.strftime('%d/%m/%Y'))
+        self.assertEqual(force_majeure.last_update_by_force_majeure, LAST_UPDATE_BY)
 
     def test_build_specifications_cols(self):
 
@@ -655,6 +708,7 @@ def initialize_optional_data():
         'has_periodicity': False,
         'has_active': False,
         'has_quadrimester': False,
+        'has_force_majeure': False,
         'has_session_derogation': False,
         'has_volume': False,
         'has_teacher_list': False,
@@ -666,7 +720,7 @@ def initialize_optional_data():
     }
 
 
-def _initialize_cms_data_description_fiche(gey):
+def _initialize_cms_data_description_fiche(gey, force_majeure: bool = False):
     gey_cms = gey
     gey_cms.resume = CMS_TXT_WITH_LIST
     gey_cms.resume_en = CMS_TXT_WITH_LIST
@@ -681,6 +735,20 @@ def _initialize_cms_data_description_fiche(gey):
 
     gey_cms.online_resources = CMS_TXT_WITH_LINK
     gey_cms.online_resources_en = CMS_TXT_WITH_LINK
+
+    gey_cms.last_update_date = LAST_UPDATE_DATE
+    gey_cms.last_update_by = LAST_UPDATE_BY
+
+    if force_majeure:
+        gey_cms.teaching_methods_force_majeure = CMS_TXT_WITH_LIST
+        gey_cms.teaching_methods_force_majeure_en = CMS_TXT_WITH_LIST
+        gey_cms.evaluation_methods_force_majeure = CMS_TXT_WITH_LIST
+        gey_cms.evaluation_methods_force_majeure_en = CMS_TXT_WITH_LIST
+        gey_cms.other_informations_force_majeure = CMS_TXT_WITH_LIST
+        gey_cms.other_informations_force_majeure_en = CMS_TXT_WITH_LIST
+
+        gey_cms.last_update_date_force_majeure = LAST_UPDATE_DATE
+        gey_cms.last_update_by_force_majeure = LAST_UPDATE_BY
 
     return gey_cms
 
