@@ -50,7 +50,9 @@ class ProposalLearningUnitForm(forms.ModelForm):
 
     def __init__(self, data, person, *args, initial=None, **kwargs):
         super().__init__(data, *args, initial=initial, **kwargs)
-        self.fields['entity'] = PedagogicalEntitiesRoleModelChoiceField(person=person, initial=data and data.get('entity'))
+        self.fields['entity'] = PedagogicalEntitiesRoleModelChoiceField(
+            person=person, initial=data and data.get('entity')
+        )
         self.fields['entity'].queryset = find_attached_faculty_entities_version(person, acronym_exceptions=['ILV'])
 
         if initial:
