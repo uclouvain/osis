@@ -397,7 +397,7 @@ def export_xls(request, learning_unit_year_id):
                                                                learning_unit_year_id=learning_unit_year_id)
     scores_list = score_encoding_list.filter_without_closed_exam_enrollments(scores_list, is_program_manager)
     if scores_list.enrollments:
-        return score_encoding_export.export_xls(scores_list.enrollments)
+        return score_encoding_export.export_xls(scores_list.enrollments, is_program_manager)
     else:
         messages.add_message(request, messages.WARNING, _("No students to encode by excel"))
         return HttpResponseRedirect(reverse('online_encoding', args=(learning_unit_year_id,)))

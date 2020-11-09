@@ -44,6 +44,11 @@ from base.tests.factories.exam_enrollment import ExamEnrollmentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
 from base.tests.factories.session_examen import SessionExamFactory
+from assessments.models.enums import score_sheet_address_choices
+from assessments.tests.factories.score_sheet_address import ScoreSheetAddressFactory
+from base.tests.factories.offer_year import OfferYearFactory
+from base.tests.factories.structure import StructureFactory
+from assessments.tests.business.test_score_encoding_sheet import create_data_for_entity_address
 
 WHITE_RGB = '00000000'
 ROW_NUMBER = 1
@@ -116,7 +121,7 @@ class XlsTests(TestCase):
                                                 date_enrollment=self.academic_calendar.start_date)
         ue = exam_enrollment.learning_unit_enrollment.learning_unit_year
 
-        _add_header_and_legend_to_file([exam_enrollment], self.worksheet)
+        _add_header_and_legend_to_file([exam_enrollment], self.worksheet, True)
         self.assertEqual(
             self.worksheet.cell(row=1, column=1).value,
             str(ue) + " " + ue.complete_title if ue.complete_title else str(ue)
@@ -185,4 +190,34 @@ class XlsTests(TestCase):
             str(_('Decimals authorized for this learning unit'))
             if ue.decimal_scores else
             str(_('Unauthorized decimal for this learning unit'))
+        )
+
+    def test_add_header_for_tutor(self):
+        offer_year_current_year = OfferYearFactory(academic_year=self.academic_year)
+        create_data_for_entity_address(
+            self.academic_year, offer_year_current_year, score_sheet_address_choices.ENTITY_MANAGEMENT
+        )
+        create_data_for_entity_address(
+            self.academic_year, offer_year_current_year, score_sheet_address_choices.ENTITY_ADMINISTRATION
+        )
+        exam_enrollment = ExamEnrollmentFactory(
+            session_exam=self.session_exam,
+            enrollment_state=enrollment_states.ENROLLED,
+            date_enrollment=self.academic_calendar.start_date,
+            learning_unit_enrollment__offer_enrollment__offer_year=offer_year_current_year)
+
+        score_sheet_adress = ScoreSheetAddressFactory(
+            offer_year=exam_enrollment.learning_unit_enrollment.offer,
+            entity_address_choice=score_sheet_address_choices.ENTITY_MANAGEMENT,
+            email='dd@fa.com'
+        )
+        _add_header_and_legend_to_file([exam_enrollment], self.worksheet, False)
+
+        self.assertEqual(
+            self.worksheet.cell(row=1, column=7).value,
+            str('Contacts')
+        )
+        self.assertEqual(
+            self.worksheet.cell(row=1, column=8).value,
+            score_sheet_adress.email
         )

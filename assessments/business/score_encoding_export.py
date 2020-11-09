@@ -29,15 +29,17 @@ from django.utils.translation import gettext_lazy as _
 from openpyxl import Workbook
 from openpyxl.styles import Color, PatternFill, Font, colors
 from openpyxl.writer.excel import save_virtual_workbook
+from typing import List
 
 from assessments.business.enrollment_state import get_line_color, ENROLLED_LATE_COLOR, NOT_ENROLLED_COLOR
 from base import models as mdl
 from base.models.enums import exam_enrollment_justification_type
 from openpyxl.styles.borders import Border, Side, BORDER_MEDIUM
-from openpyxl.styles import Style
 from base.models.enums import peps_type
+from base.models.exam_enrollment import ExamEnrollment
 from base.models.student_specific_profile import StudentSpecificProfile
 from osis_common.decorators.download import set_download_cookie
+from assessments.business.score_encoding_sheet import get_score_sheet_address
 
 HEADER = [_('Academic year'), _('Session'), _('Learning unit'), _('Program'), _('Registration number'), _('Lastname'),
           _('Firstname'), _('Email'), _('Numbered scores'), _('Justification (A,T)'), _('End date Prof'),
@@ -66,10 +68,10 @@ BORDER_LEFT = Border(
 
 
 @set_download_cookie
-def export_xls(exam_enrollments):
+def export_xls(exam_enrollments: List[ExamEnrollment], is_program_manager: bool):
     workbook = Workbook()
     worksheet = workbook.active
-    _add_header_and_legend_to_file(exam_enrollments, worksheet)
+    _add_header_and_legend_to_file(exam_enrollments, worksheet, is_program_manager)
 
     row_number = 12
     for exam_enroll in exam_enrollments:
@@ -132,9 +134,18 @@ def export_xls(exam_enrollments):
     return response
 
 
-def _add_header_and_legend_to_file(exam_enrollments, worksheet):
+def _add_header_and_legend_to_file(exam_enrollments, worksheet, is_program_manager: bool):
     ue = exam_enrollments[0].learning_unit_enrollment.learning_unit_year
-    worksheet.append([str(ue) + " " + ue.complete_title if ue.complete_title else str(ue)])
+    ue_complete_title = str(ue) + " " + ue.complete_title if ue.complete_title else str(ue)
+
+    if not is_program_manager:
+        first_line = [
+            ue_complete_title, '', '', '', '', '', str('Contacts'), _build_offers_entities_emails_list(exam_enrollments)
+        ]
+    else:
+        first_line = [ue_complete_title]
+
+    worksheet.append(first_line)
     worksheet.append([str('Session: %s' % exam_enrollments[0].session_exam.number_session)])
     worksheet.append([str('')])
     __display_creation_date_with_message_about_state(worksheet, row_number=4)
@@ -327,3 +338,12 @@ def _update_border_for_first_peps_column(cell):
         c = cell.style
         c.border = BORDER_LEFT
         cell.style = c
+
+
+def _build_offers_entities_emails_list(exam_enrollments: List[ExamEnrollment]) -> str:
+    emails = []
+    for exam_enroll in exam_enrollments:
+        address = get_score_sheet_address(exam_enroll.learning_unit_enrollment.offer).get('address')
+        if address.get('email') and address.get('email') not in emails:
+            emails.append(address.get('email'))
+    return ';'.join(emails)
