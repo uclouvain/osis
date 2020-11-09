@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import collections
 import itertools
 from typing import Dict, List
 
@@ -54,8 +55,6 @@ class ConflictedFields(interface.DomainService):
                     conflicted_fields[year] = current_group.get_conflicted_fields(next_year_group)
             except GroupNotFoundException:
                 break
-            if conflicted_fields:
-                break
             current_group = next_year_group
         return conflicted_fields
 
@@ -63,9 +62,8 @@ class ConflictedFields(interface.DomainService):
     def get_training_conflicted_fields(cls, training_id: 'TrainingIdentity') -> Dict[Year, List[FieldLabel]]:
         current_training = TrainingRepository.get(training_id)
         group_id = GroupIdentity(code=current_training.code, year=current_training.year)
-        conflicted_fields = {
-            **cls.get_group_conflicted_fields(group_id)
-        }
+        conflicted_fields = collections.defaultdict(list)
+        conflicted_fields.update(cls.get_group_conflicted_fields(group_id))
 
         for year in itertools.count(current_training.year + 1):
             try:
@@ -75,10 +73,8 @@ class ConflictedFields(interface.DomainService):
                 )
                 next_year_training = TrainingRepository.get(next_year_training_identity)
                 if not current_training.has_same_values_as(next_year_training):
-                    conflicted_fields[year] = current_training.get_conflicted_fields(next_year_training)
+                    conflicted_fields[year].extend(current_training.get_conflicted_fields(next_year_training))
             except TrainingNotFoundException:
-                break
-            if conflicted_fields:
                 break
             current_training = next_year_training
         return conflicted_fields
@@ -88,9 +84,8 @@ class ConflictedFields(interface.DomainService):
             -> Dict[Year, List[FieldLabel]]:
         current_mini_training = MiniTrainingRepository.get(mini_training_id)
         group_id = GroupIdentity(code=current_mini_training.code, year=current_mini_training.year)
-        conflicted_fields = {
-            **cls.get_group_conflicted_fields(group_id)
-        }
+        conflicted_fields = collections.defaultdict(list)
+        conflicted_fields.update(cls.get_group_conflicted_fields(group_id))
 
         for year in itertools.count(current_mini_training.year + 1):
             try:
@@ -100,10 +95,8 @@ class ConflictedFields(interface.DomainService):
                 )
                 next_year_mini_training = MiniTrainingRepository.get(next_year_mini_training_identity)
                 if not current_mini_training.has_same_values_as(next_year_mini_training):
-                    conflicted_fields[year] = current_mini_training.get_conflicted_fields(next_year_mini_training)
+                    conflicted_fields[year].extend(current_mini_training.get_conflicted_fields(next_year_mini_training))
             except MiniTrainingNotFoundException:
-                break
-            if conflicted_fields:
                 break
             current_mini_training = next_year_mini_training
         return conflicted_fields
@@ -123,8 +116,6 @@ class ConflictedFields(interface.DomainService):
                 if current_training.has_conflicted_certificate_aims(next_year_training):
                     conflicted_aims.append(year)
             except TrainingNotFoundException:
-                break
-            if conflicted_aims:
                 break
             current_training = next_year_training
         return conflicted_aims
