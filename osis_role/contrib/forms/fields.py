@@ -54,6 +54,10 @@ class EntityRoleChoiceFieldMixin:
 
 
 class EntityRoleModelChoiceField(EntityRoleChoiceFieldMixin, forms.ModelChoiceField):
+    """
+        ModelChoiceField which allow to display entities which have a link with person according to all
+        EntityRoleModel declared in OSIS Role Manager
+    """
     def __init__(self, person=None, group_names=None, **kwargs):
         self._group_names = group_names
         self._person = person

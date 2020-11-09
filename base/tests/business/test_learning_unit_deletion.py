@@ -26,7 +26,6 @@
 import datetime
 from unittest import mock
 
-from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase
 from django.utils.translation import gettext_lazy as _
@@ -412,8 +411,3 @@ class LearningUnitYearDeletion(TestCase):
         manager = CentralManagerFactory(entity=luy_next_year.requirement_entity)
         TutorApplicationFactory(learning_container_year=self.luy1.learning_container_year)
         self.assertFalse(manager.person.user.has_perm('base.can_delete_learningunit', luy_next_year))
-
-
-def add_to_group(user, group_name):
-    group, created = Group.objects.get_or_create(name=group_name)
-    group.user_set.add(user)

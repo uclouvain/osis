@@ -32,7 +32,7 @@ from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.attribution_new import AttributionNew
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from attribution.tests.views.charge_repartition.common import TestChargeRepartitionMixin
-from education_group.tests.factories.auth.central_manager import CentralManagerFactory
+from learning_unit.tests.factories.central_manager import CentralManagerFactory
 
 
 class TestSelectAttributionView(TestChargeRepartitionMixin, TestCase):

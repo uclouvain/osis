@@ -53,7 +53,7 @@ class EntitiesVersionChoiceField(forms.ModelChoiceField):
         return ev_data.entity if ev_data else None
 
 
-class EntitiesVersionRoleModelChoiceField(EntityRoleModelChoiceField):
+class PedagogicalEntitiesRoleModelChoiceField(EntityRoleModelChoiceField):
     entity_version = None
 
     def __init__(self, person=None, initial=None, *args, **kwargs):
