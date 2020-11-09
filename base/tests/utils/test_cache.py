@@ -80,8 +80,21 @@ class TestRequestCache(TestCase):
             expected_result
         )
 
+
+class TestCacheFilterMixin(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = UserFactory()
+        cls.path = 'dummy_url'
+        cls.request_data = {"country": ["Belgium"], "city": ["Louvain-la-neuve"]}
+
+    def setUp(self):
+        request_factory = RequestFactory()
+        self.request = request_factory.get("www.dummy.com", data=self.request_data)
+        self.addCleanup(cache.clear)
+
     @mock.patch('base.utils.cache.RequestCache.restore_get_request')
-    def test_cache_filter_mixin(self, mock_restore_get_request):
+    def test_assert_restore_get_request_called(self, mock_restore_get_request):
         class DummyClass(CacheFilterMixin, TemplateView):
             template_name = 'test.html'
 
@@ -89,3 +102,14 @@ class TestRequestCache(TestCase):
         obj = DummyClass(request=self.request)
         obj.get(self.request)
         self.assertTrue(mock_restore_get_request.called)
+
+    @mock.patch('base.utils.cache.RequestCache.save_get_parameters')
+    def test_assert_save_get_request_not_called_because_excluding_keys(self, mock_save_get_parameters):
+        class DummyClass(CacheFilterMixin, TemplateView):
+            template_name = 'test.html'
+            cache_exclude_params = ['country', 'city']
+
+        self.request.user = self.user
+        obj = DummyClass(request=self.request)
+        obj.get(self.request)
+        self.assertFalse(mock_save_get_parameters.called)
