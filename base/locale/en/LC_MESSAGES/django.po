@@ -1190,6 +1190,18 @@ msgstr ""
 msgid "Last name"
 msgstr ""
 
+msgid "Last update description fiche (force majeure) by"
+msgstr ""
+
+msgid "Last update description fiche (force majeure) on"
+msgstr ""
+
+msgid "Last update description fiche by"
+msgstr ""
+
+msgid "Last update description fiche on"
+msgstr ""
+
 msgid "Last year of organization"
 msgstr ""
 
