@@ -56,6 +56,16 @@ class TestQuickSearchLearningUnitYearView(TestCase):
         self.assertTemplateUsed(response, 'quick_search_luy_inner.html')
         self.assertFalse(list(response.context['page_obj']))
 
+    def test_assert_context_keys(self):
+        response = self.client.get(self.url, data={'path': self.path})
+
+        expected_url = reverse_with_get(
+            "quick_search_education_group",
+            args=[self.root_element.group_year.academic_year.year],
+            get={'path': self.path}
+        )
+        self.assertEqual(response.context['quick_search_education_group_url'], expected_url)
+
     def test_learning_unit_search_filter(self):
         response = self.client.get(self.url, data={'title': 'dead', 'path': self.path})
         self.assertTemplateUsed(response, 'quick_search_luy_inner.html')
@@ -91,6 +101,16 @@ class TestQuickSearchGroupYearView(TestCase):
         response = self.client.get(self.url, data={'path': self.path})
         self.assertTemplateUsed(response, 'quick_search_egy_inner.html')
         self.assertFalse(list(response.context['page_obj']))
+
+    def test_assert_context_keys(self):
+        response = self.client.get(self.url, data={'path': self.path})
+
+        expected_url = reverse_with_get(
+            "quick_search_learning_unit",
+            args=[self.root_element.group_year.academic_year.year],
+            get={'path': self.path}
+        )
+        self.assertEqual(response.context['quick_search_learning_unit_url'], expected_url)
 
     def test_education_group_search_filter(self):
         response = self.client.get(self.url, data={'title': 'Rav', 'path': self.path})
