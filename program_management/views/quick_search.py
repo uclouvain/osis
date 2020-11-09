@@ -34,6 +34,7 @@ from base.models.academic_year import AcademicYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import CacheFilterMixin
 from base.utils.search import SearchMixin
+from base.utils.urls import reverse_with_get
 from base.views.mixins import AjaxTemplateMixin
 from education_group.views.serializers.group_year import GroupYearSerializer
 from education_group.models.group_year import GroupYear
@@ -112,7 +113,7 @@ class QuickSearchGroupYearView(PermissionRequiredMixin, CacheFilterMixin, AjaxTe
     timeout = CACHE_TIMEOUT
 
     filterset_class = QuickGroupYearFilter
-    cache_exclude_params = ['page']
+    cache_exclude_params = ['page', 'path']
     paginate_by = "12"
     ordering = ('academic_year', 'acronym', 'partial_acronym')
 
@@ -132,6 +133,7 @@ class QuickSearchGroupYearView(PermissionRequiredMixin, CacheFilterMixin, AjaxTe
         context['display_quick_search_luy_link'] = self.is_learning_unit_child_allowed()
         context['node_path'] = self.request.GET["path"]
         context['year'] = self.kwargs["year"]
+        context['quick_search_learning_unit_url'] = self.get_quick_search_learning_unit_url()
         return context
 
     def render_to_response(self, context, **response_kwargs):
@@ -146,6 +148,14 @@ class QuickSearchGroupYearView(PermissionRequiredMixin, CacheFilterMixin, AjaxTe
         element_id = int(self.request.GET["path"].split("|")[-1])
         return GroupYear.objects.get(element__id=element_id).education_group_type.learning_unit_child_allowed
 
+    def get_quick_search_learning_unit_url(self):
+        queryparams = {'path': self.request.GET['path']} if 'path' in self.request.GET else {}
+        return reverse_with_get(
+            "quick_search_learning_unit",
+            args=[self.kwargs['year']],
+            get=queryparams
+        )
+
 
 class QuickSearchLearningUnitYearView(PermissionRequiredMixin, CacheFilterMixin, AjaxTemplateMixin, SearchMixin,
                                       FilterView):
@@ -155,7 +165,7 @@ class QuickSearchLearningUnitYearView(PermissionRequiredMixin, CacheFilterMixin,
     timeout = CACHE_TIMEOUT
 
     filterset_class = QuickLearningUnitYearFilter
-    cache_exclude_params = ['page']
+    cache_exclude_params = ['page', 'path']
     paginate_by = "12"
     ordering = ('academic_year', 'acronym')
 
@@ -174,6 +184,7 @@ class QuickSearchLearningUnitYearView(PermissionRequiredMixin, CacheFilterMixin,
         context['form'] = context["filter"].form
         context['node_path'] = self.request.GET["path"]
         context['year'] = self.kwargs["year"]
+        context['quick_search_education_group_url'] = self.get_quick_search_education_group_url()
         return context
 
     def render_to_response(self, context, **response_kwargs):
@@ -183,3 +194,11 @@ class QuickSearchLearningUnitYearView(PermissionRequiredMixin, CacheFilterMixin,
 
     def get_paginate_by(self, queryset):
         return self.paginate_by
+
+    def get_quick_search_education_group_url(self):
+        queryparams = {'path': self.request.GET['path']} if 'path' in self.request.GET else {}
+        return reverse_with_get(
+            "quick_search_education_group",
+            args=[self.kwargs['year']],
+            get=queryparams
+        )
