@@ -36,4 +36,3 @@ class StartAndEndYearValidator(business_validator.BusinessValidator):
     def validate(self, *args, **kwargs):
         if self.end_year and self.start_year > self.end_year:
             raise exception.StartYearGreaterThanEndYearException
-
