@@ -101,7 +101,7 @@ class PermsTestCase(TestCase):
         generate_learning_unit_edition_calendars(academic_years)
 
     def test_can_faculty_manager_modify_end_date_partim(self):
-        for container_type in FACULTY_EDITABLE_CONTAINER_TYPES:
+        for container_type in [type.name for type in FACULTY_EDITABLE_CONTAINER_TYPES]:
             lunit_container_yr = LearningContainerYearFactory(
                 academic_year=self.academic_yr,
                 container_type=container_type,
