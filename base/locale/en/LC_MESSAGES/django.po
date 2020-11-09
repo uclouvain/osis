@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-30 17:47+0100\n"
+"POT-Creation-Date: 2020-11-09 09:36+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -790,9 +790,6 @@ msgstr ""
 msgid "Embassy"
 msgstr ""
 
-msgid "Encode"
-msgstr ""
-
 msgid "End"
 msgstr ""
 
@@ -1146,9 +1143,6 @@ msgstr ""
 msgid "Is this teaching material mandatory?"
 msgstr ""
 
-msgid "Isn't a proposal"
-msgstr ""
-
 msgid "Isolated classes"
 msgstr ""
 
@@ -1238,9 +1232,6 @@ msgid "Learning unit edition by faculty managers"
 msgstr ""
 
 msgid "Learning unit search"
-msgstr ""
-
-msgid "Learning unit type is not deletable"
 msgstr ""
 
 msgid "Learning unit year"
@@ -1783,9 +1774,6 @@ msgstr ""
 msgid "Person entities"
 msgstr ""
 
-msgid "Person not in accordance with proposal state"
-msgstr ""
-
 msgid "Person with reduced mobility"
 msgstr ""
 
@@ -1973,9 +1961,6 @@ msgstr ""
 msgid "Proposal is neither accepted nor refused."
 msgstr ""
 
-msgid "Proposal isn't on current learning unit year"
-msgstr ""
-
 #, python-format
 msgid ""
 "Proposal learning unit <a href='%(link)s'> %(acronym)s (%(academic_year)s) </"
@@ -1983,9 +1968,6 @@ msgid ""
 msgstr ""
 
 msgid "Proposal management"
-msgstr ""
-
-msgid "Proposal not in eligible state for consolidation"
 msgstr ""
 
 msgid "Proposal of creation"
@@ -2589,7 +2571,7 @@ msgstr ""
 msgid "This field is required."
 msgstr ""
 
-msgid "This learning unit has application"
+msgid "This learning unit has application this year"
 msgstr ""
 
 msgid ""
@@ -2831,19 +2813,8 @@ msgstr ""
 msgid "You can not delete this object because some dependencies are protected"
 msgstr ""
 
-msgid ""
-"You can only modify a learning unit when your are linked to its requirement "
-"entity"
-msgstr ""
-
 #, python-format
 msgid "You can't modify learning unit under year : %(year)d"
-msgstr ""
-
-#, python-format
-msgid ""
-"You can't modify learning unit under year : %(year)d. Modifications should "
-"be made in EPC under year %(year)d"
 msgstr ""
 
 #, python-format

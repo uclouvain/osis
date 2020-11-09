@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-30 17:47+0100\n"
+"POT-Creation-Date: 2020-11-09 09:36+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -811,9 +811,6 @@ msgstr "Courriel"
 msgid "Embassy"
 msgstr "Ambassade"
 
-msgid "Encode"
-msgstr "Encoder"
-
 msgid "End"
 msgstr "Fin"
 
@@ -1173,9 +1170,6 @@ msgstr "Code non valide"
 msgid "Is this teaching material mandatory?"
 msgstr "Ce support de cours est-il obligatoire ?"
 
-msgid "Isn't a proposal"
-msgstr "Ce n'est pas une proposition"
-
 msgid "Isolated classes"
 msgstr "Cours isolés"
 
@@ -1271,9 +1265,6 @@ msgstr "Modification UE par gestionnaires facultaires"
 
 msgid "Learning unit search"
 msgstr "Recherche d'unités d'enseignement"
-
-msgid "Learning unit type is not deletable"
-msgstr "L'unité d'enseignement ne peut pas être supprimée"
 
 msgid "Learning unit year"
 msgstr "Unité d'enseignement annualisée"
@@ -1832,9 +1823,6 @@ msgstr "Périodicité"
 msgid "Person entities"
 msgstr "Entités attachées"
 
-msgid "Person not in accordance with proposal state"
-msgstr "Vous ne pouvez pas modifier une proposition dans cet état"
-
 msgid "Person with reduced mobility"
 msgstr "PMR"
 
@@ -2034,9 +2022,6 @@ msgstr "Proposition de modification"
 msgid "Proposal is neither accepted nor refused."
 msgstr "La proposition n'est ni acceptée ni refusée."
 
-msgid "Proposal isn't on current learning unit year"
-msgstr "La proposition n'est pas sur l'année en cours"
-
 #, python-format
 msgid ""
 "Proposal learning unit <a href='%(link)s'> %(acronym)s (%(academic_year)s) </"
@@ -2047,9 +2032,6 @@ msgstr ""
 
 msgid "Proposal management"
 msgstr "Gestion de la proposition"
-
-msgid "Proposal not in eligible state for consolidation"
-msgstr "La proposition n'est pas dans un état éligible à la consolidation"
 
 msgid "Proposal of creation"
 msgstr "Proposition de création"
@@ -2699,8 +2681,8 @@ msgstr "Ce champ ne peut pas être défini"
 msgid "This field is required."
 msgstr "Ce champ est obligatoire."
 
-msgid "This learning unit has application"
-msgstr "L'unité d'enseignement dispose d'au moins une candidature"
+msgid "This learning unit has application this year"
+msgstr "L'unité d'enseignement dispose d'au moins une candidature cette année"
 
 msgid ""
 "This learning unit is not editable by central managers during this period."
@@ -2951,24 +2933,11 @@ msgstr ""
 "Vous ne pouvez pas supprimer cet objet car certaines dépendances sont "
 "protégées"
 
-msgid ""
-"You can only modify a learning unit when your are linked to its requirement "
-"entity"
-msgstr "Vous ne pouvez modifier une unité d'enseignement que si vous êtes lié à l'entité responsable"
-
 #, python-format
 msgid "You can't modify learning unit under year : %(year)d"
 msgstr ""
 "Vous ne pouvez pas modifier une unité d'enseignement dont l'année est "
 "inférieure à %(year)d"
-
-#, python-format
-msgid ""
-"You can't modify learning unit under year : %(year)d. Modifications should "
-"be made in EPC under year %(year)d"
-msgstr ""
-"Vous ne pouvez pas modifier une unité d'enseignement dont l'année est "
-"inférieure à %(year)d. Les modifications doivent être faites dans EPC avant %(year)d"
 
 #, python-format
 msgid "You cannot create/update an education group before %(limit_year)s"
