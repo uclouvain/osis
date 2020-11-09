@@ -16,11 +16,11 @@ from base.ddd.utils.business_validator import MultipleBusinessExceptions
 
 
 class LinkForm(forms.Form):
-    relative_credits = forms.IntegerField(required=False, widget=forms.TextInput)
+    relative_credits = forms.IntegerField(required=False)
     is_mandatory = forms.BooleanField(required=False)
     access_condition = forms.BooleanField(required=False)
     link_type = forms.ChoiceField(choices=choice_field.add_blank(LinkTypes.choices()), required=False)
-    block = forms.CharField(required=False, widget=forms.TextInput, empty_value=None)
+    block = forms.IntegerField(required=False)
     comment_fr = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows': 3}))
     comment_en = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows': 3}))
 

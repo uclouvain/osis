@@ -79,13 +79,13 @@
                 {% with label=_("minimum constraint") %}
                     {% bootstrap_label label|capfirst label_class='d-block'%}
                 {% endwith %}
-                <p>{{ group.content_constraint.min_constraint|default_if_none:""  }}</p>
+                <p>{{ group.content_constraint.minimum|default_if_none:""  }}</p>
             </div>
             <div class="col-md-6">
                 {% with label=_("maximum constraint") %}
                     {% bootstrap_label label|capfirst label_class='d-block'%}
                 {% endwith %}
-                <p>{{ group.content_constraint.max_constraint|default_if_none:"" }}</p>
+                <p>{{ group.content_constraint.maximum|default_if_none:"" }}</p>
             </div>
         </div>
         <br>

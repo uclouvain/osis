@@ -467,7 +467,7 @@ class LearningUnitPedagogyEditTestCase(TestCase):
             'trans_text': 'test',
             'learning_unit_year': self.learning_unit_year
         })
-        self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
         msg = get_messages_from_response(response)
         return msg
 

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-27 13:59+0100\n"
+"POT-Creation-Date: 2020-10-30 17:47+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -836,6 +836,10 @@ msgid "Enrollment enabled"
 msgstr ""
 
 msgid "Enrollments to learning unit"
+msgstr ""
+
+#, python-format
+msgid "Ensure this value is greater than or equal to %s."
 msgstr ""
 
 #, python-format
