@@ -2537,6 +2537,13 @@ msgstr "L'unité d'enseignement %(acronym)s n'est incluse dans aucun groupement"
 
 #, python-format
 msgid ""
+"The learning unit %(code)s doesn't have any Title - Common part in %(ac)s, "
+"it is then neccessary to specify a Title - Specific complement on the partim."
+msgstr "L'unité d'enseignement %(code)s ne possède pas d'intitulé - partie commune en %(ac)s, "
+"il est donc nécessaire de spécifier un intitulé - complément spécifique au partim"
+
+#, python-format
+msgid ""
 "The learning unit %(learning_unit)s has a partim %(partim)s with an end year "
 "greater than %(year)s"
 msgstr ""
