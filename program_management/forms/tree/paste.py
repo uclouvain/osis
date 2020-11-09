@@ -41,6 +41,12 @@ class PasteNodeForm(LinkForm):
         super().__init__(*args, **kwargs)
 
     def generate_paste_command(self) -> command.PasteElementCommand:
+        if "relative_credits" in self.fields:
+            relative_credits = self.cleaned_data.get("relative_credits") or \
+                               self.get_initial_for_field(self.fields['relative_credits'], "relative_credits")
+        else:
+            relative_credits = None
+
         return command.PasteElementCommand(
             node_to_paste_code=self.child_obj.code,
             node_to_paste_year=self.child_obj.year,
@@ -51,8 +57,7 @@ class PasteNodeForm(LinkForm):
             link_type=self.cleaned_data.get("link_type"),
             comment=self.cleaned_data.get("comment_fr", ""),
             comment_english=self.cleaned_data.get("comment_en", ""),
-            relative_credits=self.cleaned_data.get("relative_credits") or
-            self.get_initial_for_field(self.fields['relative_credits'], "relative_credits"),
+            relative_credits=relative_credits,
             path_where_to_detach=self.path_to_detach,
         )
 
