@@ -35,6 +35,7 @@ from base.models.person import Person
 from base.views.common import show_error_message_for_form_invalid, display_error_messages
 from base.views.learning_units.common import show_success_learning_unit_year_creation_message
 from education_group.templatetags.academic_year_display import display_as_academic_year
+from learning_unit.views.utils import learning_unit_year_getter
 from osis_role.contrib.views import permission_required
 
 
