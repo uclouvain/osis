@@ -67,4 +67,3 @@ def clear_all_scores(
 
 def _get_random_score() -> str:
     return str(random.randint(0, 20))
-
