@@ -25,17 +25,13 @@
 ##############################################################################
 from typing import Set
 
-from django.utils.translation import gettext_lazy as _
-
-import osis_common.ddd.interface
 from base.ddd.utils import business_validator
 from program_management.ddd.business_types import *
-from program_management.ddd.domain import program_tree
-from program_management.ddd.domain.exception import CannotDetachLearningWhoIsPrerequisiteException, \
-    CannotDetachChildrenWhoArePrerequisiteException, DeletePrerequisitesException
+from program_management.ddd.domain.exception import CannotDetachLearningUnitsWhoArePrerequisiteException, \
+    CannotDetachLearningUnitsWhoHavePrerequisiteException
 
 
-class IsPrerequisiteForAllTreesValidator(business_validator.BusinessValidator):
+class IsHasPrerequisiteForAllTreesValidator(business_validator.BusinessValidator):
     def __init__(self, parent_node: 'Node', node_to_detach: 'Node', program_tree_repository: 'ProgramTreeRepository'):
         super().__init__()
         self.node_to_detach = node_to_detach
@@ -45,73 +41,53 @@ class IsPrerequisiteForAllTreesValidator(business_validator.BusinessValidator):
     def validate(self, *args, **kwargs):
         trees = self.program_tree_repository.search_from_children([self.parent_node.entity_id])
         for tree in trees:
-            parent_path = tree.get_node_smallest_ordered_path(self.parent_node)
             node_to_detach = tree.get_node_by_code_and_year(self.node_to_detach.code, self.node_to_detach.year)
-            IsPrerequisiteValidator(tree, parent_path, node_to_detach).validate()
+
+            _IsPrerequisiteValidator(tree, node_to_detach).validate()
+            _HasPrerequisiteValidator(tree, node_to_detach).validate()
 
 
-class IsPrerequisiteValidator(business_validator.BusinessValidator):
+class _IsPrerequisiteValidator(business_validator.BusinessValidator):
 
-    def __init__(self, tree: 'ProgramTree', path_to_parent: 'Path', node_to_detach: 'Node'):
-        super(IsPrerequisiteValidator, self).__init__()
+    def __init__(self, tree: 'ProgramTree', node_to_detach: 'Node'):
+        super().__init__()
         self.node_to_detach = node_to_detach
         self.tree = tree
-        self.path_to_node_to_detach = program_tree.PATH_SEPARATOR.join(
-            [path_to_parent, str(self.node_to_detach.node_id)]
-        )
 
     def validate(self):
         nodes_that_are_prerequisites = self._get_nodes_that_are_prerequisite()
         if nodes_that_are_prerequisites:
-            codes_that_are_prerequisite = [node.code for node in nodes_that_are_prerequisites]
-            if self.node_to_detach.is_learning_unit():
-                raise CannotDetachLearningWhoIsPrerequisiteException(self.tree.root_node, self.node_to_detach)
-            else:
-                raise CannotDetachChildrenWhoArePrerequisiteException(
-                    self.tree.root_node,
-                    self.node_to_detach,
-                    codes_that_are_prerequisite
-                )
+            raise CannotDetachLearningUnitsWhoArePrerequisiteException(
+                self.tree.root_node,
+                nodes_that_are_prerequisites
+            )
 
-    def _get_nodes_that_are_prerequisite(self):
-        remaining_children_after_detach = self.tree.get_remaining_children_after_detach(self.path_to_node_to_detach)
-
-        learning_unit_children_removed_after_detach = self.node_to_detach.get_all_children_as_learning_unit_nodes()
+    def _get_nodes_that_are_prerequisite(self) -> Set['NodeLearningUnitYear']:
+        learning_unit_nodes_detached = self.node_to_detach.get_all_children_as_learning_unit_nodes()
         if self.node_to_detach.is_learning_unit():
-            learning_unit_children_removed_after_detach.append(self.node_to_detach)
+            learning_unit_nodes_detached.append(self.node_to_detach)
 
-        nodes_that_are_prerequisites = [
-            n for n in learning_unit_children_removed_after_detach
-            if n.is_prerequisite and n not in remaining_children_after_detach
-            and set(n.is_prerequisite_of).intersection(remaining_children_after_detach)
-        ]
-        return sorted(nodes_that_are_prerequisites, key=lambda n: n.code)
+        return {n for n in learning_unit_nodes_detached if n.is_prerequisite}
 
 
-class HasPrerequisiteValidator(business_validator.BusinessValidator):
+class _HasPrerequisiteValidator(business_validator.BusinessValidator):
 
-    def __init__(self, tree: 'ProgramTree', path_of_node_to_detach: 'Path'):
-        super(HasPrerequisiteValidator, self).__init__()
-        self.node_to_detach = tree.get_node(path_of_node_to_detach)
-        self.path_node_to_detach = path_of_node_to_detach
+    def __init__(self, tree: 'ProgramTree', node_to_detach: 'Node'):
+        super().__init__()
+        self.node_to_detach = node_to_detach
         self.tree = tree
 
     def validate(self):
         nodes_detached_that_have_prerequisites = self._get_nodes_detached_that_have_prerequisite()
-        nodes_remaining_after_detach = self.tree.get_remaining_children_after_detach(self.path_node_to_detach)
+        if nodes_detached_that_have_prerequisites:
+            raise CannotDetachLearningUnitsWhoHavePrerequisiteException(
+                self.tree.root_node,
+                nodes_detached_that_have_prerequisites
+            )
 
-        nodes_that_have_prerequisite_and_not_anymore_present_in_tree = nodes_detached_that_have_prerequisites - \
-            nodes_remaining_after_detach
-        if nodes_that_have_prerequisite_and_not_anymore_present_in_tree:
-            codes_that_have_prerequisites = [node.code
-                                             for node in nodes_that_have_prerequisite_and_not_anymore_present_in_tree]
-            raise DeletePrerequisitesException(self.tree.root_node, codes_that_have_prerequisites)
+    def _get_nodes_detached_that_have_prerequisite(self) -> Set['NodeLearningUnitYear']:
+        learning_unit_nodes_removed = self.node_to_detach.get_all_children_as_learning_unit_nodes()
+        if self.node_to_detach.is_learning_unit():
+            learning_unit_nodes_removed.append(self.node_to_detach)
 
-    def _get_nodes_detached_that_have_prerequisite(self) -> Set['Node']:
-        search_under_node = self.node_to_detach
-        learning_unit_nodes = search_under_node.get_all_children_as_learning_unit_nodes()
-
-        if search_under_node.is_learning_unit():
-            learning_unit_nodes.append(search_under_node)
-
-        return {node for node in learning_unit_nodes if node.has_prerequisite}
+        return {node for node in learning_unit_nodes_removed if node.has_prerequisite}
