@@ -52,12 +52,9 @@ class PasteNodeForm(LinkForm):
             comment=self.cleaned_data.get("comment_fr", ""),
             comment_english=self.cleaned_data.get("comment_en", ""),
             relative_credits=self.cleaned_data.get("relative_credits") or
-            self.get_initial_for_field(self.relative_credits, "relative_credits"),
+            self.get_initial_for_field(self.fields['relative_credits'], "relative_credits"),
             path_where_to_detach=self.path_to_detach,
         )
-
-    def has_changed(self):
-        return True
 
     def save(self):
         if self.is_valid():
