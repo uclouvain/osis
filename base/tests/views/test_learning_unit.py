@@ -431,7 +431,6 @@ class LearningUnitViewTestCase(TestCase):
         results = json.loads(json_response)['results']
         self.assertEqual(results[0]['text'], self.entity_version.verbose_title)
         self.assertEqual(results[1]['text'], self.entity_version_3.verbose_title)
-        self.assertEqual(results[2]['text'], self.parent_entity.entityversion_set.first().verbose_title)
 
     def test_entity_autocomplete_with_q(self):
         self.client.force_login(self.person.user)
