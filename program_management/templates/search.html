@@ -1,7 +1,7 @@
 {% extends "education_group_app/blocks/layout.html" %}
 {% load static %}
 {% load i18n bootstrap3 %}
-{% load osis_role %}
+{% load osis_role pagination %}
 
 {% comment "License" %}
  * OSIS stands for Open Student Information System. It's an application
@@ -166,6 +166,8 @@
                                 {% csrf_token %}
                                 <input type="hidden" id="xls_status" class="no_spinner" name="xls_status">
                             </form>
+
+                            <div class="pull-right" style="margin-right: 10px"> {% base_pagination_size_select %} </div>
                         </div>
                     </div>
 
