@@ -39,7 +39,7 @@ from base.models.enums import peps_type
 from base.models.exam_enrollment import ExamEnrollment
 from base.models.student_specific_profile import StudentSpecificProfile
 from osis_common.decorators.download import set_download_cookie
-from assessments.business.score_encoding_sheet import get_score_sheet_address
+from assessments.models import score_sheet_address
 
 HEADER = [_('Academic year'), _('Session'), _('Learning unit'), _('Program'), _('Registration number'), _('Lastname'),
           _('Firstname'), _('Email'), _('Numbered scores'), _('Justification (A,T)'), _('End date Prof'),
@@ -342,8 +342,15 @@ def _update_border_for_first_peps_column(cell):
 
 def _build_offers_entities_emails_list(exam_enrollments: List[ExamEnrollment]) -> str:
     emails = []
-    for exam_enroll in exam_enrollments:
-        address = get_score_sheet_address(exam_enroll.learning_unit_enrollment.offer).get('address')
-        if address.get('email') and address.get('email') not in emails:
-            emails.append(address.get('email'))
-    return ';'.join(emails)
+
+    offers = [
+        exam_enroll.learning_unit_enrollment.offer for exam_enroll in exam_enrollments
+    ]
+    addresses = score_sheet_address.get_from_offer_years(set(offers))
+
+    for address in addresses:
+        if address and not address.customized and address.email:
+            emails.append(address.email)
+    return ';'.join(set(emails))
+
+

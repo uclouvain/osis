@@ -47,7 +47,6 @@ from base.tests.factories.session_examen import SessionExamFactory
 from assessments.models.enums import score_sheet_address_choices
 from assessments.tests.factories.score_sheet_address import ScoreSheetAddressFactory
 from base.tests.factories.offer_year import OfferYearFactory
-from base.tests.factories.structure import StructureFactory
 from assessments.tests.business.test_score_encoding_sheet import create_data_for_entity_address
 
 WHITE_RGB = '00000000'
@@ -121,7 +120,7 @@ class XlsTests(TestCase):
                                                 date_enrollment=self.academic_calendar.start_date)
         ue = exam_enrollment.learning_unit_enrollment.learning_unit_year
 
-        _add_header_and_legend_to_file([exam_enrollment], self.worksheet, True)
+        _add_header_and_legend_to_file([exam_enrollment], self.worksheet, is_program_manager=True)
         self.assertEqual(
             self.worksheet.cell(row=1, column=1).value,
             str(ue) + " " + ue.complete_title if ue.complete_title else str(ue)
@@ -211,7 +210,7 @@ class XlsTests(TestCase):
             entity_address_choice=score_sheet_address_choices.ENTITY_MANAGEMENT,
             email='dd@fa.com'
         )
-        _add_header_and_legend_to_file([exam_enrollment], self.worksheet, False)
+        _add_header_and_legend_to_file([exam_enrollment], self.worksheet, is_program_manager=False)
 
         self.assertEqual(
             self.worksheet.cell(row=1, column=7).value,
