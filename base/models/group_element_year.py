@@ -171,7 +171,7 @@ class GroupElementYearManager(models.Manager):
                     INNER JOIN education_group_groupyear AS gpyp on elem.group_year_id = gpyp.id
                 )
 
-            SELECT distinct starting_node_id, id, parent_element_id AS parent_id, child_element_id AS child_id, 
+            SELECT distinct starting_node_id, id, parent_element_id AS parent_id, child_element_id AS child_id,
                             "order", level
             FROM reverse_adjacency_query
             WHERE %(academic_year_id)s IS NULL OR academic_year_id = %(academic_year_id)s
