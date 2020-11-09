@@ -2431,6 +2431,12 @@ msgstr ""
 
 #, python-format
 msgid ""
+"The learning unit %(code)s doesn't have any Title - Common part in %(ac)s, "
+"it is then neccessary to specify a Title - Specific complement on the partim."
+msgstr ""
+
+#, python-format
+msgid ""
 "The learning unit %(learning_unit)s has a partim %(partim)s with an end year "
 "greater than %(year)s"
 msgstr ""

@@ -32,9 +32,9 @@ from base.forms.learning_unit.learning_unit_postponement import LearningUnitPost
 from base.models.academic_year import AcademicYear
 from base.models.learning_unit_year import LearningUnitYear, find_latest_by_learning_unit
 from base.models.person import Person
-from base.views.common import show_error_message_for_form_invalid
+from base.views.common import show_error_message_for_form_invalid, display_error_messages
 from base.views.learning_units.common import show_success_learning_unit_year_creation_message
-from learning_unit.views.utils import learning_unit_year_getter
+from education_group.templatetags.academic_year_display import display_as_academic_year
 from osis_role.contrib.views import permission_required
 
 
@@ -81,11 +81,26 @@ def create_partim_form(request, learning_unit_year_id):
 
     if postponement_form.is_valid():
         return _save_and_redirect(postponement_form, request)
+    else:
+        _manage_future_specific_title_error(learning_unit_year_full, postponement_form, request)
 
     context = postponement_form.get_context()
     context.update({'learning_unit_year': learning_unit_year_full, 'partim_creation': True})
 
     return render(request, "learning_unit/simple/creation_partim.html", context)
+
+
+def _manage_future_specific_title_error(learning_unit_year_full, postponement_form, request):
+    for i in range(1, len(postponement_form.errors)):
+        if postponement_form.errors[i] and "specific_title" in postponement_form.errors[i][0]:
+            msg = _(
+                "The learning unit %(code)s doesn't have any Title - Common part in %(ac)s, "
+                "it is then neccessary to specify a Title - Specific complement on the partim."
+            ) % {
+                "code": learning_unit_year_full.acronym,
+                "ac": display_as_academic_year(postponement_form.start_postponement.year + i)
+            }
+            display_error_messages(request, msg)
 
 
 def _save_and_redirect(postponement_form, request):
