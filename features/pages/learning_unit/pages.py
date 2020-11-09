@@ -239,8 +239,12 @@ class LearningUnitEditPage(pypom.Page):
     volume_total_pour_la_partie_pratique = InputField(By.ID, "id_component-1-hourly_volume_total_annual")
     classes_prevues_pour_la_partie_magistrale = InputField(By.ID, "id_component-0-planned_classes")
     classes_prevues_pour_la_partie_pratique = InputField(By.ID, "id_component-1-planned_classes")
-    volume_entites_de_charges_pour_la_partie_magistrale = InputField(By.ID, "id_component-0-repartition_volume_requirement_entity")
-    volume_entites_de_charges_pour_la_partie_pratique = InputField(By.ID, "id_component-1-repartition_volume_requirement_entity")
+    volume_entites_de_charges_pour_la_partie_magistrale = InputField(
+        By.ID, "id_component-0-repartition_volume_requirement_entity"
+    )
+    volume_entites_de_charges_pour_la_partie_pratique = InputField(
+        By.ID, "id_component-1-repartition_volume_requirement_entity"
+    )
     quadrimestre = SelectField(By.ID, "id_quadrimester")
     session_derogation = SelectField(By.ID, "id_session")
 
@@ -321,7 +325,9 @@ class SearchLearningUnitPage(CommonPageMixin, pypom.Page):
 
     @property
     def proposal_results(self):
-        return [self.ProposalLearningUnitElement(self, element) for element in self.find_elements(*self._results_selector)]
+        return [
+            self.ProposalLearningUnitElement(self, element) for element in self.find_elements(*self._results_selector)
+        ]
 
     def count_result(self):
         text = self.find_element(By.CSS_SELECTOR, "#main > div.panel.panel-default > div > strong").text
