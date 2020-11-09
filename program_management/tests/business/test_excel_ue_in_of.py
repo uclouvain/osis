@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import datetime
 import html
 
 from django.template.defaultfilters import yesno
@@ -80,8 +81,13 @@ CMS_TXT_WITH_LIST = '<ol> ' \
                     '<li>La structure atomique de la mati&egrave;re</li> ' \
                     '<li>Les diff&eacute;rentes structures mol&eacute;culaires</li> ' \
                     '</ol>'
+CMS_TXT_WITH_LIST_AFTER_FORMATTING = 'La structure atomique de la matière\n' \
+                                     'Les différentes structures moléculaires'
 
 CMS_TXT_WITH_LINK = '<a href="https://moodleucl.uclouvain.be">moodle</a>'
+
+LAST_UPDATE_BY = 'User_first_name_and_name'
+LAST_UPDATE_DATE = datetime.datetime.now()
 
 
 class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
@@ -289,6 +295,7 @@ class TestContent(TestCase):
                               'has_credits': False,
                               'has_allocation_entity': False,
                               'has_english_title': False,
+                              'has_force_majeure': False,
                               'has_teacher_list': False,
                               'has_periodicity': False,
                               'has_active': False,
@@ -328,6 +335,7 @@ class TestContent(TestCase):
                               'has_credits': True,
                               'has_allocation_entity': True,
                               'has_english_title': True,
+                              'has_force_majeure': True,
                               'has_teacher_list': True,
                               'has_periodicity': True,
                               'has_active': True,
@@ -474,6 +482,7 @@ def initialize_optional_data():
         'has_periodicity': False,
         'has_active': False,
         'has_quadrimester': False,
+        'has_force_majeure': False,
         'has_session_derogation': False,
         'has_volume': False,
         'has_teacher_list': False,
