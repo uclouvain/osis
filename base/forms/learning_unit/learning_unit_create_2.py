@@ -263,9 +263,7 @@ class FullForm(LearningUnitBaseForm):
 
         instances_data = self._build_instance_data(self.data, academic_year, proposal)
         super().__init__(instances_data, *args, **kwargs)
-        if self.instance:
-            self._disable_fields()
-        else:
+        if not self.instance:
             self._restrict_academic_years_choice(postposal, proposal_type)
 
     def _restrict_academic_years_choice(self, postposal, proposal_type):
@@ -279,28 +277,6 @@ class FullForm(LearningUnitBaseForm):
             )
         else:
             self._restrict_academic_years_choice_for_proposal_creation_suppression(proposal_type)
-
-    def _disable_fields(self):
-        if self.person.is_faculty_manager and not self.person.is_central_manager:
-            self._disable_fields_as_faculty_manager()
-        else:
-            self._disable_fields_as_central_manager()
-
-    def _disable_fields_as_faculty_manager(self):
-        faculty_type_not_restricted = [t[0] for t in LEARNING_CONTAINER_YEAR_TYPES_FOR_FACULTY]
-        if self.proposal or self.instance.learning_container_year.container_type not in LCY_TYPES_WITH_FIXED_ACRONYM:
-            self.disable_fields(PROPOSAL_READ_ONLY_FIELDS)
-        elif self.instance.learning_container_year and \
-                self.instance.learning_container_year.container_type not in faculty_type_not_restricted:
-            self.disable_fields(self.fields.keys() - set(FACULTY_OPEN_FIELDS))
-        else:
-            self.disable_fields(FULL_READ_ONLY_FIELDS)
-
-    def _disable_fields_as_central_manager(self):
-        if self.proposal or self.instance.learning_container_year.container_type not in LCY_TYPES_WITH_FIXED_ACRONYM:
-            self.disable_fields(FULL_PROPOSAL_READ_ONLY_FIELDS)
-        else:
-            self.disable_fields(FULL_READ_ONLY_FIELDS)
 
     def _build_instance_data(self, data, default_ac_year, proposal):
         return {
