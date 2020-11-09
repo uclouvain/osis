@@ -53,7 +53,10 @@ class ProgramGenerators:
             "child_type"
         )
         result = {}
-        relationships_group_by_parent = itertools.groupby(all_relationships, lambda relationship: relationship.parent_type)
+        relationships_group_by_parent = itertools.groupby(
+            all_relationships,
+            lambda relationship: relationship.parent_type
+        )
         for parent, parent_relationships in relationships_group_by_parent:
             result[parent] = list(parent_relationships)
         return result
