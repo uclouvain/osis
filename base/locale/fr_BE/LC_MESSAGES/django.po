@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-06 10:43+0100\n"
+"POT-Creation-Date: 2020-11-09 08:34+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1388,6 +1388,22 @@ msgstr "Cours de langue"
 msgid "Last modifications"
 msgstr "Dernières modifications"
 
+msgid "Last update description fiche (force majeure) by"
+msgstr ""
+
+msgid "Last update description fiche (force majeure) on"
+msgstr ""
+
+#, fuzzy
+#| msgid "Not in period to edit description fiche."
+msgid "Last update description fiche by"
+msgstr "Vous n'êtes pas en période de modification des fiches descriptives."
+
+#, fuzzy
+#| msgid "Not in period to edit description fiche."
+msgid "Last update description fiche on"
+msgstr "Vous n'êtes pas en période de modification des fiches descriptives."
+
 msgid "Last year of organization"
 msgstr "Dernière année d'organisation"
 
@@ -2579,8 +2595,8 @@ msgid ""
 "Summary course submission (Force majeure) is not allowed for tutors during "
 "this period."
 msgstr ""
-"La modification des fiches descriptives (Cas de force majeure) n'est pas autorisée pour les "
-"enseignants durant cette période."
+"La modification des fiches descriptives (Cas de force majeure) n'est pas "
+"autorisée pour les enseignants durant cette période."
 
 msgid "Summary course submission force majeure"
 msgstr "Adaptation des fiches descriptives (Cas de force majeure)"
@@ -2832,6 +2848,9 @@ msgid ""
 msgstr ""
 "Le nombre d'enfants de type \"%(child_type)s\" pour \"%(parent)s\" a atteint "
 "la limite maximum."
+
+msgid "The objects are been deleted successfully"
+msgstr "Les compétences acquises ont bien été supprimées."
 
 #, python-format
 msgid ""
