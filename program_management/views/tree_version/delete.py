@@ -92,7 +92,9 @@ class TreeVersionDeleteView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, Dele
     def get_confirmation_message(self) -> str:
         return _("Are you sure you want to delete %(offer_acronym)s %(version_name)s%(title)s ?") % {
             'offer_acronym': self.tree_version_identity.offer_acronym,
-            'version_name': self._get_version_name_verbose(),
+            'version_name': "[{}]".format(
+                self.tree_version_identity.version_name
+            ) if self.tree_version_identity.version_name else '',
             'title': self._buid_title(),
         }
 
@@ -106,7 +108,7 @@ class TreeVersionDeleteView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, Dele
     def get_success_message(self):
         return _("The program tree version %(offer_acronym)s %(version_name)s has been deleted.") % {
             'offer_acronym': self.tree_version_identity.offer_acronym,
-            'version_name': self._get_version_name_verbose(),
+            'version_name': self.tree_version_identity.version_name,
         }
 
     def get_success_url(self) -> str:
