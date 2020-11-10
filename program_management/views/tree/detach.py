@@ -33,13 +33,13 @@ import osis_common.ddd.interface
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.utils.cache import ElementCache
 from base.utils.urls import reverse_with_get
-from base.views.common import display_error_messages, display_warning_messages
+from base.views.common import display_error_messages
 from base.views.common import display_success_messages
 from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import link
 from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
-from program_management.ddd.service.read import detach_warning_messages_service, get_program_tree_service
+from program_management.ddd.service.read import get_program_tree_service
 from program_management.ddd.service.write import detach_node_service
 from program_management.forms.tree.detach import DetachNodeForm
 from program_management.views.generic import GenericGroupElementYearMixin
@@ -86,10 +86,6 @@ class DetachNodeView(GenericGroupElementYearMixin, FormView):
         detach_node_command = command.DetachNodeCommand(path_where_to_detach=self.request.GET.get('path'), commit=False)
         try:
             detach_node_service.detach_node(detach_node_command)
-
-            warning_messages = detach_warning_messages_service.detach_warning_messages(detach_node_command)
-            display_warning_messages(self.request, warning_messages)
-
             context['confirmation_message'] = self.get_confirmation_msg()
         except MultipleBusinessExceptions as multiple_exceptions:
             messages = [e.message for e in multiple_exceptions.exceptions]
