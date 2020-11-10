@@ -1,7 +1,7 @@
 {% extends "scores_encoding_mgr_layout.html" %}
 {% load i18n %}
 {% load static %}
-{% load dictionnary %}
+{% load dictionnary date %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
 * designed to manage the core business of higher education institutions,
@@ -150,6 +150,7 @@
                             <th id="code">{% trans 'Acronym' context 'UE acronym' %}</th>
                             <th id="title">{% trans 'Learning unit' %}</th>
                             <th id="responsible">{% trans 'Scores responsible' %}</th>
+                            <th id="tutor_deadlines">{% trans 'Tutor deadlines' %}</th>
                             <th id="progress">{% trans 'Progress' %}</th>
                             <th id="encode"></th>
                         </tr>
@@ -180,6 +181,15 @@
                             -
                         {% endif %}
                     </td>
+                    <td headers="tutor_deadlines">
+                        {% for deadline, scores_not_yet_submitted in note_detail.deadlines_count.items %}
+                            {% if scores_not_yet_submitted > 0 %}
+                                <span class="{% if deadline|is_past %}{% endif %} text-bold text-danger">{{ deadline|date:"d/m/Y" }} </span>
+                                <span class="label label-warning">{{ scores_not_yet_submitted }}</span>
+                            {% endif %}
+                            <br>
+                        {% endfor %}
+                    </td>
                     <td headers="progress">
                         <div class="progress">
                             <div class="progress-bar {% if note_detail.progress_int == 100 %}
@@ -192,8 +202,8 @@
                                  style="width: {{ note_detail.progress }}%;"
                                  title="{% trans "Represents the quantity of scores submitted to the administration. The number surrounded by parenthesis is the number of scores encoded by the tutor that aren't submitted yet ('draft' state)" %}">
                                     <span>
-                                        {% if note_detail.scores_not_yet_submitted %}
-                                            ({{ note_detail.scores_not_yet_submitted }})
+                                        {% if note_detail.draft_scores %}
+                                            ({{ note_detail.draft_scores }})
                                         {% endif %}
                                         <b>
                                             {{ note_detail.exam_enrollments_encoded }}
@@ -263,8 +273,8 @@
                                  style="width: {{ note_detail.progress }}%;"
                                  title="{% trans "Represents the quantity of scores submitted to the administration. The number surrounded by parenthesis is the number of scores encoded by the tutor that aren't submitted yet ('draft' state)" %}">
                                     <span>
-                                        {% if note_detail.scores_not_yet_submitted %}
-                                            ({{ note_detail.scores_not_yet_submitted }})
+                                        {% if note_detail.draft_scores %}
+                                            ({{ note_detail.draft_scores }})
                                         {% endif %}
                                          <b>
                                             {{ note_detail.exam_enrollments_encoded }}
@@ -350,8 +360,8 @@
                                  style="width: {{ note_detail.progress }}%;"
                                  title="{% trans "Represents the quantity of scores submitted to the administration. The number surrounded by parenthesis is the number of scores encoded by the tutor that aren't submitted yet ('draft' state)" %}">
                                     <span>
-                                        {% if note_detail.scores_not_yet_submitted %}
-                                            ({{ note_detail.scores_not_yet_submitted }})
+                                        {% if note_detail.draft_scores %}
+                                            ({{ note_detail.draft_scores }})
                                         {% endif %}
                                         <b>
                                             {{ note_detail.exam_enrollments_encoded }}
