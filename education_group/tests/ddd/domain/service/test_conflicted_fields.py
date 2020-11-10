@@ -60,4 +60,4 @@ class TestConflictedCertificateAims(TestCase, MockPatcherMixin):
         )
         self.fake_training_repository.root_entities = self.trainings
         conflicted_aims = ConflictedFields.get_conflicted_certificate_aims(self.trainings[0].entity_identity)
-        self.assertEqual(conflicted_aims, [self.year + conflicted_year_index])
+        self.assertEqual(conflicted_aims, [self.year + conflicted_year_index, self.year + conflicted_year_index + 1])
