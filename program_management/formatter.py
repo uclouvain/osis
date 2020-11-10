@@ -23,8 +23,6 @@
 # ############################################################################
 from backoffice.settings.base import LANGUAGE_CODE_EN
 from program_management.ddd.business_types import *
-from program_management.ddd.domain.exception import ProgramTreeVersionNotFoundException
-from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 
 
 def format_version_title(node: 'NodeGroupYear', language: str) -> str:
@@ -44,34 +42,30 @@ def format_version_complete_name(node: 'NodeGroupYear', language: str) -> str:
     return " - {}{}".format(node.version_title_fr, version_name) if node.version_title_fr else ""
 
 
-def format_program_tree_version_complete_title(tree_version_identity: 'ProgramTreeVersionIdentity',
+def format_program_tree_version_complete_title(node: 'NodeGroupYear',
+                                               program_tree_version: 'ProgramTreeVersion',
                                                language: str) -> str:
     return "%(offer_acronym)s %(version_name)s%(title)s" % {
-            'offer_acronym': tree_version_identity.offer_acronym,
+            'offer_acronym': node.title,
             'version_name': "[{}{}]".format(
-                tree_version_identity.version_name,
-                '-Transition' if tree_version_identity.is_transition else ''
-            ) if tree_version_identity.version_name else '',
-            'title': _build_title(tree_version_identity, language),
+                node.version_name,
+                '-Transition' if program_tree_version.is_transition else ''
+            ) if node.version_name else '',
+            'title': _build_title(node, language),
         }
 
 
-def _build_title(tree_version_identity, language: str):
-    try:
-        program_tree_version = ProgramTreeVersionRepository.get(tree_version_identity)
-        if language == LANGUAGE_CODE_EN and program_tree_version.get_tree().root_node.offer_title_en:
-            offer_title = " - {}".format(
-                program_tree_version.get_tree().root_node.offer_title_en
-            ) if program_tree_version.get_tree().root_node.offer_title_en else ''
-        else:
-            offer_title = " - {}".format(
-                program_tree_version.get_tree().root_node.offer_title_fr
-            ) if program_tree_version.get_tree().root_node.offer_title_fr else ''
-        if language == LANGUAGE_CODE_EN and program_tree_version.title_en:
-            version_title = "[{}]".format(program_tree_version.title_en)
-        else:
-            version_title = "[{}]".format(program_tree_version.title_fr) if program_tree_version.title_fr else ''
-        return "{}{}".format(offer_title, version_title)
-
-    except ProgramTreeVersionNotFoundException:
-        return ''
+def _build_title(node: 'NodeGroupYear', language: str):
+    if language == LANGUAGE_CODE_EN and node.offer_title_en:
+        offer_title = " - {}".format(
+            node.offer_title_en
+        ) if node.offer_title_en else ''
+    else:
+        offer_title = " - {}".format(
+            node.offer_title_fr
+        ) if node.offer_title_fr else ''
+    if language == LANGUAGE_CODE_EN and node.version_title_en:
+        version_title = "[{}]".format(node.version_title_en)
+    else:
+        version_title = "[{}]".format(node.version_title_fr) if node.version_title_fr else ''
+    return "{}{}".format(offer_title, version_title)

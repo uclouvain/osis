@@ -93,7 +93,9 @@ class TreeVersionDeleteView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, Dele
 
     def get_confirmation_message(self) -> str:
         return _("Are you sure you want to delete %(object)s ?") % {
-            'object': format_program_tree_version_complete_title(self.tree_version_identity, translation.get_language()),
+            'object': format_program_tree_version_complete_title(
+                self.get_object().get_tree().root_node, self.get_object(), translation.get_language()
+            ),
         }
 
     def _get_version_name_verbose(self) -> str:
