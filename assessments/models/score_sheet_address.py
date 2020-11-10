@@ -81,8 +81,5 @@ def get_from_offer_year(off_year):
         return None
 
 
-def get_from_offer_years(off_years):
-    try:
-        return ScoreSheetAddress.objects.filter(offer_year__in=off_years)
-    except ObjectDoesNotExist:
-        return None
+def search_from_offer_years(off_years):
+    return ScoreSheetAddress.objects.filter(offer_year__in=off_years)
