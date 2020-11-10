@@ -46,7 +46,7 @@ from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.ddd.service.write import delete_all_specific_versions_service
-from program_management.formatter import format_program_tree_version_complete_title
+from program_management.formatter import format_program_tree_complete_title
 
 
 class TreeVersionDeleteView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, DeleteView):
@@ -93,17 +93,10 @@ class TreeVersionDeleteView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, Dele
 
     def get_confirmation_message(self) -> str:
         return _("Are you sure you want to delete %(object)s ?") % {
-            'object': format_program_tree_version_complete_title(
+            'object': format_program_tree_complete_title(
                 self.get_object().get_tree().root_node, self.get_object(), translation.get_language()
             ),
         }
-
-    def _get_version_name_verbose(self) -> str:
-        version_name_verbose = self.tree_version_identity.version_name
-        if version_name_verbose:
-            transition = "-Transition" if self.tree_version_identity.is_transition else ''
-            version_name_verbose = "[" + version_name_verbose + transition + "]"
-        return version_name_verbose
 
     def get_success_message(self):
         return _("The program tree version %(offer_acronym)s %(version_name)s has been deleted.") % {

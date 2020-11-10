@@ -42,9 +42,9 @@ def format_version_complete_name(node: 'NodeGroupYear', language: str) -> str:
     return " - {}{}".format(node.version_title_fr, version_name) if node.version_title_fr else ""
 
 
-def format_program_tree_version_complete_title(node: 'NodeGroupYear',
-                                               program_tree_version: 'ProgramTreeVersion',
-                                               language: str) -> str:
+def format_program_tree_complete_title(node: 'NodeGroupYear',
+                                       program_tree_version: 'ProgramTreeVersion',
+                                       language: str) -> str:
     return "%(offer_acronym)s %(version_name)s%(title)s" % {
             'offer_acronym': node.title,
             'version_name': "[{}{}]".format(
