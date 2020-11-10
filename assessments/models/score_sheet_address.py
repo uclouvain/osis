@@ -23,11 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.utils.translation import gettext_lazy
 
 from assessments.models.enums import score_sheet_address_choices
+from base.models.offer_year import OfferYear
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
@@ -74,12 +76,12 @@ class ScoreSheetAddress(models.Model):
         return "{0} - {1}".format(self.offer_year, self.entity_address_choice)
 
 
-def get_from_offer_year(off_year):
+def get_from_offer_year(off_year) -> ScoreSheetAddress:
     try:
         return ScoreSheetAddress.objects.get(offer_year=off_year)
     except ObjectDoesNotExist:
         return None
 
 
-def search_from_offer_years(off_years):
+def search_from_offer_years(off_years: List[OfferYear]) -> List[ScoreSheetAddress]:
     return ScoreSheetAddress.objects.filter(offer_year__in=off_years)
