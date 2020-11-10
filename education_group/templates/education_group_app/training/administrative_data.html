@@ -93,7 +93,7 @@
                 </div>
                 <div class="col-md-6">
                     {% bootstrap_label _("Default learning unit enrollment") label_class='d-block'%}
-                    <p>{{ additional_informations.default_learning_unit_enrollment | yesno | title }}</p>
+                    <p>{{ additional_informations.has_learning_unit_default_enrollment | yesno | title }}</p>
                 </div>
             </div>
         </div>

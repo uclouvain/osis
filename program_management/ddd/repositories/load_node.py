@@ -25,20 +25,23 @@
 ##############################################################################
 from typing import List
 
-from django.db.models import F, Value, CharField, QuerySet, Case, When, IntegerField, OuterRef, Subquery
+from django.db.models import F, Value, CharField, QuerySet, Case, When, IntegerField, OuterRef, Subquery, Q
+from django.db.models.functions import Concat
 
 from base.models.entity_version import EntityVersion
 from base.models.enums.active_status import ActiveStatusEnum
 from base.models.enums.education_group_types import EducationGroupTypesEnum, GroupType, TrainingType, MiniTrainingType
+from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from base.models.enums.schedule_type import ScheduleTypeEnum
+from base.models.learning_component_year import LearningComponentYear
+from base.models.learning_unit_year import LearningUnitYear
+from education_group.models.enums.constraint_type import ConstraintTypes
 from education_group.models.group_year import GroupYear
-from learning_unit.ddd.repository import load_learning_unit_year
 from program_management.ddd.domain import node
 from program_management.ddd.domain._campus import Campus
 from program_management.models import element
 from program_management.models.enums.node_type import NodeType
-from education_group.models.enums.constraint_type import ConstraintTypes
 
 
 def load(element_id: int) -> node.Node:
@@ -199,27 +202,61 @@ def __load_multiple_node_group_year(node_group_year_ids: List[int]) -> QuerySet:
 
 
 def __load_multiple_node_learning_unit_year(node_learning_unit_year_ids: List[int]):
-    nodes = []
-    for lu in load_learning_unit_year.load_multiple(node_learning_unit_year_ids):
-        node_data = {
-            'id': lu.id,
-            'type': NodeType.LEARNING_UNIT.name,
-            'learning_unit_type': lu.type.name,
-            'year': lu.year,
-            'proposal_type': lu.proposal.type,
-            'code': lu.acronym,
-            'title': lu.full_title_fr,
-            'credits': lu.credits,
-            'status': lu.status,
-            'periodicity': lu.periodicity.name,
-            'common_title_fr': lu.common_title_fr,
-            'specific_title_fr': lu.specific_title_fr,
-            'common_title_en': lu.common_title_en,
-            'specific_title_en': lu.specific_title_en,
-            'other_remark': lu.other_remark,
-            'quadrimester': lu.quadrimester.name if lu.quadrimester else None,
-            'volume_total_lecturing': lu.lecturing_volume.total_annual,
-            'volume_total_practical': lu.practical_volume.total_annual,
-        }
-        nodes.append(node_data)
-    return nodes
+    subquery_component = LearningComponentYear.objects.filter(
+        learning_unit_year_id=OuterRef('pk')
+    )
+    subquery_component_pm = subquery_component.filter(
+        type=LECTURING
+    )
+    subquery_component_pp = subquery_component.filter(
+        type=PRACTICAL_EXERCISES
+    )
+    return LearningUnitYear.objects.filter(
+        id__in=node_learning_unit_year_ids
+    ).annotate(
+        type=Value(NodeType.LEARNING_UNIT.name, output_field=CharField()),
+        learning_unit_type=F('learning_container_year__container_type'),
+        year=F('academic_year__year'),
+        proposal_type=F('proposallearningunit__type'),
+        code=F('acronym'),
+        title=Case(
+            When(Q(specific_title__isnull=False) & ~Q(specific_title__exact='') &
+                 Q(learning_container_year__common_title__isnull=False) &
+                 ~Q(learning_container_year__common_title__exact=''), then=Concat(
+                'learning_container_year__common_title', Value(' - '), 'specific_title',
+                output_field=CharField()
+            )),
+            When(Q(specific_title__isnull=False) & ~Q(specific_title__exact=''), then=F("specific_title")),
+            When(Q(learning_container_year__common_title__isnull=False) &
+                 ~Q(learning_container_year__common_title__exact=''), then=F('learning_container_year__common_title')
+                 ),
+            default=Value("")
+        ),
+        specific_title_en=F('specific_title_english'),
+        specific_title_fr=F('specific_title'),
+        common_title_fr=F('learning_container_year__common_title'),
+        common_title_en=F('learning_container_year__common_title_english'),
+        other_remark=F('learning_unit__other_remark'),
+        volume_total_lecturing=Subquery(subquery_component_pm.values('hourly_volume_total_annual')),
+        volume_total_practical=Subquery(subquery_component_pp.values('hourly_volume_total_annual')),
+
+    ).values(
+        'id',
+        'type',
+        'learning_unit_type',
+        'year',
+        'proposal_type',
+        'code',
+        'title',
+        'credits',
+        'status',
+        'periodicity',
+        'common_title_fr',
+        'specific_title_fr',
+        'common_title_en',
+        'specific_title_en',
+        'other_remark',
+        'quadrimester',
+        'volume_total_lecturing',
+        'volume_total_practical',
+    )

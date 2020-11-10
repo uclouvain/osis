@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-22 11:34+0200\n"
+"POT-Creation-Date: 2020-11-06 18:22+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -839,6 +839,10 @@ msgid "Enrollments to learning unit"
 msgstr ""
 
 #, python-format
+msgid "Ensure this value is greater than or equal to %s."
+msgstr ""
+
+#, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr ""
 
@@ -942,6 +946,9 @@ msgid "Finality 120 list choice"
 msgstr ""
 
 msgid "Finality 180 list choice"
+msgstr ""
+
+msgid "First name"
 msgstr ""
 
 msgid "Firstname"
@@ -1165,6 +1172,9 @@ msgstr ""
 msgid "Jury members"
 msgstr ""
 
+msgid "Justification"
+msgstr ""
+
 msgid "Keywords"
 msgstr ""
 
@@ -1181,6 +1191,21 @@ msgid "Language classes"
 msgstr ""
 
 msgid "Last modifications"
+msgstr ""
+
+msgid "Last name"
+msgstr ""
+
+msgid "Last update description fiche (force majeure) by"
+msgstr ""
+
+msgid "Last update description fiche (force majeure) on"
+msgstr ""
+
+msgid "Last update description fiche by"
+msgstr ""
+
+msgid "Last update description fiche on"
 msgstr ""
 
 msgid "Last year of organization"
@@ -1894,6 +1919,10 @@ msgstr ""
 msgid "Profile"
 msgstr ""
 
+msgctxt "Submission email table header"
+msgid "Program"
+msgstr ""
+
 msgid "Program Managers"
 msgstr ""
 
@@ -2061,6 +2090,10 @@ msgstr ""
 msgid "Registration Id"
 msgstr ""
 
+msgctxt "Submission email table header"
+msgid "Registration number"
+msgstr ""
+
 msgid "Relative / Absolute <br>credits"
 msgstr ""
 
@@ -2130,6 +2163,9 @@ msgstr ""
 msgid "School"
 msgstr ""
 
+msgid "Score"
+msgstr ""
+
 msgid "Scores diffusion"
 msgstr ""
 
@@ -2179,6 +2215,10 @@ msgid "Service courses"
 msgstr ""
 
 msgid "Session derogation"
+msgstr ""
+
+msgctxt "Submission email table header"
+msgid "Session number"
 msgstr ""
 
 msgid "Shifted"
@@ -2408,6 +2448,12 @@ msgstr ""
 
 #, python-format
 msgid "The learning unit %(acronym)s is not included in any education group"
+msgstr ""
+
+#, python-format
+msgid ""
+"The learning unit %(code)s doesn't have any Title - Common part in %(ac)s, "
+"it is then neccessary to specify a Title - Specific complement on the partim."
 msgstr ""
 
 #, python-format

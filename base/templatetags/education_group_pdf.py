@@ -36,9 +36,9 @@ from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.models.enums.constraint_type import ConstraintTypeEnum
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from base.templatetags.education_group import register
+from program_management import formatter
 from program_management.ddd.business_types import *
-from program_management.serializers.node_view import get_program_tree_version_complete_name
-from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
+
 # TODO :: Remove this file and move the code into a Serializer
 
 OPTIONAL_PNG = static('img/education_group_year/optional.png')
@@ -70,9 +70,10 @@ CHILD_LEAF = """\
             <img src="{icon_list_1}" height="14" width="17">
             <img src="{icon_list_2}" height="10" width="10">
             <img src="{icon_list_5}" height="10" width="10">
-            {value} <br>
+            {value}
             <img src="{icon_list_3}" height="10" width="10">
             <img src="{icon_list_4}" height="10" width="10">
+            <br>
             {comment}
             {sublist}
         </div>
@@ -195,11 +196,7 @@ def get_verbose_constraint(node: 'NodeGroupYear'):
 
 def get_verbose_title_group(node: 'NodeGroupYear'):
     if node.is_finality():
-        version_complete_label = get_program_tree_version_complete_name(
-            node.entity_id,
-            ProgramTreeVersionRepository.search_all_versions_from_root_node(node),
-            translation.get_language()
-        )
+        version_complete_label = formatter.format_version_complete_name(node, translation.get_language())
 
         if node.offer_partial_title_en and translation.get_language() == LANGUAGE_CODE_EN:
             offer_partial_title = node.offer_partial_title_en
@@ -224,27 +221,11 @@ def get_verbose_credits(link: 'Link'):
 
 
 def get_verbose_title_ue(node: 'NodeLearningUnitYear'):
-    verbose_title_fr = get_verbose_title_fr_ue(node)
-    verbose_title_en = get_verbose_title_en_ue(node)
-    if verbose_title_en and translation.get_language() == 'en':
+    verbose_title_fr = node.full_title_fr
+    verbose_title_en = node.full_title_en
+    if verbose_title_en and translation.get_language() == LANGUAGE_CODE_EN:
         return verbose_title_en
     return verbose_title_fr
-
-
-# Copied from LearningUnitYear.complete_title
-def get_verbose_title_fr_ue(node: 'NodeLearningUnitYear'):
-    complete_title = node.specific_title_fr
-    if node.common_title_fr:
-        complete_title = node.common_title_fr + ' - ' + node.specific_title_fr
-    return complete_title
-
-
-# Copied from LearningUnitYear.complete_title_english
-def get_verbose_title_en_ue(node: 'NodeLearningUnitYear'):
-    complete_title_english = node.specific_title_en
-    if node.common_title_en:
-        complete_title_english = node.common_title_en + ' - ' + node.specific_title_en
-    return complete_title_english
 
 
 def get_verbose_link(link: 'Link'):

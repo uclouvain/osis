@@ -23,8 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import datetime
 import html
 
+from django.template.defaultfilters import yesno
 from django.test import TestCase
 from django.utils.translation import gettext_lazy as _
 from openpyxl.styles import Font
@@ -35,8 +37,9 @@ from base.business.learning_unit_xls import CREATION_COLOR, MODIFICATION_COLOR, 
     TRANSFORMATION_AND_MODIFICATION_COLOR, SUPPRESSION_COLOR
 from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import GroupType, TrainingType
-from base.models.enums.learning_unit_year_subtypes import FULL
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
+from base.models.enums.learning_unit_year_subtypes import FULL
+from base.models.enums.learning_unit_year_subtypes import LEARNING_UNIT_YEAR_SUBTYPES
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.tests.factories.academic_year import AcademicYearFactory
@@ -48,7 +51,8 @@ from learning_unit.tests.ddd.factories.entities import EntitiesFactory
 from learning_unit.tests.ddd.factories.learning_unit_year import LearningUnitYearFactory as DddLearningUnitYearFactory
 from learning_unit.tests.ddd.factories.proposal import ProposalFactory
 from learning_unit.tests.ddd.factories.specifications import SpecificationsFactory
-from program_management.business.excel_ue_in_of import DIRECT_GATHERING_KEY, MAIN_GATHERING_KEY, EXCLUDE_UE_KEY
+from program_management.business.excel_ue_in_of import DIRECT_GATHERING_KEY, MAIN_GATHERING_KEY, EXCLUDE_UE_KEY, \
+    optional_header_for_force_majeure
 from program_management.business.excel_ue_in_of import FIX_TITLES, \
     _get_headers, optional_header_for_proposition, optional_header_for_credits, optional_header_for_volume, \
     _get_attribution_line, optional_header_for_required_entity, optional_header_for_active, \
@@ -60,16 +64,14 @@ from program_management.business.excel_ue_in_of import FIX_TITLES, \
     _build_direct_gathering_label, _build_main_gathering_label, \
     get_explore_parents, _get_xls_title
 from program_management.business.utils import html2text
+from program_management.ddd.business_types import *
 from program_management.forms.custom_xls import CustomXlsForm
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
-from program_management.tests.factories.element import ElementGroupYearFactory, ElementLearningUnitYearFactory
 from program_management.tests.ddd.factories.program_tree_version import StandardProgramTreeVersionFactory, \
     ProgramTreeVersionFactory
-from program_management.ddd.business_types import *
-from base.models.enums.learning_unit_year_subtypes import LEARNING_UNIT_YEAR_SUBTYPES
-from django.template.defaultfilters import yesno
+from program_management.tests.factories.element import ElementGroupYearFactory, ElementLearningUnitYearFactory
 
 PARTIAL_ACRONYM = 'Partial'
 
@@ -79,8 +81,13 @@ CMS_TXT_WITH_LIST = '<ol> ' \
                     '<li>La structure atomique de la mati&egrave;re</li> ' \
                     '<li>Les diff&eacute;rentes structures mol&eacute;culaires</li> ' \
                     '</ol>'
+CMS_TXT_WITH_LIST_AFTER_FORMATTING = 'La structure atomique de la matière\n' \
+                                     'Les différentes structures moléculaires'
 
 CMS_TXT_WITH_LINK = '<a href="https://moodleucl.uclouvain.be">moodle</a>'
+
+LAST_UPDATE_BY = 'User_first_name_and_name'
+LAST_UPDATE_DATE = datetime.datetime.now()
 
 
 class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
@@ -123,6 +130,7 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
                 'language': 'on',
                 'specifications': 'on',
                 'description_fiche': 'on',
+                'force_majeure': 'on'
             },
             year=self.root_node.year,
             code=self.root_node.code
@@ -133,7 +141,19 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
             optional_header_for_credits + optional_header_for_periodicity + optional_header_for_active + \
             optional_header_for_quadrimester + optional_header_for_session_derogation + optional_header_for_volume + \
             optional_header_for_teacher_list + optional_header_for_proposition + optional_header_for_english_title + \
-            optional_header_for_language + optional_header_for_specifications + optional_header_for_description_fiche
+            optional_header_for_language + optional_header_for_specifications + optional_header_for_description_fiche \
+            + optional_header_for_force_majeure
+        self.assertListEqual(_get_headers(custom_xls_form)[0], expected_headers)
+
+    def test_get_descritpion_fiche_header_if_force_majeure_checked(self):
+        custom_xls_form = CustomXlsForm(
+            {'force_majeure': 'on'},
+            year=self.root_node.year,
+            code=self.root_node.code
+        )
+
+        expected_headers = \
+            FIX_TITLES + optional_header_for_description_fiche + optional_header_for_force_majeure
         self.assertListEqual(_get_headers(custom_xls_form)[0], expected_headers)
 
     def test_get_attribution_line(self):
@@ -275,6 +295,7 @@ class TestContent(TestCase):
                               'has_credits': False,
                               'has_allocation_entity': False,
                               'has_english_title': False,
+                              'has_force_majeure': False,
                               'has_teacher_list': False,
                               'has_periodicity': False,
                               'has_active': False,
@@ -284,6 +305,7 @@ class TestContent(TestCase):
                               'has_language': False,
                               'has_description_fiche': False,
                               'has_specifications': False,
+                              'has_force_majeure': False
                               }
                              )
 
@@ -302,6 +324,7 @@ class TestContent(TestCase):
                               'language': 'on',
                               'description_fiche': 'on',
                               'specifications': 'on',
+                              'force_majeure': 'on'
                               },
                              year=self.parent_node.year,
                              code=self.parent_node.code
@@ -312,6 +335,7 @@ class TestContent(TestCase):
                               'has_credits': True,
                               'has_allocation_entity': True,
                               'has_english_title': True,
+                              'has_force_majeure': True,
                               'has_teacher_list': True,
                               'has_periodicity': True,
                               'has_active': True,
@@ -321,6 +345,7 @@ class TestContent(TestCase):
                               'has_language': True,
                               'has_description_fiche': True,
                               'has_specifications': True,
+                              'has_force_majeure': True
                               }
                              )
 
@@ -457,6 +482,7 @@ def initialize_optional_data():
         'has_periodicity': False,
         'has_active': False,
         'has_quadrimester': False,
+        'has_force_majeure': False,
         'has_session_derogation': False,
         'has_volume': False,
         'has_teacher_list': False,
@@ -465,6 +491,7 @@ def initialize_optional_data():
         'has_language': False,
         'has_description_fiche': False,
         'has_specifications': False,
+        'has_force_majeure': False
     }
 
 
@@ -577,17 +604,17 @@ class TestXlsContent(TestCase):
         # TODO : remplacer ce qui suit pour un accès plus direct
 
         cls.element_ue_1 = ElementLearningUnitYearFactory(id=cls.ue1.node_id,
-                                                      learning_unit_year=LearningUnitYearFactory(
-                                                          acronym=cls.ue1.code, academic_year=cls.academic_year)
-                                                      )
+                                                          learning_unit_year=LearningUnitYearFactory(
+                                                              acronym=cls.ue1.code, academic_year=cls.academic_year)
+                                                          )
         cls.element_ue_2 = ElementLearningUnitYearFactory(id=ue_2.node_id,
-                                                      learning_unit_year=LearningUnitYearFactory(
-                                                          acronym=ue_2.code, academic_year=cls.academic_year)
-                                                      )
+                                                          learning_unit_year=LearningUnitYearFactory(
+                                                              acronym=ue_2.code, academic_year=cls.academic_year)
+                                                          )
         cls.element_ue_3 = ElementLearningUnitYearFactory(id=cls.ue3.node_id,
-                                                      learning_unit_year=LearningUnitYearFactory(
-                                                          acronym=cls.ue3.code, academic_year=cls.academic_year)
-                                                      )
+                                                          learning_unit_year=LearningUnitYearFactory(
+                                                              acronym=cls.ue3.code, academic_year=cls.academic_year)
+                                                          )
         ElementLearningUnitYearFactory(id=cls.ue4.node_id,
                                        learning_unit_year=LearningUnitYearFactory(acronym=cls.ue4.code,
                                                                                   academic_year=cls.academic_year))
@@ -680,7 +707,6 @@ class TestXlsContent(TestCase):
         self.assertEqual(_get_xls_title(tree_version.tree, tree_version), _assert_format_title(tree, tree_version))
 
     def test_link_data(self):
-
         custom_form = CustomXlsForm({'credits': 'on'}, year=self.tree.root_node.year, code=self.tree.root_node.code)
         data = _build_excel_lines_ues(custom_form, self.tree)
         content = data['content']
