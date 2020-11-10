@@ -104,4 +104,3 @@ def step_impl(context: Context):
 def step_impl(context: Context):
     page = LearningUnitPage(driver=context.browser)
     context.test.assertIn(str(_('successfully consolidated')), page.success_messages.text)
-
