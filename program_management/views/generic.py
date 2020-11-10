@@ -48,17 +48,12 @@ from education_group.models.group_year import GroupYear
 from education_group.views.mixin import ElementSelectedClipBoardMixin
 from osis_common.utils.models import get_object_or_none
 from osis_role.contrib.views import AjaxPermissionRequiredMixin
-from program_management.ddd.business_types import *
-from program_management.ddd.domain.node import NodeIdentity
-from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories import load_tree
-from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.models.enums.node_type import NodeType
 from program_management.ddd.business_types import *
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.domain.node import NodeIdentity
-from program_management.serializers.program_tree_view import program_tree_view_serializer
 
 NO_PREREQUISITES = TrainingType.finality_types() + [
     MiniTrainingType.OPTION.name,
@@ -157,7 +152,12 @@ class LearningUnitGeneric(ElementSelectedClipBoardMixin, TemplateView):
         return root_node.node_type not in NO_PREREQUISITES
 
     def get_tree_json_url(self) -> str:
-        return reverse('tree_json', kwargs={'root_id': self.get_root_id()})
+        queryparams = {'path': self.request.GET.get('path')} if 'path' in self.request.GET else {}
+        return reverse_with_get(
+            'tree_json',
+            kwargs={'root_id': self.get_root_id()},
+            get=queryparams
+        )
 
     def get_tab_urls(self):
         queryparams = {'path': self.request.GET.get('path')} if 'path' in self.request.GET else {}

@@ -98,7 +98,6 @@ def _get_node_view_attribute_serializer(link: 'Link', tree: 'ProgramTree', conte
 
 
 def _get_leaf_view_attribute_serializer(link: 'Link', tree: 'ProgramTree', context: NodeViewContext) -> dict:
-    querystring_params = {"path": context.current_path, "redirect_path": context.view_path}
     attrs = _get_node_view_attribute_serializer(link, tree, context)
     attrs.update({
         'path': context.current_path,

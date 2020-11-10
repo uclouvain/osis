@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import re
+
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
@@ -138,11 +140,13 @@ class DetachNodeView(GenericGroupElementYearMixin, FormView):
         return _("Are you sure you want to detach %(child)s ?") % {"child": self.child_node}
 
     def get_success_url(self):
-        queryparams = {
-            'path': self.path_to_detach[:self.path_to_detach.rfind("|")]
-        }
+        path = self.request.GET.get('redirect_path') or self.path_to_detach
+        if re.match(re.escape(self.path_to_detach), path):
+            path = self.path_to_detach[:self.path_to_detach.rfind("|")]
+
+        node_identity = NodeIdentitySearch().get_from_element_id(int(path.split('|')[-1]))
         return reverse_with_get(
             'element_identification',
-            kwargs={'code': self.parent_node.code, 'year': self.parent_node.year},
-            get=queryparams
+            kwargs={'code': node_identity.code, 'year': node_identity.year},
+            get={'path': path}
         )
