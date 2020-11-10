@@ -46,12 +46,11 @@ def format_program_tree_complete_title(node: 'NodeGroupYear',
                                        program_tree_version: 'ProgramTreeVersion',
                                        language: str) -> str:
     return "%(offer_acronym)s %(version_name)s%(title)s" % {
-            'offer_acronym': node.title,
-            'version_name': "[{}{}]".format(
-                node.version_name,
-                '-Transition' if program_tree_version.is_transition else ''
-            ) if node.version_name else '',
-            'title': _build_title(node, language),
+        'offer_acronym': node.title,
+        'version_name': "[{}{}]".format(
+            node.version_name,
+            '-Transition' if program_tree_version.is_transition else '') if node.version_name else '',
+        'title': _build_title(node, language),
         }
 
 
