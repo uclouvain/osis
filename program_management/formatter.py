@@ -21,35 +21,56 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+from backoffice.settings.base import LANGUAGE_CODE_EN
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.exception import ProgramTreeVersionNotFoundException
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 
 
-def format_program_tree_version_identity(tree_version_identity: 'ProgramTreeVersionIdentity') -> str:
-    if tree_version_identity.version_name:
-        return "{}[{}]".format(tree_version_identity.offer_acronym, tree_version_identity.version_name)
-    return tree_version_identity.offer_acronym
+def format_version_title(node: 'NodeGroupYear', language: str) -> str:
+    if language == LANGUAGE_CODE_EN and node.version_title_en:
+        return "[{}]".format(node.version_title_en)
+    return "[{}]".format(node.version_title_fr) if node.version_title_fr else ''
 
 
-def format_program_tree_version_complete_title(tree_version_identity: 'ProgramTreeVersionIdentity') -> str:
+def format_version_name(node: 'NodeGroupYear') -> str:
+    return "[{}]".format(node.version_name) if node.version_name else ""
+
+
+def format_version_complete_name(node: 'NodeGroupYear', language: str) -> str:
+    version_name = format_version_name(node)
+    if language == LANGUAGE_CODE_EN and node.version_title_en:
+        return " - {}{}".format(node.version_title_en, version_name)
+    return " - {}{}".format(node.version_title_fr, version_name) if node.version_title_fr else ""
+
+
+def format_program_tree_version_complete_title(tree_version_identity: 'ProgramTreeVersionIdentity',
+                                               language: str) -> str:
     return "%(offer_acronym)s %(version_name)s%(title)s" % {
             'offer_acronym': tree_version_identity.offer_acronym,
             'version_name': "[{}{}]".format(
                 tree_version_identity.version_name,
                 '-Transition' if tree_version_identity.is_transition else ''
             ) if tree_version_identity.version_name else '',
-            'title': _build_title(tree_version_identity),
+            'title': _build_title(tree_version_identity, language),
         }
 
 
-def _build_title(tree_version_identity):
+def _build_title(tree_version_identity, language: str):
     try:
         program_tree_version = ProgramTreeVersionRepository.get(tree_version_identity)
-        offer_title = " - {}".format(
-            program_tree_version.get_tree().root_node.offer_title_fr
-        ) if program_tree_version.get_tree().root_node.offer_title_fr else ''
-        version_title = "[{}]".format(program_tree_version.title_fr) if program_tree_version.title_fr else ''
+        if language == LANGUAGE_CODE_EN and program_tree_version.get_tree().root_node.offer_title_en:
+            offer_title = " - {}".format(
+                program_tree_version.get_tree().root_node.offer_title_en
+            ) if program_tree_version.get_tree().root_node.offer_title_en else ''
+        else:
+            offer_title = " - {}".format(
+                program_tree_version.get_tree().root_node.offer_title_fr
+            ) if program_tree_version.get_tree().root_node.offer_title_fr else ''
+        if language == LANGUAGE_CODE_EN and program_tree_version.title_en:
+            version_title = "[{}]".format(program_tree_version.title_en)
+        else:
+            version_title = "[{}]".format(program_tree_version.title_fr) if program_tree_version.title_fr else ''
         return "{}{}".format(offer_title, version_title)
 
     except ProgramTreeVersionNotFoundException:

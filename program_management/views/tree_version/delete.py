@@ -27,6 +27,7 @@ from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils.functional import cached_property
+from django.utils import translation
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DeleteView
 
@@ -92,7 +93,7 @@ class TreeVersionDeleteView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, Dele
 
     def get_confirmation_message(self) -> str:
         return _("Are you sure you want to delete %(object)s ?") % {
-            'object': format_program_tree_version_complete_title(self.tree_version_identity),
+            'object': format_program_tree_version_complete_title(self.tree_version_identity, translation.get_language()),
         }
 
     def _get_version_name_verbose(self) -> str:
