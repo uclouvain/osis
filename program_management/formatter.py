@@ -22,9 +22,35 @@
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
 from program_management.ddd.business_types import *
+from program_management.ddd.domain.exception import ProgramTreeVersionNotFoundException
+from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 
 
 def format_program_tree_version_identity(tree_version_identity: 'ProgramTreeVersionIdentity') -> str:
     if tree_version_identity.version_name:
         return "{}[{}]".format(tree_version_identity.offer_acronym, tree_version_identity.version_name)
     return tree_version_identity.offer_acronym
+
+
+def format_program_tree_version_complete_title(tree_version_identity: 'ProgramTreeVersionIdentity') -> str:
+    return "%(offer_acronym)s %(version_name)s%(title)s" % {
+            'offer_acronym': tree_version_identity.offer_acronym,
+            'version_name': "[{}{}]".format(
+                tree_version_identity.version_name,
+                '-Transition' if tree_version_identity.is_transition else ''
+            ) if tree_version_identity.version_name else '',
+            'title': _build_title(tree_version_identity),
+        }
+
+
+def _build_title(tree_version_identity):
+    try:
+        program_tree_version = ProgramTreeVersionRepository.get(tree_version_identity)
+        offer_title = " - {}".format(
+            program_tree_version.get_tree().root_node.offer_title_fr
+        ) if program_tree_version.get_tree().root_node.offer_title_fr else ''
+        version_title = "[{}]".format(program_tree_version.title_fr) if program_tree_version.title_fr else ''
+        return "{}{}".format(offer_title, version_title)
+
+    except ProgramTreeVersionNotFoundException:
+        return ''

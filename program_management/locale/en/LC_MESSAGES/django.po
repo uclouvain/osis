@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-30 10:05+0100\n"
+"POT-Creation-Date: 2020-11-10 08:36+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -137,8 +137,10 @@ msgstr ""
 msgid "Annual"
 msgstr ""
 
-msgid "Are you sure you want to delete %(offer_acronym)s %(version_name)s ?"
-msgstr ""
+#, fuzzy, python-format
+#| msgid "Are you sure you want to detach %(child)s ?"
+msgid "Are you sure you want to delete %(object)s ?"
+msgstr "Are you sure you want to remove %(child)s ?"
 
 #, python-format
 msgid ""

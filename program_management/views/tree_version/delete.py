@@ -45,6 +45,7 @@ from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.ddd.service.write import delete_all_specific_versions_service
+from program_management.formatter import format_program_tree_version_complete_title
 
 
 class TreeVersionDeleteView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, DeleteView):
@@ -90,12 +91,8 @@ class TreeVersionDeleteView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, Dele
         }
 
     def get_confirmation_message(self) -> str:
-        return _("Are you sure you want to delete %(offer_acronym)s %(version_name)s%(title)s ?") % {
-            'offer_acronym': self.tree_version_identity.offer_acronym,
-            'version_name': "[{}]".format(
-                self.tree_version_identity.version_name
-            ) if self.tree_version_identity.version_name else '',
-            'title': self._buid_title(),
+        return _("Are you sure you want to delete %(object)s ?") % {
+            'object': format_program_tree_version_complete_title(self.tree_version_identity),
         }
 
     def _get_version_name_verbose(self) -> str:
@@ -125,10 +122,3 @@ class TreeVersionDeleteView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, Dele
             academic_year__year=self.node_identity.year,
             partial_acronym=self.node_identity.code,
         )
-
-    def _buid_title(self):
-        offer_title = " - {}".format(
-            self.get_object().get_tree().root_node.offer_title_fr
-        ) if self.get_object().get_tree().root_node.offer_title_fr else ''
-        version_title = "[{}]".format(self.get_object().title_fr) if self.get_object().title_fr else ''
-        return "{}{}".format(offer_title, version_title)
