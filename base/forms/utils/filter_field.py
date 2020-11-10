@@ -44,4 +44,3 @@ def espace_special_characters(value):
     for character in CHARACTER_TO_ESCAPE:
         value = value.replace(character, "\\{}".format(character))
     return r"({})".format(value)
-
