@@ -140,9 +140,18 @@ class DetachNodeView(GenericGroupElementYearMixin, FormView):
         if re.match(re.escape(self.path_to_detach), path):
             path = self.path_to_detach[:self.path_to_detach.rfind("|")]
 
-        node_identity = NodeIdentitySearch().get_from_element_id(int(path.split('|')[-1]))
-        return reverse_with_get(
-            'element_identification',
-            kwargs={'code': node_identity.code, 'year': node_identity.year},
-            get={'path': path}
-        )
+        root_identity = NodeIdentitySearch().get_from_element_id(int(path.split('|')[0]))
+        cmd = command.GetProgramTree(code=root_identity.code, year=root_identity.year)
+        tree = get_program_tree_service.get_program_tree(cmd)
+        node = tree.get_node(path)
+
+        if node.is_learning_unit():
+            # TODO : Change element_identification proxy logic in order to be specific
+            #  to tree for learning unit year
+            url_name = 'learning_unit_prerequisite' if 'prerequisite' in self.request.META.get('HTTP_REFERER') \
+                else 'learning_unit_utilization'
+            view_kwargs = {'root_element_id': tree.root_node.pk, 'child_element_id': node.pk}
+        else:
+            url_name = 'element_identification'
+            view_kwargs = {'code': node.code, 'year': node.year}
+        return reverse_with_get(url_name, kwargs=view_kwargs, get={'path': path})
