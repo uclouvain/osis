@@ -183,47 +183,32 @@
                     </td>
                     <td headers="tutor_deadlines">
                         {% with note_detail.remaining_scores_by_deadline|ordered_deadlines_to_display as deadlines %}
-{#                            <div class="row">#}
-{#                                <div class="col-md-6">#}
-                                    <ul style="list-style: none;">
-                                        {% with first_item=deadlines|get_first_item %}
-                                            {% with deadline=first_item.0 scores_not_yet_submitted=first_item.1 %}
-                                                <li>
-                                                    {% include "blocks/deadline_tutor_display.html" %}
-                                                    {% if deadlines|length > 1 %}
-                                                        <a role="button" data-toggle="collapse" data-target="#tutor_deadlines_collapse_{{ note_detail.learning_unit_year_acronym }}"
-                                                           aria-expanded="false"
-                                                           class="col-md-offset-1"
-                                                           aria-controls="tutor_deadlines_collapse_{{ note_detail.learning_unit_year_acronym }}"
-                                                           title="{% trans 'Display all deadlines for this learning unit' %}">
-                                                            <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
-                                                        </a>
-                                                    {% endif %}
-                                                </li>
-                                            {% endwith %}
-                                        {% endwith %}
-                                        <div class="collapse {% if tutor %}in{% endif %}"
-                                             id="tutor_deadlines_collapse_{{ note_detail.learning_unit_year_acronym }}">
-                                            {% with deadlines_without_first=deadlines|remove_first %}
-                                                {% for deadline, scores_not_yet_submitted in deadlines_without_first.items %}
-                                                    <li>{% include "blocks/deadline_tutor_display.html" %}</li>
-                                                {% endfor %}
-                                            {% endwith %}
-                                        </div>
-                                    </ul>
-{#                                </div>#}
-{#                                <div class="col-md-6">#}
-{#                                    {% if deadlines|length > 0 %}#}
-{#                                        <a role="button" data-toggle="collapse" data-target="#tutor_deadlines_collapse_{{ note_detail.learning_unit_year_acronym }}"#}
-{#                                           aria-expanded="false"#}
-{#                                           class="pull-right"#}
-{#                                           aria-controls="tutor_deadlines_collapse_{{ note_detail.learning_unit_year_acronym }}"#}
-{#                                           title="{% trans 'Display all deadlines for this learning unit' %}">#}
-{#                                            <span class="glyphicon glyphicon-list" aria-hidden="true"></span>#}
-{#                                        </a>#}
-{#                                    {% endif %}#}
-{#                                </div>#}
-                            </div>
+                            <ul style="list-style: none;">
+                                {% with first_item=deadlines|get_first_item %}
+                                    {% with deadline=first_item.0 scores_not_yet_submitted=first_item.1 %}
+                                        <li>
+                                            {% include "blocks/deadline_tutor_display.html" %}
+                                            {% if deadlines|length > 1 %}
+                                                <a role="button" data-toggle="collapse" data-target="#tutor_deadlines_collapse_{{ note_detail.learning_unit_year_acronym }}"
+                                                   aria-expanded="false"
+                                                   class="col-md-offset-1"
+                                                   aria-controls="tutor_deadlines_collapse_{{ note_detail.learning_unit_year_acronym }}"
+                                                   title="{% trans 'Display all deadlines for this learning unit' %}">
+                                                    <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+                                                </a>
+                                            {% endif %}
+                                        </li>
+                                    {% endwith %}
+                                {% endwith %}
+                                <div class="collapse {% if tutor %}in{% endif %}"
+                                     id="tutor_deadlines_collapse_{{ note_detail.learning_unit_year_acronym }}">
+                                    {% with deadlines_without_first=deadlines|remove_first %}
+                                        {% for deadline, scores_not_yet_submitted in deadlines_without_first.items %}
+                                            <li>{% include "blocks/deadline_tutor_display.html" %}</li>
+                                        {% endfor %}
+                                    {% endwith %}
+                                </div>
+                            </ul>
                         {% endwith %}
                     </td>
                     <td headers="progress">
