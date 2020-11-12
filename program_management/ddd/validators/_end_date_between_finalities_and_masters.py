@@ -65,23 +65,25 @@ class CheckEndDateBetweenFinalitiesAndMasters2M(business_validator.BusinessValid
                 self._check_finalities_end_year_greater_or_equal_to_their_masters_2M()
 
     def _check_master_2M_end_year_greater_or_equal_to_its_finalities(self):
-        inconsistent_finalities = self._get_finalities_where_end_year_gt_root_end_year(self.updated_tree)
+        inconsistent_finalities = self._get_finalities_where_end_year_gt_root_end_year(
+            self.updated_tree_version.end_year_of_existence
+        )
         if inconsistent_finalities:
             raise Program2MEndDateLowerThanItsFinalitiesException(self.updated_tree.root_node)
 
     def _check_finalities_end_year_greater_or_equal_to_their_masters_2M(self):
         trees_2m = self._search_master_2m_trees()
         for tree_2m in trees_2m:
-            inconsistent_finalities = self._get_finalities_where_end_year_gt_root_end_year(tree_2m)
+            inconsistent_finalities = self._get_finalities_where_end_year_gt_root_end_year(tree_2m.root_node.end_year)
             if inconsistent_finalities:
                 raise FinalitiesEndDateGreaterThanTheirMasters2MException(
                     tree_2m.root_node,
                     inconsistent_finalities
                 )
 
-    def _get_finalities_where_end_year_gt_root_end_year(self, tree_2m: 'ProgramTree') -> Set['Node']:
+    def _get_finalities_where_end_year_gt_root_end_year(self, tree_2m_end_year: int) -> Set['Node']:
         inconsistent_finalities = []
-        master_2m_end_year = tree_2m.root_node.end_year or INFINITE_VALUE
+        master_2m_end_year = tree_2m_end_year or INFINITE_VALUE
         updated_node = self.updated_tree_version.get_tree().root_node
         if updated_node.is_finality():
             end_year_of_finality = (self.updated_tree_version.end_year_of_existence or INFINITE_VALUE)
