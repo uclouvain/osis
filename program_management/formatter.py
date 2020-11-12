@@ -38,5 +38,5 @@ def format_version_name(node: 'NodeGroupYear') -> str:
 def format_version_complete_name(node: 'NodeGroupYear', language: str) -> str:
     version_name = format_version_name(node)
     if language == LANGUAGE_CODE_EN and node.version_title_en:
-        return " - {}{}".format(node.version_title_en, version_name)
-    return " - {}{}".format(node.version_title_fr, version_name) if node.version_title_fr else ""
+        return " - {}{}".format(node.version_title_en if node.version_title_en else node.group_title_en, version_name)
+    return " - {}{}".format(node.version_title_fr if node.version_title_fr else node.group_title_fr, version_name)
