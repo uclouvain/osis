@@ -24,10 +24,11 @@
 #
 ##############################################################################
 import datetime
+from collections import OrderedDict
 from typing import List
 
 import attr
-from django.db.models import Prefetch, OuterRef, Subquery, Q, Count, F
+from django.db.models import OuterRef, Subquery, Q, Count, F
 
 from attribution.models import attribution
 from base.auth.roles import program_manager
@@ -185,6 +186,10 @@ class ScoreEncodingProgress:
     @property
     def progress(self):
         return "{0:.0f}".format(self.progress_int)
+
+    @property
+    def ordered_deadlines_count(self):
+        return OrderedDict(sorted(self.deadlines_count.items()))
 
     def increment_progress(self, score_encoding_progress):
         self.draft_scores += score_encoding_progress.draft_scores

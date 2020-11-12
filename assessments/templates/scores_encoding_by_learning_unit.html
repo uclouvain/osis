@@ -1,7 +1,7 @@
 {% extends "scores_encoding_mgr_layout.html" %}
 {% load i18n %}
 {% load static %}
-{% load dictionnary date %}
+{% load dictionnary tutor_deadline %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
 * designed to manage the core business of higher education institutions,
@@ -143,16 +143,16 @@
             <div class="tab-content" id="pnl_learning_units">
                 <div role="tabpanel" class="tab-pane fade in active" id="tab_online">
                     <br>
-                    <table class="table table-hover">
+                    <table class="table table-hover table-responsive">
                         <thead>
                         <tr>
-                            <th id="complete">{% trans 'Complete' %}</th>
-                            <th id="code">{% trans 'Acronym' context 'UE acronym' %}</th>
-                            <th id="title">{% trans 'Learning unit' %}</th>
-                            <th id="responsible">{% trans 'Scores responsible' %}</th>
-                            <th id="tutor_deadlines">{% trans 'Tutor deadlines' %}</th>
-                            <th id="progress">{% trans 'Progress' %}</th>
-                            <th id="encode"></th>
+                            <th id="complete" class="col-md-1">{% trans 'Complete' %}</th>
+                            <th id="code" class="col-md-1">{% trans 'Acronym' context 'UE acronym' %}</th>
+                            <th id="title" class="col-md-4">{% trans 'Learning unit' %}</th>
+                            <th id="responsible" class="col-md-2">{% trans 'Scores responsible' %}</th>
+                            <th id="tutor_deadlines" class="col-md-2">{% trans 'Tutor deadlines' %}</th>
+                            <th id="progress" class="col-md-1">{% trans 'Progress' %}</th>
+                            <th id="encode" class="col-md-1"></th>
                         </tr>
                         </thead>
                         <tbody>
@@ -182,13 +182,49 @@
                         {% endif %}
                     </td>
                     <td headers="tutor_deadlines">
-                        {% for deadline, scores_not_yet_submitted in note_detail.deadlines_count.items %}
-                            {% if scores_not_yet_submitted > 0 %}
-                                <span class="{% if deadline|is_past %}{% endif %} text-bold text-danger">{{ deadline|date:"d/m/Y" }} </span>
-                                <span class="label label-warning">{{ scores_not_yet_submitted }}</span>
-                            {% endif %}
-                            <br>
-                        {% endfor %}
+                        {% with note_detail.deadlines_count|ordered_deadlines_to_display as deadlines %}
+{#                            <div class="row">#}
+{#                                <div class="col-md-6">#}
+                                    <ul style="list-style: none;">
+                                        {% with first_item=deadlines|get_first_item %}
+                                            {% with deadline=first_item.0 scores_not_yet_submitted=first_item.1 %}
+                                                <li>
+                                                    {% include "blocks/deadline_tutor_display.html" %}
+                                                    {% if deadlines|length > 1 %}
+                                                        <a role="button" data-toggle="collapse" data-target="#tutor_deadlines_collapse_{{ note_detail.learning_unit_year_acronym }}"
+                                                           aria-expanded="false"
+                                                           class="col-md-offset-1"
+                                                           aria-controls="tutor_deadlines_collapse_{{ note_detail.learning_unit_year_acronym }}"
+                                                           title="{% trans 'Display all deadlines for this learning unit' %}">
+                                                            <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+                                                        </a>
+                                                    {% endif %}
+                                                </li>
+                                            {% endwith %}
+                                        {% endwith %}
+                                        <div class="collapse {% if tutor %}in{% endif %}"
+                                             id="tutor_deadlines_collapse_{{ note_detail.learning_unit_year_acronym }}">
+                                            {% with deadlines_without_first=deadlines|remove_first %}
+                                                {% for deadline, scores_not_yet_submitted in deadlines_without_first.items %}
+                                                    <li>{% include "blocks/deadline_tutor_display.html" %}</li>
+                                                {% endfor %}
+                                            {% endwith %}
+                                        </div>
+                                    </ul>
+{#                                </div>#}
+{#                                <div class="col-md-6">#}
+{#                                    {% if deadlines|length > 0 %}#}
+{#                                        <a role="button" data-toggle="collapse" data-target="#tutor_deadlines_collapse_{{ note_detail.learning_unit_year_acronym }}"#}
+{#                                           aria-expanded="false"#}
+{#                                           class="pull-right"#}
+{#                                           aria-controls="tutor_deadlines_collapse_{{ note_detail.learning_unit_year_acronym }}"#}
+{#                                           title="{% trans 'Display all deadlines for this learning unit' %}">#}
+{#                                            <span class="glyphicon glyphicon-list" aria-hidden="true"></span>#}
+{#                                        </a>#}
+{#                                    {% endif %}#}
+{#                                </div>#}
+                            </div>
+                        {% endwith %}
                     </td>
                     <td headers="progress">
                         <div class="progress">

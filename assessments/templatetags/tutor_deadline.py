@@ -24,12 +24,20 @@
 #
 ##############################################################################
 import datetime
+from collections import OrderedDict
+from typing import Dict
 
 from django import template
 
 register = template.Library()
 
+ScoresNotYetSubmittedCount = int
+
 
 @register.filter
-def is_past(date):
-    return date < datetime.datetime.now().date()
+def ordered_deadlines_to_display(deadlines: Dict[datetime.date, ScoresNotYetSubmittedCount]):
+    deadlines_to_display = {
+        deadline: scores_not_yet_submitted for deadline, scores_not_yet_submitted in deadlines.items()
+        # if not deadline < datetime.datetime.now().date() or scores_not_yet_submitted > 0
+    }
+    return OrderedDict(sorted(deadlines_to_display.items()))
