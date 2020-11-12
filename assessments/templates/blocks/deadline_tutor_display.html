@@ -24,7 +24,7 @@
 {% endcomment %}
 
 {% if deadline|is_past %}
-    <strong class="text-danger">{{ deadline|date:"d/m/Y" }}</strong>
+    <strong class="error">{{ deadline|date:"d/m/Y" }}</strong>
 {% else %}
     <span>{{ deadline|date:"d/m/Y" }}</span>
 {% endif %}
