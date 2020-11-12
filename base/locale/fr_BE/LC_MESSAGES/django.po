@@ -2833,6 +2833,9 @@ msgstr ""
 "Le nombre d'enfants de type \"%(child_type)s\" pour \"%(parent)s\" a atteint "
 "la limite maximum."
 
+msgid "The objects are been deleted successfully"
+msgstr "Les compétences acquises ont bien été supprimées."
+
 #, python-format
 msgid ""
 "The parent is %(parent_periodicty)s and there is at least one partim which "
