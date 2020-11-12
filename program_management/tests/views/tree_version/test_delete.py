@@ -37,6 +37,7 @@ from program_management.ddd.domain.exception import ProgramTreeVersionNotFoundEx
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionIdentityFactory,  \
     ProgramTreeVersionFactory, StandardProgramTreeVersionFactory, SpecificProgramTreeVersionFactory
+from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 
 
 class TestDeleteVersionGetMethod(TestCase):
@@ -116,10 +117,8 @@ class TestDeleteVersionGetMethod(TestCase):
         response = self.client.get(self.url)
 
         expected_confirmation_msg = \
-            _("Are you sure you want to delete %(offer_acronym)s %(version_name)s%(title)s ?") % {
-                'offer_acronym': self.tree_version_identity.offer_acronym,
-                'version_name': "[" + self.tree_version_identity.version_name + "]",
-                'title': " - {}".format('Titre fr'),
+            _("Are you sure you want to delete %(object)s ?") % {
+                'object': "{} - {}".format(program_tree_version.tree.root_node.title, 'Titre fr')
             }
         self.assertEqual(
             response.context['confirmation_message'],
@@ -128,17 +127,29 @@ class TestDeleteVersionGetMethod(TestCase):
 
     @mock.patch('program_management.ddd.repositories.program_tree_version.ProgramTreeVersionRepository.get')
     def test_assert_context_confirmation_message_version_label_and_title(self, mock_repo):
-        program_tree_version = SpecificProgramTreeVersionFactory(tree__root_node__offer_title_fr='Titre fr',
+        root_node = NodeGroupYearFactory(offer_title_fr='Titre fr', version_name='CEMS', version_title_fr='CEMS title')
+        program_tree_version = SpecificProgramTreeVersionFactory(tree__root_node=root_node,
                                                                  title_fr='Version title')
         mock_repo.return_value = program_tree_version
-        response = self.client.get(self.url)
+        print(program_tree_version.tree.root_node.year)
+        print(program_tree_version.tree.root_node.code)
+        url_specific_version = reverse(
+            'delete_permanently_tree_version',
+            kwargs={'year': program_tree_version.tree.root_node.year, 'code': program_tree_version.tree.root_node.code}
+        )
+
+        response = self.client.get(url_specific_version)
 
         expected_confirmation_msg = \
-            _("Are you sure you want to delete %(offer_acronym)s %(version_name)s%(title)s ?") % {
-                'offer_acronym': self.tree_version_identity.offer_acronym,
-                'version_name': "[" + self.tree_version_identity.version_name + "]",
-                'title': " - Titre fr[Version title]",
+            _("Are you sure you want to delete %(object)s ?") % {
+                'object': "{}{}{}".format(program_tree_version.tree.root_node.title,
+                                          "[" + program_tree_version.tree.root_node.version_name + "]",
+                                          " - Titre fr[CEMS title]"
+                                          )
             }
+        print(response.context['confirmation_message'])
+        print('---')
+        print(expected_confirmation_msg)
         self.assertEqual(
             response.context['confirmation_message'],
             expected_confirmation_msg

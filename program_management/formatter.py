@@ -45,7 +45,7 @@ def format_version_complete_name(node: 'NodeGroupYear', language: str) -> str:
 def format_program_tree_complete_title(node: 'NodeGroupYear',
                                        program_tree_version: 'ProgramTreeVersion',
                                        language: str) -> str:
-    return "%(offer_acronym)s %(version_name)s%(title)s" % {
+    return "%(offer_acronym)s%(version_name)s%(title)s" % {
         'offer_acronym': node.title,
         'version_name': "[{}{}]".format(
             node.version_name,
