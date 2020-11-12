@@ -3,13 +3,16 @@ const PANEL_TREE_MAX_WIDTH = 1000;
 const PANEL_TREE_MAIN_MIN_WIDTH = 600;
 const PANEL_TREE_ID = '#panel_file_tree';
 
+var cache = null;
+
+
 $(document).ready(function () {
     setListenerForCopyElements();
     setListenerForCutElements();
     setListnerForClearClipboard();
-
     let $documentTree = $(PANEL_TREE_ID);
     if ($documentTree.length) {
+        cache = new BaseCache('program_tree_data', getTreeRootId());
         const copy_element_url = $documentTree.attr("data-copyUrl");
         const cut_element_url = $documentTree.attr("data-cutUrl");
         const tree_json_url = $documentTree.attr("data-jsonUrl");
@@ -215,35 +218,17 @@ function fetchTreeData(){
     $.ajax({
        url: tree_json_url,
        success: function(treeData){
-           cacheTreeData(treeData);
-           restoreTreeDataFromCache();
+           cache.setItem(treeData);
+           updateTreeData(treeData);
        },
        dataType: 'json',
        global: false  // Prevent display spinner
     });
 }
 
-function cacheTreeData(treeData) {
-    const key = getStoreKeyTreeData();
-    localStorage.setItem(key, JSON.stringify(treeData));
-}
-
-function hasTreeCacheData() {
-    const key = getStoreKeyTreeData();
-    return localStorage.getItem(key) !== null;
-}
-
-function getTreeCacheData() {
-    if (hasTreeCacheData()) {
-        const key = getStoreKeyTreeData();
-        return JSON.parse(localStorage.getItem(key));
-    }
-    return [];
-}
-
-function restoreTreeDataFromCache() {
+function updateTreeData(treeData) {
     const $documentTree = $(PANEL_TREE_ID);
-    $documentTree.jstree(true).settings.core.data = getTreeCacheData();
+    $documentTree.jstree(true).settings.core.data = treeData;
     $documentTree.jstree(true).refresh(skip_loading=true);
 }
 
@@ -288,8 +273,7 @@ function initializeJsTree($documentTree, tree_json_url, cut_element_url, copy_el
                 "animation": 0,
                 "check_callback": true,
                 "data": function(obj, callback) {
-                    const treeCachedData = getTreeCacheData();
-                    callback(treeCachedData);
+                    callback(cache.getItem({}));
                 },
             },
             "plugins": [
@@ -304,6 +288,7 @@ function initializeJsTree($documentTree, tree_json_url, cut_element_url, copy_el
                 "key": generateTreeKey(),
                 "opened": true,
                 "selected": false,
+                "ttl": 3600000
             },
             "contextmenu": {
                 "select_node": false,
