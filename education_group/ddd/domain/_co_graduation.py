@@ -24,17 +24,14 @@
 #
 ##############################################################################
 from _decimal import Decimal
+from typing import Optional
+
+import attr
 
 from osis_common.ddd import interface
 
 
+@attr.s(slots=True, frozen=True)
 class CoGraduation(interface.ValueObject):
-    def __init__(self, code_inter_cfb: str, coefficient: Decimal):
-        self.code_inter_cfb = code_inter_cfb
-        self.coefficient = coefficient
-
-    def __eq__(self, other):
-        return self.code_inter_cfb == other.code_inter_cfb and self.coefficient == other.coefficient
-
-    def __hash__(self):
-        return hash(self.code_inter_cfb + self.coefficient)
+    code_inter_cfb = attr.ib(type=str, converter=lambda val: val or "")
+    coefficient = attr.ib(type=Optional[Decimal])
