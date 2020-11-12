@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-05 09:53+0200\n"
+"POT-Creation-Date: 2020-11-12 18:15+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -160,6 +160,9 @@ msgstr "Les notes décimales sont autorisées pour ce cours"
 
 msgid "Definitive submission (Submit to faculty)"
 msgstr "Soumission définitive (Soumettre à la faculté)"
+
+msgid "Display all deadlines for this learning unit"
+msgstr "Afficher toutes les dates d'échéances pour cette unité d'enseignement"
 
 msgid "Display all tutors for this learning unit"
 msgstr "Afficher tous les tuteurs pour cette unité d'enseignement"
@@ -425,6 +428,9 @@ msgstr "Le noma ne corresond pas à l'adresse de messagerie"
 msgid "Registration number"
 msgstr "Noma"
 
+msgid "Remaining scores to submit for this deadline"
+msgstr "Nombre de notes encore à soumettre pour cette date"
+
 msgid "Remove"
 msgstr "Retirer"
 
@@ -602,6 +608,9 @@ msgstr "Formation"
 
 msgid "Tutor"
 msgstr "Tuteur"
+
+msgid "Tutor deadlines"
+msgstr "Dates d'échéance de l'enseignant"
 
 msgid "Tutors of the course"
 msgstr "Tuteurs du cours"
