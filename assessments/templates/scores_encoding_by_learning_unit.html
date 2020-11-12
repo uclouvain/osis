@@ -182,7 +182,7 @@
                         {% endif %}
                     </td>
                     <td headers="tutor_deadlines">
-                        {% with note_detail.deadlines_count|ordered_deadlines_to_display as deadlines %}
+                        {% with note_detail.remaining_scores_by_deadline|ordered_deadlines_to_display as deadlines %}
 {#                            <div class="row">#}
 {#                                <div class="col-md-6">#}
                                     <ul style="list-style: none;">

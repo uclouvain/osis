@@ -139,7 +139,7 @@ def _group_by_learning_unit(score_encoding_progress_list):
         if key in group_by_learning_unit:
             score_encoding_progress_to_update = group_by_learning_unit[key]
             score_encoding_progress_to_update.increment_progress(score_encoding_progress)
-            score_encoding_progress_to_update.increment_deadlines_count(score_encoding_progress)
+            score_encoding_progress_to_update.increment_remaining_scores_by_deadline(score_encoding_progress)
         else:
             group_by_learning_unit[key] = score_encoding_progress
     return list(group_by_learning_unit.values())
@@ -165,12 +165,9 @@ class ScoreEncodingProgress:
         self.draft_scores = exam_enrol.draft_scores
         self.scores_not_yet_submitted = exam_enrol.scores_not_yet_submitted
         self.total_exam_enrollments = exam_enrol.total_exam_enrollments
-        self.deadlines_count = {  # TODO :: to rename and add documentation
+        self.remaining_scores_by_deadline = {
             compute_deadline_tutor(exam_enrol.deadline, exam_enrol.deadline_tutor): self.scores_not_yet_submitted
         }
-        # self.session_exam_deadlines = sorted(
-        #     deadline.computed_deadline for deadline in exam_enrol.session_exam_deadlines
-        # )
 
     @property
     def progress_int(self):
@@ -182,7 +179,7 @@ class ScoreEncodingProgress:
 
     @property
     def ordered_deadlines_count(self):
-        return OrderedDict(sorted(self.deadlines_count.items()))
+        return OrderedDict(sorted(self.remaining_scores_by_deadline.items()))
 
     def increment_progress(self, score_encoding_progress):
         self.draft_scores += score_encoding_progress.draft_scores
@@ -190,12 +187,12 @@ class ScoreEncodingProgress:
         self.exam_enrollments_encoded += score_encoding_progress.exam_enrollments_encoded
         self.total_exam_enrollments += score_encoding_progress.total_exam_enrollments
 
-    def increment_deadlines_count(self, score_encoding_progress):
-        for deadline_computed, scores_not_yet_submitted in score_encoding_progress.deadlines_count.items():
-            if deadline_computed in self.deadlines_count:
-                self.deadlines_count[deadline_computed] += scores_not_yet_submitted
+    def increment_remaining_scores_by_deadline(self, score_encoding_progress):
+        for deadline_computed, scores_not_yet_submitted in score_encoding_progress.remaining_scores_by_deadline.items():
+            if deadline_computed in self.remaining_scores_by_deadline:
+                self.remaining_scores_by_deadline[deadline_computed] += scores_not_yet_submitted
             else:
-                self.deadlines_count[deadline_computed] = scores_not_yet_submitted
+                self.remaining_scores_by_deadline[deadline_computed] = scores_not_yet_submitted
 
 
 @attr.s(slots=True, frozen=True)
