@@ -41,10 +41,12 @@ from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from psycopg2._psycopg import OperationalError as PsycopOperationalError, InterfaceError as  PsycopInterfaceError
 
+import base
 from assessments.business import score_encoding_progress, score_encoding_list, score_encoding_export
 from assessments.business import score_encoding_sheet
 from attribution import models as mdl_attr
 from base import models as mdl
+from base.auth.roles import program_manager
 from base.models.enums import exam_enrollment_state as enrollment_states, exam_enrollment_state
 from base.utils import send_mail
 from osis_common.document import paper_sheet
@@ -111,7 +113,7 @@ def scores_encoding(request):
     if offer_year_id:
         offer_year_id = int(offer_year_id)
 
-    if mdl.program_manager.is_program_manager(request.user):
+    if program_manager.is_program_manager(request.user):
         template_name = "scores_encoding_by_learning_unit.html"
         NOBODY = -1
 
@@ -231,10 +233,13 @@ def online_encoding_form(request, learning_unit_year_id=None):
             context = _preserve_encoded_values(request, context)
         else:
             template_name = "online_encoding.html"
-            send_messages_to_notify_encoding_progress(context["enrollments"],
-                                                      context["learning_unit_year"],
-                                                      context["is_program_manager"],
-                                                      updated_enrollments)
+            send_messages_to_notify_encoding_progress(
+                context["enrollments"],
+                context["learning_unit_year"],
+                context["is_program_manager"],
+                updated_enrollments,
+                pgm_manager=mdl.person.find_by_user(request.user)
+            )
     else:
         context = _get_common_encoding_context(request, learning_unit_year_id)
     return render(request, template_name, context)
@@ -309,8 +314,7 @@ def specific_criteria_submission(request):
         context = _preserve_encoded_values(request, context)
         return render(request, "scores_encoding_by_specific_criteria.html", context)
     else:
-        is_program_manager = mdl.program_manager.is_program_manager(request.user)
-        bulk_send_messages_to_notify_encoding_progress(request, updated_enrollments, is_program_manager)
+        bulk_send_messages_to_notify_encoding_progress(request.user, updated_enrollments)
         if updated_enrollments:
             messages.add_message(request, messages.SUCCESS, "%s %s" % (len(updated_enrollments), _('score(s) saved')))
         return specific_criteria(request)
@@ -357,14 +361,17 @@ def online_double_encoding_validation(request, learning_unit_year_id=None):
         updated_enrollments = _update_enrollments(request, scores_list_encoded, updated_enrollments)
 
         if updated_enrollments:
-            is_program_manager = mdl.program_manager.is_program_manager(request.user)
+            is_program_manager = program_manager.is_program_manager(request.user)
             scores_list_encoded = score_encoding_list.get_scores_encoding_list(
                 user=request.user,
                 learning_unit_year_id=learning_unit_year_id)
-            send_messages_to_notify_encoding_progress(scores_list_encoded.enrollments,
-                                                      scores_list_encoded.learning_unit_year,
-                                                      is_program_manager,
-                                                      updated_enrollments)
+            send_messages_to_notify_encoding_progress(
+                scores_list_encoded.enrollments,
+                scores_list_encoded.learning_unit_year,
+                is_program_manager,
+                updated_enrollments,
+                pgm_manager=mdl.person.find_by_user(request.user)
+            )
 
     return HttpResponseRedirect(reverse('online_encoding', args=(learning_unit_year_id,)))
 
@@ -390,12 +397,12 @@ def notes_printing_all(request, tutor_id=None, offer_id=None):
 @permission_required('assessments.can_access_scoreencoding', raise_exception=True)
 @user_passes_test(_is_inside_scores_encodings_period, login_url=reverse_lazy('outside_scores_encodings_period'))
 def export_xls(request, learning_unit_year_id):
-    is_program_manager = mdl.program_manager.is_program_manager(request.user)
+    is_program_manager = base.auth.roles.program_manager.is_program_manager(request.user)
     scores_list = score_encoding_list.get_scores_encoding_list(request.user,
                                                                learning_unit_year_id=learning_unit_year_id)
     scores_list = score_encoding_list.filter_without_closed_exam_enrollments(scores_list, is_program_manager)
     if scores_list.enrollments:
-        return score_encoding_export.export_xls(scores_list.enrollments)
+        return score_encoding_export.export_xls(scores_list.enrollments, is_program_manager)
     else:
         messages.add_message(request, messages.WARNING, _("No students to encode by excel"))
         return HttpResponseRedirect(reverse('online_encoding', args=(learning_unit_year_id,)))
@@ -405,7 +412,7 @@ def export_xls(request, learning_unit_year_id):
 @permission_required('assessments.can_access_scoreencoding', raise_exception=True)
 @user_passes_test(_is_inside_scores_encodings_period, login_url=reverse_lazy('outside_scores_encodings_period'))
 def notes_printing(request, learning_unit_year_id=None, tutor_id=None, offer_id=None):
-    is_program_manager = mdl.program_manager.is_program_manager(request.user)
+    is_program_manager = base.auth.roles.program_manager.is_program_manager(request.user)
     scores_list_encoded = score_encoding_list.get_scores_encoding_list(
         user=request.user,
         learning_unit_year_id=learning_unit_year_id,
@@ -417,7 +424,12 @@ def notes_printing(request, learning_unit_year_id=None, tutor_id=None, offer_id=
     return paper_sheet.print_notes(sheet_data)
 
 
-def __send_messages_for_each_offer_year(all_enrollments, learning_unit_year, updated_enrollments):
+def __send_messages_for_each_offer_year(
+        all_enrollments,
+        learning_unit_year,
+        updated_enrollments,
+        pgm_manager: mdl.person.Person
+):
     """
     Send a message for each offer year to all the tutors of a learning unit inside a program
     managed by the program manager if all the scores
@@ -426,13 +438,18 @@ def __send_messages_for_each_offer_year(all_enrollments, learning_unit_year, upd
     :param all_enrollments: The enrollments to the learning unit year , inside the managed program.
     :param learning_unit_year: The learning unit year of the enrollments.
     :param updated_enrollments: list of exam enrollments objects which has been updated
+    :param pgm_manager: The program manager (current logged user) that has encoded scores.
     :return: A list of error message if message cannot be sent
     """
     sent_error_messages = []
     offer_years = get_offer_years_from_enrollments(updated_enrollments)
     for offer_year in offer_years:
-        sent_error_message = __send_message_for_offer_year(all_enrollments, learning_unit_year,
-                                                           offer_year)
+        sent_error_message = __send_message_for_offer_year(
+            all_enrollments,
+            learning_unit_year,
+            offer_year,
+            pgm_manager=pgm_manager
+        )
         if sent_error_message:
             sent_error_messages.append(sent_error_message)
     return sent_error_messages
@@ -443,16 +460,25 @@ def get_offer_years_from_enrollments(enrollments):
     return list(set(list_offer_years))
 
 
-def __send_message_for_offer_year(all_enrollments, learning_unit_year, offer_year):
+def __send_message_for_offer_year(
+        all_enrollments,
+        learning_unit_year,
+        offer_year,
+        pgm_manager: mdl.person.Person
+):
     enrollments = filter_enrollments_by_offer_year(all_enrollments, offer_year)
     progress = mdl.exam_enrollment.calculate_exam_enrollment_progress(enrollments)
     offer_acronym = offer_year.acronym
     sent_error_message = None
     if progress == 100:
-        persons = list(set([tutor.person for tutor in mdl.tutor.find_by_learning_unit(learning_unit_year)]))
-        sent_error_message = send_mail.send_message_after_all_encoded_by_manager(persons, enrollments,
-                                                                                 learning_unit_year.acronym,
-                                                                                 offer_acronym)
+        receivers = list(set([tutor.person for tutor in mdl.tutor.find_by_learning_unit(learning_unit_year)]))
+        sent_error_message = send_mail.send_message_after_all_encoded_by_manager(
+            receivers,
+            enrollments,
+            learning_unit_year.acronym,
+            offer_acronym,
+            cc=[pgm_manager]
+        )
     return sent_error_message
 
 
@@ -490,24 +516,38 @@ def _extract_encoded_values_from_post_data(request, enrollments):
     return enrollment_with_encoded_values
 
 
-def bulk_send_messages_to_notify_encoding_progress(request, updated_enrollments, is_program_manager):
+def bulk_send_messages_to_notify_encoding_progress(logged_user, updated_enrollments):
+    is_program_manager = program_manager.is_program_manager(logged_user)
     if is_program_manager:
+        pgm_manager = mdl.person.find_by_user(logged_user)
         mail_already_sent_by_learning_unit = set()
         for enrollment in updated_enrollments:
             learning_unit_year = enrollment.learning_unit_enrollment.learning_unit_year
             if learning_unit_year in mail_already_sent_by_learning_unit:
                 continue
-            scores_list = score_encoding_list.get_scores_encoding_list(user=request.user,
-                                                                       learning_unit_year_id=learning_unit_year.id)
-            send_messages_to_notify_encoding_progress(scores_list.enrollments, learning_unit_year,
-                                                      is_program_manager, updated_enrollments)
+            scores_list = score_encoding_list.get_scores_encoding_list(
+                user=logged_user,
+                learning_unit_year_id=learning_unit_year.id
+            )
+            send_messages_to_notify_encoding_progress(
+                scores_list.enrollments,
+                learning_unit_year,
+                is_program_manager,
+                updated_enrollments,
+                pgm_manager=pgm_manager
+            )
             mail_already_sent_by_learning_unit.add(learning_unit_year)
 
 
-def send_messages_to_notify_encoding_progress(all_enrollments, learning_unit_year, is_program_manager,
-                                              updated_enrollments):
+def send_messages_to_notify_encoding_progress(
+        all_enrollments,
+        learning_unit_year,
+        is_program_manager,
+        updated_enrollments,
+        pgm_manager: mdl.person.Person
+):
     if is_program_manager:
-        __send_messages_for_each_offer_year(all_enrollments, learning_unit_year, updated_enrollments)
+        __send_messages_for_each_offer_year(all_enrollments, learning_unit_year, updated_enrollments, pgm_manager)
 
 
 def online_double_encoding_get_form(request, data=None, learning_unit_year_id=None):
@@ -528,7 +568,7 @@ def _get_common_encoding_context(request, learning_unit_year_id):
     tutors = mdl.tutor.find_by_learning_unit(scores_list.learning_unit_year) \
         .exclude(id__in=[score_responsible.id for score_responsible in score_responsibles])
     is_coordinator = mdl_attr.attribution.is_score_responsible(request.user, scores_list.learning_unit_year)
-    is_program_manager = mdl.program_manager.is_program_manager(request.user)
+    is_program_manager = program_manager.is_program_manager(request.user)
 
     context = {
         'section': 'scores_encoding',
@@ -555,7 +595,7 @@ def _get_specific_criteria_context(request):
     offer_year_id = post_data.get('program')
     current_academic_year = mdl.academic_year.current_academic_year()
     offers_year_managed = mdl.offer_year.find_by_user(request.user, current_academic_year)
-    is_program_manager = mdl.program_manager.is_program_manager(request.user)
+    is_program_manager = program_manager.is_program_manager(request.user)
 
     context = {
         'offer_year_id': int(offer_year_id) if offer_year_id else None,
