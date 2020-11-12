@@ -100,7 +100,9 @@ class TestDeleteMiniTrainingGetMethod(TestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
 
-    def test_assert_template_used(self):
+    @mock.patch('program_management.ddd.repositories.program_tree_version.ProgramTreeVersionRepository.get')
+    def test_assert_template_used(self, mock_repo):
+        mock_repo.return_value = self.program_tree_version
         response = self.client.get(self.url)
         self.assertTemplateUsed(response, "education_group_app/mini_training/delete_inner.html")
 

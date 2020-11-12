@@ -23,6 +23,8 @@
 # ############################################################################
 from backoffice.settings.base import LANGUAGE_CODE_EN
 from program_management.ddd.business_types import *
+from program_management.ddd.domain.exception import ProgramTreeNotFoundException
+from django.http import Http404
 
 
 def format_version_title(node: 'NodeGroupYear', language: str) -> str:
@@ -42,16 +44,19 @@ def format_version_complete_name(node: 'NodeGroupYear', language: str) -> str:
     return " - {}{}".format(node.version_title_fr, version_name) if node.version_title_fr else ""
 
 
-def format_program_tree_complete_title(node: 'NodeGroupYear',
-                                       program_tree_version: 'ProgramTreeVersion',
+def format_program_tree_complete_title(program_tree_version: 'ProgramTreeVersion',
                                        language: str) -> str:
-    return "%(offer_acronym)s%(version_name)s%(title)s" % {
-        'offer_acronym': node.title,
-        'version_name': "[{}{}]".format(
-            node.version_name,
-            '-Transition' if program_tree_version.is_transition else '') if node.version_name else '',
-        'title': _build_title(node, language),
-        }
+    try:
+        node = program_tree_version.get_tree().root_node
+        return "%(offer_acronym)s%(version_name)s%(title)s" % {
+            'offer_acronym': node.title,
+            'version_name': "[{}{}]".format(
+                node.version_name,
+                '-Transition' if program_tree_version.is_transition else '') if node.version_name else '',
+            'title': _build_title(node, language),
+            }
+    except ProgramTreeNotFoundException:
+        raise Http404
 
 
 def _build_title(node: 'NodeGroupYear', language: str):
