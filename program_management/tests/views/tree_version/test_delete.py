@@ -131,8 +131,7 @@ class TestDeleteVersionGetMethod(TestCase):
         program_tree_version = SpecificProgramTreeVersionFactory(tree__root_node=root_node,
                                                                  title_fr='Version title')
         mock_repo.return_value = program_tree_version
-        print(program_tree_version.tree.root_node.year)
-        print(program_tree_version.tree.root_node.code)
+
         url_specific_version = reverse(
             'delete_permanently_tree_version',
             kwargs={'year': program_tree_version.tree.root_node.year, 'code': program_tree_version.tree.root_node.code}
@@ -147,9 +146,7 @@ class TestDeleteVersionGetMethod(TestCase):
                                           " - Titre fr[CEMS title]"
                                           )
             }
-        print(response.context['confirmation_message'])
-        print('---')
-        print(expected_confirmation_msg)
+
         self.assertEqual(
             response.context['confirmation_message'],
             expected_confirmation_msg
