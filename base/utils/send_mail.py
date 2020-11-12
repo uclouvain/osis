@@ -299,8 +299,7 @@ def send_message_after_all_encoded_by_manager(receivers, enrollments, learning_u
             justifications[enrollment.justification_final] if enrollment.justification_final else '',
         ) for enrollment in enrollments]
 
-    order_by = lambda r: r['receiver_lang']
-    receivers_by_lang = itertools.groupby(sorted(receivers, key=order_by), order_by)
+    receivers_by_lang = itertools.groupby(sorted(receivers, key=__order_by_lang), __order_by_lang)
 
     for receiver_lang, receivers in receivers_by_lang:
 
@@ -323,6 +322,10 @@ def send_message_after_all_encoded_by_manager(receivers, enrollments, learning_u
             cc=cc,
         )
         message_service.send_messages(message_content)
+
+
+def __order_by_lang(receiver):
+    return receiver['receiver_lang']
 
 
 def build_scores_sheet_attachment(list_exam_enrollments):
