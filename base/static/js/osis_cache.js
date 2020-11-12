@@ -1,34 +1,36 @@
 CACHE_MAX_ELEMENTS = 10;
 
 class BaseCache {
-    constructor(context, key) {
+    constructor(context) {
         this.context = context;
-        this.key = key;
-        this.storageKey = BaseCache.getStorageKey(this.context, this.key)
+        this.storageKey = BaseCache.getStorageKey(this.context, this.key);
     }
 
-    getItem(defaultValue=null) {
-        const cachedData =  JSON.parse(localStorage.getItem(this.storageKey));
+    getItem(key, defaultValue=null) {
+        const storageKey = BaseCache.getStorageKey(this.context, key)
+        const cachedData =  JSON.parse(localStorage.getItem(storageKey));
         if (cachedData === null && defaultValue !== null){
             return defaultValue;
         }
         return cachedData;
     }
 
-    setItem(data) {
+    setItem(key, data) {
+        const storageKey = BaseCache.getStorageKey(this.context, key)
         try{
-            localStorage.setItem(this.storageKey, JSON.stringify(data));
+            localStorage.setItem(storageKey, JSON.stringify(data));
         }catch {
             const eventExceed = new CustomEvent('cache_exceeded', {detail: this.context});
             document.dispatchEvent(eventExceed);
-            localStorage.setItem(this.storageKey, JSON.stringify(data));
+            localStorage.setItem(storageKey, JSON.stringify(data));
         }
         const eventGarbage = new CustomEvent('cache_garbage', {detail: this.context});
         document.dispatchEvent(eventGarbage);
     }
 
-    removeItem(){
-        localStorage.removeItem(this.storageKey);
+    removeItem(key){
+        const storageKey = BaseCache.getStorageKey(this.context, key)
+        localStorage.removeItem(storageKey);
     }
 
     static getStorageKey(context, key) {

@@ -4,7 +4,7 @@ const PANEL_TREE_MAIN_MIN_WIDTH = 600;
 const PANEL_TREE_ID = '#panel_file_tree';
 
 var cache = null;
-
+var configurationCache = null;
 
 $(document).ready(function () {
     setListenerForCopyElements();
@@ -12,7 +12,8 @@ $(document).ready(function () {
     setListnerForClearClipboard();
     let $documentTree = $(PANEL_TREE_ID);
     if ($documentTree.length) {
-        cache = new BaseCache('program_tree_data', getTreeRootId());
+        cache = new BaseCache('program_tree_data');
+        configurationCache = new BaseCache('program_tree_configuration')
         const copy_element_url = $documentTree.attr("data-copyUrl");
         const cut_element_url = $documentTree.attr("data-cutUrl");
         const tree_json_url = $documentTree.attr("data-jsonUrl");
@@ -67,7 +68,8 @@ function setResearchTimeOut($documentTree) {
 
 
 function setNavVisibility() {
-    let treeVisibility = localStorage.getItem("treeVisibility") || "0";
+
+    let treeVisibility = configurationCache.getItem("treeVisibility", "0");
     if (treeVisibility === "1") {
         openNav();
         adaptTreeOnFooter();
@@ -76,21 +78,21 @@ function setNavVisibility() {
     }
 }
 function openNav() {
-    let size = localStorage.getItem("sidenav_size") || "300px";
+    let size = configurationCache.getItem("sidenav_size", "300px");
     document.getElementById("mySidenav").style.width = size;
     document.getElementById("main").style.marginLeft = size;
-    localStorage.setItem("treeVisibility", "1");
+    configurationCache.setItem("treeVisibility", "1");
 
 }
 
 function closeNav() {
     document.getElementById("mySidenav").style.width = "0";
     document.getElementById("main").style.marginLeft = "0";
-    localStorage.setItem("treeVisibility", "0");
+    configurationCache.setItem("treeVisibility", "0");
 }
 
 function toggleNav() {
-    let treeVisibility = localStorage.getItem("treeVisibility") || "0";
+    let treeVisibility = configurationCache.getItem("treeVisibility", "0");
     if (treeVisibility === "0") {
         openNav();
     } else {
@@ -109,7 +111,7 @@ $('#split-bar').mousedown(function (e) {
             sidebar.css("width", x);
             $('#main').css("margin-left", x);
         }
-        localStorage.setItem("sidenav_size", sidebar.width().toString() + "px")
+        configurationCache.setItem("sidenav_size", sidebar.width().toString() + "px")
     })
 });
 
@@ -133,13 +135,13 @@ function saveScrollPosition() {
     const scrollPosition = $("#scrollableDiv")[0].scrollTop;
     const storageValue = {};
     storageValue[rootId] = scrollPosition;
-    localStorage.setItem('scrollpos', JSON.stringify(storageValue));
+    configurationCache.setItem('scrollpos', storageValue);
 }
 
 
 function scrollToPositionSaved() {
     const rootId = getTreeRootId();
-    const storageValue = JSON.parse(localStorage.getItem('scrollpos'));
+    const storageValue = configurationCache.getItem('scrollpos');
     let scrollPosition = 0;
     if (storageValue !== null && rootId in storageValue) {
         scrollPosition = storageValue[rootId];
@@ -218,7 +220,7 @@ function fetchTreeData(){
     $.ajax({
        url: tree_json_url,
        success: function(treeData){
-           cache.setItem(treeData);
+           cache.setItem(getTreeRootId(), treeData);
            updateTreeData(treeData);
        },
        dataType: 'json',
@@ -273,7 +275,7 @@ function initializeJsTree($documentTree, tree_json_url, cut_element_url, copy_el
                 "animation": 0,
                 "check_callback": true,
                 "data": function(obj, callback) {
-                    callback(cache.getItem({}));
+                    callback(cache.getItem(getTreeRootId(), {}));
                 },
             },
             "plugins": [
