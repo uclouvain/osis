@@ -37,7 +37,7 @@ from base.models.enums import exam_enrollment_state
 from base.models.exam_enrollment import ExamEnrollment
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.offer_year import OfferYear
-from base.models.session_exam_deadline import SessionExamDeadline
+from base.models.session_exam_deadline import SessionExamDeadline, compute_deadline_tutor
 from base.models.tutor import Tutor
 
 
@@ -149,13 +149,6 @@ def _sort_by_acronym(score_encoding_progress_list):
     return sorted(score_encoding_progress_list, key=lambda k: k.learning_unit_year_acronym)
 
 
-# FIXME : duplicated with SessionExamDeadline
-def compute_deadline(deadline, deadline_tutor):
-    if deadline_tutor is not None:
-        return deadline - datetime.timedelta(days=deadline_tutor)
-    return None
-
-
 class ScoreEncodingProgress:
     def __init__(self, exam_enrol: exam_enrollment.ExamEnrollment):
         self.learning_unit_year_id = exam_enrol.learning_unit_year_id
@@ -173,7 +166,7 @@ class ScoreEncodingProgress:
         self.scores_not_yet_submitted = exam_enrol.scores_not_yet_submitted
         self.total_exam_enrollments = exam_enrol.total_exam_enrollments
         self.deadlines_count = {  # TODO :: to rename and add documentation
-            compute_deadline(exam_enrol.deadline, exam_enrol.deadline_tutor): self.scores_not_yet_submitted
+            compute_deadline_tutor(exam_enrol.deadline, exam_enrol.deadline_tutor): self.scores_not_yet_submitted
         }
         # self.session_exam_deadlines = sorted(
         #     deadline.computed_deadline for deadline in exam_enrol.session_exam_deadlines
