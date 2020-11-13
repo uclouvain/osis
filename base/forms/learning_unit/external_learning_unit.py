@@ -230,7 +230,8 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
                 # Default language French
                 'language': Language.objects.get(code='FR'),
             },
-            'person': self.person
+            'person': self.person,
+            'subtype': self.subtype
         }
 
     def get_context(self):
@@ -349,7 +350,8 @@ class ExternalPartimForm(LearningUnitBaseForm):
             },
             LearningContainerYearExternalModelForm: {
                 'instance': self.learning_unit_year_full.learning_container_year,
-                'person': self.person
+                'person': self.person,
+                'subtype': self.subtype
             },
             SimplifiedVolumeManagementForm: {
                 'data': data,
