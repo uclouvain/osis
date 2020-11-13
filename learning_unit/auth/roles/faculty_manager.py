@@ -32,7 +32,7 @@ class FacultyManager(osis_role_models.EntityRoleModel):
             'base.can_delete_learningunit':
                 predicates.is_learning_unit_container_type_deletable &
                 predicates.is_user_attached_to_current_requirement_entity &
-                predicates.is_learning_unit_year_older_or_equals_than_limit_settings_year &
+                predicates.is_learning_unit_start_year_after_year_limit &
                 predicates.has_learning_unit_prerequisite_dependencies &
                 predicates.has_learning_unit_no_application_all_years,
             'base.can_edit_learningunit':
