@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import re
 
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
@@ -31,13 +32,14 @@ from django.views.generic import FormView
 import osis_common.ddd.interface
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.utils.cache import ElementCache
-from base.views.common import display_error_messages, display_warning_messages
+from base.utils.urls import reverse_with_get
+from base.views.common import display_error_messages
 from base.views.common import display_success_messages
 from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import link
 from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
-from program_management.ddd.service.read import detach_warning_messages_service, get_program_tree_service
+from program_management.ddd.service.read import get_program_tree_service
 from program_management.ddd.service.write import detach_node_service
 from program_management.forms.tree.detach import DetachNodeForm
 from program_management.views.generic import GenericGroupElementYearMixin
@@ -84,10 +86,6 @@ class DetachNodeView(GenericGroupElementYearMixin, FormView):
         detach_node_command = command.DetachNodeCommand(path_where_to_detach=self.request.GET.get('path'), commit=False)
         try:
             detach_node_service.detach_node(detach_node_command)
-
-            warning_messages = detach_warning_messages_service.detach_warning_messages(detach_node_command)
-            display_warning_messages(self.request, warning_messages)
-
             context['confirmation_message'] = self.get_confirmation_msg()
         except MultipleBusinessExceptions as multiple_exceptions:
             messages = [e.message for e in multiple_exceptions.exceptions]
@@ -138,5 +136,22 @@ class DetachNodeView(GenericGroupElementYearMixin, FormView):
         return _("Are you sure you want to detach %(child)s ?") % {"child": self.child_node}
 
     def get_success_url(self):
-        # We can just reload the page
-        return
+        path = self.request.GET.get('redirect_path') or self.path_to_detach
+        if re.match(re.escape(self.path_to_detach), path):
+            path = self.path_to_detach[:self.path_to_detach.rfind("|")]
+
+        root_identity = NodeIdentitySearch().get_from_element_id(int(path.split('|')[0]))
+        cmd = command.GetProgramTree(code=root_identity.code, year=root_identity.year)
+        tree = get_program_tree_service.get_program_tree(cmd)
+        node = tree.get_node(path)
+
+        if node.is_learning_unit():
+            # TODO : Change element_identification proxy logic in order to be specific
+            #  to tree for learning unit year
+            url_name = 'learning_unit_prerequisite' if 'prerequisite' in self.request.META.get('HTTP_REFERER') \
+                else 'learning_unit_utilization'
+            view_kwargs = {'root_element_id': tree.root_node.pk, 'child_element_id': node.pk}
+        else:
+            url_name = 'element_identification'
+            view_kwargs = {'code': node.code, 'year': node.year}
+        return reverse_with_get(url_name, kwargs=view_kwargs, get={'path': path})
