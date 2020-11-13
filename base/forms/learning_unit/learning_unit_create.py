@@ -32,6 +32,7 @@ from django.utils.functional import lazy, cached_property
 from django.utils.translation import gettext_lazy as _
 
 from base.business.learning_units.edition import update_partim_acronym
+from base.forms.common import ValidationRuleMixin
 from base.forms.learning_unit.entity_form import find_additional_requirement_entities_choices, \
     PedagogicalEntitiesRoleModelChoiceField
 from base.forms.utils.acronym_field import AcronymField, PartimAcronymField, split_acronym
@@ -90,11 +91,12 @@ class LearningContainerModelForm(forms.ModelForm):
         fields = ()
 
 
-class LearningUnitYearModelForm(PermissionFieldMixin, forms.ModelForm):
+class LearningUnitYearModelForm(PermissionFieldMixin, ValidationRuleMixin, forms.ModelForm):
 
     def __init__(self, data, person, subtype, *args, external=False, **kwargs):
         self.person = person
         self.user = self.person.user
+        self.proposal = kwargs.pop('proposal', False)
         super().__init__(data, *args, **kwargs)
 
         self.external = external
@@ -194,6 +196,16 @@ class LearningUnitYearModelForm(PermissionFieldMixin, forms.ModelForm):
                 raise ValidationError(_('The credits value should be an integer'))
         return credits_
 
+    # ValidationRuleMixin
+    def field_reference(self, field_name: str) -> str:
+        context = []
+        if self.instance.learning_container_year:
+            context.append(self.instance.learning_container_year.container_type)
+        context.append(self.instance.subtype)
+        if self.proposal:
+            context.append("PROPOSAL")
+        return '.'.join(["LearningUnitYearModelForm", '_'.join(context), field_name])
+
 
 class CountryEntityField(forms.ChoiceField):
     def __init__(self, *args, widget_attrs=None, **kwargs):
@@ -214,7 +226,7 @@ class CountryEntityField(forms.ChoiceField):
         )
 
 
-class LearningContainerYearModelForm(PermissionFieldMixin, forms.ModelForm):
+class LearningContainerYearModelForm(PermissionFieldMixin, ValidationRuleMixin, forms.ModelForm):
     requirement_entity = forms.CharField()
     country_requirement_entity = CountryEntityField()
 
@@ -236,6 +248,7 @@ class LearningContainerYearModelForm(PermissionFieldMixin, forms.ModelForm):
         self.user = self.person.user
         self.proposal = kwargs.pop('proposal', False)
         self.is_create_form = kwargs['instance'] is None
+        self.subtype = kwargs.pop('subtype')
         super().__init__(*args, **kwargs)
         self.prepare_fields()
         self.fields['common_title'].label = _('Common part')
@@ -411,3 +424,14 @@ class LearningContainerYearModelForm(PermissionFieldMixin, forms.ModelForm):
     @cached_property
     def additionnal_entity_version_2(self):
         return self.fields["additional_entity_2"].entity_version
+
+    # ValidationRuleMixin
+    def field_reference(self, field_name: str) -> str:
+        context = []
+        if self.instance.container_type:
+            context.append(self.instance.container_type)
+        if self.subtype:
+            context.append(self.subtype)
+        if self.proposal:
+            context.append("PROPOSAL")
+        return '.'.join(["LearningContainerYearModelForm", '_'.join(context), field_name])

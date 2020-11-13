@@ -28,6 +28,7 @@ class FacultyManager(osis_role_models.EntityRoleModel):
                 predicates.is_learning_unit_year_full &
                 predicates.is_external_learning_unit_with_cograduation,
             'base.can_access_learningunit': rules.always_allow,
+            'base.can_access_externallearningunityear': rules.always_allow,
             'base.can_delete_learningunit':
                 predicates.is_learning_unit_container_type_deletable &
                 predicates.is_user_attached_to_current_requirement_entity &
