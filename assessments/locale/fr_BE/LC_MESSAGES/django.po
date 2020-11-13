@@ -504,7 +504,7 @@ msgid "Search"
 msgstr "Chercher"
 
 msgid "Search of annual programs"
-msgstr "Chercher les formations annuels"
+msgstr "Chercher les formations annuelles"
 
 msgid "Select an encoding type"
 msgstr "Sélectionnez un type d'encodage"
@@ -568,7 +568,7 @@ msgid "The file must be a valid 'XLSX' excel file"
 msgstr "Le fichier doit être un fichier excel valide"
 
 msgid "The manager will keep the following programs : "
-msgstr "Le gestionnaire devra conserver les formations suivant : "
+msgstr "Le gestionnaire devra conserver les formations suivantes : "
 
 #, python-format
 msgid ""
