@@ -33,7 +33,7 @@ from django.test import TestCase
 from base.forms.learning_unit.edition_volume import SimplifiedVolumeManagementForm
 from base.forms.learning_unit.learning_unit_create import LearningUnitYearModelForm, \
     LearningUnitModelForm, LearningContainerYearModelForm, LearningContainerModelForm
-from base.forms.learning_unit.learning_unit_partim import PARTIM_FORM_READ_ONLY_FIELD, PartimForm, \
+from base.forms.learning_unit.learning_unit_partim import PartimForm, \
     LearningUnitPartimModelForm
 from base.models.enums import learning_unit_year_subtypes, organization_type
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
@@ -411,15 +411,6 @@ class TestPartimFormSave(LearningUnitPartimFormContextMixin):
         self.learning_unit_year_partim.refresh_from_db()
         self.assertEqual(self.learning_unit_year_partim.acronym, partim_acronym)
         self.assertEqual(self.learning_unit_year_partim.learning_container_year.acronym, parent_acronym)
-
-    def test_disable_fields_partim(self):
-        form = _instanciate_form(learning_unit_full=self.learning_unit_year_full.learning_unit,
-                                 academic_year=self.learning_unit_year_full.academic_year,
-                                 instance=self.learning_unit_year_partim.learning_unit)
-        disabled_fields = {key for key, value in form.fields.items() if value.disabled is True}
-        # acronym_0 and acronym_1 are disabled in the widget, not in the field
-        disabled_fields.update({'acronym_0', 'acronym_1'})
-        self.assertEqual(disabled_fields, PARTIM_FORM_READ_ONLY_FIELD)
 
     def test_save_partim_from_proposal_with_no_end_year_in_original_learning_unit(self):
         proposal = ProposalLearningUnitFactory(

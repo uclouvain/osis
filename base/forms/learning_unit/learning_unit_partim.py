@@ -43,7 +43,7 @@ from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit import LearningUnit
 from base.models.proposal_learning_unit import is_learning_unit_in_proposal, find_by_learning_unit
 
-PARTIM_FORM_READ_ONLY_FIELD = {
+PARTIM_FORM_INHERIT_FIELDS = {
     'acronym_0', 'acronym_1', 'common_title', 'common_title_english',
     'requirement_entity', 'allocation_entity',
     'academic_year', 'container_type', 'internship_subtype',
@@ -124,7 +124,6 @@ class PartimForm(LearningUnitBaseForm):
         instances_data = self._build_instance_data(data, inherit_luy_values)
 
         super().__init__(instances_data, *args, **kwargs)
-        self.disable_fields(PARTIM_FORM_READ_ONLY_FIELD)
 
     def _specific_title_post_clean(self):
         if not self.learning_container_year_form.instance.common_title and \
@@ -148,7 +147,8 @@ class PartimForm(LearningUnitBaseForm):
             },
             LearningContainerYearModelForm: {
                 'instance': self.learning_unit_year_full.learning_container_year,
-                'person': self.person
+                'person': self.person,
+                'subtype': self.subtype
             },
             SimplifiedVolumeManagementForm: {
                 'data': data,
@@ -179,7 +179,7 @@ class PartimForm(LearningUnitBaseForm):
     def _get_inherit_learning_unit_year_full_value(self):
         """This function will return the inherit value come from learning unit year FULL"""
         return {field: value for field, value in self._get_initial_learning_unit_year_form().items()
-                if field in PARTIM_FORM_READ_ONLY_FIELD}
+                if field in PARTIM_FORM_INHERIT_FIELDS}
 
     def _get_initial_learning_unit_year_form(self):
         acronym = self.instance.acronym if self.instance else self.learning_unit_year_full.acronym

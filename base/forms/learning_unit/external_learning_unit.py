@@ -36,7 +36,7 @@ from base.forms.learning_unit.edition_volume import SimplifiedVolumeManagementFo
 from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm, LearningContainerModelForm, \
     LearningContainerYearModelForm, LearningUnitYearModelForm
 from base.forms.learning_unit.learning_unit_create_2 import LearningUnitBaseForm
-from base.forms.learning_unit.learning_unit_partim import PARTIM_FORM_READ_ONLY_FIELD, LearningUnitPartimModelForm, \
+from base.forms.learning_unit.learning_unit_partim import PARTIM_FORM_INHERIT_FIELDS, LearningUnitPartimModelForm, \
     merge_data
 from base.forms.utils.acronym_field import ExternalAcronymField, split_acronym, ExternalPartimAcronymField
 from base.models.academic_year import AcademicYear, compute_max_academic_year_adjournment
@@ -318,7 +318,6 @@ class ExternalPartimForm(LearningUnitBaseForm):
         instances_data = self._build_instance_data(data, inherit_luy_values)
 
         super().__init__(instances_data, *args, **kwargs)
-        self.disable_fields(PARTIM_FORM_READ_ONLY_FIELD)
         self.learning_unit_year_form.fields['acronym'] = ExternalPartimAcronymField()
 
     @property
@@ -390,7 +389,7 @@ class ExternalPartimForm(LearningUnitBaseForm):
     def _get_inherit_learning_unit_year_full_value(self):
         """This function will return the inherit value come from learning unit year FULL"""
         return {field: value for field, value in self._get_initial_learning_unit_year_form().items()
-                if field in PARTIM_FORM_READ_ONLY_FIELD}
+                if field in PARTIM_FORM_INHERIT_FIELDS}
 
     def _get_initial_learning_unit_year_form(self):
         acronym = self.instance.acronym if self.instance else self.learning_unit_year_full.acronym

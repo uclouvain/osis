@@ -39,28 +39,10 @@ from base.models import academic_year
 from base.models.academic_year import MAX_ACADEMIC_YEAR_FACULTY, MAX_ACADEMIC_YEAR_CENTRAL, AcademicYear
 from base.models.campus import Campus
 from base.models.enums import learning_unit_year_subtypes, learning_component_year_type
-from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_YEAR_TYPES_FOR_FACULTY, \
-    LCY_TYPES_WITH_FIXED_ACRONYM
 from base.models.enums.proposal_type import ProposalType
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import LearningUnitYear
 from reference.models.language import Language
-
-FULL_READ_ONLY_FIELDS = {"acronym",
-                         "academic_year",
-                         "container_type",
-                         "type_declaration_vacant",
-                         "is_vacant",
-                         "attribution_procedure"}
-FULL_PROPOSAL_READ_ONLY_FIELDS = {"academic_year",
-                                  "container_type",
-                                  "type_declaration_vacant",
-                                  "is_vacant",
-                                  "attribution_procedure"}
-PROPOSAL_READ_ONLY_FIELDS = {"container_type",
-                             "type_declaration_vacant",
-                             "is_vacant",
-                             "attribution_procedure"}
 
 FACULTY_OPEN_FIELDS = {
     'quadrimester',
@@ -288,7 +270,7 @@ class FullForm(LearningUnitBaseForm):
                 'data': data,
                 'instance': self.instance.learning_container_year.learning_container if self.instance else None,
             },
-            LearningUnitYearModelForm: self._build_instance_data_learning_unit_year(data, default_ac_year),
+            LearningUnitYearModelForm: self._build_instance_data_learning_unit_year(data, default_ac_year, proposal),
             LearningContainerYearModelForm: self._build_instance_data_learning_container_year(data, proposal),
             SimplifiedVolumeManagementForm: {
                 'data': data,
@@ -319,10 +301,11 @@ class FullForm(LearningUnitBaseForm):
                 # Default campus selected 'Louvain-la-Neuve' if exist
                 'campus': Campus.objects.filter(name='Louvain-la-Neuve').first()
             } if not self.instance else None,
-            'person': self.person
+            'person': self.person,
+            'subtype': self.subtype
         }
 
-    def _build_instance_data_learning_unit_year(self, data, default_ac_year):
+    def _build_instance_data_learning_unit_year(self, data, default_ac_year, proposal):
         return {
             'data': data,
             'instance': self.instance,
@@ -333,7 +316,8 @@ class FullForm(LearningUnitBaseForm):
                 'language': Language.objects.get(code='FR')
             } if not self.instance else None,
             'person': self.person,
-            'subtype': self.subtype
+            'subtype': self.subtype,
+            'proposal': proposal,
         }
 
     def save(self, commit=True):
