@@ -268,7 +268,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
         return reverse_with_get(
             'tree_json',
             kwargs={'root_id': self.get_root_id()},
-            get={"path": self.get_path()}
+            get={"path": self.path}
         )
 
     def get_create_version_permission_name(self) -> str:
