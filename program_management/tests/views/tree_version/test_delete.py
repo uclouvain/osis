@@ -143,7 +143,7 @@ class TestDeleteVersionGetMethod(TestCase):
             _("Are you sure you want to delete %(object)s ?") % {
                 'object': "{}{}{}".format(program_tree_version.tree.root_node.title,
                                           "[" + program_tree_version.tree.root_node.version_name + "]",
-                                          " - Titre fr[CEMS title]"
+                                          " - Titre fr [CEMS title]"
                                           )
             }
 

@@ -69,7 +69,7 @@ def _build_title(node: 'NodeGroupYear', language: str):
             node.offer_title_fr
         ) if node.offer_title_fr else ''
     if language == LANGUAGE_CODE_EN and node.version_title_en:
-        version_title = "[{}]".format(node.version_title_en)
+        version_title = " [{}]".format(node.version_title_en)
     else:
-        version_title = "[{}]".format(node.version_title_fr) if node.version_title_fr else ''
+        version_title = " [{}]".format(node.version_title_fr) if node.version_title_fr else ''
     return "{}{}".format(offer_title, version_title)
