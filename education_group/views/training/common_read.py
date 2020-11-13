@@ -333,7 +333,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
         return academic_year.starting_academic_year()
 
     def have_administrative_data_tab(self):
-        return not self.group.type in TrainingType.root_master_2m_types_enum() and \
+        return self.group.type not in TrainingType.root_master_2m_types_enum() and \
                self.current_version.is_standard_version
 
     def have_general_information_tab(self):
