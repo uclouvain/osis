@@ -23,23 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import datetime
+
 from django import template
 
 register = template.Library()
 
 
 @register.filter
-def get_item(dictionary, key):
-    return dictionary.get(key)
-
-
-@register.filter
-def get_first_item(dictionary):
-    return next(iter(dictionary.items()))
-
-
-@register.filter
-def remove_first(dictionary: dict):
-    key, value = get_first_item(dictionary)
-    del dictionary[key]
-    return dictionary
+def is_past(date):
+    return date < datetime.datetime.now().date()

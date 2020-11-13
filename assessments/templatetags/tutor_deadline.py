@@ -23,23 +23,21 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import datetime
+from collections import OrderedDict
+from typing import Dict
+
 from django import template
 
 register = template.Library()
 
-
-@register.filter
-def get_item(dictionary, key):
-    return dictionary.get(key)
+ScoresNotYetSubmittedCount = int
 
 
 @register.filter
-def get_first_item(dictionary):
-    return next(iter(dictionary.items()))
-
-
-@register.filter
-def remove_first(dictionary: dict):
-    key, value = get_first_item(dictionary)
-    del dictionary[key]
-    return dictionary
+def ordered_deadlines_to_display(deadlines: Dict[datetime.date, ScoresNotYetSubmittedCount]):
+    deadlines_to_display = {
+        deadline: scores_not_yet_submitted for deadline, scores_not_yet_submitted in deadlines.items()
+        if not deadline < datetime.datetime.now().date() or scores_not_yet_submitted > 0
+    }
+    return OrderedDict(sorted(deadlines_to_display.items()))
