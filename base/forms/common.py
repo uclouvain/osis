@@ -96,7 +96,7 @@ class ValidationRuleMixin(WarningFormMixin):
         return result
 
     def field_reference(self, name):
-        return ImproperlyConfigured('You must define a field reference for validation rule')
+        raise ImproperlyConfigured('You must define a field reference in order to check for existing validation rules')
 
     def _set_rules_on_fields(self):
         for name, field in self.fields.items():
