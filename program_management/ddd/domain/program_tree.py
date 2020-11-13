@@ -573,6 +573,30 @@ class ProgramTree(interface.RootEntity):
         ).validate()
         return link_updated
 
+    def get_direct_parents_nodes_using_node(self, child_node: 'Node') -> List['Node']:
+        return [link_obj.parent for link_obj in _links_from_root(self.root_node) if link_obj.child == child_node]
+
+    def get_path_from_node(self, node_parent: 'Node') -> List['Path']:
+        paths = []
+        for path, child_node in self.root_node.descendents:
+            if str(node_parent.pk) in path:
+                paths.append(path)
+        return paths
+
+    def get_indirect_parents(self, node: 'Node') -> List['NodeGroupYear']:
+        # TODO attention perf
+        paths = self.get_path_from_node(node)
+
+        indirect_parents = []
+        for path in paths:
+            for parent in self.get_parents(path):
+                if parent.is_training() or (parent.is_mini_training() and not parent.is_option()):
+                    indirect_parents.append(parent)
+        return indirect_parents
+
+    def node_contains_usage(self, node: Node) -> bool:
+        return self.count_usage(node) >= 1
+
 
 def _nodes_from_root(root: 'Node') -> List['Node']:
     nodes = [root]
