@@ -143,7 +143,7 @@ class EntityRequirementAutocomplete(LoginRequiredMixin, EntityRoleChoiceFieldMix
         return {FacultyManager.group_name, CentralManager.group_name}
 
     def get_queryset(self):
-        qs = super().get_queryset()
+        qs = super().get_queryset().pedagogical_entities().order_by('acronym')
         if self.q:
             qs = qs.filter(Q(acronym__icontains=self.q) | Q(title__icontains=self.q))
         return qs

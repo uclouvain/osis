@@ -65,6 +65,20 @@ def is_learning_unit_year_older_or_equals_than_limit_settings_year(self, user, l
 
 
 @predicate(bind=True)
+@predicate_failed_msg(
+    message=_("The learning unit start year is set before %(year)d.") % {
+        "year": settings.YEAR_LIMIT_LUE_MODIFICATION + 1
+    },
+)
+@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
+def is_learning_unit_start_year_after_year_limit(self, user, learning_unit_year=None):
+    if learning_unit_year:
+        learning_unit = learning_unit_year.learning_unit
+        return learning_unit.start_year.year > settings.YEAR_LIMIT_LUE_MODIFICATION
+    return None
+
+
+@predicate(bind=True)
 @predicate_failed_msg(message=_("You cannot delete a learning unit which is prerequisite or has prerequisite(s)"))
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def has_learning_unit_prerequisite_dependencies(self, user, learning_unit_year):

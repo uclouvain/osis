@@ -69,8 +69,8 @@ def is_eligible_to_update_learning_unit_pedagogy(learning_unit_year, person):
 
 # TODO : migrate with tutor role creation
 def is_eligible_to_update_learning_unit_pedagogy_force_majeure_section(learning_unit_year, person):
-    if not person.user.has_perm('base.can_edit_learningunit_pedagogy', learning_unit_year):
-        return False
+    if person.user.has_perm('base.can_edit_learningunit_pedagogy', learning_unit_year):
+        return True
 
     if is_year_editable(learning_unit_year, raise_exception=False):
 

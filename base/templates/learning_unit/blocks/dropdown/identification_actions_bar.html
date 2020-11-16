@@ -93,7 +93,7 @@
 
                             <li>
                                 {% url "learning_unit_modification_proposal" learning_unit_year_id=learning_unit_year.id as learning_unit_modification_proposal_url %}
-                                {% a_tag_has_perm learning_unit_modification_proposal_url _('Put in proposal in modification') 'base.can_edit_learning_unit_proposal' user learning_unit_year %}
+                                {% a_tag_has_perm learning_unit_modification_proposal_url _('Put in proposal in modification') 'base.can_propose_learningunit' user learning_unit_year %}
                             </li>
 
                             <li>
