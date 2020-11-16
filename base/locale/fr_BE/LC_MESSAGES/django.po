@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-13 14:29+0100\n"
+"POT-Creation-Date: 2020-11-16 08:55+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2019,9 +2019,6 @@ msgstr "Master en 180-240 crédits (programme)"
 
 msgid "Program organized with other institutes"
 msgstr "Programme co-organisés avec d'autres institutions"
-
-msgid "Programs"
-msgstr "Programmes"
 
 msgid "Prohibition to delete a learning unit before 2015."
 msgstr "Interdiction de supprimer une unité d'enseignement avant 2015."
