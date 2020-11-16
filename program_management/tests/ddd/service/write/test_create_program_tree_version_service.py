@@ -31,6 +31,8 @@ from base.tests.factories.campus import CampusFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.validation_rule import ValidationRuleFactory
+from education_group.tests.ddd.factories.command.create_and_postpone_training_and_tree_command import \
+    CreateAndPostponeTrainingAndProgramTreeCommandFactory
 from program_management.ddd.command import CreateProgramTreeVersionCommand
 from program_management.ddd.domain.exception import ProgramTreeVersionNotFoundException
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, STANDARD
@@ -38,8 +40,6 @@ from program_management.ddd.repositories.program_tree_version import ProgramTree
 from program_management.ddd.service.write import create_program_tree_version_service
 from program_management.ddd.service.write.create_training_with_program_tree import \
     create_and_report_training_with_program_tree
-from education_group.tests.ddd.factories.command.create_and_postpone_training_and_tree_command import \
-    CreateAndPostponeTrainingAndProgramTreeCommandFactory
 from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
 from reference.tests.factories.language import LanguageFactory
 from testing.mocks import MockPatcherMixin
@@ -87,6 +87,10 @@ class TestCreateProgramTreeVersion(TestCase, MockPatcherMixin):
         ValidationRuleFactory(
             field_reference="TrainingForm.PGRM_MASTER_120.code",
             initial_value="200M",
+        )
+        self.credit_rule = ValidationRuleFactory(
+            field_reference="TrainingVersionForm.PGRM_MASTER_120.credits",
+            initial_value=100,
         )
         AuthorizedRelationshipFactory(
             parent_type=root_type,
@@ -148,6 +152,7 @@ class TestCreateProgramTreeVersion(TestCase, MockPatcherMixin):
         identity = create_program_tree_version_service.create_program_tree_version(self.command)
 
         tree_version_created = ProgramTreeVersionRepository().get(identity)
+        tree = tree_version_created.get_tree()
 
         self.assertEqual(tree_version_created.entity_id.offer_acronym, self.command.offer_acronym)
         self.assertEqual(tree_version_created.entity_id.year, self.command.start_year)
@@ -157,3 +162,4 @@ class TestCreateProgramTreeVersion(TestCase, MockPatcherMixin):
         self.assertEqual(tree_version_created.title_en, self.command.title_en)
         self.assertEqual(tree_version_created.end_year_of_existence, self.command.end_year)
         self.assertEqual(tree_version_created.start_year, self.command.start_year)
+        self.assertEqual(tree.root_node.credits, self.credit_rule.initial_value)

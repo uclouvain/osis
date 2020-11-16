@@ -48,7 +48,7 @@ def duplicate_program_tree(
         override_start_year_to=cmd.override_start_year_to
     )
     validation_rule = FieldValidationRule.get(
-        program_tree.root_node.node_type, 'credits'
+        program_tree.root_node.node_type, 'credits', is_version=True
     )
     program_tree.root_node.credits = validation_rule.initial_value
     # THEN
