@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-13 14:27+0100\n"
+"POT-Creation-Date: 2020-11-16 08:46+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -374,9 +374,6 @@ msgid "Print all courses"
 msgstr ""
 
 msgid "Print the scores"
-msgstr ""
-
-msgid "Program"
 msgstr ""
 
 msgctxt "encoding"

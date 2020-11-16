@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-13 14:27+0100\n"
+"POT-Creation-Date: 2020-11-16 08:46+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -206,7 +206,6 @@ msgstr "Entité"
 msgid "Evaluations"
 msgstr "Evaluations"
 
-# python-format
 msgid "Extra time (33% generally)"
 msgstr "Tiers-Temps"
 
@@ -401,9 +400,6 @@ msgstr "Imprimer tous les cours"
 
 msgid "Print the scores"
 msgstr "Imprimer toutes les notes"
-
-msgid "Program"
-msgstr "Formation"
 
 msgctxt "encoding"
 msgid "Program"
