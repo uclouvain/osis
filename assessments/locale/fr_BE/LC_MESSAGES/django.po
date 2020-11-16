@@ -30,7 +30,7 @@ msgid ""
 msgstr ""
 "\n"
 "Si vous personnalisez l'un des champs ci-dessous, cela ne changera que "
-"l'adresse affichée sur les pages d'encodage de notes pour le programme "
+"l'adresse affichée sur les pages d'encodage de notes pour la formation "
 "%(program)s. Cela ne changera jamais l'adresse d'une structure. La liste ci-"
 "dessous vous aidera à pré-remplir le formulaire."
 
@@ -403,7 +403,11 @@ msgid "Print the scores"
 msgstr "Imprimer toutes les notes"
 
 msgid "Program"
-msgstr "Programme"
+msgstr "Formation"
+
+msgctxt "encoding"
+msgid "Program"
+msgstr "Formation"
 
 msgid "Program managers"
 msgstr "Gestionnaires de parcours étudiant"
@@ -445,7 +449,7 @@ msgid ""
 "Reuse the address of an entity linked to the program or inform the posting "
 "address for the papersheet."
 msgstr ""
-"Ré-utilisez l'adresse d'une entité liée au programme ou informez l'adresse "
+"Ré-utilisez l'adresse d'une entité liée à la formation ou informez l'adresse "
 "postale pour la feuille papier."
 
 msgid "Row"
@@ -501,7 +505,7 @@ msgid "Search"
 msgstr "Chercher"
 
 msgid "Search of annual programs"
-msgstr "Chercher les programmes annuels"
+msgstr "Chercher les formations annuelles"
 
 msgid "Select an encoding type"
 msgstr "Sélectionnez un type d'encodage"
@@ -693,7 +697,7 @@ msgid "of"
 msgstr "sur"
 
 msgid "program(s)"
-msgstr "programme(s)"
+msgstr "formation(s)"
 
 msgid "score(s) saved"
 msgstr "note(s) sauvées"

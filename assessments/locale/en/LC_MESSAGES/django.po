@@ -379,6 +379,10 @@ msgstr ""
 msgid "Program"
 msgstr ""
 
+msgctxt "encoding"
+msgid "Program"
+msgstr ""
+
 msgid "Program managers"
 msgstr ""
 
