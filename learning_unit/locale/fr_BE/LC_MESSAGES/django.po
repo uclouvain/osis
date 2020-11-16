@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-09 09:15+0100\n"
+"POT-Creation-Date: 2020-11-16 09:30+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -78,6 +78,9 @@ msgstr "L'unité d'enseignement n'est pas un partim"
 
 msgid "The learning unit is not in proposal state"
 msgstr "L'unité d'enseignement n'est pas en proposition"
+
+msgid "The learning unit start year is set before %(year)d."
+msgstr "L'année de début de l'unité d'enseignement est définie avant %(year)d."
 
 msgid "This learning unit has application"
 msgstr "L'unité d'enseignement a au moins une application"
