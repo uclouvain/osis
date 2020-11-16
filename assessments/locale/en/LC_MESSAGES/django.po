@@ -107,6 +107,9 @@ msgstr ""
 msgid "City"
 msgstr ""
 
+msgid "Code"
+msgstr ""
+
 msgid "Compare"
 msgstr ""
 
