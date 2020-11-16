@@ -29,7 +29,7 @@
 {% block content_tab %}
     <div class="panel-body" id="tabs">
         <br>
-        {% if group_elements_years %}
+        {% if direct_parents %}
             <div class="panel panel-default">
                 <div class="panel-heading">
                     {% blocktrans with acronym=learning_unit_year.acronym %}The learning unit {{ acronym }} is included in the following education groups{% endblocktrans %}
@@ -49,48 +49,34 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {% for group_element_year in group_elements_years %}
-                                    {% url 'group_identification' group_element_year.parent_element.group_year.academic_year.year group_element_year.parent_element.group_year.partial_acronym as url_education_group_year %}
+                                {% for direct_parent in direct_parents %}
                                     <tr>
-                                        <td>
-                                            <a href="{{ url_education_group_year }}">
-                                                {{ group_element_year.parent_element.group_year.partial_acronym | default_if_none:'-' }}
-                                            </a>
-                                        </td>
-                                        <td>{{ group_element_year.parent_element.group_year.title_fr | default_if_none:'-' }}</td>
-                                        <td>{{ group_element_year.parent_element.group_year.education_group_type | default_if_none:'-' }}</td>
-                                        <td>{{ group_element_year.block | default_if_none:'-' }}</td>
-                                        <td>
-                                            <ul>
-                                                {% for training in formations_by_educ_group_year|get_item:group_element_year.parent_element_id %}
-                                                    {% with training.group_year.educationgroupversion.offer as offer %}
-                                                    {% url 'training_identification' offer.academic_year.year offer.partial_acronym as url_education_group_yr %}
-                                                    <li>
-                                                        <a href="{{ url_education_group_yr }}">{{ offer.acronym }}
-                                                            - {{ offer.title }}</a>
-                                                        {% if formations_by_educ_group_year|get_item:training.id %}
-                                                            <ul>
-                                                                <li>
-                                                                    {% trans 'Included in' %} :
-                                                                    {% for parent_training in formations_by_educ_group_year|get_item:training.id %}
-                                                                        {% with parent_training.group_year.educationgroupversion.offer as parent_offer %}
-                                                                        {% url 'training_identification' parent_training.group_year.academic_year.year parent_training.group_year.partial_acronym as url_parent_training %}
-                                                                        <a href="{{ url_parent_training }}">{{ parent_offer.acronym }}</a>
-                                                                        {% if not forloop.last %} - {% endif %}
-                                                                        {% endwith %}
-                                                                    {% endfor %}
-                                                                </li>
-                                                            </ul>
-                                                        {% endif %}
-                                                    </li>
-                                                    {% endwith %}
-                                                {% endfor %}
-                                            </ul>
-                                        </td>
-                                        <td class="text-center">
-                                            {{ group_element_year.relative_credits | default_if_none:'-' }}
-                                            / {{ group_element_year.child_element.learning_unit_year.credits.normalize | default_if_none:'-' }}
-                                        </td>
+                                    <td>{{ direct_parent.code }}</td>
+                                    <td>{{ direct_parent.title }}</td>
+                                    <td>TODO on a pas le lien</td>
+                                    <td>TODO on a pas le lien</td>
+                                    <td>
+
+                                        {% for  indirect_parent in map_indirect_parents|get_item:direct_parent %}
+                                            {% if forloop.first %}<ul style="padding-left: 15px;">{% endif %}
+                                           <li>{{ indirect_parent.title }} - {% if LANGUAGE_CODE == 'en' and indirect_parent.offer_title_en %}{{ indirect_parent.offer_title_en }}{% else %}{{ indirect_parent.offer_title_fr }}{% endif %}
+                                           {% if LANGUAGE_CODE == 'en' and indirect_parent.version_title_en %}{{ indirect_parent.version_title_en }}{% else %}{{ indirect_parent.version_title_fr }}{% endif %}
+
+                                           <ul >
+                                           {% for top_parent_training_or_mini_training in map_indirect_parents_level2|get_item:indirect_parent %}
+                                               {% if forloop.first %}<li>{% trans 'Included in' %} : {% else %} - {% endif %}
+                                               {{ top_parent_training_or_mini_training.title }}
+                                               {% if LANGUAGE_CODE == 'en' and top_parent_training_or_mini_training.version_title_en %}{{ top_parent_training_or_mini_training.version_title_en }}{% else %}{{ top_parent_training_or_mini_training.version_title_fr }}{% endif %}
+                                               {% if forloop.last %}</li>{% endif %}
+                                           {% endfor %}
+
+                                           </ul>
+                                            </li>
+                                            {% if forloop.last %}</ul>{% endif %}
+                                        {% endfor %}
+
+                                    </td>
+                                    <td>TODO on a pas le lien</td>
                                     </tr>
                                 {% endfor %}
                                 </tbody>

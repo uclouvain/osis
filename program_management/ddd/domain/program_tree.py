@@ -25,7 +25,7 @@
 ##############################################################################
 import copy
 from collections import Counter
-from typing import List, Set, Optional, Dict, Hashable
+from typing import List, Set, Optional, Dict
 
 import attr
 
@@ -590,8 +590,10 @@ class ProgramTree(interface.RootEntity):
         indirect_parents = []
         for path in paths:
             for parent in self.get_parents(path):
-                if parent.is_training() or (parent.is_mini_training() and not parent.is_option()):
+                if (parent.is_training() and not parent.is_finality()) or (parent.is_minor_or_deepening()) and node.pk != parent.pk:
                     indirect_parents.append(parent)
+                    break
+
         return indirect_parents
 
     def node_contains_usage(self, node: Node) -> bool:
