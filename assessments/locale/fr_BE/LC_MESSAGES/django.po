@@ -122,6 +122,9 @@ msgstr "Choisir un fichier"
 msgid "City"
 msgstr "Ville"
 
+msgid "Code"
+msgstr "Code"
+
 msgid "Compare"
 msgstr "Comparer"
 
