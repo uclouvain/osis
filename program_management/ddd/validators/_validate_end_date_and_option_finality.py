@@ -50,9 +50,10 @@ class ValidateFinalitiesEndDateAndOptions(business_validator.BusinessValidator):
             year=self.node_to_paste.academic_year.year
         )
         tree_from_node_to_paste = self.tree_repository.get(tree_identity)
-        tree_version_from_node_to_paste = self.tree_version_repository.search_versions_from_trees(
-            [tree_from_node_to_paste]
-        )[0]
+        tree_version_from_node_to_paste = next(
+            iter(self.tree_version_repository.search_versions_from_trees([tree_from_node_to_paste])),
+            None
+        )
         has_options = tree_from_node_to_paste.root_node.get_all_children_as_nodes(take_only={MiniTrainingType.OPTION})
         has_finalities = tree_from_node_to_paste.get_all_finalities()
         if has_finalities or has_options:
