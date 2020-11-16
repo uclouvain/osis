@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-09 15:13+0100\n"
+"POT-Creation-Date: 2020-11-16 08:46+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -401,9 +401,6 @@ msgstr "Imprimer tous les cours"
 msgid "Print the scores"
 msgstr "Imprimer toutes les notes"
 
-msgid "Program"
-msgstr "Formation"
-
 msgctxt "encoding"
 msgid "Program"
 msgstr "Formation"
@@ -567,7 +564,7 @@ msgstr "L'inscription à l'activité %(xls_learning_unit_acronym)s n'existe pas"
 msgid "The file must be a valid 'XLSX' excel file"
 msgstr "Le fichier doit être un fichier excel valide"
 
-msgid "The manager will keep the following programs : "
+msgid "The manager will keep the following trainings : "
 msgstr "Le gestionnaire devra conserver les formations suivantes : "
 
 #, python-format
