@@ -162,7 +162,7 @@ msgid "Definitive submission (Submit to faculty)"
 msgstr "Soumission définitive (Soumettre à la faculté)"
 
 msgid "Display all deadlines for this learning unit"
-msgstr "Afficher toutes les dates d'échéances pour cette unité d'enseignement"
+msgstr "Afficher toutes les dates d'échéance pour cette unité d'enseignement"
 
 msgid "Display all tutors for this learning unit"
 msgstr "Afficher tous les tuteurs pour cette unité d'enseignement"

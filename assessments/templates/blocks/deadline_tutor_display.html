@@ -24,11 +24,13 @@
 {% endcomment %}
 
 {% if deadline|is_past %}
-    <strong class="error">{{ deadline|date:"d/m/Y" }}</strong>
+    <strong class="error" style="width: 7em; display: inline-block">{{ deadline|date:"d/m/Y" }}</strong>
 {% else %}
-    <span>{{ deadline|date:"d/m/Y" }}</span>
+    <span style="width: 7em; display: inline-block">{{ deadline|date:"d/m/Y" }}</span>
 {% endif %}
 <span title="{% trans 'Remaining scores to submit for this deadline' %}"
-      class="label {% if scores_not_yet_submitted == 0 %}label-success{% else %}label-warning{% endif %}">
-                                        {{ scores_not_yet_submitted }}
+      class="badge badge-default {% if note_detail.exam_enrollments_encoded == 0%}background-grey
+                   {% elif scores_not_yet_submitted == 0 %}background-success
+                   {% else %}background-warning{% endif %}">
+    {{ scores_not_yet_submitted }}
 </span>
