@@ -152,6 +152,8 @@ def scores_encoding(request):
         score_encoding_progress_list = score_encoding_progress. \
             append_related_tutors_and_score_responsibles(score_encoding_progress_list)
 
+        score_encoding_progress_list = score_encoding_progress.group_by_learning_unit_year(score_encoding_progress_list)
+
         if incomplete_encodings_only:
             score_encoding_progress_list = score_encoding_progress.filter_only_incomplete(score_encoding_progress_list)
 
@@ -182,6 +184,7 @@ def scores_encoding(request):
             number_session=number_session,
             academic_year=academic_yr
         )
+        score_encoding_progress.group_by_learning_unit_year(score_encoding_progress_list)
         all_offers = score_encoding_progress.find_related_offer_years(score_encoding_progress_list)
 
         context.update({'tutor': tutor,
@@ -193,8 +196,7 @@ def scores_encoding(request):
     else:
         filtered_list = []
     context.update({
-        'notes_list': score_encoding_progress.group_by_learning_unit_year(score_encoding_progress_list)
-        if not offer_year_id else filtered_list
+        'notes_list': score_encoding_progress_list if not offer_year_id else filtered_list
     })
 
     return render(request, template_name, context)
