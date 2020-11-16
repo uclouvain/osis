@@ -132,7 +132,7 @@ class TestCreateProgramTreeVersion(TestCase, MockPatcherMixin):
             initial_value="200M",
         )
 
-        training_identity = create_and_report_training_with_program_tree(cmd)
+        training_identities = create_and_report_training_with_program_tree(cmd)
         standard_version_identity = ProgramTreeVersionIdentity(
             offer_acronym=cmd.abbreviated_title,
             year=cmd.year,
@@ -140,7 +140,7 @@ class TestCreateProgramTreeVersion(TestCase, MockPatcherMixin):
             is_transition=False,
         )
 
-        return training_identity, standard_version_identity
+        return training_identities, standard_version_identity
 
     def test_when_tree_version_standard_does_not_exist(self):
         with self.assertRaises(ProgramTreeVersionNotFoundException):
