@@ -227,7 +227,7 @@ class MultipleEntitiesFoundException(BusinessException):
 
 class AbstractConsistencyException(ABC):
     def __init__(self, year_to: int, conflict_fields: List[str], *args, **kwargs):
-        fields_str = ", ".join([str(self.__map_field_to_label(field_name)) for field_name in conflict_fields])
+        fields_str = ", ".join([str(self.__map_field_to_label(field_name)) for field_name in set(conflict_fields)])
         message = _("Consistency error in %(academic_year)s: %(fields)s has already been modified") % {
             "academic_year": display_as_academic_year(year_to),
             "fields": fields_str
