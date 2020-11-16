@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import copy
+import copy, time
 from collections import Counter
 from typing import List, Set, Optional, Dict
 
@@ -51,6 +51,20 @@ from program_management.models.enums.node_type import NodeType
 PATH_SEPARATOR = '|'
 Path = str  # Example : "root|node1|node2|child_leaf"
 
+
+def timeit(method):
+    def timed(*args, **kw):
+        ts = time.time()
+        result = method(*args, **kw)
+        te = time.time()
+        if 'log_time' in kw:
+            name = kw.get('log_name', method.__name__.upper())
+            kw['log_time'][name] = int((te - ts) * 1000)
+        else:
+            print('%r  %2.2f ms' % (method.__name__, (te - ts) * 1000))
+        return result
+
+    return timed
 
 @attr.s(frozen=True, slots=True)
 class ProgramTreeIdentity(interface.EntityIdentity):
@@ -238,6 +252,7 @@ class ProgramTree(interface.RootEntity):
             result += self.get_parents(PATH_SEPARATOR.join(str_nodes))
         return result
 
+    @timeit
     def get_links_using_node(self, child_node: 'Node') -> List['Link']:
         return [link_obj for link_obj in _links_from_root(self.root_node) if link_obj.child == child_node]
 
@@ -573,13 +588,10 @@ class ProgramTree(interface.RootEntity):
         ).validate()
         return link_updated
 
-    def get_direct_parents_nodes_using_node(self, child_node: 'Node') -> List['Node']:
-        return [link_obj.parent for link_obj in _links_from_root(self.root_node) if link_obj.child == child_node]
-
     def get_path_from_node(self, node_parent: 'Node') -> List['Path']:
         paths = []
         for path, child_node in self.root_node.descendents:
-            if str(node_parent.pk) in path:
+            if '|' + str(node_parent.pk) in path:
                 paths.append(path)
         return paths
 
@@ -588,6 +600,8 @@ class ProgramTree(interface.RootEntity):
         paths = self.get_path_from_node(node)
 
         indirect_parents = []
+        if node.code =='LARKE200M':
+            print('iii')
         for path in paths:
             for parent in self.get_parents(path):
                 if (parent.is_training() and not parent.is_finality()) or (parent.is_minor_or_deepening()) and node.pk != parent.pk:
@@ -606,7 +620,7 @@ def _nodes_from_root(root: 'Node') -> List['Node']:
         nodes.extend(_nodes_from_root(link.child))
     return nodes
 
-
+@timeit
 def _links_from_root(root: 'Node', ignore: Set[EducationGroupTypesEnum] = None) -> List['Link']:
     links = []
     for link in root.children:

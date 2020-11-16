@@ -49,34 +49,38 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {% for direct_parent in direct_parents %}
+                                {% for direct_link in direct_parents %}
                                     <tr>
-                                    <td>{{ direct_parent.code }}</td>
-                                    <td>{{ direct_parent.title }}</td>
-                                    <td>TODO on a pas le lien</td>
-                                    <td>TODO on a pas le lien</td>
+                                    <td>{% url 'element_identification' direct_link.parent.year direct_link.parent.code as url_parent_identification %}
+                                        <a href="{{ url_parent_identification }}">{{ direct_link.parent.code | default_if_none:'' }}</a>
+                                    </td>
+                                    <td>{{ direct_link.parent.title | default_if_none:'' }}</td>
+                                    <td>{{ direct_link.parent.node_type.value | default_if_none:'-' }}</td>
+                                    <td>{{ direct_link.block | default_if_none:'-' }}</td>
                                     <td>
-
-                                        {% for  indirect_parent in map_indirect_parents|get_item:direct_parent %}
+                                        {% for  indirect_parent in map_indirect_parents|get_item:direct_link.parent %}
                                             {% if forloop.first %}<ul style="padding-left: 15px;">{% endif %}
-                                           <li>{{ indirect_parent.title }} - {% if LANGUAGE_CODE == 'en' and indirect_parent.offer_title_en %}{{ indirect_parent.offer_title_en }}{% else %}{{ indirect_parent.offer_title_fr }}{% endif %}
+                                           <li>{% url 'element_identification' indirect_parent.year indirect_parent.code as url_indirect_parent_identification %}
+                                               <a href="{{ url_indirect_parent_identification }}">{{ indirect_parent.title }}</a> - {% if LANGUAGE_CODE == 'en' and indirect_parent.offer_title_en %}{{ indirect_parent.offer_title_en }}{% else %}{{ indirect_parent.offer_title_fr }}{% endif %}
                                            {% if LANGUAGE_CODE == 'en' and indirect_parent.version_title_en %}{{ indirect_parent.version_title_en }}{% else %}{{ indirect_parent.version_title_fr }}{% endif %}
 
                                            <ul >
-                                           {% for top_parent_training_or_mini_training in map_indirect_parents_level2|get_item:indirect_parent %}
-                                               {% if forloop.first %}<li>{% trans 'Included in' %} : {% else %} - {% endif %}
-                                               {{ top_parent_training_or_mini_training.title }}
-                                               {% if LANGUAGE_CODE == 'en' and top_parent_training_or_mini_training.version_title_en %}{{ top_parent_training_or_mini_training.version_title_en }}{% else %}{{ top_parent_training_or_mini_training.version_title_fr }}{% endif %}
-                                               {% if forloop.last %}</li>{% endif %}
-                                           {% endfor %}
-
+                                               {% for top_parent_training_or_mini_training in map_indirect_parents_level2|get_item:indirect_parent %}
+                                                   {% if forloop.first %}<li>{% trans 'Included in' %} : {% else %} - {% endif %}
+                                                   {% url 'element_identification' top_parent_training_or_mini_training.year top_parent_training_or_mini_training.code as url_top_parent_training_or_mini_training_identification %}
+                                                   <a href="url_top_parent_training_or_mini_training_identification">{{ top_parent_training_or_mini_training.title }}</a>
+                                                   {% if LANGUAGE_CODE == 'en' and top_parent_training_or_mini_training.version_title_en %}{{ top_parent_training_or_mini_training.version_title_en }}{% else %}{{ top_parent_training_or_mini_training.version_title_fr }}{% endif %}
+                                                   {% if forloop.last %}</li>{% endif %}
+                                               {% endfor %}
                                            </ul>
                                             </li>
                                             {% if forloop.last %}</ul>{% endif %}
                                         {% endfor %}
 
                                     </td>
-                                    <td>TODO on a pas le lien</td>
+                                    <td>
+                                        {{ direct_link.relative_credits | default_if_none:'-' }} /{{ direct_link.child.credits.normalize | default_if_none:'-' }}
+                                    </td>
                                     </tr>
                                 {% endfor %}
                                 </tbody>

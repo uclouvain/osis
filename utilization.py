@@ -1,5 +1,4 @@
 import os
-
 import django
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "backoffice.settings.local")
@@ -17,16 +16,17 @@ IndirectParentNode = NodeGroupYear
 
 
 def get_utilization_rows(acronym: str, year: int) -> Dict['Node', List['IndirectParentNode']]:
-    return _get_direct_parents(acronym, year)
 
-
-def _get_direct_parents(acronym: str, year: int):
     node_identity = NodeIdentity(code=acronym, year=year)
     cmd = GetProgramTreesFromNodeCommand(code=node_identity.code, year=node_identity.year)
     program_trees = search_program_trees_using_node_service.search_program_trees_using_node(cmd)
     direct_parents = get_direct_parents(node_identity, program_trees)
-
-    map_indirect_parents = _get_indirect_parents_nodes(direct_parents, program_trees)
+    parents_direct_nodes = []
+    for link in direct_parents:
+        parents_direct_nodes.append(link.parent)
+    #TODO ordonner par ordre alphobtique
+    map_indirect_parents = _get_indirect_parents_nodes(parents_direct_nodes,
+                                                       program_trees)
     indirect_parents = []
 
     for k, val in map_indirect_parents.items():
@@ -51,14 +51,15 @@ def _get_indirect_parents(direct_parent: 'Node', program_trees: List['ProgramTre
     for tree in trees_using_direct_parent:
         node_indirect_parents = tree.get_indirect_parents(direct_parent)
         indirect_parents.extend(node_indirect_parents)
+    # TODO ordonner par ordre alphobtique
     return set(indirect_parents)
 
 
-def get_direct_parents(node_identity: 'NodeIdentity', program_trees: List['ProgramTree']) -> Set['Node']:
+def get_direct_parents(node_identity: 'NodeIdentity', program_trees: List['ProgramTree']) -> Set['Link']:
     node = NodeRepository.get(node_identity)
     utilizations = []
     for tree in program_trees:
-        direct_parent_nodes = tree.get_direct_parents_nodes_using_node(node)
-        for direct_parent in direct_parent_nodes:
+        direct_parent_links = tree.get_links_using_node(node)
+        for direct_parent in direct_parent_links:
             utilizations.append(direct_parent)
     return set(utilizations)
