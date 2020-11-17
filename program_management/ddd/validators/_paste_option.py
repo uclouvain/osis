@@ -45,6 +45,7 @@ class PasteOptionsValidator(BusinessValidator):
             self,
             program_tree_repository: 'ProgramTreeRepository',
             tree_from_node_to_paste: 'ProgramTree',
+            node_to_paste_to: 'NodeGroupYear',
             trees_2m: List['ProgramTree']
     ):
         super(PasteOptionsValidator, self).__init__()
@@ -54,6 +55,7 @@ class PasteOptionsValidator(BusinessValidator):
         self.program_tree_repository = program_tree_repository
         self.tree_from_node_to_paste = tree_from_node_to_paste
         self.node_to_paste = self.tree_from_node_to_paste.root_node
+        self.node_to_paste_to = node_to_paste_to
         self.trees_2m = trees_2m
 
     def get_options_to_paste(self):
@@ -80,7 +82,7 @@ class PasteOptionsValidator(BusinessValidator):
         nodes_inside_finalities = finalities.copy()
         for finality in finalities:
             nodes_inside_finalities |= set(finality.children_as_nodes)
-        return self.node_to_paste in nodes_inside_finalities
+        return self.node_to_paste_to in nodes_inside_finalities
 
     def _is_node_to_paste_a_finality(self):
         return self.node_to_paste.is_finality()

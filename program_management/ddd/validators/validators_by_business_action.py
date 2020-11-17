@@ -82,7 +82,7 @@ class PasteNodeValidatorList(MultipleExceptionBusinessListValidator):
                 InfiniteRecursivityTreeValidator(tree, node_to_paste, path),
                 AuthorizedLinkTypeValidator(tree, node_to_paste, link_type),
                 BlockValidator(block),
-                ValidateFinalitiesEndDateAndOptions(parent_node, node_to_paste, tree_repository, version_repository),
+                ValidateFinalitiesEndDateAndOptions(parent_node, node_to_paste, tree_repository),
                 ValidateAuthorizedRelationshipForAllTrees(tree, node_to_paste, path, tree_repository),
                 MatchVersionValidator(parent_node, node_to_paste, tree_repository, version_repository),
                 RelativeCreditsValidator(relative_credits),
@@ -137,12 +137,7 @@ class CheckPasteNodeValidatorList(MultipleExceptionBusinessListValidator):
                 CreateLinkValidatorList(tree.get_node(path), node_to_paste),
                 MinimumEditableYearValidator(tree),
                 InfiniteRecursivityTreeValidator(tree, node_to_paste, path),
-                ValidateFinalitiesEndDateAndOptions(
-                    tree.get_node(path),
-                    node_to_paste,
-                    tree_repository,
-                    tree_version_repository
-                ),
+                ValidateFinalitiesEndDateAndOptions(tree.get_node(path), node_to_paste, tree_repository),
                 MatchVersionValidator(
                     tree.get_node(path),
                     node_to_paste,
@@ -251,7 +246,7 @@ class CopyProgramTreeValidatorList(business_validator.BusinessListValidator):
 class UpdateProgramTreeVersionValidatorList(MultipleExceptionBusinessListValidator):
     def __init__(self, tree_version: 'ProgramTreeVersion'):
         self.validators = [
-            CheckEndDateBetweenFinalitiesAndMasters2M(tree_version),
+            CheckEndDateBetweenFinalitiesAndMasters2M(tree_version.get_tree(), tree_version.program_tree_repository),
         ]
         super().__init__()
 
