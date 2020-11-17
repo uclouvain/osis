@@ -51,35 +51,52 @@
                                 <tbody>
                                 {% for direct_link in direct_parents %}
                                     <tr>
-                                    <td>{% url 'element_identification' direct_link.parent.year direct_link.parent.code as url_parent_identification %}
-                                        <a href="{{ url_parent_identification }}">{{ direct_link.parent.code | default_if_none:'' }}</a>
+                                    <td>{% url 'element_identification' direct_link.link.parent.year direct_link.link.parent.code as url_parent_identification %}
+                                        <a href="{{ url_parent_identification }}">{{ direct_link.link.parent.code | default_if_none:'' }}</a>
                                     </td>
-                                    <td>{{ direct_link.parent.title | default_if_none:'' }}</td>
-                                    <td>{{ direct_link.parent.node_type.value | default_if_none:'-' }}</td>
-                                    <td>{{ direct_link.block | default_if_none:'-' }}</td>
+                                    <td>{{ direct_link.link.parent.title | default_if_none:'' }}</td>
+                                    <td>{{ direct_link.link.parent.node_type.value | default_if_none:'-' }}</td>
+                                    <td>{{ direct_link.link.block | default_if_none:'-' }}</td>
                                     <td>
-                                        {% for  indirect_parent in map_node_with_indirect_parents|get_item:direct_link.parent %}
+                                        {% for indirect_parent in direct_link.indirect_parents %}
                                             {% if forloop.first %}<ul style="padding-left: 15px;">{% endif %}
-                                           <li>{% url 'element_identification' indirect_parent.year indirect_parent.code as url_indirect_parent_identification %}
-                                               <a href="{{ url_indirect_parent_identification }}">{{ indirect_parent.title }}</a> - {% if LANGUAGE_CODE == 'en' and indirect_parent.offer_title_en %}{{ indirect_parent.offer_title_en }}{% else %}{{ indirect_parent.offer_title_fr }}{% endif %}
-                                           {% if LANGUAGE_CODE == 'en' and indirect_parent.version_title_en %}{{ indirect_parent.version_title_en }}{% else %}{{ indirect_parent.version_title_fr }}{% endif %}
-
-                                           <ul >
-                                               {% for top_parent_training_or_mini_training in map_node_with_indirect_parents|get_item:indirect_parent %}
-                                                   {% if forloop.first %}<li>{% trans 'Included in' %} : {% else %} - {% endif %}
-                                                   {% url 'element_identification' top_parent_training_or_mini_training.year top_parent_training_or_mini_training.code as url_top_parent_training_or_mini_training_identification %}
-                                                   <a href="url_top_parent_training_or_mini_training_identification">{{ top_parent_training_or_mini_training.title }}</a>
-                                                   {% if LANGUAGE_CODE == 'en' and top_parent_training_or_mini_training.version_title_en %}{{ top_parent_training_or_mini_training.version_title_en }}{% else %}{{ top_parent_training_or_mini_training.version_title_fr }}{% endif %}
-                                                   {% if forloop.last %}</li>{% endif %}
-                                               {% endfor %}
-                                           </ul>
+                                            <li>
+                                                {% url 'element_identification' indirect_parent.node.year indirect_parent.node.code as url_indirect_parent_identification %}
+                                                <a href="{{ url_indirect_parent_identification }}">
+                                                    {{ indirect_parent.node.title }}
+                                                </a>
+                                                {% if LANGUAGE_CODE == 'en' and indirect_parent.node.offer_title_en %}
+                                                    - {{ indirect_parent.node.offer_title_en }}
+                                                {% else %}
+                                                    - {{ indirect_parent.node.offer_title_fr }}
+                                                {% endif %}
+                                                {% if LANGUAGE_CODE == 'en' and indirect_parent.node.version_title_en %}
+                                                    {{ indirect_parent.node.version_title_en }}
+                                                {% else %}
+                                                    {{ indirect_parent.node.version_title_fr }}
+                                                {% endif %}
+                                                <ul>
+                                                    {% for indirect_parent_of_indirect_parent in indirect_parent.indirect_parents %}
+                                                        {% if forloop.first %}<li>{% trans 'Included in' %} : {% else %} - {% endif %}
+                                                        {% url 'element_identification' indirect_parent_of_indirect_parent.node.year indirect_parent_of_indirect_parent.node.code as url_indirect_parent_node_identification %}
+                                                        <a href="{{ url_indirect_parent_node_identification }}">
+                                                            {{ indirect_parent_of_indirect_parent.node.title }}
+                                                        </a>
+                                                        {% if LANGUAGE_CODE == 'en' and indirect_parent_of_indirect_parent.node.version_title_en %}
+                                                            {{ indirect_parent_of_indirect_parent.node.version_title_en }}
+                                                        {% else %}
+                                                            {{ indirect_parent_of_indirect_parent.node.version_title_fr }}
+                                                        {% endif %}
+                                                        {% if forloop.last %}</li>{% endif %}
+                                                    {% endfor %}
+                                                </ul>
                                             </li>
                                             {% if forloop.last %}</ul>{% endif %}
                                         {% endfor %}
 
                                     </td>
-                                    <td>
-                                        {{ direct_link.relative_credits | default_if_none:'-' }} /{{ direct_link.child.credits.normalize | default_if_none:'-' }}
+                                    <td class="text-nowrap text-center">
+                                        {{ direct_link.link.relative_credits | default_if_none:'-' }} /{{ direct_link.link.child.credits.normalize | default_if_none:'-' }}
                                     </td>
                                     </tr>
                                 {% endfor %}

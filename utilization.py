@@ -6,25 +6,29 @@ import django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "backoffice.settings.local")
 django.setup()
 
-from typing import Dict, List, Set
+from typing import Dict, List, Set, Callable
 
 from program_management.ddd.business_types import *
 from program_management.ddd.command import GetProgramTreesFromNodeCommand
 from program_management.ddd.domain.node import NodeGroupYear, NodeIdentity
-from program_management.ddd.service.read import search_program_trees_using_node_service
 from program_management.ddd.repositories.node import NodeRepository
 
 IndirectParentNode = NodeGroupYear
 
 
-def get_utilization_rows(acronym: str, year: int) -> Dict['Node', List['IndirectParentNode']]:
-    node_identity = NodeIdentity(code=acronym, year=year)
-    cmd = GetProgramTreesFromNodeCommand(code=node_identity.code, year=node_identity.year)
-    program_trees = search_program_trees_using_node_service.search_program_trees_using_node(cmd)
+def utilizations_serializer(
+        node_identity: 'NodeIdentity',
+        search_program_trees_service: Callable[['GetProgramTreesFromNodeCommand'], List['ProgramTree']]
+):
+    program_trees = search_program_trees_service(
+        GetProgramTreesFromNodeCommand(
+            code=node_identity.code,
+            year=node_identity.year
+        )
+    )
 
-    links_using_node = get_direct_parents(node_identity, program_trees)
+    links_using_node = get_links_using_node(node_identity, program_trees)
 
-    #TODO ordonner par ordre alphobtique
     map_node_with_indirect_parents = _get_map_node_with_indirect_parents(
         direct_parents={link.parent for link in links_using_node},
         program_trees=program_trees
@@ -34,36 +38,46 @@ def get_utilization_rows(acronym: str, year: int) -> Dict['Node', List['Indirect
     map_node_indirect_parents_of_indirect_parents = _get_map_node_with_indirect_parents(indirect_parents, program_trees)
     map_node_with_indirect_parents.update(map_node_indirect_parents_of_indirect_parents)
 
-    return {
-        'direct_parents': links_using_node,
-        'map_node_with_indirect_parents': map_node_with_indirect_parents
-    }
+    return [
+        {
+            'link': link,
+            'indirect_parents': [
+                {
+                    'node': indirect_parent,
+                    'indirect_parents': [
+                        {
+                            'node': indirect_parent_of_indirect_parent
+                        }
+                        for indirect_parent_of_indirect_parent in map_node_with_indirect_parents.get(indirect_parent)
+                    ]
+                } for indirect_parent in map_node_with_indirect_parents.get(link.parent)
+            ]
+        }
+        for link in links_using_node
+    ]
 
 
 def _get_map_node_with_indirect_parents(
         direct_parents: Set['Node'],
         program_trees: List['ProgramTree']
-) -> Dict['Node', List['Node']]:
-    utilizations = {}
-    for direct_parent in direct_parents:
-        utilizations[direct_parent] = _get_indirect_parents(direct_parent, program_trees)
-    return utilizations
+) -> Dict['Node', Set['Node']]:
+    return {
+        direct_parent: _get_indirect_parents(direct_parent, program_trees)
+        for direct_parent in direct_parents
+    }
 
 
 def _get_indirect_parents(direct_parent: 'Node', program_trees: List['ProgramTree']) -> List['NodeGroupYear']:
-    trees_using_direct_parent = [tree for tree in program_trees if tree.node_contains_usage(direct_parent)]
-    indirect_parents = []
-
+    trees_using_direct_parent = [tree for tree in program_trees if tree.contains(direct_parent)]
+    indirect_parents = set()
     for tree in trees_using_direct_parent:
-        node_indirect_parents = tree.get_indirect_parents(direct_parent)
-        indirect_parents.extend(node_indirect_parents)
-    # TODO ordonner par ordre alphobtique
-    return set(indirect_parents)
+        indirect_parents |= set(tree.get_indirect_parents(direct_parent))
+    return indirect_parents
 
 
-def get_direct_parents(node_identity: 'NodeIdentity', program_trees: List['ProgramTree']) -> Set['Link']:
+def get_links_using_node(node_identity: 'NodeIdentity', program_trees: List['ProgramTree']) -> Set['Link']:
     node = NodeRepository.get(node_identity)
-    utilizations = set()
+    direct_parents = set()
     for tree in program_trees:
-        utilizations |= set(tree.get_links_using_node(node))
-    return utilizations
+        direct_parents |= set(tree.get_links_using_node(node))
+    return direct_parents
