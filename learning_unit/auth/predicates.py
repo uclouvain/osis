@@ -145,8 +145,8 @@ def is_learning_unit_edition_period_open(self, user, learning_unit_year):
 def is_proposal_date_edition_period_open(self, user, learning_unit_year):
     if learning_unit_year:
         for role in self.context['role_qs']:
-            return event_perms.generate_event_perm_modification_transformation_proposal(
-                role.person, learning_unit_year
+            return event_perms.generate_event_perm_creation_end_date_proposal(
+                role.person, learning_unit_year, raise_exception=False
             ).is_open()
     return None
 
@@ -157,8 +157,8 @@ def is_proposal_date_edition_period_open(self, user, learning_unit_year):
 def is_proposal_edition_period_open(self, user, learning_unit_year):
     if learning_unit_year:
         for role in self.context['role_qs']:
-            return event_perms.generate_event_perm_creation_end_date_proposal(
-                role.person, learning_unit_year
+            return event_perms.generate_event_perm_modification_transformation_proposal(
+                role.person, learning_unit_year, raise_exception=False
             ).is_open()
     return None
 

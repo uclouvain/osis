@@ -61,6 +61,7 @@ class FacultyManager(osis_role_models.EntityRoleModel):
                 predicates.is_learning_unit_year_not_a_partim &
                 predicates.is_learning_unit_container_type_editable &
                 predicates.is_not_in_proposal_state &
+                predicates.is_proposal_edition_period_open &
                 predicates.is_user_attached_to_current_requirement_entity &
                 predicates.is_external_learning_unit_with_cograduation,
             'base.can_cancel_proposal':
