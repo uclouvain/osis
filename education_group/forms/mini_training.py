@@ -52,7 +52,8 @@ class MiniTrainingForm(ValidationRuleMixin, forms.Form):
     end_year = forms.ModelChoiceField(
         queryset=AcademicYear.objects.all(),
         label=_('Last year of organization'),
-        required=False
+        required=False,
+        to_field_name="year"
     )
     abbreviated_title = UpperCaseCharField(max_length=40, label=_("Acronym/Short title"), required=False)
     title_fr = forms.CharField(max_length=240, label=_("Title in French"))
@@ -155,10 +156,10 @@ class MiniTrainingForm(ValidationRuleMixin, forms.Form):
             return self.cleaned_data['academic_year'].year
         return None
 
-    def clean_end_year(self):
-        if self.cleaned_data['end_year']:
-            return self.cleaned_data['end_year'].year
-        return None
+    # def clean_end_year(self):
+    #     if self.cleaned_data['end_year']:
+    #         return self.cleaned_data['end_year'].year
+    #     return None
 
     def clean_teaching_campus(self):
         if self.cleaned_data['teaching_campus']:

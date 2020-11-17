@@ -295,5 +295,5 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             offer_acronym=cleaned_data["abbreviated_title"],
             version_name='',
             is_transition=False,
-            from_year=cleaned_data["end_year"]+1
+            from_year=cleaned_data["end_year"].year+1
         )
