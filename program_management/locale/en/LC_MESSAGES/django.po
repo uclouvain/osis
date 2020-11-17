@@ -176,10 +176,7 @@ msgstr ""
 "Cannot remove because the following learning units are prerequisite in "
 "%(formation)s: %(learning_units)s"
 
-#, fuzzy, python-format
-#| msgid ""
-#| "Cannot detach because the following learning units are prerequisite in "
-#| "%(formation)s: %(learning_units)s"
+#, python-format
 msgid ""
 "Cannot detach because the following learning units have prerequisite in "
 "%(formation)s: %(learning_units)s"
@@ -1014,10 +1011,3 @@ msgstr ""
 
 msgid "yes,no"
 msgstr ""
-
-#~ msgid ""
-#~ "Cannot detach education group year %(acronym)s as the following learning "
-#~ "units are prerequisite in %(formation)s: %(learning_units)s"
-#~ msgstr ""
-#~ "Cannot remove education group year %(acronym)s as the following learning "
-#~ "units are prerequisite in %(formation)s: %(learning_units)s"
