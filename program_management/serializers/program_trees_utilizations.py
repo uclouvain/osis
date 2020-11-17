@@ -1,10 +1,4 @@
 import itertools
-import os
-
-import django
-
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "backoffice.settings.local")
-django.setup()
 
 from typing import Dict, List, Set, Callable
 
