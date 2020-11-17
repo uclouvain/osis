@@ -149,6 +149,9 @@ msgstr ""
 msgid "Definitive submission (Submit to faculty)"
 msgstr ""
 
+msgid "Display all deadlines for this learning unit"
+msgstr ""
+
 msgid "Display all tutors for this learning unit"
 msgstr ""
 
@@ -404,6 +407,9 @@ msgstr ""
 msgid "Registration number"
 msgstr ""
 
+msgid "Remaining scores to submit for this deadline"
+msgstr ""
+
 msgid "Remove"
 msgstr ""
 
@@ -571,6 +577,9 @@ msgid "Training"
 msgstr ""
 
 msgid "Tutor"
+msgstr ""
+
+msgid "Tutor deadlines"
 msgstr ""
 
 msgid "Tutors of the course"
