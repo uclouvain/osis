@@ -596,8 +596,8 @@ class ProgramTree(interface.RootEntity):
 
         return indirect_parents
 
-    def node_contains_usage(self, node: Node) -> bool:
-        return self.count_usage(node) >= 1
+    def contains(self, node: Node) -> bool:
+        return node in self.get_all_nodes()
 
 
 def _nodes_from_root(root: 'Node') -> List['Node']:
