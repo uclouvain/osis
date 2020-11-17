@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-09 15:13+0100\n"
+"POT-Creation-Date: 2020-11-16 14:45+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -105,6 +105,9 @@ msgid "Choose file"
 msgstr ""
 
 msgid "City"
+msgstr ""
+
+msgid "Code"
 msgstr ""
 
 msgid "Compare"
@@ -376,9 +379,6 @@ msgstr ""
 msgid "Print the scores"
 msgstr ""
 
-msgid "Program"
-msgstr ""
-
 msgctxt "encoding"
 msgid "Program"
 msgstr ""
@@ -506,6 +506,9 @@ msgstr ""
 msgid "Student not registered for exam"
 msgstr ""
 
+msgid "Student path"
+msgstr ""
+
 msgid "Students deliberated are not shown"
 msgstr ""
 
@@ -535,7 +538,7 @@ msgstr ""
 msgid "The file must be a valid 'XLSX' excel file"
 msgstr ""
 
-msgid "The manager will keep the following programs : "
+msgid "The manager will keep the following trainings : "
 msgstr ""
 
 #, python-format

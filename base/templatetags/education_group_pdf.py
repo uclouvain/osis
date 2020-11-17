@@ -198,7 +198,7 @@ def get_verbose_title_group(node: 'NodeGroupYear'):
     if node.is_finality():
         return format_complete_title_label(node, node.offer_partial_title_en, node.offer_partial_title_fr)
     if node.is_option():
-        return format_complete_title_label(node, node.group_title_en, node.group_title_fr)
+        return format_complete_title_label(node, node.offer_title_en, node.offer_title_fr)
     else:
         return node.group_title_en \
             if node.group_title_en and translation.get_language() == LANGUAGE_CODE_EN else node.group_title_fr
