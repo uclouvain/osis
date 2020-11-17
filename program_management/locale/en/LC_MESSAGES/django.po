@@ -176,15 +176,11 @@ msgstr ""
 "Cannot remove because the following learning units are prerequisite in "
 "%(formation)s: %(learning_units)s"
 
-#, fuzzy, python-format
-#| msgid ""
-#| "Cannot detach because the following learning units are prerequisite in "
-#| "%(formation)s: %(learning_units)s"
 msgid ""
 "Cannot detach because the following learning units have prerequisite in "
 "%(formation)s: %(learning_units)s"
 msgstr ""
-"Cannot remove because the following learning units are prerequisite in "
+"Cannot detach because the following learning units have prerequisite in "
 "%(formation)s: %(learning_units)s"
 
 #, python-format
@@ -587,17 +583,11 @@ msgstr ""
 msgid "Pre-condition"
 msgstr ""
 
-#, fuzzy
-#| msgid "Prerequisite"
-#| msgid_plural "Prerequisites"
 msgid "Prerequisite"
 msgstr "Prerequisite"
 
-#, fuzzy
-#| msgid "Prerequisite"
-#| msgid_plural "Prerequisites"
 msgid "Prerequisites"
-msgstr "Prerequisite"
+msgstr "Prerequisites"
 
 msgid "Prerequisites are invalid"
 msgstr ""
