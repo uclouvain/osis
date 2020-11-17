@@ -585,7 +585,6 @@ class ProgramTree(interface.RootEntity):
         return self._paths_by_node().get(node) or []
 
     def get_indirect_parents(self, node: 'Node') -> List['NodeGroupYear']:
-        # TODO attention perf
         paths = self.get_paths_from_node(node)
         indirect_parents = []
         for path in paths:
@@ -593,7 +592,6 @@ class ProgramTree(interface.RootEntity):
                 if (parent.is_training() and not parent.is_finality()) or (parent.is_minor_or_deepening()) and node.pk != parent.pk:
                     indirect_parents.append(parent)
                     break
-
         return indirect_parents
 
     def contains(self, node: Node) -> bool:
