@@ -65,8 +65,11 @@ from base.views.common import display_success_messages
 from base.views.learning_units.common import get_common_context_learning_unit_year, get_text_label_translated
 from cms.models.text_label import TextLabel
 from cms.models.translated_text_label import TranslatedTextLabel
+from program_management.ddd.domain.node import NodeIdentity
+from program_management.ddd.repositories.node import NodeRepository
+from program_management.ddd.service.read.search_program_trees_using_node_service import search_program_trees_using_node
+from program_management.serializers.program_trees_utilizations import utilizations_serializer
 from reference.models.language import find_language_in_settings
-from utilization import get_utilization_rows
 
 ORGANIZATION_KEYS = ['ALLOCATION_ENTITY', 'REQUIREMENT_ENTITY',
                      'ADDITIONAL_REQUIREMENT_ENTITY_1', 'ADDITIONAL_REQUIREMENT_ENTITY_2',
@@ -94,8 +97,9 @@ def learning_unit_formations(request, learning_unit_year_id=None, code=None, yea
     #     context['group_elements_years'] = group_elements_years
     # print('ici {}'.format(learn_unit_year.acronym))
     # context['formations_by_educ_group_year'] = get_utilization_rows(learn_unit_year.acronym, learn_unit_year.academic_year.year)
-    utilizations = get_utilization_rows(learn_unit_year.acronym, learn_unit_year.academic_year.year)
-    context.update(utilizations)
+    node_identity = NodeIdentity(code=learn_unit_year.acronym, year=learn_unit_year.academic_year.year)
+    utilizations = utilizations_serializer(node_identity, search_program_trees_using_node, NodeRepository())
+    context['direct_parents'] = utilizations
 
     context['root_formations'] = education_group_year.find_with_enrollments_count(learn_unit_year)
     context['total_formation_enrollments'] = 0
