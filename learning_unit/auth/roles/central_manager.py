@@ -51,7 +51,8 @@ class CentralManager(osis_role_models.EntityRoleModel):
             'base.can_edit_learning_unit_proposal':
                 predicates.is_in_proposal_state &
                 (predicates.is_user_attached_to_current_requirement_entity |
-                 predicates.is_user_attached_to_requirement_entity),
+                 predicates.is_user_attached_to_requirement_entity) &
+                predicates.is_proposal_date_edition_period_open,
             'base.can_edit_learning_unit_proposal_date':
                 predicates.is_in_proposal_state &
                 (predicates.is_user_attached_to_current_requirement_entity |
