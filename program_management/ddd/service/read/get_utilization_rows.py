@@ -37,6 +37,7 @@ from program_management.ddd.service.read import search_program_trees_using_node_
 from program_management.serializers.node_view import get_program_tree_version_name, get_program_tree_version_dict
 
 
+# FIXMe :: to remove
 def get_utilizations(node_identity: 'NodeIdentity', language: str) -> List[Dict[str, Any]]:
     cmd = GetProgramTreesFromNodeCommand(code=node_identity.code, year=node_identity.year)
     program_trees = search_program_trees_using_node_service.search_program_trees_using_node(cmd)

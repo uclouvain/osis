@@ -28,11 +28,15 @@
     <thead>
     <tr>
         <th>{% trans 'Code' %}</th>
-        <th>{% trans 'Title' %}</th>
+        {% if node.is_learning_unit %}
+            <th>{% trans 'Title' %}</th>
+        {% endif %}
         <th>{% trans "Training type" %}</th>
         <th>{% trans 'Block' %}</th>
         <th>{% trans 'Trainings' %}</th>
-        <th class="text-nowrap text-center">{% trans 'Relative / Absolute <br>credits' %}</th>
+        {% if node.is_learning_unit %}
+            <th class="text-nowrap text-center">{% trans 'Relative / Absolute <br>credits' %}</th>
+        {% endif %}
     </tr>
     </thead>
     <tbody>
@@ -41,7 +45,9 @@
             <td>{% url 'element_identification' direct_link.link.parent.year direct_link.link.parent.code as url_parent_identification %}
                 <a href="{{ url_parent_identification }}">{{ direct_link.link.parent.code | default_if_none:'' }}</a>
             </td>
-            <td>{{ direct_link.link.parent.title | default_if_none:'' }}</td>
+            {% if node.is_learning_unit %}
+                <td>{{ direct_link.link.parent.title | default_if_none:'' }}</td>
+            {% endif %}
             <td>{{ direct_link.link.parent.node_type.value | default_if_none:'-' }}</td>
             <td>{{ direct_link.link.block | default_if_none:'-' }}</td>
             <td>
@@ -82,9 +88,11 @@
                 {% endfor %}
 
             </td>
-            <td class="text-nowrap text-center">
-                {{ direct_link.link.relative_credits | default_if_none:'-' }} / {{ direct_link.link.child.credits.normalize | default_if_none:'-' }}
-            </td>
+            {% if node.is_learning_unit %}
+                <td class="text-nowrap text-center">
+                    {{ direct_link.link.relative_credits | default_if_none:'-' }} / {{ direct_link.link.child.credits.normalize | default_if_none:'-' }}
+                </td>
+            {% endif %}
         </tr>
     {% endfor %}
     </tbody>
