@@ -1,7 +1,6 @@
 {% extends "learning_unit/layout_detail.html" %}
 {% load static %}
 {% load i18n %}
-{% load dictionnary %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
 * designed to manage the core business of higher education institutions,
@@ -37,71 +36,7 @@
                 <div class="panel-body">
                     <div class="tab-content" id="tab_content">
                         <div role="tabpanel" class="tab-pane active" id="trainings">
-                            <table class="table">
-                                <thead>
-                                <tr>
-                                    <th>{% trans 'Code' %}</th>
-                                    <th>{% trans 'Title' %}</th>
-                                    <th>{% trans "Training type" %}</th>
-                                    <th>{% trans 'Block' %}</th>
-                                    <th>{% trans 'Trainings' %}</th>
-                                    <th class="text-nowrap text-center">{% trans 'Relative / Absolute <br>credits' %}</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {% for direct_link in direct_parents %}
-                                    <tr>
-                                    <td>{% url 'element_identification' direct_link.link.parent.year direct_link.link.parent.code as url_parent_identification %}
-                                        <a href="{{ url_parent_identification }}">{{ direct_link.link.parent.code | default_if_none:'' }}</a>
-                                    </td>
-                                    <td>{{ direct_link.link.parent.title | default_if_none:'' }}</td>
-                                    <td>{{ direct_link.link.parent.node_type.value | default_if_none:'-' }}</td>
-                                    <td>{{ direct_link.link.block | default_if_none:'-' }}</td>
-                                    <td>
-                                        {% for indirect_parent in direct_link.indirect_parents %}
-                                            {% if forloop.first %}<ul style="padding-left: 15px;">{% endif %}
-                                            <li>
-                                                {% url 'element_identification' indirect_parent.node.year indirect_parent.node.code as url_indirect_parent_identification %}
-                                                <a href="{{ url_indirect_parent_identification }}">
-                                                    {{ indirect_parent.node.title }}
-                                                </a>
-                                                {% if LANGUAGE_CODE == 'en' and indirect_parent.node.offer_title_en %}
-                                                    - {{ indirect_parent.node.offer_title_en }}
-                                                {% else %}
-                                                    - {{ indirect_parent.node.offer_title_fr }}
-                                                {% endif %}
-                                                {% if LANGUAGE_CODE == 'en' and indirect_parent.node.version_title_en %}
-                                                    {{ indirect_parent.node.version_title_en }}
-                                                {% else %}
-                                                    {{ indirect_parent.node.version_title_fr }}
-                                                {% endif %}
-                                                <ul>
-                                                    {% for indirect_parent_of_indirect_parent in indirect_parent.indirect_parents %}
-                                                        {% if forloop.first %}<li>{% trans 'Included in' %} : {% else %} - {% endif %}
-                                                        {% url 'element_identification' indirect_parent_of_indirect_parent.node.year indirect_parent_of_indirect_parent.node.code as url_indirect_parent_node_identification %}
-                                                        <a href="{{ url_indirect_parent_node_identification }}">
-                                                            {{ indirect_parent_of_indirect_parent.node.title }}
-                                                        </a>
-                                                        {% if LANGUAGE_CODE == 'en' and indirect_parent_of_indirect_parent.node.version_title_en %}
-                                                            {{ indirect_parent_of_indirect_parent.node.version_title_en }}
-                                                        {% else %}
-                                                            {{ indirect_parent_of_indirect_parent.node.version_title_fr }}
-                                                        {% endif %}
-                                                        {% if forloop.last %}</li>{% endif %}
-                                                    {% endfor %}
-                                                </ul>
-                                            </li>
-                                            {% if forloop.last %}</ul>{% endif %}
-                                        {% endfor %}
-
-                                    </td>
-                                    <td class="text-nowrap text-center">
-                                        {{ direct_link.link.relative_credits | default_if_none:'-' }} /{{ direct_link.link.child.credits.normalize | default_if_none:'-' }}
-                                    </td>
-                                    </tr>
-                                {% endfor %}
-                                </tbody>
-                            </table>
+                            {% include 'program_management/node_trees_utilizations_table.html' %}
                         </div>
                     </div>
                 </div>
