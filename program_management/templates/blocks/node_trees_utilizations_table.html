@@ -29,10 +29,11 @@
     <tr>
         <th>{% trans 'Code' %}</th>
         <th>{% trans 'Title' %}</th>
-        <th>{% trans "Training type" %}</th>
+        <th>{% trans 'Training type' %}</th>
+        <th class="text-nowrap text-center">{% trans 'Relative / Absolute <br>credits' %}</th>
+        <th>{% trans 'Mandatory' %}</th>
         <th>{% trans 'Block' %}</th>
         <th>{% trans 'Trainings' %}</th>
-        <th class="text-nowrap text-center">{% trans 'Relative / Absolute <br>credits' %}</th>
     </tr>
     </thead>
     <tbody>
@@ -41,9 +42,19 @@
             <td>{% url 'element_identification' direct_link.link.parent.year direct_link.link.parent.code as url_parent_identification %}
                 <a href="{{ url_parent_identification }}">{{ direct_link.link.parent.code | default_if_none:'' }}</a>
             </td>
-            <td>{{ direct_link.link.parent.title | default_if_none:'' }}</td>
+            <td>
+                {% if LANGUAGE_CODE == 'en' and indirect_parent.node.offer_title_en %}
+                    {{ direct_link.link.parent.group_title_en | default_if_none:'' }}
+                {% else %}
+                    {{ direct_link.link.parent.group_title_fr | default_if_none:'' }}
+                {% endif %}
+            </td>
             <td>{{ direct_link.link.parent.node_type.value | default_if_none:'-' }}</td>
+            <td class="text-nowrap text-center">
+                {{ direct_link.link.relative_credits | default_if_none:'-' }} / {{ direct_link.link.child.credits.normalize | default_if_none:'-' }}
+            </td>
             <td>{{ direct_link.link.block | default_if_none:'-' }}</td>
+            <td>{{ direct_link.link.mandatory | default_if_none:'-' }}</td>
             <td>
                 {% for indirect_parent in direct_link.indirect_parents %}
                     {% if forloop.first %}<ul style="padding-left: 15px;">{% endif %}
@@ -81,9 +92,6 @@
                 {% if forloop.last %}</ul>{% endif %}
                 {% endfor %}
 
-            </td>
-            <td class="text-nowrap text-center">
-                {{ direct_link.link.relative_credits | default_if_none:'-' }} / {{ direct_link.link.child.credits.normalize | default_if_none:'-' }}
             </td>
         </tr>
     {% endfor %}
