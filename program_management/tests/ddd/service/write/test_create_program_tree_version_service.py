@@ -42,10 +42,9 @@ from program_management.ddd.service.write.create_training_with_program_tree impo
     create_and_report_training_with_program_tree
 from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
 from reference.tests.factories.language import LanguageFactory
-from testing.mocks import MockPatcherMixin
 
 
-class TestCreateProgramTreeVersion(TestCase, MockPatcherMixin):
+class TestCreateProgramTreeVersion(TestCase):
     def setUp(self) -> None:
         self.offer_acronym = 'DROI2M'
         self.current_year = 2018
@@ -99,11 +98,11 @@ class TestCreateProgramTreeVersion(TestCase, MockPatcherMixin):
         )
         ValidationRuleFactory(
             field_reference="GroupForm.COMMON_CORE.title_fr",
-            initial_value="	Master [120] en",
+            initial_value="	Contenu: ",
         )
         ValidationRuleFactory(
             field_reference="GroupForm.COMMON_CORE.code",
-            initial_value="200M",
+            initial_value="100T",
         )
         AuthorizedRelationshipFactory(
             parent_type=root_type,
@@ -112,11 +111,11 @@ class TestCreateProgramTreeVersion(TestCase, MockPatcherMixin):
         )
         ValidationRuleFactory(
             field_reference="GroupForm.FINALITY_120_LIST_CHOICE.title_fr",
-            initial_value="	Master [120] en",
+            initial_value="List au choix",
         )
         ValidationRuleFactory(
             field_reference="GroupForm.FINALITY_120_LIST_CHOICE.code",
-            initial_value="200M",
+            initial_value="400G",
         )
         AuthorizedRelationshipFactory(
             parent_type=root_type,
@@ -125,11 +124,11 @@ class TestCreateProgramTreeVersion(TestCase, MockPatcherMixin):
         )
         ValidationRuleFactory(
             field_reference="GroupForm.OPTION_LIST_CHOICE.title_fr",
-            initial_value="	Master [120] en",
+            initial_value="List au choix options",
         )
         ValidationRuleFactory(
             field_reference="GroupForm.OPTION_LIST_CHOICE.code",
-            initial_value="200M",
+            initial_value="300G",
         )
 
         training_identities = create_and_report_training_with_program_tree(cmd)
