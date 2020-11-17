@@ -92,7 +92,7 @@ def learning_unit_formations(request, learning_unit_year_id=None, code=None, yea
     #     )
     #     context['formations_by_educ_group_year'] = formations_by_educ_group_year
     #     context['group_elements_years'] = group_elements_years
-    print('ici {}'.format(learn_unit_year.acronym))
+    # print('ici {}'.format(learn_unit_year.acronym))
     # context['formations_by_educ_group_year'] = get_utilization_rows(learn_unit_year.acronym, learn_unit_year.academic_year.year)
     utilizations = get_utilization_rows(learn_unit_year.acronym, learn_unit_year.academic_year.year)
     context.update(utilizations)

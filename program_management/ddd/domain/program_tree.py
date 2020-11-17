@@ -33,6 +33,7 @@ from base.ddd.utils.converters import to_upper_case_converter
 from base.models.authorized_relationship import AuthorizedRelationshipList
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, GroupType
 from base.models.enums.link_type import LinkTypes
+from base.utils.cache import cached_result
 from education_group.ddd.business_types import *
 from osis_common.ddd import interface
 from osis_common.decorators.deprecated import deprecated
@@ -51,20 +52,6 @@ from program_management.models.enums.node_type import NodeType
 PATH_SEPARATOR = '|'
 Path = str  # Example : "root|node1|node2|child_leaf"
 
-
-def timeit(method):
-    def timed(*args, **kw):
-        ts = time.time()
-        result = method(*args, **kw)
-        te = time.time()
-        if 'log_time' in kw:
-            name = kw.get('log_name', method.__name__.upper())
-            kw['log_time'][name] = int((te - ts) * 1000)
-        else:
-            print('%r  %2.2f ms' % (method.__name__, (te - ts) * 1000))
-        return result
-
-    return timed
 
 @attr.s(frozen=True, slots=True)
 class ProgramTreeIdentity(interface.EntityIdentity):
@@ -252,9 +239,8 @@ class ProgramTree(interface.RootEntity):
             result += self.get_parents(PATH_SEPARATOR.join(str_nodes))
         return result
 
-    @timeit
     def get_links_using_node(self, child_node: 'Node') -> List['Link']:
-        return [link_obj for link_obj in _links_from_root(self.root_node) if link_obj.child == child_node]
+        return [link_obj for link_obj in self.get_all_links() if link_obj.child == child_node]
 
     def get_first_link_occurence_using_node(self, child_node: 'Node') -> 'Link':
         links = self.get_links_using_node(child_node)
@@ -588,20 +574,20 @@ class ProgramTree(interface.RootEntity):
         ).validate()
         return link_updated
 
-    def get_path_from_node(self, node_parent: 'Node') -> List['Path']:
-        paths = []
+    @cached_result
+    def _paths_by_node(self) -> Dict['Node', List['Path']]:
+        paths_by_node = {}
         for path, child_node in self.root_node.descendents:
-            if '|' + str(node_parent.pk) in path:
-                paths.append(path)
-        return paths
+            paths_by_node.setdefault(child_node, []).append(path)
+        return paths_by_node
+
+    def get_paths_from_node(self, node: 'Node') -> List['Path']:
+        return self._paths_by_node().get(node) or []
 
     def get_indirect_parents(self, node: 'Node') -> List['NodeGroupYear']:
         # TODO attention perf
-        paths = self.get_path_from_node(node)
-
+        paths = self.get_paths_from_node(node)
         indirect_parents = []
-        if node.code =='LARKE200M':
-            print('iii')
         for path in paths:
             for parent in self.get_parents(path):
                 if (parent.is_training() and not parent.is_finality()) or (parent.is_minor_or_deepening()) and node.pk != parent.pk:
@@ -620,7 +606,7 @@ def _nodes_from_root(root: 'Node') -> List['Node']:
         nodes.extend(_nodes_from_root(link.child))
     return nodes
 
-@timeit
+
 def _links_from_root(root: 'Node', ignore: Set[EducationGroupTypesEnum] = None) -> List['Link']:
     links = []
     for link in root.children:
@@ -648,6 +634,7 @@ def _copy(root: 'Node', ignore_children_from: Set[EducationGroupTypesEnum] = Non
     return new_node
 
 
+#  FIXME :: to remove
 def get_nearest_parents(parents: List['Node']) -> Optional[Dict[str, 'Node']]:
     parent_direct_node = None
     root_node = None
@@ -671,3 +658,7 @@ def get_nearest_parents(parents: List['Node']) -> Optional[Dict[str, 'Node']]:
         'parent_direct_node': parent_direct_node,
         'root_node': root_node
     }
+
+
+def _path_contains(path: 'Path', node: 'Node') -> bool:
+    return PATH_SEPARATOR + str(node.pk) in path

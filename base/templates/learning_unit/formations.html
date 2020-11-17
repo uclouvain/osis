@@ -58,14 +58,14 @@
                                     <td>{{ direct_link.parent.node_type.value | default_if_none:'-' }}</td>
                                     <td>{{ direct_link.block | default_if_none:'-' }}</td>
                                     <td>
-                                        {% for  indirect_parent in map_indirect_parents|get_item:direct_link.parent %}
+                                        {% for  indirect_parent in map_node_with_indirect_parents|get_item:direct_link.parent %}
                                             {% if forloop.first %}<ul style="padding-left: 15px;">{% endif %}
                                            <li>{% url 'element_identification' indirect_parent.year indirect_parent.code as url_indirect_parent_identification %}
                                                <a href="{{ url_indirect_parent_identification }}">{{ indirect_parent.title }}</a> - {% if LANGUAGE_CODE == 'en' and indirect_parent.offer_title_en %}{{ indirect_parent.offer_title_en }}{% else %}{{ indirect_parent.offer_title_fr }}{% endif %}
                                            {% if LANGUAGE_CODE == 'en' and indirect_parent.version_title_en %}{{ indirect_parent.version_title_en }}{% else %}{{ indirect_parent.version_title_fr }}{% endif %}
 
                                            <ul >
-                                               {% for top_parent_training_or_mini_training in map_indirect_parents_level2|get_item:indirect_parent %}
+                                               {% for top_parent_training_or_mini_training in map_node_with_indirect_parents|get_item:indirect_parent %}
                                                    {% if forloop.first %}<li>{% trans 'Included in' %} : {% else %} - {% endif %}
                                                    {% url 'element_identification' top_parent_training_or_mini_training.year top_parent_training_or_mini_training.code as url_top_parent_training_or_mini_training_identification %}
                                                    <a href="url_top_parent_training_or_mini_training_identification">{{ top_parent_training_or_mini_training.title }}</a>
