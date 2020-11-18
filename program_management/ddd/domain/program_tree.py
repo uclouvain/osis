@@ -589,7 +589,7 @@ class ProgramTree(interface.RootEntity):
         indirect_parents = []
         for path in paths:
             for parent in self.get_parents(path):
-                if (parent.is_training() and not parent.is_finality()) or (parent.is_minor_or_deepening()) and node.pk != parent.pk:
+                if parent.is_indirect_parent() and node != parent:
                     indirect_parents.append(parent)
                     break
         return indirect_parents
