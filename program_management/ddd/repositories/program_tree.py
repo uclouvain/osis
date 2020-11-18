@@ -23,8 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Optional, List, Union
+from typing import Optional, List
 
+from backoffice.messagebus import messagebus_instance
 from base.models.group_element_year import GroupElementYear
 from education_group.ddd.command import CreateOrphanGroupCommand, CopyGroupCommand
 from osis_common.ddd import interface
@@ -69,13 +70,12 @@ class ProgramTreeRepository(interface.AbstractRepository):
     def create(
             cls,
             program_tree: 'ProgramTree',
-            create_orphan_group_service: interface.ApplicationService = None,
+            create_orphan_group: bool = False,
             copy_group_service: interface.ApplicationService = None
     ) -> 'ProgramTreeIdentity':
         for node in [n for n in program_tree.get_all_nodes() if n._has_changed is True]:
-            if create_orphan_group_service:
-                create_orphan_group_service(
-                    CreateOrphanGroupCommand(
+            if create_orphan_group:
+                create_cmd = CreateOrphanGroupCommand(
                         code=node.code,
                         year=node.year,
                         type=node.node_type.name,
@@ -94,7 +94,7 @@ class ProgramTreeRepository(interface.AbstractRepository):
                         start_year=node.start_year,
                         end_year=node.end_year,
                     )
-                )
+                messagebus_instance.invoke(create_cmd)
             if copy_group_service:
                 copy_group_service(
                     CopyGroupCommand(

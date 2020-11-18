@@ -24,6 +24,7 @@
 
 from django.db import transaction
 
+from backoffice.messagebus import messagebus_instance
 from education_group.ddd import command as command_education_group
 from program_management.ddd import command as command_program_mangement
 
@@ -39,7 +40,7 @@ from program_management.ddd.service.write import paste_element_service
 @transaction.atomic()
 def create_group_and_attach(cmd: command_program_mangement.CreateGroupAndAttachCommand) -> 'GroupIdentity':
     cmd_orphan_group = __get_orphan_group_cmd_from_create_group_and_attach_cmd(cmd)
-    group_id = create_group_service.create_orphan_group(cmd_orphan_group)
+    group_id = messagebus_instance.invoke(cmd_orphan_group)
 
     cmd_paste = __get_paste_cmd(group_id, cmd.path_to_paste)
     paste_element_service.paste_element(cmd_paste)

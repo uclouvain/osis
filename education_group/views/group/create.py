@@ -7,6 +7,8 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.base import View
 
+from backoffice import messagebus
+from backoffice.messagebus import messagebus_instance
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models import academic_year
 from base.models.academic_year import starting_academic_year
@@ -108,7 +110,7 @@ class GroupCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                         start_year=group_form.cleaned_data['academic_year'],
                         end_year=None
                     )
-                    group_id = create_group_service.create_orphan_group(cmd_create)
+                    group_id = messagebus_instance.invoke(cmd_create)
             except MultipleBusinessExceptions as multiple_exceptions:
                 for e in multiple_exceptions.exceptions:
                     if isinstance(e, CodeAlreadyExistException):

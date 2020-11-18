@@ -23,32 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
-from django.db import transaction
-
-from education_group.ddd.domain.group import GroupIdentity
+from education_group.ddd import command
 from education_group.ddd.repository.group import GroupRepository
-from program_management.ddd import command
-from program_management.ddd.business_types import *
-from program_management.ddd.domain.program_tree import ProgramTreeBuilder
-from program_management.ddd.repositories.node import NodeRepository
-from program_management.ddd.repositories.program_tree import ProgramTreeRepository
+from education_group.ddd.service.write import create_group_service
+from osis_common.ddd.messagebus import AbstractMessageBus
 
 
-@transaction.atomic()
-def create_standard_program_tree(create_standard_cmd: command.CreateStandardVersionCommand) -> 'ProgramTreeIdentity':
+class MessageBus(AbstractMessageBus):
+    EVENT_HANDLERS = {}
+    COMMAND_HANDLERS = {
+        command.CreateOrphanGroupCommand: lambda cmd: create_group_service.create_orphan_group(cmd, GroupRepository())
+    }
 
-    # GIVEN
-    group_identity = GroupIdentity(code=create_standard_cmd.code, year=create_standard_cmd.start_year)
-    root_group = GroupRepository().get(entity_id=group_identity)
 
-    # WHEN
-    program_tree = ProgramTreeBuilder().build_from_orphan_group_as_root(
-        orphan_group_as_root=root_group,
-        node_repository=NodeRepository(),
-    )
-
-    # THEN
-    program_tree_identity = ProgramTreeRepository().create(program_tree=program_tree, create_orphan_group=True)
-
-    return program_tree_identity
+messagebus_instance = MessageBus()

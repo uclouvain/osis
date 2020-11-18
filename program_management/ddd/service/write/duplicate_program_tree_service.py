@@ -26,7 +26,6 @@
 
 from django.db import transaction
 
-from education_group.ddd.service.write import create_group_service
 from program_management.ddd import command
 from program_management.ddd.domain.program_tree import ProgramTreeBuilder, ProgramTreeIdentity
 from program_management.ddd.domain.service.validation_rule import FieldValidationRule
@@ -52,9 +51,6 @@ def duplicate_program_tree(
     )
     program_tree.root_node.credits = validation_rule.initial_value
     # THEN
-    program_tree_identity = ProgramTreeRepository().create(
-        program_tree=program_tree,
-        create_orphan_group_service=create_group_service.create_orphan_group
-    )
+    program_tree_identity = ProgramTreeRepository().create(program_tree=program_tree, create_orphan_group=True)
 
     return program_tree_identity

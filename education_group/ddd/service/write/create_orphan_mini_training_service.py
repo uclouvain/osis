@@ -25,6 +25,7 @@ from typing import List
 
 from django.db import transaction
 
+from backoffice.messagebus import messagebus_instance
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from education_group.ddd import command
 from education_group.ddd.domain import mini_training
@@ -45,7 +46,8 @@ def create_and_postpone_orphan_mini_training(
         errors = e.exceptions
 
     try:
-        create_group_service.create_orphan_group(__convert_to_create_group_command(cmd))
+        cmd_create = __convert_to_create_group_command(cmd)
+        messagebus_instance.invoke(cmd_create)
     except MultipleBusinessExceptions as e:
         errors += e.exceptions
 
