@@ -183,12 +183,17 @@ def __build_children(
             prerequisites
         )
 
+        link_node = links['_'.join([str(parent_id), str(child_node.pk)])]
+
         if child_node.is_learning_unit():
+            # FIXME Copy links and nodes because it's possible there is a node a present in different trees but
+            #  with different attributes values like prerequisites (cf. OSIS-5281)
+            #  It's because prerequisites should be an attribute of the ProgramTree, not of the Node.
             child_node = copy.copy(child_node)
+            link_node = copy.copy(link_node)
             child_node.prerequisite = prerequisites['has_prerequisite_dict'].get(child_node.pk, NullPrerequisite())
             child_node.is_prerequisite_of = prerequisites['is_prerequisite_dict'].get(child_node.pk, [])
 
-        link_node = links['_'.join([str(parent_id), str(child_node.pk)])]
         link_node.parent = nodes[parent_id]
         link_node.child = child_node
         link_node.entity_id = LinkIdentity(
