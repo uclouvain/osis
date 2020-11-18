@@ -271,7 +271,7 @@ class PermsTestCase(TestCase):
             [self.academic_yr, self.academic_yr_1, self.academic_yr_2, self.academic_yr_6]
         )
 
-        self.assertFalse(faculty_manager.person.user.has_perm('base.can_edit_learning_unit_proposal', luy))
+        self.assertTrue(faculty_manager.person.user.has_perm('base.can_edit_learning_unit_proposal', luy))
 
     def test_can_access_edit_learning_unit_creation_faculty_proposal_state_as_faculty_manager(self):
         generated_container = GenerateContainer(start_year=self.academic_yr_1, end_year=self.academic_yr_1)
