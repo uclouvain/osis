@@ -91,7 +91,6 @@ class TestNodeUtilizationsSerializer2(SimpleTestCase):
             search_program_trees_service=lambda *args: self.trees_using_node,
             node_repository=NodeRepository()
         )
-        print()
         expected_result = [
             # WARNING : Order is important
             {
