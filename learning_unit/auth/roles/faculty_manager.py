@@ -46,8 +46,7 @@ class FacultyManager(osis_role_models.EntityRoleModel):
                 (predicates.is_user_attached_to_current_requirement_entity |
                  predicates.is_user_attached_to_requirement_entity) &
                 predicates.has_faculty_proposal_state &
-                (predicates.is_not_modification_proposal_type |
-                 predicates.is_proposal_edition_period_open),
+                predicates.is_proposal_edition_period_open,
             'base.can_edit_learning_unit_proposal_date':
                 predicates.is_in_proposal_state &
                 (predicates.is_user_attached_to_current_requirement_entity |

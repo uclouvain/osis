@@ -253,7 +253,7 @@ class PermsTestCase(TestCase):
 
         self.assertFalse(faculty_manager.person.user.has_perm('base.can_edit_learning_unit_proposal', luy))
 
-    def test_cannot_access_edit_learning_unit_modification_faculty_proposal_state_as_faculty_manager(self):
+    def test_can_access_edit_learning_unit_modification_faculty_proposal_state_as_faculty_manager(self):
         generated_container = GenerateContainer(start_year=self.academic_yr_1, end_year=self.academic_yr_1)
         generated_container_first_year = generated_container.generated_container_years[0]
         an_requirement_entity = generated_container_first_year.requirement_entity_container_year
@@ -489,7 +489,8 @@ class TestIsEligibleToCreateModificationProposal(TestCase):
         person = CentralManagerFactory().person
         self.assertFalse(person.user.has_perm('base.can_propose_learningunit', self.luy))
 
-    def test_all_requirements_are_met_to_propose_modification(self):
+    @mock.patch('base.business.event_perms.EventPerm.is_open', return_value=True)
+    def test_all_requirements_are_met_to_propose_modification(self, mock_is_open):
         for luy_container_type in [type.name for type in FACULTY_EDITABLE_CONTAINER_TYPES]:
             with self.subTest(luy_container_type=luy_container_type):
                 self.luy.learning_container_year.container_type = luy_container_type
