@@ -27,9 +27,10 @@
 <table class="table">
     <thead>
     <tr>
+        <th></th>
         <th>{% trans 'Code' %}</th>
+        <th>{% trans 'Acronym/Short title' context 'abbreviation' %}</th>
         <th>{% trans 'Title' %}</th>
-        <th>{% trans 'Training type' %}</th>
         <th class="text-nowrap text-center">{% trans 'Relative / Absolute <br>credits' %}</th>
         <th>{% trans 'Mandatory' %}</th>
         <th>{% trans 'Block' %}</th>
@@ -39,9 +40,11 @@
     <tbody>
     {% for direct_link in direct_parents %}
         <tr>
+            <td> {% if row.link.is_reference %}  <img src="{% static 'img/reference.jpg' %}"> {% endif %} </td>
             <td>{% url 'element_identification' direct_link.link.parent.year direct_link.link.parent.code as url_parent_identification %}
                 <a href="{{ url_parent_identification }}">{{ direct_link.link.parent.code | default_if_none:'' }}</a>
             </td>
+            <td>{{ direct_link.link.parent.full_acronym }}</td>
             <td>
                 {% if LANGUAGE_CODE == 'en' and indirect_parent.node.offer_title_en %}
                     {{ direct_link.link.parent.group_title_en | default_if_none:'' }}
@@ -49,7 +52,6 @@
                     {{ direct_link.link.parent.group_title_fr | default_if_none:'' }}
                 {% endif %}
             </td>
-            <td>{{ direct_link.link.parent.node_type.value | default_if_none:'-' }}</td>
             <td class="text-nowrap text-center">
                 {{ direct_link.link.relative_credits | default_if_none:'-' }} / {{ direct_link.link.child.credits.normalize | default_if_none:'-' }}
             </td>
@@ -61,7 +63,7 @@
                 <li>
                     {% url 'element_identification' indirect_parent.node.year indirect_parent.node.code as url_indirect_parent_identification %}
                     <a href="{{ url_indirect_parent_identification }}">
-                        {{ indirect_parent.node.title }}
+                        {{ indirect_parent.node.full_acronym }}
                     </a>
                     {% if LANGUAGE_CODE == 'en' and indirect_parent.node.offer_title_en %}
                         - {{ indirect_parent.node.offer_title_en }}
@@ -78,7 +80,7 @@
                             {% if forloop.first %}<li>{% trans 'Included in' %} : {% else %} - {% endif %}
                         {% url 'element_identification' indirect_parent_of_indirect_parent.node.year indirect_parent_of_indirect_parent.node.code as url_indirect_parent_node_identification %}
                         <a href="{{ url_indirect_parent_node_identification }}">
-                            {{ indirect_parent_of_indirect_parent.node.title }}
+                            {{ indirect_parent_of_indirect_parent.node.full_acronym }}
                         </a>
                         {% if LANGUAGE_CODE == 'en' and indirect_parent_of_indirect_parent.node.version_title_en %}
                             {{ indirect_parent_of_indirect_parent.node.version_title_en }}
