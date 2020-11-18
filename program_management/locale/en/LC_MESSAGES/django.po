@@ -176,6 +176,7 @@ msgstr ""
 "Cannot remove because the following learning units are prerequisite in "
 "%(formation)s: %(learning_units)s"
 
+#, python-format
 msgid ""
 "Cannot detach because the following learning units have prerequisite in "
 "%(formation)s: %(learning_units)s"
@@ -890,7 +891,7 @@ msgstr ""
 #, python-brace-format
 msgid ""
 "You can't delete the standard program tree '{code}' in {year} as specific "
-"versions exists during this year."
+"versions exists during this year and/or in the future."
 msgstr ""
 
 #, python-format

@@ -962,10 +962,10 @@ msgstr ""
 #, python-brace-format
 msgid ""
 "You can't delete the standard program tree '{code}' in {year} as specific "
-"versions exists during this year."
+"versions exists during this year and/or in the future."
 msgstr ""
 "Vous ne pouvez pas supprimer la formation standard '{code}' en {year} parce "
-"qu'il existe une version particiulière durant cette année."
+"qu'il existe une version particulière pour cette année et/ou dans le futur."
 
 #, python-format
 msgid ""
