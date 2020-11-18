@@ -44,22 +44,6 @@ from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import LearningUnitYear
 from reference.models.language import Language
 
-FACULTY_OPEN_FIELDS = {
-    'quadrimester',
-    'session',
-    'team',
-    "faculty_remark",
-    "other_remark",
-    'common_title_english',
-    'specific_title_english',
-    "status",
-    "professional_integration",
-    "component-0-hourly_volume_partial_q1",
-    "component-0-hourly_volume_partial_q2",
-    "component-1-hourly_volume_partial_q1",
-    "component-1-hourly_volume_partial_q2",
-}
-
 # This fields can not be disabled.
 PROTECTED_FIELDS = {
     "component-0-id",
