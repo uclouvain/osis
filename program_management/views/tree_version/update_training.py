@@ -143,7 +143,7 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
                         isinstance(e, program_exception.Program2MEndDateLowerThanItsFinalitiesException):
                     self.training_version_form.add_error('end_year', e.message)
                 else:
-                    self.training_version_form.add_error('', e.message)
+                    self.training_version_form.add_error(None, e.message)
         except exception_education_group.GroupCopyConsistencyException as e:
             display_warning_messages(self.request, e.message)
             return [
