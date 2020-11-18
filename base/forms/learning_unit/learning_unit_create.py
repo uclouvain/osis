@@ -196,6 +196,7 @@ class LearningUnitYearModelForm(PermissionFieldMixin, ValidationRuleMixin, forms
                 raise ValidationError(_('The credits value should be an integer'))
         return credits_
 
+    # PermissionFieldMixin
     def get_context(self) -> str:
         context = []
         if self.instance.learning_container_year:
@@ -428,6 +429,7 @@ class LearningContainerYearModelForm(PermissionFieldMixin, ValidationRuleMixin, 
     def additionnal_entity_version_2(self):
         return self.fields["additional_entity_2"].entity_version
 
+    # PermissionFieldMixin
     def get_context(self) -> str:
         context = []
         if self.instance.container_type:
