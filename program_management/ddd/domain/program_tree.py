@@ -239,11 +239,11 @@ class ProgramTree(interface.RootEntity):
             result += self.get_parents(PATH_SEPARATOR.join(str_nodes))
         return result
 
-    def get_links_using_node(self, child_node: 'Node') -> List['Link']:
+    def search_links_using_node(self, child_node: 'Node') -> List['Link']:
         return [link_obj for link_obj in self.get_all_links() if link_obj.child == child_node]
 
     def get_first_link_occurence_using_node(self, child_node: 'Node') -> 'Link':
-        links = self.get_links_using_node(child_node)
+        links = self.search_links_using_node(child_node)
         if links:
             return links[0]
 
@@ -501,7 +501,7 @@ class ProgramTree(interface.RootEntity):
         distinct_credits_repr = []
         node = self.get_node_by_code_and_year(child_node.code, child_node.year)
 
-        for link_obj in self.get_links_using_node(node):
+        for link_obj in self.search_links_using_node(node):
             if link_obj.relative_credits_repr not in distinct_credits_repr:
                 distinct_credits_repr.append(link_obj.relative_credits_repr)
         return " ; ".join(
@@ -511,7 +511,7 @@ class ProgramTree(interface.RootEntity):
     def get_blocks_values(self, child_node: 'NodeIdentity'):
         node = self.get_node_by_code_and_year(child_node.code, child_node.year)
         return " ; ".join(
-            [str(grp.block) for grp in self.get_links_using_node(node) if grp.block]
+            [str(grp.block) for grp in self.search_links_using_node(node) if grp.block]
         )
 
     def is_empty(self):
@@ -584,7 +584,7 @@ class ProgramTree(interface.RootEntity):
     def get_paths_from_node(self, node: 'Node') -> List['Path']:
         return self._paths_by_node().get(node) or []
 
-    def get_indirect_parents(self, node: 'Node') -> List['NodeGroupYear']:
+    def search_indirect_parents(self, node: 'Node') -> List['NodeGroupYear']:
         paths = self.get_paths_from_node(node)
         indirect_parents = []
         for path in paths:

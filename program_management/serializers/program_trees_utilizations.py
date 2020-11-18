@@ -22,7 +22,7 @@ def utilizations_serializer(
         )
     )
 
-    links_using_node = _get_links_using_node(node_repository.get(node_identity), program_trees)
+    links_using_node = _search_links_using_node(node_repository.get(node_identity), program_trees)
 
     map_node_with_indirect_parents = _get_map_node_with_indirect_parents(
         direct_parents={link.parent for link in links_using_node},
@@ -57,21 +57,21 @@ def _get_map_node_with_indirect_parents(
         program_trees: List['ProgramTree']
 ) -> Dict['Node', Set['Node']]:
     return {
-        direct_parent: _get_indirect_parents(direct_parent, program_trees)
+        direct_parent: _search_indirect_parents(direct_parent, program_trees)
         for direct_parent in direct_parents
     }
 
 
-def _get_indirect_parents(direct_parent: 'Node', program_trees: List['ProgramTree']) -> List['NodeGroupYear']:
+def _search_indirect_parents(direct_parent: 'Node', program_trees: List['ProgramTree']) -> List['NodeGroupYear']:
     trees_using_direct_parent = [tree for tree in program_trees if tree.contains(direct_parent)]
     indirect_parents = set()
     for tree in trees_using_direct_parent:
-        indirect_parents |= set(tree.get_indirect_parents(direct_parent))
+        indirect_parents |= set(tree.search_indirect_parents(direct_parent))
     return indirect_parents
 
 
-def _get_links_using_node(node: 'Node', program_trees: List['ProgramTree']) -> Set['Link']:
+def _search_links_using_node(node: 'Node', program_trees: List['ProgramTree']) -> Set['Link']:
     direct_parents = set()
     for tree in program_trees:
-        direct_parents |= set(tree.get_links_using_node(node))
+        direct_parents |= set(tree.search_links_using_node(node))
     return direct_parents

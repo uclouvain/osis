@@ -962,19 +962,19 @@ class TestGetIndirectParents(SimpleTestCase):
 
     def test_when_child_node_not_in_tree(self):
         child_node = NodeLearningUnitYearFactory()
-        result = self.program_tree.get_indirect_parents(child_node)
+        result = self.program_tree.search_indirect_parents(child_node)
         expected_result = []
         self.assertEqual(result, expected_result)
 
     def test_when_child_node_is_himself_an_indirect_parent(self):
         indirect_parent = next(n for n in self.program_tree.get_all_nodes() if n.is_finality())
-        result = self.program_tree.get_indirect_parents(indirect_parent)
+        result = self.program_tree.search_indirect_parents(indirect_parent)
         expected_result = [self.program_tree.root_node]
         self.assertEqual(result, expected_result, "The indirect parent of a finality is the master 2M")
 
     def test_when_child_node_has_one_indirect_parent(self):
         child_node = next(n for n in self.program_tree.get_all_nodes() if n.is_finality_list_choice())
-        result = self.program_tree.get_indirect_parents(child_node)
+        result = self.program_tree.search_indirect_parents(child_node)
         expected_result = [self.program_tree.root_node]
         self.assertEqual(result, expected_result, "The indirect parent of a finality list choice is the master 2M")
 
@@ -986,7 +986,7 @@ class TestGetIndirectParents(SimpleTestCase):
         )
         finality = next(n for n in tree.get_all_nodes() if n.is_finality())
         finality.add_child(child_node)
-        result = tree.get_indirect_parents(child_node)
+        result = tree.search_indirect_parents(child_node)
         expected_result = [finality]
         self.assertEqual(result, expected_result)
         self.assertNotIn(
@@ -1006,7 +1006,7 @@ class TestGetIndirectParents(SimpleTestCase):
         common_core = next(n for n in tree.get_all_nodes() if n.is_common_core())
         common_core.add_child(child_node)  # Indirect parent is master 2M
 
-        result = tree.get_indirect_parents(child_node)
+        result = tree.search_indirect_parents(child_node)
         expected_result = [tree.root_node, finality]
         self.assertEqual(
             result,
