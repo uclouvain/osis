@@ -18,6 +18,12 @@ FACULTY_EDITABLE_CONTAINER_TYPES = (
     LearningContainerYearType.INTERNSHIP
 )
 
+FACULTY_DATE_EDITABLE_CONTAINER_TYPES = (
+    LearningContainerYearType.OTHER_INDIVIDUAL,
+    LearningContainerYearType.OTHER_COLLECTIVE,
+    LearningContainerYearType.MASTER_THESIS
+)
+
 PROPOSAL_CONSOLIDATION_ELIGIBLE_STATES = (ProposalState.ACCEPTED.name, ProposalState.REFUSED.name)
 
 DELETABLE_CONTAINER_TYPES = [LearningContainerYearType.DISSERTATION, LearningContainerYearType.INTERNSHIP]
@@ -126,6 +132,21 @@ def is_learning_unit_container_type_editable(self, user, learning_unit_year):
     if learning_unit_year:
         container = learning_unit_year.learning_container_year
         return container and container.container_type in [type.name for type in FACULTY_EDITABLE_CONTAINER_TYPES]
+    return None
+
+
+@predicate(bind=True)
+@predicate_failed_msg(
+    message=_(
+        "The learning unit date is not eligible for modification because of its type which is not among those types:"
+        " %(types)s"
+    ) % {"types": [type.value for type in FACULTY_DATE_EDITABLE_CONTAINER_TYPES]}
+)
+@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
+def is_learning_unit_date_container_type_editable(self, user, learning_unit_year):
+    if learning_unit_year:
+        container = learning_unit_year.learning_container_year
+        return container and container.container_type in [type.name for type in FACULTY_DATE_EDITABLE_CONTAINER_TYPES]
     return None
 
 
