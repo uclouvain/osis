@@ -667,6 +667,9 @@ class LearningUnitViewTestCase(TestCase):
         self.assertIn('direct_parents', context)
         self.assertTrue(len(context['direct_parents']) == 3)
         self.assertIn('root_formations', context)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertTrue("tab_active" in response.context)
+        self.assertEqual(response.context["tab_active"], 'learning_unit_formations')
 
     def test_learning_unit_usage_with_complete_LU(self):
         learning_container_yr = LearningContainerYearFactory(academic_year=self.current_academic_year,
