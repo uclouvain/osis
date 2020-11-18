@@ -196,15 +196,19 @@ class LearningUnitYearModelForm(PermissionFieldMixin, ValidationRuleMixin, forms
                 raise ValidationError(_('The credits value should be an integer'))
         return credits_
 
-    # ValidationRuleMixin
-    def field_reference(self, field_name: str) -> str:
+    # PermissionFieldMixin
+    def get_context(self) -> str:
         context = []
         if self.instance.learning_container_year:
             context.append(self.instance.learning_container_year.container_type)
         context.append(self.instance.subtype)
         if self.proposal:
             context.append("PROPOSAL")
-        return '.'.join(["LearningUnitYearModelForm", '_'.join(context), field_name])
+        return '_'.join(context)
+
+    # ValidationRuleMixin
+    def field_reference(self, field_name: str) -> str:
+        return '.'.join(["LearningUnitYearModelForm", self.get_context(), field_name])
 
 
 class CountryEntityField(forms.ChoiceField):
@@ -425,6 +429,17 @@ class LearningContainerYearModelForm(PermissionFieldMixin, ValidationRuleMixin, 
     def additionnal_entity_version_2(self):
         return self.fields["additional_entity_2"].entity_version
 
+    # PermissionFieldMixin
+    def get_context(self) -> str:
+        context = []
+        if self.instance.container_type:
+            context.append(self.instance.container_type)
+        if self.subtype:
+            context.append(self.subtype)
+        if self.proposal:
+            context.append("PROPOSAL")
+        return '_'.join(context)
+
     # ValidationRuleMixin
     def field_reference(self, field_name: str) -> str:
         context = []
@@ -434,4 +449,4 @@ class LearningContainerYearModelForm(PermissionFieldMixin, ValidationRuleMixin, 
             context.append(self.subtype)
         if self.proposal:
             context.append("PROPOSAL")
-        return '.'.join(["LearningContainerYearModelForm", '_'.join(context), field_name])
+        return '.'.join(["LearningContainerYearModelForm", self.get_context(), field_name])
