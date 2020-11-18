@@ -43,13 +43,18 @@ def utilizations_serializer(
                         {
                             'node': indirect_parent_of_indirect_parent
                         }
-                        for indirect_parent_of_indirect_parent in sorted(map_node_with_indirect_parents.get(indirect_parent), key=lambda node: node.title)
+                        for indirect_parent_of_indirect_parent in _sort(map_node_with_indirect_parents, indirect_parent)
                     ]
-                } for indirect_parent in sorted(map_node_with_indirect_parents.get(link.parent), key=lambda node: node.title)
+                }
+                for indirect_parent in _sort(map_node_with_indirect_parents, link.parent)
             ]
         }
         for link in sorted(links_using_node, key=lambda link: link.parent.code)
     ]
+
+
+def _sort(map_node_with_indirect_parents: Dict['Node', Set['Node']], node: 'Node'):
+    return sorted(map_node_with_indirect_parents.get(node), key=lambda n: n.title)
 
 
 def _get_map_node_with_indirect_parents(
