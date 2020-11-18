@@ -28,7 +28,7 @@
 {% block details %}
     <div class="row">
         <div class="col-md-12">
-            {% url 'education_group_read' group.year group.code as url_identification %}
+            {% url 'group_identification' group.year group.code as url_identification %}
              <a href="{{url_identification}}"
                id="lnk_identification">{{ group.code }} - {{ group.abbreviated_title }}</a>
             {% trans 'is using in' %} :
