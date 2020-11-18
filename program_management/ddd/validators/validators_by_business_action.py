@@ -245,8 +245,10 @@ class CopyProgramTreeValidatorList(business_validator.BusinessListValidator):
 
 class UpdateProgramTreeVersionValidatorList(MultipleExceptionBusinessListValidator):
     def __init__(self, tree_version: 'ProgramTreeVersion'):
+        tree = tree_version.get_tree()
+        tree.root_node.end_year = tree_version.end_year_of_existence
         self.validators = [
-            CheckEndDateBetweenFinalitiesAndMasters2M(tree_version.get_tree(), tree_version.program_tree_repository),
+            CheckEndDateBetweenFinalitiesAndMasters2M(tree, tree_version.program_tree_repository),
         ]
         super().__init__()
 

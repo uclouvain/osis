@@ -123,7 +123,7 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                     self.mini_training_form.add_error("min_constraint", e.message)
                     self.mini_training_form.add_error("max_constraint", "")
                 else:
-                    self.mini_training_form.add_error('', e.message)
+                    self.mini_training_form.add_error(None, e.message)
         except exception.MiniTrainingCopyConsistencyException as e:
             display_warning_messages(self.request, e.message)
             return [
