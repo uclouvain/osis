@@ -23,7 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import copy, time
+import collections
+import copy
 from collections import Counter
 from typing import List, Set, Optional, Dict
 
@@ -576,9 +577,9 @@ class ProgramTree(interface.RootEntity):
 
     @cached_result
     def _paths_by_node(self) -> Dict['Node', List['Path']]:
-        paths_by_node = {}
+        paths_by_node = collections.defaultdict(list)
         for path, child_node in self.root_node.descendents:
-            paths_by_node.setdefault(child_node, []).append(path)
+            paths_by_node[child_node].append(path)
         return paths_by_node
 
     def get_paths_from_node(self, node: 'Node') -> List['Path']:
