@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-16 08:46+0100\n"
+"POT-Creation-Date: 2020-11-16 14:45+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -122,6 +122,9 @@ msgstr "Choisir un fichier"
 msgid "City"
 msgstr "Ville"
 
+msgid "Code"
+msgstr "Code"
+
 msgid "Compare"
 msgstr "Comparer"
 
@@ -160,6 +163,9 @@ msgstr "Les notes décimales sont autorisées pour ce cours"
 
 msgid "Definitive submission (Submit to faculty)"
 msgstr "Soumission définitive (Soumettre à la faculté)"
+
+msgid "Display all deadlines for this learning unit"
+msgstr "Afficher toutes les dates d'échéance pour cette unité d'enseignement"
 
 msgid "Display all tutors for this learning unit"
 msgstr "Afficher tous les tuteurs pour cette unité d'enseignement"
@@ -426,6 +432,9 @@ msgstr "Le noma ne corresond pas à l'adresse de messagerie"
 msgid "Registration number"
 msgstr "Noma"
 
+msgid "Remaining scores to submit for this deadline"
+msgstr "Nombre de notes encore à soumettre pour cette date"
+
 msgid "Remove"
 msgstr "Retirer"
 
@@ -533,6 +542,9 @@ msgstr "Status"
 msgid "Student not registered for exam"
 msgstr "L'étudiant n'est plus inscrit à l'examen"
 
+msgid "Student path"
+msgstr "Parcours de l'étudiant"
+
 msgid "Students deliberated are not shown"
 msgstr "Les étudiants délibérés ne sont pas montrés"
 
@@ -603,6 +615,9 @@ msgstr "Formation"
 
 msgid "Tutor"
 msgstr "Tuteur"
+
+msgid "Tutor deadlines"
+msgstr "Dates d'échéance de l'enseignant"
 
 msgid "Tutors of the course"
 msgstr "Tuteurs du cours"

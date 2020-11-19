@@ -187,7 +187,7 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 elif isinstance(e, FinalitiesEndDateGreaterThanTheirMasters2MException):
                     self.training_form.add_error('end_year', e.message)
                 else:
-                    self.training_form.add_error('', e.message)
+                    self.training_form.add_error(None, e.message)
         except Program2MEndDateLowerThanItsFinalitiesException as e:
             self.training_form.add_error("end_year", e.message)
         except TrainingCopyConsistencyException as e:

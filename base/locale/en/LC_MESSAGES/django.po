@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-16 08:55+0100\n"
+"POT-Creation-Date: 2020-11-16 14:58+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2497,6 +2497,9 @@ msgid ""
 msgstr ""
 
 msgid "The messages sent by the application to you"
+msgstr ""
+
+msgid "The objects are been deleted successfully"
 msgstr ""
 
 #, python-format
