@@ -32,6 +32,7 @@ from django.db import transaction
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils.translation import gettext as _
+from django.utils.translation import pgettext_lazy
 from django.views.decorators.http import require_http_methods
 from openpyxl import load_workbook
 
@@ -40,12 +41,13 @@ from assessments.business.score_encoding_export import HEADER
 from assessments.forms.score_file import ScoreFileForm
 from attribution import models as mdl_attr
 from base import models as mdl
+from base.auth.roles import program_manager
 from base.models.enums import exam_enrollment_justification_type as justification_types
 
 col_academic_year = HEADER.index(_('Academic year'))
 col_session = HEADER.index(_('Session'))
 col_learning_unit = HEADER.index(_('Learning unit'))
-col_offer = HEADER.index(_('Program'))
+col_offer = HEADER.index(pgettext_lazy('encoding', 'Program'))
 col_registration_id = HEADER.index(_('Registration number'))
 col_email = HEADER.index(_('Email'))
 col_score = HEADER.index(_('Numbered scores'))
@@ -146,7 +148,7 @@ def __save_xls_scores(request, file_name, learning_unit_year_id):
     worksheet = workbook.active
     new_scores_number = 0
     learning_unit_year = mdl.learning_unit_year.get_by_id(learning_unit_year_id)
-    is_program_manager = mdl.program_manager.is_program_manager(request.user)
+    is_program_manager = program_manager.is_program_manager(request.user)
 
     data_xls = _get_all_data(worksheet)
 
