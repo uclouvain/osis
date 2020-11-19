@@ -56,7 +56,7 @@ from base.tests.factories.person import PersonFactory, CentralManagerForUEFactor
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.user import UserFactory
 from learning_unit.auth import predicates
-from learning_unit.auth.predicates import FACULTY_EDITABLE_CONTAINER_TYPES
+from learning_unit.auth.predicates import FACULTY_EDITABLE_CONTAINER_TYPES, FACULTY_DATE_EDITABLE_CONTAINER_TYPES
 from learning_unit.tests.factories.central_manager import CentralManagerFactory
 from learning_unit.tests.factories.faculty_manager import FacultyManagerFactory
 
@@ -131,7 +131,7 @@ class PermsTestCase(TestCase):
         self.assertTrue(central_manager.person.user.has_perm('base.can_edit_learningunit_date', self.luy))
 
     def test_can_faculty_manager_modify_end_date_full(self):
-        for direct_edit_permitted_container_type in [type.name for type in FACULTY_EDITABLE_CONTAINER_TYPES]:
+        for direct_edit_permitted_container_type in [type.name for type in FACULTY_DATE_EDITABLE_CONTAINER_TYPES]:
             lunit_container_yr = LearningContainerYearFactory(
                 academic_year=self.academic_yr,
                 container_type=direct_edit_permitted_container_type,
