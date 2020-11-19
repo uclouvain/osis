@@ -56,14 +56,28 @@ class TestNodeUtilizationsSerializer2(SimpleTestCase):
              |---- LTEMP734R (UE)
         """
         year = 2020
-        self.arke1ba = NodeGroupYearFactory(node_id=1, code="LARKE100B", title="ARKE1BA", node_type=TrainingType.BACHELOR, year=year)
-        self.musi1ba = NodeGroupYearFactory(node_id=2, code="LMUSI100B", title="MUSI1BA", node_type=TrainingType.BACHELOR, year=year)
-        self.clas1ba = NodeGroupYearFactory(node_id=3, code="LCLAS100B", title="CLAS1BA", node_type=TrainingType.BACHELOR, year=year)
-        self.minmedi = NodeGroupYearFactory(node_id=4, code="LMEDI100I", title="MINMEDI (mineure)", node_type=MiniTrainingType.OPEN_MINOR, year=year)
+        self.arke1ba = NodeGroupYearFactory(
+            node_id=1, code="LARKE100B", title="ARKE1BA", node_type=TrainingType.BACHELOR, year=year
+        )
+        self.musi1ba = NodeGroupYearFactory(
+            node_id=2, code="LMUSI100B", title="MUSI1BA", node_type=TrainingType.BACHELOR, year=year
+        )
+        self.clas1ba = NodeGroupYearFactory(
+            node_id=3, code="LCLAS100B", title="CLAS1BA", node_type=TrainingType.BACHELOR, year=year
+        )
+        self.minmedi = NodeGroupYearFactory(
+            node_id=4, code="LMEDI100I", title="MINMEDI (mineure)", node_type=MiniTrainingType.OPEN_MINOR, year=year
+        )
 
-        self.musi2m = NodeGroupYearFactory(node_id=5, code="LMUSI200M", title="MUSI2M", node_type=TrainingType.PGRM_MASTER_120, year=year)
-        self.musi_2ms_ar = NodeGroupYearFactory(node_id=6, code="LMUSI706S", title="MUSI2MS/AR", node_type=TrainingType.MASTER_MS_120, year=year)
-        self.musi_common_core = NodeGroupYearFactory(node_id=7, code="LMUSI106T", title="PARTIEDEBASEMUSI2MS/AR", node_type=GroupType.COMMON_CORE, year=year)
+        self.musi2m = NodeGroupYearFactory(
+            node_id=5, code="LMUSI200M", title="MUSI2M", node_type=TrainingType.PGRM_MASTER_120, year=year
+        )
+        self.musi_2ms_ar = NodeGroupYearFactory(
+            node_id=6, code="LMUSI706S", title="MUSI2MS/AR", node_type=TrainingType.MASTER_MS_120, year=year
+        )
+        self.musi_common_core = NodeGroupYearFactory(
+            node_id=7, code="LMUSI106T", title="PARTIEDEBASEMUSI2MS/AR", node_type=GroupType.COMMON_CORE, year=year
+        )
 
         self.ltemp734r = NodeLearningUnitYearFactory(node_id=8, code="LTEMP734R", year=year)
 
