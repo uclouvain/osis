@@ -3,13 +3,17 @@ const PANEL_TREE_MAX_WIDTH = 1000;
 const PANEL_TREE_MAIN_MIN_WIDTH = 600;
 const PANEL_TREE_ID = '#panel_file_tree';
 
+var cache = null;
+var configurationCache = null;
+
 $(document).ready(function () {
     setListenerForCopyElements();
     setListenerForCutElements();
     setListnerForClearClipboard();
-
     let $documentTree = $(PANEL_TREE_ID);
     if ($documentTree.length) {
+        cache = new BaseCache('program_tree_data');
+        configurationCache = new BaseCache('program_tree_configuration')
         const copy_element_url = $documentTree.attr("data-copyUrl");
         const cut_element_url = $documentTree.attr("data-cutUrl");
         const tree_json_url = $documentTree.attr("data-jsonUrl");
@@ -64,7 +68,8 @@ function setResearchTimeOut($documentTree) {
 
 
 function setNavVisibility() {
-    let treeVisibility = localStorage.getItem("treeVisibility") || "0";
+
+    let treeVisibility = configurationCache.getItem("treeVisibility", "0");
     if (treeVisibility === "1") {
         openNav();
         adaptTreeOnFooter();
@@ -73,21 +78,21 @@ function setNavVisibility() {
     }
 }
 function openNav() {
-    let size = localStorage.getItem("sidenav_size") || "300px";
+    let size = configurationCache.getItem("sidenav_size", "300px");
     document.getElementById("mySidenav").style.width = size;
     document.getElementById("main").style.marginLeft = size;
-    localStorage.setItem("treeVisibility", "1");
+    configurationCache.setItem("treeVisibility", "1");
 
 }
 
 function closeNav() {
     document.getElementById("mySidenav").style.width = "0";
     document.getElementById("main").style.marginLeft = "0";
-    localStorage.setItem("treeVisibility", "0");
+    configurationCache.setItem("treeVisibility", "0");
 }
 
 function toggleNav() {
-    let treeVisibility = localStorage.getItem("treeVisibility") || "0";
+    let treeVisibility = configurationCache.getItem("treeVisibility", "0");
     if (treeVisibility === "0") {
         openNav();
     } else {
@@ -106,7 +111,7 @@ $('#split-bar').mousedown(function (e) {
             sidebar.css("width", x);
             $('#main').css("margin-left", x);
         }
-        localStorage.setItem("sidenav_size", sidebar.width().toString() + "px")
+        configurationCache.setItem("sidenav_size", sidebar.width().toString() + "px")
     })
 });
 
@@ -120,26 +125,23 @@ $("a[id^='quick-search']").click(function (event) {
 });
 
 
-$("#scrollableDiv").on("scroll", function() {
-    saveScrollPosition();
-});
-
 function getTreeRootId() {
     return $(PANEL_TREE_ID).attr('data-rootId');
 }
 
+$("#scrollableDiv").on("scroll", saveScrollPosition);
 function saveScrollPosition() {
     const rootId = getTreeRootId();
     const scrollPosition = $("#scrollableDiv")[0].scrollTop;
     const storageValue = {};
     storageValue[rootId] = scrollPosition;
-    localStorage.setItem('scrollpos', JSON.stringify(storageValue));
+    configurationCache.setItem('scrollpos', storageValue);
 }
 
 
 function scrollToPositionSaved() {
     const rootId = getTreeRootId();
-    const storageValue = JSON.parse(localStorage.getItem('scrollpos'));
+    const storageValue = configurationCache.getItem('scrollpos');
     let scrollPosition = 0;
     if (storageValue !== null && rootId in storageValue) {
         scrollPosition = storageValue[rootId];
@@ -148,11 +150,7 @@ function scrollToPositionSaved() {
 }
 
 
-$(window).scroll(function() {
-    adaptTreeOnFooter();
-});
-
-
+$(window).scroll(adaptTreeOnFooter);
 function adaptTreeOnFooter() {
     if (checkVisible !== undefined && checkVisible($('.footer'))) {
         $('.side-container').css("height", "calc(100% - 100px)");
@@ -222,36 +220,32 @@ function fetchTreeData(){
     $.ajax({
        url: tree_json_url,
        success: function(treeData){
-           cacheTreeData(treeData);
-           restoreTreeDataFromCache();
+           cache.setItem(getTreeRootId(), treeData);
+           updateTreeData(treeData);
        },
        dataType: 'json',
        global: false  // Prevent display spinner
     });
 }
 
-function cacheTreeData(treeData) {
-    const key = getStoreKeyTreeData();
-    localStorage.setItem(key, JSON.stringify(treeData));
-}
-
-function hasTreeCacheData() {
-    const key = getStoreKeyTreeData();
-    return localStorage.getItem(key) !== null;
-}
-
-function getTreeCacheData() {
-    if (hasTreeCacheData()) {
-        const key = getStoreKeyTreeData();
-        return JSON.parse(localStorage.getItem(key));
-    }
-    return [];
-}
-
-function restoreTreeDataFromCache() {
+function updateTreeData(treeData) {
     const $documentTree = $(PANEL_TREE_ID);
-    $documentTree.jstree(true).settings.core.data = getTreeCacheData();
+    $documentTree.jstree(true).settings.core.data = treeData;
     $documentTree.jstree(true).refresh(skip_loading=true);
+}
+
+function getActiveNodeIdAccordingToQueryStringParams() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const pathQueryString = urlParams.get('path');
+
+    return pathQueryString ? pathQueryString : getTreeRootId();
+}
+
+function selectActiveNodeAccordingToQueryStringParams() {
+    const $documentTree = $(PANEL_TREE_ID);
+    const nodeId = getActiveNodeIdAccordingToQueryStringParams();
+    $documentTree.jstree(true).deselect_all();
+    $documentTree.jstree(true).select_node(nodeId);
 }
 
 
@@ -268,6 +262,7 @@ function initializeJsTree($documentTree, tree_json_url, cut_element_url, copy_el
             $(this).jstree('close_all');
         }
     });
+    $documentTree.bind("refresh.jstree", selectActiveNodeAccordingToQueryStringParams);
 
     function generateTreeKey(){
         const treeRootId = getTreeRootId();
@@ -280,9 +275,8 @@ function initializeJsTree($documentTree, tree_json_url, cut_element_url, copy_el
                 "animation": 0,
                 "check_callback": true,
                 "data": function(obj, callback) {
-                    const treeCachedData = getTreeCacheData();
-                    callback(treeCachedData);
-                }
+                    callback(cache.getItem(getTreeRootId(), {}));
+                },
             },
             "plugins": [
                 "contextmenu",
@@ -296,20 +290,27 @@ function initializeJsTree($documentTree, tree_json_url, cut_element_url, copy_el
                 "key": generateTreeKey(),
                 "opened": true,
                 "selected": false,
+                "ttl": 3600000
             },
             "contextmenu": {
                 "select_node": false,
                 "items": function ($node) {
+                    let has_or_is_prerequisite = $node.a_attr.is_prerequisite === true || $node.a_attr.has_prerequisite === true;
+                    let detach_msg = has_or_is_prerequisite ? gettext('Forbidden because of prerequisites') : null;
+                    let cut_msg = has_or_is_prerequisite ?  gettext('Forbidden because of prerequisites') : null;
+
                     return {
                         "cut": {
                             "label": gettext("Cut"),
                             "_disabled": function (data) {
-                                return !get_data_from_tree(data).group_element_year_id;
+                                let __ret = get_data_from_tree(data);
+                                return !__ret.group_element_year_id || has_or_is_prerequisite;
                             },
                             "action": function (data) {
                                 const node_data = get_data_from_tree(data);
                                 handleCutAction(cut_element_url, node_data.element_code, node_data.element_year, node_data.path)
-                            }
+                            },
+                            "title": cut_msg
                         },
 
                         "copy": {
@@ -363,10 +364,10 @@ function initializeJsTree($documentTree, tree_json_url, cut_element_url, copy_el
 
                                 });
                             },
-                            "title": $node.a_attr.detach_msg,
+                            "title": detach_msg,
                             "_disabled": function (data) {
                                 let __ret = get_data_from_tree(data);
-                                return __ret.detach_url == null;
+                                return __ret.detach_url == null || has_or_is_prerequisite;
                             }
                         },
 

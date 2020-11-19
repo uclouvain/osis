@@ -71,6 +71,7 @@ def load_has_prerequisite_multiple(
         element_id=F('prerequisite__learning_unit_year__element__pk'),
         root_element_id=F('prerequisite__education_group_version__root_group__element__pk'),
     ).order_by(
+        'root_element_id',
         'element_id',
         'group_number',
         'position'

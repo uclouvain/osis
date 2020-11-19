@@ -105,7 +105,7 @@ class ProgramTreeBuilder:
                 override_end_year_to=override_end_year_to,
                 override_start_year_to=override_start_year_to
             )
-            copied_link = link_factory.duplicate(copy_from_link, new_parent, new_child)
+            copied_link = link_factory.create_link(new_parent, new_child)
             new_parent.children.append(copied_link)
         return new_parent
 
@@ -488,7 +488,6 @@ class ProgramTree(interface.RootEntity):
             tree_repository
         ).validate()
 
-        self.remove_prerequisites(path_to_node_to_detach)
         return parent.detach_child(node_to_detach)
 
     def __copy__(self) -> 'ProgramTree':
@@ -496,19 +495,6 @@ class ProgramTree(interface.RootEntity):
             root_node=_copy(self.root_node),
             authorized_relationships=copy.copy(self.authorized_relationships)
         )
-
-    def remove_prerequisites(self, path_node_to_detach: 'Path'):
-        children_remaining = self.get_remaining_children_after_detach(path_node_to_detach)
-        detached_node = self.get_node(path_node_to_detach)
-
-        if detached_node.is_learning_unit():
-            to_remove = [detached_node] if detached_node.has_prerequisite else []
-        else:
-            to_remove = ProgramTree(root_node=detached_node).get_nodes_that_have_prerequisites()
-
-        for n in to_remove:
-            if n not in children_remaining:
-                n.remove_all_prerequisite_items()
 
     def get_relative_credits_values(self, child_node: 'NodeIdentity'):
         distinct_credits_repr = []

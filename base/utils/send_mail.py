@@ -28,6 +28,7 @@
 Utility files for mail sending
 """
 import datetime
+import itertools
 
 from django.contrib.auth.models import Permission
 from django.contrib.messages import ERROR
@@ -264,19 +265,20 @@ def _build_worksheet_parameters(workbook, a_user, operation, research_criteria):
     return worksheet_parameters
 
 
-def send_message_after_all_encoded_by_manager(persons, enrollments, learning_unit_acronym, offer_acronym):
+def send_message_after_all_encoded_by_manager(receivers, enrollments, learning_unit_acronym, offer_acronym, cc=None):
     """
     Send a message to all tutor from a learning unit when all scores are submitted by program manager
-    :param persons: The list of the tutor (person) of the learning unit
+    :param receivers: The list of the tutor (person) of the learning unit
     :param enrollments: The enrollments that are encoded and submitted
     :param learning_unit_acronym The learning unit encoded
     :param offer_acronym: The offer which is managed
+    :param cc: Persons (list) need to be in copy (cc) of the emails sent
     :return: A message if an error occurred, None if it's ok
     """
 
     html_template_ref = '{}_html'.format(ASSESSMENTS_ALL_SCORES_BY_PGM_MANAGER)
     txt_template_ref = '{}_txt'.format(ASSESSMENTS_ALL_SCORES_BY_PGM_MANAGER)
-    receivers = [message_config.create_receiver(person.id, person.email, person.language) for person in persons]
+    receivers = [message_config.create_receiver(person.id, person.email, person.language) for person in receivers]
     subject_data = {
         'learning_unit_acronym': learning_unit_acronym,
         'offer_acronym': offer_acronym
@@ -296,17 +298,34 @@ def send_message_after_all_encoded_by_manager(persons, enrollments, learning_uni
             enrollment.score_final if enrollment.score_final is not None else '',
             justifications[enrollment.justification_final] if enrollment.justification_final else '',
         ) for enrollment in enrollments]
-    for receiver in receivers:
-        table = message_config.create_table('enrollments',
-                                            get_enrollment_headers(receiver['receiver_lang']),
-                                            enrollments_data,
-                                            data_translatable=['Justification'])
+
+    receivers_by_lang = itertools.groupby(sorted(receivers, key=__order_by_lang), __order_by_lang)
+
+    for receiver_lang, receivers in receivers_by_lang:
+
+        table = message_config.create_table(
+            'enrollments',
+            get_enrollment_headers(receiver_lang),
+            enrollments_data,
+            data_translatable=['Justification'],
+        )
 
         attachment = build_scores_sheet_attachment(enrollments)
-        message_content = message_config.create_message_content(html_template_ref, txt_template_ref,
-                                                                [table], [receiver], template_base_data, subject_data,
-                                                                attachment)
+        message_content = message_config.create_message_content(
+            html_template_ref,
+            txt_template_ref,
+            [table],
+            receivers,
+            template_base_data,
+            subject_data,
+            attachment,
+            cc=cc,
+        )
         message_service.send_messages(message_content)
+
+
+def __order_by_lang(receiver):
+    return receiver['receiver_lang']
 
 
 def build_scores_sheet_attachment(list_exam_enrollments):

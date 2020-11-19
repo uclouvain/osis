@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
+import copy
 from typing import List, Dict, Any
 
 from base.models import group_element_year
@@ -62,20 +62,22 @@ def load_trees(tree_root_ids: List[int]) -> List['ProgramTree']:
     has_prerequisites = load_prerequisite.load_has_prerequisite_multiple(tree_root_ids, nodes)
     is_prerequisites = load_prerequisite.load_is_prerequisite_multiple(tree_root_ids, nodes)
     for tree_root_id in tree_root_ids:
+        # FIXME Copy links and nodes because it's possible there is a node a present in different trees but
+        #  with different attributes values like prerequisites
+        copy_links = {key: copy.copy(value) for key, value in links.items()}
+        copy_nodes = {key: copy.copy(value) for key, value in nodes.items()}
         root_node = load_node.load(tree_root_id)  # TODO : use load_multiple
-        nodes[root_node.pk] = root_node
+        copy_nodes[root_node.pk] = root_node
         tree_prerequisites = {
             'has_prerequisite_dict': has_prerequisites.get(tree_root_id) or {},
             'is_prerequisite_dict': is_prerequisites.get(tree_root_id) or {},
         }
         structure_for_current_root_node = [s for s in structure if s['starting_node_id'] == tree_root_id]
-        tree = __build_tree(root_node, structure_for_current_root_node, nodes, links, tree_prerequisites)
+        tree = __build_tree(root_node, structure_for_current_root_node, copy_nodes, copy_links, tree_prerequisites)
         trees.append(tree)
-        del nodes[root_node.pk]
     return trees
 
 
-# FIXME :: to move into ProgramTreeRepository.search()
 def load_trees_from_children(
         child_element_ids: list,
         link_type: LinkTypes = None

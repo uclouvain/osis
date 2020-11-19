@@ -153,23 +153,23 @@ class ProgramTreeVersionMismatch(BusinessException):
         return str(_('Standard')) if version_identity.is_standard() else version_identity.version_name
 
 
-class Program2MEndDateShouldBeGreaterOrEqualThanItsFinalities(BusinessException):
-    def __init__(self, finality: 'Node', **kwargs):
-        message = _("The end date must be higher or equal to finality %(acronym)s") % {
-            "acronym": str(finality)
+class Program2MEndDateLowerThanItsFinalitiesException(BusinessException):
+    def __init__(self, node_2m: 'Node', **kwargs):
+        message = _("The end date of %(acronym)s must be higher or equal to its finalities") % {
+            "acronym": node_2m.title
         }
         super().__init__(message, **kwargs)
 
 
-class CannotAttachFinalitiesWithGreaterEndDateThanProgram2M(BusinessException):
+class FinalitiesEndDateGreaterThanTheirMasters2MException(BusinessException):
     def __init__(self, root_node: 'Node', finalities: List['Node']):
         message = ngettext(
             "Finality \"%(acronym)s\" has an end date greater than %(root_acronym)s program.",
             "Finalities \"%(acronym)s\" have an end date greater than %(root_acronym)s program.",
             len(finalities)
         ) % {
-            "acronym": ', '.join([str(node) for node in finalities]),
-            "root_acronym": root_node
+            "acronym": ', '.join([node.title for node in finalities]),
+            "root_acronym": root_node.title
         }
         super().__init__(message)
 
@@ -324,25 +324,27 @@ class CannotDetachRootException(BusinessException):
         super().__init__(message)
 
 
-class CannotDetachLearningWhoIsPrerequisiteException(BusinessException):
-    def __init__(self, node_to_detach: 'Node'):
-        message = _("Cannot detach learning unit %(acronym)s as it has a prerequisite or it is a prerequisite.") % {
-            "acronym": node_to_detach.code
+class CannotDetachLearningUnitsWhoArePrerequisiteException(BusinessException):
+    def __init__(self, root_node: 'Node', nodes: Iterable['NodeLearningUnitYear']):
+        message = _(
+            "Cannot detach because the following learning units are prerequisite "
+            "in %(formation)s: %(learning_units)s"
+        ) % {
+            "learning_units": ", ".join([n.code for n in nodes]),
+            "formation": root_node.title,
         }
         super().__init__(message)
 
 
-class CannotDetachChildrenWhoArePrerequisiteException(BusinessException):
-    def __init__(self, root_node: 'Node', node_to_detach: 'Node', codes_that_are_prerequisite: List['str']):
+class CannotDetachLearningUnitsWhoHavePrerequisiteException(BusinessException):
+    def __init__(self, root_node: 'Node', nodes: Iterable['NodeLearningUnitYear']):
         message = _(
-            "Cannot detach education group year %(acronym)s as the following learning units "
-            "are prerequisite in %(formation)s: %(learning_units)s"
+            "Cannot detach because the following learning units have prerequisite "
+            "in %(formation)s: %(learning_units)s"
         ) % {
-            "acronym": node_to_detach.title,
             "formation": root_node.title,
-            "learning_units": ", ".join(codes_that_are_prerequisite)
+            "learning_units": ", ".join([n.code for n in nodes])
         }
-
         super().__init__(message)
 
 
@@ -355,17 +357,5 @@ class CannotDetachOptionsException(BusinessException):
         ) % {
             "acronym": ', '.join(str(n) for n in options_to_detach),
             "finality_acronym": finality
-        }
-        super().__init__(message)
-
-
-class DeletePrerequisitesException(BusinessException):
-    def __init__(self, root_node: 'Node', learning_unit_codes: List['str']):
-        message = _(
-            "The prerequisites for the following learning units contained in education group year "
-            "%(acronym)s will be deleted: %(learning_units)s"
-        ) % {
-            "acronym": root_node,
-            "learning_units": ", ".join(learning_unit_codes)
         }
         super().__init__(message)

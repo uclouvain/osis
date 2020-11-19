@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-06 18:22+0100\n"
+"POT-Creation-Date: 2020-11-16 08:55+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1382,7 +1382,7 @@ msgstr ""
 msgid "Manage volumes"
 msgstr ""
 
-msgid "Managed programs"
+msgid "Managed trainings"
 msgstr ""
 
 msgid "Management entity"
@@ -1954,12 +1954,6 @@ msgid "Program master 180-240"
 msgstr ""
 
 msgid "Program organized with other institutes"
-msgstr ""
-
-msgid "Programs"
-msgstr ""
-
-msgid "Programs/gathering"
 msgstr ""
 
 msgid "Prohibition to delete a learning unit before 2015."
@@ -2666,6 +2660,9 @@ msgid "Trainings"
 msgstr ""
 
 msgid "Trainings and learning units"
+msgstr ""
+
+msgid "Trainings/gathering"
 msgstr ""
 
 msgid "Transformation"
