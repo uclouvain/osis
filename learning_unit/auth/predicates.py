@@ -161,7 +161,7 @@ def is_learning_unit_edition_period_open(self, user, learning_unit_year):
 
 
 @predicate(bind=True)
-@predicate_failed_msg(message=_("Modification or transformation proposal not allowed during this period."))
+@predicate_failed_msg(message=_("You are not allowed to put in proposal for ending date during this academic year"))
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def is_proposal_date_edition_period_open(self, user, learning_unit_year):
     if learning_unit_year:
@@ -173,7 +173,7 @@ def is_proposal_date_edition_period_open(self, user, learning_unit_year):
 
 
 @predicate(bind=True)
-@predicate_failed_msg(message=_("Date creation or modification of proposal not allowed during this period."))
+@predicate_failed_msg(message=_("You are not allowed to put in proposal for modification during this academic year"))
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def is_proposal_edition_period_open(self, user, learning_unit_year):
     if learning_unit_year:
