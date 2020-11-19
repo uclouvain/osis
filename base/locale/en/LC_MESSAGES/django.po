@@ -2502,6 +2502,9 @@ msgstr ""
 msgid "The objects are been deleted successfully"
 msgstr ""
 
+msgid "The objects are been deleted successfully"
+msgstr ""
+
 #, python-format
 msgid ""
 "The parent is %(parent_periodicty)s and there is at least one partim which "
