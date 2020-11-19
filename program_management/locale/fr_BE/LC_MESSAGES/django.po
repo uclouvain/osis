@@ -154,10 +154,15 @@ msgstr "Ent. attrib."
 msgid "Annual"
 msgstr "Annuel"
 
+msgid "Are you sure you want to delete %(object)s ?"
+msgstr "Êtes-vous sûr·e de vouloir supprimer  %(object)s ?"
+
 #, python-format
-msgid "Are you sure you want to delete %(offer_acronym)s %(version_name)s ?"
+msgid ""
+"Are you sure you want to delete %(offer_acronym)s %(version_name)s%(title)s ?"
 msgstr ""
-"Êtes-vous sûr·e de vouloir supprimer %(offer_acronym)s %(version_name)s ?"
+"Êtes-vous sûr·e de vouloir supprimer %(offer_acronym)s %(version_name)s"
+"%(title)s ?"
 
 #, python-format
 msgid "Are you sure you want to detach %(child)s ?"

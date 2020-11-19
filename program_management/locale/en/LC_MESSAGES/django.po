@@ -137,8 +137,12 @@ msgstr ""
 msgid "Annual"
 msgstr ""
 
+msgid "Are you sure you want to delete %(object)s ?"
+msgstr ""
+
 #, python-format
-msgid "Are you sure you want to delete %(offer_acronym)s %(version_name)s ?"
+msgid ""
+"Are you sure you want to delete %(offer_acronym)s %(version_name)s%(title)s ?"
 msgstr ""
 
 #, python-format

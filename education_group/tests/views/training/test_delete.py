@@ -100,17 +100,21 @@ class TestDeleteTrainingGetMethod(TestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
 
-    def test_assert_template_used(self):
+    @mock.patch('program_management.ddd.repositories.program_tree_version.ProgramTreeVersionRepository.get')
+    def test_assert_template_used(self, mock_repo):
+        mock_repo.return_value = self.program_tree_version
         response = self.client.get(self.url)
         self.assertTemplateUsed(response, "education_group_app/training/delete_inner.html")
 
-    def test_assert_context(self):
+    @mock.patch('program_management.ddd.repositories.program_tree_version.ProgramTreeVersionRepository.get')
+    def test_assert_context(self, mock_repo):
+        mock_repo.return_value = self.program_tree_version
         response = self.client.get(self.url)
 
-        expected_confirmation_msg = _("Are you sure you want to delete %(acronym)s - %(title)s ?") % {
-            'acronym': self.training.acronym,
-            'title': self.training.titles.title_fr
-        }
+        expected_confirmation_msg = \
+            _("Are you sure you want to delete %(object)s ?") % {
+                'object': "{} - {}".format(self.root_node.title, self.root_node.offer_title_fr)
+            }
         self.assertEqual(
             response.context['confirmation_message'],
             expected_confirmation_msg
