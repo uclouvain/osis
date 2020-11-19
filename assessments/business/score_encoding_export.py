@@ -347,5 +347,3 @@ def _build_offers_entities_emails_list(exam_enrollments: List[ExamEnrollment]) -
         {exam_enroll.learning_unit_enrollment.offer for exam_enroll in exam_enrollments}
     )
     return ';'.join({address.email for address in addresses if address.email})
-
-
