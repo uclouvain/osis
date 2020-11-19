@@ -52,8 +52,7 @@ class FacultyManager(osis_role_models.EntityRoleModel):
                 (predicates.is_user_attached_to_current_requirement_entity |
                  predicates.is_user_attached_to_requirement_entity) &
                 predicates.has_faculty_proposal_state &
-                (predicates.is_not_modification_proposal_type |
-                 predicates.is_proposal_date_edition_period_open),
+                predicates.is_not_modification_proposal_type,
             'base.add_externallearningunityear': rules.always_allow,
             'base.can_propose_learningunit':
                 predicates.is_learning_unit_year_not_in_past &
@@ -61,6 +60,14 @@ class FacultyManager(osis_role_models.EntityRoleModel):
                 predicates.is_learning_unit_container_type_editable &
                 predicates.is_not_in_proposal_state &
                 predicates.is_proposal_edition_period_open &
+                predicates.is_user_attached_to_current_requirement_entity &
+                predicates.is_external_learning_unit_with_cograduation,
+            'base.can_propose_learningunit_end_date':
+                predicates.is_learning_unit_year_not_in_past &
+                predicates.is_learning_unit_year_not_a_partim &
+                predicates.is_learning_unit_container_type_editable &
+                predicates.is_not_in_proposal_state &
+                predicates.is_proposal_date_edition_period_open &
                 predicates.is_user_attached_to_current_requirement_entity &
                 predicates.is_external_learning_unit_with_cograduation,
             'base.can_cancel_proposal':
@@ -77,9 +84,9 @@ class FacultyManager(osis_role_models.EntityRoleModel):
                 predicates.has_learning_unit_no_application_this_year &
                 predicates.is_learning_unit_edition_period_open &
                 predicates.is_user_attached_to_current_requirement_entity &
-                predicates.is_learning_unit_container_type_editable &
                 predicates.is_external_learning_unit_with_cograduation &
-                predicates.is_not_in_proposal_state,
+                predicates.is_not_in_proposal_state &
+                (predicates.is_learning_unit_year_a_partim | predicates.is_learning_unit_date_container_type_editable),
             'base.can_edit_learningunit_pedagogy':
                 predicates.is_learning_unit_year_older_or_equals_than_limit_settings_year &
                 predicates.is_user_attached_to_current_requirement_entity,
@@ -98,7 +105,6 @@ class FacultyManager(osis_role_models.EntityRoleModel):
                 predicates.is_user_attached_to_current_requirement_entity,
             'base.can_delete_attribution':
                 predicates.is_learning_unit_year_a_partim &
-                predicates.is_learning_unit_type_allowed_for_attributions &
                 predicates.is_user_attached_to_current_requirement_entity,
             'base.can_edit_summary_locked_field':
                 predicates.is_user_attached_to_current_requirement_entity,

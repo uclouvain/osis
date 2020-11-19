@@ -49,6 +49,14 @@ class CentralManager(osis_role_models.EntityRoleModel):
                 predicates.is_proposal_edition_period_open &
                 predicates.is_user_attached_to_current_requirement_entity &
                 predicates.is_external_learning_unit_with_cograduation,
+            'base.can_propose_learningunit_end_date':
+                predicates.is_learning_unit_year_not_in_past &
+                predicates.is_learning_unit_year_not_a_partim &
+                predicates.is_learning_unit_container_type_editable &
+                predicates.is_not_in_proposal_state &
+                predicates.is_proposal_date_edition_period_open &
+                predicates.is_user_attached_to_current_requirement_entity &
+                predicates.is_external_learning_unit_with_cograduation,
             'base.can_edit_learning_unit_proposal':
                 predicates.is_in_proposal_state &
                 (predicates.is_user_attached_to_current_requirement_entity |
