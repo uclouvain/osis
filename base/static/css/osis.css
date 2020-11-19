@@ -690,6 +690,6 @@ input::-webkit-inner-spin-button {
     background-color: #5cb85c;
 }
 
-.background-warning {
-    background-color: #f0ad4e;
+.background-error {
+    background-color: #d9534f;
 }
