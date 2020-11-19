@@ -693,3 +693,8 @@ input::-webkit-inner-spin-button {
 .background-error {
     background-color: #d9534f;
 }
+
+
+.row-score-encoding {
+    line-height: 2em;
+}

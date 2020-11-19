@@ -24,14 +24,15 @@
 {% endcomment %}
 
 {% if deadline|is_past %}
-    <strong class="{% if scores_not_yet_submitted == 0 %}success{% else %}error{% endif %}"
-            style="width: 7em; display: inline-block">
+    <strong class="col-md-4 {% if scores_not_yet_submitted == 0 %}success{% else %}error{% endif %}">
         {{ deadline|date:"d/m/Y" }}
     </strong>
 {% else %}
-    <span style="width: 7em; display: inline-block">{{ deadline|date:"d/m/Y" }}</span>
+    <span class="col-md-4">{{ deadline|date:"d/m/Y" }}</span>
 {% endif %}
-<span title="{% trans 'Remaining scores to submit for this deadline' %}"
-      class="badge badge-default {% if scores_not_yet_submitted == 0 %}background-success{% else %}background-error{% endif %}">
+<span class="col-md-3">
+    <span title="{% trans 'Remaining scores to submit for this deadline' %}"
+          class="badge badge-default {% if scores_not_yet_submitted == 0 %}background-success{% else %}background-error{% endif %}">
     {{ scores_not_yet_submitted }}
+    </span>
 </span>
