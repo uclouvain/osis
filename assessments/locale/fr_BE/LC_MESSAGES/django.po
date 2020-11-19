@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-25 13:18+0200\n"
+"POT-Creation-Date: 2020-11-16 14:45+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -30,7 +30,7 @@ msgid ""
 msgstr ""
 "\n"
 "Si vous personnalisez l'un des champs ci-dessous, cela ne changera que "
-"l'adresse affichée sur les pages d'encodage de notes pour le programme "
+"l'adresse affichée sur les pages d'encodage de notes pour la formation "
 "%(program)s. Cela ne changera jamais l'adresse d'une structure. La liste ci-"
 "dessous vous aidera à pré-remplir le formulaire."
 
@@ -66,10 +66,8 @@ msgstr "Année académique"
 msgid "Accepted value: %(justification_label_authorized)s "
 msgstr "Valeur acceptée: %(justification_label_authorized)s "
 
+msgctxt "UE acronym"
 msgid "Acronym"
-msgstr "Acronyme"
-
-msgid "Acronym enrollment header"
 msgstr "Sigle"
 
 msgid "Add"
@@ -134,7 +132,7 @@ msgid "Complete"
 msgstr "Compléter"
 
 msgid "Confirm delete for : "
-msgstr ""
+msgstr "Confirmer suppression pour : "
 
 msgid "Country"
 msgstr "Pays"
@@ -165,6 +163,9 @@ msgstr "Les notes décimales sont autorisées pour ce cours"
 
 msgid "Definitive submission (Submit to faculty)"
 msgstr "Soumission définitive (Soumettre à la faculté)"
+
+msgid "Display all deadlines for this learning unit"
+msgstr "Afficher toutes les dates d'échéance pour cette unité d'enseignement"
 
 msgid "Display all tutors for this learning unit"
 msgstr "Afficher tous les tuteurs pour cette unité d'enseignement"
@@ -242,7 +243,7 @@ msgstr ""
 "Si vous tentez d'introduire des valeurs décimales, elles seront ignorées."
 
 msgid "Include subordinate entities"
-msgstr ""
+msgstr "Inclure les entités subordonnées"
 
 msgid "Inject"
 msgstr "Injecter"
@@ -294,8 +295,9 @@ msgstr "Location"
 msgid "M=Justified Absence"
 msgstr "M=Absence Justifiée"
 
+msgctxt "male"
 msgid "Main"
-msgstr ""
+msgstr "Principal"
 
 msgid "Manager"
 msgstr "Gestionnaire"
@@ -405,8 +407,9 @@ msgstr "Imprimer tous les cours"
 msgid "Print the scores"
 msgstr "Imprimer toutes les notes"
 
+msgctxt "encoding"
 msgid "Program"
-msgstr "Programme"
+msgstr "Formation"
 
 msgid "Program managers"
 msgstr "Gestionnaires de parcours étudiant"
@@ -429,8 +432,8 @@ msgstr "Le noma ne corresond pas à l'adresse de messagerie"
 msgid "Registration number"
 msgstr "Noma"
 
-msgid "Registration number header"
-msgstr "Noma"
+msgid "Remaining scores to submit for this deadline"
+msgstr "Nombre de notes encore à soumettre pour cette date"
 
 msgid "Remove"
 msgstr "Retirer"
@@ -451,7 +454,7 @@ msgid ""
 "Reuse the address of an entity linked to the program or inform the posting "
 "address for the papersheet."
 msgstr ""
-"Ré-utilisez l'adresse d'une entité liée au programme ou informez l'adresse "
+"Ré-utilisez l'adresse d'une entité liée à la formation ou informez l'adresse "
 "postale pour la feuille papier."
 
 msgid "Row"
@@ -507,7 +510,7 @@ msgid "Search"
 msgstr "Chercher"
 
 msgid "Search of annual programs"
-msgstr "Chercher les programmes annuels"
+msgstr "Chercher les formations annuelles"
 
 msgid "Select an encoding type"
 msgstr "Sélectionnez un type d'encodage"
@@ -524,9 +527,6 @@ msgstr "Sélectionné"
 msgid "Session"
 msgstr "Session"
 
-msgid "Session enrollment header"
-msgstr "Session"
-
 msgid "Session number"
 msgstr "Numéro de session"
 
@@ -541,6 +541,9 @@ msgstr "Status"
 
 msgid "Student not registered for exam"
 msgstr "L'étudiant n'est plus inscrit à l'examen"
+
+msgid "Student path"
+msgstr "Parcours de l'étudiant"
 
 msgid "Students deliberated are not shown"
 msgstr "Les étudiants délibérés ne sont pas montrés"
@@ -573,8 +576,8 @@ msgstr "L'inscription à l'activité %(xls_learning_unit_acronym)s n'existe pas"
 msgid "The file must be a valid 'XLSX' excel file"
 msgstr "Le fichier doit être un fichier excel valide"
 
-msgid "The manager will keep the following programs : "
-msgstr "Le gestionnaire devra conserver les programmes suivant : "
+msgid "The manager will keep the following trainings : "
+msgstr "Le gestionnaire devra conserver les formations suivantes : "
 
 #, python-format
 msgid ""
@@ -613,6 +616,9 @@ msgstr "Formation"
 msgid "Tutor"
 msgstr "Tuteur"
 
+msgid "Tutor deadlines"
+msgstr "Dates d'échéance de l'enseignant"
+
 msgid "Tutors of the course"
 msgstr "Tuteurs du cours"
 
@@ -649,6 +655,9 @@ msgstr ""
 
 msgid "Without attribution"
 msgstr "Sans attribution"
+
+msgid "Yes"
+msgstr "Oui"
 
 msgid "You can't encode a 'score' and a 'justification' together"
 msgstr "Vous ne pouvez pas encoder une note et une justification ensemble"
@@ -690,7 +699,7 @@ msgstr ""
 "du fichier excel à fournir (bouton '%(button_value)s')"
 
 msgid "date_format"
-msgstr "%d%m%Y"
+msgstr "%d/%m/%Y"
 
 msgid "learning units in"
 msgstr "unités d'enseignement dans"
@@ -699,7 +708,7 @@ msgid "of"
 msgstr "sur"
 
 msgid "program(s)"
-msgstr "programme(s)"
+msgstr "formation(s)"
 
 msgid "score(s) saved"
 msgstr "note(s) sauvées"
