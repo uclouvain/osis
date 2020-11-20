@@ -126,6 +126,6 @@ class MiniTrainingDetailSerializer(MiniTrainingListSerializer):
 
     def to_representation(self, obj):
         data = super().to_representation(obj)
-        if self.context.get('is_version'):
+        if obj.version_name != '':
             data.pop('versions')
         return data
