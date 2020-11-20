@@ -105,8 +105,8 @@ class OrganizationOrderingTest(TestCase):
         self.assertEqual(organizations[3].end_date, datetime.date(2015, 1, 1))
 
 
-class OrganizationIsCurrentPartnerTest(TestCase):
-    def test_is_current_partner_case_end_date_lower_than_today(self):
+class OrganizationIsActiveTest(TestCase):
+    def test_is_active_case_end_date_lower_than_today(self):
         root_inactive = EntityVersionFactory(
             entity__organization__name='A',
             start_date=datetime.date(2015, 1, 1),
