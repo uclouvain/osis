@@ -46,16 +46,31 @@
             </td>
             <td>{{ direct_link.link.parent.full_acronym }}</td>
             <td>
-                {% if LANGUAGE_CODE == 'en' and indirect_parent.node.offer_title_en %}
-                    {{ direct_link.link.parent.group_title_en | default_if_none:'' }}
+                {% if direct_link.link.parent.is_training or direct_link.link.parent.is_mini_training %}
+                    {% if LANGUAGE_CODE == 'en' and indirect_parent.node.offer_title_en %}
+                        {{ direct_link.link.parent.offer_title_en | default_if_none:'' }}
+                    {% else %}
+                        {{ direct_link.link.parent.offer_title_fr | default_if_none:'' }}
+                    {% endif %}
                 {% else %}
-                    {{ direct_link.link.parent.group_title_fr | default_if_none:'' }}
+                    {% if LANGUAGE_CODE == 'en' and indirect_parent.node.group_title_en %}
+                        {{ direct_link.link.parent.group_title_en | default_if_none:'' }}
+                    {% else %}
+                        {{ direct_link.link.parent.group_title_fr | default_if_none:'' }}
+                    {% endif %}
+                {% endif %}
+                {% if LANGUAGE_CODE == 'en' and direct_link.link.parent.version_title_en %}
+                    [{{ direct_link.link.parent.version_title_en | default_if_none:'' }}]
+                {% else %}
+                    {% if direct_link.link.parent.version_title_fr %}
+                        [{{ direct_link.link.parent.version_title_fr | default_if_none:'' }}]
+                    {% endif %}
                 {% endif %}
             </td>
             <td class="text-nowrap text-center">
                 {{ direct_link.link.relative_credits | default_if_none:'-' }} / {{ direct_link.link.child.credits.normalize | default_if_none:'-' }}
             </td>
-            <td class="text-nowrap text-center">{{ direct_link.link.is_mandatory | yesno | capfirst }}</td>
+            <td class="text-nowrap text-center">{{ direct_link.link.is_mandatory | yesno | title }}</td>
             <td class="text-nowrap text-center">{{ direct_link.link.block | default_if_none:'-' }}</td>
             <td>
                 {% for indirect_parent in direct_link.indirect_parents %}
@@ -71,9 +86,11 @@
                         - {{ indirect_parent.node.offer_title_fr }}
                     {% endif %}
                     {% if LANGUAGE_CODE == 'en' and indirect_parent.node.version_title_en %}
-                        {{ indirect_parent.node.version_title_en }}
+                        [{{ indirect_parent.node.version_title_en }}]
                     {% else %}
-                        {{ indirect_parent.node.version_title_fr }}
+                        {% if indirect_parent.node.version_title_fr %}
+                            [{{ indirect_parent.node.version_title_fr }}]
+                        {% endif %}
                     {% endif %}
                     <ul>
                         {% for indirect_parent_of_indirect_parent in indirect_parent.indirect_parents %}
@@ -82,11 +99,6 @@
                         <a href="{{ url_indirect_parent_node_identification }}">
                             {{ indirect_parent_of_indirect_parent.node.full_acronym }}
                         </a>
-                        {% if LANGUAGE_CODE == 'en' and indirect_parent_of_indirect_parent.node.version_title_en %}
-                            {{ indirect_parent_of_indirect_parent.node.version_title_en }}
-                        {% else %}
-                            {{ indirect_parent_of_indirect_parent.node.version_title_fr }}
-                        {% endif %}
                         {% if forloop.last %}</li>{% endif %}
                         {% endfor %}
                     </ul>
