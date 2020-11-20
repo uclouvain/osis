@@ -31,26 +31,35 @@ from program_management.models.education_group_version import EducationGroupVers
 
 class EducationGroupTitleSerializer(serializers.ModelSerializer):
     title = serializers.SerializerMethodField()
-    title_en = serializers.SerializerMethodField()
 
     class Meta:
         model = EducationGroupVersion
         fields = (
             'title',
-            'title_en'
         )
 
-    def get_title(self, version):
-        return self._get_offer_title_from_lang(version, settings.LANGUAGE_CODE_FR)
+    @staticmethod
+    def get_title(version):
+        return _get_offer_title_from_lang(version, settings.LANGUAGE_CODE_FR)
 
-    def get_title_en(self, version):
-        return self._get_offer_title_from_lang(version, settings.LANGUAGE_CODE_EN)
+
+class EducationGroupTitleAllLanguagesSerializer(EducationGroupTitleSerializer):
+    title_en = serializers.SerializerMethodField()
+
+    class Meta(EducationGroupTitleSerializer.Meta):
+        fields = EducationGroupTitleSerializer.Meta.fields + (
+            'title_en',
+        )
 
     @staticmethod
-    def _get_offer_title_from_lang(version, lang: str):
-        field_suffix = '_en' if lang == settings.LANGUAGE_CODE_EN else '_fr'
-        field_name = 'title' + field_suffix
-        title = getattr(version.root_group, 'title' + field_suffix)
-        version_title = getattr(version, field_name)
-        title_suffix = ' [{}]'.format(version_title) if version_title else ''
-        return title + title_suffix if title else None
+    def get_title_en(version):
+        return _get_offer_title_from_lang(version, settings.LANGUAGE_CODE_EN)
+
+
+def _get_offer_title_from_lang(version, lang: str):
+    field_suffix = '_en' if lang == settings.LANGUAGE_CODE_EN else '_fr'
+    field_name = 'title' + field_suffix
+    title = getattr(version.root_group, 'title' + field_suffix)
+    version_title = getattr(version, field_name)
+    title_suffix = ' [{}]'.format(version_title) if version_title else ''
+    return title + title_suffix if title else None
