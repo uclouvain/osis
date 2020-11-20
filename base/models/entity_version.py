@@ -299,11 +299,9 @@ class EntityVersionQuerySet(CTEQuerySet):
         return self.filter(entity__organization__type=MAIN)
 
     @property
-    def of_active_academic_partner(self):
+    def of_academic_partner(self):
         return self.filter(
             entity__organization__type=ACADEMIC_PARTNER,
-            # The two following check for active root entity
-            end_date__isnull=True,
         ).only_roots()
 
 
