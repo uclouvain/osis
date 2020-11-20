@@ -385,3 +385,32 @@ class TrainingDetailSerializerForMasterWithFinalityTestCase(TestCase):
             self.serializer.data['education_group_type'],
             self.training.education_group_type.name
         )
+
+
+class TrainingVersionDetailSerializerTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory(year=2018)
+        cls.entity_version = EntityVersionFactory(entity__organization__type=organization_type.MAIN)
+        cls.training = TrainingFactory(
+            academic_year=cls.academic_year,
+            management_entity=cls.entity_version.entity,
+            administration_entity=cls.entity_version.entity,
+            main_domain=DomainFactory(parent=DomainFactory())
+        )
+        cls.version = EducationGroupVersionFactory(offer=cls.training, version_name='TEST')
+        annotated_version = EducationGroupVersion.objects.annotate(
+            domain_code=F('offer__main_domain__code'),
+            domain_name=F('offer__main_domain__parent__name'),
+        ).get(id=cls.version.id)
+        url = reverse('education_group_api_v1:training_read', kwargs={
+            'acronym': cls.training.acronym,
+            'year': cls.academic_year.year
+        })
+        cls.serializer = TrainingDetailSerializer(annotated_version, context={
+            'request': RequestFactory().get(url),
+            'language': settings.LANGUAGE_CODE_EN
+        })
+
+    def test_contains_not_field_versions(self):
+        self.assertNotIn('versions', list(self.serializer.data.keys()))
