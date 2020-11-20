@@ -31,11 +31,11 @@ from base.models.academic_year import AcademicYear
 from base.models.education_group_type import EducationGroupType
 from base.models.enums import education_group_categories
 from education_group.api.serializers import utils
-from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
+from education_group.api.serializers.education_group_title import EducationGroupTitleAllLanguagesSerializer
 from education_group.api.serializers.utils import MiniTrainingHyperlinkedIdentityField
 
 
-class MiniTrainingListSerializer(EducationGroupTitleSerializer, serializers.ModelSerializer):
+class MiniTrainingListSerializer(EducationGroupTitleAllLanguagesSerializer, serializers.ModelSerializer):
     url = MiniTrainingHyperlinkedIdentityField(read_only=True)
     acronym = serializers.CharField(source='offer.acronym')
     code = serializers.CharField(source='root_group.partial_acronym')
@@ -58,8 +58,8 @@ class MiniTrainingListSerializer(EducationGroupTitleSerializer, serializers.Mode
         read_only=True
     )
 
-    class Meta(EducationGroupTitleSerializer.Meta):
-        fields = EducationGroupTitleSerializer.Meta.fields + (
+    class Meta(EducationGroupTitleAllLanguagesSerializer.Meta):
+        fields = EducationGroupTitleAllLanguagesSerializer.Meta.fields + (
             'url',
             'version_name',
             'acronym',

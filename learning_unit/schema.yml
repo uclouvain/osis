@@ -579,8 +579,6 @@ components:
           multipleOf: 0.01
         title:
           type: string
-        title_en:
-          type: string
         decree_category:
           $ref: '#/components/schemas/DecreeCategoryEnum'
         decree_category_text:
