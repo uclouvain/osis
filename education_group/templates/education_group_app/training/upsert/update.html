@@ -39,11 +39,7 @@
     <div class="page-header">
         <h2>{{ training_obj.acronym }} - {{ training_obj.academic_year }}</h2>
         <h3>
-            {% if training_obj.is_finality %}
-                {{ training_obj.titles.partial_title_fr }}
-            {% else %}
-                {{ training_obj.titles.title_fr }}
-            {% endif %}
+            {{ training_obj.titles.title_fr }}uuu
         </h3>
     </div>
 {% endblock header_content %}

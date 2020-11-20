@@ -111,7 +111,8 @@ class LinkForm(forms.Form):
 
 class BaseContentFormSet(BaseFormSet):
     def get_form_kwargs(self, index):
-        if self.form_kwargs:
+        print(index)
+        if self.form_kwargs and index:
             return self.form_kwargs[index]
         return {}
 
