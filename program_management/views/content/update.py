@@ -22,8 +22,8 @@ from program_management.ddd.domain import exception as program_exception
 from program_management.ddd.domain.service.get_program_tree_version_for_tree import get_program_tree_version_for_tree
 from program_management.ddd.service.read import get_program_tree_service, get_program_tree_version_from_node_service
 from program_management.forms import content as content_forms
-from django.http import Http404, HttpResponseRedirect
 from education_group.ddd.domain.exception import TrainingNotFoundException
+from program_management.ddd.domain.service.identity_search import TrainingIdentitySearch
 
 
 class ContentUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
@@ -141,10 +141,11 @@ class ContentUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
     @functools.lru_cache()
     def get_training_obj(self) -> 'Training':
         try:
-            training_acronym = self.get_version().entity_id.offer_acronym
+            training_identity = TrainingIdentitySearch().get_from_program_tree_version_identity(
+                self.get_version().entity_id)
             get_cmd = command.GetTrainingCommand(
-                acronym=training_acronym,
-                year=self.kwargs['year']
+                acronym=training_identity.acronym,
+                year=training_identity.year
             )
             return get_training_service.get_training(get_cmd)
         except TrainingNotFoundException:
