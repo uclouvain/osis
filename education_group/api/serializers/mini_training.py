@@ -33,6 +33,7 @@ from base.models.education_group_type import EducationGroupType
 from base.models.enums import education_group_categories
 from education_group.api.serializers import utils
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
+from education_group.api.serializers.education_group_version import MiniTrainingVersionListSerializer
 from education_group.api.serializers.utils import MiniTrainingHyperlinkedIdentityField
 
 
@@ -93,6 +94,8 @@ class MiniTrainingDetailSerializer(MiniTrainingListSerializer):
     active_text = serializers.CharField(source='offer.get_active_display', read_only=True)
     schedule_type_text = serializers.CharField(source='offer.get_schedule_type_display', read_only=True)
 
+    versions = serializers.SerializerMethodField()
+
     class Meta(MiniTrainingListSerializer.Meta):
         fields = MiniTrainingListSerializer.Meta.fields + (
             'active',
@@ -107,6 +110,7 @@ class MiniTrainingDetailSerializer(MiniTrainingListSerializer):
             'constraint_type_text',
             'remark',
             'campus',
+            'versions'
         )
 
     def get_remark(self, education_group_version):
@@ -115,3 +119,13 @@ class MiniTrainingDetailSerializer(MiniTrainingListSerializer):
             education_group_version.root_group,
             'remark_' + ('en' if language and language not in settings.LANGUAGE_CODE_FR else 'fr')
         )
+
+    def get_versions(self, version):
+        versions = version.offer.educationgroupversion_set.filter(is_transition=False)
+        return MiniTrainingVersionListSerializer(versions, many=True, context=self.context).data
+
+    def to_representation(self, obj):
+        data = super().to_representation(obj)
+        if obj.version_name != '':
+            data.pop('versions')
+        return data

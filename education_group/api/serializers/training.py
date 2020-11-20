@@ -33,6 +33,7 @@ from base.models.education_group_type import EducationGroupType
 from base.models.enums import education_group_categories, education_group_types
 from education_group.api.serializers import utils
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
+from education_group.api.serializers.education_group_version import TrainingVersionListSerializer
 from education_group.api.serializers.utils import TrainingHyperlinkedIdentityField
 from reference.models.language import Language
 
@@ -185,6 +186,7 @@ class TrainingDetailSerializer(TrainingListSerializer):
     ares_study = serializers.IntegerField(source='offer.hops.ares_study', read_only=True)
     ares_graca = serializers.IntegerField(source='offer.hops.ares_graca', read_only=True)
     ares_ability = serializers.IntegerField(source='offer.hops.ares_ability', read_only=True)
+    versions = serializers.SerializerMethodField()
 
     class Meta(TrainingListSerializer.Meta):
         fields = TrainingListSerializer.Meta.fields + (
@@ -248,7 +250,8 @@ class TrainingDetailSerializer(TrainingListSerializer):
             'domain_name',
             'ares_study',
             'ares_graca',
-            'ares_ability'
+            'ares_ability',
+            'versions'
         )
 
     def get_remark(self, version):
@@ -257,3 +260,13 @@ class TrainingDetailSerializer(TrainingListSerializer):
             version.root_group,
             'remark_' + ('en' if language and language not in settings.LANGUAGE_CODE_FR else 'fr')
         )
+
+    def get_versions(self, version):
+        versions = version.offer.educationgroupversion_set.filter(is_transition=False)
+        return TrainingVersionListSerializer(versions, many=True, context=self.context).data
+
+    def to_representation(self, obj):
+        data = super().to_representation(obj)
+        if obj.version_name != '':
+            data.pop('versions')
+        return data
