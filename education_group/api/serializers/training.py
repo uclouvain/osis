@@ -24,7 +24,6 @@
 #
 ##############################################################################
 
-from django.conf import settings
 from rest_framework import serializers
 
 from base.api.serializers.campus import CampusDetailSerializer
@@ -85,24 +84,20 @@ class TrainingBaseListSerializer(EducationGroupTitleSerializer, serializers.Hype
 
 
 class TrainingListSerializer(TrainingBaseListSerializer):
-    partial_title = serializers.SerializerMethodField()
+    partial_title = serializers.CharField(source='offer.partial_title')
+    partial_title_en = serializers.CharField(source='offer.partial_title_english')
 
     class Meta(TrainingBaseListSerializer.Meta):
         fields = TrainingBaseListSerializer.Meta.fields + (
             'partial_title',
-        )
-
-    def get_partial_title(self, version):
-        language = self.context.get('language')
-        return getattr(
-            version.offer,
-            'partial_title' + ('_english' if language and language not in settings.LANGUAGE_CODE_FR else '')
+            'partial_title_en'
         )
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
         if instance.offer.education_group_type.name not in education_group_types.TrainingType.finality_types():
             data.pop('partial_title')
+            data.pop('partial_title_en')
         return data
 
 
@@ -179,7 +174,8 @@ class TrainingDetailSerializer(TrainingListSerializer):
     decree_category_text = serializers.CharField(source='offer.get_decree_category_display', read_only=True)
     rate_code_text = serializers.CharField(source='offer.get_rate_code_display', read_only=True)
     active_text = serializers.CharField(source='offer.get_active_display', read_only=True)
-    remark = serializers.SerializerMethodField()
+    remark = serializers.CharField(source='root_group.remark_fr', read_only=True)
+    remark_en = serializers.CharField(source='root_group.remark_en', read_only=True)
     domain_name = serializers.CharField(read_only=True)
     domain_code = serializers.CharField(read_only=True)
     ares_study = serializers.IntegerField(source='offer.hops.ares_study', read_only=True)
@@ -226,6 +222,7 @@ class TrainingDetailSerializer(TrainingListSerializer):
             'enrollment_enabled',
             'credits',
             'remark',
+            'remark_en',
             'min_constraint',
             'max_constraint',
             'constraint_type',
@@ -249,11 +246,4 @@ class TrainingDetailSerializer(TrainingListSerializer):
             'ares_study',
             'ares_graca',
             'ares_ability'
-        )
-
-    def get_remark(self, version):
-        language = self.context.get('language')
-        return getattr(
-            version.root_group,
-            'remark_' + ('en' if language and language not in settings.LANGUAGE_CODE_FR else 'fr')
         )

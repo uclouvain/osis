@@ -24,7 +24,6 @@
 #
 ##############################################################################
 
-from django.conf import settings
 from rest_framework import serializers
 
 from base.api.serializers.campus import CampusDetailSerializer
@@ -78,7 +77,8 @@ class MiniTrainingListSerializer(EducationGroupTitleSerializer, serializers.Mode
 
 
 class MiniTrainingDetailSerializer(MiniTrainingListSerializer):
-    remark = serializers.SerializerMethodField()
+    remark = serializers.CharField(source='root_group.remark_fr', read_only=True)
+    remark_en = serializers.CharField(source='root_group.remark_en', read_only=True)
     campus = CampusDetailSerializer(source='root_group.main_teaching_campus', read_only=True)
     active = serializers.CharField(source='offer.active', read_only=True)
     schedule_type = serializers.CharField(source='offer.schedule_type', read_only=True)
@@ -106,12 +106,6 @@ class MiniTrainingDetailSerializer(MiniTrainingListSerializer):
             'constraint_type',
             'constraint_type_text',
             'remark',
+            'remark_en',
             'campus',
-        )
-
-    def get_remark(self, education_group_version):
-        language = self.context.get('language')
-        return getattr(
-            education_group_version.root_group,
-            'remark_' + ('en' if language and language not in settings.LANGUAGE_CODE_FR else 'fr')
         )
