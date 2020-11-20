@@ -405,7 +405,8 @@ class TrainingVersionDetailSerializerTestCase(TestCase):
         ).get(id=cls.version.id)
         url = reverse('education_group_api_v1:training_read', kwargs={
             'acronym': cls.training.acronym,
-            'year': cls.academic_year.year
+            'year': cls.academic_year.year,
+            'version_name': cls.version.version_name
         })
         cls.serializer = TrainingDetailSerializer(annotated_version, context={
             'request': RequestFactory().get(url),
