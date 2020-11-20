@@ -34,7 +34,8 @@ from base.tests.factories.education_group_year import TrainingFactory, Education
 from base.tests.factories.entity_version import EntityVersionFactory
 from education_group.api.serializers.training import TrainingListSerializer, TrainingDetailSerializer
 from program_management.models.education_group_version import EducationGroupVersion
-from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
+from program_management.tests.factories.education_group_version import EducationGroupVersionFactory, \
+    StandardEducationGroupVersionFactory
 from reference.tests.factories.domain import DomainFactory
 
 
@@ -157,7 +158,7 @@ class TrainingDetailSerializerTestCase(TestCase):
             administration_entity=cls.entity_version.entity,
             main_domain=DomainFactory(parent=DomainFactory())
         )
-        cls.version = EducationGroupVersionFactory(offer=cls.training)
+        cls.version = StandardEducationGroupVersionFactory(offer=cls.training)
         annotated_version = EducationGroupVersion.objects.annotate(
             domain_code=F('offer__main_domain__code'),
             domain_name=F('offer__main_domain__parent__name'),
@@ -245,7 +246,8 @@ class TrainingDetailSerializerTestCase(TestCase):
             'domain_name',
             'ares_study',
             'ares_graca',
-            'ares_ability'
+            'ares_ability',
+            'versions'
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 
@@ -278,7 +280,7 @@ class TrainingDetailSerializerForMasterWithFinalityTestCase(TestCase):
             administration_entity=cls.entity_version.entity,
             main_domain=DomainFactory(parent=DomainFactory())
         )
-        cls.version = EducationGroupVersionFactory(offer=cls.training)
+        cls.version = StandardEducationGroupVersionFactory(offer=cls.training)
         annotated_version = EducationGroupVersion.objects.annotate(
             domain_code=F('offer__main_domain__code'),
             domain_name=F('offer__main_domain__parent__name'),
@@ -367,7 +369,8 @@ class TrainingDetailSerializerForMasterWithFinalityTestCase(TestCase):
             'domain_name',
             'ares_study',
             'ares_graca',
-            'ares_ability'
+            'ares_ability',
+            'versions'
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 

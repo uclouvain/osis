@@ -138,6 +138,7 @@ class MiniTrainingDetailSerializerTestCase(TestCase):
             'constraint_type_text',
             'remark',
             'campus',
+            'versions'
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 
