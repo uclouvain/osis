@@ -69,14 +69,14 @@ class CountryAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
 class CampusAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
     def get_queryset(self):
         qs = Campus.objects.annotate(
-            organization_is_current_partner=Subquery(
+            organization_is_active=Subquery(
                 Organization.objects.filter(
                     pk=OuterRef('organization_id'),
                     type=ACADEMIC_PARTNER,
-                ).values('is_current_partner')[:1],
+                ).values('is_active')[:1],
                 output_field=BooleanField(),
             )
-        ).filter(organization_is_current_partner=True)
+        ).filter(organization_is_active=True)
 
         country = self.forwarded.get('country_external_institution', None)
 

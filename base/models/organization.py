@@ -27,7 +27,7 @@ from datetime import datetime
 from typing import Optional
 
 from django.db import models
-from django.db.models import F, Func, OuterRef, Subquery, Prefetch
+from django.db.models import F, Func, OuterRef, Subquery, Prefetch, BooleanField
 from django.utils.safestring import mark_safe
 
 from base.models.entity_version import EntityVersion
@@ -45,14 +45,15 @@ class OrganizationAdmin(SerializableModelAdmin):
 class OrganizationManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().annotate(
-            is_current_partner=Func(
+            is_active=Func(
                 Subquery(
                     EntityVersion.objects.filter(
                         entity__organization=OuterRef('pk'),
                     ).only_roots().order_by('-start_date').values('end_date')[:1]
                 ),
                 function='IS NULL',
-                template='%(expressions)s %(function)s',
+                template='(%(expressions)s %(function)s OR %(expressions)s >= NOW())',
+                output_field=BooleanField()
             ),
         )
 
@@ -80,7 +81,7 @@ class Organization(SerializableModel):
     logo_tag.short_description = 'Logo'
 
     class Meta:
-        ordering = (F("is_current_partner").desc(), "name")
+        ordering = (F("is_active").desc(), "name")
         permissions = (
             ("can_access_organization", "Can access organization"),
         )
