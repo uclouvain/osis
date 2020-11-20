@@ -205,9 +205,13 @@ class LearningUnitYearModelForm(PermissionFieldMixin, ValidationRuleMixin, forms
             context.append(self.instance.subtype)
         elif self.initial:
             context.append("NEW")
-            context.append(self.initial['subtype'])
+            context.append(self.initial['subtype'] if 'subtype' in self.initial.keys() else self.instance.subtype)
         if self.proposal:
             context.append("PROPOSAL")
+            if hasattr(self.instance, 'proposallearningunit'):
+                context.append(self.instance.proposallearningunit.type)
+            else:
+                context.append('MODIFICATION')
         return '_'.join(context)
 
     # ValidationRuleMixin
@@ -443,9 +447,13 @@ class LearningContainerYearModelForm(PermissionFieldMixin, ValidationRuleMixin, 
                 context.append(self.subtype)
         elif self.initial:
             context.append("NEW")
-            context.append(self.initial['subtype'])
+            context.append(self.initial['subtype'] if 'subtype' in self.initial.keys() else self.subtype)
         if self.proposal:
             context.append("PROPOSAL")
+            if hasattr(self.instance, 'proposallearningunit'):
+                context.append(self.instance.proposallearningunit.type)
+            else:
+                context.append('MODIFICATION')
         return '_'.join(context)
 
     # ValidationRuleMixin
