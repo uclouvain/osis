@@ -31,15 +31,24 @@ from program_management.models.education_group_version import EducationGroupVers
 
 class EducationGroupTitleSerializer(serializers.ModelSerializer):
     title = serializers.SerializerMethodField()
+    title_en = serializers.SerializerMethodField()
 
     class Meta:
         model = EducationGroupVersion
         fields = (
             'title',
+            'title_en'
         )
 
     def get_title(self, version):
-        field_suffix = '_en' if self.context.get('language') == settings.LANGUAGE_CODE_EN else '_fr'
+        return self._get_offer_title_from_lang(version, settings.LANGUAGE_CODE_FR)
+
+    def get_title_en(self, version):
+        return self._get_offer_title_from_lang(version, settings.LANGUAGE_CODE_EN)
+
+    @staticmethod
+    def _get_offer_title_from_lang(version, lang: str):
+        field_suffix = '_en' if lang == settings.LANGUAGE_CODE_EN else '_fr'
         field_name = 'title' + field_suffix
         title = getattr(version.root_group, 'title' + field_suffix)
         version_title = getattr(version, field_name)
