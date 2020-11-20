@@ -168,7 +168,7 @@ class MiniTrainingVersionDetailSerializerTestCase(TestCase):
             management_entity=cls.entity_version.entity,
         )
         cls.version = EducationGroupVersionFactory(offer=cls.mini_training, version_name='TEST')
-        url = reverse('education_group_api_v1:training_read', kwargs={
+        url = reverse('education_group_api_v1:mini_training_read', kwargs={
             'acronym': cls.mini_training.acronym,
             'year': cls.academic_year.year,
             'version_name': cls.version.version_name
