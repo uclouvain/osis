@@ -1336,11 +1336,15 @@ components:
           type: string
         title:
           type: string
+        title_en:
+          type: string
         node_type:
           $ref: '#/components/schemas/NodeTypeEnum'
         subtype:
           $ref: '#/components/schemas/NodeSubTypeEnum'
         partial_title:
+          type: string
+        partial_title_en:
           type: string
         min_constraint:
           type: integer
@@ -1351,6 +1355,8 @@ components:
         constraint_type:
           $ref: '#/components/schemas/ConstraintTypeEnum'
         remark:
+          type: string
+        remark_en:
           type: string
         version_name:
           type: string
@@ -1385,11 +1391,15 @@ components:
           type: string
         title:
           type: string
+        title_en:
+          type: string
         node_type:
           $ref: '#/components/schemas/NodeTypeEnum'
         subtype:
           $ref: '#/components/schemas/NodeSubTypeEnum'
         partial_title:
+          type: string
+        partial_title_en:
           type: string
         credits:
           type: number
@@ -1415,7 +1425,11 @@ components:
           type: boolean
         comment:
           type: string
+        comment_en:
+          type: string
         remark:
+          type: string
+        remark_en:
           type: string
         link_type:
           $ref: '#/components/schemas/NodeLinkTypeEnum'
