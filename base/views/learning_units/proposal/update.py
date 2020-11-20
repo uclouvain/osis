@@ -38,7 +38,6 @@ from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.views.common import display_success_messages, show_error_message_for_form_invalid, display_warning_messages
-from base.views.learning_units import perms
 from base.views.learning_units.common import get_learning_unit_identification_context
 from learning_unit.views.utils import learning_unit_year_getter
 from osis_role.contrib.views import permission_required
@@ -54,7 +53,7 @@ def learning_unit_modification_proposal(request, learning_unit_year_id):
 
 @waffle_flag('learning_unit_proposal_update')
 @login_required
-@permission_required('base.can_propose_learningunit', raise_exception=True, fn=learning_unit_year_getter)
+@permission_required('base.can_propose_learningunit_end_date', raise_exception=True, fn=learning_unit_year_getter)
 def learning_unit_suppression_proposal(request, learning_unit_year_id):
     learning_unit_year = get_object_or_404(LearningUnitYear, id=learning_unit_year_id)
     if LearningUnitYear.objects.filter(

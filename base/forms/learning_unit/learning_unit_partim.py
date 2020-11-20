@@ -38,7 +38,7 @@ from base.forms.utils.choice_field import add_blank
 from base.models.academic_year import LEARNING_UNIT_CREATION_SPAN_YEARS, starting_academic_year, \
     find_academic_year_by_year
 from base.models.enums import learning_unit_year_subtypes
-from base.models.enums.learning_unit_year_subtypes import FULL
+from base.models.enums.learning_unit_year_subtypes import FULL, PARTIM
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit import LearningUnit
 from base.models.proposal_learning_unit import is_learning_unit_in_proposal, find_by_learning_unit
@@ -113,6 +113,7 @@ class PartimForm(LearningUnitBaseForm):
         self.learning_unit_full_instance = learning_unit_full_instance
         self.learning_unit_instance = learning_unit_instance
         self.start_anac = start_anac
+        self.subtype = PARTIM
 
         self.learning_unit_year_full = self.learning_unit_full_instance.learningunityear_set.filter(
             academic_year=self.academic_year,
