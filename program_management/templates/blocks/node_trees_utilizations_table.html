@@ -55,7 +55,7 @@
             <td class="text-nowrap text-center">
                 {{ direct_link.link.relative_credits | default_if_none:'-' }} / {{ direct_link.link.child.credits.normalize | default_if_none:'-' }}
             </td>
-            <td class="text-nowrap text-center">{{ direct_link.link.is_mandatory | yesno | capfirst }}</td>
+            <td class="text-nowrap text-center">{{ direct_link.link.is_mandatory | yesno | title }}</td>
             <td class="text-nowrap text-center">{{ direct_link.link.block | default_if_none:'-' }}</td>
             <td>
                 {% for indirect_parent in direct_link.indirect_parents %}
