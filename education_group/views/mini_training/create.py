@@ -240,7 +240,7 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
             remark_fr=form.cleaned_data['remark_fr'],
             remark_en=form.cleaned_data['remark_en'],
             start_year=form.cleaned_data['academic_year'],
-            end_year=form.cleaned_data['end_year'],
+            end_year=form.cleaned_data['end_year'].year,
         )
 
     def _generate_create_and_paste_command_from_valid_form(
@@ -266,7 +266,7 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
             remark_fr=form.cleaned_data['remark_fr'],
             remark_en=form.cleaned_data['remark_en'],
             start_year=form.cleaned_data['academic_year'],
-            end_year=form.cleaned_data['end_year'],
+            end_year=form.cleaned_data['end_year'].year,
             path_to_paste=self.get_attach_path()
         )
 
