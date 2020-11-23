@@ -156,7 +156,9 @@ def is_learning_unit_date_container_type_editable(self, user, learning_unit_year
 def is_learning_unit_edition_period_open(self, user, learning_unit_year):
     if learning_unit_year:
         for role in self.context['role_qs']:
-            return event_perms.generate_event_perm_learning_unit_edition(role.person, learning_unit_year).is_open()
+            return event_perms.generate_event_perm_learning_unit_edition(
+                role.person, learning_unit_year, raise_exception=False
+            ).is_open()
     return None
 
 
