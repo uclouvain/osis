@@ -664,12 +664,12 @@ class LearningUnitViewTestCase(TestCase):
         self.assertTemplateUsed(response, 'learning_unit/formations.html')
         self.assertEqual(context['current_academic_year'], self.current_academic_year)
         self.assertEqual(context['learning_unit_year'], learning_unit_year)
-        expected_order = [group_element2, group_element3, group_element1]
-        self._assert_group_elements_ordered_by_partial_acronym(context, expected_order)
+        self.assertIn('direct_parents', context)
+        self.assertTrue(len(context['direct_parents']) == 3)
         self.assertIn('root_formations', context)
-
-    def _assert_group_elements_ordered_by_partial_acronym(self, context, expected_order):
-        self.assertListEqual(list(context['group_elements_years']), expected_order)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertTrue("tab_active" in response.context)
+        self.assertEqual(response.context["tab_active"], 'learning_unit_formations')
 
     def test_learning_unit_usage_with_complete_LU(self):
         learning_container_yr = LearningContainerYearFactory(academic_year=self.current_academic_year,
