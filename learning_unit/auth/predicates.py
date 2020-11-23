@@ -242,6 +242,18 @@ def is_in_proposal_state(self, user, learning_unit_year):
 
 
 @predicate(bind=True)
+@predicate_failed_msg(message=_("The proposal is not on this academic year"))
+@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
+def is_year_in_proposal_state(self, user, learning_unit_year):
+    if learning_unit_year:
+        return ProposalLearningUnit.objects.filter(
+            learning_unit_year__learning_unit=learning_unit_year.learning_unit,
+            learning_unit_year__academic_year__year=learning_unit_year.academic_year.year
+        ).exists()
+    return None
+
+
+@predicate(bind=True)
 @predicate_failed_msg(message=_("The learning unit has proposal"))
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def is_not_in_proposal_state(self, user, learning_unit_year):

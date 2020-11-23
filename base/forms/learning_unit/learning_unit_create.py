@@ -199,9 +199,13 @@ class LearningUnitYearModelForm(PermissionFieldMixin, ValidationRuleMixin, forms
     # PermissionFieldMixin
     def get_context(self) -> str:
         context = []
-        if self.instance.learning_container_year:
-            context.append(self.instance.learning_container_year.container_type)
-        context.append(self.instance.subtype)
+        if self.instance.pk:
+            if self.instance.learning_container_year:
+                context.append(self.instance.learning_container_year.container_type)
+            context.append(self.instance.subtype)
+        elif self.initial:
+            context.append("NEW")
+            context.append(self.initial['subtype'] if 'subtype' in self.initial.keys() else self.instance.subtype)
         if self.proposal:
             context.append("PROPOSAL")
         return '_'.join(context)
@@ -432,10 +436,14 @@ class LearningContainerYearModelForm(PermissionFieldMixin, ValidationRuleMixin, 
     # PermissionFieldMixin
     def get_context(self) -> str:
         context = []
-        if self.instance.container_type:
-            context.append(self.instance.container_type)
-        if self.subtype:
-            context.append(self.subtype)
+        if self.instance.pk:
+            if self.instance.container_type:
+                context.append(self.instance.container_type)
+            if self.subtype:
+                context.append(self.subtype)
+        elif self.initial:
+            context.append("NEW")
+            context.append(self.initial['subtype'] if 'subtype' in self.initial.keys() else self.subtype)
         if self.proposal:
             context.append("PROPOSAL")
         return '_'.join(context)

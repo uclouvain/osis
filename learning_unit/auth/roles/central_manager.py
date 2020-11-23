@@ -59,14 +59,17 @@ class CentralManager(osis_role_models.EntityRoleModel):
                 predicates.is_external_learning_unit_with_cograduation,
             'base.can_edit_learning_unit_proposal':
                 predicates.is_in_proposal_state &
+                predicates.is_year_in_proposal_state &
                 (predicates.is_user_attached_to_current_requirement_entity |
                  predicates.is_user_attached_to_requirement_entity),
             'base.can_edit_learning_unit_proposal_date':
                 predicates.is_in_proposal_state &
+                predicates.is_year_in_proposal_state &
                 (predicates.is_user_attached_to_current_requirement_entity |
                  predicates.is_user_attached_to_requirement_entity),
             'base.can_cancel_proposal':
                 predicates.is_in_proposal_state &
+                predicates.is_year_in_proposal_state &
                 (predicates.is_not_proposal_of_type_creation |
                  predicates.has_learning_unit_no_application_this_year) &
                 (predicates.is_user_attached_to_current_requirement_entity |
@@ -86,6 +89,7 @@ class CentralManager(osis_role_models.EntityRoleModel):
             'base.can_edit_learningunit_specification': rules.always_allow,
             'base.can_consolidate_learningunit_proposal':
                 predicates.is_in_proposal_state &
+                predicates.is_year_in_proposal_state &
                 predicates.is_proposal_in_state_to_be_consolidated &
                 (predicates.is_user_attached_to_current_requirement_entity |
                  predicates.is_user_attached_to_requirement_entity) &
@@ -97,8 +101,8 @@ class CentralManager(osis_role_models.EntityRoleModel):
                 predicates.is_learning_unit_type_allowed_for_attributions &
                 predicates.is_user_attached_to_current_requirement_entity,
             'base.can_delete_attribution':
-                predicates.is_learning_unit_year_a_partim &
-                predicates.is_learning_unit_type_allowed_for_attributions &
+                (predicates.is_learning_unit_year_a_partim |
+                 predicates.is_learning_unit_type_allowed_for_attributions) &
                 predicates.is_user_attached_to_current_requirement_entity,
             'base.can_edit_summary_locked_field':
                 # to be verified (may be add failed message)
