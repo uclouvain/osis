@@ -3584,6 +3584,9 @@
             "groups": [
                 [
                     "central_managers_for_ue"
+                ],
+                [
+                    "faculty_managers_for_ue"
                 ]
             ]
         },
@@ -4659,6 +4662,9 @@
             "groups": [
                 [
                     "central_managers_for_ue"
+                ],
+                [
+                    "faculty_managers_for_ue"
                 ]
             ]
         },
@@ -5734,6 +5740,9 @@
             "groups": [
                 [
                     "central_managers_for_ue"
+                ],
+                [
+                    "faculty_managers_for_ue"
                 ]
             ]
         },
