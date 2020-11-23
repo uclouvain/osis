@@ -398,6 +398,21 @@ class SimplifiedVolumeForm(PermissionFieldMixin, forms.ModelForm):
         container_type = self._learning_unit_year.learning_container_year.container_type
         return container_type not in CONTAINER_TYPE_WITH_DEFAULT_COMPONENT
 
+    # PermissionFieldMixin
+    def get_context(self) -> str:
+        context = []
+        if self.instance.pk:
+            if self.instance.learning_unit_year.learning_container_year:
+                context.append(self.instance.learning_unit_year.learning_container_year.container_type)
+            context.append(self.instance.learning_unit_year.subtype)
+        elif self.initial:
+            context.append("NEW")
+            subtype = self.instance.learning_unit_year.subtype
+            context.append(self.initial['subtype'] if 'subtype' in self.initial.keys() else subtype)
+        if self.proposal:
+            context.append("PROPOSAL")
+        return '_'.join(context)
+
 
 class SimplifiedVolumeFormset(forms.BaseModelFormSet):
     def __init__(self, data, person, proposal=False, *args, **kwargs):
