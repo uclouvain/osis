@@ -449,7 +449,7 @@ msgstr ""
 msgid "Score legend: %(score_legend)s (0=Score of presence)"
 msgstr ""
 
-msgid "Score saved"
+msgid "Score(s) saved"
 msgstr ""
 
 msgid "Score sheet address was successfully saved."
