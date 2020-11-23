@@ -21,7 +21,8 @@ FACULTY_EDITABLE_CONTAINER_TYPES = (
 FACULTY_DATE_EDITABLE_CONTAINER_TYPES = (
     LearningContainerYearType.OTHER_INDIVIDUAL,
     LearningContainerYearType.OTHER_COLLECTIVE,
-    LearningContainerYearType.MASTER_THESIS
+    LearningContainerYearType.MASTER_THESIS,
+    LearningContainerYearType.EXTERNAL
 )
 
 PROPOSAL_CONSOLIDATION_ELIGIBLE_STATES = (ProposalState.ACCEPTED.name, ProposalState.REFUSED.name)
