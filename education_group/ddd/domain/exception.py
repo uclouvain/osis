@@ -29,6 +29,12 @@ class CodeAlreadyExistException(BusinessException):
         message = _("Code already exists in %(academic_year)s") % {"academic_year": display_as_academic_year(year)}
         super().__init__(message, **kwargs)
 
+    def __eq__(self, other):
+        return self.message == other.message
+
+    def __hash__(self):
+        return hash(self.message)
+
 
 class GroupIsBeingUsedException(Exception):
     pass
