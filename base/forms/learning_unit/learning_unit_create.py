@@ -453,7 +453,7 @@ class LearningContainerYearModelForm(PermissionFieldMixin, ValidationRuleMixin, 
             if hasattr(self.instance, 'proposallearningunit'):
                 context.append(self.instance.proposallearningunit.type)
             else:
-                context.append('MODIFICATION')
+                context.append("MODIFICATION")
         return '_'.join(context)
 
     # ValidationRuleMixin
