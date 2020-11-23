@@ -39,7 +39,7 @@ from education_group.ddd.service.write import postpone_training_and_group_modifi
 def create_and_postpone_orphan_training(create_training_cmd: command.CreateTrainingCommand) -> List['TrainingIdentity']:
     # GIVEN
     cmd = create_training_cmd
-    errors = []
+    errors = set()
 
     # WHEN
     try:
@@ -50,7 +50,7 @@ def create_and_postpone_orphan_training(create_training_cmd: command.CreateTrain
     try:
         create_group_service.create_orphan_group(__convert_to_create_group_command(create_training_cmd))
     except MultipleBusinessExceptions as e:
-        errors += e.exceptions
+        errors |= e.exceptions
 
     if errors:
         raise MultipleBusinessExceptions(exceptions=errors)
