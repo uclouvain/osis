@@ -73,7 +73,7 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
             with self.assertRaises(MultipleBusinessExceptions) as e:
                 update_link_service.update_link(cmd_with_invalid_block_value)
             self.assertIsInstance(
-                e.exception.exceptions[0],
+                next(iter(e.exception.exceptions)),
                 exception.InvalidBlockException
             )
 
@@ -90,7 +90,7 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
             update_link_service.update_link(cmd_with_invalid_relative_credits_value)
 
         self.assertIsInstance(
-            e.exception.exceptions[0],
+            next(iter(e.exception.exceptions)),
             exception.RelativeCreditShouldBeGreaterOrEqualsThanZero
         )
 
@@ -107,7 +107,7 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
             update_link_service.update_link(cmd_with_invalid_relative_credits_value)
 
         self.assertIsInstance(
-            e.exception.exceptions[0],
+            next(iter(e.exception.exceptions)),
             exception.RelativeCreditShouldBeLowerOrEqualThan999
         )
 
@@ -124,7 +124,7 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
             update_link_service.update_link(cmd_with_invalid_reference_link)
 
         self.assertIsInstance(
-            e.exception.exceptions[0],
+            next(iter(e.exception.exceptions)),
             exception.ReferenceLinkNotAllowedWithLearningUnitException
         )
 
@@ -190,7 +190,7 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
             update_link_service.update_link(cmd_with_invalid_reference_link)
 
         self.assertIsInstance(
-            e.exception.exceptions[0],
+            next(iter(e.exception.exceptions)),
             exception.ChildTypeNotAuthorizedException
         )
 
@@ -225,7 +225,7 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
             update_link_service.update_link(invalid_command)
 
         self.assertIsInstance(
-            e.exception.exceptions[0],
+            next(iter(e.exception.exceptions)),
             exception.ChildTypeNotAuthorizedException
         )
 
@@ -282,6 +282,6 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
             update_link_service.update_link(invalid_command)
 
         self.assertIsInstance(
-            e.exception.exceptions[0],
+            next(iter(e.exception.exceptions)),
             exception.MaximumChildTypesReachedException
         )
