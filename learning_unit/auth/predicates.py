@@ -348,7 +348,6 @@ def is_not_modification_proposal_type(self, user, learning_unit_year):
 def is_learning_unit_type_allowed_for_attributions(self, user, learning_unit_year):
     if learning_unit_year:
         container_type = learning_unit_year.learning_container_year.container_type
-        print(container_type)
         return container_type in learning_container_year_types.TYPE_ALLOWED_FOR_ATTRIBUTIONS
     return None
 
