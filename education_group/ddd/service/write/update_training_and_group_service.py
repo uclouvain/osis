@@ -51,7 +51,7 @@ from education_group.ddd.service.write import update_group_service
 
 @transaction.atomic()
 def update_training_and_group(cmd: command.UpdateTrainingAndGroupCommand) -> 'TrainingIdentity':
-    errors = []
+    errors = set()
     try:
         update_group_service.update_group(__convert_to_update_group_command(cmd))
     except MultipleBusinessExceptions as e:
@@ -63,7 +63,7 @@ def update_training_and_group(cmd: command.UpdateTrainingAndGroupCommand) -> 'Tr
         training_domain_obj.update(__convert_command_to_update_training_data(cmd))
         training_repository.TrainingRepository.update(training_domain_obj)
     except MultipleBusinessExceptions as e:
-        errors.extend(e.exceptions)
+        errors |= e.exceptions
 
     if errors:
         raise MultipleBusinessExceptions(exceptions=errors)

@@ -135,7 +135,7 @@ class TestCreateOrphanGroupPostMethod(TestCase):
         mock_form_is_valid.return_value = True
         mock_form_clean_data.return_value = defaultdict(lambda: None)
 
-        mock_service_create_group.side_effect = MultipleBusinessExceptions([CodeAlreadyExistException(year=2018)])
+        mock_service_create_group.side_effect = MultipleBusinessExceptions({CodeAlreadyExistException(year=2018)})
 
         response = self.client.post(self.url)
         self.assertIsInstance(response.context['group_form'], GroupForm)
@@ -152,7 +152,7 @@ class TestCreateOrphanGroupPostMethod(TestCase):
         mock_form_is_valid.return_value = True
         mock_form_clean_data.return_value = defaultdict(lambda: None)
 
-        mock_service_create_group.side_effect = MultipleBusinessExceptions([ContentConstraintTypeMissing()])
+        mock_service_create_group.side_effect = MultipleBusinessExceptions({ContentConstraintTypeMissing()})
 
         response = self.client.post(self.url)
         self.assertIsInstance(response.context['group_form'], GroupForm)
