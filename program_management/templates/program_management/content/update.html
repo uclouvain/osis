@@ -49,8 +49,8 @@
     <div class="page-header">
         <h2>{{ group_obj.abbreviated_title }} {% if version.version_label %} {{ version.version_label }} {% endif %}- {{ group_obj.academic_year }}</h2>
         <h3>
-            {% if group_obj.is_finality %}
-                {{ group_obj.titles.partial_title_fr }}
+            {% if training_obj %}
+                {{ training_obj.titles.title_fr }}
             {% else %}
                 {{ group_obj.titles.title_fr }}
             {% endif %} {% if version.title_fr %} [{{ version.title_fr }}]{% endif %}

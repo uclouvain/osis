@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from abc import ABC
-from typing import List
+from typing import List, Set
 
 from base.ddd.utils.validation_message import BusinessValidationMessage, MessageLevel
 from osis_common.ddd.interface import BusinessException
@@ -115,20 +115,20 @@ class BusinessListValidator(BusinessValidator):
 
 
 class MultipleBusinessExceptions(Exception):
-    def __init__(self, exceptions: List['BusinessException']):
+    def __init__(self, exceptions: Set['BusinessException']):
         self.exceptions = exceptions
 
 
 class MultipleExceptionBusinessListValidator(BusinessListValidator):
     def validate(self):
-        exceptions = []
+        exceptions = set()
         for validator in self.validators:
             try:
                 validator.validate()
             except MultipleBusinessExceptions as e:
-                exceptions.extend(e.exceptions)
+                exceptions |= e.exceptions
             except BusinessException as e:
-                exceptions.append(e)
+                exceptions.add(e)
 
         if exceptions:
             raise MultipleBusinessExceptions(exceptions=exceptions)

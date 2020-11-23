@@ -36,7 +36,7 @@ from education_group.ddd.service.write import postpone_mini_training_and_orphan_
 @transaction.atomic()
 def create_and_postpone_orphan_mini_training(
         cmd: command.CreateMiniTrainingCommand) -> List['mini_training.MiniTrainingIdentity']:
-    errors = []
+    errors = set()
 
     try:
         mini_training_object = mini_training.MiniTrainingBuilder().build_from_create_cmd(cmd)
@@ -47,7 +47,7 @@ def create_and_postpone_orphan_mini_training(
     try:
         create_group_service.create_orphan_group(__convert_to_create_group_command(cmd))
     except MultipleBusinessExceptions as e:
-        errors += e.exceptions
+        errors |= e.exceptions
 
     if errors:
         raise MultipleBusinessExceptions(exceptions=errors)
