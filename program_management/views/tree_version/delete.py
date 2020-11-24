@@ -27,6 +27,7 @@ from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils.functional import cached_property
+from django.utils import translation
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DeleteView
 
@@ -45,6 +46,7 @@ from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.ddd.service.write import delete_all_specific_versions_service
+from program_management.formatter import format_program_tree_complete_title
 
 
 class TreeVersionDeleteView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, DeleteView):
@@ -90,21 +92,14 @@ class TreeVersionDeleteView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, Dele
         }
 
     def get_confirmation_message(self) -> str:
-        return _("Are you sure you want to delete %(offer_acronym)s %(version_name)s ?") % {
-            'offer_acronym': self.tree_version_identity.offer_acronym,
-            'version_name': self._get_version_name_verbose(),
+        return _("Are you sure you want to delete %(object)s ?") % {
+            'object': format_program_tree_complete_title(self.get_object(), translation.get_language()),
         }
-
-    def _get_version_name_verbose(self) -> str:
-        version_name_verbose = self.tree_version_identity.version_name
-        if version_name_verbose:
-            version_name_verbose = "[" + version_name_verbose + "]"
-        return version_name_verbose
 
     def get_success_message(self):
         return _("The program tree version %(offer_acronym)s %(version_name)s has been deleted.") % {
             'offer_acronym': self.tree_version_identity.offer_acronym,
-            'version_name': self._get_version_name_verbose(),
+            'version_name': self.tree_version_identity.version_name,
         }
 
     def get_success_url(self) -> str:

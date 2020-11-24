@@ -339,7 +339,7 @@ class TestCheckPasteView(TestCase):
             self
     ):
         self.mock_check_paste.side_effect = MultipleBusinessExceptions(
-            [osis_common.ddd.interface.BusinessException("Not valid")]
+            {osis_common.ddd.interface.BusinessException("Not valid")}
         )
 
         response = self.client.get(
