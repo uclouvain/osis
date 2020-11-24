@@ -27,12 +27,12 @@ from django.conf import settings
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 
+from education_group.api.serializers.utils import get_title_from_lang
 from education_group.api.views.group import GroupDetail
 from education_group.api.views.mini_training import MiniTrainingDetail
 from education_group.api.views.training import TrainingDetail
 from education_group.enums.node_type import NodeType
 from learning_unit.api.views.learning_unit import LearningUnitDetailed
-from program_management import formatter
 from program_management.ddd.business_types import *
 
 
@@ -123,18 +123,10 @@ class EducationGroupCommonNodeTreeSerializer(serializers.Serializer):
         return NodeType.GROUP.name
 
     def get_title(self, obj):
-        return self._get_title_from_lang(obj, settings.LANGUAGE_CODE_FR)
+        return get_title_from_lang(obj, settings.LANGUAGE_CODE_FR)
 
     def get_title_en(self, obj):
-        return self._get_title_from_lang(obj, settings.LANGUAGE_CODE_EN)
-
-    @staticmethod
-    def _get_title_from_lang(obj, lang: str):
-        lang_suffix = 'en' if lang == settings.LANGUAGE_CODE_EN else 'fr'
-        version_title = formatter.format_version_title(obj.child, lang)
-        field_prefix = 'offer' if obj.child.is_training() else 'group'
-        attr_name = '{}_title_{}'.format(field_prefix, lang_suffix)
-        return getattr(obj.child, attr_name) + (' {}'.format(version_title) if version_title else '')
+        return get_title_from_lang(obj, settings.LANGUAGE_CODE_EN)
 
     @staticmethod
     def get_version_name(obj):
@@ -156,19 +148,6 @@ class EducationGroupRootNodeTreeSerializer(BaseCommonNodeTreeSerializer, Educati
     def get_acronym(self, obj):
         version_name = self.context.get('version_name')
         return obj.child.title + ('[{}]'.format(version_name) if version_name else '')
-
-    def get_title(self, obj):
-        return self._get_root_title_from_lang(obj, settings.LANGUAGE_CODE_FR)
-
-    def get_title_en(self, obj):
-        return self._get_root_title_from_lang(obj, settings.LANGUAGE_CODE_EN)
-
-    def _get_root_title_from_lang(self, obj, lang: str):
-        lang_suffix = 'en' if lang == settings.LANGUAGE_CODE_EN else 'fr'
-        version_title = self.context.get('version_title_' + lang_suffix)
-        title_suffix = ' [{}]'.format(version_title) if version_title else ''
-        title = getattr(obj.child, 'offer_title_' + lang_suffix)
-        return title + title_suffix if title else None
 
 
 class EducationGroupNodeTreeSerializer(CommonNodeTreeSerializer, EducationGroupCommonNodeTreeSerializer):

@@ -23,8 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.conf import settings
 from rest_framework import serializers
 from rest_framework.reverse import reverse
+
+from program_management import formatter
 
 
 class TrainingGetUrlMixin:
@@ -108,3 +111,11 @@ def get_entity(obj, entity_field):
     entity_version = getattr(obj, entity_field + '_entity_version')
     faculty_entity = entity_version and entity_version.find_faculty_version(obj.academic_year)
     return faculty_entity.acronym if faculty_entity else None
+
+
+def get_title_from_lang(obj, lang: str):
+    lang_suffix = 'en' if lang == settings.LANGUAGE_CODE_EN else 'fr'
+    version_title = formatter.format_version_title(obj.child, lang)
+    field_prefix = 'group' if obj.child.is_group() else 'offer'
+    attr_name = '{}_title_{}'.format(field_prefix, lang_suffix)
+    return getattr(obj.child, attr_name) + (' {}'.format(version_title) if version_title else '')
