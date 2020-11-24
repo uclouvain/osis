@@ -92,7 +92,7 @@ class CampusAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
         return qs.select_related('organization').order_by('organization__name').distinct()
 
     def get_result_label(self, result):
-        return "{} ({})".format(result.organization.name, result.name)
+        return result.organization.name
 
 
 class EntityAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
