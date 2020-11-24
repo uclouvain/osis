@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import itertools
 from typing import Dict
 
 import factory.fuzzy
@@ -91,6 +92,14 @@ class ProgramTreeFactory(factory.Factory):
 
         return tree_standard
 
+    @staticmethod
+    def produce_standard_2M_program_tree_with_one_finality(current_year: int, end_year: int) -> 'ProgramTree':
+        program_tree = ProgramTreeFactory.produce_standard_2M_program_tree(current_year, end_year)
+        finality = NodeGroupYearFactory(node_type=TrainingType.MASTER_MD_120)
+        finality_list_node = next(n for n in program_tree.get_all_nodes() if n.is_finality_list_choice())
+        finality_list_node.add_child(finality)
+        return program_tree
+
 
 def _tree_builder(data: Dict) -> 'Node':
     _data = data.copy()
@@ -98,10 +107,10 @@ def _tree_builder(data: Dict) -> 'Node':
 
     node = _node_builder(_data)
 
-    for child_data in children:
+    for child_data, order in zip(children, itertools.count()):
         link_data = child_data.pop("link_data", {})
         child_node = _tree_builder(child_data)
-        LinkFactory(parent=node, child=child_node, **link_data)
+        LinkFactory(parent=node, child=child_node, **link_data, order=order)
 
     return node
 
