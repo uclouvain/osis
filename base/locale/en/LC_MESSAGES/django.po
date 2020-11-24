@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-23 10:52+0100\n"
+"POT-Creation-Date: 2020-11-23 14:08+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2915,6 +2915,10 @@ msgid "You can't modify learning unit under year : %(year)d"
 msgstr ""
 
 msgid "You can't modify proposal which is on an other year"
+msgstr ""
+
+msgid ""
+"You cannot create a partim for a learning unit in proposition of creation"
 msgstr ""
 
 #, python-format
