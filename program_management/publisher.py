@@ -23,30 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db import transaction
+from django.dispatch import Signal
 
-from program_management import publisher
-from program_management.ddd import command
-from program_management.ddd.domain import link
-from program_management.ddd.domain.program_tree import PATH_SEPARATOR
-from program_management.ddd.domain.service import identity_search
-from program_management.ddd.repositories import persist_tree, program_tree
-
-
-@transaction.atomic()
-def detach_node(detach_command: command.DetachNodeCommand) -> link.LinkIdentity:
-    path_to_detach = detach_command.path
-    commit = detach_command.commit
-    root_id = int(path_to_detach.split(PATH_SEPARATOR)[0])
-    program_tree_repository = program_tree.ProgramTreeRepository()
-
-    program_tree_identity = identity_search.ProgramTreeIdentitySearch.get_from_element_id(root_id)
-    working_tree = program_tree_repository.get(program_tree_identity)
-
-    deleted_link = working_tree.detach_node(path_to_detach, program_tree_repository)
-
-    if commit:
-        persist_tree.persist(working_tree)
-        publisher.element_detached.send(None, path_to_detach)
-
-    return deleted_link.entity_id
+element_detached = Signal(providing_args=['path_detached'])
