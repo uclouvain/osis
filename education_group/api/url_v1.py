@@ -45,12 +45,12 @@ urlpatterns = [
             name='{}_official'.format(TrainingPrerequisites.NAME)),
     ])),
     url(
-        r'^trainings/(?P<year>[\d]{4})/(?P<acronym>[\w]+(?:[/ ]?[a-zA-Z]{1,2}){0,2})/versions/(?P<version_name>[\w]*)$',
+        r'^trainings/(?P<year>[\d]{4})/(?P<acronym>[\w]+(?:[/ ]?[a-zA-Z]{1,2}){0,2})/versions/(?P<version_name>[\w]+)$',
         TrainingDetail.as_view(),
         name=TrainingDetail.name
     ),
     url(
-        r'^trainings/(?P<year>[\d]{4})/(?P<acronym>[\w]+(?:[/ ]?[a-zA-Z]{1,2}){0,2})/versions/(?P<version_name>[\w]*)/',
+        r'^trainings/(?P<year>[\d]{4})/(?P<acronym>[\w]+(?:[/ ]?[a-zA-Z]{1,2}){0,2})/versions/(?P<version_name>[\w]+)/',
         include([
             url(r'^tree$', TrainingTreeView.as_view(), name=TrainingTreeView.name),
             url(r'^title$', TrainingTitle.as_view(), name=TrainingTitle.name),
@@ -62,12 +62,12 @@ urlpatterns = [
         name=TrainingDetail.name
     ),
     url(
-        r'^mini_trainings/(?P<year>[\d]{4})/(?P<acronym>[\w]+([&/\-_:É ][\w]+){0,3})/versions/(?P<version_name>[\w]*)$',
+        r'^mini_trainings/(?P<year>[\d]{4})/(?P<acronym>[\w]+([&/\-_:É ][\w]+){0,3})/versions/(?P<version_name>[\w]+)$',
         MiniTrainingDetail.as_view(),
         name=MiniTrainingDetail.name
     ),
     url(
-        r'^mini_trainings/(?P<year>[\d]{4})/(?P<acronym>[\w]+([&/\-_:É ][\w]+){0,3})/versions/(?P<version_name>[\w]*)/',
+        r'^mini_trainings/(?P<year>[\d]{4})/(?P<acronym>[\w]+([&/\-_:É ][\w]+){0,3})/versions/(?P<version_name>[\w]+)/',
         include([
             url(r'^tree$', MiniTrainingTreeView.as_view(), name=MiniTrainingTreeView.name),
             url(r'^title$', MiniTrainingTitle.as_view(), name=MiniTrainingTitle.name),
