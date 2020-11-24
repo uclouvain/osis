@@ -530,6 +530,9 @@ msgstr ""
 msgid "Common title"
 msgstr ""
 
+msgid "Comparison of LUs"
+msgstr ""
+
 msgid "Comparison of learning units"
 msgstr ""
 
@@ -3106,6 +3109,9 @@ msgid "items per page"
 msgstr ""
 
 msgid "learning unit year"
+msgstr ""
+
+msgid "learning_units_comparison"
 msgstr ""
 
 msgid "list of required teaching materials"
