@@ -25,6 +25,7 @@
 ##############################################################################
 import itertools
 from typing import List
+from typing import Optional
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required, permission_required
@@ -40,6 +41,7 @@ from base.business.learning_unit import CMS_LABEL_PEDAGOGY_FR_ONLY, \
 from base.business.learning_units import perms
 from base.business.learning_units.perms import is_eligible_to_update_learning_unit_pedagogy, \
     is_eligible_to_update_learning_unit_pedagogy_force_majeure_section
+from base.models import academic_year
 from base.models.person import Person
 from base.models.teaching_material import TeachingMaterial
 from base.views.common import add_to_session
@@ -48,7 +50,6 @@ from base.views.learning_units.detail import SEARCH_URL_PART
 from cms.enums.entity_name import LEARNING_UNIT_YEAR
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
-from typing import Optional
 
 
 @login_required
@@ -70,6 +71,10 @@ def read_learning_unit_pedagogy(request, learning_unit_year_id: int, context, te
         learning_unit_year,
         person
     )
+    luy_in_current_academic_year = learning_unit_year.academic_year in academic_year.current_academic_years()
+    context['luy_in_current_academic_year'] = luy_in_current_academic_year
+    context['enable_publish_button'] = (perm_to_edit or perm_to_edit_force_majeure) and luy_in_current_academic_year
+
     user_language = mdl.person.get_user_interface_language(request.user)
 
     cms_pedagogy_labels_translated = _get_cms_pedagogy_labels_translated(learning_unit_year_id, user_language)
