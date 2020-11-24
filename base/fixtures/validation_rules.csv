@@ -3,7 +3,7 @@ base.validationrule,TrainingForm.AGGREGATION.acronym,REQUIRED,2A,"^([A-Za-z]{2,4
 <ul>
 <li>2-4 letters + <b>2A</b></li>
 </ul>
-Examples: <i>ARKE2A, BIOL2A, HIST2A</i>","Sigle d’une Aggégation est composé de:
+Examples: <i>ARKE2A, BIOL2A, HIST2A</i>","Sigle d’une Agrégation est composé de:
 <ul>
 <li>2-4 lettres + <b>2A</b></li>
 </ul>
