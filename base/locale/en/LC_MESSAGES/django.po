@@ -3108,6 +3108,9 @@ msgstr ""
 msgid "learning unit year"
 msgstr ""
 
+msgid "learning_units_comparison"
+msgstr ""
+
 msgid "list of required teaching materials"
 msgstr ""
 
