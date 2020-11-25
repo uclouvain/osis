@@ -1077,6 +1077,12 @@ components:
           type: string
         partial_title:
           type: string
+        ares_ability:
+          type: integer
+        ares_graca:
+          type: integer
+        ares_study:
+          type: integer
       required:
         - url
         - acronym
@@ -1087,6 +1093,9 @@ components:
         - academic_year
         - administration_entity
         - management_entity
+        - ares_ability
+        - ares_graca
+        - ares_study
     TrainingDetailed:
       allOf:
         - $ref: '#/components/schemas/Training'
