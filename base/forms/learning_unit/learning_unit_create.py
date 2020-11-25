@@ -37,6 +37,7 @@ from base.forms.learning_unit.entity_form import find_additional_requirement_ent
     PedagogicalEntitiesRoleModelChoiceField
 from base.forms.utils.acronym_field import AcronymField, PartimAcronymField, split_acronym
 from base.forms.utils.choice_field import add_blank, add_all
+from base.models import entity_version
 from base.models.campus import find_main_campuses
 from base.models.entity_version import get_last_version
 from base.models.enums import learning_unit_year_subtypes
@@ -343,7 +344,8 @@ class LearningContainerYearModelForm(PermissionFieldMixin, ValidationRuleMixin, 
                 forward=['country_allocation_entity']
             ),
             label=_('Allocation entity'),
-            disabled=self.fields['requirement_entity'].disabled
+            disabled=self.fields['requirement_entity'].disabled,
+            queryset=entity_version.find_pedagogical_entities_version(),
         )
 
     def __init_additional_entity_1_field(self):
