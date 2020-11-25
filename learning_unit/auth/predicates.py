@@ -95,17 +95,6 @@ def has_learning_unit_prerequisite_dependencies(self, user, learning_unit_year):
 
 
 @predicate(bind=True)
-@predicate_failed_msg(message=_("This learning unit has no application."))
-@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
-def has_learning_unit_applications(self, user, learning_unit_year):
-    if learning_unit_year:
-        return TutorApplication.objects.filter(
-            learning_container_year__learning_container=learning_unit_year.learning_container_year.learning_container
-        ).exists()
-    return None
-
-
-@predicate(bind=True)
 @predicate_failed_msg(
     message=_(
         "Learning unit type is not deletable because it is either a full course or it has the following type: %(types)s"
@@ -182,6 +171,18 @@ def is_proposal_edition_period_open(self, user, learning_unit_year):
     if learning_unit_year:
         for role in self.context['role_qs']:
             return event_perms.generate_event_perm_modification_transformation_proposal(
+                role.person, learning_unit_year, raise_exception=False
+            ).is_open()
+    return None
+
+
+@predicate(bind=True)
+@predicate_failed_msg(message=_("You are not allowed create proposal during this academic year"))
+@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
+def is_proposal_creation_period_open(self, user, learning_unit_year):
+    if learning_unit_year:
+        for role in self.context['role_qs']:
+            return event_perms.generate_event_perm_creation_end_date_proposal(
                 role.person, learning_unit_year, raise_exception=False
             ).is_open()
     return None
@@ -278,20 +279,29 @@ def has_faculty_proposal_state(self, user, learning_unit_year):
 
 
 @predicate(bind=True)
+@predicate_failed_msg(message=_("This learning unit is not of type creation"))
+@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
+def is_proposal_of_type_creation(self, user, learning_unit_year):
+    if learning_unit_year and hasattr(learning_unit_year, 'proposallearningunit'):
+        return learning_unit_year.proposallearningunit.type == ProposalType.CREATION.name
+    return None
+
+
+@predicate(bind=True)
+@predicate_failed_msg(message=_("This learning unit is not of type modification"))
+@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
+def is_proposal_of_type_modification(self, user, learning_unit_year):
+    if learning_unit_year and hasattr(learning_unit_year, 'proposallearningunit'):
+        return learning_unit_year.proposallearningunit.type == ProposalType.MODIFICATION.name
+    return None
+
+
+@predicate(bind=True)
 @predicate_failed_msg(message=_("This learning unit is of type creation"))
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def is_not_proposal_of_type_creation(self, user, learning_unit_year):
     if learning_unit_year and hasattr(learning_unit_year, 'proposallearningunit'):
         return learning_unit_year.proposallearningunit.type != ProposalType.CREATION.name
-    return None
-
-
-@predicate(bind=True)
-@predicate_failed_msg(message=_("This learning unit is of type suppression"))
-@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
-def is_not_proposal_of_type_suppression(self, user, learning_unit_year):
-    if learning_unit_year and hasattr(learning_unit_year, 'proposallearningunit'):
-        return learning_unit_year.proposallearningunit.type != ProposalType.SUPPRESSION.name
     return None
 
 
