@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-23 09:00+0100\n"
+"POT-Creation-Date: 2020-11-25 10:56+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -84,22 +84,25 @@ msgstr ""
 msgid "This learning unit has application this year"
 msgstr ""
 
-msgid "This learning unit has no application."
-msgstr ""
-
 msgid "This learning unit is not editable this period."
 msgstr ""
 
-msgid "This learning unit is of type creation"
+msgid "This learning unit is not of type creation"
 msgstr ""
 
-msgid "This learning unit is of type suppression"
+msgid "This learning unit is not of type modification"
+msgstr ""
+
+msgid "This learning unit is of type creation"
 msgstr ""
 
 #, python-format
 msgid ""
 "This learning unit isn't eligible for modification because of its type which "
 "is not among those types: %(types)s"
+msgstr ""
+
+msgid "You are not allowed to create proposal during this academic year"
 msgstr ""
 
 msgid ""

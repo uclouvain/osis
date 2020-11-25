@@ -23,6 +23,8 @@
 # ############################################################################
 from backoffice.settings.base import LANGUAGE_CODE_EN
 from program_management.ddd.business_types import *
+from program_management.ddd.domain.exception import ProgramTreeNotFoundException
+from django.http import Http404
 
 
 def format_version_title(node: 'NodeGroupYear', language: str) -> str:
@@ -37,6 +39,39 @@ def format_version_name(node: 'NodeGroupYear') -> str:
 
 def format_version_complete_name(node: 'NodeGroupYear', language: str) -> str:
     version_name = format_version_name(node)
+    if language == LANGUAGE_CODE_EN:
+        return " - {} {}".format(node.version_title_en, version_name) if node.version_title_en \
+            else " {}".format(version_name)
+    return " - {} {}".format(node.version_title_fr, version_name) if node.version_title_fr \
+        else " {}".format(version_name)
+
+
+def format_program_tree_complete_title(program_tree_version: 'ProgramTreeVersion',
+                                       language: str) -> str:
+    try:
+        node = program_tree_version.get_tree().root_node
+        return "%(offer_acronym)s%(version_name)s%(title)s" % {
+            'offer_acronym': node.title,
+            'version_name': "[{}{}]".format(
+                node.version_name,
+                '-Transition' if program_tree_version.is_transition else '') if node.version_name else '',
+            'title': _build_title(node, language),
+            }
+    except ProgramTreeNotFoundException:
+        raise Http404
+
+
+def _build_title(node: 'NodeGroupYear', language: str):
+    if language == LANGUAGE_CODE_EN and node.offer_title_en:
+        offer_title = " - {}".format(
+            node.offer_title_en
+        ) if node.offer_title_en else ''
+    else:
+        offer_title = " - {}".format(
+            node.offer_title_fr
+        ) if node.offer_title_fr else ''
     if language == LANGUAGE_CODE_EN and node.version_title_en:
-        return " - {}{}".format(node.version_title_en, version_name)
-    return " - {}{}".format(node.version_title_fr, version_name) if node.version_title_fr else ""
+        version_title = " [{}]".format(node.version_title_en)
+    else:
+        version_title = " [{}]".format(node.version_title_fr) if node.version_title_fr else ''
+    return "{}{}".format(offer_title, version_title)

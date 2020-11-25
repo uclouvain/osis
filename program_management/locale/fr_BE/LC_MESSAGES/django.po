@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-09 10:49+0100\n"
+"POT-Creation-Date: 2020-11-23 15:24+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -155,9 +155,8 @@ msgid "Annual"
 msgstr "Annuel"
 
 #, python-format
-msgid "Are you sure you want to delete %(offer_acronym)s %(version_name)s ?"
-msgstr ""
-"Êtes-vous sûr·e de vouloir supprimer %(offer_acronym)s %(version_name)s ?"
+msgid "Are you sure you want to delete %(object)s ?"
+msgstr "Êtes-vous sûr·e de vouloir supprimer  %(object)s ?"
 
 #, python-format
 msgid "Are you sure you want to detach %(child)s ?"
@@ -188,19 +187,21 @@ msgstr "Interdit d'ajouter des éléments à  l'UE %(parent_node)s"
 msgid "Cannot attach a node %(node)s to himself."
 msgstr "Interdit d'attacher un élément %(node)s à lui-même."
 
+#, python-format
 msgid ""
 "Cannot detach because the following learning units are prerequisite in "
 "%(formation)s: %(learning_units)s"
 msgstr ""
-"Interdit de détacher car les unités d'enseignement suivantes sont "
-"des prérequis dans %(formation)s: %(learning_units)s"
+"Interdit de détacher car les unités d'enseignement suivantes sont des "
+"prérequis dans %(formation)s: %(learning_units)s"
 
+#, python-format
 msgid ""
 "Cannot detach because the following learning units have prerequisite in "
 "%(formation)s: %(learning_units)s"
 msgstr ""
-"Interdit de détacher car les unités d'enseignement suivantes ont "
-"des prérequis dans %(formation)s: %(learning_units)s"
+"Interdit de détacher car les unités d'enseignement suivantes ont des "
+"prérequis dans %(formation)s: %(learning_units)s"
 
 #, python-format
 msgid "Cannot perform action on a education group before %(limit_year)s"
@@ -312,9 +313,6 @@ msgstr "Pour accord,"
 
 msgid "Formation catalogue"
 msgstr "Catalogue des formations"
-
-msgid "Formations"
-msgstr "Formations"
 
 msgid "Full title of the english version"
 msgstr "Intitulé de la version en anglais"
@@ -624,9 +622,10 @@ msgid "Pre-condition"
 msgstr "Préalable"
 
 msgid "Prerequisite"
-msgid_plural "Prerequisites"
-msgstr[0] "Prérequis"
-msgstr[1] "Prérequis"
+msgstr "Prérequis"
+
+msgid "Prerequisites"
+msgstr "Prérequis"
 
 msgid "Prerequisites are invalid"
 msgstr "Prérequis non valides."
@@ -672,6 +671,9 @@ msgstr "NOMA"
 
 msgid "Registration form for the content of"
 msgstr "Formulaire d'inscription au contenu de"
+
+msgid "Relative / Absolute <br>credits"
+msgstr "Crédits <br>relatifs / absolus"
 
 msgid "Relative credits"
 msgstr "Crédits relatifs"
@@ -763,9 +765,10 @@ msgstr ""
 "auquel vous voulez rattacher."
 
 #, python-format
-msgid "The end date must be higher or equal to finality %(acronym)s"
+msgid "The end date of %(acronym)s must be higher or equal to its finalities"
 msgstr ""
-"La date de fin doit être plus grande ou égale à la finalité %(acronym)s"
+"La date de fin de la formation %(acronym)s doit être plus grande ou égale à "
+"ses finalités"
 
 #, python-format
 msgid "The learning unit %(acronym)s is not contained inside the formation"
@@ -958,10 +961,10 @@ msgstr ""
 #, python-brace-format
 msgid ""
 "You can't delete the standard program tree '{code}' in {year} as specific "
-"versions exists during this year."
+"versions exists during this year and/or in the future."
 msgstr ""
 "Vous ne pouvez pas supprimer la formation standard '{code}' en {year} parce "
-"qu'il existe une version particiulière durant cette année."
+"qu'il existe une version particulière pour cette année et/ou dans le futur."
 
 #, python-format
 msgid ""
@@ -1084,6 +1087,3 @@ msgstr "formation"
 
 msgid "yes"
 msgstr "Oui"
-
-msgid "yes,no"
-msgstr "oui,non"

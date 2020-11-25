@@ -25,10 +25,12 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-
-    {{ content_formset.management_form }}
-    {{ content_formset.media }}
     {% for form in content_formset.forms %}
+        {% if forloop.first %}
+            {{ content_formset.management_form }}
+            {{ content_formset.media }}
+        {% endif %}
+
         {% bootstrap_form_errors form %}
     {% endfor %}
     <table class="table">
@@ -61,7 +63,7 @@
                     <td style="width:12%"></td>
                     <td>
                         <a id="lnk_learning_unit_{{ form.child_obj.acronym }}"
-                           href="{% url 'learning_unit' acronym=form.child_obj.title year=form.child_obj.year %}">
+                           href="{% url 'learning_unit' acronym=form.child_obj.code year=form.child_obj.year %}">
                             {{ form.child_obj.code }}
                         </a>
                     </td>

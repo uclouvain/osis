@@ -177,7 +177,7 @@ def is_proposal_edition_period_open(self, user, learning_unit_year):
 
 
 @predicate(bind=True)
-@predicate_failed_msg(message=_("You are not allowed create proposal during this academic year"))
+@predicate_failed_msg(message=_("You are not allowed to create proposal during this academic year"))
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def is_proposal_creation_period_open(self, user, learning_unit_year):
     if learning_unit_year:
