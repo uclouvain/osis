@@ -147,14 +147,12 @@ class TestCampusAutocomplete(TestCase):
         cls.url = reverse("campus-autocomplete")
 
         cls.partner_academic_organization = OrganizationFactory(type=ACADEMIC_PARTNER, name="Université de Louvain")
-        cls.campus = CampusFactory(organization=cls.partner_academic_organization)
         cls.main_address = MainRootEntityVersionAddressFactory(
             entity_version__entity__organization=cls.partner_academic_organization,
             country__iso_code='BE',
         )
 
         embassy_organization = OrganizationFactory(type=EMBASSY, name="Université de Nantes")
-        CampusFactory(organization=embassy_organization)
         MainRootEntityVersionAddressFactory(
             entity_version__entity__organization=embassy_organization,
             country__iso_code='FR',
@@ -167,9 +165,9 @@ class TestCampusAutocomplete(TestCase):
         response = self.client.get(self.url, data={'q': 'univ'})
 
         expected_results = [{
-            'text': "{} ({})".format(self.partner_academic_organization.name, self.campus.name),
-            'selected_text': "{} ({})".format(self.partner_academic_organization.name, self.campus.name),
-            'id': str(self.campus.pk)
+            'text': self.partner_academic_organization.name,
+            'selected_text': self.partner_academic_organization.name,
+            'id': str(self.partner_academic_organization.campus_set.first().pk)
         }]
         self.assertEqual(response.status_code, 200)
         results = _get_results_from_autocomplete_response(response)
@@ -188,9 +186,9 @@ class TestCampusAutocomplete(TestCase):
             data={'forward': '{"country_external_institution": "%s"}' % self.main_address.country.pk}
         )
         expected_results = [{
-            'text': "{} ({})".format(self.partner_academic_organization.name, self.campus.name),
-            'selected_text': "{} ({})".format(self.partner_academic_organization.name, self.campus.name),
-            'id': str(self.campus.pk)
+            'text': self.partner_academic_organization.name,
+            'selected_text': self.partner_academic_organization.name,
+            'id': str(self.partner_academic_organization.campus_set.first().pk)
         }]
         self.assertEqual(response.status_code, 200)
         results = _get_results_from_autocomplete_response(response)
