@@ -40,7 +40,7 @@
            data-toggle="tooltip"
            {% if not can_edit_information and not can_edit_force_majeur_section %}
                 title="{% trans 'You do not have the permission to refresh the publication for this learning unit' %}"
-           {% elif not luy_in_current_academic_year %}
+           {% elif not luy_in_current_or_future_anac %}
                 title="{% trans 'You do not have the permission to refresh the publication for this year' %}"
            {% endif %}>
            {% trans 'Refresh and visualize publication' %}

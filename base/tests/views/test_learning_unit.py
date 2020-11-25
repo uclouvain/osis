@@ -859,7 +859,7 @@ class LearningUnitViewTestCase(TestCase):
         mock_perm_pedagogy.return_value = True
         response = self.client.get(reverse(learning_unit_pedagogy, args=[self.luy.pk]))
 
-        self.assertTrue(response.context['luy_in_current_academic_year'])
+        self.assertTrue(response.context['luy_in_current_or_future_anac'])
         self.assertTrue(response.context['enable_publish_button'])
 
     @mock.patch(
@@ -870,7 +870,7 @@ class LearningUnitViewTestCase(TestCase):
         mock_perm_force_majeure.return_value = False
         response = self.client.get(reverse(learning_unit_pedagogy, args=[self.luy.pk]))
 
-        self.assertTrue(response.context['luy_in_current_academic_year'])
+        self.assertTrue(response.context['luy_in_current_or_future_anac'])
         self.assertFalse(response.context['enable_publish_button'])
 
     def test_learning_unit_specification(self):
