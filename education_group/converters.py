@@ -39,7 +39,7 @@ class TrainingTypeConverter:
 
 
 class AcronymConverter:
-    regex = r'[\w%+]+'
+    regex = r'[\w%\.]+'
 
     def to_python(self, value):
         return urllib.parse.unquote_plus(value)
