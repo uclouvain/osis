@@ -41,7 +41,6 @@ from base.business.learning_unit import CMS_LABEL_PEDAGOGY_FR_ONLY, \
 from base.business.learning_units import perms
 from base.business.learning_units.perms import is_eligible_to_update_learning_unit_pedagogy, \
     is_eligible_to_update_learning_unit_pedagogy_force_majeure_section
-from base.models import academic_year
 from base.models.person import Person
 from base.models.teaching_material import TeachingMaterial
 from base.views.common import add_to_session
@@ -71,9 +70,9 @@ def read_learning_unit_pedagogy(request, learning_unit_year_id: int, context, te
         learning_unit_year,
         person
     )
-    luy_in_current_academic_year = learning_unit_year.academic_year in academic_year.current_academic_years()
-    context['luy_in_current_academic_year'] = luy_in_current_academic_year
-    context['enable_publish_button'] = (perm_to_edit or perm_to_edit_force_majeure) and luy_in_current_academic_year
+    luy_in_current_or_future_anac = not learning_unit_year.academic_year.is_past
+    context['luy_in_current_or_future_anac'] = luy_in_current_or_future_anac
+    context['enable_publish_button'] = (perm_to_edit or perm_to_edit_force_majeure) and luy_in_current_or_future_anac
 
     user_language = mdl.person.get_user_interface_language(request.user)
 
