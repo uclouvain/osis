@@ -188,9 +188,6 @@ class TrainingDetailSerializer(TrainingListSerializer):
     remark = serializers.SerializerMethodField()
     domain_name = serializers.CharField(read_only=True)
     domain_code = serializers.CharField(read_only=True)
-    ares_study = serializers.IntegerField(source='offer.hops.ares_study', read_only=True)
-    ares_graca = serializers.IntegerField(source='offer.hops.ares_graca', read_only=True)
-    ares_ability = serializers.IntegerField(source='offer.hops.ares_ability', read_only=True)
 
     class Meta(TrainingListSerializer.Meta):
         fields = TrainingListSerializer.Meta.fields + (
