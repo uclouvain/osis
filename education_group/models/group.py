@@ -57,9 +57,6 @@ class Group(models.Model):
     )
 
     def save(self, *args, **kwargs):
-        if self.end_year and self.start_year.year > self.end_year.year:
-            raise AttributeError(_('End year must be greater than the start year, or equal'))
-
         super().save(*args, **kwargs)
 
     def __str__(self):
