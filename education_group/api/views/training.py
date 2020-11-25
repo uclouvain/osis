@@ -86,10 +86,13 @@ class TrainingList(LanguageContextSerializerMixin, generics.ListAPIView):
         is_transition=False,
     ).select_related(
         'offer__education_group_type',
-        'offer__academic_year'
+        'offer__academic_year',
+        'offer__hops__ares_study',
+        'offer__hops__ares_graca',
+        'offer__hops__ares_ability'
     ).prefetch_related(
         'offer__administration_entity__entityversion_set',
-        'offer__management_entity__entityversion_set'
+        'offer__management_entity__entityversion_set',
     ).exclude(
         offer__acronym__icontains='common'
     )
