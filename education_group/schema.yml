@@ -1075,14 +1075,14 @@ components:
           type: string
         management_faculty:
           type: string
-        partial_title:
-          type: string
         ares_ability:
           type: integer
         ares_graca:
           type: integer
         ares_study:
           type: integer
+        partial_title:
+          type: string
       required:
         - url
         - acronym
