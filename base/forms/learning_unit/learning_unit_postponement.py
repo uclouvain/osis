@@ -347,10 +347,10 @@ class LearningUnitPostponementForm:
                         ).append(
                             _("The repartition volume of %(col_name)s has been already modified. "
                               "(%(new_value)s instead of %(current_value)s)") % {
-                                'col_name': name,
-                                'new_value': new_repartition_volume,
-                                'current_value': current_repartition
-                            }
+                                  'col_name': name,
+                                  'new_value': new_repartition_volume,
+                                  'current_value': current_repartition
+                              }
                         )
                     else:
                         name = new_component.acronym
