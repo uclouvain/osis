@@ -122,6 +122,9 @@ class ProgramTreeRepository(interface.AbstractRepository):
         except Element.DoesNotExist:
             raise exception.ProgramTreeNotFoundException(code=entity_id.code, year=entity_id.year)
 
+    # def get_from_node_identity(self, entity_id: 'NodeIdentity') -> 'ProgramTree':
+    #     return self.get(ProgramTreeIdentity(code=entity_id.code, year=entity_id.year))
+
 
 def _delete_node_content(parent_node: 'Node', delete_node_service: interface.ApplicationService) -> None:
     for link in parent_node.children:

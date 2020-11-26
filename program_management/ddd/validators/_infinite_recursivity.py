@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Set
 
 from base.ddd.utils import business_validator
 from program_management.ddd.business_types import *
@@ -31,14 +32,35 @@ from program_management.ddd.domain.exception import CannotPasteNodeToHimselfExce
 
 class InfiniteRecursivityTreeValidator(business_validator.BusinessValidator):
 
-    def __init__(self, tree: 'ProgramTree', node_to_add: 'Node', path: 'Path'):
+    def __init__(
+            self,
+            tree: 'ProgramTree',
+            node_to_add: 'Node',
+            path_from_where_to_paste: 'Path',
+            repository: 'ProgramTreeRepository'
+    ):
         super(InfiniteRecursivityTreeValidator, self).__init__()
         self.tree = tree
         self.node_to_add = node_to_add
-        self.path = path
+        self.path_from_where_to_paste = path_from_where_to_paste
+        self.node_to_paste = self.tree.get_node(self.path_from_where_to_paste)
+        self.repository = repository
+
+    def _get_tree_from_node_to_add(self) -> 'ProgramTree':
+        from program_management.ddd.domain.program_tree import ProgramTreeIdentity  # FIXME circular import
+        tree_identity = ProgramTreeIdentity(code=self.node_to_add.entity_id.code, year=self.node_to_add.entity_id.year)
+        return self.repository.get(tree_identity)
+
+    def _get_parents(self) -> Set['Node']:
+        return set(self.tree.get_parents(self.path_from_where_to_paste)) | {self.node_to_paste}
+
+    def _children_are_parents(self) -> bool:
+        all_children_of_node_to_add = self._get_tree_from_node_to_add().get_all_nodes()
+        parents = self._get_parents()
+        return bool(all_children_of_node_to_add.intersection(parents))
 
     def validate(self):
-        if self.node_to_add in self.tree.get_parents(self.path):
+        if self._children_are_parents():
             raise CannotAttachParentNodeException(self.node_to_add)
 
 

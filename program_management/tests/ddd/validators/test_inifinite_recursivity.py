@@ -35,48 +35,68 @@ from program_management.ddd.validators._infinite_recursivity import InfiniteRecu
     InfiniteRecursivityLinkValidator
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
+from program_management.tests.ddd.factories.repository.fake import get_fake_program_tree_repository
 from program_management.tests.ddd.validators.mixins import TestValidatorValidateMixin
 
 
 class TestInfiniteRecursivityTreeValidator(TestValidatorValidateMixin, SimpleTestCase):
 
     def setUp(self):
+        """
+        root
+         |---- child_of_root
+        """
         self.academic_year = AcademicYearFactory.build(current=True)
 
-        self.node_to_attach = NodeGroupYearFactory(year=self.academic_year.year)
+        self.root = NodeGroupYearFactory(year=self.academic_year.year)
+        self.child_of_root = NodeGroupYearFactory(year=self.academic_year.year)
+        self.root.add_child(self.child_of_root)
 
-        self.tree = ProgramTreeFactory(root_node=self.node_to_attach)
+        self.tree = ProgramTreeFactory(root_node=self.root)
+        self.path_to_child_of_root = build_path(self.root, self.child_of_root)
+        self.path_to_root = build_path(self.root)
 
-        self.common_core_node = NodeGroupYearFactory(year=self.academic_year.year)
+        self.fake_program_tree_repository = get_fake_program_tree_repository([self.tree])
 
     def test_should_not_raise_eception_when_no_recursivity_found(self):
-        path = build_path(self.node_to_attach)
-        node_to_attach = self.common_core_node
-        self.assertValidatorNotRaises(InfiniteRecursivityTreeValidator(self.tree, node_to_attach, path))
+        node_to_attach = NodeGroupYearFactory(year=self.academic_year.year)
+        self.assertValidatorNotRaises(InfiniteRecursivityTreeValidator(
+            self.tree,
+            node_to_attach,
+            self.path_to_root,
+            self.fake_program_tree_repository
+        ))
 
-    def test_should_raise_exception_when_adding_node_as_parent_level_1(self):
-        child = NodeGroupYearFactory(
-            year=self.academic_year.year,
-        )
-        self.node_to_attach.add_child(child)
-        path = build_path(self.node_to_attach, child)
+    def test_when_node_to_paste_is_parent_of_node_where_to_paste(self):
+        node_to_paste = self.root
+        path_where_to_paste = self.path_to_child_of_root
+
+        self.fake_program_tree_repository.root_entities.append(ProgramTreeFactory(root_node=node_to_paste))
 
         with self.assertRaises(CannotAttachParentNodeException):
-            InfiniteRecursivityTreeValidator(self.tree, self.node_to_attach, path).validate()
+            InfiniteRecursivityTreeValidator(
+                self.tree,
+                node_to_paste,
+                path_where_to_paste,
+                self.fake_program_tree_repository
+            ).validate()
 
-    def test_should_raise_exception_when_adding_node_as_parent_level_2(self):
-        child_lvl1 = NodeGroupYearFactory(
+    def test_when_node_to_paste_contains_child_that_is_parent_of_node_where_to_paste(self):
+        node_to_paste = NodeGroupYearFactory(
             year=self.academic_year.year,
-        )
-        self.node_to_attach.add_child(child_lvl1)
-        child_lvl2 = NodeGroupYearFactory(
-            year=self.academic_year.year,
-        )
-        child_lvl1.add_child(child_lvl2)
+        )  # node not used in tree where to paste ...
+        node_to_paste.add_child(self.child_of_root)  # ... but the child is one of the parent where to paste.
 
-        path = build_path(self.node_to_attach, child_lvl1, child_lvl2)
+        self.fake_program_tree_repository.root_entities.append(ProgramTreeFactory(root_node=node_to_paste))
+        where_to_paste = self.path_to_child_of_root
+
         with self.assertRaises(CannotAttachParentNodeException):
-            InfiniteRecursivityTreeValidator(self.tree, self.node_to_attach, path).validate()
+            InfiniteRecursivityTreeValidator(
+                self.tree,
+                node_to_paste,
+                where_to_paste,
+                self.fake_program_tree_repository
+            ).validate()
 
 
 class TestInfiniteRecursivityLinkValidator(TestValidatorValidateMixin, SimpleTestCase):
