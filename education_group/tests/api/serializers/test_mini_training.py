@@ -62,6 +62,7 @@ class MiniTrainingListSerializerTestCase(TestCase):
     def test_contains_expected_fields(self):
         expected_fields = [
             'title',
+            'title_en',
             'url',
             'version_name',
             'acronym',
@@ -118,6 +119,7 @@ class MiniTrainingDetailSerializerTestCase(TestCase):
     def test_contains_expected_fields(self):
         expected_fields = [
             'title',
+            'title_en',
             'url',
             'version_name',
             'acronym',
@@ -138,6 +140,7 @@ class MiniTrainingDetailSerializerTestCase(TestCase):
             'constraint_type',
             'constraint_type_text',
             'remark',
+            'remark_en',
             'campus',
             'versions'
         ]
