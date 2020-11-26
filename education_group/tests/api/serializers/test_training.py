@@ -252,7 +252,7 @@ class TrainingDetailSerializerTestCase(TestCase):
             'enrollment_campus',
             'main_teaching_campus',
             'domain_code',
-            'domain_name'
+            'domain_name',
             'versions'
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
