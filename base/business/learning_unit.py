@@ -123,10 +123,10 @@ def get_cms_label_data(cms_label, user_language):
     return cms_label_data
 
 
-def _learning_unit_usage(learning_unit_year):
+def _learning_unit_usage(learning_unit_yr):
     return "{} ({})".format(
-        learning_unit_year.acronym,
-        LearningUnitYearQuadrimester.get_value(learning_unit_year.quadrimester) if learning_unit_year.quadrimester else '?'
+        learning_unit_yr.acronym,
+        LearningUnitYearQuadrimester.get_value(learning_unit_yr.quadrimester) if learning_unit_yr.quadrimester else '?'
     )
 
 
