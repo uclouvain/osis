@@ -152,7 +152,7 @@ $(document).ready(function() {
         });
         if(isDisabledField('allocation_entity')){
             document.getElementById('id_allocation_entity-country').disabled = true;
-        };
+        }
     });
     $.extend($.validator.messages, {
         required: trans_field_required,
