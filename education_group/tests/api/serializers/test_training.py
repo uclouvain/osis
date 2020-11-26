@@ -73,6 +73,9 @@ class TrainingListSerializerTestCase(TestCase):
             'administration_faculty',
             'management_entity',
             'management_faculty',
+            'ares_study',
+            'ares_graca',
+            'ares_ability',
         ]
         self.assertListEqual(list(self.serializer.data), expected_fields)
 
@@ -125,6 +128,9 @@ class TrainingListSerializerForMasterWithFinalityTestCase(TestCase):
             'administration_faculty',
             'management_entity',
             'management_faculty',
+            'ares_study',
+            'ares_graca',
+            'ares_ability',
             'partial_title'
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
@@ -185,6 +191,9 @@ class TrainingDetailSerializerTestCase(TestCase):
             'administration_faculty',
             'management_entity',
             'management_faculty',
+            'ares_study',
+            'ares_graca',
+            'ares_ability',
             'partial_deliberation',
             'admission_exam',
             'funding',
@@ -242,10 +251,7 @@ class TrainingDetailSerializerTestCase(TestCase):
             'enrollment_campus',
             'main_teaching_campus',
             'domain_code',
-            'domain_name',
-            'ares_study',
-            'ares_graca',
-            'ares_ability'
+            'domain_name'
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 
@@ -306,6 +312,9 @@ class TrainingDetailSerializerForMasterWithFinalityTestCase(TestCase):
             'administration_faculty',
             'management_entity',
             'management_faculty',
+            'ares_study',
+            'ares_graca',
+            'ares_ability',
             'partial_title',
             'partial_deliberation',
             'admission_exam',
@@ -364,10 +373,7 @@ class TrainingDetailSerializerForMasterWithFinalityTestCase(TestCase):
             'enrollment_campus',
             'main_teaching_campus',
             'domain_code',
-            'domain_name',
-            'ares_study',
-            'ares_graca',
-            'ares_ability'
+            'domain_name'
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 
