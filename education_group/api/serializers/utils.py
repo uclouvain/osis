@@ -28,6 +28,7 @@ from rest_framework import serializers
 from rest_framework.reverse import reverse
 
 from program_management import formatter
+from program_management.ddd.domain.program_tree_version import STANDARD
 
 
 class TrainingGetUrlMixin:
@@ -38,8 +39,11 @@ class TrainingGetUrlMixin:
         url_kwargs = {
             'acronym': obj.offer.acronym,
             'year': obj.offer.academic_year.year,
-            'version_name': obj.version_name
         }
+        if obj.version_name != STANDARD:
+            url_kwargs.update({
+                'version_name': obj.version_name
+            })
         return reverse(view_name, kwargs=url_kwargs, request=request, format=format)
 
 
@@ -82,8 +86,11 @@ class MiniTrainingGetUrlMixin:
         url_kwargs = {
             'acronym': obj.offer.acronym,
             'year': obj.offer.academic_year.year,
-            'version_name': obj.version_name
         }
+        if obj.version_name != STANDARD:
+            url_kwargs.update({
+                'version_name': obj.version_name
+            })
         return reverse(view_name, kwargs=url_kwargs, request=request, format=format)
 
 

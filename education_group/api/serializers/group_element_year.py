@@ -34,6 +34,7 @@ from education_group.api.views.training import TrainingDetail
 from education_group.enums.node_type import NodeType
 from learning_unit.api.views.learning_unit import LearningUnitDetailed
 from program_management.ddd.business_types import *
+from program_management.ddd.domain.program_tree_version import STANDARD
 
 
 class RecursiveField(serializers.Serializer):
@@ -57,9 +58,12 @@ class CommonNodeHyperlinkedRelatedField(serializers.HyperlinkedIdentityField):
             )
             url_kwargs = {
                 'acronym': obj.child.title,
-                'year': obj.child.year,
-                'version_name': obj.child.version_name
+                'year': obj.child.year
             }
+            if obj.child.version_name != STANDARD:
+                url_kwargs.update({
+                    'version_name': obj.child.version_name
+                })
         else:
             view_name = 'education_group_api_v1:' + GroupDetail.name
             url_kwargs = {

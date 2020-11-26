@@ -177,42 +177,6 @@ paths:
           $ref: '#/components/responses/NotFound'
       tags:
         - trainings
-  /trainings/{year}/{acronym}/versions:
-    get:
-      description: Return the versions list of the training
-      operationId: versions_list
-      parameters:
-        - in: path
-          name: year
-          required: true
-          schema:
-            description: ''
-            type: string
-        - in: path
-          name: acronym
-          required: true
-          schema:
-            description: ''
-            type: string
-        - in: query
-          name: is_transition
-          schema:
-            description: Is a transition version (default is standard version -> false)
-            type: boolean
-            default: false
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PaginatedVersion'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-      tags:
-        - trainings
   /trainings/{year}/{acronym}/versions/{version_name}:
     get:
       description: Return the detail of the training version
@@ -779,42 +743,6 @@ paths:
           $ref: '#/components/responses/NotFound'
       tags:
         - mini_trainings
-  /mini_trainings/{year}/{acronym}/versions:
-    get:
-      description: Return the versions list of the mini training
-      operationId: minitrainings_versions_list
-      parameters:
-        - in: path
-          name: year
-          required: true
-          schema:
-            description: ''
-            type: string
-        - in: path
-          name: acronym
-          required: true
-          schema:
-            description: ''
-            type: string
-        - in: query
-          name: is_transition
-          schema:
-            description: Is a transition version (default is standard version -> false)
-            type: boolean
-            default: false
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PaginatedVersion'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-      tags:
-        - mini_trainings
   /mini_trainings/{year}/{acronym}/versions/{version_name}:
     get:
       description: Return the detail of the mini training version
@@ -1014,15 +942,10 @@ components:
           type: array
           items:
             type: integer
-    PaginatedVersion:
-      allOf:
-        - $ref: '#/components/schemas/Pagination'
-        - type: object
-          properties:
-            results:
-              type: array
-              items:
-                $ref: '#/components/schemas/Version'
+    ArrayOfVersions:
+      type: array
+      items:
+        $ref: '#/components/schemas/Version'
     Version:
       type: object
       properties:
@@ -1231,6 +1154,8 @@ components:
               type: string
             is_transition:
               type: boolean
+            versions:
+              $ref: '#/components/schemas/ArrayOfVersions'
     GroupDetailed:
       type: object
       properties:
@@ -1343,6 +1268,8 @@ components:
               $ref: '#/components/schemas/ScheduleTypeEnum'
             schedule_type_text:
               type: string
+            versions:
+              $ref: '#/components/schemas/ArrayOfVersions'
     Tree:
       type: object
       properties:
