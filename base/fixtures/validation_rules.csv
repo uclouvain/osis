@@ -249,7 +249,7 @@ base.validationrule,TrainingForm.AGGREGATION.code,REQUIRED,200E,"^([LWMBlwmb])([
 <li>numerical part: 3 numbers</li>
 <li><b>E</b></li>
 </ul>
-Examples: <i>LHIST200E, LEDPH200E, LPSP200E</i>","Code d’une Aggrégation est composé de:
+Examples: <i>LHIST200E, LEDPH200E, LPSP200E</i>","Code d’une Agrégation est composé de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
