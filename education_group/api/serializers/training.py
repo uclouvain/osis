@@ -56,6 +56,9 @@ class TrainingBaseListSerializer(EducationGroupTitleSerializer, serializers.Hype
     administration_faculty = serializers.SerializerMethodField()
     management_entity = serializers.CharField(source='offer.management_entity_version.acronym', read_only=True)
     management_faculty = serializers.SerializerMethodField()
+    ares_study = serializers.IntegerField(source='offer.hops.ares_study', read_only=True)
+    ares_graca = serializers.IntegerField(source='offer.hops.ares_graca', read_only=True)
+    ares_ability = serializers.IntegerField(source='offer.hops.ares_ability', read_only=True)
 
     # Display human readable value
     education_group_type_text = serializers.CharField(source='offer.education_group_type.get_name_display',
@@ -74,6 +77,9 @@ class TrainingBaseListSerializer(EducationGroupTitleSerializer, serializers.Hype
             'administration_faculty',
             'management_entity',
             'management_faculty',
+            'ares_study',
+            'ares_graca',
+            'ares_ability',
         )
 
     @staticmethod
@@ -183,9 +189,6 @@ class TrainingDetailSerializer(TrainingListSerializer):
     remark = serializers.SerializerMethodField()
     domain_name = serializers.CharField(read_only=True)
     domain_code = serializers.CharField(read_only=True)
-    ares_study = serializers.IntegerField(source='offer.hops.ares_study', read_only=True)
-    ares_graca = serializers.IntegerField(source='offer.hops.ares_graca', read_only=True)
-    ares_ability = serializers.IntegerField(source='offer.hops.ares_ability', read_only=True)
     versions = serializers.SerializerMethodField()
 
     class Meta(TrainingListSerializer.Meta):
@@ -248,9 +251,6 @@ class TrainingDetailSerializer(TrainingListSerializer):
             'main_teaching_campus',
             'domain_code',
             'domain_name',
-            'ares_study',
-            'ares_graca',
-            'ares_ability',
             'versions'
         )
 
