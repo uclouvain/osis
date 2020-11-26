@@ -47,6 +47,6 @@ def detach_node(detach_command: command.DetachNodeCommand) -> link.LinkIdentity:
 
     if commit:
         persist_tree.persist(working_tree)
-        publisher.element_detached.send(None, path_to_detach)
+        publisher.element_detached.send(None, path_detached=path_to_detach)
 
     return deleted_link.entity_id
