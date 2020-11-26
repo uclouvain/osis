@@ -1075,6 +1075,12 @@ components:
           type: string
         management_faculty:
           type: string
+        ares_ability:
+          type: integer
+        ares_graca:
+          type: integer
+        ares_study:
+          type: integer
         partial_title:
           type: string
       required:
@@ -1087,6 +1093,9 @@ components:
         - academic_year
         - administration_entity
         - management_entity
+        - ares_ability
+        - ares_graca
+        - ares_study
     TrainingDetailed:
       allOf:
         - $ref: '#/components/schemas/Training'
@@ -1216,12 +1225,6 @@ components:
               type: string
             is_transition:
               type: boolean
-            ares_ability:
-              type: integer
-            ares_graca:
-              type: integer
-            ares_study:
-              type: integer
     GroupDetailed:
       type: object
       properties:
