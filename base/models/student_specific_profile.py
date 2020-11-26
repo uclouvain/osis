@@ -35,7 +35,8 @@ class StudentSpecificProfileAdmin(VersionAdmin, SerializableModelAdmin):
     list_display = ('student', 'guide', 'changed',)
     list_filter = ('type', 'subtype_disability', 'subtype_sport')
     search_fields = [
-        'guide__first_name', 'guide__last_name', 'student__person__first_name', 'student__person__last_name'
+        'guide__first_name', 'guide__last_name',
+        'student__person__first_name', 'student__person__last_name'
     ]
 
 
