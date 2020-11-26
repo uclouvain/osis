@@ -342,7 +342,9 @@ class LearningUnitPostponementForm:
                 if new_repartition_volume != current_repartition and entity_container_type in entity_by_type:
                     if entity_by_type[entity_container_type]:
                         name = new_component.acronym + "-" + entity_by_type[entity_container_type].most_recent_acronym
-                        self.consistency_errors.setdefault(luy.academic_year, []).append(
+                        self.consistency_errors.setdefault(
+                            luy.academic_year, []
+                        ).append(
                             _("The repartition volume of %(col_name)s has been already modified. "
                               "(%(new_value)s instead of %(current_value)s)") % {
                                 'col_name': name,
