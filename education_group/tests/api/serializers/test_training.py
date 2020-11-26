@@ -62,6 +62,7 @@ class TrainingListSerializerTestCase(TestCase):
     def test_contains_expected_fields(self):
         expected_fields = [
             'title',
+            'title_en',
             'url',
             'version_name',
             'acronym',
@@ -117,6 +118,7 @@ class TrainingListSerializerForMasterWithFinalityTestCase(TestCase):
     def test_contains_expected_fields(self):
         expected_fields = [
             'title',
+            'title_en',
             'url',
             'version_name',
             'acronym',
@@ -131,7 +133,8 @@ class TrainingListSerializerForMasterWithFinalityTestCase(TestCase):
             'ares_study',
             'ares_graca',
             'ares_ability',
-            'partial_title'
+            'partial_title',
+            'partial_title_en',
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 
@@ -180,6 +183,7 @@ class TrainingDetailSerializerTestCase(TestCase):
     def test_contains_expected_fields(self):
         expected_fields = [
             'title',
+            'title_en',
             'url',
             'version_name',
             'acronym',
@@ -232,6 +236,7 @@ class TrainingDetailSerializerTestCase(TestCase):
             'enrollment_enabled',
             'credits',
             'remark',
+            'remark_en',
             'min_constraint',
             'max_constraint',
             'constraint_type',
@@ -301,6 +306,7 @@ class TrainingDetailSerializerForMasterWithFinalityTestCase(TestCase):
     def test_contains_expected_fields(self):
         expected_fields = [
             'title',
+            'title_en',
             'url',
             'version_name',
             'acronym',
@@ -316,6 +322,7 @@ class TrainingDetailSerializerForMasterWithFinalityTestCase(TestCase):
             'ares_graca',
             'ares_ability',
             'partial_title',
+            'partial_title_en',
             'partial_deliberation',
             'admission_exam',
             'funding',
@@ -354,6 +361,7 @@ class TrainingDetailSerializerForMasterWithFinalityTestCase(TestCase):
             'enrollment_enabled',
             'credits',
             'remark',
+            'remark_en',
             'min_constraint',
             'max_constraint',
             'constraint_type',
