@@ -56,9 +56,6 @@ class Group(models.Model):
         on_delete=models.PROTECT
     )
 
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-
     def __str__(self):
         return "{}".format(self.most_recent_acronym or '')
 
