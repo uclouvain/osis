@@ -133,7 +133,7 @@ class TrainingListSerializerForMasterWithFinalityTestCase(TestCase):
             'ares_study',
             'ares_graca',
             'ares_ability',
-            'partial_title'
+            'partial_title',
             'partial_title_en',
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
