@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-23 14:08+0100\n"
+"POT-Creation-Date: 2020-11-26 14:57+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -403,9 +403,6 @@ msgstr "Attributions"
 
 msgid "Bachelor"
 msgstr "Bachelier"
-
-msgid "Back"
-msgstr "Retour"
 
 msgid "Back to messages"
 msgstr "Retourner à la liste des messages"
@@ -1137,9 +1134,6 @@ msgstr "Inactif"
 msgid "Include subordinate entities"
 msgstr "Inclure les entités subordonnées"
 
-msgid "Included in"
-msgstr "Inclus dans"
-
 msgid "Initial data"
 msgstr "Valeur initiale"
 
@@ -1210,9 +1204,6 @@ msgstr "Mots clés"
 
 msgid "LU"
 msgstr "UE"
-
-msgid "Label"
-msgstr "Label"
 
 msgid "Language"
 msgstr "Langue"
@@ -1368,9 +1359,6 @@ msgstr "Liste des propositions"
 
 msgid "Local credits"
 msgstr "Crédits locaux"
-
-msgid "Location"
-msgstr "Localité"
 
 msgid "Lock"
 msgstr "Bloquer"
@@ -1743,9 +1731,6 @@ msgstr "Ou"
 msgid "Organization"
 msgstr "Organisation"
 
-msgid "Organization address"
-msgstr "Adresse de l'organisation"
-
 msgid "Organizational chart"
 msgstr "Organigramme"
 
@@ -1884,9 +1869,6 @@ msgstr ""
 
 msgid "Pole"
 msgstr "Pôle"
-
-msgid "Postal code"
-msgstr "Code postal"
 
 msgid ""
 "Postponement will not be possible as the chosen code already exists for "
@@ -2127,6 +2109,9 @@ msgstr "Référence"
 msgid "Reference institution"
 msgstr "Institution de référence"
 
+msgid "Refresh and visualize publication"
+msgstr "Actualiser et visualiser la publication"
+
 msgid "Refused"
 msgstr "Refusé"
 
@@ -2136,9 +2121,6 @@ msgstr "Noma"
 msgctxt "Submission email table header"
 msgid "Registration number"
 msgstr "Noma"
-
-msgid "Relative / Absolute <br>credits"
-msgstr "Crédits<br>relatifs / absolus"
 
 msgid "Release"
 msgstr "Release"
@@ -2758,9 +2740,6 @@ msgstr "Total d'inscrits à la formation"
 msgid "Training"
 msgstr "Formation"
 
-msgid "Training type"
-msgstr "Type d'OF"
-
 msgid "Trainings"
 msgstr "Formations"
 
@@ -2970,7 +2949,8 @@ msgstr ""
 msgid ""
 "You cannot create a partim for a learning unit in proposition of creation"
 msgstr ""
-"Vous ne pouvez pas créer de partim pour une unité d'enseignement en proposition de création"
+"Vous ne pouvez pas créer de partim pour une unité d'enseignement en "
+"proposition de création"
 
 #, python-format
 msgid "You cannot create/update an education group before %(limit_year)s"
@@ -2988,6 +2968,17 @@ msgid ""
 msgstr ""
 "Vous ne pouvez pas créer une proposition de fin d'enseignement sur la "
 "première année d'organisation de l'UE."
+
+msgid ""
+"You do not have the permission to refresh the publication for this learning "
+"unit"
+msgstr ""
+"Vous n'avez pas la permission d'actualiser la publication pour cette unité "
+"d'enseignement"
+
+msgid "You do not have the permission to refresh the publication for this year"
+msgstr ""
+"Vous n'avez pas la permission d'actualiser la publication pour cette année"
 
 msgid "You have the choice between"
 msgstr "Vous avez le choix entre"

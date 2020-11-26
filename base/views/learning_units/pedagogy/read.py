@@ -69,6 +69,10 @@ def read_learning_unit_pedagogy(request, learning_unit_year_id: int, context, te
         learning_unit_year,
         person
     )
+    luy_in_current_or_future_anac = not learning_unit_year.academic_year.is_past
+    context['luy_in_current_or_future_anac'] = luy_in_current_or_future_anac
+    context['enable_publish_button'] = (perm_to_edit or perm_to_edit_force_majeure) and luy_in_current_or_future_anac
+
     user_language = mdl.person.get_user_interface_language(request.user)
 
     cms_pedagogy_labels_translated = _get_cms_pedagogy_labels_translated(learning_unit_year_id, user_language)

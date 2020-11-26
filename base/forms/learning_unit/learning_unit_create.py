@@ -230,7 +230,7 @@ class CountryEntityField(forms.ChoiceField):
     @staticmethod
     def _get_section_choices():
         return add_blank(
-            add_all(Country.objects.filter(entity__isnull=False).values_list('id', 'name').distinct().order_by('name')),
+            add_all(Country.objects.values_list('id', 'name').distinct().order_by('name')),
             blank_choice_display="UCLouvain"
         )
 
@@ -244,12 +244,22 @@ class LearningContainerYearModelForm(PermissionFieldMixin, ValidationRuleMixin, 
 
     additional_entity_1 = forms.CharField()
     country_additional_entity_1 = CountryEntityField(
-        widget_attrs={'id': 'id_additional_entity_1_country'}
+        widget_attrs={
+            'id': 'id_additional_entity_1_country',
+            'onchange': (
+                'clearAutocomplete("id_additional_requirement_entity_1");'
+            )
+        }
     )
 
     additional_entity_2 = forms.CharField()
     country_additional_entity_2 = CountryEntityField(
-        widget_attrs={'id': 'id_additional_entity_2_country'}
+        widget_attrs={
+            'id': 'id_additional_entity_2_country',
+            'onchange': (
+                'clearAutocomplete("id_additional_requirement_entity_2");'
+            )
+        }
     )
 
     def __init__(self, *args, **kwargs):
