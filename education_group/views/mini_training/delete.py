@@ -28,6 +28,7 @@ import functools
 from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
+from django.utils import translation
 from django.utils.translation import gettext_lazy as _
 
 from django.views.generic import DeleteView
@@ -49,8 +50,8 @@ from program_management.ddd.domain.exception import ProgramTreeNonEmpty, NodeHav
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
-from program_management.ddd.service.write import delete_all_standard_versions_service, \
-    delete_all_mini_training_versions_service
+from program_management.ddd.service.write import delete_all_mini_training_versions_service
+from program_management.formatter import format_program_tree_complete_title
 
 
 class MiniTrainingDeleteView(PermissionRequiredMixin, AjaxTemplateMixin, DeleteView):
@@ -99,9 +100,8 @@ class MiniTrainingDeleteView(PermissionRequiredMixin, AjaxTemplateMixin, DeleteV
         }
 
     def get_confirmation_message(self) -> str:
-        return _("Are you sure you want to delete %(code)s - %(title)s ?") % {
-            'code': self.kwargs['code'],
-            'title': self.get_mini_training().titles.title_fr
+        return _("Are you sure you want to delete %(object)s ?") % {
+            'object': format_program_tree_complete_title(self.get_object(), translation.get_language()),
         }
 
     def get_success_message(self) -> str:

@@ -530,9 +530,6 @@ msgstr ""
 msgid "Common title"
 msgstr ""
 
-msgid "Comparison of LUs"
-msgstr ""
-
 msgid "Comparison of learning units"
 msgstr ""
 
@@ -2918,6 +2915,10 @@ msgid "You can't modify learning unit under year : %(year)d"
 msgstr ""
 
 msgid "You can't modify proposal which is on an other year"
+msgstr ""
+
+msgid ""
+"You cannot create a partim for a learning unit in proposition of creation"
 msgstr ""
 
 #, python-format
