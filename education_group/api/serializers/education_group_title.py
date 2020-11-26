@@ -57,8 +57,8 @@ class EducationGroupTitleAllLanguagesSerializer(EducationGroupTitleSerializer):
 
 
 def _get_offer_title_from_lang(version, lang: str):
-    field_name = 'title' + ('_en' if lang == settings.LANGUAGE_CODE_EN else '_fr')
+    version_field_name = 'title' + ('_en' if lang == settings.LANGUAGE_CODE_EN else '_fr')
     title = getattr(version.offer, 'title' + ('_english' if lang == settings.LANGUAGE_CODE_EN else ''))
-    version_title = getattr(version, field_name)
+    version_title = getattr(version, version_field_name)
     title_suffix = ' [{}]'.format(version_title) if version_title else ''
     return title + title_suffix if title else None
