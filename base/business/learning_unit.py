@@ -36,6 +36,7 @@ from base.models.academic_year import AcademicYear
 from base.models.enums import academic_calendar_type, learning_unit_year_subtypes
 from base.models.enums import entity_container_year_link_type
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITIES
+from base.models.enums.quadrimesters import LearningUnitYearQuadrimester
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_container_year import find_last_entity_version_grouped_by_linktypes
 from cms import models as mdl_cms
@@ -125,7 +126,7 @@ def get_cms_label_data(cms_label, user_language):
 def _learning_unit_usage(learning_unit_year):
     return "{} ({})".format(
         learning_unit_year.acronym,
-        _(learning_unit_year.quadrimester) if learning_unit_year.quadrimester else '?'
+        LearningUnitYearQuadrimester.get_value(learning_unit_year.quadrimester) if learning_unit_year.quadrimester else '?'
     )
 
 
