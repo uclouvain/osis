@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-24 10:38+0100\n"
+"POT-Creation-Date: 2020-11-24 12:49+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2622,6 +2622,9 @@ msgstr "Le partim"
 
 msgid "The program aim has been updated"
 msgstr "L’objectif du programme a été mis à jour avec succès"
+
+msgid "The repartition volume of %(col_name)s has been already modified."
+msgstr "La répartition des volumes de %(col_name)s a déjà été modifiée."
 
 #, python-format
 msgid ""
