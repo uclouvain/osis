@@ -2082,6 +2082,9 @@ msgstr ""
 msgid "Reference institution"
 msgstr ""
 
+msgid "Refresh and visualize publication"
+msgstr ""
+
 msgid "Refused"
 msgstr ""
 
@@ -2918,6 +2921,10 @@ msgstr ""
 msgid "You can't modify proposal which is on an other year"
 msgstr ""
 
+msgid ""
+"You cannot create a partim for a learning unit in proposition of creation"
+msgstr ""
+
 #, python-format
 msgid "You cannot create/update an education group before %(limit_year)s"
 msgstr ""
@@ -2938,6 +2945,14 @@ msgstr ""
 msgid ""
 "You cannot put in proposal for ending date on the first year of the learning "
 "unit."
+msgstr ""
+
+msgid ""
+"You do not have the permission to refresh the publication for this learning "
+"unit"
+msgstr ""
+
+msgid "You do not have the permission to refresh the publication for this year"
 msgstr ""
 
 msgid "You don't have the rights to consolidate"
@@ -3106,6 +3121,9 @@ msgid "items per page"
 msgstr ""
 
 msgid "learning unit year"
+msgstr ""
+
+msgid "learning_units_comparison"
 msgstr ""
 
 msgid "list of required teaching materials"

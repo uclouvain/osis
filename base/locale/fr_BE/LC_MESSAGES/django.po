@@ -546,6 +546,9 @@ msgstr "Partie commune"
 msgid "Common title"
 msgstr "Intitulé commun"
 
+msgid "Comparison of LUs"
+msgstr "Comparaison entre UEs"
+
 msgid "Comparison of learning units"
 msgstr "Liste comparative d'unités d'enseignement"
 
@@ -2148,6 +2151,9 @@ msgstr "Référence"
 msgid "Reference institution"
 msgstr "Institution de référence"
 
+msgid "Refresh and visualize publication"
+msgstr "Actualiser et visualiser la publication"
+
 msgid "Refused"
 msgstr "Refusé"
 
@@ -3062,6 +3068,11 @@ msgstr ""
 msgid "You can't modify proposal which is on an other year"
 msgstr "Vous ne pouvez pas modifier les propositions liées à une autre année"
 
+msgid ""
+"You cannot create a partim for a learning unit in proposition of creation"
+msgstr ""
+"Vous ne pouvez pas créer de partim pour une unité d'enseignement en proposition de création"
+
 #, python-format
 msgid "You cannot create/update an education group before %(limit_year)s"
 msgstr ""
@@ -3092,6 +3103,14 @@ msgid ""
 msgstr ""
 "Vous ne pouvez pas créer une proposition de fin d'enseignement sur la "
 "première année d'organisation de l'UE."
+
+msgid ""
+"You do not have the permission to refresh the publication for this learning "
+"unit"
+msgstr "Vous n'avez pas la permission d'actualiser la publication pour cette unité d'enseignement"
+
+msgid "You do not have the permission to refresh the publication for this year"
+msgstr "Vous n'avez pas la permission d'actualiser la publication pour cette année"
 
 msgid "You don't have the rights to consolidate"
 msgstr "Vous n'avez pas le droit de consolider"
@@ -3268,6 +3287,9 @@ msgstr "éléments par page"
 
 msgid "learning unit year"
 msgstr "unité d'enseignement annualisée"
+
+msgid "learning_units_comparison"
+msgstr "comparaison_entre_UEs"
 
 msgid "list of required teaching materials"
 msgstr "liste des supports de cours obligatoires"
