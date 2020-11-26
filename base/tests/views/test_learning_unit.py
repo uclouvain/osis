@@ -108,6 +108,7 @@ from program_management.tests.factories.education_group_version import StandardE
 from program_management.tests.factories.element import ElementFactory
 from reference.tests.factories.country import CountryFactory
 from reference.tests.factories.language import LanguageFactory, FrenchLanguageFactory, EnglishLanguageFactory
+from base.models.enums.quadrimesters import LearningUnitYearQuadrimester
 
 
 @override_flag('learning_unit_create', active=True)
@@ -697,13 +698,14 @@ class LearningUnitViewTestCase(TestCase):
                                                              acronym='LBIOL')
 
         learning_unit_yr_1 = LearningUnitYearFactory(academic_year=self.current_academic_year,
-                                                     acronym='LBIOL', quadrimester='Q1&2',
+                                                     acronym='LBIOL',
+                                                     quadrimester=LearningUnitYearQuadrimester.Q1and2.name,
                                                      learning_container_year=learning_container_yr)
 
         learning_component_yr = LearningComponentYearFactory(learning_unit_year=learning_unit_yr_1)
 
         result = learning_unit_business._learning_unit_usage(learning_component_yr.learning_unit_year)
-        self.assertEqual(result, 'LBIOL (Q1&2)')
+        self.assertEqual(result, 'LBIOL ({})'.format(LearningUnitYearQuadrimester.Q1and2.value))
 
     def _prepare_context_learning_units_search(self):
         # Create a structure [Entity / Entity version]
