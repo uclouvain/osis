@@ -23,19 +23,20 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import copy
+from unittest.mock import patch
 
 from django.test import SimpleTestCase
-from django.utils.translation import gettext as _
 
-from base.ddd.utils import business_validator
+from base.models.enums.education_group_types import TrainingType, GroupType
 from base.tests.factories.academic_year import AcademicYearFactory
 from program_management.ddd.domain.exception import CannotPasteNodeToHimselfException, CannotAttachParentNodeException
 from program_management.ddd.domain.program_tree import build_path
+from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 from program_management.ddd.validators._infinite_recursivity import InfiniteRecursivityTreeValidator, \
     InfiniteRecursivityLinkValidator
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
-from program_management.tests.ddd.factories.repository.fake import get_fake_program_tree_repository
 from program_management.tests.ddd.validators.mixins import TestValidatorValidateMixin
 
 
@@ -43,59 +44,115 @@ class TestInfiniteRecursivityTreeValidator(TestValidatorValidateMixin, SimpleTes
 
     def setUp(self):
         """
-        root
-         |---- child_of_root
+        DROI1BA
+         |---- COMMON_CORE
+                |---- SUBGROUP
+
+        WARNING : Int these unit tests, we're using mocks of repository instead of fake_repository
+        WARNING : because we need 2 different results for repository.get() and repository.search_from_children()
         """
         self.academic_year = AcademicYearFactory.build(current=True)
 
-        self.root = NodeGroupYearFactory(year=self.academic_year.year)
-        self.child_of_root = NodeGroupYearFactory(year=self.academic_year.year)
-        self.root.add_child(self.child_of_root)
+        self.droi1ba = NodeGroupYearFactory(
+            year=self.academic_year.year, title='DROI1BA', node_type=TrainingType.BACHELOR
+        )
+        self.common_core = NodeGroupYearFactory(
+            year=self.academic_year.year, title='COMMON_CORE', node_type=GroupType.COMMON_CORE
+        )
+        self.subgroup = NodeGroupYearFactory(
+            year=self.academic_year.year, title='SUBGROUP', node_type=GroupType.SUB_GROUP
+        )
+        self.droi1ba.add_child(self.common_core)
+        self.common_core.add_child(self.subgroup)
 
-        self.tree = ProgramTreeFactory(root_node=self.root)
-        self.path_to_child_of_root = build_path(self.root, self.child_of_root)
-        self.path_to_root = build_path(self.root)
+        self.tree_droi1ba = ProgramTreeFactory(root_node=self.droi1ba)
+        self.path_to_subgroup = build_path(self.droi1ba, self.common_core, self.subgroup)
 
-        self.fake_program_tree_repository = get_fake_program_tree_repository([self.tree])
+        self._mock_trees_using_nodes()
 
-    def test_should_not_raise_eception_when_no_recursivity_found(self):
-        node_to_attach = NodeGroupYearFactory(year=self.academic_year.year)
+    def _mock_trees_using_nodes(self):
+        patcher = patch('program_management.ddd.repositories.program_tree.ProgramTreeRepository.search_from_children')
+        self.addCleanup(patcher.stop)
+        self.mock_trees_using_nodes = patcher.start()
+        self.mock_trees_using_nodes.return_value = []
+
+    @patch('program_management.ddd.repositories.program_tree.ProgramTreeRepository.get')
+    def test_should_not_raise_eception_when_no_recursivity_found(self, mock_tree_of_node_to_paste):
+        node_to_paste = NodeGroupYearFactory(
+            year=self.academic_year.year, title="inexisting group in DROI1BA", node_type=GroupType.SUB_GROUP
+        )
+
+        mock_tree_of_node_to_paste.return_value = ProgramTreeFactory(root_node=node_to_paste)
+
         self.assertValidatorNotRaises(InfiniteRecursivityTreeValidator(
-            self.tree,
-            node_to_attach,
-            self.path_to_root,
-            self.fake_program_tree_repository
+            self.tree_droi1ba,
+            node_to_paste,
+            self.path_to_subgroup,
+            ProgramTreeRepository()
         ))
 
-    def test_when_node_to_paste_is_parent_of_node_where_to_paste(self):
-        node_to_paste = self.root
-        path_where_to_paste = self.path_to_child_of_root
+    @patch('program_management.ddd.repositories.program_tree.ProgramTreeRepository.get')
+    def test_when_node_to_paste_is_parent_of_node_where_to_paste(self, mock_tree_of_node_to_paste):
+        node_to_paste = self.droi1ba
+        path_where_to_paste = self.path_to_subgroup
 
-        self.fake_program_tree_repository.root_entities.append(ProgramTreeFactory(root_node=node_to_paste))
+        mock_tree_of_node_to_paste.return_value = ProgramTreeFactory(root_node=node_to_paste)
 
         with self.assertRaises(CannotAttachParentNodeException):
             InfiniteRecursivityTreeValidator(
-                self.tree,
+                self.tree_droi1ba,
                 node_to_paste,
                 path_where_to_paste,
-                self.fake_program_tree_repository
+                ProgramTreeRepository()
             ).validate()
 
-    def test_when_node_to_paste_contains_child_that_is_parent_of_node_where_to_paste(self):
+    @patch('program_management.ddd.repositories.program_tree.ProgramTreeRepository.get')
+    def test_when_node_to_paste_contains_child_that_is_parent_of_node_where_to_paste(self, mock_tree_of_node_to_paste):
         node_to_paste = NodeGroupYearFactory(
             year=self.academic_year.year,
-        )  # node not used in tree where to paste ...
-        node_to_paste.add_child(self.child_of_root)  # ... but the child is one of the parent where to paste.
+        )  # node not used in DROI1BA ...
+        node_to_paste.add_child(self.droi1ba)  # ... but the child is one of the parent of the common_Core.
 
-        self.fake_program_tree_repository.root_entities.append(ProgramTreeFactory(root_node=node_to_paste))
-        where_to_paste = self.path_to_child_of_root
+        mock_tree_of_node_to_paste.return_value = ProgramTreeFactory(root_node=node_to_paste)
+        where_to_paste = self.path_to_subgroup
 
         with self.assertRaises(CannotAttachParentNodeException):
             InfiniteRecursivityTreeValidator(
-                self.tree,
+                self.tree_droi1ba,
                 node_to_paste,
                 where_to_paste,
-                self.fake_program_tree_repository
+                ProgramTreeRepository()
+            ).validate()
+
+    @patch('program_management.ddd.repositories.program_tree.ProgramTreeRepository.get')
+    def test_when_node_to_paste_contains_child_that_is_parent_of_node_where_to_paste_in_another_tree(
+            self,
+            mock_tree_of_node_to_paste
+    ):
+        where_to_paste = self.subgroup
+        path_where_to_paste = self.path_to_subgroup
+
+        node_to_paste = NodeGroupYearFactory(
+            year=self.academic_year.year,
+        )
+        child_of_node_to_paste = NodeGroupYearFactory(year=self.academic_year.year)
+        node_to_paste.add_child(child_of_node_to_paste)
+        mock_tree_of_node_to_paste.return_value = ProgramTreeFactory(root_node=node_to_paste)
+
+        # another tree where the node to paste is reused AND where one of its parent is a child of node to paste
+        another_tree_using_node = ProgramTreeFactory()
+        another_tree_using_node.root_node.add_child(copy.deepcopy(child_of_node_to_paste))
+        another_tree_using_node.root_node.children_as_nodes[0].add_child(where_to_paste)
+        self.mock_trees_using_nodes.return_value = [
+            another_tree_using_node
+        ]
+
+        with self.assertRaises(CannotAttachParentNodeException):
+            InfiniteRecursivityTreeValidator(
+                self.tree_droi1ba,
+                node_to_paste,
+                path_where_to_paste,
+                ProgramTreeRepository()
             ).validate()
 
 
