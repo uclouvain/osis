@@ -376,14 +376,16 @@ class LearningUnitPostponementForm:
 
     @staticmethod
     def _get_translated_value(value, field_name: str) -> str:
+        if isinstance(value, bool):
+            return _("yes") if value else _("no")
+
         if value:
             if field_name == 'periodicity':
                 return dict(PERIODICITY_TYPES)[value].lower()
             elif field_name == 'quadrimester':
                 return quadrimesters.LearningUnitYearQuadrimester.get_value(value).lower()
-            elif isinstance(value, bool):
-                return _("yes") if value else _("no")
             return value
+
         return "-"
 
     def _is_update_action(self):
