@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -43,6 +43,8 @@ from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit import LearningUnit
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.proposal_learning_unit import ProposalLearningUnit
+from base.models.enums import quadrimesters
+from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
 
 FIELDS_TO_NOT_POSTPONE = {
     'is_vacant': 'learning_container_year.is_vacant',
@@ -355,8 +357,8 @@ class LearningUnitPostponementForm:
         differences = [
             _("%(col_name)s has been already modified. (%(new_value)s instead of %(current_value)s)") % {
                 'col_name': next_form.label_fields.get(col_name, col_name),
-                'new_value': self._get_translated_value(next_form.instances_data.get(col_name)),
-                'current_value': self._get_translated_value(value)
+                'new_value': self._get_translated_value(next_form.instances_data.get(col_name), col_name),
+                'current_value': self._get_translated_value(value, col_name)
             } for col_name, value in current_form.instances_data.items()
             if self._get_cmp_value(next_form.instances_data.get(col_name)) != self._get_cmp_value(value) and
             col_name in FIELDS_TO_CHECK
@@ -373,11 +375,17 @@ class LearningUnitPostponementForm:
         return value
 
     @staticmethod
-    def _get_translated_value(value):
+    def _get_translated_value(value, field_name: str) -> str:
+        if value:
+            if field_name == 'periodicity':
+                value = dict(PERIODICITY_TYPES)[value].lower()
+            if field_name == 'quadrimester':
+                value = quadrimesters.LearningUnitYearQuadrimester.get_value(value).lower()
         if isinstance(value, bool):
             return _("yes") if value else _("no")
         elif value is None:
             return "-"
+
         return value
 
     def _is_update_action(self):
