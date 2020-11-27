@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-23 15:24+0100\n"
+"POT-Creation-Date: 2020-11-27 13:01+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1087,3 +1087,10 @@ msgstr "formation"
 
 msgid "yes"
 msgstr "Oui"
+
+#~ msgid "is_prerequisite_of-%(year)s-%(acronym)s %(version)s"
+#~ msgstr "est_prérequis_de-%(year)s-%(acronym)s %(version)s"
+
+#, python-format
+#~ msgid "prerequisites-%(year)s-%(acronym)s %(version)s"
+#~ msgstr "prérequis-%(year)s-%(acronym)s %(version)s"
