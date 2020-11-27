@@ -35,7 +35,7 @@ from program_management.ddd.domain.program_tree import build_path
 from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 from program_management.ddd.validators._infinite_recursivity import InfiniteRecursivityTreeValidator, \
     InfiniteRecursivityLinkValidator
-from program_management.tests.ddd.factories.node import NodeGroupYearFactory
+from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 from program_management.tests.ddd.validators.mixins import TestValidatorValidateMixin
 
@@ -83,6 +83,19 @@ class TestInfiniteRecursivityTreeValidator(TestValidatorValidateMixin, SimpleTes
         )
 
         mock_tree_of_node_to_paste.return_value = ProgramTreeFactory(root_node=node_to_paste)
+
+        self.assertValidatorNotRaises(InfiniteRecursivityTreeValidator(
+            self.tree_droi1ba,
+            node_to_paste,
+            self.path_to_subgroup,
+            ProgramTreeRepository()
+        ))
+
+    @patch('program_management.ddd.repositories.program_tree.ProgramTreeRepository.get')
+    def test_when_node_to_paste_is_learning_unit(self, mock_tree_of_node_to_paste):
+        node_to_paste = NodeLearningUnitYearFactory(
+            year=self.academic_year.year, title="inexisting in DROI1BA"
+        )
 
         self.assertValidatorNotRaises(InfiniteRecursivityTreeValidator(
             self.tree_droi1ba,

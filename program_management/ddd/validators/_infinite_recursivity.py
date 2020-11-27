@@ -53,14 +53,17 @@ class InfiniteRecursivityTreeValidator(business_validator.BusinessValidator):
 
     @cached_result
     def _children_of_node_to_paste(self) -> Set['Node']:
-        from program_management.ddd.domain.program_tree import ProgramTreeIdentity  # FIXME circular import
-        tree = self.repository.get(
-            ProgramTreeIdentity(
-                code=self.node_to_paste.entity_id.code,
-                year=self.node_to_paste.entity_id.year,
+        children = {self.node_to_paste}
+        if self.node_to_paste.is_group_or_mini_or_training():
+            from program_management.ddd.domain.program_tree import ProgramTreeIdentity  # FIXME circular import
+            tree = self.repository.get(
+                ProgramTreeIdentity(
+                    code=self.node_to_paste.entity_id.code,
+                    year=self.node_to_paste.entity_id.year,
+                )
             )
-        )
-        return tree.get_all_nodes() | {self.node_to_paste}
+            children |= tree.get_all_nodes()
+        return children
 
     def validate(self):
         self._validate_for_working_tree()
