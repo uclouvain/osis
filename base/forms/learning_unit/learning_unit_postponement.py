@@ -378,15 +378,13 @@ class LearningUnitPostponementForm:
     def _get_translated_value(value, field_name: str) -> str:
         if value:
             if field_name == 'periodicity':
-                value = dict(PERIODICITY_TYPES)[value].lower()
-            if field_name == 'quadrimester':
-                value = quadrimesters.LearningUnitYearQuadrimester.get_value(value).lower()
-        if isinstance(value, bool):
-            return _("yes") if value else _("no")
-        elif value is None:
-            return "-"
-
-        return value
+                return dict(PERIODICITY_TYPES)[value].lower()
+            elif field_name == 'quadrimester':
+                return quadrimesters.LearningUnitYearQuadrimester.get_value(value).lower()
+            elif isinstance(value, bool):
+                return _("yes") if value else _("no")
+            return value
+        return "-"
 
     def _is_update_action(self):
         return self.learning_unit_full_instance or self.learning_unit_instance
