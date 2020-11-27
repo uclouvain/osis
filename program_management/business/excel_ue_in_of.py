@@ -518,10 +518,13 @@ def _build_main_gathering_label(gathering_node: 'Node', tree_versions: List['Pro
         pgm_tree_version = _get_program_tree_version_from_tree_versions_list(gathering_node.year,
                                                                              gathering_node.code,
                                                                              tree_versions)
-        return "{}{} - {}".format(
+        return "{}{} - {}{}".format(
             gathering_node.title,
             pgm_tree_version.version_label if pgm_tree_version else '',
-            gathering_node.offer_partial_title_fr if gathering_node.is_finality() else gathering_node.group_title_fr)
+            gathering_node.offer_partial_title_fr if gathering_node.is_finality() else gathering_node.group_title_fr,
+            "[{}]".format(pgm_tree_version.title_fr)
+            if pgm_tree_version and not pgm_tree_version.is_standard_version else ''
+        )
     return '-'
 
 
