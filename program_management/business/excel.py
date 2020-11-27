@@ -88,13 +88,17 @@ class EducationGroupYearLearningUnitsPrerequisitesToExcel:
     def to_excel(self):
         return {
             'workbook': save_virtual_workbook(self._to_workbook()),
-            'acronym': self.tree.root_node.title
+            'acronym': self.tree.root_node.title + (
+                "[{}]".format(self.tree.root_node.version_name) if self.tree.root_node.version_name else ""
+            )
         }
 
 
 def generate_prerequisites_workbook(tree: 'ProgramTree') -> Workbook:
-    worksheet_title = _("prerequisites-%(year)s-%(acronym)s") % {"year": tree.root_node.year,
-                                                                 "acronym": tree.root_node.code}
+    worksheet_title = _("prerequisites-%(year)s-%(acronym)s") % {
+        "year": tree.root_node.year,
+        "acronym": tree.root_node.code,
+    }
     worksheet_title = clean_worksheet_title(worksheet_title)
     workbook = Workbook(encoding='utf-8')
 
@@ -106,7 +110,9 @@ def generate_prerequisites_workbook(tree: 'ProgramTree') -> Workbook:
 def _build_excel_lines(tree: 'ProgramTree') -> List:
     content = _first_line_content(
         HeaderLine(
-            egy_acronym=tree.root_node.title,
+            egy_acronym=tree.root_node.title + (
+                "[{}]".format(tree.root_node.version_name) if tree.root_node.version_name else ""
+            ),
             egy_title=tree.root_node.group_title_en if translation.get_language() == LANGUAGE_CODE_EN else
             tree.root_node.group_title_fr,
             code_header=_('Code'),
@@ -259,13 +265,17 @@ class EducationGroupYearLearningUnitsIsPrerequisiteOfToExcel:
     def to_excel(self):
         return {
             'workbook': save_virtual_workbook(self._to_workbook()),
-            'acronym': self.tree.root_node.title
+            'acronym': self.tree.root_node.title + (
+                "[{}]".format(self.tree.root_node.version_name) if self.tree.root_node.version_name else ""
+            )
         }
 
 
 def generate_ue_is_prerequisite_for_workbook(tree: 'ProgramTree') -> Workbook:
-    worksheet_title = _("is_prerequisite_of-%(year)s-%(acronym)s") % {"year": tree.root_node.year,
-                                                                      "acronym": tree.root_node.code}
+    worksheet_title = _("is_prerequisite_of-%(year)s-%(acronym)s") % {
+        "year": tree.root_node.year,
+        "acronym": tree.root_node.code,
+    }
     worksheet_title = clean_worksheet_title(worksheet_title)
     workbook = Workbook()
 
@@ -296,14 +306,17 @@ def _get_workbook(tree: 'ProgramTree',
 
 def _build_excel_lines_prerequisited(tree: 'ProgramTree') -> List:
     content = _first_line_content(
-        HeaderLinePrerequisiteOf(node_title=tree.root_node.title,
-                                 tree_title=tree.root_node.group_title_en
-                                 if translation.get_language() == LANGUAGE_CODE_EN else tree.root_node.group_title_fr,
-                                 title_header=_('Title'),
-                                 credits_header=_('Cred. rel./abs.'),
-                                 block_header=_('Block'),
-                                 mandatory_header=_('Mandatory')
-                                 )
+        HeaderLinePrerequisiteOf(
+            node_title=tree.root_node.title + (
+                "[{}]".format(tree.root_node.version_name) if tree.root_node.version_name else ""
+            ),
+            tree_title=tree.root_node.group_title_en
+            if translation.get_language() == LANGUAGE_CODE_EN else tree.root_node.group_title_fr,
+            title_header=_('Title'),
+            credits_header=_('Cred. rel./abs.'),
+            block_header=_('Block'),
+            mandatory_header=_('Mandatory')
+        )
     )
     for child_node in tree.get_nodes_that_are_prerequisites():
         if child_node.is_prerequisite:
