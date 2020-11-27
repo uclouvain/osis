@@ -41,7 +41,7 @@ from base.models.enums.learning_unit_year_subtypes import FULL, PARTIM
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.tests.factories.academic_calendar import generate_modification_transformation_proposal_calendars, \
-    generate_learning_unit_edition_calendars
+    generate_learning_unit_edition_calendars, generate_creation_or_end_date_proposal_calendars
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year, \
     create_past_academic_year
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
@@ -287,7 +287,7 @@ class PermsTestCase(TestCase):
             learning_unit_year=luy
         )
 
-        generate_modification_transformation_proposal_calendars(
+        generate_creation_or_end_date_proposal_calendars(
             [self.academic_yr, self.academic_yr_1, self.academic_yr_2, self.academic_yr_6]
         )
 

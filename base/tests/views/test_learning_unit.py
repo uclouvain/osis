@@ -64,6 +64,7 @@ from base.models.enums.academic_calendar_type import LEARNING_UNIT_EDITION_FACUL
 from base.models.enums.attribution_procedure import EXTERNAL
 from base.models.enums.learning_unit_year_subtypes import FULL
 from base.models.enums.proposal_type import ProposalType
+from base.models.enums.quadrimesters import LearningUnitYearQuadrimester
 from base.models.enums.vacant_declaration_type import DO_NOT_ASSIGN, VACANT_NOT_PUBLISH
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.proposal_learning_unit import ProposalLearningUnit
@@ -108,7 +109,6 @@ from program_management.tests.factories.education_group_version import StandardE
 from program_management.tests.factories.element import ElementFactory
 from reference.tests.factories.country import CountryFactory
 from reference.tests.factories.language import LanguageFactory, FrenchLanguageFactory, EnglishLanguageFactory
-from base.models.enums.quadrimesters import LearningUnitYearQuadrimester
 
 
 @override_flag('learning_unit_create', active=True)
@@ -332,9 +332,7 @@ class LearningUnitViewCreatePartimTestCase(TestCase):
         url_to_redirect = reverse("learning_unit", kwargs={'learning_unit_year_id': a_partim_learning_unit_year.id})
         self.assertRedirects(response, url_to_redirect)
 
-    @mock.patch('base.views.learning_units.perms.business_perms.is_person_linked_to_entity_in_charge_of_learning_unit',
-                side_effect=lambda *args: True)
-    def test_create_partim_for_learning_unit_in_creation_proposal(self, mock_is_pers_linked_to_entity_charge):
+    def test_create_partim_for_learning_unit_in_creation_proposal(self):
         ProposalLearningUnitFactory(
             learning_unit_year=self.learning_unit_year_full,
             type=ProposalType.CREATION.name
