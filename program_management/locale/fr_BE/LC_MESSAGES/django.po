@@ -1087,10 +1087,3 @@ msgstr "formation"
 
 msgid "yes"
 msgstr "Oui"
-
-#~ msgid "is_prerequisite_of-%(year)s-%(acronym)s %(version)s"
-#~ msgstr "est_prérequis_de-%(year)s-%(acronym)s %(version)s"
-
-#, python-format
-#~ msgid "prerequisites-%(year)s-%(acronym)s %(version)s"
-#~ msgstr "prérequis-%(year)s-%(acronym)s %(version)s"
