@@ -93,7 +93,7 @@ class CommonAggregateAdmissionCondition(PermissionRequiredMixin, TemplateView):
 
     def get_admission_condition(self):
         obj = self.get_object()
-        if(hasattr(obj, 'admissioncondition')):
+        if hasattr(obj, 'admissioncondition'):
             return obj.admissioncondition
         return AdmissionCondition.objects.get_or_create(education_group_year=obj)
 
