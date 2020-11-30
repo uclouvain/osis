@@ -108,13 +108,17 @@ def generate_prerequisites_workbook(tree: 'ProgramTree') -> Workbook:
 
 
 def _build_excel_lines(tree: 'ProgramTree') -> List:
+    language = translation.get_language()
+    version_title = tree.root_node.version_title_en if language == LANGUAGE_CODE_EN else tree.root_node.version_title_fr
     content = _first_line_content(
         HeaderLine(
             egy_acronym=tree.root_node.title + (
                 "[{}]".format(tree.root_node.version_name) if tree.root_node.version_name else ""
             ),
-            egy_title=tree.root_node.group_title_en if translation.get_language() == LANGUAGE_CODE_EN else
-            tree.root_node.group_title_fr,
+            egy_title="{title} {version_title}".format(
+                title=tree.root_node.group_title_en if language == LANGUAGE_CODE_EN else tree.root_node.group_title_fr,
+                version_title="[{}]".format(version_title) if version_title else ""
+            ),
             code_header=_('Code'),
             title_header=_('Title'),
             credits_header=_('Cred. rel./abs.'),
@@ -305,13 +309,17 @@ def _get_workbook(tree: 'ProgramTree',
 
 
 def _build_excel_lines_prerequisited(tree: 'ProgramTree') -> List:
+    language = translation.get_language()
+    version_title = tree.root_node.version_title_en if language == LANGUAGE_CODE_EN else tree.root_node.version_title_fr
     content = _first_line_content(
         HeaderLinePrerequisiteOf(
             node_title=tree.root_node.title + (
                 "[{}]".format(tree.root_node.version_name) if tree.root_node.version_name else ""
             ),
-            tree_title=tree.root_node.group_title_en
-            if translation.get_language() == LANGUAGE_CODE_EN else tree.root_node.group_title_fr,
+            tree_title="{title} {version_title}".format(
+                title=tree.root_node.group_title_en if language == LANGUAGE_CODE_EN else tree.root_node.group_title_fr,
+                version_title="[{}]".format(version_title) if version_title else ""
+            ),
             title_header=_('Title'),
             credits_header=_('Cred. rel./abs.'),
             block_header=_('Block'),
