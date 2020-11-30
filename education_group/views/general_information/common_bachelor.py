@@ -95,7 +95,7 @@ class CommonBachelorAdmissionCondition(PermissionRequiredMixin, TemplateView):
         obj = self.get_object()
         if hasattr(obj, 'admissioncondition'):
             return obj.admissioncondition
-        return AdmissionCondition.objects.get_or_create(education_group_year=obj)
+        return AdmissionCondition.objects.get_or_create(education_group_year=obj)[0]
 
 
 class UpdateCommonBachelorAdmissionCondition(UpdateCommonCondition):
