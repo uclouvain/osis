@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-25 09:25+0100\n"
+"POT-Creation-Date: 2020-11-30 12:00+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -526,9 +526,6 @@ msgstr "Nouvelle version particulière"
 msgid "New training"
 msgstr "Nouvelle Formation"
 
-msgid "New version"
-msgstr "Nouvelle version"
-
 msgid "No"
 msgstr "Non"
 
@@ -701,6 +698,9 @@ msgstr "Groupement racine"
 
 msgid "Save"
 msgstr "Enregistrer"
+
+msgid "Save will prolong the past version"
+msgstr "Enregistrer va prolonger la version existante."
 
 msgid "Schedule type"
 msgstr "Type horaire"
