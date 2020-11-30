@@ -23,9 +23,10 @@
 # ############################################################################
 from django.test import SimpleTestCase
 
+from base.models.enums.education_group_types import TrainingType, MiniTrainingType
 from program_management.ddd.validators._prerequisites_items import PrerequisiteItemsValidator
 from program_management.tests.ddd.factories.link import LinkFactory
-from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory
+from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory, NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
 
@@ -76,3 +77,34 @@ class TestPrerequisiteItemsValidator(SimpleTestCase):
         self.assertTrue(
             PrerequisiteItemsValidator(prerequisite_string, node, self.program_tree).is_valid()
         )
+
+    def test_should_be_invalid_when_codes_used_in_minor_or_deepening(self):
+        minor_or_deepening_types = (
+            MiniTrainingType.OPEN_MINOR,
+            MiniTrainingType.ACCESS_MINOR,
+            MiniTrainingType.DISCIPLINARY_COMPLEMENT_MINOR,
+            MiniTrainingType.SOCIETY_MINOR,
+            MiniTrainingType.DEEPENING,
+        )
+        for mini_training_type in minor_or_deepening_types:
+            with self.subTest(mini_training_type=mini_training_type):
+                program_tree = ProgramTreeFactory(root_node__node_type=TrainingType.BACHELOR)
+                minor = NodeGroupYearFactory(node_id=9999, node_type=mini_training_type)
+                ue = NodeLearningUnitYearFactory()
+                LinkFactory(
+                    parent=self.program_tree.root_node,
+                    child=ue
+                )
+                LinkFactory(
+                    parent=program_tree.root_node,
+                    child=minor
+                )
+                code_not_permitted = "LOSIS9999"
+                LinkFactory(
+                    parent=minor,
+                    child=NodeLearningUnitYearFactory(code=code_not_permitted)
+                )
+                prerequisite_string = code_not_permitted
+                self.assertFalse(
+                    PrerequisiteItemsValidator(prerequisite_string, ue, program_tree).is_valid()
+                )

@@ -22,6 +22,8 @@
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
 import re
+from typing import List
+
 from program_management.ddd.business_types import *
 from django.utils.translation import gettext_lazy as _
 
@@ -41,7 +43,20 @@ class PrerequisiteItemsValidator(BusinessValidator):
         self.prerequisite_string = prerequisite_string
         self.node = node
         self.program_tree = program_tree
-        self.codes_permitted = self.program_tree.get_codes_permitted_as_prerequisite()
+        self.codes_permitted = self.get_codes_permitted_as_prerequisite(self.program_tree)
+
+    # TODO :: place this function inside ProgramTree domain object?
+    def get_codes_permitted_as_prerequisite(self, tree: 'ProgramTree') -> List[str]:
+        codes_permitted = set()
+        for path, node in tree.root_node.descendents:
+            if node.is_learning_unit():
+                if tree.is_bachelor() and self._is_inside_minor_or_deepening(tree, node):
+                    continue
+                codes_permitted.add(node.code)
+        return list(sorted(codes_permitted))
+
+    def _is_inside_minor_or_deepening(self, tree: 'ProgramTree', node: 'Node') -> bool:
+        return bool(any(parent for parent in tree.get_all_parents(node) if parent.is_minor_or_deepening()))
 
     def validate(self, *args, **kwargs):
         codes_used_in_prerequisite_string = self._extract_acronyms()

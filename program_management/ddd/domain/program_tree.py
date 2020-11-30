@@ -196,6 +196,9 @@ class ProgramTree(interface.RootEntity):
     def is_master_2m(self):
         return self.root_node.is_master_2m()
 
+    def is_bachelor(self) -> bool:
+        return self.root_node.is_bachelor()
+
     def is_root(self, node: 'Node'):
         return self.root_node == node
 
@@ -340,6 +343,7 @@ class ProgramTree(interface.RootEntity):
     def get_all_learning_unit_nodes(self) -> List['NodeLearningUnitYear']:
         return self.root_node.get_all_children_as_learning_unit_nodes()
 
+    # TODO :: to remove and replace with get_all_learning_unit_nodes
     def get_nodes_by_type(self, node_type_value) -> Set['Node']:
         return {node for node in self.get_all_nodes() if node.type == node_type_value}
 
@@ -354,10 +358,6 @@ class ProgramTree(interface.RootEntity):
             )
         )
 
-    def get_codes_permitted_as_prerequisite(self) -> List[str]:
-        learning_unit_nodes_contained_in_program = self.get_nodes_by_type(node_type.NodeType.LEARNING_UNIT)
-        return list(sorted(node_obj.code for node_obj in learning_unit_nodes_contained_in_program))
-
     def get_nodes_that_are_prerequisites(self) -> List['NodeLearningUnitYear']:  # TODO :: unit test
         return list(
             sorted(
@@ -369,6 +369,7 @@ class ProgramTree(interface.RootEntity):
             )
         )
 
+    # TODO :: to remove because unused ?
     def count_usage(self, node: 'Node') -> int:
         return Counter(_nodes_from_root(self.root_node))[node]
 
