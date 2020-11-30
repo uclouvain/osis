@@ -588,7 +588,6 @@ class ProgramTree(interface.RootEntity):
             paths_by_node[child_node].append(path)
         return paths_by_node
 
-    # TODO : to rename into "search_paths_using_node"
     def search_paths_using_node(self, node: 'Node') -> List['Path']:
         return self._paths_by_node().get(node) or []
 
