@@ -13,7 +13,7 @@ const DEFAULT_CONFIGURATION = {
 }
 
 $(document).ready(function () {
-    window.Parsley.addAsyncValidator('osis', remoteFieldValidation);
+    window.Parsley.addAsyncValidator('async-osis', remoteFieldValidation);
 
     $(".osis-form").parsley(DEFAULT_CONFIGURATION);
 

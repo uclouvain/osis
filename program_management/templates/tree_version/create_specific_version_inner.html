@@ -36,16 +36,7 @@
             <div class="panel panel-default">
                 <div class="panel-body">
 
-                    <div class="form-group required_field">
-                        {% bootstrap_label form.version_name.label label_class="control-label" %}
-                        <div class="input-group">
-                            <span class="input-group-addon">{{ training_identity.acronym }}[</span>
-                            <input id="{{ form.version_name.id_for_label }}" class="form-control" type="text" name="{{ form.version_name.name }}" style="text-transform: uppercase;"
-                                   maxlength="15" required data-parsley-remote="{% url 'check_version_name' training_identity.year training_identity.acronym %}"
-                                   data-parsley-remote-validator="osis">
-                            <span class="input-group-addon">]</span>
-                        </div>
-                    </div>
+                    {% bootstrap_field form.version_name addon_before=training_identity.acronym|add:"[" addon_after=']' %}
                     {% bootstrap_field form.version_title_fr %}
                     {% bootstrap_field form.version_title_en %}
                     {% bootstrap_field form.end_year %}
