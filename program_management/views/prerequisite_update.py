@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from collections import OrderedDict
+
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
@@ -31,18 +33,20 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 
 from base.ddd.utils.validation_message import MessageLevel
+from base.utils.urls import reverse_with_get
 from education_group.models.group_year import GroupYear
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd.repositories import persist_tree
 from program_management.ddd.validators._authorized_root_type_for_prerequisite import AuthorizedRootTypeForPrerequisite
 from program_management.forms.prerequisite import PrerequisiteForm
 from program_management.models.enums.node_type import NodeType
-from program_management.views.generic import LearningUnitGeneric
+from program_management.views.generic import LearningUnitGeneric, Tab
 
 
 class LearningUnitPrerequisite(PermissionRequiredMixin, SuccessMessageMixin, LearningUnitGeneric, FormView):
     template_name = "learning_unit/tab_prerequisite_update.html"
     form_class = PrerequisiteForm
+    active_tab = Tab.PREREQUISITE
 
     permission_required = 'base.change_prerequisite'
     raise_exception = True
