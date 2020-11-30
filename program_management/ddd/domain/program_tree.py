@@ -346,15 +346,11 @@ class ProgramTree(interface.RootEntity):
     def get_all_learning_unit_nodes(self) -> List['NodeLearningUnitYear']:
         return self.root_node.get_all_children_as_learning_unit_nodes()
 
-    # TODO :: to remove and replace with get_all_learning_unit_nodes
-    def get_nodes_by_type(self, node_type_value) -> Set['Node']:
-        return {node for node in self.get_all_nodes() if node.type == node_type_value}
-
     def get_nodes_that_have_prerequisites(self) -> List['NodeLearningUnitYear']:
         return list(
             sorted(
                 (
-                    node_obj for node_obj in self.get_nodes_by_type(node_type.NodeType.LEARNING_UNIT)
+                    node_obj for node_obj in self.get_all_learning_unit_nodes()
                     if node_obj.has_prerequisite
                 ),
                 key=lambda node_obj: node_obj.code
@@ -372,7 +368,6 @@ class ProgramTree(interface.RootEntity):
             )
         )
 
-    # TODO :: to remove because unused ?
     def count_usage(self, node: 'Node') -> int:
         return Counter(_nodes_from_root(self.root_node))[node]
 

@@ -31,7 +31,7 @@ from program_management.models.enums.node_type import NodeType
 
 
 def persist(tree: 'ProgramTree'):
-    all_learning_unit_nodes = tree.get_nodes_by_type(NodeType.LEARNING_UNIT)
+    all_learning_unit_nodes = tree.get_all_learning_unit_nodes()
     learning_unit_nodes_modified = [node for node in all_learning_unit_nodes if node.prerequisite.has_changed]
     for node in learning_unit_nodes_modified:
         _persist(tree.root_node, node)
