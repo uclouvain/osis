@@ -25,6 +25,7 @@
 ##############################################################################
 from enum import Enum
 
+from django.http import Http404
 from django.urls import reverse
 from django.views.generic import TemplateView
 from django.utils.translation import gettext_lazy as _
@@ -74,15 +75,10 @@ class CommonAggregateAdmissionCondition(PermissionRequiredMixin, TemplateView):
         try:
             return EducationGroupYear.objects.look_for_common(
                 academic_year__year=self.kwargs['year'],
-                education_group_type__name=TrainingType.AGGREGATION.name,
-                admissioncondition__isnull=False
+                education_group_type__name=TrainingType.AGGREGATION.name
             ).select_related('admissioncondition').get()
         except EducationGroupYear.DoesNotExist:
-            return EducationGroupYear.objects.look_for_common(
-                academic_year__year=self.kwargs['year'],
-                education_group_type__name=TrainingType.AGGREGATION.name,
-                admissioncondition__isnull=True
-            ).get()
+            raise Http404
 
     def get_publish_url(self):
         return reverse('publish_common_aggregate_admission_condition', kwargs={'year': self.kwargs['year']})
