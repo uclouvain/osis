@@ -23,8 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from collections import OrderedDict
-
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
@@ -33,7 +31,6 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 
 from base.ddd.utils.validation_message import MessageLevel
-from base.utils.urls import reverse_with_get
 from education_group.models.group_year import GroupYear
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd.repositories import persist_tree
