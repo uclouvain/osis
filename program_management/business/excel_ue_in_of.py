@@ -523,7 +523,7 @@ def _build_main_gathering_label(gathering_node: 'Node', tree_versions: List['Pro
             pgm_tree_version.version_label if pgm_tree_version else '',
             gathering_node.offer_partial_title_fr if gathering_node.is_finality() else gathering_node.group_title_fr,
             "[{}]".format(pgm_tree_version.title_fr)
-            if pgm_tree_version and not pgm_tree_version.is_standard_version else ''
+            if pgm_tree_version and pgm_tree_version.title_fr and not pgm_tree_version.is_standard_version else ''
         )
     return '-'
 
