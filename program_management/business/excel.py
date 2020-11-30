@@ -115,7 +115,7 @@ def _build_excel_lines(tree: 'ProgramTree') -> List:
             egy_acronym=tree.root_node.title + (
                 "[{}]".format(tree.root_node.version_name) if tree.root_node.version_name else ""
             ),
-            egy_title="{title} {version_title}".format(
+            egy_title="{title}{version_title}".format(
                 title=tree.root_node.group_title_en if language == LANGUAGE_CODE_EN else tree.root_node.group_title_fr,
                 version_title="[{}]".format(version_title) if version_title else ""
             ),
@@ -316,7 +316,7 @@ def _build_excel_lines_prerequisited(tree: 'ProgramTree') -> List:
             node_title=tree.root_node.title + (
                 "[{}]".format(tree.root_node.version_name) if tree.root_node.version_name else ""
             ),
-            tree_title="{title} {version_title}".format(
+            tree_title="{title}{version_title}".format(
                 title=tree.root_node.group_title_en if language == LANGUAGE_CODE_EN else tree.root_node.group_title_fr,
                 version_title="[{}]".format(version_title) if version_title else ""
             ),
