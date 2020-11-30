@@ -76,8 +76,8 @@ class QuickLearningUnitYearFilter(FilterSet):
 
     def get_queryset(self):
         # Need this close so as to return empty query by default when form is unbound
-        if not self.data or not all([self.data.get('acronym'),
-                                     self.data.get('title')]):
+        if not self.data or (not self.data.get('acronym')
+                             and not self.data.get('title')):
             return LearningUnitYear.objects.none()
         queryset = LearningUnitYear.objects_with_container.select_related(
             'academic_year',
