@@ -50,13 +50,10 @@ class PrerequisiteItemsValidator(BusinessValidator):
         codes_permitted = set()
         for path, node in tree.root_node.descendents:
             if node.is_learning_unit():
-                if tree.is_bachelor() and self._is_inside_minor_or_deepening(tree, node):
+                if tree.is_bachelor() and tree.is_inside_minor_or_deepening(node):
                     continue
                 codes_permitted.add(node.code)
         return list(sorted(codes_permitted))
-
-    def _is_inside_minor_or_deepening(self, tree: 'ProgramTree', node: 'Node') -> bool:
-        return bool(any(parent for parent in tree.get_all_parents(node) if parent.is_minor_or_deepening()))
 
     def validate(self, *args, **kwargs):
         codes_used_in_prerequisite_string = self._extract_acronyms()

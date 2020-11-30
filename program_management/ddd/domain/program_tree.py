@@ -202,6 +202,9 @@ class ProgramTree(interface.RootEntity):
     def is_root(self, node: 'Node'):
         return self.root_node == node
 
+    def is_inside_minor_or_deepening(self, node: 'Node') -> bool:
+        return bool(any(parent for parent in self.get_all_parents(node) if parent.is_minor_or_deepening()))
+
     def allows_learning_unit_child(self, node: 'Node') -> bool:
         try:
             return self.authorized_relationships.is_authorized(
