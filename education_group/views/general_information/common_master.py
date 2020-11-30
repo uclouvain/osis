@@ -25,7 +25,6 @@
 ##############################################################################
 from enum import Enum
 
-from django.http import Http404
 from django.urls import reverse
 from django.views.generic import TemplateView
 from django.utils.translation import gettext_lazy as _
@@ -34,6 +33,7 @@ from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import TrainingType
 from education_group.views.general_information.update_common_condition import UpdateCommonCondition
 from osis_role.contrib.views import PermissionRequiredMixin
+from base.models.admission_condition import AdmissionCondition
 
 
 class Tab(Enum):
@@ -51,7 +51,7 @@ class CommonMasterAdmissionCondition(PermissionRequiredMixin, TemplateView):
         return {
             **super().get_context_data(**kwargs),
             "object": object,
-            "admission_condition": object.admissioncondition,
+            "admission_condition": self.get_admission_condition(),
             "tab_urls": self.get_tab_urls(),
             "can_edit_information": self.request.user.has_perm(
                 "base.change_commonadmissioncondition", self.get_object()
@@ -78,7 +78,11 @@ class CommonMasterAdmissionCondition(PermissionRequiredMixin, TemplateView):
                 admissioncondition__isnull=False
             ).select_related('admissioncondition').get()
         except EducationGroupYear.DoesNotExist:
-            raise Http404
+            return EducationGroupYear.objects.look_for_common(
+                academic_year__year=self.kwargs['year'],
+                education_group_type__name=TrainingType.PGRM_MASTER_120.name,
+                admissioncondition__isnull=True
+            ).get()
 
     def get_publish_url(self):
         return reverse('publish_common_master_admission_condition', kwargs={'year': self.kwargs['year']})
@@ -90,6 +94,12 @@ class CommonMasterAdmissionCondition(PermissionRequiredMixin, TemplateView):
                 'year': self.kwargs['year'],
             }
         )
+
+    def get_admission_condition(self):
+        obj = self.get_object()
+        if(hasattr(obj, 'admissioncondition')):
+            return obj.admissioncondition
+        return AdmissionCondition.objects.get_or_create(education_group_year=obj)
 
 
 class UpdateCommonMasterAdmissionCondition(UpdateCommonCondition):
