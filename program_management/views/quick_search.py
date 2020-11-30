@@ -139,7 +139,10 @@ class QuickSearchGroupYearView(PermissionRequiredMixin, CacheFilterMixin, AjaxTe
         return context
 
     def render_to_response(self, context, **response_kwargs):
-        if context["form"].is_valid() and not context["paginator"].count:
+        if context["form"].is_valid() and not context["paginator"].count and \
+                (context["form"].data.get('acronym') or
+                 context["form"].data.get('partial_acronym') or
+                 context["form"].data.get('title')):
             messages.add_message(self.request, messages.WARNING, _('No result!'))
         return super().render_to_response(context, **response_kwargs)
 
@@ -191,7 +194,9 @@ class QuickSearchLearningUnitYearView(PermissionRequiredMixin, CacheFilterMixin,
         return context
 
     def render_to_response(self, context, **response_kwargs):
-        if context["form"].is_valid() and not context["paginator"].count:
+        if context["form"].is_valid() and not context["paginator"].count and \
+                (context["form"].data.get('acronym') or
+                 context["form"].data.get('title')):
             messages.add_message(self.request, messages.WARNING, _('No result!'))
         return super().render_to_response(context, **response_kwargs)
 
