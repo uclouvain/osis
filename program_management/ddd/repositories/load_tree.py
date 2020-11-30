@@ -64,7 +64,6 @@ def load_trees(tree_root_ids: List[int]) -> List['ProgramTree']:
     has_prerequisites = load_prerequisite.load_has_prerequisite_multiple(tree_root_ids, nodes)
     is_prerequisites = load_prerequisite.load_is_prerequisite_multiple(tree_root_ids, nodes)
     for tree_root_id in tree_root_ids:
-        # TODO : check this changes with Eddy
         root_node = load_node.load(tree_root_id)  # TODO : use load_multiple
         nodes[root_node.pk] = root_node
         tree_prerequisites = {
