@@ -346,6 +346,14 @@ class ProgramTree(interface.RootEntity):
     def get_all_learning_unit_nodes(self) -> List['NodeLearningUnitYear']:
         return self.root_node.get_all_children_as_learning_unit_nodes()
 
+    def get_nodes_permitted_as_prerequisite(self) -> List['NodeLearningUnitYear']:
+        nodes_permitted = set()
+        for node in self.get_all_learning_unit_nodes():
+            if self.is_bachelor() and self.is_inside_minor_or_deepening(node):
+                continue
+            nodes_permitted.add(node)
+        return list(sorted(nodes_permitted, key=lambda n: n.code))
+
     def get_nodes_that_have_prerequisites(self) -> List['NodeLearningUnitYear']:
         return list(
             sorted(

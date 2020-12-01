@@ -43,23 +43,13 @@ class PrerequisiteItemsValidator(BusinessValidator):
         self.prerequisite_string = prerequisite_string
         self.node = node
         self.program_tree = program_tree
-        self.codes_permitted = self.get_codes_permitted_as_prerequisite(self.program_tree)
-
-    # TODO :: place this function inside ProgramTree domain object?
-    def get_codes_permitted_as_prerequisite(self, tree: 'ProgramTree') -> List[str]:
-        codes_permitted = set()
-        for path, node in tree.root_node.descendents:
-            if node.is_learning_unit():
-                if tree.is_bachelor() and tree.is_inside_minor_or_deepening(node):
-                    continue
-                codes_permitted.add(node.code)
-        return list(sorted(codes_permitted))
+        self.codes_permitted = {n.code for n in self.program_tree.get_nodes_permitted_as_prerequisite()}
 
     def validate(self, *args, **kwargs):
         codes_used_in_prerequisite_string = self._extract_acronyms()
         codes_used_but_not_permitted = set(codes_used_in_prerequisite_string) - set(self.codes_permitted)
         if codes_used_but_not_permitted:
-            for code in codes_used_but_not_permitted:
+            for code in sorted(codes_used_but_not_permitted):
                 self.add_error_message(
                     _("The learning unit %(acronym)s is not contained inside the formation") % {'acronym': code}
                 )
