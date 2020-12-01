@@ -76,6 +76,8 @@ class QuickLearningUnitYearFilter(FilterSet):
 
     def get_queryset(self):
         # Need this close so as to return empty query by default when form is unbound
+        # 'changed_data' has been used instead of 'has_changed' here because the hidden field 'academic_year'
+        # which never is empty so need to check the 2 other fields of the form
         watched_form_fields = ['acronym', 'title']
         if not self.data or not any(field in self.form.changed_data for field in watched_form_fields):
             return LearningUnitYear.objects.none()
