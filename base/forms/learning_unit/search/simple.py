@@ -197,11 +197,12 @@ class LearningUnitFilter(FilterSet):
         )
         queryset = LearningUnitYearQuerySet.annotate_full_title_class_method(queryset)
         queryset = LearningUnitYearQuerySet.annotate_entities_allocation_and_requirement_acronym(queryset)
+
         queryset = queryset.annotate(
             type_ordering=Case(
-                When(externallearningunityear__isnull=True, then='learning_container_year__container_type'),
-                When(externallearningunityear__mobility=True, then=Value(str('MOBILITY'))),
-                When(externallearningunityear__mobility=False, then='learning_container_year__container_type'),
+                When(externallearningunityear__mobility=True, then=Value(str(_('Mobility')))),
+                *[When(learning_container_year__container_type=key, then=Value(str(_(val))))
+                  for i, (key, val) in enumerate(LearningContainerYearType.choices())],
                 default=Value(''),
                 output_field=CharField()
             )
