@@ -43,25 +43,17 @@
 
                         {% flag "learning_unit_create" %}
                             {% if "base.can_create_learningunit" in perms and can_create_partim %}
-                                <li {% if not is_person_linked_to_entity %}class="disabled"{% endif %}>
-                                    <a id="new_partim" {% if is_person_linked_to_entity %}
-                                       href="{% url 'learning_unit_create_partim' learning_unit_year_id=learning_unit_year.id %}" {% endif %}>
+                                <li {% if not is_person_linked_to_entity or proposal.type == 'CREATION' %}class="disabled"{% endif %}>
+                                    <a id="new_partim" {% if is_person_linked_to_entity or proposal.type == 'CREATION' %}
+                                       href="{% url 'learning_unit_create_partim' learning_unit_year_id=learning_unit_year.id %}" {% endif %}
+                                        data-toggle="tooltip"
+                                        {% if proposal.type == 'CREATION' %} disabled
+                                        title="{% trans 'You cannot create a partim for a learning unit in proposition of creation' %}"{% endif %}>
                                         {% trans 'New partim' %}
                                     </a>
                                 </li>
                                 <li class="divider"></li>
                             {% endif %}
-                        {% endflag %}
-
-                        {# This feature is used for managing tree in education group context #}
-                        {% flag "copy_education_group_to_cache" %}
-                            <li {% if not "base.can_edit_learningunit" in perms %}class="disabled"{% endif %}>
-                                <a {% if "base.can_edit_learningunit" in perms %} href="#"
-                                                                                  onclick="javascript:select()" {% endif %}>
-                                    {% trans 'Copy' %}
-                                </a>
-                            </li>
-                            <li class="divider"></li>
                         {% endflag %}
 
                         {% flag "learning_unit_update" %}
@@ -126,18 +118,3 @@
                 </div>
     {% endif %}
 {% endif %}
-
-{% block script %}
-    <script>
-        function select() {
-            $.ajax({
-                url: "{% url 'copy_learning_unit_to_cache' learning_unit_year_id=learning_unit_year.id %}",
-                dataType: 'json',
-                type: 'POST',
-                success: function (jsonResponse) {
-                    displayInfoMessage(jsonResponse, 'message_info_container');
-                }
-            });
-        }
-    </script>
-{% endblock %}

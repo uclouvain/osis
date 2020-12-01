@@ -28,7 +28,6 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
-from base.models import organization_address
 from base.models.enums import diploma_coorganization
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
@@ -48,14 +47,10 @@ class EducationGroupOrganization(models.Model):
     enrollment_place = models.BooleanField(default=False, verbose_name=_('Reference institution'))
     diploma = models.CharField(max_length=40,
                                choices=diploma_coorganization.COORGANIZATION_DIPLOMA_TYPE,
-                               default=diploma_coorganization.DiplomaCoorganizationTypes.NOT_CONCERNED.value,
+                               default=diploma_coorganization.DiplomaCoorganizationTypes.NOT_CONCERNED.name,
                                verbose_name=_('UCL Diploma'))
     is_producing_cerfificate = models.BooleanField(default=False, verbose_name=_('Producing certificat'))
     is_producing_annexe = models.BooleanField(default=False, verbose_name=_('Producing annexe'))
 
     class Meta:
         unique_together = ('education_group_year', 'organization', )
-
-    @cached_property
-    def address(self):
-        return organization_address.find_by_organization(self.organization).first()

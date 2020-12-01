@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
 ##############################################################################
 import itertools
 from typing import List
+from typing import Optional
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required, permission_required
@@ -52,15 +53,16 @@ from cms.models.translated_text_label import TranslatedTextLabel
 
 @login_required
 @permission_required('base.can_access_learningunit', raise_exception=True)
-def learning_unit_pedagogy(request, learning_unit_year_id):
+def learning_unit_pedagogy(request, learning_unit_year_id=None, code=None, year=None):
     if SEARCH_URL_PART in request.META.get('HTTP_REFERER', ''):
         add_to_session(request, 'search_url', request.META.get('HTTP_REFERER'))
-    return read_learning_unit_pedagogy(request, learning_unit_year_id, {}, "learning_unit/pedagogy.html")
+    return read_learning_unit_pedagogy(request, learning_unit_year_id, {}, "learning_unit/pedagogy.html", code,  year)
 
 
-def read_learning_unit_pedagogy(request, learning_unit_year_id, context, template):
+def read_learning_unit_pedagogy(request, learning_unit_year_id: int, context, template, code: Optional[str] = None,
+                                year: Optional[int] = None):
     person = get_object_or_404(Person, user=request.user)
-    context.update(get_common_context_learning_unit_year(learning_unit_year_id, person))
+    context.update(get_common_context_learning_unit_year(person, learning_unit_year_id, code, year))
 
     learning_unit_year = context['learning_unit_year']
     perm_to_edit = is_eligible_to_update_learning_unit_pedagogy(learning_unit_year, person)
@@ -68,6 +70,10 @@ def read_learning_unit_pedagogy(request, learning_unit_year_id, context, templat
         learning_unit_year,
         person
     )
+    luy_in_current_or_future_anac = not learning_unit_year.academic_year.is_past
+    context['luy_in_current_or_future_anac'] = luy_in_current_or_future_anac
+    context['enable_publish_button'] = (perm_to_edit or perm_to_edit_force_majeure) and luy_in_current_or_future_anac
+
     user_language = mdl.person.get_user_interface_language(request.user)
 
     cms_pedagogy_labels_translated = _get_cms_pedagogy_labels_translated(learning_unit_year_id, user_language)
