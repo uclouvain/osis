@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -29,13 +29,20 @@ from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from django_filters import FilterSet, filters, OrderingFilter
 
 from base.business.entity import get_entities_ids
-from base.forms.utils.filter_field import filter_field_by_regex
+from base.forms.utils.filter_field import filter_field_by_regex, espace_special_characters
 from base.models.academic_year import AcademicYear, starting_academic_year
 from base.models.enums import quadrimesters, learning_unit_year_subtypes, active_status, learning_container_year_types
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.views.learning_units.search.common import SearchTypes
+
+COMMON_ORDERING_FIELDS = (
+    ('academic_year__year', 'academic_year'), ('acronym', 'acronym'), ('full_title', 'title'),
+    ('learning_container_year__container_type', 'type'), ('subtype', 'subtype'),
+    ('entity_requirement', 'requirement_entity'), ('entity_allocation', 'allocation_entity'),
+    ('credits', 'credits'), ('status', 'status'), ('has_proposal', 'has_proposal'),
+)
 
 MOBILITY = 'mobility'
 MOBILITY_CHOICE = ((MOBILITY, _('Mobility')),)
@@ -46,11 +53,11 @@ class LearningUnitFilter(FilterSet):
         queryset=AcademicYear.objects.all(),
         required=False,
         label=_('Ac yr.'),
-        empty_label=pgettext_lazy("plural", "All"),
+        empty_label=pgettext_lazy("female plural", "All"),
     )
     acronym = filters.CharFilter(
         field_name="acronym",
-        lookup_expr="iregex",
+        method="filter_learning_unit_year_field",
         max_length=40,
         required=False,
         label=_('Code'),
@@ -81,7 +88,7 @@ class LearningUnitFilter(FilterSet):
         required=False,
         field_name="quadrimester",
         label=_('Quadri'),
-        empty_label=pgettext_lazy("plural", "All"),
+        empty_label=pgettext_lazy("male plural", "All"),
     )
 
     container_type = filters.ChoiceFilter(
@@ -89,7 +96,7 @@ class LearningUnitFilter(FilterSet):
         required=False,
         field_name="learning_container_year__container_type",
         label=_('Type'),
-        empty_label=pgettext_lazy("plural", "All"),
+        empty_label=pgettext_lazy("male plural", "All"),
         method="filter_container_type"
     )
     subtype = filters.ChoiceFilter(
@@ -97,14 +104,14 @@ class LearningUnitFilter(FilterSet):
         required=False,
         field_name="subtype",
         label=_('Subtype'),
-        empty_label=pgettext_lazy("plural", "All")
+        empty_label=pgettext_lazy("male plural", "All")
     )
     status = filters.ChoiceFilter(
         choices=active_status.ACTIVE_STATUS_LIST_FOR_FILTER,
         required=False,
         label=_('Status'),
         field_name="status",
-        empty_label=pgettext_lazy("plural", "All")
+        empty_label=pgettext_lazy("male plural", "All")
     )
     title = filters.CharFilter(
         field_name="full_title",
@@ -123,16 +130,7 @@ class LearningUnitFilter(FilterSet):
     order_by_field = 'ordering'
     ordering = OrderingFilter(
         fields=(
-            ('academic_year__year', 'academic_year'),
-            ('acronym', 'acronym'),
-            ('full_title', 'title'),
-            ('learning_container_year__container_type', 'type'),
-            ('subtype', 'subtype'),
-            ('entity_requirement', 'requirement_entity'),
-            ('entity_allocation', 'allocation_entity'),
-            ('credits', 'credits'),
-            ('status', 'status'),
-            ('has_proposal', 'has_proposal'),
+            COMMON_ORDERING_FIELDS
         ),
         widget=forms.HiddenInput
     )
@@ -157,7 +155,8 @@ class LearningUnitFilter(FilterSet):
         self.form.fields["academic_year"].initial = starting_academic_year()
 
     def filter_tutor(self, queryset, name, value):
-        for tutor_name in value.split():
+        search_value = espace_special_characters(value)
+        for tutor_name in search_value.split():
             queryset = queryset.filter(
                 Q(learningcomponentyear__attributionchargenew__attribution__tutor__person__first_name__iregex=tutor_name
                   ) |
@@ -173,7 +172,10 @@ class LearningUnitFilter(FilterSet):
         return queryset.filter(learning_container_year__container_type=value)
 
     def filter_entity(self, queryset, name, value):
-        return filter_by_entities(name, queryset, value, self.form.cleaned_data['with_entity_subordinated'])
+        return filter_by_entities(name,
+                                  queryset,
+                                  espace_special_characters(value),
+                                  self.form.cleaned_data['with_entity_subordinated'])
 
     def get_queryset(self):
         # Need this close so as to return empty query by default when form is unbound

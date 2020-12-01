@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,21 +23,30 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from base.models.group_element_year import find_learning_unit_roots
-from program_management.views.generic import LearningUnitGenericDetailView
+from education_group.models.group_year import GroupYear
+from osis_role.contrib.views import PermissionRequiredMixin
+from program_management.ddd.domain.node import NodeIdentity
+from program_management.ddd.repositories.node import NodeRepository
+from program_management.ddd.service.read.search_program_trees_using_node_service import search_program_trees_using_node
+from program_management.serializers.program_trees_utilizations import utilizations_serializer
+from program_management.views.generic import LearningUnitGeneric, Tab
 
 
-class LearningUnitUtilization(LearningUnitGenericDetailView):
+class LearningUnitUtilization(PermissionRequiredMixin, LearningUnitGeneric):
     template_name = "learning_unit/tab_utilization.html"
+
+    active_tab = Tab.UTILIZATION
+    permission_required = 'base.view_educationgroup'
+    raise_exception = True
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["group_element_years"] = self.object.child_leaf.select_related("parent")
-        context["formations"] = find_learning_unit_roots(
-            list(grp.parent for grp in self.object.child_leaf.select_related("parent")),
-            return_result_params={
-                'parents_as_instances': True
-            },
-            luy=self.object
+        context['direct_parents'] = utilizations_serializer(
+            NodeIdentity(code=self.node.code, year=self.node.year),
+            search_program_trees_using_node,
+            NodeRepository()
         )
         return context
+
+    def get_permission_object(self):
+        return GroupYear.objects.get(element__pk=self.program_tree.root_node.pk)

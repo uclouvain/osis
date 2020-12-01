@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -74,6 +74,7 @@ class RulesRequiredMixin(UserPassesTestMixin):
 class AjaxTemplateMixin:
     ajax_template_suffix = "_inner"
     partial_reload = None
+    force_reload = False
 
     def get_template_names(self):
         template_names = super().get_template_names()
@@ -113,11 +114,13 @@ class AjaxTemplateMixin:
                 response['success_url'] = url
             if self.partial_reload:
                 response['partial_reload'] = self.partial_reload
+            if self.force_reload:
+                response['force_reload'] = self.force_reload
             return JsonResponse(response)
 
 
 class DeleteViewWithDependencies(FlagMixin, RulesRequiredMixin, AjaxTemplateMixin, DeleteView):
-    success_message = "The objects are been deleted successfully"
+    success_message = _("The objects are been deleted successfully")
     protected_template = None
     protected_messages = None
 
@@ -139,7 +142,7 @@ class DeleteViewWithDependencies(FlagMixin, RulesRequiredMixin, AjaxTemplateMixi
 
     def delete(self, request, *args, **kwargs):
         result = super().delete(request, *args, **kwargs)
-        common.display_success_messages(request, _(self.success_message))
+        common.display_success_messages(request, self.success_message)
         return result
 
 

@@ -26,21 +26,39 @@
 from django.conf import settings
 from rest_framework import serializers
 
-from base.models.education_group_year import EducationGroupYear
+from program_management.models.education_group_version import EducationGroupVersion
 
 
 class EducationGroupTitleSerializer(serializers.ModelSerializer):
     title = serializers.SerializerMethodField()
 
     class Meta:
-        model = EducationGroupYear
+        model = EducationGroupVersion
         fields = (
             'title',
         )
 
-    def get_title(self, education_group_year):
-        language = self.context.get('language')
-        return getattr(
-            education_group_year,
-            'title' + ('_english' if language and language not in settings.LANGUAGE_CODE_FR else '')
+    @staticmethod
+    def get_title(version):
+        return _get_offer_title_from_lang(version, settings.LANGUAGE_CODE_FR)
+
+
+class EducationGroupTitleAllLanguagesSerializer(EducationGroupTitleSerializer):
+    title_en = serializers.SerializerMethodField()
+
+    class Meta(EducationGroupTitleSerializer.Meta):
+        fields = EducationGroupTitleSerializer.Meta.fields + (
+            'title_en',
         )
+
+    @staticmethod
+    def get_title_en(version):
+        return _get_offer_title_from_lang(version, settings.LANGUAGE_CODE_EN)
+
+
+def _get_offer_title_from_lang(version, lang: str):
+    version_field_name = 'title' + ('_en' if lang == settings.LANGUAGE_CODE_EN else '_fr')
+    title = getattr(version.offer, 'title' + ('_english' if lang == settings.LANGUAGE_CODE_EN else ''))
+    version_title = getattr(version, version_field_name)
+    title_suffix = ' [{}]'.format(version_title) if version_title else ''
+    return title + title_suffix if title else None

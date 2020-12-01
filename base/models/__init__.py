@@ -14,8 +14,8 @@ from base.models import education_group_year
 from base.models import education_group_year_domain
 from base.models import entity
 from base.models import entity_calendar
-from base.models import entity_manager
 from base.models import entity_version
+from base.models import entity_version_address
 from base.models import exam_enrollment
 from base.models import external_learning_unit_year
 from base.models import external_learning_unit_year
@@ -39,13 +39,11 @@ from base.models import offer_year_calendar
 from base.models import offer_year_domain
 from base.models import offer_year_entity
 from base.models import organization
-from base.models import organization_address
 from base.models import person
 from base.models import person_address
 from base.models import person_entity
 from base.models import prerequisite
 from base.models import prerequisite_item
-from base.models import program_manager
 from base.models import proposal_learning_unit
 from base.models import session_exam
 from base.models import session_exam_calendar
