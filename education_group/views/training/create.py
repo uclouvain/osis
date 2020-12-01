@@ -21,7 +21,7 @@ from education_group.ddd.domain.exception import ContentConstraintTypeMissing, \
     AcronymAlreadyExist, CodeAlreadyExistException, \
     HopsFieldsAllOrNone, AresCodeShouldBeGreaterOrEqualsThanZeroAndLessThan9999, \
     AresGracaShouldBeGreaterOrEqualsThanZeroAndLessThan9999, \
-    AresAuthorizationShouldBeGreaterOrEqualsThanZeroAndLessThan9999, StartYearGreaterThanEndYearException
+    AresAuthorizationShouldBeGreaterOrEqualsThanZeroAndLessThan9999, StartYearGreaterThanEndYear
 from education_group.ddd.domain.training import TrainingIdentity
 from education_group.ddd.service.read import get_group_service
 from education_group.forms.training import CreateTrainingForm
@@ -134,9 +134,9 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                             isinstance(e, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum):
                         training_form.add_error('min_constraint', e.message)
                         training_form.add_error('max_constraint', '')
-                    elif isinstance(e, StartYearGreaterThanEndYearException):
-                        training_form.add_error('academic_year', e.message)
-                        training_form.add_error('end_year', '')
+                    elif isinstance(e, StartYearGreaterThanEndYear):
+                        training_form.add_error('end_year', e.message)
+                        training_form.add_error('academic_year', '')
                     elif isinstance(e, HopsFieldsAllOrNone) or \
                             isinstance(e, AresCodeShouldBeGreaterOrEqualsThanZeroAndLessThan9999):
                         training_form.add_error('ares_code', e.message)
