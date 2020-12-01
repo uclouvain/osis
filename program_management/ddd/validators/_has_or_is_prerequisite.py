@@ -67,7 +67,10 @@ class _IsPrerequisiteValidator(business_validator.BusinessValidator):
         if self.node_to_detach.is_learning_unit():
             learning_unit_nodes_detached.append(self.node_to_detach)
 
-        return {n for n in learning_unit_nodes_detached if n.is_prerequisite}
+        return {
+            n for n in learning_unit_nodes_detached
+            if n.is_prerequisite and self.tree.count_usage(n) <= 1
+        }
 
 
 class _HasPrerequisiteValidator(business_validator.BusinessValidator):
@@ -90,4 +93,7 @@ class _HasPrerequisiteValidator(business_validator.BusinessValidator):
         if self.node_to_detach.is_learning_unit():
             learning_unit_nodes_removed.append(self.node_to_detach)
 
-        return {node for node in learning_unit_nodes_removed if node.has_prerequisite}
+        return {
+            node for node in learning_unit_nodes_removed
+            if node.has_prerequisite and self.tree.count_usage(node) <= 1
+        }

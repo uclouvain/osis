@@ -268,6 +268,9 @@ class Node(interface.Entity):
     def is_common_core(self) -> bool:
         return self.node_type == GroupType.COMMON_CORE
 
+    def is_bachelor(self) -> bool:
+        return self.node_type == TrainingType.BACHELOR
+
     def is_indirect_parent(self) -> bool:
         return self.is_training() or self.is_minor_or_deepening()
 

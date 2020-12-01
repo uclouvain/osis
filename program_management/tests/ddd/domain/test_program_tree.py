@@ -249,45 +249,17 @@ class TestGetNodePath(SimpleTestCase):
         )
 
 
-class TestGetCNodesByType(SimpleTestCase):
+class TestGetAllLearningUnitNodes(SimpleTestCase):
     def setUp(self):
         link = LinkFactory(child=NodeGroupYearFactory())
         self.root_node = link.parent
-        self.subgroup_node = link.child
-
         self.tree = ProgramTreeFactory(root_node=self.root_node)
 
     def test_should_return_empty_list_if_no_matching_type(self):
-        result = self.tree.get_nodes_by_type(node_type.NodeType.LEARNING_UNIT)
+        result = self.tree.get_all_learning_unit_nodes()
         self.assertCountEqual(
             result,
             []
-        )
-
-    def test_should_return_all_nodes_with_specific_node_type(self):
-        result = self.tree.get_nodes_by_type(node_type.NodeType.GROUP)
-        self.assertCountEqual(
-            result,
-            [self.subgroup_node, self.root_node]
-        )
-
-
-class TestGetCodesPermittedAsPrerequisite(SimpleTestCase):
-    def setUp(self):
-        link = LinkFactory(child=NodeGroupYearFactory())
-        self.root_node = link.parent
-        self.subgroup_node = link.child
-
-        self.tree = ProgramTreeFactory(root_node=self.root_node)
-
-    def test_should_return_codes_of_all_learning_unit_nodes(self):
-        LinkFactory(parent=self.root_node, child=NodeLearningUnitYearFactory(code='LOSIS452'))
-        LinkFactory(parent=self.root_node, child=NodeLearningUnitYearFactory(code="LT"))
-
-        result = self.tree.get_codes_permitted_as_prerequisite()
-        self.assertCountEqual(
-            result,
-            ["LOSIS452", "LT"]
         )
 
 
@@ -634,15 +606,15 @@ class TestGetCodesPermittedAsPrerequisite(SimpleTestCase):
     def test_when_tree_contains_learning_units(self):
         link_with_learn_unit = LinkFactory(parent=self.tree.root_node, child=NodeLearningUnitYearFactory())
         link_with_group = LinkFactory(parent=self.tree.root_node, child=NodeGroupYearFactory())
-        result = self.tree.get_codes_permitted_as_prerequisite()
-        expected_result = [link_with_learn_unit.child.code]
+        result = self.tree.get_nodes_permitted_as_prerequisite()
+        expected_result = [link_with_learn_unit.child]
         self.assertListEqual(result, expected_result)
-        self.assertNotIn(link_with_group.child.code, result)
+        self.assertNotIn(link_with_group.child, result)
 
     def test_when_tree_contains_only_groups(self):
         link_with_group1 = LinkFactory(parent=self.tree.root_node, child=NodeGroupYearFactory())
         link_with_group2 = LinkFactory(parent=self.tree.root_node, child=NodeGroupYearFactory())
-        result = self.tree.get_codes_permitted_as_prerequisite()
+        result = self.tree.get_nodes_permitted_as_prerequisite()
         expected_result = []
         self.assertListEqual(result, expected_result)
 
@@ -650,8 +622,8 @@ class TestGetCodesPermittedAsPrerequisite(SimpleTestCase):
         link_with_learn_unit1 = LinkFactory(parent=self.tree.root_node, child=NodeLearningUnitYearFactory(code='c2'))
         link_with_learn_unit2 = LinkFactory(parent=self.tree.root_node, child=NodeLearningUnitYearFactory(code='c1'))
         link_with_learn_unit3 = LinkFactory(parent=self.tree.root_node, child=NodeLearningUnitYearFactory(code='c3'))
-        result = self.tree.get_codes_permitted_as_prerequisite()
-        expected_result_order = ['c1', 'c2', 'c3']
+        result = self.tree.get_nodes_permitted_as_prerequisite()
+        expected_result_order = [link_with_learn_unit2.child, link_with_learn_unit1.child, link_with_learn_unit3.child]
         self.assertListEqual(result, expected_result_order)
 
 

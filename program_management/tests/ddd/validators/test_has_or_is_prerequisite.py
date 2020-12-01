@@ -79,6 +79,21 @@ class TestIsPrerequisiteValidator(TestValidatorValidateMixin, SimpleTestCase):
         with self.assertRaises(CannotDetachLearningUnitsWhoArePrerequisiteException):
             _IsPrerequisiteValidator(self.tree, node_to_detach).validate()
 
+    def test_should_not_raise_exception_when_node_to_detach_is_prerequisite_twice(self):
+        learning_unit_that_is_prerequisite = NodeLearningUnitYearFactory(is_prerequisite_of=[self.node_learning_unit])
+        link_with_child_is_prerequisite = LinkFactory(
+            parent=self.common_core,
+            child=learning_unit_that_is_prerequisite  # learning unit used once
+        )
+        link_with_child_is_prerequisite_2 = LinkFactory(
+            parent=self.tree.root_node,
+            child=learning_unit_that_is_prerequisite  # learning unit used twice
+        )
+        node_to_detach = link_with_child_is_prerequisite.child
+
+        assertion = "While the prerequisite is used more than once in the same tree, we can detach it"
+        self.assertValidatorNotRaises(_IsPrerequisiteValidator(self.tree, node_to_detach))
+
 
 class TestHasPrerequisiteValidator(TestValidatorValidateMixin, SimpleTestCase):
 
@@ -118,3 +133,25 @@ class TestHasPrerequisiteValidator(TestValidatorValidateMixin, SimpleTestCase):
 
         with self.assertRaises(CannotDetachLearningUnitsWhoHavePrerequisiteException):
             _HasPrerequisiteValidator(tree, node_to_detach_has_prerequisite).validate()
+
+    def test_should_not_raise_exception_when_node_to_detach_has_prerequisite_twice(self):
+        tree = ProgramTreeFactory()
+        LinkFactory(
+            parent=tree.root_node,
+            child=self.node_is_prerequisite,
+        )
+        LinkFactory(
+            parent=tree.root_node,
+            child=LinkFactory(
+                child=self.node_has_prerequisite
+            ).parent
+        )  # node_has_prerequisite used once
+        LinkFactory(
+            parent=tree.root_node,
+            child=LinkFactory(
+                child=self.node_has_prerequisite
+            ).parent
+        )  # node_has_prerequisite used twice
+
+        assertion = "While the prerequisite is used more than once in the same tree, we can detach it"
+        self.assertValidatorNotRaises(_HasPrerequisiteValidator(tree, self.node_has_prerequisite))

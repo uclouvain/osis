@@ -196,8 +196,14 @@ class ProgramTree(interface.RootEntity):
     def is_master_2m(self):
         return self.root_node.is_master_2m()
 
+    def is_bachelor(self) -> bool:
+        return self.root_node.is_bachelor()
+
     def is_root(self, node: 'Node'):
         return self.root_node == node
+
+    def is_inside_minor_or_deepening(self, node: 'Node') -> bool:
+        return bool(any(parent for parent in self.get_all_parents(node) if parent.is_minor_or_deepening()))
 
     def allows_learning_unit_child(self, node: 'Node') -> bool:
         try:
@@ -226,7 +232,7 @@ class ProgramTree(interface.RootEntity):
         return _get_parents(child_node)
 
     def get_all_parents(self, child_node: 'Node') -> Set['Node']:
-        paths_using_node = self.get_paths_from_node(child_node)
+        paths_using_node = self.search_paths_using_node(child_node)
         return set(
             itertools.chain.from_iterable(self.get_parents(path) for path in paths_using_node)
         )
@@ -340,23 +346,24 @@ class ProgramTree(interface.RootEntity):
     def get_all_learning_unit_nodes(self) -> List['NodeLearningUnitYear']:
         return self.root_node.get_all_children_as_learning_unit_nodes()
 
-    def get_nodes_by_type(self, node_type_value) -> Set['Node']:
-        return {node for node in self.get_all_nodes() if node.type == node_type_value}
+    def get_nodes_permitted_as_prerequisite(self) -> List['NodeLearningUnitYear']:
+        nodes_permitted = set()
+        for node in self.get_all_learning_unit_nodes():
+            if self.is_bachelor() and self.is_inside_minor_or_deepening(node):
+                continue
+            nodes_permitted.add(node)
+        return list(sorted(nodes_permitted, key=lambda n: n.code))
 
     def get_nodes_that_have_prerequisites(self) -> List['NodeLearningUnitYear']:
         return list(
             sorted(
                 (
-                    node_obj for node_obj in self.get_nodes_by_type(node_type.NodeType.LEARNING_UNIT)
+                    node_obj for node_obj in self.get_all_learning_unit_nodes()
                     if node_obj.has_prerequisite
                 ),
                 key=lambda node_obj: node_obj.code
             )
         )
-
-    def get_codes_permitted_as_prerequisite(self) -> List[str]:
-        learning_unit_nodes_contained_in_program = self.get_nodes_by_type(node_type.NodeType.LEARNING_UNIT)
-        return list(sorted(node_obj.code for node_obj in learning_unit_nodes_contained_in_program))
 
     def get_nodes_that_are_prerequisites(self) -> List['NodeLearningUnitYear']:  # TODO :: unit test
         return list(
@@ -589,12 +596,11 @@ class ProgramTree(interface.RootEntity):
             paths_by_node[child_node].append(path)
         return paths_by_node
 
-    # TODO : to rename into "search_paths_using_node"
-    def get_paths_from_node(self, node: 'Node') -> List['Path']:
+    def search_paths_using_node(self, node: 'Node') -> List['Path']:
         return self._paths_by_node().get(node) or []
 
     def search_indirect_parents(self, node: 'Node') -> List['NodeGroupYear']:
-        paths = self.get_paths_from_node(node)
+        paths = self.search_paths_using_node(node)
         indirect_parents = []
         for path in paths:
             for parent in self.get_parents(path):
