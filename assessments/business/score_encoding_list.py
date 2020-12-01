@@ -271,7 +271,7 @@ class ScoresEncodingList:
     def remaining_drafts_to_submit_before_deadlines(self):
         return [
             enrollment for enrollment in self.enrollments
-            if enrollment.is_draft and not enrollment.is_final and enrollment.deadline_tutor_reached
+            if enrollment.is_draft and not enrollment.is_final and not enrollment.deadline_tutor_reached
         ]
 
     @property
