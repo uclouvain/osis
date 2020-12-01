@@ -27,6 +27,7 @@ import re
 from collections import namedtuple, defaultdict
 from typing import Dict, List
 
+from django.conf import settings
 from django.template.defaultfilters import yesno
 from django.utils import translation
 from django.utils.translation import gettext as _
@@ -515,17 +516,35 @@ def _build_direct_gathering_label(direct_gathering_node: 'NodeGroupYear') -> str
 
 def _build_main_gathering_label(gathering_node: 'Node', tree_versions: List['ProgramTreeVersion']) -> str:
     if gathering_node:
-        pgm_tree_version = _get_program_tree_version_from_tree_versions_list(gathering_node.year,
-                                                                             gathering_node.code,
-                                                                             tree_versions)
+        pgm_tree_version = _get_program_tree_version_from_tree_versions_list(
+            gathering_node.year, gathering_node.code, tree_versions
+        )
+        language = translation.get_language()
+        node_title = _get_gathering_node_title(gathering_node, language)
+        node_version_title = _get_gathering_node_version_title(pgm_tree_version, language)
         return "{}{} - {}{}".format(
             gathering_node.title,
             pgm_tree_version.version_label if pgm_tree_version else '',
-            gathering_node.offer_partial_title_fr if gathering_node.is_finality() else gathering_node.group_title_fr,
-            "[{}]".format(pgm_tree_version.title_fr)
-            if pgm_tree_version and pgm_tree_version.title_fr and not pgm_tree_version.is_standard_version else ''
+            node_title,
+            node_version_title
         )
     return '-'
+
+
+def _get_gathering_node_title(gathering_node: 'Node', language: str):
+    is_finality = gathering_node.is_finality()
+    if language == settings.LANGUAGE_CODE_EN:
+        return gathering_node.offer_partial_title_en if is_finality else gathering_node.group_title_en
+    return gathering_node.offer_partial_title_fr if is_finality else gathering_node.group_title_fr
+
+
+def _get_gathering_node_version_title(pgm_tree_version: 'ProgramTreeVersion', language: str):
+    if pgm_tree_version and not pgm_tree_version.is_standard_version:
+        if language == settings.LANGUAGE_CODE_EN and pgm_tree_version.title_en:
+            return "[{}]".format(pgm_tree_version.title_en)
+        elif language == settings.LANGUAGE_CODE_FR and pgm_tree_version.title_fr:
+            return "[{}]".format(pgm_tree_version.title_fr)
+    return ""
 
 
 def volumes_information(lecturing_volume, practical_volume):
