@@ -52,7 +52,7 @@ class TestPrerequisiteItemsValidator(SimpleTestCase):
 
     def test_should_be_valid_when_empty_prerequisite_string(self):
         prerequisite_string = ""
-        node = NodeLearningUnitYearFactory()
+        node = self.program_tree.root_node.children_as_nodes[0]
         self.assertTrue(
             PrerequisiteItemsValidator(prerequisite_string, node, self.program_tree).is_valid()
         )
@@ -74,6 +74,7 @@ class TestPrerequisiteItemsValidator(SimpleTestCase):
     def test_should_be_valid_when_codes_used_in_prerequisite_string_are_permitted(self):
         prerequisite_string = "LOSIS1121 ET MARC2547 ET (BREM5890 OU MECK8960)"
         node = NodeLearningUnitYearFactory()
+        LinkFactory(parent=self.program_tree.root_node, child=node)
         self.assertTrue(
             PrerequisiteItemsValidator(prerequisite_string, node, self.program_tree).is_valid()
         )
@@ -88,23 +89,33 @@ class TestPrerequisiteItemsValidator(SimpleTestCase):
         )
         for mini_training_type in minor_or_deepening_types:
             with self.subTest(mini_training_type=mini_training_type):
+                """
+                root
+                  |--- LOSIS1000
+                  |--- minor
+                        |--- LOSIS9999
+                """
                 program_tree = ProgramTreeFactory(root_node__node_type=TrainingType.BACHELOR)
                 minor = NodeGroupYearFactory(node_id=9999, node_type=mini_training_type)
-                ue = NodeLearningUnitYearFactory()
+                ue_in_bachelor = NodeLearningUnitYearFactory(code="LOSIS1000")
                 LinkFactory(
-                    parent=self.program_tree.root_node,
-                    child=ue
+                    parent=program_tree.root_node,
+                    child=ue_in_bachelor
                 )
                 LinkFactory(
                     parent=program_tree.root_node,
                     child=minor
                 )
-                code_not_permitted = "LOSIS9999"
+                ue_in_minor = NodeLearningUnitYearFactory(code="LOSIS9999")
                 LinkFactory(
                     parent=minor,
-                    child=NodeLearningUnitYearFactory(code=code_not_permitted)
+                    child=ue_in_minor
                 )
-                prerequisite_string = code_not_permitted
+                prerequisite_string = "LOSIS9999"
                 self.assertFalse(
-                    PrerequisiteItemsValidator(prerequisite_string, ue, program_tree).is_valid()
+                    PrerequisiteItemsValidator(prerequisite_string, ue_in_bachelor, program_tree).is_valid()
+                )
+                prerequisite_string = 'LOSIS1000'
+                self.assertFalse(
+                    PrerequisiteItemsValidator(prerequisite_string, ue_in_minor, program_tree).is_valid()
                 )

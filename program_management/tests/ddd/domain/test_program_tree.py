@@ -626,6 +626,24 @@ class TestGetCodesPermittedAsPrerequisite(SimpleTestCase):
         expected_result_order = [link_with_learn_unit2.child, link_with_learn_unit1.child, link_with_learn_unit3.child]
         self.assertListEqual(result, expected_result_order)
 
+    def test_when_node_is_used_inside_minor_and_inside_the_bachelor(self):
+        tree = ProgramTreeFactory(root_node__node_type=TrainingType.BACHELOR)
+        minor = NodeGroupYearFactory()
+        ue = NodeLearningUnitYearFactory()
+
+        LinkFactory(
+            parent=tree.root_node,
+            child=LinkFactory(
+                parent=minor,
+                child=ue
+            ).parent
+        )
+        LinkFactory(parent=tree.root_node, child=ue)
+
+        result = tree.get_nodes_permitted_as_prerequisite()
+        expected_result = [ue]
+        self.assertListEqual(result, expected_result)
+
 
 class TestGetAllFinalities(SimpleTestCase):
 

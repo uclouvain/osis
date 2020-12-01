@@ -202,8 +202,12 @@ class ProgramTree(interface.RootEntity):
     def is_root(self, node: 'Node'):
         return self.root_node == node
 
-    def is_inside_minor_or_deepening(self, node: 'Node') -> bool:
-        return bool(any(parent for parent in self.get_all_parents(node) if parent.is_minor_or_deepening()))
+    def is_used_only_inside_minor_or_deepening(self, node: 'Node') -> bool:
+        usages = []
+        for path in self.search_paths_using_node(node):
+            inside_minor_or_deepening = any(p for p in self.get_parents(path) if p.is_minor_or_deepening())
+            usages.append(inside_minor_or_deepening)
+        return all(usages)
 
     def allows_learning_unit_child(self, node: 'Node') -> bool:
         try:
@@ -349,7 +353,7 @@ class ProgramTree(interface.RootEntity):
     def get_nodes_permitted_as_prerequisite(self) -> List['NodeLearningUnitYear']:
         nodes_permitted = set()
         for node in self.get_all_learning_unit_nodes():
-            if self.is_bachelor() and self.is_inside_minor_or_deepening(node):
+            if self.is_bachelor() and self.is_used_only_inside_minor_or_deepening(node):
                 continue
             nodes_permitted.add(node)
         return list(sorted(nodes_permitted, key=lambda n: n.code))
