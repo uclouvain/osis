@@ -22,8 +22,8 @@
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
 from base.ddd.utils import business_validator
-from education_group.ddd.domain import exception
 from education_group.ddd.business_types import *
+from education_group.ddd.domain import exception
 
 
 class StartYearEndYearValidator(business_validator.BusinessValidator):

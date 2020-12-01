@@ -135,8 +135,8 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                         training_form.add_error('min_constraint', e.message)
                         training_form.add_error('max_constraint', '')
                     elif isinstance(e, StartYearGreaterThanEndYearException):
-                        training_form.add_error('academic_year', e.message)
-                        training_form.add_error('end_year', '')
+                        training_form.add_error('end_year', e.message)
+                        training_form.add_error('academic_year', '')
                     elif isinstance(e, HopsFieldsAllOrNone) or \
                             isinstance(e, AresCodeShouldBeGreaterOrEqualsThanZeroAndLessThan9999):
                         training_form.add_error('ares_code', e.message)

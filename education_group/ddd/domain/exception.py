@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import List, Dict
+from typing import List
 
 from django.utils.translation import gettext_lazy as _, ngettext_lazy
 
@@ -101,7 +101,7 @@ class ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum(BusinessExcepti
 
 class StartYearGreaterThanEndYearException(BusinessException):
     def __init__(self, *args, **kwargs):
-        message = _("Validity cannot be greater than last year of organization")
+        message = _('End year must be greater than or equal to the start year')
         super().__init__(message, **kwargs)
 
 
