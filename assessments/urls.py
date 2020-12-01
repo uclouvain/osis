@@ -31,9 +31,10 @@ from assessments.views.pgm_manager_administration import ProgramManagerListView,
     ProgramManagerCreateView, PersonAutocomplete, MainProgramManagerUpdateView, MainProgramManagerPersonUpdateView, \
     ProgramManagerPersonDeleteView
 from assessments.views.scores_responsible import ScoresResponsibleSearch
-
+import base.views.learning_units.testo
+#
 urlpatterns = [
-
+    url(r'^testo/$', base.views.learning_units.testo.test, name='testo'),
     url(r'^scores_encoding/', include([
         url(r'^$', score_encoding.scores_encoding, name='scores_encoding'),
         url(r'^outside_period/$',
