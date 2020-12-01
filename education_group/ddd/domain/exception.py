@@ -101,7 +101,7 @@ class ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum(BusinessExcepti
 
 class StartYearGreaterThanEndYearException(BusinessException):
     def __init__(self, *args, **kwargs):
-        message = _('End year must be greater than the start year, or equal')
+        message = _('End year must be greater than or equal to the start year')
         super().__init__(message, **kwargs)
 
 
