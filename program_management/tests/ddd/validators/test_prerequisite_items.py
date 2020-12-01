@@ -88,23 +88,33 @@ class TestPrerequisiteItemsValidator(SimpleTestCase):
         )
         for mini_training_type in minor_or_deepening_types:
             with self.subTest(mini_training_type=mini_training_type):
+                """
+                root
+                  |--- LOSIS1000
+                  |--- minor
+                        |--- LOSIS9999
+                """
                 program_tree = ProgramTreeFactory(root_node__node_type=TrainingType.BACHELOR)
                 minor = NodeGroupYearFactory(node_id=9999, node_type=mini_training_type)
-                ue = NodeLearningUnitYearFactory()
+                ue_in_bachelor = NodeLearningUnitYearFactory(code="LOSIS1000")
                 LinkFactory(
-                    parent=self.program_tree.root_node,
-                    child=ue
+                    parent=program_tree.root_node,
+                    child=ue_in_bachelor
                 )
                 LinkFactory(
                     parent=program_tree.root_node,
                     child=minor
                 )
-                code_not_permitted = "LOSIS9999"
+                ue_in_minor = NodeLearningUnitYearFactory(code="LOSIS9999")
                 LinkFactory(
                     parent=minor,
-                    child=NodeLearningUnitYearFactory(code=code_not_permitted)
+                    child=ue_in_minor
                 )
-                prerequisite_string = code_not_permitted
+                prerequisite_string = "LOSIS9999"
                 self.assertFalse(
-                    PrerequisiteItemsValidator(prerequisite_string, ue, program_tree).is_valid()
+                    PrerequisiteItemsValidator(prerequisite_string, ue_in_bachelor, program_tree).is_valid()
+                )
+                prerequisite_string = 'LOSIS1000'
+                self.assertFalse(
+                    PrerequisiteItemsValidator(prerequisite_string, ue_in_minor, program_tree).is_valid()
                 )
