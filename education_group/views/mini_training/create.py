@@ -101,7 +101,7 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
                         isinstance(e, exception.ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum):
                     form.add_error('min_constraint', e.message)
                     form.add_error('max_constraint', '')
-                elif isinstance(e, exception.StartYearGreaterThanEndYear):
+                elif isinstance(e, exception.StartYearGreaterThanEndYearException):
                     form.add_error('end_year', e.message)
                     form.add_error('academic_year', '')
                 else:

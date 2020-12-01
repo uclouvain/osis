@@ -29,7 +29,7 @@ from education_group.ddd.validators import start_and_end_year_validator
 
 class TestStartAndEndYearValidator(SimpleTestCase):
     def test_should_raise_exception_when_start_year_strictly_superior_than_end_year(self):
-        with self.assertRaises(exception.StartYearGreaterThanEndYear):
+        with self.assertRaises(exception.StartYearGreaterThanEndYearException):
             start_and_end_year_validator.StartAndEndYearValidator(2019, 2018).validate()
 
     def test_should_not_raise_exception_when_start_year_inferior_to_end_year(self):
