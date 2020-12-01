@@ -52,7 +52,7 @@ class TestPrerequisiteItemsValidator(SimpleTestCase):
 
     def test_should_be_valid_when_empty_prerequisite_string(self):
         prerequisite_string = ""
-        node = NodeLearningUnitYearFactory()
+        node = self.program_tree.root_node.children_as_nodes[0]
         self.assertTrue(
             PrerequisiteItemsValidator(prerequisite_string, node, self.program_tree).is_valid()
         )
@@ -74,6 +74,7 @@ class TestPrerequisiteItemsValidator(SimpleTestCase):
     def test_should_be_valid_when_codes_used_in_prerequisite_string_are_permitted(self):
         prerequisite_string = "LOSIS1121 ET MARC2547 ET (BREM5890 OU MECK8960)"
         node = NodeLearningUnitYearFactory()
+        LinkFactory(parent=self.program_tree.root_node, child=node)
         self.assertTrue(
             PrerequisiteItemsValidator(prerequisite_string, node, self.program_tree).is_valid()
         )
