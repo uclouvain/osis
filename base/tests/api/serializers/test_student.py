@@ -23,31 +23,22 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.http import JsonResponse
+from django.test import TestCase
 
-from base.models.campus import Campus
-from base.models.organization_address import find_distinct_by_country
-from osis_common.decorators.ajax import ajax_required
-
-
-# TODO :: On peut combiner les différentes vues en faisant passer les paramètres via le GET et en uniformisant
-# le JsonResponse.
-@ajax_required
-def filter_cities_by_country(request):
-    """ Ajax request to filter the cities choice field """
-    country = request.GET.get('country')
-    cities = []
-    if country != '':
-        cities = find_distinct_by_country(country)
-
-    return JsonResponse(list(cities), safe=False)
+from base.api.serializers.student import StudentSerializer
+from base.tests.factories.student import StudentFactory
 
 
-@ajax_required
-def filter_campus_by_city(request):
-    """ Ajax request to filter the campus choice field """
-    city = request.GET.get('city')
-    campuses = Campus.objects.filter(
-        organization__organizationaddress__city=city
-    ).distinct('organization__name').order_by('organization__name').values('pk', 'organization__name')
-    return JsonResponse(list(campuses), safe=False)
+class StudentSerializerTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.student = StudentFactory()
+        cls.serializer = StudentSerializer(cls.student)
+
+    def test_contains_expected_fields(self):
+        expected_fields = [
+            'uuid',
+            'registration_id',
+            'person'
+        ]
+        self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
