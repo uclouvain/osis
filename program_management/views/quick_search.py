@@ -99,9 +99,8 @@ class QuickGroupYearFilter(FilterSet):
 
     def get_queryset(self):
         # Need this close so as to return empty query by default when form is unbound
-        if not self.data or (not self.data.get('acronym')
-                             and not self.data.get('partial_acronym')
-                             and not self.data.get('title')):
+        watched_form_fields = ['acronym', 'partial_acronym', 'title']
+        if not self.data or not any(field in self.form.changed_data for field in watched_form_fields):
             return GroupYear.objects.none()
         return GroupYear.objects.all()
 
