@@ -41,7 +41,7 @@ var formAjaxSubmit = function (form, modal) {
             context: this,
             success: function (xhr, ajaxOptions, thrownError) {
                 //Stay on the form if there are errors.
-                if ($(xhr).find('.has-error,.alert-danger,.stay_in_modal').length > 0) {
+                if ($(xhr).find('.has-error,.alert-danger:not(#notice-header),.stay_in_modal').length > 0) {
                     $(modal).find('.modal-content').html(xhr);
                     // Add compatibility with ckeditor and related textareas
                     bindTextArea();
