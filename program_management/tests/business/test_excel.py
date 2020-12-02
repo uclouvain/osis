@@ -99,11 +99,9 @@ class TestGeneratePrerequisitesWorkbook(SimpleTestCase):
                                          block_header=_('Block'),
                                          mandatory_header=_('Mandatory')
                                          )
-        expected_second_line = OfficialTextLine(text=_("Official"))
 
         headers = _build_excel_lines(program_tree)
         self.assertEqual(expected_first_line, headers[0])
-        self.assertEqual(expected_second_line, headers[1])
 
     @override_settings(LANGUAGES=[('en', 'English'), ], LANGUAGE_CODE='en')
     def test_when_learning_unit_year_has_one_prerequisite(self):
