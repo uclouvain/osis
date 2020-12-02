@@ -532,10 +532,14 @@ def _build_main_gathering_label(gathering_node: 'Node', tree_versions: List['Pro
 
 
 def _get_gathering_node_title(gathering_node: 'Node', language: str):
-    is_finality = gathering_node.is_finality()
-    if language == settings.LANGUAGE_CODE_EN:
-        return gathering_node.offer_partial_title_en if is_finality else gathering_node.group_title_en
-    return gathering_node.offer_partial_title_fr if is_finality else gathering_node.group_title_fr
+    lang_suffix = 'en' if language == settings.LANGUAGE_CODE_EN else 'fr'
+    field_prefix = 'group' if gathering_node.is_group() else 'offer'
+
+    if gathering_node.is_finality():
+        attr_name = '{}_partial_title_{}'.format(field_prefix, lang_suffix)
+    else:
+        attr_name = '{}_title_{}'.format(field_prefix, lang_suffix)
+    return getattr(gathering_node, attr_name)
 
 
 def _get_gathering_node_version_title(pgm_tree_version: 'ProgramTreeVersion', language: str):
