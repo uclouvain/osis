@@ -28,6 +28,7 @@ from django.test import SimpleTestCase
 from django.test.utils import override_settings
 from django.utils.translation import gettext_lazy as _
 
+from base.models.enums.education_group_types import GroupType
 from base.models.enums.prerequisite_operator import AND, OR
 from program_management.business.excel import HeaderLine, OfficialTextLine, LearningUnitYearLine, PrerequisiteItemLine
 from program_management.business.excel import _build_excel_lines
@@ -71,7 +72,7 @@ class TestGeneratePrerequisitesWorkbook(SimpleTestCase):
 
         self.children[2].set_prerequisite(prerequisite)
 
-    def test_header_lines(self):
+    def test_header_lines_offer(self):
         expected_first_line = HeaderLine(egy_acronym=self.program_tree.root_node.title,
                                          egy_title=self.program_tree.root_node.offer_title_fr,
                                          code_header=_('Code'),
@@ -83,6 +84,24 @@ class TestGeneratePrerequisitesWorkbook(SimpleTestCase):
         expected_second_line = OfficialTextLine(text=_("Official"))
 
         headers = _build_excel_lines(self.program_tree)
+        self.assertEqual(expected_first_line, headers[0])
+        self.assertEqual(expected_second_line, headers[1])
+
+    def test_header_lines_group(self):
+        program_tree = ProgramTreeFactory(
+            root_node__node_type=GroupType.COMMON_CORE
+        )
+        expected_first_line = HeaderLine(egy_acronym=program_tree.root_node.title,
+                                         egy_title=program_tree.root_node.group_title_fr,
+                                         code_header=_('Code'),
+                                         title_header=_('Title'),
+                                         credits_header=_('Cred. rel./abs.'),
+                                         block_header=_('Block'),
+                                         mandatory_header=_('Mandatory')
+                                         )
+        expected_second_line = OfficialTextLine(text=_("Official"))
+
+        headers = _build_excel_lines(program_tree)
         self.assertEqual(expected_first_line, headers[0])
         self.assertEqual(expected_second_line, headers[1])
 
