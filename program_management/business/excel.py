@@ -112,7 +112,7 @@ def _build_excel_lines(tree: 'ProgramTree') -> List:
         HeaderLine(
             egy_acronym=tree.root_node.title + formatter.format_version_name(tree.root_node),
             egy_title="{title}{version_title}".format(
-                title=tree.root_node.group_title_en if language == LANGUAGE_CODE_EN else tree.root_node.group_title_fr,
+                title=_get_group_or_offer_title(language, tree),
                 version_title=formatter.format_version_title(tree.root_node, language)
             ),
             code_header=_('Code'),
@@ -308,7 +308,7 @@ def _build_excel_lines_prerequisited(tree: 'ProgramTree') -> List:
         HeaderLinePrerequisiteOf(
             node_title=tree.root_node.title + formatter.format_version_name(tree.root_node),
             tree_title="{title}{version_title}".format(
-                title=tree.root_node.group_title_en if language == LANGUAGE_CODE_EN else tree.root_node.group_title_fr,
+                title=_get_group_or_offer_title(language, tree),
                 version_title=formatter.format_version_title(tree.root_node, language)
             ),
             title_header=_('Title'),
@@ -333,6 +333,13 @@ def _build_excel_lines_prerequisited(tree: 'ProgramTree') -> List:
                     first = False
                     content.append(prerequisite_line)
     return content
+
+
+def _get_group_or_offer_title(language, tree):
+    lang_suffix = 'en' if language == LANGUAGE_CODE_EN else 'fr'
+    field_prefix = 'group' if tree.root_node.is_group() else 'offer'
+    attr_name = '{}_title_{}'.format(field_prefix, lang_suffix)
+    return getattr(tree.root_node, attr_name)
 
 
 def _build_is_prerequisite_for_line(prerequisite_node: 'NodeLearningUnitYear', first, tree: 'ProgramTree') \

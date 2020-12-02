@@ -25,19 +25,18 @@
 ##############################################################################
 
 from django.test import SimpleTestCase
-from django.utils.translation import gettext_lazy as _
 from django.test.utils import override_settings
-from base.models.enums.prerequisite_operator import AND, OR
+from django.utils.translation import gettext_lazy as _
 
+from base.models.enums.prerequisite_operator import AND, OR
+from program_management.business.excel import HeaderLine, OfficialTextLine, LearningUnitYearLine, PrerequisiteItemLine
+from program_management.business.excel import _build_excel_lines
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory
-from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
-
 from program_management.tests.ddd.factories.prerequisite import PrerequisiteFactory, PrerequisiteItemGroupFactory, \
     PrerequisiteItemFactory
 from program_management.tests.ddd.factories.prerequisite import cast_to_prerequisite
-from program_management.business.excel import _build_excel_lines
-from program_management.business.excel import HeaderLine, OfficialTextLine, LearningUnitYearLine, PrerequisiteItemLine
+from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
 
 class TestGeneratePrerequisitesWorkbook(SimpleTestCase):
@@ -74,7 +73,7 @@ class TestGeneratePrerequisitesWorkbook(SimpleTestCase):
 
     def test_header_lines(self):
         expected_first_line = HeaderLine(egy_acronym=self.program_tree.root_node.title,
-                                         egy_title=self.program_tree.root_node.group_title_fr,
+                                         egy_title=self.program_tree.root_node.offer_title_fr,
                                          code_header=_('Code'),
                                          title_header=_('Title'),
                                          credits_header=_('Cred. rel./abs.'),
