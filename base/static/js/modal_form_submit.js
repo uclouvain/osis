@@ -1,4 +1,5 @@
 function redirect_after_success(modal, xhr) {
+    destroyAllInstances();
     $(modal).modal('toggle');
     if (xhr.hasOwnProperty('partial_reload')) {
         $(xhr["partial_reload"]).load(xhr["success_url"]);
