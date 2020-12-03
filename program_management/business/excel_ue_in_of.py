@@ -213,7 +213,7 @@ def _build_excel_lines_ues(custom_xls_form: CustomXlsForm, tree: 'ProgramTree'):
             ]
         )
     else:
-        learning_unit_years = None
+        learning_unit_years = []
 
     tree_versions = search_all_versions_from_root_nodes(
         [
