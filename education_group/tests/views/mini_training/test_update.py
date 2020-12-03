@@ -93,21 +93,17 @@ class TestMiniTrainingUpdateView(TestCase):
     @mock.patch("education_group.views.mini_training.update.MiniTrainingUpdateView."
                 "get_success_msg_updated_mini_trainings", return_value=[])
     @mock.patch("education_group.views.mini_training.update.MiniTrainingUpdateView.update_mini_training")
-    @mock.patch("education_group.views.mini_training.update.MiniTrainingUpdateView.delete_mini_training")
     def test_should_call_mini_training_and_link_services_when_forms_are_valid_without_end_year(
             self,
-            delete_mini_training,
             update_mini_training,
             *mocks
     ):
         update_mini_training.return_value = [
             mini_training.MiniTrainingIdentity(acronym="ACRONYM", year=get_current_year()-1)
         ]
-        delete_mini_training.return_value = []
         response = self.client.post(self.url, data=self._get_form_data())
 
         self.assertTrue(update_mini_training.called)
-        self.assertTrue(delete_mini_training.called)
 
         expected_redirec_url = reverse_with_get(
             'element_identification',
@@ -120,17 +116,14 @@ class TestMiniTrainingUpdateView(TestCase):
     @mock.patch("education_group.views.mini_training.update.MiniTrainingUpdateView."
                 "get_success_msg_updated_mini_trainings", return_value=[])
     @mock.patch("education_group.views.mini_training.update.MiniTrainingUpdateView.update_mini_training")
-    @mock.patch("education_group.views.mini_training.update.MiniTrainingUpdateView.delete_mini_training")
     def test_should_call_mini_training_and_link_services_when_forms_are_valid_with_end_year(
             self,
-            delete_mini_training,
             update_mini_training,
             *mocks
     ):
         update_mini_training.return_value = [
             mini_training.MiniTrainingIdentity(acronym="ACRONYM", year=get_current_year()-1)
         ]
-        delete_mini_training.return_value = []
 
         form_data = self._get_form_data()
 
@@ -140,7 +133,6 @@ class TestMiniTrainingUpdateView(TestCase):
         response = self.client.post(self.url, data=form_data)
 
         self.assertTrue(update_mini_training.called)
-        self.assertTrue(delete_mini_training.called)
 
         expected_redirec_url = reverse_with_get(
             'element_identification',
