@@ -48,7 +48,8 @@ class TestMiniTrainingUpdateView(TestCase):
             entity_identity=cls.mini_training_identity,
             start_year=get_current_year()-1
         )
-        cls.teaching_campus = CampusFactory(organization=MainOrganizationFactory())
+        cls.organization = MainOrganizationFactory()
+        cls.teaching_campus = CampusFactory(organization=cls.organization)
         cls.url = reverse_with_get(
             "mini_training_update",
             kwargs={
@@ -58,11 +59,10 @@ class TestMiniTrainingUpdateView(TestCase):
             },
             get={"path": "1|2|3"}
         )
-
         cls.egy = EducationGroupYearFactory(
             partial_acronym=cls.mini_training.code,
             academic_year__year=cls.mini_training.year,
-            management_entity=EntityWithVersionFactory()
+            management_entity=EntityWithVersionFactory(organization=cls.organization)
         )
         cls.central_manager = CentralManagerFactory(entity=cls.egy.management_entity)
 
