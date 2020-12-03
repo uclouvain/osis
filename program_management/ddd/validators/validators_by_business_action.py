@@ -81,7 +81,7 @@ class PasteNodeValidatorList(MultipleExceptionBusinessListValidator):
                 CreateLinkValidatorList(parent_node, node_to_paste),
                 PasteAuthorizedRelationshipValidator(tree, node_to_paste, parent_node, link_type=link_type),
                 MinimumEditableYearValidator(tree),
-                InfiniteRecursivityTreeValidator(tree, node_to_paste, path),
+                InfiniteRecursivityTreeValidator(tree, node_to_paste, path, tree_repository),
                 AuthorizedLinkTypeValidator(tree, node_to_paste, link_type),
                 BlockValidator(block),
                 ValidateFinalitiesEndDateAndOptions(parent_node, node_to_paste, tree_repository),
@@ -95,7 +95,7 @@ class PasteNodeValidatorList(MultipleExceptionBusinessListValidator):
                 CreateLinkValidatorList(parent_node, node_to_paste),
                 AuthorizedRelationshipLearningUnitValidator(tree, node_to_paste, parent_node),
                 MinimumEditableYearValidator(tree),
-                InfiniteRecursivityTreeValidator(tree, node_to_paste, path),
+                InfiniteRecursivityTreeValidator(tree, node_to_paste, path, tree_repository),
                 AuthorizedLinkTypeValidator(tree, node_to_paste, link_type),
                 BlockValidator(block),
                 ValidateAuthorizedRelationshipForAllTrees(tree, node_to_paste, path, tree_repository),
@@ -138,7 +138,7 @@ class CheckPasteNodeValidatorList(MultipleExceptionBusinessListValidator):
             self.validators = [
                 CreateLinkValidatorList(tree.get_node(path), node_to_paste),
                 MinimumEditableYearValidator(tree),
-                InfiniteRecursivityTreeValidator(tree, node_to_paste, path),
+                InfiniteRecursivityTreeValidator(tree, node_to_paste, path, tree_repository),
                 ValidateFinalitiesEndDateAndOptions(tree.get_node(path), node_to_paste, tree_repository),
                 MatchVersionValidator(
                     tree.get_node(path),
@@ -153,7 +153,7 @@ class CheckPasteNodeValidatorList(MultipleExceptionBusinessListValidator):
                 CreateLinkValidatorList(tree.get_node(path), node_to_paste),
                 AuthorizedRelationshipLearningUnitValidator(tree, node_to_paste, tree.get_node(path)),
                 MinimumEditableYearValidator(tree),
-                InfiniteRecursivityTreeValidator(tree, node_to_paste, path),
+                InfiniteRecursivityTreeValidator(tree, node_to_paste, path, tree_repository),
             ]
 
         else:

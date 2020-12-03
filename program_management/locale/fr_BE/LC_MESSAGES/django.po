@@ -252,7 +252,7 @@ msgid "Description fiche"
 msgstr "Fiche descriptive"
 
 msgid "Description fiche (including force majeure)"
-msgstr "Fiche descriptive (inclut force majeure)"
+msgstr "Fiche descriptive (cas de force majeure inclus)"
 
 msgid "Diploma title"
 msgstr "Intitulé du diplôme/du certificat"
@@ -286,7 +286,7 @@ msgid "Evaluation methods"
 msgstr "Mode d'évaluation des acquis des étudiants"
 
 msgid "Evaluation methods (force majeure)"
-msgstr "Mode d'évaluation des acquis des étudiants ((force majeure)"
+msgstr "Mode d'évaluation des acquis des étudiants (force majeure)"
 
 msgid "Export"
 msgstr "Exporter"
@@ -757,7 +757,7 @@ msgid "Teaching methods"
 msgstr "Méthodes d'enseignement"
 
 msgid "Teaching methods (force majeure)"
-msgstr "Méthodes d'enseignement (force majeure)7"
+msgstr "Méthodes d'enseignement (force majeure)"
 
 #, python-format
 msgid ""

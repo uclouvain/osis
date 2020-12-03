@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Set
+
 from dal import autocomplete
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Subquery, OuterRef, BooleanField, Q, Value
@@ -35,6 +37,9 @@ from base.models.entity_version import find_pedagogical_entities_version
 from base.models.enums.organization_type import ACADEMIC_PARTNER, MAIN
 from base.models.organization import Organization
 from base.models.person import Person
+from learning_unit.auth.roles.central_manager import CentralManager
+from learning_unit.auth.roles.faculty_manager import FacultyManager
+from osis_role.contrib.forms.fields import EntityRoleChoiceFieldMixin
 from reference.models.country import Country
 
 
@@ -45,8 +50,8 @@ class OrganizationAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetV
         country = self.forwarded.get('country', None)
         if country:
             qs = qs.filter(
-                organizationaddress__is_main=True,
-                organizationaddress__country=country,
+                entity__entityversion__parent__isnull=True,
+                entity__entityversion__entityversionaddress__country=country,
             )
 
         if self.q:
@@ -60,30 +65,31 @@ class OrganizationAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetV
 
 class CountryAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
     def get_queryset(self):
-        qs = Country.objects.filter(organizationaddress__isnull=False).distinct()
-
+        qs = Country.objects.all()
         if self.q:
             qs = qs.filter(name__icontains=self.q)
-
-        return qs.distinct().order_by('name')
+        return qs.order_by('name')
 
 
 class CampusAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
     def get_queryset(self):
         qs = Campus.objects.annotate(
-            organization_is_current_partner=Subquery(
+            organization_is_active=Subquery(
                 Organization.objects.filter(
                     pk=OuterRef('organization_id'),
                     type=ACADEMIC_PARTNER,
-                ).values('is_current_partner')[:1],
+                ).values('is_active')[:1],
                 output_field=BooleanField(),
             )
-        ).filter(organization_is_current_partner=True)
+        ).filter(organization_is_active=True)
 
         country = self.forwarded.get('country_external_institution', None)
 
         if country:
-            qs = qs.filter(organization__organizationaddress__country=country)
+            qs = qs.filter(
+                organization__entity__entityversion__parent__isnull=True,
+                organization__entity__entityversion__entityversionaddress__country=country,
+            )
 
         if self.q:
             qs = qs.filter(Q(organization__name__icontains=self.q) | Q(name__icontains=self.q))
@@ -91,7 +97,7 @@ class CampusAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
         return qs.select_related('organization').order_by('organization__name').distinct()
 
     def get_result_label(self, result):
-        return "{} ({})".format(result.organization.name, result.name)
+        return result.organization.name
 
 
 class EntityAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
@@ -101,7 +107,9 @@ class EntityAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
         if country:
             qs = qs.exclude(entity__organization__type=MAIN).order_by('title')
             if country != "all":
-                qs = qs.filter(entity__country_id=country)
+                qs = qs.filter(
+                    entity__entityversion__entityversionaddress__country_id=country
+                )
         else:
             qs = find_pedagogical_entities_version().order_by('acronym')
         if self.q:
@@ -130,10 +138,18 @@ class AdditionnalEntity2Autocomplete(EntityAutocomplete):
         return super(AdditionnalEntity2Autocomplete, self).get_queryset()
 
 
-class EntityRequirementAutocomplete(EntityAutocomplete):
+class EntityRequirementAutocomplete(LoginRequiredMixin, EntityRoleChoiceFieldMixin, autocomplete.Select2QuerySetView):
+    def get_person(self) -> Person:
+        return self.request.user.person
+
+    def get_group_names(self) -> Set[str]:
+        return {FacultyManager.group_name, CentralManager.group_name}
+
     def get_queryset(self):
-        return super(EntityRequirementAutocomplete, self).get_queryset()\
-            .filter(entity__in=self.request.user.person.linked_entities)
+        qs = super().get_queryset().pedagogical_entities().order_by('acronym')
+        if self.q:
+            qs = qs.filter(Q(acronym__icontains=self.q) | Q(title__icontains=self.q))
+        return qs
 
     def get_result_label(self, result):
         return format_html(result.verbose_title)
