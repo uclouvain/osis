@@ -23,9 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import datetime
 from abc import ABC
+from collections import namedtuple
+from typing import List
 
 from django.core.exceptions import PermissionDenied
+from django.db.models import F
 from django.db.models.query import QuerySet
 from django.utils import timezone
 from django.utils.functional import cached_property
@@ -33,10 +37,48 @@ from django.utils.translation import gettext_lazy as _
 
 from base.models.academic_calendar import AcademicCalendar
 from base.models.academic_year import AcademicYear
-from base.models.education_group_year import EducationGroupYear
 from base.models.enums import academic_calendar_type
 from base.models.learning_unit_year import LearningUnitYear
-from education_group.models.group_year import GroupYear
+
+
+ProcessCalendarObj = namedtuple('ProcessCalendarObj', 'title start_date end_date target_year')
+
+
+class ProcessCalendar(ABC):
+    event_reference = None
+    raise_exception = True
+    error_msg = ""
+
+    def __init__(self, raise_exception=True):
+        self.raise_exception = raise_exception
+
+    def is_open(self, target_year: int = None) -> bool:
+        target_years_opened = self.get_target_years_opened()
+        if target_year:
+            is_open = bool(next((year for year in target_years_opened if year == target_year), False))
+        else:
+            is_open = bool(target_years_opened)
+
+        if self.raise_exception:
+            raise PermissionDenied(_(self.error_msg).capitalize())
+        return is_open
+
+    def get_target_years_opened(self, date=None) -> List[int]:
+        if date is None:
+            date = datetime.date.today()
+        return sorted([
+            process_cal.target_year for process_cal in self._process_calendars
+            if process_cal.start_date <= date and (process_cal.end_date is None or process_cal.end_date >= date)
+        ])
+
+    @cached_property
+    def _process_calendars(self) -> List[ProcessCalendarObj]:
+        qs = AcademicCalendar.objects.filter(
+            reference=self.event_reference
+        ).annotate(
+            target_year=F('data_year__year')
+        ).values('title', 'start_date', 'end_date', 'target_year')
+        return [ProcessCalendarObj(**obj) for obj in qs]
 
 
 class EventPerm(ABC):
@@ -138,12 +180,6 @@ class EventPermClosed(EventPerm):
 class EventPermOpened(EventPerm):
     def is_open(self):
         return True
-
-
-class EventPermEducationGroupEdition(EventPerm):
-    model = GroupYear
-    event_reference = academic_calendar_type.EDUCATION_GROUP_EDITION
-    error_msg = _("This education group is not editable during this period.")
 
 
 class EventPermLearningUnitFacultyManagerEdition(EventPerm):

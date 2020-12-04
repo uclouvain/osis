@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _, pgettext
 from rules import predicate
 
-from base.business.event_perms import EventPermEducationGroupEdition
+from education_group.calendar.education_group_edition_process_calendar import EventPermEducationGroupEdition
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import TrainingType
@@ -170,7 +170,7 @@ def is_element_only_inside_standard_program(
 @predicate_failed_msg(message=EventPermEducationGroupEdition.error_msg)
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def is_program_edition_period_open(self, user, group_year: 'GroupYear' = None):
-    return EventPermEducationGroupEdition(obj=group_year, raise_exception=False).is_open()
+    return EventPermEducationGroupEdition(raise_exception=False).is_open(target_year=group_year.academic_year.year)
 
 
 @predicate(bind=True)

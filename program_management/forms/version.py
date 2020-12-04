@@ -32,7 +32,7 @@ from django.forms import TextInput
 from django.utils.functional import lazy
 from django.utils.translation import gettext_lazy as _
 
-from base.business.event_perms import EventPermEducationGroupEdition
+from education_group.calendar.education_group_edition_process_calendar import EventPermEducationGroupEdition
 from base.forms.common import ValidationRuleMixin
 from base.forms.utils.choice_field import BLANK_CHOICE
 from base.models.certificate_aim import CertificateAim
@@ -264,11 +264,11 @@ class UpdateTrainingVersionForm(ValidationRuleMixin, PermissionFieldMixin, Speci
             training_version_identity: 'ProgramTreeVersionIdentity',
             training_type: TrainingType,
             user: User,
-            event_perm_obj: GroupYearDB,
+            year: int,
             **kwargs
     ):
         self.user = user
-        self.event_perm_obj = event_perm_obj
+        self.year = year
         self.training_type = training_type
 
         super().__init__(training_version_identity, **kwargs)
@@ -288,10 +288,7 @@ class UpdateTrainingVersionForm(ValidationRuleMixin, PermissionFieldMixin, Speci
 
     # PermissionFieldMixin
     def get_context(self) -> str:
-        is_edition_period_opened = EventPermEducationGroupEdition(
-            obj=self.event_perm_obj,
-            raise_exception=False
-        ).is_open()
+        is_edition_period_opened = EventPermEducationGroupEdition(raise_exception=False).is_open(target_year=self.year)
         return TRAINING_PGRM_ENCODING_PERIOD if is_edition_period_opened else TRAINING_DAILY_MANAGEMENT
 
     # PermissionFieldMixin
@@ -340,11 +337,11 @@ class UpdateMiniTrainingVersionForm(ValidationRuleMixin, PermissionFieldMixin, S
             mini_training_version_identity: 'ProgramTreeVersionIdentity',
             mini_training_type: MiniTrainingType,
             user: User,
-            event_perm_obj: GroupYearDB,
+            year: int,
             **kwargs
     ):
         self.user = user
-        self.event_perm_obj = event_perm_obj
+        self.year = year
         self.mini_training_type = mini_training_type
 
         super().__init__(mini_training_version_identity, **kwargs)
@@ -364,10 +361,7 @@ class UpdateMiniTrainingVersionForm(ValidationRuleMixin, PermissionFieldMixin, S
 
     # PermissionFieldMixin
     def get_context(self) -> str:
-        is_edition_period_opened = EventPermEducationGroupEdition(
-            obj=self.event_perm_obj,
-            raise_exception=False
-        ).is_open()
+        is_edition_period_opened = EventPermEducationGroupEdition(raise_exception=False).is_open(target_year=self.year)
         return MINI_TRAINING_PGRM_ENCODING_PERIOD if is_edition_period_opened else MINI_TRAINING_DAILY_MANAGEMENT
 
     # PermissionFieldMixin

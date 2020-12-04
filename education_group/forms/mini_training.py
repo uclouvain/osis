@@ -28,7 +28,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
 
-from base.business.event_perms import EventPermEducationGroupEdition
+from education_group.calendar.education_group_edition_process_calendar import EventPermEducationGroupEdition
 from base.forms.common import ValidationRuleMixin
 from base.forms.utils import choice_field
 from base.models import campus
@@ -124,7 +124,8 @@ class MiniTrainingForm(ValidationRuleMixin, forms.Form):
             self.fields['academic_year'].disabled = True
 
         if not self.fields['academic_year'].disabled and self.user.person.is_faculty_manager:
-            working_academic_years = EventPermEducationGroupEdition.get_academic_years()
+            target_years_opened = EventPermEducationGroupEdition(raise_exception=False).get_target_years_opened()
+            working_academic_years = AcademicYear.objects.filter(year__in=target_years_opened)
         else:
             working_academic_years = AcademicYear.objects.all()
 
@@ -193,8 +194,8 @@ class UpdateMiniTrainingForm(PermissionFieldMixin, MiniTrainingForm):
         to_field_name="year"
     )
 
-    def __init__(self, *args, event_perm_obj=None, **kwargs):
-        self.event_perm_obj = event_perm_obj
+    def __init__(self, *args, year=None, **kwargs):
+        self.year = year
         super().__init__(*args, **kwargs)
         self.__init_end_year_field()
 
@@ -205,10 +206,7 @@ class UpdateMiniTrainingForm(PermissionFieldMixin, MiniTrainingForm):
 
     # PermissionFieldMixin
     def get_context(self) -> str:
-        is_edition_period_opened = EventPermEducationGroupEdition(
-            obj=self.event_perm_obj,
-            raise_exception=False
-        ).is_open()
+        is_edition_period_opened = EventPermEducationGroupEdition(raise_exception=False).is_open(target_year=self.year)
         return MINI_TRAINING_PGRM_ENCODING_PERIOD if is_edition_period_opened else MINI_TRAINING_DAILY_MANAGEMENT
 
     # PermissionFieldMixin
