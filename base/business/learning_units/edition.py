@@ -306,9 +306,11 @@ def _get_actual_end_year(learning_unit_to_edit: LearningUnit) -> AcademicYear:
         type=ProposalType.CREATION.name
     ).first()
 
-    end_year_lu = academic_year.find_academic_year_by_id(proposal.initial_data.get('learning_unit').get('end_year')) \
-        if proposal and proposal.initial_data.get('learning_unit').get('end_year') \
-        else learning_unit_to_edit.end_year
+    end_year_lu = learning_unit_to_edit.end_year
+    if proposal:
+        end_year = proposal.initial_data.get('learning_unit').get('end_year')
+        if end_year:
+            end_year_lu = academic_year.find_academic_year_by_id(end_year)
     return end_year_lu or academic_year.find_academic_year_by_year(compute_max_academic_year_adjournment() + 1)
 
 
