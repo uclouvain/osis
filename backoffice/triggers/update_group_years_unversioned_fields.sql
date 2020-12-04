@@ -8,17 +8,17 @@ BEGIN
             WHERE root_group_id = OLD.id
         ) THEN
         WITH offer_fields AS (
-            SELECT egy.*
+            SELECT egy.id, egy.acronym, egy.title, egy.title_english
             FROM public.base_educationgroupyear egy
-                     JOIN public.program_management_educationgroupversion egv
-                          ON egv.offer_id = egy.id AND egv.root_group_id = OLD.id
+            JOIN public.program_management_educationgroupversion egv
+            ON egv.offer_id = egy.id AND egv.root_group_id = OLD.id
         ),
-             group_ids AS (
-                 SELECT gy.id
-                 FROM public.education_group_groupyear gy
-                          JOIN public.program_management_educationgroupversion egv ON egv.root_group_id = gy.id
-                 WHERE egv.offer_id = (SELECT id FROM offer_fields)
-             )
+         group_ids AS (
+             SELECT gy.id
+             FROM public.education_group_groupyear gy
+             JOIN public.program_management_educationgroupversion egv ON egv.root_group_id = gy.id
+             WHERE egv.offer_id = (SELECT id FROM offer_fields)
+         )
         UPDATE public.education_group_groupyear gy
         SET (title_fr, title_en, acronym) = (SELECT title, title_english, acronym FROM offer_fields)
         WHERE id IN (SELECT * FROM group_ids);

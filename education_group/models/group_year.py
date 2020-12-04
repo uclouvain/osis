@@ -117,6 +117,9 @@ class GroupYear(models.Model):
         null=True,
         verbose_name=_("code"),
     )
+
+    # Field synchronized (between all versions) by trigger 'update_group_years_unversioned_fields' in case of
+    # insert/update of a root group
     acronym = models.CharField(
         max_length=40,
         db_index=True,
@@ -157,10 +160,16 @@ class GroupYear(models.Model):
         'Group',
         on_delete=models.CASCADE
     )
+
+    # Field synchronized (between all versions) by trigger 'update_group_years_unversioned_fields' in case of
+    # insert/update of a root group
     title_fr = models.CharField(
         max_length=255,
         verbose_name=_("Title in French")
     )
+
+    # Field synchronized (between all versions) by trigger 'update_group_years_unversioned_fields' in case of
+    # insert/update of a root group
     title_en = models.CharField(
         max_length=240,
         blank=True,
