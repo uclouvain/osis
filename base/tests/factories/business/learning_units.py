@@ -40,6 +40,7 @@ from base.models.enums import quadrimesters
 from base.models.enums.component_type import DEFAULT_ACRONYM_COMPONENT
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.campus import CampusFactory
+from base.tests.factories.entity import EntityWithVersionFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_container import LearningContainerFactory
@@ -49,7 +50,7 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.teaching_material import TeachingMaterialFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory
 from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
-from reference.tests.factories.language import LanguageFactory
+from reference.tests.factories.language import FrenchLanguageFactory
 
 
 class LearningUnitsMixin:
@@ -111,7 +112,9 @@ class LearningUnitsMixin:
         if academic_year and container_type:
             result = LearningContainerYearFactory(
                 academic_year=academic_year,
-                container_type=container_type
+                container_type=container_type,
+                requirement_entity=EntityWithVersionFactory(),
+                allocation_entity=None
             )
         return result
 
@@ -222,7 +225,8 @@ def generate_academic_years(range=2):
 
 
 class GenerateContainer:
-    def __init__(self, start_year, end_year):
+    def __init__(self, start_year, end_year, parent_entity=None):
+        self.parent_entity = parent_entity
         self.start_year = start_year
         self.end_year = end_year
         self.learning_container = LearningContainerFactory()
@@ -255,14 +259,15 @@ class GenerateContainer:
                 start_date=datetime.datetime(1900, 1, 1),
                 end_date=None,
                 entity_type=entity_type.FACULTY,
-                entity__organization__type=organization_type.MAIN
+                entity__organization__type=organization_type.MAIN,
+                parent=self.parent_entity
             ).entity for _ in range(4)
         ]
         for entity in self.entities:
             entity.refresh_from_db()
 
     def _setup_common_data(self):
-        self.language = LanguageFactory(code='FR', name='French')
+        self.language = FrenchLanguageFactory()
         self.campus = CampusFactory(name='Louvain-la-Neuve', organization__type=organization_type.MAIN)
 
     def __iter__(self):
@@ -403,7 +408,11 @@ def _setup_learning_component_year(learning_unit_year, component_type):
         acronym=DEFAULT_ACRONYM_COMPONENT[component_type],
         learning_unit_year=learning_unit_year,
         type=component_type,
-        planned_classes=1
+        planned_classes=1,
+        hourly_volume_total_annual=30,
+        hourly_volume_partial_q1=30,
+        hourly_volume_partial_q2=0,
+        repartition_volume_requirement_entity=30,
     )
 
 

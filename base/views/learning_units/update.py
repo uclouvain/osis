@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from dal import autocomplete
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import IntegrityError
 from django.db.models import Q
@@ -54,12 +54,13 @@ from base.views.learning_unit import learning_unit_components
 from base.views.learning_units import perms
 from base.views.learning_units.common import get_learning_unit_identification_context, \
     get_common_context_learning_unit_year
+from learning_unit.views.utils import learning_unit_year_getter
+from osis_role.contrib.views import permission_required
 
 
 @login_required
 @waffle_flag("learning_unit_update")
-@permission_required('base.can_edit_learningunit_date', raise_exception=True)
-@perms.can_perform_end_date_modification
+@permission_required('base.can_edit_learningunit_date', raise_exception=True, fn=learning_unit_year_getter)
 def learning_unit_edition_end_date(request, learning_unit_year_id):
     learning_unit_year = get_object_or_404(LearningUnitYear, pk=learning_unit_year_id)
     person = get_object_or_404(Person, user=request.user)
@@ -96,8 +97,7 @@ def _get_current_learning_unit_year_id(learning_unit_to_edit, learning_unit_year
 
 @login_required
 @waffle_flag("learning_unit_update")
-@permission_required('base.can_edit_learningunit', raise_exception=True)
-@perms.can_perform_learning_unit_modification
+@permission_required('base.can_edit_learningunit', raise_exception=True, fn=learning_unit_year_getter)
 def update_learning_unit(request, learning_unit_year_id):
     learning_unit_year = get_object_or_404(LearningUnitYear, pk=learning_unit_year_id)
     person = get_object_or_404(Person, user=request.user)
@@ -137,11 +137,10 @@ def update_learning_unit(request, learning_unit_year_id):
 
 @login_required
 @waffle_flag("learning_unit_update")
-@permission_required('base.can_edit_learningunit', raise_exception=True)
-@perms.can_perform_learning_unit_modification
+@permission_required('base.can_edit_learningunit', raise_exception=True, fn=learning_unit_year_getter)
 def learning_unit_volumes_management(request, learning_unit_year_id, form_type):
     person = get_object_or_404(Person, user=request.user)
-    context = get_common_context_learning_unit_year(learning_unit_year_id, person)
+    context = get_common_context_learning_unit_year(person, learning_unit_year_id)
 
     context['learning_units'] = _get_learning_units_for_context(luy=context['learning_unit_year'],
                                                                 with_family=form_type == "full")
@@ -185,7 +184,7 @@ def _save_form_and_display_messages(request, form, learning_unit_year):
         records = form.save()
         display_warning_messages(request, getattr(form, 'warnings', []))
 
-        is_postponement = bool(int(request.POST.get('postponement', 0)))
+        is_postponement = bool(int(request.POST.get('postponement', 1))) and is_not_past(form)
 
         if is_postponement and existing_proposal:
             display_success_messages(
@@ -206,46 +205,8 @@ def _save_form_and_display_messages(request, form, learning_unit_year):
     return records
 
 
-class EntityAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
-    def get_queryset(self):
-        country = self.forwarded.get('country', None)
-        qs = find_additional_requirement_entities_choices()
-        if country:
-            qs = qs.exclude(entity__organization__type=MAIN).order_by('title')
-            if country != "all":
-                qs = qs.filter(entity__country_id=country)
-        else:
-            qs = find_pedagogical_entities_version().order_by('acronym')
-        if self.q:
-            qs = qs.filter(Q(title__icontains=self.q) | Q(acronym__icontains=self.q))
-        return qs
-
-    def get_result_label(self, result):
-        return format_html(result.verbose_title)
-
-
-class AllocationEntityAutocomplete(EntityAutocomplete):
-    def get_queryset(self):
-        self.forwarded['country'] = self.forwarded.get('country_allocation_entity')
-        return super(AllocationEntityAutocomplete, self).get_queryset()
-
-
-class AdditionnalEntity1Autocomplete(EntityAutocomplete):
-    def get_queryset(self):
-        self.forwarded['country'] = self.forwarded.get('country_additional_entity_1')
-        return super(AdditionnalEntity1Autocomplete, self).get_queryset()
-
-
-class AdditionnalEntity2Autocomplete(EntityAutocomplete):
-    def get_queryset(self):
-        self.forwarded['country'] = self.forwarded.get('country_additional_entity_2')
-        return super(AdditionnalEntity2Autocomplete, self).get_queryset()
-
-
-class EntityRequirementAutocomplete(EntityAutocomplete):
-    def get_queryset(self):
-        return super(EntityRequirementAutocomplete, self).get_queryset()\
-            .filter(entity__in=self.request.user.person.linked_entities)
-
-    def get_result_label(self, result):
-        return format_html(result.verbose_title)
+def is_not_past(form):
+    return (
+        not isinstance(form, LearningUnitPostponementForm) or
+        (isinstance(form, LearningUnitPostponementForm) and not form.start_postponement.is_past)
+    )

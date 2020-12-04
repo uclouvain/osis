@@ -135,18 +135,6 @@ table.volumes thead {
     background-color: #d9534f;
 }
 
-.notification:after {
-    content: "";
-    display: block;
-    position: absolute;
-    width: 6px;
-    height: 6px;
-    background: red;
-    top: -3px;
-    right: -2px;
-    border-radius: 50%;
-}
-
 .no_label {
     font-weight: normal;
 }
@@ -172,6 +160,9 @@ input[type="text"].ui-autocomplete-input:disabled ~ .results_on_deck .ui-icon {
 .results_on_deck .ui-icon.ui-icon-trash:before {
     color: black;
     content: "\f00d";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+
 }
 
 .table_header {
@@ -288,4 +279,9 @@ input[type="text"].ui-autocomplete-input:disabled ~ .results_on_deck .ui-icon {
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 160px;
+}
+
+.trigger_modal{
+    cursor: pointer;
+    text-decoration: none;
 }

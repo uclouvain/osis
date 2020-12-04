@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@ from base.models.enums.proposal_type import ProposalType
 from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.views.learning_units.search.common import SearchTypes
+from base.forms.utils.filter_field import filter_field_by_regex, espace_special_characters
 
 
 def _get_sorted_choices(tuple_of_choices):
@@ -59,11 +60,11 @@ class ProposalLearningUnitFilter(FilterSet):
         queryset=AcademicYear.objects.all(),
         required=False,
         label=_('Ac yr.'),
-        empty_label=pgettext_lazy("plural", "All"),
+        empty_label=pgettext_lazy("female plural", "All"),
     )
     acronym = filters.CharFilter(
         field_name="acronym",
-        lookup_expr="iregex",
+        method="filter_acronym_field",
         max_length=40,
         required=False,
         label=_('Code'),
@@ -88,7 +89,7 @@ class ProposalLearningUnitFilter(FilterSet):
         field_name="proposallearningunit__entity_id",
         label=_('Folder entity'),
         required=False,
-        empty_label=pgettext_lazy("plural", "All"),
+        empty_label=pgettext_lazy("male plural", "All"),
     )
     folder = filters.NumberFilter(
         field_name="proposallearningunit__folder_id",
@@ -102,14 +103,14 @@ class ProposalLearningUnitFilter(FilterSet):
         label=_('Proposal type'),
         choices=_get_sorted_choices(ProposalType.choices()),
         required=False,
-        empty_label=pgettext_lazy("plural", "All"),
+        empty_label=pgettext_lazy("male plural", "All"),
     )
     proposal_state = filters.ChoiceFilter(
         field_name="proposallearningunit__state",
         label=_('Proposal status'),
         choices=_get_sorted_choices(ProposalState.choices()),
         required=False,
-        empty_label=pgettext_lazy("plural", "All"),
+        empty_label=pgettext_lazy("male plural", "All"),
     )
     search_type = filters.CharFilter(
         field_name="acronym",
@@ -175,12 +176,14 @@ class ProposalLearningUnitFilter(FilterSet):
         with_subordinated = self.form.cleaned_data['with_entity_subordinated']
         lookup_expression = "__".join(["learning_container_year", name, "in"])
         if value:
-            entity_ids = get_entities_ids(value, with_subordinated)
+            search_value = espace_special_characters(value)
+            entity_ids = get_entities_ids(search_value, with_subordinated)
             queryset = queryset.filter(**{lookup_expression: entity_ids})
         return queryset
 
     def filter_tutor(self, queryset, name, value):
-        for tutor_name in value.split():
+        search_value = espace_special_characters(value)
+        for tutor_name in search_value.split():
             filter_by_first_name = Q(
                 learningcomponentyear__attributionchargenew__attribution__tutor__person__first_name__iregex=tutor_name
             )
@@ -229,6 +232,10 @@ class ProposalLearningUnitFilter(FilterSet):
         queryset = LearningUnitYearQuerySet.annotate_entities_allocation_and_requirement_acronym(queryset)
 
         return queryset
+
+    @staticmethod
+    def filter_acronym_field(queryset, name, value):
+        return filter_field_by_regex(queryset, name, value)
 
 
 class ProposalStateModelForm(forms.ModelForm):

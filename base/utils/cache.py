@@ -63,7 +63,7 @@ class CacheFilterMixin:
     # Mixin that keep the cache for cbv.
     def get(self, request, *args, **kwargs):
         request_cache = RequestCache(user=request.user, path=request.path)
-        if request.GET:
+        if self.__have_data_to_cached(request):
             request_cache.save_get_parameters(
                 request,
                 parameters_to_exclude=self.cache_exclude_params,
@@ -71,6 +71,9 @@ class CacheFilterMixin:
             )
         request.GET = request_cache.restore_get_request(request)
         return super().get(request, *args, **kwargs)
+
+    def __have_data_to_cached(self, request) -> bool:
+        return bool(set(request.GET.keys()) - set(self.cache_exclude_params or []))
 
 
 class OsisCache(abc.ABC):
@@ -118,6 +121,16 @@ class RequestCache(OsisCache):
                 new_get_request[key] = value
         return new_get_request
 
+    def get_single_value_cached(self, key: str):
+        values_cached = self.get_values_list_cached(key)
+        if not values_cached:
+            return
+        return values_cached[0]
+
+    def get_values_list_cached(self, key: str) -> list:
+        cached_data = self.cached_data or {}
+        return cached_data.get(key) or []
+
 
 class SearchParametersCache(OsisCache):
     PREFIX_KEY = "search_"
@@ -138,27 +151,48 @@ class ElementCache(OsisCache):
         COPY = "copy-action"
         CUT = "cut-action"
 
-    def __init__(self, user):
-        self.user = user
+    def __init__(self, user_id: int):
+        self.user_id = user_id
 
     @property
     def key(self):
-        return self.PREFIX_KEY.format(user=self.user.pk)
+        return self.PREFIX_KEY.format(user=self.user_id)
 
-    def equals(self, obj_to_compare):
+    def equals_element(self, element_code: str, element_year: int) -> bool:
         return (
             self.cached_data
-            and self.cached_data['id'] == obj_to_compare.id
-            and self.cached_data['modelname'] == obj_to_compare._meta.db_table
+            and self.cached_data['element_code'] == element_code
+            and self.cached_data['element_year'] == element_year
         )
 
     def save_element_selected(
             self,
-            obj,
-            source_link_id=None,
-            action: ElementCacheAction = ElementCacheAction.COPY.value
+            element_code: str,
+            element_year: int,
+            path_to_detach: str = None,
+            action: ElementCacheAction = ElementCacheAction.COPY
     ):
-        data_to_cache = {'id': obj.pk, 'modelname': obj._meta.db_table, 'action': action}
-        if source_link_id:
-            data_to_cache['source_link_id'] = source_link_id
+        data_to_cache = {
+            'element_code': element_code,
+            'element_year': element_year,
+            'path_to_detach': path_to_detach,
+            'action': action.value
+        }
         self.set_cached_data(data_to_cache)
+
+
+def cached_result(func):
+    """
+    Decorator used to cache the result returned by any function/property.
+    Only works on functions/properties of an instance objects.
+    """
+    def f_cached(*args, **kwargs):
+        self = args[0]
+        cached_property_name = '__cached_' + func.__name__
+        if hasattr(self, cached_property_name):
+            result = getattr(self, cached_property_name, None)
+        else:
+            result = func(*args, **kwargs)
+            setattr(self, cached_property_name, result)
+        return result
+    return f_cached

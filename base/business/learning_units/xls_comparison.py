@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -58,8 +58,8 @@ EMPTY_VALUE = ''
 DATE_FORMAT = '%d-%m-%Y'
 DATE_TIME_FORMAT = '%d-%m-%Y %H:%M'
 DESC = "desc"
-WORKSHEET_TITLE = 'learning_units_comparison'
-XLS_FILENAME = 'learning_units_comparison'
+WORKSHEET_TITLE = _('Comparison of LUs')
+XLS_FILENAME = _('learning_units_comparison')
 XLS_DESCRIPTION = _("Comparison of learning units")
 
 ACRONYM_COL_NUMBER = 0
@@ -91,15 +91,12 @@ def create_xls_comparison(user, learning_unit_years, filters, academic_yr_compar
         xls_build.HEADER_TITLES: learning_unit_titles(),
         xls_build.WS_TITLE: WORKSHEET_TITLE,
     }
-    dict_styled_cells = {}
+
     if cells_modified_with_green_font:
-        dict_styled_cells[xls_build.STYLE_MODIFIED] = cells_modified_with_green_font
+        parameters[xls_build.FONT_CELLS] = {xls_build.STYLE_MODIFIED: cells_modified_with_green_font}
 
     if cells_with_top_border:
-        dict_styled_cells[xls_build.STYLE_BORDER_TOP] = cells_with_top_border
-
-    if dict_styled_cells:
-        parameters[xls_build.STYLED_CELLS] = dict_styled_cells
+        parameters[xls_build.BORDER_CELLS] = {xls_build.BORDER_TOP: cells_with_top_border}
 
     return xls_build.generate_xls(xls_build.prepare_xls_parameters_list(working_sheets_data, parameters), filters)
 
@@ -209,7 +206,7 @@ def _get_data(learning_unit_yr, new_line, first_data, partims=True, proposal_com
         volume_format(learning_unit_yr.credits) or BLANK_VALUE,
         learning_unit_yr.language.name or BLANK_VALUE,
         learning_unit_yr.get_periodicity_display() if learning_unit_yr.periodicity else BLANK_VALUE,
-        get_translation(learning_unit_yr.quadrimester),
+        learning_unit_yr.get_quadrimester_display() if learning_unit_yr.quadrimester else BLANK_VALUE,
         get_translation(learning_unit_yr.session),
         get_representing_string(learning_unit_yr.learning_container_year.common_title),
         get_representing_string(learning_unit_yr.specific_title),
@@ -411,8 +408,8 @@ def _get_data_from_initial_data(initial_data, proposal_comparison=False):
 def _check_changes(initial_data, proposal_data, line_index):
     modifications = []
     for col_index, obj in enumerate(initial_data[2:]):
-        if str(obj) != str(proposal_data[col_index+2]):
-            modifications.append('{}{}'.format(get_column_letter(col_index+2 + 1), line_index))
+        if str(obj) != str(proposal_data[col_index + 2]):
+            modifications.append('{}{}'.format(get_column_letter(col_index + 2 + 1), line_index))
     return modifications
 
 
@@ -434,14 +431,13 @@ def create_xls_proposal_comparison(user, learning_units_with_proposal, filters):
         xls_build.HEADER_TITLES: COMPARISON_PROPOSAL_TITLES,
         xls_build.WS_TITLE: COMPARISON_WORKSHEET_TITLE,
     }
-    dict_styled_cells = {}
+
     if cells_modified_with_green_font:
-        dict_styled_cells[xls_build.STYLE_MODIFIED] = cells_modified_with_green_font
+        parameters[xls_build.FONT_CELLS] = {xls_build.STYLE_MODIFIED: cells_modified_with_green_font}
 
     if cells_with_top_border:
-        dict_styled_cells[xls_build.STYLE_BORDER_BOTTOM] = cells_with_top_border
-    if dict_styled_cells:
-        parameters[xls_build.STYLED_CELLS] = dict_styled_cells
+        parameters[xls_build.BORDER_CELLS] = {xls_build.BORDER_BOTTOM: cells_with_top_border}
+
     return xls_build.generate_xls(xls_build.prepare_xls_parameters_list(working_sheets_data, parameters), filters)
 
 

@@ -89,6 +89,7 @@
     <script type="text/javascript" src="{% static 'js/diacritics-sort.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/jstree.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/ckeditor/custom_ckeditor.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/osis_cache.js' %}"></script>
     <script src="{% statici18n LANGUAGE_CODE %}"></script>
 
     {% block header %}
@@ -117,7 +118,7 @@
 {% hijack_notification %}
 {% analytical_body_top %}
 <div id="overlay" class="overlay"></div>
-<div id="overlay_fadein" class="overlay fadein"></div>
+<div id="overlay-fade-in" class="overlay fadein"></div>
 <div id="loader"></div>
 
 
@@ -144,7 +145,7 @@
 
 {% if subject %}
     <div class="container-fluid p0-50">
-        <div class="alert alert-danger" role="alert"><strong>{{ subject|safe }}</strong><br>{{ notice|safe }}</div>
+        <div id="notice-header" class="alert alert-danger" role="alert"><strong>{{ subject|safe }}</strong><br>{{ notice|safe }}</div>
     </div>
 {% endif %}
 
@@ -158,12 +159,6 @@
                                                                         aria-hidden="true"></span></a></li>
                 {% block breadcrumb %}
                 {% endblock %}
-                <a href="{{ user_manual.contextual }}" target="help" id="lnk_user_manual_section">
-                    <span
-                            class="glyphicon glyphicon-question-sign pull-right"
-                            style="font-size: 14pt; color: green"
-                            aria-hidden="true"></span>
-                </a>
             </ol>
         {% endblock %}
     {% endif %}

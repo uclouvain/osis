@@ -30,14 +30,13 @@ from django.db.models import Prefetch
 from django.db.models import Subquery, OuterRef
 from django.views.generic import ListView
 
+from base.auth.roles.program_manager import ProgramManager
 from base.models.academic_year import current_academic_year
 from base.models.education_group_year import EducationGroupYear
-from base.models.entity_manager import EntityManager
 from base.models.entity_version import EntityVersion
 from base.models.enums.groups import TUTOR
 from base.models.person import Person
 from base.models.person_entity import PersonEntity
-from base.models.program_manager import ProgramManager
 
 
 class UserListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
@@ -65,13 +64,6 @@ class UserListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
             ).order_by('-start_date').values('acronym')[:1]
         )
 
-        prefetch_managed_entity = Prefetch(
-            "entitymanager_set",
-            queryset=EntityManager.objects.annotate(
-                entity_recent_acronym=most_recent_acronym_subquery
-            ).order_by('entity_recent_acronym')
-        )
-
         prefetch_personentity = Prefetch(
             "personentity_set",
             queryset=PersonEntity.objects.annotate(
@@ -85,7 +77,6 @@ class UserListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
                 'user__groups'
             ).prefetch_related(
                 prefetch_pgm_mgr,
-                prefetch_managed_entity,
                 prefetch_personentity
             ).filter(
                 user__is_active=True,
@@ -93,7 +84,7 @@ class UserListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
             ).distinct()
 
         if 'partnership' in settings.INSTALLED_APPS:
-            from partnership.models import PartnershipEntityManager
+            from partnership.auth.roles.partnership_manager import PartnershipEntityManager
             qs = qs.prefetch_related(
                 Prefetch(
                     'partnershipentitymanager_set',

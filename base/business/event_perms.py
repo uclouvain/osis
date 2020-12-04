@@ -36,6 +36,7 @@ from base.models.academic_year import AcademicYear
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import academic_calendar_type
 from base.models.learning_unit_year import LearningUnitYear
+from education_group.models.group_year import GroupYear
 
 
 class EventPerm(ABC):
@@ -140,7 +141,7 @@ class EventPermOpened(EventPerm):
 
 
 class EventPermEducationGroupEdition(EventPerm):
-    model = EducationGroupYear
+    model = GroupYear
     event_reference = academic_calendar_type.EDUCATION_GROUP_EDITION
     error_msg = _("This education group is not editable during this period.")
 
@@ -157,10 +158,11 @@ class EventPermLearningUnitCentralManagerEdition(EventPerm):
     error_msg = _("This learning unit is not editable by central managers during this period.")
 
 
+# TODO : gather EventPerm disregarding role
 def generate_event_perm_learning_unit_edition(person, obj=None, raise_exception=True):
-    if person.is_central_manager:
+    if person.is_central_manager_for_ue:
         return EventPermLearningUnitCentralManagerEdition(obj, raise_exception)
-    elif person.is_faculty_manager:
+    elif person.is_faculty_manager_for_ue:
         return EventPermLearningUnitFacultyManagerEdition(obj, raise_exception)
     else:
         return EventPermClosed(obj, raise_exception)
