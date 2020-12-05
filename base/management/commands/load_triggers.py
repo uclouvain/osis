@@ -6,10 +6,10 @@ from django.db import connection
 
 
 class Command(BaseCommand):
-    lock_path = 'backoffice/triggers/lock.sql'
     triggers_path = 'backoffice/triggers/'
+    lock_file = 'lock.sql'
     files_to_ignore = [
-        'lock.sql'
+        lock_file
     ]
 
     def handle(self, *args, **kwargs):
@@ -18,11 +18,14 @@ class Command(BaseCommand):
         self.load_triggers(self.triggers_path, lock_string)
 
     def load_lock(self):
-        lock_string = self._get_sql_string_from_file(path=self.lock_path)
-        return lock_string
+        lock_path = self.triggers_path + self.lock_file
+        return self._get_sql_string_from_file(path=lock_path)
 
     @staticmethod
     def _get_sql_string_from_file(path: str):
+        file_extension = path.split(".")[-1].lower()
+        if file_extension != 'sql':
+            print("##### Error: Should load sql file but it is a {} extension".format(file_extension))
         file = open(path)
         return file.read()
 
