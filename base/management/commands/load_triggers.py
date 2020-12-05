@@ -31,7 +31,7 @@ class Command(BaseCommand):
         for trigger_filename in os.listdir(path):
             if trigger_filename not in self.files_to_ignore:
                 trigger_string = self._get_sql_string_from_file(path=path + trigger_filename)
-                table_name = re.search(r'(?:ON)(?:.*)(public..*)\n.*(?:FOR)', trigger_string, re.IGNORECASE).group(1)
+                table_name = re.search(r'ON.*(public..*)\n.*FOR', trigger_string, re.IGNORECASE).group(1)
                 sql_script = lock_string.format(
                     table_name=table_name,
                     trigger_sql=trigger_string
