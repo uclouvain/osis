@@ -1,0 +1,4 @@
+BEGIN WORK;
+LOCK TABLE {table_name} IN SHARE MODE;
+{trigger_sql}
+COMMIT WORK;
