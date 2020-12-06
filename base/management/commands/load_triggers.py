@@ -2,7 +2,7 @@ from base.management.commands.load_sql_scripts import LoadSqlCommand
 
 
 class Command(LoadSqlCommand):
-    subfolder_script_name = "triggers/"
+    subfolder = "triggers/"
     tablename_regex = r'ON.*(public..*)\n.*FOR'
 
     def handle(self, *args, **kwargs):

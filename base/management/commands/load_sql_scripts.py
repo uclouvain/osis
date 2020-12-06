@@ -12,15 +12,15 @@ class LoadSqlCommand(BaseCommand):
     lock_file: str = 'lock.sql'
     lock_string: str = """"""
     files_to_ignore: List[str] = [
-        lock_file
+        lock_file.lower()
     ]
     cursor = None
-    subfolder_script_name: str = ''
+    subfolder: str = ''
     tablename_regex: str = ''
 
     def __init__(self):
         super().__init__()
-        self.scripts_path = self.backoffice + self.subfolder_script_name
+        self.scripts_path = self.backoffice + self.subfolder
         self.lock_string = self.load_lock()
         self.cursor = connection.cursor()
 
@@ -41,6 +41,6 @@ class LoadSqlCommand(BaseCommand):
 
     def _get_scripts_files(self):
         scripts_files = [
-            file_name for file_name in os.listdir(self.scripts_path) if file_name not in self.files_to_ignore
+            file_name for file_name in os.listdir(self.scripts_path) if file_name.lower() not in self.files_to_ignore
         ]
         return scripts_files
