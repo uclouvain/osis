@@ -20,7 +20,6 @@ class Command(BaseCommand):
         self.cursor = connection.cursor()
 
     def handle(self, *args, **kwargs):
-        print("##### Starting loading triggers from {} #####".format(self.triggers_path))
         self.load_triggers()
 
     def load_lock(self):
@@ -29,9 +28,10 @@ class Command(BaseCommand):
 
     def load_triggers(self):
         trigger_files = self._get_trigger_files()
+        print("## Loading triggers from {} ##".format(self.triggers_path))
         for trigger_filename in trigger_files:
             self.load_trigger(trigger_filename)
-        print("##### Loading triggers finished #####")
+        print("## Loading triggers finished ##")
 
     def _get_trigger_files(self):
         trigger_files = [
@@ -46,10 +46,10 @@ class Command(BaseCommand):
             table_name=table_name,
             trigger_sql=trigger_string
         )
-        print("#### Load trigger from {filename} ####".format(filename=trigger_filename))
-        print("#### Lock table {tablename} ####".format(tablename=table_name))
+        print("# Load trigger from {filename} #".format(filename=trigger_filename))
+        print("# Table {tablename} LOCKED #".format(tablename=table_name))
         self.cursor.execute(sql_script)
-        print("#### Table {tablename} unlocked ####".format(
+        print("# Table {tablename} UNLOCKED #".format(
             tablename=table_name
         ))
 
