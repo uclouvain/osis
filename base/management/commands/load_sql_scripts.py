@@ -35,9 +35,9 @@ class LoadSqlCommand(BaseCommand):
         file_extension = file.split(".")[-1].lower()
         if file_extension != 'sql':
             print("##### Error: Should load sql file but it is a {} extension".format(file_extension))
-        print(self.scripts_path, file)
-        file = open(self.scripts_path + file)
-        return file.read()
+        else:
+            file = open(self.scripts_path + file)
+            return file.read()
 
     def _get_scripts_files(self):
         scripts_files = [
