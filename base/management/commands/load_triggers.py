@@ -7,10 +7,6 @@ class Command(LoadSqlCommand):
     subfolder_script_name = "triggers/"
     tablename_regex = r'ON.*(public..*)\n.*FOR'
 
-    def __init__(self):
-        super().__init__()
-        self.lock_file = self.backoffice + self.subfolder_script_name + self.lock_file
-
     def handle(self, *args, **kwargs):
         self.load_triggers()
 
