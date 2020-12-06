@@ -1,3 +1,4 @@
+import os
 import re
 from typing import List
 
@@ -37,3 +38,9 @@ class LoadSqlCommand(BaseCommand):
         print(self.scripts_path, file)
         file = open(self.scripts_path + file)
         return file.read()
+
+    def _get_scripts_files(self):
+        scripts_files = [
+            file_name for file_name in os.listdir(self.scripts_path) if file_name not in self.files_to_ignore
+        ]
+        return scripts_files

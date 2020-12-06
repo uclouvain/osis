@@ -1,5 +1,3 @@
-import os
-
 from base.management.commands.load_sql_scripts import LoadSqlCommand
 
 
@@ -11,17 +9,11 @@ class Command(LoadSqlCommand):
         self.load_triggers()
 
     def load_triggers(self):
-        trigger_files = self._get_trigger_files()
+        trigger_files = self._get_scripts_files()
         print("## Loading triggers from {} ##".format(self.scripts_path))
         for trigger_filename in trigger_files:
             self.load_trigger(trigger_filename)
         print("## Loading triggers finished ##")
-
-    def _get_trigger_files(self):
-        trigger_files = [
-            file_name for file_name in os.listdir(self.scripts_path) if file_name not in self.files_to_ignore
-        ]
-        return trigger_files
 
     def load_trigger(self, trigger_filename: str):
         trigger_string = self._get_sql_string_from_file(file=trigger_filename)
