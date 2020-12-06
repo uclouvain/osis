@@ -19,8 +19,8 @@ class Command(LoadSqlCommand):
         trigger_string = self._get_sql_string_from_file(file=trigger_filename)
         table_name = self._get_table_name(trigger_string)
         sql_script = self.lock_string.format(
-            table_name=table_name,
-            trigger_sql=trigger_string
+            table_to_lock=table_name,
+            sql_script=trigger_string
         )
         print("# Load trigger from {filename} #".format(filename=trigger_filename))
         print("# Table {tablename} LOCKED #".format(tablename=table_name))
