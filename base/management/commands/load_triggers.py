@@ -1,18 +1,20 @@
 import os
 import re
+from typing import List
 
 from django.core.management.base import BaseCommand
 from django.db import connection
 
 
 class Command(BaseCommand):
-    triggers_path = 'backoffice/triggers/'
-    lock_file = 'lock.sql'
-    lock_string = """"""
-    files_to_ignore = [
+    triggers_path: str = 'backoffice/triggers/'
+    lock_file: str = 'lock.sql'
+    lock_string: str = """"""
+    files_to_ignore: List[str] = [
         lock_file
     ]
     cursor = None
+    tablename_regex = r'ON.*(public..*)\n.*FOR'
 
     def __init__(self):
         super().__init__()
@@ -23,8 +25,7 @@ class Command(BaseCommand):
         self.load_triggers()
 
     def load_lock(self):
-        lock_path = self.triggers_path + self.lock_file
-        return self._get_sql_string_from_file(path=lock_path)
+        return self._get_sql_string_from_file(file=self.lock_file)
 
     def load_triggers(self):
         trigger_files = self._get_trigger_files()
@@ -39,9 +40,9 @@ class Command(BaseCommand):
         ]
         return trigger_files
 
-    def load_trigger(self, trigger_filename):
-        trigger_string = self._get_sql_string_from_file(path=self.triggers_path + trigger_filename)
-        table_name = re.search(r'ON.*(public..*)\n.*FOR', trigger_string, re.IGNORECASE).group(1)
+    def load_trigger(self, trigger_filename: str):
+        trigger_string = self._get_sql_string_from_file(file=trigger_filename)
+        table_name = self._get_table_name(trigger_string)
         sql_script = self.lock_string.format(
             table_name=table_name,
             trigger_sql=trigger_string
@@ -49,14 +50,15 @@ class Command(BaseCommand):
         print("# Load trigger from {filename} #".format(filename=trigger_filename))
         print("# Table {tablename} LOCKED #".format(tablename=table_name))
         self.cursor.execute(sql_script)
-        print("# Table {tablename} UNLOCKED #".format(
-            tablename=table_name
-        ))
+        print("# Table {tablename} UNLOCKED #".format(tablename=table_name))
 
-    @staticmethod
-    def _get_sql_string_from_file(path: str):
-        file_extension = path.split(".")[-1].lower()
+    def _get_table_name(self, sql_string: str):
+        table_name = re.search(self.tablename_regex, sql_string, re.IGNORECASE).group(1)
+        return table_name
+
+    def _get_sql_string_from_file(self, file: str):
+        file_extension = file.split(".")[-1].lower()
         if file_extension != 'sql':
             print("##### Error: Should load sql file but it is a {} extension".format(file_extension))
-        file = open(path)
+        file = open(self.triggers_path + file)
         return file.read()
