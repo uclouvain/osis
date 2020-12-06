@@ -28,10 +28,16 @@ class Command(BaseCommand):
         return self._get_sql_string_from_file(path=lock_path)
 
     def load_triggers(self):
-        for trigger_filename in os.listdir(self.triggers_path):
-            if trigger_filename not in self.files_to_ignore:
-                self.load_trigger(trigger_filename)
+        trigger_files = self._get_trigger_files()
+        for trigger_filename in trigger_files:
+            self.load_trigger(trigger_filename)
         print("##### Loading triggers finished #####")
+
+    def _get_trigger_files(self):
+        trigger_files = [
+            file_name for file_name in os.listdir(self.triggers_path) if file_name not in self.files_to_ignore
+        ]
+        return trigger_files
 
     def load_trigger(self, trigger_filename):
         trigger_string = self._get_sql_string_from_file(path=self.triggers_path + trigger_filename)
