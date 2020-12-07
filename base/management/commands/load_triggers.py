@@ -1,30 +1,34 @@
+from typing import Dict
+
 from base.management.commands.load_sql_scripts import LoadSqlCommand
 
 
 class Command(LoadSqlCommand):
-    subfolder = "triggers/"
-    tablename_regex = r'CREATE TRIGGER[\S\s]*(public..*)'
-    lock_mode = 'SHARE ROW EXCLUSIVE'
+
+    def __init__(self):
+        self.tablename_regex = r'CREATE TRIGGER[\S\s]*(public..*)'
+        self.subfolder = 'triggers/'
+        self.lock_mode = 'SHARE ROW EXCLUSIVE'
+        super().__init__()
 
     def handle(self, *args, **kwargs):
         self.load_triggers()
 
     def load_triggers(self):
-        trigger_files = self._get_scripts_files()
+        trigger_strings = self.load_scripts()
         print("## Loading triggers from {} ##".format(self.scripts_path))
-        for trigger_filename in trigger_files:
-            self.load_trigger(trigger_filename)
+        for trigger in trigger_strings:
+            self.load_trigger(trigger)
         print("## Loading triggers finished ##")
 
-    def load_trigger(self, trigger_filename: str):
-        trigger_string = self._get_sql_string_from_file(file=trigger_filename)
-        table_name = self._get_table_name(trigger_string)
-        sql_script = self.lock_string.format(
+    def load_trigger(self, trigger: Dict[str, str]):
+        table_name = self._get_table_name(trigger['trigger_string'])
+        sql_script = self.lock_template.format(
             table_to_lock=table_name,
-            sql_script=trigger_string,
+            sql_script=trigger['trigger_string'],
             lock_mode=self.lock_mode
         )
-        print("# Load trigger from {filename} #".format(filename=trigger_filename))
+        print("# Load trigger from {filename} #".format(filename=trigger['filename']))
         print("# Table {tablename} LOCKED #".format(tablename=table_name))
         self.cursor.execute(sql_script)
         print("# Table {tablename} UNLOCKED #".format(tablename=table_name))
