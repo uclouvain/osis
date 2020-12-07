@@ -72,8 +72,8 @@ class LoadSQLTriggers(LoadSQL):
         self.subfolder = 'triggers/'
         self.scripts_path = self.backoffice + self.subfolder
         self.tablename_regex = r'CREATE TRIGGER[\S\s]*(public..*)'
-        self.lock_mode = 'SHARE ROW EXCLUSIVE'
         super().__init__()
+        self.lock_mode = 'SHARE ROW EXCLUSIVE'
 
     def load_triggers(self):
         trigger_strings = self.load_scripts()
