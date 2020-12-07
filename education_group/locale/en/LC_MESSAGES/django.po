@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-12-01 15:56+0100\n"
+"POT-Creation-Date: 2020-12-07 14:06+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -680,6 +680,9 @@ msgid "The value of this attribute is inherited from the standard OF"
 msgstr ""
 
 msgid "There can only be one type 2 expectation"
+msgstr ""
+
+msgid "This education group is not editable during this period."
 msgstr ""
 
 msgid "Title"
