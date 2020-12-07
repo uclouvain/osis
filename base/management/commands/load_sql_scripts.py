@@ -1,10 +1,14 @@
+import logging
 import os
 import re
 import sys
 from typing import Dict, List
 
 import attr
+from django.conf import settings
 from django.db import connection
+
+logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 LOCK_TEMPLATE = """
     BEGIN WORK;
@@ -77,20 +81,19 @@ class LoadSQLTriggers(LoadSQL):
 
     def load_triggers(self):
         trigger_strings = self.load_scripts()
-        print("## Loading triggers from {} ##".format(self.scripts_path))
+        logger.info("## Loading triggers from {} ##".format(self.scripts_path))
         for trigger in trigger_strings:
             self.load_trigger(trigger)
-        print("## Loading triggers finished ##")
+        logger.info("## Loading triggers finished ##")
 
     def load_trigger(self, trigger: Dict[str, str]):
         table_name = self._get_table_name(trigger['script_string'])
-        print("YOLOOO", self.lock_mode)
         sql_script = self.lock_template.format(
             table_to_lock=table_name,
             sql_script=trigger['script_string'],
             lock_mode=self.lock_mode
         )
-        print("# Load trigger from {filename} #".format(filename=trigger['filename']))
-        print("# Table {tablename} LOCKED #".format(tablename=table_name))
+        logger.info("# Load trigger from {filename} #".format(filename=trigger['filename']))
+        logger.info("# Table {tablename} LOCKED #".format(tablename=table_name))
         self.cursor.execute(sql_script)
-        print("# Table {tablename} UNLOCKED #".format(tablename=table_name))
+        logger.info("# Table {tablename} UNLOCKED #".format(tablename=table_name))
