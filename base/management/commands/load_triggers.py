@@ -22,10 +22,10 @@ class Command(LoadSqlCommand):
         print("## Loading triggers finished ##")
 
     def load_trigger(self, trigger: Dict[str, str]):
-        table_name = self._get_table_name(trigger['trigger_string'])
+        table_name = self._get_table_name(trigger['script_string'])
         sql_script = self.lock_template.format(
             table_to_lock=table_name,
-            sql_script=trigger['trigger_string'],
+            sql_script=trigger['script_string'],
             lock_mode=self.lock_mode
         )
         print("# Load trigger from {filename} #".format(filename=trigger['filename']))
