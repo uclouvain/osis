@@ -3,7 +3,7 @@ from base.management.commands.load_sql_scripts import LoadSqlCommand
 
 class Command(LoadSqlCommand):
     subfolder = "triggers/"
-    tablename_regex = r'ON.*(public..*)\n.*FOR'
+    tablename_regex = r'CREATE TRIGGER[\S\s*]*(public..*)'
     lock_mode = 'SHARE ROW EXCLUSIVE'
 
     def handle(self, *args, **kwargs):
