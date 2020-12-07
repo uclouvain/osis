@@ -4,6 +4,7 @@ from base.management.commands.load_sql_scripts import LoadSqlCommand
 class Command(LoadSqlCommand):
     subfolder = "triggers/"
     tablename_regex = r'ON.*(public..*)\n.*FOR'
+    lock_mode = 'SHARE ROW EXCLUSIVE'
 
     def handle(self, *args, **kwargs):
         self.load_triggers()
@@ -20,7 +21,8 @@ class Command(LoadSqlCommand):
         table_name = self._get_table_name(trigger_string)
         sql_script = self.lock_string.format(
             table_to_lock=table_name,
-            sql_script=trigger_string
+            sql_script=trigger_string,
+            lock_mode=self.lock_mode
         )
         print("# Load trigger from {filename} #".format(filename=trigger_filename))
         print("# Table {tablename} LOCKED #".format(tablename=table_name))
