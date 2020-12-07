@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,18 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django import forms
+from rest_framework import serializers
 
-from base.models.organization_address import OrganizationAddress
+from base.api.serializers.person import PersonDetailSerializer
+from base.models.student import Student
 
 
-class OrganizationAddressForm(forms.ModelForm):
+class StudentSerializer(serializers.ModelSerializer):
+    person = PersonDetailSerializer()
+
     class Meta:
-        model = OrganizationAddress
-        fields = [
-            "label",
-            "location",
-            "postal_code",
-            "city",
-            "country",
-        ]
+        model = Student
+        fields = (
+            'uuid',
+            'registration_id',
+            'person',
+        )
