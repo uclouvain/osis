@@ -1,4 +1,4 @@
 BEGIN WORK;
-LOCK TABLE {table_to_lock} IN SHARE MODE;
+LOCK TABLE {table_to_lock} IN SHARE ROW EXCLUSIVE MODE;
 {sql_script}
 COMMIT WORK;
