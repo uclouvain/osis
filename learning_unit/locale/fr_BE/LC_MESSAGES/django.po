@@ -64,8 +64,7 @@ msgstr ""
 
 msgid "The learning unit has proposal"
 msgstr ""
-"L'unité d'enseignement est en proposition pour cette année ou une année "
-"antérieure"
+"L'unité d'enseignement est en proposition pour cette année ou une autre année"
 
 msgid "The learning unit is a partim"
 msgstr "L'unité d'enseignement est un partim"

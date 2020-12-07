@@ -263,8 +263,7 @@ def is_year_in_proposal_state(self, user, learning_unit_year):
 def is_not_in_proposal_state(self, user, learning_unit_year):
     if learning_unit_year:
         return not ProposalLearningUnit.objects.filter(
-            learning_unit_year__learning_unit=learning_unit_year.learning_unit,
-            learning_unit_year__academic_year__year__lte=learning_unit_year.academic_year.year
+            learning_unit_year__learning_unit=learning_unit_year.learning_unit
         ).exists()
     return None
 
