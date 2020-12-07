@@ -163,8 +163,3 @@ msgstr "Vous ne pouvez pas modifier ce type d'unité d'enseignement"
 msgid "You cannot modify a learning unit of a previous year"
 msgstr ""
 "Vous ne pouvez pas modifier l'unité d'enseignement d'une année dans le passé"
-
-#~ msgid "The learning unit has proposal"
-#~ msgstr ""
-#~ "L'unité d'enseignement est en proposition pour cette année ou une année "
-#~ "antérieure"
