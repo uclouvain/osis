@@ -318,7 +318,7 @@ def _get_new_end_year(new_academic_year: AcademicYear):
     return new_academic_year if new_academic_year else None
 
 
-def get_next_academic_years(learning_unit_to_edit, year):
+def get_next_academic_years(learning_unit_to_edit, year: int):
     end_date = learning_unit_to_edit.end_year.year + 1 if learning_unit_to_edit.end_year else None
     return AcademicYear.objects.filter(year__range=(end_date, year)).order_by('year')
 
