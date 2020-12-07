@@ -1,5 +1,6 @@
 import os
 import re
+import sys
 from typing import List
 
 from django.core.management.base import BaseCommand
@@ -28,13 +29,18 @@ class LoadSqlCommand(BaseCommand):
         return self._get_sql_string_from_file(file=self.lock_file)
 
     def _get_table_name(self, sql_string: str):
-        table_name = re.search(self.tablename_regex, sql_string, re.IGNORECASE).group(1)
-        return table_name
+        table_match = re.search(self.tablename_regex, sql_string, re.IGNORECASE)
+        try:
+            match = table_match.group(1)
+            if match:
+                return match
+        except Exception:
+            sys.exit("#### Error: Unable to get table name from sql file ####")
 
     def _get_sql_string_from_file(self, file: str):
         file_extension = file.split(".")[-1].lower()
         if file_extension != 'sql':
-            print("##### Error: Should load sql file but it is a {} extension".format(file_extension))
+            sys.exit("##### Error: Should load sql file but it is a {} extension".format(file_extension))
         else:
             file = open(self.scripts_path + file)
             return file.read()
