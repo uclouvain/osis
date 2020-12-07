@@ -39,7 +39,7 @@ from django.db.models.functions import Concat
 from django.utils.functional import lazy
 from django.utils.translation import gettext_lazy as _
 
-from education_group.calendar.education_group_edition_process_calendar import EventPermEducationGroupEdition
+from education_group.calendar.education_group_edition_process_calendar import EducationGroupEditionCalendar
 from base.forms.common import ValidationRuleMixin
 from base.forms.utils.choice_field import BLANK_CHOICE, add_blank
 from base.models import campus
@@ -328,7 +328,8 @@ class CreateTrainingForm(ValidationRuleMixin, forms.Form):
 
     def __init_academic_year_field(self):
         if not self.fields['academic_year'].disabled and self.user.person.is_faculty_manager:
-            working_academic_years = EventPermEducationGroupEdition.get_academic_years()
+            target_years_opened = EducationGroupEditionCalendar(raise_exception=False).get_target_years_opened()
+            working_academic_years = AcademicYear.objects.filter(year__in=target_years_opened)
         else:
             working_academic_years = AcademicYear.objects.all()
 
@@ -420,7 +421,7 @@ class UpdateTrainingForm(PermissionFieldMixin, CreateTrainingForm):
 
     # PermissionFieldMixin
     def get_context(self) -> str:
-        is_edition_period_opened = EventPermEducationGroupEdition(raise_exception=False).is_open(target_year=self.year)
+        is_edition_period_opened = EducationGroupEditionCalendar(raise_exception=False).is_open(target_year=self.year)
         return TRAINING_PGRM_ENCODING_PERIOD if is_edition_period_opened else TRAINING_DAILY_MANAGEMENT
 
     # PermissionFieldMixin

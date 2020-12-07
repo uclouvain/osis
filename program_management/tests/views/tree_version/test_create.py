@@ -129,7 +129,8 @@ class TestGetCreateProgramTreeVersion(TestCase):
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
         self.assertTemplateUsed(response, "access_denied.html")
 
-    @mock.patch('base.business.event_perms.EventPermEducationGroupEdition.is_open', return_value=True)
+    @mock.patch('education_group.calendar.education_group_edition_process_calendar.'
+                'EducationGroupEditionCalendar.is_open', return_value=True)
     def test_case_user_as_faculty_manager_for_create_mini_training_version(self, mock_perms):
         self.client.force_login(self.factulty_manager.person.user)
         response = self.client.get(self.create_mini_training_version_url, data={}, follow=True)

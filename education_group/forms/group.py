@@ -30,7 +30,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
 
-from education_group.calendar.education_group_edition_process_calendar import EventPermEducationGroupEdition
+from education_group.calendar.education_group_edition_process_calendar import EducationGroupEditionCalendar
 from base.forms.common import ValidationRuleMixin
 from base.forms.utils.choice_field import BLANK_CHOICE
 from base.models import campus
@@ -93,7 +93,7 @@ class GroupForm(ValidationRuleMixin, forms.Form):
             year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION
         )
         if self.user.person.is_faculty_manager:
-            target_years_opened = EventPermEducationGroupEdition(raise_exception=False).get_target_years_opened()
+            target_years_opened = EducationGroupEditionCalendar(raise_exception=False).get_target_years_opened()
             self.fields['academic_year'].queryset = self.fields['academic_year'].queryset.filter(
                 year__in=target_years_opened
             )
@@ -145,7 +145,7 @@ class GroupUpdateForm(PermissionFieldMixin, GroupForm):
 
     # PermissionFieldMixin
     def get_context(self) -> str:
-        is_edition_period_opened = EventPermEducationGroupEdition(raise_exception=False).is_open(target_year=self.year)
+        is_edition_period_opened = EducationGroupEditionCalendar(raise_exception=False).is_open(target_year=self.year)
         return GROUP_PGRM_ENCODING_PERIOD if is_edition_period_opened else GROUP_DAILY_MANAGEMENT
 
     # PermissionFieldMixin

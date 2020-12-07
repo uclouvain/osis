@@ -29,7 +29,7 @@ from base.business.event_perms import ProcessCalendar
 from base.models.enums import academic_calendar_type
 
 
-class EventPermEducationGroupEdition(ProcessCalendar):
+class EducationGroupEditionCalendar(ProcessCalendar):
     event_reference = academic_calendar_type.EDUCATION_GROUP_EDITION
     error_msg = _("This education group is not editable during this period.")
 

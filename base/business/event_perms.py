@@ -59,7 +59,7 @@ class ProcessCalendar(ABC):
         else:
             is_open = bool(target_years_opened)
 
-        if self.raise_exception:
+        if is_open is False and self.raise_exception:
             raise PermissionDenied(_(self.error_msg).capitalize())
         return is_open
 

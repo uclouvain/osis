@@ -32,7 +32,7 @@ from django.forms import TextInput
 from django.utils.functional import lazy
 from django.utils.translation import gettext_lazy as _
 
-from education_group.calendar.education_group_edition_process_calendar import EventPermEducationGroupEdition
+from education_group.calendar.education_group_edition_process_calendar import EducationGroupEditionCalendar
 from base.forms.common import ValidationRuleMixin
 from base.forms.utils.choice_field import BLANK_CHOICE
 from base.models.certificate_aim import CertificateAim
@@ -288,7 +288,7 @@ class UpdateTrainingVersionForm(ValidationRuleMixin, PermissionFieldMixin, Speci
 
     # PermissionFieldMixin
     def get_context(self) -> str:
-        is_edition_period_opened = EventPermEducationGroupEdition(raise_exception=False).is_open(target_year=self.year)
+        is_edition_period_opened = EducationGroupEditionCalendar(raise_exception=False).is_open(target_year=self.year)
         return TRAINING_PGRM_ENCODING_PERIOD if is_edition_period_opened else TRAINING_DAILY_MANAGEMENT
 
     # PermissionFieldMixin
@@ -361,7 +361,7 @@ class UpdateMiniTrainingVersionForm(ValidationRuleMixin, PermissionFieldMixin, S
 
     # PermissionFieldMixin
     def get_context(self) -> str:
-        is_edition_period_opened = EventPermEducationGroupEdition(raise_exception=False).is_open(target_year=self.year)
+        is_edition_period_opened = EducationGroupEditionCalendar(raise_exception=False).is_open(target_year=self.year)
         return MINI_TRAINING_PGRM_ENCODING_PERIOD if is_edition_period_opened else MINI_TRAINING_DAILY_MANAGEMENT
 
     # PermissionFieldMixin
