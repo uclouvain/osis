@@ -27,7 +27,7 @@ from django import forms
 def set_remote_validation(field: forms.Field, url: str) -> None:
     field.widget.attrs.update(
         {
-            "required data-parsley-remote": url,
+            "data-parsley-remote": url,
             "data-parsley-remote-validator": "async-osis"
         }
     )

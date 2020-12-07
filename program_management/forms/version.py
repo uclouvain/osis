@@ -357,7 +357,6 @@ class UpdateMiniTrainingVersionForm(ValidationRuleMixin, PermissionFieldMixin, S
         self.mini_training_type = mini_training_type
 
         super().__init__(mini_training_version_identity, **kwargs)
-        self.fields['version_name'].disabled = True
         self.__init_management_entity_field()
 
     def __init_management_entity_field(self):

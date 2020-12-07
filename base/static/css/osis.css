@@ -685,3 +685,12 @@ table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:after, 
 .row-score-encoding {
     line-height: 2em;
 }
+
+.has-error.help-block {
+    color: #a94442;
+}
+
+.hidden {
+    visibility: hidden;
+    display: none;
+}
