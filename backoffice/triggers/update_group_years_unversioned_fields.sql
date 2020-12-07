@@ -1,3 +1,12 @@
+-- Ce trigger est créé afin de palier à une problématique DB.
+-- Les champ title_fr, title_en et acronym sont dupliqués entre base_educationgroupyear & education_group_groupyear.
+-- Et ce, dans le cadre des formations & mini formations.
+-- Dans education_group_groupyear, ces champs sont pertinents uniquement pour les groupements.
+
+-- Afin d éviter une incohérence de ces champs (ceux-ci sont non versionnés) entre les deux tables,
+-- ce trigger recopie ceux de la version standard dans toutes les autres versions
+-- en cas de modification education_group_groupyear
+
 CREATE OR REPLACE FUNCTION update_unversioned_fields_of_group_years() RETURNS TRIGGER AS
 $$
 BEGIN
