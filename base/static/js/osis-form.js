@@ -10,7 +10,7 @@ const DEFAULT_CONFIGURATION = {
     },
     errorsWrapper: '<div class="help-block"></div>',
     errorTemplate: '<p></p>',
-    excluded: 'input[type=button], input[type=submit], input[type=reset], input[type=hidden], [disabled], :hidden',
+    excluded: 'input[type=button], input[type=submit], input[type=reset], input[type=hidden], [disabled]',
 }
 
 $(document).ready(function () {
