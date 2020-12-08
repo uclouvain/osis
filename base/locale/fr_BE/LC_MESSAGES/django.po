@@ -3336,9 +3336,3 @@ msgstr "oui"
 
 msgid "yes,no"
 msgstr "oui,non"
-
-#~ msgid "Person entities"
-#~ msgstr "Entités attachées"
-
-#~ msgid "Trainings and learning units"
-#~ msgstr "Formations et unités d&apos;enseignement"
