@@ -48,10 +48,14 @@
                               data-title="{% trans 'Entity managers' %}"
                               data-content='{% trans "Entities for DAFs + designation of note holders and program managers" %}'>{% trans 'Entity managers' %}</span>
                     </th>
-                    <th><span id="person_entities" data-toggle="popover" data-trigger="hover" data-placement="top"
-                              data-title="{% trans 'Person entities' %}"
-                              data-content='{% trans "Trainings and learning units" %}'>{% trans 'Person entities' %}</span>
-                    </th>
+                    {% if 'learning_unit' in installed_apps %}
+                        <th>{% trans 'Central Manager (Learning units)' %}</th>
+                        <th>{% trans 'Faculty Manager (Learning units)' %}</th>
+                    {% endif %}
+                    {% if 'education_group' in installed_apps %}
+                        <th>{% trans 'Central Manager (Trainings)' %}</th>
+                        <th>{% trans 'Faculty Manager (Trainings)' %}</th>
+                    {% endif %}
                     {% if 'partnership' in installed_apps %}
                         <th>{% trans 'Partnership entities' %}</th>
                     {% endif %}
@@ -78,20 +82,56 @@
                             {% endfor %}
                             </ul>
                         </td>
-                        <td>
-                            <ul>
-                                {% for entity in object.personentity_set.all %}
-                                    <li>{{ entity.entity_recent_acronym }}</li>
-                                {% endfor %}
-                            </ul>
-                        </td>
+                        {% if 'learning_unit' in installed_apps %}
+                            {% with entities_managed=central_managers_for_ue|get_item:object.pk %}
+                                <td>
+                                    <ul>
+                                        {% for entity in entities_managed %}
+                                            <li>{{ entity }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </td>
+                            {% endwith %}
+                            {% with entities_managed=faculty_managers_for_ue|get_item:object.pk %}
+                                <td>
+                                    <ul>
+                                        {% for entity in entities_managed %}
+                                            <li>{{ entity }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </td>
+                            {% endwith %}
+                        {% endif %}
+                        {% if 'education_group' in installed_apps %}
+                             {% with entities_managed=central_managers_for_of|get_item:object.pk %}
+                                <td>
+                                    <ul>
+                                        {% for entity in entities_managed %}
+                                            <li>{{ entity }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </td>
+                            {% endwith %}
+                            {% with entities_managed=faculty_managers_for_of|get_item:object.pk %}
+                                <td>
+                                    <ul>
+                                        {% for entity in entities_managed %}
+                                            <li>{{ entity }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </td>
+                            {% endwith %}
+                        {% endif %}
                         {% if 'partnership' in installed_apps %}
-                            <td>
-                                <ul>{% for entity in object.partnershipentitymanager_set.all %}
-                                    <li>{{ entity.entity }}</li>
-                                {% endfor %}
-                                </ul>
-                            </td>
+                            {% with entities_managed=partnership_entity_managers|get_item:object.pk %}
+                                <td>
+                                    <ul>
+                                        {% for entity in entities_managed %}
+                                            <li>{{ entity }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </td>
+                            {% endwith %}
                         {% endif %}
                         <td>
                             <ul>
@@ -110,7 +150,5 @@
     <script>
         $('#entity_manager').popover({trigger: "hover"});
         $('#program_manager').popover({trigger: "hover"});
-        $('#person_entities').popover({trigger: "hover"});
     </script>
-
 {% endblock %}
