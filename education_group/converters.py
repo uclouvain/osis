@@ -21,8 +21,6 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from django.urls.converters import StringConverter
-
 from base.models.enums.education_group_types import GroupType, TrainingType, MiniTrainingType
 import urllib.parse
 
@@ -64,8 +62,8 @@ class TrainingTypeConverter:
 
 
 class AcronymConverter:
-    # TODO regex to be used for OSIS-4831 is r'[\w%\-]+'
-    regex = StringConverter.regex
+
+    regex = r'[\w%\-]+'
 
     def to_python(self, value):
         return urllib.parse.unquote_plus(value)
