@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-26 14:57+0100\n"
+"POT-Creation-Date: 2020-12-08 10:10+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -466,6 +466,12 @@ msgstr "Catégorie"
 
 msgid "Central"
 msgstr "Central"
+
+msgid "Central Manager (Learning units)"
+msgstr "Gestionnaire central (UE)"
+
+msgid "Central Manager (Trainings)"
+msgstr "Gestionnaire central (OF)"
 
 msgid "Certificate"
 msgstr "Certificat"
@@ -951,6 +957,12 @@ msgstr "Spécialité FSA (Majeure)"
 
 msgid "Faculty"
 msgstr "Faculté"
+
+msgid "Faculty Manager (Learning units)"
+msgstr "Gestionnaire Facultaire (UE)"
+
+msgid "Faculty Manager (Trainings)"
+msgstr "Gestionnaire Facultaire (OF)"
 
 msgid "Faculty borrowing"
 msgstr "Faculté emprunteuse"
@@ -1824,9 +1836,6 @@ msgstr "En attente"
 msgid "Periodicity"
 msgstr "Périodicité"
 
-msgid "Person entities"
-msgstr "Entités attachées"
-
 msgid "Person with reduced mobility"
 msgstr "PMR"
 
@@ -2578,6 +2587,7 @@ msgstr "Le partim"
 msgid "The program aim has been updated"
 msgstr "L’objectif du programme a été mis à jour avec succès"
 
+#, python-format
 msgid "The repartition volume of %(col_name)s has been already modified."
 msgstr "La répartition des volumes de %(col_name)s a déjà été modifiée."
 
@@ -2745,9 +2755,6 @@ msgstr "Formation"
 
 msgid "Trainings"
 msgstr "Formations"
-
-msgid "Trainings and learning units"
-msgstr "Formations et unités d&apos;enseignement"
 
 msgid "Trainings/gathering"
 msgstr "Formations/regroupements"
