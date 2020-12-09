@@ -51,7 +51,7 @@ class TestCheckEmptyFields(SimpleTestCase, MockPatcherMixin):
 
     def test_should_raise_exception_when_empty_fields(self):
         self.training.main_domain = None
-        self.training.funding = FundingFactory(funding_orientation=None, international_funding_orientation = None)
+        self.training.funding = FundingFactory(funding_orientation=None, international_funding_orientation=None)
 
         with self.assertRaises(exception.TrainingEmptyFieldException):
             check_training_empty_fields_on_warning(self.command)
