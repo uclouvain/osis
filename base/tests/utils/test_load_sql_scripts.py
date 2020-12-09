@@ -26,7 +26,7 @@ from unittest import mock
 from django.conf import settings
 from django.test import SimpleTestCase
 
-from base.utils.load_sql_scripts import LoadSQLFilesToExecute, ExecuteSQLTriggers, LOCK_TEMPLATE
+from base.utils.load_sql_scripts import LoadSQLFilesToExecute, ExecuteSQLTriggers
 
 
 class TestLoadSQLFilesToExecute(SimpleTestCase):
@@ -35,7 +35,7 @@ class TestLoadSQLFilesToExecute(SimpleTestCase):
         self.load_sql = LoadSQLFilesToExecute(subfolder=self.subfolder)
 
     def test_scripts_path_as_backoffice_and_subfolder(self):
-        self.assertEqual(self.load_sql.scripts_path, 'backoffice/' + self.subfolder)
+        self.assertEqual(self.load_sql.scripts_path, 'backoffice/test/')
 
     @mock.patch('base.utils.load_sql_scripts.LoadSQLFilesToExecute._get_scripts_files')
     def test_load_scripts_should_return_error_if_not_sql_file(self, mock_get_files):
@@ -47,10 +47,12 @@ class TestLoadSQLFilesToExecute(SimpleTestCase):
     @mock.patch('base.utils.load_sql_scripts.LoadSQLFilesToExecute._get_scripts_files')
     @mock.patch('base.utils.load_sql_scripts.LoadSQLFilesToExecute._get_sql_string_statement_from_file')
     def test_load_scripts_should_return_dict_with_filename_and_script_string(self, mock_get_sql, mock_get_files):
-        filename = 'test.sol'
+        filename = 'test.sql'
         mock_get_files.return_value = [filename]
         script = """
-            SELECT * FROM a WHERE b = c
+            SELECT * FROM a WHERE b = c;
+            UPDATE test set b = 'c';
+            DELETE FROM test WHERE b = 'c';
         """
         mock_get_sql.return_value = script
         result = self.load_sql.load_scripts()
@@ -105,9 +107,19 @@ class TestExecuteSQLTriggers(SimpleTestCase):
     @mock.patch('base.utils.load_sql_scripts.ExecuteSQL.execute')
     def test_load_trigger_should_call_execute_with_locked_script(self, mock_execute):
         self.executeSQL_triggers.load_trigger(script=self.script, filename=self.filename)
-        expected_locked_script = LOCK_TEMPLATE.format(
-            table_to_lock=self.table_name,
-            lock_mode='SHARE ROW EXCLUSIVE',
-            sql_script=self.script
-        )
-        mock_execute.assert_called_with(expected_locked_script)
+        expected_locked_script = """
+            BEGIN WORK;
+            LOCK TABLE public.education_group_groupyear IN SHARE ROW EXCLUSIVE MODE;
+            
+            TEST
+            CREATE TRIGGER TEST
+                TEST
+                
+                ON public.education_group_groupyear
+                TEST
+                WHEN TEST
+            TEST;
+            
+            COMMIT WORK;
+        """.replace(' ', '')
+        self.assertEqual(mock_execute.call_args[0][0].replace(' ', ''), expected_locked_script)
