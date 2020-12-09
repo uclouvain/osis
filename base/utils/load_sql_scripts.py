@@ -2,7 +2,7 @@ import logging
 import os
 import re
 import sys
-from typing import Dict
+from typing import Dict, List
 
 import attr
 from django.conf import settings
@@ -41,16 +41,16 @@ class LoadSQLFilesToExecute:
     scripts_path = attr.ib(type=str)
 
     @scripts_path.default
-    def _scripts_path(self):
+    def _scripts_path(self) -> str:
         return self.backoffice + self.subfolder
 
-    def _get_scripts_files(self):
+    def _get_scripts_files(self) -> List[Filename]:
         return os.listdir(self.scripts_path)
 
     def _get_sql_string_statement_from_file(self, filename: Filename) -> SQLStringStatement:
         file_extension = filename.split(".")[-1].lower()
         if file_extension != 'sql':
-            logger.error("##### Should load sql file but it is a {} extension".format(file_extension))
+            logger.error("##### Should load sql file but it is a {} extension #####".format(file_extension))
             sys.exit()
 
         file = open(self.scripts_path + filename)
