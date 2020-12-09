@@ -2,14 +2,16 @@ import logging
 import os
 import re
 import sys
-from typing import List, Tuple
+from typing import Dict
 
 import attr
 from django.conf import settings
 from django.db import connection
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
+
 SQLStringStatement = str
+Filename = str
 
 LOCK_TEMPLATE = """
     BEGIN WORK;
@@ -54,12 +56,12 @@ class LoadSQLFilesToExecute:
         file = open(self.scripts_path + file)
         return file.read()
 
-    def load_scripts(self) -> List[Tuple[SQLStringStatement, str]]:
+    def load_scripts(self) -> Dict[Filename, SQLStringStatement]:
         script_filenames = self._get_scripts_files()
-        script_strings = []
+        script_strings = {}
         for script_filename in script_filenames:
             script_string = self._get_sql_string_statement_from_file(file=script_filename)
-            script_strings.append((script_string, script_filename))
+            script_strings.update({script_filename: script_string})
         return script_strings
 
 
@@ -77,19 +79,18 @@ class ExecuteSQL:
 
 @attr.s(frozen=True, slots=True)
 class ExecuteSQLTriggers:
-    tablename_regex = attr.ib(type=str, default=r'CREATE TRIGGER[\S\s]*(public..*)')
-    executeSQL = attr.ib(type=ExecuteSQL, default=ExecuteSQL())
     loadSQLFile = attr.ib(type=LoadSQLFilesToExecute, default=LoadSQLFilesToExecute(subfolder='triggers/'))
     SQLLock = attr.ib(type=SQLLockStatement, default=SQLLockStatement(lock_mode='SHARE ROW EXCLUSIVE'))
+    executeSQL = attr.ib(type=ExecuteSQL, default=ExecuteSQL())
 
     def load_triggers(self):
         trigger_strings = self.loadSQLFile.load_scripts()
         logger.info("## Loading triggers from {} ##".format(self.loadSQLFile.scripts_path))
-        for trigger_script, filename in trigger_strings:
+        for filename, trigger_script in trigger_strings.items():
             self.load_trigger(script=trigger_script, filename=filename)
         logger.info("## Loading triggers finished ##")
 
-    def load_trigger(self, script: SQLStringStatement, filename: str):
+    def load_trigger(self, script: SQLStringStatement, filename: Filename):
         table_name = self._get_table_name(script)
         sql_script = self.SQLLock.add_lock_statement(
             sql_script=script,
@@ -100,8 +101,10 @@ class ExecuteSQLTriggers:
         self.executeSQL.execute(sql_script)
         logger.info("# Table {tablename} UNLOCKED #".format(tablename=table_name))
 
-    def _get_table_name(self, sql_string: SQLStringStatement) -> str:
-        table_match = re.search(self.tablename_regex, sql_string, re.IGNORECASE)
+    @staticmethod
+    def _get_table_name(sql_string: SQLStringStatement) -> str:
+        tablename_regex = r'CREATE TRIGGER[\S\s]*(public..*)'
+        table_match = re.search(tablename_regex, sql_string, re.IGNORECASE)
         try:
             match = table_match.group(1)
             if match:
