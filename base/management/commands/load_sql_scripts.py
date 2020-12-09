@@ -54,7 +54,7 @@ class LoadSQLFilesToExecute:
         file = open(self.scripts_path + file)
         return file.read()
 
-    def load_scripts(self) -> List[Dict[SQLStringStatement, str]]:
+    def load_scripts(self) -> List[Dict[str, str]]:
         script_filenames = self._get_scripts_files()
         script_strings = []
         for script_filename in script_filenames:
