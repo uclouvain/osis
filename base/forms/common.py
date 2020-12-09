@@ -133,6 +133,7 @@ class ValidationRuleMixin(WarningFormMixin):
 
         elif rule.status_field == ALERT:
             field.warning = True
+            field.widget.attrs["semi-required"] = True
 
         elif rule.status_field == NOT_REQUIRED:
             field.required = False
