@@ -56,6 +56,12 @@
             {% endfor %}
         </ul>
     </div>
+    {% else %}
+    <div id="pnl_error_messages" class="alert alert-danger hidden" role="alert">
+        <ul>
+
+        </ul>
+    </div>
     {% endif %}
 
     {% as_messages_warning as messages_warning %}

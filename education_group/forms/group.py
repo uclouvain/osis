@@ -48,7 +48,7 @@ class GroupForm(ValidationRuleMixin, forms.Form):
     abbreviated_title = UpperCaseCharField(max_length=40, label=_("Acronym/Short title"), required=False)
     title_fr = forms.CharField(max_length=240, label=_("Title in French"), required=False)
     title_en = forms.CharField(max_length=240, label=_("Title in English"), required=False)
-    credits = fields.CreditField()
+    credits = fields.CreditField(required=False)
     constraint_type = forms.ChoiceField(
         choices=BLANK_CHOICE + list(ConstraintTypeEnum.choices()),
         label=_("Type of constraint"),

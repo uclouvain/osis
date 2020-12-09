@@ -242,6 +242,7 @@ class CreateTrainingForm(ValidationRuleMixin, forms.Form):
         label=_("Funding direction"),
         required=False,
     )
+    funding_direction.widget.attrs.update({"semi-required": True})
     can_be_international_funded = forms.BooleanField(
         initial=False,
         label=_('Funding international cooperation CCD/CUD'),
@@ -252,6 +253,7 @@ class CreateTrainingForm(ValidationRuleMixin, forms.Form):
         label=_("Funding international cooperation CCD/CUD direction"),
         required=False,
     )
+    international_funding_orientation.widget.attrs.update({"semi-required": True})
 
     # panel_remarks_form.html
     remark_fr = forms.CharField(widget=forms.Textarea, label=_("Remark"), required=False)

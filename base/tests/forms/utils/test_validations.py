@@ -34,7 +34,7 @@ class TestSetRemoteValidation(SimpleTestCase):
         validations.set_remote_validation(field, url)
 
         expected_attributes = {
-            "required data-parsley-remote": url,
+            "data-parsley-remote": url,
             "data-parsley-remote-validator": "async-osis"
         }
         self.assertEqual(dict(field.widget.attrs, **expected_attributes), field.widget.attrs)
