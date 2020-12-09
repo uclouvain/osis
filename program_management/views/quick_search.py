@@ -39,8 +39,6 @@ from education_group.views.serializers.group_year import GroupYearSerializer
 from education_group.models.group_year import GroupYear
 from learning_unit.api.serializers.learning_unit import LearningUnitSerializer
 
-CACHE_TIMEOUT = 60
-
 
 class QuickGroupYearFilter(FilterSet):
     academic_year = filters.ModelChoiceFilter(
@@ -107,15 +105,13 @@ class QuickGroupYearFilter(FilterSet):
         return GroupYear.objects.all()
 
 
-class QuickSearchGroupYearView(PermissionRequiredMixin, CacheFilterMixin, AjaxTemplateMixin, SearchMixin,
-                               FilterView):
+class QuickSearchGroupYearView(PermissionRequiredMixin, AjaxTemplateMixin, SearchMixin, FilterView):
     model = GroupYear
     template_name = 'quick_search_egy_inner.html'
     permission_required = ['base.view_educationgroup', 'base.can_access_learningunit']
-    timeout = CACHE_TIMEOUT
+    cache_search = False
 
     filterset_class = QuickGroupYearFilter
-    cache_exclude_params = ['page', 'path']
     paginate_by = "12"
     ordering = ('academic_year', 'acronym', 'partial_acronym')
 
@@ -164,15 +160,13 @@ class QuickSearchGroupYearView(PermissionRequiredMixin, CacheFilterMixin, AjaxTe
         )
 
 
-class QuickSearchLearningUnitYearView(PermissionRequiredMixin, CacheFilterMixin, AjaxTemplateMixin, SearchMixin,
-                                      FilterView):
+class QuickSearchLearningUnitYearView(PermissionRequiredMixin, AjaxTemplateMixin, SearchMixin, FilterView):
     model = LearningUnitYear
     template_name = 'quick_search_luy_inner.html'
     permission_required = ['base.view_educationgroup', 'base.can_access_learningunit']
-    timeout = CACHE_TIMEOUT
+    cache_search = False
 
     filterset_class = QuickLearningUnitYearFilter
-    cache_exclude_params = ['page', 'path']
     paginate_by = "12"
     ordering = ('academic_year', 'acronym')
 
