@@ -23,7 +23,7 @@ LOCK_TEMPLATE = """
 
 @attr.s(frozen=True, slots=True)
 class SQLLockStatement:
-    lock_template = attr.ib(type=str, default=LOCK_TEMPLATE)
+    lock_template = attr.ib(type=SQLStringStatement, default=LOCK_TEMPLATE)
     lock_mode = attr.ib(type=str, default=None)
 
     def add_lock_statement(self, sql_script: SQLStringStatement, table_name: str) -> SQLStringStatement:
@@ -73,7 +73,7 @@ class ExecuteSQL:
     def _cursor(self):
         return connection.cursor()
 
-    def execute(self, script: str):
+    def execute(self, script: SQLStringStatement):
         self.cursor.execute(script)
 
 
