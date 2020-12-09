@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-12-01 15:56+0100\n"
+"POT-Creation-Date: 2020-12-09 13:57+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -622,6 +622,10 @@ msgid ""
 "or equal to 9999"
 msgstr ""
 
+#, python-format
+msgid "The following fields are empty: %(fields)s "
+msgstr ""
+
 #, python-brace-format
 msgid ""
 "The formation you work with doesn't exist (or is not at the same position) "
@@ -677,6 +681,9 @@ msgid "The user is not attached to the management entity"
 msgstr ""
 
 msgid "The value of this attribute is inherited from the standard OF"
+msgstr ""
+
+msgid "There are warnings in the form."
 msgstr ""
 
 msgid "There can only be one type 2 expectation"
@@ -762,12 +769,6 @@ msgid "Utilizations"
 msgstr ""
 
 msgid "Validity"
-msgstr ""
-
-msgid "Validity cannot be greater than last year of organization"
-msgstr ""
-
-msgid "Version name {} already exists"
 msgstr ""
 
 msgid "Web re-registration"
