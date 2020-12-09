@@ -47,20 +47,20 @@ class LoadSQLFilesToExecute:
     def _get_scripts_files(self):
         return os.listdir(self.scripts_path)
 
-    def _get_sql_string_statement_from_file(self, file: str) -> SQLStringStatement:
-        file_extension = file.split(".")[-1].lower()
+    def _get_sql_string_statement_from_file(self, filename: Filename) -> SQLStringStatement:
+        file_extension = filename.split(".")[-1].lower()
         if file_extension != 'sql':
             logger.error("##### Should load sql file but it is a {} extension".format(file_extension))
             sys.exit()
 
-        file = open(self.scripts_path + file)
+        file = open(self.scripts_path + filename)
         return file.read()
 
     def load_scripts(self) -> Dict[Filename, SQLStringStatement]:
         script_filenames = self._get_scripts_files()
         script_strings = {}
         for script_filename in script_filenames:
-            script_string = self._get_sql_string_statement_from_file(file=script_filename)
+            script_string = self._get_sql_string_statement_from_file(filename=script_filename)
             script_strings.update({script_filename: script_string})
         return script_strings
 
