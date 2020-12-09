@@ -39,7 +39,9 @@
             {% include "education_group/blocks/form/create_cancel_buttons.html" %}
         </div>
     </div>
-    {% include "blocks/modal/confirmation_modal.html" %}
+
+    {#  Need that to bypass warning form mixin  #}
+    <input type="text" hidden name="confirmed" value="true">
 </form>
 
 {{ training_form.media }}
