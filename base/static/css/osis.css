@@ -692,5 +692,4 @@ table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:after, 
 
 .hidden {
     visibility: hidden;
-    display: none;
 }
