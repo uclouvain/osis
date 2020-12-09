@@ -2,7 +2,7 @@ import logging
 import os
 import re
 import sys
-from typing import Dict, List
+from typing import List, Tuple
 
 import attr
 from django.conf import settings
@@ -54,14 +54,12 @@ class LoadSQLFilesToExecute:
         file = open(self.scripts_path + file)
         return file.read()
 
-    def load_scripts(self) -> List[Dict[str, str]]:
+    def load_scripts(self) -> List[Tuple[SQLStringStatement, str]]:
         script_filenames = self._get_scripts_files()
         script_strings = []
         for script_filename in script_filenames:
             script_string = self._get_sql_string_statement_from_file(file=script_filename)
-            script_strings.append(
-                {'script_string': script_string, 'filename': script_filename}
-            )
+            script_strings.append((script_string, script_filename))
         return script_strings
 
 
@@ -87,22 +85,22 @@ class ExecuteSQLTriggers:
     def load_triggers(self):
         trigger_strings = self.loadSQLFile.load_scripts()
         logger.info("## Loading triggers from {} ##".format(self.loadSQLFile.scripts_path))
-        for trigger in trigger_strings:
-            self.load_trigger(trigger)
+        for trigger_script, filename in trigger_strings:
+            self.load_trigger(script=trigger_script, filename=filename)
         logger.info("## Loading triggers finished ##")
 
-    def load_trigger(self, trigger: Dict[str, str]):
-        table_name = self._get_table_name(trigger['script_string'])
+    def load_trigger(self, script: SQLStringStatement, filename: str):
+        table_name = self._get_table_name(script)
         sql_script = self.SQLLock.add_lock_statement(
-            sql_script=trigger['script_string'],
+            sql_script=script,
             table_name=table_name
         )
-        logger.info("# Load trigger from {filename} #".format(filename=trigger['filename']))
+        logger.info("# Load trigger from {filename} #".format(filename=filename))
         logger.info("# Table {tablename} LOCKED #".format(tablename=table_name))
         self.executeSQL.execute(sql_script)
         logger.info("# Table {tablename} UNLOCKED #".format(tablename=table_name))
 
-    def _get_table_name(self, sql_string: str) -> str:
+    def _get_table_name(self, sql_string: SQLStringStatement) -> str:
         table_match = re.search(self.tablename_regex, sql_string, re.IGNORECASE)
         try:
             match = table_match.group(1)
