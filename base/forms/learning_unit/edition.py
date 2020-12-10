@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -71,7 +71,7 @@ class LearningUnitEndDateForm(forms.Form):
         self.fields['academic_year'].initial = end_year
 
     def _get_academic_years(self, max_year):
-        if self.learning_unit.is_past():
+        if not self.learning_unit_year.has_proposal() and self.learning_unit.is_past():
             raise ValueError(
                 'Learning_unit.end_year {} cannot be less than the current academic_year'.format(
                     self.learning_unit.end_year)
@@ -116,6 +116,7 @@ class LearningUnitProposalEndDateForm(LearningUnitEndDateForm):
     def __init__(self, data, learning_unit_year, *args, max_year=None, person=None, **kwargs):
         super().__init__(data, learning_unit_year, *args, max_year=max_year, person=person, **kwargs)
         self.fields['academic_year'].widget.attrs['readonly'] = 'readonly'
+        self.fields['academic_year'].widget.attrs['disabled'] = 'disabled'
 
     @classmethod
     def get_event_perm_generator(cls):

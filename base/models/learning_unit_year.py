@@ -543,6 +543,10 @@ class LearningUnitYear(SerializableModel):
     def get_absolute_url(self):
         return reverse('learning_unit', args=[self.pk])
 
+    def has_proposal(self):
+        return LearningUnitYear.objects.filter(learning_unit__id=self.learning_unit.id,
+                                               proposallearningunit__isnull=False).exists()
+
 
 def get_by_id(learning_unit_year_id):
     return LearningUnitYear.objects.select_related('learning_container_year__learning_container') \
