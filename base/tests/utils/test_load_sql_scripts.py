@@ -60,6 +60,7 @@ class TestLoadSQLFilesToExecute(SimpleTestCase):
         self.assertDictEqual(result, expected_result)
 
 
+@mock.patch('base.utils.load_sql_scripts.ExecuteSQL._cursor')
 class TestExecuteSQLTriggers(SimpleTestCase):
     def setUp(self):
         self.executeSQL_triggers = ExecuteSQLTriggers()
@@ -76,7 +77,7 @@ class TestExecuteSQLTriggers(SimpleTestCase):
         """.format(tablename=self.table_name)
         self.filename = 'test.sql'
 
-    def test_load_trigger_should_raise_error_if_unable_to_get_tablename(self):
+    def test_load_trigger_should_raise_error_if_unable_to_get_tablename(self, mock_cursor):
         script_without_trigger = """
             CREATE TEST
                 ON public.education_group_groupyear
@@ -92,7 +93,7 @@ class TestExecuteSQLTriggers(SimpleTestCase):
                 self.executeSQL_triggers.load_trigger(script=script, filename=self.filename)
 
     @mock.patch('base.utils.load_sql_scripts.ExecuteSQL.execute')
-    def test_load_trigger_should_display_info_logs(self, mock_execute):
+    def test_load_trigger_should_display_info_logs(self, mock_execute, mock_cursor):
         log_prefix = 'INFO:default:'
         logs = [
             '# Load trigger from {filename} #'.format(filename=self.filename),
@@ -105,7 +106,7 @@ class TestExecuteSQLTriggers(SimpleTestCase):
                 self.assertIn(log_prefix + log, cm.output)
 
     @mock.patch('base.utils.load_sql_scripts.ExecuteSQL.execute')
-    def test_load_trigger_should_call_execute_with_locked_script(self, mock_execute):
+    def test_load_trigger_should_call_execute_with_locked_script(self, mock_execute, mock_cursor):
         self.executeSQL_triggers.load_trigger(script=self.script, filename=self.filename)
         expected_locked_script = """
             BEGIN WORK;
