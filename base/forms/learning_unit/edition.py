@@ -117,7 +117,6 @@ class LearningUnitProposalEndDateForm(LearningUnitEndDateForm):
     def __init__(self, data, learning_unit_year, *args, max_year=None, person=None, **kwargs):
         super().__init__(data, learning_unit_year, *args, max_year=max_year, person=person, **kwargs)
         self.fields['academic_year'].widget.attrs['readonly'] = 'readonly'
-        self.fields['academic_year'].widget.attrs['disabled'] = 'disabled'
 
     @classmethod
     def get_event_perm_generator(cls):
