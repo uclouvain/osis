@@ -328,7 +328,7 @@ class CreateTrainingForm(ValidationRuleMixin, forms.Form):
 
     def __init_academic_year_field(self):
         if not self.fields['academic_year'].disabled and self.user.person.is_faculty_manager:
-            target_years_opened = EducationGroupEditionCalendar(raise_exception=False).get_target_years_opened()
+            target_years_opened = EducationGroupEditionCalendar().get_target_years_opened()
             working_academic_years = AcademicYear.objects.filter(year__in=target_years_opened)
         else:
             working_academic_years = AcademicYear.objects.all()
@@ -421,7 +421,7 @@ class UpdateTrainingForm(PermissionFieldMixin, CreateTrainingForm):
 
     # PermissionFieldMixin
     def get_context(self) -> str:
-        is_edition_period_opened = EducationGroupEditionCalendar(raise_exception=False).is_open(target_year=self.year)
+        is_edition_period_opened = EducationGroupEditionCalendar().is_open(target_year=self.year)
         return TRAINING_PGRM_ENCODING_PERIOD if is_edition_period_opened else TRAINING_DAILY_MANAGEMENT
 
     # PermissionFieldMixin

@@ -25,7 +25,6 @@
 ##############################################################################
 import datetime
 from abc import ABC
-from collections import namedtuple
 from typing import List
 
 from django.core.exceptions import PermissionDenied
@@ -41,44 +40,62 @@ from base.models.enums import academic_calendar_type
 from base.models.learning_unit_year import LearningUnitYear
 
 
-ProcessCalendarObj = namedtuple('ProcessCalendarObj', 'title start_date end_date target_year')
+class AcademicEvent:
+    start_date = None
+    end_date = None
+    title = None
+    authorized_target_year = None
+
+    def __init__(self, start_date, end_date, title, authorized_target_year):
+        self.start_date = start_date
+        self.end_date = end_date
+        self.title = title
+        self.authorized_target_year = authorized_target_year
+
+    def is_open_now(self) -> bool:
+        """
+        Returns True only if this event is open right now
+        """
+        date = datetime.date.today()
+        return self.is_open(date)
+
+    def is_open(self, date) -> bool:
+        """
+        Returns True only if this event is open on the date specified
+        """
+        return self.start_date <= date and (self.end_date is None or self.end_date >= date)
 
 
-class ProcessCalendar(ABC):
+class AcademicEventCalendarMixin(ABC):
     event_reference = None
-    raise_exception = True
-    error_msg = ""
-
-    def __init__(self, raise_exception=True):
-        self.raise_exception = raise_exception
 
     def is_open(self, target_year: int = None) -> bool:
         target_years_opened = self.get_target_years_opened()
-        if target_year:
-            is_open = bool(next((year for year in target_years_opened if year == target_year), False))
-        else:
-            is_open = bool(target_years_opened)
-
-        if is_open is False and self.raise_exception:
-            raise PermissionDenied(_(self.error_msg).capitalize())
-        return is_open
+        if target_year is None:
+            return bool(target_years_opened)
+        return bool(next((year for year in target_years_opened if year == target_year), False))
 
     def get_target_years_opened(self, date=None) -> List[int]:
         if date is None:
             date = datetime.date.today()
         return sorted([
-            process_cal.target_year for process_cal in self._process_calendars
-            if process_cal.start_date <= date and (process_cal.end_date is None or process_cal.end_date >= date)
+            academic_event.authorized_target_year for academic_event in self._get_academic_events
+            if academic_event.is_open(date)
         ])
 
     @cached_property
-    def _process_calendars(self) -> List[ProcessCalendarObj]:
+    def _get_academic_events(self) -> List[AcademicEvent]:
+        return AcademicEventFactory().get_academic_events(self.event_reference)
+
+
+class AcademicEventFactory:
+    def get_academic_events(self, event_reference: str) -> List[AcademicEvent]:
         qs = AcademicCalendar.objects.filter(
-            reference=self.event_reference
+            reference=event_reference
         ).annotate(
-            target_year=F('data_year__year')
-        ).values('title', 'start_date', 'end_date', 'target_year')
-        return [ProcessCalendarObj(**obj) for obj in qs]
+            authorized_target_year=F('data_year__year')
+        ).values('title', 'start_date', 'end_date', 'authorized_target_year')
+        return [AcademicEvent(**obj) for obj in qs]
 
 
 class EventPerm(ABC):

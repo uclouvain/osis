@@ -23,15 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.utils.translation import gettext_lazy as _
-
-from base.business.event_perms import ProcessCalendar
+from base.business.event_perms import AcademicEventCalendarMixin
 from base.models.enums import academic_calendar_type
 
 
-class EducationGroupEditionCalendar(ProcessCalendar):
+class EducationGroupEditionCalendar(AcademicEventCalendarMixin):
     event_reference = academic_calendar_type.EDUCATION_GROUP_EDITION
-    error_msg = _("This education group is not editable during this period.")
 
 
 def synchronize():

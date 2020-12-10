@@ -62,13 +62,5 @@ class TestEventPermGroupYearEditionPermsNotOpen(TestCase):
 
     def test_is_not_open_for_spec_egy_without_exception_raise(self):
         self.assertFalse(
-            EducationGroupEditionCalendar(raise_exception=False).is_open(target_year=self.current_academic_year.year)
+            EducationGroupEditionCalendar().is_open(target_year=self.current_academic_year.year)
         )
-
-    def test_is_not_open_for_spec_egy_with_exception_raise(self):
-        expected_exception_message = str(_("This education group is not editable during this period."))
-        with self.assertRaisesMessage(PermissionDenied, expected_exception_message):
-            EducationGroupEditionCalendar(raise_exception=True).is_open(target_year=self.current_academic_year.year)
-
-    def test_is_not_open_other_rules(self):
-        self.assertFalse(EducationGroupEditionCalendar(raise_exception=False).is_open())
