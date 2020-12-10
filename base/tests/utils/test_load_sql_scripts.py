@@ -23,7 +23,6 @@
 # ############################################################################
 from unittest import mock
 
-from django.conf import settings
 from django.test.testcases import TestCase
 
 
@@ -90,19 +89,6 @@ class TestExecuteSQLTriggers(TestCase):
         for script in [script_tablename_bad_format, script_without_trigger]:
             with self.assertRaises(SystemExit):
                 self.executeSQL_triggers.load_trigger(script=script, filename=self.filename)
-
-    @mock.patch('base.utils.load_sql_scripts.ExecuteSQL.execute')
-    def test_load_trigger_should_display_info_logs(self, mock_execute):
-        log_prefix = 'INFO:default:'
-        logs = [
-            '# Load trigger from {filename} #'.format(filename=self.filename),
-            '# Table {tablename} LOCKED #'.format(tablename=self.table_name),
-            '# Table {tablename} UNLOCKED #'.format(tablename=self.table_name)
-        ]
-        with self.assertLogs(settings.DEFAULT_LOGGER, level='INFO') as cm:
-            self.executeSQL_triggers.load_trigger(script=self.script, filename=self.filename)
-            for log in logs:
-                self.assertIn(log_prefix + log, cm.output)
 
     @mock.patch('base.utils.load_sql_scripts.ExecuteSQL.execute')
     def test_load_trigger_should_call_execute_with_locked_script(self, mock_execute):
