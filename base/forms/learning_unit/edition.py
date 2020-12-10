@@ -1,4 +1,4 @@
-##############################################################################
+find_by_learning_unit##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -32,7 +32,7 @@ from base.business.learning_units.edition import edit_learning_unit_end_date
 from base.forms.learning_unit.learning_unit_postponement import LearningUnitPostponementForm
 from base.forms.utils.choice_field import BLANK_CHOICE_DISPLAY, NO_PLANNED_END_DISPLAY
 from base.models.academic_year import AcademicYear
-from base.models.proposal_learning_unit import ProposalLearningUnit
+from base.models.proposal_learning_unit import find_by_learning_unit
 from base.models.enums import learning_unit_year_subtypes
 
 
@@ -142,6 +142,6 @@ class LearningUnitDailyManagementEndDateForm(LearningUnitEndDateForm):
 
 
 def has_proposal(learning_unit):
-    if ProposalLearningUnit.find_by_learning_unit(learning_unit):
+    if find_by_learning_unit(learning_unit):
         return True
     return False
