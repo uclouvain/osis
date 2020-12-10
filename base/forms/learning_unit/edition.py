@@ -1,4 +1,4 @@
-find_by_learning_unit##############################################################################
+##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
