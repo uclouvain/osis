@@ -7,7 +7,7 @@ from base.views.education_groups.achievement.delete import DeleteEducationGroupA
 from base.views.education_groups.achievement.update import EducationGroupAchievementAction, \
     UpdateEducationGroupAchievement, EducationGroupDetailedAchievementAction, UpdateEducationGroupDetailedAchievement
 from education_group.converters import GroupTypeConverter, TrainingTypeConverter, MiniTrainingTypeConverter, \
-    AcronymConverter
+    AcronymConverter, VersionNameConverter
 from education_group.views import group, training, mini_training, general_information
 from education_group.views.autocomplete import EducationGroupTypeAutoComplete, CertificateAimAutocomplete
 from education_group.views.configuration.common_list import CommonListView
@@ -21,6 +21,7 @@ register_converter(GroupTypeConverter, 'group_type')
 register_converter(MiniTrainingTypeConverter, 'mini_training_type')
 register_converter(TrainingTypeConverter, 'training_type')
 register_converter(AcronymConverter, 'acronym')
+register_converter(VersionNameConverter, 'version_name')
 
 urlpatterns = [
     path('groups/', include([
