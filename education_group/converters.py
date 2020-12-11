@@ -66,6 +66,17 @@ class TrainingTypeConverter:
 
 class AcronymConverter:
 
+    regex = StringConverter.regex
+
+    def to_python(self, value):
+        return urllib.parse.unquote_plus(value)
+
+    def to_url(self, value):
+        return urllib.parse.quote_plus(value)
+
+
+class MiniTrainingAcronymConverter:
+
     regex = r'[a-zA-Z0-9_%\-%\/]+'
 
     def to_python(self, value):

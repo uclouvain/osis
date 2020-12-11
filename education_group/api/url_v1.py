@@ -32,9 +32,11 @@ from education_group.api.views.mini_training import MiniTrainingDetail, MiniTrai
     OfferRoots
 from education_group.api.views.training import TrainingList, TrainingDetail, TrainingTitle
 from program_management.api.views.prerequisite import TrainingPrerequisites, MiniTrainingPrerequisites
-from education_group.converters import AcronymConverter, TrainingAcronymConverter
+from education_group.converters import AcronymConverter, TrainingAcronymConverter, MiniTrainingAcronymConverter
+
 register_converter(AcronymConverter, 'mini_training_acronym')
 register_converter(TrainingAcronymConverter, 'training_acronym')
+register_converter(MiniTrainingAcronymConverter, 'mini_training_acronym')
 
 app_name = "education_group"
 
