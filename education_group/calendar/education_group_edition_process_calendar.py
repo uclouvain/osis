@@ -23,11 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from base.business.event_perms import AcademicEventCalendarMixin
+from base.business.event_perms import AcademicEventCalendarHelper
 from base.models.enums import academic_calendar_type
 
 
-class EducationGroupEditionCalendar(AcademicEventCalendarMixin):
+class EducationGroupEditionCalendar(AcademicEventCalendarHelper):
     event_reference = academic_calendar_type.EDUCATION_GROUP_EDITION
 
 

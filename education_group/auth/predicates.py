@@ -170,7 +170,7 @@ def is_element_only_inside_standard_program(
 @predicate_failed_msg(message=_("This education group is not editable during this period."))
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def is_program_edition_period_open(self, user, group_year: 'GroupYear' = None):
-    return EducationGroupEditionCalendar().is_open(target_year=group_year.academic_year.year)
+    return EducationGroupEditionCalendar().is_target_year_authorized(target_year=group_year.academic_year.year)
 
 
 @predicate(bind=True)

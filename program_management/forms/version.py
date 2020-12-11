@@ -288,7 +288,7 @@ class UpdateTrainingVersionForm(ValidationRuleMixin, PermissionFieldMixin, Speci
 
     # PermissionFieldMixin
     def get_context(self) -> str:
-        is_edition_period_opened = EducationGroupEditionCalendar().is_open(target_year=self.year)
+        is_edition_period_opened = EducationGroupEditionCalendar().is_target_year_authorized(target_year=self.year)
         return TRAINING_PGRM_ENCODING_PERIOD if is_edition_period_opened else TRAINING_DAILY_MANAGEMENT
 
     # PermissionFieldMixin
@@ -361,7 +361,7 @@ class UpdateMiniTrainingVersionForm(ValidationRuleMixin, PermissionFieldMixin, S
 
     # PermissionFieldMixin
     def get_context(self) -> str:
-        is_edition_period_opened = EducationGroupEditionCalendar().is_open(target_year=self.year)
+        is_edition_period_opened = EducationGroupEditionCalendar().is_target_year_authorized(target_year=self.year)
         return MINI_TRAINING_PGRM_ENCODING_PERIOD if is_edition_period_opened else MINI_TRAINING_DAILY_MANAGEMENT
 
     # PermissionFieldMixin

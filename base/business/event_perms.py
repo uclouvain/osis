@@ -27,6 +27,7 @@ import datetime
 from abc import ABC
 from typing import List
 
+import attr
 from django.core.exceptions import PermissionDenied
 from django.db.models import F
 from django.db.models.query import QuerySet
@@ -40,17 +41,12 @@ from base.models.enums import academic_calendar_type
 from base.models.learning_unit_year import LearningUnitYear
 
 
+@attr.s(frozen=True, slots=True)
 class AcademicEvent:
-    start_date = None
-    end_date = None
-    title = None
-    authorized_target_year = None
-
-    def __init__(self, start_date, end_date, title, authorized_target_year):
-        self.start_date = start_date
-        self.end_date = end_date
-        self.title = title
-        self.authorized_target_year = authorized_target_year
+    title = attr.ib(type=str)
+    authorized_target_year = attr.ib(type=int)
+    start_date = attr.ib(type=datetime.date)
+    end_date = attr.ib(type=datetime.date)
 
     def is_open_now(self) -> bool:
         """
@@ -65,17 +61,28 @@ class AcademicEvent:
         """
         return self.start_date <= date and (self.end_date is None or self.end_date >= date)
 
+    def is_target_year_authorized(self, target_year: int) -> bool:
+        return self.authorized_target_year == target_year
 
-class AcademicEventCalendarMixin(ABC):
+
+class AcademicEventCalendarHelper(ABC):
     event_reference = None
 
-    def is_open(self, target_year: int = None) -> bool:
+    def is_target_year_authorized(self, target_year: int = None) -> bool:
+        """
+        Check if the target year provided in kwargs is authorized to modification.
+        If no target_year provided, it check if there is at least on year authorized to modification today
+        """
         target_years_opened = self.get_target_years_opened()
         if target_year is None:
             return bool(target_years_opened)
         return bool(next((year for year in target_years_opened if year == target_year), False))
 
     def get_target_years_opened(self, date=None) -> List[int]:
+        """
+        Return list of year authorized according to a date provided in kwargs.
+        If no date provided, it will assume as today
+        """
         if date is None:
             date = datetime.date.today()
         return sorted([
@@ -86,6 +93,12 @@ class AcademicEventCalendarMixin(ABC):
     @cached_property
     def _get_academic_events(self) -> List[AcademicEvent]:
         return AcademicEventFactory().get_academic_events(self.event_reference)
+
+    def assures_consistency_until_n_plus_6(self):
+        """
+        This function will be called by a Celery job in order to ensure that
+        """
+        raise NotImplementedError()
 
 
 class AcademicEventFactory:

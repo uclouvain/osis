@@ -46,12 +46,12 @@ class TestEventPermGroupYearEditionPerms(TestCase):
 
     def test_is_open_for_spec_egy(self):
         self.assertTrue(
-            EducationGroupEditionCalendar().is_open(target_year=self.current_academic_year.year)
+            EducationGroupEditionCalendar().is_target_year_authorized(target_year=self.current_academic_year.year)
         )
 
     def test_is_open_other_rules(self):
         self.assertTrue(
-            EducationGroupEditionCalendar().is_open()
+            EducationGroupEditionCalendar().is_target_year_authorized()
         )
 
 
@@ -62,5 +62,5 @@ class TestEventPermGroupYearEditionPermsNotOpen(TestCase):
 
     def test_is_not_open_for_spec_egy_without_exception_raise(self):
         self.assertFalse(
-            EducationGroupEditionCalendar().is_open(target_year=self.current_academic_year.year)
+            EducationGroupEditionCalendar().is_target_year_authorized(target_year=self.current_academic_year.year)
         )
