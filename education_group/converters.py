@@ -21,8 +21,11 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from base.models.enums.education_group_types import GroupType, TrainingType, MiniTrainingType
 import urllib.parse
+
+from django.urls.converters import StringConverter
+
+from base.models.enums.education_group_types import GroupType, TrainingType, MiniTrainingType
 
 
 class GroupTypeConverter:
@@ -85,7 +88,7 @@ class TrainingAcronymConverter:
 
 class VersionNameConverter:
 
-    regex = r'[\w%\-]+'
+    regex = StringConverter.regex
 
     def to_python(self, value):
         return urllib.parse.unquote_plus(value)
