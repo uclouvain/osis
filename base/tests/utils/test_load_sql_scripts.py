@@ -25,11 +25,12 @@ from unittest import mock
 
 from django.test.testcases import TestCase
 
+from base.utils.load_sql_scripts import ExecuteSQLTriggers, LoadSQLFilesToExecute
+
 
 class TestLoadSQLFilesToExecute(TestCase):
     def setUp(self):
         self.subfolder = 'test/'
-        from base.utils.load_sql_scripts import LoadSQLFilesToExecute
         self.load_sql = LoadSQLFilesToExecute(subfolder=self.subfolder)
 
     def test_scripts_path_as_backoffice_and_subfolder(self):
@@ -60,7 +61,6 @@ class TestLoadSQLFilesToExecute(TestCase):
 
 class TestExecuteSQLTriggers(TestCase):
     def setUp(self):
-        from base.utils.load_sql_scripts import ExecuteSQLTriggers
         self.executeSQL_triggers = ExecuteSQLTriggers()
         self.table_name = 'public.education_group_groupyear'
         self.script = """

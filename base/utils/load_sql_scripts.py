@@ -81,7 +81,11 @@ class ExecuteSQL:
 class ExecuteSQLTriggers:
     loadSQLFile = attr.ib(type=LoadSQLFilesToExecute, default=LoadSQLFilesToExecute(subfolder='triggers/'))
     SQLLock = attr.ib(type=SQLLockStatement, default=SQLLockStatement(lock_mode='SHARE ROW EXCLUSIVE'))
-    executeSQL = attr.ib(type=ExecuteSQL, default=ExecuteSQL())
+    executeSQL = attr.ib(type=ExecuteSQL)
+
+    @executeSQL.default
+    def _executeSQL(self):
+        return ExecuteSQL()
 
     def load_triggers(self):
         trigger_strings = self.loadSQLFile.load_scripts()
