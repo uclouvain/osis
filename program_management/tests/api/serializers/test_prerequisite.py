@@ -55,7 +55,11 @@ class TestEducationGroupPrerequisitesSerializer(SimpleTestCase):
 
         self.tree = ProgramTree(root_node=self.root_node)
 
-        p_req = prerequisite.Prerequisite(main_operator=prerequisite_operator.AND, context_tree=self.tree.entity_id)
+        p_req = prerequisite.Prerequisite(
+            main_operator=prerequisite_operator.AND,
+            node_having_prerequisites=self.ldroi100a,
+            context_tree=self.tree.entity_id
+        )
         p_req.add_prerequisite_item_group(self.p_group)
         p_req.add_prerequisite_item_group(self.p_group2)
         self.ldroi100a.set_prerequisite(p_req)

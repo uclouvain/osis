@@ -466,7 +466,11 @@ class ProgramTree(interface.RootEntity):
         is_valid, messages = self.clean_set_prerequisite(prerequisite_expression, node)
         if is_valid:
             node.set_prerequisite(
-                prerequisite.factory.from_expression(prerequisite_expression, self.root_node.year, self.entity_id)
+                prerequisite.factory.from_expression(
+                    prerequisite_expression=prerequisite_expression,
+                    node_having_prerequisites=node,
+                    context_tree=self.entity_id
+                )
             )
         return messages
 

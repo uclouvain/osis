@@ -71,7 +71,11 @@ class TestPersistPrerequisite(TestCase):
         self.element_learning_unit_year = ElementLearningUnitYearFactory(
             learning_unit_year__academic_year__current=True
         )
-        self.node = NodeLearningUnitYearFactory(node_id=self.element_learning_unit_year.pk)
+        self.node = NodeLearningUnitYearFactory(
+            node_id=self.element_learning_unit_year.pk,
+            year=self.current_academic_year.year
+        )
+        # LearningUnitYearFactory(element=self.element_learning_unit_year, academic_year__current=True)
 
         self.luy1 = LearningUnitYearFactory(acronym="LOSIS4525", academic_year__current=True)
         self.luy2 = LearningUnitYearFactory(acronym="MARC4123", academic_year__current=True)
@@ -92,7 +96,7 @@ class TestPersistPrerequisite(TestCase):
     def test_should_create_prerequisite(self):
         prerequisite_obj = prerequisite.factory.from_expression(
             prerequisite_expression="LOSIS4525 OU MARC4123",
-            year=self.current_academic_year.year,
+            node_having_prerequisites=self.node,
             context_tree=ProgramTreeIdentity(code=self.root_node.code, year=self.root_node.year)
         )
         self.node.prerequisite = prerequisite_obj
@@ -108,7 +112,7 @@ class TestPersistPrerequisite(TestCase):
     def test_should_update_main_operator(self):
         prerequisite_obj = prerequisite.factory.from_expression(
             prerequisite_expression="LOSIS4525 OU MARC4123",
-            year=self.current_academic_year.year,
+            node_having_prerequisites=self.node,
             context_tree=ProgramTreeIdentity(code=self.root_node.code, year=self.root_node.year)
         )
         self.node.prerequisite = prerequisite_obj
@@ -116,7 +120,7 @@ class TestPersistPrerequisite(TestCase):
 
         prerequisite_obj = prerequisite.factory.from_expression(
             prerequisite_expression="LOSIS4525 ET MARC4123",
-            year=self.current_academic_year.year,
+            node_having_prerequisites=self.node,
             context_tree=ProgramTreeIdentity(code=self.root_node.code, year=self.root_node.year)
         )
         self.node.prerequisite = prerequisite_obj

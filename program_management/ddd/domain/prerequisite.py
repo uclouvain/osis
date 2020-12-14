@@ -32,6 +32,8 @@ from base.models import learning_unit
 from base.models.enums import prerequisite_operator
 from base.models.enums.prerequisite_operator import OR, AND
 from django.utils.translation import gettext as _
+
+from osis_common.ddd import interface
 from program_management.ddd.business_types import *
 
 
@@ -63,6 +65,7 @@ PREREQUISITE_SYNTAX_REGEX = r'^(?i)({no_element_regex}|' \
 PrerequisiteExpression = str  # Example : "(Prerequisite1 OR Prerequisite2) AND (prerequisite3)"
 
 
+#  FIXME :: to replace with NodeLearningUnitYearIdentity
 class PrerequisiteItem:
     def __init__(self, code: str, year: int):
         self.code = code
@@ -97,11 +100,13 @@ class PrerequisiteItemGroup:
         return str(" " + _(self.operator) + " ").join(str(p_item) for p_item in self.prerequisite_items)
 
 
+# FIXME :: should be a private class => Should be an Entity, not root entity ? => Should inherit from interface.Entity
 @attr.s(slots=True)
 class Prerequisite:
 
     main_operator = attr.ib(type=str)
     context_tree = attr.ib(type='ProgramTreeIdentity')  # FIXME :: Use ProgramTreeIdentity directly instead of string
+    node_having_prerequisites = attr.ib(type='NodeIdentity')  # FIXME :: Use NodeIdentity directly instead of string
     prerequisite_item_groups = attr.ib(type=List[PrerequisiteItemGroup], factory=list)
 
     has_changed = attr.ib(type=bool, default=False)
@@ -141,9 +146,15 @@ class Prerequisite:
         return OR if self.main_operator == AND else AND
 
 
+#  FIXMe :: to remove
 class NullPrerequisite(Prerequisite):
     def __init__(self, context_tree: 'ProgramTreeIdentity'):
-        super().__init__(prerequisite_operator.AND, context_tree, None)
+        super().__init__(
+            main_operator=prerequisite_operator.AND,
+            context_tree=context_tree,
+            node_having_prerequisites=None,  # FIXME :: if not removing NullPrerequisite, then should add node_having_prerequisites into __init__
+            prerequisite_item_groups=None,
+        )
 
     def __bool__(self):
         return False
@@ -156,11 +167,11 @@ class PrerequisiteFactory:
     def from_expression(
             self,
             prerequisite_expression: PrerequisiteExpression,
-            year: int,  # FIXME :: to remove and resue program_tree.year
+            node_having_prerequisites: 'NodeIdentity',
             context_tree: 'ProgramTreeIdentity'
     ) -> Prerequisite:
         if not prerequisite_expression:
-            return NullPrerequisite(context_tree)
+            return NullPrerequisite(context_tree)  # FIXME :: to remove
 
         main_operator = self._detect_main_operator_in_string(prerequisite_expression)
         secondary_operator = AND if main_operator == OR else OR
@@ -168,10 +179,10 @@ class PrerequisiteFactory:
             prerequisite_expression,
             main_operator,
             secondary_operator,
-            year
+            node_having_prerequisites.year
         )
 
-        return Prerequisite(main_operator, context_tree, prerequisite_item_groups)
+        return Prerequisite(main_operator, context_tree, node_having_prerequisites, prerequisite_item_groups)
 
     @classmethod
     def _get_grouped_items_from_string(

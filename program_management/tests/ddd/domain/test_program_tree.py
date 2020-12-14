@@ -567,14 +567,19 @@ class TestGetNodesThatHavePrerequisites(SimpleTestCase):
 
     def test_when_tree_has_node_that_have_prerequisites(self):
         p_group = prerequisite.PrerequisiteItemGroup(operator=prerequisite_operator.AND)
-        p_group.add_prerequisite_item('BLA', self.link_with_child.child.year)
+        node_having_prerequisite = self.link_with_child.child
+        p_group.add_prerequisite_item('BLA', node_having_prerequisite.year)
 
-        p_req = prerequisite.Prerequisite(main_operator=prerequisite_operator.AND, context_tree=self.tree.entity_id)
+        p_req = prerequisite.Prerequisite(
+            main_operator=prerequisite_operator.AND,
+            node_having_prerequisites=node_having_prerequisite,
+            context_tree=self.tree.entity_id
+        )
         p_req.add_prerequisite_item_group(p_group)
-        self.link_with_child.child.set_prerequisite(p_req)
+        node_having_prerequisite.set_prerequisite(p_req)
 
         result = self.tree.get_nodes_that_have_prerequisites()
-        self.assertEqual(result, [self.link_with_child.child])
+        self.assertEqual(result, [node_having_prerequisite])
 
 
 class TestGetLink(SimpleTestCase):

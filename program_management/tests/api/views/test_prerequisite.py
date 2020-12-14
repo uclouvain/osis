@@ -97,7 +97,11 @@ class ProgramTreePrerequisitesBaseTestCase(APITestCase):
 
         cls.tree = ProgramTree(root_node=cls.root_node)
 
-        p_req = prerequisite.Prerequisite(main_operator=prerequisite_operator.AND, context_tree=cls.tree.entity_id)
+        p_req = prerequisite.Prerequisite(
+            main_operator=prerequisite_operator.AND,
+            node_having_prerequisites=cls.ldroi100a,
+            context_tree=cls.tree.entity_id
+        )
         p_req.add_prerequisite_item_group(cls.p_group)
         cls.ldroi100a.set_prerequisite(p_req)
 

@@ -55,7 +55,8 @@ def load_has_prerequisite_multiple(
     :param nodes: Dict where keys = '<node_id>_<TYPE>' and values = Node
     :return:
     """
-    from program_management.ddd.domain.program_tree import ProgramTreeIdentity  # FIXME :: cyclic import - use dependency injection instead
+    from program_management.ddd.domain.program_tree import ProgramTreeIdentity  # FIXME :: cyclic import - use dependency injection instead ?
+    from program_management.ddd.domain.node import NodeIdentity  # FIXME :: cyclic import - use dependency injection instead ?
     prerequisite_item_qs = PrerequisiteItem.objects.filter(
         prerequisite__education_group_version__root_group__element__id__in=tree_root_ids,
         prerequisite__learning_unit_year_id__element__pk__in=set(n.pk for n in nodes.values() if n.is_learning_unit())
@@ -69,6 +70,7 @@ def load_has_prerequisite_multiple(
         year=F('prerequisite__learning_unit_year__academic_year__year'),
         main_operator=F('prerequisite__main_operator'),
         element_id=F('prerequisite__learning_unit_year__element__pk'),
+        element_code=F('prerequisite__learning_unit_year__partial_acronym'),
         root_element_id=F('prerequisite__education_group_version__root_group__element__pk'),
         root_code=F('prerequisite__education_group_version__root_group__partial_acronym'),
         root_year=F('prerequisite__education_group_version__root_group__academic_year__year'),
@@ -103,6 +105,7 @@ def load_has_prerequisite_multiple(
             first_item = prequisite_items[0]
             preq = prerequisite_domain.Prerequisite(
                 main_operator=first_item['main_operator'],
+                node_having_prerequisites=NodeIdentity(code=first_item['element_code'], year=first_item['year']),
                 context_tree=ProgramTreeIdentity(code=first_item['root_code'], year=first_item['root_year'])
             )
             prerequisites_dict.setdefault(node_id, preq)
