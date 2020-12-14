@@ -70,6 +70,8 @@ def load_has_prerequisite_multiple(
         main_operator=F('prerequisite__main_operator'),
         element_id=F('prerequisite__learning_unit_year__element__pk'),
         root_element_id=F('prerequisite__education_group_version__root_group__element__pk'),
+        root_code=F('prerequisite__education_group_version__root_group__partial_acronym'),
+        root_year=F('prerequisite__education_group_version__root_group__academic_year__year'),
     ).order_by(
         'root_element_id',
         'element_id',
@@ -77,6 +79,8 @@ def load_has_prerequisite_multiple(
         'position'
     ).values(
         'root_element_id',
+        'root_code',
+        'root_year',
         'element_id',
         'main_operator',
         'group_number',
@@ -96,7 +100,11 @@ def load_has_prerequisite_multiple(
         for node_id, prequisite_items in result_grouped_by_learn_unit_id:
             prequisite_items = list(prequisite_items)
 
-            preq = prerequisite_domain.Prerequisite(main_operator=prequisite_items[0]['main_operator'])
+            first_item = prequisite_items[0]
+            preq = prerequisite_domain.Prerequisite(
+                main_operator=first_item['main_operator'],
+                context_tree=ProgramTreeIdentity(code=first_item['root_code'], year=first_item['root_year'])
+            )
             prerequisites_dict.setdefault(node_id, preq)
             for _, p_items in itertools.groupby(prequisite_items, key=lambda p: p['group_number']):
                 operator_item = prerequisite_operator.OR if preq.main_operator == prerequisite_operator.AND else \

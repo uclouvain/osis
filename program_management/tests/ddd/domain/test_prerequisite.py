@@ -32,6 +32,7 @@ from program_management.ddd.domain.prerequisite import NullPrerequisite
 from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory
 from program_management.tests.ddd.factories.prerequisite import PrerequisiteItemFactory, PrerequisiteFactory, \
     PrerequisiteItemGroupFactory
+from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
 
 class TestPrerequisiteItem(SimpleTestCase):
@@ -84,30 +85,41 @@ class TestPrerequisiteGroupItem(SimpleTestCase):
 
 class TestPrerequisite(SimpleTestCase):
     def setUp(self):
+
+        year = 2018
+        ldroi1300 = NodeLearningUnitYearFactory(code="LDROI1300", year=year)
+        lagro2400 = NodeLearningUnitYearFactory(code="LAGRO2400", year=year)
+        ldroi1400 = NodeLearningUnitYearFactory(code="LDROI1400", year=year)
+
+        self.tree = ProgramTreeFactory(root_node__code="LDROI100B", root_node__year=year)
+        self.tree.root_node.add_child(ldroi1300)
+        self.tree.root_node.add_child(lagro2400)
+        self.tree.root_node.add_child(ldroi1400)
+
         self.p_group = prerequisite.PrerequisiteItemGroup(operator=prerequisite_operator.OR)
-        self.p_group.add_prerequisite_item('LDROI1300', 2018)
-        self.p_group.add_prerequisite_item('LAGRO2400', 2018)
+        self.p_group.add_prerequisite_item(ldroi1300.code, ldroi1300.year)
+        self.p_group.add_prerequisite_item(lagro2400.code, lagro2400.year)
 
         self.p_group_2 = prerequisite.PrerequisiteItemGroup(operator=prerequisite_operator.OR)
-        self.p_group_2.add_prerequisite_item('LDROI1400', 2018)
+        self.p_group_2.add_prerequisite_item(ldroi1400.code, ldroi1400.year)
 
     def test_case_assert_invalid_main_operator_raise_exception(self):
         with self.assertRaises(AssertionError):
-            prerequisite.Prerequisite(main_operator="XOR")
+            prerequisite.Prerequisite(main_operator="XOR", context_tree=ProgramTreeFactory())
 
     def test_case_assert_str_method_no_group(self):
-        p_req = prerequisite.Prerequisite(main_operator=prerequisite_operator.AND)
+        p_req = prerequisite.Prerequisite(main_operator=prerequisite_operator.AND, context_tree=self.tree)
         self.assertEqual(str(p_req), '')
 
     def test_case_assert_str_method_with_one_group(self):
-        p_req = prerequisite.Prerequisite(main_operator=prerequisite_operator.AND)
+        p_req = prerequisite.Prerequisite(main_operator=prerequisite_operator.AND, context_tree=self.tree)
         p_req.add_prerequisite_item_group(self.p_group)
 
         expected_str = 'LDROI1300 {OR} LAGRO2400'.format(OR=_(prerequisite_operator.OR))
         self.assertEqual(str(p_req), expected_str)
 
     def test_case_assert_str_method_with_multiple_groups(self):
-        p_req = prerequisite.Prerequisite(main_operator=prerequisite_operator.AND)
+        p_req = prerequisite.Prerequisite(main_operator=prerequisite_operator.AND, context_tree=self.tree)
         p_req.add_prerequisite_item_group(self.p_group)
         p_req.add_prerequisite_item_group(self.p_group_2)
 

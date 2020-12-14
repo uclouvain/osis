@@ -95,11 +95,11 @@ class ProgramTreePrerequisitesBaseTestCase(APITestCase):
         cls.p_group.add_prerequisite_item('LDROI1300', 2018)
         cls.p_group.add_prerequisite_item('LAGRO2400', 2018)
 
-        p_req = prerequisite.Prerequisite(main_operator=prerequisite_operator.AND)
+        cls.tree = ProgramTree(root_node=cls.root_node)
+
+        p_req = prerequisite.Prerequisite(main_operator=prerequisite_operator.AND, context_tree=cls.tree.entity_id)
         p_req.add_prerequisite_item_group(cls.p_group)
         cls.ldroi100a.set_prerequisite(p_req)
-
-        cls.tree = ProgramTree(root_node=cls.root_node)
 
     def setUp(self):
         self.client.force_authenticate(user=self.person.user)

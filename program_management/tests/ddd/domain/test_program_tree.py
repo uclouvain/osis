@@ -569,7 +569,7 @@ class TestGetNodesThatHavePrerequisites(SimpleTestCase):
         p_group = prerequisite.PrerequisiteItemGroup(operator=prerequisite_operator.AND)
         p_group.add_prerequisite_item('BLA', self.link_with_child.child.year)
 
-        p_req = prerequisite.Prerequisite(main_operator=prerequisite_operator.AND)
+        p_req = prerequisite.Prerequisite(main_operator=prerequisite_operator.AND, context_tree=self.tree)
         p_req.add_prerequisite_item_group(p_group)
         self.link_with_child.child.set_prerequisite(p_req)
 

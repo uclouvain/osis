@@ -530,7 +530,7 @@ class NodeLearningUnitYear(Node):
     is_prerequisite_of = attr.ib(type=List, factory=list)
     status = attr.ib(type=bool, default=None)
     periodicity = attr.ib(type=PeriodicityEnum, default=None)
-    prerequisite = attr.ib(type=Prerequisite, default=NullPrerequisite())
+    prerequisite = attr.ib(type=Prerequisite, default=NullPrerequisite(None))  # FIXME :: replace None by TreeIdentity
     common_title_fr = attr.ib(type=str, default=None)
     specific_title_fr = attr.ib(type=str, default=None)
     common_title_en = attr.ib(type=str, default=None)

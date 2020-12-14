@@ -57,9 +57,11 @@ class PrerequisiteFactory(factory.Factory):
         abstract = False
 
     main_operator = prerequisite_operator.AND
+    context_tree = None  # FIXME :: refactor to assign real value to context tree
     prerequisite_item_groups = []
 
 
+# FIXME :: add 'context_tree' to params
 def cast_to_prerequisite(node: 'NodeLearningUnitYear') -> Prerequisite:
     return PrerequisiteFactory(
         prerequisite_item_groups=[

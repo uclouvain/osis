@@ -101,9 +101,10 @@ class PrerequisiteItemGroup:
 class Prerequisite:
 
     main_operator = attr.ib(type=str)
-    prerequisite_item_groups = attr.ib(type=List[PrerequisiteItemGroup], default=[])
+    context_tree = attr.ib(type='ProgramTreeIdentity')  # FIXME :: Use ProgramTreeIdentity directly instead of string
+    prerequisite_item_groups = attr.ib(type=List[PrerequisiteItemGroup], factory=list)
 
-    has_changed = False
+    has_changed = attr.ib(type=bool, default=False)
 
     @main_operator.validator
     def _main_operator_validator(self, attribute, value):
@@ -141,8 +142,8 @@ class Prerequisite:
 
 
 class NullPrerequisite(Prerequisite):
-    def __init__(self):
-        super().__init__(prerequisite_operator.AND, None)
+    def __init__(self, context_tree: 'ProgramTreeIdentity'):
+        super().__init__(prerequisite_operator.AND, context_tree, None)
 
     def __bool__(self):
         return False
@@ -152,9 +153,14 @@ class NullPrerequisite(Prerequisite):
 
 
 class PrerequisiteFactory:
-    def from_expression(self, prerequisite_expression: PrerequisiteExpression, year: int) -> Prerequisite:
+    def from_expression(
+            self,
+            prerequisite_expression: PrerequisiteExpression,
+            year: int,  # FIXME :: to remove and resue program_tree.year
+            context_tree: 'ProgramTreeIdentity'
+    ) -> Prerequisite:
         if not prerequisite_expression:
-            return NullPrerequisite()
+            return NullPrerequisite(context_tree)
 
         main_operator = self._detect_main_operator_in_string(prerequisite_expression)
         secondary_operator = AND if main_operator == OR else OR
@@ -165,7 +171,7 @@ class PrerequisiteFactory:
             year
         )
 
-        return Prerequisite(main_operator, prerequisite_item_groups)
+        return Prerequisite(main_operator, context_tree, prerequisite_item_groups)
 
     @classmethod
     def _get_grouped_items_from_string(

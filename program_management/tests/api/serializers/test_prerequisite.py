@@ -53,12 +53,12 @@ class TestEducationGroupPrerequisitesSerializer(SimpleTestCase):
         self.p_group2 = prerequisite.PrerequisiteItemGroup(operator=prerequisite_operator.AND)
         self.p_group2.add_prerequisite_item('LAGRO2400', 2018)
 
-        p_req = prerequisite.Prerequisite(main_operator=prerequisite_operator.AND)
+        self.tree = ProgramTree(root_node=self.root_node)
+
+        p_req = prerequisite.Prerequisite(main_operator=prerequisite_operator.AND, context_tree=self.tree.entity_id)
         p_req.add_prerequisite_item_group(self.p_group)
         p_req.add_prerequisite_item_group(self.p_group2)
         self.ldroi100a.set_prerequisite(p_req)
-
-        self.tree = ProgramTree(root_node=self.root_node)
 
         url = reverse('program_management_api_v1:training-prerequisites_official',
                       kwargs={'year': self.root_node.year, 'acronym': self.root_node.code})
