@@ -70,7 +70,7 @@ def load_has_prerequisite_multiple(
         year=F('prerequisite__learning_unit_year__academic_year__year'),
         main_operator=F('prerequisite__main_operator'),
         element_id=F('prerequisite__learning_unit_year__element__pk'),
-        element_code=F('prerequisite__learning_unit_year__partial_acronym'),
+        element_code=F('prerequisite__learning_unit_year__acronym'),
         root_element_id=F('prerequisite__education_group_version__root_group__element__pk'),
         root_code=F('prerequisite__education_group_version__root_group__partial_acronym'),
         root_year=F('prerequisite__education_group_version__root_group__academic_year__year'),
