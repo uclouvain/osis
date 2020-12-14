@@ -26,10 +26,13 @@
 import re
 from typing import List
 
+import attr
+
 from base.models import learning_unit
 from base.models.enums import prerequisite_operator
 from base.models.enums.prerequisite_operator import OR, AND
 from django.utils.translation import gettext as _
+from program_management.ddd.business_types import *
 
 
 AND_OPERATOR = "ET"
@@ -94,13 +97,17 @@ class PrerequisiteItemGroup:
         return str(" " + _(self.operator) + " ").join(str(p_item) for p_item in self.prerequisite_items)
 
 
+@attr.s(slots=True)
 class Prerequisite:
-    def __init__(self, main_operator: str, prerequisite_item_groups: List[PrerequisiteItemGroup] = None):
-        assert main_operator in [prerequisite_operator.OR, prerequisite_operator.AND]
-        self.main_operator = main_operator
 
-        self.prerequisite_item_groups = prerequisite_item_groups or []
-        self.has_changed = False
+    main_operator = attr.ib(type=str)
+    prerequisite_item_groups = attr.ib(type=List[PrerequisiteItemGroup], default=[])
+
+    has_changed = False
+
+    @main_operator.validator
+    def _main_operator_validator(self, attribute, value):
+        assert value in [prerequisite_operator.OR, prerequisite_operator.AND]
 
     def add_prerequisite_item_group(self, group: PrerequisiteItemGroup):
         self.prerequisite_item_groups.append(group)
