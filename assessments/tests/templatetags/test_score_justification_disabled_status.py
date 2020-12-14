@@ -26,37 +26,34 @@
 
 from django.test import TestCase
 
-from assessments.templatetags.enrollment_state import enrolled_exists
+from assessments.templatetags.score_justification_disabled_status import get_score_justification_disabled_status, \
+    DISABLED, ENABLED
 from base.models.enums import exam_enrollment_state as enrollment_states
-from base.models.enums import number_session
-from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.exam_enrollment import ExamEnrollmentFactory
-from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
-from base.tests.factories.session_examen import SessionExamFactory
-from base.tests.factories.exam_enrollment import ExamEnrollmentFactory
-from assessments.templatetags.score_justification_disabled_status import get_score_justification_disabled_status, DISABLED, ENABLED
 from base.models.enums.exam_enrollment_justification_type import CHEATING
+from base.tests.factories.exam_enrollment import ExamEnrollmentFactory
+
 
 class ScoreJustificationDisabledStatusForProgramManagerTests(TestCase):
+    def setUp(self) -> None:
+        self.exam_enrollment = ExamEnrollmentFactory()
+        self.exam_enrollment.deadline_reached = False
+        self.exam_enrollment.deadline_tutor_reached = False
 
     def test_enrollment_not_enrolled(self):
-        enrollment_not_enrolled = ExamEnrollmentFactory(enrollment_state=enrollment_states.NOT_ENROLLED)
-        context = {'is_program_manager': True,
-                   'enrollment': enrollment_not_enrolled}
+        self.exam_enrollment.enrollment_state = enrollment_states.NOT_ENROLLED
+        context = {'is_program_manager': True, 'enrollment': self.exam_enrollment}
         self.assertEqual(get_score_justification_disabled_status(context), DISABLED)
 
     def test_enrollment_not_enrolled_deadline_reached(self):
-        enrollment = ExamEnrollmentFactory(enrollment_state=enrollment_states.ENROLLED)
-        enrollment.deadline_reached = True
-        context = {'is_program_manager': True,
-                   'enrollment': enrollment}
+        self.exam_enrollment.enrollment_state = enrollment_states.ENROLLED
+        self.exam_enrollment.deadline_reached = True
+        context = {'is_program_manager': True, 'enrollment': self.exam_enrollment}
         self.assertEqual(get_score_justification_disabled_status(context), DISABLED)
 
     def test_enrollment_not_enrolled_deadline_unreached(self):
-        enrollment = ExamEnrollmentFactory(enrollment_state=enrollment_states.ENROLLED)
-        enrollment.deadline_reached = False
-        context = {'is_program_manager': True,
-                   'enrollment': enrollment}
+        self.exam_enrollment.enrollment_state = enrollment_states.ENROLLED
+        self.exam_enrollment.deadline_reached = False
+        context = {'is_program_manager': True, 'enrollment': self.exam_enrollment}
         self.assertEqual(get_score_justification_disabled_status(context), ENABLED)
 
 
@@ -64,10 +61,12 @@ class ScoreJustificationDisabledStatusNotProgramManagerTests(TestCase):
     def setUp(self):
         self.context = {'is_program_manager': False}
         self.enrollment_enrolled = ExamEnrollmentFactory(enrollment_state=enrollment_states.ENROLLED)
+        self.enrollment_enrolled.deadline_reached = False
+        self.enrollment_enrolled.deadline_tutor_reached = False
 
     def test_enrollment_not_enrolled(self):
-        enrollment_not_enrolled = ExamEnrollmentFactory(enrollment_state=enrollment_states.NOT_ENROLLED)
-        self.context.update({'enrollment': enrollment_not_enrolled})
+        self.enrollment_enrolled.enrollment_state = enrollment_states.NOT_ENROLLED
+        self.context.update({'enrollment': self.enrollment_enrolled})
         self.assertEqual(get_score_justification_disabled_status(self.context), DISABLED)
 
     def test_enrollment_not_enrolled_deadline_reached(self):
@@ -85,6 +84,12 @@ class ScoreJustificationDisabledStatusNotProgramManagerTests(TestCase):
 
     def test_enrollment_score_final(self):
         self.enrollment_enrolled.score_final = 10
+
+        self.context.update({'enrollment': self.enrollment_enrolled})
+        self.assertEqual(get_score_justification_disabled_status(self.context), DISABLED)
+
+    def test_enrollment_score_final_equal_to_0(self):
+        self.enrollment_enrolled.score_final = 0
 
         self.context.update({'enrollment': self.enrollment_enrolled})
         self.assertEqual(get_score_justification_disabled_status(self.context), DISABLED)
