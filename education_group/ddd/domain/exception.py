@@ -254,7 +254,7 @@ MAP_FIELDS_TO_NAME = {
     "english_activities": _("activities in English").capitalize(),
     "other_language_activities": _("Other languages activities"),
     "internal_comment": _("comment (internal)").capitalize(),
-    "main_domain": _("main domain"),
+    "main_domain": _("main domain").capitalize(),
     "secondary_domains": _("secondary domains"),
     "isced_domain": _("ISCED domain"),
     "management_entity": _("Management entity"),
@@ -274,7 +274,7 @@ MAP_FIELDS_TO_NAME = {
     "leads_to_diploma": _('Leads to diploma/certificate'),
     "certificate_aims": _("certificate aims"),
     "funding_orientation": _("Funding direction"),
-    "international_funding_orientation": _('Funding international cooperation CCD/CUD'),
+    "international_funding_orientation": _('Funding international cooperation CCD/CUD direction'),
 }
 
 

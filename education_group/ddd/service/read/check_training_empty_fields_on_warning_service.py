@@ -24,6 +24,7 @@
 
 from education_group.ddd.command import GetTrainingEmptyFieldsOnWarningCommand
 from education_group.ddd.domain import exception
+from education_group.ddd.domain.service import fields_with_alert_when_empty
 from education_group.ddd.domain.training import TrainingIdentity
 from education_group.ddd.repository import training as training_repository
 
@@ -32,12 +33,15 @@ def check_training_empty_fields_on_warning(cmd: 'GetTrainingEmptyFieldsOnWarning
     training_identity = TrainingIdentity(acronym=cmd.acronym, year=cmd.year)
     training = training_repository.TrainingRepository().get(training_identity)
 
+    fields_to_check = fields_with_alert_when_empty.get_for_training(training.type)
     fields_on_warning = []
-    if training.main_domain is None:
+    if "main_domain" in fields_to_check and training.main_domain is None:
         fields_on_warning.append("main_domain")
-    if training.funding is None or training.funding.funding_orientation is None:
+    if "funding_orientation" in fields_to_check and \
+            (training.funding is None or training.funding.funding_orientation is None):
         fields_on_warning.append("funding_orientation")
-    if training.funding is None or training.funding.international_funding_orientation is None:
+    if "international_funding_orientation" in fields_to_check and \
+            (training.funding is None or training.funding.international_funding_orientation is None):
         fields_on_warning.append("international_funding_orientation")
 
     if fields_on_warning:

@@ -44,6 +44,11 @@ class TestCheckEmptyFields(SimpleTestCase, MockPatcherMixin):
             year=self.training.entity_id.year
         )
 
+        self.mock_service(
+            "education_group.ddd.domain.service.fields_with_alert_when_empty.get_for_training",
+            ["funding_orientation"]
+        )
+
     def test_should_not_return_exception_when_no_empty_fields(self):
         result = check_training_empty_fields_on_warning(self.command)
 
@@ -51,7 +56,7 @@ class TestCheckEmptyFields(SimpleTestCase, MockPatcherMixin):
 
     def test_should_raise_exception_when_empty_fields(self):
         self.training.main_domain = None
-        self.training.funding = FundingFactory(funding_orientation=None, international_funding_orientation=None)
+        self.training.funding = FundingFactory(funding_orientation=None)
 
         with self.assertRaises(exception.TrainingEmptyFieldException):
             check_training_empty_fields_on_warning(self.command)

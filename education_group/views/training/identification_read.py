@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
+
 from reversion.models import Version
 
 from base.models.education_group_achievement import EducationGroupAchievement
@@ -30,7 +32,6 @@ from base.models.education_group_certificate_aim import EducationGroupCertificat
 from base.models.education_group_detailed_achievement import EducationGroupDetailedAchievement
 from base.models.education_group_organization import EducationGroupOrganization
 from base.models.education_group_year_domain import EducationGroupYearDomain
-from base.views.common import display_warning_messages
 from education_group.ddd.command import GetTrainingEmptyFieldsOnWarningCommand
 from education_group.ddd.domain import exception
 from education_group.ddd.service.read.check_training_empty_fields_on_warning_service import \
@@ -38,7 +39,6 @@ from education_group.ddd.service.read.check_training_empty_fields_on_warning_ser
 from education_group.models.group_year import GroupYear
 from education_group.views.training.common_read import TrainingRead, Tab
 from program_management.models.education_group_version import EducationGroupVersion
-from django.utils.translation import gettext_lazy as _
 
 
 class TrainingReadIdentification(TrainingRead):
@@ -46,25 +46,21 @@ class TrainingReadIdentification(TrainingRead):
     active_tab = Tab.IDENTIFICATION
 
     def get_context_data(self, **kwargs):
-        self.display_warning_message()
         return {
             **super().get_context_data(**kwargs),
             "permission_object": self.get_permission_object(),
             "history": self.get_related_history(),
+            "fields_warnings": self.get_fields_in_warning()
         }
 
-    def display_warning_message(self):
-        cmd = GetTrainingEmptyFieldsOnWarningCommand(acronym=self.training.acronym, year=self.training.year)
-        try:
-            check_training_empty_fields_on_warning(cmd)
-        except exception.TrainingEmptyFieldException as e:
-            fields_to_list_item = ["<li>" + field + "</li>" for field in e.fields]
-            fields = "<ul>" + "".join(fields_to_list_item) + "</ul>"
-            message = "{introduction} {fields} ".format(
-                introduction=_("There are warnings in the form."),
-                fields=fields
-            )
-            display_warning_messages(self.request, message, extra_tags="safe")
+    def get_fields_in_warning(self) -> List[str]:
+        if self.current_version.is_standard_version:
+            try:
+                cmd = GetTrainingEmptyFieldsOnWarningCommand(acronym=self.training.acronym, year=self.training.year)
+                check_training_empty_fields_on_warning(cmd)
+            except exception.TrainingEmptyFieldException as e:
+                return e.fields
+        return []
 
     def get_related_history(self):
         group_year = self.education_group_version.root_group
