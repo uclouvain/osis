@@ -57,6 +57,7 @@ class PrerequisiteFactory(factory.Factory):
         abstract = False
 
     main_operator = prerequisite_operator.AND
+    node_having_prerequisites = None  # FIXME :: refactor to assign real value to node_having_prerequisites
     context_tree = None  # FIXME :: refactor to assign real value to context tree
     prerequisite_item_groups = []
 
