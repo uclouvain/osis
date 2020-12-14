@@ -29,6 +29,7 @@ from django.utils.translation import gettext_lazy as _
 from base.models.enums import prerequisite_operator
 from program_management.ddd.domain import prerequisite
 from program_management.ddd.domain.prerequisite import NullPrerequisite
+from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory
 from program_management.tests.ddd.factories.prerequisite import PrerequisiteItemFactory, PrerequisiteFactory, \
     PrerequisiteItemGroupFactory
@@ -209,14 +210,18 @@ class TestgetAllPrerequisiteItems(SimpleTestCase):
 class TestConstructPrerequisiteFromExpression(SimpleTestCase):
     def test_return_null_prerequisite_when_empty_expression_given(self):
         self.assertIsInstance(
-            prerequisite.factory.from_expression("", 2019),
+            prerequisite.factory.from_expression("", 2019, None),
             NullPrerequisite
         )
 
     def test_return_prerequisite_object_when_expression_given(self):
+        tree = ProgramTreeFactory()
+        LinkFactory(parent=tree.root_node, child__code='LOSIS4525')
+        LinkFactory(parent=tree.root_node, child__code='LMARC5823')
+        LinkFactory(parent=tree.root_node, child__code='BRABD6985')
         prerequisite_expression = "LOSIS4525 OU (LMARC5823 ET BRABD6985)"
 
-        prerequisite_obj = prerequisite.factory.from_expression(prerequisite_expression, 2019)
+        prerequisite_obj = prerequisite.factory.from_expression(prerequisite_expression, 2019, tree.entity_id)
         self.assertEqual(
             prerequisite_expression,
             str(prerequisite_obj)

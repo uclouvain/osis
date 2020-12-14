@@ -34,6 +34,7 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.prerequisite import PrerequisiteFactory
 from program_management.ddd.domain import prerequisite
 from program_management.ddd.domain.prerequisite import NullPrerequisite
+from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 from program_management.ddd.repositories import _persist_prerequisite
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory, \
@@ -50,7 +51,7 @@ class TestPersist(TestCase):
         link1 = LinkFactory(parent=tree.root_node, child=NodeLearningUnitYearFactory())
         link2 = LinkFactory(parent=tree.root_node, child=NodeLearningUnitYearFactory())
 
-        link1.child.set_prerequisite(NullPrerequisite())
+        link1.child.set_prerequisite(context_tree=NullPrerequisite(tree.entity_id))
 
         _persist_prerequisite.persist(tree)
 
@@ -76,7 +77,9 @@ class TestPersistPrerequisite(TestCase):
         self.luy2 = LearningUnitYearFactory(acronym="MARC4123", academic_year__current=True)
 
     def test_when_null_prerequisite_given(self):
-        self.node.prerequisite = NullPrerequisite()
+        self.node.prerequisite = NullPrerequisite(
+            context_tree=ProgramTreeIdentity(code=self.root_node.code, year=self.root_node.year)
+        )
         _persist_prerequisite._persist(self.root_node, self.node)
 
         self.assertQuerysetEqual(
@@ -88,8 +91,9 @@ class TestPersistPrerequisite(TestCase):
 
     def test_should_create_prerequisite(self):
         prerequisite_obj = prerequisite.factory.from_expression(
-            "LOSIS4525 OU MARC4123",
-            self.current_academic_year.year
+            prerequisite_expression="LOSIS4525 OU MARC4123",
+            year=self.current_academic_year.year,
+            context_tree=ProgramTreeIdentity(code=self.root_node.code, year=self.root_node.year)
         )
         self.node.prerequisite = prerequisite_obj
         _persist_prerequisite._persist(self.root_node, self.node)
@@ -103,15 +107,17 @@ class TestPersistPrerequisite(TestCase):
 
     def test_should_update_main_operator(self):
         prerequisite_obj = prerequisite.factory.from_expression(
-            "LOSIS4525 OU MARC4123",
-            self.current_academic_year.year
+            prerequisite_expression="LOSIS4525 OU MARC4123",
+            year=self.current_academic_year.year,
+            context_tree=ProgramTreeIdentity(code=self.root_node.code, year=self.root_node.year)
         )
         self.node.prerequisite = prerequisite_obj
         _persist_prerequisite._persist(self.root_node, self.node)
 
         prerequisite_obj = prerequisite.factory.from_expression(
-            "LOSIS4525 ET MARC4123",
-            self.current_academic_year.year
+            prerequisite_expression="LOSIS4525 ET MARC4123",
+            year=self.current_academic_year.year,
+            context_tree=ProgramTreeIdentity(code=self.root_node.code, year=self.root_node.year)
         )
         self.node.prerequisite = prerequisite_obj
         _persist_prerequisite._persist(self.root_node, self.node)
@@ -128,7 +134,9 @@ class TestPersistPrerequisite(TestCase):
             learning_unit_year=self.element_learning_unit_year.learning_unit_year,
             items__groups=((self.luy1,), (self.luy2,))
         )
-        self.node.prerequisite = NullPrerequisite()
+        self.node.prerequisite = NullPrerequisite(
+            context_tree=ProgramTreeIdentity(code=self.root_node.code, year=self.root_node.year)
+        )
         _persist_prerequisite._persist(self.root_node, self.node)
 
         self.assertQuerysetEqual(

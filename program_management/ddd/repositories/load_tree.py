@@ -195,7 +195,7 @@ def __build_children(
             #  It's because prerequisites should be an attribute of the ProgramTree, not of the Node.
             child_node = copy.copy(child_node)
             link_node = copy.copy(link_node)
-            child_node.prerequisite = prerequisites['has_prerequisite_dict'].get(child_node.pk, NullPrerequisite())
+            child_node.prerequisite = prerequisites['has_prerequisite_dict'].get(child_node.pk, NullPrerequisite(None))  # FIXME :: add ProgramTreeIdentity (root) instance
             child_node.is_prerequisite_of = prerequisites['is_prerequisite_dict'].get(child_node.pk, [])
 
         link_node.parent = nodes[parent_id]
