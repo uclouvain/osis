@@ -21,8 +21,11 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from base.models.enums.education_group_types import GroupType, TrainingType, MiniTrainingType
 import urllib.parse
+
+from django.urls.converters import StringConverter
+
+from base.models.enums.education_group_types import GroupType, TrainingType, MiniTrainingType
 
 
 class GroupTypeConverter:
@@ -63,7 +66,40 @@ class TrainingTypeConverter:
 
 class AcronymConverter:
 
-    regex = r'[\w%\-]+'
+    regex = StringConverter.regex
+
+    def to_python(self, value):
+        return urllib.parse.unquote_plus(value)
+
+    def to_url(self, value):
+        return urllib.parse.quote_plus(value)
+
+
+class MiniTrainingAcronymConverter:
+
+    regex = r'[a-zA-Z0-9_%\-%\/]+'
+
+    def to_python(self, value):
+        return urllib.parse.unquote_plus(value)
+
+    def to_url(self, value):
+        return urllib.parse.quote_plus(value)
+
+
+class TrainingAcronymConverter:
+
+    regex = r'[a-zA-Z0-9_\/ ]+'
+
+    def to_python(self, value):
+        return urllib.parse.unquote_plus(value)
+
+    def to_url(self, value):
+        return urllib.parse.quote_plus(value)
+
+
+class VersionNameConverter:
+
+    regex = StringConverter.regex
 
     def to_python(self, value):
         return urllib.parse.unquote_plus(value)

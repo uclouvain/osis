@@ -1518,89 +1518,89 @@ Examples: <i>LAGRO114V, LDRT100V, LFIAL100V</i>","Code d’un Parternariat de mo
 <li><b>V</b></li>
 </ul>
 Exemples: <i>LAGRO114V, LDRT100V, LFIAL100V</i>",Ex: LAGRO100V
-base.validationrule,MiniTrainingForm.DEEPENING.abbreviated_title,REQUIRED,,"^[\w\-\/]+$",,"Acronym/Short title of mini-training is composed of:
+base.validationrule,MiniTrainingForm.DEEPENING.abbreviated_title,REQUIRED,,"^[a-zA-Z0-9_\-\/]+$",,"Authorized characters for the acronym/short title of mini-training:
 <ul>
 	<li>letters: A-Z</li>
 	<li>numbers: 0-9</li>
 	<li>special characters: <b>-</b>, <b>_</b> or <b>/</b></li>
-</ul>","Sigle/Intitul&eacute; abr&eacute;g&eacute; d&rsquo;une mini-formation est compos&eacute; de:
+</ul>","Caract&egrave;res autoris&eacute;s pour le sigle/intitul&eacute; abr&eacute;g&eacute; d&rsquo;une mini-formation:
 <ul>
 	<li>lettres: A-Z</li>
 	<li>chiffres: 0-9</li>
 	<li>caract&egrave;res sp&eacute;ciaux: <b>-</b>, <b>_</b> ou <b>/</b></li>
 </ul>",Ex: APPBIOL
-base.validationrule,MiniTrainingForm.SOCIETY_MINOR.abbreviated_title,REQUIRED,,"^[\w\-\/]+$",,"Acronym/Short title of mini-training is composed of:
+base.validationrule,MiniTrainingForm.SOCIETY_MINOR.abbreviated_title,REQUIRED,,"^[a-zA-Z0-9_\-\/]+$",,"Authorized characters for the acronym/short title of mini-training:
 <ul>
 	<li>letters: A-Z</li>
 	<li>numbers: 0-9</li>
 	<li>special characters: <b>-</b>, <b>_</b> or <b>/</b></li>
-</ul>","Sigle/Intitul&eacute; abr&eacute;g&eacute; d&rsquo;une mini-formation est compos&eacute; de:
+</ul>","Caract&egrave;res autoris&eacute;s pour le sigle/intitul&eacute; abr&eacute;g&eacute; d&rsquo;une mini-formation:
 <ul>
 	<li>lettres: A-Z</li>
 	<li>chiffres: 0-9</li>
 	<li>caract&egrave;res sp&eacute;ciaux: <b>-</b>, <b>_</b> ou <b>/</b></li>
 </ul>",Ex: MINDD
-base.validationrule,MiniTrainingForm.ACCESS_MINOR.abbreviated_title,REQUIRED,,"^[\w\-\/]+$",,"Acronym/Short title of mini-training is composed of:
+base.validationrule,MiniTrainingForm.ACCESS_MINOR.abbreviated_title,REQUIRED,,"^[a-zA-Z0-9_\-\/]+$",,"Authorized characters for the acronym/short title of mini-training:
 <ul>
 	<li>letters: A-Z</li>
 	<li>numbers: 0-9</li>
 	<li>special characters: <b>-</b>, <b>_</b> or <b>/</b></li>
-</ul>","Sigle/Intitul&eacute; abr&eacute;g&eacute; d&rsquo;une mini-formation est compos&eacute; de:
+</ul>","Caract&egrave;res autoris&eacute;s pour le sigle/intitul&eacute; abr&eacute;g&eacute; d&rsquo;une mini-formation:
 <ul>
 	<li>lettres: A-Z</li>
 	<li>chiffres: 0-9</li>
 	<li>caract&egrave;res sp&eacute;ciaux: <b>-</b>, <b>_</b> ou <b>/</b></li>
 </ul>",Ex: MINECON
-base.validationrule,MiniTrainingForm.OPEN_MINOR.abbreviated_title,REQUIRED,,"^[\w\-\/]+$",,"Acronym/Short title of mini-training is composed of:
+base.validationrule,MiniTrainingForm.OPEN_MINOR.abbreviated_title,REQUIRED,,"^[a-zA-Z0-9_\-\/]+$",,"Authorized characters for the acronym/short title of mini-training:
 <ul>
 	<li>letters: A-Z</li>
 	<li>numbers: 0-9</li>
 	<li>special characters: <b>-</b>, <b>_</b> or <b>/</b></li>
-</ul>","Sigle/Intitul&eacute; abr&eacute;g&eacute; d&rsquo;une mini-formation est compos&eacute; de:
+</ul>","Caract&egrave;res autoris&eacute;s pour le sigle/intitul&eacute; abr&eacute;g&eacute; d&rsquo;une mini-formation:
 <ul>
 	<li>lettres: A-Z</li>
 	<li>chiffres: 0-9</li>
 	<li>caract&egrave;res sp&eacute;ciaux: <b>-</b>, <b>_</b> ou <b>/</b></li>
 </ul>",Ex: MINCULTS
-base.validationrule,MiniTrainingForm.DISCIPLINARY_COMPLEMENT_MINOR.abbreviated_title,REQUIRED,,"^[\w\-\/]+$",,"Acronym/Short title of mini-training is composed of:
+base.validationrule,MiniTrainingForm.DISCIPLINARY_COMPLEMENT_MINOR.abbreviated_title,REQUIRED,,"^[a-zA-Z0-9_\-\/]+$",,"Authorized characters for the acronym/short title of mini-training:
 <ul>
 	<li>letters: A-Z</li>
 	<li>numbers: 0-9</li>
 	<li>special characters: <b>-</b>, <b>_</b> or <b>/</b></li>
-</ul>","Sigle/Intitul&eacute; abr&eacute;g&eacute; d&rsquo;une mini-formation est compos&eacute; de:
+</ul>","Caract&egrave;res autoris&eacute;s pour le sigle/intitul&eacute; abr&eacute;g&eacute; d&rsquo;une mini-formation:
 <ul>
 	<li>lettres: A-Z</li>
 	<li>chiffres: 0-9</li>
 	<li>caract&egrave;res sp&eacute;ciaux: <b>-</b>, <b>_</b> ou <b>/</b></li>
 </ul>",Ex: MINANGL
-base.validationrule,MiniTrainingForm.FSA_SPECIALITY.abbreviated_title,REQUIRED,,"^[\w\-\/]+$",,"Acronym/Short title of mini-training is composed of:
+base.validationrule,MiniTrainingForm.FSA_SPECIALITY.abbreviated_title,REQUIRED,,"^[a-zA-Z0-9_\-\/]+$",,"Authorized characters for the acronym/short title of mini-training:
 <ul>
 	<li>letters: A-Z</li>
 	<li>numbers: 0-9</li>
 	<li>special characters: <b>-</b>, <b>_</b> or <b>/</b></li>
-</ul>","Sigle/Intitul&eacute; abr&eacute;g&eacute; d&rsquo;une mini-formation est compos&eacute; de:
+</ul>","Caract&egrave;res autoris&eacute;s pour le sigle/intitul&eacute; abr&eacute;g&eacute; d&rsquo;une mini-formation:
 <ul>
 	<li>lettres: A-Z</li>
 	<li>chiffres: 0-9</li>
 	<li>caract&egrave;res sp&eacute;ciaux: <b>-</b>, <b>_</b> ou <b>/</b></li>
 </ul>",Ex: MAJPSY
-base.validationrule,MiniTrainingForm.OPTION.abbreviated_title,REQUIRED,,"^[\w\-\/]+$",,"Acronym/Short title of mini-training is composed of:
+base.validationrule,MiniTrainingForm.OPTION.abbreviated_title,REQUIRED,,"^[a-zA-Z0-9_\-\/]+$",,"Authorized characters for the acronym/short title of mini-training:
 <ul>
 	<li>letters: A-Z</li>
 	<li>numbers: 0-9</li>
 	<li>special characters: <b>-</b>, <b>_</b> or <b>/</b></li>
-</ul>","Sigle/Intitul&eacute; abr&eacute;g&eacute; d&rsquo;une mini-formation est compos&eacute; de:
+</ul>","Caract&egrave;res autoris&eacute;s pour le sigle/intitul&eacute; abr&eacute;g&eacute; d&rsquo;une mini-formation:
 <ul>
 	<li>lettres: A-Z</li>
 	<li>chiffres: 0-9</li>
 	<li>caract&egrave;res sp&eacute;ciaux: <b>-</b>, <b>_</b> ou <b>/</b></li>
 </ul>",Ex: OPTLAFR2M1/LA
-base.validationrule,MiniTrainingForm.MOBILITY_PARTNERSHIP.abbreviated_title,REQUIRED,,"^[\w\-\/]+$",,"Acronym/Short title of mini-training is composed of:
+base.validationrule,MiniTrainingForm.MOBILITY_PARTNERSHIP.abbreviated_title,REQUIRED,,"^[a-zA-Z0-9_\-\/]+$",,"Authorized characters for the acronym/short title of mini-training:
 <ul>
 	<li>letters: A-Z</li>
 	<li>numbers: 0-9</li>
 	<li>special characters: <b>-</b>, <b>_</b> or <b>/</b></li>
-</ul>","Sigle/Intitul&eacute; abr&eacute;g&eacute; d&rsquo;une mini-formation est compos&eacute; de:
+</ul>","Caract&egrave;res autoris&eacute;s pour le sigle/intitul&eacute; abr&eacute;g&eacute; d&rsquo;une mini-formation:
 <ul>
 	<li>lettres: A-Z</li>
 	<li>chiffres: 0-9</li>
