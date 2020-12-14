@@ -51,7 +51,7 @@ class TestPersist(TestCase):
         link1 = LinkFactory(parent=tree.root_node, child=NodeLearningUnitYearFactory())
         link2 = LinkFactory(parent=tree.root_node, child=NodeLearningUnitYearFactory())
 
-        link1.child.set_prerequisite(context_tree=NullPrerequisite(tree.entity_id))
+        link1.child.set_prerequisite(NullPrerequisite(context_tree=tree.entity_id))
 
         _persist_prerequisite.persist(tree)
 

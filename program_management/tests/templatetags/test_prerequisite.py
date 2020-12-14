@@ -72,7 +72,7 @@ class TestPrerequisiteHtmlDisplay(SimpleTestCase):
         )
         prerequisite_obj = prerequisite_domain.Prerequisite(
             main_operator=prerequisite_operator.AND,
-            context_tree=self.tree,
+            context_tree=self.tree.entity_id,
             prerequisite_item_groups=[prerequisite_items_group_obj]
         )
 
@@ -96,7 +96,7 @@ class TestPrerequisiteHtmlDisplay(SimpleTestCase):
         )
         prerequisite_obj = prerequisite_domain.Prerequisite(
             main_operator=prerequisite_operator.AND,
-            context_tree=self.tree,
+            context_tree=self.tree.entity_id,
             prerequisite_item_groups=[prerequisite_items_group_obj_1, prerequisite_items_group_obj_2]
         )
 
@@ -121,7 +121,7 @@ class TestPrerequisiteHtmlDisplay(SimpleTestCase):
         )
         prerequisite_obj = prerequisite_domain.Prerequisite(
             main_operator=prerequisite_operator.AND,
-            context_tree=self.tree,
+            context_tree=self.tree.entity_id,
             prerequisite_item_groups=[prerequisite_items_group_obj]
 
         )

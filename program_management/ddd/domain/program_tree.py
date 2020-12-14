@@ -177,7 +177,6 @@ class ProgramTree(interface.RootEntity):
     root_node = attr.ib(type=Node)
     authorized_relationships = attr.ib(type=AuthorizedRelationshipList, factory=list)
     entity_id = attr.ib(type=ProgramTreeIdentity)  # FIXME :: pass entity_id as mandatory param !
-    prerequisites = attr.ib(type=List['Prerequisite'], factory=list)  # FIXME :: replace string by Class for typing
 
     def is_empty(self, parent_node=None):
         parent_node = parent_node or self.root_node
@@ -467,7 +466,7 @@ class ProgramTree(interface.RootEntity):
         is_valid, messages = self.clean_set_prerequisite(prerequisite_expression, node)
         if is_valid:
             node.set_prerequisite(
-                prerequisite.factory.from_expression(prerequisite_expression, self.root_node.year, self)
+                prerequisite.factory.from_expression(prerequisite_expression, self.root_node.year, self.entity_id)
             )
         return messages
 

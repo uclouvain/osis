@@ -106,21 +106,21 @@ class TestPrerequisite(SimpleTestCase):
 
     def test_case_assert_invalid_main_operator_raise_exception(self):
         with self.assertRaises(AssertionError):
-            prerequisite.Prerequisite(main_operator="XOR", context_tree=ProgramTreeFactory())
+            prerequisite.Prerequisite(main_operator="XOR", context_tree=ProgramTreeFactory().entity_id)
 
     def test_case_assert_str_method_no_group(self):
-        p_req = prerequisite.Prerequisite(main_operator=prerequisite_operator.AND, context_tree=self.tree)
+        p_req = prerequisite.Prerequisite(main_operator=prerequisite_operator.AND, context_tree=self.tree.entity_id)
         self.assertEqual(str(p_req), '')
 
     def test_case_assert_str_method_with_one_group(self):
-        p_req = prerequisite.Prerequisite(main_operator=prerequisite_operator.AND, context_tree=self.tree)
+        p_req = prerequisite.Prerequisite(main_operator=prerequisite_operator.AND, context_tree=self.tree.entity_id)
         p_req.add_prerequisite_item_group(self.p_group)
 
         expected_str = 'LDROI1300 {OR} LAGRO2400'.format(OR=_(prerequisite_operator.OR))
         self.assertEqual(str(p_req), expected_str)
 
     def test_case_assert_str_method_with_multiple_groups(self):
-        p_req = prerequisite.Prerequisite(main_operator=prerequisite_operator.AND, context_tree=self.tree)
+        p_req = prerequisite.Prerequisite(main_operator=prerequisite_operator.AND, context_tree=self.tree.entity_id)
         p_req.add_prerequisite_item_group(self.p_group)
         p_req.add_prerequisite_item_group(self.p_group_2)
 
@@ -210,7 +210,7 @@ class TestgetAllPrerequisiteItems(SimpleTestCase):
 class TestConstructPrerequisiteFromExpression(SimpleTestCase):
     def test_return_null_prerequisite_when_empty_expression_given(self):
         self.assertIsInstance(
-            prerequisite.factory.from_expression("", 2019, None),
+            prerequisite.factory.from_expression("", 2019, ProgramTreeFactory().entity_id),
             NullPrerequisite
         )
 

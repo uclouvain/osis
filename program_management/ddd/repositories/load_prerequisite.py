@@ -34,7 +34,6 @@ from base.models.learning_unit_year import LearningUnitYear
 from base.models.prerequisite_item import PrerequisiteItem as PrerequisiteItemModel, PrerequisiteItem
 from program_management.ddd.domain import prerequisite as prerequisite_domain
 
-from program_management.ddd.business_types import *
 
 TreeRootId = int
 NodeId = int
@@ -56,6 +55,7 @@ def load_has_prerequisite_multiple(
     :param nodes: Dict where keys = '<node_id>_<TYPE>' and values = Node
     :return:
     """
+    from program_management.ddd.domain.program_tree import ProgramTreeIdentity  # FIXME :: cyclic import - use dependency injection instead
     prerequisite_item_qs = PrerequisiteItem.objects.filter(
         prerequisite__education_group_version__root_group__element__id__in=tree_root_ids,
         prerequisite__learning_unit_year_id__element__pk__in=set(n.pk for n in nodes.values() if n.is_learning_unit())
