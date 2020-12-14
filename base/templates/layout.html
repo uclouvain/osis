@@ -168,7 +168,9 @@
         </div>
     {% endif %}
 
-    {% include "template_messages.html" %}
+    {% block messages %}
+        {% include "template_messages.html" %}
+    {% endblock %}
 
     {# FIXME ! It is forbidden to add something in the main layout for a specific need. Use messages instead !#}
     {% if warnings %}
