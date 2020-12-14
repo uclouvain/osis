@@ -1089,7 +1089,3 @@ msgstr "formation"
 
 msgid "yes"
 msgstr "Oui"
-
-#~ msgctxt "UE acronym"
-#~ msgid "Acronym"
-#~ msgstr "Sigle"
