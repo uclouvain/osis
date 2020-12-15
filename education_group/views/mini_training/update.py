@@ -151,6 +151,15 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 None,
                 _("Impossible to put end date to %(end_year)s: %(msg)s") % {"msg": e.message, "end_year": end_year.year}
             )
+        except MultipleBusinessExceptions as multiple_exceptions:
+            msg = ", ".join([e.message for e in multiple_exceptions.exceptions])
+            self.mini_training_form.add_error("end_year", "")
+            self.mini_training_form.add_error(
+                None,
+                _("Impossible to put end date to %(end_year)s: %(msg)s") % {
+                    "msg": msg,
+                    "end_year": end_year}
+            )
         return []
 
     def get_attach_path(self) -> Optional['Path']:

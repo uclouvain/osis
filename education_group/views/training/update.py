@@ -239,6 +239,15 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                     "msg": e.message,
                     "end_year": end_year}
             )
+        except MultipleBusinessExceptions as multiple_exceptions:
+            msg = ", ".join([e.message for e in multiple_exceptions.exceptions])
+            self.training_form.add_error("end_year", "")
+            self.training_form.add_error(
+                None,
+                _("Impossible to put end date to %(end_year)s: %(msg)s") % {
+                    "msg": msg,
+                    "end_year": end_year}
+            )
 
         return []
 

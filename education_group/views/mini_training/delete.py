@@ -33,6 +33,7 @@ from django.utils.translation import gettext_lazy as _
 
 from django.views.generic import DeleteView
 
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.views.common import display_success_messages, display_error_messages
 from base.views.mixins import AjaxTemplateMixin
 from education_group.ddd.business_types import *
@@ -91,6 +92,9 @@ class MiniTrainingDeleteView(PermissionRequiredMixin, AjaxTemplateMixin, DeleteV
                 CannotDeleteStandardDueToVersionEndDate,
         ) as e:
             display_error_messages(request, e.message)
+            return render(request, self.template_name, {})
+        except MultipleBusinessExceptions as multiple_exceptions:
+            display_error_messages(request, [e.message for e in multiple_exceptions.exceptions])
             return render(request, self.template_name, {})
 
     def get_context_data(self, **kwargs):
