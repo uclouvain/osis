@@ -122,6 +122,10 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                         isinstance(e, exception.ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum):
                     self.mini_training_form.add_error("min_constraint", e.message)
                     self.mini_training_form.add_error("max_constraint", "")
+                elif isinstance(e, exception.ContentConstraintMinimumInvalid):
+                    self.mini_training_form.add_error("min_constraint", e.message)
+                elif isinstance(e, exception.ContentConstraintMaximumInvalid):
+                    self.mini_training_form.add_error("max_constraint", e.message)
                 else:
                     self.mini_training_form.add_error(None, e.message)
         except exception.MiniTrainingCopyConsistencyException as e:
