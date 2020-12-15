@@ -27,8 +27,10 @@ from django.utils.translation import gettext_lazy as _
 
 BASE = 'BASE'
 DISSERTATION = 'DISSERTATION'
+INTERNSHIP = 'INTERNSHIP'
 
 CHOICES = (
     (BASE, _("Base")),
-    (DISSERTATION, _("Dissertation"))
+    (DISSERTATION, _("Dissertation")),
+    (INTERNSHIP, _("Internship"))
 )
