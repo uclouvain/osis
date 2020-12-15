@@ -35,15 +35,15 @@ def get_score_justification_disabled_status(context):
     enrollment = context["enrollment"]
     is_program_manager = context["is_program_manager"]
 
+    is_deadline_reached_for_program_manager = enrollment.deadline_reached
+    is_deadline_reached_for_tutor = enrollment.deadline_reached or enrollment.deadline_tutor_reached
+    is_final_score_encoded = enrollment.score_final or enrollment.score_final == 0 or enrollment.justification_final
+
     if enrollment.enrollment_state != 'ENROLLED':
         return DISABLED
-    else:
-        if is_program_manager:
-            if enrollment.deadline_reached:
-                return DISABLED
-        else:
-            if enrollment.score_final or enrollment.justification_final or enrollment.deadline_reached \
-                    or enrollment.deadline_tutor_reached:
-                return DISABLED
+    elif is_program_manager and is_deadline_reached_for_program_manager:
+        return DISABLED
+    elif not is_program_manager and (is_final_score_encoded or is_deadline_reached_for_tutor):
+        return DISABLED
 
     return ENABLED
