@@ -84,6 +84,7 @@ def load_has_prerequisite_multiple(
         'root_code',
         'root_year',
         'element_id',
+        'element_code',
         'main_operator',
         'group_number',
         'position',
