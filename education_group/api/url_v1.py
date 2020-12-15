@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.urls import include, path, register_converter
+from django.conf.urls import url, include
 
 from education_group.api.views.group import GroupDetail, GroupTitle
 from education_group.api.views.group_element_year import TrainingTreeView, MiniTrainingTreeView, GroupTreeView
@@ -32,75 +32,69 @@ from education_group.api.views.mini_training import MiniTrainingDetail, MiniTrai
     OfferRoots
 from education_group.api.views.training import TrainingList, TrainingDetail, TrainingTitle
 from program_management.api.views.prerequisite import TrainingPrerequisites, MiniTrainingPrerequisites
-from education_group.converters import AcronymConverter, TrainingAcronymConverter, MiniTrainingAcronymConverter
-
-register_converter(AcronymConverter, 'mini_training_acronym')
-register_converter(TrainingAcronymConverter, 'training_acronym')
-register_converter(MiniTrainingAcronymConverter, 'mini_training_acronym')
 
 app_name = "education_group"
 
-
 urlpatterns = [
-    path('hops/<int:year>', HopsList.as_view(), name=HopsList.name),
-    path('trainings', TrainingList.as_view(), name=TrainingList.name),
-    path('trainings/<int:year>/<training_acronym:acronym>/', include([
-        path('tree', TrainingTreeView.as_view(), name=TrainingTreeView.name),
-        path('title', TrainingTitle.as_view(), name=TrainingTitle.name),
-        path('prerequisites', TrainingPrerequisites.as_view(), {'transition': False},
-             name='{}_official'.format(TrainingPrerequisites.NAME)),
+    url(r'^hops/(?P<year>[\d]{4})$', HopsList.as_view(), name=HopsList.name),
+    url(r'^trainings$', TrainingList.as_view(), name=TrainingList.name),
+    url(r'^trainings/(?P<year>[\d]{4})/(?P<acronym>[\w]+(?:[/ ]?[\w]{1,2}){0,2})/', include([
+        url(r'^tree$', TrainingTreeView.as_view(), name=TrainingTreeView.name),
+        url(r'^title$', TrainingTitle.as_view(), name=TrainingTitle.name),
+        url(r'^prerequisites$', TrainingPrerequisites.as_view(), {'transition': False},
+            name='{}_official'.format(TrainingPrerequisites.NAME)),
     ])),
-    path(
-        'trainings/<int:year>/<training_acronym:acronym>/versions/<str:version_name>',
+    url(
+        r'^trainings/(?P<year>[\d]{4})/(?P<acronym>[\w]+(?:[/ ]?[a-zA-Z]{1,2}){0,2})/versions/(?P<version_name>[\w]+)$',
         TrainingDetail.as_view(),
         name=TrainingDetail.name
     ),
-    path(
-        'trainings/<int:year>/<training_acronym:acronym>/versions/<str:version_name>/',
+    url(
+        r'^trainings/(?P<year>[\d]{4})/(?P<acronym>[\w]+(?:[/ ]?[a-zA-Z]{1,2}){0,2})/versions/(?P<version_name>[\w]+)/',
         include([
-            path('tree', TrainingTreeView.as_view(), name=TrainingTreeView.name),
-            path('title', TrainingTitle.as_view(), name=TrainingTitle.name),
+            url(r'^tree$', TrainingTreeView.as_view(), name=TrainingTreeView.name),
+            url(r'^title$', TrainingTitle.as_view(), name=TrainingTitle.name),
         ])
     ),
-    path(
-        'trainings/<int:year>/<training_acronym:acronym>',
+    url(
+        r'^trainings/(?P<year>[\d]{4})/(?P<acronym>[\w]+(?:[/ ]?[\w]{1,2}){0,2})$',
         TrainingDetail.as_view(),
         name=TrainingDetail.name
     ),
-    path(
-        'mini_trainings/<int:year>/<mini_training_acronym:acronym>/<str:version_name>)',
+    url(
+        r'^mini_trainings/(?P<year>[\d]{4})/(?P<acronym>[a-zA-Z0-9/\-_]+)/versions/(?P<version_name>[\w]+)$',
         MiniTrainingDetail.as_view(),
         name=MiniTrainingDetail.name
     ),
-    path(
-        'mini_trainings/<int:year>/<mini_training_acronym:acronym>/versions/<str:version_name>/',
+    url(
+        r'^mini_trainings/(?P<year>[\d]{4})/(?P<acronym>[a-zA-Z0-9/\-_]+)/versions/(?P<version_name>[\w]+)/',
         include([
-            path('tree', MiniTrainingTreeView.as_view(), name=MiniTrainingTreeView.name),
-            path('title', MiniTrainingTitle.as_view(), name=MiniTrainingTitle.name),
-            path('offer_roots', OfferRoots.as_view(), name=OfferRoots.name),
+            url(r'^tree$', MiniTrainingTreeView.as_view(), name=MiniTrainingTreeView.name),
+            url(r'^title$', MiniTrainingTitle.as_view(), name=MiniTrainingTitle.name),
+            url(r'^offer_roots$', OfferRoots.as_view(), name=OfferRoots.name),
         ])
     ),
-    path('mini_trainings', MiniTrainingList.as_view(), name=MiniTrainingList.name),
+    url(r'^mini_trainings$', MiniTrainingList.as_view(), name=MiniTrainingList.name),
     # TODO: Limit special characters authorized in mini trainings urls (in 4831)
-    path('mini_trainings/<int:year>/<mini_training_acronym:acronym>/', include([
-        path('tree', MiniTrainingTreeView.as_view(), name=MiniTrainingTreeView.name),
-        path('title', MiniTrainingTitle.as_view(), name=MiniTrainingTitle.name),
-        path('offer_roots', OfferRoots.as_view(), name=OfferRoots.name),
-        path('prerequisites', MiniTrainingPrerequisites.as_view(), {'transition': False},
-             name='{}_official'.format(MiniTrainingPrerequisites.NAME)),
+    url(r'^mini_trainings/(?P<year>[\d]{4})/(?P<acronym>[a-zA-Z0-9/\-_]+)/', include([
+        url(r'^tree$', MiniTrainingTreeView.as_view(), name=MiniTrainingTreeView.name),
+        url(r'^title$', MiniTrainingTitle.as_view(), name=MiniTrainingTitle.name),
+        url(r'^offer_roots$', OfferRoots.as_view(), name=OfferRoots.name),
+        url(r'^prerequisites$', MiniTrainingPrerequisites.as_view(), {'transition': False},
+            name='{}_official'.format(MiniTrainingPrerequisites.NAME)),
     ])),
-    path(
-        'mini_trainings/<int:year>/<mini_training_acronym:acronym>',
+    url(
+        r'^mini_trainings/(?P<year>[\d]{4})/(?P<acronym>[a-zA-Z0-9/\-_]+)$',
         MiniTrainingDetail.as_view(),
         name=MiniTrainingDetail.name
     ),
-    path(
-        'groups/<int:year>/<str:partial_acronym>',
+    url(
+        r'^groups/(?P<year>[\d]{4})/(?P<partial_acronym>[\w]+)$',
         GroupDetail.as_view(),
         name=GroupDetail.name
     ),
-    path('groups/<int:year>/<str:partial_acronym>/', include([
-        path('tree', GroupTreeView.as_view(), name=GroupTreeView.name),
-        path('title', GroupTitle.as_view(), name=GroupTitle.name),
+    url(r'^groups/(?P<year>[\d]{4})/(?P<partial_acronym>[\w]+)/', include([
+        url(r'^tree$', GroupTreeView.as_view(), name=GroupTreeView.name),
+        url(r'^title$', GroupTitle.as_view(), name=GroupTitle.name),
     ])),
 ]
