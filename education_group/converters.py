@@ -84,25 +84,3 @@ class MiniTrainingAcronymConverter:
 
     def to_url(self, value):
         return urllib.parse.quote_plus(value)
-
-
-class TrainingAcronymConverter:
-
-    regex = r'[a-zA-Z0-9_\/ ]+'
-
-    def to_python(self, value):
-        return urllib.parse.unquote_plus(value)
-
-    def to_url(self, value):
-        return urllib.parse.quote_plus(value)
-
-
-class VersionNameConverter:
-
-    regex = StringConverter.regex
-
-    def to_python(self, value):
-        return urllib.parse.unquote_plus(value)
-
-    def to_url(self, value):
-        return urllib.parse.quote_plus(value)
