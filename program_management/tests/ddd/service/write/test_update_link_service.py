@@ -285,3 +285,27 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
             next(iter(e.exception.exceptions)),
             exception.MaximumChildTypesReachedException
         )
+
+    def test_cannot_convert_mandatory_child_link_to_reference(self):
+        self.tree.authorized_relationships.update(
+            TrainingType.BACHELOR,
+            GroupType.COMMON_CORE,
+            max_count_authorized=1,
+            min_count_authorized=1,
+        )
+
+        cmd = UpdateLinkCommandFactory(
+            parent_node_code=self.tree.root_node.code,
+            parent_node_year=self.tree.root_node.year,
+            child_node_code=self.tree.root_node.children_as_nodes[0].code,
+            child_node_year=self.tree.root_node.children_as_nodes[0].year,
+            link_type=LinkTypes.REFERENCE.name,
+        )
+
+        with self.assertRaises(MultipleBusinessExceptions) as e:
+            update_link_service.update_link(cmd)
+
+        self.assertIsInstance(
+            next(iter(e.exception.exceptions)),
+            exception.MinimumChildTypesNotRespectedException
+        )
