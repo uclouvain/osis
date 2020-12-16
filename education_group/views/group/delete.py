@@ -30,6 +30,7 @@ from django.utils.translation import gettext_lazy as _
 
 from django.views.generic import DeleteView
 
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.views.common import display_success_messages, display_error_messages
 from base.views.mixins import AjaxTemplateMixin
 from education_group.ddd.business_types import *
@@ -62,6 +63,10 @@ class GroupDeleteView(PermissionRequiredMixin, AjaxTemplateMixin, DeleteView):
             return self._ajax_response() or HttpResponseRedirect(self.get_success_url())
         except (ProgramTreeNonEmpty, NodeHaveLinkException,) as e:
             display_error_messages(request, e.message)
+            return render(request, self.template_name, {})
+        except MultipleBusinessExceptions as multiple_exceptions:
+            msg = [e.message for e in multiple_exceptions.exceptions]
+            display_error_messages(request, msg)
             return render(request, self.template_name, {})
 
     def get_context_data(self, **kwargs):
