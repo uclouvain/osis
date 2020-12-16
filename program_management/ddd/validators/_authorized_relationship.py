@@ -25,16 +25,12 @@
 ##############################################################################
 import copy
 import functools
-import sys
+import itertools
 from collections import Counter
 from typing import List, Set
 
-from django.utils.translation import gettext as _
-
-import osis_common.ddd.interface
 from base.ddd.utils import business_validator
 from base.models.authorized_relationship import AuthorizedRelationshipList
-from base.models.enums import education_group_types
 from base.models.enums.education_group_types import EducationGroupTypesEnum
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.exception import ChildTypeNotAuthorizedException, \
@@ -108,12 +104,17 @@ class AuthorizedRelationshipValidator(business_validator.BusinessValidator):
 
     @functools.lru_cache()
     def get_children_node_types_that_surpass_maximum_allowed(self) -> Set[EducationGroupTypesEnum]:
+        children_nodes = self.link.parent.children_as_nodes_with_respect_to_reference_link
+        finalities = list(itertools.chain.from_iterable([list(child.get_finality_list()) for child in children_nodes]))
+        children_nodes += finalities
+
         node_types_that_surpass_capacity = get_node_types_that_are_full(
             self.tree.authorized_relationships,
             self.link.parent,
-            self.link.parent.children_as_nodes_with_respect_to_reference_link
+            children_nodes
+
         )
-        children_node_types = {children_node.node_type for children_node in self.children_nodes}
+        children_node_types = {children_node.node_type for children_node in self.children_nodes + finalities}
         return children_node_types.intersection(node_types_that_surpass_capacity)
 
     @property

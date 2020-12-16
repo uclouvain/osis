@@ -30,6 +30,7 @@ from django.test import SimpleTestCase, TestCase
 
 import program_management.ddd.command
 import program_management.ddd.service.write.paste_element_service
+from base.models.authorized_relationship import AuthorizedRelationshipObject
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
 from base.models.enums.link_type import LinkTypes
 from osis_common.ddd.interface import BusinessExceptions
@@ -479,6 +480,86 @@ class TestPasteGroupNodeService(DDDTestCase, MockPatcherMixin):
             node_to_paste_code=node_to_paste.code,
             node_to_paste_year=node_to_paste.year,
             path_where_to_paste="1",
+        )
+
+        self.assertRaisesBusinessException(
+            exception.MaximumChildTypesReachedException,
+            paste_element_service.paste_element,
+            invalid_command
+        )
+
+    def test_cannot_paste_list_finalities_inside_list_finalities_if_max_finalities_is_surpassed(self):
+        tree_data = {
+            "node_type": TrainingType.PGRM_MASTER_120,
+            "node_id": 8,
+            "year": 2020,
+            "end_year": 2025,
+            "children": [
+                {
+                    "node_type": GroupType.FINALITY_120_LIST_CHOICE,
+                    "code": "LMINOR45",
+                    "node_id": 11,
+                    "year": 2020,
+                    "children": [
+                        {
+                            "node_type": TrainingType.MASTER_MD_120,
+                            "year": 2020
+                        },
+                    ]
+                }
+            ]
+        }
+
+        tree_to_paste_data = {
+            "node_type": GroupType.FINALITY_120_LIST_CHOICE,
+            "year": 2020,
+            "children": [
+                {
+                    "node_type": TrainingType.MASTER_MD_120,
+                    "year": 2020,
+                    "end_year": 2025
+                },
+            ]
+        }
+
+        tree = tree_builder(tree_data)
+        tree_to_paste = tree_builder(tree_to_paste_data)
+
+        self.fake_program_tree_repository.root_entities.append(tree_to_paste)
+        self.fake_program_tree_repository.root_entities.append(tree)
+        self.fake_tree_version_repository.root_entities.append(
+            StandardProgramTreeVersionFactory(
+                tree=tree_to_paste,
+                program_tree_repository=self.fake_program_tree_repository,
+            )
+        )
+        self.fake_tree_version_repository.root_entities.append(
+            StandardProgramTreeVersionFactory(
+                tree=tree,
+                program_tree_repository=self.fake_program_tree_repository,
+            )
+        )
+        tree.authorized_relationships.update(
+            parent_type=GroupType.FINALITY_120_LIST_CHOICE,
+            child_type=TrainingType.MASTER_MD_120,
+            min_count_authorized=1,
+            max_count_authorized=1
+        )
+        tree.authorized_relationships.authorized_relationships.append(
+            AuthorizedRelationshipObject(
+                parent_type=GroupType.FINALITY_120_LIST_CHOICE,
+                child_type=GroupType.FINALITY_120_LIST_CHOICE,
+                min_count_authorized=0,
+                max_count_authorized=None
+            )
+        )
+
+        self.mocked_get_from_element_id.return_value = tree.entity_id
+
+        invalid_command = PasteElementCommandFactory(
+            node_to_paste_code=tree_to_paste.root_node.code,
+            node_to_paste_year=tree_to_paste.root_node.year,
+            path_where_to_paste="8|11",
         )
 
         self.assertRaisesBusinessException(
