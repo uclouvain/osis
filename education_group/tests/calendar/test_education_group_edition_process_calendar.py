@@ -23,17 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.core.exceptions import PermissionDenied
-from django.test import TestCase
-from django.utils.translation import gettext_lazy as _
+import datetime
 
+from django.forms import model_to_dict
+from django.test import TestCase
+
+from base.models.academic_calendar import AcademicCalendar
 from base.models.enums import academic_calendar_type
 from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
-from base.tests.factories.academic_year import create_current_academic_year
+from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from education_group.calendar.education_group_edition_process_calendar import EducationGroupEditionCalendar
 
 
-class TestEventPermGroupYearEditionPerms(TestCase):
+class TestEducationGroupEditionCalendarOpened(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.current_academic_year = create_current_academic_year()
@@ -55,7 +57,7 @@ class TestEventPermGroupYearEditionPerms(TestCase):
         )
 
 
-class TestEventPermGroupYearEditionPermsNotOpen(TestCase):
+class TestEducationGroupEditionCalendarClosed(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.current_academic_year = create_current_academic_year()
@@ -63,4 +65,37 @@ class TestEventPermGroupYearEditionPermsNotOpen(TestCase):
     def test_is_not_open_for_spec_egy_without_exception_raise(self):
         self.assertFalse(
             EducationGroupEditionCalendar().is_target_year_authorized(target_year=self.current_academic_year.year)
+        )
+
+
+class TestEducationGroupEditionCalendarEnsureConsistencyUntilNPlus6(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.current_academic_year = create_current_academic_year()
+        AcademicYearFactory.produce_in_future(cls.current_academic_year.year)
+
+    def test_ensure_consistency_until_n_plus_6_assert_default_value(self):
+        EducationGroupEditionCalendar().ensure_consistency_until_n_plus_6()
+
+        qs = AcademicCalendar.objects.filter(reference=academic_calendar_type.EDUCATION_GROUP_EDITION)
+
+        self.assertEqual(qs.count(), 7)
+        self.assertDictEqual(
+            model_to_dict(qs.first(), fields=('title', 'reference', 'data_year', 'start_date', 'end_date')),
+            {
+                "title": "Edition des programmes",
+                "reference": academic_calendar_type.EDUCATION_GROUP_EDITION,
+                "data_year": self.current_academic_year.pk,
+                "start_date": datetime.date(2020, 8, 15),
+                "end_date": datetime.date(2020, 11, 20),
+            }
+        )
+
+    def test_ensure_consistency_until_n_plus_6_assert_idempotent(self):
+        for _ in range(5):
+            EducationGroupEditionCalendar().ensure_consistency_until_n_plus_6()
+
+        self.assertEqual(
+            AcademicCalendar.objects.filter(reference=academic_calendar_type.EDUCATION_GROUP_EDITION).count(),
+            7
         )
