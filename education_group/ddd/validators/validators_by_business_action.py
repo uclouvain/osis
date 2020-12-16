@@ -151,7 +151,7 @@ class DeleteOrphanTrainingValidatorList(MultipleExceptionBusinessListValidator):
         super().__init__()
 
 
-class DeleteOrphanMiniTrainingValidatorList(business_validator.BusinessListValidator):
+class DeleteOrphanMiniTrainingValidatorList(MultipleExceptionBusinessListValidator):
 
     def __init__(
             self,

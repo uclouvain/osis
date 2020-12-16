@@ -23,6 +23,7 @@
 # ############################################################################
 from django.db import transaction
 
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from education_group.ddd import command as command_education_group
 from education_group.ddd.service.write import delete_orphan_mini_training_service
 from program_management.ddd import command
@@ -34,16 +35,29 @@ from program_management.ddd.service.write import delete_standard_version_service
 def delete_mini_training_standard_version(
         cmd: command.DeleteMiniTrainingWithStandardVersionCommand
 ) -> ProgramTreeVersionIdentity:
-    tree_version_id = delete_standard_version_service.delete_standard_version(
-        command.DeleteStandardVersionCommand(
-            acronym=cmd.mini_training_acronym,
-            year=cmd.year,
+    errors = set()
+
+    try:
+        tree_version_id = delete_standard_version_service.delete_standard_version(
+            command.DeleteStandardVersionCommand(
+                acronym=cmd.mini_training_acronym,
+                year=cmd.year,
+            )
         )
-    )
-    delete_orphan_mini_training_service.delete_orphan_mini_training(
-        command_education_group.DeleteOrphanMiniTrainingCommand(
-            abbreviated_title=cmd.mini_training_acronym,
-            year=cmd.year
+    except MultipleBusinessExceptions as multiple_exceptions:
+        errors = multiple_exceptions.exceptions
+
+    try:
+        delete_orphan_mini_training_service.delete_orphan_mini_training(
+            command_education_group.DeleteOrphanMiniTrainingCommand(
+                abbreviated_title=cmd.mini_training_acronym,
+                year=cmd.year
+            )
         )
-    )
+    except MultipleBusinessExceptions as multiple_exceptions:
+        errors |= multiple_exceptions.exceptions
+
+    if errors:
+        raise MultipleBusinessExceptions(exceptions=errors)
+
     return tree_version_id
