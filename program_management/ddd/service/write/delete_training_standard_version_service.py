@@ -23,6 +23,7 @@
 # ############################################################################
 from django.db import transaction
 
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from education_group.ddd.service.write import delete_orphan_training_service
 from program_management.ddd import command
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, STANDARD
@@ -32,16 +33,28 @@ from education_group.ddd import command as command_education_group
 
 @transaction.atomic()
 def delete_training_standard_version(cmd: command.DeleteTrainingStandardVersionCommand) -> ProgramTreeVersionIdentity:
-    tree_version_id = delete_standard_version_service.delete_standard_version(
-        command.DeleteStandardVersionCommand(
-            acronym=cmd.offer_acronym,
-            year=cmd.year,
+    errors = set()
+    try:
+        tree_version_id = delete_standard_version_service.delete_standard_version(
+            command.DeleteStandardVersionCommand(
+                acronym=cmd.offer_acronym,
+                year=cmd.year,
+            )
         )
-    )
-    delete_orphan_training_service.delete_orphan_training(
-        command_education_group.DeleteOrphanTrainingCommand(
-            acronym=cmd.offer_acronym,
-            year=cmd.year,
+    except MultipleBusinessExceptions as multiple_exceptions:
+        errors = multiple_exceptions.exceptions
+
+    try:
+        delete_orphan_training_service.delete_orphan_training(
+            command_education_group.DeleteOrphanTrainingCommand(
+                acronym=cmd.offer_acronym,
+                year=cmd.year,
+            )
         )
-    )
+    except MultipleBusinessExceptions as multiple_exceptions:
+        errors |= multiple_exceptions.exceptions
+
+    if errors:
+        raise MultipleBusinessExceptions(exceptions=errors)
+
     return tree_version_id

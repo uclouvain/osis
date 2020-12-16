@@ -21,13 +21,15 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+import itertools
 from typing import List
 
 from django.db import transaction
 
-from education_group.ddd.business_types import *
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from education_group.ddd import command as command_education_group
-from education_group.ddd.domain import training
+from education_group.ddd.business_types import *
+from education_group.ddd.domain import exception
 from education_group.ddd.service.write import delete_orphan_training_service
 from program_management.ddd import command
 from program_management.ddd.service.write import delete_standard_program_tree_version_service
@@ -37,25 +39,39 @@ from program_management.ddd.service.write import delete_standard_program_tree_ve
 def delete_training_with_program_tree(
         delete_command: command.DeleteTrainingWithProgramTreeCommand
 ) -> List['TrainingIdentity']:
-    delete_program_tree_version_command = command.DeleteProgramTreeVersionCommand(
-        offer_acronym=delete_command.offer_acronym,
-        version_name=delete_command.version_name,
-        is_transition=delete_command.is_transition,
-        from_year=delete_command.from_year
-    )
-    delete_versions_identities = delete_standard_program_tree_version_service.delete_standard_program_tree_version(
-        delete_program_tree_version_command
-    )
+    training_identities = []
+    errors = set()
 
-    training_identities = [
-        training.TrainingIdentity(acronym=identity.offer_acronym, year=identity.year)
-        for identity in delete_versions_identities
-    ]
-    for training_id in training_identities:
-        delete_orphan_training_service.delete_orphan_training(
-            command_education_group.DeleteOrphanTrainingCommand(
-                acronym=training_id.acronym,
-                year=training_id.year
-            )
+    try:
+        delete_program_tree_version_command = command.DeleteProgramTreeVersionCommand(
+            offer_acronym=delete_command.offer_acronym,
+            version_name=delete_command.version_name,
+            is_transition=delete_command.is_transition,
+            from_year=delete_command.from_year
         )
+        delete_standard_program_tree_version_service.delete_standard_program_tree_version(
+            delete_program_tree_version_command
+        )
+    except MultipleBusinessExceptions as multiple_exceptions:
+        errors = multiple_exceptions.exceptions
+
+    try:
+
+        for year in itertools.count(delete_command.from_year):
+            try:
+                identity = delete_orphan_training_service.delete_orphan_training(
+                    command_education_group.DeleteOrphanTrainingCommand(
+                        acronym=delete_command.offer_acronym,
+                        year=year
+                    )
+                )
+                training_identities.append(identity)
+            except exception.TrainingNotFoundException:
+                break
+    except MultipleBusinessExceptions as multiple_exceptions:
+        errors |= multiple_exceptions.exceptions
+
+    if errors:
+        raise MultipleBusinessExceptions(exceptions=errors)
+
     return training_identities

@@ -207,7 +207,7 @@ class UpdatePrerequisiteValidatorList(business_validator.BusinessListValidator):
         super().__init__()
 
 
-class DeleteProgramTreeValidatorList(business_validator.BusinessListValidator):
+class DeleteProgramTreeValidatorList(MultipleExceptionBusinessListValidator):
     def __init__(self, program_tree: 'ProgramTree'):
         self.validators = [
             EmptyProgramTreeValidator(program_tree),

@@ -138,7 +138,7 @@ class CopyMiniTrainingValidatorList(business_validator.BusinessListValidator):
         super().__init__()
 
 
-class DeleteOrphanTrainingValidatorList(business_validator.BusinessListValidator):
+class DeleteOrphanTrainingValidatorList(MultipleExceptionBusinessListValidator):
 
     def __init__(
             self,
