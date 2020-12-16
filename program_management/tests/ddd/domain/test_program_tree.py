@@ -481,7 +481,7 @@ class TestCopyAndPrune(SimpleTestCase):
         self.assertNotEqual(original_link.block, 123456)
 
     def test_when_change_tree_signature(self):
-        original_signature = ['self', 'root_node', 'authorized_relationships', 'entity_id']
+        original_signature = ['self', 'root_node', 'authorized_relationships', 'entity_id', 'prerequisites']
         current_signature = list(inspect.signature(ProgramTree.__init__).parameters.keys())
         error_msg = "Please update the {} function to fit with new object signature.".format(ProgramTree.prune)
         self.assertEqual(original_signature, current_signature, error_msg)

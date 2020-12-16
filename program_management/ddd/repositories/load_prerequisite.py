@@ -33,6 +33,7 @@ from base.models.enums import prerequisite_operator
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.prerequisite_item import PrerequisiteItem as PrerequisiteItemModel, PrerequisiteItem
 from program_management.ddd.domain import prerequisite as prerequisite_domain
+from program_management.ddd.business_types import *
 
 
 TreeRootId = int
@@ -42,9 +43,9 @@ IsPrerequisiteOfNodeId = int
 
 
 def load_has_prerequisite_multiple(
-        tree_root_ids: List[int],
+        tree_root_ids: List[TreeRootId],
         nodes: Dict[str, 'Node']
-) -> Dict[TreeRootId, Dict[NodeId, prerequisite_domain.Prerequisite]]:
+) -> Dict[TreeRootId, Dict['NodeIdentity', prerequisite_domain.Prerequisite]]:
     """
     This function return a dict of prerequisite grouped by node_id
     Ex: {
@@ -55,8 +56,9 @@ def load_has_prerequisite_multiple(
     :param nodes: Dict where keys = '<node_id>_<TYPE>' and values = Node
     :return:
     """
-    from program_management.ddd.domain.program_tree import ProgramTreeIdentity  # FIXME :: cyclic import - use dependency injection instead ?
-    from program_management.ddd.domain.node import NodeIdentity  # FIXME :: cyclic import - use dependency injection instead ?
+    # FIXME :: cyclic import - use dependency injection instead ?
+    from program_management.ddd.domain.program_tree import ProgramTreeIdentity
+    from program_management.ddd.domain.node import NodeIdentity
     prerequisite_item_qs = PrerequisiteItem.objects.filter(
         prerequisite__education_group_version__root_group__element__id__in=tree_root_ids,
         prerequisite__learning_unit_year_id__element__pk__in=set(n.pk for n in nodes.values() if n.is_learning_unit())
@@ -104,12 +106,13 @@ def load_has_prerequisite_multiple(
             prequisite_items = list(prequisite_items)
 
             first_item = prequisite_items[0]
+            node_identity = NodeIdentity(code=first_item['element_code'], year=first_item['year'])
             preq = prerequisite_domain.Prerequisite(
                 main_operator=first_item['main_operator'],
-                node_having_prerequisites=NodeIdentity(code=first_item['element_code'], year=first_item['year']),
+                node_having_prerequisites=node_identity,
                 context_tree=ProgramTreeIdentity(code=first_item['root_code'], year=first_item['root_year'])
             )
-            prerequisites_dict.setdefault(node_id, preq)
+            prerequisites_dict.setdefault(node_identity, preq)
             for _, p_items in itertools.groupby(prequisite_items, key=lambda p: p['group_number']):
                 operator_item = prerequisite_operator.OR if preq.main_operator == prerequisite_operator.AND else \
                     prerequisite_operator.AND
@@ -119,11 +122,12 @@ def load_has_prerequisite_multiple(
                         prerequisite_domain.PrerequisiteItem(p_item['code'], p_item['year']) for p_item in p_items
                     ]
                 )
-                prerequisites_dict[node_id].add_prerequisite_item_group(p_group_items)
+                prerequisites_dict[node_identity].add_prerequisite_item_group(p_group_items)
         prerequisites_dict_by_program_root_id[program_id] = prerequisites_dict
     return prerequisites_dict_by_program_root_id
 
 
+# FIXME :: to remove (is calculated into new "Prerequisites" domain object)
 def load_is_prerequisite_multiple(
         tree_root_ids: List[int],
         nodes: Dict['NodeKey', 'Node']

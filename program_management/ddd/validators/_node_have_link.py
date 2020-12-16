@@ -25,7 +25,7 @@ from base.ddd.utils import business_validator
 from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.exception import NodeHaveLinkException
-from program_management.ddd.service.read import search_program_trees_using_node_service
+from program_management.ddd.service.read import search_program_trees_using_node_service  # FIXME : use dependency injection instead
 
 
 class NodeHaveLinkValidator(business_validator.BusinessValidator):

@@ -85,7 +85,7 @@ class TestLoadTree(TestCase):
             self.link_level_1.child_element.group_year.acronym
         )
 
-    # TODO : move this into test_load_prerequisite
+    # FIXME : move this into test_load_prerequisite
     def test_case_load_tree_leaf_have_some_prerequisites(self):
         PrerequisiteFactory(
             education_group_version=self.education_group_version,
@@ -114,13 +114,14 @@ class TestLoadTree(TestCase):
         leaf = education_group_program_tree.root_node.children[0].child.children[0].child
 
         self.assertIsInstance(leaf, node.NodeLearningUnitYear)
-        self.assertIsInstance(leaf.prerequisite, prerequisite.Prerequisite)
+        self.assertTrue(education_group_program_tree.has_prerequisites(leaf))
+        result = education_group_program_tree.get_prerequisite(leaf)
+        self.assertIsInstance(result, prerequisite.Prerequisite)
         expected_str = 'LDROI1200 {AND} (LAGRO1600 {OR} LBIR2300)'.format(
             OR=_(prerequisite_operator.OR),
             AND=_(prerequisite_operator.AND)
         )
-        self.assertEqual(str(leaf.prerequisite), expected_str)
-        self.assertTrue(leaf.has_prerequisite)
+        self.assertEqual(str(result), expected_str)
 
     def test_case_load_tree_leaf_is_prerequisites_of(self):
         new_link = GroupElementYearChildLeafFactory(parent_element=self.link_level_1.child_element)

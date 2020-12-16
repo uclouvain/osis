@@ -142,9 +142,7 @@ class TestLeafViewSerializer(SimpleTestCase):
         serialized_data = _leaf_view_serializer(self.link, self.tree, self.context)
         self.assertEqual(serialized_data['text'], expected_text)
 
-    @mock.patch('program_management.ddd.domain.node.NodeLearningUnitYear.has_prerequisite',
-                new_callable=mock.PropertyMock,
-                return_value=True)
+    @mock.patch('program_management.ddd.domain.program_tree.ProgramTree.has_prerequisites', return_value=True)
     @mock.patch('program_management.ddd.domain.node.NodeLearningUnitYear.is_prerequisite',
                 new_callable=mock.PropertyMock,
                 return_value=True)
@@ -157,9 +155,7 @@ class TestLeafViewSerializer(SimpleTestCase):
         serialized_data = _leaf_view_serializer(self.link, self.tree, self.context)
         self.assertEqual(serialized_data['icon'], expected_icon)
 
-    @mock.patch('program_management.ddd.domain.node.NodeLearningUnitYear.has_prerequisite',
-                new_callable=mock.PropertyMock,
-                return_value=False)
+    @mock.patch('program_management.ddd.domain.program_tree.ProgramTree.has_prerequisites', return_value=False)
     @mock.patch('program_management.ddd.domain.node.NodeLearningUnitYear.is_prerequisite',
                 new_callable=mock.PropertyMock,
                 return_value=True)
@@ -172,9 +168,7 @@ class TestLeafViewSerializer(SimpleTestCase):
         serialized_data = _leaf_view_serializer(self.link, self.tree, self.context)
         self.assertEqual(serialized_data['icon'], expected_icon)
 
-    @mock.patch('program_management.ddd.domain.node.NodeLearningUnitYear.has_prerequisite',
-                new_callable=mock.PropertyMock,
-                return_value=True)
+    @mock.patch('program_management.ddd.domain.program_tree.ProgramTree.has_prerequisites', return_value=True)
     @mock.patch('program_management.ddd.domain.node.NodeLearningUnitYear.is_prerequisite',
                 new_callable=mock.PropertyMock,
                 return_value=False)
@@ -187,9 +181,7 @@ class TestLeafViewSerializer(SimpleTestCase):
         serialized_data = _leaf_view_serializer(self.link, self.tree, self.context)
         self.assertEqual(serialized_data['icon'], expected_icon)
 
-    @mock.patch('program_management.ddd.domain.node.NodeLearningUnitYear.has_prerequisite',
-                new_callable=mock.PropertyMock,
-                return_value=False)
+    @mock.patch('program_management.ddd.domain.program_tree.ProgramTree.has_prerequisites', return_value=False)
     @mock.patch('program_management.ddd.domain.node.NodeLearningUnitYear.is_prerequisite',
                 new_callable=mock.PropertyMock,
                 return_value=False)
@@ -226,9 +218,7 @@ class TestLeafViewAttributeSerializer(SimpleTestCase):
         serialized_data = _get_leaf_view_attribute_serializer(self.link, self.tree, self.context)
         self.assertEqual(serialized_data['element_type'], NodeType.LEARNING_UNIT.name)
 
-    @mock.patch('program_management.ddd.domain.node.NodeLearningUnitYear.has_prerequisite',
-                new_callable=mock.PropertyMock,
-                return_value=True)
+    @mock.patch('program_management.ddd.domain.program_tree.ProgramTree.has_prerequisites', return_value=True)
     @mock.patch('program_management.ddd.domain.node.NodeLearningUnitYear.is_prerequisite',
                 new_callable=mock.PropertyMock,
                 return_value=True)
@@ -242,9 +232,7 @@ class TestLeafViewAttributeSerializer(SimpleTestCase):
         serialized_data = _get_leaf_view_attribute_serializer(self.link, self.tree, self.context)
         self.assertEqual(serialized_data['title'], expected_title)
 
-    @mock.patch('program_management.ddd.domain.node.NodeLearningUnitYear.has_prerequisite',
-                new_callable=mock.PropertyMock,
-                return_value=False)
+    @mock.patch('program_management.ddd.domain.program_tree.ProgramTree.has_prerequisites', return_value=False)
     @mock.patch('program_management.ddd.domain.node.NodeLearningUnitYear.is_prerequisite',
                 new_callable=mock.PropertyMock,
                 return_value=True)
@@ -257,9 +245,7 @@ class TestLeafViewAttributeSerializer(SimpleTestCase):
         serialized_data = _get_leaf_view_attribute_serializer(self.link, self.tree, self.context)
         self.assertEqual(serialized_data['title'], expected_title)
 
-    @mock.patch('program_management.ddd.domain.node.NodeLearningUnitYear.has_prerequisite',
-                new_callable=mock.PropertyMock,
-                return_value=True)
+    @mock.patch('program_management.ddd.domain.program_tree.ProgramTree.has_prerequisites', return_value=True)
     @mock.patch('program_management.ddd.domain.node.NodeLearningUnitYear.is_prerequisite',
                 new_callable=mock.PropertyMock,
                 return_value=False)
@@ -272,9 +258,7 @@ class TestLeafViewAttributeSerializer(SimpleTestCase):
         serialized_data = _get_leaf_view_attribute_serializer(self.link, self.tree, self.context)
         self.assertEqual(serialized_data['title'], expected_title)
 
-    @mock.patch('program_management.ddd.domain.node.NodeLearningUnitYear.has_prerequisite',
-                new_callable=mock.PropertyMock,
-                return_value=False)
+    @mock.patch('program_management.ddd.domain.program_tree.ProgramTree.has_prerequisites', return_value=False)
     @mock.patch('program_management.ddd.domain.node.NodeLearningUnitYear.is_prerequisite',
                 new_callable=mock.PropertyMock,
                 return_value=False)

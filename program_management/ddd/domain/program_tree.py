@@ -45,6 +45,7 @@ from program_management.ddd.command import DO_NOT_OVERRIDE
 from program_management.ddd.domain import prerequisite, exception
 from program_management.ddd.domain.link import factory as link_factory
 from program_management.ddd.domain.node import factory as node_factory, NodeIdentity, Node, NodeNotFoundException
+from program_management.ddd.domain.prerequisite import PrerequisiteItem
 from program_management.ddd.repositories import load_authorized_relationship
 from program_management.ddd.validators import validators_by_business_action
 from program_management.ddd.validators._path_validator import PathValidator
@@ -177,6 +178,12 @@ class ProgramTree(interface.RootEntity):
     root_node = attr.ib(type=Node)
     authorized_relationships = attr.ib(type=AuthorizedRelationshipList, factory=list)
     entity_id = attr.ib(type=ProgramTreeIdentity)  # FIXME :: pass entity_id as mandatory param !
+    prerequisites = attr.ib(type='Prerequisites')  # FIXME :: replace string by Class for typing
+
+    @prerequisites.default
+    def _default_prerequisite(self) -> 'Prerequisites':
+        from program_management.ddd.domain.prerequisite import NullPrerequisites
+        return NullPrerequisites()
 
     def is_empty(self, parent_node=None):
         parent_node = parent_node or self.root_node
@@ -363,7 +370,7 @@ class ProgramTree(interface.RootEntity):
             sorted(
                 (
                     node_obj for node_obj in self.get_all_learning_unit_nodes()
-                    if node_obj.has_prerequisite
+                    if self.has_prerequisites(node_obj)
                 ),
                 key=lambda node_obj: node_obj.code
             )
@@ -408,7 +415,11 @@ class ProgramTree(interface.RootEntity):
 
     def prune(self, ignore_children_from: Set[EducationGroupTypesEnum] = None) -> 'ProgramTree':
         copied_root_node = _copy(self.root_node, ignore_children_from=ignore_children_from)
-        return ProgramTree(root_node=copied_root_node, authorized_relationships=self.authorized_relationships)
+        return ProgramTree(
+            root_node=copied_root_node,
+            authorized_relationships=self.authorized_relationships,
+            prerequisite=self.prerequisites
+        )
 
     def get_ordered_mandatory_children_types(self, parent_node: 'Node') -> List[EducationGroupTypesEnum]:
         return self.authorized_relationships.get_ordered_mandatory_children_types(parent_node.node_type)
@@ -619,6 +630,18 @@ class ProgramTree(interface.RootEntity):
 
     def contains(self, node: Node) -> bool:
         return node in self.get_all_nodes()
+
+    def has_prerequisites(self, node: 'NodeLearningUnitYear') -> bool:
+        return self.prerequisites.has_prerequisites(node)
+
+    def is_prerequisites(self, node: 'NodeLearningUnitYear') -> bool:
+        return self.prerequisites.is_prerequisites(node)
+
+    def search_is_prerequisite_of(self, search_from_node: 'NodeLearningUnitYear') -> List['NodeLearningUnitYear']:
+        return self.prerequisites.search_is_prerequisite_of(search_from_node)
+
+    def get_prerequisite(self, node: 'NodeLearningUnitYear'):
+        return self.prerequisites.get_prerequisite(node)
 
 
 def _nodes_from_root(root: 'Node') -> List['Node']:

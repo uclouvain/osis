@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import copy
 
 from django.test import SimpleTestCase
 
@@ -31,9 +32,10 @@ from program_management.ddd.domain.exception import CannotDetachLearningUnitsWho
     CannotDetachLearningUnitsWhoHavePrerequisiteException
 from program_management.ddd.validators._has_or_is_prerequisite import _IsPrerequisiteValidator, \
     _HasPrerequisiteValidator
+from program_management.tests.ddd.factories.domain.prerequisite.prerequisite import PrerequisitesFactory
+from program_management.tests.ddd.factories.domain.program_tree.LDROI200M_DROI2M import ProgramTreeDROI2MFactory
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory, NodeGroupYearFactory
-from program_management.tests.ddd.factories.prerequisite import cast_to_prerequisite
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 from program_management.tests.ddd.validators.mixins import TestValidatorValidateMixin
 
@@ -98,41 +100,36 @@ class TestIsPrerequisiteValidator(TestValidatorValidateMixin, SimpleTestCase):
 class TestHasPrerequisiteValidator(TestValidatorValidateMixin, SimpleTestCase):
 
     def setUp(self):
-        self.node_is_prerequisite = NodeLearningUnitYearFactory()
-
-        node_has_prerequisite = NodeLearningUnitYearFactory()
-        node_has_prerequisite.set_prerequisite(cast_to_prerequisite(self.node_is_prerequisite))
-        self.node_has_prerequisite = node_has_prerequisite
+        self.year = 2020
+        self.tree_droi2m = ProgramTreeDROI2MFactory(root_node__year=self.year)
+        self.node_is_prerequisite = self.tree_droi2m.get_node_by_code_and_year(code="LDROI2101", year=self.year)
+        self.node_has_prerequisite = self.tree_droi2m.get_node_by_code_and_year(code="LDROP2011", year=self.year)
+        PrerequisitesFactory.produce_inside_tree(
+            context_tree=self.tree_droi2m,
+            node_having_prerequisite=self.node_has_prerequisite.entity_id,
+            nodes_that_are_prequisites=[self.node_is_prerequisite.entity_id]
+        )
 
     def test_should_not_raise_exception_when_children_of_node_to_detach_do_not_have_prerequisites(self):
-        node_to_detach = NodeGroupYearFactory()
-        link = LinkFactory(child=node_to_detach)
-        tree = ProgramTreeFactory(root_node=link.parent)
+        inexisting_node_in_tree = NodeGroupYearFactory()
 
-        validator = _HasPrerequisiteValidator(tree, node_to_detach)
+        validator = _HasPrerequisiteValidator(self.tree_droi2m, node_to_detach=inexisting_node_in_tree)
         self.assertValidatorNotRaises(validator)
 
     def test_should_raise_exception_when_children_of_node_to_detach_have_prerequisites(self):
-        node_to_detach = NodeGroupYearFactory()
-
-        link = LinkFactory(child=node_to_detach)
-        LinkFactory(parent=node_to_detach, child=self.node_has_prerequisite)
-        LinkFactory(parent=self.node_has_prerequisite, child=self.node_is_prerequisite)
-
-        tree = ProgramTreeFactory(root_node=link.parent)
+        parent_of_node_that_has_prerequisite = self.tree_droi2m.get_node_by_code_and_year(
+            code="LDROP100T",
+            year=self.year
+        )
 
         with self.assertRaises(CannotDetachLearningUnitsWhoHavePrerequisiteException):
-            _HasPrerequisiteValidator(tree, node_to_detach).validate()
+            _HasPrerequisiteValidator(self.tree_droi2m, node_to_detach=parent_of_node_that_has_prerequisite).validate()
 
     def test_should_raise_exception_when_node_to_detach_is_learning_unit_that_has_prerequisite(self):
-        node_to_detach_has_prerequisite = self.node_has_prerequisite
-
-        link = LinkFactory(child=node_to_detach_has_prerequisite)
-
-        tree = ProgramTreeFactory(root_node=link.parent)
+        node_having_prerequisite = self.node_has_prerequisite
 
         with self.assertRaises(CannotDetachLearningUnitsWhoHavePrerequisiteException):
-            _HasPrerequisiteValidator(tree, node_to_detach_has_prerequisite).validate()
+            _HasPrerequisiteValidator(self.tree_droi2m, node_to_detach=node_having_prerequisite).validate()
 
     def test_should_not_raise_exception_when_node_to_detach_has_prerequisite_twice(self):
         tree = ProgramTreeFactory()
@@ -154,4 +151,4 @@ class TestHasPrerequisiteValidator(TestValidatorValidateMixin, SimpleTestCase):
         )  # node_has_prerequisite used twice
 
         assertion = "While the prerequisite is used more than once in the same tree, we can detach it"
-        self.assertValidatorNotRaises(_HasPrerequisiteValidator(tree, self.node_has_prerequisite))
+        self.assertValidatorNotRaises(_HasPrerequisiteValidator(tree, node_to_detach=self.node_has_prerequisite))

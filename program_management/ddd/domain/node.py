@@ -555,10 +555,6 @@ class NodeLearningUnitYear(Node):
         return _get_full_title(self.common_title_en, self.specific_title_en)
 
     @property
-    def has_prerequisite(self) -> bool:
-        return bool(self.prerequisite)
-
-    @property
     def is_prerequisite(self) -> bool:
         return bool(self.is_prerequisite_of)
 

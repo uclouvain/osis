@@ -43,10 +43,12 @@ from program_management.ddd.repositories import load_node, load_prerequisite, \
 # Typing
 from program_management.ddd.repositories.load_prerequisite import TreeRootId, NodeId
 from program_management.models.education_group_version import EducationGroupVersion
+from program_management.ddd.domain.prerequisite import Prerequisites
+
 
 GroupElementYearColumnName = str
 LinkKey = str  # <parent_id>_<child_id>  Example : "123_124"
-NodeKey = str  # <node_id>_<node_type> Example : "589_LEARNING_UNIT"
+NodeKey = int  # Element.pk
 TreeStructure = List[Dict[GroupElementYearColumnName, Any]]
 
 
@@ -134,6 +136,7 @@ def __load_tree_links(tree_structure: TreeStructure) -> Dict[LinkKey, 'Link']:
     return tree_links
 
 
+#  FIXME :: to remove because unused
 def __load_tree_prerequisites(
         tree_root_ids: List[int],
         nodes: Dict[NodeKey, 'Node']
@@ -151,13 +154,21 @@ def __build_tree(
         links: Dict[LinkKey, 'Link'],
         prerequisites
 ) -> 'ProgramTree':
+    from program_management.ddd.domain.program_tree import ProgramTreeIdentity  # FIXME :: cyclic import
     structure_by_parent = {}  # For performance
     for s_dict in tree_structure:
         if s_dict['path']:  # TODO :: Case child_id or parent_id is null - to remove after DB null constraint set
             parent_path = '|'.join(s_dict['path'].split('|')[:-1])
             structure_by_parent.setdefault(parent_path, []).append(s_dict)
     root_node.children = __build_children(str(root_node.pk), structure_by_parent, nodes, links, prerequisites)
-    tree = program_tree.ProgramTree(root_node, authorized_relationships=load_authorized_relationship.load())
+    tree = program_tree.ProgramTree(
+        root_node,
+        authorized_relationships=load_authorized_relationship.load(),
+        prerequisites=Prerequisites(
+            context_tree=ProgramTreeIdentity(code=root_node.code, year=root_node.year),
+            prerequisites=prerequisites['has_prerequisite_dict'].values(),
+        ),
+    )
     return tree
 
 

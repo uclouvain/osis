@@ -95,5 +95,5 @@ class _HasPrerequisiteValidator(business_validator.BusinessValidator):
 
         return {
             node for node in learning_unit_nodes_removed
-            if node.has_prerequisite and self.tree.count_usage(node) <= 1
+            if self.tree.has_prerequisites(node) and self.tree.count_usage(node) <= 1
         }

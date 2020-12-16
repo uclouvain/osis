@@ -24,7 +24,7 @@
 #
 ##############################################################################
 import re
-from typing import List
+from typing import List, Dict
 
 import attr
 
@@ -33,6 +33,7 @@ from base.models.enums import prerequisite_operator
 from base.models.enums.prerequisite_operator import OR, AND
 from django.utils.translation import gettext as _
 
+from base.utils.cache import cached_result
 from osis_common.ddd import interface
 from program_management.ddd.business_types import *
 
@@ -223,3 +224,43 @@ class PrerequisiteFactory:
 
 
 factory = PrerequisiteFactory()
+
+
+@attr.s(slots=True)
+class Prerequisites(interface.RootEntity):
+    context_tree = attr.ib(type='ProgramTreeIdentity')
+    prerequisites = attr.ib(type=List[Prerequisite], factory=list)
+
+    @cached_result
+    def __map_is_prerequisite_of(self) -> Dict['NodeIdentity', List['NodeIdentity']]:
+        result = {}
+        for node_having_prerequisites, prerequisites_list in self.prerequisites.items():
+            for prerequisite in prerequisites_list:
+                for prereq_item in prerequisite.get_all_prerequisite_items():
+                    prereq_item_as_node_identity = NodeIdentity(code=prereq_item.code, year=prereq_item.year)  # FIXME :: put this into a domain service
+                    result.setdefault(prereq_item_as_node_identity, set()).add(node_having_prerequisites)
+        return {
+            node_is_prerequisite: sorted(nodes_having_prerequisites, key=lambda node_identity: node_identity.code)
+            for node_is_prerequisite, nodes_having_prerequisites in result.items()
+        }
+
+    @cached_result
+    def __map_node_identity_prerequisite(self) -> Dict['NodeIdentity', 'Prerequisite']:
+        return {p.node_having_prerequisites: p for p in self.prerequisites}
+
+    def has_prerequisites(self, node: 'NodeLearningUnitYear') -> bool:
+        return bool(self.get_prerequisite(node))
+
+    def is_prerequisites(self, node: 'NodeLearningUnitYear') -> bool:
+        return bool(self.search_is_prerequisite_of(node))
+
+    def search_is_prerequisite_of(self, search_from_node: 'NodeLearningUnitYear') -> List['NodeLearningUnitYear']:
+        return self.__map_is_prerequisite_of().get(search_from_node.entity_id) or []
+
+    def get_prerequisite(self, node: 'NodeLearningUnitYear'):
+        return self.__map_node_identity_prerequisite().get(node.entity_id)
+
+
+@attr.s(slots=True)
+class NullPrerequisites(Prerequisites):
+    context_tree = attr.ib(type='ProgramTreeIdentity', default=None)
