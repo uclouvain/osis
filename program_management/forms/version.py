@@ -29,12 +29,14 @@ import attr
 from django import forms
 from django.contrib.auth.models import User
 from django.forms import TextInput
+from django.urls import reverse
 from django.utils.functional import lazy
 from django.utils.translation import gettext_lazy as _
 
 from education_group.calendar.education_group_edition_process_calendar import EducationGroupEditionCalendar
 from base.forms.common import ValidationRuleMixin
 from base.forms.utils.choice_field import BLANK_CHOICE
+from base.forms.utils.validations import set_remote_validation
 from base.models.certificate_aim import CertificateAim
 from base.models.enums.constraint_type import ConstraintTypeEnum
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType
@@ -58,9 +60,7 @@ class SpecificVersionForm(forms.Form):
         max_length=15,
         required=True,
         label=_('Acronym/Short title'),
-        widget=TextInput(
-            attrs={'onchange': 'validate_version_name()', 'style': "text-transform: uppercase;"}
-        ),
+        widget=TextInput(attrs={'style': "text-transform: uppercase;"}),
     )
     version_title_fr = forms.CharField(
         max_length=100,
@@ -82,6 +82,15 @@ class SpecificVersionForm(forms.Form):
         super().__init__(*args, **kwargs)
 
         self._init_academic_year_choices()
+        self._set_remote_validation_on_version_name()
+
+    def _set_remote_validation_on_version_name(self):
+        set_remote_validation(
+            self.fields["version_name"],
+            reverse("check_version_name", args=[self.tree_version_identity.year,
+                                                self.tree_version_identity.offer_acronym]
+                    )
+        )
 
     def _init_academic_year_choices(self):
         max_year = get_version_max_end_year.calculate_version_max_end_year(
