@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -29,6 +29,8 @@ from django.http import QueryDict
 from django.test import TestCase
 from django.utils.translation import gettext_lazy as _
 
+from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
+from attribution.tests.factories.attribution_new import AttributionNewFactory
 from base.forms.learning_unit.search.educational_information import LearningUnitDescriptionFicheFilter
 from base.forms.learning_unit.search.external import ExternalLearningUnitFilter
 from base.forms.learning_unit.search.simple import LearningUnitFilter, MOBILITY
@@ -39,8 +41,10 @@ from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.entity_version_address import MainRootEntityVersionAddressFactory
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
+from base.tests.factories.learning_component_year import LecturingLearningComponentYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.organization import OrganizationFactory
+from base.tests.factories.tutor import TutorFactory
 from reference.tests.factories.country import CountryFactory
 
 CINEY = "Ciney"
@@ -186,6 +190,32 @@ class TestSearchForm(TestCase):
         learning_unit_filter = LearningUnitFilter(self.data)
         self.assertTrue(learning_unit_filter.is_valid())
         self.assertEqual(learning_unit_filter.qs.count(), 1)
+
+    def test_search_on_tutor_with_composed_name(self):
+        tutor = self._build_tutor_with_composed_name()
+
+        self.data.update({
+            "tutor": tutor.person.last_name
+        })
+
+        learning_unit_filter = LearningUnitFilter(self.data)
+        self.assertTrue(learning_unit_filter.is_valid())
+        self.assertEqual(learning_unit_filter.qs.count(), 1)
+
+    def _build_tutor_with_composed_name(self):
+        tutor = TutorFactory(person__last_name='de la croix')
+        luy = LearningUnitYearFactory()
+        lecturing_component = LecturingLearningComponentYearFactory(
+            learning_unit_year=luy)
+        attribution = AttributionNewFactory(
+            learning_container_year=luy.learning_container_year,
+            tutor=tutor
+        )
+        AttributionChargeNewFactory(
+            attribution=attribution,
+            learning_component_year=lecturing_component
+        )
+        return tutor
 
 
 class TestFilterDescriptiveficheLearningUnitYear(TestCase):
