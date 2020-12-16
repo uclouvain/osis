@@ -79,12 +79,32 @@ class AuthorizedRelationshipValidator(business_validator.BusinessValidator):
         if self.get_not_authorized_children_nodes():
             raise ChildTypeNotAuthorizedException(self.link.parent, self.children_nodes)
 
+        if self.is_mandatory_child_converted_to_reference():
+            raise MinimumChildTypesNotRespectedException(
+                parent_node=self.link.parent,
+                minimum_children_types_reached=[self.link.child.node_type]
+            )
+
         if self.get_children_node_types_that_surpass_maximum_allowed():
             raise MaximumChildTypesReachedException(
                 self.link.parent,
                 self.link.child,
                 self.get_children_node_types_that_surpass_maximum_allowed()
             )
+
+    def is_mandatory_child_converted_to_reference(self):
+        if not self.link.is_reference():
+            return False
+
+        mandatory_children_types = self.tree.get_ordered_mandatory_children_types(parent_node=self.link.parent)
+        is_link_mandatory = self.link.child.node_type in mandatory_children_types
+
+        if not is_link_mandatory:
+            return False
+
+        child_node_types = [l.child.node_type for l in self.link.parent.children if not l.is_reference()]
+        has_parent_already_mandatory_child = self.link.child.node_type in child_node_types
+        return not has_parent_already_mandatory_child
 
     @functools.lru_cache()
     def get_children_node_types_that_surpass_maximum_allowed(self) -> Set[EducationGroupTypesEnum]:
