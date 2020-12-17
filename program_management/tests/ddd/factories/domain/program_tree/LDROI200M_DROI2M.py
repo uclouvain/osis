@@ -43,6 +43,8 @@ class ProgramTreeDROI2MFactory(ProgramTreeFactory):
         |___ LDROI220T - TCDROI2M
         |        |
         |        |___ LDROI2101 (UE)
+        |        |
+        |        |___ LDROI2102 (UE)
         |
         |
         |___ LDROI101G - FINALITÉS
@@ -89,6 +91,7 @@ class ProgramTreeDROI2MFactory(ProgramTreeFactory):
         )
 
         ldroi2101 = NodeLearningUnitYearFactory(code='LDROI2101', year=current_year, end_date=end_year)
+        ldroi2102 = NodeLearningUnitYearFactory(code='LDROI2102', year=current_year, end_date=end_year)
 
         ldroi101g = NodeGroupYearFactory(
             code='LDROI101G',
@@ -106,14 +109,19 @@ class ProgramTreeDROI2MFactory(ProgramTreeFactory):
             year=current_year,
         )
 
-        link1 = LinkFactory(
+        LinkFactory(
             parent=ldroi200m,
-            child=LinkFactory(
-                parent=ldroi220t,
-                child=ldroi2101
-            ).parent
+            child=ldroi220t
         )
-        link2 = LinkFactory(
+        LinkFactory(
+            parent=ldroi220t,
+            child=ldroi2101
+        )
+        LinkFactory(
+            parent=ldroi220t,
+            child=ldroi2102
+        )
+        LinkFactory(
             parent=ldroi200m,
             child=LinkFactory(
                 parent=ldroi101g,
@@ -123,7 +131,7 @@ class ProgramTreeDROI2MFactory(ProgramTreeFactory):
                 ).root_node
             ).parent
         )
-        link3 = LinkFactory(
+        LinkFactory(
             parent=ldroi200m,
             child=LinkFactory(
                 parent=ldroi100g,
@@ -133,7 +141,6 @@ class ProgramTreeDROI2MFactory(ProgramTreeFactory):
                 ).root_node
             ).parent
         )
-        # ldroi200m.children = [link1, link2, link3]
 
     # @factory.post_generation
     # def generate_prerequisites(self, *args, **kwargs):

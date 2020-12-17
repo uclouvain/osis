@@ -27,6 +27,7 @@ from typing import List
 
 import factory.fuzzy
 
+from base.models.enums.prerequisite_operator import AND
 from program_management.ddd.domain.prerequisite import Prerequisites
 from program_management.ddd.domain.program_tree import ProgramTree, ProgramTreeIdentity
 from program_management.tests.ddd.factories.prerequisite import PrerequisiteFactory, PrerequisiteItemGroupFactory, \
@@ -57,9 +58,11 @@ class PrerequisitesFactory(factory.Factory):
     def produce_inside_tree(
             context_tree: 'ProgramTree',
             node_having_prerequisite: 'NodeIdentity',
-            nodes_that_are_prequisites: List['NodeIdentity']
+            nodes_that_are_prequisites: List['NodeIdentity'],
+            operator=None
     ) -> None:
-
+        if operator is None:
+            operator = AND
         prerequisites = PrerequisitesFactory(
             context_tree=context_tree.entity_id,
             prerequisites=[
@@ -68,6 +71,7 @@ class PrerequisitesFactory(factory.Factory):
                     context_tree=context_tree.entity_id,
                     prerequisite_item_groups=[
                         PrerequisiteItemGroupFactory(
+                            operator=operator,
                             prerequisite_items=[
                                 PrerequisiteItemFactory(
                                     code=node_that_is_prequisite.code,

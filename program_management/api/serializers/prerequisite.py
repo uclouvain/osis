@@ -53,7 +53,7 @@ class ProgramTreePrerequisitesSerializer(NodeBaseSerializer):
 
     def get_prerequisites(self, obj: 'Node'):
         list_nodes = []
-        for prig in obj.prerequisite.prerequisite_item_groups:
+        for prig in self.context['tree'].get_prerequisite(obj).prerequisite_item_groups:
             for prerequisite in prig.prerequisite_items:
                 node = self.context.get('tree').get_node_by_code_and_year(prerequisite.code, prerequisite.year)
                 list_nodes.append(node)
