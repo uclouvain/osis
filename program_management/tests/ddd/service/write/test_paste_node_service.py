@@ -393,27 +393,6 @@ class TestPasteGroupNodeService(DDDTestCase, MockPatcherMixin):
         )
 
     def test_cannot_paste_list_finalities_inside_list_finalities_if_max_finalities_is_surpassed(self):
-        tree_data = {
-            "node_type": TrainingType.PGRM_MASTER_120,
-            "node_id": 8,
-            "year": 2020,
-            "end_year": 2025,
-            "children": [
-                {
-                    "node_type": GroupType.FINALITY_120_LIST_CHOICE,
-                    "code": "LMINOR45",
-                    "node_id": 11,
-                    "year": 2020,
-                    "children": [
-                        {
-                            "node_type": TrainingType.MASTER_MD_120,
-                            "year": 2020
-                        },
-                    ]
-                }
-            ]
-        }
-
         tree_to_paste_data = {
             "node_type": GroupType.FINALITY_120_LIST_CHOICE,
             "year": 2020,
@@ -426,7 +405,7 @@ class TestPasteGroupNodeService(DDDTestCase, MockPatcherMixin):
             ]
         }
 
-        tree = tree_builder(tree_data)
+        tree = ProgramTreeFactory.produce_standard_2m_tree(2020, 2025)
         tree_to_paste = tree_builder(tree_to_paste_data)
 
         self.fake_program_tree_repository.root_entities.append(tree_to_paste)
@@ -463,7 +442,7 @@ class TestPasteGroupNodeService(DDDTestCase, MockPatcherMixin):
         invalid_command = PasteElementCommandFactory(
             node_to_paste_code=tree_to_paste.root_node.code,
             node_to_paste_year=tree_to_paste.root_node.year,
-            path_where_to_paste="8|11",
+            path_where_to_paste="1|22",
         )
 
         self.assertRaisesBusinessException(
