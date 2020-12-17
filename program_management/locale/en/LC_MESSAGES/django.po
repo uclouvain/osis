@@ -323,6 +323,9 @@ msgstr ""
 msgid "Internship"
 msgstr ""
 
+msgid "Invalid name version"
+msgstr ""
+
 msgid "Invalid tree path"
 msgstr ""
 
@@ -478,9 +481,6 @@ msgid "New specific version"
 msgstr ""
 
 msgid "New training"
-msgstr ""
-
-msgid "New version"
 msgstr ""
 
 msgid "No"
@@ -651,6 +651,9 @@ msgid "Root group"
 msgstr ""
 
 msgid "Save"
+msgstr ""
+
+msgid "Save will prolong the past version"
 msgstr ""
 
 msgid "Schedule type"
@@ -851,6 +854,12 @@ msgid "Version"
 msgstr ""
 
 msgid "Version name"
+msgstr ""
+
+msgid "Version name {} already exists"
+msgstr ""
+
+msgid "Version name {} existed"
 msgstr ""
 
 msgid "Volume"

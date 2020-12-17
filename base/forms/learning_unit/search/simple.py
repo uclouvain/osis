@@ -155,6 +155,7 @@ class LearningUnitFilter(FilterSet):
         self.form.fields["academic_year"].initial = starting_academic_year()
 
     def filter_tutor(self, queryset, name, value):
+        value = value.replace(' ', '\\s')
         search_value = espace_special_characters(value)
         for tutor_name in search_value.split():
             queryset = queryset.filter(

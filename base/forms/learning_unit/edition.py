@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@ from base.business.learning_units.edition import edit_learning_unit_end_date
 from base.forms.learning_unit.learning_unit_postponement import LearningUnitPostponementForm
 from base.forms.utils.choice_field import BLANK_CHOICE_DISPLAY, NO_PLANNED_END_DISPLAY
 from base.models.academic_year import AcademicYear
+from base.models.proposal_learning_unit import find_by_learning_unit
 from base.models.enums import learning_unit_year_subtypes
 
 
@@ -71,7 +72,7 @@ class LearningUnitEndDateForm(forms.Form):
         self.fields['academic_year'].initial = end_year
 
     def _get_academic_years(self, max_year):
-        if self.learning_unit.is_past():
+        if not has_proposal(self.learning_unit) and self.learning_unit.is_past():
             raise ValueError(
                 'Learning_unit.end_year {} cannot be less than the current academic_year'.format(
                     self.learning_unit.end_year)
@@ -137,3 +138,9 @@ class LearningUnitDailyManagementEndDateForm(LearningUnitEndDateForm):
     @classmethod
     def get_event_perm_generator(cls):
         return event_perms.generate_event_perm_learning_unit_edition
+
+
+def has_proposal(learning_unit):
+    if find_by_learning_unit(learning_unit):
+        return True
+    return False
