@@ -955,7 +955,7 @@ class TestIsEmpty(SimpleTestCase):
 class TestGetIndirectParents(SimpleTestCase):
 
     def setUp(self) -> None:
-        self.program_tree = ProgramTreeFactory.produce_standard_2M_program_tree_with_one_finality(
+        self.program_tree = ProgramTreeFactory.produce_standard_2m_tree(
             current_year=2020,
             end_year=2020
         )
@@ -980,7 +980,7 @@ class TestGetIndirectParents(SimpleTestCase):
 
     def test_when_child_node_has_one_indirect_parent_which_has_one_indirect_parent(self):
         child_node = NodeLearningUnitYearFactory()
-        tree = ProgramTreeFactory.produce_standard_2M_program_tree_with_one_finality(
+        tree = ProgramTreeFactory.produce_standard_2m_tree(
             current_year=2020,
             end_year=2020
         )
@@ -997,13 +997,13 @@ class TestGetIndirectParents(SimpleTestCase):
 
     def test_when_child_node_used_twice_in_tree_with_2_different_indirect_parent(self):
         child_node = NodeLearningUnitYearFactory()
-        tree = ProgramTreeFactory.produce_standard_2M_program_tree_with_one_finality(
+        tree = ProgramTreeFactory.produce_standard_2m_tree(
             current_year=2020,
             end_year=2020
         )
         finality = next(n for n in tree.get_all_nodes() if n.is_finality())
         finality.add_child(child_node)  # Indirect parent is finality
-        common_core = next(n for n in tree.get_all_nodes() if n.is_common_core())
+        common_core = tree.get_node("1|21")
         common_core.add_child(child_node)  # Indirect parent is master 2M
 
         result = tree.search_indirect_parents(child_node)
