@@ -29,7 +29,7 @@ from typing import Dict
 import factory.fuzzy
 
 from base.models.authorized_relationship import AuthorizedRelationshipList
-from base.models.enums.education_group_types import GroupType, TrainingType
+from base.models.enums.education_group_types import GroupType, TrainingType, MiniTrainingType
 from program_management.ddd.domain.program_tree import ProgramTree, ProgramTreeIdentity
 from program_management.models.enums.node_type import NodeType
 from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipObjectFactory
@@ -99,6 +99,91 @@ class ProgramTreeFactory(factory.Factory):
         finality_list_node = next(n for n in program_tree.get_all_nodes() if n.is_finality_list_choice())
         finality_list_node.add_child(finality)
         return program_tree
+
+    @staticmethod
+    def produce_bachelor_tree(current_year: int, end_year: int) -> 'ProgramTree':
+        tree_data = {
+            "node_type": TrainingType.BACHELOR,
+            "year": current_year,
+            "end_year": end_year,
+            "node_id": 1,
+            "children": [
+                {
+                    "node_type": GroupType.COMMON_CORE,
+                    "year": current_year,
+                    "end_year": end_year,
+                    "node_id": 21,
+                    "children": [
+                        {
+                            "node_type": GroupType.SUB_GROUP,
+                            "year": current_year,
+                            "end_year": end_year,
+                            "node_id": 31,
+                            "children": [
+                                {
+                                    "node_type": NodeType.LEARNING_UNIT,
+                                    "year": current_year,
+                                    "end_date": end_year,
+                                    "node_id": 41,
+                                },
+                                {
+                                    "node_type": NodeType.LEARNING_UNIT,
+                                    "year": current_year,
+                                    "end_date": end_year,
+                                    "node_id": 42,
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "node_type": GroupType.MINOR_LIST_CHOICE,
+                    "year": current_year,
+                    "end_year": end_year,
+                    "node_id": 22,
+                    "children": [
+                        {
+                            "node_type": MiniTrainingType.DEEPENING,
+                            "year": current_year,
+                            "end_year": end_year,
+                            "node_id": 32,
+                            "children": [
+                                {
+                                    "node_type": GroupType.COMMON_CORE,
+                                    "year": current_year,
+                                    "end_year": end_year,
+                                    "node_id": 1211,
+                                    "children": [
+                                        {
+                                            "node_type": GroupType.SUB_GROUP,
+                                            "year": current_year,
+                                            "end_year": end_year,
+                                            "node_id": 43,
+                                            "children": [
+                                                {
+                                                    "node_type": NodeType.LEARNING_UNIT,
+                                                    "year": current_year,
+                                                    "end_date": end_year,
+                                                    "node_id": 51,
+                                                },
+                                                {
+                                                    "node_type": NodeType.LEARNING_UNIT,
+                                                    "year": current_year,
+                                                    "end_date": end_year,
+                                                    "node_id": 52,
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                    ]
+                },
+                {"node_type": NodeType.LEARNING_UNIT}
+            ]
+        }
+        return tree_builder(tree_data)
 
 
 def _tree_builder(data: Dict) -> 'Node':
