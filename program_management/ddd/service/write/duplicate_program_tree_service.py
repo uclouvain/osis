@@ -47,30 +47,10 @@ def duplicate_program_tree(
         override_end_year_to=cmd.override_end_year_to,
         override_start_year_to=cmd.override_start_year_to
     )
-    validation_rule_credits = FieldValidationRule.get(
+    validation_rule = FieldValidationRule.get(
         program_tree.root_node.node_type, 'credits', is_version=True
     )
-    validation_rule_contraint_type = FieldValidationRule.get(
-        program_tree.root_node.node_type, 'constraint_type', is_version=True
-    )
-    validation_rule_min_constraint = FieldValidationRule.get(
-        program_tree.root_node.node_type, 'min_constraint', is_version=True
-    )
-    validation_rule_max_constraint = FieldValidationRule.get(
-        program_tree.root_node.node_type, 'max_constraint', is_version=True
-    )
-    validation_rule_remark_fr = FieldValidationRule.get(
-        program_tree.root_node.node_type, 'remark_fr', is_version=True
-    )
-    validation_rule_remark_en = FieldValidationRule.get(
-        program_tree.root_node.node_type, 'remark_en', is_version=True
-    )
-    program_tree.root_node.credits = validation_rule_credits.initial_value or None
-    program_tree.root_node.constraint_type = validation_rule_contraint_type.initial_value or None
-    program_tree.root_node.min_constraint = validation_rule_min_constraint.initial_value or None
-    program_tree.root_node.max_constraint = validation_rule_max_constraint.initial_value or None
-    program_tree.root_node.remark_fr = validation_rule_remark_fr.initial_value
-    program_tree.root_node.remark_en = validation_rule_remark_en.initial_value
+    program_tree.root_node.credits = validation_rule.initial_value
     # THEN
     program_tree_identity = ProgramTreeRepository().create(
         program_tree=program_tree,
