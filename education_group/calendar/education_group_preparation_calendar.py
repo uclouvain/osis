@@ -31,7 +31,7 @@ from base.models.academic_year import AcademicYear
 from base.models.enums import academic_calendar_type
 
 
-class EducationGroupEditionCalendar(AcademicEventCalendarHelper):
+class EducationGroupPreparationCalendar(AcademicEventCalendarHelper):
     event_reference = academic_calendar_type.EDUCATION_GROUP_EDITION
 
     def ensure_consistency_until_n_plus_6(self):
@@ -43,7 +43,7 @@ class EducationGroupEditionCalendar(AcademicEventCalendarHelper):
                 reference=self.event_reference,
                 data_year=ac_year,
                 defaults={
-                    "title": "Edition des programmes",
+                    "title": "Préparation des formations",
                     "start_date": datetime.date(ac_year.year, 8, 15),
                     "end_date": datetime.date(ac_year.year, 11, 20),
                     "academic_year": ac_year  # To remove after refactoring

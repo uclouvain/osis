@@ -791,7 +791,7 @@ msgid "Education group detailed achievement"
 msgstr "Acquis d'apprentissage détaillé d'une formation"
 
 msgid "Education group edition"
-msgstr "Édition des programmes"
+msgstr "Préparation des programmes"
 
 msgid "Education group year"
 msgstr "Organisation de formations annualisée"

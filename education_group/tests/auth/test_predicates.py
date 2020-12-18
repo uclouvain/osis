@@ -219,8 +219,8 @@ class TestIsEditionProgramPeriodOpen(TestCase):
         self.predicate_context_mock.start()
         self.addCleanup(self.predicate_context_mock.stop)
 
-    @mock.patch('education_group.calendar.education_group_edition_process_calendar.'
-                'EducationGroupEditionCalendar.is_target_year_authorized', return_value=True)
+    @mock.patch('education_group.calendar.education_group_preparation_calendar.'
+                'EducationGroupPreparationCalendar.is_target_year_authorized', return_value=True)
     def test_case_edition_program_period_open(self, mock_event_perm_is_open):
         self.assertTrue(
             predicates.is_program_edition_period_open(
@@ -229,8 +229,8 @@ class TestIsEditionProgramPeriodOpen(TestCase):
             )
         )
 
-    @mock.patch('education_group.calendar.education_group_edition_process_calendar.'
-                'EducationGroupEditionCalendar.is_target_year_authorized', return_value=False)
+    @mock.patch('education_group.calendar.education_group_preparation_calendar.'
+                'EducationGroupPreparationCalendar.is_target_year_authorized', return_value=False)
     def test_case_edition_program_period_closed(self, mock_event_perm_is_open):
         self.assertFalse(
             predicates.is_program_edition_period_open(
@@ -381,8 +381,8 @@ class TestAreAllEducationGroupRemovable(TestCase):
             )
         )
 
-    @mock.patch('education_group.calendar.education_group_edition_process_calendar.'
-                'EducationGroupEditionCalendar.is_target_year_authorized', return_value=True)
+    @mock.patch('education_group.calendar.education_group_preparation_calendar.'
+                'EducationGroupPreparationCalendar.is_target_year_authorized', return_value=True)
     def test_case_all_minitrainings_are_removable(self, mock_open):
         minitraining_roots = [GroupYearFactory(group=self.group, academic_year__year=2020)]
         person = FacultyManagerFactory(entity=minitraining_roots[0].management_entity).person
@@ -393,8 +393,8 @@ class TestAreAllEducationGroupRemovable(TestCase):
             )
         )
 
-    @mock.patch('education_group.calendar.education_group_edition_process_calendar.'
-                'EducationGroupEditionCalendar.is_target_year_authorized', return_value=True)
+    @mock.patch('education_group.calendar.education_group_preparation_calendar.'
+                'EducationGroupPreparationCalendar.is_target_year_authorized', return_value=True)
     def test_case_all_groups_are_not_removable(self, mock_open):
         groups = [GroupYearFactory()]
         person = FacultyManagerFactory(entity=groups[0].management_entity).person

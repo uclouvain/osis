@@ -32,10 +32,10 @@ from base.models.academic_calendar import AcademicCalendar
 from base.models.enums import academic_calendar_type
 from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
-from education_group.calendar.education_group_edition_process_calendar import EducationGroupEditionCalendar
+from education_group.calendar.education_group_preparation_calendar import EducationGroupPreparationCalendar
 
 
-class TestEducationGroupEditionCalendarOpened(TestCase):
+class TestEducationGroupPreparationCalendarOpened(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.current_academic_year = create_current_academic_year()
@@ -48,34 +48,34 @@ class TestEducationGroupEditionCalendarOpened(TestCase):
 
     def test_is_open_for_spec_egy(self):
         self.assertTrue(
-            EducationGroupEditionCalendar().is_target_year_authorized(target_year=self.current_academic_year.year)
+            EducationGroupPreparationCalendar().is_target_year_authorized(target_year=self.current_academic_year.year)
         )
 
     def test_is_open_other_rules(self):
         self.assertTrue(
-            EducationGroupEditionCalendar().is_target_year_authorized()
+            EducationGroupPreparationCalendar().is_target_year_authorized()
         )
 
 
-class TestEducationGroupEditionCalendarClosed(TestCase):
+class TestEducationGroupPreparationCalendarClosed(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.current_academic_year = create_current_academic_year()
 
     def test_is_not_open_for_spec_egy_without_exception_raise(self):
         self.assertFalse(
-            EducationGroupEditionCalendar().is_target_year_authorized(target_year=self.current_academic_year.year)
+            EducationGroupPreparationCalendar().is_target_year_authorized(target_year=self.current_academic_year.year)
         )
 
 
-class TestEducationGroupEditionCalendarEnsureConsistencyUntilNPlus6(TestCase):
+class TestEducationGroupPreparationCalendarEnsureConsistencyUntilNPlus6(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.current_academic_year = create_current_academic_year()
         AcademicYearFactory.produce_in_future(cls.current_academic_year.year)
 
     def test_ensure_consistency_until_n_plus_6_assert_default_value(self):
-        EducationGroupEditionCalendar().ensure_consistency_until_n_plus_6()
+        EducationGroupPreparationCalendar().ensure_consistency_until_n_plus_6()
 
         qs = AcademicCalendar.objects.filter(reference=academic_calendar_type.EDUCATION_GROUP_EDITION)
 
@@ -83,7 +83,7 @@ class TestEducationGroupEditionCalendarEnsureConsistencyUntilNPlus6(TestCase):
         self.assertDictEqual(
             model_to_dict(qs.first(), fields=('title', 'reference', 'data_year', 'start_date', 'end_date')),
             {
-                "title": "Edition des programmes",
+                "title": "Préparation des formations",
                 "reference": academic_calendar_type.EDUCATION_GROUP_EDITION,
                 "data_year": self.current_academic_year.pk,
                 "start_date": datetime.date(2020, 8, 15),
@@ -93,7 +93,7 @@ class TestEducationGroupEditionCalendarEnsureConsistencyUntilNPlus6(TestCase):
 
     def test_ensure_consistency_until_n_plus_6_assert_idempotent(self):
         for _ in range(5):
-            EducationGroupEditionCalendar().ensure_consistency_until_n_plus_6()
+            EducationGroupPreparationCalendar().ensure_consistency_until_n_plus_6()
 
         self.assertEqual(
             AcademicCalendar.objects.filter(reference=academic_calendar_type.EDUCATION_GROUP_EDITION).count(),
