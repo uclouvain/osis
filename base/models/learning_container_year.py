@@ -101,9 +101,7 @@ class LearningContainerYear(SerializableModel):
 
     @property
     def in_charge(self):
-        if self.container_type and self.container_type in IN_CHARGE_TYPES:
-            return True
-        return False
+        return self.container_type and self.container_type in IN_CHARGE_TYPES
 
     def __str__(self):
         return u"%s - %s" % (self.acronym, self.common_title)
