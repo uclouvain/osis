@@ -35,13 +35,13 @@ class EducationGroupPreparationCalendar(AcademicEventCalendarHelper):
     event_reference = academic_calendar_type.EDUCATION_GROUP_EDITION
 
     @classmethod
-    def ensure_consistency_until_n_plus_6(self):
+    def ensure_consistency_until_n_plus_6(cls):
         current_academic_year = AcademicYear.objects.current()
         academic_years = AcademicYear.objects.min_max_years(current_academic_year.year, current_academic_year.year + 6)
 
         for ac_year in academic_years:
             AcademicCalendar.objects.update_or_create(
-                reference=self.event_reference,
+                reference=cls.event_reference,
                 data_year=ac_year,
                 defaults={
                     "title": "Préparation des formations",
