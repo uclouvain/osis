@@ -94,7 +94,8 @@ class AcademicEventCalendarHelper(ABC):
     def _get_academic_events(self) -> List[AcademicEvent]:
         return AcademicEventFactory().get_academic_events(self.event_reference)
 
-    def ensure_consistency_until_n_plus_6(self):
+    @classmethod
+    def ensure_consistency_until_n_plus_6(cls):
         """
         This function will be called by a Celery job in order to ensure that event exist to N + 6.
         This function must be implemented in idempotent way.

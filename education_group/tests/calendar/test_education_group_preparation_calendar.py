@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -75,7 +75,7 @@ class TestEducationGroupPreparationCalendarEnsureConsistencyUntilNPlus6(TestCase
         AcademicYearFactory.produce_in_future(cls.current_academic_year.year)
 
     def test_ensure_consistency_until_n_plus_6_assert_default_value(self):
-        EducationGroupPreparationCalendar().ensure_consistency_until_n_plus_6()
+        EducationGroupPreparationCalendar.ensure_consistency_until_n_plus_6()
 
         qs = AcademicCalendar.objects.filter(reference=academic_calendar_type.EDUCATION_GROUP_EDITION)
 
@@ -93,7 +93,7 @@ class TestEducationGroupPreparationCalendarEnsureConsistencyUntilNPlus6(TestCase
 
     def test_ensure_consistency_until_n_plus_6_assert_idempotent(self):
         for _ in range(5):
-            EducationGroupPreparationCalendar().ensure_consistency_until_n_plus_6()
+            EducationGroupPreparationCalendar.ensure_consistency_until_n_plus_6()
 
         self.assertEqual(
             AcademicCalendar.objects.filter(reference=academic_calendar_type.EDUCATION_GROUP_EDITION).count(),

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -34,6 +34,7 @@ from base.models.enums import academic_calendar_type
 class EducationGroupPreparationCalendar(AcademicEventCalendarHelper):
     event_reference = academic_calendar_type.EDUCATION_GROUP_EDITION
 
+    @classmethod
     def ensure_consistency_until_n_plus_6(self):
         current_academic_year = AcademicYear.objects.current()
         academic_years = AcademicYear.objects.min_max_years(current_academic_year.year, current_academic_year.year + 6)

@@ -4,5 +4,5 @@ from education_group.calendar.education_group_preparation_calendar import Educat
 
 @celery_app.task
 def run() -> dict:
-    EducationGroupPreparationCalendar().ensure_consistency_until_n_plus_6()
+    EducationGroupPreparationCalendar.ensure_consistency_until_n_plus_6()
     return {}
