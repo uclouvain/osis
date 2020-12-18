@@ -119,12 +119,13 @@ class NodeFactory:
             node_id=None,
         )
         if copied_node.type == NodeType.GROUP:
-            copied_node.credits = None
-        copied_node.constraint_type = None
-        copied_node.min_constraint = None
-        copied_node.max_constraint = None
-        copied_node.remark_en = None
-        copied_node.remark_fr = None
+            copied_node.constraint_type = None
+            copied_node.min_constraint = None
+            copied_node.max_constraint = None
+            copied_node.remark_en = None
+            copied_node.remark_fr = None
+            if copied_node.node_type in GroupType:
+                copied_node.credits = None
         copied_node._has_changed = True
         return copied_node
 
