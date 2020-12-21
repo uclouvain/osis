@@ -734,6 +734,11 @@ msgstr "Il y a des avertissements dans le formulaire."
 msgid "There can only be one type 2 expectation"
 msgstr "Il ne peut y avoir qu'un seul attendu de type 2"
 
+msgid "This education group is not editable during this period."
+msgstr ""
+"La période de modification des formations n'est pas ouverte durant cette "
+"période."
+
 msgid "Title"
 msgstr "Intitulé"
 
@@ -825,6 +830,9 @@ msgstr "Utilisations"
 
 msgid "Validity"
 msgstr "Validité"
+
+msgid "Version name {} already exists"
+msgstr "Le nom de version {} existe déjà"
 
 msgid "Web re-registration"
 msgstr "Ré-inscription par internet"

@@ -39,7 +39,7 @@ from django.db.models.functions import Concat
 from django.utils.functional import lazy
 from django.utils.translation import gettext_lazy as _
 
-from base.business.event_perms import EventPermEducationGroupEdition
+from education_group.calendar.education_group_preparation_calendar import EducationGroupPreparationCalendar
 from base.forms.common import ValidationRuleMixin
 from base.forms.utils.choice_field import BLANK_CHOICE, add_blank
 from base.models import campus
@@ -333,7 +333,8 @@ class CreateTrainingForm(ValidationRuleMixin, forms.Form):
 
     def __init_academic_year_field(self):
         if not self.fields['academic_year'].disabled and self.user.person.is_faculty_manager:
-            working_academic_years = EventPermEducationGroupEdition.get_academic_years()
+            target_years_opened = EducationGroupPreparationCalendar().get_target_years_opened()
+            working_academic_years = AcademicYear.objects.filter(year__in=target_years_opened)
         else:
             working_academic_years = AcademicYear.objects.all()
 
@@ -398,8 +399,8 @@ class UpdateTrainingForm(PermissionFieldMixin, CreateTrainingForm):
         to_field_name="year"
     )
 
-    def __init__(self, *args, event_perm_obj=None, **kwargs):
-        self.event_perm_obj = event_perm_obj
+    def __init__(self, *args, year: int = None, **kwargs):
+        self.year = year
 
         super().__init__(*args, **kwargs)
         self.__init_end_year_field()
@@ -425,10 +426,7 @@ class UpdateTrainingForm(PermissionFieldMixin, CreateTrainingForm):
 
     # PermissionFieldMixin
     def get_context(self) -> str:
-        is_edition_period_opened = EventPermEducationGroupEdition(
-            obj=self.event_perm_obj,
-            raise_exception=False
-        ).is_open()
+        is_edition_period_opened = EducationGroupPreparationCalendar().is_target_year_authorized(target_year=self.year)
         return TRAINING_PGRM_ENCODING_PERIOD if is_edition_period_opened else TRAINING_DAILY_MANAGEMENT
 
     # PermissionFieldMixin

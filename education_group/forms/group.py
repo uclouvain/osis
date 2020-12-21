@@ -30,7 +30,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
 
-from base.business.event_perms import EventPermEducationGroupEdition
+from education_group.calendar.education_group_preparation_calendar import EducationGroupPreparationCalendar
 from base.forms.common import ValidationRuleMixin
 from base.forms.utils.choice_field import BLANK_CHOICE
 from base.models import campus
@@ -77,12 +77,13 @@ class GroupForm(ValidationRuleMixin, forms.Form):
         self.__init_teaching_campus()
 
     def __init_academic_year_field(self):
+        self.fields['academic_year'].queryset = self.fields['academic_year'].queryset.filter(
+            year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION
+        )
         if self.user.person.is_faculty_manager:
-            self.fields['academic_year'].queryset = EventPermEducationGroupEdition.get_academic_years()\
-                .filter(year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION)
-        else:
+            target_years_opened = EducationGroupPreparationCalendar().get_target_years_opened()
             self.fields['academic_year'].queryset = self.fields['academic_year'].queryset.filter(
-                year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION
+                year__in=target_years_opened
             )
 
     def __init_management_entity_field(self):
@@ -121,8 +122,8 @@ class GroupAttachForm(GroupForm):
 
 
 class GroupUpdateForm(PermissionFieldMixin, GroupForm):
-    def __init__(self, *args, event_perm_obj=None, **kwargs):
-        self.event_perm_obj = event_perm_obj
+    def __init__(self, *args, year: int = None, **kwargs):
+        self.year = year
 
         super().__init__(*args, **kwargs)
         self.fields['academic_year'].disabled = True
@@ -132,10 +133,7 @@ class GroupUpdateForm(PermissionFieldMixin, GroupForm):
 
     # PermissionFieldMixin
     def get_context(self) -> str:
-        is_edition_period_opened = EventPermEducationGroupEdition(
-            obj=self.event_perm_obj,
-            raise_exception=False
-        ).is_open()
+        is_edition_period_opened = EducationGroupPreparationCalendar().is_target_year_authorized(target_year=self.year)
         return GROUP_PGRM_ENCODING_PERIOD if is_edition_period_opened else GROUP_DAILY_MANAGEMENT
 
     # PermissionFieldMixin

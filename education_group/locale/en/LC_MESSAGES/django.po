@@ -689,6 +689,9 @@ msgstr ""
 msgid "There can only be one type 2 expectation"
 msgstr ""
 
+msgid "This education group is not editable during this period."
+msgstr ""
+
 msgid "Title"
 msgstr ""
 
@@ -769,6 +772,9 @@ msgid "Utilizations"
 msgstr ""
 
 msgid "Validity"
+msgstr ""
+
+msgid "Version name {} already exists"
 msgstr ""
 
 msgid "Web re-registration"

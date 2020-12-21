@@ -171,7 +171,7 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
         return version.UpdateMiniTrainingVersionForm(
             data=self.request.POST or None,
             user=self.request.user,
-            event_perm_obj=self.get_permission_object(),
+            year=self.kwargs['year'],
             mini_training_version_identity=mini_training_version_identity,
             mini_training_type=self.get_mini_training_obj().type,
             initial=self._get_mini_training_version_form_initial_values()
