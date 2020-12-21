@@ -102,8 +102,8 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
                     form.add_error('min_constraint', e.message)
                     form.add_error('max_constraint', '')
                 elif isinstance(e, exception.StartYearGreaterThanEndYearException):
-                    form.add_error('academic_year', e.message)
-                    form.add_error('end_year', '')
+                    form.add_error('end_year', e.message)
+                    form.add_error('academic_year', '')
                 else:
                     form.add_error(None, e.message)
 
@@ -240,7 +240,8 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
             remark_fr=form.cleaned_data['remark_fr'],
             remark_en=form.cleaned_data['remark_en'],
             start_year=form.cleaned_data['academic_year'],
-            end_year=form.cleaned_data['end_year'],
+            end_year=form.cleaned_data['end_year'].year
+            if form.cleaned_data['end_year'] else form.cleaned_data['end_year'],
         )
 
     def _generate_create_and_paste_command_from_valid_form(
@@ -266,7 +267,8 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
             remark_fr=form.cleaned_data['remark_fr'],
             remark_en=form.cleaned_data['remark_en'],
             start_year=form.cleaned_data['academic_year'],
-            end_year=form.cleaned_data['end_year'],
+            end_year=form.cleaned_data['end_year'].year
+            if form.cleaned_data['end_year'] else form.cleaned_data['end_year'],
             path_to_paste=self.get_attach_path()
         )
 

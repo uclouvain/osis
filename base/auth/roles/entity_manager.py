@@ -35,4 +35,5 @@ class EntityManager(osis_role_models.EntityRoleModel):
             "base.view_programmanager": rules.always_allow,
             "base.can_access_catalog": rules.always_allow,
             "base.is_institution_administrator": rules.always_allow,
+            "dissertation.change_offerproposition": rules.always_allow
         })

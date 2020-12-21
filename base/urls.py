@@ -46,10 +46,9 @@ from attribution.views import attribution, tutor_application
 from base.views import geocoding
 from base.views import learning_achievement, search, user_list
 from base.views import learning_unit, offer, common, institution, organization, academic_calendar, \
-    my_osis, entity, student
+    my_osis, student
 from base.views import teaching_material
 from base.views.education_groups import urls as education_groups_urls
-from base.views.filter import filter_cities_by_country, filter_campus_by_city
 from base.views.learning_units.detail import DetailLearningUnitYearView, DetailLearningUnitYearViewBySlug
 from base.views.learning_units.external import create as create_external
 from base.views.learning_units.pedagogy.publish import publish_and_access_publication
@@ -109,7 +108,6 @@ urlpatterns = [
     ])),
 
     url(r'^api/v1/', include([
-        url(r'^entities/$', entity.post_entities, name='post_entities'),
         url(r'^tutor_application/recompute_portal$', tutor_application.recompute_portal,
             name='recompute_tutor_application_portal'),
         url(r'^attribution/recompute_portal$', attribution.recompute_portal, name='recompute_attribution_portal'),
@@ -144,8 +142,23 @@ urlpatterns = [
         url(r'^by_summary/',
             base.views.learning_units.search.educational_information.LearningUnitDescriptionFicheSearch.as_view(),
             name='learning_units_summary'),
-        url(r'^by_external/', base.views.learning_units.search.external.ExternalLearningUnitSearch.as_view(),
-            name='learning_units_external'),
+        url(r'^by_external/', include([
+            url(
+                r'^$',
+                base.views.learning_units.search.external.ExternalLearningUnitSearch.as_view(),
+                name='learning_units_external'
+            ),
+            url(
+                r'^get_cities_related_to_country',
+                base.views.learning_units.search.external.get_cities_related_to_country,
+                name="get_cities_related_to_country"
+            ),
+            url(
+                r'^get_campuses_related_to_city$',
+                base.views.learning_units.search.external.get_campuses_related_to_city,
+                name="get_campuses_related_to_city"
+            ),
+        ])),
         url(r'^new/', include([
             url(r'^academic_year_id=(?P<academic_year_id>[0-9]+)$',
                 base.views.learning_units.create.create_learning_unit,
@@ -156,8 +169,6 @@ urlpatterns = [
             url(r'^external/academic_year_id=(?P<academic_year>[0-9]+)$',
                 create_external.get_external_learning_unit_creation_form,
                 name="learning_unit_create_external"),
-            url(r'^filter_cities_by_country$', filter_cities_by_country, name="filter_cities_by_country"),
-            url(r'^filter_campus_by_city$', filter_campus_by_city, name="filter_campus_by_city"),
         ])),
         path(
             "<str:code>/<int:year>/publish_and_access_publication",
@@ -169,6 +180,7 @@ urlpatterns = [
             url(r'^$', DetailLearningUnitYearView.as_view(), name='learning_unit'),
             url(r'^formations/$', learning_unit.learning_unit_formations, name="learning_unit_formations"),
             url(r'^components/$', learning_unit.learning_unit_components, name="learning_unit_components"),
+            url(r'^attributions/$', attribution.learning_unit_attributions, name="learning_unit_attributions"),
             url(r'^pedagogy/', include([
                 url(r'^$', learning_unit_pedagogy, name="learning_unit_pedagogy"),
                 url(r'^edit/$', learning_unit_pedagogy_edit, name="learning_unit_pedagogy_edit"),
@@ -191,7 +203,7 @@ urlpatterns = [
                 url(r'^consolidate/$', base.views.learning_units.proposal.consolidate.consolidate_proposal,
                     name="learning_unit_consolidate_proposal"),
             ])),
-            url(r'^update_end_date/$', learning_unit_edition_end_date, name="learning_unit_edition"),
+            url(r'^update_end_date/$', learning_unit_edition_end_date, name="learning_unit_edition_end_date"),
             url(r'^update/$', update_learning_unit, name="edit_learning_unit"),
             url(r'^specifications/$', learning_unit.learning_unit_specifications, name="learning_unit_specifications"),
             url(r'^specifications/edit/$', learning_unit.learning_unit_specifications_edit,
@@ -276,17 +288,6 @@ urlpatterns = [
         url(r'^(?P<organization_id>[0-9]+)/', include([
             url(r'^$', organization.DetailOrganization.as_view(), name='organization_read'),
         ])),
-    ])),
-
-    url(r'^organization_address/', include([
-        url(r'^(?P<organization_address_id>[0-9]+)/', include([
-            url(r'^read/$', organization.organization_address_read,
-                name='organization_address_read'),
-            url(r'^edit/$', organization.organization_address_edit,
-                name='organization_address_edit'),
-            url(r'^delete/$', organization.organization_address_delete,
-                name='organization_address_delete')
-        ]))
     ])),
 
     url(r'^search/', include([

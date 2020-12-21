@@ -331,7 +331,8 @@ def _get_type_peps(student_specific_profile: StudentSpecificProfile) -> str:
             str(_(student_specific_profile.get_type_display())) or "-",
             str(_(student_specific_profile.get_subtype_disability_display())) or "-",
         )
-
+    if student_specific_profile.type == peps_type.PepsTypes.NOT_DEFINED.name:
+        return "-"
     return str(_(student_specific_profile.get_type_display())) or "-"
 
 
@@ -347,5 +348,3 @@ def _build_offers_entities_emails_list(exam_enrollments: List[ExamEnrollment]) -
         {exam_enroll.learning_unit_enrollment.offer for exam_enroll in exam_enrollments}
     )
     return ';'.join({address.email for address in addresses if address.email})
-
-

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-17 14:07+0100\n"
+"POT-Creation-Date: 2020-11-27 13:01+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -138,7 +138,7 @@ msgid "Annual"
 msgstr ""
 
 #, python-format
-msgid "Are you sure you want to delete %(offer_acronym)s %(version_name)s ?"
+msgid "Are you sure you want to delete %(object)s ?"
 msgstr ""
 
 #, python-format
@@ -286,9 +286,6 @@ msgid "For approval,"
 msgstr ""
 
 msgid "Formation catalogue"
-msgstr ""
-
-msgid "Formations"
 msgstr ""
 
 msgid "Full title of the english version"
@@ -631,6 +628,9 @@ msgid "Registration ID"
 msgstr ""
 
 msgid "Registration form for the content of"
+msgstr ""
+
+msgid "Relative / Absolute <br>credits"
 msgstr ""
 
 msgid "Relative credits"
@@ -1008,7 +1008,4 @@ msgid "training"
 msgstr ""
 
 msgid "yes"
-msgstr ""
-
-msgid "yes,no"
 msgstr ""

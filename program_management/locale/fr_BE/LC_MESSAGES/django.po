@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-17 14:07+0100\n"
+"POT-Creation-Date: 2020-11-27 13:01+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -155,9 +155,8 @@ msgid "Annual"
 msgstr "Annuel"
 
 #, python-format
-msgid "Are you sure you want to delete %(offer_acronym)s %(version_name)s ?"
-msgstr ""
-"Êtes-vous sûr·e de vouloir supprimer %(offer_acronym)s %(version_name)s ?"
+msgid "Are you sure you want to delete %(object)s ?"
+msgstr "Êtes-vous sûr·e de vouloir supprimer  %(object)s ?"
 
 #, python-format
 msgid "Are you sure you want to detach %(child)s ?"
@@ -253,7 +252,7 @@ msgid "Description fiche"
 msgstr "Fiche descriptive"
 
 msgid "Description fiche (including force majeure)"
-msgstr "Fiche descriptive (inclut force majeure)"
+msgstr "Fiche descriptive (cas de force majeure inclus)"
 
 msgid "Diploma title"
 msgstr "Intitulé du diplôme/du certificat"
@@ -287,7 +286,7 @@ msgid "Evaluation methods"
 msgstr "Mode d'évaluation des acquis des étudiants"
 
 msgid "Evaluation methods (force majeure)"
-msgstr "Mode d'évaluation des acquis des étudiants ((force majeure)"
+msgstr "Mode d'évaluation des acquis des étudiants (force majeure)"
 
 msgid "Export"
 msgstr "Exporter"
@@ -314,9 +313,6 @@ msgstr "Pour accord,"
 
 msgid "Formation catalogue"
 msgstr "Catalogue des formations"
-
-msgid "Formations"
-msgstr "Formations"
 
 msgid "Full title of the english version"
 msgstr "Intitulé de la version en anglais"
@@ -676,6 +672,9 @@ msgstr "NOMA"
 msgid "Registration form for the content of"
 msgstr "Formulaire d'inscription au contenu de"
 
+msgid "Relative / Absolute <br>credits"
+msgstr "Crédits <br>relatifs / absolus"
+
 msgid "Relative credits"
 msgstr "Crédits relatifs"
 
@@ -755,7 +754,7 @@ msgid "Teaching methods"
 msgstr "Méthodes d'enseignement"
 
 msgid "Teaching methods (force majeure)"
-msgstr "Méthodes d'enseignement (force majeure)7"
+msgstr "Méthodes d'enseignement (force majeure)"
 
 #, python-format
 msgid ""
@@ -1088,6 +1087,3 @@ msgstr "formation"
 
 msgid "yes"
 msgstr "Oui"
-
-msgid "yes,no"
-msgstr "oui,non"

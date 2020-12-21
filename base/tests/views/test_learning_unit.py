@@ -63,6 +63,8 @@ from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.academic_calendar_type import LEARNING_UNIT_EDITION_FACULTY_MANAGERS
 from base.models.enums.attribution_procedure import EXTERNAL
 from base.models.enums.learning_unit_year_subtypes import FULL
+from base.models.enums.proposal_type import ProposalType
+from base.models.enums.quadrimesters import LearningUnitYearQuadrimester
 from base.models.enums.vacant_declaration_type import DO_NOT_ASSIGN, VACANT_NOT_PUBLISH
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.proposal_learning_unit import ProposalLearningUnit
@@ -72,7 +74,7 @@ from base.tests.factories.business.learning_units import GenerateContainer, Gene
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
-from base.tests.factories.entity import EntityFactory
+from base.tests.factories.entity import EntityFactory, EntityWithVersionFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_achievement import LearningAchievementFactory
@@ -83,8 +85,7 @@ from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollmentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearFakerFactory
 from base.tests.factories.organization import OrganizationFactory
-from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory, FacultyManagerForUEFactory
-from base.tests.factories.person_entity import PersonEntityFactory
+from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.user import SuperUserFactory, UserFactory
 from base.tests.factories.utils.get_messages import get_messages_from_response
@@ -100,6 +101,8 @@ from cms.tests.factories.text_label import LearningUnitYearTextLabelFactory
 from cms.tests.factories.translated_text import LearningUnitYearTranslatedTextFactory
 from cms.tests.factories.translated_text_label import TranslatedTextLabelFactory
 from learning_unit.api.views.learning_unit import LearningUnitFilter
+from learning_unit.tests.factories.central_manager import CentralManagerFactory
+from learning_unit.tests.factories.faculty_manager import FacultyManagerFactory
 from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
 from osis_common.document import xls_build
 from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
@@ -248,17 +251,17 @@ class LearningUnitViewCreatePartimTestCase(TestCase):
             end_date=datetime.datetime(cls.current_academic_year.year + 1, 9, 14),
             reference=LEARNING_UNIT_EDITION_FACULTY_MANAGERS
         )
-
+        entity_version = EntityVersionFactory()
         cls.learning_unit_year_full = LearningUnitYearFactory(
             academic_year=cls.current_academic_year,
             learning_container_year__academic_year=cls.current_academic_year,
-            learning_container_year__requirement_entity=None,
+            learning_container_year__requirement_entity=entity_version.entity,
             learning_container_year__allocation_entity=None,
             subtype=learning_unit_year_subtypes.FULL
         )
         cls.url = reverse(create_partim_form, kwargs={'learning_unit_year_id': cls.learning_unit_year_full.id})
-        faculty_manager = FacultyManagerForUEFactory("can_access_learningunit", "can_create_learningunit")
-        cls.user = faculty_manager.user
+        faculty_manager = FacultyManagerFactory(entity=entity_version.entity)
+        cls.user = faculty_manager.person.user
         cls.access_denied = "access_denied.html"
 
     def setUp(self):
@@ -281,16 +284,14 @@ class LearningUnitViewCreatePartimTestCase(TestCase):
         self.assertTemplateUsed(response, "method_not_allowed.html")
         self.assertEqual(response.status_code, HttpResponseNotAllowed.status_code)
 
-    @mock.patch('base.views.learning_units.perms.business_perms.is_person_linked_to_entity_in_charge_of_learning_unit',
-                side_effect=lambda *args: False)
-    def test_create_partim_when_user_not_linked_to_entity_charge(self, mock_is_pers_linked_to_entity_charge):
+    def test_create_partim_when_user_not_linked_to_entity_charge(self):
+        faculty_manager = FacultyManagerFactory()
+        self.client.force_login(faculty_manager.person.user)
         response = self.client.get(self.url)
         self.assertTemplateUsed(response, self.access_denied)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
-    @mock.patch('base.views.learning_units.perms.business_perms.is_person_linked_to_entity_in_charge_of_learning_unit',
-                side_effect=lambda *args: True)
-    def test_create_partim_get_form(self, mock_is_pers_linked_to_entity_charge):
+    def test_create_partim_get_form(self):
         response = self.client.get(self.url)
         self.assertTemplateUsed(response, "learning_unit/simple/creation_partim.html")
         self.assertEqual(response.status_code, HttpResponse.status_code)
@@ -298,16 +299,12 @@ class LearningUnitViewCreatePartimTestCase(TestCase):
         self.assertEqual(context['learning_unit_year'], self.learning_unit_year_full)
         self.assertTrue(context['partim_creation'])
 
-    @mock.patch('base.views.learning_units.perms.business_perms.is_person_linked_to_entity_in_charge_of_learning_unit',
-                side_effect=lambda *args: True)
     @mock.patch('base.forms.learning_unit.learning_unit_partim.PartimForm.is_valid', side_effect=lambda *args: False)
-    def test_create_partim_when_invalid_form_no_redirection(self, mock_is_valid, mock_is_pers_linked_to_entity_charge):
+    def test_create_partim_when_invalid_form_no_redirection(self, mock_is_valid):
         response = self.client.post(self.url, data={})
         self.assertTemplateUsed(response, "learning_unit/simple/creation_partim.html")
         self.assertEqual(response.status_code, HttpResponse.status_code)
 
-    @mock.patch('base.views.learning_units.perms.business_perms.is_person_linked_to_entity_in_charge_of_learning_unit',
-                side_effect=lambda *args: True)
     @mock.patch('base.forms.learning_unit.learning_unit_partim.PartimForm.is_valid', side_effect=lambda *args: True)
     @mock.patch('base.forms.learning_unit.learning_unit_partim.PartimForm.save')
     @mock.patch('base.forms.learning_unit.learning_unit_postponement.LearningUnitPostponementForm.__init__',
@@ -317,7 +314,7 @@ class LearningUnitViewCreatePartimTestCase(TestCase):
     @mock.patch('base.forms.learning_unit.learning_unit_postponement.LearningUnitPostponementForm.save')
     def test_create_partim_success_with_redirection(self, mock_postponement_save, mock_postponement_is_valid,
                                                     mock_postponement_init, mock_partim_form_save,
-                                                    mock_partim_form_is_valid, mock_is_pers_linked_to_entity_charge):
+                                                    mock_partim_form_is_valid):
         learning_container_year = LearningContainerYearFactory(academic_year=self.current_academic_year)
         LearningUnitYearFactory(
             academic_year=self.current_academic_year,
@@ -335,6 +332,21 @@ class LearningUnitViewCreatePartimTestCase(TestCase):
         url_to_redirect = reverse("learning_unit", kwargs={'learning_unit_year_id': a_partim_learning_unit_year.id})
         self.assertRedirects(response, url_to_redirect)
 
+    def test_create_partim_for_learning_unit_in_creation_proposal(self):
+        ProposalLearningUnitFactory(
+            learning_unit_year=self.learning_unit_year_full,
+            type=ProposalType.CREATION.name
+        )
+        response = self.client.get(self.url)
+
+        msg = get_messages_from_response(response)
+        expected_message = _('You cannot create a partim for a learning unit in proposition of creation')
+        self.assertEqual(msg[0].get('message'), expected_message)
+        self.assertEqual(msg[0].get('level'), messages.ERROR)
+
+        url_to_redirect = reverse("learning_unit", kwargs={'learning_unit_year_id': self.learning_unit_year_full.id})
+        self.assertRedirects(response, url_to_redirect)
+
 
 # TODO Split this test based on functionality
 class LearningUnitViewTestCase(TestCase):
@@ -343,7 +355,10 @@ class LearningUnitViewTestCase(TestCase):
         cls.organization = OrganizationFactory(type=organization_type.MAIN)
         cls.country = CountryFactory()
 
+        cls.parent_entity = EntityWithVersionFactory()
         cls.entities = EntityFactory.create_batch(3, country=cls.country, organization=cls.organization)
+
+        cls.person = CentralManagerFactory(entity=cls.parent_entity, with_child=True).person
 
         today = datetime.date.today()
         cls.current_academic_year, *cls.academic_years = AcademicYearFactory.produce_in_future(quantity=8)
@@ -366,34 +381,39 @@ class LearningUnitViewTestCase(TestCase):
             learning_container_year=cls.learning_container_yr,
             learning_unit=cls.learning_unit
         )
-        cls.learning_component_yr = LearningComponentYearFactory(learning_unit_year=cls.luy,
-                                                                 hourly_volume_total_annual=10,
-                                                                 hourly_volume_partial_q1=5,
-                                                                 hourly_volume_partial_q2=5)
+        cls.learning_component_yr = LearningComponentYearFactory(
+            learning_unit_year=cls.luy,
+            hourly_volume_total_annual=10,
+            hourly_volume_partial_q1=5,
+            hourly_volume_partial_q2=5,
+        )
 
-        cls.entity_version = EntityVersionFactory(acronym="1 acronym", entity=cls.entities[0],
-                                                  entity_type=entity_type.SCHOOL,
-                                                  start_date=today - datetime.timedelta(days=1),
-                                                  end_date=today.replace(year=today.year + 1))
-        cls.entity_version_2 = EntityVersionFactory(acronym="2 acronym", entity=cls.entities[1],
-                                                    entity_type=entity_type.INSTITUTE,
-                                                    start_date=today - datetime.timedelta(days=20),
-                                                    end_date=today.replace(year=today.year + 1))
-        cls.entity_version_3 = EntityVersionFactory(acronym="3 acronym", entity=cls.entities[2],
-                                                    entity_type=entity_type.FACULTY,
-                                                    start_date=today - datetime.timedelta(days=50),
-                                                    end_date=today.replace(year=today.year + 1))
+        cls.entity_version = EntityVersionFactory(
+            acronym="1 acronym", entity=cls.entities[0],
+            entity_type=entity_type.SCHOOL,
+            start_date=today - datetime.timedelta(days=1),
+            end_date=today.replace(year=today.year + 1),
+            parent=cls.parent_entity
+        )
+        cls.entity_version_2 = EntityVersionFactory(
+            acronym="2 acronym", entity=cls.entities[1],
+            entity_type=entity_type.INSTITUTE,
+            start_date=today - datetime.timedelta(days=20),
+            end_date=today.replace(year=today.year + 1),
+        )
+        cls.entity_version_3 = EntityVersionFactory(
+            acronym="3 acronym", entity=cls.entities[2],
+            entity_type=entity_type.FACULTY,
+            start_date=today - datetime.timedelta(days=50),
+            end_date=today.replace(year=today.year + 1),
+            parent=cls.parent_entity
+        )
 
         cls.campus = CampusFactory(organization=cls.organization, is_administration=True)
         cls.language = FrenchLanguageFactory()
-        cls.a_superuser = SuperUserFactory()
-        cls.person = PersonFactory(user=cls.a_superuser)
-
-        for entity in cls.entities:
-            PersonEntityFactory(person=cls.person, entity=entity)
 
     def setUp(self):
-        self.client.force_login(self.a_superuser)
+        self.client.force_login(self.person.user)
 
     def test_entity_requirement_autocomplete(self):
         self.client.force_login(self.person.user)
@@ -403,9 +423,9 @@ class LearningUnitViewTestCase(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         json_response = str(response.content, encoding='utf8')
-        results = json.loads(json_response)['results']
-        self.assertEqual(results[0]['text'], self.entity_version.verbose_title)
-        self.assertEqual(results[1]['text'], self.entity_version_3.verbose_title)
+        results = [result['text'] for result in json.loads(json_response)['results']]
+        self.assertIn(self.entity_version.verbose_title, results)
+        self.assertIn(self.entity_version_3.verbose_title, results)
 
     def test_entity_requirement_autocomplete_with_q(self):
         self.client.force_login(self.person.user)
@@ -664,25 +684,26 @@ class LearningUnitViewTestCase(TestCase):
         self.assertTemplateUsed(response, 'learning_unit/formations.html')
         self.assertEqual(context['current_academic_year'], self.current_academic_year)
         self.assertEqual(context['learning_unit_year'], learning_unit_year)
-        expected_order = [group_element2, group_element3, group_element1]
-        self._assert_group_elements_ordered_by_partial_acronym(context, expected_order)
+        self.assertIn('direct_parents', context)
+        self.assertTrue(len(context['direct_parents']) == 3)
         self.assertIn('root_formations', context)
-
-    def _assert_group_elements_ordered_by_partial_acronym(self, context, expected_order):
-        self.assertListEqual(list(context['group_elements_years']), expected_order)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertTrue("tab_active" in response.context)
+        self.assertEqual(response.context["tab_active"], 'learning_unit_formations')
 
     def test_learning_unit_usage_with_complete_LU(self):
         learning_container_yr = LearningContainerYearFactory(academic_year=self.current_academic_year,
                                                              acronym='LBIOL')
 
         learning_unit_yr_1 = LearningUnitYearFactory(academic_year=self.current_academic_year,
-                                                     acronym='LBIOL', quadrimester='Q1&2',
+                                                     acronym='LBIOL',
+                                                     quadrimester=LearningUnitYearQuadrimester.Q1and2.name,
                                                      learning_container_year=learning_container_yr)
 
         learning_component_yr = LearningComponentYearFactory(learning_unit_year=learning_unit_yr_1)
 
         result = learning_unit_business._learning_unit_usage(learning_component_yr.learning_unit_year)
-        self.assertEqual(result, 'LBIOL (Q1&2)')
+        self.assertEqual(result, 'LBIOL ({})'.format(LearningUnitYearQuadrimester.Q1and2.value))
 
     def _prepare_context_learning_units_search(self):
         # Create a structure [Entity / Entity version]
@@ -853,6 +874,25 @@ class LearningUnitViewTestCase(TestCase):
 
         self.assertTemplateUsed(response, 'learning_unit/pedagogy.html')
         self.assertEqual(self.client.session['search_url'], SEARCH_URL_PART)
+
+    @mock.patch("base.views.learning_units.pedagogy.read.is_eligible_to_update_learning_unit_pedagogy")
+    def test_learning_unit_pedagogy_publish_button_enabled(self, mock_perm_pedagogy):
+        mock_perm_pedagogy.return_value = True
+        response = self.client.get(reverse(learning_unit_pedagogy, args=[self.luy.pk]))
+
+        self.assertTrue(response.context['luy_in_current_or_future_anac'])
+        self.assertTrue(response.context['enable_publish_button'])
+
+    @mock.patch(
+        "base.views.learning_units.pedagogy.read.is_eligible_to_update_learning_unit_pedagogy_force_majeure_section")
+    @mock.patch("base.views.learning_units.pedagogy.read.is_eligible_to_update_learning_unit_pedagogy")
+    def test_learning_unit_pedagogy_publish_button_disabled(self, mock_perm_pedagogy, mock_perm_force_majeure):
+        mock_perm_pedagogy.return_value = False
+        mock_perm_force_majeure.return_value = False
+        response = self.client.get(reverse(learning_unit_pedagogy, args=[self.luy.pk]))
+
+        self.assertTrue(response.context['luy_in_current_or_future_anac'])
+        self.assertFalse(response.context['enable_publish_button'])
 
     def test_learning_unit_specification(self):
         learning_unit_year = LearningUnitYearFactory()

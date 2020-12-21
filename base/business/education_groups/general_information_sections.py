@@ -26,7 +26,7 @@
 from collections import namedtuple
 
 from django.utils.translation import gettext_lazy as _
-from django.utils.translation import pgettext
+from django.utils.translation import pgettext_lazy
 
 # This all text_label which are related to "general information" for education group year
 # The key MUST be in french because it depend on Webservice (filtering)
@@ -72,7 +72,7 @@ CMS_LABEL_ADDITIONAL_INFORMATION = 'skills_and_achievements_additional_text'
 Section = namedtuple('Section', 'title labels')
 
 SECTION_LIST = [
-    Section(title=pgettext('section title', 'Welcome'),
+    Section(title=pgettext_lazy('section title', 'Welcome'),
             labels=[
                 WELCOME_INTRODUCTION,
                 WELCOME_PROFIL,

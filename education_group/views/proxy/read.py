@@ -1,4 +1,5 @@
 from enum import IntEnum
+from typing import Dict
 
 from django.urls import reverse
 from django.utils.functional import cached_property
@@ -116,17 +117,24 @@ def get_group_available_tabs(node: 'Node'):
     return tabs
 
 
-def get_training_available_tabs():
-    return {
+def get_training_available_tabs(is_standard_version: bool = True) -> Dict[str, int]:
+    tabs = {
         SUFFIX_IDENTIFICATION: Tab.IDENTIFICATION,
-        SUFFIX_DIPLOMAS_CERTIFICATES: Tab.DIPLOMAS_CERTIFICATES,
-        SUFFIX_ADMINISTRATIVE_DATA: Tab.ADMINISTRATIVE_DATA,
         SUFFIX_CONTENT: Tab.CONTENT,
-        SUFFIX_UTILIZATION: Tab.UTILIZATION,
-        SUFFIX_GENERAL_INFO: Tab.GENERAL_INFO,
-        SUFFIX_SKILLS_ACHIEVEMENTS: Tab.SKILLS_ACHIEVEMENTS,
-        SUFFIX_ADMISSION_CONDITION: Tab.ADMISSION_CONDITION
-    }
+        SUFFIX_UTILIZATION: Tab.UTILIZATION
+        }
+
+    if is_standard_version:
+        tabs.update(
+            {
+                SUFFIX_DIPLOMAS_CERTIFICATES: Tab.DIPLOMAS_CERTIFICATES,
+                SUFFIX_ADMINISTRATIVE_DATA: Tab.ADMINISTRATIVE_DATA,
+                SUFFIX_GENERAL_INFO: Tab.GENERAL_INFO,
+                SUFFIX_SKILLS_ACHIEVEMENTS: Tab.SKILLS_ACHIEVEMENTS,
+                SUFFIX_ADMISSION_CONDITION: Tab.ADMISSION_CONDITION
+            }
+        )
+    return tabs
 
 
 def get_mini_training_available_tabs():

@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import List, Dict
+from typing import List
 
 from django.utils.translation import gettext_lazy as _, ngettext_lazy
 
@@ -28,6 +28,12 @@ class CodeAlreadyExistException(BusinessException):
     def __init__(self, year: int, **kwargs):
         message = _("Code already exists in %(academic_year)s") % {"academic_year": display_as_academic_year(year)}
         super().__init__(message, **kwargs)
+
+    def __eq__(self, other):
+        return self.message == other.message
+
+    def __hash__(self):
+        return hash(self.message)
 
 
 class GroupIsBeingUsedException(Exception):
@@ -95,7 +101,7 @@ class ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum(BusinessExcepti
 
 class StartYearGreaterThanEndYearException(BusinessException):
     def __init__(self, *args, **kwargs):
-        message = _("Validity cannot be greater than last year of organization")
+        message = _('End year must be greater than or equal to the start year')
         super().__init__(message, **kwargs)
 
 
@@ -153,12 +159,6 @@ class CannotCopyMiniTrainingDueToEndDate(BusinessException):
             to_year=mini_training.year + 1,
             end_year=mini_training.end_year,
         )
-        super().__init__(message, **kwargs)
-
-
-class StartYearGreaterThanEndYear(BusinessException):
-    def __init__(self, *args, **kwargs):
-        message = _('End year must be greater than the start year, or equal')
         super().__init__(message, **kwargs)
 
 
