@@ -479,8 +479,8 @@ msgstr "Note contenant plus de 2 décimales"
 msgid "Score legend: %(score_legend)s (0=Score of presence)"
 msgstr "Valeur acceptée: %(score_legend)s (0=Note de présence)"
 
-msgid "Score saved"
-msgstr "Note sauvée"
+msgid "Score(s) saved"
+msgstr "Note(s) sauvée(s)"
 
 msgid "Score sheet address was successfully saved."
 msgstr "L'adresse de la feuille de notes a été sauvée avec succès."
@@ -597,7 +597,7 @@ msgid "The period of scores' encoding is not opened"
 msgstr "La période d'encodage de notes n'est pas ouverte"
 
 msgid "The scores responsible must still submit the scores"
-msgstr "Le resonsable de notes doit tout de même soumettre les notes"
+msgstr "Le responsable de notes doit tout de même soumettre les notes"
 
 msgid "The selected entity no longer exists today (end date passed)."
 msgstr "L'entité sélectionnée n'existe plus aujourd'hui (date de fin passée)."
