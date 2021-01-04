@@ -38,7 +38,7 @@ class AttributionNewAdmin(admin.ModelAdmin):
                     'changed', 'substitute')
     list_filter = ('learning_container_year__academic_year', 'score_responsible')
     fieldsets = ((None, {'fields': ('learning_container_year', 'tutor', 'function', 'score_responsible',
-                                    'start_year', 'end_year', 'substitute')}),)
+                                    'start_year', 'end_year', 'substitute', 'decision_making')}),)
     raw_id_fields = ('learning_container_year', 'tutor', 'substitute')
     search_fields = ['tutor__person__first_name', 'tutor__person__last_name', 'learning_container_year__acronym',
                      'tutor__person__global_id', 'function']
