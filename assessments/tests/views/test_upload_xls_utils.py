@@ -220,7 +220,7 @@ class TestUploadXls(MixinTestUploadScoresFile, TestCase):
             messages = list(response.context['messages'])
 
             messages_tag_and_content = _get_list_tag_and_content(messages)
-            self.assertIn(('success', '%s %s' % (NUMBER_CORRECT_SCORES, _('Score saved'))),
+            self.assertIn(('success', '%s %s' % (NUMBER_CORRECT_SCORES, _('Score(s) saved'))),
                           messages_tag_and_content)
 
             self.assert_enrollments_equal(
@@ -235,7 +235,7 @@ class TestUploadXls(MixinTestUploadScoresFile, TestCase):
             messages = list(response.context['messages'])
 
             messages_tag_and_content = _get_list_tag_and_content(messages)
-            self.assertIn(('success', '%s %s' % (NUMBER_SCORES, _('Score saved'))),
+            self.assertIn(('success', '%s %s' % (NUMBER_SCORES, _('Score(s) saved'))),
                           messages_tag_and_content)
 
             self.assert_enrollments_equal(
@@ -253,7 +253,7 @@ class TestUploadXls(MixinTestUploadScoresFile, TestCase):
             messages_tag_and_content = _get_list_tag_and_content(messages)
             self.assertIn(('error', "%s : %s %s" % (_("Scores must be between 0 and 20"), _('Row'), INCORRECT_LINE)),
                           messages_tag_and_content)
-            self.assertIn(('success', '%s %s' % (NUMBER_CORRECT_SCORES, _('Score saved'))),
+            self.assertIn(('success', '%s %s' % (NUMBER_CORRECT_SCORES, _('Score(s) saved'))),
                           messages_tag_and_content)
 
             self.assert_enrollments_equal(
@@ -280,7 +280,7 @@ class TestUploadXls(MixinTestUploadScoresFile, TestCase):
             messages = list(response.context['messages'])
 
             messages_tag_and_content = _get_list_tag_and_content(messages)
-            self.assertIn(('success', '%s %s' % (NUMBER_CORRECT_SCORES, _('Score saved'))),
+            self.assertIn(('success', '%s %s' % (NUMBER_CORRECT_SCORES, _('Score(s) saved'))),
                           messages_tag_and_content)
 
             self.assert_enrollments_equal(
@@ -297,7 +297,7 @@ class TestUploadXls(MixinTestUploadScoresFile, TestCase):
             messages = list(response.context['messages'])
 
             messages_tag_and_content = _get_list_tag_and_content(messages)
-            self.assertIn(('success', '%s %s' % (NUMBER_CORRECT_SCORES, _('Score saved'))),
+            self.assertIn(('success', '%s %s' % (NUMBER_CORRECT_SCORES, _('Score(s) saved'))),
                           messages_tag_and_content)
 
             self.assert_enrollments_equal(

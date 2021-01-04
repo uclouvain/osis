@@ -1787,6 +1787,9 @@ msgstr ""
 msgid "Periodicity"
 msgstr ""
 
+msgid "Person entities"
+msgstr ""
+
 msgid "Person with reduced mobility"
 msgstr ""
 

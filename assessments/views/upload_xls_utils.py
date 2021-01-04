@@ -197,7 +197,7 @@ def __save_xls_scores(request, file_name, learning_unit_year_id):
     _show_error_messages(request, errors_list)
 
     if new_scores_number:
-        messages.add_message(request, messages.SUCCESS, '%s %s' % (str(new_scores_number), _('Score saved')))
+        messages.add_message(request, messages.SUCCESS, '%s %s' % (str(new_scores_number), _('Score(s) saved')))
         if not is_program_manager:
             __warn_that_score_responsibles_must_submit_scores(request, learning_unit_year)
         return True
