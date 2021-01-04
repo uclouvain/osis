@@ -87,7 +87,8 @@ class BaseCommonNodeTreeSerializer(serializers.Serializer):
     def to_representation(self, obj: 'Link'):
         data = super().to_representation(obj)
         root_node = self.context.get('root_node')
-        if obj.child.node_type == GroupType.MINOR_LIST_CHOICE and root_node.node_type == TrainingType.BACHELOR:
+        if obj.child.node_type in GroupType.minor_major_list_choice_enums() \
+                and root_node.node_type == TrainingType.BACHELOR:
             data.pop('children')
         return data
 
