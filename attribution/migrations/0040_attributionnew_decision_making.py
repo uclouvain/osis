@@ -13,6 +13,9 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='attributionnew',
             name='decision_making',
-            field=models.CharField(blank=True, choices=[('PROGRAM_MODIFICATION', 'Program modification'), ('DISCHARGE', 'Discharge'), ('TEACHING_SUPPLY', 'Teaching supply'), ('AUTHORITY_OR_SABBATICAL_TEACHING_SUPPLY', 'Authority/sabbatical teaching supply'), ('DEMAND_FOR_DISCHARGE', 'Demand for discharge'), ('DEMAND_FOR_CO_HOLDER', 'Demand for co-holder'), ('CO_HOLDER', 'Co-holder'), ('TO_DELETE', 'To delete'), ('PART_TIME_TEACHING_SUPPLY', 'Part-time teaching supply')], default=None, max_length=30),
+            field=models.CharField(blank=True,
+                                   null=False,
+                                   choices=[('PROGRAM_MODIFICATION', 'Program modification'), ('DISCHARGE', 'Discharge'), ('TEACHING_SUPPLY', 'Teaching supply'), ('AUTHORITY_OR_SABBATICAL_TEACHING_SUPPLY', 'Authority/sabbatical teaching supply'), ('DEMAND_FOR_DISCHARGE', 'Demand for discharge'), ('DEMAND_FOR_CO_HOLDER', 'Demand for co-holder'), ('CO_HOLDER', 'Co-holder'), ('TO_DELETE', 'To delete'), ('PART_TIME_TEACHING_SUPPLY', 'Part-time teaching supply')],
+                                   max_length=30),
         ),
     ]
