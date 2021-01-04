@@ -5,7 +5,6 @@ from django.db import migrations
 from django.utils import timezone
 
 from base.models.enums import academic_calendar_type
-from education_group.tasks import check_academic_calendar
 
 
 def remove_education_group_academic_calendar(apps, shema_editor):
@@ -23,20 +22,18 @@ def create_education_group_academic_calendar(apps, shema_editor):
     """
     We will create all calendars which are mandatory to education group app
     """
-    # Create calendars from N to N+6
-    check_academic_calendar.run()
-
-    # Create older calendars from EDUCATION_GROUP_EDITION to N
+    # Create older calendars from EDUCATION_GROUP_EDITION to N + 6
     AcademicYear = apps.get_model('base', 'academicyear')
     AcademicCalendar = apps.get_model('base', 'academiccalendar')
 
     now = timezone.now()
     current_academic_year = AcademicYear.objects.filter(start_date__lte=now, end_date__gte=now).last()
-    qs = AcademicYear.objects.filter(year__gte=2019, year__lt=current_academic_year.year)
-    for ac_year in qs:
-        _create_education_group_preparation_calendar(AcademicCalendar, ac_year)
-        _create_education_group_extended_daily_management_calendar(AcademicCalendar, ac_year)
-        _create_education_group_limited_daily_management_calendar(AcademicCalendar, ac_year)
+    if current_academic_year:
+        qs = AcademicYear.objects.filter(year__gte=2019, year__lte=current_academic_year.year + 6)
+        for ac_year in qs:
+            _create_education_group_preparation_calendar(AcademicCalendar, ac_year)
+            _create_education_group_extended_daily_management_calendar(AcademicCalendar, ac_year)
+            _create_education_group_limited_daily_management_calendar(AcademicCalendar, ac_year)
 
 
 def _create_education_group_preparation_calendar(academic_calendar_cls, targeted_academic_year):
@@ -45,8 +42,8 @@ def _create_education_group_preparation_calendar(academic_calendar_cls, targeted
         data_year=targeted_academic_year,
         defaults={
             "title": "Préparation des formations",
-            "start_date": datetime.date(targeted_academic_year.year, 8, 15),
-            "end_date": datetime.date(targeted_academic_year.year, 11, 20),
+            "start_date": datetime.date(targeted_academic_year.year - 1, 8, 15),
+            "end_date": datetime.date(targeted_academic_year.year - 1, 11, 20),
             "academic_year": targeted_academic_year
         }
     )
