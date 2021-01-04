@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import random
 
 from django.conf import settings
 from django.test import RequestFactory, SimpleTestCase
@@ -232,11 +233,41 @@ class EducationGroupRootNodeTreeSerializerTestCase(SimpleTestCase):
             Link(parent=None, child=training),
             context={
                 'request': RequestFactory().get(url),
-                'language': settings.LANGUAGE_CODE_EN
+                'language': settings.LANGUAGE_CODE_EN,
+                'root_node': training
             }
         )
         self.assertEqual(len(serializer.data['children']), 1)
         self.assertEqual(serializer.data['children'][0]['code'], minor.code)
+
+    def test_ensure_get_minor_or_major_list_choice_without_children_if_within_bachelor(self):
+        training = NodeGroupYearFactory(
+            year=self.year,
+            node_type=TrainingType.BACHELOR
+        )
+        training_list = NodeGroupYearFactory(
+            year=self.year,
+            node_type=random.choice(GroupType.minor_major_list_choice_enums()),
+        )
+        minor = NodeGroupYearFactory(
+            year=self.year,
+            node_type=MiniTrainingType.ACCESS_MINOR,
+        )
+        LinkFactory(parent=training, child=training_list)
+        LinkFactory(parent=training_list, child=minor)
+        url = reverse('education_group_api_v1:' + TrainingTreeView.name, kwargs={
+            'acronym': training.title,
+            'year': self.year
+        })
+        serializer = EducationGroupRootNodeTreeSerializer(
+            Link(parent=None, child=training),
+            context={
+                'request': RequestFactory().get(url),
+                'language': settings.LANGUAGE_CODE_EN,
+                'root_node': training
+            }
+        )
+        self.assertNotIn('children', serializer.data['children'][0])
 
     def test_ensure_node_type_and_subtype_expected(self):
         self.assertEqual(self.serializer.data['node_type'], NodeType.TRAINING.name)

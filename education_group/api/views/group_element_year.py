@@ -69,8 +69,8 @@ class EducationGroupTreeView(LanguageContextSerializerMixin, generics.RetrieveAP
         except exception.ProgramTreeVersionNotFoundException:
             self.tree_version = None
 
-        tree = load_tree.load(element.id)
-        return link.factory.get_link(parent=None, child=tree.root_node)
+        self.tree = load_tree.load(element.id)
+        return link.factory.get_link(parent=None, child=self.tree.root_node)
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
@@ -80,6 +80,7 @@ class EducationGroupTreeView(LanguageContextSerializerMixin, generics.RetrieveAP
                     'version_name': self.tree_version.version_name,
                     'version_title_fr': self.tree_version.title_fr,
                     'version_title_en': self.tree_version.title_en,
+                    'root_node': self.tree.root_node
                 }
             )
         return context
