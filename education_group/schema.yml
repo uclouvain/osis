@@ -1388,7 +1388,7 @@ components:
           type: integer
           minimum: 1
         constraint_type:
-          $ref: '#/components/schemas/ConstrainTypeEnum'
+          $ref: '#/components/schemas/ConstraintTypeEnum'
         version_name:
           type: string
         children:
