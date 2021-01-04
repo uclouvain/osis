@@ -26,10 +26,11 @@
 from typing import Dict
 
 from django import forms
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
 
+from education_group.calendar.education_group_extended_daily_management import \
+    EducationGroupExtendedDailyManagementCalendar
 from education_group.calendar.education_group_preparation_calendar import EducationGroupPreparationCalendar
 from base.forms.common import ValidationRuleMixin
 from base.forms.utils.choice_field import BLANK_CHOICE
@@ -77,14 +78,13 @@ class GroupForm(ValidationRuleMixin, forms.Form):
         self.__init_teaching_campus()
 
     def __init_academic_year_field(self):
-        self.fields['academic_year'].queryset = self.fields['academic_year'].queryset.filter(
-            year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION
-        )
+        target_years_opened = EducationGroupExtendedDailyManagementCalendar().get_target_years_opened()
         if self.user.person.is_faculty_manager:
             target_years_opened = EducationGroupPreparationCalendar().get_target_years_opened()
-            self.fields['academic_year'].queryset = self.fields['academic_year'].queryset.filter(
-                year__in=target_years_opened
-            )
+
+        self.fields['academic_year'].queryset = self.fields['academic_year'].queryset.filter(
+            year__in=target_years_opened
+        )
 
     def __init_management_entity_field(self):
         self.fields['management_entity'] = fields.ManagementEntitiesModelChoiceField(

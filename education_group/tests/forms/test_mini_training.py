@@ -26,15 +26,14 @@
 from django.test import TestCase
 
 from base.models.enums import academic_calendar_type
-from base.models.enums.education_group_types import GroupType
+from base.models.enums.education_group_types import MiniTrainingType
 from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory, CloseAcademicCalendarFactory
-from base.tests.factories.person import PersonFactory
-from education_group.forms.group import GroupUpdateForm, GroupForm
+from education_group.forms.mini_training import MiniTrainingForm
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from education_group.tests.factories.auth.faculty_manager import FacultyManagerFactory
 
 
-class TestGroupForm(TestCase):
+class TestMiniTrainingForm(TestCase):
     def setUp(self) -> None:
         for year in range(2020, 2025):
             OpenAcademicCalendarFactory(
@@ -51,7 +50,11 @@ class TestGroupForm(TestCase):
 
     def test_assert_academic_years_available_for_faculty_manager(self):
         faculty_manager = FacultyManagerFactory()
-        form = GroupForm(user=faculty_manager.person.user, group_type=GroupType.COMMON_CORE.name)
+        form = MiniTrainingForm(
+            user=faculty_manager.person.user,
+            mini_training_type=MiniTrainingType.OPTION.name,
+            attach_path=None
+        )
 
         self.assertQuerysetEqual(
             form.fields['academic_year'].queryset,
@@ -61,24 +64,14 @@ class TestGroupForm(TestCase):
 
     def test_assert_academic_years_available_for_central_manager(self):
         central_manager = CentralManagerFactory()
-        form = GroupForm(user=central_manager.person.user, group_type=GroupType.COMMON_CORE.name)
+        form = MiniTrainingForm(
+            user=central_manager.person.user,
+            mini_training_type=MiniTrainingType.OPTION.name,
+            attach_path=None
+        )
 
         self.assertQuerysetEqual(
             form.fields['academic_year'].queryset,
             [2020, 2021, 2022, 2023, 2024],
             transform=lambda obj: obj.year
         )
-
-
-class TestGroupUpdateForm(TestCase):
-    def setUp(self) -> None:
-        self.person = PersonFactory()
-        self.form = GroupUpdateForm(user=self.person.user, group_type=GroupType.COMMON_CORE.name)
-
-    def test_assert_code_is_disabled(self):
-        self.assertTrue(self.form.fields['code'].disabled)
-        self.assertFalse(self.form.fields['code'].required)
-
-    def test_assert_academic_year_is_disabled(self):
-        self.assertTrue(self.form.fields['academic_year'].disabled)
-        self.assertFalse(self.form.fields['academic_year'].required)
