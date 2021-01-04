@@ -381,7 +381,7 @@ class ProgramTree(interface.RootEntity):
             sorted(
                 (
                     node_obj for node_obj in self.get_all_nodes()
-                    if node_obj.is_learning_unit() and node_obj.is_prerequisite
+                    if node_obj.is_learning_unit() and self.is_prerequisites(node_obj)
                 ),
                 key=lambda node_obj: node_obj.code
             )
@@ -418,7 +418,7 @@ class ProgramTree(interface.RootEntity):
         return ProgramTree(
             root_node=copied_root_node,
             authorized_relationships=self.authorized_relationships,
-            prerequisite=self.prerequisites
+            prerequisites=self.prerequisites
         )
 
     def get_ordered_mandatory_children_types(self, parent_node: 'Node') -> List[EducationGroupTypesEnum]:

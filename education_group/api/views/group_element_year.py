@@ -142,18 +142,19 @@ class GroupTreeView(EducationGroupTreeView):
         education_group_year_obj=F('group_year__educationgroupversion__offer')
     ).select_related('group_year')
 
-    def get_object(self):
+    @cached_property
+    def element(self) -> Element:
         queryset = self.filter_queryset(self.get_queryset())
         filter_kwargs = {
             lookup_field: self.kwargs[lookup_url_kwarg]
             for lookup_field, lookup_url_kwarg in zip(self.lookup_fields, self.lookup_url_kwargs)
         }
 
-        element = get_object_or_404(
+        return get_object_or_404(
             queryset,
             **filter_kwargs,
         )
-        self.check_object_permissions(self.request, element.education_group_year_obj)
 
-        tree = load_tree.load(element.id)
-        return link.factory.get_link(parent=None, child=tree.root_node)
+    def get_object(self):
+        self.check_object_permissions(self.request, self.element.education_group_year_obj)
+        return link.factory.get_link(parent=None, child=self.program_tree.root_node)

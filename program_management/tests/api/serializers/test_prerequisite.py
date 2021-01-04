@@ -6,6 +6,7 @@ from program_management.api.serializers.prerequisite import ProgramTreePrerequis
     NodeBaseSerializer
 from program_management.ddd.domain import prerequisite
 from program_management.ddd.domain.program_tree import ProgramTree
+from program_management.tests.ddd.factories.domain.prerequisite.prerequisite import PrerequisitesFactory
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 
@@ -48,21 +49,13 @@ class TestEducationGroupPrerequisitesSerializer(SimpleTestCase):
         LinkFactory(parent=self.subgroup1, child=self.ldroi1300)
         LinkFactory(parent=self.subgroup1, child=self.lagro2400)
 
-        self.p_group = prerequisite.PrerequisiteItemGroup(operator=prerequisite_operator.AND)
-        self.p_group.add_prerequisite_item('LDROI1300', 2018)
-        self.p_group2 = prerequisite.PrerequisiteItemGroup(operator=prerequisite_operator.AND)
-        self.p_group2.add_prerequisite_item('LAGRO2400', 2018)
-
         self.tree = ProgramTree(root_node=self.root_node)
 
-        p_req = prerequisite.Prerequisite(
-            main_operator=prerequisite_operator.AND,
-            node_having_prerequisites=self.ldroi100a,
-            context_tree=self.tree.entity_id
+        PrerequisitesFactory.produce_inside_tree(
+            context_tree=self.tree,
+            node_having_prerequisite=self.ldroi100a,
+            nodes_that_are_prequisites=[self.ldroi1300, self.lagro2400]
         )
-        p_req.add_prerequisite_item_group(self.p_group)
-        p_req.add_prerequisite_item_group(self.p_group2)
-        self.ldroi100a.set_prerequisite(p_req)
 
         url = reverse('program_management_api_v1:training-prerequisites_official',
                       kwargs={'year': self.root_node.year, 'acronym': self.root_node.code})

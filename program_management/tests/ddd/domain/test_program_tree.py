@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import copy
 import inspect
 from unittest import mock
 from unittest.mock import patch
@@ -53,6 +54,7 @@ from program_management.models.enums import node_type
 from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipObjectFactory, \
     AuthorizedRelationshipListFactory, MandatoryRelationshipObjectFactory
 from program_management.tests.ddd.factories.commands.paste_element_command import PasteElementCommandFactory
+from program_management.tests.ddd.factories.domain.prerequisite.prerequisite import PrerequisitesFactory
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 from program_management.tests.ddd.factories.prerequisite import cast_to_prerequisite
@@ -566,19 +568,14 @@ class TestGetNodesThatHavePrerequisites(SimpleTestCase):
         self.assertEqual(self.tree.get_nodes_that_have_prerequisites(), [])
 
     def test_when_tree_has_node_that_have_prerequisites(self):
-        p_group = prerequisite.PrerequisiteItemGroup(operator=prerequisite_operator.AND)
+        tree = copy.deepcopy(self.tree)
         node_having_prerequisite = self.link_with_child.child
-        p_group.add_prerequisite_item('BLA', node_having_prerequisite.year)
-
-        p_req = prerequisite.Prerequisite(
-            main_operator=prerequisite_operator.AND,
-            node_having_prerequisites=node_having_prerequisite,
-            context_tree=self.tree.entity_id
+        PrerequisitesFactory.produce_inside_tree(
+            context_tree=tree,
+            node_having_prerequisite=node_having_prerequisite,
+            nodes_that_are_prequisites=[NodeLearningUnitYearFactory()]
         )
-        p_req.add_prerequisite_item_group(p_group)
-        node_having_prerequisite.set_prerequisite(p_req)
-
-        result = self.tree.get_nodes_that_have_prerequisites()
+        result = tree.get_nodes_that_have_prerequisites()
         self.assertEqual(result, [node_having_prerequisite])
 
 

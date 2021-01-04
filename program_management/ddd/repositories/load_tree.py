@@ -166,7 +166,7 @@ def __build_tree(
         authorized_relationships=load_authorized_relationship.load(),
         prerequisites=Prerequisites(
             context_tree=ProgramTreeIdentity(code=root_node.code, year=root_node.year),
-            prerequisites=prerequisites['has_prerequisite_dict'].values(),
+            prerequisites=prerequisites['has_prerequisite_dict'].values(),  # FIXME :: to unit test !
         ),
     )
     return tree
@@ -192,6 +192,7 @@ def __build_children(
             links,
             prerequisites
         )
+        # FIXME :: should be removed after moving prerequisites into ProgramTree
         # FIXME Copy links and nodes because it's possible there is a node a present in different trees but
         #  with different attributes values like prerequisites (cf. OSIS-5281)
         #  It's because prerequisites should be an attribute of the ProgramTree, not of the Node.
@@ -201,6 +202,7 @@ def __build_children(
         link_node = links['_'.join([str(parent_id), str(child_node.pk)])]
 
         if child_node.is_learning_unit():
+            # FIXME :: should be removed after moving prerequisites into ProgramTree
             # FIXME Copy links and nodes because it's possible there is a node a present in different trees but
             #  with different attributes values like prerequisites (cf. OSIS-5281)
             #  It's because prerequisites should be an attribute of the ProgramTree, not of the Node.

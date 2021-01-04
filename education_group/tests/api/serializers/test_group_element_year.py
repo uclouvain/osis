@@ -422,6 +422,7 @@ class EducationGroupWithMasterFinalityInRootTreeSerializerTestCase(SimpleTestCas
         self.serializer = EducationGroupRootNodeTreeSerializer(
             Link(parent=None, child=self.training),
             context={
+                'program_tree': ProgramTreeFactory(root_node=self.training),
                 'request': RequestFactory().get(url),
                 'language': settings.LANGUAGE_CODE_EN
             }
@@ -512,6 +513,7 @@ class EducationGroupWithMasterFinalityInChildTreeSerializerTestCase(SimpleTestCa
         self.serializer = EducationGroupRootNodeTreeSerializer(
             Link(parent=None, child=self.training),
             context={
+                'program_tree': ProgramTreeFactory(root_node=self.training),
                 'request': RequestFactory().get(url),
                 'language': settings.LANGUAGE_CODE_EN
             }
