@@ -53,7 +53,7 @@ class TestEducationGroupPrerequisitesSerializer(SimpleTestCase):
 
         PrerequisitesFactory.produce_inside_tree(
             context_tree=self.tree,
-            node_having_prerequisite=self.ldroi100a,
+            node_having_prerequisite=self.ldroi100a.entity_id,
             nodes_that_are_prequisites=[self.ldroi1300, self.lagro2400]
         )
 

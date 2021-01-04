@@ -274,7 +274,7 @@ class EducationGroupRootNodeTreeSerializerTestCase(SimpleTestCase):
         )
         PrerequisitesFactory.produce_inside_tree(
             context_tree=tree,
-            node_having_prerequisite=luy_has_prerequisites,
+            node_having_prerequisite=luy_has_prerequisites.entity_id,
             nodes_that_are_prequisites=[luy_is_prerequisite]
         )
         url = reverse('education_group_api_v1:' + GroupTreeView.name, kwargs={

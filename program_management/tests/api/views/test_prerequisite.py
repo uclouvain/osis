@@ -96,7 +96,7 @@ class ProgramTreePrerequisitesBaseTestCase(APITestCase):
 
         PrerequisitesFactory.produce_inside_tree(
             context_tree=cls.tree,
-            node_having_prerequisite=cls.ldroi100a,
+            node_having_prerequisite=cls.ldroi100a.entity_id,
             nodes_that_are_prequisites=[cls.ldroi1300, cls.lagro2400]
         )
 

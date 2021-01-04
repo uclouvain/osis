@@ -572,7 +572,7 @@ class TestGetNodesThatHavePrerequisites(SimpleTestCase):
         node_having_prerequisite = self.link_with_child.child
         PrerequisitesFactory.produce_inside_tree(
             context_tree=tree,
-            node_having_prerequisite=node_having_prerequisite,
+            node_having_prerequisite=node_having_prerequisite.entity_id,
             nodes_that_are_prequisites=[NodeLearningUnitYearFactory()]
         )
         result = tree.get_nodes_that_have_prerequisites()
