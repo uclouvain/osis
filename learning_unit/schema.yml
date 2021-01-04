@@ -9,10 +9,10 @@ servers:
          - qa # Staging server
          - test # Test server
  - url: https://osis.uclouvain.be/api/v1/learning_unit/
-   description: Production server
+   description: 'Production server'
 info:
-  version: '1'
-  title: Learning Unit Service
+  version: '1.01'
+  title: 'Learning Unit Service'
   description: |-
     A set of API endpoints that allow you to get information about learning unit
 paths:
@@ -680,125 +680,111 @@ components:
     LearningUnitTypeEnum:
       type: string
       enum:
-        - COURSE
-        - INTERNSHIP
-        - DISSERTATION
-        - OTHER_COLLECTIVE
-        - OTHER_INDIVIDUAL
-        - MASTER_THESIS
-        - EXTERNAL
+        - 'COURSE'
+        - 'INTERNSHIP'
+        - 'DISSERTATION'
+        - 'OTHER_COLLECTIVE'
+        - 'OTHER_INDIVIDUAL'
+        - 'MASTER_THESIS'
+        - 'EXTERNAL'
     LearningUnitSubtypeEnum:
       type: string
       enum:
-        - FULL
-        - PARTIM
+        - 'FULL'
+        - 'PARTIM'
     QuadrimesterEnum:
       type: string
       enum:
-       - Q1
-       - Q2
-       - Q3
-       - Q1and2
-       - Q1or2
+        - 'Q1'
+        - 'Q2'
+        - 'Q3'
+        - 'Q1and2'
+        - 'Q1or2'
     PeriodicityEnum:
       type: string
       enum:
-       - ANNUAL
-       - BIENNIAL_EVEN
-       - BIENNIAL_ODD
+        - 'ANNUAL'
+        - 'BIENNIAL_EVEN'
+        - 'BIENNIAL_ODD'
     ComponentTypeEnum:
       type: string
       enum:
-        - LECTURING
-        - PRACTICAL_EXERCISES
+        - 'LECTURING'
+        - 'PRACTICAL_EXERCISES'
     AttributionFunctionEnum:
       type: string
       enum:
-        - COORDINATOR
-        - HOLDER
-        - CO_HOLDER
-        - DEPUTY
-        - DEPUTY_AUTHORITY
-        - DEPUTY_SABBATICAL
-        - DEPUTY_TEMPORARY
-        - PROFESSOR
-        - INTERNSHIP_SUPERVISOR
-        - INTERNSHIP_CO_SUPERVISOR
+        - 'COORDINATOR'
+        - 'HOLDER'
+        - 'CO_HOLDER'
+        - 'DEPUTY'
+        - 'DEPUTY_AUTHORITY'
+        - 'DEPUTY_SABBATICAL'
+        - 'DEPUTY_TEMPORARY'
+        - 'PROFESSOR'
+        - 'INTERNSHIP_SUPERVISOR'
+        - 'INTERNSHIP_CO_SUPERVISOR'
     DecreeCategoryEnum:
       type: string
       enum:
-        - FCONT
-        - BAS1
-        - BAS2
-        - AESS
-        - DEC1
-        - DEC2
-        - DES
-        - DEA
-        - DOC
-        - AES
-        - AUTRE
-        - BAC
-        - AP2C
-        - MA1
-        - MA2X
-        - MA2D
-        - MA2S
-        - MA2A
-        - MA2M
-        - AS2C
-        - MACO
-        - AESSB
-        - CAPS
-        - AS3C
-        - FODO
-        - DOCB
-        - CEMC
-        - MED
-        - VETE
+        - 'FCONT'
+        - 'DOC'
+        - 'BAC'
+        - 'MA1'
+        - 'MA2X'
+        - 'MA2D'
+        - 'MA2S'
+        - 'MA2A'
+        - 'MA2M'
+        - 'MACO'
+        - 'AESSB'
+        - 'CAPS'
+        - 'FODO'
+        - 'DOCB'
+        - 'CEMC'
     DurationUnitEnum:
       type: string
       enum:
-        - QUADRIMESTER
-        - TRIMESTER
-        - MONTH
-        - WEEK
-        - DAY
+        - 'QUADRIMESTER'
+        - 'TRIMESTER'
+        - 'MONTH'
+        - 'WEEK'
+        - 'DAY'
     EducationGroupTypeEnum:
       type: string
       enum:
-        - AGGREGATION
-        - CERTIFICATE_OF_PARTICIPATION
-        - CERTIFICATE_OF_SUCCESS
-        - CERTIFICATE_OF_HOLDING_CREDITS
-        - BACHELOR
-        - CERTIFICATE
-        - CAPAES
-        - RESEARCH_CERTIFICATE
-        - UNIVERSITY_FIRST_CYCLE_CERTIFICATE
-        - UNIVERSITY_SECOND_CYCLE_CERTIFICATE
-        - ACCESS_CONTEST
-        - LANGUAGE_CLASS
-        - ISOLATED_CLASS
-        - PHD
-        - FORMATION_PHD
-        - JUNIOR_YEAR
-        - PGRM_MASTER_120
-        - MASTER_MA_120
-        - MASTER_MD_120
-        - MASTER_MS_120
-        - PGRM_MASTER_180_240
-        - MASTER_MA_180_240
-        - MASTER_MD_180_240
-        - MASTER_MS_180_240
-        - MASTER_M1
-        - MASTER_MC
-        - INTERNSHIP
-        - DEEPENING
-        - SOCIETY_MINOR
-        - ACCESS_MINOR
-        - OPEN_MINOR
-        - DISCIPLINARY_COMPLEMENT_MINOR
+        - 'AGGREGATION'
+        - 'CERTIFICATE_OF_PARTICIPATION'
+        - 'CERTIFICATE_OF_SUCCESS'
+        - 'CERTIFICATE_OF_HOLDING_CREDITS'
+        - 'BACHELOR'
+        - 'CERTIFICATE'
+        - 'CAPAES'
+        - 'RESEARCH_CERTIFICATE'
+        - 'UNIVERSITY_FIRST_CYCLE_CERTIFICATE'
+        - 'UNIVERSITY_SECOND_CYCLE_CERTIFICATE'
+        - 'ACCESS_CONTEST'
+        - 'LANGUAGE_CLASS'
+        - 'ISOLATED_CLASS'
+        - 'PHD'
+        - 'FORMATION_PHD'
+        - 'JUNIOR_YEAR'
+        - 'PGRM_MASTER_120'
+        - 'MASTER_MA_120'
+        - 'MASTER_MD_120'
+        - 'MASTER_MS_120'
+        - 'PGRM_MASTER_180_240'
+        - 'MASTER_MA_180_240'
+        - 'MASTER_MD_180_240'
+        - 'MASTER_MS_180_240'
+        - 'MASTER_M1'
+        - 'MASTER_MC'
+        - 'INTERNSHIP'
+        - 'DEEPENING'
+        - 'SOCIETY_MINOR'
+        - 'ACCESS_MINOR'
+        - 'OPEN_MINOR'
+        - 'DISCIPLINARY_COMPLEMENT_MINOR'
     Error:
       type: object
       properties:
