@@ -246,11 +246,11 @@ class Prerequisites(interface.RootEntity):
     @cached_result
     def __map_is_prerequisite_of(self) -> Dict['NodeIdentity', List['NodeIdentity']]:
         result = {}
-        for node_having_prerequisites, prerequisites_list in self.prerequisites.items():
-            for prerequisite in prerequisites_list:
-                for prereq_item in prerequisite.get_all_prerequisite_items():
-                    prereq_item_as_node_identity = NodeIdentity(code=prereq_item.code, year=prereq_item.year)  # FIXME :: put this into a domain service
-                    result.setdefault(prereq_item_as_node_identity, set()).add(node_having_prerequisites)
+        for prerequisite in self.prerequisites:
+            node_having_prerequisites = prerequisite.node_having_prerequisites
+            for prereq_item in prerequisite.get_all_prerequisite_items():
+                prereq_item_as_node_identity = NodeIdentity(code=prereq_item.code, year=prereq_item.year)  # FIXME :: put this into a domain service
+                result.setdefault(prereq_item_as_node_identity, set()).add(node_having_prerequisites)
         return {
             node_is_prerequisite: sorted(nodes_having_prerequisites, key=lambda node_identity: node_identity.code)
             for node_is_prerequisite, nodes_having_prerequisites in result.items()
@@ -258,7 +258,7 @@ class Prerequisites(interface.RootEntity):
 
     @cached_result
     def _map_node_identity_prerequisite(self) -> Dict['NodeIdentity', 'Prerequisite']:
-        return {p.node_having_prerequisites.entity_id: p for p in self.prerequisites}
+        return {p.node_having_prerequisites: p for p in self.prerequisites}
 
 
 @attr.s(slots=True)
