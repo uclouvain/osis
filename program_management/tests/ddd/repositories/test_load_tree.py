@@ -54,9 +54,16 @@ class TestLoadTree(TestCase):
               |-link_level_2
                 |-- leaf
         """
-        cls.root_node = ElementGroupYearFactory()
-        cls.link_level_1 = GroupElementYearFactory(parent_element=cls.root_node)
-        cls.link_level_2 = GroupElementYearChildLeafFactory(parent_element=cls.link_level_1.child_element)
+        cls.academic_year = AcademicYearFactory(current=True)
+        cls.root_node = ElementGroupYearFactory(group_year__academic_year=cls.academic_year)
+        cls.link_level_1 = GroupElementYearFactory(
+            parent_element=cls.root_node,
+            child_element__group_year__academic_year=cls.academic_year,
+        )
+        cls.link_level_2 = GroupElementYearChildLeafFactory(
+            parent_element=cls.link_level_1.child_element,
+            child_element__learning_unit_year__academic_year=cls.academic_year
+        )
         cls.education_group_version = EducationGroupVersionFactory(
             root_group=cls.root_node.group_year
         )
@@ -124,12 +131,16 @@ class TestLoadTree(TestCase):
         self.assertEqual(str(result), expected_str)
 
     def test_case_load_tree_leaf_is_prerequisites_of(self):
-        new_link = GroupElementYearChildLeafFactory(parent_element=self.link_level_1.child_element)
+        new_link = GroupElementYearChildLeafFactory(
+            parent_element=self.link_level_1.child_element,
+            child_element__learning_unit_year__academic_year=self.academic_year
+        )
 
         # Add prerequisite between two node
+        learnin_unit_that_has_prerequisite = self.link_level_2.child_element.learning_unit_year
         PrerequisiteFactory(
             education_group_version=self.education_group_version,
-            learning_unit_year=self.link_level_2.child_element.learning_unit_year,
+            learning_unit_year=learnin_unit_that_has_prerequisite,
             items__groups=((new_link.child_element.learning_unit_year,),)
         )
 
@@ -137,10 +148,12 @@ class TestLoadTree(TestCase):
         leaf = education_group_program_tree.root_node.children[0].child.children[1].child
 
         self.assertIsInstance(leaf, node.NodeLearningUnitYear)
-        self.assertIsInstance(leaf.is_prerequisite_of, list)
-        self.assertEqual(len(leaf.is_prerequisite_of), 1)
-        self.assertEqual(leaf.is_prerequisite_of[0].pk, self.link_level_2.child_element.pk)
-        self.assertTrue(leaf.is_prerequisite)
+        is_prerequisite_of = education_group_program_tree.search_is_prerequisite_of(leaf)
+        self.assertIsInstance(is_prerequisite_of, list)
+        self.assertEqual(len(is_prerequisite_of), 1)
+        self.assertEqual(is_prerequisite_of[0].code, learnin_unit_that_has_prerequisite.acronym)
+        self.assertEqual(is_prerequisite_of[0].year, learnin_unit_that_has_prerequisite.academic_year.year)
+        self.assertTrue(education_group_program_tree.is_prerequisites(leaf))
 
     def test_case_load_tree_leaf_node_have_a_proposal(self):
         proposal_types = ProposalType.get_names()

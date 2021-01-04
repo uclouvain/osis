@@ -66,7 +66,7 @@ class LearningUnitPrerequisiteTrainingandMiniTraining(PermissionRequiredMixin, L
             self.program_tree.root_node
         ).is_valid()
         context["program_links"] = self.program_tree.get_all_links()
-        context["is_prerequisite_of_list"] = context["node"].get_is_prerequisite_of()
+        context["is_prerequisite_of_list"] = self.program_tree.search_is_prerequisite_of(context["node"])
         return context
 
     def render_to_response(self, context, **response_kwargs):

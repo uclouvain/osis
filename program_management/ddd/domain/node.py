@@ -555,15 +555,8 @@ class NodeLearningUnitYear(Node):
         return _get_full_title(self.common_title_en, self.specific_title_en)
 
     @property
-    def is_prerequisite(self) -> bool:
-        return bool(self.is_prerequisite_of)
-
-    @property
     def has_proposal(self) -> bool:
         return bool(self.proposal_type)
-
-    def get_is_prerequisite_of(self) -> List['NodeLearningUnitYear']:
-        return sorted(self.is_prerequisite_of, key=lambda node: node.code)
 
     def set_prerequisite(self, prerequisite: Prerequisite):
         self.prerequisite = prerequisite

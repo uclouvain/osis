@@ -634,7 +634,7 @@ class ProgramTree(interface.RootEntity):
     def has_prerequisites(self, node: 'NodeLearningUnitYear') -> bool:
         return self.prerequisites.has_prerequisites(node)
 
-    def is_prerequisites(self, node: 'NodeLearningUnitYear') -> bool:
+    def is_prerequisites(self, node: 'NodeLearningUnitYear') -> bool:  # TODO :: to rename into is_prerequisite
         return self.prerequisites.is_prerequisites(node)
 
     def search_is_prerequisite_of(self, search_from_node: 'NodeLearningUnitYear') -> List['NodeLearningUnitYear']:
