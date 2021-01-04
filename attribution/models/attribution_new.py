@@ -27,6 +27,7 @@ from django.contrib import admin
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from attribution.models.enums.decision_making import DecisionMakings
 from attribution.models.enums.function import Functions
 from base.models.utils.utils import filter_with_list_or_object
 
@@ -62,6 +63,8 @@ class AttributionNew(models.Model):
     end_year = models.IntegerField(blank=True, null=True)
     score_responsible = models.BooleanField(default=False)
     substitute = models.ForeignKey('base.Person', blank=True, null=True, on_delete=models.CASCADE)
+    decision_making = models.CharField(max_length=30, blank=True, null=False, choices=DecisionMakings.choices(),
+                                       default=None)
 
     def __str__(self):
         return u"%s - %s" % (self.tutor.person, self.function)
