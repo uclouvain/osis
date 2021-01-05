@@ -10,7 +10,6 @@ def copy_remarks_from_lu_to_luy(apps, schema_editor):
     lus = LearningUnit.objects.filter(
         Q(other_remark__isnull=False) | Q(faculty_remark__isnull=False)
     )
-    print(lus.count())
     for lu in lus:
         luys = lu.learningunityear_set.all()
         for luy in luys:
@@ -20,6 +19,23 @@ def copy_remarks_from_lu_to_luy(apps, schema_editor):
                 luy.faculty_remark = lu.other_remark
 
         LearningUnitYear.objects.bulk_update(luys, ['faculty_remark'])
+
+
+def adapt_initial_data_from_proposals(apps, schema_editor):
+    ProposalLearningUnit = apps.get_model('base', 'ProposalLearningUnit')
+
+    proposals = ProposalLearningUnit.objects.filter(
+        Q(initial_data__learning_unit__other_remark__isnull=False) |
+        Q(initial_data__learning_unit__faculty_remark__isnull=False)
+    )
+    for proposal in proposals:
+        other_remark = proposal.initial_data['learning_unit']['other_remark']
+        faculty_remark = proposal.initial_data['learning_unit']['faculty_remark']
+        proposal.initial_data['learning_unit_year']['other_remark'] = other_remark
+        proposal.initial_data['learning_unit_year']['faculty_remark'] = faculty_remark
+        del proposal.initial_data['learning_unit']['other_remark']
+        del proposal.initial_data['learning_unit']['faculty_remark']
+    ProposalLearningUnit.objects.bulk_update(proposals, ['initial_data'])
 
 
 class Migration(migrations.Migration):
@@ -39,6 +55,7 @@ class Migration(migrations.Migration):
             field=models.TextField(blank=True, null=True, verbose_name='Other remark (intended for publication)'),
         ),
         migrations.RunPython(copy_remarks_from_lu_to_luy),
+        migrations.RunPython(adapt_initial_data_from_proposals),
         migrations.RemoveField(
             model_name='learningunit',
             name='faculty_remark',
