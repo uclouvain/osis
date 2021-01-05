@@ -817,12 +817,12 @@ class TestSetPrerequisite(SimpleTestCase, ValidatorPatcherMixin):
     def test_should_not_set_prerequisites_when_clean_is_not_valid(self):
         self.mock_validator(UpdatePrerequisiteValidatorList, ["error_message_text"], level=MessageLevel.ERROR)
         self.tree.set_prerequisite("LOSIS1452 OU MARC2589", self.link1.child)
-        self.assertFalse(self.link1.child.prerequisite)
+        self.assertTrue(len(self.tree.get_all_prerequisites()) == 0)
 
     def test_should_set_prerequisites_when_clean_is_valid(self):
         self.mock_validator(UpdatePrerequisiteValidatorList, ["success_message_text"], level=MessageLevel.SUCCESS)
         self.tree.set_prerequisite("LOSIS1452 OU MARC2589", self.link1.child)
-        self.assertTrue(self.link1.child.prerequisite)
+        self.assertTrue(len(self.tree.get_all_prerequisites()) == 1)
 
 
 class TestUpdateLink(SimpleTestCase):
