@@ -24,10 +24,8 @@ def copy_remarks_from_lu_to_luy(apps, schema_editor):
 def adapt_initial_data_from_proposals(apps, schema_editor):
     ProposalLearningUnit = apps.get_model('base', 'ProposalLearningUnit')
 
-    proposals = ProposalLearningUnit.objects.filter(
-        Q(initial_data__learning_unit__other_remark__isnull=False) |
-        Q(initial_data__learning_unit__faculty_remark__isnull=False)
-    )
+    proposals = ProposalLearningUnit.objects.filter(initial_data__learning_unit__isnull=False)
+
     for proposal in proposals:
         other_remark = proposal.initial_data['learning_unit']['other_remark']
         faculty_remark = proposal.initial_data['learning_unit']['faculty_remark']
