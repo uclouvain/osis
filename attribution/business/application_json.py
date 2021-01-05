@@ -43,7 +43,7 @@ def publish_to_portal(global_ids=None):
         try:
             queue_sender.send_message(queue_name, tutor_application_list)
         except (RuntimeError, pika.exceptions.ConnectionClosed, pika.exceptions.ChannelClosed,
-                 pika.exceptions.AMQPError):
+                pika.exceptions.AMQPError):
             logger.exception('Could not recompute attributions for portal...')
             return False
         return True
@@ -73,11 +73,15 @@ def _group_tutor_application_by_global_id(tutor_application_list):
         key = tutor_application.tutor.person.global_id
         tutor_applications_grouped.setdefault(key, {'global_id': key,
                                                     'tutor_applications': []})
-        tutor_applications_grouped[key]['tutor_applications'].append({'last_changed': str(tutor_application.last_changed),
-                                                                      'year': tutor_application.learning_container_year.academic_year.year,
-                                                                      'acronym': tutor_application.learning_container_year.acronym,
-                                                                      'remark': tutor_application.remark,
-                                                                      'course_summary': tutor_application.course_summary,
-                                                                      'charge_lecturing_asked': str(tutor_application.volume_lecturing or Decimal('0.0')),
-                                                                      'charge_practical_asked': str(tutor_application.volume_pratical_exercice or Decimal('0.0'))})
+        tutor_applications_grouped[key]['tutor_applications'].append(
+            {
+                'updated_at': str(tutor_application.last_changed),
+                'year': tutor_application.learning_container_year.academic_year.year,
+                'acronym': tutor_application.learning_container_year.acronym,
+                'remark': tutor_application.remark,
+                'course_summary': tutor_application.course_summary,
+                'charge_lecturing_asked': str(tutor_application.volume_lecturing or Decimal('0.0')),
+                'charge_practical_asked': str(tutor_application.volume_pratical_exercice or Decimal('0.0'))
+            }
+        )
     return tutor_applications_grouped
