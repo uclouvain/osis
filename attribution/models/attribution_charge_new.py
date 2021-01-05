@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -42,6 +42,18 @@ class AttributionChargeNewAdmin(admin.ModelAdmin):
     list_filter = ('learning_component_year__type', 'attribution__learning_container_year__academic_year')
 
 
+class AttributionChargeNewManager(models.Manager):
+
+    def get_queryset(self):
+        return super().get_queryset()
+
+
+class AttributionChargeNewWithoutDecisionManager(models.Manager):
+
+    def get_queryset(self):
+        return super().get_queryset().filter(attribution__decision_making='')
+
+
 class AttributionChargeNew(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
@@ -49,6 +61,8 @@ class AttributionChargeNew(models.Model):
     learning_component_year = models.ForeignKey('base.LearningComponentYear', on_delete=models.CASCADE)
     allocation_charge = models.DecimalField(max_digits=6, decimal_places=1, blank=True, null=True,
                                             validators=[validators.MinValueValidator(MIN_ALLOCATION_CHARGE)])
+    objects = AttributionChargeNewManager()
+    objects_attributions = AttributionChargeNewWithoutDecisionManager()
 
     def __str__(self):
         return u"%s" % self.attribution

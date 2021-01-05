@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ from base.models.utils.utils import filter_with_list_or_object
 class AttributionNewAdmin(admin.ModelAdmin):
 
     list_display = ('tutor', 'score_responsible', 'function', 'learning_container_year', 'start_year', 'end_year',
-                    'changed', 'substitute')
+                    'changed', 'substitute', 'decision_making')
     list_filter = ('learning_container_year__academic_year', 'score_responsible')
     fieldsets = ((None, {'fields': ('learning_container_year', 'tutor', 'function', 'score_responsible',
                                     'start_year', 'end_year', 'substitute', 'decision_making')}),)
@@ -51,6 +51,18 @@ class AttributionNewAdmin(admin.ModelAdmin):
     publish_attribution_to_portal.short_description = _("Publish attribution to portal")
 
 
+class AttributionNewManager(models.Manager):
+
+    def get_queryset(self):
+        return super().get_queryset()
+
+
+class AttributionChargeNewWithoutDecisionManager(models.Manager):
+
+    def get_queryset(self):
+        return super().get_queryset().filter(decision_making='')
+
+
 class AttributionNew(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
@@ -64,7 +76,10 @@ class AttributionNew(models.Model):
     score_responsible = models.BooleanField(default=False)
     substitute = models.ForeignKey('base.Person', blank=True, null=True, on_delete=models.CASCADE)
     decision_making = models.CharField(max_length=30, blank=True, null=False, choices=DecisionMakings.choices(),
-                                       default=None)
+                                       default='')
+
+    objects = AttributionNewManager()
+    objects_attributions = AttributionChargeNewWithoutDecisionManager()
 
     def __str__(self):
         return u"%s - %s" % (self.tutor.person, self.function)

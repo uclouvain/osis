@@ -34,8 +34,11 @@ from base.models.academic_year import AcademicYear, starting_academic_year
 from base.models.enums import quadrimesters, learning_unit_year_subtypes, active_status, learning_container_year_types
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
+from base.models.learning_component_year import LearningComponentYear
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.views.learning_units.search.common import SearchTypes
+from attribution.models.enums.decision_making import DecisionMakings
+
 
 COMMON_ORDERING_FIELDS = (
     ('academic_year__year', 'academic_year'), ('acronym', 'acronym'), ('full_title', 'title'),
@@ -158,10 +161,13 @@ class LearningUnitFilter(FilterSet):
         value = value.replace(' ', '\\s')
         search_value = espace_special_characters(value)
         for tutor_name in search_value.split():
+            queryset = queryset.exclude(
+                learning_container_year__attributionnew__decision_making__in=DecisionMakings.get_names()
+            )
             queryset = queryset.filter(
-                Q(learningcomponentyear__attributionchargenew__attribution__tutor__person__first_name__iregex=tutor_name
+                Q(learning_container_year__attributionnew__tutor__person__first_name__iregex=tutor_name
                   ) |
-                Q(learningcomponentyear__attributionchargenew__attribution__tutor__person__last_name__iregex=tutor_name)
+                Q(learning_container_year__attributionnew__tutor__person__last_name__iregex=tutor_name)
             ).distinct()
         return queryset
 

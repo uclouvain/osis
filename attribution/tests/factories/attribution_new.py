@@ -50,4 +50,4 @@ class AttributionNewFactory(factory.django.DjangoModelFactory):
     tutor = factory.SubFactory(TutorFactory)
     score_responsible = False
     learning_container_year = factory.SubFactory(LearningContainerYearFactory)
-    decision_making = None
+    decision_making = ''
