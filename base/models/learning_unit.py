@@ -105,6 +105,11 @@ class LearningUnit(SerializableModel):
         related_name='learning_unit_end_years',
         on_delete=models.PROTECT
     )
+    other_remark = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name=_('Other remark (intended for publication)')
+    )
 
     def __str__(self):
         return self.acronym
