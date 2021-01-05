@@ -32,6 +32,7 @@ OPTIONAL_APPS = (
     'dissertation',
     'internship',
     'assessments',
+    'partnership',
     'cms',
     'webservices',
     'behave_django',
