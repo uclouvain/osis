@@ -25,10 +25,8 @@
 ##############################################################################
 import collections
 import copy
-import functools
 from _decimal import Decimal
-from collections import OrderedDict
-from typing import List, Set, Dict, Optional, Iterator, Tuple, Generator
+from typing import List, Set, Optional, Iterator, Tuple, Generator
 
 import attr
 
@@ -120,6 +118,14 @@ class NodeFactory:
             children=[],
             node_id=None,
         )
+        if copied_node.type == NodeType.GROUP:
+            copied_node.constraint_type = None
+            copied_node.min_constraint = None
+            copied_node.max_constraint = None
+            copied_node.remark_en = None
+            copied_node.remark_fr = None
+            if copied_node.node_type in GroupType:
+                copied_node.credits = None
         copied_node._has_changed = True
         return copied_node
 
