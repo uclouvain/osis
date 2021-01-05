@@ -5,6 +5,8 @@ from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _, pgettext
 from rules import predicate
 
+from education_group.calendar.education_group_extended_daily_management import \
+    EducationGroupExtendedDailyManagementCalendar
 from education_group.calendar.education_group_preparation_calendar import EducationGroupPreparationCalendar
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_categories import Categories
@@ -170,7 +172,20 @@ def is_element_only_inside_standard_program(
 @predicate_failed_msg(message=_("This education group is not editable during this period."))
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def is_program_edition_period_open(self, user, group_year: 'GroupYear' = None):
-    return EducationGroupPreparationCalendar().is_target_year_authorized(target_year=group_year.academic_year.year)
+    calendar = EducationGroupPreparationCalendar()
+    if group_year:
+        return calendar.is_target_year_authorized(target_year=group_year.academic_year.year)
+    return bool(calendar.get_target_years_opened())
+
+
+@predicate(bind=True)
+@predicate_failed_msg(message=_("This education group is not editable during this period."))
+@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
+def is_education_group_extended_daily_management_calendar_open(self, user, group_year: 'GroupYear' = None):
+    calendar = EducationGroupExtendedDailyManagementCalendar()
+    if group_year:
+        return calendar.is_target_year_authorized(target_year=group_year.academic_year.year)
+    return bool(calendar.get_target_years_opened())
 
 
 @predicate(bind=True)

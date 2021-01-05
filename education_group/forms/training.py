@@ -25,7 +25,7 @@
 ##############################################################################
 import functools
 import operator
-from typing import Dict, List, Union
+from typing import Dict, List, Union, Optional
 
 from ajax_select import register, LookupChannel
 from django import forms
@@ -39,6 +39,8 @@ from django.db.models.functions import Concat
 from django.utils.functional import lazy
 from django.utils.translation import gettext_lazy as _
 
+from education_group.calendar.education_group_extended_daily_management import \
+    EducationGroupExtendedDailyManagementCalendar
 from education_group.calendar.education_group_preparation_calendar import EducationGroupPreparationCalendar
 from base.forms.common import ValidationRuleMixin
 from base.forms.utils.choice_field import BLANK_CHOICE, add_blank
@@ -312,7 +314,8 @@ class CreateTrainingForm(ValidationRuleMixin, forms.Form):
         )
     )
 
-    def __init__(self, *args, user: User, training_type: str, attach_path: str, training: 'Training' = None,  **kwargs):
+    def __init__(self, *args, user: User, training_type: str, attach_path: Optional[str],
+                 training: 'Training' = None, **kwargs):
         self.user = user
         self.training_type = training_type
         self.attach_path = attach_path
@@ -334,14 +337,13 @@ class CreateTrainingForm(ValidationRuleMixin, forms.Form):
     def __init_academic_year_field(self):
         if not self.fields['academic_year'].disabled and self.user.person.is_faculty_manager:
             target_years_opened = EducationGroupPreparationCalendar().get_target_years_opened()
-            working_academic_years = AcademicYear.objects.filter(year__in=target_years_opened)
         else:
-            working_academic_years = AcademicYear.objects.all()
+            target_years_opened = EducationGroupExtendedDailyManagementCalendar().get_target_years_opened()
 
-        working_academic_years = working_academic_years.filter(year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION)
+        working_academic_years = AcademicYear.objects.filter(year__in=target_years_opened)
         self.fields['academic_year'].queryset = working_academic_years
         self.fields['end_year'].queryset = AcademicYear.objects.filter(
-            year__gte=working_academic_years.first().year
+            year__gte=getattr(working_academic_years.first(), 'year', settings.YEAR_LIMIT_EDG_MODIFICATION)
         )
 
     def __init_management_entity_field(self):
