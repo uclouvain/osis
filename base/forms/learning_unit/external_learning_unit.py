@@ -117,6 +117,8 @@ class LearningUnitYearForExternalModelForm(LearningUnitYearModelForm):
                 }
             ),
             'credits': forms.TextInput(),
+            'faculty_remark': forms.Textarea(attrs={'rows': '5'}),
+            'other_remark': forms.Textarea(attrs={'rows': '5'})
         }
 
         labels = {
