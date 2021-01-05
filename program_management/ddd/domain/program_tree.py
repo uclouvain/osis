@@ -469,29 +469,9 @@ class ProgramTree(interface.RootEntity):
     def set_prerequisite(
             self,
             prerequisite_expression: 'PrerequisiteExpression',
-            node: 'NodeLearningUnitYear'
+            node_having_prerequisites: 'NodeLearningUnitYear'
     ) -> List['BusinessValidationMessage']:
-        """
-        Set prerequisite for the node corresponding to the path.
-        """
-        is_valid, messages = self.clean_set_prerequisite(prerequisite_expression, node)
-        if is_valid:
-            node.set_prerequisite(
-                prerequisite.factory.from_expression(
-                    prerequisite_expression=prerequisite_expression,
-                    node_having_prerequisites=node,
-                    context_tree=self.entity_id
-                )
-            )
-        return messages
-
-    def clean_set_prerequisite(
-            self,
-            prerequisite_expression: 'PrerequisiteExpression',
-            node: 'NodeLearningUnitYear'
-    ) -> (bool, List['BusinessValidationMessage']):
-        validator = validators_by_business_action.UpdatePrerequisiteValidatorList(prerequisite_expression, node, self)
-        return validator.is_valid(), validator.messages
+        return self.prerequisites.set_prerequisite(node_having_prerequisites, prerequisite_expression, self)
 
     def get_remaining_children_after_detach(self, path_node_to_detach: 'Path'):
         children_with_counter = self.root_node.get_all_children_with_counter()
@@ -630,6 +610,9 @@ class ProgramTree(interface.RootEntity):
 
     def contains(self, node: Node) -> bool:
         return node in self.get_all_nodes()
+
+    def get_all_prerequisites(self) -> List['Prerequisite']:
+        return self.prerequisites.prerequisites
 
     def has_prerequisites(self, node: 'NodeLearningUnitYear') -> bool:
         return self.prerequisites.has_prerequisites(node)

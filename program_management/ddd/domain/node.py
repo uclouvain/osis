@@ -530,7 +530,7 @@ class NodeLearningUnitYear(Node):
     is_prerequisite_of = attr.ib(type=List, factory=list)
     status = attr.ib(type=bool, default=None)
     periodicity = attr.ib(type=PeriodicityEnum, default=None)
-    prerequisite = attr.ib(type=Prerequisite, default=NullPrerequisite(None))  # FIXME :: replace None by TreeIdentity
+    prerequisite = attr.ib(type=Prerequisite, default=NullPrerequisite(None, None))  # FIXME :: to remove
     common_title_fr = attr.ib(type=str, default=None)
     specific_title_fr = attr.ib(type=str, default=None)
     common_title_en = attr.ib(type=str, default=None)
@@ -557,10 +557,6 @@ class NodeLearningUnitYear(Node):
     @property
     def has_proposal(self) -> bool:
         return bool(self.proposal_type)
-
-    def set_prerequisite(self, prerequisite: Prerequisite):
-        self.prerequisite = prerequisite
-        self.prerequisite.has_changed = True
 
     def remove_all_prerequisite_items(self) -> None:
         self.prerequisite.remove_all_prerequisite_items()

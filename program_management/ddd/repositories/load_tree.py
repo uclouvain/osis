@@ -166,7 +166,7 @@ def __build_tree(
         authorized_relationships=load_authorized_relationship.load(),
         prerequisites=Prerequisites(
             context_tree=ProgramTreeIdentity(code=root_node.code, year=root_node.year),
-            prerequisites=prerequisites['has_prerequisite_dict'].values(),  # FIXME :: to unit test !
+            prerequisites=list(prerequisites['has_prerequisite_dict'].values()),  # FIXME :: to unit test !
         ),
     )
     return tree
@@ -208,7 +208,7 @@ def __build_children(
             #  It's because prerequisites should be an attribute of the ProgramTree, not of the Node.
             child_node = copy.copy(child_node)
             link_node = copy.copy(link_node)
-            child_node.prerequisite = prerequisites['has_prerequisite_dict'].get(child_node.pk, NullPrerequisite(None))  # FIXME :: add ProgramTreeIdentity (root) instance
+            child_node.prerequisite = prerequisites['has_prerequisite_dict'].get(child_node.pk, NullPrerequisite(None, None))  # FIXME :: add ProgramTreeIdentity (root) instance
             child_node.is_prerequisite_of = prerequisites['is_prerequisite_dict'].get(child_node.pk, [])
 
         link_node.parent = nodes[parent_id]

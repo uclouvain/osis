@@ -36,6 +36,7 @@ from django.utils.translation import gettext as _
 from base.utils.cache import cached_result
 from osis_common.ddd import interface
 from program_management.ddd.business_types import *
+from program_management.ddd.validators import validators_by_business_action
 
 
 AND_OPERATOR = "ET"
@@ -147,13 +148,12 @@ class Prerequisite:
         return OR if self.main_operator == AND else AND
 
 
-#  FIXMe :: to remove
 class NullPrerequisite(Prerequisite):
-    def __init__(self, context_tree: 'ProgramTreeIdentity'):
+    def __init__(self, context_tree: 'ProgramTreeIdentity', node_having_prerequisites: 'NodeIdentity'):
         super().__init__(
             main_operator=prerequisite_operator.AND,
             context_tree=context_tree,
-            node_having_prerequisites=None,  # FIXME :: if not removing NullPrerequisite, then should add node_having_prerequisites into __init__
+            node_having_prerequisites=node_having_prerequisites,
             prerequisite_item_groups=None,
         )
 
@@ -167,12 +167,12 @@ class NullPrerequisite(Prerequisite):
 class PrerequisiteFactory:
     def from_expression(
             self,
-            prerequisite_expression: PrerequisiteExpression,
+            prerequisite_expression: 'PrerequisiteExpression',
             node_having_prerequisites: 'NodeIdentity',
             context_tree: 'ProgramTreeIdentity'
     ) -> Prerequisite:
         if not prerequisite_expression:
-            return NullPrerequisite(context_tree)  # FIXME :: to remove
+            return NullPrerequisite(context_tree, node_having_prerequisites)
 
         main_operator = self._detect_main_operator_in_string(prerequisite_expression)
         secondary_operator = AND if main_operator == OR else OR
@@ -242,6 +242,42 @@ class Prerequisites(interface.RootEntity):
 
     def get_prerequisite(self, node: 'NodeLearningUnitYear'):
         return self._map_node_identity_prerequisite().get(node.entity_id)
+
+    def set_prerequisite(
+            self,
+            node_having_prerequisites: 'NodeLearningUnitYear',
+            prerequisite_expression: 'PrerequisiteExpression',
+            context_tree: 'ProgramTree'
+    ):
+        is_valid, messages = self.__clean_set_prerequisite(
+            prerequisite_expression,
+            node_having_prerequisites,
+            context_tree
+        )
+        if is_valid:
+            new_prerequisite = factory.from_expression(
+                prerequisite_expression=prerequisite_expression,
+                node_having_prerequisites=node_having_prerequisites.entity_id,
+                context_tree=context_tree.entity_id
+            )
+            new_prerequisite.has_changed = True
+            if new_prerequisite in self.prerequisites:
+                self.prerequisites.remove(new_prerequisite)
+            self.prerequisites.append(new_prerequisite)
+        return messages
+
+    @staticmethod
+    def __clean_set_prerequisite(
+            prerequisite_expression: 'PrerequisiteExpression',
+            node: 'NodeLearningUnitYear',
+            context_tree: 'ProgramTree'
+    ) -> (bool, List['BusinessValidationMessage']):
+        validator = validators_by_business_action.UpdatePrerequisiteValidatorList(
+            prerequisite_expression,
+            node,
+            context_tree
+        )
+        return validator.is_valid(), validator.messages
 
     @cached_result
     def __map_is_prerequisite_of(self) -> Dict['NodeIdentity', List['NodeIdentity']]:

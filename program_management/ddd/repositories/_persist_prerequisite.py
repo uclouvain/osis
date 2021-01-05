@@ -31,15 +31,14 @@ from program_management.models.enums.node_type import NodeType
 
 
 def persist(tree: 'ProgramTree'):
-    all_learning_unit_nodes = tree.get_all_learning_unit_nodes()
-    learning_unit_nodes_modified = [node for node in all_learning_unit_nodes if node.prerequisite.has_changed]
-    for node in learning_unit_nodes_modified:
-        _persist(tree.root_node, node)
+    prerequisites_changed = [prerequisite for prerequisite in tree.get_all_prerequisites() if prerequisite.has_changed]
+    for prerequisite in prerequisites_changed:
+        _persist(tree.root_node, prerequisite)
 
 
 def _persist(
-        node_group_year: NodeGroupYear,
-        node_learning_unit_year_obj: NodeLearningUnitYear,
+        node_group_year: 'NodeGroupYear',
+        prerequisite: 'Prerequisite',
 ) -> None:
     try:
         education_group_version_obj = EducationGroupVersion.objects.get(root_group__element__pk=node_group_year.node_id)
@@ -47,9 +46,9 @@ def _persist(
         return
 
     learning_unit_year_obj = learning_unit_year.LearningUnitYear.objects.get(
-        element__id=node_learning_unit_year_obj.node_id
+        acronym=prerequisite.node_having_prerequisites.code,
+        academic_year__year=prerequisite.node_having_prerequisites.year,
     )
-    prerequisite = node_learning_unit_year_obj.prerequisite
 
     prerequisite_model_obj, created = prerequisite_model.Prerequisite.objects.update_or_create(
         education_group_version=education_group_version_obj,
@@ -61,12 +60,6 @@ def _persist(
         _persist_prerequisite_items(prerequisite_model_obj, prerequisite)
     else:
         prerequisite_model_obj.delete()
-
-
-def _delete_prerequisite_items(prerequisite_model_obj: prerequisite_model.Prerequisite):
-    items = prerequisite_model_obj.prerequisiteitem_set.all()
-    for item in items:
-        item.delete()
 
 
 def _persist_prerequisite_items(
@@ -85,6 +78,12 @@ def _persist_prerequisite_items(
                 group_number=group_number,
                 position=position,
             )
+
+
+def _delete_prerequisite_items(prerequisite_model_obj: prerequisite_model.Prerequisite):
+    items = prerequisite_model_obj.prerequisiteitem_set.all()
+    for item in items:
+        item.delete()
 
 
 def _get_learning_unit_of_prerequisite_item(prerequisite_item_domain_obj: prerequisite_domain.PrerequisiteItem):
