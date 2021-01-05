@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -34,7 +34,6 @@ from base.models.academic_year import AcademicYear, starting_academic_year
 from base.models.enums import quadrimesters, learning_unit_year_subtypes, active_status, learning_container_year_types
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
-from base.models.learning_component_year import LearningComponentYear
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.views.learning_units.search.common import SearchTypes
 from attribution.models.enums.decision_making import DecisionMakings
