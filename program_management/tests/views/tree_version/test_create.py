@@ -28,6 +28,8 @@ from django.http import HttpResponse, HttpResponseForbidden
 from django.test import TestCase
 from django.urls import reverse
 
+from base.models.enums import academic_calendar_type
+from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_type import TrainingEducationGroupTypeFactory, \
     MiniTrainingEducationGroupTypeFactory
@@ -46,6 +48,10 @@ class TestGetCreateProgramTreeVersion(TestCase):
         AcademicYearFactory.produce_in_future(cls.current_academic_year.year, 10)
 
         cls.central_manager = CentralManagerFactory()
+        OpenAcademicCalendarFactory(
+            reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT,
+            data_year=cls.current_academic_year
+        )
         cls.factulty_manager = FacultyManagerFactory(entity=cls.central_manager.entity)
 
         cls.training_type = TrainingEducationGroupTypeFactory()

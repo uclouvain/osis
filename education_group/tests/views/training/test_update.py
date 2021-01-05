@@ -54,6 +54,10 @@ class TestTrainingUpdateView(TestCase):
         )
         cls.training = TrainingFactory()
         cls.egy = EducationGroupYearFactory(partial_acronym=cls.training.code, academic_year__year=cls.training.year)
+        OpenAcademicCalendarFactory(
+            reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT,
+            data_year=cls.egy.academic_year
+        )
         cls.central_manager = CentralManagerFactory(entity=cls.egy.management_entity)
 
     def setUp(self):

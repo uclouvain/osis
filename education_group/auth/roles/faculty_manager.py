@@ -120,9 +120,6 @@ class FacultyManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
                 predicates.is_user_attached_to_management_entity &
                 predicates.is_education_group_type_authorized_according_to_user_scope &
                 (predicates.is_continuing_education_group_year | predicates.is_program_edition_period_open),
-            'base.change_educationgrouporganization': osis_role_predicates.always_deny(
-                    message=_('Coorganization can only be changed by central manager')
-                ),
             'base.add_educationgroupachievement':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_user_attached_to_management_entity &
@@ -135,7 +132,6 @@ class FacultyManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_user_attached_to_management_entity &
                 predicates.is_education_group_type_authorized_according_to_user_scope,
-            'base.can_edit_education_group_administrative_data': rules.always_deny,
             'base.change_link_data':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_user_attached_to_management_entity &
