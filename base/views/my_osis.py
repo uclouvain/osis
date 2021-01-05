@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -40,6 +40,7 @@ from base import models as mdl
 from base.forms.my_message import MyMessageActionForm, MyMessageForm
 from base.models.academic_year import starting_academic_year
 from base.models.education_group_year import EducationGroupYear
+from base.models.learning_unit_year import LearningUnitYear
 from osis_common.models import message_history as message_history_mdl
 
 
@@ -147,7 +148,7 @@ def _get_data(request):
     return {'person': person,
             'addresses': mdl.person_address.find_by_person(person),
             'tutor': tutor,
-            'attributions': mdl_attr.attribution.search(tutor=tutor) if tutor else None,
+            'learning_unit_years_attributed': _get_learning_unit_years_attributed(tutor),
             'programs': programs,
             'supported_languages': settings.LANGUAGES,
             'default_language': settings.LANGUAGE_CODE,
@@ -162,3 +163,15 @@ def get_messages_formset(my_messages):
                                 'read': message_hist.read_by_user
                                 } for message_hist in my_messages]
     return formset_factory(MyMessageForm, extra=0)(initial=initial_formset_content)
+
+
+def _get_learning_unit_years_attributed(tutor):
+    attributions = mdl_attr.attribution_new.search(tutor=tutor) if tutor else None
+    luy_attributions = []
+    if attributions:
+        for attr in attributions.order_by('learning_container_year__academic_year', 'learning_container_year__acronym'):
+            learning_unit_years = LearningUnitYear.objects.filter(learning_container_year=attr.learning_container_year)
+            for learning_unit_year in learning_unit_years:
+                if learning_unit_year not in luy_attributions:
+                    luy_attributions.append(learning_unit_year)
+    return luy_attributions

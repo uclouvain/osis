@@ -28,6 +28,7 @@ import string
 import factory.fuzzy
 from faker import Faker
 
+from attribution.models.enums.decision_making import DecisionMakings
 from attribution.models.enums.function import Functions
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.tutor import TutorFactory
@@ -51,3 +52,7 @@ class AttributionNewFactory(factory.django.DjangoModelFactory):
     score_responsible = False
     learning_container_year = factory.SubFactory(LearningContainerYearFactory)
     decision_making = ''
+
+
+class AttributionNewWithDecisionFactory(AttributionNewFactory):
+    decision_making = factory.Iterator(DecisionMakings.choices(), getter=lambda c: c[0])

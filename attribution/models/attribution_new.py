@@ -93,7 +93,7 @@ class AttributionNew(models.Model):
 
 
 def search(*args, **kwargs):
-    qs = AttributionNew.objects.all()
+    qs = AttributionNew.objects_attributions.all()
     if "learning_container_year" in kwargs:
         qs = filter_with_list_or_object('learning_container_year', AttributionNew, **kwargs)
     if "tutor" in kwargs:
