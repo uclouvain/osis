@@ -166,8 +166,10 @@ class TestPropositionComparisonXls(TestCase):
         cls.original_learning_unit_year_1 = copy.deepcopy(cls.learning_unit_year_1)
 
         cls.academic_year = cls.learning_unit_year_1.academic_year
-        cls.proposal = ProposalLearningUnitFactory(learning_unit_year=cls.learning_unit_year_1,
-                                                   initial_data={"faculty_remark": "First remark"})
+        cls.proposal = ProposalLearningUnitFactory(
+            learning_unit_year=cls.learning_unit_year_1,
+            initial_data={"learning_unit_year": {"faculty_remark": "First remark"}}
+        )
 
     def test_get_proposal_data(self):
         practical_component = LearningComponentYear.objects.filter(
