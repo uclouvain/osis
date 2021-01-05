@@ -9,10 +9,10 @@ servers:
          - qa # Staging server
          - test # Test server
  - url: https://osis.uclouvain.be/api/v1/education_group/
-   description: Production server
+   description: 'Production server'
 info:
-  version: '1'
-  title: Education Group Service
+  version: '1.01'
+  title: 'Education Group Service'
   description: |-
     A set of API endpoints that allow you to get, update, delete an education group.
 paths:
@@ -1412,26 +1412,26 @@ components:
     ActiveEnum:
       type: string
       enum:
-        - ACTIVE
-        - INACTIVE
-        - RE_REGISTRATION
+        - 'ACTIVE'
+        - 'INACTIVE'
+        - 'RE_REGISTRATION'
     NodeTypeEnum:
       type: string
       enum:
-        - GROUP
-        - TRAINING
-        - MINI_TRAINING
-        - LEARNING_UNIT
+        - 'GROUP'
+        - 'TRAINING'
+        - 'MINI_TRAINING'
+        - 'LEARNING_UNIT'
     LearningUnitTypeEnum:
       type: string
       enum:
-        - COURSE
-        - INTERNSHIP
-        - DISSERTATION
-        - OTHER_COLLECTIVE
-        - OTHER_INDIVIDUAL
-        - MASTER_THESIS
-        - EXTERNAL
+        - 'COURSE'
+        - 'INTERNSHIP'
+        - 'DISSERTATION'
+        - 'OTHER_COLLECTIVE'
+        - 'OTHER_INDIVIDUAL'
+        - 'MASTER_THESIS'
+        - 'EXTERNAL'
     NodeSubTypeEnum:
       allOf:
         - $ref: '#/components/schemas/LearningUnitTypeEnum'
@@ -1441,168 +1441,154 @@ components:
     NodeLinkTypeEnum:
       type: string
       enum:
-        - REFERENCE
+        - 'REFERENCE'
     InternshipPresenceEnum:
       type: string
       enum:
-        - YES
-        - NO
-        - OPTIONAL
+        - 'YES'
+        - 'NO'
+        - 'OPTIONAL'
     ScheduleTypeEnum:
       type: string
       enum:
-        - DAILY
-        - SHIFTED
-        - ADAPTED
+        - 'DAILY'
+        - 'SHIFTED'
+        - 'ADAPTED'
     ActivityPresenceEnum:
       type: string
       enum:
-        - YES
-        - NO
-        - OPTIONAL
+        - 'YES'
+        - 'NO'
+        - 'OPTIONAL'
     PrintOrientationEnum:
       type: string
       enum:
-        - NO_PRINT
-        - IN_HEADING_2_OF_DIPLOMA
-        - IN_EXPECTED_FORM
+        - 'NO_PRINT'
+        - 'IN_HEADING_2_OF_DIPLOMA'
+        - 'IN_EXPECTED_FORM'
     DurationUnitEnum:
       type: string
       enum:
-        - QUADRIMESTER
-        - TRIMESTER
-        - MONTH
-        - WEEK
-        - DAY
+        - 'QUADRIMESTER'
+        - 'TRIMESTER'
+        - 'MONTH'
+        - 'WEEK'
+        - 'DAY'
     ConstraintTypeEnum:
       type: string
       enum:
-        - CREDITS
-        - NUMBER_OF_ELEMENTS
+        - 'CREDITS'
+        - 'NUMBER_OF_ELEMENTS'
     DecreeCategoryEnum:
       type: string
       enum:
-        - FCONT
-        - BAS1
-        - BAS2
-        - AESS
-        - DEC1
-        - DEC2
-        - DES
-        - DEA
-        - DOC
-        - AES
-        - AUTRE
-        - BAC
-        - AP2C
-        - MA1
-        - MA2X
-        - MA2D
-        - MA2S
-        - MA2A
-        - MA2M
-        - AS2C
-        - MACO
-        - AESSB
-        - CAPS
-        - AS3C
-        - FODO
-        - DOCB
-        - CEMC
-        - MED
-        - VETE
+        - 'FCONT'
+        - 'DOC'
+        - 'BAC'
+        - 'MA1'
+        - 'MA2X'
+        - 'MA2D'
+        - 'MA2S'
+        - 'MA2A'
+        - 'MA2M'
+        - 'MACO'
+        - 'AESSB'
+        - 'CAPS'
+        - 'FODO'
+        - 'DOCB'
+        - 'CEMC'
     RateCodeEnum:
       type: string
       enum:
-        - NO_ADDITIONAL_FEES
-        - AESS_CAPAES
-        - MINERVAL_COMPLETE
-        - UNIVERSITY_CERTIFICATE
-        - ADVANCED_MASTER_IN_MEDICAL_SPECIALIZATION
-        - ACCESS_CONTEST
-        - UNIVERSITY_CERTIFICATE_30_CREDITS
-        - CERTIFICATE_MEDECINE_COMPETENCE
+        - 'NO_ADDITIONAL_FEES'
+        - 'AESS_CAPAES'
+        - 'MINERVAL_COMPLETE'
+        - 'UNIVERSITY_CERTIFICATE'
+        - 'ADVANCED_MASTER_IN_MEDICAL_SPECIALIZATION'
+        - 'ACCESS_CONTEST'
+        - 'UNIVERSITY_CERTIFICATE_30_CREDITS'
+        - 'CERTIFICATE_MEDECINE_COMPETENCE'
     TrainingTypeEnum:
       type: string
       enum:
-        - AGGREGATION
-        - CERTIFICATE_OF_PARTICIPATION
-        - CERTIFICATE_OF_SUCCESS
-        - CERTIFICATE_OF_HOLDING_CREDITS
-        - BACHELOR
-        - CERTIFICATE
-        - CAPAES
-        - RESEARCH_CERTIFICATE
-        - UNIVERSITY_FIRST_CYCLE_CERTIFICATE
-        - UNIVERSITY_SECOND_CYCLE_CERTIFICATE
-        - ACCESS_CONTEST
-        - LANGUAGE_CLASS
-        - ISOLATED_CLASS
-        - PHD
-        - FORMATION_PHD
-        - JUNIOR_YEAR
-        - PGRM_MASTER_120
-        - MASTER_MA_120
-        - MASTER_MD_120
-        - MASTER_MS_120
-        - PGRM_MASTER_180_240
-        - MASTER_MA_180_240
-        - MASTER_MD_180_240
-        - MASTER_MS_180_240
-        - MASTER_M1
-        - MASTER_MC
-        - INTERNSHIP
+        - 'AGGREGATION'
+        - 'CERTIFICATE_OF_PARTICIPATION'
+        - 'CERTIFICATE_OF_SUCCESS'
+        - 'CERTIFICATE_OF_HOLDING_CREDITS'
+        - 'BACHELOR'
+        - 'CERTIFICATE'
+        - 'CAPAES'
+        - 'RESEARCH_CERTIFICATE'
+        - 'UNIVERSITY_FIRST_CYCLE_CERTIFICATE'
+        - 'UNIVERSITY_SECOND_CYCLE_CERTIFICATE'
+        - 'ACCESS_CONTEST'
+        - 'LANGUAGE_CLASS'
+        - 'ISOLATED_CLASS'
+        - 'PHD'
+        - 'FORMATION_PHD'
+        - 'JUNIOR_YEAR'
+        - 'PGRM_MASTER_120'
+        - 'MASTER_MA_120'
+        - 'MASTER_MD_120'
+        - 'MASTER_MS_120'
+        - 'PGRM_MASTER_180_240'
+        - 'MASTER_MA_180_240'
+        - 'MASTER_MD_180_240'
+        - 'MASTER_MS_180_240'
+        - 'MASTER_M1'
+        - 'MASTER_MC'
+        - 'INTERNSHIP'
     GroupTypeEnum:
       type: string
       enum:
-        - COMMON_CORE
-        - MINOR_LIST_CHOICE
-        - MAJOR_LIST_CHOICE
-        - OPTION_LIST_CHOICE
-        - FINALITY_120_LIST_CHOICE
-        - FINALITY_180_LIST_CHOICE
-        - MOBILITY_PARTNERSHIP_LIST_CHOICE
-        - COMPLEMENTARY_MODULE
-        - SUB_GROUP
+        - 'COMMON_CORE'
+        - 'MINOR_LIST_CHOICE'
+        - 'MAJOR_LIST_CHOICE'
+        - 'OPTION_LIST_CHOICE'
+        - 'FINALITY_120_LIST_CHOICE'
+        - 'FINALITY_180_LIST_CHOICE'
+        - 'MOBILITY_PARTNERSHIP_LIST_CHOICE'
+        - 'COMPLEMENTARY_MODULE'
+        - 'SUB_GROUP'
     MiniTrainingTypeEnum:
       type: string
       enum:
-        - DEEPENING
-        - SOCIETY_MINOR
-        - ACCESS_MINOR
-        - OPEN_MINOR
-        - DISCIPLINARY_COMPLEMENT_MINOR
-        - FSA_SPECIALITY
-        - OPTION
-        - MOBILITY_PARTNERSHIP
+        - 'DEEPENING'
+        - 'SOCIETY_MINOR'
+        - 'ACCESS_MINOR'
+        - 'OPEN_MINOR'
+        - 'DISCIPLINARY_COMPLEMENT_MINOR'
+        - 'FSA_SPECIALITY'
+        - 'OPTION'
+        - 'MOBILITY_PARTNERSHIP'
     AcademicTypeEnum:
       type: string
       enum:
-        - NON_ACADEMIC
-        - NON_ACADEMIC_CREF
-        - ACADEMIC
+        - 'NON_ACADEMIC'
+        - 'NON_ACADEMIC_CREF'
+        - 'ACADEMIC'
     QuadrimesterEnum:
       type: string
       enum:
-        - Q1
-        - Q2
-        - Q3
-        - Q1and2
-        - Q1or2
+        - 'Q1'
+        - 'Q2'
+        - 'Q3'
+        - 'Q1and2'
+        - 'Q1or2'
     PeriodicityEnum:
       type: string
       enum:
-        - ANNUAL
-        - BIENNIAL_EVEN
-        - BIENNIAL_ODD
+        - 'ANNUAL'
+        - 'BIENNIAL_EVEN'
+        - 'BIENNIAL_ODD'
     ProposalTypeEnum:
       type: string
       enum:
-        - CREATION
-        - MODIFICATION
-        - TRANSFORMATION
-        - SUPPRESSION
-        - TRANSFORMATION_AND_MODIFICATION
+        - 'CREATION'
+        - 'MODIFICATION'
+        - 'TRANSFORMATION'
+        - 'SUPPRESSION'
+        - 'TRANSFORMATION_AND_MODIFICATION'
     Error:
       type: object
       properties:
