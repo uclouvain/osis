@@ -22,21 +22,19 @@
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
 import re
-from typing import List
 
 from program_management.ddd.business_types import *
 from django.utils.translation import gettext_lazy as _
 
 from base.ddd.utils.business_validator import BusinessValidator
-from program_management.ddd.domain.node import NodeLearningUnitYear
-from program_management.ddd.domain.prerequisite import PrerequisiteExpression, ACRONYM_REGEX
+from program_management.ddd.domain import prerequisite
 
 
 class PrerequisiteItemsValidator(BusinessValidator):
     def __init__(
             self,
-            prerequisite_string: PrerequisiteExpression,
-            node: NodeLearningUnitYear,
+            prerequisite_string: 'PrerequisiteExpression',
+            node: 'NodeLearningUnitYear',
             program_tree: 'ProgramTree'
     ):
         super().__init__()
@@ -82,4 +80,4 @@ class PrerequisiteItemsValidator(BusinessValidator):
             )
 
     def _extract_acronyms(self):
-        return re.findall(ACRONYM_REGEX, self.prerequisite_string)
+        return re.findall(prerequisite.ACRONYM_REGEX, self.prerequisite_string)

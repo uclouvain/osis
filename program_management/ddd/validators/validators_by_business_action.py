@@ -210,10 +210,10 @@ class UpdatePrerequisiteValidatorList(business_validator.BusinessListValidator):
 
 
 class DeleteProgramTreeValidatorList(business_validator.BusinessListValidator):
-    def __init__(self, program_tree: 'ProgramTree'):
+    def __init__(self, program_tree: 'ProgramTree', tree_repository: 'ProgramTreeRepository'):
         self.validators = [
             EmptyProgramTreeValidator(program_tree),
-            NodeHaveLinkValidator(program_tree.root_node)
+            NodeHaveLinkValidator(program_tree.root_node, tree_repository)
         ]
         super().__init__()
 
