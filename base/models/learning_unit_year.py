@@ -254,6 +254,7 @@ class LearningUnitYear(SerializableModel):
         null=True,
         verbose_name=_('Other remark (intended for publication)')
     )
+    faculty_remark = models.TextField(blank=True, null=True, verbose_name=_('Faculty remark (unpublished)'))
 
     objects = BaseLearningUnitYearManager()
     objects_with_container = LearningUnitYearWithContainerManager()

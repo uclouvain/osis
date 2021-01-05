@@ -3,15 +3,19 @@
 from django.db import migrations, models
 
 
-def copy_other_remark_from_lu_to_luy(apps, schema_editor):
+def copy_remarks_from_lu_to_luy(apps, schema_editor):
     LearningUnit = apps.get_model('base', 'LearningUnit')
     LearningUnitYear = apps.get_model('base', 'LearningUnitYear')
-    lus = LearningUnit.objects.filter(other_remark__isnull=False)
+    lus = LearningUnit.objects.all()
     for lu in lus:
         luys = lu.learningunityear_set.all()
         for luy in luys:
-            luy.other_remark = lu.other_remark
-        LearningUnitYear.objects.bulk_update(luys, ['other_remark'])
+            if lu.faculty_remark:
+                luy.faculty_remark = lu.faculty_remark
+            elif lu.other_remark:
+                luy.faculty_remark = lu.other_remark
+
+        LearningUnitYear.objects.bulk_update(luys, ['faculty_remark'])
 
 
 class Migration(migrations.Migration):
@@ -22,12 +26,17 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name='learningunityear',
+            name='faculty_remark',
+            field=models.TextField(blank=True, null=True, verbose_name='Faculty remark (unpublished)'),
+        ),
+        migrations.AddField(
+            model_name='learningunityear',
             name='other_remark',
             field=models.TextField(blank=True, null=True, verbose_name='Other remark (intended for publication)'),
         ),
-        migrations.RunPython(copy_other_remark_from_lu_to_luy),
+        migrations.RunPython(copy_remarks_from_lu_to_luy),
         migrations.RemoveField(
             model_name='learningunit',
-            name='other_remark',
-        )
+            name='faculty_remark',
+        ),
     ]

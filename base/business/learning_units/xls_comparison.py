@@ -231,7 +231,7 @@ def _get_data(learning_unit_yr, new_line, first_data, partims=True, proposal_com
         data.append(get_partims_as_str(learning_unit_yr.get_partims_related()))
     data.extend(
         [
-            get_representing_string(learning_unit_yr.learning_unit.faculty_remark),
+            get_representing_string(learning_unit_yr.faculty_remark),
             get_representing_string(learning_unit_yr.other_remark),
             _('Yes') if learning_unit_yr.learning_container_year.team else _('No'),
             _('Yes') if learning_unit_yr.learning_container_year.is_vacant else _('No'),
@@ -401,7 +401,7 @@ def _get_data_from_initial_data(initial_data, proposal_comparison=False):
         _('Yes') if luy_initial.get('professional_integration') else _('No'),
         organization.name if organization else BLANK_VALUE,
         campus if campus else BLANK_VALUE,
-        get_representing_string(lu_initial.get('faculty_remark')),
+        get_representing_string(luy_initial.get('faculty_remark')),
         get_representing_string(luy_initial.get('other_remark')),
         _('Yes') if lcy_initial.get('team') else _('No'),
         _('Yes') if lcy_initial.get('is_vacant') else _('No'),

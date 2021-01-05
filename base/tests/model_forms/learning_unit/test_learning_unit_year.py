@@ -142,6 +142,10 @@ class TestLearningUnitYearModelFormSave(TestCase):
             'periodicity': ANNUAL,
             'other_remark': """And then her heart changed, or at least she understood it; 
     and the winter passed, and the sun shone upon her.""",
+            'faculty_remark': """Many that live deserve death. 
+    And some that die deserve life. 
+    Can you give it to them? 
+    Then do not be too eager to deal out death in judgement.""",
 
             # Learning component year data model form
             'form-TOTAL_FORMS': '2',
@@ -203,6 +207,7 @@ class TestLearningUnitYearModelFormSave(TestCase):
         self.assertEqual(luy.internship_subtype, self.post_data['internship_subtype'])
         self.assertEqual(luy.attribution_procedure, self.post_data['attribution_procedure'])
         self.assertEqual(luy.other_remark, self.post_data['other_remark'])
+        self.assertEqual(luy.faculty_remark, self.post_data['faculty_remark'])
 
     def test_case_update_post_data_correctly_saved(self):
         learning_unit_year_to_update = LearningUnitYearFactory(

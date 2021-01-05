@@ -108,7 +108,7 @@ class TestComparisonXls(TestCase):
             self.assertEqual(data[0][20], BLANK_VALUE)
             self.assertEqual(data[0][21], BLANK_VALUE)
         self.assertEqual(data[0][22], self.partim.subdivision)
-        self.assertEqual(data[0][23], learning_unit_yr.learning_unit.faculty_remark or BLANK_VALUE)
+        self.assertEqual(data[0][23], learning_unit_yr.faculty_remark or BLANK_VALUE)
         self.assertEqual(data[0][24], learning_unit_yr.other_remark or BLANK_VALUE)
         self.assertEqual(data[0][25], _('Yes') if learning_unit_yr.learning_container_year.team else _('No'))
         self.assertEqual(data[0][26], _('Yes') if learning_unit_yr.learning_container_year.is_vacant else _('No'))
@@ -167,7 +167,7 @@ class TestPropositionComparisonXls(TestCase):
 
         cls.academic_year = cls.learning_unit_year_1.academic_year
         cls.proposal = ProposalLearningUnitFactory(learning_unit_year=cls.learning_unit_year_1,
-                                                   initial_data={"learning_unit": {"faculty_remark": "First remark"}})
+                                                   initial_data={"faculty_remark": "First remark"})
 
     def test_get_proposal_data(self):
         practical_component = LearningComponentYear.objects.filter(
@@ -216,7 +216,7 @@ class TestPropositionComparisonXls(TestCase):
         else:
             self.assertEqual(data[21], BLANK_VALUE)
             self.assertEqual(data[22], BLANK_VALUE)
-        self.assertEqual(data[23], self.learning_unit_year_1.learning_unit.faculty_remark or BLANK_VALUE)
+        self.assertEqual(data[23], self.learning_unit_year_1.faculty_remark or BLANK_VALUE)
         self.assertEqual(data[24], self.learning_unit_year_1.other_remark or BLANK_VALUE)
         self.assertEqual(data[25], _('Yes') if self.learning_unit_year_1.learning_container_year.team else _('No'))
         self.assertEqual(data[26], _('Yes') if self.learning_unit_year_1.learning_container_year.is_vacant else _('No'))
@@ -308,7 +308,7 @@ class TestPropositionComparisonXls(TestCase):
         else:
             to_test.append((data[21], BLANK_VALUE))
             to_test.append((data[22], BLANK_VALUE))
-        to_test.append((data[23], self.original_learning_unit_year_1.learning_unit.faculty_remark or BLANK_VALUE))
+        to_test.append((data[23], self.original_learning_unit_year_1.faculty_remark or BLANK_VALUE))
         to_test.append((data[24], self.original_learning_unit_year_1.other_remark or BLANK_VALUE))
         to_test.append((data[25],
                         _('Yes') if self.original_learning_unit_year_1.learning_container_year.team else _('No')))

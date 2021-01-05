@@ -49,7 +49,6 @@ class LearningUnitFactory(DjangoModelFactory):
     changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1), datetime.datetime(2017, 3, 1))
     start_year = factory.SubFactory(AcademicYearFactory, year=factory.fuzzy.FuzzyInteger(2000, timezone.now().year))
     end_year = None
-    faculty_remark = factory.fuzzy.FuzzyText(length=255)
 
 
 class LearningUnitFactoryWithAnnualizedData(LearningUnitFactory):

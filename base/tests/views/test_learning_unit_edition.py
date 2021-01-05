@@ -290,7 +290,7 @@ class TestEditLearningUnit(TestCase):
                 "other_remark": self.learning_unit_year.other_remark
             },
             'learning_unit_form': {
-                "faculty_remark": self.learning_unit_year.learning_unit.faculty_remark,
+                "faculty_remark": self.learning_unit_year.faculty_remark,
             }
         }
         for form_name, expected_initial in expected_initials.items():
