@@ -54,18 +54,25 @@ class TestIsPrerequisiteValidator(TestValidatorValidateMixin, SimpleTestCase):
 
     def test_should_not_raise_exception_when_children_of_node_to_detach_are_not_prerequisites(self):
         node_to_detach = self.common_core
-        LinkFactory(parent=self.common_core, child=NodeLearningUnitYearFactory(is_prerequisite_of=[]))
-        LinkFactory(parent=self.common_core, child=NodeLearningUnitYearFactory(is_prerequisite_of=[]))
+        LinkFactory(parent=self.common_core, child=NodeLearningUnitYearFactory())
+        LinkFactory(parent=self.common_core, child=NodeLearningUnitYearFactory())
 
         validator = _IsPrerequisiteValidator(self.tree, node_to_detach)
         self.assertValidatorNotRaises(validator)
 
     def test_should_raise_exception_when_children_of_node_to_detach_are_prerequisites(self):
         node_to_detach = self.common_core
-        link = LinkFactory(parent=self.tree.root_node, child=NodeLearningUnitYearFactory(is_prerequisite_of=[]))
+        link = LinkFactory(
+            parent=self.tree.root_node,
+            child=NodeLearningUnitYearFactory(year=self.node_learning_unit.year)
+        )
         link_with_child_that_is_prerequisite = LinkFactory(
             parent=self.common_core,
-            child=NodeLearningUnitYearFactory(is_prerequisite_of=[link.child])
+            child=NodeLearningUnitYearFactory(code="LOSIS2222", year=self.node_learning_unit.year)
+        )
+        self.tree.set_prerequisite(
+            prerequisite_expression="LOSIS2222",
+            node_having_prerequisites=link.child
         )
 
         with self.assertRaises(CannotDetachLearningUnitsWhoArePrerequisiteException):
@@ -74,7 +81,11 @@ class TestIsPrerequisiteValidator(TestValidatorValidateMixin, SimpleTestCase):
     def test_should_raise_exception_when_node_to_detach_is_prerequisite(self):
         link_with_child_is_prerequisite = LinkFactory(
             parent=self.common_core,
-            child=NodeLearningUnitYearFactory(is_prerequisite_of=[self.node_learning_unit])
+            child=NodeLearningUnitYearFactory(code="LOSIS1111", year=self.node_learning_unit.year)
+        )
+        self.tree.set_prerequisite(
+            prerequisite_expression="LOSIS1111",
+            node_having_prerequisites=self.node_learning_unit
         )
         node_to_detach = link_with_child_is_prerequisite.child
 
@@ -82,7 +93,10 @@ class TestIsPrerequisiteValidator(TestValidatorValidateMixin, SimpleTestCase):
             _IsPrerequisiteValidator(self.tree, node_to_detach).validate()
 
     def test_should_not_raise_exception_when_node_to_detach_is_prerequisite_twice(self):
-        learning_unit_that_is_prerequisite = NodeLearningUnitYearFactory(is_prerequisite_of=[self.node_learning_unit])
+        learning_unit_that_is_prerequisite = NodeLearningUnitYearFactory(
+            code="LOSIS1111",
+            year=self.node_learning_unit.year
+        )
         link_with_child_is_prerequisite = LinkFactory(
             parent=self.common_core,
             child=learning_unit_that_is_prerequisite  # learning unit used once
@@ -91,6 +105,11 @@ class TestIsPrerequisiteValidator(TestValidatorValidateMixin, SimpleTestCase):
             parent=self.tree.root_node,
             child=learning_unit_that_is_prerequisite  # learning unit used twice
         )
+        self.tree.set_prerequisite(
+            prerequisite_expression="LOSIS1111",
+            node_having_prerequisites=self.node_learning_unit
+        )
+
         node_to_detach = link_with_child_is_prerequisite.child
 
         assertion = "While the prerequisite is used more than once in the same tree, we can detach it"
