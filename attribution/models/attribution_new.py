@@ -46,6 +46,7 @@ class AttributionNewAdmin(admin.ModelAdmin):
 
     def publish_attribution_to_portal(self, request, queryset):
         from attribution.business import attribution_json
+        queryset = queryset.exclude(decision_making__in=DecisionMakings.get_names())
         global_ids = list(queryset.values_list('tutor__person__global_id', flat=True))
         return attribution_json.publish_to_portal(global_ids)
     publish_attribution_to_portal.short_description = _("Publish attribution to portal")
