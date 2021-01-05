@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-12-09 14:26+0100\n"
+"POT-Creation-Date: 2021-01-05 10:36+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -226,10 +226,6 @@ msgstr "Contenu"
 
 msgid "Content constraint"
 msgstr "Contrainte"
-
-msgid "Coorganization can only be changed by central manager"
-msgstr ""
-"Co-organisation peuvent seulement être modifié par les gestionnaire centraux"
 
 msgid "Copied element"
 msgstr "Élément copié"
@@ -830,9 +826,6 @@ msgstr "Utilisations"
 
 msgid "Validity"
 msgstr "Validité"
-
-msgid "Version name {} already exists"
-msgstr "Le nom de version {} existe déjà"
 
 msgid "Web re-registration"
 msgstr "Ré-inscription par internet"
