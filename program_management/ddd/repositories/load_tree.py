@@ -64,13 +64,11 @@ def load_trees(tree_root_ids: List[int]) -> List['ProgramTree']:
     nodes = __load_tree_nodes(structure)
     links = __load_tree_links(structure)
     has_prerequisites = load_prerequisite.load_has_prerequisite_multiple(tree_root_ids, nodes)
-    is_prerequisites = load_prerequisite.load_is_prerequisite_multiple(tree_root_ids, nodes)
     for tree_root_id in tree_root_ids:
         root_node = load_node.load(tree_root_id)  # TODO : use load_multiple
         nodes[root_node.pk] = root_node
         tree_prerequisites = {
             'has_prerequisite_dict': has_prerequisites.get(tree_root_id) or {},
-            'is_prerequisite_dict': is_prerequisites.get(tree_root_id) or {},
         }
         structure_for_current_root_node = [s for s in structure if s['starting_node_id'] == tree_root_id]
         tree = __build_tree(root_node, structure_for_current_root_node, nodes, links, tree_prerequisites)
@@ -136,17 +134,6 @@ def __load_tree_links(tree_structure: TreeStructure) -> Dict[LinkKey, 'Link']:
     return tree_links
 
 
-#  FIXME :: to remove because unused
-def __load_tree_prerequisites(
-        tree_root_ids: List[int],
-        nodes: Dict[NodeKey, 'Node']
-) -> Dict[str, Dict[TreeRootId, Dict[NodeId, Prerequisite]]]:
-    return {
-        'has_prerequisite_dict': load_prerequisite.load_has_prerequisite_multiple(tree_root_ids, nodes),
-        'is_prerequisite_dict': load_prerequisite.load_is_prerequisite_multiple(tree_root_ids, nodes)
-    }
-
-
 def __build_tree(
         root_node: 'Node',
         tree_structure: TreeStructure,
@@ -192,24 +179,8 @@ def __build_children(
             links,
             prerequisites
         )
-        # FIXME :: should be removed after moving prerequisites into ProgramTree
-        # FIXME Copy links and nodes because it's possible there is a node a present in different trees but
-        #  with different attributes values like prerequisites (cf. OSIS-5281)
-        #  It's because prerequisites should be an attribute of the ProgramTree, not of the Node.
-        if any(child.is_learning_unit() for child in child_node.children_as_nodes):
-            child_node = copy.copy(child_node)
 
         link_node = links['_'.join([str(parent_id), str(child_node.pk)])]
-
-        if child_node.is_learning_unit():
-            # FIXME :: should be removed after moving prerequisites into ProgramTree
-            # FIXME Copy links and nodes because it's possible there is a node a present in different trees but
-            #  with different attributes values like prerequisites (cf. OSIS-5281)
-            #  It's because prerequisites should be an attribute of the ProgramTree, not of the Node.
-            child_node = copy.copy(child_node)
-            link_node = copy.copy(link_node)
-            child_node.prerequisite = prerequisites['has_prerequisite_dict'].get(child_node.pk, NullPrerequisite(None, None))  # FIXME :: add ProgramTreeIdentity (root) instance
-            child_node.is_prerequisite_of = prerequisites['is_prerequisite_dict'].get(child_node.pk, [])
 
         link_node.parent = nodes[parent_id]
         link_node.child = child_node

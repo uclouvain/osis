@@ -236,7 +236,7 @@ class Prerequisites(interface.RootEntity):
     def is_prerequisite(self, node: 'NodeLearningUnitYear') -> bool:
         return bool(self.search_is_prerequisite_of(node))
 
-    def search_is_prerequisite_of(self, search_from_node: 'NodeLearningUnitYear') -> List['NodeLearningUnitYear']:
+    def search_is_prerequisite_of(self, search_from_node: 'NodeLearningUnitYear') -> List['NodeIdentity']:
         return self.__map_is_prerequisite_of().get(search_from_node.entity_id) or []
 
     def get_prerequisite(self, node: 'NodeLearningUnitYear') -> 'Prerequisite':

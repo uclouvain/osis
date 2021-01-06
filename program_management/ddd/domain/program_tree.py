@@ -619,7 +619,10 @@ class ProgramTree(interface.RootEntity):
         return self.prerequisites.is_prerequisite(node)
 
     def search_is_prerequisite_of(self, search_from_node: 'NodeLearningUnitYear') -> List['NodeLearningUnitYear']:
-        return self.prerequisites.search_is_prerequisite_of(search_from_node)
+        return [
+            self.get_node_by_code_and_year(node_identity.code, node_identity.year)
+            for node_identity in self.prerequisites.search_is_prerequisite_of(search_from_node)
+        ]
 
     def get_prerequisite(self, node: 'NodeLearningUnitYear') -> 'Prerequisite':
         return self.prerequisites.get_prerequisite(node)
