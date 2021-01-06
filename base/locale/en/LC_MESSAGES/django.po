@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-12-08 10:10+0100\n"
+"POT-Creation-Date: 2021-01-06 16:53+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -915,6 +915,9 @@ msgstr ""
 msgid "Export"
 msgstr ""
 
+msgid "Extended proposal management"
+msgstr ""
+
 msgid "External"
 msgstr ""
 
@@ -1296,6 +1299,9 @@ msgid "Lecturing vol."
 msgstr ""
 
 msgid "Legend"
+msgstr ""
+
+msgid "Limited proposal management"
 msgstr ""
 
 msgid "Link type"
@@ -1785,9 +1791,6 @@ msgid "Pending"
 msgstr ""
 
 msgid "Periodicity"
-msgstr ""
-
-msgid "Person entities"
 msgstr ""
 
 msgid "Person with reduced mobility"

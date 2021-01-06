@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-12-08 10:10+0100\n"
+"POT-Creation-Date: 2021-01-06 16:53+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -940,6 +940,9 @@ msgstr "Sigle déjà existant"
 msgid "Export"
 msgstr "Exporter"
 
+msgid "Proposal management"
+msgstr "Gestion de la proposition"
+
 msgid "External"
 msgstr "Externe"
 
@@ -1329,6 +1332,12 @@ msgstr "Vol. PM"
 
 msgid "Legend"
 msgstr "Légende"
+
+msgid "Limited proposal management"
+msgstr "Gestion limitée de la proposition"
+
+msgid "Extended proposal management"
+msgstr "Gestion étendue de la proposition"
 
 msgid "Link type"
 msgstr "Type de lien"
