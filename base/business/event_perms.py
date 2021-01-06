@@ -39,6 +39,7 @@ from base.models.academic_calendar import AcademicCalendar
 from base.models.academic_year import AcademicYear
 from base.models.enums import academic_calendar_type
 from base.models.learning_unit_year import LearningUnitYear
+from education_group.models.group_year import GroupYear
 
 
 @attr.s(frozen=True, slots=True)
@@ -212,6 +213,12 @@ class EventPermClosed(EventPerm):
 class EventPermOpened(EventPerm):
     def is_open(self):
         return True
+
+
+class EventPermEducationGroupEdition(EventPerm):
+    model = GroupYear
+    event_reference = academic_calendar_type.EDUCATION_GROUP_EDITION
+    error_msg = _("This education group is not editable during this period.")
 
 
 class EventPermLearningUnitFacultyManagerEdition(EventPerm):
