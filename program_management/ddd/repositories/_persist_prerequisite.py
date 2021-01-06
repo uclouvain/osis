@@ -24,7 +24,6 @@
 from base.models import learning_unit_year, prerequisite_item, learning_unit
 from base.models import prerequisite as prerequisite_model
 from program_management.ddd.business_types import *
-from program_management.ddd.domain import prerequisite as prerequisite_domain
 from program_management.ddd.domain.node import NodeLearningUnitYear, NodeGroupYear
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.models.enums.node_type import NodeType
@@ -64,7 +63,7 @@ def _persist(
 
 def _persist_prerequisite_items(
         prerequisite_model_obj: prerequisite_model.Prerequisite,
-        prerequisite_domain_obj: prerequisite_domain.Prerequisite
+        prerequisite_domain_obj: 'Prerequisite'
 ):
     _delete_prerequisite_items(prerequisite_model_obj)
     for group_number, group in enumerate(prerequisite_domain_obj.prerequisite_item_groups, 1):
@@ -86,7 +85,7 @@ def _delete_prerequisite_items(prerequisite_model_obj: prerequisite_model.Prereq
         item.delete()
 
 
-def _get_learning_unit_of_prerequisite_item(prerequisite_item_domain_obj: prerequisite_domain.PrerequisiteItem):
+def _get_learning_unit_of_prerequisite_item(prerequisite_item_domain_obj: 'PrerequisiteItem'):
     return learning_unit.LearningUnit.objects.filter(
         learningunityear__acronym=prerequisite_item_domain_obj.code,
         learningunityear__academic_year__year=prerequisite_item_domain_obj.year

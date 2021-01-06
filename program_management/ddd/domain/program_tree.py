@@ -42,14 +42,12 @@ from osis_common.decorators.deprecated import deprecated
 from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.command import DO_NOT_OVERRIDE
-from program_management.ddd.domain import prerequisite, exception
+from program_management.ddd.domain import exception
 from program_management.ddd.domain.link import factory as link_factory
 from program_management.ddd.domain.node import factory as node_factory, NodeIdentity, Node, NodeNotFoundException
-from program_management.ddd.domain.prerequisite import PrerequisiteItem
 from program_management.ddd.repositories import load_authorized_relationship
 from program_management.ddd.validators import validators_by_business_action
 from program_management.ddd.validators._path_validator import PathValidator
-from program_management.models.enums import node_type
 from program_management.models.enums.node_type import NodeType
 
 PATH_SEPARATOR = '|'

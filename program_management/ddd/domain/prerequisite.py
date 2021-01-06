@@ -27,6 +27,7 @@ import re
 from typing import List, Dict
 
 import attr
+from attr.validators import instance_of
 
 from base.models import learning_unit
 from base.models.enums import prerequisite_operator
@@ -67,7 +68,6 @@ PREREQUISITE_SYNTAX_REGEX = r'^(?i)({no_element_regex}|' \
 PrerequisiteExpression = str  # Example : "(Prerequisite1 OR Prerequisite2) AND (prerequisite3)"
 
 
-#  FIXME :: to replace with NodeLearningUnitYearIdentity
 class PrerequisiteItem:
     def __init__(self, code: str, year: int):
         self.code = code
@@ -102,13 +102,12 @@ class PrerequisiteItemGroup:
         return str(" " + _(self.operator) + " ").join(str(p_item) for p_item in self.prerequisite_items)
 
 
-# FIXME :: should be a private class => Should be an Entity, not root entity ? => Should inherit from interface.Entity
 @attr.s(slots=True)
-class Prerequisite:
+class Prerequisite(interface.Entity):
 
     main_operator = attr.ib(type=str)
-    context_tree = attr.ib(type='ProgramTreeIdentity')  # FIXME :: Use ProgramTreeIdentity directly instead of string
-    node_having_prerequisites = attr.ib(type='NodeIdentity')  # FIXME :: Use NodeIdentity directly instead of string
+    context_tree = attr.ib(type='ProgramTreeIdentity')
+    node_having_prerequisites = attr.ib(type='NodeIdentity')
     prerequisite_item_groups = attr.ib(type=List[PrerequisiteItemGroup], factory=list)
 
     has_changed = attr.ib(type=bool, default=False)

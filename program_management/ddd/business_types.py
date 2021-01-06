@@ -9,7 +9,8 @@ if TYPE_CHECKING:
     from program_management.ddd.domain.program_tree_version import ProgramTreeVersion, ProgramTreeVersionIdentity
 
     from program_management.ddd.domain.link import Link, LinkIdentity
-    from program_management.ddd.domain.prerequisite import PrerequisiteExpression, Prerequisite, Prerequisites
+    from program_management.ddd.domain.prerequisite import PrerequisiteExpression, Prerequisite, Prerequisites, \
+        PrerequisiteItem
 
     from program_management.ddd.repositories.load_tree import NodeKey
 
