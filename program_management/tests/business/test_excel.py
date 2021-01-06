@@ -29,17 +29,11 @@ from django.test import SimpleTestCase
 from django.test.utils import override_settings
 from django.utils.translation import gettext_lazy as _
 
-from base.models.enums.education_group_types import GroupType
-from base.models.enums.prerequisite_operator import AND, OR
+from base.models.enums.prerequisite_operator import OR
 from program_management.business.excel import HeaderLine, OfficialTextLine, LearningUnitYearLine, PrerequisiteItemLine
 from program_management.business.excel import _build_excel_lines
 from program_management.tests.ddd.factories.domain.prerequisite.prerequisite import PrerequisitesFactory
 from program_management.tests.ddd.factories.domain.program_tree.LDROI200M_DROI2M import ProgramTreeDROI2MFactory
-from program_management.tests.ddd.factories.link import LinkFactory
-from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory
-from program_management.tests.ddd.factories.prerequisite import PrerequisiteFactory, PrerequisiteItemGroupFactory, \
-    PrerequisiteItemFactory
-from program_management.tests.ddd.factories.prerequisite import cast_to_prerequisite
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
 

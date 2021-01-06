@@ -57,7 +57,6 @@ from program_management.tests.ddd.factories.commands.paste_element_command impor
 from program_management.tests.ddd.factories.domain.prerequisite.prerequisite import PrerequisitesFactory
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
-from program_management.tests.ddd.factories.prerequisite import cast_to_prerequisite
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 from program_management.tests.ddd.service.mixins import ValidatorPatcherMixin
 

@@ -31,6 +31,7 @@ from base.models.enums import prerequisite_operator
 from program_management.ddd.domain.prerequisite import PrerequisiteItem, PrerequisiteItemGroup, Prerequisite
 
 from program_management.ddd.business_types import *
+from program_management.tests.ddd.factories.domain.program_tree.program_tree_identity import ProgramTreeIdentityFactory
 
 
 class PrerequisiteItemFactory(factory.Factory):
@@ -57,19 +58,6 @@ class PrerequisiteFactory(factory.Factory):
         abstract = False
 
     main_operator = prerequisite_operator.AND
-    node_having_prerequisites = None  # FIXME :: refactor to assign real value to node_having_prerequisites
-    context_tree = None  # FIXME :: refactor to assign real value to context tree
+    context_tree = None  # Mandatory param - dependency injection
+    node_having_prerequisites = None  # Mandatory param - dependency injection
     prerequisite_item_groups = []
-
-
-# FIXME :: add 'context_tree' to params
-def cast_to_prerequisite(node: 'NodeLearningUnitYear') -> Prerequisite:
-    return PrerequisiteFactory(
-        prerequisite_item_groups=[
-            PrerequisiteItemGroupFactory(
-                prerequisite_items=[
-                    PrerequisiteItemFactory(code=node.code, year=node.year),
-                ]
-            ),
-        ]
-    )
