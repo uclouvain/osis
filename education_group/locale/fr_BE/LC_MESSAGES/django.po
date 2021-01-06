@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-05 10:36+0100\n"
+"POT-Creation-Date: 2021-01-06 08:24+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -197,6 +197,11 @@ msgstr "Code co-diplômation intra CfB"
 msgid "Comment"
 msgstr "Commentaire"
 
+msgid "Common admission conditions can only be edited by central manager"
+msgstr ""
+"Les conditions d'admission communes peuvent seulement être modifiées par un "
+"gestionnaire en central"
+
 msgid "Common admission conditions have been updated"
 msgstr "Les conditions d'admission communes ont été mises à jour"
 
@@ -205,6 +210,11 @@ msgstr "Les conditions d'admission communes seront publiées sous peu"
 
 msgid "Common general informations will be published soon"
 msgstr "Les informations générales communes seront publiées sous peu"
+
+msgid "Common pedagogy informations can only be edited by central manager"
+msgstr ""
+"Les informations pédagogiques communes peuvent seulement être modifiées par "
+"un gestionnaire en central"
 
 msgid "Conditions"
 msgstr "Conditions"

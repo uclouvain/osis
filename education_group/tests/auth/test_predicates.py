@@ -305,7 +305,10 @@ class TestIsEducationGroupExtendedDailyManagementCalendarOpen(TestCase):
 
     @mock.patch('education_group.calendar.education_group_extended_daily_management.'
                 'EducationGroupExtendedDailyManagementCalendar.get_target_years_opened', return_value=[2020, 2021])
-    def test_assert_education_group_preparation_period_opened_case_no_instance_provided(self, mock_get_years_opened):
+    def test_assert_education_group_extended_daily_management_calendar_opened_case_no_instance_provided(
+            self,
+            mock_get_years_opened
+    ):
         self.assertTrue(
             predicates.is_education_group_extended_daily_management_calendar_open(
                 self.user,
@@ -315,9 +318,81 @@ class TestIsEducationGroupExtendedDailyManagementCalendarOpen(TestCase):
 
     @mock.patch('education_group.calendar.education_group_extended_daily_management.'
                 'EducationGroupExtendedDailyManagementCalendar.get_target_years_opened', return_value=[])
-    def test_assert_education_group_preparation_period_closed_case_no_instance_provided(self, mock_get_years_opened):
+    def test_assert_education_group_extended_daily_management_calendar_closed_case_no_instance_provided(
+            self,
+            mock_get_years_opened
+    ):
         self.assertFalse(
             predicates.is_education_group_extended_daily_management_calendar_open(
+                self.user,
+                group_year=None
+            )
+        )
+
+
+class TestIsEducationGroupLimitedDailyManagementCalendarOpen(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.group_year = GroupYearFactory()
+
+    def setUp(self):
+        self.user = UserFactory()
+        self.predicate_context_mock = mock.patch(
+            "rules.Predicate.context",
+            new_callable=mock.PropertyMock,
+            return_value={
+                'perm_name': 'dummy-perm'
+            }
+        )
+        self.predicate_context_mock.start()
+        self.addCleanup(self.predicate_context_mock.stop)
+
+    @mock.patch('education_group.calendar.education_group_limited_daily_management.'
+                'EducationGroupLimitedDailyManagementCalendar.is_target_year_authorized', return_value=True)
+    def test_assert_education_group_limited_daily_management_calendar_open_case_instance_provided(
+            self,
+            mock_event_perm_is_open
+    ):
+        self.assertTrue(
+            predicates.is_education_group_limited_daily_management_calendar_open(
+                self.user,
+                self.group_year
+            )
+        )
+
+    @mock.patch('education_group.calendar.education_group_limited_daily_management.'
+                'EducationGroupLimitedDailyManagementCalendar.is_target_year_authorized', return_value=False)
+    def test_assert_education_group_limited_daily_management_calendar_closed_case_instance_provided(
+            self,
+            mock_event_perm_is_open
+    ):
+        self.assertFalse(
+            predicates.is_education_group_limited_daily_management_calendar_open(
+                self.user,
+                self.group_year
+            )
+        )
+
+    @mock.patch('education_group.calendar.education_group_limited_daily_management.'
+                'EducationGroupLimitedDailyManagementCalendar.get_target_years_opened', return_value=[2020, 2021])
+    def test_assert_education_group_limited_daily_management_calendar_opened_case_no_instance_provided(
+            self, mock_get_years_opened
+    ):
+        self.assertTrue(
+            predicates.is_education_group_limited_daily_management_calendar_open(
+                self.user,
+                group_year=None
+            )
+        )
+
+    @mock.patch('education_group.calendar.education_group_limited_daily_management.'
+                'EducationGroupLimitedDailyManagementCalendar.get_target_years_opened', return_value=[])
+    def test_assert_education_group_limited_daily_management_calendar_closed_case_no_instance_provided(
+            self,
+            mock_get_years_opened
+    ):
+        self.assertFalse(
+            predicates.is_education_group_limited_daily_management_calendar_open(
                 self.user,
                 group_year=None
             )
