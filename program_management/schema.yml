@@ -11,7 +11,7 @@ servers:
  - url: https://osis.uclouvain.be/api/v1/program_management/
    description: Production server
 info:
-  version: '1'
+  version: '1.01'
   title: Program Management Service
   description: |-
     A set of API endpoints that allow you to get, update, delete an education group.
