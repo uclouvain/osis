@@ -153,7 +153,7 @@ class TestLoadTree(TestCase):
         self.assertEqual(len(is_prerequisite_of), 1)
         self.assertEqual(is_prerequisite_of[0].code, learnin_unit_that_has_prerequisite.acronym)
         self.assertEqual(is_prerequisite_of[0].year, learnin_unit_that_has_prerequisite.academic_year.year)
-        self.assertTrue(education_group_program_tree.is_prerequisites(leaf))
+        self.assertTrue(education_group_program_tree.is_prerequisite(leaf))
 
     def test_case_load_tree_leaf_node_have_a_proposal(self):
         proposal_types = ProposalType.get_names()

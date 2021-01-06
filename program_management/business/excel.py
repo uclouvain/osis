@@ -318,7 +318,7 @@ def _build_excel_lines_prerequisited(tree: 'ProgramTree') -> List:
         )
     )
     for child_node in tree.get_nodes_that_are_prerequisites():
-        if tree.is_prerequisites(child_node):
+        if tree.is_prerequisite(child_node):
             content.append(
                 LearningUnitYearLine(luy_acronym=child_node.code, luy_title=child_node.title)
             )

@@ -110,7 +110,7 @@ def _get_leaf_view_attribute_serializer(link: 'Link', tree: 'ProgramTree', conte
         'paste_url': None,
         'search_url': None,
         'has_prerequisite': tree.has_prerequisites(link.child),
-        'is_prerequisite': tree.is_prerequisites(link.child),
+        'is_prerequisite': tree.is_prerequisite(link.child),
         'class': __get_css_class(link),
         'element_type': NodeType.LEARNING_UNIT.name,
         'title': __get_title(tree, link),
@@ -130,7 +130,7 @@ def __get_title(tree: 'ProgramTree', obj: 'Link') -> str:
     child_node = obj.child
     title = child_node.title
     has_prerequisite = tree.has_prerequisites(child_node)
-    is_prerequisite = tree.is_prerequisites(child_node)
+    is_prerequisite = tree.is_prerequisite(child_node)
     if has_prerequisite and is_prerequisite:
         title = "%s\n%s" % (title, _("The learning unit has prerequisites and is a prerequisite"))
     elif has_prerequisite:
@@ -179,7 +179,7 @@ def _leaf_view_serializer(link: 'Link', tree: 'ProgramTree', context: NodeViewCo
 def __get_learning_unit_node_icon(tree: 'ProgramTree', link: 'Link') -> str:
     child_node = link.child
     has_prerequisite = tree.has_prerequisites(child_node)
-    is_prerequisite = tree.is_prerequisites(child_node)
+    is_prerequisite = tree.is_prerequisite(child_node)
     if has_prerequisite and is_prerequisite:
         return "fa fa-exchange-alt"
     elif has_prerequisite:

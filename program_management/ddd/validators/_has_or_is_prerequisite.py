@@ -69,7 +69,7 @@ class _IsPrerequisiteValidator(business_validator.BusinessValidator):
 
         return {
             n for n in learning_unit_nodes_detached
-            if self.tree.is_prerequisites(n) and self.tree.count_usage(n) <= 1
+            if self.tree.is_prerequisite(n) and self.tree.count_usage(n) <= 1
         }
 
 

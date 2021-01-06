@@ -381,7 +381,7 @@ class ProgramTree(interface.RootEntity):
             sorted(
                 (
                     node_obj for node_obj in self.get_all_nodes()
-                    if node_obj.is_learning_unit() and self.is_prerequisites(node_obj)
+                    if node_obj.is_learning_unit() and self.is_prerequisite(node_obj)
                 ),
                 key=lambda node_obj: node_obj.code
             )
@@ -617,8 +617,8 @@ class ProgramTree(interface.RootEntity):
     def has_prerequisites(self, node: 'NodeLearningUnitYear') -> bool:
         return self.prerequisites.has_prerequisites(node)
 
-    def is_prerequisites(self, node: 'NodeLearningUnitYear') -> bool:  # TODO :: to rename into is_prerequisite
-        return self.prerequisites.is_prerequisites(node)
+    def is_prerequisite(self, node: 'NodeLearningUnitYear') -> bool:
+        return self.prerequisites.is_prerequisite(node)
 
     def search_is_prerequisite_of(self, search_from_node: 'NodeLearningUnitYear') -> List['NodeLearningUnitYear']:
         return self.prerequisites.search_is_prerequisite_of(search_from_node)
