@@ -100,7 +100,7 @@ class TestLearningUnitYearModelFormInit(TestCase):
 
     def test_other_remark_widget_textarea_rows(self):
         self.form = LearningUnitYearModelForm(data=None, person=self.central_manager, subtype=FULL)
-        self.assertEqual(self.form.fields['other_remark'].widget.attrs['rows'], '5', "should assert rows == 5")
+        self.assertEqual(self.form.fields['other_remark'].widget.attrs['rows'], '5')
 
 
 class TestLearningUnitYearModelFormSave(TestCase):

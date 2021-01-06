@@ -8,7 +8,8 @@ def copy_remarks_from_lu_to_luy(apps, schema_editor):
     LearningUnit = apps.get_model('base', 'LearningUnit')
     LearningUnitYear = apps.get_model('base', 'LearningUnitYear')
     lus = LearningUnit.objects.filter(
-        Q(other_remark__isnull=False) | Q(faculty_remark__isnull=False)
+        Q(other_remark__isnull=False) | Q(faculty_remark__isnull=False),
+        learningunityear__academic_year__year__gte=2019
     )
     for lu in lus:
         luys = lu.learningunityear_set.all()

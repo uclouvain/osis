@@ -307,7 +307,7 @@ class TestFullFormIsValid(LearningUnitFullFormContextMixin):
         form_instance = full_form.forms[LearningUnitYearModelForm]
         fields_to_validate = ['acronym', 'specific_title', 'specific_title_english', 'credits',
                               'session', 'quadrimester', 'status', 'internship_subtype', 'attribution_procedure',
-                              'subtype', 'periodicity']
+                              'subtype', 'periodicity', 'other_remark', 'faculty_remark']
         self._assert_equal_values(form_instance.instance, self.post_data, fields_to_validate)
         self.assertEqual(form_instance.instance.academic_year.id, self.post_data['academic_year'])
 

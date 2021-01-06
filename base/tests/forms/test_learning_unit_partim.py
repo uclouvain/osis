@@ -216,7 +216,7 @@ class TestPartimFormIsValid(LearningUnitPartimFormContextMixin):
     def _test_learning_unit_year_model_form_instance(self, partim_form, post_data):
         form_instance = partim_form.forms[LearningUnitYearModelForm]
         fields_to_validate = ['specific_title', 'specific_title_english', 'credits',
-                              'session', 'quadrimester', 'status', 'subtype', 'faculty_remark']
+                              'session', 'quadrimester', 'status', 'subtype', 'faculty_remark', 'other_remark']
         self._assert_equal_values(form_instance.instance, post_data, fields_to_validate)
         self.assertEqual(form_instance.instance.acronym, FULL_ACRONYM + 'B')
 
