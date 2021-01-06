@@ -49,7 +49,6 @@ from program_management.ddd.command import DO_NOT_OVERRIDE
 from program_management.ddd.domain._campus import Campus
 from program_management.ddd.domain.academic_year import AcademicYear
 from program_management.ddd.domain.link import factory as link_factory
-from program_management.ddd.domain.prerequisite import Prerequisite, NullPrerequisite
 from program_management.ddd.domain.service.generate_node_abbreviated_title import GenerateNodeAbbreviatedTitle
 from program_management.ddd.domain.service.generate_node_code import GenerateNodeCode
 from program_management.ddd.domain.service.validation_rule import FieldValidationRule
@@ -527,10 +526,8 @@ class NodeLearningUnitYear(Node):
     type = NodeType.LEARNING_UNIT
     node_type = attr.ib(type=NodeType, default=NodeType.LEARNING_UNIT)
 
-    is_prerequisite_of = attr.ib(type=List, factory=list)
     status = attr.ib(type=bool, default=None)
     periodicity = attr.ib(type=PeriodicityEnum, default=None)
-    prerequisite = attr.ib(type=Prerequisite, default=NullPrerequisite(None, None))  # FIXME :: to remove
     common_title_fr = attr.ib(type=str, default=None)
     specific_title_fr = attr.ib(type=str, default=None)
     common_title_en = attr.ib(type=str, default=None)
@@ -557,9 +554,6 @@ class NodeLearningUnitYear(Node):
     @property
     def has_proposal(self) -> bool:
         return bool(self.proposal_type)
-
-    def remove_all_prerequisite_items(self) -> None:
-        self.prerequisite.remove_all_prerequisite_items()
 
 
 def _get_full_title(common_title, specific_title):
