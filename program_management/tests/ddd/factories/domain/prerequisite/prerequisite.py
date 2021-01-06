@@ -29,20 +29,10 @@ import factory.fuzzy
 
 from base.models.enums.prerequisite_operator import AND
 from program_management.ddd.domain.prerequisite import Prerequisites
-from program_management.ddd.domain.program_tree import ProgramTree, ProgramTreeIdentity
+from program_management.ddd.domain.program_tree import ProgramTree
+from program_management.tests.ddd.factories.domain.program_tree.program_tree_identity import ProgramTreeIdentityFactory
 from program_management.tests.ddd.factories.prerequisite import PrerequisiteFactory, PrerequisiteItemGroupFactory, \
     PrerequisiteItemFactory
-
-
-# FIXME :: Ducplicated - to remove and reuse the ProgramTreeIdentityFactory aftyer moving it into a separate file
-class ProgramTreeIdentityFactory(factory.Factory):
-
-    class Meta:
-        model = ProgramTreeIdentity
-        abstract = False
-
-    code = factory.Sequence(lambda n: 'CODE%02d' % n)
-    year = factory.fuzzy.FuzzyInteger(low=1999, high=2099)
 
 
 class PrerequisitesFactory(factory.Factory):

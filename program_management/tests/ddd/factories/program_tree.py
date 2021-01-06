@@ -29,24 +29,14 @@ from typing import Dict
 import factory.fuzzy
 
 from base.models.authorized_relationship import AuthorizedRelationshipList
-from base.models.enums.education_group_types import GroupType, TrainingType, MiniTrainingType
-from program_management.ddd.domain.prerequisite import Prerequisites
-from program_management.ddd.domain.program_tree import ProgramTree, ProgramTreeIdentity
+from base.models.enums.education_group_types import GroupType, TrainingType
+from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.models.enums.node_type import NodeType
 from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipObjectFactory
 from program_management.tests.ddd.factories.domain.prerequisite.prerequisite import PrerequisitesFactory
+from program_management.tests.ddd.factories.domain.program_tree.program_tree_identity import ProgramTreeIdentityFactory
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
-
-
-class ProgramTreeIdentityFactory(factory.Factory):  # FIXME :: to move into a separate file
-
-    class Meta:
-        model = ProgramTreeIdentity
-        abstract = False
-
-    code = factory.Sequence(lambda n: 'CODE%02d' % n)
-    year = factory.fuzzy.FuzzyInteger(low=1999, high=2099)
 
 
 class ProgramTreeFactory(factory.Factory):

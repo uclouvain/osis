@@ -153,7 +153,7 @@ def __build_tree(
         authorized_relationships=load_authorized_relationship.load(),
         prerequisites=Prerequisites(
             context_tree=ProgramTreeIdentity(code=root_node.code, year=root_node.year),
-            prerequisites=list(prerequisites['has_prerequisite_dict'].values()),  # FIXME :: to unit test !
+            prerequisites=list(prerequisites['has_prerequisite_dict'].values()),
         ),
     )
     return tree
