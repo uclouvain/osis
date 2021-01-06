@@ -364,6 +364,7 @@ def build_initial_data(learning_unit_year, entity):
             "professional_integration": learning_unit_year.professional_integration,
             "attribution_procedure": learning_unit_year.attribution_procedure,
             "other_remark": learning_unit_year.other_remark,
+            'other_remark_english': learning_unit_year.other_remark_english,
             "faculty_remark": learning_unit_year.faculty_remark,
         },
         "learning_unit": {

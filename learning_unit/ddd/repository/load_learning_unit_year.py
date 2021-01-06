@@ -160,6 +160,7 @@ def __instanciate_learning_unit_year(
         status=learning_unit_data.status,
         periodicity=PeriodicityEnum[learning_unit_data.periodicity] if learning_unit_data.periodicity else None,
         other_remark=learning_unit_data.other_remark,
+        other_remark_english=learning_unit_data.other_remark_english,
         quadrimester=LearningUnitYearQuadrimester[learning_unit_data.quadrimester]
         if learning_unit_data.quadrimester else None,
         lecturing_volume=LecturingVolume(

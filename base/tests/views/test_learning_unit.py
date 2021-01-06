@@ -222,6 +222,7 @@ class LearningUnitViewCreateFullTestCase(TestCase):
             "session": learning_unit_year_session.SESSION_P23,
             "faculty_remark": "faculty remark",
             "other_remark": "other remark",
+            "other_remark_english": "other other_remark_english",
 
             # Learning component year data model form
             'component-TOTAL_FORMS': '2',
@@ -821,6 +822,7 @@ class LearningUnitViewTestCase(TestCase):
             "session": learning_unit_year_session.SESSION_P23,
             "faculty_remark": "faculty remark",
             "other_remark": "other remark",
+            "other_remark_english": "other other_remark_english",
         }
 
     def get_learning_unit_data(self):
