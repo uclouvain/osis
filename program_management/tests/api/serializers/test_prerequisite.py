@@ -88,10 +88,10 @@ class TestEducationGroupPrerequisitesSerializer(SimpleTestCase):
             self.assertEqual(url, self.serializer.data.get('url'))
 
         with self.subTest('code'):
-            self.assertEqual(self.ldroi100a.code, self.serializer.data.get('code'))
+            self.assertEqual("LDROI100A", self.serializer.data.get('code'))
 
         with self.subTest('prerequisites_string'):
-            self.assertEqual(str(self.ldroi100a.prerequisite), self.serializer.data.get('prerequisites_string'))
+            self.assertEqual("LDROI1300 AND LAGRO2400", self.serializer.data.get('prerequisites_string'))
 
 
 class TestLearningUnitBaseSerializer(SimpleTestCase):

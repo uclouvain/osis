@@ -135,7 +135,7 @@ def _build_excel_lines(tree: 'ProgramTree') -> List:
                 )
                 prerequisite_line = _prerequisite_item_line(tree,
                                                             prerequisite_item, prerequisite_item_links,
-                                                            node.prerequisite, group_number, position,
+                                                            tree.get_prerequisite(node), group_number, position,
                                                             len(group.prerequisite_items))
                 content.append(prerequisite_line)
 

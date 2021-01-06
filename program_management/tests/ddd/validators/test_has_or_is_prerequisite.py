@@ -43,77 +43,64 @@ from program_management.tests.ddd.validators.mixins import TestValidatorValidate
 class TestIsPrerequisiteValidator(TestValidatorValidateMixin, SimpleTestCase):
 
     def setUp(self):
-        link = LinkFactory(parent__node_type=TrainingType.BACHELOR, child__node_type=GroupType.COMMON_CORE)
-        self.tree = ProgramTreeFactory(root_node=link.parent)
-        self.common_core = link.child
-        link_with_learn_unit = LinkFactory(
-            parent=self.common_core,
-            child=NodeLearningUnitYearFactory(is_prerequisite_of=[])
-        )
-        self.node_learning_unit = link_with_learn_unit.child
+        self.year = 2020
+        self.tree = ProgramTreeDROI2MFactory(root_node__year=self.year)
+        self.ldrop2011 = self.tree.get_node_by_code_and_year(code="LDROP2011", year=self.year)
+        self.ldroi2101 = self.tree.get_node_by_code_and_year(code="LDROI2101", year=self.year)
+        self.ldrop100t = self.tree.get_node_by_code_and_year(code="LDROP100T", year=self.year)
+        self.ldroi220t = self.tree.get_node_by_code_and_year(code="LDROI220T", year=self.year)
 
     def test_should_not_raise_exception_when_children_of_node_to_detach_are_not_prerequisites(self):
-        node_to_detach = self.common_core
-        LinkFactory(parent=self.common_core, child=NodeLearningUnitYearFactory())
-        LinkFactory(parent=self.common_core, child=NodeLearningUnitYearFactory())
-
-        validator = _IsPrerequisiteValidator(self.tree, node_to_detach)
+        tree = copy.deepcopy(self.tree)
+        node_without_prerequisite = self.ldroi2101
+        validator = _IsPrerequisiteValidator(tree, node_to_detach=node_without_prerequisite)
         self.assertValidatorNotRaises(validator)
 
     def test_should_raise_exception_when_children_of_node_to_detach_are_prerequisites(self):
-        node_to_detach = self.common_core
-        link = LinkFactory(
-            parent=self.tree.root_node,
-            child=NodeLearningUnitYearFactory(year=self.node_learning_unit.year)
-        )
-        link_with_child_that_is_prerequisite = LinkFactory(
-            parent=self.common_core,
-            child=NodeLearningUnitYearFactory(code="LOSIS2222", year=self.node_learning_unit.year)
-        )
-        self.tree.set_prerequisite(
-            prerequisite_expression="LOSIS2222",
-            node_having_prerequisites=link.child
+        tree = copy.deepcopy(self.tree)
+        tree.set_prerequisite(
+            prerequisite_expression="LDROI2101",
+            node_having_prerequisites=self.ldrop2011
         )
 
+        node_containing_child_that_is_prerequisite = self.ldroi220t
+
         with self.assertRaises(CannotDetachLearningUnitsWhoArePrerequisiteException):
-            _IsPrerequisiteValidator(self.tree, node_to_detach).validate()
+            _IsPrerequisiteValidator(tree, node_to_detach=node_containing_child_that_is_prerequisite).validate()
 
     def test_should_raise_exception_when_node_to_detach_is_prerequisite(self):
-        link_with_child_is_prerequisite = LinkFactory(
-            parent=self.common_core,
-            child=NodeLearningUnitYearFactory(code="LOSIS1111", year=self.node_learning_unit.year)
+        tree = copy.deepcopy(self.tree)
+        tree.set_prerequisite(
+            prerequisite_expression="LDROI2101",
+            node_having_prerequisites=self.ldrop2011
         )
-        self.tree.set_prerequisite(
-            prerequisite_expression="LOSIS1111",
-            node_having_prerequisites=self.node_learning_unit
-        )
-        node_to_detach = link_with_child_is_prerequisite.child
+
+        node_that_is_prerequisite = self.ldroi2101
 
         with self.assertRaises(CannotDetachLearningUnitsWhoArePrerequisiteException):
-            _IsPrerequisiteValidator(self.tree, node_to_detach).validate()
+            _IsPrerequisiteValidator(tree, node_to_detach=node_that_is_prerequisite).validate()
 
     def test_should_not_raise_exception_when_node_to_detach_is_prerequisite_twice(self):
-        learning_unit_that_is_prerequisite = NodeLearningUnitYearFactory(
-            code="LOSIS1111",
-            year=self.node_learning_unit.year
-        )
-        link_with_child_is_prerequisite = LinkFactory(
-            parent=self.common_core,
-            child=learning_unit_that_is_prerequisite  # learning unit used once
-        )
-        link_with_child_is_prerequisite_2 = LinkFactory(
-            parent=self.tree.root_node,
-            child=learning_unit_that_is_prerequisite  # learning unit used twice
-        )
-        self.tree.set_prerequisite(
-            prerequisite_expression="LOSIS1111",
-            node_having_prerequisites=self.node_learning_unit
+        tree = ProgramTreeDROI2MFactory(root_node__year=self.year)
+        ldrop2011 = tree.get_node_by_code_and_year(code="LDROP2011", year=self.year)
+        ldroi2101 = tree.get_node_by_code_and_year(code="LDROI2101", year=self.year)
+        ldrop100t = tree.get_node_by_code_and_year(code="LDROP100T", year=self.year)
+        LinkFactory(
+            parent=ldrop100t,
+            child=ldroi2101  # learning unit used twice
         )
 
-        node_to_detach = link_with_child_is_prerequisite.child
+        tree.set_prerequisite(
+            prerequisite_expression="LDROI2101",
+            node_having_prerequisites=ldrop2011
+        )
+        node_that_is_prerequisite_and_used_twice_in_tree = ldroi2101
+        self.assertTrue(tree.count_usage(node_that_is_prerequisite_and_used_twice_in_tree) == 2)
 
         assertion = "While the prerequisite is used more than once in the same tree, we can detach it"
-        self.assertValidatorNotRaises(_IsPrerequisiteValidator(self.tree, node_to_detach))
+        self.assertValidatorNotRaises(
+            _IsPrerequisiteValidator(tree, node_to_detach=node_that_is_prerequisite_and_used_twice_in_tree)
+        )
 
 
 class TestHasPrerequisiteValidator(TestValidatorValidateMixin, SimpleTestCase):

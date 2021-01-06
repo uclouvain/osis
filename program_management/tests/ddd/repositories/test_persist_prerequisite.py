@@ -49,9 +49,10 @@ from program_management.tests.factories.element import ElementGroupYearFactory, 
 class TestPersist(TestCase):
     @mock.patch("program_management.ddd.repositories._persist_prerequisite._persist")
     def test_call_persist_prerequisite_on_changed_node(self, mock_persist_prerequisite):
-        tree = ProgramTreeFactory()
-        link1 = LinkFactory(parent=tree.root_node, child=NodeLearningUnitYearFactory(code='LDROI1001'))
-        link2 = LinkFactory(parent=tree.root_node, child=NodeLearningUnitYearFactory(code='LDROI1002'))
+        year = 2020
+        tree = ProgramTreeFactory(root_node__year=year)
+        link1 = LinkFactory(parent=tree.root_node, child=NodeLearningUnitYearFactory(code='LDROI1001', year=year))
+        link2 = LinkFactory(parent=tree.root_node, child=NodeLearningUnitYearFactory(code='LDROI1002', year=year))
 
         tree.set_prerequisite("LDROI1002", link1.child)
 

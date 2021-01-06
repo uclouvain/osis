@@ -811,8 +811,11 @@ class TestGet2mOptionList(SimpleTestCase):
 
 class TestSetPrerequisite(SimpleTestCase, ValidatorPatcherMixin):
     def setUp(self):
-        self.tree = ProgramTreeFactory()
-        self.link1 = LinkFactory(parent=self.tree.root_node, child=NodeLearningUnitYearFactory())
+        self.year = 2020
+        self.tree = ProgramTreeFactory(root_node__year=self.year)
+        self.link1 = LinkFactory(parent=self.tree.root_node, child=NodeLearningUnitYearFactory(year=self.year))
+        LinkFactory(parent=self.tree.root_node, child=NodeLearningUnitYearFactory(code='LOSIS1452', year=self.year))
+        LinkFactory(parent=self.tree.root_node, child=NodeLearningUnitYearFactory(code='MARC2589', year=self.year))
 
     def test_should_not_set_prerequisites_when_clean_is_not_valid(self):
         self.mock_validator(UpdatePrerequisiteValidatorList, ["error_message_text"], level=MessageLevel.ERROR)
