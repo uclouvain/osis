@@ -27,7 +27,7 @@ from django.conf import settings
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 
-from base.models.enums.education_group_types import GroupType, TrainingType
+from base.models.enums.education_group_types import GroupType, MiniTrainingType
 from education_group.api.serializers.utils import get_title_from_lang
 from education_group.api.views.group import GroupDetail
 from education_group.api.views.mini_training import MiniTrainingDetail
@@ -86,9 +86,9 @@ class BaseCommonNodeTreeSerializer(serializers.Serializer):
 
     def to_representation(self, obj: 'Link'):
         data = super().to_representation(obj)
-        root_node = self.context.get('root_node')
-        if obj.child.node_type in GroupType.minor_major_list_choice_enums() \
-                and root_node.node_type == TrainingType.BACHELOR:
+        parent = obj.parent
+        if parent and parent.node_type in GroupType.minor_major_list_choice_enums() \
+                and obj.child.node_type in MiniTrainingType.minors_and_deepening() + [MiniTrainingType.FSA_SPECIALITY]:
             data.pop('children')
         return data
 
