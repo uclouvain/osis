@@ -37,6 +37,7 @@ from django.utils.translation import gettext as _
 from base.utils.cache import cached_result
 from osis_common.ddd import interface
 from program_management.ddd.business_types import *
+from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
 from program_management.ddd.validators import validators_by_business_action
 
 
@@ -280,12 +281,12 @@ class Prerequisites(interface.RootEntity):
 
     @cached_result
     def __map_is_prerequisite_of(self) -> Dict['NodeIdentity', List['NodeIdentity']]:
-        from program_management.ddd.domain.node import NodeIdentity
+        # from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
         result = {}
         for prerequisite in self.prerequisites:
             node_having_prerequisites = prerequisite.node_having_prerequisites
             for prereq_item in prerequisite.get_all_prerequisite_items():
-                prereq_item_as_node_identity = NodeIdentity(code=prereq_item.code, year=prereq_item.year)  # FIXME :: put this into a domain service
+                prereq_item_as_node_identity = NodeIdentitySearch().get_from_prerequisite_item(prereq_item)
                 result.setdefault(prereq_item_as_node_identity, set()).add(node_having_prerequisites)
         result = {
             node_is_prerequisite: sorted(nodes_having_prerequisites, key=lambda node_identity: node_identity.code)

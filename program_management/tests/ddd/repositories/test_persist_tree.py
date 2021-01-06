@@ -92,7 +92,7 @@ class TestPersistTree(TestCase):
         self.common_core_node.detach_child(self.learning_unit_year_node)
         self.root_node.detach_child(self.common_core_node)
 
-def test_save_when_first_link_exists_and_second_one_does_not(self):
+    def test_save_when_first_link_exists_and_second_one_does_not(self):
         GroupElementYearFactory(parent_element=self.root_group, child_element=self.common_core_element)
         tree = load_tree.load(self.root_node.node_id)
 
