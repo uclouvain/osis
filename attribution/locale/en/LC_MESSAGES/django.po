@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-25 15:15+0200\n"
+"POT-Creation-Date: 2020-09-23 13:55+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -83,10 +83,7 @@ msgstr ""
 msgid "Description fiche"
 msgstr ""
 
-msgid "Description fiche ending"
-msgstr ""
-
-msgid "Description fiche opening"
+msgid "Description fiche edition"
 msgstr ""
 
 msgid "Duration"
@@ -97,14 +94,27 @@ msgstr ""
 
 #, python-format
 msgid ""
-"For the academic year %(data_year)s, the summary edition period is ended "
-"since %(end_date)s."
+"For the academic year %(data_year)s, the summary edition period ended on "
+"%(end_date)s."
 msgstr ""
 
 #, python-format
 msgid ""
 "For the academic year %(data_year)s, the summary edition period will open on "
 "%(start_date)s."
+msgstr ""
+
+#, python-format
+msgid ""
+"Force majeure case : Some fields of the description fiche can be edited from "
+"%(start_date)s to %(end_date)s."
+msgstr ""
+
+msgid "Force majeure case edition"
+msgstr ""
+
+msgctxt "Du"
+msgid "From"
 msgstr ""
 
 msgid "Function"
@@ -203,4 +213,8 @@ msgid "Yes, I confirm."
 msgstr ""
 
 msgid "delete"
+msgstr ""
+
+msgctxt "au"
+msgid "to"
 msgstr ""

@@ -35,7 +35,7 @@ from django.utils.translation import gettext_lazy as _
 
 from backoffice.settings.base import LANGUAGE_CODE_FR, LANGUAGE_CODE_EN
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY_FR_ONLY, \
-    CMS_LABEL_PEDAGOGY_FR_AND_EN, CMS_LABEL_SPECIFICATIONS
+    CMS_LABEL_PEDAGOGY_FR_AND_EN, CMS_LABEL_SPECIFICATIONS, CMS_LABEL_PEDAGOGY_FORCE_MAJEURE
 from base.business.learning_units.xls_educational_information_and_specifications import _get_titles, \
     _add_cms_title_fr_en, prepare_xls_educational_information_and_specifications
 from base.models.entity_version import EntityVersion
@@ -57,11 +57,11 @@ from base.tests.factories.user import UserFactory
 from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory
 from cms.tests.factories.translated_text_label import TranslatedTextLabelFactory
-from reference.tests.factories.language import LanguageFactory
+from reference.tests.factories.language import LanguageFactory, FrenchLanguageFactory, EnglishLanguageFactory
 
 INDEX_FIRST_CMS_LABEL_PEDAGOGY_FR_AND_EN_COLUMN = 3
 INDEX_FIRST_CMS_LABEL_PEDAGOGY_FR_ONLY_COLUMN = 14
-INDEX_FIRST_CMS_LABEL_SPECIFICATIONS_COLUMN = 16
+INDEX_FIRST_CMS_LABEL_SPECIFICATIONS_COLUMN = 26
 
 ENTITY_ACRONYM = 'ESPO'
 ACRONYM_ALLOCATION = 'INFO'
@@ -81,9 +81,9 @@ class TestXlsEducationalInformationSpecificationXls(TestCase):
         cls.teaching_material = TeachingMaterialFactory(learning_unit_year=cls.l_unit_yr_1, 
                                                         title='Teaching material title')
         cls.learning_unit_achievement_fr = LearningAchievementFactory(learning_unit_year=cls.l_unit_yr_1, 
-                                                                      language=LanguageFactory(code='FR'))
+                                                                      language=FrenchLanguageFactory())
         cls.learning_unit_achievement_en = LearningAchievementFactory(learning_unit_year=cls.l_unit_yr_1, 
-                                                                      language=LanguageFactory(code='EN'))
+                                                                      language=EnglishLanguageFactory())
         cls.entity_requirement = EntityVersion.objects.filter(
             entity=OuterRef('learning_container_year__requirement_entity'),
         ).current(
@@ -94,6 +94,7 @@ class TestXlsEducationalInformationSpecificationXls(TestCase):
     def _create_cms_data(cls):
         cls._create_needed_cms_label(CMS_LABEL_PEDAGOGY_FR_AND_EN + CMS_LABEL_SPECIFICATIONS, True)
         cls._create_needed_cms_label(CMS_LABEL_PEDAGOGY_FR_ONLY, False)
+        cls._create_needed_cms_label(CMS_LABEL_PEDAGOGY_FORCE_MAJEURE, True)
 
     @classmethod
     def _create_needed_cms_label(cls, cms_labels, with_en):
@@ -163,6 +164,16 @@ class TestXlsEducationalInformationSpecificationXls(TestCase):
             str(_('Teaching material')),
             str("cms_bibliography - FR-BE"),
             str("cms_mobility - FR-BE"),
+            str(_('Last update description fiche by')),
+            str(_('Last update description fiche on')),
+            str('cms_teaching_methods_force_majeure - FR-BE'),
+            str('cms_teaching_methods_force_majeure - EN'),
+            str('cms_evaluation_methods_force_majeure - FR-BE'),
+            str('cms_evaluation_methods_force_majeure - EN'),
+            str('cms_other_informations_force_majeure - FR-BE'),
+            str('cms_other_informations_force_majeure - EN'),
+            str(_('Last update description fiche (force majeure) by')),
+            str(_('Last update description fiche (force majeure) on')),
             str('cms_themes_discussed - FR-BE'),
             str('cms_themes_discussed - EN'),
             str('cms_prerequisite - FR-BE'),

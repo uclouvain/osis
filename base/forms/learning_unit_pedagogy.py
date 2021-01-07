@@ -54,10 +54,12 @@ class LearningUnitPedagogyEditForm(forms.Form):
         self.fields['trans_text'].initial = value.text
 
     @atomic
-    def save(self):
+    def save(self, postpone=True):
         trans_text = self._get_or_create_translated_text()
         start_luy = learning_unit_year.get_by_id(trans_text.reference)
-        self.luys = [start_luy] + list(start_luy.find_gt_learning_units_year())
+        self.luys = [start_luy]
+        if postpone:
+            self.luys += list(start_luy.find_gt_learning_units_year())
 
         reference_ids = [start_luy.id]
         if is_pedagogy_data_must_be_postponed(start_luy):
@@ -86,12 +88,13 @@ class LearningUnitPedagogyEditForm(forms.Form):
         if hasattr(self, 'cleaned_data'):
             cms_id = self.cleaned_data['cms_id']
             return TranslatedText.objects.get(pk=cms_id)
-        return translated_text.get_or_create(
+        translated_text, _ = TranslatedText.objects.get_or_create(
             entity=entity_name.LEARNING_UNIT_YEAR,
             reference=self.learning_unit_year.id,
-            language=self.language_iso,
-            text_label=self.text_label
+            text_label=self.text_label,
+            language=self.language_iso
         )
+        return translated_text
 
 
 class TeachingMaterialModelForm(forms.ModelForm):

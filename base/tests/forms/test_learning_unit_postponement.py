@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -35,19 +35,21 @@ from base.forms.learning_unit.learning_unit_create_2 import FullForm
 from base.forms.learning_unit.learning_unit_partim import PartimForm
 from base.forms.learning_unit.learning_unit_postponement import LearningUnitPostponementForm, FIELDS_TO_NOT_POSTPONE
 from base.models.academic_year import AcademicYear
-from base.models.enums import learning_unit_year_subtypes
+from base.models.enums import learning_unit_year_subtypes, quadrimesters
 from base.models.enums.groups import FACULTY_MANAGER_GROUP
 from base.models.enums.learning_component_year_type import LECTURING
+from base.models.enums.learning_container_year_types import MASTER_THESIS
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
-from base.tests.factories.group import FacultyManagerGroupFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
-from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
+from base.models.enums.learning_unit_year_periodicity import ANNUAL, BIENNIAL_EVEN
+from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
+from learning_unit.tests.factories.faculty_manager import FacultyManagerFactory
 
 FULL_ACRONYM = 'LAGRO1000'
 SUBDIVISION_ACRONYM = 'C'
@@ -63,12 +65,15 @@ class LearningUnitPostponementFormContextMixin(TestCase):
         start_year = AcademicYearFactory(year=cls.current_academic_year.year + 1)
         end_year = AcademicYearFactory(year=cls.current_academic_year.year + 10)
         cls.generated_ac_years = GenerateAcademicYear(start_year, end_year)
-        FacultyManagerGroupFactory()
+
+        end_year_6 = AcademicYearFactory(year=cls.current_academic_year.year + 6)
+        # Creation of a LearingContainerYear and all related models - FOR 6 years
+        cls.learn_unit_structure = GenerateContainer(cls.current_academic_year, end_year_6)
+        cls.person = PersonFactory()
+        for entity in cls.learn_unit_structure.entities:
+            FacultyManagerFactory(person=cls.person, entity=entity)
 
     def setUp(self):
-        end_year_6 = AcademicYearFactory(year=self.current_academic_year.year + 6)
-        # Creation of a LearingContainerYear and all related models - FOR 6 years
-        self.learn_unit_structure = GenerateContainer(self.current_academic_year, end_year_6)
         # Build in Generated Container [first index = start Generate Container ]
         self.generated_container_year = self.learn_unit_structure.generated_container_years[0]
 
@@ -81,17 +86,15 @@ class LearningUnitPostponementFormContextMixin(TestCase):
 
         self.learning_unit_year_full = LearningUnitYear.objects.get(
             learning_unit=self.learn_unit_structure.learning_unit_full,
-            academic_year=self.current_academic_year
+            academic_year=self.current_academic_year,
+            periodicity=ANNUAL,
+            quadrimester=quadrimesters.LearningUnitYearQuadrimester.Q1.name
         )
 
         self.learning_unit_year_partim = LearningUnitYear.objects.get(
             learning_unit=self.learn_unit_structure.learning_unit_partim,
             academic_year=self.current_academic_year
         )
-
-        self.person = PersonFactory()
-        for entity in self.learn_unit_structure.entities:
-            PersonEntityFactory(person=self.person, entity=entity)
 
 
 class TestLearningUnitPostponementFormInit(LearningUnitPostponementFormContextMixin):
@@ -433,6 +436,22 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
         qs.update(repartition_volume_requirement_entity=repartition_volume)
         return qs.get()
 
+    def _change_periodicity_value(self, academic_year):
+        initial_periodicity_value = self.learning_unit_year_full.periodicity
+        new_periodicity_value = BIENNIAL_EVEN
+        LearningUnitYear.objects.filter(academic_year=academic_year,
+                                        learning_unit=self.learning_unit_year_full.learning_unit) \
+            .update(periodicity=new_periodicity_value)
+        return initial_periodicity_value, new_periodicity_value
+
+    def _change_quadrimester_value(self, academic_year):
+        initial_quadrimester_value = self.learning_unit_year_full.quadrimester
+        new_quadrimester_value = quadrimesters.LearningUnitYearQuadrimester.Q1and2.name
+        LearningUnitYear.objects.filter(academic_year=academic_year,
+                                        learning_unit=self.learning_unit_year_full.learning_unit) \
+            .update(quadrimester=new_quadrimester_value)
+        return initial_quadrimester_value, new_quadrimester_value
+
     @staticmethod
     def _remove_additional_requirement_entity_2(academic_year):
         # Remove additional requirement entity 2 container year
@@ -498,6 +517,40 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
         self.assertIsInstance(result, OrderedDict)
         self.assertEqual(expected_result[next_academic_year], result[next_academic_year])
 
+    def test_when_difference_found_on_periodicity_field(self):
+        next_academic_year = AcademicYear.objects.get(year=self.learning_unit_year_full.academic_year.year + 1)
+        initial_status_value, new_status_value = self._change_periodicity_value(next_academic_year)
+        expected_result = OrderedDict({
+            next_academic_year: [
+                _("%(col_name)s has been already modified. (%(new_value)s instead of %(current_value)s)") % {
+                    'col_name': _('Periodicity'),
+                    'new_value': dict(PERIODICITY_TYPES)[new_status_value].lower(),
+                    'current_value': dict(PERIODICITY_TYPES)[initial_status_value].lower(),
+                }
+            ]
+        })
+        self.assertTrue(self.form.is_valid(), self.form.errors)
+        result = self.form.consistency_errors
+        self.assertIsInstance(result, OrderedDict)
+        self.assertEqual(expected_result[next_academic_year], result[next_academic_year])
+
+    def test_when_difference_found_on_quadrimester_field(self):
+        next_academic_year = AcademicYear.objects.get(year=self.learning_unit_year_full.academic_year.year + 1)
+        initial_status_value, new_status_value = self._change_quadrimester_value(next_academic_year)
+        expected_result = OrderedDict({
+            next_academic_year: [
+                _("%(col_name)s has been already modified. (%(new_value)s instead of %(current_value)s)") % {
+                    'col_name': _('Quadrimester'),
+                    'new_value': quadrimesters.LearningUnitYearQuadrimester.Q1and2.value.lower(),
+                    'current_value': _(initial_status_value).lower(),
+                }
+            ]
+        })
+        self.assertTrue(self.form.is_valid(), self.form.errors)
+        result = self.form.consistency_errors
+        self.assertIsInstance(result, OrderedDict)
+        self.assertEqual(expected_result[next_academic_year], result[next_academic_year])
+
     def test_when_differences_found_on_2_next_years(self):
         next_academic_year = AcademicYear.objects.get(year=self.learning_unit_year_full.academic_year.year + 1)
         initial_credits_value, new_credits_value = self._change_credits_value(next_academic_year)
@@ -554,7 +607,7 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
                   "(%(new_value)s instead of %(current_value)s)") % {
                     'col_name': component.acronym + "-" + requirement_entity.most_recent_acronym,
                     'new_value': component.repartition_volume_requirement_entity,
-                    'current_value': "0.00"
+                    'current_value': "30.00"
                 }
             ],
         })
@@ -588,6 +641,7 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
 
 def _instantiate_base_learning_unit_form(learning_unit_year_instance, person):
     container_year = learning_unit_year_instance.learning_container_year
+    container_year.container_type = MASTER_THESIS
     learning_unit_instance = learning_unit_year_instance.learning_unit
 
     if learning_unit_year_instance.subtype == learning_unit_year_subtypes.FULL:

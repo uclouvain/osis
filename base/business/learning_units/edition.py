@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
 #
 ##############################################################################
 import logging
-from typing import Dict, List, Any, Iterable
+from typing import Dict, List, Any
 
 from django.conf import settings
 from django.db import IntegrityError, transaction, Error
@@ -54,6 +54,7 @@ from base.models.enums.proposal_type import ProposalType
 from base.models.learning_achievement import LearningAchievement
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_container_year import LearningContainerYear
+from base.models.learning_unit import LearningUnit
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from cms.enums.entity_name import LEARNING_UNIT_YEAR
@@ -63,14 +64,15 @@ from learning_unit.models.learning_class_year import LearningClassYear
 from osis_common.utils.numbers import normalize_fraction
 from reference.models.language import Language
 
-
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 FIELDS_TO_EXCLUDE_WITH_REPORT = ("is_vacant", "type_declaration_vacant", "attribution_procedure")
 NO_DATA = _('No data')
 
 
 # TODO :: Use LearningUnitPostponementForm to extend/shorten a LearningUnit and remove all this code
-def edit_learning_unit_end_date(learning_unit_to_edit, new_academic_year, propagate_end_date_to_luy=True):
+def edit_learning_unit_end_date(learning_unit_to_edit: LearningUnit,
+                                new_academic_year: AcademicYear,
+                                propagate_end_date_to_luy=True) -> List:
     result = []
     new_end_year = _get_new_end_year(new_academic_year)
 
@@ -81,7 +83,9 @@ def edit_learning_unit_end_date(learning_unit_to_edit, new_academic_year, propag
     return result
 
 
-def _update_learning_unit_year_end_date(learning_unit_to_edit, new_academic_year, new_end_year):
+def _update_learning_unit_year_end_date(learning_unit_to_edit: LearningUnit,
+                                        new_academic_year: AcademicYear,
+                                        new_end_year):
     end_year = _get_actual_end_year(learning_unit_to_edit)
     if new_end_year is None or new_end_year.year > end_year.year:
         return extend_learning_unit(learning_unit_to_edit, new_academic_year)
@@ -122,6 +126,8 @@ def extend_learning_unit(learning_unit_to_edit, new_academic_year):
 
     if not new_academic_year:  # If there is no selected academic_year, we take the maximal value
         new_academic_year = AcademicYear.objects.max_adjournment()
+        if last_learning_unit_year.is_partim():
+            new_academic_year = _get_max_academic_year_for_partim(last_learning_unit_year, new_academic_year)
 
     with transaction.atomic():
         for ac_year in get_next_academic_years(learning_unit_to_edit, new_academic_year.year):
@@ -129,6 +135,16 @@ def extend_learning_unit(learning_unit_to_edit, new_academic_year):
             result.append(create_learning_unit_year_creation_message(new_luy))
 
     return result
+
+
+def _get_max_academic_year_for_partim(last_learning_unit_year, new_academic_year):
+    full_learning_unit = last_learning_unit_year.parent.learning_unit
+    last_full = LearningUnitYear.objects.filter(
+        learning_unit=full_learning_unit
+    ).order_by('academic_year').last()
+    if last_full.academic_year.year < new_academic_year.year:
+        new_academic_year = last_full.academic_year
+    return new_academic_year
 
 
 def _check_extend_partim(last_learning_unit_year, new_academic_year):
@@ -140,7 +156,8 @@ def _check_extend_partim(last_learning_unit_year, new_academic_year):
     lu_parent = last_learning_unit_year.parent
     if last_learning_unit_year.is_partim() and lu_parent:
         actual_end_year = _get_actual_end_year(lu_parent.learning_unit).year
-        if actual_end_year < new_academic_year.year:
+        both_no_end_year = no_planned_end and not lu_parent.learning_unit.end_year
+        if not both_no_end_year and actual_end_year < new_academic_year.year:
             raise IntegrityError(
                 _('The selected end year (%(partim_end_year)s) is greater '
                   'than the end year of the parent %(lu_parent)s') % {
@@ -282,22 +299,26 @@ def _check_shorten_partim(learning_unit_to_edit, new_academic_year, partim):
         )
 
 
-def _get_actual_end_year(learning_unit_to_edit):
+def _get_actual_end_year(learning_unit_to_edit: LearningUnit) -> AcademicYear:
     proposal = ProposalLearningUnit.objects.filter(
         learning_unit_year__learning_unit=learning_unit_to_edit
     ).exclude(
         type=ProposalType.CREATION.name
     ).first()
-    end_year_lu = proposal.initial_data.get('learning_unit').get('end_year') if proposal \
-        else learning_unit_to_edit.end_year
+
+    end_year_lu = learning_unit_to_edit.end_year
+    if proposal:
+        end_year = proposal.initial_data.get('learning_unit').get('end_year')
+        if end_year:
+            end_year_lu = academic_year.find_academic_year_by_id(end_year)
     return end_year_lu or academic_year.find_academic_year_by_year(compute_max_academic_year_adjournment() + 1)
 
 
-def _get_new_end_year(new_academic_year):
+def _get_new_end_year(new_academic_year: AcademicYear):
     return new_academic_year if new_academic_year else None
 
 
-def get_next_academic_years(learning_unit_to_edit, year):
+def get_next_academic_years(learning_unit_to_edit, year: int):
     end_date = learning_unit_to_edit.end_year.year + 1 if learning_unit_to_edit.end_year else None
     return AcademicYear.objects.filter(year__range=(end_date, year)).order_by('year')
 
@@ -710,4 +731,3 @@ def __report_component(reference: LearningComponentYear, to_postpone_to: List[Le
             learning_unit_year=learning_unit_year_obj,
             type=reference.type,
         )
-

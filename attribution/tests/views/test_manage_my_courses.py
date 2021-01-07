@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -44,7 +44,8 @@ from base.models.enums import academic_calendar_type
 from base.models.enums.entity_type import FACULTY
 from base.models.enums.learning_unit_year_subtypes import FULL
 from base.tests.factories.academic_calendar import AcademicCalendarFactory, OpenAcademicCalendarFactory
-from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
+from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory, get_current_year
+from base.tests.factories.entity import EntityWithVersionFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_achievement import LearningAchievementFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
@@ -53,7 +54,7 @@ from base.tests.factories.person import PersonFactory
 from base.tests.factories.teaching_material import TeachingMaterialFactory
 from base.tests.factories.tutor import TutorFactory
 from base.tests.factories.utils.get_messages import get_messages_from_response
-from osis_common.utils.perms import BasePerm
+from reference.tests.factories.language import FrenchLanguageFactory, EnglishLanguageFactory
 
 
 class ManageMyCoursesViewTestCase(TestCase):
@@ -70,6 +71,11 @@ class ManageMyCoursesViewTestCase(TestCase):
             academic_year=cls.current_ac_year,
             data_year=cls.current_ac_year,
             reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
+        )
+        cls.academic_calendar_force_majeure = OpenAcademicCalendarFactory(
+            academic_year=cls.current_ac_year,
+            data_year=cls.current_ac_year,
+            reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION_FORCE_MAJEURE
         )
         requirement_entity = EntityVersionFactory().entity
         # Create multiple attribution in different academic years
@@ -111,12 +117,14 @@ class ManageMyCoursesViewTestCase(TestCase):
 
         context = response.context
         self.assertIsInstance(context['entity_calendars'], dict)
+        self.assertTrue(context['event_perm_desc_fiche_open'])
 
-        for luy, error in context["learning_unit_years_with_errors"]:
+        for luy, error, error_force_majeure in context["learning_unit_years_with_errors"]:
             self.assertEqual(luy.academic_year.year, self.current_ac_year.year)
             self.assertFalse(error.errors)
 
-    def test_list_my_attributions_summary_editable_after_period(self):
+    @patch('base.business.event_perms.EventPerm.is_open', return_value=False)
+    def test_list_my_attributions_summary_editable_after_period(self, mock_is_open):
         self.academic_calendar.start_date = datetime.date.today() - datetime.timedelta(weeks=52)
         self.academic_calendar.end_date = datetime.date.today() - datetime.timedelta(weeks=48)
         self.academic_calendar.save()
@@ -124,25 +132,28 @@ class ManageMyCoursesViewTestCase(TestCase):
         next_calendar = AcademicCalendarFactory(
             start_date=datetime.date.today() + datetime.timedelta(weeks=48),
             end_date=datetime.date.today() + datetime.timedelta(weeks=52),
+            academic_year=self.ac_year_in_future[1],
+            data_year=self.ac_year_in_future[1],
             reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
         )
-
         response = self.client.get(self.url)
+
         self.assertTemplateUsed(response, "manage_my_courses/list_my_courses_summary_editable.html")
 
         context = response.context
         self.assertIsInstance(context['entity_calendars'], dict)
 
-        for luy, error in context["learning_unit_years_with_errors"]:
+        for luy, error, error_force_majeure in context["learning_unit_years_with_errors"]:
             self.assertEqual(luy.academic_year.year, self.current_ac_year.year)
             self.assertEqual(error.errors[0], _("Not in period to edit description fiche."))
 
         msg = get_messages_from_response(response)
         self.assertEqual(
             msg[0].get('message'),
-            _('For the academic year %(data_year)s, the summary edition period is ended since %(end_date)s.') % {
+            _('For the academic year %(data_year)s, the summary edition period ended on %(end_date)s.') % {
                 "data_year": self.academic_calendar.data_year,
-                "end_date": self.academic_calendar.end_date.strftime('%d-%m-%Y'),
+                "end_date": (self.academic_calendar.end_date - datetime.timedelta(days=1)).strftime('%d/%m/%Y'),
+                # TODO :: Remove timedelta when end_date is included in period
             }
         )
         self.assertEqual(msg[0].get('level'), messages.INFO)
@@ -150,7 +161,7 @@ class ManageMyCoursesViewTestCase(TestCase):
             msg[1].get('message'),
             _('For the academic year %(data_year)s, the summary edition period will open on %(start_date)s.') % {
                 "data_year": next_calendar.data_year,
-                "start_date": next_calendar.start_date.strftime('%d-%m-%Y'),
+                "start_date": next_calendar.start_date.strftime('%d/%m/%Y'),
             }
         )
         self.assertEqual(msg[1].get('level'), messages.INFO)
@@ -162,14 +173,54 @@ class ManageMyCoursesViewTestCase(TestCase):
         self.academic_calendar.data_year = self.ac_year_in_future[1]  # This is n+1
         self.academic_calendar.save()
 
+        AcademicCalendarFactory(
+            academic_year=self.ac_year_in_future[1],
+            data_year=self.ac_year_in_future[1],
+            reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION_FORCE_MAJEURE
+        )
+
         response = self.client.get(self.url)
         self.assertTemplateUsed(response, "manage_my_courses/list_my_courses_summary_editable.html")
 
         context = response.context
 
-        for luy, error in context["learning_unit_years_with_errors"]:
+        for luy, error, error_force_majeure in context["learning_unit_years_with_errors"]:
             self.assertEqual(luy.academic_year.year, self.ac_year_in_future[1].year)
             self.assertFalse(error.errors)
+
+    def test_list_my_attributions_force_majeure_editable(self):
+        response = self.client.get(self.url)
+        context = response.context
+        self.assertTrue(context['event_perm_force_majeure_open'])
+        self.assertEquals(
+            context['event_perm_force_majeure_start_date'],
+            self.academic_calendar_force_majeure.start_date
+        )
+        self.assertEquals(
+            context['event_perm_force_majeure_end_date'],
+            self.academic_calendar_force_majeure.end_date
+        )
+        msg = get_messages_from_response(response)
+        self.assertEqual(
+            msg[0].get('message'),
+            _("Force majeure case : Some fields of the description fiche can be edited from %(start_date)s to "
+              "%(end_date)s.") % {
+                "start_date":
+                    self.academic_calendar_force_majeure.start_date.strftime('%d/%m/%Y'),
+                "end_date":
+                    (self.academic_calendar_force_majeure.end_date - datetime.timedelta(days=1)).strftime('%d/%m/%Y'),
+                # TODO :: Remove timedelta when end_date is included in period
+            }
+        )
+        self.assertEqual(msg[0].get('level'), messages.WARNING)
+
+    def test_list_my_attributions_force_majeure_not_editable(self):
+        self.academic_calendar_force_majeure.start_date = datetime.date.today() + datetime.timedelta(days=7)
+        self.academic_calendar_force_majeure.end_date = datetime.date.today() + datetime.timedelta(days=10)
+        self.academic_calendar_force_majeure.save()
+        response = self.client.get(self.url)
+        context = response.context
+        self.assertFalse(context['event_perm_force_majeure_open'])
 
 
 @override_flag('educational_information_block_action', active=True)
@@ -177,15 +228,16 @@ class TestViewEducationalInformation(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.tutor = TutorFactory()
+        AcademicYearFactory.produce()
         cls.attribution = AttributionFactory(tutor=cls.tutor, summary_responsible=True)
         cls.url = reverse(view_educational_information, args=[cls.attribution.learning_unit_year.id])
-        cls.tutor.person.user.user_permissions.add(Permission.objects.get(codename='can_edit_learningunit_pedagogy'))
 
     def setUp(self):
         self.client.force_login(self.tutor.person.user)
 
         self.patcher_perm_can_view_educational_information = mock.patch(
-            'attribution.views.perms.can_tutor_view_educational_information')
+            'attribution.views.perms.can_tutor_view_educational_information'
+        )
         self.mock_perm_view = self.patcher_perm_can_view_educational_information.start()
         self.mock_perm_view.return_value = True
 
@@ -227,15 +279,17 @@ class TestViewEducationalInformation(TestCase):
 class TestFetchAchievement(TestCase):
     @classmethod
     def setUpTestData(cls):
+        fr = FrenchLanguageFactory()
+        en = EnglishLanguageFactory()
         cls.learning_unit_year = LearningUnitYearFactory()
-        cls.achivement_fr = LearningAchievementFactory(language__code="FR", learning_unit_year=cls.learning_unit_year)
-        cls.achivement_en = LearningAchievementFactory(language__code="EN", learning_unit_year=cls.learning_unit_year)
+        cls.achievement_fr = LearningAchievementFactory(language=fr, learning_unit_year=cls.learning_unit_year)
+        cls.achievement_en = LearningAchievementFactory(language=en, learning_unit_year=cls.learning_unit_year)
 
     def test_return_an_iterable_of_fr_and_en_achievements(self):
         result = _fetch_achievements_by_language(self.learning_unit_year)
         self.assertListEqual(
             list(result),
-            list(zip([self.achivement_fr], [self.achivement_en]))
+            list(zip([self.achievement_fr], [self.achievement_en]))
         )
 
 
@@ -243,23 +297,17 @@ class TestManageEducationalInformation(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.tutor = TutorFactory()
+        cls.academic_year = AcademicYearFactory(year=get_current_year())
         cls.attribution = AttributionFactory(
             tutor=cls.tutor,
             summary_responsible=True,
-            learning_unit_year__academic_year=AcademicYearFactory(year=2019)
+            learning_unit_year__academic_year=cls.academic_year,
+            learning_unit_year__learning_container_year__requirement_entity=EntityWithVersionFactory()
         )
         cls.url = reverse("tutor_edit_educational_information", args=[cls.attribution.learning_unit_year.id])
-        cls.tutor.person.user.user_permissions.add(Permission.objects.get(codename='can_edit_learningunit_pedagogy'))
 
     def setUp(self):
         self.client.force_login(self.tutor.person.user)
-
-        self.patcher_perm_can_edit_educational_information = mock.patch.object(BasePerm, "is_valid")
-        self.mock_perm_view = self.patcher_perm_can_edit_educational_information.start()
-        self.mock_perm_view.return_value = True
-
-    def tearDown(self):
-        self.patcher_perm_can_edit_educational_information.stop()
 
     def test_user_not_logged(self):
         self.client.logout()
@@ -267,28 +315,37 @@ class TestManageEducationalInformation(TestCase):
         self.assertRedirects(response, '/login/?next={}'.format(self.url))
 
     def test_check_if_user_can_view_educational_information(self):
-        self.mock_perm_view.return_value = False
-
+        self.client.force_login(PersonFactory().user)
         response = self.client.get(self.url)
-
-        self.assertTrue(self.mock_perm_view.called)
         self.assertTemplateUsed(response, "access_denied.html")
 
     @mock.patch("attribution.views.manage_my_courses.edit_learning_unit_pedagogy", return_value=HttpResponse())
-    def test_use_edit_learning_unit_pedagogy_method(self, mock_edit_learning_unit_pedagogy):
+    @mock.patch("base.models.entity_calendar.find_interval_dates_for_entity")
+    def test_use_edit_learning_unit_pedagogy_method(
+            self,
+            mock_interval_dates,
+            mock_edit_learning_unit_pedagogy
+    ):
+        mock_interval_dates.return_value = {
+            'start_date': self.academic_year.start_date,
+            'end_date': self.academic_year.end_date
+        }
         self.client.get(self.url)
         self.assertTrue(mock_edit_learning_unit_pedagogy.called)
 
     @mock.patch("attribution.views.manage_my_courses.edit_learning_unit_pedagogy", return_value=HttpResponse())
-    def test_use_edit_learning_unit_pedagogy_method(self, mock_edit_learning_unit_pedagogy):
-        self.client.get(self.url)
-        self.assertTrue(mock_edit_learning_unit_pedagogy.called)
-
-    @mock.patch("attribution.views.manage_my_courses.edit_learning_unit_pedagogy", return_value=HttpResponse())
+    @mock.patch("base.models.entity_calendar.find_interval_dates_for_entity")
     @override_settings(YEAR_LIMIT_LUE_MODIFICATION=2018)
-    def test_should_not_call_edit_learning_unit_pedagogy_method_before_2018(self, mock_edit_learning_unit_pedagogy):
-        self.attribution.learning_unit_year.academic_year = AcademicYearFactory(year=2015)
+    def test_should_not_call_edit_learning_unit_pedagogy_method_before_2018(
+            self,
+            mock_interval_dates,
+            mock_edit_learning_unit_pedagogy
+    ):
+        academic_year = AcademicYearFactory(year=2015)
+        mock_interval_dates.return_value = {'start_date': academic_year.start_date, 'end_date': academic_year.end_date}
+        self.attribution.learning_unit_year.academic_year = academic_year
         self.attribution.learning_unit_year.save()
+
         self.client.get(self.url)
         self.assertFalse(mock_edit_learning_unit_pedagogy.called)
 

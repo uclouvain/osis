@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -25,18 +25,22 @@
 ##############################################################################
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from reversion.admin import VersionAdmin
 
 from base.models.enums import peps_type
-from osis_common.models.osis_model_admin import OsisModelAdmin
+from osis_common.models.serializable_model import SerializableModelAdmin, SerializableModel
 
 
-class StudentSpecificProfileAdmin(OsisModelAdmin):
+class StudentSpecificProfileAdmin(VersionAdmin, SerializableModelAdmin):
     list_display = ('student', 'guide', 'changed',)
     list_filter = ('type', 'subtype_disability', 'subtype_sport')
-    search_fields = ['guide__first_name', 'guide__last_name', 'student']
+    search_fields = [
+        'guide__first_name', 'guide__last_name',
+        'student__person__first_name', 'student__person__last_name'
+    ]
 
 
-class StudentSpecificProfile(models.Model):
+class StudentSpecificProfile(SerializableModel):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     student = models.OneToOneField('Student', on_delete=models.PROTECT)

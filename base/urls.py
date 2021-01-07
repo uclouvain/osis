@@ -29,7 +29,7 @@ from django.conf.urls import url, include
 from django.conf.urls.static import static
 from django.urls import path
 
-import base.views.education_groups.create
+import base.views.autocomplete
 import base.views.learning_units.common
 import base.views.learning_units.create
 import base.views.learning_units.delete
@@ -43,57 +43,48 @@ import base.views.learning_units.search.service_course
 import base.views.learning_units.search.simple
 import base.views.learning_units.update
 from attribution.views import attribution, tutor_application
+from base.views import geocoding
 from base.views import learning_achievement, search, user_list
 from base.views import learning_unit, offer, common, institution, organization, academic_calendar, \
-    my_osis, entity, student, notifications
+    my_osis, student
 from base.views import teaching_material
 from base.views.education_groups import urls as education_groups_urls
-from base.views.filter import filter_cities_by_country, filter_campus_by_city
-from base.views.learning_units.detail import DetailLearningUnitYearView
+from base.views.learning_units.detail import DetailLearningUnitYearView, DetailLearningUnitYearViewBySlug
 from base.views.learning_units.external import create as create_external
-from base.views.learning_units.pedagogy.publish import access_refreshed_publication
+from base.views.learning_units.pedagogy.publish import publish_and_access_publication
 from base.views.learning_units.pedagogy.read import learning_unit_pedagogy
-from base.views.learning_units.pedagogy.update import learning_unit_pedagogy_edit, toggle_summary_locked
+from base.views.learning_units.pedagogy.update import learning_unit_pedagogy_edit, toggle_summary_locked, \
+    learning_unit_pedagogy_force_majeure_edit
 from base.views.learning_units.proposal import create, update
 from base.views.learning_units.update import update_learning_unit, learning_unit_edition_end_date
-from base.views.organization import OrganizationAutocomplete, CountryAutocomplete, CampusAutocomplete
-from base.views.person import EmployeeAutocomplete
+from base.views.autocomplete import OrganizationAutocomplete, CountryAutocomplete, CampusAutocomplete, \
+    EntityAutocomplete, AllocationEntityAutocomplete, AdditionnalEntity1Autocomplete, AdditionnalEntity2Autocomplete, \
+    EntityRequirementAutocomplete, EmployeeAutocomplete
 
 urlpatterns = [
     url(r'^$', common.home, name='home'),
-    url(
-        r'^entity_autocomplete/$',
-        base.views.learning_units.update.EntityAutocomplete.as_view(),
-        name='entity_autocomplete'
-    ),
-    url(
-        r'^allocation_entity_autocomplete/$',
-        base.views.learning_units.update.AllocationEntityAutocomplete.as_view(),
-        name='allocation_entity_autocomplete'
-    ),
-    url(
-        r'^additional_entity_1_autocomplete/$',
-        base.views.learning_units.update.AdditionnalEntity1Autocomplete.as_view(),
-        name='additional_entity_1_autocomplete'
-    ),
-    url(
-        r'^additional_entity_2_autocomplete/$',
-        base.views.learning_units.update.AdditionnalEntity2Autocomplete.as_view(),
-        name='additional_entity_2_autocomplete'
-    ),
-    url(
-        r'^entity_requirement_autocomplete/$',
-        base.views.learning_units.update.EntityRequirementAutocomplete.as_view(),
-        name='entity_requirement_autocomplete'
-    ),
-    url(r'^organization-autocomplete/$', OrganizationAutocomplete.as_view(),
-        name='organization_autocomplete'),
-    url(r'^country-autocomplete/$', CountryAutocomplete.as_view(),
-        name='country-autocomplete'),
-    url(r'^campus-autocomplete/$', CampusAutocomplete.as_view(),
-        name='campus-autocomplete'),
-    url(r'^employee-autocomplete/$', EmployeeAutocomplete.as_view(),
-        name='employee_autocomplete'),
+    path('autocomplete/', include([
+        path('entities/', EntityAutocomplete.as_view(), name='entity_autocomplete'),
+        # FIXME: Merge with entity_autocomplete (Find a fix with use forward...)
+        path('allocation-entities/', AllocationEntityAutocomplete.as_view(), name='allocation_entity_autocomplete'),
+        # FIXME: Merge with entity_autocomplete (Find a fix with use forward...)
+        path(
+            'additional-entities-1/',
+            AdditionnalEntity1Autocomplete.as_view(),
+            name='additional_entity_1_autocomplete'
+        ),
+        # FIXME: Merge with entity_autocomplete (Find a fix with use forward...)
+        path(
+            'additional-entities-2/',
+            AdditionnalEntity2Autocomplete.as_view(),
+            name='additional_entity_2_autocomplete'
+        ),
+        path('requirement-entitites/', EntityRequirementAutocomplete.as_view(), name='entity_requirement_autocomplete'),
+        path('organizations/', OrganizationAutocomplete.as_view(), name='organization_autocomplete'),
+        path('countries/', CountryAutocomplete.as_view(), name='country-autocomplete'),
+        path('campus/', CampusAutocomplete.as_view(), name='campus-autocomplete'),
+        path('employee/', EmployeeAutocomplete.as_view(), name='employee_autocomplete'),
+    ])),
     url(r'^list-of-users/$', user_list.UserListView.as_view(), name='academic_actors_list'),
 
     url(r'^academic_actors/', include([
@@ -117,7 +108,6 @@ urlpatterns = [
     ])),
 
     url(r'^api/v1/', include([
-        url(r'^entities/$', entity.post_entities, name='post_entities'),
         url(r'^tutor_application/recompute_portal$', tutor_application.recompute_portal,
             name='recompute_tutor_application_portal'),
         url(r'^attribution/recompute_portal$', attribution.recompute_portal, name='recompute_attribution_portal'),
@@ -152,8 +142,23 @@ urlpatterns = [
         url(r'^by_summary/',
             base.views.learning_units.search.educational_information.LearningUnitDescriptionFicheSearch.as_view(),
             name='learning_units_summary'),
-        url(r'^by_external/', base.views.learning_units.search.external.ExternalLearningUnitSearch.as_view(),
-            name='learning_units_external'),
+        url(r'^by_external/', include([
+            url(
+                r'^$',
+                base.views.learning_units.search.external.ExternalLearningUnitSearch.as_view(),
+                name='learning_units_external'
+            ),
+            url(
+                r'^get_cities_related_to_country',
+                base.views.learning_units.search.external.get_cities_related_to_country,
+                name="get_cities_related_to_country"
+            ),
+            url(
+                r'^get_campuses_related_to_city$',
+                base.views.learning_units.search.external.get_campuses_related_to_city,
+                name="get_campuses_related_to_city"
+            ),
+        ])),
         url(r'^new/', include([
             url(r'^academic_year_id=(?P<academic_year_id>[0-9]+)$',
                 base.views.learning_units.create.create_learning_unit,
@@ -164,18 +169,26 @@ urlpatterns = [
             url(r'^external/academic_year_id=(?P<academic_year>[0-9]+)$',
                 create_external.get_external_learning_unit_creation_form,
                 name="learning_unit_create_external"),
-            url(r'^filter_cities_by_country$', filter_cities_by_country, name="filter_cities_by_country"),
-            url(r'^filter_campus_by_city$', filter_campus_by_city, name="filter_campus_by_city"),
         ])),
-        path("<str:code>/<int:year>/access_publication", access_refreshed_publication, name="access_publication"),
-
+        path(
+            "<str:code>/<int:year>/publish_and_access_publication",
+            publish_and_access_publication,
+            name="publish_and_access_learning_unit_pedagogy"
+        ),
+        path('<str:acronym>/<int:year>', DetailLearningUnitYearViewBySlug.as_view(), name='learning_unit'),
         url(r'^(?P<learning_unit_year_id>[0-9]+)/', include([
             url(r'^$', DetailLearningUnitYearView.as_view(), name='learning_unit'),
             url(r'^formations/$', learning_unit.learning_unit_formations, name="learning_unit_formations"),
             url(r'^components/$', learning_unit.learning_unit_components, name="learning_unit_components"),
+            url(r'^attributions/$', attribution.learning_unit_attributions, name="learning_unit_attributions"),
             url(r'^pedagogy/', include([
                 url(r'^$', learning_unit_pedagogy, name="learning_unit_pedagogy"),
                 url(r'^edit/$', learning_unit_pedagogy_edit, name="learning_unit_pedagogy_edit"),
+                url(
+                    r'^edit_force_majeure/$',
+                    learning_unit_pedagogy_force_majeure_edit,
+                    name="learning_unit_pedagogy_force_majeure_edit"
+                ),
                 url(r'^toggle_summary_locked/$', toggle_summary_locked,
                     name="learning_unit_pedagogy_toggle_summary_locked")
             ])),
@@ -190,7 +203,7 @@ urlpatterns = [
                 url(r'^consolidate/$', base.views.learning_units.proposal.consolidate.consolidate_proposal,
                     name="learning_unit_consolidate_proposal"),
             ])),
-            url(r'^update_end_date/$', learning_unit_edition_end_date, name="learning_unit_edition"),
+            url(r'^update_end_date/$', learning_unit_edition_end_date, name="learning_unit_edition_end_date"),
             url(r'^update/$', update_learning_unit, name="edit_learning_unit"),
             url(r'^specifications/$', learning_unit.learning_unit_specifications, name="learning_unit_specifications"),
             url(r'^specifications/edit/$', learning_unit.learning_unit_specifications_edit,
@@ -227,6 +240,14 @@ urlpatterns = [
                 name="learning_unit_proposal_comparison"),
             url(r'^consolidate/$', base.views.learning_units.proposal.consolidate.consolidate_proposal,
                 name="learning_unit_consolidate_proposal"),
+        ])),
+        url(r'^(?P<code>[A-Za-z0-9]+)/(?P<year>[0-9]+)/', include([
+            url(r'^components/$', learning_unit.learning_unit_components, name="learning_unit_components"),
+            url(r'^specifications/$', learning_unit.learning_unit_specifications, name="learning_unit_specifications"),
+            url(r'^formations/$', learning_unit.learning_unit_formations, name="learning_unit_formations"),
+            url(r'^pedagogy/', include([
+                url(r'^$', learning_unit_pedagogy, name="learning_unit_pedagogy"),
+            ])),
         ])),
         url(r'^check/(?P<subtype>[A-Z]+)$', base.views.learning_units.common.check_acronym, name="check_acronym"),
     ])),
@@ -269,17 +290,6 @@ urlpatterns = [
         ])),
     ])),
 
-    url(r'^organization_address/', include([
-        url(r'^(?P<organization_address_id>[0-9]+)/', include([
-            url(r'^read/$', organization.organization_address_read,
-                name='organization_address_read'),
-            url(r'^edit/$', organization.organization_address_edit,
-                name='organization_address_edit'),
-            url(r'^delete/$', organization.organization_address_delete,
-                name='organization_address_delete')
-        ]))
-    ])),
-
     url(r'^search/', include([
         url(r'^tutors/$', search.search_tutors, name="search_tutors"),
     ])),
@@ -293,12 +303,8 @@ urlpatterns = [
         ]))
     ])),
     url(r'^ajax_select/', include(ajax_select_urls)),
+    path('geocoding', base.views.geocoding.geocode),
     url(r'^clear_filter/$', base.views.search.clear_filter, name="clear_filter"),
-    url(r'^notifications/', include([
-        url(r'^clear/$', base.views.notifications.clear_user_notifications, name="clear_notifications"),
-        url(r'^mark_as_read/$', base.views.notifications.mark_notifications_as_read, name="mark_notifications_as_read"),
-    ])),
-
 ]
 
 if settings.DEBUG:

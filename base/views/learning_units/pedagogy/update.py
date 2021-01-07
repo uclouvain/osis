@@ -25,6 +25,7 @@
 ##############################################################################
 from django.contrib.auth.decorators import login_required
 from django.db.models import Prefetch
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -33,7 +34,8 @@ from django.views.decorators.http import require_http_methods
 from base import models as mdl
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY_FR_ONLY
 from base.business.learning_units.pedagogy import is_pedagogy_data_must_be_postponed
-from base.business.learning_units.perms import is_eligible_to_update_learning_unit_pedagogy
+from base.business.learning_units.perms import is_eligible_to_update_learning_unit_pedagogy, \
+    is_eligible_to_update_learning_unit_pedagogy_force_majeure_section
 from base.forms.learning_unit_pedagogy import LearningUnitPedagogyEditForm
 from base.models import learning_unit_year
 from base.models.learning_unit_year import LearningUnitYear
@@ -41,16 +43,17 @@ from base.models.person import Person
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.views import learning_unit
 from base.views.common import display_success_messages
-from base.views.learning_units import perms
 from base.views.learning_units.common import get_common_context_learning_unit_year, get_text_label_translated
 from base.views.learning_units.perms import PermissionDecorator
 from cms.models.text_label import TextLabel
+from learning_unit.views.utils import learning_unit_year_getter
+from osis_role.contrib.views import permission_required
 from reference.models.language import find_language_in_settings
 
 
 @login_required
 @require_http_methods(["POST"])
-@perms.can_edit_summary_locked_field
+@permission_required('base.can_edit_summary_locked_field', fn=learning_unit_year_getter, raise_exception=True)
 def toggle_summary_locked(request, learning_unit_year_id):
     luy = learning_unit_year.toggle_summary_locked(learning_unit_year_id)
     success_msg = "Update for teacher locked" if luy.summary_locked else "Update for teacher unlocked"
@@ -62,19 +65,26 @@ def toggle_summary_locked(request, learning_unit_year_id):
 @require_http_methods(["GET", "POST"])
 @PermissionDecorator(is_eligible_to_update_learning_unit_pedagogy, "learning_unit_year_id", LearningUnitYear)
 def learning_unit_pedagogy_edit(request, learning_unit_year_id):
-    redirect_url = reverse("learning_unit_pedagogy", kwargs={'learning_unit_year_id': learning_unit_year_id})
-    return edit_learning_unit_pedagogy(request, learning_unit_year_id, redirect_url)
+    return edit_learning_unit_pedagogy(request, learning_unit_year_id)
 
 
-def edit_learning_unit_pedagogy(request, learning_unit_year_id, redirect_url):
+@login_required
+@require_http_methods(["GET", "POST"])
+@PermissionDecorator(is_eligible_to_update_learning_unit_pedagogy_force_majeure_section, "learning_unit_year_id",
+                     LearningUnitYear)
+def learning_unit_pedagogy_force_majeure_edit(request, learning_unit_year_id):
+    if request.method == 'POST':
+        return post_method_edit_force_majeure_pedagogy(request)
+    return edit_learning_unit_pedagogy(request, learning_unit_year_id)
+
+
+def edit_learning_unit_pedagogy(request, learning_unit_year_id):
     if request.method == 'POST':
         _post_learning_unit_pedagogy_form(request)
-        return redirect(redirect_url)
+        return HttpResponse()
 
-    context = get_common_context_learning_unit_year(
-        learning_unit_year_id,
-        get_object_or_404(Person, user=request.user)
-    )
+    context = get_common_context_learning_unit_year(get_object_or_404(Person, user=request.user), learning_unit_year_id,
+                                                    None, None)
     label_name = request.GET.get('label')
     language = request.GET.get('language')
     text_lb = TextLabel.objects.prefetch_related(
@@ -93,6 +103,14 @@ def edit_learning_unit_pedagogy(request, learning_unit_year_id, redirect_url):
     context['cms_label_pedagogy_fr_only'] = CMS_LABEL_PEDAGOGY_FR_ONLY
     context['label_name'] = label_name
     return render(request, "learning_unit/pedagogy_edit.html", context)
+
+
+def post_method_edit_force_majeure_pedagogy(request):
+    form = LearningUnitPedagogyEditForm(request.POST)
+    if form.is_valid():
+        form.save(postpone=False)
+        display_success_messages(request, _("The learning unit has been updated (without report)."))
+        return HttpResponse()
 
 
 def _post_learning_unit_pedagogy_form(request):

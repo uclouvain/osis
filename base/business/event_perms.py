@@ -36,6 +36,7 @@ from base.models.academic_year import AcademicYear
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import academic_calendar_type
 from base.models.learning_unit_year import LearningUnitYear
+from education_group.models.group_year import GroupYear
 
 
 class EventPerm(ABC):
@@ -60,6 +61,13 @@ class EventPerm(ABC):
     @classmethod
     def get_open_academic_calendars_queryset(cls) -> QuerySet:
         qs = AcademicCalendar.objects.open_calendars()
+        if cls.event_reference:
+            qs = qs.filter(reference=cls.event_reference)
+        return qs
+
+    @classmethod
+    def get_academic_calendars_queryset(cls, data_year) -> QuerySet:
+        qs = AcademicCalendar.objects.filter(data_year=data_year)
         if cls.event_reference:
             qs = qs.filter(reference=cls.event_reference)
         return qs
@@ -133,7 +141,7 @@ class EventPermOpened(EventPerm):
 
 
 class EventPermEducationGroupEdition(EventPerm):
-    model = EducationGroupYear
+    model = GroupYear
     event_reference = academic_calendar_type.EDUCATION_GROUP_EDITION
     error_msg = _("This education group is not editable during this period.")
 
@@ -150,10 +158,11 @@ class EventPermLearningUnitCentralManagerEdition(EventPerm):
     error_msg = _("This learning unit is not editable by central managers during this period.")
 
 
+# TODO : gather EventPerm disregarding role
 def generate_event_perm_learning_unit_edition(person, obj=None, raise_exception=True):
-    if person.is_central_manager:
+    if person.is_central_manager_for_ue:
         return EventPermLearningUnitCentralManagerEdition(obj, raise_exception)
-    elif person.is_faculty_manager:
+    elif person.is_faculty_manager_for_ue:
         return EventPermLearningUnitFacultyManagerEdition(obj, raise_exception)
     else:
         return EventPermClosed(obj, raise_exception)
@@ -205,3 +214,9 @@ class EventPermSummaryCourseSubmission(EventPerm):
     model = LearningUnitYear
     event_reference = academic_calendar_type.SUMMARY_COURSE_SUBMISSION
     error_msg = _("Summary course submission is not allowed for tutors during this period.")
+
+
+class EventPermSummaryCourseSubmissionForceMajeure(EventPerm):
+    model = LearningUnitYear
+    event_reference = academic_calendar_type.SUMMARY_COURSE_SUBMISSION_FORCE_MAJEURE
+    error_msg = _("Summary course submission (Force majeure) is not allowed for tutors during this period.")

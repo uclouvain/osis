@@ -30,8 +30,9 @@ from decimal import Decimal, Context, Inexact
 from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 
-from base.models import academic_year, session_exam_calendar, exam_enrollment, program_manager, tutor, offer_year, \
+from base.models import academic_year, session_exam_calendar, exam_enrollment, tutor, offer_year, \
     learning_unit_year
+from base.auth.roles import program_manager
 from base.models.enums import exam_enrollment_justification_type
 
 
@@ -267,8 +268,11 @@ class ScoresEncodingList:
         return "{0:.0f}".format(self.progress_int)
 
     @property
-    def enrollment_draft_not_submitted(self):
-        return [enrollment for enrollment in self.enrollments if enrollment.is_draft and not enrollment.is_final]
+    def remaining_drafts_to_submit_before_deadlines(self):
+        return [
+            enrollment for enrollment in self.enrollments
+            if enrollment.is_draft and not enrollment.is_final and not enrollment.deadline_tutor_reached
+        ]
 
     @property
     def enrollment_encoded(self):
