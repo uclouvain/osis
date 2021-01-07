@@ -39,7 +39,7 @@ def adapt_initial_data_from_proposals(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('base', '0549_auto_20201215_1249'),
+        ('base', '0550_remove_learningcontaineryear_in_charge'),
     ]
 
     operations = [
