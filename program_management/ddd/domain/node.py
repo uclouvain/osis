@@ -323,7 +323,7 @@ class Node(interface.Entity):
 
     def get_all_children_as_learning_unit_nodes(self) -> List['NodeLearningUnitYear']:
         sorted_links = sorted(
-            [link for link in self.get_all_children() if isinstance(link.child, NodeLearningUnitYear)],
+            [link for link in self.get_all_children() if link.child.is_learning_unit()],
             key=lambda link: (link.order, link.parent.code)
         )
         return [link.child for link in sorted_links]
