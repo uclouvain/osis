@@ -27,18 +27,15 @@ import re
 from typing import List, Dict
 
 import attr
-from attr.validators import instance_of
+from django.utils.translation import gettext as _
 
 from base.models import learning_unit
 from base.models.enums import prerequisite_operator
 from base.models.enums.prerequisite_operator import OR, AND
-from django.utils.translation import gettext as _
-
 from base.utils.cache import cached_result
 from osis_common.ddd import interface
 from program_management.ddd.business_types import *
 from program_management.ddd.validators import validators_by_business_action
-
 
 AND_OPERATOR = "ET"
 OR_OPERATOR = 'OU'

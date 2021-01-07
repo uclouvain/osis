@@ -52,7 +52,7 @@ class TestIsPrerequisiteValidator(TestValidatorValidateMixin, SimpleTestCase):
 
     def test_should_not_raise_exception_when_children_of_node_to_detach_are_not_prerequisites(self):
         tree = copy.deepcopy(self.tree)
-        node_without_prerequisite = self.ldroi2101
+        node_without_prerequisite = self.tree.get_node_by_code_and_year(code="LDROP2013", year=self.year)
         validator = _IsPrerequisiteValidator(tree, node_to_detach=node_without_prerequisite)
         self.assertValidatorNotRaises(validator)
 

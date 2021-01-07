@@ -274,8 +274,8 @@ class TestSearchIsPrerequisiteOf(SimpleTestCase):
             node_having_prerequisites=self.ldrop2012
         )
         expected_result = [
-            self.ldrop2011.entity_id,
-            self.ldrop2012.entity_id
+            self.ldrop2011,
+            self.ldrop2012
         ]
         result = tree.search_is_prerequisite_of(
             self.ldroi2101
@@ -299,7 +299,7 @@ class TestSearchIsPrerequisiteOf(SimpleTestCase):
         )
 
         error_msg = "This order is used to order prerequisite nodes in excel file."
-        expected_result = [self.ldrop2011.entity_id, self.ldrop2012.entity_id, self.ldrop2013.entity_id]
+        expected_result = [self.ldrop2011, self.ldrop2012, self.ldrop2013]
         self.assertListEqual(tree.search_is_prerequisite_of(self.ldroi2101), expected_result, error_msg)
 
 

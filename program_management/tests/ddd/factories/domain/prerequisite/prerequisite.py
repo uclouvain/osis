@@ -42,7 +42,7 @@ class PrerequisitesFactory(factory.Factory):
         abstract = False
 
     context_tree = factory.SubFactory(ProgramTreeIdentityFactory)
-    prerequisites = []
+    prerequisites = factory.LazyFunction(list)
 
     @staticmethod
     def produce_inside_tree(
