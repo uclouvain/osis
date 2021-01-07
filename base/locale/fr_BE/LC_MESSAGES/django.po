@@ -2043,9 +2043,6 @@ msgstr ""
 "Proposition d'unité d'enseignement <a href='%(link)s'> %(acronym)s "
 "(%(academic_year)s) </a> créée avec succès."
 
-msgid "Proposal management"
-msgstr "Gestion de la proposition"
-
 msgid "Proposal of creation"
 msgstr "Proposition de création"
 
