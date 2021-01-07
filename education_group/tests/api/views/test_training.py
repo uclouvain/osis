@@ -35,7 +35,6 @@ from rest_framework.test import APITestCase
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.campus import CampusFactory
 from base.tests.factories.education_group_year import TrainingFactory
 from base.tests.factories.hops import HopsFactory
 from base.tests.factories.person import PersonFactory
@@ -206,21 +205,6 @@ class FilterTrainingTestCase(APITestCase):
 
         response = self.client.get(self.url, data=query_string)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
-    def test_get_training_case_version_type_param_is_transition(self):
-        query_string = {'version_type': 'transition'}
-
-        response = self.client.get(self.url, data=query_string)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-        trainings = EducationGroupVersion.objects.filter(is_transition=True)
-
-        serializer = TrainingListSerializer(
-            trainings,
-            many=True,
-            context={'request': RequestFactory().get(self.url, query_string)},
-        )
-        self.assertEqual(response.data['results'], serializer.data)
 
     def test_get_training_case_version_type_param_is_special(self):
         query_string = {'version_type': 'special'}
