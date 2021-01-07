@@ -35,7 +35,6 @@ from django.utils import translation
 from django.utils.translation import gettext as _
 
 import base.business.learning_unit
-from attribution import models as mdl_attr
 from base import models as mdl
 from base.forms.my_message import MyMessageActionForm, MyMessageForm
 from base.models.academic_year import starting_academic_year
@@ -166,12 +165,6 @@ def get_messages_formset(my_messages):
 
 
 def _get_learning_unit_years_attributed(tutor):
-    attributions = mdl_attr.attribution_new.search(tutor=tutor) if tutor else None
-    luy_attributions = []
-    if attributions:
-        for attr in attributions.order_by('learning_container_year__academic_year', 'learning_container_year__acronym'):
-            learning_unit_years = LearningUnitYear.objects.filter(learning_container_year=attr.learning_container_year)
-            for learning_unit_year in learning_unit_years:
-                if learning_unit_year not in luy_attributions:
-                    luy_attributions.append(learning_unit_year)
-    return luy_attributions
+    res = LearningUnitYear.objects.filter(learning_container_year__attributionnew__tutor=tutor,
+                                          learning_container_year__attributionnew__decision_making='').distinct()
+    return list(res)

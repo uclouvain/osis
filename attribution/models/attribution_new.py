@@ -46,16 +46,10 @@ class AttributionNewAdmin(admin.ModelAdmin):
 
     def publish_attribution_to_portal(self, request, queryset):
         from attribution.business import attribution_json
-        queryset = queryset.exclude(decision_making__in=DecisionMakings.get_names())
+        queryset = queryset.filter(decision_making='')
         global_ids = list(queryset.values_list('tutor__person__global_id', flat=True))
         return attribution_json.publish_to_portal(global_ids)
     publish_attribution_to_portal.short_description = _("Publish attribution to portal")
-
-
-class AttributionNewManager(models.Manager):
-
-    def get_queryset(self):
-        return super().get_queryset()
 
 
 class AttributionChargeNewWithoutDecisionManager(models.Manager):
@@ -79,7 +73,7 @@ class AttributionNew(models.Model):
     decision_making = models.CharField(max_length=30, blank=True, null=False, choices=DecisionMakings.choices(),
                                        default='')
 
-    objects = AttributionNewManager()
+    objects = models.Manager()
     objects_attributions = AttributionChargeNewWithoutDecisionManager()
 
     def __str__(self):
