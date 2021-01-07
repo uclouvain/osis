@@ -64,8 +64,9 @@ def load_trees(tree_root_ids: List[int]) -> List['ProgramTree']:
     nodes = __load_tree_nodes(structure)
     links = __load_tree_links(structure)
     has_prerequisites = load_prerequisite.load_has_prerequisite_multiple(tree_root_ids, nodes)
-    for tree_root_id in tree_root_ids:
-        root_node = load_node.load(tree_root_id)  # TODO : use load_multiple
+    root_nodes = load_node.load_multiple(tree_root_ids)
+    for root_node in root_nodes:
+        tree_root_id = root_node.pk
         nodes[root_node.pk] = root_node
         tree_prerequisites = {
             'has_prerequisite_dict': has_prerequisites.get(tree_root_id) or {},
