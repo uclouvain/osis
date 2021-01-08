@@ -89,6 +89,7 @@ class TestPersistTree(TestCase):
         )
         self.assertTrue(link_common_core_with_learn_unit.exists())
 
+        # Rollback attach by detaching nodes becauses theses nodes are reused in other tests.
         self.common_core_node.detach_child(self.learning_unit_year_node)
         self.root_node.detach_child(self.common_core_node)
 
