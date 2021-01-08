@@ -50,7 +50,6 @@ class EducationGroupTreeView(LanguageContextSerializerMixin, generics.RetrieveAP
     @cached_property
     def element(self) -> Element:
         queryset = self.filter_queryset(self.get_queryset())
-        version_name = self.kwargs.pop('version_name', '')
         filter_kwargs = {
             lookup_field: self.kwargs[lookup_url_kwarg]
             for lookup_field, lookup_url_kwarg in zip(self.lookup_fields, self.lookup_url_kwargs)
@@ -58,7 +57,7 @@ class EducationGroupTreeView(LanguageContextSerializerMixin, generics.RetrieveAP
         return get_object_or_404(
             queryset,
             **filter_kwargs,
-            group_year__educationgroupversion__version_name__iexact=version_name
+            group_year__educationgroupversion__version_name__iexact=self.version_name
         )
 
     @cached_property
