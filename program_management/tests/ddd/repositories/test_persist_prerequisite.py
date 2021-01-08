@@ -27,6 +27,8 @@ from unittest import mock
 from django.test import TestCase
 
 from base.models.enums import prerequisite_operator
+from base.models.enums.education_group_categories import Categories
+from base.models.enums.education_group_types import TrainingType
 from base.models.prerequisite import Prerequisite
 from base.models.prerequisite_item import PrerequisiteItem
 from base.tests.factories.academic_year import AcademicYearFactory
@@ -51,7 +53,7 @@ class TestPersist(TestCase):
     @mock.patch("program_management.ddd.repositories._persist_prerequisite._persist")
     def test_call_persist_prerequisite_on_changed_node(self, mock_persist_prerequisite):
         year = 2020
-        tree = ProgramTreeFactory(root_node__year=year)
+        tree = ProgramTreeFactory(root_node__year=year, root_node__node_type=TrainingType.BACHELOR)
         link1 = LinkFactory(parent=tree.root_node, child=NodeLearningUnitYearFactory(code='LDROI1001', year=year))
         link2 = LinkFactory(parent=tree.root_node, child=NodeLearningUnitYearFactory(code='LDROI1002', year=year))
 
@@ -65,7 +67,10 @@ class TestPersist(TestCase):
 class TestPersistPrerequisite(TestCase):
     def setUp(self):
         self.current_academic_year = AcademicYearFactory(current=True)
-        self.root_element = ElementGroupYearFactory(group_year__academic_year__current=True)
+        self.root_element = ElementGroupYearFactory(
+            group_year__academic_year__current=True,
+            group_year__education_group_type__category=Categories.TRAINING.name,
+        )
         self.education_group_version = EducationGroupVersionFactory(
             root_group=self.root_element.group_year,
             offer__academic_year__current=True
