@@ -141,23 +141,3 @@ class ProgramTreeDROI2MFactory(ProgramTreeFactory):
                 ).root_node
             ).parent
         )
-
-    # @factory.post_generation
-    # def generate_prerequisites(self, *args, **kwargs):
-    #     ldrop2011 = self.get_node_by_code_and_year(code="LDROP2011", year=self.entity_id.year)
-    #     self.prerequisites = [
-    #         PrerequisitesFactory(
-    #             context_tree=self.entity_id,
-    #             prerequisites=[
-    #                 PrerequisiteFactory(
-    #                     node_having_prerequisites=ldrop2011,
-    #                     context_tree=self.entity_id,
-    #                     prerequisite_item_groups=[
-    #                         PrerequisiteItemGroupFactory(
-    #                             prerequisite_items=[PrerequisiteItemFactory(code='LDROI2101', year=self.entity_id.year)]
-    #                         )
-    #                     ]
-    #                 )
-    #             ]
-    #         )
-    #     ]
