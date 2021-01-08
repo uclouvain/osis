@@ -338,7 +338,6 @@ def build_initial_data(learning_unit_year, entity):
             "acronym": learning_unit_year.learning_container_year.acronym,
             "common_title": learning_unit_year.learning_container_year.common_title,
             "container_type": learning_unit_year.learning_container_year.container_type,
-            "in_charge": learning_unit_year.learning_container_year.in_charge,
             "team": learning_unit_year.learning_container_year.team,
             "common_title_english": learning_unit_year.learning_container_year.common_title_english,
             "is_vacant": learning_unit_year.learning_container_year.is_vacant,
