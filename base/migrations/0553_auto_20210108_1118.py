@@ -18,7 +18,7 @@ def fix_title_academic_calendar(apps, shema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('base', '0551_merge_20210108_0900'),
+        ('base', '0552_remarks_annualized'),
     ]
 
     operations = [
