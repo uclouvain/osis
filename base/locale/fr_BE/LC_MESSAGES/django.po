@@ -791,7 +791,7 @@ msgid "Education group detailed achievement"
 msgstr "Acquis d'apprentissage détaillé d'une formation"
 
 msgid "Education group edition"
-msgstr "Préparation des programmes"
+msgstr "Préparation des formations"
 
 msgid "Education group extended daily management"
 msgstr "Gestion journalière étendue - catalogue"
