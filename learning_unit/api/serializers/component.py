@@ -44,4 +44,4 @@ class LearningUnitComponentSerializer(serializers.ModelSerializer):
         )
 
     def get_computed_volume(self, obj):
-        return str(obj.vol_global)
+        return '{0:g}'.format(obj.vol_global)
