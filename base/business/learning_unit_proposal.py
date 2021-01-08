@@ -112,7 +112,7 @@ def reinitialize_data_before_proposal(learning_unit_proposal):
 
 def _reinitialize_model_before_proposal(obj_model, attribute_initial_values):
     for attribute_name, attribute_value in attribute_initial_values.items():
-        if attribute_name != "id":
+        if attribute_name != "id" and attribute_name != "in_charge":
             cleaned_initial_value = clean_attribute_initial_value(attribute_name, attribute_value)
             setattr(obj_model, attribute_name, cleaned_initial_value)
     obj_model.save()
