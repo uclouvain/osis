@@ -177,7 +177,7 @@ class DetachNodeValidatorList(MultipleExceptionBusinessListValidator):
                 DetachRootValidator(tree, path_to_node_to_detach),
                 MinimumEditableYearValidator(tree),
                 DetachAuthorizedRelationshipValidator(tree, node_to_detach, detach_from),
-                IsHasPrerequisiteForAllTreesValidator(detach_from, node_to_detach, tree_repository),
+                IsHasPrerequisiteForAllTreesValidator(tree, detach_from, node_to_detach, tree_repository),
                 DetachOptionValidator(tree, path_to_node_to_detach, tree_repository),
             ]
 
@@ -185,7 +185,7 @@ class DetachNodeValidatorList(MultipleExceptionBusinessListValidator):
             self.validators = [
                 AuthorizedRelationshipLearningUnitValidator(tree, node_to_detach, detach_from),
                 MinimumEditableYearValidator(tree),
-                IsHasPrerequisiteForAllTreesValidator(detach_from, node_to_detach, tree_repository),
+                IsHasPrerequisiteForAllTreesValidator(tree, detach_from, node_to_detach, tree_repository),
             ]
 
         else:

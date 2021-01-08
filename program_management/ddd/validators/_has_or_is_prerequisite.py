@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Set
+from typing import Set, List
 
 from base.ddd.utils import business_validator
 from program_management.ddd.business_types import *
@@ -32,19 +32,38 @@ from program_management.ddd.domain.exception import CannotDetachLearningUnitsWho
 
 
 class IsHasPrerequisiteForAllTreesValidator(business_validator.BusinessValidator):
-    def __init__(self, parent_node: 'Node', node_to_detach: 'Node', program_tree_repository: 'ProgramTreeRepository'):
+    def __init__(
+            self,
+            tree: 'ProgramTree',
+            parent_node: 'Node',
+            node_to_detach: 'Node',
+            program_tree_repository: 'ProgramTreeRepository'
+    ):
         super().__init__()
+        self.tree = tree
         self.node_to_detach = node_to_detach
         self.parent_node = parent_node
         self.program_tree_repository = program_tree_repository
 
     def validate(self, *args, **kwargs):
-        trees = self.program_tree_repository.search_from_children([self.parent_node.entity_id])
+        trees = self.search_trees_reusing_node()
+        trees += self.search_trees_inside_node()
         for tree in trees:
             node_to_detach = tree.get_node_by_code_and_year(self.node_to_detach.code, self.node_to_detach.year)
 
             _IsPrerequisiteValidator(tree, node_to_detach).validate()
             _HasPrerequisiteValidator(tree, node_to_detach).validate()
+
+    def search_trees_reusing_node(self) -> List['ProgramTree']:
+        return self.program_tree_repository.search_from_children([self.parent_node.entity_id])
+
+    def search_trees_inside_node(self):
+        trainings_and_minitrainings_root_ids = [
+            child.pk for child in self.tree.get_all_nodes()
+            if (child.is_training() or child.is_mini_training())
+            and child != self.tree.root_node
+        ]
+        return self.program_tree_repository.search(root_ids=trainings_and_minitrainings_root_ids)
 
 
 class _IsPrerequisiteValidator(business_validator.BusinessValidator):
