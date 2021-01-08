@@ -21,6 +21,7 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+import copy
 from unittest import mock
 
 from django.test import TestCase
@@ -121,7 +122,7 @@ class TestPersistPrerequisite(TestCase):
         )
 
     def test_should_update_main_operator(self):
-        tree = ProgramTreeRepository().get(self.program_tree_identity)
+        tree = copy.deepcopy(ProgramTreeRepository().get(self.program_tree_identity))
         node_having_prerequisites = tree.get_node_by_code_and_year("LDROI1001", self.current_academic_year.year)
         tree.set_prerequisite("LOSIS4525 OU MARC4123", node_having_prerequisites)
 

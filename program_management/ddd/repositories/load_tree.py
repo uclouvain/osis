@@ -23,28 +23,21 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import copy
 from typing import List, Dict, Any
 
 from base.models import group_element_year
-from program_management.ddd.domain.link import factory as link_factory
-from program_management.ddd.domain.node import factory as node_factory
 from base.models.enums.link_type import LinkTypes
 from base.models.enums.quadrimesters import DerogationQuadrimester
 from education_group.models.group_year import GroupYear
 from osis_common.decorators.deprecated import deprecated
 from program_management.ddd.business_types import *
-from program_management.ddd.domain import program_tree
+from program_management.ddd.domain import program_tree, node
 from program_management.ddd.domain.education_group_version_academic_year import EducationGroupVersionAcademicYear
 from program_management.ddd.domain.link import factory as link_factory, LinkIdentity
-from program_management.ddd.domain.prerequisite import NullPrerequisite, Prerequisite
+# Typing
+from program_management.ddd.domain.prerequisite import Prerequisites
 from program_management.ddd.repositories import load_node, load_prerequisite, \
     load_authorized_relationship
-# Typing
-from program_management.ddd.repositories.load_prerequisite import TreeRootId, NodeId
-from program_management.models.education_group_version import EducationGroupVersion
-from program_management.ddd.domain.prerequisite import Prerequisites
-
 
 GroupElementYearColumnName = str
 LinkKey = str  # <parent_id>_<child_id>  Example : "123_124"
@@ -54,7 +47,10 @@ TreeStructure = List[Dict[GroupElementYearColumnName, Any]]
 
 @deprecated  # use ProgramTreeRepository.get() instead
 def load(tree_root_id: int) -> 'ProgramTree':
-    return load_trees([tree_root_id])[0]
+    trees = load_trees([tree_root_id])
+    if not trees:
+        raise node.NodeNotFoundException
+    return trees[0]
 
 
 @deprecated  # use ProgramTreeRepository.search() instead
