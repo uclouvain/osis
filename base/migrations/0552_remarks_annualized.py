@@ -12,7 +12,7 @@ def copy_remarks_from_lu_to_luy(apps, schema_editor):
         learningunityear__academic_year__year__gte=2019
     ).prefetch_related(
         Prefetch('learningunityear_set', queryset=LearningUnitYear.objects.filter(academic_year__year__gte=2019))
-    )
+    ).distinct()
     luys_to_update = []
     for lu in lus:
         luys = lu.learningunityear_set.all()
