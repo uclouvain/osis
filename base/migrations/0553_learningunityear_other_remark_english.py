@@ -5,7 +5,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('base', '0550_remarks_annualized'),
+        ('base', '0551_remarks_annualized'),
     ]
 
     operations = [
