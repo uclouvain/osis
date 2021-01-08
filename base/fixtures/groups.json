@@ -1901,11 +1901,6 @@
                     "can_access_student_path",
                     "base",
                     "offerenrollment"
-                ],
-                [
-                    "can_edit_learningunit_pedagogy",
-                    "base",
-                    "learningunit"
                 ]
             ]
         }
