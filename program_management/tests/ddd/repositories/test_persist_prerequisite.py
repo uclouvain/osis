@@ -70,6 +70,7 @@ class TestPersistPrerequisite(TestCase):
         self.root_element = ElementGroupYearFactory(
             group_year__academic_year__current=True,
             group_year__education_group_type__category=Categories.TRAINING.name,
+            group_year__education_group_type__name=TrainingType.BACHELOR.name,
         )
         self.education_group_version = EducationGroupVersionFactory(
             root_group=self.root_element.group_year,
@@ -127,7 +128,7 @@ class TestPersistPrerequisite(TestCase):
         )
 
     def test_should_update_main_operator(self):
-        tree = copy.deepcopy(ProgramTreeRepository().get(self.program_tree_identity))
+        tree = ProgramTreeRepository().get(self.program_tree_identity)
         node_having_prerequisites = tree.get_node_by_code_and_year("LDROI1001", self.current_academic_year.year)
         tree.set_prerequisite("LOSIS4525 OU MARC4123", node_having_prerequisites)
 
