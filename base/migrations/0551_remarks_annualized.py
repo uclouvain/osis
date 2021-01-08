@@ -12,7 +12,7 @@ def copy_remarks_from_lu_to_luy(apps, schema_editor):
         learningunityear__academic_year__year__gte=2019
     )
     for lu in lus:
-        luys = lu.learningunityear_set.all()
+        luys = lu.learningunityear_set.filter(academic_year__year__gte=2019)
         for luy in luys:
             if lu.faculty_remark:
                 luy.faculty_remark = lu.faculty_remark
@@ -39,7 +39,7 @@ def adapt_initial_data_from_proposals(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('base', '0549_auto_20201215_1249'),
+        ('base', '0550_remove_learningcontaineryear_in_charge'),
     ]
 
     operations = [
