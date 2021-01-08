@@ -165,7 +165,7 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         return mini_training_forms.UpdateMiniTrainingForm(
             self.request.POST or None,
             user=self.request.user,
-            event_perm_obj=self.get_permission_object(),
+            year=self.kwargs['year'],
             mini_training_type=self.get_mini_training_obj().type.name,
             attach_path=self.get_attach_path(),
             initial=self._get_mini_training_form_initial_values()
