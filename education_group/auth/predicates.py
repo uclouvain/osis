@@ -182,12 +182,24 @@ def is_program_edition_period_open(self, user, group_year: 'GroupYear' = None):
 
 @predicate(bind=True)
 @predicate_failed_msg(message=_("This education group is not editable during this period."))
+def have_one_program_edition_calendar_open(self, user, group_year: 'GroupYear' = None):
+    return is_program_edition_period_open(user, None)
+
+
+@predicate(bind=True)
+@predicate_failed_msg(message=_("This education group is not editable during this period."))
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def is_education_group_extended_daily_management_calendar_open(self, user, group_year: 'GroupYear' = None):
     calendar = EducationGroupExtendedDailyManagementCalendar()
     if group_year:
         return calendar.is_target_year_authorized(target_year=group_year.academic_year.year)
     return bool(calendar.get_target_years_opened())
+
+
+@predicate(bind=True)
+@predicate_failed_msg(message=_("This education group is not editable during this period."))
+def have_one_education_group_extended_daily_management_calendar_open(self, user, group_year: 'GroupYear' = None):
+    return is_education_group_extended_daily_management_calendar_open(user, None)
 
 
 @predicate(bind=True)

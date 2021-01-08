@@ -67,10 +67,13 @@ class FacultyManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
                 predicates.is_education_group_type_authorized_according_to_user_scope &
                 predicates.is_program_edition_period_open,
             'base.delete_all_training':
+                predicates.have_one_program_edition_calendar_open &
                 predicates.are_all_trainings_removable,
             'base.delete_all_minitraining':
+                predicates.have_one_program_edition_calendar_open &
                 predicates.are_all_minitrainings_removable,
             'base.delete_all_group':
+                predicates.have_one_program_edition_calendar_open &
                 predicates.are_all_groups_removable,
             'base.delete_training':
                 osis_role_predicates.always_deny(
@@ -81,13 +84,11 @@ class FacultyManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
             'base.delete_minitraining':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_user_attached_to_management_entity &
-                predicates.is_education_group_type_authorized_according_to_user_scope &
-                predicates.is_program_edition_period_open,
+                predicates.is_education_group_type_authorized_according_to_user_scope,
             'base.delete_group':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_user_attached_to_management_entity &
-                predicates.is_education_group_type_authorized_according_to_user_scope &
-                predicates.is_program_edition_period_open,
+                predicates.is_education_group_type_authorized_according_to_user_scope,
             'base.can_attach_node':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_user_attached_to_management_entity &
@@ -167,6 +168,5 @@ class FacultyManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
             'program_management.delete_minitraining_version':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_user_attached_to_management_entity &
-                predicates.is_user_linked_to_all_scopes_of_management_entity &
-                predicates.is_program_edition_period_open,
+                predicates.is_user_linked_to_all_scopes_of_management_entity
         })
