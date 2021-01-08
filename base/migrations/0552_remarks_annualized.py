@@ -13,6 +13,7 @@ def copy_remarks_from_lu_to_luy(apps, schema_editor):
     ).prefetch_related(
         Prefetch('learningunityear_set', queryset=LearningUnitYear.objects.filter(academic_year__year__gte=2019))
     )
+    luys_to_update = []
     for lu in lus:
         luys = lu.learningunityear_set.all()
         for luy in luys:
@@ -20,8 +21,8 @@ def copy_remarks_from_lu_to_luy(apps, schema_editor):
                 luy.faculty_remark = lu.faculty_remark
             elif lu.other_remark:
                 luy.faculty_remark = lu.other_remark
-
-        LearningUnitYear.objects.bulk_update(luys, ['faculty_remark'])
+        luys_to_update += list(luys)
+    LearningUnitYear.objects.bulk_update(luys_to_update, ['faculty_remark'], batch_size=1000)
 
 
 def adapt_initial_data_from_proposals(apps, schema_editor):
