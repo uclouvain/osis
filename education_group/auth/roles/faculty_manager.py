@@ -164,6 +164,7 @@ class FacultyManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
                 predicates.is_education_group_type_authorized_according_to_user_scope &
                 predicates.is_program_edition_period_open,
             'program_management.delete_permanently_minitraining_version':
+                predicates.have_one_program_edition_calendar_open &
                 predicates.are_all_mini_training_versions_removable,
             'program_management.delete_minitraining_version':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
