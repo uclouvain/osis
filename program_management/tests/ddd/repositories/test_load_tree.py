@@ -36,6 +36,7 @@ from base.tests.factories.prerequisite import PrerequisiteFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from program_management.ddd.domain import prerequisite
 from program_management.ddd.domain import program_tree, node
+from program_management.ddd.domain.exception import ProgramTreeNotFoundException
 from program_management.ddd.repositories import load_tree
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory, ElementLearningUnitYearFactory
@@ -70,7 +71,7 @@ class TestLoadTree(TestCase):
 
     def test_case_tree_root_not_exist(self):
         unknown_tree_root_id = -1
-        with self.assertRaises(node.NodeNotFoundException):
+        with self.assertRaises(ProgramTreeNotFoundException):
             load_tree.load(unknown_tree_root_id)
 
     def test_fields_to_load(self):
