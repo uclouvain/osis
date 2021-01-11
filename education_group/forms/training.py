@@ -335,15 +335,19 @@ class CreateTrainingForm(ValidationRuleMixin, forms.Form):
         self.__init_secondary_domains()
 
     def __init_academic_year_field(self):
-        if not self.fields['academic_year'].disabled and self.user.person.is_faculty_manager:
-            target_years_opened = EducationGroupPreparationCalendar().get_target_years_opened()
-        else:
-            target_years_opened = EducationGroupExtendedDailyManagementCalendar().get_target_years_opened()
-
+        target_years_opened = EducationGroupExtendedDailyManagementCalendar().get_target_years_opened()
         working_academic_years = AcademicYear.objects.filter(year__in=target_years_opened)
-        self.fields['academic_year'].queryset = working_academic_years
-        self.fields['end_year'].queryset = AcademicYear.objects.filter(
-            year__gte=getattr(working_academic_years.first(), 'year', settings.YEAR_LIMIT_EDG_MODIFICATION)
+        self.fields['academic_year'].queryset = self.fields['end_year'].queryset = working_academic_years
+
+        if not self.fields['academic_year'].disabled and self.user.person.is_faculty_manager:
+            self.fields['academic_year'].queryset = self.fields['academic_year'].queryset.filter(
+                year__in=EducationGroupPreparationCalendar().get_target_years_opened()
+            )
+
+        self.fields['end_year'].queryset = self.fields['end_year'].queryset.filter(
+            year__gte=getattr(
+                self.fields['academic_year'].queryset.first(), 'year', settings.YEAR_LIMIT_EDG_MODIFICATION
+            )
         )
 
     def __init_management_entity_field(self):
