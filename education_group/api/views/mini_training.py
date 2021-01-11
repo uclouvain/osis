@@ -35,7 +35,6 @@ from base.models.enums.education_group_types import MiniTrainingType
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
 from education_group.api.serializers.mini_training import MiniTrainingDetailSerializer, MiniTrainingListSerializer
 from education_group.api.serializers.training import TrainingListSerializer
-from education_group.api.views import utils
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.models.element import Element
 
@@ -50,7 +49,6 @@ class MiniTrainingFilter(filters.FilterSet):
         choices=MiniTrainingType.choices()
     )
     campus = filters.CharFilter(field_name='root_group__main_teaching_campus__name', lookup_expr='icontains')
-    version_type = filters.CharFilter(method='filter_version_type')
     acronym = filters.CharFilter(field_name="offer__acronym", lookup_expr='icontains')
     title = filters.CharFilter(field_name="root_group__title_fr", lookup_expr='icontains')
     title_english = filters.CharFilter(field_name="root_group__title_en", lookup_expr='icontains')
@@ -71,13 +69,9 @@ class MiniTrainingFilter(filters.FilterSet):
         model = EducationGroupVersion
         fields = [
             'acronym', 'code', 'education_group_type', 'title', 'title_english',
-            'from_year', 'to_year', 'version_type',
+            'from_year', 'to_year',
             'is_transition', 'version_name'
         ]
-
-    @staticmethod
-    def filter_version_type(queryset, _, value):
-        return utils.filter_version_type(queryset, value)
 
 
 class MiniTrainingList(LanguageContextSerializerMixin, generics.ListAPIView):
@@ -87,7 +81,8 @@ class MiniTrainingList(LanguageContextSerializerMixin, generics.ListAPIView):
     name = 'minitraining_list'
     queryset = EducationGroupVersion.objects.filter(
         offer__education_group_type__category=education_group_categories.MINI_TRAINING,
-        is_transition=False
+        is_transition=False,
+        version_name=''
     ).select_related(
         'offer__education_group_type',
         'offer__academic_year',
