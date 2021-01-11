@@ -52,12 +52,6 @@ class AttributionNewAdmin(admin.ModelAdmin):
     publish_attribution_to_portal.short_description = _("Publish attribution to portal")
 
 
-class AttributionChargeNewWithoutDecisionManager(models.Manager):
-
-    def get_queryset(self):
-        return super().get_queryset().filter(decision_making='')
-
-
 class AttributionNew(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
@@ -74,7 +68,6 @@ class AttributionNew(models.Model):
                                        default='')
 
     objects = models.Manager()
-    objects_attributions = AttributionChargeNewWithoutDecisionManager()
 
     def __str__(self):
         return u"%s - %s" % (self.tutor.person, self.function)
@@ -87,7 +80,7 @@ class AttributionNew(models.Model):
 
 
 def search(*args, **kwargs):
-    qs = AttributionNew.objects_attributions.all()
+    qs = AttributionNew.objects.all()
     if "learning_container_year" in kwargs:
         qs = filter_with_list_or_object('learning_container_year', AttributionNew, **kwargs)
     if "tutor" in kwargs:
