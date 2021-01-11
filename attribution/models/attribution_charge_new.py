@@ -42,12 +42,6 @@ class AttributionChargeNewAdmin(admin.ModelAdmin):
     list_filter = ('learning_component_year__type', 'attribution__learning_container_year__academic_year')
 
 
-class AttributionChargeNewWithoutDecisionManager(models.Manager):
-
-    def get_queryset(self):
-        return super().get_queryset().filter(attribution__decision_making='')
-
-
 class AttributionChargeNew(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
@@ -56,7 +50,6 @@ class AttributionChargeNew(models.Model):
     allocation_charge = models.DecimalField(max_digits=6, decimal_places=1, blank=True, null=True,
                                             validators=[validators.MinValueValidator(MIN_ALLOCATION_CHARGE)])
     objects = models.Manager()
-    objects_attributions = AttributionChargeNewWithoutDecisionManager()
 
     def __str__(self):
         return u"%s" % self.attribution

@@ -36,7 +36,6 @@ from base.models.enums.learning_container_year_types import LearningContainerYea
 from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.views.learning_units.search.common import SearchTypes
-from attribution.models.enums.decision_making import DecisionMakings
 
 
 COMMON_ORDERING_FIELDS = (
@@ -160,9 +159,6 @@ class LearningUnitFilter(FilterSet):
         value = value.replace(' ', '\\s')
         search_value = espace_special_characters(value)
         for tutor_name in search_value.split():
-            queryset = queryset.exclude(
-                learning_container_year__attributionnew__decision_making__in=DecisionMakings.get_names()
-            )
             queryset = queryset.filter(
                 Q(learning_container_year__attributionnew__tutor__person__first_name__iregex=tutor_name
                   ) |
