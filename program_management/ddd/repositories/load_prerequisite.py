@@ -33,8 +33,8 @@ from base.models.enums import prerequisite_operator
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.prerequisite_item import PrerequisiteItem as PrerequisiteItemModel, PrerequisiteItem
 from program_management.ddd.domain import prerequisite as prerequisite_domain
-
 from program_management.ddd.business_types import *
+
 
 TreeRootId = int
 NodeId = int
@@ -43,9 +43,9 @@ IsPrerequisiteOfNodeId = int
 
 
 def load_has_prerequisite_multiple(
-        tree_root_ids: List[int],
+        tree_root_ids: List[TreeRootId],
         nodes: Dict[str, 'Node']
-) -> Dict[TreeRootId, Dict[NodeId, prerequisite_domain.Prerequisite]]:
+) -> Dict[TreeRootId, Dict['NodeIdentity', prerequisite_domain.Prerequisite]]:
     """
     This function return a dict of prerequisite grouped by node_id
     Ex: {
@@ -56,6 +56,9 @@ def load_has_prerequisite_multiple(
     :param nodes: Dict where keys = '<node_id>_<TYPE>' and values = Node
     :return:
     """
+    # FIXME :: cyclic import - use dependency injection instead ?
+    from program_management.ddd.domain.program_tree import ProgramTreeIdentity
+    from program_management.ddd.domain.node import NodeIdentity
     prerequisite_item_qs = PrerequisiteItem.objects.filter(
         prerequisite__education_group_version__root_group__element__id__in=tree_root_ids,
         prerequisite__learning_unit_year_id__element__pk__in=set(n.pk for n in nodes.values() if n.is_learning_unit())
@@ -69,7 +72,10 @@ def load_has_prerequisite_multiple(
         year=F('prerequisite__learning_unit_year__academic_year__year'),
         main_operator=F('prerequisite__main_operator'),
         element_id=F('prerequisite__learning_unit_year__element__pk'),
+        element_code=F('prerequisite__learning_unit_year__acronym'),
         root_element_id=F('prerequisite__education_group_version__root_group__element__pk'),
+        root_code=F('prerequisite__education_group_version__root_group__partial_acronym'),
+        root_year=F('prerequisite__education_group_version__root_group__academic_year__year'),
     ).order_by(
         'root_element_id',
         'element_id',
@@ -77,7 +83,10 @@ def load_has_prerequisite_multiple(
         'position'
     ).values(
         'root_element_id',
+        'root_code',
+        'root_year',
         'element_id',
+        'element_code',
         'main_operator',
         'group_number',
         'position',
@@ -96,8 +105,14 @@ def load_has_prerequisite_multiple(
         for node_id, prequisite_items in result_grouped_by_learn_unit_id:
             prequisite_items = list(prequisite_items)
 
-            preq = prerequisite_domain.Prerequisite(main_operator=prequisite_items[0]['main_operator'])
-            prerequisites_dict.setdefault(node_id, preq)
+            first_item = prequisite_items[0]
+            node_identity = NodeIdentity(code=first_item['element_code'], year=first_item['year'])
+            preq = prerequisite_domain.Prerequisite(
+                main_operator=first_item['main_operator'],
+                node_having_prerequisites=node_identity,
+                context_tree=ProgramTreeIdentity(code=first_item['root_code'], year=first_item['root_year'])
+            )
+            prerequisites_dict.setdefault(node_identity, preq)
             for _, p_items in itertools.groupby(prequisite_items, key=lambda p: p['group_number']):
                 operator_item = prerequisite_operator.OR if preq.main_operator == prerequisite_operator.AND else \
                     prerequisite_operator.AND
@@ -107,59 +122,6 @@ def load_has_prerequisite_multiple(
                         prerequisite_domain.PrerequisiteItem(p_item['code'], p_item['year']) for p_item in p_items
                     ]
                 )
-                prerequisites_dict[node_id].add_prerequisite_item_group(p_group_items)
+                prerequisites_dict[node_identity].add_prerequisite_item_group(p_group_items)
         prerequisites_dict_by_program_root_id[program_id] = prerequisites_dict
     return prerequisites_dict_by_program_root_id
-
-
-def load_is_prerequisite_multiple(
-        tree_root_ids: List[int],
-        nodes: Dict['NodeKey', 'Node']
-) -> Dict[TreeRootId, Dict[NodeId, List['NodeLearningUnitYear']]]:
-    """
-    By node_id, compute the fact that this node is prerequisite of another node
-        Ex: {
-           node_id:  [node_id, node_id, ...],
-           node_id:  [node_id],
-        }
-    :param tree_root_ids: List of root nodes of the trees
-    :param nodes: Dict where keys = '<node_id>' and values = Node
-    :return:
-    """
-    qs = PrerequisiteItemModel.objects.filter(
-        prerequisite__education_group_version__root_group__element__pk__in=tree_root_ids,
-        learning_unit__learningunityear__element__pk__in=set(n.pk for n in nodes.values() if n.is_learning_unit())
-    ).values(
-        'learning_unit__learningunityear__element__pk'
-    ).annotate(
-        node_id=F('learning_unit__learningunityear__element__pk'),
-        is_a_prerequisite_of=ArrayAgg('prerequisite__learning_unit_year__element__pk'),
-        root_element_id=F('prerequisite__education_group_version__root_group__element__pk'),
-    ).values(
-        'node_id',
-        'is_a_prerequisite_of',
-        'root_element_id',
-    )
-
-    result = {}
-    for tree_root_id, prerequisite_query_result in itertools.groupby(qs, key=lambda p: p['root_element_id']):
-        map_node_id_with_ids_prerequisite_of = __get_is_prerequisite_of_by_node_id(prerequisite_query_result)
-        result[tree_root_id] = __convert_ids_to_nodes(map_node_id_with_ids_prerequisite_of, nodes)
-    return result
-
-
-def __get_is_prerequisite_of_by_node_id(prerequisite_query_result) -> Dict[NodeId, List[IsPrerequisiteOfNodeId]]:
-    return {
-        prerequisite_result['node_id']: prerequisite_result['is_a_prerequisite_of']
-        for prerequisite_result in prerequisite_query_result
-    }
-
-
-def __convert_ids_to_nodes(
-        map_node_id_with_is_prerequisite: Dict[NodeId, List[IsPrerequisiteOfNodeId]],
-        nodes: Dict['NodeKey', 'Node']
-) -> Dict[NodeId, List['NodeLearningUnitYear']]:
-    return {
-        main_node_id: [nodes[id] for id in node_ids]
-        for main_node_id, node_ids in map_node_id_with_is_prerequisite.items()
-    }

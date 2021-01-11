@@ -25,6 +25,8 @@
 ##############################################################################
 from typing import Optional, List, Union
 
+from django.db.models import Q
+
 from base.models.group_element_year import GroupElementYear
 from education_group.ddd.command import CreateOrphanGroupCommand, CopyGroupCommand
 from osis_common.ddd import interface
@@ -39,8 +41,14 @@ from program_management.models.element import Element
 class ProgramTreeRepository(interface.AbstractRepository):
 
     @classmethod
-    def search(cls, entity_ids: Optional[List['ProgramTreeIdentity']] = None, **kwargs) -> List[Entity]:
-        raise NotImplementedError
+    def search(
+            cls,
+            entity_ids: Optional[List['ProgramTreeIdentity']] = None,
+            root_ids: List[int] = None
+    ) -> List['ProgramTree']:
+        if root_ids:
+            return load_tree.load_trees(root_ids)
+        return []
 
     @classmethod
     def search_from_children(cls, node_ids: List['NodeIdentity'], **kwargs) -> List['ProgramTree']:

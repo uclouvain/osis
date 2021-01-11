@@ -23,31 +23,56 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from unittest import mock
 
-from django.test import SimpleTestCase
+import factory.fuzzy
 
-from program_management.ddd.domain.exception import NodeHaveLinkException
-from program_management.ddd.repositories.program_tree import ProgramTreeRepository
-from program_management.ddd.validators._node_have_link import NodeHaveLinkValidator
+from base.models.enums.education_group_types import GroupType, TrainingType
+from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
 
-class TestNodeHaveLinkValidator(SimpleTestCase):
-    def setUp(self):
-        self.node = NodeGroupYearFactory()
-        self.repository = ProgramTreeRepository()
+class ProgramTreeFinalityDROI2MSIUFactory(ProgramTreeFactory):
+    """
+    LIURE200S - DROI2MS/IU
+        |
+        |___ LIURE100T - PARTIEDEBASEDROI2MS/IU
+        |
+        |___ LIURE101G - LISTEAUCHOIXOPTIONSDROIMS/IU
 
-    @mock.patch('program_management.ddd.repositories.program_tree.ProgramTreeRepository.search_from_children')
-    def test_should_raise_exception_if_node_have_links(self, mock_search_tree):
-        mock_search_tree.return_value = [ProgramTreeFactory(), ProgramTreeFactory()]
+    """
+    root_node = factory.SubFactory(
+        NodeGroupYearFactory,
+        node_type=TrainingType.MASTER_MS_120,
+        code='LIURE200S',
+        title='DROI2MS/IU',
+    )
 
-        with self.assertRaises(NodeHaveLinkException):
-            NodeHaveLinkValidator(self.node, self.repository).validate()
+    @factory.post_generation
+    def generate_children(self, *args, **kwargs):
+        end_year = self.root_node.end_year
+        current_year = self.root_node.year
+        liure100t = NodeGroupYearFactory(
+            code='LIURE100T',
+            title='PARTIEDEBASEDROI2MS/IU',
+            node_type=GroupType.COMMON_CORE,
+            end_year=end_year,
+            year=current_year,
+        )
 
-    @mock.patch('program_management.ddd.repositories.program_tree.ProgramTreeRepository.search_from_children')
-    def test_should_not_raise_exception_when_node_doesnt_have_links(self, mock_search_tree):
-        mock_search_tree.return_value = []
+        liure101g = NodeGroupYearFactory(
+            code='LIURE101G',
+            title='LISTEAUCHOIXOPTIONSDROIMS/IU',
+            node_type=GroupType.OPTION_LIST_CHOICE,
+            end_year=end_year,
+            year=current_year,
+        )
 
-        NodeHaveLinkValidator(self.node, self.repository).validate()
+        LinkFactory(
+            parent=self.root_node,
+            child=liure100t,
+        )
+        LinkFactory(
+            parent=self.root_node,
+            child=liure101g,
+        )

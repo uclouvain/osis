@@ -42,13 +42,12 @@ from osis_common.decorators.deprecated import deprecated
 from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.command import DO_NOT_OVERRIDE
-from program_management.ddd.domain import prerequisite, exception
+from program_management.ddd.domain import exception
 from program_management.ddd.domain.link import factory as link_factory
 from program_management.ddd.domain.node import factory as node_factory, NodeIdentity, Node, NodeNotFoundException
 from program_management.ddd.repositories import load_authorized_relationship
 from program_management.ddd.validators import validators_by_business_action
 from program_management.ddd.validators._path_validator import PathValidator
-from program_management.models.enums import node_type
 from program_management.models.enums.node_type import NodeType
 
 PATH_SEPARATOR = '|'
@@ -177,6 +176,12 @@ class ProgramTree(interface.RootEntity):
     root_node = attr.ib(type=Node)
     authorized_relationships = attr.ib(type=AuthorizedRelationshipList, factory=list)
     entity_id = attr.ib(type=ProgramTreeIdentity)  # FIXME :: pass entity_id as mandatory param !
+    prerequisites = attr.ib(type='Prerequisites')
+
+    @prerequisites.default
+    def _default_prerequisite(self) -> 'Prerequisites':
+        from program_management.ddd.domain.prerequisite import NullPrerequisites
+        return NullPrerequisites()
 
     def is_empty(self, parent_node=None):
         parent_node = parent_node or self.root_node
@@ -363,7 +368,7 @@ class ProgramTree(interface.RootEntity):
             sorted(
                 (
                     node_obj for node_obj in self.get_all_learning_unit_nodes()
-                    if node_obj.has_prerequisite
+                    if self.has_prerequisites(node_obj)
                 ),
                 key=lambda node_obj: node_obj.code
             )
@@ -374,7 +379,7 @@ class ProgramTree(interface.RootEntity):
             sorted(
                 (
                     node_obj for node_obj in self.get_all_nodes()
-                    if node_obj.is_learning_unit() and node_obj.is_prerequisite
+                    if node_obj.is_learning_unit() and self.is_prerequisite(node_obj)
                 ),
                 key=lambda node_obj: node_obj.code
             )
@@ -408,7 +413,11 @@ class ProgramTree(interface.RootEntity):
 
     def prune(self, ignore_children_from: Set[EducationGroupTypesEnum] = None) -> 'ProgramTree':
         copied_root_node = _copy(self.root_node, ignore_children_from=ignore_children_from)
-        return ProgramTree(root_node=copied_root_node, authorized_relationships=self.authorized_relationships)
+        return ProgramTree(
+            root_node=copied_root_node,
+            authorized_relationships=self.authorized_relationships,
+            prerequisites=self.prerequisites
+        )
 
     def get_ordered_mandatory_children_types(self, parent_node: 'Node') -> List[EducationGroupTypesEnum]:
         return self.authorized_relationships.get_ordered_mandatory_children_types(parent_node.node_type)
@@ -458,25 +467,9 @@ class ProgramTree(interface.RootEntity):
     def set_prerequisite(
             self,
             prerequisite_expression: 'PrerequisiteExpression',
-            node: 'NodeLearningUnitYear'
+            node_having_prerequisites: 'NodeLearningUnitYear'
     ) -> List['BusinessValidationMessage']:
-        """
-        Set prerequisite for the node corresponding to the path.
-        """
-        is_valid, messages = self.clean_set_prerequisite(prerequisite_expression, node)
-        if is_valid:
-            node.set_prerequisite(
-                prerequisite.factory.from_expression(prerequisite_expression, self.root_node.year)
-            )
-        return messages
-
-    def clean_set_prerequisite(
-            self,
-            prerequisite_expression: 'PrerequisiteExpression',
-            node: 'NodeLearningUnitYear'
-    ) -> (bool, List['BusinessValidationMessage']):
-        validator = validators_by_business_action.UpdatePrerequisiteValidatorList(prerequisite_expression, node, self)
-        return validator.is_valid(), validator.messages
+        return self.prerequisites.set_prerequisite(node_having_prerequisites, prerequisite_expression, self)
 
     def get_remaining_children_after_detach(self, path_node_to_detach: 'Path'):
         children_with_counter = self.root_node.get_all_children_with_counter()
@@ -615,6 +608,24 @@ class ProgramTree(interface.RootEntity):
 
     def contains(self, node: Node) -> bool:
         return node in self.get_all_nodes()
+
+    def get_all_prerequisites(self) -> List['Prerequisite']:
+        return self.prerequisites.prerequisites
+
+    def has_prerequisites(self, node: 'NodeLearningUnitYear') -> bool:
+        return self.prerequisites.has_prerequisites(node)
+
+    def is_prerequisite(self, node: 'NodeLearningUnitYear') -> bool:
+        return self.prerequisites.is_prerequisite(node)
+
+    def search_is_prerequisite_of(self, search_from_node: 'NodeLearningUnitYear') -> List['NodeLearningUnitYear']:
+        return [
+            self.get_node_by_code_and_year(node_identity.code, node_identity.year)
+            for node_identity in self.prerequisites.search_is_prerequisite_of(search_from_node)
+        ]
+
+    def get_prerequisite(self, node: 'NodeLearningUnitYear') -> 'Prerequisite':
+        return self.prerequisites.get_prerequisite(node)
 
 
 def _nodes_from_root(root: 'Node') -> List['Node']:

@@ -38,9 +38,11 @@ from education_group.api.views.training import TrainingDetail
 from education_group.enums.node_type import NodeType
 from learning_unit.api.views.learning_unit import LearningUnitDetailed
 from program_management.ddd.domain.link import Link
+from program_management.tests.ddd.factories.domain.prerequisite.prerequisite import PrerequisitesFactory
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 from program_management.tests.ddd.factories.prerequisite import PrerequisiteFactory
+from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
 
 class EducationGroupRootNodeTreeSerializerTestCase(SimpleTestCase):
@@ -92,7 +94,8 @@ class EducationGroupRootNodeTreeSerializerTestCase(SimpleTestCase):
             Link(parent=None, child=self.training),
             context={
                 'request': RequestFactory().get(url),
-                'language': settings.LANGUAGE_CODE_EN
+                'language': settings.LANGUAGE_CODE_EN,
+                'program_tree': ProgramTreeFactory(root_node=self.training)
             }
         )
 
@@ -205,7 +208,8 @@ class EducationGroupRootNodeTreeSerializerTestCase(SimpleTestCase):
             Link(parent=None, child=training),
             context={
                 'request': RequestFactory().get(url),
-                'language': settings.LANGUAGE_CODE_EN
+                'language': settings.LANGUAGE_CODE_EN,
+                'program_tree': ProgramTreeFactory(root_node=training)
             }
         )
         self.assertEqual(len(serializer.data['children']), 1)
@@ -234,6 +238,7 @@ class EducationGroupRootNodeTreeSerializerTestCase(SimpleTestCase):
             context={
                 'request': RequestFactory().get(url),
                 'language': settings.LANGUAGE_CODE_EN,
+                'program_tree': ProgramTreeFactory(root_node=training)
             }
         )
         self.assertEqual(len(serializer.data['children']), 1)
@@ -265,6 +270,7 @@ class EducationGroupRootNodeTreeSerializerTestCase(SimpleTestCase):
             context={
                 'request': RequestFactory().get(url),
                 'language': settings.LANGUAGE_CODE_EN,
+                'program_tree': ProgramTreeFactory(root_node=training)
             }
         )
         minor = serializer.data['children'][0]['children'][0]
@@ -283,25 +289,37 @@ class EducationGroupRootNodeTreeSerializerTestCase(SimpleTestCase):
 
     def test_get_with_prerequisites(self):
         self.assertFalse(self.serializer.data['children'][0]['children'][0]['with_prerequisite'])
+        tree = ProgramTreeFactory(root_node__node_type=GroupType.COMMON_CORE, root_node__year=self.year)
 
-        luy = NodeLearningUnitYearFactory(
+        luy_has_prerequisites = NodeLearningUnitYearFactory(
             year=self.year,
         )
-        luy.set_prerequisite(PrerequisiteFactory())
-        gey = LinkFactory(
-            parent__node_type=GroupType.COMMON_CORE,
-            child=luy,
-            relative_credits=None
+        LinkFactory(
+            parent=tree.root_node,
+            child=luy_has_prerequisites,
+        )
+        luy_is_prerequisite = NodeLearningUnitYearFactory(
+            year=self.year,
+        )
+        LinkFactory(
+            parent=tree.root_node,
+            child=luy_is_prerequisite,
+        )
+        PrerequisitesFactory.produce_inside_tree(
+            context_tree=tree,
+            node_having_prerequisite=luy_has_prerequisites.entity_id,
+            nodes_that_are_prequisites=[luy_is_prerequisite]
         )
         url = reverse('education_group_api_v1:' + GroupTreeView.name, kwargs={
-            'partial_acronym': gey.parent.code,
+            'partial_acronym': tree.root_node.code,
             'year': self.year
         })
         serializer = EducationGroupRootNodeTreeSerializer(
-            Link(parent=None, child=gey.parent),
+            Link(parent=None, child=tree.root_node),
             context={
                 'request': RequestFactory().get(url),
-                'language': settings.LANGUAGE_CODE_EN
+                'language': settings.LANGUAGE_CODE_EN,
+                'program_tree': tree,
             }
         )
         self.assertTrue(serializer.data['children'][0]['with_prerequisite'])
@@ -321,7 +339,8 @@ class EducationGroupRootNodeTreeSerializerTestCase(SimpleTestCase):
             Link(parent=None, child=gey.parent),
             context={
                 'request': RequestFactory().get(url),
-                'language': settings.LANGUAGE_CODE_EN
+                'language': settings.LANGUAGE_CODE_EN,
+                'program_tree': ProgramTreeFactory(root_node=gey.parent),
             }
         )
         self.assertEqual(serializer.data['children'][0]['credits'], luy.credits,
@@ -399,7 +418,8 @@ class EducationGroupRootNodeTreeSerializerTestCase(SimpleTestCase):
             Link(parent=None, child=gey.parent),
             context={
                 'request': RequestFactory().get(url),
-                'language': settings.LANGUAGE_CODE_EN
+                'language': settings.LANGUAGE_CODE_EN,
+                'program_tree': ProgramTreeFactory(root_node=gey.parent),
             }
         )
         return serializer
@@ -435,6 +455,7 @@ class EducationGroupWithMasterFinalityInRootTreeSerializerTestCase(SimpleTestCas
         self.serializer = EducationGroupRootNodeTreeSerializer(
             Link(parent=None, child=self.training),
             context={
+                'program_tree': ProgramTreeFactory(root_node=self.training),
                 'request': RequestFactory().get(url),
                 'language': settings.LANGUAGE_CODE_EN
             }
@@ -525,6 +546,7 @@ class EducationGroupWithMasterFinalityInChildTreeSerializerTestCase(SimpleTestCa
         self.serializer = EducationGroupRootNodeTreeSerializer(
             Link(parent=None, child=self.training),
             context={
+                'program_tree': ProgramTreeFactory(root_node=self.training),
                 'request': RequestFactory().get(url),
                 'language': settings.LANGUAGE_CODE_EN
             }

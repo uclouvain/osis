@@ -177,7 +177,7 @@ class DetachNodeValidatorList(MultipleExceptionBusinessListValidator):
                 DetachRootValidator(tree, path_to_node_to_detach),
                 MinimumEditableYearValidator(tree),
                 DetachAuthorizedRelationshipValidator(tree, node_to_detach, detach_from),
-                IsHasPrerequisiteForAllTreesValidator(detach_from, node_to_detach, tree_repository),
+                IsHasPrerequisiteForAllTreesValidator(tree, detach_from, node_to_detach, tree_repository),
                 DetachOptionValidator(tree, path_to_node_to_detach, tree_repository),
             ]
 
@@ -185,7 +185,7 @@ class DetachNodeValidatorList(MultipleExceptionBusinessListValidator):
             self.validators = [
                 AuthorizedRelationshipLearningUnitValidator(tree, node_to_detach, detach_from),
                 MinimumEditableYearValidator(tree),
-                IsHasPrerequisiteForAllTreesValidator(detach_from, node_to_detach, tree_repository),
+                IsHasPrerequisiteForAllTreesValidator(tree, detach_from, node_to_detach, tree_repository),
             ]
 
         else:
@@ -210,10 +210,10 @@ class UpdatePrerequisiteValidatorList(business_validator.BusinessListValidator):
 
 
 class DeleteProgramTreeValidatorList(business_validator.BusinessListValidator):
-    def __init__(self, program_tree: 'ProgramTree'):
+    def __init__(self, program_tree: 'ProgramTree', tree_repository: 'ProgramTreeRepository'):
         self.validators = [
             EmptyProgramTreeValidator(program_tree),
-            NodeHaveLinkValidator(program_tree.root_node)
+            NodeHaveLinkValidator(program_tree.root_node, tree_repository)
         ]
         super().__init__()
 

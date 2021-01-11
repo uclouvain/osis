@@ -23,41 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import operator
 
 import factory.fuzzy
 
-from base.models.enums import prerequisite_operator
-from program_management.ddd.domain.prerequisite import PrerequisiteItem, PrerequisiteItemGroup, Prerequisite
-
-from program_management.ddd.business_types import *
-from program_management.tests.ddd.factories.domain.program_tree.program_tree_identity import ProgramTreeIdentityFactory
+from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 
 
-class PrerequisiteItemFactory(factory.Factory):
+class ProgramTreeIdentityFactory(factory.Factory):
+
     class Meta:
-        model = PrerequisiteItem
+        model = ProgramTreeIdentity
         abstract = False
 
-    code = factory.Sequence(lambda n: 'Code%02d' % n)
+    code = factory.Sequence(lambda n: 'CODE%02d' % n)
     year = factory.fuzzy.FuzzyInteger(low=1999, high=2099)
-
-
-class PrerequisiteItemGroupFactory(factory.Factory):
-    class Meta:
-        model = PrerequisiteItemGroup
-        abstract = False
-
-    operator = factory.Iterator(prerequisite_operator.PREREQUISITES_OPERATORS, getter=operator.itemgetter(0))
-    prerequisite_items = []
-
-
-class PrerequisiteFactory(factory.Factory):
-    class Meta:
-        model = Prerequisite
-        abstract = False
-
-    main_operator = prerequisite_operator.AND
-    context_tree = None  # Mandatory param - dependency injection
-    node_having_prerequisites = None  # Mandatory param - dependency injection
-    prerequisite_item_groups = []

@@ -71,9 +71,9 @@ class TestPersistTree(TestCase):
         )
 
     def test_persist_tree_from_scratch(self):
-        self.common_core_node.add_child(self.learning_unit_year_node)
-        self.root_node.add_child(self.common_core_node)
-        tree = ProgramTreeFactory(root_node=self.root_node)
+        tree = load_tree.load(self.root_node.node_id)
+        tree.root_node.add_child(self.common_core_node)
+        tree.root_node.children_as_nodes[0].add_child(self.learning_unit_year_node)
 
         persist_tree.persist(tree)
 
