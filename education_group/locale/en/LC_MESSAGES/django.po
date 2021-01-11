@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-12-09 14:26+0100\n"
+"POT-Creation-Date: 2021-01-06 08:24+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -185,6 +185,9 @@ msgstr ""
 msgid "Comment"
 msgstr ""
 
+msgid "Common admission conditions can only be edited by central manager"
+msgstr ""
+
 msgid "Common admission conditions have been updated"
 msgstr ""
 
@@ -192,6 +195,9 @@ msgid "Common admission conditions will be published soon"
 msgstr ""
 
 msgid "Common general informations will be published soon"
+msgstr ""
+
+msgid "Common pedagogy informations can only be edited by central manager"
 msgstr ""
 
 msgid "Conditions"
@@ -212,9 +218,6 @@ msgid "Content"
 msgstr ""
 
 msgid "Content constraint"
-msgstr ""
-
-msgid "Coorganization can only be changed by central manager"
 msgstr ""
 
 msgid "Copied element"
@@ -687,6 +690,9 @@ msgid "There are warnings in the form."
 msgstr ""
 
 msgid "There can only be one type 2 expectation"
+msgstr ""
+
+msgid "This education group is not editable during this period."
 msgstr ""
 
 msgid "Title"
