@@ -146,10 +146,3 @@ def _delete_node_content(parent_node: 'Node', delete_node_service: interface.App
         except exception.NodeIsUsedException:
             continue
         _delete_node_content(link.child, delete_node_service)
-
-
-def _build_where_clause(tree_identity: 'ProgramTreeIdentity') -> Q:
-    return Q(
-        acronym=tree_identity.code,
-        academic_year__year=tree_identity.year
-    )
