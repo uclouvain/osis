@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -179,7 +179,7 @@ class LearningUnitNodeTreeSerializer(CommonNodeTreeSerializer):
     periodicity = serializers.CharField(source='child.periodicity.name', allow_null=True, read_only=True)
     quadrimester = serializers.CharField(source='child.quadrimester.name', allow_null=True, read_only=True)
     status = serializers.BooleanField(source='child.status', read_only=True)
-    proposal_type = serializers.CharField(source='child.proposal_type.name', allow_null=True, read_only=True)
+    proposal_type = serializers.CharField(source='child.proposal_type', allow_null=True, read_only=True)
 
     def get_title(self, obj: 'Link'):
         return self._get_ue_title_from_lang(obj, settings.LANGUAGE_CODE_FR)
