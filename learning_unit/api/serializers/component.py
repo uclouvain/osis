@@ -50,4 +50,4 @@ class LearningUnitComponentSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_hourly_volume_total_annual(obj):
-        return '{0:g}'.format(obj.hourly_volume_total_annual)
+        return '{0:g}'.format(obj.hourly_volume_total_annual) if obj.hourly_volume_total_annual else None
