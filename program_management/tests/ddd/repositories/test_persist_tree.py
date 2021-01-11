@@ -71,9 +71,9 @@ class TestPersistTree(TestCase):
         )
 
     def test_persist_tree_from_scratch(self):
-        self.common_core_node.add_child(self.learning_unit_year_node)
-        self.root_node.add_child(self.common_core_node)
-        tree = ProgramTreeFactory(root_node=self.root_node)
+        tree = load_tree.load(self.root_node.node_id)
+        tree.root_node.add_child(self.common_core_node)
+        tree.root_node.children_as_nodes[0].add_child(self.learning_unit_year_node)
 
         persist_tree.persist(tree)
 
@@ -88,10 +88,6 @@ class TestPersistTree(TestCase):
             child_element_id=self.learning_unit_year_node.node_id,
         )
         self.assertTrue(link_common_core_with_learn_unit.exists())
-
-        # Rollback attach by detaching nodes becauses theses nodes are reused in other tests.
-        self.common_core_node.detach_child(self.learning_unit_year_node)
-        self.root_node.detach_child(self.common_core_node)
 
     def test_save_when_first_link_exists_and_second_one_does_not(self):
         GroupElementYearFactory(parent_element=self.root_group, child_element=self.common_core_element)
