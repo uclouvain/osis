@@ -46,8 +46,8 @@ class LearningUnitComponentSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_computed_volume(obj):
-        return '{0:g}'.format(obj.vol_global)
+        return '%g' % obj.vol_global
 
     @staticmethod
     def get_hourly_volume_total_annual(obj):
-        return '{0:g}'.format(obj.hourly_volume_total_annual) if obj.hourly_volume_total_annual else None
+        return '%g' % obj.hourly_volume_total_annual if obj.hourly_volume_total_annual else None
