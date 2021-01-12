@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-23 13:55+0200\n"
+"POT-Creation-Date: 2021-01-04 11:10+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -55,6 +55,9 @@ msgstr "Attribution supprimée pour %(tutor)s (%(function)s)"
 msgid "Attributions"
 msgstr "Attributions"
 
+msgid "Authority/sabbatical teaching supply"
+msgstr "Suppléance de sabbatique/autorité"
+
 msgid "Cancel"
 msgstr "Annuler"
 
@@ -66,6 +69,12 @@ msgstr "Coordinateur(trice)"
 
 msgid "Courses"
 msgstr "Cours"
+
+msgid "Demand for co-holder"
+msgstr "Demande de cotitulature"
+
+msgid "Demand for discharge"
+msgstr "Demande de décharge"
 
 msgid "Deputy"
 msgstr "Suppléant"
@@ -84,6 +93,9 @@ msgstr "Fiche descriptive"
 
 msgid "Description fiche edition"
 msgstr "Modification des fiches descriptives"
+
+msgid "Discharge"
+msgstr "Décharge"
 
 msgid "Duration"
 msgstr "Durée"
@@ -158,11 +170,17 @@ msgstr "Aucune attribution n'existe pour l'UE complète"
 msgid "Not in period to edit description fiche."
 msgstr "Pas en période pour modifier les fiches descriptives."
 
+msgid "Part-time teaching supply"
+msgstr "Suppléance partielle"
+
 msgid "Practical exercises"
 msgstr "Partie pratique"
 
 msgid "Professor"
 msgstr "Professeur"
+
+msgid "Program modification"
+msgstr "Modification de programme"
 
 msgid "Publish application to portal"
 msgstr "Publier la candidature sur portal"
@@ -193,6 +211,9 @@ msgstr "Début"
 msgid "Substitute"
 msgstr "Suppléé"
 
+msgid "Teaching supply"
+msgstr "Suppléance"
+
 #, python-format
 msgid ""
 "The sum of volumes for the partims for professor %(tutor)s is superior to "
@@ -207,6 +228,9 @@ msgstr ""
 
 msgid "Title"
 msgstr "Intitulé"
+
+msgid "To delete"
+msgstr "A supprimer"
 
 msgid "Tutor"
 msgstr "Enseignant·e"
