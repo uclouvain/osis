@@ -200,27 +200,6 @@ class FilterTrainingTestCase(APITestCase):
     def setUp(self):
         self.client.force_authenticate(user=self.user)
 
-    def test_get_training_case_version_type_param_is_not_allowed(self):
-        query_string = {'version_type': 'test'}
-
-        response = self.client.get(self.url, data=query_string)
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
-    def test_get_training_case_version_type_param_is_special(self):
-        query_string = {'version_type': 'special'}
-
-        response = self.client.get(self.url, data=query_string)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-        trainings = EducationGroupVersion.objects.exclude(version_name__iexact='')
-
-        serializer = TrainingListSerializer(
-            trainings,
-            many=True,
-            context={'request': RequestFactory().get(self.url, query_string)},
-        )
-        self.assertEqual(response.data['results'], serializer.data)
-
     def test_get_training_case_filter_from_year_params(self):
         query_string = {'from_year': 2020}
 
