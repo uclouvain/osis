@@ -36,7 +36,7 @@ def copy_reddot_information_from_group_year():
             academic_year__year__gt=group_year.academic_year.year
         )
         translated_texts = TranslatedText.objects.filter(
-            entity=OFFER_YEAR,
+            entity=GROUP_YEAR,
             reference=group_year.id
         )
         for next_group_year in next_group_years:
@@ -96,7 +96,7 @@ class CopyEgyOldModel:
         self.copy_data_from_model(EducationGroupPublicationContact, ('education_group_year', 'type', 'order'))
         self.copy_admission_condition()
         translated_texts = TranslatedText.objects.filter(
-            entity=GROUP_YEAR,
+            entity=OFFER_YEAR,
             reference=self.old_education_group_year.id
         )
         copy_general_information(translated_texts, self.new_education_group_year)
