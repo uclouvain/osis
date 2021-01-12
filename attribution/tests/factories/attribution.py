@@ -68,3 +68,4 @@ class AttributionNewFactory(factory.django.DjangoModelFactory):
     start_year = None
     end_year = None
     score_responsible = False
+    decision_making = ''
