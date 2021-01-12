@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from decimal import Decimal
+
 from django.test import TestCase
 
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
@@ -32,7 +34,7 @@ from learning_unit.api.serializers.component import LearningUnitComponentSeriali
 class LearningUnitComponentSerializerTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.component = LearningComponentYearFactory()
+        cls.component = LearningComponentYearFactory(hourly_volume_total_annual=Decimal('4.50'))
         cls.serializer = LearningUnitComponentSerializer(cls.component)
 
     def test_contains_expected_fields(self):
@@ -45,8 +47,14 @@ class LearningUnitComponentSerializerTestCase(TestCase):
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 
-    def test_ensure_compute_correct_volume(self):
+    def test_ensure_compute_correct_volume_and_normalized(self):
         self.assertEqual(
             self.serializer.data['hourly_volume_total_annual_computed'],
-            str(self.component.vol_global)
+            str(self.component.vol_global).rstrip('0').rstrip('.')
+        )
+
+    def test_ensure_hourly_volume_total_annual_normalized(self):
+        self.assertEqual(
+            self.serializer.data['hourly_volume_total_annual'],
+            str(self.component.hourly_volume_total_annual).rstrip('0').rstrip('.')
         )
