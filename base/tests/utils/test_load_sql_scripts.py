@@ -67,7 +67,7 @@ class TestExecuteSQLTriggers(TestCase):
             TEST
             CREATE TRIGGER TEST
                 TEST
-
+                
                 ON {tablename}
                 TEST
                 WHEN TEST
