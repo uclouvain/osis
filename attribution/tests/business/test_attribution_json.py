@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -70,19 +70,24 @@ class AttributionJsonTest(TestCase):
             acronym="LBIR1210B",
             subtype=learning_unit_year_subtypes.PARTIM
         )
-
+        LearningUnitYearWithComponentFactory(
+            academic_year=cls.academic_year,
+            learning_container_year=cls.l_container,
+            acronym="LBIR1210C",
+            subtype=learning_unit_year_subtypes.PARTIM
+        )
         # Creation Tutors
         cls.tutor_1 = TutorFactory(person__global_id='00012345')
         cls.tutor_2 = TutorFactory(person__global_id='08923545')
 
         # Creation Attribution and Attributions Charges - Tutor 1 - Holder
-        attribution_tutor_1 = AttributionNewFactory(
+        cls.attribution_tutor_1 = AttributionNewFactory(
             learning_container_year=cls.l_container,
             tutor=cls.tutor_1,
             function=function.HOLDER
         )
-        _create_attribution_charge(cls.academic_year, attribution_tutor_1, "LBIR1210", Decimal(15.5), Decimal(10))
-        _create_attribution_charge(cls.academic_year, attribution_tutor_1, "LBIR1210A", None, Decimal(5))
+        _create_attribution_charge(cls.academic_year, cls.attribution_tutor_1, "LBIR1210", Decimal(15.5), Decimal(10))
+        _create_attribution_charge(cls.academic_year, cls.attribution_tutor_1, "LBIR1210A", None, Decimal(5))
 
         # Creation Attribution and Attributions Charges - Tutor 2 - Co-holder
         attribution_tutor_2 = AttributionNewFactory(
@@ -117,19 +122,13 @@ class AttributionJsonTest(TestCase):
         self.assertEqual(attrib_tutor_2['attributions'][0][learning_component_year_type.PRACTICAL_EXERCISES], "0.0")
 
     def test_learning_unit_in_charge_false(self):
-        self.l_container.container_type = EXTERNAL
-        self.l_container.save()
+        new_attrib = AttributionNewFactory(learning_container_year=self.l_container, tutor=self.tutor_1,
+                                           function=function.COORDINATOR, decision_making='DISCHARGE')
+        _create_attribution_charge(self.academic_year, new_attrib, "LBIR1210C", Decimal(0), Decimal(0))
 
-        attrib_list = attribution_json._compute_list()
+        attrib_list = attribution_json._compute_list(global_ids=[self.tutor_1.person.global_id])
         self.assertIsInstance(attrib_list, list)
-        self.assertEqual(len(attrib_list), 2)
-
-        attrib_tutor_1 = next(
-            (attrib for attrib in attrib_list if attrib['global_id'] == self.tutor_1.person.global_id),
-            None
-        )
-        self.assertTrue(attrib_tutor_1)
-        self.assertEqual(len(attrib_tutor_1['attributions']), 0)
+        self.assertEqual(len(attrib_list), 1)
 
     def test_two_attribution_function_to_same_learning_unit(self):
         new_attrib = AttributionNewFactory(learning_container_year=self.l_container, tutor=self.tutor_1,
