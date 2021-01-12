@@ -86,6 +86,7 @@ class EducationGroupRootNodeTreeSerializerTestCase(SimpleTestCase):
         self.mini_gey = LinkFactory(
             parent=self.common_core, child=self.mini_training
         )
+
         self.learning_unit_year_with_proposal = NodeLearningUnitYearFactory(
             year=self.year,
             credits=10,
@@ -97,6 +98,7 @@ class EducationGroupRootNodeTreeSerializerTestCase(SimpleTestCase):
         self.luy_gey = LinkFactory(
             parent=self.common_core, child=self.learning_unit_year_with_proposal
         )
+
         url = reverse('education_group_api_v1:' + TrainingTreeView.name, kwargs={
             'acronym': self.training.title,
             'year': self.year
