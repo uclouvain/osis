@@ -30,6 +30,8 @@ from base.models.enums import prerequisite_operator
 from base.models.enums.link_type import LinkTypes
 from base.models.enums.proposal_type import ProposalType
 from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.education_group_type import MiniTrainingEducationGroupTypeFactory, \
+    TrainingEducationGroupTypeFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory, GroupElementYearChildLeafFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.prerequisite import PrerequisiteFactory
@@ -176,6 +178,36 @@ class TestLoadTree(TestCase):
         leaf = education_group_program_tree.root_node.children[0].child.children[0].child
         self.assertFalse(leaf.has_proposal)
         self.assertIsNone(leaf.proposal_type)
+
+    def test_when_load_tree_root_ids_contained_each_others(self):
+        """
+        Test the load multiple trees function and ensure that the trees are correctly loaded
+        even if we ask to load 2 trees where the first tree is a child of the second tree
+        """
+        node_contained_in_training = self.root_node
+
+        training_containing_root_node = ElementGroupYearFactory(
+            group_year__education_group_type=TrainingEducationGroupTypeFactory(),
+            group_year__partial_acronym='LMIN1111',
+            group_year__academic_year=self.academic_year,
+        )
+
+        GroupElementYearFactory(
+            parent_element=training_containing_root_node,
+            child_element=node_contained_in_training
+        )
+
+        root_ids_where_one_root_is_contained_into_the_second_root = [
+            node_contained_in_training.pk, training_containing_root_node.pk
+        ]
+        result = load_tree.load_trees(root_ids_where_one_root_is_contained_into_the_second_root)
+        self.assertTrue(len(result) == 2)
+        first_root = result[0].root_node
+        self.assertEqual(first_root.code, node_contained_in_training.group_year.partial_acronym)
+        self.assertEqual(first_root.year, node_contained_in_training.group_year.academic_year.year)
+        second_root = result[1].root_node
+        self.assertEqual(second_root.code, training_containing_root_node.group_year.partial_acronym)
+        self.assertEqual(second_root.year, training_containing_root_node.group_year.academic_year.year)
 
 
 class TestLoadTreesFromChildren(TestCase):

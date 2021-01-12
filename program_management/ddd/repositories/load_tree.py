@@ -62,16 +62,15 @@ def load_trees(tree_root_ids: List[int]) -> List['ProgramTree']:
     links = __load_tree_links(structure)
     has_prerequisites = load_prerequisite.load_has_prerequisite_multiple(tree_root_ids, nodes)
     root_nodes = load_node.load_multiple(tree_root_ids)
+    nodes.update({n.pk: n for n in root_nodes})
     for root_node in root_nodes:
         tree_root_id = root_node.pk
-        nodes[root_node.pk] = root_node
         tree_prerequisites = {
             'has_prerequisite_dict': has_prerequisites.get(tree_root_id) or {},
         }
         structure_for_current_root_node = [s for s in structure if s['starting_node_id'] == tree_root_id]
         tree = __build_tree(root_node, structure_for_current_root_node, nodes, links, tree_prerequisites)
         trees.append(tree)
-        del nodes[root_node.pk]
     return trees
 
 
@@ -170,13 +169,15 @@ def __build_children(
         parent_id = child_structure['parent_id']
         child_node = nodes[child_id]
 
-        child_node.children = __build_children(
-            child_structure['path'],
-            map_parent_path_with_tree_structure,
-            nodes,
-            links,
-            prerequisites
-        )
+        if not child_node.children:
+            # "if" condition for performance : avoid recursivity if the children of the node have already been computed
+            child_node.children = __build_children(
+                child_structure['path'],
+                map_parent_path_with_tree_structure,
+                nodes,
+                links,
+                prerequisites
+            )
 
         link_node = links['_'.join([str(parent_id), str(child_node.pk)])]
 
