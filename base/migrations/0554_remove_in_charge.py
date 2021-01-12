@@ -9,7 +9,9 @@ def delete_in_charge_from_initial_data(apps, schema_editor):
     proposals = ProposalLearningUnit.objects.filter(initial_data__learning_container_year__isnull=False)
 
     for proposal in proposals:
-        del proposal.initial_data['learning_container_year']['in_charge']
+        to_delete = proposal.initial_data['learning_container_year'].get('in_charge')
+        if to_delete:
+            del to_delete
     ProposalLearningUnit.objects.bulk_update(proposals, ['initial_data'])
 
 
