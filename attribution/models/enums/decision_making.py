@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,31 +23,29 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.utils.translation import gettext_lazy as _
 
-from rest_framework import serializers
-
-from base.models.learning_component_year import LearningComponentYear
+from base.models.utils.utils import ChoiceEnum
 
 
-class LearningUnitComponentSerializer(serializers.ModelSerializer):
-    type_text = serializers.CharField(source='get_type_display', read_only=True)
-    hourly_volume_total_annual = serializers.SerializerMethodField()
-    hourly_volume_total_annual_computed = serializers.SerializerMethodField('get_computed_volume')
+PROGRAM_MODIFICATION = "PROGRAM_MODIFICATION"
+DISCHARGE = "DISCHARGE"
+TEACHING_SUPPLY = "TEACHING_SUPPLY"
+AUTHORITY_OR_SABBATICAL_TEACHING_SUPPLY = "AUTHORITY_OR_SABBATICAL_TEACHING_SUPPLY"
+DEMAND_FOR_DISCHARGE = "DEMAND_FOR_DISCHARGE"
+DEMAND_FOR_CO_HOLDER = "DEMAND_FOR_CO_HOLDER"
+CO_HOLDER = "CO_HOLDER"
+TO_DELETE = "TO_DELETE"
+PART_TIME_TEACHING_SUPPLY = "PART_TIME_TEACHING_SUPPLY"
 
-    class Meta:
-        model = LearningComponentYear
-        fields = (
-            'type',
-            'type_text',
-            'planned_classes',
-            'hourly_volume_total_annual',
-            'hourly_volume_total_annual_computed'
-        )
 
-    @staticmethod
-    def get_computed_volume(obj):
-        return '%g' % obj.vol_global
-
-    @staticmethod
-    def get_hourly_volume_total_annual(obj):
-        return '%g' % obj.hourly_volume_total_annual if obj.hourly_volume_total_annual else None
+class DecisionMakings(ChoiceEnum):
+    PROGRAM_MODIFICATION = _("Program modification")
+    DISCHARGE = _("Discharge")
+    TEACHING_SUPPLY = _("Teaching supply")
+    AUTHORITY_OR_SABBATICAL_TEACHING_SUPPLY = _("Authority/sabbatical teaching supply")
+    DEMAND_FOR_DISCHARGE = _("Demand for discharge")
+    DEMAND_FOR_CO_HOLDER = _("Demand for co-holder")
+    CO_HOLDER = _("Co-holder")
+    TO_DELETE = _("To delete")
+    PART_TIME_TEACHING_SUPPLY = _("Part-time teaching supply")
