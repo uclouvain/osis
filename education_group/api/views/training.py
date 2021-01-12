@@ -33,7 +33,6 @@ from base.models.enums import education_group_categories
 from base.models.enums.education_group_types import TrainingType
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
 from education_group.api.serializers.training import TrainingListSerializer, TrainingDetailSerializer
-from education_group.api.views import utils
 from program_management.models.education_group_version import EducationGroupVersion
 
 
@@ -41,7 +40,6 @@ class TrainingFilter(filters.FilterSet):
     from_year = filters.NumberFilter(field_name="offer__academic_year__year", lookup_expr='gte')
     to_year = filters.NumberFilter(field_name="offer__academic_year__year", lookup_expr='lte')
     in_type = filters.CharFilter(field_name="offer__education_group_type__name", lookup_expr='contains')
-    version_type = filters.CharFilter(method='filter_version_type')
     acronym = filters.CharFilter(field_name="offer__acronym", lookup_expr="icontains")
     campus = filters.CharFilter(field_name='root_group__main_teaching_campus__name', lookup_expr='icontains')
     partial_acronym = filters.CharFilter(field_name="root_group__partial_acronym", lookup_expr='icontains')
@@ -60,21 +58,6 @@ class TrainingFilter(filters.FilterSet):
             'acronym', 'partial_acronym', 'title', 'title_english', 'from_year', 'to_year', 'education_group_type'
         ]
 
-    @staticmethod
-    def filter_version_type(queryset, _, value):
-        queryset = EducationGroupVersion.objects.filter(
-            offer__education_group_type__category=education_group_categories.TRAINING,
-        ).select_related(
-            'offer__education_group_type',
-            'offer__academic_year'
-        ).prefetch_related(
-            'offer__administration_entity__entityversion_set',
-            'offer__management_entity__entityversion_set'
-        ).exclude(
-            offer__acronym__icontains='common'
-        )
-        return utils.filter_version_type(queryset, value)
-
 
 class TrainingList(LanguageContextSerializerMixin, generics.ListAPIView):
     """
@@ -84,6 +67,7 @@ class TrainingList(LanguageContextSerializerMixin, generics.ListAPIView):
     queryset = EducationGroupVersion.objects.filter(
         offer__education_group_type__category=education_group_categories.TRAINING,
         is_transition=False,
+        version_name=''
     ).select_related(
         'offer__education_group_type',
         'offer__academic_year'
