@@ -52,8 +52,8 @@ class TestLearningUnitSummaryEditionCalendarEnsureConsistencyUntilNPlus6(TestCas
                 "title": "Edition fiches descriptives",
                 "reference": academic_calendar_type.SUMMARY_COURSE_SUBMISSION,
                 "data_year": self.current_academic_year.pk,
-                "start_date": datetime.date(self.current_academic_year.year - 1, 7, 1),
-                "end_date": datetime.date(self.current_academic_year.year - 1, 9, 13),
+                "start_date": datetime.date(self.current_academic_year.year, 7, 1),
+                "end_date": datetime.date(self.current_academic_year.year, 9, 13),
             }
         )
 

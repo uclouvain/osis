@@ -2355,7 +2355,7 @@ msgid "Success"
 msgstr "Succès"
 
 msgid "Summary course submission"
-msgstr "Soumission des fiches descriptives"
+msgstr "Edition fiches descriptives"
 
 msgid ""
 "Summary course submission (Force majeure) is not allowed for tutors during "
@@ -2365,7 +2365,7 @@ msgstr ""
 "autorisée pour les enseignants durant cette période."
 
 msgid "Summary course submission force majeure"
-msgstr "Adaptation des fiches descriptives (Cas de force majeure)"
+msgstr "Edition fiches descriptives (cas de force majeure)"
 
 msgid "Summary course submission is not allowed for tutors during this period."
 msgstr ""
