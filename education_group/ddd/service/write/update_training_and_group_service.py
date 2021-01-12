@@ -65,6 +65,11 @@ def update_training_and_group(cmd: command.UpdateTrainingAndGroupCommand) -> 'Tr
     except MultipleBusinessExceptions as e:
         errors |= e.exceptions
 
+    try:
+        update_group_service.update_group(__convert_to_update_group_command(cmd))
+    except MultipleBusinessExceptions as e:
+        errors = e.exceptions
+
     if errors:
         raise MultipleBusinessExceptions(exceptions=errors)
 
