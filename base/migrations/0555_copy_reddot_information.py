@@ -19,7 +19,7 @@ logger = logging.getLogger(settings.DEFAULT_LOGGER)
 FROM_YEAR = 2021
 
 
-def copy_reddot_information():
+def copy_reddot_information(apps, schema_editor):
     copy_reddot_information_from_group_year()
     copy_reddot_information_from_education_group_year()
 
