@@ -74,16 +74,20 @@ class ProgramManagerListView(ListView):
         if not education_group_ids:
             return qs.none()
 
-        result = qs.filter(education_group_id__in=education_group_ids).order_by(
-            'person__last_name', 'person__first_name', 'pk'
-        ).annotate(
+        result = qs.filter(education_group_id__in=education_group_ids).annotate(
             offer_acronym=Subquery(
                 EducationGroupYear.objects.filter(
-                    education_group_id=OuterRef('pk'),
+                    education_group_id=OuterRef('education_group_id'),
                     academic_year=current_academic_year(),
                 ).values('acronym')[:1]
             ),
-        ).select_related('person')
+        ).select_related(
+            'person'
+        ).order_by(
+            'person__last_name',
+            'person__first_name',
+            'pk'
+        )
         return result
 
     def get_context_data(self, **kwargs):
@@ -222,9 +226,7 @@ def __search_offer_types():
     return EducationGroupType.objects.filter(
         category=Categories.TRAINING.name
     )
-    #     .exclude(
-    #     name__in=EXCLUDE_OFFER_TYPE_SEARCH
-    # )
+
 
 @login_required
 def pgm_manager_search(request):
@@ -239,7 +241,7 @@ def pgm_manager_search(request):
     if entity_selected is None:
         entity_root_selected = get_entity_root_selected(request)
 
-    pgm_offer_type = get_filter_value(request, 'offer_type')  # TODO :: pass the education_group_type instead
+    pgm_offer_type = get_filter_value(request, 'offer_type')
 
     administrator_entities = get_administrator_entities(request.user)
 
@@ -306,16 +308,6 @@ def get_filter_value(request, value_name):
     return value
 
 
-# def test():
-#     cte = EV.objects.with_parents()
-#     return cte.join(EV, id=cte.col.id).with_cte(cte).annotate(parents=cte.col.parents).filter(parents__contains_any=[2885])
-#
-#
-# def test():
-#     cte = EV.objects.with_children()
-#     return cte.join(EV, id=cte.col.id).with_cte(cte).annotate(parents=cte.col.parents).filter(parents__contains_any=[2885])
-
-
 def get_administrator_entities(a_user) -> List[Dict[str, Union['EntityVersion', List['EntityVersion']]]]:
     root_entity_ids = EntityManager.objects.filter(
         person__user=a_user
@@ -324,25 +316,7 @@ def get_administrator_entities(a_user) -> List[Dict[str, Union['EntityVersion', 
         flat=True
     ).distinct().order_by('entity__entityversion__acronym')
 
-    # cte = EntityVersion.objects.with_parents(
-    #     'acronym',
-    #     entity_id__in=root_entity_ids
-    # )
-    # qs = cte.join(EntityVersion, id=cte.col.id).with_cte(cte)
-    # row_by_entity_id = defaultdict(list)
-    # for row in qs:
-    #     entity_id = row.entity_id
-    #     row_by_entity_id[entity_id].append(row)
-
-    structure = build_current_entity_version_structure_in_memory()  # TODO :: reuse CTE
-
-    # root_entities = EntityVersion.objects.current(
-    #     date=datetime.datetime.now()
-    # ).filter(
-    #     entity_id__in=root_entity_ids
-    # ).union(
-    #
-    # ).order_by('acronym')
+    structure = build_current_entity_version_structure_in_memory()
 
     structures = []
 
@@ -358,14 +332,6 @@ def get_administrator_entities(a_user) -> List[Dict[str, Union['EntityVersion', 
     return structures
 
 
-# def _search_children_recursively(entity_id, row_by_entity_id):
-#     children = []
-#     for child in row_by_entity_id.get(entity_id, []):
-#         children += _search_children_recursively(child['entity_id'], row_by_entity_id)
-#         children.append(child)
-#     return children
-
-
 def _get_programs(academic_yr, entity_list, manager_person, education_group_type) -> List['EducationGroupYear']:
     qs = EducationGroupYear.objects.filter(
         academic_year=academic_yr,
@@ -377,7 +343,7 @@ def _get_programs(academic_yr, entity_list, manager_person, education_group_type
 
     if manager_person:
         qs = qs.filter(education_group__programmanager__person=manager_person)
-    return qs.distinct().select_related('management_entity', 'education_group_type')
+    return qs.distinct().select_related('management_entity', 'education_group_type').order_by('acronym')
 
 
 def _get_entity_program_managers(entity):
