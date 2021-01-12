@@ -94,28 +94,5 @@ def search(acronym=None, title=None, type=None):
     return queryset
 
 
-def find_faculty(a_structure):
-    if a_structure.type == structure_type.FACULTY:
-        return a_structure
-    else:
-        parent = a_structure.part_of
-        if parent:
-            if parent.type != structure_type.FACULTY:
-                find_faculty(parent)
-            else:
-                return parent
-        return None
-
-
 def find_by_acronyms(acronym_list):
     return Structure.objects.filter(acronym__in=acronym_list).order_by("acronym")
-
-
-def find_all_structure_children(structure):
-    structures_list = list()
-    structures = Structure.objects.filter(part_of=structure)
-    for structure in structures:
-        if structure.part_of:
-            children_list = list(chain(structures, find_all_structure_children(structure)))
-            structures_list = list(chain(structures_list, children_list))
-    return structures_list
