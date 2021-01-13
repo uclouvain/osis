@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,23 +23,29 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
-from django.http import Http404
+from django.utils.translation import gettext_lazy as _
 
 from base.models.utils.utils import ChoiceEnum
 
 
-class VersionTypeEnum(ChoiceEnum):
-    STANDARD = "standard"
-    TRANSITION = "transition"
-    SPECIAL = "special"
+PROGRAM_MODIFICATION = "PROGRAM_MODIFICATION"
+DISCHARGE = "DISCHARGE"
+TEACHING_SUPPLY = "TEACHING_SUPPLY"
+AUTHORITY_OR_SABBATICAL_TEACHING_SUPPLY = "AUTHORITY_OR_SABBATICAL_TEACHING_SUPPLY"
+DEMAND_FOR_DISCHARGE = "DEMAND_FOR_DISCHARGE"
+DEMAND_FOR_CO_HOLDER = "DEMAND_FOR_CO_HOLDER"
+CO_HOLDER = "CO_HOLDER"
+TO_DELETE = "TO_DELETE"
+PART_TIME_TEACHING_SUPPLY = "PART_TIME_TEACHING_SUPPLY"
 
 
-def filter_version_type(queryset, value):
-    if value not in VersionTypeEnum.get_values():
-        raise Http404
-    elif value == VersionTypeEnum.TRANSITION.value:
-        return queryset.filter(is_transition=True)
-    elif value == VersionTypeEnum.SPECIAL.value:
-        return queryset.exclude(version_name='')
-    return queryset.filter(is_transition=False, version_name='')
+class DecisionMakings(ChoiceEnum):
+    PROGRAM_MODIFICATION = _("Program modification")
+    DISCHARGE = _("Discharge")
+    TEACHING_SUPPLY = _("Teaching supply")
+    AUTHORITY_OR_SABBATICAL_TEACHING_SUPPLY = _("Authority/sabbatical teaching supply")
+    DEMAND_FOR_DISCHARGE = _("Demand for discharge")
+    DEMAND_FOR_CO_HOLDER = _("Demand for co-holder")
+    CO_HOLDER = _("Co-holder")
+    TO_DELETE = _("To delete")
+    PART_TIME_TEACHING_SUPPLY = _("Part-time teaching supply")

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -72,7 +72,7 @@ def _get_all_attributions_with_charges(global_ids):
         qs = mdl_attribution.attribution_new.search(global_id=global_ids)
     else:
         qs = mdl_attribution.attribution_new.search()
-
+    qs = qs.filter(decision_making='')
     return qs.exclude(tutor__person__global_id__isnull=True)\
              .exclude(tutor__person__global_id="")\
              .prefetch_related(
