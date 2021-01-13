@@ -28,10 +28,10 @@ from django.test import TestCase
 from django.test.utils import override_settings
 
 from base.business.learning_units.perms import is_eligible_to_update_learning_unit_pedagogy
-from base.models.enums import learning_container_year_types
+from base.models.enums import learning_container_year_types, academic_calendar_type
 from base.models.enums import learning_unit_year_subtypes
 from base.tests.factories.academic_calendar import generate_creation_or_end_date_proposal_calendars, \
-    generate_modification_transformation_proposal_calendars
+    generate_modification_transformation_proposal_calendars, OpenAcademicCalendarFactory
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
@@ -51,6 +51,15 @@ class TestPerms(TestCase):
         cls.current_academic_year = create_current_academic_year()
         cls.next_academic_yr = AcademicYearFactory(year=cls.current_academic_year.year+1)
         academic_years = [cls.current_academic_year, cls.next_academic_yr]
+        for ac in academic_years:
+            OpenAcademicCalendarFactory(
+                reference=academic_calendar_type.LEARNING_UNIT_EXTENDED_PROPOSAL_MANAGEMENT,
+                data_year=ac
+            )
+            OpenAcademicCalendarFactory(
+                reference=academic_calendar_type.LEARNING_UNIT_LIMITED_PROPOSAL_MANAGEMENT,
+                data_year=ac
+            )
         cls.lcy = LearningContainerYearFactory(
             academic_year=cls.current_academic_year,
             container_type=learning_container_year_types.COURSE,

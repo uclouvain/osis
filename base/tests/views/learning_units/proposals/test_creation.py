@@ -37,13 +37,14 @@ from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm,
 from base.forms.learning_unit_proposal import ProposalLearningUnitForm, CreationProposalBaseForm
 from base.models.academic_year import AcademicYear
 from base.models.enums import learning_unit_year_subtypes, learning_container_year_types, organization_type, \
-    entity_type, learning_unit_year_periodicity
+    entity_type, learning_unit_year_periodicity, academic_calendar_type
 from base.models.enums.proposal_state import ProposalState
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.tests.factories import campus as campus_factory, \
     organization as organization_factory
-from base.tests.factories.academic_calendar import generate_creation_or_end_date_proposal_calendars
+from base.tests.factories.academic_calendar import generate_creation_or_end_date_proposal_calendars, \
+    OpenAcademicCalendarFactory
 from base.tests.factories.academic_year import get_current_year, AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.entity import EntityFactory
@@ -74,6 +75,15 @@ class LearningUnitViewTestCase(TestCase):
         cls.next_academic_year = cls.academic_years[1]
         generate_creation_or_end_date_proposal_calendars(cls.academic_years)
         cls.language = FrenchLanguageFactory()
+        for ac in cls.academic_years:
+            OpenAcademicCalendarFactory(
+                reference=academic_calendar_type.LEARNING_UNIT_EXTENDED_PROPOSAL_MANAGEMENT,
+                data_year=ac
+            )
+            OpenAcademicCalendarFactory(
+                reference=academic_calendar_type.LEARNING_UNIT_LIMITED_PROPOSAL_MANAGEMENT,
+                data_year=ac
+            )
 
     def setUp(self):
         self.client.force_login(self.person.user)
