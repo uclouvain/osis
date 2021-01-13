@@ -127,6 +127,11 @@ class TestMiniTrainingUpdateView(TestCase):
             update_mini_training,
             *mocks
     ):
+        OpenAcademicCalendarFactory(
+            reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT,
+            data_year__year=self.egy.academic_year.year + 1
+        )
+
         update_mini_training.return_value = [
             mini_training.MiniTrainingIdentity(acronym="ACRONYM", year=get_current_year()-1)
         ]

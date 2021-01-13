@@ -240,13 +240,6 @@ class TestEducationGroupDataSearchFilter(TestCase):
         self.assertIsInstance(context["form"], self.form_class)
         self.assertEqual(context["object_list_count"], 0)
 
-    def test_initial_form_data(self):
-        response = self.client.get(self.url)
-
-        form = response.context["form"]
-        self.assertEqual(form.fields["academic_year"].initial, self.current_academic_year)
-        self.assertEqual(form.fields["category"].initial, education_group_categories.TRAINING)
-
     def test_with_empty_search_result(self):
         response = self.client.get(self.url, data={"category": education_group_categories.MINI_TRAINING})
 
