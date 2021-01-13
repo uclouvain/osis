@@ -43,7 +43,6 @@ from base.models.enums.education_group_types import TrainingType, MiniTrainingTy
 from education_group.forms import fields
 from education_group.forms.training import _get_section_choices
 from education_group.forms.widgets import CertificateAimsWidget
-from education_group.models.group_year import GroupYear as GroupYearDB
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from program_management.ddd.command import GetVersionMaxEndYear
 from program_management.ddd.domain import program_tree_version

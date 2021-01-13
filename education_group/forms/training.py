@@ -415,7 +415,10 @@ class UpdateTrainingForm(PermissionFieldMixin, CreateTrainingForm):
     def __init_end_year_field(self):
         initial_academic_year_value = self.initial.get("academic_year", None)
         if initial_academic_year_value:
-            self.fields["end_year"].queryset = AcademicYear.objects.filter(year__gte=initial_academic_year_value)
+            self.fields["end_year"].queryset = AcademicYear.objects.filter(
+                year__gte=initial_academic_year_value,
+                year__in=EducationGroupExtendedDailyManagementCalendar().get_target_years_opened()
+            )
 
     def __init_certificate_aims_field(self):
         perm = 'base.change_educationgroupcertificateaim'
