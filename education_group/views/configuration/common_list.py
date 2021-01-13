@@ -31,11 +31,12 @@ from django_filters import FilterSet, filters, OrderingFilter
 from django_filters.views import FilterView
 from rest_framework import serializers
 
-from base.models.academic_year import AcademicYear, starting_academic_year
+from base.models.academic_year import AcademicYear
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import TrainingType
 from base.utils.cache import CacheFilterMixin
 from base.utils.search import SearchMixin
+from education_group.calendar.education_group_switch_calendar import EducationGroupSwitchCalendar
 from osis_role.contrib.views import PermissionRequiredMixin
 
 
@@ -64,7 +65,9 @@ class CommonListFilter(FilterSet):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.queryset = self.get_queryset()
-        self.form.fields['academic_year'].initial = starting_academic_year()
+        self.form.fields['academic_year'].initial = AcademicYear.objects.filter(
+            year__in=EducationGroupSwitchCalendar().get_target_years_opened()
+        ).first()
 
     def get_queryset(self):
         # Need this close so as to return empty query by default when form is unbound

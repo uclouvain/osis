@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-05 10:43+0100\n"
+"POT-Creation-Date: 2021-01-11 09:39+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -798,6 +798,9 @@ msgstr "Gestion journalière étendue - catalogue"
 
 msgid "Education group limited daily management"
 msgstr "Gestion journalière limitée - catalogue"
+
+msgid "Education group switch"
+msgstr "Basculement des formations"
 
 msgid "Education group year"
 msgstr "Organisation de formations annualisée"
