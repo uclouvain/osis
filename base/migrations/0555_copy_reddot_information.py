@@ -54,14 +54,18 @@ def copy_reddot_information_from_education_group_year():
     egys = EducationGroupYear.objects.filter(
         academic_year__year=FROM_YEAR
     )
+    egys_to_update_entity = []
     for egy in egys:
         next_egys = EducationGroupYear.objects.filter(
             education_group=egy.education_group,
             academic_year__year__gt=egy.academic_year.year
         )
         for next_egy in next_egys:
+            next_egy.publication_contact_entity_id = egy.publication_contact_entity_id
+            egys_to_update_entity.append(next_egy)
             copy_egy = CopyEgyOldModel(old_education_group_year=egy, new_education_group_year=next_egy)
             copy_egy.run()
+    EducationGroupYear.objects.bulk_update(egys_to_update_entity, ['publication_contact_entity_id'], batch_size=1000)
     end_time = datetime.datetime.now()
     total_time = end_time - start_time
     logger.info("Time to copy all admission condition, publication contact and achievements : {}".format(total_time))
