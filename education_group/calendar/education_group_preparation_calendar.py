@@ -40,7 +40,7 @@ class EducationGroupPreparationCalendar(AcademicEventCalendarHelper):
         academic_years = AcademicYear.objects.min_max_years(current_academic_year.year, current_academic_year.year + 6)
 
         for ac_year in academic_years:
-            AcademicCalendar.objects.update_or_create(
+            AcademicCalendar.objects.get_or_create(
                 reference=cls.event_reference,
                 data_year=ac_year,
                 defaults={
