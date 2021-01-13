@@ -170,14 +170,20 @@ def is_proposal_creation_period_open(self, user, group_year: 'GroupYear' = None)
 @predicate_failed_msg(message=_("You are not allowed to put in proposal for ending date during this academic year"))
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def is_proposal_date_edition_period_open(self, user, group_year: 'GroupYear' = None):
-    return is_proposal_creation_period_open(self, user, group_year)
+    calendar = LearningUnitLimitedProposalManagementCalendar()
+    if group_year:
+        return calendar.is_target_year_authorized(target_year=group_year.academic_year.year)
+    return bool(calendar.get_target_years_opened())
 
 
 @predicate(bind=True)
 @predicate_failed_msg(message=_("You are not allowed to put in proposal for modification during this academic year"))
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def is_proposal_edition_period_open(self, user, group_year: 'GroupYear' = None):
-    return is_proposal_creation_period_open(self, user, group_year)
+    calendar = LearningUnitLimitedProposalManagementCalendar()
+    if group_year:
+        return calendar.is_target_year_authorized(target_year=group_year.academic_year.year)
+    return bool(calendar.get_target_years_opened())
 
 
 @predicate(bind=True)
