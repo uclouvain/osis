@@ -52,8 +52,8 @@ class TestEducationGroupSwitchCalendarEnsureConsistencyUntilNPlus6(TestCase):
                 "title": "Basculement des formations",
                 "reference": academic_calendar_type.EDUCATION_GROUP_SWITCH,
                 "data_year": self.current_academic_year.pk,
-                "start_date": datetime.date(self.current_academic_year.year - 1, 7, 1),
-                "end_date": datetime.date(self.current_academic_year.year, 6, 30),
+                "start_date": datetime.date(self.current_academic_year.year, 7, 1),
+                "end_date": datetime.date(self.current_academic_year.year + 1, 6, 30),
             }
         )
 

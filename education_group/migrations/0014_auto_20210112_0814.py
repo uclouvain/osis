@@ -21,8 +21,8 @@ def create_education_group_switch_calendar(apps, shema_editor):
                 data_year=ac_year,
                 defaults={
                     "title": "Basculement des formations",
-                    "start_date": datetime.date(ac_year.year - 1, 7, 1),
-                    "end_date": datetime.date(ac_year.year, 6, 30),
+                    "start_date": datetime.date(ac_year.year, 7, 1),
+                    "end_date": datetime.date(ac_year.year + 1, 6, 30),
                     "academic_year": ac_year
                 }
             )
