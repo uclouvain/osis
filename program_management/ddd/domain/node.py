@@ -538,6 +538,7 @@ class NodeLearningUnitYear(Node):
     proposal_type = attr.ib(type=ProposalType, default=None)
     learning_unit_type = attr.ib(type=LearningContainerYearType, default=None)
     other_remark = attr.ib(type=str, default=None)
+    other_remark_english = attr.ib(type=str, default=None)
     quadrimester = attr.ib(type=DerogationQuadrimester, default=None)
     volume_total_lecturing = attr.ib(type=Decimal, default=None)
     volume_total_practical = attr.ib(type=Decimal, default=None)
