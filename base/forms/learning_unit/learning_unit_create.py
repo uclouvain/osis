@@ -131,7 +131,8 @@ class LearningUnitYearModelForm(PermissionFieldMixin, ValidationRuleMixin, forms
         model = LearningUnitYear
         fields = ('academic_year', 'acronym', 'specific_title', 'specific_title_english', 'credits',
                   'session', 'quadrimester', 'status', 'internship_subtype', 'attribution_procedure',
-                  'professional_integration', 'campus', 'language', 'periodicity', 'faculty_remark', 'other_remark')
+                  'professional_integration', 'campus', 'language', 'periodicity', 'faculty_remark', 'other_remark',
+                  'other_remark_english')
         field_classes = {'acronym': AcronymField}
         error_messages = {
             'credits': {
@@ -147,7 +148,8 @@ class LearningUnitYearModelForm(PermissionFieldMixin, ValidationRuleMixin, forms
         widgets = {
             'credits': DecimalFormatInput(render_value=True),
             'faculty_remark': forms.Textarea(attrs={'rows': '5'}),
-            'other_remark': forms.Textarea(attrs={'rows': '5'})
+            'other_remark': forms.Textarea(attrs={'rows': '5'}),
+            'other_remark_english': forms.Textarea(attrs={'rows': '5'})
         }
 
     def __clean_acronym_external(self):

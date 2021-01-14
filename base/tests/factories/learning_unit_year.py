@@ -95,6 +95,7 @@ class LearningUnitYearFactory(DjangoModelFactory):
     summary_locked = False
     faculty_remark = factory.fuzzy.FuzzyText(length=255)
     other_remark = factory.fuzzy.FuzzyText(length=255)
+    other_remark_english = factory.fuzzy.FuzzyText(length=255)
 
     @factory.post_generation
     def gen_acronym(self, create, extracted, **kwargs):
