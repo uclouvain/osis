@@ -38,23 +38,23 @@ from base.forms.learning_unit.learning_unit_partim import PartimForm
 from base.models import academic_year
 from base.models.academic_year import AcademicYear
 from base.models.enums import learning_unit_year_subtypes
+from base.models.enums import quadrimesters
 from base.models.enums.learning_component_year_type import LECTURING
+from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit import LearningUnit
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.proposal_learning_unit import ProposalLearningUnit
-from base.models.enums import quadrimesters
-from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
 
 FIELDS_TO_NOT_POSTPONE = {
     'is_vacant': 'learning_container_year.is_vacant',
     'type_declaration_vacant': 'learning_container_year.type_declaration_vacant',
     'attribution_procedure': 'attribution_procedure'
 }
-FIELDS_TO_CHECK = ['faculty_remark', 'other_remark', 'acronym', 'specific_title', 'specific_title_english',
-                   'credits', 'session', 'quadrimester', 'status', 'internship_subtype', 'professional_integration',
-                   'campus', 'language', 'periodicity', 'container_type', 'common_title', 'common_title_english',
-                   'team', 'requirement_entity', 'allocation_entity', 'additional_entity_1',
+FIELDS_TO_CHECK = ['faculty_remark', 'other_remark', 'other_remark_english', 'acronym', 'specific_title',
+                   'specific_title_english', 'credits', 'session', 'quadrimester', 'status', 'internship_subtype',
+                   'professional_integration', 'campus', 'language', 'periodicity', 'container_type', 'common_title',
+                   'common_title_english', 'team', 'requirement_entity', 'allocation_entity', 'additional_entity_1',
                    'additional_entity_2']
 
 

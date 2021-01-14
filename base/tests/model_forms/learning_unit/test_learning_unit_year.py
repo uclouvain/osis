@@ -102,6 +102,14 @@ class TestLearningUnitYearModelFormInit(TestCase):
         self.form = LearningUnitYearModelForm(data=None, person=self.central_manager, subtype=FULL)
         self.assertEqual(self.form.fields['other_remark'].widget.attrs['rows'], '5')
 
+    def test_other_remark_english_widget_textarea_rows(self):
+        self.form = LearningUnitYearModelForm(data=None, person=self.central_manager, subtype=FULL)
+        self.assertEqual(self.form.fields['other_remark_english'].widget.attrs['rows'], '5')
+
+    def test_faculty_remark_widget_textarea_rows(self):
+        self.form = LearningUnitYearModelForm(data=None, person=self.central_manager, subtype=FULL)
+        self.assertEqual(self.form.fields['faculty_remark'].widget.attrs['rows'], '5')
+
 
 class TestLearningUnitYearModelFormSave(TestCase):
     """Tests LearningUnitYearModelForm.save()"""
@@ -142,6 +150,8 @@ class TestLearningUnitYearModelFormSave(TestCase):
             'periodicity': ANNUAL,
             'other_remark': """And then her heart changed, or at least she understood it; 
     and the winter passed, and the sun shone upon her.""",
+            'other_remark_english': """And then her heart changed, or at least she understood it; 
+        and the winter passed, and the sun shone upon her. IN ENGLISH""",
             'faculty_remark': """Many that live deserve death. 
     And some that die deserve life. 
     Can you give it to them? 
@@ -207,6 +217,7 @@ class TestLearningUnitYearModelFormSave(TestCase):
         self.assertEqual(luy.internship_subtype, self.post_data['internship_subtype'])
         self.assertEqual(luy.attribution_procedure, self.post_data['attribution_procedure'])
         self.assertEqual(luy.other_remark, self.post_data['other_remark'])
+        self.assertEqual(luy.other_remark_english, self.post_data['other_remark_english'])
         self.assertEqual(luy.faculty_remark, self.post_data['faculty_remark'])
 
     def test_case_update_post_data_correctly_saved(self):

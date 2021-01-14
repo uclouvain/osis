@@ -258,6 +258,7 @@ def __load_multiple_node_learning_unit_year(node_learning_unit_year_ids: List[in
         'common_title_en',
         'specific_title_en',
         'other_remark',
+        'other_remark_english',
         'quadrimester',
         'volume_total_lecturing',
         'volume_total_practical',
