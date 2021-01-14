@@ -58,7 +58,7 @@ class ProgramTreeDROI2MFactory(ProgramTreeFactory):
         |
         |___ LDROI100G - DROI2MO
                  |
-                 |___ LDROP2210 - OPTDROI2M/AR
+                 |___ LDROP221O - OPTDROI2M/AR
                          |
                          |___ LDROP100T - PARTIEDEBASE
                                  |

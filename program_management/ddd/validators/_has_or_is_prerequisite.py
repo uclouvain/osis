@@ -46,13 +46,14 @@ class IsHasPrerequisiteForAllTreesValidator(business_validator.BusinessValidator
         self.program_tree_repository = program_tree_repository
 
     def validate(self, *args, **kwargs):
-        trees = self.search_trees_reusing_node()
-        trees += self.search_trees_inside_node()
-        for tree in trees:
-            node_to_detach = tree.get_node_by_code_and_year(self.node_to_detach.code, self.node_to_detach.year)
-            if node_to_detach:
-                _IsPrerequisiteValidator(tree, node_to_detach).validate()
-                _HasPrerequisiteValidator(tree, node_to_detach).validate()
+        for tree in self.search_trees_reusing_node():
+            _IsPrerequisiteValidator(tree, self.node_to_detach).validate()
+            _HasPrerequisiteValidator(tree, self.node_to_detach).validate()
+
+        for tree in self.search_trees_inside_node():
+            if tree.contains(self.node_to_detach) and tree.root_node != self.node_to_detach:
+                _IsPrerequisiteValidator(tree, self.node_to_detach).validate()
+                _HasPrerequisiteValidator(tree, self.node_to_detach).validate()
 
     def search_trees_reusing_node(self) -> List['ProgramTree']:
         return self.program_tree_repository.search_from_children([self.parent_node.entity_id])

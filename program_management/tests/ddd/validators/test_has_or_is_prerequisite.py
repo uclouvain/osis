@@ -24,14 +24,16 @@
 #
 ##############################################################################
 import copy
+from unittest import mock
 
 from django.test import SimpleTestCase
 
 from base.models.enums.education_group_types import TrainingType, GroupType
 from program_management.ddd.domain.exception import CannotDetachLearningUnitsWhoArePrerequisiteException, \
     CannotDetachLearningUnitsWhoHavePrerequisiteException
+from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 from program_management.ddd.validators._has_or_is_prerequisite import _IsPrerequisiteValidator, \
-    _HasPrerequisiteValidator
+    _HasPrerequisiteValidator, IsHasPrerequisiteForAllTreesValidator
 from program_management.tests.ddd.factories.domain.prerequisite.prerequisite import PrerequisitesFactory
 from program_management.tests.ddd.factories.domain.program_tree.LDROI200M_DROI2M import ProgramTreeDROI2MFactory
 from program_management.tests.ddd.factories.link import LinkFactory
@@ -100,6 +102,39 @@ class TestIsPrerequisiteValidator(TestValidatorValidateMixin, SimpleTestCase):
         assertion = "While the prerequisite is used more than once in the same tree, we can detach it"
         self.assertValidatorNotRaises(
             _IsPrerequisiteValidator(tree, node_to_detach=node_that_is_prerequisite_and_used_twice_in_tree)
+        )
+
+    @mock.patch.object(IsHasPrerequisiteForAllTreesValidator, 'search_trees_reusing_node')
+    @mock.patch.object(IsHasPrerequisiteForAllTreesValidator, 'search_trees_inside_node')
+    def test_should_not_raise_when_node_to_detach_has_prerequisite_and_is_program_tree(
+            self,
+            mock_trees_inside_node,
+            mock_trees_reusing_node
+    ):
+        tree = copy.deepcopy(self.tree)
+
+        mini_training_node = tree.get_node_by_code_and_year(code="LDROP221O", year=self.year)
+        mini_training_tree = ProgramTreeFactory(root_node=mini_training_node)
+        PrerequisitesFactory.produce_inside_tree(
+            context_tree=mini_training_tree,
+            node_having_prerequisite=self.ldrop2011.entity_id,
+            nodes_that_are_prequisites=[tree.get_node_by_code_and_year(code="LDROP2012", year=self.year)]
+        )
+
+        mock_trees_inside_node.return_value = [mini_training_tree]
+        mock_trees_reusing_node.return_value = [tree]
+
+        assertion = """
+            The node to detach is a minitraining where there are prerequisite only inside itself.
+            In this case, we can detach it becauses prerequisites are not pertinent in the cotnext of the DROI2M.
+        """
+        self.assertValidatorNotRaises(
+            IsHasPrerequisiteForAllTreesValidator(
+                tree,
+                node_to_detach=mini_training_node,
+                parent_node=tree.get_node_by_code_and_year(code="LDROI100G", year=self.year),
+                program_tree_repository=ProgramTreeRepository()
+            )
         )
 
 
