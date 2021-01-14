@@ -77,6 +77,7 @@ def basic_titles_part_2():
     return [
         str(_("Faculty remark (unpublished)")),
         str(_("Other remark (intended for publication)")),
+        str(_("Other remark in english (intended for publication)")),
         str(_("Team management")),
         str(_("Vacant")),
         str(_("Decision")),

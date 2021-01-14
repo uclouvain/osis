@@ -2,6 +2,7 @@
 
 from django.db import migrations, models
 from django.db.models import Q, Prefetch
+from django.utils import timezone
 
 
 def copy_remarks_from_lu_to_luy(apps, schema_editor):
@@ -21,8 +22,9 @@ def copy_remarks_from_lu_to_luy(apps, schema_editor):
                 luy.faculty_remark = lu.faculty_remark
             elif lu.other_remark:
                 luy.faculty_remark = lu.other_remark
+        luy.changed = timezone.now()
         luys_to_update += list(luys)
-    LearningUnitYear.objects.bulk_update(luys_to_update, ['faculty_remark'], batch_size=1000)
+    LearningUnitYear.objects.bulk_update(luys_to_update, ['faculty_remark', 'changed'], batch_size=1000)
 
 
 def adapt_initial_data_from_proposals(apps, schema_editor):

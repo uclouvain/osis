@@ -386,6 +386,7 @@ def _get_default_common_value_learning_unit_year(learning_container_year, subtyp
         'language': language,
         'periodicity': learning_unit_year_periodicity.ANNUAL,
         'other_remark': 'Other Remark',
+        'other_remark_english': 'Other Remark in english',
         'faculty_remark': 'Faculty Remark'
     }
     if subtype == learning_unit_year_subtypes.PARTIM:

@@ -1735,6 +1735,9 @@ msgstr ""
 msgid "Other remark (intended for publication)"
 msgstr ""
 
+msgid "Other remark in english (intended for publication)"
+msgstr ""
+
 msgid "Other special needs"
 msgstr ""
 
