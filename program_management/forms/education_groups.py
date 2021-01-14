@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -40,7 +40,8 @@ from base.models.enums import education_group_categories
 from base.models.enums import education_group_types
 from base.models.enums.education_group_categories import Categories
 from education_group.calendar.education_group_switch_calendar import EducationGroupSwitchCalendar
-from education_group.models.group_year import GroupYear
+from education_group.models.group_year import GroupYear, find_distinct_academic_years
+
 
 PARTICULAR = "PARTICULAR"
 STANDARD = "STANDARD"
@@ -53,7 +54,7 @@ VERSION_CHOICES = (
 
 class GroupFilter(FilterSet):
     academic_year = filters.ModelChoiceFilter(
-        queryset=AcademicYear.objects.all(),
+        queryset=find_distinct_academic_years().order_by('-year'),
         required=False,
         label=_('Ac yr.'),
         empty_label=pgettext_lazy("female plural", "All"),

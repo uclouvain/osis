@@ -33,7 +33,7 @@ from base.forms.utils.filter_field import filter_field_by_regex, espace_special_
 from base.models.academic_year import AcademicYear, starting_academic_year
 from base.models.enums import quadrimesters, learning_unit_year_subtypes, active_status, learning_container_year_types
 from base.models.enums.learning_container_year_types import LearningContainerYearType
-from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
+from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet, find_distinct_academic_years
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.views.learning_units.search.common import SearchTypes
 
@@ -51,7 +51,7 @@ MOBILITY_CHOICE = ((MOBILITY, _('Mobility')),)
 
 class LearningUnitFilter(FilterSet):
     academic_year = filters.ModelChoiceFilter(
-        queryset=AcademicYear.objects.all(),
+        queryset=find_distinct_academic_years().order_by('-year'),
         required=False,
         label=_('Ac yr.'),
         empty_label=pgettext_lazy("female plural", "All"),

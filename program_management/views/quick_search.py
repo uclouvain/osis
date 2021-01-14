@@ -1,11 +1,11 @@
-# ############################################################################
+#############################################################################
 #  OSIS stands for Open Student Information System. It's an application
 #  designed to manage the core business of higher education institutions,
 #  such as universities, faculties, institutes and professional schools.
 #  The core business involves the administration of students, teachers,
 #  courses, programs and so on.
 #
-#  Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#  Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -29,14 +29,14 @@ from django_filters import FilterSet, filters, OrderingFilter
 from django_filters.views import FilterView
 
 from base.forms.learning_unit.search.quick_search import QuickLearningUnitYearFilter
-from base.models.academic_year import AcademicYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import CacheFilterMixin
 from base.utils.search import SearchMixin
 from base.utils.urls import reverse_with_get
 from base.views.mixins import AjaxTemplateMixin
 from education_group.views.serializers.group_year import GroupYearSerializer
-from education_group.models.group_year import GroupYear
+from education_group.models.group_year import GroupYear, find_distinct_academic_years
+# from program_management.business.find_distinct_academic_years import find_distinct_academic_years
 from learning_unit.api.serializers.learning_unit import LearningUnitSerializer
 
 CACHE_TIMEOUT = 60
@@ -44,7 +44,7 @@ CACHE_TIMEOUT = 60
 
 class QuickGroupYearFilter(FilterSet):
     academic_year = filters.ModelChoiceFilter(
-        queryset=AcademicYear.objects.all(),
+        queryset=find_distinct_academic_years().order_by('-year'),
         to_field_name="year",
         required=False,
         label=_('Ac yr.'),

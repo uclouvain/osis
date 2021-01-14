@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -26,19 +26,22 @@
 
 from django.core.validators import MinValueValidator
 from django.db import models
-from django.db.models import Case, When, Q, Value, CharField
+from django.db.models import Case, When, Q, Value, CharField, QuerySet
 from django.db.models.functions import Concat
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
-from base.models import entity_version
+from base.models import entity_version, academic_year
+from base.models.academic_year import AcademicYear
 from base.models.campus import Campus
 from base.models.entity import Entity
 from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import GroupType, MiniTrainingType
 from education_group.models.enums.constraint_type import ConstraintTypes
 from osis_common.models.osis_model_admin import OsisModelAdmin
+
+MAX_YEARS_ADDING_TO_CURRENT = 6
 
 
 class GroupYearManager(models.Manager):
@@ -261,3 +264,15 @@ class GroupYear(models.Model):
         return entity_version.find_entity_version_according_academic_year(
             self.management_entity, self.academic_year
         )
+
+
+def find_distinct_academic_years():
+    starting_academic_year = academic_year.starting_academic_year()
+    if starting_academic_year:
+        max_limit = starting_academic_year.year + MAX_YEARS_ADDING_TO_CURRENT
+        academic_year_ids = GroupYear.objects.filter(academic_year__year__lte=max_limit)\
+            .distinct('academic_year').values('academic_year__id')
+
+        return AcademicYear.objects.filter(id__in=academic_year_ids)
+    else:
+        return AcademicYear.objects.all()

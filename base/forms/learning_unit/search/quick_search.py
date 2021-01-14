@@ -1,11 +1,11 @@
-# ############################################################################
+#############################################################################
 #  OSIS stands for Open Student Information System. It's an application
 #  designed to manage the core business of higher education institutions,
 #  such as universities, faculties, institutes and professional schools.
 #  The core business involves the administration of students, teachers,
 #  courses, programs and so on.
 #
-#  Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#  Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -20,18 +20,17 @@
 #  A copy of this license - GNU General Public License - is available
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
-# ############################################################################
+#############################################################################
 from django import forms
 from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from django_filters import FilterSet, filters, OrderingFilter
 
-from base.models.academic_year import AcademicYear
-from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
+from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet, find_distinct_academic_years
 
 
 class QuickLearningUnitYearFilter(FilterSet):
     academic_year = filters.ModelChoiceFilter(
-        queryset=AcademicYear.objects.all(),
+        queryset=find_distinct_academic_years().order_by('-year'),
         to_field_name="year",
         required=False,
         label=_('Ac yr.'),

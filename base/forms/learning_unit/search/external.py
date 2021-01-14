@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ from base.models.academic_year import AcademicYear, starting_academic_year
 from base.models.campus import Campus
 from base.models.entity_version_address import EntityVersionAddress
 from base.models.enums import active_status
-from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
+from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet, find_distinct_academic_years
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.views.learning_units.search.common import SearchTypes
 from reference.models.country import Country
@@ -41,7 +41,7 @@ from reference.models.country import Country
 
 class ExternalLearningUnitFilter(FilterSet):
     academic_year = filters.ModelChoiceFilter(
-        queryset=AcademicYear.objects.all(),
+        queryset=find_distinct_academic_years().order_by('-year'),
         required=False,
         label=_('Ac yr.'),
         empty_label=pgettext_lazy("female plural", "All"),

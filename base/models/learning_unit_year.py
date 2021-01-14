@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
 from django.db import models
-from django.db.models import Q, When, CharField, Value, Case, Subquery, OuterRef
+from django.db.models import Q, When, CharField, Value, Case, Subquery, OuterRef, QuerySet
 from django.db.models.functions import Concat
 from django.db.models.signals import post_delete
 from django.dispatch.dispatcher import receiver
@@ -39,7 +39,7 @@ from reversion.admin import VersionAdmin
 
 from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.business.learning_container_year import get_learning_container_year_warnings
-from base.models import entity_version
+from base.models import entity_version, academic_year
 from base.models.academic_year import compute_max_academic_year_adjournment, AcademicYear
 from base.models.entity_version import get_entity_version_parent_or_itself_from_type
 from base.models.enums import active_status, learning_container_year_types
@@ -61,6 +61,7 @@ AUTHORIZED_REGEX_CHARS = "$*+.^"
 REGEX_ACRONYM_CHARSET = "[A-Z0-9" + AUTHORIZED_REGEX_CHARS + "]+"
 MINIMUM_CREDITS = 0.0
 MAXIMUM_CREDITS = 500
+MAX_YEARS_ADDING_TO_CURRENT = 6
 
 # This query can be used as annotation in a LearningUnitYearQuerySet with a RawSql.
 # It return a dictionary with the closest trainings and mini_training (except 'option')
@@ -711,3 +712,14 @@ def toggle_summary_locked(learning_unit_year_id):
 @receiver(post_delete, sender=LearningUnitYear)
 def _learningunityear_delete(sender, instance, **kwargs):
     TranslatedText.objects.filter(entity=LEARNING_UNIT_YEAR, reference=instance.id).delete()
+
+
+def find_distinct_academic_years() -> QuerySet:
+    starting_academic_year = academic_year.starting_academic_year()
+    if starting_academic_year:
+        max_limit = starting_academic_year.year + MAX_YEARS_ADDING_TO_CURRENT
+        academic_year_ids = LearningUnitYear.objects.filter(academic_year__year__lte=max_limit)\
+            .distinct('academic_year__id').values('academic_year__id').order_by()
+        return AcademicYear.objects.filter(id__in=academic_year_ids)
+
+    return AcademicYear.objects.all()

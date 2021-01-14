@@ -1,11 +1,11 @@
-# ############################################################################
+#############################################################################
 #  OSIS stands for Open Student Information System. It's an application
 #  designed to manage the core business of higher education institutions,
 #  such as universities, faculties, institutes and professional schools.
 #  The core business involves the administration of students, teachers,
 #  courses, programs and so on.
 #
-#  Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#  Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 #  A copy of this license - GNU General Public License - is available
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
-# ############################################################################
+#############################################################################
 from typing import Dict, Optional
 
 from django import forms
@@ -118,19 +118,19 @@ class MiniTrainingForm(ValidationRuleMixin, forms.Form):
             self.fields['academic_year'].disabled = True
 
         target_years_opened = EducationGroupExtendedDailyManagementCalendar().get_target_years_opened()
-        working_academic_years = AcademicYear.objects.filter(year__in=target_years_opened)
+        working_academic_years = AcademicYear.objects.filter(year__in=target_years_opened).order_by('-year')
         self.fields['academic_year'].queryset = self.fields['end_year'].queryset = working_academic_years
 
         if not self.fields['academic_year'].disabled and self.user.person.is_faculty_manager:
             self.fields['academic_year'].queryset = self.fields['academic_year'].queryset.filter(
                 year__in=EducationGroupPreparationCalendar().get_target_years_opened()
-            )
+            ).order_by('-academiccalendar__academic_year__year')
 
         self.fields['end_year'].queryset = self.fields['end_year'].queryset.filter(
             year__gte=getattr(
                 self.fields['academic_year'].queryset.first(), 'year', settings.YEAR_LIMIT_EDG_MODIFICATION
             )
-        )
+        ).order_by('-year')
 
     def __init_management_entity_field(self):
         self.fields['management_entity'] = fields.ManagementEntitiesModelChoiceField(
@@ -202,7 +202,7 @@ class UpdateMiniTrainingForm(PermissionFieldMixin, MiniTrainingForm):
             self.fields["end_year"].queryset = AcademicYear.objects.filter(
                 year__gte=initial_academic_year_value,
                 year__in=EducationGroupExtendedDailyManagementCalendar().get_target_years_opened()
-            )
+            ).order_by('-year')
 
     # PermissionFieldMixin
     def get_context(self) -> str:

@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import contextlib
 from typing import List, Tuple
 
 from django.urls import reverse

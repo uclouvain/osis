@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -27,7 +27,6 @@ import itertools
 from typing import Dict, List
 
 from django import forms
-from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from django_filters import filters
 
@@ -37,16 +36,14 @@ from base.models import entity_version
 from base.models.academic_year import AcademicYear
 from base.models.entity_version import EntityVersion, build_current_entity_version_structure_in_memory
 from base.models.enums import entity_type
-from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
-from base.models.offer_year_entity import OfferYearEntity
+from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet, find_distinct_academic_years
 from base.views.learning_units.search.common import SearchTypes
-from education_group.models.group_year import GroupYear
 from program_management.models.element import Element
 
 
 class BorrowedLearningUnitSearch(LearningUnitFilter):
     academic_year = filters.ModelChoiceFilter(
-        queryset=AcademicYear.objects.all(),
+        queryset=find_distinct_academic_years().order_by('-year'),
         required=True,
         label=_('Ac yr.'),
         empty_label=None

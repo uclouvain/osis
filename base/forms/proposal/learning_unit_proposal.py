@@ -30,12 +30,11 @@ from django_filters import FilterSet, filters, OrderingFilter
 
 from base.business import event_perms
 from base.business.entity import get_entities_ids
-from base.models.academic_year import AcademicYear
 from base.models.entity import Entity
 from base.models.entity_version import EntityVersion
 from base.models.enums.proposal_state import ProposalState, LimitedProposalState
 from base.models.enums.proposal_type import ProposalType
-from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
+from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet, find_distinct_academic_years
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.views.learning_units.search.common import SearchTypes
 from base.forms.utils.filter_field import filter_field_by_regex, espace_special_characters
@@ -57,7 +56,7 @@ class ProposalLearningUnitOrderingFilter(OrderingFilter):
 
 class ProposalLearningUnitFilter(FilterSet):
     academic_year = filters.ModelChoiceFilter(
-        queryset=AcademicYear.objects.all(),
+        queryset=find_distinct_academic_years().order_by('-year'),
         required=False,
         label=_('Ac yr.'),
         empty_label=pgettext_lazy("female plural", "All"),
