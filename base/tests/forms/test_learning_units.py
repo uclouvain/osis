@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -28,13 +28,11 @@ from django.test import TestCase
 import base.forms.learning_unit.search.service_course
 import base.forms.learning_unit.search.simple
 from attribution.tests.factories.attribution import AttributionNewFactory
-from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from base.business.learning_unit_year_with_context import is_service_course
 from base.models.entity_version import PEDAGOGICAL_ENTITY_ADDED_EXCEPTIONS
 from base.models.enums import entity_type
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.entity_version import EntityVersionFactory
-from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.tutor import TutorFactory
@@ -55,15 +53,13 @@ class TestLearningUnitForm(TestCase):
             )
             for container in range(4)
         ]
+        cls.attribution_new = AttributionNewFactory(tutor=cls.tutor,
+                                                    learning_container_year=cls.list_learning_unit_container_year[0])
         cls.list_learning_unit_year = cls._create_list_learning_units_from_containers(
             cls.list_learning_unit_container_year,
             cls.current_ac_year
         )
-        cls.learning_component = LearningComponentYearFactory(learning_unit_year=cls.list_learning_unit_year[0])
-        cls.attribution_charge_new = AttributionChargeNewFactory(
-            attribution=cls.attribution,
-            learning_component_year=cls.learning_component
-        )
+
         cls.list_entity_version = cls._create_list_entities_version(
             cls.current_ac_year.end_date,
             cls.current_ac_year.start_date
@@ -87,7 +83,7 @@ class TestLearningUnitForm(TestCase):
         """
         Create the most simple Learning Units list:
         which is one Learning Unit per Container.
-        So in this case, four Learning Units are instanciated:
+        So in this case, four Learning Units are instantiated:
         LUY0, LUY1, LUY2 and LUY3.
         """
         list_lu_year = [
