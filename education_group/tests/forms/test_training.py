@@ -77,6 +77,6 @@ class TestCreateTrainingForm(TestCase):
 
         self.assertQuerysetEqual(
             form.fields['academic_year'].queryset,
-            [2020, 2021, 2022, 2023, 2024],
+            [2024, 2023, 2022, 2021, 2020],
             transform=lambda obj: obj.year
         )
