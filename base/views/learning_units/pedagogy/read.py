@@ -165,3 +165,14 @@ def _get_modification_history(filter_qs):
         "-revision__date_created"
     ).first()
 
+    context['cms_labels_translated'] = translated_labels_with_text
+    context['teaching_materials'] = teaching_materials
+    context['can_edit_information'] = perm_to_edit
+    context['can_edit_summary_locked_field'] = person.user.has_perm(
+        'base.can_edit_summary_locked_field', learning_unit_year
+    )
+    context['cms_label_pedagogy_fr_only'] = CMS_LABEL_PEDAGOGY_FR_ONLY
+    context['attributions'] = attributions
+    context["version"] = reversion
+    context['tab_active'] = 'learning_unit_pedagogy'  # Corresponds to url_name
+    return render(request, template, context)
