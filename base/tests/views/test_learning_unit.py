@@ -875,7 +875,7 @@ class LearningUnitViewTestCase(TestCase):
         self.assertTemplateUsed(response, 'learning_unit/pedagogy.html')
         self.assertEqual(self.client.session['search_url'], SEARCH_URL_PART)
 
-    @mock.patch("base.views.learning_units.pedagogy.read.is_eligible_to_update_learning_unit_pedagogy")
+    @mock.patch("base.views.learning_units.common.is_eligible_to_update_learning_unit_pedagogy")
     def test_learning_unit_pedagogy_publish_button_enabled(self, mock_perm_pedagogy):
         mock_perm_pedagogy.return_value = True
         response = self.client.get(reverse(learning_unit_pedagogy, args=[self.luy.pk]))
@@ -884,8 +884,8 @@ class LearningUnitViewTestCase(TestCase):
         self.assertTrue(response.context['enable_publish_button'])
 
     @mock.patch(
-        "base.views.learning_units.pedagogy.read.is_eligible_to_update_learning_unit_pedagogy_force_majeure_section")
-    @mock.patch("base.views.learning_units.pedagogy.read.is_eligible_to_update_learning_unit_pedagogy")
+        "base.views.learning_units.common.is_eligible_to_update_learning_unit_pedagogy_force_majeure_section")
+    @mock.patch("base.views.learning_units.common.is_eligible_to_update_learning_unit_pedagogy")
     def test_learning_unit_pedagogy_publish_button_disabled(self, mock_perm_pedagogy, mock_perm_force_majeure):
         mock_perm_pedagogy.return_value = False
         mock_perm_force_majeure.return_value = False
@@ -894,7 +894,10 @@ class LearningUnitViewTestCase(TestCase):
         self.assertTrue(response.context['luy_in_current_or_future_anac'])
         self.assertFalse(response.context['enable_publish_button'])
 
-    def test_learning_unit_specification(self):
+    @mock.patch(
+        "base.views.learning_units.common.is_eligible_to_update_learning_unit_pedagogy_force_majeure_section")
+    @mock.patch("base.views.learning_units.common.is_eligible_to_update_learning_unit_pedagogy")
+    def test_learning_unit_specification(self, mock_perm_pedagogy, mock_perm_force_majeure):
         learning_unit_year = LearningUnitYearFactory()
         fr = FrenchLanguageFactory()
         en = EnglishLanguageFactory()
