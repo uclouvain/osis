@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import random
 
 from django.conf import settings
 from django.test import RequestFactory, SimpleTestCase
@@ -30,6 +31,7 @@ from rest_framework.reverse import reverse
 
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
 from base.models.enums.link_type import LinkTypes
+from base.models.enums.proposal_type import ProposalType
 from education_group.api.serializers.group_element_year import EducationGroupRootNodeTreeSerializer
 from education_group.api.views.group import GroupDetail
 from education_group.api.views.group_element_year import TrainingTreeView, GroupTreeView
@@ -49,6 +51,7 @@ class EducationGroupRootNodeTreeSerializerTestCase(SimpleTestCase):
         |--Common Core
            |-- Learning unit year
            |-- Access minor
+           |-- Learning unit year WITH PROPOSAL
         """
         self.year = 2018
         self.training = NodeGroupYearFactory(
@@ -83,6 +86,19 @@ class EducationGroupRootNodeTreeSerializerTestCase(SimpleTestCase):
         self.mini_gey = LinkFactory(
             parent=self.common_core, child=self.mini_training
         )
+
+        self.learning_unit_year_with_proposal = NodeLearningUnitYearFactory(
+            year=self.year,
+            credits=10,
+            status=False,
+            specific_title_en=None,
+            common_title_en='COMMON',
+            proposal_type=ProposalType.MODIFICATION.name
+        )
+        self.luy_gey = LinkFactory(
+            parent=self.common_core, child=self.learning_unit_year_with_proposal
+        )
+
         url = reverse('education_group_api_v1:' + TrainingTreeView.name, kwargs={
             'acronym': self.training.title,
             'year': self.year
@@ -232,11 +248,42 @@ class EducationGroupRootNodeTreeSerializerTestCase(SimpleTestCase):
             Link(parent=None, child=training),
             context={
                 'request': RequestFactory().get(url),
-                'language': settings.LANGUAGE_CODE_EN
+                'language': settings.LANGUAGE_CODE_EN,
             }
         )
         self.assertEqual(len(serializer.data['children']), 1)
         self.assertEqual(serializer.data['children'][0]['code'], minor.code)
+
+    def test_ensure_get_mini_training_without_children_if_within_minor_major_list_from_bachelor(self):
+        training = NodeGroupYearFactory(
+            year=self.year,
+            node_type=TrainingType.BACHELOR
+        )
+        training_list = NodeGroupYearFactory(
+            year=self.year,
+            node_type=random.choice(GroupType.minor_major_list_choice_enums()),
+        )
+        minor = NodeGroupYearFactory(
+            year=self.year,
+            node_type=MiniTrainingType.ACCESS_MINOR,
+        )
+        luy = NodeLearningUnitYearFactory(year=self.year)
+        LinkFactory(parent=training, child=training_list)
+        LinkFactory(parent=training_list, child=minor)
+        LinkFactory(parent=minor, child=luy)
+        url = reverse('education_group_api_v1:' + TrainingTreeView.name, kwargs={
+            'acronym': training.title,
+            'year': self.year
+        })
+        serializer = EducationGroupRootNodeTreeSerializer(
+            Link(parent=None, child=training),
+            context={
+                'request': RequestFactory().get(url),
+                'language': settings.LANGUAGE_CODE_EN,
+            }
+        )
+        minor = serializer.data['children'][0]['children'][0]
+        self.assertNotIn('children', minor)
 
     def test_ensure_node_type_and_subtype_expected(self):
         self.assertEqual(self.serializer.data['node_type'], NodeType.TRAINING.name)
@@ -371,6 +418,10 @@ class EducationGroupRootNodeTreeSerializerTestCase(SimpleTestCase):
             }
         )
         return serializer
+
+    def test_learning_unit_children_is_proposal(self):
+        self.assertEqual(self.serializer.data['children'][0]['children'][2]['proposal_type'],
+                         ProposalType.MODIFICATION.name)
 
 
 class EducationGroupWithMasterFinalityInRootTreeSerializerTestCase(SimpleTestCase):

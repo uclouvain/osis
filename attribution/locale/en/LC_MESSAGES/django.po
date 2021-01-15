@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-23 13:55+0200\n"
+"POT-Creation-Date: 2021-01-04 11:10+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -56,6 +56,9 @@ msgstr ""
 msgid "Attributions"
 msgstr ""
 
+msgid "Authority/sabbatical teaching supply"
+msgstr ""
+
 msgid "Cancel"
 msgstr ""
 
@@ -66,6 +69,12 @@ msgid "Coordinator"
 msgstr ""
 
 msgid "Courses"
+msgstr ""
+
+msgid "Demand for co-holder"
+msgstr ""
+
+msgid "Demand for discharge"
 msgstr ""
 
 msgid "Deputy"
@@ -84,6 +93,9 @@ msgid "Description fiche"
 msgstr ""
 
 msgid "Description fiche edition"
+msgstr ""
+
+msgid "Discharge"
 msgstr ""
 
 msgid "Duration"
@@ -153,10 +165,16 @@ msgstr ""
 msgid "Not in period to edit description fiche."
 msgstr ""
 
+msgid "Part-time teaching supply"
+msgstr ""
+
 msgid "Practical exercises"
 msgstr ""
 
 msgid "Professor"
+msgstr ""
+
+msgid "Program modification"
 msgstr ""
 
 msgid "Publish application to portal"
@@ -188,6 +206,9 @@ msgstr ""
 msgid "Substitute"
 msgstr ""
 
+msgid "Teaching supply"
+msgstr ""
+
 #, python-format
 msgid ""
 "The sum of volumes for the partims for professor %(tutor)s is superior to "
@@ -198,6 +219,9 @@ msgid "There is no course for which you can edit description fiche"
 msgstr ""
 
 msgid "Title"
+msgstr ""
+
+msgid "To delete"
 msgstr ""
 
 msgid "Tutor"

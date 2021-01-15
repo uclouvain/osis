@@ -249,6 +249,17 @@ class LearningUnitYear(SerializableModel):
 
     periodicity = models.CharField(max_length=20, choices=PERIODICITY_TYPES, default=ANNUAL,
                                    verbose_name=_('Periodicity'))
+    other_remark = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name=_('Other remark (intended for publication)')
+    )
+    other_remark_english = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name=_('Other remark in english (intended for publication)')
+    )
+    faculty_remark = models.TextField(blank=True, null=True, verbose_name=_('Faculty remark (unpublished)'))
 
     objects = BaseLearningUnitYearManager()
     objects_with_container = LearningUnitYearWithContainerManager()
