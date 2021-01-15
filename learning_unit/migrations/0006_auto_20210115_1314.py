@@ -71,6 +71,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(create_proposal_limited_calendar(), remove_proposal_limited_calendar()),
-        migrations.RunPython(create_proposal_extended_calendar(), remove_proposal_extended_calendar()),
+        migrations.RunPython(create_proposal_limited_calendar, remove_proposal_limited_calendar),
+        migrations.RunPython(create_proposal_extended_calendar, remove_proposal_extended_calendar),
     ]
