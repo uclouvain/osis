@@ -1,4 +1,4 @@
-{% load messages %}
+{% load messages i18n %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
 * designed to manage the core business of higher education institutions,
@@ -6,7 +6,7 @@
 * The core business involves the administration of students, teachers,
 * courses, programs and so on.
 *
-* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+* Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -38,6 +38,20 @@
                             {% if 'safe' in message.tags %}{{ message|safe }}{% else %}{{ message }}{% endif %}
                         </li>
                     {%endif%}
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+    {% as_messages_update_warning as messages_update_warning %}
+    {% if messages_update_warning %}
+        <div id="pnl_warning_messages" class="alert alert-warning" role="alert" style="max-height: 250px; overflow: auto;">
+            <b>{% trans 'Pay attention! This learning unit is used in more than one formation' %}</b>
+            <br>
+            <ul>
+                {% for message in messages %}
+                    {% if message.tags == '' %}
+                        <li>{% if 'safe' in message.tags %}{{ message|safe }}{% else %}{{ message }}{% endif %}</li>
+                    {% endif %}
                 {% endfor %}
             </ul>
         </div>
