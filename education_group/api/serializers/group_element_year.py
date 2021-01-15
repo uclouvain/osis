@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ from django.conf import settings
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 
+from base.models.enums.education_group_types import GroupType, MiniTrainingType
 from education_group.api.serializers.utils import get_title_from_lang
 from education_group.api.views.group import GroupDetail
 from education_group.api.views.mini_training import MiniTrainingDetail
@@ -82,6 +83,14 @@ class BaseCommonNodeTreeSerializer(serializers.Serializer):
         source='child.get_children_and_only_reference_children_except_within_minor_list',
         many=True,
     )
+
+    def to_representation(self, obj: 'Link'):
+        data = super().to_representation(obj)
+        parent = obj.parent
+        if parent and parent.node_type in GroupType.minor_major_list_choice_enums() \
+                and obj.child.node_type in MiniTrainingType.minors_and_deepening() + [MiniTrainingType.FSA_SPECIALITY]:
+            data.pop('children')
+        return data
 
 
 class CommonNodeTreeSerializer(BaseCommonNodeTreeSerializer):
@@ -179,7 +188,7 @@ class LearningUnitNodeTreeSerializer(CommonNodeTreeSerializer):
     periodicity = serializers.CharField(source='child.periodicity.name', allow_null=True, read_only=True)
     quadrimester = serializers.CharField(source='child.quadrimester.name', allow_null=True, read_only=True)
     status = serializers.BooleanField(source='child.status', read_only=True)
-    proposal_type = serializers.CharField(source='child.proposal_type.name', allow_null=True, read_only=True)
+    proposal_type = serializers.CharField(source='child.proposal_type', allow_null=True, read_only=True)
 
     def get_title(self, obj: 'Link'):
         return self._get_ue_title_from_lang(obj, settings.LANGUAGE_CODE_FR)

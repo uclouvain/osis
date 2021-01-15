@@ -54,8 +54,8 @@
                            value="{{ entity_acronym | default_if_none:'' }}" style="text-transform:uppercase" maxlength="15">
                 </div>
                 <div class="col-md-3">
-                    <label for="txt_code">{% trans 'Acronym'%}</label>
-                    <input class="form-control" id="txt_code" placeholder="{% trans 'Acronym' %}" name="code"
+                    <label for="txt_code">{% trans 'Acronym/Short title'%}</label>
+                    <input class="form-control" id="txt_code" placeholder="{% trans 'Acronym/Short title' %}" name="code"
                            value="{{ code  | default_if_none:'' }}" style="text-transform:uppercase" maxlength="15">
                 </div>
                 <div class="col-md-3">
@@ -75,7 +75,7 @@
             <thead>
                 <tr>
                     <th>{% trans 'Academic year'%}</th>
-                    <th>{% trans 'Acronym'%}</th>
+                    <th>{% trans 'Acronym/Short title'%}</th>
                     <th>{% trans 'Title'%}</th>
                     <th>{% trans 'Entity'%}</th>
                 </tr>

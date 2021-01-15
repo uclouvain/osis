@@ -24,7 +24,10 @@
 #
 ##############################################################################
 from decimal import Decimal
+from typing import List
 
+from django.db.models import Case, When
+from django.db.models.query import QuerySet
 from django.utils.translation import gettext_lazy as _
 from openpyxl.utils import get_column_letter
 
@@ -73,13 +76,14 @@ def learning_unit_titles():
     return basic_titles() + components_titles()
 
 
-def create_xls_comparison(user, learning_unit_years, filters, academic_yr_comparison):
+def create_xls_comparison(user, learning_unit_years: QuerySet, filters, academic_yr_comparison: int):
     working_sheets_data = []
     cells_modified_with_green_font = []
     cells_with_top_border = []
 
     if learning_unit_years:
-        luys_for_2_years = _get_learning_unit_yrs_on_2_different_years(academic_yr_comparison, learning_unit_years)
+        luys_for_2_years = _get_learning_unit_yrs_on_2_different_years(academic_yr_comparison,
+                                                                       learning_unit_years)
         data = prepare_xls_content(luys_for_2_years)
         working_sheets_data = data.get('data')
         cells_modified_with_green_font = data.get(CELLS_MODIFIED_NO_BORDER)
@@ -101,7 +105,11 @@ def create_xls_comparison(user, learning_unit_years, filters, academic_yr_compar
     return xls_build.generate_xls(xls_build.prepare_xls_parameters_list(working_sheets_data, parameters), filters)
 
 
-def _get_learning_unit_yrs_on_2_different_years(academic_yr_comparison, learning_unit_years):
+def _get_learning_unit_yrs_on_2_different_years(academic_yr_comparison: int,
+                                                learning_unit_years: QuerySet) -> List[LearningUnitYear]:
+    l_units_order_to_preserve = [learning_unit_yr.learning_unit for learning_unit_yr in learning_unit_years]
+    preserved = Case(*[When(learning_unit__pk=pk.id, then=pos) for pos, pk in enumerate(l_units_order_to_preserve)])
+
     learning_unit_years = LearningUnitYear.objects.filter(
         learning_unit__in=(_get_learning_units(learning_unit_years)),
         academic_year__year__in=(
@@ -118,7 +126,7 @@ def _get_learning_unit_yrs_on_2_different_years(academic_yr_comparison, learning
         build_entity_container_prefetch(entity_types.REQUIREMENT_ENTITY),
         build_entity_container_prefetch(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1),
         build_entity_container_prefetch(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2),
-    ).order_by('learning_unit', 'academic_year__year')
+    ).order_by(preserved, 'academic_year__year')
     [append_latest_entities(learning_unit) for learning_unit in learning_unit_years]
     [append_components(learning_unit) for learning_unit in learning_unit_years]
     return learning_unit_years
@@ -223,8 +231,9 @@ def _get_data(learning_unit_yr, new_line, first_data, partims=True, proposal_com
         data.append(get_partims_as_str(learning_unit_yr.get_partims_related()))
     data.extend(
         [
-            get_representing_string(learning_unit_yr.learning_unit.faculty_remark),
-            get_representing_string(learning_unit_yr.learning_unit.other_remark),
+            get_representing_string(learning_unit_yr.faculty_remark),
+            get_representing_string(learning_unit_yr.other_remark),
+            get_representing_string(learning_unit_yr.other_remark_english),
             _('Yes') if learning_unit_yr.learning_container_year.team else _('No'),
             _('Yes') if learning_unit_yr.learning_container_year.is_vacant else _('No'),
             get_representing_string(learning_unit_yr.learning_container_year.get_type_declaration_vacant_display()),
@@ -393,8 +402,9 @@ def _get_data_from_initial_data(initial_data, proposal_comparison=False):
         _('Yes') if luy_initial.get('professional_integration') else _('No'),
         organization.name if organization else BLANK_VALUE,
         campus if campus else BLANK_VALUE,
-        get_representing_string(lu_initial.get('faculty_remark')),
-        get_representing_string(lu_initial.get('other_remark')),
+        get_representing_string(luy_initial.get('faculty_remark')),
+        get_representing_string(luy_initial.get('other_remark')),
+        get_representing_string(luy_initial.get('other_remark_english')),
         _('Yes') if lcy_initial.get('team') else _('No'),
         _('Yes') if lcy_initial.get('is_vacant') else _('No'),
         dict(vacant_declaration_type.DECLARATION_TYPE)[lcy_initial.get('type_declaration_vacant')] if lcy_initial.get(

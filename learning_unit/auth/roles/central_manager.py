@@ -20,6 +20,8 @@ class CentralManager(osis_role_models.EntityRoleModel):
     @classmethod
     def rule_set(cls):
         return rules.RuleSet({
+            'base.can_access_catalog': rules.always_allow,
+            'base.view_educationgroup': rules.always_allow,
             'base.can_create_learningunit': rules.always_allow,
             'base.can_create_partim':
                 predicates.is_user_attached_to_current_requirement_entity &
@@ -39,13 +41,13 @@ class CentralManager(osis_role_models.EntityRoleModel):
                 predicates.is_learning_unit_year_older_or_equals_than_limit_settings_year &
                 predicates.is_learning_unit_edition_period_open &
                 predicates.is_external_learning_unit_with_cograduation &
-                predicates.is_not_in_proposal_state,
+                predicates.is_not_in_proposal_state_for_this_and_previous_years,
             'base.add_externallearningunityear': rules.always_allow,
             'base.can_propose_learningunit':
                 predicates.is_learning_unit_year_not_in_past &
                 predicates.is_learning_unit_year_not_a_partim &
                 predicates.is_learning_unit_container_type_editable &
-                predicates.is_not_in_proposal_state &
+                predicates.is_not_in_proposal_state_any_year &
                 predicates.is_proposal_edition_period_open &
                 predicates.is_user_attached_to_current_requirement_entity &
                 predicates.is_external_learning_unit_with_cograduation,
@@ -53,7 +55,7 @@ class CentralManager(osis_role_models.EntityRoleModel):
                 predicates.is_learning_unit_year_not_in_past &
                 predicates.is_learning_unit_year_not_a_partim &
                 predicates.is_learning_unit_container_type_editable &
-                predicates.is_not_in_proposal_state &
+                predicates.is_not_in_proposal_state_any_year &
                 predicates.is_proposal_date_edition_period_open &
                 predicates.is_user_attached_to_current_requirement_entity &
                 predicates.is_external_learning_unit_with_cograduation,
@@ -82,7 +84,7 @@ class CentralManager(osis_role_models.EntityRoleModel):
                 predicates.is_learning_unit_edition_period_open &
                 predicates.is_user_attached_to_current_requirement_entity &
                 predicates.is_external_learning_unit_with_cograduation &
-                predicates.is_not_in_proposal_state,
+                predicates.is_not_in_proposal_state_for_this_and_previous_years,
             'base.can_edit_learningunit_pedagogy':
                 predicates.is_learning_unit_year_older_or_equals_than_limit_settings_year &
                 predicates.is_user_attached_to_current_requirement_entity,
