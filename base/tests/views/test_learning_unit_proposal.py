@@ -251,7 +251,7 @@ class TestLearningUnitModificationProposal(TestCase):
             'learning_unit_year': [
                 "id", "acronym", "specific_title", "internship_subtype", "credits", "campus", "language", "periodicity",
                 "status", "professional_integration", "specific_title", "specific_title_english", "quadrimester",
-                "session", "attribution_procedure", "faculty_remark", "other_remark",
+                "session", "attribution_procedure", "faculty_remark", "other_remark", "other_remark_english"
             ],
             'learning_component_year': [
                 "id", "acronym", "hourly_volume_total_annual", "hourly_volume_partial_q1", "hourly_volume_partial_q2",

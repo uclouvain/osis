@@ -1791,6 +1791,9 @@ msgstr "Activités dans d'autres langues"
 msgid "Other remark (intended for publication)"
 msgstr "Autre remarque (destinée à la publication)"
 
+msgid "Other remark in english (intended for publication)"
+msgstr "Autre remarque en anglais (destinée à la publication)"
+
 msgid "Other special needs"
 msgstr "Autre HTM"
 
