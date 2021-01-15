@@ -34,6 +34,7 @@ from django.utils import timezone
 
 from attribution import models as mdl_attribution
 from base import models as mdl_base
+from base.models.enums.learning_container_year_types import IN_CHARGE_TYPES
 from osis_common.queue import queue_sender
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
@@ -63,8 +64,9 @@ def _compute_list(global_ids=None):
 
 
 def _get_all_attributions_with_charges(global_ids):
-    attributioncharge_prefetch = mdl_attribution.attribution_charge_new.search()\
-        .select_related('learning_component_year__learning_unit_year__academic_year')
+    attributioncharge_prefetch = mdl_attribution.attribution_charge_new.search().filter(
+        learning_component_year__learning_unit_year__learning_container_year__container_type__in=IN_CHARGE_TYPES
+    ).select_related('learning_component_year__learning_unit_year__academic_year')
 
     if global_ids is not None:
         qs = mdl_attribution.attribution_new.search(global_id=global_ids)
