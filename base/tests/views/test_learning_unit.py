@@ -912,6 +912,10 @@ class LearningUnitViewTestCase(TestCase):
             response.context['achievements'],
             list(itertools.zip_longest([learning_unit_achievements_fr], [learning_unit_achievements_en]))
         )
+        self.assertIn('luy_in_current_or_future_anac', response.context)
+        self.assertIn('can_edit_information', response.context)
+        self.assertIn('can_edit_force_majeur_section', response.context)
+        self.assertIn('enable_publish_button', response.context)
 
     def test_learning_unit_specifications_edit(self):
         a_label = 'label'
