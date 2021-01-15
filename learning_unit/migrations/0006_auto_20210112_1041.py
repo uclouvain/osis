@@ -27,7 +27,7 @@ def create_learning_unit_academic_calendar(apps, shema_editor):
     now = timezone.now()
     current_academic_year = AcademicYear.objects.filter(start_date__lte=now, end_date__gte=now).last()
     if current_academic_year:
-        qs = AcademicYear.objects.filter(year__gte=2015, year__lte=current_academic_year.year + 6)
+        qs = AcademicYear.objects.filter(year__gte=2021, year__lte=current_academic_year.year + 6)
         for ac_year in qs:
             _create_learning_unit_summary_edition_calendar(AcademicCalendar, ac_year)
             _create_learning_unit_force_majeur_summary_edition_calendar(AcademicCalendar, ac_year)
